@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 
 Item {
     id: productsCollectionViewContainer;
@@ -36,7 +37,7 @@ Item {
         }
         else if (parameters["status"] === "yes") {
 
-            if (featureCollectionView.model.ContainsKey("data")) {
+            if (productCollectionView.model.ContainsKey("data")) {
                 var dataModelLocal = productCollectionView.model.GetData("data");
                 dataModelLocal.RemoveItem(productCollectionView.table.selectedIndex);
 
@@ -47,21 +48,23 @@ Item {
         }
     }
 
+    function createLicense(id, name) {
+        var dataModelLocal = model.GetData("data");
+        var index = dataModelLocal.InsertNewItem();
+
+        dataModelLocal.SetData("Name", name, index);
+        dataModelLocal.SetData("Id", id, index);
+
+        model.SetData("data", dataModelLocal);
+        model.Refresh();
+        productCollectionView.refresh();
+    }
+
     function menuActivated(menuId) {
 
         console.log("ProductView menuActivated", menuId);
         if (menuId  === "New"){
-            var countItems = model.GetData("data").GetItemsCount();
-            var dataModelLocal = model.GetData("data");
-            var index = dataModelLocal.InsertNewItem();
-
-            dataModelLocal.SetData("Name", "Product Name", index);//
-            dataModelLocal.SetData("Id", "", index);//
-
-            model.SetData("data", dataModelLocal);
-            model.Refresh();
-            productCollectionView.refresh();
-
+            productsCollectionViewContainer.createLicense("", "License Name");
         }
         else if (menuId  === "Save") {
             if (productCollectionView.itemId === "") {
@@ -83,9 +86,15 @@ Item {
             parameters["resultItem"] = productsCollectionViewContainer;
             thubnailDecoratorContainer.openDialog(source, parameters);
         }else if (menuId  === "Close") {
-             productsCollectionViewContainer.rootItem.closeTab();
+            productsCollectionViewContainer.rootItem.closeTab();
+        } else if (menuId  === "Duplicate") {
+            var dataModelLocal = model.GetData("data");
+            var duplicateName = "Copy of " + dataModelLocal.GetData("Name", productCollectionView.selectedIndex);
+            var duplicateId = dataModelLocal.GetData("Id", productCollectionView.selectedIndex);
+            productsCollectionViewContainer.createLicense(duplicateId, duplicateName);
+
         } else {
-             productCollectionView.menuActivated(menuId)
+            productCollectionView.menuActivated(menuId)
         }
     }
 
@@ -194,7 +203,7 @@ Item {
 
             productModel.SetData("Id", productsCollectionViewContainer.itemId)
             productModel.SetData("Name", productsCollectionViewContainer.itemName)
-            productModel.SetExternTreeModel("features", productCollectionView.model.GetData("data"));
+            productModel.SetExternTreeModel("licenses", productCollectionView.model.GetData("data"));
 
             //featureCollectionViewContainer.model.SetIsArray(false);
             var jsonString = productModel.toJSON();
@@ -241,7 +250,144 @@ Item {
         id: productMetaInfo;
         anchors.right: parent.right;
         height: parent.height;
-        width: 150;
-        color: "transparent";
+        width: 200;
+//        color: "transparent";
+        color: Style.backgroundColor;
+
+        Rectangle {
+            id: leftBorder;
+
+            anchors.right: productMetaInfo.left;
+            anchors.top: productMetaInfo.top;
+
+            height: productMetaInfo.height;
+            width: 3;
+
+            color: Style.backgroundColor;
+        }
+
+
+        Rectangle {
+            id: productIdTextRect;
+
+            anchors.left: parent.left;
+            anchors.top: parent.top;
+
+            width: parent.width;
+            height: 20;
+
+            color: Style.backgroundColor;
+
+            Text {
+               id: productIdText;
+
+               anchors.left: parent.left;
+               anchors.verticalCenter: parent.verticalCenter;
+
+               color: Style.textColor;
+               font.pixelSize: Style.fontSize_common;
+               font.family: Style.fontFamily;
+
+               text: "Product-ID";
+            }
+        }
+
+        TextFieldCustom {
+            id: tfcProductId;
+
+            anchors.top: productIdTextRect.bottom;
+
+            width: parent.width - 3;
+            height: 30;
+
+            text: productsCollectionViewContainer.itemId;
+//            borderColor: "gray";
+        }
+
+
+        Rectangle {
+            id: productNameTextRect;
+            anchors.top: tfcProductId.bottom;
+
+            width: parent.width;
+            height: 20;
+
+            color: Style.backgroundColor;
+
+            Text {
+               id: productNameText;
+
+               anchors.left: parent.left;
+               anchors.verticalCenter: parent.verticalCenter;
+
+               color: Style.textColor;
+               font.pixelSize: Style.fontSize_common;
+               font.family: Style.fontFamily;
+
+               text: "Product Name";
+            }
+        }
+
+        TextFieldCustom {
+            id: tfcProductName;
+            anchors.top: productNameTextRect.bottom;
+            width: parent.width - 3;
+            height: 30;
+
+            text: productsCollectionViewContainer.itemId;
+        }
+
+        Rectangle {
+            id: headerTreeView;
+            anchors.top: tfcProductName.bottom;
+            anchors.topMargin: 5;
+//            anchors.horizontalCenter: parent.horizontalCenter;
+            width: parent.width - 5;
+
+            height: 35;
+
+            Text {
+                id: titleHeader;
+
+                anchors.verticalCenter: headerTreeView.verticalCenter;
+
+                anchors.left: headerTreeView.left;
+                anchors.leftMargin: 5;
+
+                text: "Features";
+                font.family: Style.fontFamilyBold;
+                color: Style.textColor;
+                font.pixelSize: Style.fontSize_small;
+                font.bold: true;
+            }
+        }
+
+        Rectangle {
+            id: headerBottomBorder;
+
+            anchors.bottom: headerTreeView.bottom;
+
+            height: 1;
+            width: parent.width;
+            color: "lightgray";
+        }
+
+        TreeView {
+            id: treeView;
+            anchors.top: headerBottomBorder.bottom;
+            anchors.left: parent.left;
+//            anchors.leftMargin: 5;
+            anchors.right: parent.right;
+            anchors.rightMargin: 5;
+
+            anchors.bottom: parent.bottom;
+//            width: 200;
+//            height: 500;
+            modelItems: featuresTreeView.model;
+        }
+
+        FeaturesTreeView {
+            id: featuresTreeView;
+        }
     }
 }

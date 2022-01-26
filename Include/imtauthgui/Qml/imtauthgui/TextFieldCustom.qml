@@ -17,13 +17,15 @@ Item {
     property bool canReduce: false;
     property bool reduced: false;
 
+    property color borderColor: "transparent";
+
     signal focusChanged();
 
     Rectangle {
         id: mainRect;
         anchors.fill: parent;
         color: Style.baseColor;
-        border.color: textField.focus ? "#00BFFF" : "transparent";
+        border.color: textField.focus ? "#00BFFF" : Style.hover;
         border.width: 1;
     }
 
@@ -66,7 +68,6 @@ Item {
             container.accepted();
             container.isTextChanged = false;
         }
-
     }
 
     Text {
@@ -76,15 +77,15 @@ Item {
         anchors.bottom: parent.bottom;
     }
 
-    Rectangle{
-        id:bottomBlue;
-        anchors.horizontalCenter: parent.horizontalCenter;
-        anchors.bottom: parent.bottom;
-        height: 3;
-        Behavior on width {
-            NumberAnimation { duration: container.animDuration;}
-        }
-        color: container.focusColor;
-    }
+//    Rectangle{
+//        id:bottomBlue;
+//        anchors.horizontalCenter: parent.horizontalCenter;
+//        anchors.bottom: parent.bottom;
+//        height: 3;
+//        Behavior on width {
+//            NumberAnimation { duration: container.animDuration;}
+//        }
+//        color: container.focusColor;
+//    }
 
 }

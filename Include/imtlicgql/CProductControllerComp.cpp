@@ -82,30 +82,66 @@ istd::IChangeable* CProductControllerComp::CreateObject(const QList<imtgql::CGql
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 
-		istd::TDelPtr<imtlic::CLicenseInstance> licenseInstancePtr = new imtlic::CLicenseInstance;
-		imtbase::IObjectCollection* licenseCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(licenseInstancePtr.GetPtr());
+		if (!m_productFactCompPtr.IsValid()){
+			return nullptr;
+		}
+
+		istd::TDelPtr<imtlic::IProductLicensingInfo> productPtr = m_productFactCompPtr.CreateInstance();
+
+		if (!productPtr.IsValid()){
+			return nullptr;
+		}
+
+		imtbase::IObjectCollection* licenseCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(productPtr.GetPtr());
+
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
-		objectId = itemModel.GetData("Id").toByteArray();
-		name = itemModel.GetData("Name").toString();
+		if (itemModel.ContainsKey("Id")){
+			objectId = itemModel.GetData("Id").toByteArray();
+			productPtr->SetProductId(objectId);
+		}
 
-		licenseInstancePtr->SetLicenseId(objectId);
+		if (itemModel.ContainsKey("Name")){
+			name = itemModel.GetData("Name").toString();
+			productPtr->SetName(name);
+		}
 
-		imtbase::CTreeItemModel *licenses = itemModel.GetTreeItemModel("licenses");
+		imtbase::CTreeItemModel *licenses = nullptr;
+		licenses = itemModel.GetTreeItemModel("licenses");
+
+//		if (itemModel.ContainsKey("licenses")){
+//			licenses = itemModel.GetTreeItemModel("licenses");
+//			return nullptr;
+//		}
 
 		for (int i = 0; i < licenses->GetItemsCount(); i++){
-			QByteArray licenseId = licenses->GetData("Id", i).toByteArray();
-			QString licenseName = licenses->GetData("Name", i).toString();
-			QString licenseDescription = licenses->GetData("Description", i).toString();
+			QByteArray licenseId;
+			QString licenseDescription, licenseName;
+
+			if (licenses->ContainsKey("Id")){
+				licenseId = licenses->GetData("Id", i).toByteArray();
+			}
+
+			if (licenses->ContainsKey("Name")){
+				licenseName = licenses->GetData("Name", i).toString();
+			}
+
+			if (licenses->ContainsKey("Description")){
+				licenseDescription = licenses->GetData("Description", i).toString();
+			}
 
 			istd::TDelPtr<imtlic::CLicenseInfo> licenseInfoPtr = new imtlic::CLicenseInfo;
 			licenseInfoPtr->SetLicenseId(licenseId);
 			licenseInfoPtr->SetLicenseName(licenseName);
-			licenseCollectionPtr->InsertNewObject("ProductInfo", licenseName, licenseDescription, licenseInfoPtr.GetPtr());
+
+			imtlic::ILicenseInfo::FeatureInfos featureInfos;
+			licenseInfoPtr->SetFeatureInfos(featureInfos);
+
+			licenseCollectionPtr->InsertNewObject(imtlic::CLicenseInfo::GetTypeId(), licenseName, licenseDescription, licenseInfoPtr.GetPtr(), licenseId);
 		}
 
-		return licenseInstancePtr.PopPtr();
+		return productPtr.PopPtr();
 	}
 	return nullptr;
 }

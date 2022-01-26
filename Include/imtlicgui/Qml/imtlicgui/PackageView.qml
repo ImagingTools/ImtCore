@@ -267,25 +267,6 @@ Item {
             width: 3;
 
             color: Style.backgroundColor;
-
-//            MouseArea {
-
-//                anchors.fill: parent;
-
-//                onPressed: {
-//                        pressX = mouse.x
-//                        pressY = mouse.y
-//                        console.log("Pressed Co-ordinates",pressX,pressY);
-//                }
-
-//                onReleased: {
-//                    releaseX = mouse.x
-//                    console.log("Released Co-ordinates",releaseX,releaseY);
-//                    widthRect = releaseX - pressX
-//                    heightRect = releaseY - pressY
-//                    console.log("Released Co-ordinates",releaseX,releaseY);
-//                }
-//            }
         }
 
         Rectangle {

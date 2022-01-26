@@ -142,7 +142,7 @@ Rectangle
 
         onModelChanged: {
             console.log("ThumbnailDecorator ListView onModelChanged!");
-            loaderDialog.source = model.source;
+//            loaderDialog.source = model.source;
         }
 
         delegate: Item {

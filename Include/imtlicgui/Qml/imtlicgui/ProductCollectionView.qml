@@ -16,7 +16,28 @@ Item {
     }
 
     function menuActivated(menuId) {
-        productCollectionView.menuActivated(menuId)
+        console.log("ProductCollectionView menuActivated", menuId);
+        if (menuId === "Duplicate") {
+            var count = productCollectionView.model.GetItemsCount();
+            console.log("Count =", count);
+            var dataModelLocal = productCollectionView.model.GetData("data");
+            var index = dataModelLocal.InsertNewItem();
+
+            var currentName = dataModelLocal.GetData("Name", productCollectionView.selectedIndex);
+            var currentId = dataModelLocal.GetData("Id", productCollectionView.selectedIndex);
+
+            var duplicateName = "Copy of " + currentName;
+
+            dataModelLocal.SetData("Name", duplicateName, index);
+            dataModelLocal.SetData("Id", currentId, index);
+
+            model.SetData("data", dataModelLocal);
+            model.Refresh();
+            productCollectionView.refresh();
+
+        } else {
+            productCollectionView.menuActivated(menuId)
+        }
     }
 
     function commandsChanged(commandsId) {

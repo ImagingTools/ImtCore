@@ -28,14 +28,6 @@ Rectangle {
 
         if (parameters["status"] === "yes") {
 
-//            if (model.ContainsKey("data")) {
-//                var dataModelLocal = model.GetData("data");
-//                dataModelLocal.RemoveItem(tableInternal.selectedIndex);
-
-//                model.SetData("data", dataModelLocal);
-//                model.Refresh();
-//            }
-
             if (gqlModelRemove !== "") {
                 collectionViewContainer.removeSelectedItem();
             }
@@ -71,8 +63,6 @@ Rectangle {
             if (collectionViewContainer.autoRefresh) {
                 itemsModel.updateModel();
             }
-
-            //console.log("collectionViewContainer data count",dataModelLocal.GetItemsCount())
         }
         else if(!isHeaderUpdated){
             console.log("CollectionView refresh data not contains")
@@ -109,9 +99,6 @@ Rectangle {
                 parameters["resultItem"] = collectionViewContainer;
 
                 thubnailDecoratorContainer.openDialog(source, parameters);
-//                collectionViewContainer.removeSelectedItem();
-//                collectionViewContainer.itemId = tableInternal.getSelectedId();
-//                removeModel.updateModel();
             }
         }
     }
@@ -218,8 +205,10 @@ Rectangle {
 
                         if (!collectionViewContainer.autoRefresh) {
                             console.log("CollectionView itemsModel onStateChanged update data");
-                            collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements)
+                            collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
                         }
+
+//                        collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
 
                     }
                     else if(itemsModel.ContainsKey("errors")){
