@@ -528,6 +528,12 @@ exports.getElement = function(ctx, tag) {
 }
 
 exports.init = function(ctx) {
+	document.body.onresize = ()=>{
+		if(ctx._timerResize) clearTimeout(ctx._timerResize)
+		ctx._timerResize = setTimeout(()=>{
+			ctx._processActions()
+		}, 100)
+	}
 	imageCache = new _globals.html5.cache.Cache(loadImage)
 
 	ctx._styleCache = new StyleCache()
@@ -663,7 +669,9 @@ history.replaceState = ( f => function replaceState(){
 
 window.addEventListener('popstate',()=>{
     window.dispatchEvent(new Event('locationchange'))
+	
 });
+
 
 exports.initRectangle = function(rect) {
 }

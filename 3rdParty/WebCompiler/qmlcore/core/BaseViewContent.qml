@@ -38,7 +38,9 @@ Item {
 		} else {
 			this.parent.element.dom.scrollTop = 0
 		}
-		this.parent._context._processActions()
+
+		this.parent._context.backend.tick(this.parent._context)
+		//this.parent._context._processActions()
 	}
 	///@private silently updates scroll positions, because browser animates scroll
 	function _updateScrollPositions(x, y, layout) {

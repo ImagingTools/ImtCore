@@ -111,7 +111,9 @@ Item {
 
 		var invoker = this._asyncInvoker
 
-		while (this._delayedActions.length || this._completedObjects.length) {
+		let count = 0
+
+		while (count < 3 && (this._delayedActions.length || this._completedObjects.length)) {
 			var actions = this._delayedActions
 			this._delayedActions = []
 			for(var i = 0, n = actions.length; i < n; ++i)
@@ -124,10 +126,13 @@ Item {
 				try { object.__complete() }
 				catch(ex) { log('onCompleted failed', ex, ex.stack)}
 			}
+			count++
 		}
 
 		this._processingActions = false
 		this.backend.tick(this)
+
+
 	}
 
 	///@private

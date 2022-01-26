@@ -3,6 +3,9 @@ BaseLayout {
 	signal layoutFinished;
 	signal scrollEvent;
 	signal modelUpdated;
+	signal flickStarted;
+	signal flickEnded;
+
 	property Item highlight;		///< an object that follows currentIndex and placed below other elements
 	property Object model;			///< model object to attach to
 	property Item delegate;			///< delegate - template object, filled with model row
@@ -10,6 +13,7 @@ BaseLayout {
 	property int contentY: -content.y;			///< y offset to visible part of the content surface
 	property int scrollingStep: 0;	///< scrolling step
 	property int animationDuration: 0;
+	property int webScroll: -1; 
 	property string animationEasing: "ease";
 	property bool contentFollowsCurrentItem: !nativeScrolling;	///< auto-scroll content to current focused item
 	property bool nativeScrolling: context.system.device === context.system.Mobile; ///< allows native scrolling on mobile targets and shows native scrollbars
@@ -39,6 +43,10 @@ BaseLayout {
 		}
 	}
 
+	onWebScrollChanged: {
+		
+	}
+
 	property ContentMargin contentMargin: ContentMargin { }
 
 	onContentXChanged: {
@@ -46,12 +54,32 @@ BaseLayout {
 		// 	this.element.setScrollX(value)
 		// else
 			this.content.x = -value
+
+			if(!this._flickTimer) {
+				this.flickStarted()
+			}
+			clearTimeout(this._flickTimer)
+			
+			this._flickTimer = setTimeout(()=>{
+				this.flickEnded()
+				this._flickTimer = null
+			}, 100)
 	}
 	onContentYChanged: {
 		// if (this.nativeScrolling)
 		// 	this.element.setScrollY(value)
 		// else
 			this.content.y = -value
+
+			if(!this._flickTimer) {
+				this.flickStarted()
+			}
+			clearTimeout(this._flickTimer)
+
+			this._flickTimer = setTimeout(()=>{
+				this.flickEnded()
+				this._flickTimer = null
+			}, 100)
 	}
 
 	/// @private
@@ -67,6 +95,7 @@ BaseLayout {
 		this._modelRowsRemoved =  this._onRowsRemoved.bind(this)
 
 		this.nativeScrolling = true
+		this._flickTimer = null
 	}
 
 	/// returns index of item by x,y coordinates
@@ -435,6 +464,7 @@ BaseLayout {
 
 		this.element.dom.addEventListener("wheel", (e) => {
 			if(this.interactive && this.enabled){
+				//console.log('wheel')
 				e.preventDefault()
 				switch(this.flickableDirection){
 					case BaseView.AutoFlickDirection:
@@ -551,6 +581,8 @@ BaseLayout {
 
 		this.style({
 			'overflow': 'scroll',
+			'pointer-events': 'auto',
+			'touch-action': 'auto',
 		})
 
 	}

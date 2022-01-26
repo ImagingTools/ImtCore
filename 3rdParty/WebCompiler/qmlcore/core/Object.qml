@@ -29,6 +29,8 @@ EventEmitter {
 		if(source.indexOf('src') < 0) {
 			if(source[0] === '/') source = 'src' + source; else source = 'src/' + source;
 		}
+		let sourceSplit = source.split('/')
+		let qmlName = sourceSplit[sourceSplit.length-1]
         var path = source.replace('.qml', '').split('/')
 		
         var ctor = _globals
@@ -47,7 +49,7 @@ EventEmitter {
         }*/
 
 		var item = new ctor(parent)
-
+		item._qmlName = qmlName
 		$core.core.createObject(item)
         return item
     }
