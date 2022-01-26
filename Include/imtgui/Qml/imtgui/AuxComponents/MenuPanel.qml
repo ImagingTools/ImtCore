@@ -52,6 +52,15 @@ Rectangle {
 
     }
 
+    Timer {
+        id: pageIndexTimer;
+        property int pageIndex: -1;
+        interval: 10;
+        onTriggered: {
+            menuPanel.activePageIndex  = pageIndexTimer.pageIndex;
+        }
+    }
+
 
     GqlModel {
         id: pagesModel;
@@ -83,8 +92,11 @@ Rectangle {
                         menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
-                        menuPanel.activePageIndex = 0;
 
+                        pageIndexTimer.pageIndex = 0;
+                        pageIndexTimer.start();
+
+//                        menuPanel.activePageIndex = 0;
                         console.log("PageModel pagesData end!");
                     }
                     else if(this.ContainsKey("errors")){

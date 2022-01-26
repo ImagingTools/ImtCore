@@ -167,6 +167,15 @@ Rectangle {
         }
     }
 
+    Timer {
+        id: elementsTimer;
+        property var model;
+        interval: 10;
+        onTriggered: {
+            tableInternal.elements = elementsTimer.model;
+        }
+    }
+
     GqlModel {
         id: itemsModel;
 
@@ -202,6 +211,8 @@ Rectangle {
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         tableInternal.elements = dataModelLocal.GetData("items");
+//                        elementsTimer.model = dataModelLocal.GetData("items");
+//                        elementsTimer.start();
 
                         if (!collectionViewContainer.autoRefresh) {
                             console.log("CollectionView itemsModel onStateChanged update data");

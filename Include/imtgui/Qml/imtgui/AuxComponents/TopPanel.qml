@@ -16,16 +16,21 @@ Rectangle {
 
     function setModeMenuButton(commandId, mode) {
         console.log("TopPanel setModeMenuButton!", commandId, mode);
-        var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-        //console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
-        for (var i = 0; i < buttonsModelLocal.GetItemsCount(); i++) {
-            var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
-            //lvButtons.model.Refresh()
-            if (id === commandId) {
-                 buttonsModelLocal.SetData("Mode", mode, i);
-                 break;
+        if (buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
+            var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
+            //console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
+            var itemsCount = buttonsModelLocal.GetItemsCount();
+            console.log("TopPanel setModeMenuButton itemsCount", itemsCount);
+            for (var i = 0; i < itemsCount; i++) {
+                var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
+                //lvButtons.model.Refresh()
+                if (id === commandId) {
+                     buttonsModelLocal.SetData("Mode", mode, i);
+                     break;
+                }
             }
         }
+
     }
 
     function dialogResult(parameters) {
@@ -113,6 +118,7 @@ Rectangle {
             orientation: ListView.Horizontal;
             boundsBehavior: Flickable.StopAtBounds;
             delegate: TopButton {
+                id: topButtonDelegate;
                 text: model[CommandEnum.NAME];
                 isEmpty: model[CommandEnum.NAME] === "";
                 imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "Off" + "_" + model["Mode"] + ".svg";
@@ -121,16 +127,16 @@ Rectangle {
                 visible: x + width <= lvButtons.width;
 
                 onVisibleChanged: {
-                    console.log("TopPanel onVisibleChanged",text, visible);
-                    if (!visible && lvButtons.width !== 0) {
+                    console.log("TopPanel onVisibleChanged",topButtonDelegate.text, topButtonDelegate.visible);
+                    if (!topButtonDelegate.visible && lvButtons.width !== 0) {
                         for (var i = 0; i < modelButtons.count; i++) {
                             if (modelButtons.get(i).id !== "" && modelButtons.get(i).id === model[CommandEnum.ID]) {
                                return;
                             }
                         }
                         console.log("ModelButtons added id ", model[CommandEnum.ID]);
-                        modelButtons.append({"id": model[CommandEnum.ID], "imageSource": imageSource, "name": text, "mode": model["Mode"]});
-                    } else if (visible && lvButtons.width !== 0) {
+                        modelButtons.append({"id": model[CommandEnum.ID], "imageSource": topButtonDelegate.imageSource, "name": topButtonDelegate.text, "mode": model["Mode"]});
+                    } else if (topButtonDelegate.visible && lvButtons.width !== 0) {
                         var j;
                         for (var i = 0; i < modelButtons.count; i++) {
                             if (modelButtons.get(i).id === model[CommandEnum.ID]) {
@@ -212,6 +218,7 @@ Rectangle {
 
         function updateModel() {
 
+            console.log("commandsModel topPanel.activeCommandsModelId", topPanel.activeCommandsModelId);
             var query = Gql.GqlRequest("query", "CommandsData");
 
             var inputParams = Gql.GqlObject("input");

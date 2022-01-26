@@ -26,12 +26,12 @@ Rectangle {
     }
 
     function updateCommandId(){
-        console.log("MultidocWorkspaceView updateCommandId")
-        var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
-        var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
-
-        //pagesDeleg.changeCommandsId(commandsId);
-        multiDocView.rootItem.changeCommandsId(commandsId);
+        console.log("MultidocWorkspaceView updateCommandId", tabPanelInternal.selectedIndex, multiDocView, packagesMultiDocView)
+        if (tabPanelInternal.selectedIndex > -1 && multiDocView.rootItem){
+            var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
+            var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
+            multiDocView.rootItem.changeCommandsId(commandsId);
+        }
     }
 
     function commandsChanged(commandsId){
@@ -173,8 +173,9 @@ Rectangle {
                     loader.source = model.Source
                 }
                 onItemChanged: {
-                    console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)
+                    console.log("MultidocWorkspaceView Loader onItemChanged", loader.source, docsDataDeleg)
                     if (loader.item && loader.source != ""){
+                        loader.item.rootItem = docsDataDeleg;
                         loader.item.itemId = model.ItemId
                         var dataModelLocal
                         if (pages.ContainsKey("DocsData",model.index)){

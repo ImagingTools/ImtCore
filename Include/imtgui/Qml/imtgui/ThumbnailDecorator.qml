@@ -24,6 +24,7 @@ Rectangle
     function openDialog(source, parameters) {
         console.log("ThumbnailDecorator openDialog", source, parameters);
         modelLayers.append({"source": source, "parameters": parameters});
+        console.log("ThumbnailDecorator listViewDialogs.count", listViewDialogs.count);
         return modelLayers.count - 1;
     }
 
@@ -74,6 +75,9 @@ Rectangle
                 thubnailDecoratorContainer.activeItem.updateCommandId();
             }
         }
+        onActivePageIndexChanged: {
+            console.log("ThumbnailDecorator MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
+        }
     }
 
     Repeater {
@@ -91,10 +95,11 @@ Rectangle
             visible: menuPanel.activePageIndex === model.index;
 
             onVisibleChanged: {
-                console.log("ThumbnailDecorator Repeater onVisibleChanged", loader.item, menuPanel.activePageIndex, model.index)
+                console.log("ThumbnailDecorator Repeater onVisibleChanged", pagesLoader.item, menuPanel.activePageIndex, model.index)
                 if(pagesDeleg.visible){
-                    thubnailDecoratorContainer.activeItem = loader.item;
-                    loader.item.visible = pagesDeleg.visible;
+                    console.log("ThumbnailDecorator Repeater onVisibleChanged visible", pagesDeleg.visible)
+                    thubnailDecoratorContainer.activeItem = pagesLoader.item;
+                    pagesLoader.item.visible = pagesDeleg.visible;
                 }
             }
 
@@ -109,47 +114,52 @@ Rectangle
             }
 
             Loader {
-                id: loader;
+                id: pagesLoader;
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-//                    loader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
+//                    pagesLoader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
                     var source = menuPanel.model.GetData(PageEnum.SOURCE, model.index);
                     console.log("PageEnum.SOURCE ", source, PageEnum.SOURCE, model.index);
-                    loader.source = source;
-                    console.log("ThumbnailDecorator loader.source", loader.source);
+                    pagesLoader.source = source;
+//                    console.log("ThumbnailDecorator pagesLoader.source", pagesLoader.source);
                 }
 
                 onItemChanged: {
-                    console.log("ThumbnailDecorator Repeater Loader onItemChanged", loader.item)
-                    if (loader.item){
-                        loader.item.rootItem = pagesDeleg;
-                        loader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
+                    console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
+                    if (pagesLoader.item){
+                        pagesLoader.item.rootItem = pagesDeleg;
+                        console.log("ThumbnailDecorator pagesLoader.item.rootItem", pagesLoader.item.rootItem)
+                        pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
                     }
                 }
             }
         }
     }
 
-    Loader {
-        id: dialogLoader;
-    }
+//    Loader {
+//        id: dialogLoader;
+//    }
 
     ListView {
         id: listViewDialogs;
-
+        anchors.fill: parent;
         model: modelLayers;
+        visible: modelLayers.count > 0;
+        z: 10;
+
 
         onModelChanged: {
             console.log("ThumbnailDecorator ListView onModelChanged!");
 //            loaderDialog.source = model.source;
         }
 
-        delegate: Item {
+        delegate: Rectangle {
             id: delegateListViewDialogs;
             //anchors.fill:thubnailDecoratorContainer;
             width: thubnailDecoratorContainer.width;
             height: thubnailDecoratorContainer.height;
+            color: "transparent";
 
             Rectangle {
                 id: darkBackground;

@@ -3,7 +3,7 @@ import Acf 1.0
 import imtqml 1.0
 
 Rectangle {
-    id: container;
+    id: preferenceContainer;
 
     width: 450;
     height: 450;
@@ -18,7 +18,7 @@ Rectangle {
     property bool centered: true;
 
     Component.onCompleted: {
-        container.changeThemeIcons("Light");
+//        preferenceContainer.changeThemeIcons("Light");
     }
 
     function changeThemeIcons(theme)
@@ -52,8 +52,8 @@ Rectangle {
     Rectangle {
         id: body;
         anchors.fill: parent;
-       anchors.horizontalCenter: parent.horizontalCenter;
-       anchors.verticalCenter: parent.verticalCenter;
+//       anchors.horizontalCenter: parent.horizontalCenter;
+//       anchors.verticalCenter: parent.verticalCenter;
        clip: true;
        color: Style.baseColor;
        anchors.margins: 10;
@@ -97,7 +97,7 @@ Rectangle {
                   anchors.fill: parent;
                   onClicked: {
                       cbLang.menuVisible = false;
-//                      container.visible = false;
+//                      preferenceContainer.visible = false;
                       loaderDialog.closeItem();
                   }
               }
@@ -219,7 +219,7 @@ Rectangle {
                anchors.topMargin: 10;
                color: "black";
                radius: radiusValue;
-               border.color: container.styleColor == "Dark"? "#1560BD" : "transparent";
+               border.color: preferenceContainer.styleColor == "Dark"? "#1560BD" : "transparent";
                border.width: 2;
 
                Text {
@@ -235,11 +235,11 @@ Rectangle {
                MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        container.styleColor = "Dark";
+                        preferenceContainer.styleColor = "Dark";
 
                         Style.camera = "../Icons/Dark/Camera.svg";
                         stylesModel.getStyle("Dark");
-                        container.changeThemeIcons("Dark");
+//                        preferenceContainer.changeThemeIcons("Dark");
                         Style.theme = "Dark";
                     }
                }
@@ -256,7 +256,7 @@ Rectangle {
                anchors.topMargin: 10;
                anchors.leftMargin: 20;
                color: "white";
-               border.color: container.styleColor == "Light"? "#1560BD" : "black";
+               border.color: preferenceContainer.styleColor == "Light"? "#1560BD" : "black";
                border.width: 2;
                radius: radiusValue;
 
@@ -274,8 +274,8 @@ Rectangle {
                     anchors.fill: parent;
                     onClicked: {
                         stylesModel.getStyle("Light");
-                        container.changeThemeIcons("Light");
-                        container.styleColor = "Light";
+//                        preferenceContainer.changeThemeIcons("Light");
+                        preferenceContainer.styleColor = "Light";
                         Style.theme = "Light";
 
                     }
@@ -290,26 +290,26 @@ Rectangle {
     }
 
     function parseStyleTheme(themeType) {
-        Style.baseColor = container.getThemeColor("ActiveColors", "Base", themeType);
-        Style.alternateBaseColor = container.getThemeColor("ActiveColors", "AlternateBase", themeType);
-        Style.backgroundColor = container.getThemeColor("ActiveColors", "Background", themeType);
-        Style.textColor = container.getThemeColor("ActiveColors", "Text", themeType);
-        Style.textSelected = container.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
+        Style.baseColor = preferenceContainer.getThemeColor("ActiveColors", "Base", themeType);
+        Style.alternateBaseColor = preferenceContainer.getThemeColor("ActiveColors", "AlternateBase", themeType);
+        Style.backgroundColor = preferenceContainer.getThemeColor("ActiveColors", "Background", themeType);
+        Style.textColor = preferenceContainer.getThemeColor("ActiveColors", "Text", themeType);
+        Style.textSelected = preferenceContainer.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
         console.log("Style.textSelected ", Style.textSelected);
-        Style.selectedColor = container.getThemeColor("ActiveColors", "ItemSelected", themeType);
-        Style.buttonColor = container.getThemeColor("ActiveColors", "HeaderBorder", themeType);
-        Style.buttonBorderColor = container.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+        Style.selectedColor = preferenceContainer.getThemeColor("ActiveColors", "ItemSelected", themeType);
+        Style.buttonColor = preferenceContainer.getThemeColor("ActiveColors", "HeaderBorder", themeType);
+        Style.buttonBorderColor = preferenceContainer.getThemeColor("ActiveColors", "ButtonBorder", themeType);
 
-        Style.disabledInActiveTextColor = container.getThemeColor("DisabledInActiveColors", "Text", themeType);
+        Style.disabledInActiveTextColor = preferenceContainer.getThemeColor("DisabledInActiveColors", "Text", themeType);
 
-        Style.hover = container.getThemeColor("ActiveColors", "Hover", themeType);
+        Style.hover = preferenceContainer.getThemeColor("ActiveColors", "Hover", themeType);
 
         Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
         Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
         Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
         Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
 
-        Style.iconColorOnSelected = container.getThemeColor("IconColor", "OnSelected", themeType);
+        Style.iconColorOnSelected = preferenceContainer.getThemeColor("IconColor", "OnSelected", themeType);
 
 
     }
@@ -343,7 +343,7 @@ Rectangle {
                 }
                 if(dataModelLocal !== null && dataModelLocal.ContainsKey("source")){
                     dataModelLocal = dataModelLocal.GetData("source");
-                    container.parseStyleTheme(dataModelLocal);
+                    preferenceContainer.parseStyleTheme(dataModelLocal);
                 }
                 else if(stylesModel.ContainsKey("errors")){
                     var errorsModel = stylesModel.GetData("errors");
