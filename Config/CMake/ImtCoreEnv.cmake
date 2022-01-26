@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.1.0)
 
-set(QT_DEFAULT_MAJOR_VERSION 5)
-
 if(NOT DEFINED IACFDIR)
 	set(IACFDIR "$ENV{IACFDIR}")
 endif()
@@ -42,7 +40,7 @@ endif()
 
 include(${IACFDIR}/Config/CMake/IAcfEnv.cmake)
 
-include_directories("${IMTCOREDIR}/AuxInclude/Qt${QT_DEFAULT_MAJOR_VERSION}_${TARGETNAME}")
+include_directories("${IMTCOREDIR}/AuxInclude/Qt${QT_VERSION_MAJOR}_${TARGETNAME}")
 include_directories("${IMTCOREDIR}/Include")
 include_directories("${IMTCOREDIR}/Impl")
 

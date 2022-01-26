@@ -6,5 +6,5 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 target_link_libraries(${PROJECT_NAME} imod iser imtbase)
 
-find_package("Qt${QT_DEFAULT_MAJOR_VERSION}" COMPONENTS WebSockets REQUIRED)
-target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::WebSockets)
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS WebSockets REQUIRED)
+target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::WebSockets)

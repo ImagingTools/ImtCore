@@ -1,6 +1,6 @@
 project(ImtComPck LANGUAGES CXX)
 
-message("QT_DEFAULT_MAJOR_VERSION " ${QT_DEFAULT_MAJOR_VERSION})
+message("QT_VERSION_MAJOR " ${QT_VERSION_MAJOR})
 
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)

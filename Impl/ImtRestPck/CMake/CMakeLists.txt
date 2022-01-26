@@ -1,8 +1,8 @@
 project(ImtRestPck LANGUAGES CXX)
 
-message("QT_DEFAULT_MAJOR_VERSION " ${QT_DEFAULT_MAJOR_VERSION})
+message("QT_VERSION_MAJOR " ${QT_VERSION_MAJOR})
 
-find_package("Qt${QT_DEFAULT_MAJOR_VERSION}" COMPONENTS WebSockets REQUIRED)
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS WebSockets REQUIRED)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
@@ -10,7 +10,7 @@ include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::WebSockets)
+target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::WebSockets)
 
 target_link_libraries(${PROJECT_NAME} imtbase imtrest)
 
