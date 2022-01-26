@@ -83,11 +83,11 @@ imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateC
 	const imtlic::ILicenseInfo* licenseInfoPtr = dynamic_cast<const imtlic::ILicenseInfo*>(m_collectionPtr->GetObjectPtr(objectId));
 
 	if (licenseInfoPtr != nullptr){
-		if (informationId == QByteArray("LicenseId")){
-			result.text = licenseInfoPtr->GetLicenseId();
+		if (informationId == QByteArray("Id")){
+			result.text = licenseInfoPtr->GetLicenseId();//Изменил LicenseId на Id
 			result.sortValue = result.text;
 		}
-		else if (informationId == QByteArray("LicenseName")){
+		else if (informationId == QByteArray("Name")){
 			result.text = licenseInfoPtr->GetLicenseName();
 			result.sortValue = result.text;
 		}
@@ -136,11 +136,11 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("LicenseName", tr("License Name"), "");
-	m_summaryInformationHeaders["LicenseName"] = HeaderInfo(true);
+	m_summaryInformationTypes.InsertItem("Name", tr("License Name"), "");
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
 
-	m_summaryInformationTypes.InsertItem("LicenseId", tr("License-ID"), "");
-	m_summaryInformationHeaders["LicenseId"] = HeaderInfo(true);
+	m_summaryInformationTypes.InsertItem("Id", tr("License-ID"), "");//Изменил LicenseId на Id
+	m_summaryInformationHeaders["Id"] = HeaderInfo(true);
 
 	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");
 	m_summaryInformationHeaders["Description"] = HeaderInfo(true);

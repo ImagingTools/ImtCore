@@ -27,7 +27,7 @@ Item {
     onVisibleChanged: {
         if (accountsMultiDocViewContainer.visible && accountsMultiDocView.pagesCount === 0) {
             console.log("AccountsMultiDocView first page loaded !");
-            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
+            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtauthgui/AccountCollectionView.qml", "Accounts")
         }
     }
 

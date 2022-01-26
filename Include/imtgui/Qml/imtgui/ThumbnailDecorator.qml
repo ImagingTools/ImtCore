@@ -113,7 +113,10 @@ Rectangle
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    loader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
+//                    loader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
+                    var source = menuPanel.model.GetData(PageEnum.SOURCE, model.index);
+                    console.log("PageEnum.SOURCE ", source, PageEnum.SOURCE, model.index);
+                    loader.source = source;
                     console.log("ThumbnailDecorator loader.source", loader.source);
                 }
 

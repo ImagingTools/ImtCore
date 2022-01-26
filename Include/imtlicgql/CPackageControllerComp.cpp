@@ -167,6 +167,7 @@ bool CPackageControllerComp::GetOperationFromRequest(
 			QString& errorMessage,
 			int& operationType) const
 {
+
 	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
 	if(fieldList == nullptr){
 		return false;

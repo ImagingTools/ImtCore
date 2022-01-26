@@ -127,6 +127,7 @@ Rectangle {
         anchors.fill: parent;
 
         onSelectItem: {
+            console.log("CollectionView AuxTable onSelectItem", itemId, name);
             collectionViewContainer.selectItem(itemId, name);
         }
 

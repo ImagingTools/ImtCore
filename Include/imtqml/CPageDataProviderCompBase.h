@@ -38,6 +38,7 @@ public:
 		I_ASSIGN(m_pageDefaultStatusIcon, "PageDefaultStatusIcon", "Path of status icon used by default", false, "");
 		I_ASSIGN(m_pageOnSelectedStatusIcon, "PageOnSelectedStatusIcon", "Path of status icon used on selected", false, "");
 		I_ASSIGN(m_pageOffSelectedStatusIcon, "PageOffSelectedStatusIcon", "Path of status icon used off selected", false, "");
+		I_ASSIGN(m_pageSourceItem, "PageSourceItem", "Path of source item", false, "");
 		I_ASSIGN(m_representationCommandProviderCompPtr, "RepresentationCommandProvider", "List of page commands", false,"");
 	I_END_COMPONENT;
 
@@ -54,6 +55,7 @@ private:
 	I_ATTR(QString, m_pageDefaultStatusIcon);
 	I_ATTR(QString, m_pageOnSelectedStatusIcon);
 	I_ATTR(QString, m_pageOffSelectedStatusIcon);
+	I_ATTR(QString, m_pageSourceItem);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_representationCommandProviderCompPtr);
 
 };

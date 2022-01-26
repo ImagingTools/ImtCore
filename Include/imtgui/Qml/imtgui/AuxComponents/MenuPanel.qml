@@ -63,6 +63,7 @@ Rectangle {
             queryFields.InsertField(PageEnum.ID);
             queryFields.InsertField(PageEnum.NAME);
             queryFields.InsertField(PageEnum.ICON);
+            queryFields.InsertField(PageEnum.SOURCE);
             query.AddField(queryFields);
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData)

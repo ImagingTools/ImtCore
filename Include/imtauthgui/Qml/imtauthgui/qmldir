@@ -1,3 +1,6 @@
 module imtauthgui
 ContactInfoEditor 1.0 ContactInfoEditor.qml
 TextFieldCustom 1.0 TextFieldCustom.qml
+AccountsMultiDocView 1.0 AccountsMultiDocView.qml
+AccountCollectionView 1.0 AccountCollectionView.qml
+AccountView 1.0 AccountView.qml

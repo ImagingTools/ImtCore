@@ -42,6 +42,9 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 		if (fields[indexField] == PageEnum::ICON_OFF_SELECTED){
 			rootModel->SetData(PageEnum::ICON_OFF_SELECTED,*m_pageOffSelectedStatusIcon);
 		}
+		if (fields[indexField] == PageEnum::SOURCE){
+			rootModel->SetData(PageEnum::SOURCE,*m_pageSourceItem);
+		}
 		if (fields[indexField] == PageEnum::ENABLED){
 			rootModel->SetData(PageEnum::ENABLED,"true");
 		}

@@ -7,11 +7,22 @@ Item {
     height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
     property bool isOpened: true;
 
+    property TreeItemModel childItemModel;
+
     Component.onCompleted: {
+        console.log("TreeItemDelegate Component.onCompleted");
+        console.log("Model Name ", model.Name);
+        console.log("Model level ", model.level);
+        console.log("Model stateChecked ", model.stateChecked);
         if (model.childItemModel)
         {
+            console.log("Model childCount ", model.childItemModel.GetItemsCount());
             treeItemRepeater.model = model.childItemModel;
         }
+    }
+
+    onChildItemModelChanged: {
+        //treeItemRepeater.model = treeItemDelegate.childItemModel;
     }
 
     Rectangle {
@@ -21,6 +32,7 @@ Item {
         anchors.top: parent.top;
         anchors.right: parent.right;
         height: 30;
+//        color: "red";
 
         Image {
             id: iconArrow;

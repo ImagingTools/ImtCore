@@ -38,6 +38,10 @@ Rectangle {
 //        mainTreeView.model = treeItemModel;
     }
 
+    onModelItemsChanged: {
+        console.log("TreeView onModelItemsChanged");
+    }
+
     TreeItemModel {
         id: treeItemModel;
     }
@@ -47,6 +51,11 @@ Rectangle {
         anchors.fill: container;
         delegate: TreeItemDelegate {
             width: parent.width;
+            //childItemModel: model.childItemModel;
+        }
+
+        onModelChanged: {
+            console.log("TreeView ListView onModelChanged");
         }
     }
 }

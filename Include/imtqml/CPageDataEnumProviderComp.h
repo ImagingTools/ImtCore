@@ -19,6 +19,7 @@ class CPageDataEnumProviderComp :
 	Q_PROPERTY(QString ICON READ Icon)
 	Q_PROPERTY(QString ICON_ON_SELECTED READ IconOnSelected)
 	Q_PROPERTY(QString ICON_OFF_SELECTED READ IconOffSelected)
+	Q_PROPERTY(QString SOURCE READ Source)
 	Q_PROPERTY(QString COMMANDS READ Commands)
 	Q_PROPERTY(QString ENABLED READ Enabled)
 public:
@@ -40,6 +41,8 @@ public:
 	static constexpr const char* ICON_OFF_SELECTED = "IconOffSelected";
 	const QString IconOffSelected() { return ICON_OFF_SELECTED; }
 	static constexpr const char* COMMANDS = "Commands";
+	const QString Source() { return SOURCE; }
+	static constexpr const char* SOURCE = "Source";
 	const QString Commands() { return COMMANDS; }
 	static constexpr const char* ENABLED = "Enabled";
 	const QString Enabled() { return ENABLED; }
@@ -52,6 +55,7 @@ protected:
 		enums.insert("ICON", ICON);
 		enums.insert("ICON_ON_SELECTED", ICON_ON_SELECTED);
 		enums.insert("ICON_OFF_SELECTED", ICON_OFF_SELECTED);
+		enums.insert("SOURCE", SOURCE);
 		enums.insert("COMMANDS", COMMANDS);
 		enums.insert("ENABLED", ENABLED);
 	}

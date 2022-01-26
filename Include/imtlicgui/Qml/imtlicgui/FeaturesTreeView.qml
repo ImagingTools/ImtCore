@@ -40,13 +40,23 @@ Item {
             console.log("State:", this.state, featuresModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
-
                 if (dataModelLocal.ContainsKey("FeaturesTree")) {
                     dataModelLocal = dataModelLocal.GetData("FeaturesTree");
                     if (dataModelLocal.ContainsKey("TreeModel")) {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
-                        container.model = dataModelLocal;
 
+                        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+                            console.log("Model name ", dataModelLocal.GetData("Name", i));
+                            if (dataModelLocal.GetData("childItemModel", i)) {
+                                console.log("\tChilds: ");
+                                var childs = dataModelLocal.GetData("childItemModel", i);
+                                for (var j = 0; j < childs.GetItemsCount(); j++) {
+                                    console.log("\tModel name ", childs.GetData("Name", j));
+                                }
+                            }
+                        }
+
+                        container.model = dataModelLocal;
                         console.log("container.model ItemsCount = ", container.model.GetItemsCount());
                         console.log("dataModelLocal ItemsCount = ", dataModelLocal.GetItemsCount());
                         //console.log("ItemsCount = ", dataModelLocal.GetItemsCount());

@@ -50,6 +50,11 @@ I_EXPORT_COMPONENT(
 			"PackageController",
 			"Package Controller");
 
+I_EXPORT_COMPONENT(
+			ProductController,
+			"ProductController",
+			"Product Controller");
+
 
 } // namespace ImtLicenseGuiPck
 

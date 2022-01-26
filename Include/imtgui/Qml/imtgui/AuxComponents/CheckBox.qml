@@ -10,10 +10,10 @@ Rectangle {
 
     property int checkState: 0;
 
-    Image {
-        anchors.fill: parent;
-        visible: container.checkState === 2;
-        source: "../../../" + "Icons/" + Style.theme + "/Checkup_On_Normal.svg";
-    }
+//    Image {
+//        anchors.fill: parent;
+//        visible: container.checkState === 2;
+//        source: "../../../" + "Icons/" + Style.theme + "/Checkup_On_Normal.svg";
+//    }
 
 }

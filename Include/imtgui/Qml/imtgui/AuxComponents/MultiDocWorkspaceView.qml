@@ -56,14 +56,6 @@ Rectangle {
         if (itemId !== "" && tabIsOpened(itemId)) {
             tabPanelInternal.selectedIndex = i;
             findPage = true;
-//            for (var i = 0; i < pages.GetItemsCount(); i++) {
-//                var pageId = pages.GetData("ItemId", i);
-//                if (pageId === itemId) {
-//                    tabPanelInternal.selectedIndex = i;
-//                    findPage = true;
-//                    break;
-//                }
-//            }
         }
         if (!findPage) {
             multiDocView.activeItem = null

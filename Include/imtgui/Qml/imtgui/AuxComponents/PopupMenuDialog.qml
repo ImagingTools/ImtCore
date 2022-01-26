@@ -13,14 +13,14 @@ Rectangle {
     radius: 3;
     clip: true;
 
-    layer.enabled: true;
-    layer.effect: DropShadow {
-        transparentBorder: true;
-        horizontalOffset: 1;
-        verticalOffset: 1;
-        color: Style.textColor;
-        spread: 0.05;
-    }
+//    layer.enabled: true;
+//    layer.effect: DropShadow {
+//        transparentBorder: true;
+//        horizontalOffset: 1;
+//        verticalOffset: 1;
+//        color: Style.textColor;
+//        spread: 0.05;
+//    }
     property Item resultItem;
     property var model;
     property var backgroundOpacity;

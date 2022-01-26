@@ -38,8 +38,9 @@ Item {
     CollectionView {
         id: productCollectionView;
         anchors.fill: parent;
+        autoRefresh: true;
         Component.onCompleted: {
-            productCollectionView.gqlModelInfo = "ProductInfo"
+            productCollectionView.gqlModelInfo = "ProductCollectionInfo"
             productCollectionView.gqlModelItems = "ProductList"
             productCollectionView.gqlModelRemove = "ProductRemove"
         }
