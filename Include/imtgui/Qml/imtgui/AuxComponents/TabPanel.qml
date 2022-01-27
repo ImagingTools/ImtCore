@@ -35,18 +35,18 @@ Rectangle {
         tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1
     }
 
-    function updateTitleTab(index, title) {
-        console.log("TabPanel updateTitleTab", index, title);
-        if (index < 0 || index > list.model.count) {
-            return;
-        }
+//    function updateTitleTab(index, title) {
+//        console.log("TabPanel updateTitleTab", index, title);
+//        if (index < 0 || index > list.model.count) {
+//            return;
+//        }
 
-        tabPanelContainer.model.SetData("Title", title, index);
-        //tabPanelContainer.model.Refresh();
-//        var tab = list.model.get(index);
-//        tab.text = title;
-//        list.model.set(index, tab);
-    }
+//        tabPanelContainer.model.SetData("Title", title, index);
+//        //tabPanelContainer.model.Refresh();
+////        var tab = list.model.get(index);
+////        tab.text = title;
+////        list.model.set(index, tab);
+//    }
 
 
     function viewTabInListView(index) {

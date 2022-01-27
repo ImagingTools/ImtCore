@@ -20,6 +20,7 @@ Item {
     property color borderColor: "transparent";
 
     signal focusChanged();
+//    signal textChanged();
 
     Rectangle {
         id: mainRect;
@@ -60,6 +61,7 @@ Item {
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged");
             container.isTextChanged = true;
+            container.textChanged();
             timer.restart();
         }
 

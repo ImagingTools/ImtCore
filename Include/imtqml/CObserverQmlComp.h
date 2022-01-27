@@ -11,6 +11,8 @@
 #include <imtqml/IQuickObject.h>
 #include <imtbase/CTreeItemModel.h>
 
+#include <QTimer>
+
 
 namespace imtqml
 {
@@ -34,7 +36,6 @@ protected:
 
 private Q_SLOTS:
     void OnChangeSourceItem(QString src);
-
 
 private:
 

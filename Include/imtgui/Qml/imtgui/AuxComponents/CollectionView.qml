@@ -58,7 +58,10 @@ Rectangle {
             console.log("CollectionView refresh data items count", dataModelLocal.GetItemsCount());
 
             var selectedIndexLocal = collectionViewContainer.model.GetData("selectedIndex");
-            tableInternal.selectedIndex = selectedIndexLocal;
+
+            if (selectedIndexLocal) {
+                tableInternal.selectedIndex = selectedIndexLocal;
+            }
 
             if (collectionViewContainer.autoRefresh) {
                 itemsModel.updateModel();
@@ -71,7 +74,7 @@ Rectangle {
     }
 
     onModelChanged: {
-        console.log("CollectionView onModelChanged");
+        console.log("CollectionView onModelChanged",collectionViewContainer.itemId, collectionViewContainer.itemName);
         collectionViewContainer.refresh();
     }
 
@@ -214,12 +217,14 @@ Rectangle {
 //                        elementsTimer.model = dataModelLocal.GetData("items");
 //                        elementsTimer.start();
 
-                        if (!collectionViewContainer.autoRefresh) {
-                            console.log("CollectionView itemsModel onStateChanged update data");
-                            collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
-                        }
+//                        if (!collectionViewContainer.autoRefresh) {
+//                            console.log("CollectionView itemsModel onStateChanged update data");
+//                            collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
+//                        }
 
-//                        collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
+                        collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
+
+//                        collectionViewContainer.itemId = "";
 
                     }
                     else if(itemsModel.ContainsKey("errors")){

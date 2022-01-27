@@ -9,6 +9,7 @@ Item {
     property Item rootItem;
     property Item multiDocViewItem;
     property alias itemId: accountCollectionView.itemId;
+    property alias itemName: accountCollectionView.itemName;
     property alias model: accountCollectionView.model;
 
     function menuActivated(menuId) {
@@ -42,12 +43,13 @@ Item {
         onSelectItem: {
             console.log("Item id = ", itemId);
             console.log("Name = ", name);
-
+            var typeOperation = "Open";
             if (itemId === "") {
                 name = "New Account";
+                typeOperation = "New";
             }
 
-            accountCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit");
+            accountCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit", typeOperation);
 //            multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
         }
 

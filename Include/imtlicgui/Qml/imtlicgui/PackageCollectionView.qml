@@ -51,13 +51,14 @@ Item {
             console.log("packageCollectionView onSelectItem", packageCollectionView.selectedIndex);
             console.log("Item id = ", itemId);
             console.log("Name = ", name);
-
+            var typeOperation = "Open";
             if (itemId === "") {
                 name = "New Package";
+                typeOperation = "New";
             }
 
             //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
-            packageCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
+            packageCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 
         onSelectedIndexChanged: {

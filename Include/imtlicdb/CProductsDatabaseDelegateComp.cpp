@@ -122,9 +122,9 @@ QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 	}
 
 	const imtbase::IObjectCollection* packagesCollectionPtr = productPtr->GetFeaturePackages();
-	if (packagesCollectionPtr == nullptr){
-		return QByteArray();
-	}
+//	if (packagesCollectionPtr == nullptr){
+//		return QByteArray();
+//	}
 
 	QByteArray productId = productPtr->GetProductId();
 	if (productId.isEmpty()){

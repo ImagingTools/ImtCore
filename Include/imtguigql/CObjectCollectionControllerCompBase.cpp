@@ -11,6 +11,13 @@
 namespace imtguigql
 {
 
+// reimplemented (icomp::CComponentBase)
+void CObjectCollectionControllerCompBase::OnComponentCreated()
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		qDebug() << "Invalid object collection component";
+	}
+}
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
@@ -443,6 +450,7 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QList
 {
 	return nullptr;
 }
+
 
 
 } // namespace imtgql

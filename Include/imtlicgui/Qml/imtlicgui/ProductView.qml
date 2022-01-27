@@ -14,6 +14,12 @@ Item {
 
     property alias model: productCollectionView.model;
 
+    property string typeOperation: multiDocViewItem.typeOperation;
+
+    Component.onCompleted: {
+        console.log("ProductView Component.onCompleted", productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
+    }
+
     function dialogResult(parameters) {
          console.log("ProductView dialogResult", parameters["status"]);
 
@@ -176,30 +182,40 @@ Item {
     GqlModel {
         id: saveModel;
 
-        function updateModel(newId) {
-            console.log( "updateModel saveModel");
+        function updateModel() {
+            console.log( "updateModel saveModel", productsCollectionViewContainer.typeOperation);
 
             var query;
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            if(productsCollectionViewContainer.itemId != ""){
+            if (productsCollectionViewContainer.typeOperation == "Open") {
                 query = Gql.GqlRequest("query", "ProductUpdate");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", productsCollectionViewContainer.itemId);
                 queryFields = Gql.GqlObject("updatedNotification");
-            }
-            else{
+            } else {
                 query = Gql.GqlRequest("query", "ProductAdd");
                 queryFields = Gql.GqlObject("addedNotification");
             }
+
+//            if(productsCollectionViewContainer.itemId != "" && productsCollectionViewContainer.typeOperation != "Copy"){
+//                query = Gql.GqlRequest("query", "ProductUpdate");
+//                inputParams.InsertField("Id");
+//                inputParams.InsertFieldArgument("Id", productsCollectionViewContainer.itemId);
+//                queryFields = Gql.GqlObject("updatedNotification");
+//            }
+//            else{
+//                query = Gql.GqlRequest("query", "ProductAdd");
+//                queryFields = Gql.GqlObject("addedNotification");
+//            }
             query.AddParam(inputParams);
 
-            if (newId !== undefined && newId !== "") {
-                //console.log();
-                productsCollectionViewContainer.itemId = newId;
-                productsCollectionViewContainer.itemName = newId;
-            }
+//            if (newId !== undefined && newId !== "") {
+//                //console.log();
+//                productsCollectionViewContainer.itemId = newId;
+//                productsCollectionViewContainer.itemName = newId;
+//            }
 
             productModel.SetData("Id", productsCollectionViewContainer.itemId)
             productModel.SetData("Name", productsCollectionViewContainer.itemName)
@@ -231,9 +247,11 @@ Item {
                 var dataModelLocal = model.GetData("data");
                 if(dataModelLocal.ContainsKey("addedNotification")){
                     dataModelLocal = dataModelLocal.GetData("addedNotification");
-                                            productCollectionView.refresh();
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id") && productsCollectionViewContainer.itemId === ""){
+                     productCollectionView.refresh();
+                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id") &&
+                            (productsCollectionViewContainer.itemId === "" ||productsCollectionViewContainer.typeOperation == "Copy")){
                         productsCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
+                        productsCollectionViewContainer.itemName = dataModelLocal.GetData("Name");
                     }
                     else if(saveModel.ContainsKey("errors")){
                         var errorsModel = accountItemModel.GetData("errors");
@@ -301,6 +319,11 @@ Item {
             height: 30;
 
             text: productsCollectionViewContainer.itemId;
+
+            onTextChanged: {
+                productsCollectionViewContainer.itemId = tfcProductId.text;
+            }
+
 //            borderColor: "gray";
         }
 
@@ -334,7 +357,11 @@ Item {
             width: parent.width - 3;
             height: 30;
 
-            text: productsCollectionViewContainer.itemId;
+            text: productsCollectionViewContainer.itemName;
+
+            onTextChanged: {
+                productsCollectionViewContainer.itemName = tfcProductName.text;
+            }
         }
 
         Rectangle {
@@ -352,7 +379,7 @@ Item {
                 anchors.verticalCenter: headerTreeView.verticalCenter;
 
                 anchors.left: headerTreeView.left;
-                anchors.leftMargin: 5;
+                anchors.leftMargin: 10;
 
                 text: "Features";
                 font.family: Style.fontFamilyBold;

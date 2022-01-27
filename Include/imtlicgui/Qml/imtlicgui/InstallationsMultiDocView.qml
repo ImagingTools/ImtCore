@@ -27,7 +27,7 @@ Item {
     onVisibleChanged: {
         if (installationsMultiDocViewContainer.visible && installationsMultiDocView.pagesCount === 0) {
             console.log("InstallationsMultiDocView first page loaded !");
-            installationsMultiDocView.addToHeadersArray("", "Installations", "../../imtlicgui/InstallationCollectionView.qml", "Installations")
+            installationsMultiDocView.addToHeadersArray("", "Installations", "../../imtlicgui/InstallationCollectionView.qml", "Installations", "Open")
         }
     }
 

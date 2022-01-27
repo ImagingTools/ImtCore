@@ -9,6 +9,7 @@ Item {
     property Item rootItem;
     property Item multiDocViewItem;
     property alias itemId: installationCollectionView.itemId;
+    property alias itemName: installationCollectionView.itemName;
     property alias model: installationCollectionView.model;
 
     function menuActivated(menuId) {
@@ -43,7 +44,7 @@ Item {
         }
 
         onSelectItem: {
-            installationCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit")
+            installationCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", "Open")
 //            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit")
         }
 

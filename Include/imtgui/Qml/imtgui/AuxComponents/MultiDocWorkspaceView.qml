@@ -17,6 +17,8 @@ Rectangle {
     property var pagesItems: [];
     property alias pagesCount: docsData.count;
 
+    property string typeOperation;
+
     onActiveItemChanged: {
 
     }
@@ -50,10 +52,13 @@ Rectangle {
         return false;
     }
 
-    function addToHeadersArray(itemId, title, source, commandsId){
-        console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId)
+    function addToHeadersArray(itemId, title, source, commandsId, typeOperation){
+        console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId, typeOperation)
+        if (typeOperation) {
+            multiDocView.typeOperation = typeOperation;
+        }
         var findPage = false;
-        if (itemId !== "" && tabIsOpened(itemId)) {
+        if (itemId !== "" && multiDocView.tabIsOpened(itemId)) {
             tabPanelInternal.selectedIndex = i;
             findPage = true;
         }
@@ -76,6 +81,11 @@ Rectangle {
         if (tabPanelInternal.selectedIndex >= index){
             tabPanelInternal.selectedIndex--;
         }
+    }
+
+    function updateTitleTab(index, title) {
+        console.log("MultidocWorkspaceView updateTitleTab()", index, title);
+        pages.SetData("Title", title, index);
     }
 
     Component.onCompleted: {
@@ -158,7 +168,7 @@ Rectangle {
 
             function updateTitleTab(name) {
                 console.log("MultiDocView ListView updateTitleTab", name);
-                tabPanelInternal.updateTitleTab(tabPanelInternal.selectedIndex, name);
+                multiDocView.updateTitleTab(tabPanelInternal.selectedIndex, name);
             }
 
             function closeTab() {
@@ -176,7 +186,15 @@ Rectangle {
                     console.log("MultidocWorkspaceView Loader onItemChanged", loader.source, docsDataDeleg)
                     if (loader.item && loader.source != ""){
                         loader.item.rootItem = docsDataDeleg;
+                        console.log("ItemId =", model.ItemId, "ItemName =", model.Title, "TypeOperation = ", multiDocView.typeOperation);
                         loader.item.itemId = model.ItemId
+                        loader.item.itemName = model.Title
+
+//                        if (loader.item.typeOperation) {
+//                            console.log("loader.item.typeOperation exist!");
+//                            loader.item.typeOperation = multiDocView.typeOperation;
+//                        }
+
                         var dataModelLocal
                         if (pages.ContainsKey("DocsData",model.index)){
                             dataModelLocal = pages.GetData("DocsData",model.index);

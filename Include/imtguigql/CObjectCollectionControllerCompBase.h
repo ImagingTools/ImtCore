@@ -37,7 +37,8 @@ public:
 		OT_COMMANDS,
 		OT_USER_OPERATION = 1000
 	};
-
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 

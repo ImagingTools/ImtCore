@@ -45,7 +45,7 @@ Item {
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
                 featureCollectionViewContainer.rootItem.updateTitleTab(value);
-                saveModel.updateModel(value);
+                saveModelPackage.updateModel(value);
             }
         }
         else if (parameters["status"] === "yes") {
@@ -87,7 +87,7 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
             else {
-                saveModel.updateModel()
+                saveModelPackage.updateModel()
             }
         }
         else if (menuId  === "Remove") {
@@ -178,7 +178,7 @@ Item {
     }
 
     GqlModel {
-        id: saveModel;
+        id: saveModelPackage;
 
         function updateModel(newId) {
             console.log( "updateModel saveModel");
@@ -229,7 +229,7 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, saveModel);
+            console.log("State:", this.state, saveModelPackage);
             if (this.state === "Ready"){
 
                 var dataModelLocal = model.GetData("data");
@@ -239,7 +239,7 @@ Item {
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id") && featureCollectionViewContainer.itemId === ""){
                         featureCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
                     }
-                    else if(saveModel.ContainsKey("errors")){
+                    else if(saveModelPackage.ContainsKey("errors")){
                         var errorsModel = accountItemModel.GetData("errors");
                         if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
                             console.log("message", errorsModel.GetData(featureCollectionViewContainer.gqlModelItems).GetData("message"));
