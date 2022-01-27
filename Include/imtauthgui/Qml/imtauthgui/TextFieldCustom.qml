@@ -52,6 +52,7 @@ Item {
 
         verticalAlignment: TextInput.AlignVCenter;
         selectionColor: Style.textSelected;
+        selectByMouse: true;
         clip: true;
 
         onFocusChanged: {

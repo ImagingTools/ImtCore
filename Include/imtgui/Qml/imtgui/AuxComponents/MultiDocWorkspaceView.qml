@@ -70,8 +70,6 @@ Rectangle {
             pages.SetData("Title", title, index);
             pages.SetData("Source", source, index);
             pages.SetData("CommandsId", commandsId, index);
-
-            // pagesDeleg.changeCommandsId(commandsId);//???
             tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
         }
     }
@@ -83,9 +81,11 @@ Rectangle {
         }
     }
 
-    function updateTitleTab(index, title) {
+    function updateTitleTab(itemId, title, index) {
         console.log("MultidocWorkspaceView updateTitleTab()", index, title);
         pages.SetData("Title", title, index);
+        pages.SetData("ItemId", itemId, index);
+        console.log("Tab after updating ItemId = " , pages.GetData("ItemId", index), "Title = ", pages.GetData("Title", index))
     }
 
     Component.onCompleted: {
@@ -166,9 +166,9 @@ Rectangle {
 
             }
 
-            function updateTitleTab(name) {
-                console.log("MultiDocView ListView updateTitleTab", name);
-                multiDocView.updateTitleTab(tabPanelInternal.selectedIndex, name);
+            function updateTitleTab(itemId, name) {
+                console.log("MultiDocView ListView updateTitleTab",itemId,  name);
+                multiDocView.updateTitleTab(itemId, name, tabPanelInternal.selectedIndex);
             }
 
             function closeTab() {

@@ -37,7 +37,7 @@ Item {
             else if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
                 console.log("LicenseCollectionViewContainer dialogResult", value);
-                productsCollectionViewContainer.rootItem.updateTitleTab(value);
+                productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, value);
                 saveModel.updateModel(value);
             }
         }
@@ -243,20 +243,27 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, saveModel);
             if (this.state === "Ready"){
+                console.log("ProductView saveModel data exist");
+                var dataModelLocal = saveModel.GetData("data");
+                if (dataModelLocal.ContainsKey("ProductAdd")) {
+                    dataModelLocal = dataModelLocal.GetData("ProductAdd");
 
-                var dataModelLocal = model.GetData("data");
-                if(dataModelLocal.ContainsKey("addedNotification")){
-                    dataModelLocal = dataModelLocal.GetData("addedNotification");
-                     productCollectionView.refresh();
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id") &&
-                            (productsCollectionViewContainer.itemId === "" ||productsCollectionViewContainer.typeOperation == "Copy")){
-                        productsCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
-                        productsCollectionViewContainer.itemName = dataModelLocal.GetData("Name");
-                    }
-                    else if(saveModel.ContainsKey("errors")){
-                        var errorsModel = accountItemModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
-                            console.log("message", errorsModel.GetData(productsCollectionViewContainer.gqlModelItems).GetData("message"));
+                    if(dataModelLocal.ContainsKey("addedNotification")){
+                        dataModelLocal = dataModelLocal.GetData("addedNotification");
+                        console.log("ProductView saveModel addedNotification exist");
+                         productCollectionView.refresh();
+                        if(dataModelLocal.ContainsKey("Id")){
+                            console.log("ProductView saveModel addedNotification  Id exist");
+                            productsCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
+                            //productsCollectionViewContainer.itemName = dataModelLocal.GetData("Name");
+
+                            productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
+                        }
+                        else if(saveModel.ContainsKey("errors")){
+                            var errorsModel = accountItemModel.GetData("errors");
+                            if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
+                                console.log("message", errorsModel.GetData(productsCollectionViewContainer.gqlModelItems).GetData("message"));
+                            }
                         }
                     }
                 }

@@ -44,7 +44,7 @@ Item {
             else if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
-                featureCollectionViewContainer.rootItem.updateTitleTab(value);
+                featureCollectionViewContainer.rootItem.updateTitleTab(featureCollectionViewContainer.itemId, value);
                 saveModelPackage.updateModel(value);
             }
         }

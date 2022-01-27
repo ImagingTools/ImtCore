@@ -23,18 +23,12 @@ Rectangle {
     property bool backgroundExist: true;
     property bool centered: true;
 
-//    Component.onCompleted: {
-//        console.log("EditFeatureDialog Component.onCompleted");
-//        tfcFeatureNameText.setFocus();
-//    }
-
     Keys.onPressed: {
         console.log("EditFeatureDialog Keys.onPressed", event.key);
         if (event.key === Qt.Key_Tab) {
             console.log("event.key tab", event.key);
         }
     }
-
 
     function generateKey() {
         console.log("EditFeatureDialog generateKey...");

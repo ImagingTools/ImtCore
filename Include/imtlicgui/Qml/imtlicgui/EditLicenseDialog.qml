@@ -9,9 +9,10 @@ Rectangle {
     id: container;
     width: 400;
     height: 300;
-    radius: 10;
+    radius: 2;
     color: Style.backgroundColor;
     clip: true;
+    focus: true;
 
     property Item resultItem;
     property string licenseId;
