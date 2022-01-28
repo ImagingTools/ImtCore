@@ -6,6 +6,7 @@ Item {
 	signal canceled;			///< emitted when mouse leaved the item's area while mouse button was pressed
 	signal mousePressed;	 //by Artur
 	signal mouseReleased; //by Artur
+	signal doubleClicked;
 	//signal wheelEvent;			///< emitted when mouse wheel scrolling
 	signal wheel; //by Artur, wheel signal
 	signal verticalSwiped;		///< emitted on vertical swipe
@@ -39,7 +40,27 @@ Item {
 			this._touchBinder = new $core.EventBinder(this.element)
 
 			var touchStart = function(event) { this.touchStart(event); this.mousePressed(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
-			var touchEnd = function(event) { this.touchEnd(event); this.mouseReleased(event); this.clicked(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
+			var touchEnd = function(event) { 
+				this.touchEnd(event); 
+				this.mouseReleased(event); 
+
+				let now = new Date().getTime()
+				if(this._lastClickOrTouch){
+					if(now - this._lastClickOrTouch > 600){
+						this.clicked(event);
+						this._lastClickOrTouch = now
+					} else {
+						this.doubleClicked(event);
+						this._lastClickOrTouch = now
+					}
+				} else {
+					this.clicked(event);
+					this._lastClickOrTouch = now
+				}
+
+				if(this.mouse.accepted) 
+				event.stopPropagation();  
+			}.bind(this)
 			var touchMove = (function(event) { this.touchMove(event); if(this.mouse.accepted) event.stopPropagation();  }).bind(this)
 
 			this._touchBinder.on('touchstart', touchStart)
@@ -80,7 +101,21 @@ Item {
 					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
 				}
 				this.updatePosition(event); 
-				this.clicked(event); 
+				let now = new Date().getTime()
+				if(this._lastClickOrTouch){
+					if(now - this._lastClickOrTouch > 600){
+						this.clicked(event);
+						this._lastClickOrTouch = now
+					} else {
+						this.doubleClicked(event);
+						this._lastClickOrTouch = now
+					}
+				} else {
+					this.clicked(event);
+					this._lastClickOrTouch = now
+				}
+				
+				 
 				if(this.mouse.accepted) event.stopPropagation();  
 			}.bind(this))
 		}

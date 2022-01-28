@@ -165,6 +165,8 @@ BaseLayout {
 		this._removeItems(0, this.count)
 		this.count = 0
 		this._scheduleLayout()
+
+		this._context._processActions()
 	}
 
 	/// @private
