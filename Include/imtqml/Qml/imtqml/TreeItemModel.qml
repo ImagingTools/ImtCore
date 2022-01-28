@@ -123,6 +123,7 @@ JSONListModel {
 
     function InsertNewItem(){
         this.append({});
+        return this.count - 1;
     }
 
 

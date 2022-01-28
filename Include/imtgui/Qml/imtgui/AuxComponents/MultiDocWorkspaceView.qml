@@ -30,8 +30,8 @@ Rectangle {
     function updateCommandId(){
         console.log("MultidocWorkspaceView updateCommandId", tabPanelInternal.selectedIndex, multiDocView, packagesMultiDocView)
         if (tabPanelInternal.selectedIndex > -1 && multiDocView.rootItem){
-            var commandsId = pages.GetData("CommandsId", tabPanelInternal.selectedIndex);
-            var itemId = pages.GetData("ItemId", tabPanelInternal.selectedIndex);
+            var commandsId = pagesData.GetData("CommandsId", tabPanelInternal.selectedIndex);
+            var itemId = pagesData.GetData("ItemId", tabPanelInternal.selectedIndex);
             multiDocView.rootItem.changeCommandsId(commandsId);
         }
     }
@@ -42,8 +42,8 @@ Rectangle {
     }
 
     function tabIsOpened(itemId) {
-        for (var i = 0; i < pages.GetItemsCount(); i++) {
-            var pageId = pages.GetData("ItemId", i);
+        for (var i = 0; i < pagesData.GetItemsCount(); i++) {
+            var pageId = pagesData.GetData("ItemId", i);
             if (pageId === itemId) {
                 tabPanelInternal.selectedIndex = i;
                 return true;
@@ -59,23 +59,24 @@ Rectangle {
         }
         var findPage = false;
         if (itemId !== "" && multiDocView.tabIsOpened(itemId)) {
-            tabPanelInternal.selectedIndex = i;
             findPage = true;
         }
         if (!findPage) {
             multiDocView.activeItem = null
-            var index = pages.InsertNewItem();
+            var index = pagesData.InsertNewItem();
             console.log("MultidicWorkspaceView addToHeadersArray index", index);
-            pages.SetData("ItemId", itemId, index);
-            pages.SetData("Title", title, index);
-            pages.SetData("Source", source, index);
-            pages.SetData("CommandsId", commandsId, index);
-            tabPanelInternal.selectedIndex = pages.GetItemsCount() - 1;
+            pagesData.SetData("ItemId", itemId, index);
+            pagesData.SetData("Title", title, index);
+            pagesData.SetData("Source", source, index);
+            pagesData.SetData("CommandsId", commandsId, index);
+//            tabPanelInternal.model = 0;
+//            tabPanelInternal.model = pages;
+            tabPanelInternal.selectedIndex = pagesData.GetItemsCount() - 1;
         }
     }
 
     function closeTab(index) {
-        pages.RemoveItem(index)
+        pagesData.RemoveItem(index)
         if (tabPanelInternal.selectedIndex >= index){
             tabPanelInternal.selectedIndex--;
         }
@@ -93,7 +94,7 @@ Rectangle {
     }
 
     TreeItemModel {
-        id: pages;
+        id: pagesData;
     }
 
     TabPanel {
@@ -101,7 +102,7 @@ Rectangle {
         anchors.left: parent.left;
         anchors.right: parent.right;
         visible: true;
-        model: pages;
+        model: pagesData;
 
         onCloseItem: {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
@@ -115,7 +116,7 @@ Rectangle {
         }
 
         onRightClicked: {
-            if (tabPanelInternal.selectedIndex < pages.GetItemsCount() - 1) {
+            if (tabPanelInternal.selectedIndex < pagesData.GetItemsCount() - 1) {
                 tabPanelInternal.selectedIndex++;
                 tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
             }
@@ -139,7 +140,7 @@ Rectangle {
         clip: true;
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
-        model: pages;
+        model: pagesData;
         delegate: Rectangle {
             id: docsDataDeleg;
             width: visible ? docsData.width : 0;
@@ -196,11 +197,11 @@ Rectangle {
 //                        }
 
                         var dataModelLocal
-                        if (pages.ContainsKey("DocsData",model.index)){
-                            dataModelLocal = pages.GetData("DocsData",model.index);
+                        if (pagesData.ContainsKey("DocsData",model.index)){
+                            dataModelLocal = pagesData.GetData("DocsData",model.index);
                         }
                         else {
-                            dataModelLocal = pages.AddTreeModel("DocsData",model.index)
+                            dataModelLocal = pagesData.AddTreeModel("DocsData",model.index)
                             console.log("MultidocWorkspaceView onItemChanged", dataModelLocal)
                         }
                         console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)

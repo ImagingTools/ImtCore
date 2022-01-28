@@ -223,6 +223,7 @@ Rectangle {
 //                        }
 
                         collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
+//                        tableInternal._context._processActions()
 
 //                        collectionViewContainer.itemId = "";
 

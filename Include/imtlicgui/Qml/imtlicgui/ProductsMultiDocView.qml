@@ -6,6 +6,7 @@ import imtgui 1.0
 Item {
     id: productsMultiDocViewContainer;
     anchors.fill: parent;
+    visible: false;
 
     property Item rootItem;
     property alias firstElementImageSource: productsMultiDocView.firstElementImageSource;

@@ -51,7 +51,7 @@ Item {
         text: "";
 
         verticalAlignment: TextInput.AlignVCenter;
-        selectionColor: Style.textSelected;
+//        selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
 

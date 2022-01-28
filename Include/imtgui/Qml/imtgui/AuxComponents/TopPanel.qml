@@ -15,7 +15,7 @@ Rectangle {
     signal commandsChangedSignal(string commandsId);
 
     function setModeMenuButton(commandId, mode) {
-        console.log("TopPanel setModeMenuButton!", commandId, mode);
+        console.log("TopPanel setModeMenuButton!", commandId, mode, topPanel.activeCommandsModelId);
         if (buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
             var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
             //console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
@@ -23,12 +23,15 @@ Rectangle {
             console.log("TopPanel setModeMenuButton itemsCount", itemsCount);
             for (var i = 0; i < itemsCount; i++) {
                 var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
-                //lvButtons.model.Refresh()
                 if (id === commandId) {
-                     buttonsModelLocal.SetData("Mode", mode, i);
-                     break;
+                    buttonsModelLocal.SetData("Mode", mode, i);
+//                    console.log("TopPanel Mode changed", buttonsModelLocal, lvButtons.model)
+                    lvButtons.model = 0
+                    lvButtons.model =  buttonsModelLocal
+                    break;
                 }
             }
+
         }
 
     }
@@ -253,7 +256,8 @@ Rectangle {
                         var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
                         dataModelLocal = dataModelLocal.GetData("items");
                         buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
-                        updateTimer.model = dataModelLocal;
+//                        updateTimer.model = dataModelLocal;
+                        lvButtons.model = dataModelLocal;
                         commandsModel.isFirst = !commandsModel.isFirst
                         topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
                     }
