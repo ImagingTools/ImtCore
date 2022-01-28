@@ -17,14 +17,18 @@ Item {
         accountCollectionView.menuActivated(menuId)
     }
 
+    function refresh() {
+        accountCollectionView.refresh();
+    }
+
     function commandsChanged(commandsId) {
         console.log("AccountCollectionView commandsChanged!", commandsId);
         if (commandsId !== "Accounts"){
             return;
         }
         if (accountCollectionView.selectedIndex > -1) {
-            accountCollectionContainer.rootItem.setModeMenuButton("Remove", "Active");
-            accountCollectionContainer.rootItem.setModeMenuButton("Edit", "Active");
+            accountCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            accountCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
         } else {
             accountCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             accountCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
@@ -34,6 +38,8 @@ Item {
     CollectionView {
         id: accountCollectionView;
         anchors.fill: parent;
+        autoRefresh: true;
+
         Component.onCompleted: {
             accountCollectionView.gqlModelInfo = "AccountInfo"
             accountCollectionView.gqlModelItems = "AccountList"
@@ -48,9 +54,12 @@ Item {
                 name = "New Account";
                 typeOperation = "New";
             }
+//            name.replace(/[^a-zа-яё^0-9]/gi, ''); удалить все кроме букв и цифр
 
-            accountCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit", typeOperation);
-//            multiDocView.addToHeadersArray(itemId, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit")
+//            var id = name.replace(/\s/g, '');
+            var id = name;
+            accountCollectionContainer.multiDocViewItem.activeCollectionItem = accountCollectionContainer;
+            accountCollectionContainer.multiDocViewItem.addToHeadersArray(id, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit", typeOperation);
         }
 
         onSelectedIndexChanged: {
@@ -58,8 +67,6 @@ Item {
                 accountCollectionContainer.commandsChanged("Accounts");
             }
         }
-
-
     }
 //    Rectangle {
 //        id: packageMetaInfo;

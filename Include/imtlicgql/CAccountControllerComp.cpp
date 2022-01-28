@@ -1,16 +1,15 @@
 #include <imtlicgql/CAccountControllerComp.h>
 
 // ImtCore includes
-//#include <imtlic/CFeaturePackageCollectionUtility.h>
-//#include <imtlic/CFeatureInfo.h>
-//#include <imtlic/IFeaturePackage.h>
 #include <imtauth/IContactInfo.h>
 #include <imtauth/IAccountInfo.h>
+#include <imtauth/CAccountInfo.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <imtauth/IAddressManager.h>
 #include <imtauth/CAddress.h>
-
+#include <imtauth/CContactInfo.h>
+#include <imtauth/CAccountInfoMetaInfo.h>
 
 
 namespace imtlicgql
@@ -59,7 +58,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 					accountTypeId = "company";
 				}
 				else if (accountType == imtauth::IAccountInfo::AT_PERSON){
-					accountTypeId = "private";
+					accountTypeId = "personal";
 				}
 
 				QString mail;
@@ -112,6 +111,95 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
+}
+
+istd::IChangeable* CAccountControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams,
+									QByteArray &objectId, QString &name,
+									QString &description,
+									QString& errorMessage) const
+{
+	if (!m_accountInfoFactCompPtr.IsValid()) {
+		return nullptr;
+	}
+
+	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+
+	if (!itemData.isEmpty()) {
+//		istd::TDelPtr<imtauth::IAccountInfo> accountInfoPtr = m_accountInfoFactCompPtr.CreateInstance();
+
+		imtauth::CAccountInfo *accountInfoPtr = new imtauth::CAccountInfo();
+//		if (!accountInfoPtr.IsValid()){
+//			return nullptr;
+//		}
+
+		imtbase::CTreeItemModel itemModel;
+		itemModel.Parse(itemData);
+
+		if (itemModel.ContainsKey("Id")) {
+			objectId = itemModel.GetData("Id").toByteArray();
+		}
+
+		if (itemModel.ContainsKey("AccountName")) {
+			name = itemModel.GetData("AccountName").toString();
+			accountInfoPtr->SetAccountName(name);
+		}
+
+		if (itemModel.ContainsKey("AccountDescription")) {
+			description = itemModel.GetData("AccountDescription").toString();
+			accountInfoPtr->SetAccountDescription(description);
+		}
+
+		if (itemModel.ContainsKey("AccountType")) {
+			QString accountType = itemModel.GetData("AccountType").toString();
+
+			if (accountType == "company") {
+				accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_COMPANY);
+			}
+			else if (accountType == "personal")  {
+				accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_PERSON);
+			}
+		}
+
+		imtauth::CContactInfo contactInfo;
+
+		if (itemModel.ContainsKey("Email")) {
+			QString email = itemModel.GetData("Email").toString();
+			contactInfo.SetEmail(email);
+		}
+
+		if (itemModel.ContainsKey("LastName")) {
+			QString lastName = itemModel.GetData("LastName").toString();
+			contactInfo.SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, lastName);
+		}
+
+		if (itemModel.ContainsKey("FirstName")) {
+			QString firstName = itemModel.GetData("FirstName").toString();
+			contactInfo.SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, firstName);
+		}
+
+		if (itemModel.ContainsKey("BirthDay")) {
+			QString birthDay = itemModel.GetData("BirthDay").toString();
+			contactInfo.SetBirthday(QDate::fromString(birthDay));
+		}
+
+		if (itemModel.ContainsKey("Gender")) {
+			QString gender = itemModel.GetData("Gender").toString();
+
+			if (gender == "male") {
+				contactInfo.SetGenderType(imtauth::IContactInfo::GenderType::GT_MALE);
+			}
+			else if (gender == "female") {
+				contactInfo.SetGenderType(imtauth::IContactInfo::GenderType::GT_FEMALE);
+			}
+			else {
+				contactInfo.SetGenderType(imtauth::IContactInfo::GenderType::GT_DIVERSE);
+			}
+		}
+
+		accountInfoPtr->SetAccountOwner(contactInfo);
+		return accountInfoPtr;
+	}
+	return nullptr;
 }
 
 

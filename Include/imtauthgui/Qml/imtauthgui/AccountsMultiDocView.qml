@@ -7,6 +7,7 @@ Item {
     id: accountsMultiDocViewContainer;
     anchors.fill: parent;
 
+    visible: false;
     property Item rootItem;
     property alias firstElementImageSource: accountsMultiDocView.firstElementImageSource;
 //    property alias model: accountsMultiDocView.model;

@@ -19,22 +19,9 @@ Item {
     function menuActivated(menuId) {
         console.log("ProductCollectionView menuActivated", menuId);
         if (menuId === "Duplicate") {
-//            var count = productCollectionView.model.GetItemsCount();
-//            console.log("Count =", count);
             var dataModelLocal = productCollectionView.model.GetData("data");
-//            var index = dataModelLocal.InsertNewItem();
-
             var currentName = dataModelLocal.GetData("Name", productCollectionView.selectedIndex);
             var currentId = dataModelLocal.GetData("Id", productCollectionView.selectedIndex);
-
-//            var duplicateName = "Copy of " + currentName;
-
-//            dataModelLocal.SetData("Name", duplicateName, index);
-//            dataModelLocal.SetData("Id", currentId, index);
-
-//            model.SetData("data", dataModelLocal);
-//            model.Refresh();
-//            productCollectionView.refresh();
             var name = "Copy of " + currentName;
 
             productCollectionContainer.multiDocViewItem.addToHeadersArray(currentId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", "Copy")
@@ -77,7 +64,7 @@ Item {
                 name = "New Product";
                 typeOperation = "New";
             }
-
+            productCollectionContainer.multiDocViewItem.activeCollectionItem = productCollectionContainer;
             productCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", typeOperation)
         }
 

@@ -16,23 +16,36 @@ Rectangle {
 //    property var contactInfoModel;
     property TreeItemModel model;
     property Item multiDocViewItem;
+
+    property Item rootItem;
     property string accountType;
     property string itemId;
+    property string itemName;
 
-    Component.onCompleted: {
-        //accountItemModel.updateModel()
-    }
+    property bool wasChanged: false;
 
+    property string typeOperation: multiDocViewItem.typeOperation;
 
     function updateData() {
-        console.log("containerContactInfo updateData", containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode"));
+        console.log("containerContactInfo updateData");
         tfcEmail.text = containerContactInfo.contactInfoModel.GetData("Email");
         tfcFirstNameText.text = containerContactInfo.contactInfoModel.GetData("FirstName");
         tfcLastName.text = containerContactInfo.contactInfoModel.GetData("LastName");
         tfcNickName.text = containerContactInfo.contactInfoModel.GetData("NickName");
         tfcAccountName.text = containerContactInfo.contactInfoModel.GetData("AccountName");
         tfcAccountDescription.text = containerContactInfo.contactInfoModel.GetData("AccountDescription");
-//        tfcBD.text = containerContactInfo.contactInfoModel.GetData("BirthDay");
+
+        var accountType = containerContactInfo.contactInfoModel.GetData("AccountType");
+        console.log("AccountType =", accountType);
+        if (accountType === "personal") {
+            cbTypeAccount.currentIndex = 0;
+            containerContactInfo.accountType = "personal";
+        } else {
+            cbTypeAccount.currentIndex = 1;
+            containerContactInfo.accountType = "company";
+        }
+
+        //tfcBD.text = containerContactInfo.contactInfoModel.GetData("BirthDay");
 
         if (containerContactInfo.accountType === "company")
         {
@@ -62,16 +75,33 @@ Rectangle {
     }
 
     function menuActivated(menuId) {
-        console.log("containerContactInfo menuActivated", menuId);
-
-        //console.log("CollectionView itemId ", itemId, "name", name);
-
+        console.log("ContactInfoEditor menuActivated", menuId);
         if (menuId  === "New"){
 //            collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Save") {
-            saveModel.updateModel()
+            saveModel.updateModel();
         }
+        else if (menuId === "Close") {
+            containerContactInfo.rootItem.closeTab();
+        }
+    }
+
+    function activateSaveButton() {
+        console.log("ContactInfoEditor activateSaveButton");
+        if (containerContactInfo.wasChanged) {
+            containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
+        }
+    }
+
+    function commandsChanged(commandsId){
+        if (commandsId !== "AccountEdit") {
+            return;
+        }
+
+        containerContactInfo.rootItem.setModeMenuButton("Save", "Disabled");
+        containerContactInfo.rootItem.setModeMenuButton("New", "Normal");
+        containerContactInfo.rootItem.setModeMenuButton("Close", "Normal");
     }
 
     onModelChanged: {
@@ -80,7 +110,7 @@ Rectangle {
             containerContactInfo.updateData();
         }
         else {
-            if(containerContactInfo.itemId === ""){
+            if(containerContactInfo.typeOperation === "New"){
                 containerContactInfo.accountType = "company";
                 containerContactInfo.contactInfoModel = model.AddTreeModel("data");
                 containerContactInfo.contactInfoModel.SetData("Email","")
@@ -89,6 +119,7 @@ Rectangle {
                 containerContactInfo.contactInfoModel.SetData("NickName","")
                 containerContactInfo.contactInfoModel.SetData("AccountName","")
                 containerContactInfo.contactInfoModel.SetData("AccountDescription","")
+                containerContactInfo.contactInfoModel.SetData("AccountType", "company")
                 var addresses = containerContactInfo.contactInfoModel.AddTreeModel("Addresses")
                 addresses.SetData("Country","");
                 addresses.SetData("City","");
@@ -147,13 +178,18 @@ Rectangle {
                 var dataModelLocal = accountItemModel.GetData("data");
                 if(dataModelLocal.ContainsKey("AccountItem")){
                     dataModelLocal = dataModelLocal.GetData("AccountItem");
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("item")){
-                        containerContactInfo.accountType = dataModelLocal.GetData("item").GetData("AccountType");
+                    if(dataModelLocal.ContainsKey("item")){
+                        //containerContactInfo.accountType = dataModelLocal.GetData("item").GetData("AccountType");
                         containerContactInfo.contactInfoModel = dataModelLocal.GetData("item");
-                        addressesTable.elementsModel = containerContactInfo.contactInfoModel.GetData("Addresses");
+
+//                        console.log("Email", containerContactInfo.contactInfoModel.GetData("Email"));
+//                        console.log("AccountName", containerContactInfo.contactInfoModel.GetData("AccountName"));
+//                        console.log("FirstName", containerContactInfo.contactInfoModel.GetData("FirstName"));
+//                        console.log("LastName", containerContactInfo.contactInfoModel.GetData("LastName"));
+//                        console.log("Addresses", addressesTable.elements = containerContactInfo.contactInfoModel.GetData("Addresses"))
 
                         containerContactInfo.model.SetExternTreeModel('data', containerContactInfo.contactInfoModel)
-                        dataModelLocal.RemoveData("item");
+                        //dataModelLocal.RemoveData("item");
                     }
                     else if(accountItemModel.ContainsKey("errors")){
                         var errorsModel = accountItemModel.GetData("errors");
@@ -176,7 +212,7 @@ Rectangle {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            if(containerContactInfo.itemId != ""){
+            if(containerContactInfo.typeOperation === "Open"){
                 query = Gql.GqlRequest("query", "AccountUpdate");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", containerContactInfo.itemId);
@@ -210,20 +246,46 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, saveModel);
             if (this.state === "Ready"){
-
                 var dataModelLocal = saveModel.GetData("data");
-                if(dataModelLocal.ContainsKey("addedNotification")){
-                    dataModelLocal = dataModelLocal.GetData("addedNotification");
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id")){
-                        containerContactInfo.itemId = dataModelLocal.GetData("Id");
-                    }
-                    else if(saveModel.ContainsKey("errors")){
-                        var errorsModel = saveModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
-                            console.log("message", errorsModel.GetData(containerContactInfo.gqlModelItems).GetData("message"));
+
+
+                containerContactInfo.multiDocViewItem.activeCollectionItem.refresh();
+                if (dataModelLocal.ContainsKey("AccountAdd")) {
+                    dataModelLocal = dataModelLocal.GetData("AccountAdd");
+
+                    if (dataModelLocal.ContainsKey("addedNotification")) {
+                        dataModelLocal = dataModelLocal.GetData("addedNotification");
+
+                        if (dataModelLocal.ContainsKey("Id")) {
+                            containerContactInfo.itemId = dataModelLocal.GetData("Id");
                         }
                     }
                 }
+
+                if (dataModelLocal.ContainsKey("AccountUpdate")) {
+                    dataModelLocal = dataModelLocal.GetData("AccountUpdate");
+
+                    if (dataModelLocal.ContainsKey("updatedNotification")) {
+                        dataModelLocal = dataModelLocal.GetData("updatedNotification");
+
+                        if (dataModelLocal.ContainsKey("Id")) {
+                            containerContactInfo.itemId = dataModelLocal.GetData("Id");
+                        }
+                    }
+                }
+
+//                if(dataModelLocal.ContainsKey("addedNotification")){
+//                    dataModelLocal = dataModelLocal.GetData("addedNotification");
+//                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id")){
+//                        containerContactInfo.itemId = dataModelLocal.GetData("Id");
+//                    }
+//                    else if(saveModel.ContainsKey("errors")){
+//                        var errorsModel = saveModel.GetData("errors");
+//                        if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
+//                            console.log("message", errorsModel.GetData(containerContactInfo.gqlModelItems).GetData("message"));
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -266,6 +328,71 @@ Rectangle {
             width: 500;
             spacing: 7;
 
+            Rectangle {
+                id: buttonsAvatar;
+                anchors.horizontalCenter: parent.horizontalCenter;
+
+                width: 125;
+                height: 30;
+                color: "transparent";
+
+                AuxButton {
+                    id: loadAvatarButton;
+
+                    anchors.left: buttonsAvatar.left;
+                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
+
+                    width: 50;
+                    height:  20;
+
+                    fontPixelSize: 12;
+
+                  //  hasIcon: true;
+                    hasText: true;
+                    textButton: "Load";
+
+                }
+
+                AuxButton {
+                    id: removeAvatarButton;
+
+                    anchors.left: loadAvatarButton.right;
+                    anchors.leftMargin: 5;
+                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
+
+                    width: 50;
+                    height:  20;
+                    fontPixelSize: 12;
+
+                  //  hasIcon: true;
+                    hasText: true;
+
+                    textButton: "Remove";
+                }
+            }
+
+            Rectangle {
+                id: avatarRect;
+                anchors.horizontalCenter: parent.horizontalCenter;
+
+                width: 150;
+                height: 150;
+
+                color: "transparent";
+
+                Image {
+                    id: avatarIcon;
+
+                    height: 150;
+                    width: 150;
+
+                    fillMode: Image.PreserveAspectFit;
+                    source: "../../../" + "Icons/Light/Account_On_Normal.svg";
+                    sourceSize.width: width;
+                    sourceSize.height: height;
+                }
+            }
+
             Text {
                 id: titleAccountType;
                 text: qsTr("Account type");
@@ -281,11 +408,17 @@ Rectangle {
                 height: 23;
                 radius: 3;
                 model: typeAccountModel;
-                currentIndex: accountType == "company" ? 1 : 0;
-                currentText: accountType == "company" ? "Company" : "Person";
+                currentIndex: containerContactInfo.accountType == "company" ? 1 : 0;
+                currentText: containerContactInfo.accountType == "company" ? "Company" : "Personal";
                 textCentered: false;
                 backgroundColor: "#d0d0d0";
                 borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+
+                onCurrentIndexChanged: {
+                    var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).text.toLowerCase();
+                    console.log("ContactInfoEditor ComboBox onCurrentIndexChanged", accountType);
+                    containerContactInfo.contactInfoModel.SetData("AccountType", accountType);
+                }
             }
 
             Text {
@@ -302,8 +435,12 @@ Rectangle {
                 width: container.width;
                 height: 23;
                 anchors.horizontalCenter: container.horizontalCenter;
-                onTextChanged: {
-                     containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
+
+                onInputTextChanged: {
+                    console.log("ContactInfoEditor TextFieldCustom AccountName onInputTextChanged");
+                    containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
+                    containerContactInfo.wasChanged = true;
+                    containerContactInfo.activateSaveButton();
                 }
             }
 
@@ -320,8 +457,11 @@ Rectangle {
                 width: container.width;
                 height: 23;
                 anchors.horizontalCenter: container.horizontalCenter;
-                onTextChanged: {
-                     containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
+
+                onInputTextChanged: {
+                    containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
+                    containerContactInfo.wasChanged = true;
+                    containerContactInfo.activateSaveButton();
                 }
             }
 
@@ -341,6 +481,7 @@ Rectangle {
                 color: Style.imagingToolsGradient1;
                 border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
                 visible: cbTypeAccount.currentIndex === 1;
+
                 Text {
                     id: titleCountry;
                     text: qsTr("Country");
@@ -363,12 +504,19 @@ Rectangle {
                     //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcCountryText;
                         width: countryBlock.width - 22;
                         height: 23;
                         anchors.horizontalCenter: countryBlock.horizontalCenter;
                         anchors.verticalCenter: countryBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("Country", tfcCountryText.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 
@@ -394,6 +542,7 @@ Rectangle {
                     //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcCity;
                         width: cityBlock.width - 22;
@@ -401,6 +550,12 @@ Rectangle {
                         height: 23;
                         anchors.horizontalCenter: cityBlock.horizontalCenter;
                         anchors.verticalCenter: cityBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("City", tfcCity.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 
@@ -426,6 +581,7 @@ Rectangle {
                     //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: postalCode;
                         width: postalCodeBlock.width - 22;
@@ -434,6 +590,12 @@ Rectangle {
                         //text: containerContactInfo.accountType === "company" ? containerContactInfo.contactInfoModel.GetData("Addresses").GetData("PostalCode") : "";
                         anchors.horizontalCenter: postalCodeBlock.horizontalCenter;
                         anchors.verticalCenter: postalCodeBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("PostalCode", postalCode.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 
@@ -457,6 +619,7 @@ Rectangle {
                     anchors.top: titleStreet.bottom;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcStreet;
                         width: streetBlock.width - 22;
@@ -464,6 +627,12 @@ Rectangle {
                         height: 23;
                         anchors.horizontalCenter: streetBlock.horizontalCenter;
                         anchors.verticalCenter: streetBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("Street", tfcStreet.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
             }
@@ -505,6 +674,7 @@ Rectangle {
                     //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcEmail;
                         width: emailBlock.width - 22;
@@ -512,6 +682,12 @@ Rectangle {
                         height: 23;
                         anchors.horizontalCenter: emailBlock.horizontalCenter;
                         anchors.verticalCenter: emailBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("Email", tfcEmail.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 
@@ -539,6 +715,7 @@ Rectangle {
                     //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcBD;
                         width: bdBlock.width - 22;
@@ -546,6 +723,12 @@ Rectangle {
                         height: 23;
                         anchors.horizontalCenter: bdBlock.horizontalCenter;
                         anchors.verticalCenter: bdBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("BirthDay", tfcBD.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 
@@ -585,16 +768,12 @@ Rectangle {
                         backgroundColor: "#d0d0d0";
                         borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
                         textCentered: false;
-                    }
 
-//                    TextFieldCustom {
-//                        id: tfcGender;
-//                        width: bdBlock.width - 22;
-//                        text: containerContactInfo.contactInfoModel ? containerContactInfo.contactInfoModel.GetData("Email") : "";
-//                        height: 23;
-//                        anchors.horizontalCenter: genderBlock.horizontalCenter;
-//                        anchors.verticalCenter: genderBlock.verticalCenter;
-//                    }
+                        onCurrentIndexChanged: {
+                            var gender = genderModel.get(genderCB.currentIndex).text.toLowerCase();
+                            containerContactInfo.contactInfoModel.SetData("Gender", gender);
+                        }
+                    }
                 }
 
                 Text {
@@ -620,6 +799,7 @@ Rectangle {
                     //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcFirstNameText;
                         width: firstNameBlock.width - 22;
@@ -627,6 +807,12 @@ Rectangle {
                         height: 23;
                         anchors.horizontalCenter: firstNameBlock.horizontalCenter;
                         anchors.verticalCenter: firstNameBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("FirstName", tfcFirstNameText.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 
@@ -651,6 +837,7 @@ Rectangle {
                     //color: Style.baseColor;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcLastName;
                         width: lastNameBlock.width - 22;
@@ -658,6 +845,12 @@ Rectangle {
                         height: 23;
                         anchors.horizontalCenter: lastNameBlock.horizontalCenter;
                         anchors.verticalCenter: lastNameBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("LastName", tfcLastName.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 
@@ -684,6 +877,7 @@ Rectangle {
                     visible: cbTypeAccount.currentIndex === 0;
                     color: Style.imagingToolsGradient1;
                     border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
                     TextFieldCustom {
                         id: tfcNickName;
                         width: nickNameBlock.width - 22;
@@ -691,6 +885,12 @@ Rectangle {
                         height: 23;
                         anchors.horizontalCenter: nickNameBlock.horizontalCenter;
                         anchors.verticalCenter: nickNameBlock.verticalCenter;
+
+                        onInputTextChanged: {
+                            containerContactInfo.contactInfoModel.SetData("NickName", tfcNickName.text);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
+                        }
                     }
                 }
 

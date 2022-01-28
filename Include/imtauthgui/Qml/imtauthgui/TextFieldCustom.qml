@@ -17,10 +17,12 @@ Item {
     property bool canReduce: false;
     property bool reduced: false;
 
+    property bool wasFocus: false;
+
     property color borderColor: "transparent";
 
     signal focusChanged();
-//    signal textChanged();
+    signal inputTextChanged();
 
     Rectangle {
         id: mainRect;
@@ -45,9 +47,11 @@ Item {
     TextInput {
         id: textField;
         anchors.fill: parent;
+        anchors.leftMargin: 5;
+        anchors.rightMargin: 5;
 
         color: Style.textColor;
-        font.pixelSize: 12;
+        font.pixelSize: 15;
         text: "";
 
         verticalAlignment: TextInput.AlignVCenter;
@@ -57,12 +61,17 @@ Item {
 
         onFocusChanged: {
             container.focusChanged();
+            container.wasFocus = true;
         }
 
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged");
+
+            if (container.wasFocus) {
+               container.inputTextChanged();
+            }
+
             container.isTextChanged = true;
-            container.textChanged();
             timer.restart();
         }
 
@@ -79,16 +88,4 @@ Item {
         anchors.leftMargin: 5;
         anchors.bottom: parent.bottom;
     }
-
-//    Rectangle{
-//        id:bottomBlue;
-//        anchors.horizontalCenter: parent.horizontalCenter;
-//        anchors.bottom: parent.bottom;
-//        height: 3;
-//        Behavior on width {
-//            NumberAnimation { duration: container.animDuration;}
-//        }
-//        color: container.focusColor;
-//    }
-
 }

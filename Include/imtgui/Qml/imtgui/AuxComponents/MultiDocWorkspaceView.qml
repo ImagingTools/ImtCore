@@ -10,6 +10,8 @@ Rectangle {
     color: "transparent";
     property TabPanel tabPanel: tabPanelInternal;
     property Item activeItem;
+
+    property Item activeCollectionItem;
     property Item rootItem;
     property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
 //    property TreeItemModel model;

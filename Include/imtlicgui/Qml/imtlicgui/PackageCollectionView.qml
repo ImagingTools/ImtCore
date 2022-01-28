@@ -56,8 +56,6 @@ Item {
                 name = "New Package";
                 typeOperation = "New";
             }
-
-            //multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit")
             packageCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 

@@ -52,6 +52,24 @@ istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<im
 		name = itemModel.GetData("AccountName").toString();
 		accountInfo->SetAccountName(name);
 		accountInfo->SetAccountDescription(description);
+
+		imtauth::CContactInfo contactInfo;
+
+		if (itemModel.ContainsKey("Email")) {
+			QString email = itemModel.GetData("Email").toString();
+			contactInfo.SetEmail(email);
+		}
+
+		if (itemModel.ContainsKey("LastName")) {
+			QString lastName = itemModel.GetData("LastName").toString();
+			contactInfo.SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, lastName);
+		}
+
+		if (itemModel.ContainsKey("FirstName")) {
+			QString firstName = itemModel.GetData("FirstName").toString();
+			contactInfo.SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, firstName);
+		}
+		accountInfo->SetAccountOwner(contactInfo);
 		return accountInfo;
 	}
 	return nullptr;

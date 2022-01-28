@@ -7,6 +7,8 @@ Item {
     id: installationsMultiDocViewContainer;
     anchors.fill: parent;
 
+    visible: false;
+
     property Item rootItem;
     property alias firstElementImageSource: installationsMultiDocView.firstElementImageSource;
 //    property alias model: installationsMultiDocView.model;

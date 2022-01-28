@@ -47,6 +47,8 @@ Rectangle {
                 console.log("menuPanel.activePageName ", menuPanel.activePageName);
                 console.log("menuPanel.activePageId ", menuPanel.activePageId);
                 console.log("menuPanel.activeIcon ", model[PageEnum.ICON]);
+
+                console.log("menuPanel.imageSource ", this.imageSource);
             }
         }
 

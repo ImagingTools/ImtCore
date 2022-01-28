@@ -15,8 +15,9 @@ namespace imtguigql
 void CObjectCollectionControllerCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
 	// for object collection thread running
-	if (!m_objectCollectionCompPtr.IsValid()){
+	if (!m_objectCollectionCompPtr.EnsureInitialized()){
 		qDebug() << "Invalid object collection component";
 	}
 }

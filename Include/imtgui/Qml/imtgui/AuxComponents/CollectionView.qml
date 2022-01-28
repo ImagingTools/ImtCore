@@ -69,7 +69,7 @@ Rectangle {
         }
         else if(!isHeaderUpdated){
             console.log("CollectionView refresh data not contains")
-             itemsModel.updateModel();
+            itemsModel.updateModel();
         }
     }
 
@@ -157,7 +157,6 @@ Rectangle {
                         collectionViewContainer.model.SetExternTreeModel('headers',tableInternal.headers)
 
                         itemsModel.updateModel();
-
                     }
                     else if(packageInfoModel.ContainsKey("errors")){
                         var errorsModelLocal = packageInfoModel.GetData("errors");

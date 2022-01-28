@@ -7,6 +7,9 @@ import imtauthgui 1.0
 Item {
     id: productsCollectionViewContainer;
     anchors.fill: parent;
+
+//    visible: false;
+
     property Item rootItem;
     property Item multiDocViewItem;
     property alias itemId: productCollectionView.itemId;
@@ -243,7 +246,9 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, saveModel);
             if (this.state === "Ready"){
-                console.log("ProductView saveModel data exist");
+
+                productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.refresh();
+
                 var dataModelLocal = saveModel.GetData("data");
                 if (dataModelLocal.ContainsKey("ProductAdd")) {
                     dataModelLocal = dataModelLocal.GetData("ProductAdd");

@@ -10,8 +10,13 @@ Rectangle {
 
     property bool hasIcon: container.iconSource !== "";
 
+    property bool hasText: false;
+
+
     property int iconWidth: container.width;
     property int iconHeight: container.height;
+
+    property int fontPixelSize: Style.fontSize_common;
 
     color: container.highlighted ? Style.hover : "transparent";
 
@@ -25,23 +30,51 @@ Rectangle {
 
     Image {
         id: image;
-        anchors.centerIn: parent;
+       // anchors.centerIn: parent;
         height: container.iconHeight;
         width: container.iconWidth;
         sourceSize.width: width;
         sourceSize.height: height;
 
         visible: container.hasIcon;
+
+        Component.onCompleted: {
+//            if (container.hasIcon) {
+//                image.anchors.left = container.left;
+//                image.anchors.leftMargin = 5;
+//                image.anchors.verticalCenter = container.verticalCenter;
+//            } else {
+//                image.anchors.centerIn = container;
+//            }
+        }
     }
 
     Text {
         id: text;
-        anchors.centerIn: parent;
+//        anchors.left: image.right;
 
         color: Style.textColor;
-        font.pixelSize: Style.fontSize_common;
+        font.pixelSize: container.fontPixelSize;
         font.family: Style.fontFamily;
         text: container.textButton;
+
+        visible: container.hasText;
+
+        Component.onCompleted: {
+            if (container.hasText) {
+
+//                if (container.hasIcon) {
+//                    text.anchors.left = image.right;
+//                    text.anchors.leftMargin = 5;
+//                    image.anchors.verticalCenter = container.verticalCenter;
+//                } else{
+//                    text.anchors.horizontalCenter = container.horizontalCenter;
+//                    text.anchors.verticalCenter = container.verticalCenter;
+//                }
+                text.anchors.horizontalCenter = container.horizontalCenter;
+                text.anchors.verticalCenter = container.verticalCenter;
+            }
+        }
     }
 
     MouseArea {
