@@ -4,7 +4,9 @@
 // ImtCore includes
 #include <imtstyle/IDesignSchemaInfoProvider.h>
 
+
 class QFont;
+
 
 namespace imtbase
 {

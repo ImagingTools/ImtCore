@@ -1,6 +1,7 @@
-#include "CHttpGraphQLServletComp.h"
+#include <imtgql/CHttpGraphQLServletComp.h>
 
-// Acf includes
+
+// ACF includes
 #include <iser/CJsonStringWriteArchive.h>
 
 // ImtCore includes
@@ -12,23 +13,14 @@ namespace imtgql
 {
 
 
-// reimplemented (ilog::CLoggerComponentBase)
-void CHttpGraphQLServletComp::OnComponentCreated()
-{
-	ilog::CLoggerComponentBase::OnComponentCreated();
-}
-
-void CHttpGraphQLServletComp::OnComponentDestroyed()
-{
-	ilog::CLoggerComponentBase::OnComponentDestroyed();
-}
-
 // reimplemented (imtrest::IRequestServlet)
 
-imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(const QByteArray& commandId, const imtrest::IRequest::CommandParams& commandParams, const HeadersMap& headers, const imtrest::CHttpRequest& request) const
+imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
-	using statusCode = imtrest::IProtocolEngine::StatusCode;
-
 	imtgql::CGqlRequest gqlRequest;
 	int errorPosition = -1;
 
@@ -72,43 +64,49 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(const
 	}
 
 	if (gqlError == true){
-		return CreateResponse(statusCode::SC_BAD_REQUEST, representationData, request);
+		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_BAD_REQUEST, representationData, request);
 	}
 	else if (!representationData.isEmpty()){
-		return CreateResponse(statusCode::SC_OK, representationData, request);
+		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, representationData, request);
 	}
 
-	return GenerateError(statusCode::SC_INTERNAL_SERVER_ERROR,"Request incorrected",request);
+	return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR,"Request incorrected",request);
 }
 
 
-imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(const imtrest::IProtocolEngine::StatusCode &statusCode, const QByteArray &payload, const imtrest::IRequest &request, const QByteArray &contentType) const
+// private methods
+
+imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
+			const imtrest::IProtocolEngine::StatusCode& statusCode,
+			const QByteArray& payload,
+			const imtrest::IRequest& request,
+			const QByteArray& contentTypeId) const
 {
-	return imtrest::IRequestServlet::ConstResponsePtr(
-				request.GetProtocolEngine().CreateResponse(
-				request,
-				statusCode,
-				payload,
-				contentType));
+	return imtrest::IRequestServlet::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
-imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(const imtrest::IProtocolEngine::StatusCode &errorCode, const QString &errorString, const imtrest::CHttpRequest &request) const
+
+imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
+			const imtrest::IProtocolEngine::StatusCode& errorCode,
+			const QString& errorString,
+			const imtrest::CHttpRequest& request) const
 {
+	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
+
 	int protocolErrorCode = 200;
 	QByteArray protocolErrorString;
-	request.GetProtocolEngine().GetProtocolStatusCode(errorCode, protocolErrorCode, protocolErrorString);
+	engine.GetProtocolStatusCode(errorCode, protocolErrorCode, protocolErrorString);
 
 	QByteArray responseJson;
-
-	return imtrest::IRequestServlet::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(
-														request,
-														errorCode,
-														responseJson,
-														QByteArray("application/json;charset=utf-8")));
-
+	return imtrest::IRequestServlet::ConstResponsePtr(
+				engine.CreateResponse(
+							request,
+							errorCode,
+							responseJson,
+							QByteArray("application/json;charset=utf-8")));
 }
-
 
 
 } // namespace imtgql
+
 

@@ -16,7 +16,6 @@ class IRequest;
 class IRequestServlet;
 class IResponse;
 class ISender;
-//class IResponder;
 
 
 /**
@@ -181,11 +180,6 @@ public:
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const = 0;
-
-//	/**
-//		Get responder instance using for sending responses to the clients.
-//	*/
-	//	virtual const IResponder& GetResponder(const IRequest* requestPtr = nullptr) const = 0;
 
 	/**
 		Get sender instance using for sending responses to the clients.
