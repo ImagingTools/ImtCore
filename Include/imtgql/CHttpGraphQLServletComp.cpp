@@ -34,30 +34,37 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 		QString errorMessage;
 		QByteArray gqlCommand = gqlRequest.GetCommandId();
+
 		int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
 		for (int index = 0; index < dataControllersCount; index++){
-			QByteArrayList modelIds = m_gqlRepresentationDataControllerCompPtr[index]->GetModelIds();
-			if (modelIds.contains(gqlCommand)){
-				imtbase::CTreeItemModel* sourceItemModel = m_gqlRepresentationDataControllerCompPtr[index]->CreateResponse(gqlRequest, errorMessage);
-				if(sourceItemModel != nullptr){
-					imtbase::CTreeItemModel* dataItemModel = rootModel.GetTreeItemModel("data");
-					imtbase::CTreeItemModel* errorsSourceItemModel = sourceItemModel->GetTreeItemModel("errors");
-					dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));
-					if (errorsSourceItemModel != nullptr){
-						imtbase::CTreeItemModel* errorsItemModel = rootModel.GetTreeItemModel("errors");
-						if (errorsItemModel == nullptr){
-							errorsItemModel = rootModel.AddTreeModel("errors");
+			const imtgql::IGqlRepresentationDataController* representationControllerPtr = m_gqlRepresentationDataControllerCompPtr[index];
+			if (representationControllerPtr != nullptr){
+				QByteArrayList modelIds = representationControllerPtr->GetModelIds();
+				if (modelIds.contains(gqlCommand)){
+					imtbase::CTreeItemModel* sourceItemModel = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
+					if(sourceItemModel != nullptr){
+						imtbase::CTreeItemModel* dataItemModel = rootModel.GetTreeItemModel("data");
+						imtbase::CTreeItemModel* errorsSourceItemModel = sourceItemModel->GetTreeItemModel("errors");
+						dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));
+						if (errorsSourceItemModel != nullptr){
+							imtbase::CTreeItemModel* errorsItemModel = rootModel.GetTreeItemModel("errors");
+							if (errorsItemModel == nullptr){
+								errorsItemModel = rootModel.AddTreeModel("errors");
+							}
+							errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
+							gqlError = true;
 						}
-						errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
-						gqlError = true;
+					}
+					else{
+						qCritical() << __FILE__ << __LINE__ << "source itemo model is invalid";
 					}
 				}
-				else {
-					qCritical() << __FILE__ << __LINE__ << "{CRITICAL!!!} sourceItemModel IS NULL!!!";
-				}
 			}
-
+			else{
+				qCritical() << __FILE__ << __LINE__ << "Representation controller component could not be resolved";
+			}
 		}
+
 		iser::CJsonStringWriteArchive archive(representationData);
 
 		bool retVal = rootModel.Serialize(archive);
