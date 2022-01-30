@@ -7,12 +7,6 @@ namespace imtqml
 
 // public methods
 
-CPageDataProviderCompBase::CPageDataProviderCompBase()
-	:BaseClass()
-{
-}
-
-
 // reimplemented (imtbase::IItemBasedRepresentationProvider)
 
 QByteArray CPageDataProviderCompBase::GetModelId() const
@@ -34,16 +28,16 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 			rootModel->SetData(PageEnum::NAME, *m_pageNameAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::ICON){
-			rootModel->SetData(PageEnum::ICON, *m_pageDefaultStatusIcon);
+			rootModel->SetData(PageEnum::ICON, *m_pageDefaultStatusIconAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::ICON_ON_SELECTED){
-			rootModel->SetData(PageEnum::ICON_ON_SELECTED,*m_pageOnSelectedStatusIcon);
+			rootModel->SetData(PageEnum::ICON_ON_SELECTED,*m_pageOnSelectedStatusIconAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::ICON_OFF_SELECTED){
-			rootModel->SetData(PageEnum::ICON_OFF_SELECTED,*m_pageOffSelectedStatusIcon);
+			rootModel->SetData(PageEnum::ICON_OFF_SELECTED,*m_pageOffSelectedStatusIconAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::SOURCE){
-			rootModel->SetData(PageEnum::SOURCE,*m_pageSourceItem);
+			rootModel->SetData(PageEnum::SOURCE,*m_pageSourceItemAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::ENABLED){
 			rootModel->SetData(PageEnum::ENABLED,"true");
