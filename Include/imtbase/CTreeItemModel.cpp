@@ -278,7 +278,7 @@ bool CTreeItemModel::ContainsKey(const QByteArray &key, int index) const
 }
 
 
-imtbase::CTreeItemModel* CTreeItemModel::GetTreeItemModel(const QByteArray &key, int index) const
+imtbase::CTreeItemModel* CTreeItemModel::GetTreeItemModel(const QByteArray& key, int index) const
 {
 	QVariant data = GetData(key, index);
 	if (data.isValid()){

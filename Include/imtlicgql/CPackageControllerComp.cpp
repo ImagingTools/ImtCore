@@ -1,5 +1,6 @@
 #include <imtlicgql/CPackageControllerComp.h>
 
+
 // ImtCore includes
 #include <imtlic/CFeaturePackageCollectionUtility.h>
 #include <imtlic/CFeatureInfo.h>
@@ -52,7 +53,6 @@ imtbase::CTreeItemModel* CPackageControllerComp::ListObjects(
 					QString featureDescription = packagePtr->GetFeatureList().GetElementInfo(featureCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 					itemsModel->SetData("Description", featureDescription, itemIndex);
 				}
-
 			}
 		}
 
@@ -66,12 +66,17 @@ imtbase::CTreeItemModel* CPackageControllerComp::ListObjects(
 	return rootModel;
 }
 
-istd::IChangeable* CPackageControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
-																	 QString& name, QString& description, QString &errorMessage) const
+istd::IChangeable* CPackageControllerComp::CreateObject(
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
 {
 	if (inputParams.isEmpty()){
 		return nullptr;
 	}
+
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
@@ -83,29 +88,35 @@ istd::IChangeable* CPackageControllerComp::CreateObject(const QList<imtgql::CGql
 		name = itemModel.GetData("Name").toString();
 		featurePackagePtr->SetPackageId(objectId);
 
-		imtbase::CTreeItemModel *features = itemModel.GetTreeItemModel("features");
+		imtbase::CTreeItemModel* featuresModelPtr = itemModel.GetTreeItemModel("featuresModelPtr");
+		if (featuresModelPtr != nullptr){
+			for (int i = 0; i < featuresModelPtr->GetItemsCount(); i++){
+				QByteArray featureId = featuresModelPtr->GetData("Id", i).toByteArray();
+				QString featureName = featuresModelPtr->GetData("Name", i).toString();
+				QString featureDescription = featuresModelPtr->GetData("Description", i).toString();
 
-		for (int i = 0; i < features->GetItemsCount(); i++){
-			QByteArray featureId = features->GetData("Id", i).toByteArray();
-			QString featureName = features->GetData("Name", i).toString();
-			QString featureDescription = features->GetData("Description", i).toString();
+				istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
+				featureInfoPtr->SetFeatureId(featureId);
+				featureInfoPtr->SetFeatureName(featureName);
 
-			istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
-			featureInfoPtr->SetFeatureId(featureId);
-			featureInfoPtr->SetFeatureName(featureName);
-
-			featurePackagePtr->InsertNewObject("FeatureInfo", featureName, featureDescription, featureInfoPtr.GetPtr());
+				featurePackagePtr->InsertNewObject("FeatureInfo", featureName, featureDescription, featureInfoPtr.GetPtr());
+			}
+		}
+		else{
+			Q_ASSERT(false);
 		}
 
 		return featurePackagePtr.PopPtr();
 	}
+
 	return nullptr;
 }
 
+
 imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
-		const QList<imtgql::CGqlObject>& inputParams,
-		const imtgql::CGqlObject& gqlObject,
-		QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			const imtgql::CGqlObject& gqlObject,
+			QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* treeItemModel = nullptr;
@@ -113,11 +124,11 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 	bool isSetResponce = false;
 	QByteArrayList fields;
 
-	if (!m_viewDelegateCompPtr.IsValid()) {
+	if (!m_viewDelegateCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
 
-	if (!errorMessage.isEmpty()) {
+	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
@@ -127,7 +138,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 		treeItemModel->SetIsArray(true);
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 		int index;
-		for (const QByteArray& collectionId : collectionIds) {
+		for (const QByteArray& collectionId : collectionIds){
 			index = treeItemModel->InsertNewItem();
 
 			treeItemModel->SetData("Name", collectionId, index);
@@ -135,13 +146,13 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 			treeItemModel->SetData("level", 0, index);
 
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)) {
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 				const imtlic::IFeaturePackage* packagePtr  = dynamic_cast<const imtlic::IFeaturePackage*>(dataPtr.GetPtr());
 				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 
 				imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("childItemModel", index);
 
-				for (const QByteArray& featureCollectionId : featureCollectionIds) {
+				for (const QByteArray& featureCollectionId : featureCollectionIds){
 					QString featureId = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureId();
 					QString featureName = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureName();
 
@@ -153,6 +164,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 				}
 			}
 		}
+
 		dataModel->SetExternTreeModel("TreeModel", treeItemModel);
 	}
 
@@ -160,6 +172,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 
 	return rootModel;
 }
+
 
 bool CPackageControllerComp::GetOperationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
@@ -190,6 +203,7 @@ bool CPackageControllerComp::GetOperationFromRequest(
 			return true;
 		}
 	}
+
 	return false;
 }
 

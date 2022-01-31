@@ -44,10 +44,6 @@ Rectangle {
         anchors.left: nextStack.right
         anchors.leftMargin: 10
         anchors.verticalCenter: parent.verticalCenter
-
-        text: qsTr("Products")
-        font.family: "Helvetica"
-        font.pixelSize: 25
     }
 
 //    TopButton {
