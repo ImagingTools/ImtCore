@@ -21,6 +21,8 @@ Item {
 
     property color borderColor: "transparent";
 
+    property int textSize: 15;
+
     signal focusChanged();
     signal inputTextChanged();
 
@@ -51,7 +53,7 @@ Item {
         anchors.rightMargin: 5;
 
         color: Style.textColor;
-        font.pixelSize: 15;
+        font.pixelSize: container.textSize;
         text: "";
 
         verticalAlignment: TextInput.AlignVCenter;

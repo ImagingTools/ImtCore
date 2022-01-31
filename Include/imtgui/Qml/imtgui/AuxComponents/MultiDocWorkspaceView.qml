@@ -86,9 +86,9 @@ Rectangle {
 
     function updateTitleTab(itemId, title, index) {
         console.log("MultidocWorkspaceView updateTitleTab()", index, title);
-        pages.SetData("Title", title, index);
-        pages.SetData("ItemId", itemId, index);
-        console.log("Tab after updating ItemId = " , pages.GetData("ItemId", index), "Title = ", pages.GetData("Title", index))
+        pagesData.SetData("Title", title, index);
+        pagesData.SetData("ItemId", itemId, index);
+        console.log("Tab after updating ItemId = " , pagesData.GetData("ItemId", index), "Title = ", pagesData.GetData("Title", index))
     }
 
     Component.onCompleted: {

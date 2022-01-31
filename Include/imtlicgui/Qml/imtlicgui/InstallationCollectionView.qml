@@ -16,16 +16,20 @@ Item {
         installationCollectionView.menuActivated(menuId)
     }
 
+    function refresh() {
+        installationCollectionView.refresh();
+    }
+
     function commandsChanged(commandsId) {
         console.log("InstallationCollectionView commandsChanged!", commandsId);
         if (commandsId !== "Installations"){
             return;
         }
         if (installationCollectionView.selectedIndex > -1) {
-            installationCollectionContainer.rootItem.setModeMenuButton("Remove", "Active");
-            installationCollectionContainer.rootItem.setModeMenuButton("Edit", "Active");
-            installationCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Active");
-            installationCollectionContainer.rootItem.setModeMenuButton("CreateLicense", "Activ");
+            installationCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            installationCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
+            installationCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
+            installationCollectionContainer.rootItem.setModeMenuButton("CreateLicense", "Normal");
         } else {
             installationCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             installationCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
@@ -44,7 +48,14 @@ Item {
         }
 
         onSelectItem: {
-            installationCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", "Open")
+
+            var typeOperation = "Open";
+            if (itemId === "") {
+                name = "New Installation";
+                typeOperation = "New";
+            }
+            installationCollectionContainer.multiDocViewItem.activeCollectionItem = installationCollectionContainer;
+            installationCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
 //            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit")
         }
 

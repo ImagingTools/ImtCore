@@ -58,7 +58,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 					accountTypeId = "company";
 				}
 				else if (accountType == imtauth::IAccountInfo::AT_PERSON){
-					accountTypeId = "personal";
+					accountTypeId = "private";
 				}
 
 				QString mail;
@@ -155,7 +155,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(const QList<imtgql::CGql
 			if (accountType == "company") {
 				accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_COMPANY);
 			}
-			else if (accountType == "personal")  {
+			else if (accountType == "private")  {
 				accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_PERSON);
 			}
 		}

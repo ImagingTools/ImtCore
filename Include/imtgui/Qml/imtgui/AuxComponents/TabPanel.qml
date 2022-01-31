@@ -126,6 +126,10 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
+
+            hasIcon: true;
+            hasText: false;
+
             iconHeight: 10;
             iconWidth: 10;
             iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
@@ -145,9 +149,13 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
+            hasIcon: true;
+            hasText: false;
             iconHeight: 10;
             iconWidth: 10;
             iconSource: "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg";
+
+
 
             onClicked: {
                 console.log("right button clicked");

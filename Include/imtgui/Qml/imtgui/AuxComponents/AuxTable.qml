@@ -10,7 +10,7 @@ Item {
     property int count: 3; //headersArray.length;
     property alias elements: elementsList.model;
     property TreeItemModel headers; //: elementsList.model;
-
+    property alias delegate: elementsList.delegate;
     signal selectItem(string itemId, string name);
 
     function getSelectedId(){
@@ -19,6 +19,16 @@ Item {
 
     function getSelectedName(){
         return elementsList.selectedName;
+    }
+
+    MouseArea {
+        id: maTable;
+        anchors.fill: parent;
+
+        onClicked: {
+            console.log("AuxTable MouseArea onClicked");
+            tableContainer.selectedIndex = -1;
+        }
     }
 
     Rectangle {
@@ -68,7 +78,7 @@ Item {
 
     }//headers
 
-    ListView{
+    ListView {
         id: elementsList;
         property string selectedId;
         property string selectedName;
@@ -105,5 +115,16 @@ Item {
                 tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
             }
         }
+
+        onModelChanged: {
+            console.log("AuxTable elements model onModelChanged");
+
+            console.log("count = ", elementsList.model.GetItemsCount());
+
+            for (var i = 0; i < elementsList.model.GetItemsCount(); i++) {
+                console.log("Name ", elementsList.model.GetData("Name", i));
+            }
+        }
     }
+
 }

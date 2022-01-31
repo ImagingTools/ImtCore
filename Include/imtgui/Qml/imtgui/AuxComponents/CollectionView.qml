@@ -43,7 +43,7 @@ Rectangle {
             var dataModelLocal = collectionViewContainer.model.GetData("headers");
             tableInternal.headers = dataModelLocal;
         }
-        else{
+        else {
             console.log("CollectionView refresh key headers not contains")
             headerInfoModel.updateModel()
             isHeaderUpdated = true

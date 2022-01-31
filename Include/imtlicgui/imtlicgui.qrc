@@ -14,5 +14,6 @@
         <file alias="imtlicgui/EditLicenseDialog.qml">Qml/imtlicgui/EditLicenseDialog.qml</file>
         <file alias="imtlicgui/InstallationInfoEditor.qml">Qml/imtlicgui/InstallationInfoEditor.qml</file>
         <file alias="imtlicgui/FeaturesTreeView.qml">Qml/imtlicgui/FeaturesTreeView.qml</file>
+        <file alias="imtlicgui/TableInstanceLicensesDelegate.qml">Qml/imtlicgui/TableInstanceLicensesDelegate.qml</file>
     </qresource>
 </RCC>

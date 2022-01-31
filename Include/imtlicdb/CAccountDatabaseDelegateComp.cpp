@@ -90,7 +90,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 		accountTypeId = "company";
 	}
 	else if (accountType == imtauth::IAccountInfo::AT_PERSON){
-		accountTypeId = "personal";
+		accountTypeId = "private";
 	}
 
 	QString accountDescription = accountInfoPtr->GetAccountDescription();
@@ -164,7 +164,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateUpdateObjectQuery(
 		accountTypeId = "company";
 	}
 	else if (accountType == imtauth::IAccountInfo::AT_PERSON){
-		accountTypeId = "personal";
+		accountTypeId = "private";
 	}
 
 	QString accountDescription = accountInfoPtr->GetAccountDescription();
@@ -289,8 +289,8 @@ bool CAccountDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord&
 		if (accountTypeId == "company"){
 			typeName = QObject::tr("Company");
 		}
-		else if (accountTypeId == "personal"){
-			typeName = QObject::tr("Personal");
+		else if (accountTypeId == "private"){
+			typeName = QObject::tr("Private");
 		}
 
 		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE, typeName);

@@ -30,7 +30,7 @@ Rectangle {
 
     Image {
         id: image;
-       // anchors.centerIn: parent;
+        anchors.centerIn: parent;
         height: container.iconHeight;
         width: container.iconWidth;
         sourceSize.width: width;

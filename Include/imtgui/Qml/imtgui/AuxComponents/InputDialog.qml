@@ -6,7 +6,7 @@ import imtauthgui 1.0
 
 Rectangle {
     id: container;
-    anchors.centerIn: parent;
+//    anchors.centerIn: parent;
 
     width: 300;
     height: 160;
@@ -21,8 +21,10 @@ Rectangle {
 
     property bool okButtonVisible: true;
     property bool cancelButtonVisible: true;
+    property bool centered: true;
 
     property real backgroundOpacity: 0.4;
+    property bool backgroundExist: true;
 
     property Item resultItem;
 

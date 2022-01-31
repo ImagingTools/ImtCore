@@ -37,9 +37,9 @@ Rectangle {
 
         var accountType = containerContactInfo.contactInfoModel.GetData("AccountType");
         console.log("AccountType =", accountType);
-        if (accountType === "personal") {
+        if (accountType === "private") {
             cbTypeAccount.currentIndex = 0;
-            containerContactInfo.accountType = "personal";
+            containerContactInfo.accountType = "private";
         } else {
             cbTypeAccount.currentIndex = 1;
             containerContactInfo.accountType = "company";
@@ -293,7 +293,7 @@ Rectangle {
     ListModel {
         id: typeAccountModel;
         ListElement {
-            text: "Personal";
+            text: "Private";
         }
 
         ListElement {
@@ -409,7 +409,7 @@ Rectangle {
                 radius: 3;
                 model: typeAccountModel;
                 currentIndex: containerContactInfo.accountType == "company" ? 1 : 0;
-                currentText: containerContactInfo.accountType == "company" ? "Company" : "Personal";
+                currentText: containerContactInfo.accountType == "company" ? "Company" : "Private";
                 textCentered: false;
                 backgroundColor: "#d0d0d0";
                 borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";

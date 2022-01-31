@@ -80,7 +80,7 @@ Rectangle{
         spacing: 0;
         model: container.count;
         delegate: Rectangle {
-            id:deleg;
+            id: deleg;
             width: container.delegateWidth;
             height: container.height;
             color: "transparent";

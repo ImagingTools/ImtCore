@@ -3,6 +3,7 @@ ThumbnailDecorator 1.0 ThumbnailDecorator.qml
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
 MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
 ComboBox 1.0 ./AuxComponents/ComboBox.qml
+CheckBox 1.0 ./AuxComponents/CheckBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
 MessageDialog 1.0 ./AuxComponents/MessageDialog.qml
