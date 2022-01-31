@@ -6,6 +6,9 @@ Item {
 	property string text;
 	property Font font: Font {}
 	property Color color: "#000";
+	property Color selectionColor: '#000080';
+	property Color selectedTextColor: '#fff';
+	property bool selectByMouse: false;
 
 	onTextChanged: { 
 		this._updateValue(value) 
@@ -53,11 +56,11 @@ Item {
 	}
 
 	function _getCursorPosition() {
-		let selection = this._context.backend.document.getSelection()
-		if(!selection.anchorNode || !selection.anchorOffset) return 0
+		let _selection = this._context.backend.document.getSelection()
+		if(!_selection.anchorNode || !_selection.anchorOffset) return 0
 		let range = new Range
 		range.setStart(this.element.dom, 0)
-		range.setEnd(selection.anchorNode, selection.anchorOffset)
+		range.setEnd(_selection.anchorNode, _selection.anchorOffset)
 		return range.toString().length
 	}
 
@@ -93,8 +96,19 @@ Item {
 
 	}
 
+	onSelectedTextColor,
+	onSelectionColorChanged: {
+		this._updateSelection()
+	}
+
 	onCompleted: {
-		//this._updateValue(this.text) 
+		this._updateSelection()
+	}
+
+	function _updateSelection(){
+		if(this._style) this._style.remove() 
+		this._style = this._context.backend.document.head.appendChild(this._context.backend.document.createElement("style"));
+		this._style.innerHTML = `#el-${this._uid}::selection{color: ${this.selectedTextColor}; background: ${this.selectionColor}} #el-${this._uid}::-moz-selection{color: ${this.selectedTextColor}; background: ${this.selectionColor}}`
 	}
 
 	onHorizontalAlignmentChanged:{
