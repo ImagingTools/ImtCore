@@ -83,12 +83,22 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
-		objectId = itemModel.GetData("Id").toByteArray();
-//		description = itemModel.GetData("Description").toString();
-		name = itemModel.GetData("Name").toString();
+		if (itemModel.ContainsKey("Id")){
+			objectId = itemModel.GetData("Id").toByteArray();
+		}
+
+		if (itemModel.ContainsKey("Name")){
+			name = itemModel.GetData("Name").toString();
+		}
+
 		featurePackagePtr->SetPackageId(objectId);
 
-		imtbase::CTreeItemModel* featuresModelPtr = itemModel.GetTreeItemModel("featuresModelPtr");
+		imtbase::CTreeItemModel* featuresModelPtr = nullptr;
+
+		if (itemModel.ContainsKey("features")){
+			featuresModelPtr = itemModel.GetTreeItemModel("features");
+		}
+
 		if (featuresModelPtr != nullptr){
 			for (int i = 0; i < featuresModelPtr->GetItemsCount(); i++){
 				QByteArray featureId = featuresModelPtr->GetData("Id", i).toByteArray();
@@ -101,9 +111,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 				featurePackagePtr->InsertNewObject("FeatureInfo", featureName, featureDescription, featureInfoPtr.GetPtr());
 			}
-		}
-		else{
-			Q_ASSERT(false);
 		}
 
 		return featurePackagePtr.PopPtr();

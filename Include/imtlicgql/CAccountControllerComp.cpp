@@ -128,9 +128,6 @@ istd::IChangeable* CAccountControllerComp::CreateObject(const QList<imtgql::CGql
 //		istd::TDelPtr<imtauth::IAccountInfo> accountInfoPtr = m_accountInfoFactCompPtr.CreateInstance();
 
 		imtauth::CAccountInfo *accountInfoPtr = new imtauth::CAccountInfo();
-//		if (!accountInfoPtr.IsValid()){
-//			return nullptr;
-//		}
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
