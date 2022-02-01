@@ -46,7 +46,7 @@ Item {
             orientation: ListView.Horizontal;
             spacing: 0;
             model: tableContainer.headers;
-            interactive: false;
+            boundsBehavior: Flickable.StopAtBounds;
             delegate: Rectangle{
                 id: deleg;
                 width: headersList.width/headersList.count;

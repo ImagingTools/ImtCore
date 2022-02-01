@@ -147,7 +147,7 @@ Rectangle
         model: modelLayers;
         visible: modelLayers.count > 0;
         z: 10;
-
+        boundsBehavior: Flickable.StopAtBounds;
 
         onModelChanged: {
             console.log("ThumbnailDecorator ListView onModelChanged!");

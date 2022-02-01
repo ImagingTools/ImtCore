@@ -36,6 +36,10 @@ Rectangle {
         container.resultItem.dialogResult(parameters);
     }
 
+    MouseArea {
+        anchors.fill: parent;
+    }
+
     Rectangle {
         id: editLicenseDialogTopPanel;
         width: container.width;

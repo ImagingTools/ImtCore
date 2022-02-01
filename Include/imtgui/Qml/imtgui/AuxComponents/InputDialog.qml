@@ -39,6 +39,10 @@ Rectangle {
         container.resultItem.dialogResult(parameters);
     }
 
+    MouseArea {
+        anchors.fill: parent;
+    }
+
     Rectangle {
         id: inputDialogTopPanel;
         width: container.width;

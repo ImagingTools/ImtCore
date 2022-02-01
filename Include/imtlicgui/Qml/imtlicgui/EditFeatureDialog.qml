@@ -53,6 +53,10 @@ Rectangle {
         container.resultItem.dialogResult(parameters);
     }
 
+    MouseArea {
+        anchors.fill: parent;
+    }
+
     Rectangle {
         id: editFeatureDialogTopPanel;
         width: container.width;
