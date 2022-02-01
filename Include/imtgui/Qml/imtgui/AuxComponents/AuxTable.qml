@@ -13,6 +13,8 @@ Item {
     property alias delegate: elementsList.delegate;
     signal selectItem(string itemId, string name);
 
+    signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
+
     function getSelectedId(){
         return elementsList.selectedId;
     }
@@ -108,6 +110,14 @@ Item {
                 elementsList.selectedName = model[tableContainer.headers.GetData("Id",0)];
                 tableContainer.selectedIndex = model.index;
                 console.log("TableDelegate onClicked", tableContainer.selectedIndex, elementsList.selectedId, elementsList.selectedName)
+            }
+
+            onRightButtonMouseClicked: {
+                console.log("AuxTable onRightButtonMouseClicked");
+                var x = mouseX;
+                var y = model.index * tableDelegate.height + mouseY;
+
+                tableContainer.rightButtonMouseClicked(tableContainer, x, y);
             }
 
             onDoubleClicked: {

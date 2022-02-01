@@ -65,7 +65,7 @@
 			"TabBackground": "GrayBlue",
 			"TabBorderSelected": "Orange",
 			"TabBorderSelected2": "Orange 2",
-			"TabSelected": "DeepBlue",
+			"TabSelected": "Red",
 			"BackgroundSelected": "White",
 			"TextSelected": "DarkGrayBlue",
 			"TextSelectedBackground": "VividBlue",

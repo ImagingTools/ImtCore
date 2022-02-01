@@ -70,7 +70,7 @@
 			"TabBackground": "DarkGray",
 			"TabBorderSelected": "VividBlue",
 			"TabBorderSelected2": "VividBlue",
-			"TabSelected": "Red",
+			"TabSelected": "VividBlue",
 			"BackgroundSelected": "DarkGray",
 			"TextSelected": "VividBlue",
 			"TextSelectedBackground": "VividBlue"

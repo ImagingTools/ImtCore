@@ -18,6 +18,7 @@ Rectangle {
 
     property string message;
     property string nameDialog;
+    property string typeOperation;
 
     property bool okButtonVisible: true;
     property bool cancelButtonVisible: true;
@@ -35,6 +36,7 @@ Rectangle {
         var parameters  = {};
         parameters["status"] = status;
         parameters["value"] = value;
+        parameters["typeOperation"] = container.typeOperation;
         parameters["dialog"] = "InputDialog";
         container.resultItem.dialogResult(parameters);
     }

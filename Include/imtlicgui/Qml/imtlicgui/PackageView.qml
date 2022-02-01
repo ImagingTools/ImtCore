@@ -14,6 +14,9 @@ Item {
     property alias itemName: featureCollectionView.itemName;
     property alias model: featureCollectionView.model;
 
+    property int contextMenuX;
+    property int contextMenuY;
+
     Component.onCompleted: {
         console.log("PackageView onCompleted", featureCollectionView.selectedIndex);
     }
@@ -32,6 +35,43 @@ Item {
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
+    ListModel {
+        id: contextMenuModel;
+
+        Component.onCompleted: {
+            contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": "Set Description...", "imageSource": "", "mode": "Normal"});
+//            contextMenuModel.append({"id": "Rename", "name": "Rename", "imageSource": "", "mode": "Normal"});
+        }
+    }
+
+    function getMenuButtonsX() {
+        return featureCollectionViewContainer.contextMenuX + 75;
+    }
+
+    function getMenuButtonsY() {
+        return featureCollectionViewContainer.contextMenuY + 132;
+    }
+
+    function openContextMenu(item, mouseX, mouseY) {
+        var point = featureCollectionViewContainer.mapToItem(item, mouseX, mouseY);
+
+        contextMenuX = point.x;
+        contextMenuY = point.y;
+
+        var source = "AuxComponents/PopupMenuDialog.qml";
+        var parameters = {};
+        parameters["model"] = contextMenuModel;
+        parameters["backgroundOpacity"] = 0;
+        parameters["resultItem"] = featureCollectionViewContainer;
+        parameters["itemHeight"] = 25;
+        parameters["itemWidth"] = 150;
+        parameters["styleColor"] = Style.theme == "Dark" ? "Light" : "Dark";
+        thubnailDecoratorContainer.openDialog(source, parameters);
+    }
+
     function alreadyExistIdHasEmpty() {
         var dataModelLocal = featureCollectionView.model.GetData("data")
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
@@ -42,22 +82,6 @@ Item {
         return "";
     }
 
-//    function checkNewFeatureId(checkId) {
-//        if (checkId === undefined || checkId === "#") {
-//            return "Empty Feature-ID!";
-//        }
-
-//        var dataModelLocal = featureCollectionView.model.GetData("data");
-
-//        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-//            if (dataModelLocal.GetData("Id", i) === checkId && featureCollectionView.selectedIndex !== i) {
-//                return "Feature-ID " + checkId + " already exist!";
-//            }
-//        }
-
-//        return "";
-//    }
-
     function dialogResult(parameters) {
          console.log("PackageView dialogResult", parameters["status"]);
 
@@ -65,34 +89,28 @@ Item {
 
             if (parameters["dialog"] === "EditFeature") {
                 var dataModelLocal = featureCollectionView.model.GetData("data");
-
-//                var checkIdStr = featureCollectionViewContainer.checkNewFeatureId(parameters["newFeatureId"]);
-
-//                if (checkIdStr !== "") {
-
-//                    var source = "AuxComponents/MessageDialog.qml";
-//                    var parameters = {};
-//                    parameters["message"] = checkIdStr;
-//                    parameters["noButtonVisible"] = false;
-//                    parameters["textOkButton"] = "Ok";
-//                    parameters["nameDialog"] = "ErrorDialog";
-
-//                    featureCollectionViewContainer.openMessageDialog(source, parameters);
-//                    return;
-//                }
-
                 console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
                 dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);//
                 dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
-//                parameters["loaderDialog"].closeItem();
                 featureCollectionView.model.SetData("data", dataModelLocal);
                 featureCollectionView.refresh();
             }
             else if (parameters["dialog"] === "InputDialog") {
-                var value = parameters["value"];
-                console.log("featureCollectionViewContainer dialogResult", value);
-                featureCollectionViewContainer.rootItem.updateTitleTab(featureCollectionViewContainer.itemId, value);
-                saveModelPackage.updateModel(value);
+                if (parameters["typeOperation"] === "Save") {
+                    var value = parameters["value"];
+                    console.log("featureCollectionViewContainer dialogResult", value);
+                    featureCollectionViewContainer.rootItem.updateTitleTab(featureCollectionViewContainer.itemId, value);
+                    saveModelPackage.updateModel(value);
+                }
+                else if (parameters["typeOperation"] === "SetDescription") {
+                    var value = parameters["value"];
+                    var dataModelLocal = featureCollectionView.model.GetData("data");
+
+                    dataModelLocal.SetData("Description", value, featureCollectionView.table.selectedIndex);
+                    featureCollectionView.model.SetData("data", dataModelLocal);
+
+                    featureCollectionView.refresh();
+                }
             }
         }
         else if (parameters["status"] === "yes") {
@@ -100,11 +118,32 @@ Item {
             if (featureCollectionView.model.ContainsKey("data")) {
                 var dataModelLocal = featureCollectionView.model.GetData("data");
                 dataModelLocal.RemoveItem(featureCollectionView.table.selectedIndex);
-
                 featureCollectionView.model.SetData("data", dataModelLocal);
                 featureCollectionView.model.Refresh();
                 featureCollectionView.refresh();
+
+                featureCollectionView.table.selectedIndex = -1;
+                featureCollectionViewContainer.commandsChanged("PackageEdit");
             }
+        }
+        else if (parameters["status"] === "Edit") {
+//            var dataModelLocal = featureCollectionView.model.GetData("data");
+//            var id = dataModelLocal.GetData("Id", featureCollectionView.table.selectedIndex);
+//            var name = dataModelLocal.GetData("Id", featureCollectionView.table.selectedIndex);
+//            featureCollectionView.selectItem(id, name);
+            featureCollectionViewContainer.menuActivated("Edit");
+        }
+        else if (parameters["status"] === "Remove") {
+            featureCollectionViewContainer.menuActivated("Remove");
+        }
+        else if (parameters["status"] === "Set Description...") {
+            var source = "AuxComponents/InputDialog.qml";
+            var parameters = {};
+            parameters["message"] = "Please enter the description of the feature: ";
+            parameters["nameDialog"] = "Set description";
+            parameters["typeOperation"] = "SetDescription";
+            parameters["resultItem"] = featureCollectionViewContainer;
+            thubnailDecoratorContainer.openDialog(source, parameters);
         }
     }
 
@@ -130,6 +169,7 @@ Item {
                 var parameters = {};
                 parameters["message"] = "Please enter the name of the document: ";
                 parameters["nameDialog"] = "Document Name";
+                parameters["typeOperation"] = "Save";
                 parameters["resultItem"] = featureCollectionViewContainer;
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
@@ -178,7 +218,7 @@ Item {
             return;
         }
 
-        if (featureCollectionView.selectedIndex > -1) {
+        if (featureCollectionView.table.selectedIndex > -1) {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
@@ -217,6 +257,11 @@ Item {
                 featureCollectionView.gqlModelItems = "FeatureList"
                 featureCollectionView.gqlModelRemove = "";
             }
+        }
+
+        onRightButtonMouseClicked: {
+            console.log("PackageView CollectionView AuxTable onRightButtonMouseClicked");
+            featureCollectionViewContainer.openContextMenu(item, mouseX, mouseY);
         }
 
         onSelectItem: {
@@ -337,6 +382,8 @@ Item {
             anchors.top: parent.top;
             width: parent.width;
             height: 35;
+//            color: "transparent";
+            color: Style.theme === "Light" ? "white": Style.backgroundColor;
             Text {
                 id: titleHeader;
 

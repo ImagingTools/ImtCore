@@ -33,7 +33,6 @@ Rectangle {
             }
 
         }
-
     }
 
     function dialogResult(parameters) {

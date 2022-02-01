@@ -3,36 +3,43 @@ import Acf 1.0
 
 Rectangle {
     id: container;
+
     property alias iconSource: image.source;
 //    radius: container.height * 0.15;
     radius: 2;
+    border.color: container.borderColor;
     property bool highlighted: ma.containsMouse;
 
     property bool hasIcon: container.iconSource !== "";
 
     property bool hasText: false;
+    property bool borderExist: false;
 
+    property bool enabled: true;
+
+    property string borderColor: "transparent";
+    property string backgroundColor: "transparent";
 
     property int iconWidth: container.width;
     property int iconHeight: container.height;
 
     property int fontPixelSize: Style.fontSize_common;
 
-    color: container.highlighted ? Style.hover : "transparent";
+    color: container.highlighted ? Style.hover : container.backgroundColor;
 
 //    color: "red";
 
     property string textButton;
 //    border.color: container.highlighted ? Style.buttonBorderColor : "transparent";
-     border.color: Style.buttonColor;
+//    border.color: Style.buttonColor;
     signal clicked;
 
 
     Image {
         id: image;
         anchors.centerIn: parent;
-        height: container.iconHeight;
-        width: container.iconWidth;
+        height: container.iconHeight - 3;
+        width: container.iconWidth - 3;
         sourceSize.width: width;
         sourceSize.height: height;
 
@@ -53,7 +60,7 @@ Rectangle {
         id: text;
 //        anchors.left: image.right;
 
-        color: Style.textColor;
+        color: container.enabled ? Style.textColor : Style.disabledInActiveTextColor;
         font.pixelSize: container.fontPixelSize;
         font.family: Style.fontFamily;
         text: container.textButton;
@@ -82,7 +89,7 @@ Rectangle {
         anchors.fill: parent;
         hoverEnabled: true;
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
+        visible: container.enabled;
         onPressed: {
             image.anchors.verticalCenterOffset = 1;
         }

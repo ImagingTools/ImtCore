@@ -13,11 +13,15 @@ Rectangle{
     property bool selected: false;
     property int textTopMargin: 8;
 
+//    property int mouseClickX;
+//    property int mouseClickY;
+
     property var bodyArray:  [];
 
     property string maxSizeText: "";
 
     signal clicked;
+    signal rightButtonMouseClicked(int mouseX, int mouseY);
     signal doubleClicked;
 
     onBodyArrayChanged: {
@@ -42,6 +46,14 @@ Rectangle{
             }
         }
     }
+
+//    function getMenuButtonsX() {
+//        return container.mouseClickX;
+//    }
+
+//    function getMenuButtonsY() {
+//        return container.mouseClickY;
+//    }
 
     Rectangle{
         id: selectionBackGround;
@@ -105,7 +117,20 @@ Rectangle{
     MouseArea {
         id: ma;
         anchors.fill: parent;
+        acceptedButtons: Qt.LeftButton | Qt.RightButton;
         onClicked: {
+//            container.mouseClickX = mouseX;
+//            container.mouseClickY = mouseY;
+            if (mouse.button === Qt.RightButton) {
+                console.log("TableDelegate onRightButtonMouseClicked");
+                thubnailDecoratorContainer.closeDialog();
+                container.rightButtonMouseClicked(mouseX, mouseY);
+            }
+//            else {
+//                console.log("TableDelegate Clicked", mouseX, mouseY);
+//                container.clicked();
+//            }
+            console.log("TableDelegate Clicked", mouseX, mouseY);
             container.clicked();
         }
 

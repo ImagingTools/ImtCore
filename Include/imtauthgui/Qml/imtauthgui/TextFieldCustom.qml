@@ -10,6 +10,10 @@ Item {
     property string focusColor: Style.textSelected;
     property bool enabled:  true;
 
+    property bool correctData: true;
+
+    property bool isFocus: textField.focus;
+
     property alias text: textField.text;
     property bool isTextChanged: false;
     property string placeHolderText: "Наименование";
@@ -19,7 +23,7 @@ Item {
 
     property bool wasFocus: false;
 
-    property color borderColor: "#00BFFF";
+    property color borderColor: Style.iconColorOnSelected;
 
     property int textSize: 15;
 

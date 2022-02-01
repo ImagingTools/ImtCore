@@ -23,6 +23,8 @@ Rectangle {
 
     signal removedItem(string itemId);
 
+    signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
+
     function dialogResult(parameters) {
          console.log("CollectionView dialogResult", parameters["status"]);
 
@@ -121,10 +123,18 @@ Rectangle {
             collectionViewContainer.selectItem(itemId, name);
         }
 
+        onRightButtonMouseClicked: {
+            console.log("CollectionView AuxTable onRightButtonMouseClicked");
+            collectionViewContainer.rightButtonMouseClicked(item, mouseX, mouseY);
+        }
+
         onSelectedIndexChanged: {
             console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
-            collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
-            collectionViewContainer.model.SetData("selectedIndex", tableInternal.selectedIndex);
+            if (tableInternal.selectedIndex != -1) {
+                collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
+                collectionViewContainer.model.SetData("selectedIndex", tableInternal.selectedIndex);
+            }
+
             //console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
         }
     }

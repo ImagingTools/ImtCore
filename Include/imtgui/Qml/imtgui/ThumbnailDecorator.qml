@@ -23,8 +23,8 @@ Rectangle
 
     function openDialog(source, parameters) {
         console.log("ThumbnailDecorator openDialog", source, parameters);
-        modelLayers.insert(0, {"source": source, "parameters": parameters})
-//        modelLayers.append({"source": source, "parameters": parameters});
+//        modelLayers.insert(0, {"source": source, "parameters": parameters})
+        modelLayers.append({"source": source, "parameters": parameters});
 
         for (var i = 0; i < modelLayers.count; i++) {
             console.log(i, modelLayers.get(i).source);
@@ -43,8 +43,12 @@ Rectangle
     }
 
     function closeDialog() {
+
         var index = thubnailDecoratorContainer.getIndexActiveDialog();
-        modelLayers.remove(index);
+        console.log("ThumbnailDecorator closeDialog ", index);
+        if (index > -1) {
+            modelLayers.remove(index);
+        }
     }
 
     ListModel {

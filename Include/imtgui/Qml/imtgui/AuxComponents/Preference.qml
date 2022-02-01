@@ -89,8 +89,8 @@ Rectangle {
                id: exit;
                anchors.right: topPan.right;
                anchors.verticalCenter: topPan.verticalCenter;
-               width: 15;
-               height: 15;
+               width: 17;
+               height: 17;
                radius: radiusValue;
                iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
               MouseArea {

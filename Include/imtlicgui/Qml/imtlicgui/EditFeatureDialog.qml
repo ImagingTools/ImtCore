@@ -32,19 +32,6 @@ Rectangle {
         }
     }
 
-//    onFeatureIdChanged: {
-//        var msg = container.validateId(container.featureId);
-
-//        errorIdMessage.text = msg;
-//    }
-
-    Component.onCompleted: {
-        console.log("EditFeatureDialog Component.onCompleted", container.featureId);
-//        var msg = container.validateId(container.featureId);
-
-//        errorIdMessage.text = msg;
-    }
-
     function validateId(id) {
         if (id === "") {
             return "Id can't be empty!";
@@ -135,8 +122,8 @@ Rectangle {
             anchors.right: editFeatureDialogTopPanel.right;
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
-            width: 15;
-            height: 15;
+            width: 17;
+            height: 17;
             iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
 
             onClicked: {
@@ -178,8 +165,9 @@ Rectangle {
                 height: 23;
                 text: container.featureName;
                 focus: true;
+                correctData: errorNameMessage.text !== "";
 
-                borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : "#00BFFF";
+                borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
                 anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureName.verticalCenter;
 
@@ -191,14 +179,13 @@ Rectangle {
                        errorNameMessage.text = nameMessage;
                     }
                 }
-
             }
         }
 
         Text {
             id: titleFeatureId;
             anchors.top: tfcFeatureName.bottom;
-            anchors.topMargin: 20;
+            anchors.topMargin: 25;
             text: qsTr("Feature - ID");
 
             color: Style.textColor;
@@ -221,15 +208,8 @@ Rectangle {
                 text: container.featureId;
                 anchors.horizontalCenter: tfcFeatureId.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureId.verticalCenter;
-                borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : "#00BFFF";
-//                onInputTextChanged: {
-//                    errorIdMessage.text = "";
-
-//                    var idMessage = container.validateId(tfcFeatureIdText.text);
-//                    if (idMessage !== "") {
-//                       errorIdMessage.text =idMessage;
-//                    }
-//                }
+                borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
+                correctData: errorIdMessage.text !== "";
 
                 onTextChanged: {
                     errorIdMessage.text = "";
@@ -243,77 +223,62 @@ Rectangle {
                 onFocusChanged: {
                     container.generateKey();
                 }
-
             }
         }
 
-        Rectangle {
+        AuxButton {
             id: okButton;
+
             anchors.top: tfcFeatureId.bottom;
             anchors.right: cancelButton.left;
             anchors.rightMargin: 15;
             anchors.topMargin: 30;
+
             width: 70;
             height: 25;
-            color: Style.backgroundColor;
-            border.color: okButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                text: qsTr("ОК");
-                font.family: Style.fontFamily;
-            }
+            hasText: true;
+            hasIcon: false;
 
-            MouseArea {
-                id: okButtonMa;
-                anchors.fill: parent;
-                //hoverEnabled: errorIdMessage.text !== "" ? true : false;
-                hoverEnabled: true;
-                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-                visible:tfcFeatureNameText.text !== "" && tfcFeatureIdText.text !== "" && errorIdMessage.text === "" && errorNameMessage.text === "";
-                onClicked: {
-                    if (tfcFeatureIdText.text[0] !== "#") {
-                        tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
-                    }
+            textButton: "OK";
+            borderColor: okButton.highlighted ? Style.iconColorOnSelected :
+                                              okButton.enabled ? Style.buttonColor :
+                                                                 Style.imagingToolsGradient2;
+            backgroundColor: okButton.enabled ? Style.imagingToolsGradient1 : Style.backgroundColor;
 
-                    container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
-                    container.exit("ok");
-                    loaderDialog.closeItem();
+            enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
+
+            onClicked: {
+                if (tfcFeatureIdText.text[0] !== "#") {
+                    tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
                 }
+
+                container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
+                container.exit("ok");
+                loaderDialog.closeItem();
             }
         }
 
-        Rectangle {
+        AuxButton {
             id: cancelButton;
-            width: 70;
-            height: 25;
-            color: Style.backgroundColor;
-            border.color: cancelButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
             anchors.top: tfcFeatureId.bottom;
             anchors.topMargin: 30;
             anchors.right: tfcFeatureId.right;
 
+            width: 70;
+            height: 25;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                text: qsTr("Cancel");
-            }
+            hasText: true;
+            hasIcon: false;
 
-            MouseArea {
-                id: cancelButtonMa;
-                anchors.fill: parent;
-                hoverEnabled: enabled;
-                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+            textButton: "Cancel";
+            borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+            backgroundColor: Style.imagingToolsGradient1;
 
-                onClicked: {
-                    container.exit("cancel");
-                    loaderDialog.closeItem();
-                }
+            onClicked: {
+                container.exit("cancel");
+                loaderDialog.closeItem();
             }
         }
 
@@ -321,7 +286,9 @@ Rectangle {
             id: errorIdMessage;
 
             anchors.top: tfcFeatureId.bottom;
+            anchors.topMargin: 3;
             anchors.left: editFeatureDialogBody.left;
+            anchors.leftMargin: 10;
 
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -335,7 +302,9 @@ Rectangle {
             id: errorNameMessage;
 
             anchors.top: tfcFeatureName.bottom;
+            anchors.topMargin: 3;
             anchors.left: editFeatureDialogBody.left;
+            anchors.leftMargin: 10;
 
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
