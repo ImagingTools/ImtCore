@@ -23,7 +23,13 @@ Rectangle
 
     function openDialog(source, parameters) {
         console.log("ThumbnailDecorator openDialog", source, parameters);
-        modelLayers.append({"source": source, "parameters": parameters});
+        modelLayers.insert(0, {"source": source, "parameters": parameters})
+//        modelLayers.append({"source": source, "parameters": parameters});
+
+        for (var i = 0; i < modelLayers.count; i++) {
+            console.log(i, modelLayers.get(i).source);
+        }
+
         console.log("ThumbnailDecorator listViewDialogs.count", listViewDialogs.count);
         return modelLayers.count - 1;
     }
@@ -167,8 +173,6 @@ Rectangle
                 color: "gray";
                 opacity: loaderDialog.item.backgroundOpacity;
 
-                //visible: loaderDialog.item.backgroundOpacity !== 0;
-
                 MouseArea {
                     anchors.fill: parent;
 
@@ -183,7 +187,8 @@ Rectangle
                   anchors.centerIn: loaderDialog.item.centered ? delegateListViewDialogs : "";
 
                   function closeItem() {
-                        modelLayers.remove(model.index);
+                      console.log("ThummnailDecorator close dialog", model.index);
+                      modelLayers.remove(model.index);
                   }
 
                   Component.onCompleted: {
@@ -197,6 +202,7 @@ Rectangle
                           console.log(key, model.parameters[key]);
                           loaderDialog.item[key]  = model.parameters[key];
                       }
+                      loaderDialog.item["loaderDialog"] = loaderDialog;
                       console.log(loaderDialog.item.activeFocus);
                   }
 

@@ -19,7 +19,7 @@ Item {
 
     property bool wasFocus: false;
 
-    property color borderColor: "transparent";
+    property color borderColor: "#00BFFF";
 
     property int textSize: 15;
 
@@ -30,7 +30,7 @@ Item {
         id: mainRect;
         anchors.fill: parent;
         color: Style.baseColor;
-        border.color: textField.focus ? "#00BFFF" : Style.hover;
+        border.color: textField.focus ? container.borderColor : Style.hover;
         border.width: 1;
     }
 

@@ -8,13 +8,15 @@ import imtauthgui 1.0
 Rectangle {
     id: container;
     width: 400;
-    height: 300;
+    height: 280;
     radius: 2;
     color: Style.backgroundColor;
     clip: true;
     focus: true;
 
     property Item resultItem;
+    property Item loaderDialog;
+    property Item collectionViewFeatures;
     property string featureId;
     property string featureName;
     property real backgroundOpacity: 0.4;
@@ -28,6 +30,48 @@ Rectangle {
         if (event.key === Qt.Key_Tab) {
             console.log("event.key tab", event.key);
         }
+    }
+
+//    onFeatureIdChanged: {
+//        var msg = container.validateId(container.featureId);
+
+//        errorIdMessage.text = msg;
+//    }
+
+    Component.onCompleted: {
+        console.log("EditFeatureDialog Component.onCompleted", container.featureId);
+//        var msg = container.validateId(container.featureId);
+
+//        errorIdMessage.text = msg;
+    }
+
+    function validateId(id) {
+        if (id === "") {
+            return "Id can't be empty!";
+        }
+
+        var dataModelLocal = collectionViewFeatures.model.GetData("data");
+
+        if (id[0] !== "#") {
+            id = "#" + id;
+        }
+
+        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+
+            if (dataModelLocal.GetData("Id", i ) === id &&
+                    collectionViewFeatures.selectedIndex !== i) {
+                return "Id already exist!";
+            }
+        }
+
+        return "";
+    }
+
+    function validateName(name) {
+        if (name === "") {
+            return "Name can't be empty!";
+        }
+        return "";
     }
 
     function generateKey() {
@@ -48,6 +92,7 @@ Rectangle {
             parameters["newFeatureName"] = tfcFeatureNameText.text;
 
             parameters["dialog"] = "EditFeature";
+            parameters["loaderDialog"] = container.loaderDialog;
         }
         parameters["status"] = status;
         container.resultItem.dialogResult(parameters);
@@ -103,13 +148,13 @@ Rectangle {
 
     Rectangle {
         id: editFeatureDialogBody;
-        anchors.topMargin: 40;
+        anchors.topMargin: 20;
         color: container.color;
         anchors.top: editFeatureDialogTopPanel.bottom;
         anchors.horizontalCenter: container.horizontalCenter;
         anchors.verticalCenter: container.verticalCenter;
         width: container.width - 50;
-        height: container.height - 100;
+        height: container.height - 50;
 
         Text {
             id: titleFeatureName;
@@ -126,18 +171,29 @@ Rectangle {
             anchors.top: titleFeatureName.bottom;
             color: Style.imagingToolsGradient1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
             TextFieldCustom {
                 id: tfcFeatureNameText;
                 width: tfcFeatureName.width - 22;
                 height: 23;
                 text: container.featureName;
                 focus: true;
+
+                borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : "#00BFFF";
                 anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureName.verticalCenter;
 
+                onTextChanged: {
+                    errorNameMessage.text = "";
+
+                    var nameMessage = container.validateName(tfcFeatureNameText.text);
+                    if (nameMessage !== "") {
+                       errorNameMessage.text = nameMessage;
+                    }
+                }
+
             }
         }
-
 
         Text {
             id: titleFeatureId;
@@ -165,10 +221,29 @@ Rectangle {
                 text: container.featureId;
                 anchors.horizontalCenter: tfcFeatureId.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureId.verticalCenter;
+                borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : "#00BFFF";
+//                onInputTextChanged: {
+//                    errorIdMessage.text = "";
+
+//                    var idMessage = container.validateId(tfcFeatureIdText.text);
+//                    if (idMessage !== "") {
+//                       errorIdMessage.text =idMessage;
+//                    }
+//                }
+
+                onTextChanged: {
+                    errorIdMessage.text = "";
+
+                    var idMessage = container.validateId(tfcFeatureIdText.text);
+                    if (idMessage !== "") {
+                       errorIdMessage.text =idMessage;
+                    }
+                }
 
                 onFocusChanged: {
                     container.generateKey();
                 }
+
             }
         }
 
@@ -194,10 +269,15 @@ Rectangle {
             MouseArea {
                 id: okButtonMa;
                 anchors.fill: parent;
-                hoverEnabled: enabled;
+                //hoverEnabled: errorIdMessage.text !== "" ? true : false;
+                hoverEnabled: true;
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+                visible:tfcFeatureNameText.text !== "" && tfcFeatureIdText.text !== "" && errorIdMessage.text === "" && errorNameMessage.text === "";
                 onClicked: {
-                    container.generateKey();
+                    if (tfcFeatureIdText.text[0] !== "#") {
+                        tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
+                    }
+
                     container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
                     container.exit("ok");
                     loaderDialog.closeItem();
@@ -235,6 +315,34 @@ Rectangle {
                     loaderDialog.closeItem();
                 }
             }
+        }
+
+        Text {
+            id: errorIdMessage;
+
+            anchors.top: tfcFeatureId.bottom;
+            anchors.left: editFeatureDialogBody.left;
+
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+
+            color: Style.errorTextColor;
+
+            text: "";
+        }
+
+        Text {
+            id: errorNameMessage;
+
+            anchors.top: tfcFeatureName.bottom;
+            anchors.left: editFeatureDialogBody.left;
+
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+
+            color: Style.errorTextColor;
+
+            text: "";
         }
     }
 }

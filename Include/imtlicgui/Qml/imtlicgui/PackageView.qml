@@ -27,6 +27,37 @@ Item {
         featureCollectionView.refresh();
     }
 
+    function openMessageDialog(source, parameters) {
+        parameters["resultItem"] = featureCollectionViewContainer;
+        thubnailDecoratorContainer.openDialog(source, parameters);
+    }
+
+    function alreadyExistIdHasEmpty() {
+        var dataModelLocal = featureCollectionView.model.GetData("data")
+        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+            if (dataModelLocal.GetData("Id", i) === "") {
+                return dataModelLocal.GetData("Name", i);
+            }
+        }
+        return "";
+    }
+
+//    function checkNewFeatureId(checkId) {
+//        if (checkId === undefined || checkId === "#") {
+//            return "Empty Feature-ID!";
+//        }
+
+//        var dataModelLocal = featureCollectionView.model.GetData("data");
+
+//        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+//            if (dataModelLocal.GetData("Id", i) === checkId && featureCollectionView.selectedIndex !== i) {
+//                return "Feature-ID " + checkId + " already exist!";
+//            }
+//        }
+
+//        return "";
+//    }
+
     function dialogResult(parameters) {
          console.log("PackageView dialogResult", parameters["status"]);
 
@@ -34,10 +65,26 @@ Item {
 
             if (parameters["dialog"] === "EditFeature") {
                 var dataModelLocal = featureCollectionView.model.GetData("data");
+
+//                var checkIdStr = featureCollectionViewContainer.checkNewFeatureId(parameters["newFeatureId"]);
+
+//                if (checkIdStr !== "") {
+
+//                    var source = "AuxComponents/MessageDialog.qml";
+//                    var parameters = {};
+//                    parameters["message"] = checkIdStr;
+//                    parameters["noButtonVisible"] = false;
+//                    parameters["textOkButton"] = "Ok";
+//                    parameters["nameDialog"] = "ErrorDialog";
+
+//                    featureCollectionViewContainer.openMessageDialog(source, parameters);
+//                    return;
+//                }
+
                 console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
                 dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);//
                 dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
-
+//                parameters["loaderDialog"].closeItem();
                 featureCollectionView.model.SetData("data", dataModelLocal);
                 featureCollectionView.refresh();
             }
@@ -87,6 +134,21 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
             else {
+                var emptyId = featureCollectionViewContainer.alreadyExistIdHasEmpty();
+                if (emptyId !== "") {
+
+                    var source = "AuxComponents/MessageDialog.qml";
+                    var parameters = {};
+                    parameters["message"] = emptyId + " has an empty id !";
+                    parameters["noButtonVisible"] = false;
+                    parameters["textOkButton"] = "Ok";
+                    parameters["nameDialog"] = "ErrorDialog";
+
+                    featureCollectionViewContainer.openMessageDialog(source, parameters);
+
+                    return;
+                }
+
                 saveModelPackage.updateModel()
             }
         }
@@ -164,6 +226,7 @@ Item {
             var parameters = {};
             parameters["featureId"] = itemId;
             parameters["featureName"] = name;
+            parameters["collectionViewFeatures"] = featureCollectionView;
             parameters["resultItem"] = featureCollectionViewContainer;
 
             thubnailDecoratorContainer.openDialog(source, parameters);

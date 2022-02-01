@@ -23,7 +23,7 @@ Rectangle{
         anchors.right: parent.right;
         height: 2;
 //        color: "#FF4500";
-        color: Style.iconColorOnSelected;
+        color: Style.tabSelectedColor;
         visible: selected;
     }
 

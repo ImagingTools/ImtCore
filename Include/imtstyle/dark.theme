@@ -23,8 +23,8 @@
 		"ImagingToolsGradient1": "#323234",
 		"ImagingToolsGradient2": "#232325",
 		"ImagingToolsGradient3": "#232325",
-		"ImagingToolsGradient4": "#232325"
-
+		"ImagingToolsGradient4": "#232325",
+		"Red": "#FF4500"
 	},
 	"Style": {
 		"Name": "Dark",
@@ -49,6 +49,7 @@
 			"ToolTipText": "LightGray",
 			"Text": "White",
 			"Button": "DeepGray",
+			"ErrorText": "Red",
 			"ButtonBorder": "LightGray2",
 			"HeaderBorder": "DeepGray2",
 			"HeaderSection": "DeepGray",
@@ -69,6 +70,7 @@
 			"TabBackground": "DarkGray",
 			"TabBorderSelected": "VividBlue",
 			"TabBorderSelected2": "VividBlue",
+			"TabSelected": "Red",
 			"BackgroundSelected": "DarkGray",
 			"TextSelected": "VividBlue",
 			"TextSelectedBackground": "VividBlue"

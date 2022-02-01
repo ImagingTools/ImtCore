@@ -16,12 +16,15 @@ Rectangle {
     property string message;
     property string nameDialog;
 
+    property string textOkButton: "Yes";
+
     property bool okButtonVisible: true;
     property bool noButtonVisible: true;
     property bool backgroundExist: true;
     property real backgroundOpacity: 0.4;
     property bool centered: true;
     property Item resultItem;
+    property Item loaderDialog;
 
     signal okButtonClicked();
     signal noButtonClicked();
@@ -29,6 +32,7 @@ Rectangle {
     function exit(status) {
         var parameters  = {};
         parameters["status"] = status;
+        parameters["dialog"] = nameDialog;
         container.resultItem.dialogResult(parameters);
     }
 
@@ -131,7 +135,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.verticalCenter: parent.verticalCenter;
                 color: Style.textColor;
-                text: qsTr("Yes");
+                text: container.textOkButton;
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
             }
@@ -141,7 +145,7 @@ Rectangle {
                 anchors.fill: parent;
                 hoverEnabled: true;
                 onClicked: {
-                    container.exit("yes");
+                    container.exit(container.textOkButton.toLowerCase());
                     container.okButtonClicked();
                     loaderDialog.closeItem();
                 }
