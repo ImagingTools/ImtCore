@@ -69,6 +69,10 @@ Rectangle {
 
     onActiveCommandsModelIdChanged: {
         console.log("onActiveCommandsModelIdChanged", topPanel.activeCommandsModelId);
+        if (topPanel.activeCommandsModelId == "") {
+            return;
+        }
+
         if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
             commandsModel.updateModel();
         } else {

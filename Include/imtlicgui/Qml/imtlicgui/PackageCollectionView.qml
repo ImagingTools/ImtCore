@@ -64,36 +64,51 @@ Item {
     }
 
     function updatePackageAfterRename(newId, newName) {
-//        var dataModelLocal = packageCollectionView.model.GetData("data");
+        console.log("PackageCollectionView updatePackageAfterRename", newId, newName);
+        var dataModelLocal = packageCollectionView.model.GetData("data");
 
-//        dataModelLocal.SetData("Id", newId, packageCollectionView.selectedIndex);
-//        dataModelLocal.SetData("Name", value, packageCollectionView.table.selectedIndex);
+        dataModelLocal.SetData("Id", newId, packageCollectionView.table.selectedIndex);
+        dataModelLocal.SetData("Name", newName, packageCollectionView.table.selectedIndex);
 
-        packageCollectionView.model.SetData("Id", newId, packageCollectionView.selectedIndex);
-        packageCollectionView.model.SetData("Name", newName, packageCollectionView.table.selectedIndex);
+        packageCollectionView.model.SetData("data", dataModelLocal);
+//        packageCollectionView.refresh();
+        console.log("Model: ");
+        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+            console.log("\tId =", dataModelLocal.GetData("Id", i), " Name =", dataModelLocal.GetData("Name", i));
+        }
+        console.log("Elements: ");
+        dataModelLocal = packageCollectionView.table.elements;
+
+        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+            console.log("\tId =", dataModelLocal.GetData("Id", i), " Name =", dataModelLocal.GetData("Name", i));
+        }
     }
 
     function updatePackageAfterSetDescription(description) {
-        packageCollectionView.model.SetData("Description", description, packageCollectionView.selectedIndex);
+        console.log("PackageCollectionView updatePackageAfterSetDescription", newId, newName);
+       // packageCollectionView.model.SetData("Description", description, packageCollectionView.selectedIndex);
+        var dataModelLocal = packageCollectionView.model.GetData("data");
+
+        dataModelLocal.SetData("Description", description, packageCollectionView.table.selectedIndex);
+
+        packageCollectionView.model.SetData("data", dataModelLocal);
+
+        //packageCollectionView.refresh();
     }
 
     function dialogResult(parameters) {
-         console.log("PackageCollectionView dialogResult", parameters["status"]);
+        console.log("PackageCollectionView dialogResult", parameters["status"]);
         if (parameters["status"] === "ok") {
             if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
-                var dataModelLocal = packageCollectionView.model.GetData("data");
-
                 if (parameters["typeOperation"] === "SetDescription") {
                     setDescriptionModel.setDescription(value);
                 }
                 else if (parameters["typeOperation"] === "Rename"){
                     renameModel.rename(value);
                 }
-
-                packageCollectionView.model.SetData("data", dataModelLocal);
-                packageCollectionView.refresh();
             }
+//            packageCollectionView.refresh();
         }
         else if (parameters["status"] === "Edit") {
             packageCollectionContainer.menuActivated("Edit");
@@ -192,7 +207,6 @@ Item {
 
         function rename(newName) {
             console.log( "PackageCollectionView renameModel rename");
-
             var query;
             var queryFields;
             var inputParams = Gql.GqlObject("input");
@@ -225,16 +239,19 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, renameModel);
             if (this.state === "Ready"){
-                var dataModelLocal = this.GetData("data");
+                var dataModelLocal = renameModel.GetData("data");
+                if (dataModelLocal.ContainsKey("FeaturePackageRename")) {
+                    dataModelLocal = dataModelLocal.GetData("FeaturePackageRename");
+                    if (dataModelLocal.ContainsKey("item")) {
+                        dataModelLocal = dataModelLocal.GetData("item");
+                        var newId = dataModelLocal.GetData("NewId");
+                        var newName = dataModelLocal.GetData("NewName");
 
-                if (dataModelLocal && dataModelLocal.ContainsKey("item")) {
-                    dataModelLocal = dataModelLocal.GetData("item");
-
-                    var newId = dataModelLocal.GetData("NewId");
-                    var newName = dataModelLocal.GetData("NewName");
-
-                    packageCollectionContainer.updatePackageAfterRename(newId, newName);
+                        packageCollectionContainer.updatePackageAfterRename(newId, newName);
+                    }
                 }
+
+                renameModel.Clear();
             }
         }
     }

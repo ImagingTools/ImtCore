@@ -30,7 +30,7 @@ Rectangle {
     }
 
     function updateCommandId(){
-        console.log("MultidocWorkspaceView updateCommandId", tabPanelInternal.selectedIndex, multiDocView, packagesMultiDocView)
+        console.log("MultidocWorkspaceView updateCommandId", tabPanelInternal.selectedIndex)
         if (tabPanelInternal.selectedIndex > -1 && multiDocView.rootItem){
             var commandsId = pagesData.GetData("CommandsId", tabPanelInternal.selectedIndex);
             var itemId = pagesData.GetData("ItemId", tabPanelInternal.selectedIndex);
@@ -64,7 +64,7 @@ Rectangle {
             findPage = true;
         }
         if (!findPage) {
-            multiDocView.activeItem = null
+            //multiDocView.activeItem = null
             var index = pagesData.InsertNewItem();
             console.log("MultidicWorkspaceView addToHeadersArray index", index);
             pagesData.SetData("ItemId", itemId, index);

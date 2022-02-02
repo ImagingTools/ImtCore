@@ -40,24 +40,19 @@ Rectangle {
     function refresh() {
         var isHeaderUpdated = false;
         console.log("CollectionView refresh()", collectionViewContainer.gqlModelInfo)
-        if (collectionViewContainer.model.ContainsKey("headers")){
-            console.log("CollectionView refresh key headers contains")
+        if (collectionViewContainer.model && collectionViewContainer.model.ContainsKey("headers")){
             var dataModelLocal = collectionViewContainer.model.GetData("headers");
             tableInternal.headers = dataModelLocal;
         }
         else {
-            console.log("CollectionView refresh key headers not contains")
             headerInfoModel.updateModel()
             isHeaderUpdated = true
         }
 
-        if (collectionViewContainer.model.ContainsKey("data")){
-            console.log("CollectionView refresh data contains", collectionViewContainer.autoRefresh)
+        if (collectionViewContainer.model && collectionViewContainer.model.ContainsKey("data")){
             var dataModelLocal = collectionViewContainer.model.GetData("data");
             tableInternal.elements = 0;
             tableInternal.elements = dataModelLocal;
-
-            console.log("CollectionView refresh data items count", dataModelLocal.GetItemsCount());
 
             var selectedIndexLocal = collectionViewContainer.model.GetData("selectedIndex");
 
@@ -70,7 +65,6 @@ Rectangle {
             }
         }
         else if(!isHeaderUpdated){
-            console.log("CollectionView refresh data not contains")
             itemsModel.updateModel();
         }
     }

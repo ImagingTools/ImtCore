@@ -213,11 +213,11 @@ Item {
     }
 
     function commandsChanged(commandsId){
-        console.log("PackageView commandsChanged", commandsId, featureCollectionViewContainer.rootItem);
+        console.log("PackageView commandsChanged", commandsId, featureCollectionView.table.selectedIndex);
         if (commandsId !== "PackageEdit") {
             return;
         }
-
+        //featureCollectionView.refresh();
         if (featureCollectionView.table.selectedIndex > -1) {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");

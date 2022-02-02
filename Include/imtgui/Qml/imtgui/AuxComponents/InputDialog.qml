@@ -13,8 +13,9 @@ Rectangle {
 
     color: Style.backgroundColor;
     clip: true;
+    focus: true;
 
-    radius: 5;
+    radius: 2;
 
     property string message;
     property string nameDialog;
@@ -132,72 +133,57 @@ Rectangle {
             height: 30;
         }
 
-        Rectangle {
+        AuxButton {
             id: okButton;
+
             anchors.bottom: dialogBody.bottom;
             anchors.bottomMargin: 10;
             anchors.right: cancelButton.left;
             anchors.rightMargin: 10;
+
             width: 70;
             height: 25;
-            color: Style.backgroundColor;
-            border.color: okButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
+            hasText: true;
+            hasIcon: false;
+
+            textButton: "OK";
+            borderColor: okButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+            backgroundColor: Style.imagingToolsGradient1;
+
+            //enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
+
             visible: container.okButtonVisible;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                text: qsTr("OK");
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
-
-            MouseArea {
-                id: okButtonMa;
-                anchors.fill: parent;
-                hoverEnabled: true;
-                onClicked: {
-                    container.exit("ok", tfcInputDialog.text);
-                    container.okButtonClicked();
-                    loaderDialog.closeItem();
-                }
+            onClicked: {
+                container.exit("ok", tfcInputDialog.text);
+                container.okButtonClicked();
+                loaderDialog.closeItem();
             }
         }
 
-        Rectangle {
+        AuxButton {
             id: cancelButton;
-            width: 70;
-            height: 25;
-            color: Style.backgroundColor;
-            border.color: cancelButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
             anchors.bottom: dialogBody.bottom;
             anchors.right: dialogBody.right;
             anchors.bottomMargin: 10;
             anchors.rightMargin: 10;
 
-            visible: container.cancelButtonVisible;
+            width: 70;
+            height: 25;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                text: qsTr("Cancel");
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
+            hasText: true;
+            hasIcon: false;
 
-            MouseArea {
-                id: cancelButtonMa;
-                anchors.fill: parent;
-                hoverEnabled: true;
+            textButton: "Cancel";
+            borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+            backgroundColor: Style.imagingToolsGradient1;
 
-                onClicked: {
-                    container.exit("cancel", "");
-                    container.cancelButtonClicked();
-                    loaderDialog.closeItem();
-                }
-
+            onClicked: {
+                container.exit("cancel", "");
+                container.cancelButtonClicked();
+                loaderDialog.closeItem();
             }
         }
     }

@@ -122,18 +122,19 @@ Item {
 
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
-                tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
+                //tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
+                tableContainer.selectItem(model["Id"], model["Name"]);
             }
         }
 
         onModelChanged: {
             console.log("AuxTable elements model onModelChanged");
 
-            console.log("count = ", elementsList.model.GetItemsCount());
+//            console.log("count = ", elementsList.model.GetItemsCount());
 
-            for (var i = 0; i < elementsList.model.GetItemsCount(); i++) {
-                console.log("Name ", elementsList.model.GetData("Name", i));
-            }
+//            for (var i = 0; i < elementsList.model.GetItemsCount(); i++) {
+//                console.log("Name ", elementsList.model.GetData("Name", i));
+//            }
         }
     }
 

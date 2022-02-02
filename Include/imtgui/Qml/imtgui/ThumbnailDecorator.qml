@@ -115,6 +115,12 @@ Rectangle
 
             function changeCommandsId(commandsId) {
                 console.log("ThumbnailDecorator Repeater changeCommandsId", topPanel.activeCommandsModelId , commandsId)
+                if (topPanel.activeCommandsModelId === commandsId) {
+//                    thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
+                    topPanel.activeCommandsModelId = ""
+                   // topPanel.activeCommandsModelId = commandsId
+                }
+
                 topPanel.activeCommandsModelId = commandsId
             }
 
@@ -128,11 +134,8 @@ Rectangle
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-//                    pagesLoader.source = "../imtlicgui/" + menuPanel.model.GetData(PageEnum.ID, model.index) + "MultiDocView.qml";
                     var source = menuPanel.model.GetData(PageEnum.SOURCE, model.index);
-                    console.log("PageEnum.SOURCE ", source, PageEnum.SOURCE, model.index);
                     pagesLoader.source = source;
-//                    console.log("ThumbnailDecorator pagesLoader.source", pagesLoader.source);
                 }
 
                 onItemChanged: {
@@ -177,13 +180,13 @@ Rectangle
                 color: "gray";
                 opacity: loaderDialog.item.backgroundOpacity;
 
-                MouseArea {
-                    anchors.fill: parent;
+//                MouseArea {
+//                    anchors.fill: parent;
 
-                    onClicked: {
-                        thubnailDecoratorContainer.closeDialog();
-                    }
-                }
+//                    onClicked: {
+//                        thubnailDecoratorContainer.closeDialog();
+//                    }
+//                }
             }
 
             Loader {

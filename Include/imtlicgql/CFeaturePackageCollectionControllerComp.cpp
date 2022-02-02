@@ -112,7 +112,7 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::RenameObject(
 		if (itemModel.ContainsKey("NewName")){
 			newObjectName = itemModel.GetData("NewName").toString();
 
-			itemsModel->SetData("Name", newObjectName);
+			itemsModel->SetData("NewName", newObjectName);
 			itemsModel->SetData("NewId", newObjectName);
 		}
 
