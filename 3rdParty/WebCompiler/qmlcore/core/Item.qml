@@ -56,12 +56,15 @@ Object {
 
 			this._createElement(this.getTag(), this.getClass())
 		} //no parent == top level element, skip
+		
 	}
 
 	onCompleted: {
 		this.style({
 			'overflow': this.clip ? 'hidden': 'unset'
 		})
+		if(this._uid > 0)
+		this.element.dom.id = `el-${this._uid}`
 		
 	}
 

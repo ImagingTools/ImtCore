@@ -8,6 +8,7 @@ Item {
 	property enum verticalAlignment { AlignTop, AlignBottom, AlignVCenter };	///< text vertical alignment
 	property enum wrapMode { NoWrap, WordWrap, WrapAnywhere, Wrap, WrapAtWordBoundaryOrAnywhere };	///< multiline text wrap mode
 	property enum textFormat { Html, Text }; ///< only html or text for now
+	property enum elide { ElideNone, ElideLeft, ElideMiddle, ElideRight };
 	property int paintedWidth;		///< real width of the text without any layout applied
 	property int paintedHeight;		///< real height of this text without any layout applied
 	width: paintedWidth;
@@ -102,6 +103,18 @@ Item {
 	onColorChanged: 			{ this.style('color', $core.Color.normalize(value)) }
 	onWidthChanged:				{ this._updateSize() }
 	onHeightChanged:			{ this._updateSize() }
+	onElideChanged: {
+		this._updateElide()
+	}
+
+	function _updateElide() {
+		switch(this.elide){
+			case Text.ElideNone: this.style({'text-overflow': 'clip', 'direction': 'ltr', 'overflow': 'unset'}); break;
+			case Text.ElideLeft: this.style({'text-overflow': 'ellipsis', 'direction': 'rtl', 'overflow': 'hidden'}); break;
+			case Text.ElideMiddle: this.style({'text-overflow': 'ellipsis', 'direction': 'rtl', 'overflow': 'hidden'}); break;
+			case Text.ElideRight: this.style({'text-overflow': 'ellipsis', 'direction': 'ltr', 'overflow': 'hidden'}); break;
+		}
+	}
 
 	onVerticalAlignmentChanged: {
 		this._enableSizeUpdate()
@@ -149,5 +162,8 @@ Item {
 
 	onWrapModeChanged: {
 		this._updateWSHandling()
+	}
+	onCompleted: {
+		this._updateElide()
 	}
 }

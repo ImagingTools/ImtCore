@@ -1,5 +1,6 @@
 //WARNING: no log() function usage before init.js
 
+$core.uid = 0
 $core.device = 0
 $core.vendor = ""
 $core.__videoBackends = {}
@@ -229,6 +230,8 @@ $core.getKeyCodeByName = function(key) {
 
 var CoreObjectComponent = $core.CoreObject = function(parent) {
 	this._local = Object.create(parent? parent._local: null)
+	this._uid = $core.uid++
+	
 }
 
 var CoreObjectComponentPrototype = CoreObjectComponent.prototype
