@@ -121,6 +121,45 @@ Item {
 		}
 		if (this._clickBinder)
 			this._clickBinder.enable(value)
+
+		if (value && !this._clickRBinder) {
+			this._clickRBinder = new $core.EventBinder(this.element)
+			this._clickRBinder.on('contextmenu', function(event) { 
+				event.preventDefault()
+				this.mouse.accepted = false
+				this.mouse.x = event.offsetX
+				this.mouse.y = event.offsetY
+				this.mouse.modifiers = 0x00000000
+				if(event.altKey) this.mouse.modifiers |= 0x08000000
+				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+				if(event.metaKey) this.mouse.modifiers |= 0x10000000
+				switch(event.button){
+					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+				}
+				this.updatePosition(event); 
+				let now = new Date().getTime()
+				if(this._lastClickOrTouch){
+					if(now - this._lastClickOrTouch > 600){
+						this.clicked(event);
+						this._lastClickOrTouch = now
+					} else {
+						this.doubleClicked(event);
+						this._lastClickOrTouch = now
+					}
+				} else {
+					this.clicked(event);
+					this._lastClickOrTouch = now
+				}
+				
+				 
+				if(this.mouse.accepted) event.stopPropagation();  
+			}.bind(this))
+		}
+		if (this._clickRBinder)
+			this._clickRBinder.enable(value)
 	}
 
 	/// @private

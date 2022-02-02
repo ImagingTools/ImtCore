@@ -672,6 +672,10 @@ window.addEventListener('popstate',()=>{
 	
 });
 
+document.oncontextmenu = function(event) {
+	event.preventDefault()
+}
+
 
 exports.initRectangle = function(rect) {
 }
