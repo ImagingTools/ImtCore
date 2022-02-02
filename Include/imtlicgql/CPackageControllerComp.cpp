@@ -78,6 +78,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 	}
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
 		imtbase::CTreeItemModel itemModel;
@@ -91,7 +92,13 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			name = itemModel.GetData("Name").toString();
 		}
 
+		QString description;
+		if (itemModel.ContainsKey("Description")){
+			description = itemModel.GetData("Description").toString();
+		}
+
 		featurePackagePtr->SetPackageId(objectId);
+		featurePackagePtr->SetObjectDescription(objectId, description);
 
 		imtbase::CTreeItemModel* featuresModelPtr = nullptr;
 

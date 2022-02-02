@@ -112,6 +112,16 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			operationType = OT_DELETE;
 			return true;
 		}
+		if (fieldList->at(i).GetId() == "rename"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_RENAME;
+			return true;
+		}
+		if (fieldList->at(i).GetId() == "setDescription"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_SET_DESCRIPTION;
+			return true;
+		}
 	}
 	return false;
 }

@@ -214,11 +214,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 				imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 			retVal += "\n" +
-				QString("UPDATE Features SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4' WHERE PackageId = '%4';")
+				QString("UPDATE Features SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4' WHERE PackageId = '%5' AND Id = '%6';")
 				.arg(qPrintable(updatedFeatureId))
 				.arg(featureName)
 				.arg(featureDescription)
-				.arg(qPrintable(newPackageId)).toLocal8Bit();
+				.arg(qPrintable(newPackageId))
+				.arg(qPrintable(newPackageId))
+				.arg(qPrintable(updatedFeatureId)).toLocal8Bit();
 		}
 	}
 

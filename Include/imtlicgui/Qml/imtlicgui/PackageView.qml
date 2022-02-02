@@ -42,7 +42,7 @@ Item {
             contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
             contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
             contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
-            contextMenuModel.append({"id": "SetDescription", "name": "Set Description...", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": "Set Description", "imageSource": "", "mode": "Normal"});
 //            contextMenuModel.append({"id": "Rename", "name": "Rename", "imageSource": "", "mode": "Normal"});
         }
     }
@@ -136,7 +136,7 @@ Item {
         else if (parameters["status"] === "Remove") {
             featureCollectionViewContainer.menuActivated("Remove");
         }
-        else if (parameters["status"] === "Set Description...") {
+        else if (parameters["status"] === "Set Description") {
             var source = "AuxComponents/InputDialog.qml";
             var parameters = {};
             parameters["message"] = "Please enter the description of the feature: ";

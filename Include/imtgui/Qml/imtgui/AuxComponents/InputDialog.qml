@@ -20,6 +20,8 @@ Rectangle {
     property string nameDialog;
     property string typeOperation;
 
+    property string startingValue;
+
     property bool okButtonVisible: true;
     property bool cancelButtonVisible: true;
     property bool centered: true;
@@ -124,6 +126,7 @@ Rectangle {
             anchors.top: rectText.bottom;
             anchors.topMargin: 5;
             anchors.horizontalCenter: dialogBody.horizontalCenter;
+            text: container.startingValue;
 
             width: dialogBody.width - 20;
             height: 30;

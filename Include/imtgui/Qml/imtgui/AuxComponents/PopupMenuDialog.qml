@@ -21,6 +21,7 @@ Rectangle {
         color: Style.textColor;
         spread: 0.05;
     }
+
     property Item resultItem;
     property var model;
     property var backgroundOpacity;

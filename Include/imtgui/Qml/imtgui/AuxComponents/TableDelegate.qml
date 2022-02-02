@@ -47,14 +47,6 @@ Rectangle{
         }
     }
 
-//    function getMenuButtonsX() {
-//        return container.mouseClickX;
-//    }
-
-//    function getMenuButtonsY() {
-//        return container.mouseClickY;
-//    }
-
     Rectangle{
         id: selectionBackGround;
         anchors.fill: parent;
@@ -105,7 +97,8 @@ Rectangle{
 
                 color: Style.textColor;
                 text: container.bodyArray[model.index];
-                wrapMode: Text.WordWrap;
+                //wrapMode: Text.WordWrap;
+                elide: Text.ElideRight;
 
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
@@ -119,17 +112,13 @@ Rectangle{
         anchors.fill: parent;
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
         onClicked: {
-//            container.mouseClickX = mouseX;
-//            container.mouseClickY = mouseY;
+
             if (mouse.button === Qt.RightButton) {
                 console.log("TableDelegate onRightButtonMouseClicked");
                 thubnailDecoratorContainer.closeDialog();
                 container.rightButtonMouseClicked(mouseX, mouseY);
             }
-//            else {
-//                console.log("TableDelegate Clicked", mouseX, mouseY);
-//                container.clicked();
-//            }
+
             console.log("TableDelegate Clicked", mouseX, mouseY);
             container.clicked();
         }
