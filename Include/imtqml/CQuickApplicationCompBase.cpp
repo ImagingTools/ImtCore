@@ -48,7 +48,7 @@ bool CQuickApplicationCompBase::InitializeApplication(int argc, char** argv)
 
 		m_applicationArguments << QString::fromLocal8Bit(argv[argIndex]);
 
-		qDebug(argv[argIndex]);
+		qDebug() << QString::fromLocal8Bit(argv[argIndex]);
 	}
 
 	if (!m_applicationPtr.IsValid()){

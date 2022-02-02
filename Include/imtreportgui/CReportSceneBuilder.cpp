@@ -186,7 +186,7 @@ void CReportSceneBuilder::CreateImage(const imtreport::CImageRectangleElement& p
 	QString imgPath = pageElement.GetImagePath();
 
 	if (!QFileInfo(imgPath).exists()){
-		qDebug(QString("CGraphicsElementShapeFactory: Image %1 can not be found!").arg(imgPath).toLocal8Bit().constData());
+		qDebug() << QString("CGraphicsElementShapeFactory: Image %1 can not be found!").arg(imgPath).toLocal8Bit().constData();
 	}
 
 	QGraphicsPixmapItem* sceneElementPtr = new QGraphicsPixmapItem(QPixmap(imgPath));

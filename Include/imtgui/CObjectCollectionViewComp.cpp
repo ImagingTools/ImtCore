@@ -346,6 +346,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	m_readCollectionThread.SetModels(&m_typeModel, &m_itemModel2);
 
 	ItemList->setProperty("ItemView", true);
+	ItemList->setAlternatingRowColors(true);
 
 	m_proxyModelPtr = new ItemProxyModel(this);
 	m_proxyModelPtr->setSourceModel(m_itemModelPtr);

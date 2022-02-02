@@ -1,7 +1,8 @@
 #----------------------------------------------------------- The DESIGN TOKEN CREATOR config
 # Setting the executable file name for specific OS
 set(COMPILER_DIR ${CMAKE_BUILD_TYPE}${TARGETNAME})
-if (WIN32)
+string(FIND "$ENV{ARXCHOST}" "VC" POSITION_OF_VC)
+if (WIN32 OR (${POSITION_OF_VC} EQUAL 0))
 	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator.exe")
 else()
 	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator")
@@ -11,8 +12,11 @@ endif()
 file(GLOB DESIGN_TOKEN_CREATOR_INPUT_THEME_FILES "${IMTCOREDIR}/Include/imtstyle/*.theme")
 
 #  Setting the executable absolutely file path for specific OS
-set(DESIGN_TOKEN_CREATOR_EXE_BIN "${CMAKE_CURRENT_SOURCE_DIR}/../../../Bin/${COMPILER_DIR}/${DESIGN_TOKEN_CREATOR_EXE}")
-
+if(ANDROID)
+	set(DESIGN_TOKEN_CREATOR_EXE_BIN "${CMAKE_CURRENT_SOURCE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}$ENV{ARXCHOST}/${DESIGN_TOKEN_CREATOR_EXE}")
+else()
+	set(DESIGN_TOKEN_CREATOR_EXE_BIN "${CMAKE_CURRENT_SOURCE_DIR}/../../../Bin/${COMPILER_DIR}/${DESIGN_TOKEN_CREATOR_EXE}")
+endif()
 
 
 string(TOLOWER ${PROJECT_NAME} LOWER_PROJECT_NAME)
