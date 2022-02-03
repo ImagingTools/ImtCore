@@ -574,7 +574,7 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 	while (objectIterator != jsonObject.end()) {
 		QJsonValue jsonValue = objectIterator.value();
 		if (jsonValue.isArray()){
-			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8());
+			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8(), index);
 			treeItemModel->SetIsArray(true);
 			QJsonArray jsonArrary = jsonValue.toArray();
 			QJsonArray::ConstIterator arrayIterator = jsonArrary.begin();
@@ -588,7 +588,7 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 			}
 		}
 		else if(jsonValue.isObject()){
-			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8());
+			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8(), index);
 			treeItemModel->InsertNewItem();
 			treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.count() - 1);
 		}
