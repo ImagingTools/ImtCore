@@ -1,3 +1,15 @@
+QAbstractItemView
+{
+	outline: 0;
+}
+
+QTreeView#ItemList 
+{
+	background: ${Active.Base};
+	alternate-background-color: ${Active.Base}; 
+	show-decoration-selected: 0;
+}
+
 QTreeWidget#TypeList
 {
 	background: ${Active.Background};
