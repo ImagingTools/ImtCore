@@ -83,6 +83,7 @@ def parse_qml_file(cache, com, path):
 
 			if(path[0:3] == 'src'):
 				data = data.replace('pragma Singleton', '') # by Artur
+				data = data.replace('property int webScroll', 'webScroll') # by Artur
 				data = data.replace('Component.onCompleted', 'onCompleted') # by Artur, for compatibility completed signal
 				data = data.replace('onPressed:', 'onMousePressed:').replace('onReleased:', 'onMouseReleased:') # by Artur, for compatibility MouseArea signal
 				#data = data.replace('.scale', '.transform.scale') # by Artur, for compatibility scale
@@ -104,7 +105,14 @@ def parse_qml_file(cache, com, path):
 					repl = "this._context.backend.window.open({},'_blank')".format(q[left+1:right])
 					data = data.replace(q, repl)
 
-
+				buttons = {
+					'Qt.NoButton': '0',
+					'Qt.AllButtons': '134217727',
+					'Qt.LeftButton': '1',
+					'Qt.RightButton': '2',
+					'Qt.MiddleButton': '4',
+					'Qt.BackButton': '8',
+				}
 				cursors = {
 					'Qt.ArrowCursor': '"default"',
 					'Qt.UpArrowCursor': '"n-resize"',
@@ -131,6 +139,8 @@ def parse_qml_file(cache, com, path):
 				}  # by Artur, for compatibility cursorShape
 				for cur in cursors:
 					data = data.replace(cur, cursors[cur])
+				for but in buttons:
+					data = data.replace(but, buttons[but])
 
 				lines = data.split('\n')
 				

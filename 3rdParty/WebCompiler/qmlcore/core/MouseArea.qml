@@ -22,6 +22,7 @@ Item {
 	property string cursorShape; //by Artur, mouse cursor
 	property bool pressed;				///< mouse pressed flag
 	property bool containsMouse;		///< mouse inside item's area flag
+	property int acceptedButtons: 1;
 	// property bool clickable: true;		///< enable mouse click event handling flag
 	// property bool pressable: true;		///< enable mouse click event handling flag
 	// property bool touchEnabled: true;	///< enable touch events handling flag
@@ -39,27 +40,35 @@ Item {
 		if (value && !this._touchBinder) {
 			this._touchBinder = new $core.EventBinder(this.element)
 
-			var touchStart = function(event) { this.touchStart(event); this.mousePressed(event); if(this.mouse.accepted) event.stopPropagation();  }.bind(this)
-			var touchEnd = function(event) { 
-				this.touchEnd(event); 
-				this.mouseReleased(event); 
+			var touchStart = function(event) { 
+				if(this.acceptedButtons & 1){
+					this.touchStart(event); 
+					this.mousePressed(event); 
+					if(this.mouse.accepted) event.stopPropagation();
+				}  
+			}.bind(this)
+			var touchEnd = function(event) {
+				if(this.acceptedButtons & 1){ 
+					this.touchEnd(event); 
+					this.mouseReleased(event); 
 
-				let now = new Date().getTime()
-				if(this._lastClickOrTouch){
-					if(now - this._lastClickOrTouch > 600){
+					let now = new Date().getTime()
+					if(this._lastClickOrTouch){
+						if(now - this._lastClickOrTouch > 600){
+							this.clicked(event);
+							this._lastClickOrTouch = now
+						} else {
+							this.doubleClicked(event);
+							this._lastClickOrTouch = now
+						}
+					} else {
 						this.clicked(event);
 						this._lastClickOrTouch = now
-					} else {
-						this.doubleClicked(event);
-						this._lastClickOrTouch = now
 					}
-				} else {
-					this.clicked(event);
-					this._lastClickOrTouch = now
-				}
 
-				if(this.mouse.accepted) 
-				event.stopPropagation();  
+					if(this.mouse.accepted) 
+					event.stopPropagation(); 
+				} 
 			}.bind(this)
 			var touchMove = (function(event) { this.touchMove(event); if(this.mouse.accepted) event.stopPropagation();  }).bind(this)
 
@@ -69,6 +78,8 @@ Item {
 		}
 		if (this._touchBinder)
 			this._touchBinder.enable(value)
+
+		
 	}
 
 	/// @private
@@ -87,36 +98,39 @@ Item {
 		if (value && !this._clickBinder) {
 			this._clickBinder = new $core.EventBinder(this.element)
 			this._clickBinder.on('click', function(event) { 
-				this.mouse.accepted = false
-				this.mouse.x = event.offsetX
-				this.mouse.y = event.offsetY
-				this.mouse.modifiers = 0x00000000
-				if(event.altKey) this.mouse.modifiers |= 0x08000000
-				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
-				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
-				if(event.metaKey) this.mouse.modifiers |= 0x10000000
-				switch(event.button){
-					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
-					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
-					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
-				}
-				this.updatePosition(event); 
-				let now = new Date().getTime()
-				if(this._lastClickOrTouch){
-					if(now - this._lastClickOrTouch > 600){
+				if(this.acceptedButtons & 1){
+					this.mouse.accepted = false
+					this.mouse.x = event.offsetX
+					this.mouse.y = event.offsetY
+					this.mouse.modifiers = 0x00000000
+					if(event.altKey) this.mouse.modifiers |= 0x08000000
+					if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+					if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+					if(event.metaKey) this.mouse.modifiers |= 0x10000000
+					switch(event.button){
+						case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+						case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+						case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+					}
+					this.updatePosition(event); 
+					let now = new Date().getTime()
+					if(this._lastClickOrTouch){
+						if(now - this._lastClickOrTouch > 600){
+							this.clicked(event);
+							this._lastClickOrTouch = now
+						} else {
+							this.doubleClicked(event);
+							this._lastClickOrTouch = now
+						}
+					} else {
 						this.clicked(event);
 						this._lastClickOrTouch = now
-					} else {
-						this.doubleClicked(event);
-						this._lastClickOrTouch = now
 					}
-				} else {
-					this.clicked(event);
-					this._lastClickOrTouch = now
+					
+					
+					if(this.mouse.accepted) event.stopPropagation();
 				}
-				
-				 
-				if(this.mouse.accepted) event.stopPropagation();  
+				  
 			}.bind(this))
 		}
 		if (this._clickBinder)
@@ -125,37 +139,39 @@ Item {
 		if (value && !this._clickRBinder) {
 			this._clickRBinder = new $core.EventBinder(this.element)
 			this._clickRBinder.on('contextmenu', function(event) { 
-				event.preventDefault()
-				this.mouse.accepted = false
-				this.mouse.x = event.offsetX
-				this.mouse.y = event.offsetY
-				this.mouse.modifiers = 0x00000000
-				if(event.altKey) this.mouse.modifiers |= 0x08000000
-				if(event.shiftKey) this.mouse.modifiers |= 0x02000000
-				if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
-				if(event.metaKey) this.mouse.modifiers |= 0x10000000
-				switch(event.button){
-					case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
-					case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
-					case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
-				}
-				this.updatePosition(event); 
-				let now = new Date().getTime()
-				if(this._lastClickOrTouch){
-					if(now - this._lastClickOrTouch > 600){
+				if(this.acceptedButtons & 2){
+					event.preventDefault()
+					this.mouse.accepted = false
+					this.mouse.x = event.offsetX
+					this.mouse.y = event.offsetY
+					this.mouse.modifiers = 0x00000000
+					if(event.altKey) this.mouse.modifiers |= 0x08000000
+					if(event.shiftKey) this.mouse.modifiers |= 0x02000000
+					if(event.ctrlKey) this.mouse.modifiers |= 0x04000000
+					if(event.metaKey) this.mouse.modifiers |= 0x10000000
+					switch(event.button){
+						case 0: this.mouse.button = 0x00000001; this.mouse.buttons = 0x00000001; break;
+						case 1: this.mouse.button = 0x00000004; this.mouse.buttons = 0x00000004; break;
+						case 2: this.mouse.button = 0x00000002; this.mouse.buttons = 0x00000002; break;
+					}
+					this.updatePosition(event); 
+					let now = new Date().getTime()
+					if(this._lastClickOrTouch){
+						if(now - this._lastClickOrTouch > 600){
+							this.clicked(event);
+							this._lastClickOrTouch = now
+						} else {
+							this.doubleClicked(event);
+							this._lastClickOrTouch = now
+						}
+					} else {
 						this.clicked(event);
 						this._lastClickOrTouch = now
-					} else {
-						this.doubleClicked(event);
-						this._lastClickOrTouch = now
 					}
-				} else {
-					this.clicked(event);
-					this._lastClickOrTouch = now
+					
+					
+					if(this.mouse.accepted) event.stopPropagation();  
 				}
-				
-				 
-				if(this.mouse.accepted) event.stopPropagation();  
 			}.bind(this))
 		}
 		if (this._clickRBinder)
