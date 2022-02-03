@@ -29,6 +29,7 @@ Rectangle {
 
     property real backgroundOpacity: 0.4;
     property bool backgroundExist: true;
+    property bool clickBackgroundClose: false;
 
     property Item resultItem;
 
@@ -42,6 +43,11 @@ Rectangle {
         parameters["typeOperation"] = container.typeOperation;
         parameters["dialog"] = "InputDialog";
         container.resultItem.dialogResult(parameters);
+    }
+
+    Component.onCompleted: {
+        tfcInputDialog.textField.focus = true;
+        tfcInputDialog.textField.cursorVisible = true;
     }
 
     MouseArea {

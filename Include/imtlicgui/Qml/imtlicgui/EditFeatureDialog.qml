@@ -23,6 +23,7 @@ Rectangle {
     signal okClicked(string newId, string newName);
     signal cancelClicked();
     property bool backgroundExist: true;
+    property bool clickBackgroundClose: false;
     property bool centered: true;
 
     Keys.onPressed: {

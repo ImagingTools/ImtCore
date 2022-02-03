@@ -110,15 +110,16 @@ Rectangle
                     console.log("ThumbnailDecorator Repeater onVisibleChanged visible", pagesDeleg.visible)
                     thubnailDecoratorContainer.activeItem = pagesLoader.item;
                     pagesLoader.item.visible = pagesDeleg.visible;
+
+//                    thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
                 }
             }
 
             function changeCommandsId(commandsId) {
                 console.log("ThumbnailDecorator Repeater changeCommandsId", topPanel.activeCommandsModelId , commandsId)
+
                 if (topPanel.activeCommandsModelId === commandsId) {
-//                    thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
                     topPanel.activeCommandsModelId = ""
-                   // topPanel.activeCommandsModelId = commandsId
                 }
 
                 topPanel.activeCommandsModelId = commandsId
@@ -180,13 +181,13 @@ Rectangle
                 color: "gray";
                 opacity: loaderDialog.item.backgroundOpacity;
 
-//                MouseArea {
-//                    anchors.fill: parent;
-
-//                    onClicked: {
-//                        thubnailDecoratorContainer.closeDialog();
-//                    }
-//                }
+                MouseArea {
+                    anchors.fill: parent;
+                    visible: loaderDialog.item.clickBackgroundClose;
+                    onClicked: {
+                        thubnailDecoratorContainer.closeDialog();
+                    }
+                }
             }
 
             Loader {

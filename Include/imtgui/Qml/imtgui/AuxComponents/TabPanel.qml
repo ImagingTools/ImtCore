@@ -35,27 +35,12 @@ Rectangle {
         tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1
     }
 
-//    function updateTitleTab(index, title) {
-//        console.log("TabPanel updateTitleTab", index, title);
-//        if (index < 0 || index > list.model.count) {
-//            return;
-//        }
-
-//        tabPanelContainer.model.SetData("Title", title, index);
-//        //tabPanelContainer.model.Refresh();
-////        var tab = list.model.get(index);
-////        tab.text = title;
-////        list.model.set(index, tab);
-//    }
-
-
     function viewTabInListView(index) {
         list.positionViewAtIndex(index, ListView.Contain);
     }
 
     ListView{
         id: list;
-//        anchors.fill: parent;
         width: externButtons.visible ? parent.width - externButtons.width :  parent.width;
         height: parent.height;
 

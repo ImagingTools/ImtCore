@@ -26,13 +26,13 @@ Rectangle {
     property var model;
     property var backgroundOpacity;
     property bool backgroundExist: false;
+    property bool clickBackgroundClose: true;
     property bool centered: false;
 
     property int itemWidth: 100;
     property int itemHeight: 26;
 
     property int emptyItemCount: 0;
-
 
     function exit(status) {
         var parameters  = {};
@@ -63,7 +63,12 @@ Rectangle {
             color: "transparent";
             Rectangle {
                 id: highlightRect;
-                anchors.fill: parent;
+//                anchors.fill: parent;
+                anchors.horizontalCenter: parent.horizontalCenter;
+
+                width: parent.width - 1;
+                height: parent.height;
+
                 color: Style.selectedColor;
                 visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
             }

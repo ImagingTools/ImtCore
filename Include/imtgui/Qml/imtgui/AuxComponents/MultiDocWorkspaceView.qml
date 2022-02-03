@@ -38,6 +38,11 @@ Rectangle {
         }
     }
 
+//    function setItemSelectedIndex(selectedIndex) {
+//        console.log("MultidocWorkspaceView setItemSelectedIndex", selectedIndex, tabPanelInternal.selectedIndex)
+//        pagesData.SetData("ItemSelectedIndex", selectedIndex, tabPanelInternal.selectedIndex);
+//    }
+
     function commandsChanged(commandsId){
         console.log("MultidocWorkspaceView commandsChanged")
         multiDocView.activeItem.commandsChanged(commandsId);
@@ -64,15 +69,17 @@ Rectangle {
             findPage = true;
         }
         if (!findPage) {
-            //multiDocView.activeItem = null
+//            multiDocView.activeItem = null
             var index = pagesData.InsertNewItem();
             console.log("MultidicWorkspaceView addToHeadersArray index", index);
             pagesData.SetData("ItemId", itemId, index);
             pagesData.SetData("Title", title, index);
             pagesData.SetData("Source", source, index);
             pagesData.SetData("CommandsId", commandsId, index);
+//            pagesData.SetData("ItemSelectedIndex", -1, index);
+
 //            tabPanelInternal.model = 0;
-//            tabPanelInternal.model = pages;
+//            tabPanelInternal.model = pagesData;
             tabPanelInternal.selectedIndex = pagesData.GetItemsCount() - 1;
         }
     }
@@ -88,7 +95,6 @@ Rectangle {
         console.log("MultidocWorkspaceView updateTitleTab()", index, title);
         pagesData.SetData("Title", title, index);
         pagesData.SetData("ItemId", itemId, index);
-        console.log("Tab after updating ItemId = " , pagesData.GetData("ItemId", index), "Title = ", pagesData.GetData("Title", index))
     }
 
     Component.onCompleted: {
@@ -113,8 +119,11 @@ Rectangle {
 
         onSelectedIndexChanged: {
             console.log("MultiDocWorkspaceView TabPanel onSelectedIndexChanged", tabPanelInternal.selectedIndex);
-            if(multiDocView.activeItem)
-                multiDocView.updateCommandId();
+
+//            if(multiDocView.activeItem) {
+//                multiDocView.updateCommandId();
+//            }
+
         }
 
         onRightClicked: {
@@ -143,17 +152,21 @@ Rectangle {
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
         model: pagesData;
+
+        property int  currentIndex: -1;
         delegate: Rectangle {
             id: docsDataDeleg;
             width: visible ? docsData.width : 0;
             height: docsData.height;
             color: "transparent";
             visible: tabPanelInternal.selectedIndex === model.index;
+
             onVisibleChanged: {
                 console.log("MultiDocView ListView onVisibleChanged", this.visible);
                 if(this.visible){
                     multiDocView.activeItem = loader.item;
                     multiDocView.activeItem.refresh();
+                    multiDocView.updateCommandId();
                 }
             }
 
@@ -163,8 +176,6 @@ Rectangle {
 
             function setModeMenuButton(commandId, mode){
                 console.log("MultiDocView ListView setModeMenuButton", commandId, mode);
-//                pagesDeleg.setModeMenuButton(commandId, mode);
-
                 multiDocView.rootItem.setModeMenuButton(commandId, mode);
 
             }
@@ -181,22 +192,20 @@ Rectangle {
             Loader {
                 id: loader;
                 anchors.fill: parent;
+
                 Component.onCompleted: {
                     console.log("MultidocWorkspaceView model index ", model.Source)
                     loader.source = model.Source
                 }
+
                 onItemChanged: {
                     console.log("MultidocWorkspaceView Loader onItemChanged", loader.source, docsDataDeleg)
                     if (loader.item && loader.source != ""){
+
                         loader.item.rootItem = docsDataDeleg;
-                        console.log("ItemId =", model.ItemId, "ItemName =", model.Title, "TypeOperation = ", multiDocView.typeOperation);
                         loader.item.itemId = model.ItemId
                         loader.item.itemName = model.Title
-
-//                        if (loader.item.typeOperation) {
-//                            console.log("loader.item.typeOperation exist!");
-//                            loader.item.typeOperation = multiDocView.typeOperation;
-//                        }
+                        docsData.currentIndex = model.index;
 
                         var dataModelLocal
                         if (pagesData.ContainsKey("DocsData",model.index)){
@@ -204,19 +213,14 @@ Rectangle {
                         }
                         else {
                             dataModelLocal = pagesData.AddTreeModel("DocsData",model.index)
-                            console.log("MultidocWorkspaceView onItemChanged", dataModelLocal)
                         }
-                        console.log("MultidocWorkspaceView Loader onItemChanged", loader.source)
+                        loader.item.model = dataModelLocal
                         loader.item.rootItem = docsDataDeleg;
                         loader.item.multiDocViewItem = multiDocView;
                         if (tabPanelInternal.selectedIndex === model.index) {
                             multiDocView.activeItem = loader.item;
                             multiDocView.updateCommandId();
                         }
-                        console.log("loader.item.rootItem = ", docsDataDeleg)
-
-                        loader.item.model = dataModelLocal
-
                     }
                 }
 

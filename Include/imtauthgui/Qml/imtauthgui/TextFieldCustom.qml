@@ -15,6 +15,7 @@ Item {
     property bool isFocus: textField.focus;
 
     property alias text: textField.text;
+    property alias textField: textField;
     property bool isTextChanged: false;
     property string placeHolderText: "Наименование";
 
@@ -65,10 +66,10 @@ Item {
         selectByMouse: true;
         clip: true;
 
-        onFocusChanged: {
-            container.focusChanged();
-            container.wasFocus = true;
-        }
+//        onFocusChanged: {
+//            container.focusChanged();
+//            container.wasFocus = true;
+//        }
 
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged");
@@ -85,6 +86,12 @@ Item {
             console.log("TextFieldCustom onAccepted");
             container.accepted();
             container.isTextChanged = false;
+        }
+
+        onCursorVisibleChanged: {
+            if (!cursorVisible) {
+                cursorVisible = true;
+            }
         }
     }
 

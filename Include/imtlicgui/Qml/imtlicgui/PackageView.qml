@@ -55,6 +55,12 @@ Item {
         return featureCollectionViewContainer.contextMenuY + 132;
     }
 
+    function getDescriptionBySelectedItem(){
+        var dataModelLocal = featureCollectionView.model.GetData("data");
+        var description = dataModelLocal.GetData("Description", featureCollectionView.table.selectedIndex);
+        return description;
+    }
+
     function openContextMenu(item, mouseX, mouseY) {
         var point = featureCollectionViewContainer.mapToItem(item, mouseX, mouseY);
 
@@ -142,6 +148,7 @@ Item {
             parameters["message"] = "Please enter the description of the feature: ";
             parameters["nameDialog"] = "Set description";
             parameters["typeOperation"] = "SetDescription";
+            parameters["startingValue"] = featureCollectionViewContainer.getDescriptionBySelectedItem();
             parameters["resultItem"] = featureCollectionViewContainer;
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
@@ -281,6 +288,7 @@ Item {
             console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
             if (featureCollectionView.selectedIndex > -1){
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
+//                multiDocViewItem.setItemSelectedIndex(featureCollectionView.selectedIndex);
             }
         }
     }
