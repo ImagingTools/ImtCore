@@ -637,6 +637,8 @@ class component_generator(object):
 							undep[indx] = "'{}'".format(temp[-1])
 							undep[indx-1] = '.'.join(temp[0:-1])
 						indx += 1
+					if 'getImageSource' in ''.join(undep):
+						print(undep)
 
 					r.append("%s%s._replaceUpdater('%s', function() { %s = %s }, [%s])" %(ident, target_owner, target_prop, target_lvalue, value, ",".join(undep)))
 				else:
@@ -661,6 +663,7 @@ class component_generator(object):
 			lines.append(code)
 			return var
 
+		
 		if not self.prototype:
 			for code, methods in self.transform_handlers(registry, self.methods):
 				if len(methods) > 1:
@@ -684,6 +687,12 @@ class component_generator(object):
 			for path, name in sorted(handlers):
 				has_path = bool(path)
 				path = path_or_parent(path, parent, partial(self.transform_root, registry, parent))
+				
+				indx = code.find('{')
+				if(indx >= 0):
+					code = code[:indx+1] + 'with(this){' + code[indx+1:] + '}'
+					
+
 				if has_path:
 					r.append("%sif (%s) %s.on('%s', %s.bind(%s))" %(ident, path, path, name, code, parent)) #fixme: remove me?
 				else:

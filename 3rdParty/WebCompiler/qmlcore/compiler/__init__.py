@@ -348,8 +348,8 @@ class Compiler(object):
 			print("generating sources...", file=sys.stderr)
 
 		appcode = ""
-		if self.strict:
-			appcode += "'use strict'\n"
+		#if self.strict:
+		#	appcode += "'use strict'\n"
 		if self.release:
 			appcode += "var log = function() { }\n"
 		else:
