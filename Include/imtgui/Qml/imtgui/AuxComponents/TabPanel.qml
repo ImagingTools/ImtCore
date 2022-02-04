@@ -118,6 +118,7 @@ Rectangle {
             iconHeight: 10;
             iconWidth: 10;
             iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
+            borderColor: Style.buttonColor;
 
             onClicked: {
                 console.log("left button clicked");
@@ -139,8 +140,7 @@ Rectangle {
             iconHeight: 10;
             iconWidth: 10;
             iconSource: "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg";
-
-
+            borderColor: Style.buttonColor;
 
             onClicked: {
                 console.log("right button clicked");

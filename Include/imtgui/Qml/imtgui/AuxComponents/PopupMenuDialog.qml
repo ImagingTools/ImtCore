@@ -4,23 +4,28 @@ import Acf 1.0
 import imtqml 1.0
 
 Rectangle {
-    id: container;
-    x: resultItem.getMenuButtonsX();
-    y: resultItem.getMenuButtonsY();
-    width: container.itemWidth;
-    height: model.count * container.itemHeight - container.emptyItemCount * container.itemHeight;
+    id: popupMenuContainer;
+    x: 100;
+    y: 100;
+//    x: popupMenuContainer.resultItem.getMenuButtonsX();
+//    y: popupMenuContainer.resultItem.getMenuButtonsY();
+    width: popupMenuContainer.itemWidth;
+//    height: model.count * popupMenuContainer.itemHeight - popupMenuContainer.emptyItemCount * popupMenuContainer.itemHeight;
+//    width: 100;
+    height: columnPopupMenu.height;
     color: Style.baseColor;
     radius: 3;
     clip: true;
 
-    layer.enabled: true;
-    layer.effect: DropShadow {
-        transparentBorder: true;
-        horizontalOffset: 1;
-        verticalOffset: 1;
-        color: Style.textColor;
-        spread: 0.05;
-    }
+//    layer.enabled: true;
+//     DropShadow {
+////        transparentBorder: true;
+//        horizontalOffset: 1;
+//        verticalOffset: 1;
+//        color: Style.textColor;
+//        spread: 0.05;
+//        source: popupMenuContainer;
+//     }
 
     property Item resultItem;
     property var model;
@@ -37,94 +42,169 @@ Rectangle {
     function exit(status) {
         var parameters  = {};
         parameters["status"] = status;
-        container.resultItem.dialogResult(parameters);
+        popupMenuContainer.resultItem.dialogResult(parameters);
     }
 
     onModelChanged: {
-        console.log("PopupMenuDialog ListView onModelChanged", container.model.count);
-        for (var i = 0; i < container.model.count; i++) {
-            if (container.model.get(i).id === "") {
-                container.emptyItemCount++;
+        console.log("PopupMenuDialog ListView onModelChanged", popupMenuContainer.model.count);
+        for (var i = 0; i < popupMenuContainer.model.count; i++) {
+            if (popupMenuContainer.model.get(i).id === "") {
+                popupMenuContainer.emptyItemCount++;
             }
         }
-        console.log("PopupMenuDialog container.emptyItemCount", container.emptyItemCount);
+        console.log("PopupMenuDialog popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
     }
 
-    ListView {
-        id: listViewPopup;
-        anchors.fill: parent;
-        anchors.margins: 1;
-        model: container.model;
-        boundsBehavior: Flickable.StopAtBounds;
-        delegate: Rectangle {
-            id: delegateListViewPopup;
-            width: container.width;
-            height: model.id !== "" ? container.itemHeight : 0;
-            color: "transparent";
-            Rectangle {
-                id: highlightRect;
-//                anchors.fill: parent;
-                anchors.horizontalCenter: parent.horizontalCenter;
+    Column {
+        id: columnPopupMenu;
+        width: parent.width;
+        Repeater {
+            model: popupMenuContainer.model;
 
-                width: parent.width - 1;
-                height: parent.height;
+            delegate: Rectangle {
+                id: delegateListViewPopup;
+                width: popupMenuContainer.width;
+                height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
+                color: "transparent";
+                Rectangle {
+                    id: highlightRect;
+    //                anchors.fill: parent;
+                    anchors.horizontalCenter: parent.horizontalCenter;
 
-                color: Style.selectedColor;
-                visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
-            }
+                    width: parent.width - 1;
+                    height: parent.height;
 
-            Text {
-                text: model.name;
-                color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
+                    color: Style.selectedColor;
+                    visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
+                }
 
-                anchors.left: iconDelegateListViewPopup.right;
-                anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
-                anchors.leftMargin: 10;
-                anchors.rightMargin: 10;
-            }
+                Text {
+                    text: model.name;
+                    color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
+                    font.pixelSize: Style.fontSize_common;
+                    font.family: Style.fontFamily;
 
-            Image {
-                id: iconDelegateListViewPopup;
-                width: 18;
-                height: width;
-                visible: model.name !== "";
-                //source: "../../../Icons//_On_Normal.svg";
-                source: model.imageSource;
+                    anchors.left: iconDelegateListViewPopup.right;
+                    anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
+                    anchors.leftMargin: 10;
+                    anchors.rightMargin: 10;
+                }
 
-                anchors.left: delegateListViewPopup.left;
-                anchors.verticalCenter: delegateListViewPopup.verticalCenter;
-                anchors.leftMargin: 10;
-            }
+                Image {
+                    id: iconDelegateListViewPopup;
+                    width: 18;
+                    height: width;
+                    visible: model.name !== "";
+                    //source: "../../../Icons//_On_Normal.svg";
+                    source: model.imageSource;
 
-            Rectangle {
-                width: parent.width - 20;
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.bottom: delegateListViewPopup.bottom;
-                //anchors.topMargin: 5;
-                visible: model.id === "";
-                height: 1;
-                color: Style.hover;
-            }
+                    anchors.left: delegateListViewPopup.left;
+                    anchors.verticalCenter: delegateListViewPopup.verticalCenter;
+                    anchors.leftMargin: 10;
+                }
 
-            MouseArea {
-                id: delegateListViewPopupMA;
-                anchors.fill: parent;
-                hoverEnabled: true;
-                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+                Rectangle {
+                    width: parent.width - 20;
+                    anchors.horizontalCenter: parent.horizontalCenter;
+                    anchors.bottom: delegateListViewPopup.bottom;
+                    //anchors.topMargin: 5;
+                    visible: model.id === "";
+                    height: 1;
+                    color: Style.hover;
+                }
 
-                visible: model.mode !== "Disabled";
+                MouseArea {
+                    id: delegateListViewPopupMA;
+                    anchors.fill: parent;
+                    hoverEnabled: true;
+                    cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-                onClicked: {
-                    container.exit(model.name);
-                    loaderDialog.closeItem();
+                    visible: model.mode !== "Disabled";
+
+                    onClicked: {
+                        popupMenuContainer.exit(model.name);
+                        loaderDialog.closeItem();
+                    }
                 }
             }
         }
     }
 
-    ListModel {
-        id: popupModel;
-    }
+//    ListView {
+//        id: listViewPopup;
+//        anchors.fill: parent;
+//        anchors.margins: 1;
+//        model: popupMenuContainer.model;
+//        boundsBehavior: Flickable.StopAtBounds;
+//        delegate: Rectangle {
+//            id: delegateListViewPopup;
+//            width: popupMenuContainer.width;
+//            height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
+//            color: "transparent";
+//            Rectangle {
+//                id: highlightRect;
+////                anchors.fill: parent;
+//                anchors.horizontalCenter: parent.horizontalCenter;
+
+//                width: parent.width - 1;
+//                height: parent.height;
+
+//                color: Style.selectedColor;
+//                visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
+//            }
+
+//            Text {
+//                text: model.name;
+//                color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
+//                font.pixelSize: Style.fontSize_common;
+//                font.family: Style.fontFamily;
+
+//                anchors.left: iconDelegateListViewPopup.right;
+//                anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
+//                anchors.leftMargin: 10;
+//                anchors.rightMargin: 10;
+//            }
+
+//            Image {
+//                id: iconDelegateListViewPopup;
+//                width: 18;
+//                height: width;
+//                visible: model.name !== "";
+//                //source: "../../../Icons//_On_Normal.svg";
+//                source: model.imageSource;
+
+//                anchors.left: delegateListViewPopup.left;
+//                anchors.verticalCenter: delegateListViewPopup.verticalCenter;
+//                anchors.leftMargin: 10;
+//            }
+
+//            Rectangle {
+//                width: parent.width - 20;
+//                anchors.horizontalCenter: parent.horizontalCenter;
+//                anchors.bottom: delegateListViewPopup.bottom;
+//                //anchors.topMargin: 5;
+//                visible: model.id === "";
+//                height: 1;
+//                color: Style.hover;
+//            }
+
+//            MouseArea {
+//                id: delegateListViewPopupMA;
+//                anchors.fill: parent;
+//                hoverEnabled: true;
+//                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+//                visible: model.mode !== "Disabled";
+
+//                onClicked: {
+//                    popupMenuContainer.exit(model.name);
+//                    loaderDialog.closeItem();
+//                }
+//            }
+//        }
+//    }
+
+//    ListModel {
+//        id: popupModel;
+//    }
 }

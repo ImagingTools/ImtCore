@@ -116,10 +116,10 @@ Rectangle{
             if (mouse.button === Qt.RightButton) {
                 console.log("TableDelegate onRightButtonMouseClicked");
                 thubnailDecoratorContainer.closeDialog();
-                container.rightButtonMouseClicked(mouseX, mouseY);
+                container.rightButtonMouseClicked(this.mouseX, this.mouseY);
             }
 
-            console.log("TableDelegate Clicked", mouseX, mouseY);
+            console.log("TableDelegate Clicked", this.mouseX, this.mouseY);
             container.clicked();
         }
 

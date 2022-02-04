@@ -28,11 +28,34 @@ Rectangle {
 //                    console.log("TopPanel Mode changed", buttonsModelLocal, lvButtons.model)
                     lvButtons.model = 0
                     lvButtons.model =  buttonsModelLocal
+                    console.log("Command", commandId, " change mode", mode);
+                    topPanel.updateModeModelMenuButtons(id, mode);
                     break;
                 }
             }
-
         }
+    }
+
+    function updateModeModelMenuButtons(id, mode) {
+//        console.log("Menu buttons model 1:");
+//        for (var i = 0; i < modelButtons.count; i++) {
+//            var temp = modelButtons.get(i);
+//            console.log("\tid: ", temp.id, ' mode:', temp.mode, ' imageSource:', temp.imageSource);
+//        }
+        for (var i = 0; i < modelButtons.count; i++) {
+            if (modelButtons.get(i).id === id) {
+                modelButtons.get(i).mode = mode;
+                modelButtons.get(i).imageSource = "../../../Icons/" + Style.theme + "/" + modelButtons.get(i).name + "_Off" + "_" + mode + ".svg";
+//                console.log("Menu buttons id", id, "change mode", mode);
+                break;
+            }
+        }
+//        console.log("Menu buttons model 2:");
+//        for (var i = 0; i < modelButtons.count; i++) {
+//            var temp = modelButtons.get(i);
+//            console.log("\tid: ", temp.id, ' mode:', temp.mode, ' imageSource:', temp.imageSource);
+//        }
+
     }
 
     function dialogResult(parameters) {
@@ -140,20 +163,17 @@ Rectangle {
                                return;
                             }
                         }
-                        console.log("ModelButtons added id ", model[CommandEnum.ID]);
                         modelButtons.append({"id": model[CommandEnum.ID], "imageSource": topButtonDelegate.imageSource, "name": topButtonDelegate.text, "mode": model["Mode"]});
                     } else if (topButtonDelegate.visible && lvButtons.width !== 0) {
                         var j;
                         for (var i = 0; i < modelButtons.count; i++) {
                             if (modelButtons.get(i).id === model[CommandEnum.ID]) {
-                                console.log("ModelButtons removed id ", modelButtons.get(i).id);
                                 modelButtons.remove(i)
                                 j = i;
                                 break;
                             }
                         }
                         for (var i = j; i < modelButtons.count; i++) {
-                            console.log("ModelButtons removed id ", modelButtons.get(i).id);
                             modelButtons.remove(i)
                         }
                     }
@@ -207,6 +227,7 @@ Rectangle {
         id: updateTimer;
         interval: 10;
         property TreeItemModel model;
+
         onModelChanged: {
             modelButtons.clear();
             updateTimer.start();
@@ -246,8 +267,6 @@ Rectangle {
             console.log("commandsModel updateModel", gqlData);
             this.SetGqlQuery(gqlData);
         }
-
-
 
         onStateChanged: {
             console.log("State:", this.state, commandsModel);

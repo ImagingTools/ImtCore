@@ -23,7 +23,7 @@ Rectangle {
 
     signal removedItem(string itemId);
 
-    signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
+    signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
 
     function dialogResult(parameters) {
          console.log("CollectionView dialogResult", parameters["status"]);
@@ -119,7 +119,7 @@ Rectangle {
 
         onRightButtonMouseClicked: {
             console.log("CollectionView AuxTable onRightButtonMouseClicked");
-            collectionViewContainer.rightButtonMouseClicked(item, mouseX, mouseY);
+            collectionViewContainer.collectionViewRightButtonMouseClicked(item, mouseX, mouseY);
         }
 
         onSelectedIndexChanged: {

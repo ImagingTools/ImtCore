@@ -48,10 +48,12 @@ Item {
     }
 
     function getMenuButtonsX() {
+        console.log("PackageView getMenuButtonsX");
         return featureCollectionViewContainer.contextMenuX + 75;
     }
 
     function getMenuButtonsY() {
+        console.log("PackageView getMenuButtonsY");
         return featureCollectionViewContainer.contextMenuY + 132;
     }
 
@@ -266,8 +268,8 @@ Item {
             }
         }
 
-        onRightButtonMouseClicked: {
-            console.log("PackageView CollectionView AuxTable onRightButtonMouseClicked");
+        onCollectionViewRightButtonMouseClicked: {
+            console.log("PackageView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
             featureCollectionViewContainer.openContextMenu(item, mouseX, mouseY);
         }
 
@@ -290,6 +292,7 @@ Item {
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
 //                multiDocViewItem.setItemSelectedIndex(featureCollectionView.selectedIndex);
             }
+            treeView.modelItems = featuresTreeView.model;
         }
     }
 
@@ -372,6 +375,7 @@ Item {
         height: parent.height;
         width: 200;
         color: "transparent";
+//        clip: true;
 
         Rectangle {
             id: leftBorder;
@@ -387,6 +391,7 @@ Item {
 
         Rectangle {
             id: headerTreeView;
+
             anchors.top: parent.top;
             width: parent.width;
             height: 35;
@@ -420,10 +425,13 @@ Item {
 
         TreeView {
             id: treeView;
+
             anchors.top: headerBottomBorder.bottom;
             width: 200;
             height: 500;
-            modelItems: featuresTreeView.model;
+
+            clip: true;
+            //modelItems: featuresTreeView.model;
         }
 
         FeaturesTreeView {

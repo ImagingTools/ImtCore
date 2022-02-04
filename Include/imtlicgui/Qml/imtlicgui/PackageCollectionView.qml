@@ -169,6 +169,8 @@ Item {
     CollectionView {
         id: packageCollectionView;
         anchors.fill: parent;
+        anchors.right: packageCollectionMetaInfo.left;
+
         autoRefresh: true;
         Component.onCompleted: {
             packageCollectionView.gqlModelInfo = "FeaturePackageInfo"
@@ -189,8 +191,8 @@ Item {
             packageCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 
-        onRightButtonMouseClicked: {
-            console.log("PackageView CollectionView AuxTable onRightButtonMouseClicked");
+        onCollectionViewRightButtonMouseClicked: {
+            console.log("PackageCollectionView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
             packageCollectionContainer.openContextMenu(item, mouseX, mouseY);
         }
 
@@ -200,6 +202,17 @@ Item {
                 packageCollectionContainer.commandsChanged("Packages")
             }
         }
+    }
+
+    Rectangle {
+        id: packageCollectionMetaInfo;
+
+        anchors.right: parent.right;
+
+        height: parent.height;
+        width: 200;
+
+        color: Style.backgroundColor;
     }
 
     GqlModel {
