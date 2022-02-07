@@ -83,7 +83,7 @@ def parse_qml_file(cache, com, path):
 
 			if(path[0:3] == 'src'):
 				data = data.replace('pragma Singleton', '') # by Artur
-				data = data.replace('property int webScroll', 'webScroll') # by Artur
+				data = data.replace('property bool webScroll', 'webScroll') # by Artur
 				data = data.replace('Component.onCompleted', 'onCompleted') # by Artur, for compatibility completed signal
 				data = data.replace('onPressed:', 'onMousePressed:').replace('onReleased:', 'onMouseReleased:') # by Artur, for compatibility MouseArea signal
 				#data = data.replace('.scale', '.transform.scale') # by Artur, for compatibility scale
@@ -196,10 +196,10 @@ def parse_qml_file(cache, com, path):
 								find = True
 					new_lines.append(line)
 
-				
+				'''
 				with open('.cache/signals', 'w') as f:
 					for key in queue_replace:
-						f.write('{}=>{}\n'.format(key, queue_replace[key]))
+						f.write('{}=>{}\n'.format(key, queue_replace[key]))'''
 
 
 				data = '\n'.join(new_lines) # by Artur, for compatibility signals
@@ -282,6 +282,56 @@ class Compiler(object):
 						if not (set(manifest.use_only_for) & self.platforms):
 							continue
 
+				queue_replace = {}
+				for filename in filenames:
+					fullpath = '\\'.join([dirpath, filename])
+					file = open(fullpath, 'r', encoding='utf-8')
+	
+					try:
+						for line in file:
+							def_signal = re.search(r'signal [(,),a-z,A-Z,0-9, ]+;', line)
+							def_signal = def_signal[0] if def_signal else None
+							if(def_signal):
+								name_signal = re.search(r'signal [a-z,A-Z,0-9]+', def_signal)
+								name_signal = name_signal[0].split(' ')[1] if name_signal else None
+								sign_signal = re.search(r'[(][a-z,A-Z,0-9, ]+[)]', def_signal)
+								sign_signal = sign_signal[0] if sign_signal else None
+								if(sign_signal):
+									line = line.replace(sign_signal, '')
+									params = sign_signal[1:-1].split(',')
+									new_params = []
+									for param in params:
+										new_params.append(param.split(' ')[-1])
+									queue_replace['on'+name_signal[0].upper()+name_signal[1:]] = 'on'+name_signal[0].upper()+name_signal[1:]+'('+','.join(new_params)+')'
+									#print(queue_replace)
+								else:
+									line = line.replace('()', '')
+							else:
+								find = False
+								#print(queue_replace)
+								for key in queue_replace:
+									if not find and key in line:
+										line = line.replace(key, queue_replace[key])
+										find = True
+					except:
+						pass
+					
+					file.close()
+
+				try:
+					with open('.cache/signals', 'r') as f:
+						for line in f:
+							temp = line.replace('\n', '').split('=>')
+							queue_replace[temp[0]] = temp[1]
+				except:
+					pass
+
+				with open('.cache/signals', 'w') as f:
+					for key in queue_replace:
+						if(key):
+							f.write('{}=>{}\n'.format(key, queue_replace[key]))
+
+				
 				for filename in filenames:
 					relpath = os.path.relpath(dirpath, package_dir)
 					if relpath.startswith('..'):
@@ -300,6 +350,7 @@ class Compiler(object):
 					promise = self.process_file(pool, generator, package, dirpath, filename)
 					if promise is not None:
 						promises.append(promise)
+				
 
 		for name, is_component, promise in promises:
 			self.finalize_qml_file(generator, name, is_component, *promise.get())

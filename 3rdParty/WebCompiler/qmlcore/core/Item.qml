@@ -6,7 +6,7 @@ Object {
 	property int width;						///< width of visible area
 	property int height;					///< height of visible area
 	property bool clip;						///< clip all children outside rectangular area defined by x, y, width, height
-	property lazy radius: Radius { }		///< round corner radius(es), allow forwarding, e.g. item.radius: 5;
+	//property lazy radius: Radius { }		///< round corner radius(es), allow forwarding, e.g. item.radius: 5;
 	property bool fullscreen;				///< fullscreen mode enabled / disabled
 	property bool enabled: true; // by Artur, enabled
 
@@ -228,6 +228,7 @@ Object {
 		for(var i = 0, n = children.length; i < n; ++i) {
 			var child = children[i]
 			this._updateVisibilityForChild(child, value)
+			child._context._processActions()
 		}
 
 		if (!value && this.parent)
@@ -243,8 +244,14 @@ Object {
 			this.parent._tryFocus()
 	}
 
-	onVisibleChanged:		{ this._updateVisibility() }
-	onVisibleInViewChanged:	{ this._updateVisibility() }
+	onVisibleChanged:		{ 
+		this._updateVisibility() 
+		this._context._processActions()
+	}
+	onVisibleInViewChanged:	{ 
+		this._updateVisibility() 
+		this._context._processActions()
+	}
 
 	onWidthChanged: {
 		this.style('width', value + (this._borderWidthAdjust || 0))

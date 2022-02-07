@@ -673,6 +673,11 @@ class component_generator(object):
 				for path, name in sorted(methods):
 					path = path_or_parent(path, parent, partial(self.transform_root, registry, None))
 					code = code.replace('@super.', self.get_base_type(registry, mangle = True) + '.prototype.')
+
+					indx = code.find('{')
+					if(indx >= 0):
+						code = code[:indx+1] + 'with(this){' + code[indx+1:] + '}'
+
 					r.append("%s%s.%s = %s.bind(%s)" %(ident, path, name, code, parent))
 
 		for code, handlers in self.transform_handlers(registry, self.signal_handlers):
@@ -710,6 +715,12 @@ class component_generator(object):
 			for path, name in sorted(handlers):
 				has_path = bool(path)
 				path = path_or_parent(path, parent, partial(self.transform_root, registry, parent))
+
+				indx = code.find('{')
+				if(indx >= 0):
+					code = code[:indx+1] + 'with(this){' + code[indx+1:] + '}'
+				
+
 				if has_path:
 					r.append("%sif (%s) %s.onChanged('%s', %s.bind(%s))" %(ident, path, path, name, code, parent)) #fixme: remove me?
 				else:

@@ -13,7 +13,7 @@ BaseLayout {
 	property int contentY: -content.y;			///< y offset to visible part of the content surface
 	property int scrollingStep: 0;	///< scrolling step
 	property int animationDuration: 0;
-	property int webScroll: -1; 
+	property bool webScroll: false; 
 	property string animationEasing: "ease";
 	property bool contentFollowsCurrentItem: !nativeScrolling;	///< auto-scroll content to current focused item
 	property bool nativeScrolling: context.system.device === context.system.Mobile; ///< allows native scrolling on mobile targets and shows native scrollbars
@@ -44,7 +44,11 @@ BaseLayout {
 	}
 
 	onWebScrollChanged: {
-		
+		if(this.webScroll){
+			this.element.dom.classList.remove('scroll-hide')
+		} else {
+			this.element.dom.classList.add('scroll-hide')
+		}
 	}
 
 	property ContentMargin contentMargin: ContentMargin { }
@@ -580,9 +584,14 @@ BaseLayout {
 			}
 		});
 
+		if(this.webScroll){
+			this.element.dom.classList.remove('scroll-hide')
+		} else {
+			this.element.dom.classList.add('scroll-hide')
+		}
 
 		this.style({
-			'overflow': 'scroll',
+			'overflow': 'auto',
 			'pointer-events': 'auto',
 			'touch-action': 'auto',
 		})
