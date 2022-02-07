@@ -5,11 +5,35 @@ import imtqml 1.0
 Item {
     id: container;
     property TreeItemModel model;
-    property TreeItemModel dependModel;
+    property alias dependModel: dependModel;
+
+    TreeItemModel {
+        id: dependModel;
+    }
 
     Component.onCompleted: {
        console.log( "FeaturesTreeView Component.onCompleted");
        container.loadFeaturesModel();
+    }
+
+    onDependModelChanged: {
+        console.log( "FeaturesTreeView onDependModelChanged");
+    }
+
+    function printInfo() {
+        for (var i = 0; i < container.dependModel.GetItemsCount(); i++) {
+            console.log("Feature ID", container.dependModel.GetData("RootFeatureId", i));
+            var packageModel = container.dependModel.GetData("Packages", i);
+
+            for (var j = 0; j < packageModel.GetItemsCount(); j++) {
+                console.log("\tPackage ID", packageModel.GetData("Id", j));
+                var childModel = packageModel.GetData("childItemModel", j);
+
+                for (var k = 0; k < childModel.GetItemsCount(); k++) {
+                    console.log("\t\tFeature ID", childModel.GetData("Id", k));
+                }
+            }
+        }
     }
 
     function loadFeaturesModel() {
@@ -20,6 +44,162 @@ Item {
     function loadDependModel() {
         console.log( "FeaturesTreeView loadDependModel()");
         dependenciesModel.loadDependModel();
+    }
+
+    function getPackageIndexByPackageId(packageId, rootIndex) {
+        var packageModel = container.dependModel.GetData("Packages", rootIndex);
+
+        if (!packageModel) {
+            return -1;
+        }
+
+        for (var i = 0; i < packageModel.GetItemsCount(); i++) {
+            if (packageModel.GetData("Id", i) === packageId) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    function addNewPackageToRootFeatureByRootIndex(packageId, rootIndex) {
+        var packageModel = container.dependModel.GetData("Packages", rootIndex);
+        var index = packageModel.InsertNewItem();
+        packageModel.SetData("Id", packageId, index);
+        container.dependModel.SetData("Packages", packageModel, rootIndex)
+        return index;
+    }
+
+    function getIndexByRootFeatureId(featureId) {
+
+        for (var i = 0; i < container.dependModel.GetItemsCount(); i++) {
+            if (container.dependModel.GetData("RootFeatureId", i) === featureId) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    function getIndexByPackageId(rootIndex, packageId) {
+
+        var packages = container.dependModel.GetData("Packages", rootIndex);
+
+        if (!packages) {
+            return -1;
+        }
+
+        for (var i = 0; i < packages.GetItemsCount(); i++) {
+            if (packages.GetData("Id", i) === packageId) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+
+    function featureIdHasDependency(featureId) {
+        if (!container.dependModel) {
+            return false;
+        }
+
+        for (var i = 0; i < container.dependModel.GetItemsCount(); i++) {
+            if (container.dependModel.GetData("RootFeatureId", i) === featureId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function rootFeatureIdHasDependPackage(rootIndex) {
+        var packageModel = container.dependModel.GetData("Packages", rootIndex);
+
+        if (!packageModel) {
+            return false;
+        }
+        return true;
+    }
+
+    function dependModelPackageHasChild(rootIndex, packageIndex) {
+        var packageModel = container.dependModel.GetData("Packages", rootIndex);
+        var childModel = packageModel.GetData("childItemModel", packageIndex);
+
+        if (childModel && childModel.GetItemsCount() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    function dependModelRemovePackageByIndex(rootIndex, packageIndex) {
+        var packageModel = container.dependModel.GetData("Packages", rootIndex);
+        packageModel.RemoveItem(packageIndex);
+        container.dependModel.SetData("Packages", packageModel,  rootIndex);
+    }
+
+    function dependModelRemoveRootFeatureByIndex(rootIndex) {
+        container.dependModel.RemoveItem(rootIndex);
+    }
+
+    function dependModePackageGetIndexByFeatureId(rootIndex, packageIndex, featureId) {
+        var packageModel = container.dependModel.GetData("Packages", rootIndex);
+
+        var childModel = packageModel.GetData("childItemModel", packageIndex);
+
+        if (!packageModel || !childModel) {
+            return -1;
+        }
+
+        for (var i = 0; i < childModel.GetItemsCount(); i++) {
+            if (childModel.GetData("Id", i) === featureId) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    function findInAllRootFeaturesDependFeatureById(packageId, featureId) {
+
+        if (!container.dependModel) {
+            return false;
+        }
+
+        var result = [];
+        for (var i = 0; i < container.dependModel.GetItemsCount(); i++) {
+            var packagesModel = container.dependModel.GetData("Packages", i);
+            var rootFeatureId = container.dependModel.GetData("RootFeatureId", i);
+            var rootPackageId = container.dependModel.GetData("RootPackageId", i);
+            if (!packagesModel) {
+                continue;
+            }
+
+            for (var j = 0; j < packagesModel.GetItemsCount(); j++) {
+                var pId = packagesModel.GetData("Id", j);
+                if (pId === packageId) {
+                    var childModel = packagesModel.GetData("childItemModel", j);
+
+                    if (!childModel) {
+                        continue;
+                    }
+
+                    for (var k = 0; k < childModel.GetItemsCount(); k++) {
+                        var fId = childModel.GetData("Id", k);
+
+                        if (fId === featureId) {
+                            result.push(rootPackageId + "." + rootFeatureId);
+
+                            break;
+                            //return true;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     GqlModel {
@@ -44,22 +224,7 @@ Item {
                     dataModelLocal = dataModelLocal.GetData("FeaturesTree");
                     if (dataModelLocal.ContainsKey("TreeModel")) {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
-
-                        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-                            console.log("Model name ", dataModelLocal.GetData("Name", i));
-                            if (dataModelLocal.GetData("childItemModel", i)) {
-                                console.log("\tChilds: ");
-                                var childs = dataModelLocal.GetData("childItemModel", i);
-                                for (var j = 0; j < childs.GetItemsCount(); j++) {
-                                    console.log("\tModel name ", childs.GetData("Name", j));
-                                }
-                            }
-                        }
-
                         container.model = dataModelLocal;
-                        console.log("container.model ItemsCount = ", container.model.GetItemsCount());
-                        console.log("dataModelLocal ItemsCount = ", dataModelLocal.GetItemsCount());
-                        //console.log("ItemsCount = ", dataModelLocal.GetItemsCount());
                     }
                 }
 
@@ -73,70 +238,24 @@ Item {
 
         function loadDependModel() {
             console.log( "FeaturesTreeView GqlModel loadDependModel");
-
-            var query;
-            var queryFields;
-            var inputParams = Gql.GqlObject("input");
-
-            query = Gql.GqlRequest("query", "FeaturesDependencies");
-
-            if(featureCollectionViewContainer.itemId != ""){
-                query = Gql.GqlRequest("query", "PackageUpdate");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", featureCollectionViewContainer.itemId);
-                queryFields = Gql.GqlObject("updatedNotification");
-            }
-            else{
-                query = Gql.GqlRequest("query", "PackageAdd");
-                queryFields = Gql.GqlObject("addedNotification");
-            }
-            query.AddParam(inputParams);
-
-            if (newId !== undefined && newId !== "") {
-                //console.log();
-                featureCollectionViewContainer.itemId = newId;
-                featureCollectionViewContainer.itemName = newId;
-            }
-
-            packageModel.SetData("Id", featureCollectionViewContainer.itemId)
-            packageModel.SetData("Name", featureCollectionViewContainer.itemName)
-            packageModel.SetExternTreeModel("features", featureCollectionView.model.GetData("data"));
-
-            //featureCollectionViewContainer.model.SetIsArray(false);
-            var jsonString = packageModel.toJSON();
-            console.log("jsonString", jsonString)
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            console.log("jsonString", jsonString)
-
-            inputParams.InsertField("Item");
-            inputParams.InsertFieldArgument ("Item", jsonString);
-
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Successed");
-
+            var query = Gql.GqlRequest("query", "FeaturesDependencies");
+            var queryFields = Gql.GqlObject("dependencies");
+            queryFields.InsertField("TreeModel");
             query.AddField(queryFields);
-
             var gqlData = query.GetQuery();
-            console.log("TreeView query ", gqlData);
+            console.log("TreeView depend query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
             console.log("State:", this.state, saveModel);
             if (this.state === "Ready"){
-
-                var dataModelLocal = model.GetData("data");
-                if(dataModelLocal.ContainsKey("addedNotification")){
-                    dataModelLocal = dataModelLocal.GetData("addedNotification");
-                                            featureCollectionView.refresh();
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("Id") && featureCollectionViewContainer.itemId === ""){
-                        featureCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
-                    }
-                    else if(saveModel.ContainsKey("errors")){
-                        var errorsModel = accountItemModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
-                            console.log("message", errorsModel.GetData(featureCollectionViewContainer.gqlModelItems).GetData("message"));
-                        }
+                var dataModelLocal = this.GetData("data");
+                if (dataModelLocal.ContainsKey("FeaturesDependencies")) {
+                    dataModelLocal = dataModelLocal.GetData("FeaturesDependencies");
+                    if (dataModelLocal.ContainsKey("TreeModel")) {
+                        dataModelLocal = dataModelLocal.GetData("TreeModel");
+                        container.dependModel = dataModelLocal;
                     }
                 }
             }

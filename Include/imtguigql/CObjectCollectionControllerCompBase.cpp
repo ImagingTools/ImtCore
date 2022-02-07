@@ -23,7 +23,6 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 }
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
-
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
@@ -59,7 +58,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 		return ListObjects(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_HEADERS:
 		return GetHeaders(*inputParamsPtr, gqlObject, errorMessage);
-	default:
+	case OT_USER_OPERATION + 1:
+		return GetTreeItemModel(*inputParamsPtr, gqlObject, errorMessage);
+	case OT_USER_OPERATION + 2:
 		return GetTreeItemModel(*inputParamsPtr, gqlObject, errorMessage);
 	}
 
@@ -68,7 +69,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 
 
 // protected methods
-
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest, 
 			imtgql::CGqlObject& gqlObject,
@@ -386,12 +386,22 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 	return rootModel;
 }
 
+
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetTreeItemModel(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
 
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDependencies(
+		const QList<imtgql::CGqlObject> &inputParams,
+		const imtgql::CGqlObject &gqlObject,
+		QString &errorMessage) const
+{
 	return nullptr;
 }
 

@@ -5,15 +5,16 @@ Item {
     id: treeItemDelegate;
     width: 100;
     height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
+//    height:  mainRect.height + childrenColumn.height;
     property bool isOpened: true;
 
     property TreeItemModel childItemModel;
 
+    property Item listViewItem;
+
+//    signal checkBoxStateChanged(int state, string packageId, string featureId);
+
     Component.onCompleted: {
-        console.log("TreeItemDelegate Component.onCompleted");
-        console.log("Model Name ", model.Name);
-        console.log("Model level ", model.level);
-        console.log("Model stateChecked ", model.stateChecked);
         if (model.childItemModel)
         {
             console.log("Model childCount ", model.childItemModel.GetItemsCount());
@@ -21,9 +22,9 @@ Item {
         }
     }
 
-    onChildItemModelChanged: {
-        //treeItemRepeater.model = treeItemDelegate.childItemModel;
-    }
+//    onCheckBoxStateChanged: {
+//        //treeItemRepeater.model = treeItemDelegate.childItemModel;
+//    }
 
     Rectangle {
         id: mainRect;
@@ -31,8 +32,9 @@ Item {
         color: Style.baseColor;
         anchors.top: parent.top;
         anchors.right: parent.right;
-        height: 30;
-//        color: "red";
+        height: model.visible === 1 ? 30 : 0;
+
+        visible: model.visible === 1;
 
         Image {
             id: iconArrow;
@@ -61,15 +63,28 @@ Item {
              anchors.right: titleModel.left;
              anchors.verticalCenter: parent.verticalCenter;
              visible: model.level === 1;
+
              onCheckStateChanged: {
-                  console.log("Check state ", checkBox.checkState);
+                // console.log("TreeItemDelegate CheckBox onCheckStateChanged", checkBox.checkState, model.packageId, model.Id);
+
+//                 treeItemDelegate.checkBoxStateChanged(checkBox.checkState, model.packageId, model.Id);
+                // listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
              }
 
              MouseArea {
                  anchors.fill: parent;
-
+                 visible: model.isActive === 1;
                  onClicked: {
-                     checkBox.checkState == 2 ? checkBox.checkState = 0 : checkBox.checkState = 2;
+                     console.log("TreeItemDelegate CheckBox MouseArea onClicked", checkBox.checkState);
+                     if (checkBox.checkState == 2) {
+                         checkBox.checkState = 0
+//                         model.stateChecked = 0;
+                     }
+                     else {
+                         checkBox.checkState = 2
+//                         model.stateChecked = 2;
+                     }
+                     listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
                  }
              }
         }
@@ -80,7 +95,7 @@ Item {
             anchors.leftMargin: 10;
             anchors.verticalCenter: parent.verticalCenter;
             text: model.Name;
-            color: Style.textColor;
+            color: model.isActive === 1 ? Style.textColor : Style.disabledInActiveTextColor;
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamily;
         }
@@ -91,13 +106,17 @@ Item {
         width: treeItemDelegate.width;
         anchors.top: mainRect.bottom;
         visible: treeItemDelegate.isOpened;
-        height: treeItemRepeater.count * mainRect.height;
 
         Repeater {
              id: treeItemRepeater;
              delegate: Loader {
                  id: loader;
                  source: "TreeItemDelegate.qml";
+                 onItemChanged: {
+                     if (loader.item) {
+                         loader.item.listViewItem = treeItemDelegate.listViewItem;
+                     }
+                 }
              }
        }
     }

@@ -224,6 +224,37 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
+	imtbase::ICollectionInfo::Ids packageIds = collection.GetElementIds();
+	for (const QByteArray& packageId : packageIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		collection.GetObjectData(packageId, dataPtr);
+
+		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
+		if (packagePtr != nullptr){
+			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
+			if (dependenciesProvider != nullptr){
+				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
+				for (const QByteArray& featureCollectionId : featureCollectionIds){
+					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+					if (featureInfoPtr != nullptr){
+						QByteArray featureId = featureInfoPtr->GetFeatureId();
+
+						QByteArrayList dependsIds = dependenciesProvider->GetFeatureDependencies(featureId);
+
+//						retVal += "\n" +
+//									QString("INSERT INTO FeatureDependencies(featureId, packageId, dependencyId, dependencyPackageId) VALUES('%1', '%2', '%3', '%4');")
+//												.arg(qPrintable(featureCollectionId))
+//												.arg(qPrintable(packageId))
+//												.arg(qPrintable(featureId))
+//												.arg(qPrintable(newPackageId)).toLocal8Bit();
+
+						//m_packageDependenciyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
+					}
+				}
+			}
+		}
+	}
+
 	return retVal;
 }
 

@@ -151,7 +151,6 @@ Item {
             productCollectionView.gqlModelRemove = "";
         }
 
-
         onItemIdChanged: {
             if (productCollectionView.itemId){
                 console.log("ProductView onItemIdChanged")
@@ -179,7 +178,6 @@ Item {
                 productsCollectionViewContainer.commandsChanged("ProductEdit")
             }
         }
-
     }
 
     GqlModel {

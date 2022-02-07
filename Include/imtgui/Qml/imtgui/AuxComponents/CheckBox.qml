@@ -5,7 +5,7 @@ Rectangle {
     id: container;
     width: 10;
     height: width;
-    color: checkState == 2 ? "green" : (checkState == 0) ? "white" : "black";
+    color: container.checkState == 2 ? "green" : (container.checkState == 0) ? "white" : "black";
     border.color: "gray";
 
     property int checkState: 0;

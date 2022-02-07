@@ -7,6 +7,8 @@ Rectangle {
 
     property alias modelItems: mainTreeView.model;
 
+    signal itemTreeViewCheckBoxStateChanged(int state, string packageId, string featureId);
+
     Component.onCompleted: {
     }
 
@@ -24,6 +26,19 @@ Rectangle {
         delegate: TreeItemDelegate {
             width: parent.width;
             //childItemModel: model.childItemModel;
+
+            listViewItem: mainTreeView;
+
+//            onCheckBoxStateChanged: {
+//                console.log("TreeView ListView onCheckBoxStateChanged", state, packageId, featureId);
+//                container.itemTreeViewCheckBoxStateChanged(state, packageId, featureId);
+//            }
+
+        }
+
+        function changeCheckBoxState(state, packageId, featureId) {
+            console.log("TreeView ListView onCheckBoxStateChanged()", state, packageId, featureId);
+            container.itemTreeViewCheckBoxStateChanged(state, packageId, featureId);
         }
 
         onModelChanged: {
