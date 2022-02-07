@@ -61,7 +61,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 	case OT_USER_OPERATION + 1:
 		return GetTreeItemModel(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_USER_OPERATION + 2:
-		return GetTreeItemModel(*inputParamsPtr, gqlObject, errorMessage);
+		return GetDependencies(*inputParamsPtr, gqlObject, errorMessage);
 	}
 
 	return nullptr;

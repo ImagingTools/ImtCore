@@ -377,12 +377,12 @@ Item {
             if (!childModel) {
                 continue;
             }
-            console.log("Old child model");
-            for (var j = 0; j < childModel.GetItemsCount(); j++) {
-                var id = childModel.GetData("Id", j);
-                var active = childModel.GetData("isActive", j);
-                console.log("\tCurrent Feature Id", id, " Active", active);
-            }
+//            console.log("Old child model");
+//            for (var j = 0; j < childModel.GetItemsCount(); j++) {
+//                var id = childModel.GetData("Id", j);
+//                var active = childModel.GetData("isActive", j);
+//                //console.log("\tCurrent Feature Id", id, " Active", active);
+//            }
 
 
             for (var j = 0; j < childModel.GetItemsCount(); j++) {
@@ -395,25 +395,20 @@ Item {
                     var pId = data[0];
                     var fId = data[1];
 
-                    console.log("\t\tPackage Id", pId, " Feature Id", fId);
-
+//                    console.log("\t\tPackage Id", pId, " Feature Id", fId);
 
                     if (pId === packageId && fId === id) {
                         childModel.SetData("isActive", 0, j);
                         console.log("\t\tPackage Id", pId, " Feature Id", fId, " SET ACTIVE = 0");
                     }
-//                    else {
-//                        childModel.SetData("isActive", 1, j);
-//                        console.log("\t\tPackage Id", pId, " Feature Id", fId, " SET ACTIVE = 1");
-//                    }
                 }
             }
-            console.log("New child model");
-            for (var j = 0; j < childModel.GetItemsCount(); j++) {
-                var id = childModel.GetData("Id", j);
-                var active = childModel.GetData("isActive", j);
-                console.log("\tCurrent Feature Id", id, " Active", active);
-            }
+//           // console.log("New child model");
+//            for (var j = 0; j < childModel.GetItemsCount(); j++) {
+//                var id = childModel.GetData("Id", j);
+//                var active = childModel.GetData("isActive", j);
+//               // console.log("\tCurrent Feature Id", id, " Active", active);
+//            }
 
 //            modelItems.SetData("childItemModel", childModel, i);
             modelItems.SetData("childItemModel", childModel, i);
@@ -467,8 +462,6 @@ Item {
         } else {
             featureCollectionViewContainer.clearCheckedCheckBox();
         }
-
-
     }
 
     function hideCurrentFeatureTreeView() {

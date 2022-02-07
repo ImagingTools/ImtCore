@@ -217,6 +217,8 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 		return false;
 	}
 
+	qDebug() << query;
+
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (ExecuteTransaction(query)){

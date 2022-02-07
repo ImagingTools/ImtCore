@@ -61,6 +61,32 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 		featureInfoPtr->SetFeatureName(featureName);
 
 		featurePackagePtr->InsertNewObject("FeatureInfo", featureName, description, featureInfoPtr.GetPtr());
+
+		QByteArrayList featureDependencies;
+		QByteArray dependenciesQuery = QString("SELECT dependencyid, dependencypackageid FROM featuredependencies"
+											   " WHERE featureid = '%1' AND featurepackageid = '%2'")
+												.arg(qPrintable(featureId))
+												.arg(qPrintable(packageId)).toUtf8();
+		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
+
+		while (dependenciesSqlQuery.next()){
+			QSqlRecord depFeatureRecord = dependenciesSqlQuery.record();
+			QByteArray dependFeatureId, dependPackageId;
+
+			if (depFeatureRecord.contains("dependencyid")){
+				dependFeatureId = depFeatureRecord.value("dependencyid").toByteArray();
+			}
+
+			if (depFeatureRecord.contains("dependencypackageid")){
+				dependPackageId = depFeatureRecord.value("dependencypackageid").toByteArray();
+			}
+
+			featureDependencies.append(dependPackageId + "." + dependFeatureId);
+		}
+
+		if (!featureDependencies.isEmpty()){
+			featurePackagePtr->SetFeatureDependencies(packageId + "." + featureId, featureDependencies);
+		}
 	}
 
 	if (!packageId.isEmpty() && !packageName.isEmpty()){
@@ -224,6 +250,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
+	// Add new dependencies for the features:
 	imtbase::ICollectionInfo::Ids packageIds = collection.GetElementIds();
 	for (const QByteArray& packageId : packageIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -238,17 +265,24 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 					if (featureInfoPtr != nullptr){
 						QByteArray featureId = featureInfoPtr->GetFeatureId();
+						QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(packageId + "." + featureId);
 
-						QByteArrayList dependsIds = dependenciesProvider->GetFeatureDependencies(featureId);
+						retVal += "\n" +
+									QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2';")
+												.arg(qPrintable(featureId))
+												.arg(qPrintable(packageId))
+												.toLocal8Bit();
 
-//						retVal += "\n" +
-//									QString("INSERT INTO FeatureDependencies(featureId, packageId, dependencyId, dependencyPackageId) VALUES('%1', '%2', '%3', '%4');")
-//												.arg(qPrintable(featureCollectionId))
-//												.arg(qPrintable(packageId))
-//												.arg(qPrintable(featureId))
-//												.arg(qPrintable(newPackageId)).toLocal8Bit();
-
-						//m_packageDependenciyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
+						for (const QByteArray& dependFeatureId : dependsIds){
+							QByteArrayList data = dependFeatureId.split('.');
+							retVal += "\n" +
+										QString("INSERT INTO FeatureDependencies(featureid, featurepackageid, dependencyid, dependencypackageid) VALUES('%1', '%2', '%3', '%4');")
+													.arg(qPrintable(featureId))
+													.arg(qPrintable(packageId))
+													.arg(qPrintable(data[1]))
+													.arg(qPrintable(data[0]))
+													.toLocal8Bit();
+						}
 					}
 				}
 			}

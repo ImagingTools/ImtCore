@@ -5,15 +5,18 @@ import imtqml 1.0
 Item {
     id: container;
     property TreeItemModel model;
-    property alias dependModel: dependModel;
 
-    TreeItemModel {
-        id: dependModel;
-    }
+    property TreeItemModel dependModel;
+    //property alias dependModel: dependModel;
+
+//    TreeItemModel {
+//        id: dependModel;
+//    }
 
     Component.onCompleted: {
-       console.log( "FeaturesTreeView Component.onCompleted");
-       container.loadFeaturesModel();
+        console.log( "FeaturesTreeView Component.onCompleted");
+        container.loadFeaturesModel();
+        container.loadDependModel();
     }
 
     onDependModelChanged: {
@@ -248,7 +251,7 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, saveModel);
+            console.log("State:", this.state, dependenciesModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
                 if (dataModelLocal.ContainsKey("FeaturesDependencies")) {
