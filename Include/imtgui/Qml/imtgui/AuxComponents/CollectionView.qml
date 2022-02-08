@@ -125,10 +125,10 @@ Rectangle {
         onSelectedIndexChanged: {
             console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
             if (tableInternal.selectedIndex != -1) {
-                collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
+                //collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
                 collectionViewContainer.model.SetData("selectedIndex", tableInternal.selectedIndex);
             }
-
+            collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
             //console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
         }
     }

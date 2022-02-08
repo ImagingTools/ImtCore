@@ -161,11 +161,11 @@ Item {
         }
 
         onSelectItem: {
-            console.log("ProductView CollectionView onSelectItem", itemId, name);
+            console.log("ProductView CollectionView onSelectItem", selectedId, name);
 
             var source = "../imtlicgui/EditLicenseDialog.qml";
             var parameters = {};
-            parameters["licenseId"] = itemId;
+            parameters["licenseId"] = selectedId;
             parameters["licenseName"] = name;
             parameters["resultItem"] = productsCollectionViewContainer;
 

@@ -223,6 +223,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 	// Delete removed features to the package:
 	for (const QByteArray& removedFeatureId : removedFeatures){
 		retVal += "\n" +
+					QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2' OR dependencyid = '%3' AND dependencypackageid = '%4';")
+									.arg(qPrintable(removedFeatureId))
+									.arg(qPrintable(newPackageId))
+									.arg(qPrintable(removedFeatureId))
+									.arg(qPrintable(newPackageId))
+									.toLocal8Bit();
+		retVal += "\n" +
 					QString("DELETE FROM Features WHERE Id = '%1' AND PackageId = '%2';")
 								.arg(qPrintable(removedFeatureId))
 								.arg(qPrintable(newPackageId)).toLocal8Bit();
@@ -267,11 +274,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 						QByteArray featureId = featureInfoPtr->GetFeatureId();
 						QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(packageId + "." + featureId);
 
+
 						retVal += "\n" +
 									QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2';")
-												.arg(qPrintable(featureId))
-												.arg(qPrintable(packageId))
-												.toLocal8Bit();
+													.arg(qPrintable(featureId))
+													.arg(qPrintable(packageId))
+													.toLocal8Bit();
+
 
 						for (const QByteArray& dependFeatureId : dependsIds){
 							QByteArrayList data = dependFeatureId.split('.');

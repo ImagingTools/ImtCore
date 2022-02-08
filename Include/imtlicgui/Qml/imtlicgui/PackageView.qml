@@ -98,10 +98,15 @@ Item {
             if (parameters["dialog"] === "EditFeature") {
                 var dataModelLocal = featureCollectionView.model.GetData("data");
                 console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
-                dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);//
+                dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);
                 dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
+                dataModelLocal.SetData("Description", "", featureCollectionView.selectedIndex);
                 featureCollectionView.model.SetData("data", dataModelLocal);
                 featureCollectionView.refresh();
+
+                featuresTreeView.addFeatureInTreeViewModel(featureCollectionViewContainer.itemId,
+                                                           parameters["newFeatureId"],
+                                                           parameters["newFeatureName"]);
             }
             else if (parameters["dialog"] === "InputDialog") {
                 if (parameters["typeOperation"] === "Save") {
@@ -132,6 +137,10 @@ Item {
 
                 featureCollectionView.table.selectedIndex = -1;
                 featureCollectionViewContainer.commandsChanged("PackageEdit");
+                featureCollectionViewContainer.makeCommandActive("Save");
+
+//                featuresTreeView.removeDependsFeature(featureCollectionViewContainer.itemId, featureCollectionView.table.getSelectedId());
+                featuresTreeView.removeFeatureInTreeViewModel(featureCollectionViewContainer.itemId, featureCollectionView.table.getSelectedId());
             }
         }
         else if (parameters["status"] === "Edit") {
@@ -221,6 +230,10 @@ Item {
         }
     }
 
+    function makeCommandActive(commandId){
+        featureCollectionViewContainer.rootItem.setModeMenuButton(commandId, "Normal");
+    }
+
     function commandsChanged(commandsId){
         console.log("PackageView commandsChanged", commandsId, featureCollectionView.table.selectedIndex);
         if (commandsId !== "PackageEdit") {
@@ -274,11 +287,11 @@ Item {
         }
 
         onSelectItem: {
-            console.log("PackageView CollectionView onSelectItem", itemId, name);
+            console.log("PackageView CollectionView onSelectItem", selectedId, name);
 
             var source = "../imtlicgui/EditFeatureDialog.qml";
             var parameters = {};
-            parameters["featureId"] = itemId;
+            parameters["featureId"] = selectedId;
             parameters["featureName"] = name;
             parameters["collectionViewFeatures"] = featureCollectionView;
             parameters["resultItem"] = featureCollectionViewContainer;
@@ -290,16 +303,20 @@ Item {
             console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
             if (featureCollectionView.selectedIndex > -1){
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
+
+                treeView.visible = true;
 //                multiDocViewItem.setItemSelectedIndex(featureCollectionView.selectedIndex);
+            } else {
+                treeView.visible = false;
             }
 
 //            if (!treeView.modelItems) {
 //                treeView.modelItems = featuresTreeView.model;
 //            }
 
-            if (!treeView.visible) {
-                treeView.visible = true;
-            }
+//            if (!treeView.visible) {
+//                treeView.visible = true;
+//            }
 
 
             featureCollectionViewContainer.hideCurrentFeatureTreeView();
