@@ -29,6 +29,8 @@ Item {
     property string linkColor: "#0078D7";
     property string selectedColor: "#e3eefa";
 
+    property string lightBlueColor: "#69b8e3";
+
     property string tabSelectedColor: "#FF4500";
 
     property string errorTextColor: "#FF4500";

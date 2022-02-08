@@ -166,7 +166,7 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
 //			metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 //										.toDateTime().toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
-			QVariant date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime();
+			QVariant date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 
 			itemsModel->SetData("ModificationTime", date);
 		}

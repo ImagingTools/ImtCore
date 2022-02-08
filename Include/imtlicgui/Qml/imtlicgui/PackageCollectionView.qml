@@ -168,7 +168,10 @@ Item {
 
     CollectionView {
         id: packageCollectionView;
-        anchors.fill: parent;
+//        anchors.fill: parent;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+        anchors.bottom: parent.bottom;
         anchors.right: packageCollectionMetaInfo.left;
 
         autoRefresh: true;
@@ -209,68 +212,14 @@ Item {
     MetaInfo {
         id: packageCollectionMetaInfo;
 
+        anchors.top: parent.top;
         anchors.right: parent.right;
 
         height: parent.height;
         width: 200;
 
         color: Style.backgroundColor;
-
-        dataTitle: "Features";
     }
-
-//    Rectangle {
-//        id: packageCollectionMetaInfo;
-
-//        anchors.right: parent.right;
-
-//        height: parent.height;
-//        width: 200;
-
-//        color: Style.backgroundColor;
-
-//        Text {
-//            id: featuresTitle;
-//            anchors.top: parent.top;
-//            anchors.topMargin: 10;
-//            anchors.left: parent.left;
-//            anchors.leftMargin: 10;
-
-//            font.family: Style.fontFamily;
-//            font.pixelSize: Style.fontSize_common;
-//            color: Style.textColor;
-//            text: "Features";
-//        }
-
-//        Column {
-//            id: metaInfoFeaturesData;
-
-//            anchors.top: featuresTitle.bottom;
-
-//            width: 200;
-
-//            Repeater {
-
-//            }
-//        }
-
-//        Text {
-//            id: modTimeTitle;
-//            anchors.top: metaInfoFeaturesData.bottom;
-//            anchors.topMargin: 10;
-//            anchors.left: parent.left;
-//            anchors.leftMargin: 10;
-
-//            font.family: Style.fontFamily;
-//            font.pixelSize: Style.fontSize_common;
-//            color: Style.textColor;
-//            text: "Modification Time";
-//        }
-
-//        Text {
-//            id: modeTime;
-//        }
-//    }
 
     GqlModel {
         id: metaInfo;
@@ -319,6 +268,9 @@ Item {
 
                         packageCollectionMetaInfo.modTimeValue = time;
                         packageCollectionMetaInfo.modelData = featuresModel;
+                        packageCollectionMetaInfo.modTimeTitle = "Modification Time";
+                        packageCollectionMetaInfo.checkSumTitle = "Checksum";
+                        packageCollectionMetaInfo.dataTitle = "Features";
 
                         //packageCollectionContainer.updatePackageAfterRename(newId, newName);
                     }

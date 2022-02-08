@@ -13,9 +13,9 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property string modTimeTitle: "Modification Time";
-    property string dataTitle: "Features";
-    property string checkSumTitle: "Checksum";
+    property string modTimeTitle: "";
+    property string dataTitle: "";
+    property string checkSumTitle: "";
     property string modTimeValue;
     property string checkSumValue;
     property var modelData;
@@ -27,10 +27,10 @@ Rectangle {
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
-        font.pixelSize: Style.fontSize_small;
+        font.pixelSize: Style.fontSize_common;
         font.family: Style.fontFamilyBold;
         font.bold: true;
-        color: Style.textColor;
+        color: Style.lightBlueColor;
         text: collectionMetaInfo.dataTitle;
     }
 
@@ -76,11 +76,11 @@ Rectangle {
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
-        font.pixelSize: Style.fontSize_small;
+        font.pixelSize: Style.fontSize_common;
         font.family: Style.fontFamilyBold;
         font.bold: true;
 
-        color: Style.textColor;
+        color: Style.lightBlueColor;
         text: collectionMetaInfo.modTimeTitle;
     }
 
@@ -88,7 +88,7 @@ Rectangle {
         id: modTime;
 
         anchors.top: modTimeTitle.bottom;
-        anchors.topMargin: 10;
+        anchors.topMargin: 5;
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
@@ -96,6 +96,7 @@ Rectangle {
         font.pixelSize: Style.fontSize_small;
         color: Style.textColor;
         text: collectionMetaInfo.modTimeValue;
+        visible: collectionMetaInfo.modTimeValue !== "";
     }
 
     Text {
@@ -105,10 +106,10 @@ Rectangle {
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
-        font.pixelSize: Style.fontSize_small;
+        font.pixelSize: Style.fontSize_common;
         font.family: Style.fontFamilyBold;
         font.bold: true;
-        color: Style.textColor;
+        color: Style.lightBlueColor;
         text: collectionMetaInfo.checkSumTitle;
     }
 
@@ -116,7 +117,7 @@ Rectangle {
         id: checksumValue;
 
         anchors.top: checkSumTitle.bottom;
-        anchors.topMargin: 10;
+        anchors.topMargin: 5;
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
@@ -124,5 +125,6 @@ Rectangle {
         font.pixelSize: Style.fontSize_small;
         color: Style.textColor;
         text: collectionMetaInfo.checkSumValue;
+        visible: collectionMetaInfo.checkSumValue !== "";
     }
 }
