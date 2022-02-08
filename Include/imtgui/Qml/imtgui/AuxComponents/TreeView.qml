@@ -23,6 +23,7 @@ Rectangle {
     ListView {
         id: mainTreeView;
         anchors.fill: container;
+        boundsBehavior: Flickable.StopAtBounds;
         delegate: TreeItemDelegate {
             width: parent.width;
             //childItemModel: model.childItemModel;

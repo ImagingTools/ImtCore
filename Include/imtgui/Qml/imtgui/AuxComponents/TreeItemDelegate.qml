@@ -36,6 +36,23 @@ Item {
 
         visible: model.visible === 1;
 
+//        MouseArea {
+//            anchors.fill: parent;
+
+//            onClicked: {
+//                selectionBackGround.visible = true;
+//            }
+//        }
+
+//        Rectangle {
+//            id: selectionBackGround;
+//            anchors.fill: parent;
+//            color: "#4682B4";
+//            opacity: 0.2;
+//            radius: 2;
+//            visible: false;
+//        }
+
         Image {
             id: iconArrow;
             width: 10;
