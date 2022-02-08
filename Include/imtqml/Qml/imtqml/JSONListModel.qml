@@ -4,7 +4,7 @@ import "jsonpath.js"
 ListModel {
 	property string source: "";
 	property string json: "";
-	property string query: "";
+    property string inquiry: "";
 	property string target: "";
 
 //	property ListModel model : ListModel { id: jsonModel }
@@ -29,7 +29,7 @@ ListModel {
 	}
 
     //onJsonChanged: updateJSONModel()
-	onQueryChanged: {
+    onInquiryChanged: {
 		this.updateJSONModel()
 	}
 
@@ -48,7 +48,7 @@ ListModel {
 
         this.clear();
 		var d1 = new Date()
-        var objectArray = this.parseJSONString(this.json, this.query);
+        var objectArray = this.parseJSONString(this.json, this.inquiry);
 		var dict = {};
 		for ( var key in objectArray ) {
 			var jo = objectArray[key];
