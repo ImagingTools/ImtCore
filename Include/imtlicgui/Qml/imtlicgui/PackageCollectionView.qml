@@ -181,14 +181,14 @@ Item {
 
         onSelectItem: {
             console.log("packageCollectionView onSelectItem", packageCollectionView.selectedIndex);
-            console.log("Item id = ", itemId);
+            console.log("Item id = ", selectedId);
             console.log("Name = ", name);
             var typeOperation = "Open";
-            if (itemId === "") {
+            if (selectedId === "") {
                 name = "New Package";
                 typeOperation = "New";
             }
-            packageCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
+            packageCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {
@@ -200,11 +200,13 @@ Item {
             console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.selectedIndex);
             if (packageCollectionView.selectedIndex > -1){
                 packageCollectionContainer.commandsChanged("Packages")
+
+                metaInfo.getMetaInfo();
             }
         }
     }
 
-    Rectangle {
+    MetaInfo {
         id: packageCollectionMetaInfo;
 
         anchors.right: parent.right;
@@ -213,6 +215,116 @@ Item {
         width: 200;
 
         color: Style.backgroundColor;
+
+        dataTitle: "Features";
+    }
+
+//    Rectangle {
+//        id: packageCollectionMetaInfo;
+
+//        anchors.right: parent.right;
+
+//        height: parent.height;
+//        width: 200;
+
+//        color: Style.backgroundColor;
+
+//        Text {
+//            id: featuresTitle;
+//            anchors.top: parent.top;
+//            anchors.topMargin: 10;
+//            anchors.left: parent.left;
+//            anchors.leftMargin: 10;
+
+//            font.family: Style.fontFamily;
+//            font.pixelSize: Style.fontSize_common;
+//            color: Style.textColor;
+//            text: "Features";
+//        }
+
+//        Column {
+//            id: metaInfoFeaturesData;
+
+//            anchors.top: featuresTitle.bottom;
+
+//            width: 200;
+
+//            Repeater {
+
+//            }
+//        }
+
+//        Text {
+//            id: modTimeTitle;
+//            anchors.top: metaInfoFeaturesData.bottom;
+//            anchors.topMargin: 10;
+//            anchors.left: parent.left;
+//            anchors.leftMargin: 10;
+
+//            font.family: Style.fontFamily;
+//            font.pixelSize: Style.fontSize_common;
+//            color: Style.textColor;
+//            text: "Modification Time";
+//        }
+
+//        Text {
+//            id: modeTime;
+//        }
+//    }
+
+    GqlModel {
+        id: metaInfo;
+
+        function getMetaInfo() {
+            console.log( "PackageCollectionView metaInfo getMetaInfo");
+            var query;
+            var queryFields;
+            var inputParams = Gql.GqlObject("input");
+
+            query = Gql.GqlRequest("query", "FeaturePackageMetaInfo");
+            inputParams.InsertField("Id");
+            inputParams.InsertFieldArgument("Id", packageCollectionView.table.getSelectedId());
+            queryFields = Gql.GqlObject("metaInfo");
+            query.AddParam(inputParams);
+
+            metaInfo.SetData("Id", packageCollectionView.table.getSelectedId())
+
+            var jsonString = metaInfo.toJSON();
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+
+            inputParams.InsertField("Item");
+            inputParams.InsertFieldArgument ("Item", jsonString);
+
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Successed");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("PackageCollectionView metaInfo query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, metaInfo);
+            if (this.state === "Ready"){
+                var dataModelLocal = metaInfo.GetData("data");
+                if (dataModelLocal.ContainsKey("FeaturePackageMetaInfo")) {
+                    dataModelLocal = dataModelLocal.GetData("FeaturePackageMetaInfo");
+                    if (dataModelLocal.ContainsKey("item")) {
+                        dataModelLocal = dataModelLocal.GetData("item");
+
+                        var time = dataModelLocal.GetData("ModificationTime");
+                        var featuresModel = dataModelLocal.GetData("features");
+
+                        packageCollectionMetaInfo.modTimeValue = time;
+                        packageCollectionMetaInfo.modelData = featuresModel;
+
+                        //packageCollectionContainer.updatePackageAfterRename(newId, newName);
+                    }
+                }
+            }
+        }
     }
 
     GqlModel {

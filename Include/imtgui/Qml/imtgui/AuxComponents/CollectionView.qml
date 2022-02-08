@@ -10,7 +10,7 @@ Rectangle {
     width: 100;
     color: "transparent";
     property TreeItemModel model;
-    property alias table: tableInternal;
+    property var table: tableInternal;
     property int selectedIndex: -1;
     property string gqlModelInfo;
     property string gqlModelItems;
@@ -19,7 +19,7 @@ Rectangle {
     property string itemName;
     property bool autoRefresh: false;
    // property var parametrs: new {};
-    signal selectItem(string itemId, string name);
+    signal selectItem(string selectedId, string name);
 
     signal removedItem(string itemId);
 
@@ -113,8 +113,8 @@ Rectangle {
         anchors.fill: parent;
 
         onSelectItem: {
-            console.log("CollectionView AuxTable onSelectItem", itemId, name);
-            collectionViewContainer.selectItem(itemId, name);
+            console.log("CollectionView AuxTable onSelectItem", selectedId, name);
+            collectionViewContainer.selectItem(selectedId, name);
         }
 
         onRightButtonMouseClicked: {

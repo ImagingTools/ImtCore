@@ -11,7 +11,7 @@ Item {
     property alias elements: elementsList.model;
     property TreeItemModel headers; //: elementsList.model;
     property alias delegate: elementsList.delegate;
-    signal selectItem(string itemId, string name);
+    signal selectItem(string selectedId, string name);
 
     signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
 
