@@ -58,6 +58,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 		return ListObjects(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_HEADERS:
 		return GetHeaders(*inputParamsPtr, gqlObject, errorMessage);
+	case OT_METAINFO:
+		return GetMetaInfo(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_USER_OPERATION + 1:
 		return GetTreeItemModel(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_USER_OPERATION + 2:
@@ -120,6 +122,11 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		if (fieldList->at(i).GetId() == "setDescription"){
 			gqlObject = fieldList->at(i);
 			operationType = OT_SET_DESCRIPTION;
+			return true;
+		}
+		if (fieldList->at(i).GetId() == "metaInfo"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_METAINFO;
 			return true;
 		}
 	}
@@ -398,6 +405,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetTreeItemModel(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDependencies(
+		const QList<imtgql::CGqlObject> &inputParams,
+		const imtgql::CGqlObject &gqlObject,
+		QString &errorMessage) const
+{
+	return nullptr;
+}
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
