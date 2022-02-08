@@ -204,7 +204,7 @@ def parse_qml_file(cache, com, path):
 
 				data = '\n'.join(new_lines) # by Artur, for compatibility signals
 				#print(data)
-
+			
 			tree = compiler.grammar.parse(data)
 			cache.write(com, h, tree)
 			return tree, data
@@ -282,9 +282,51 @@ class Compiler(object):
 						if not (set(manifest.use_only_for) & self.platforms):
 							continue
 
-				queue_replace = {}
 				for filename in filenames:
-					fullpath = '\\'.join([dirpath, filename])
+					relpath = os.path.relpath(dirpath, package_dir)
+					if relpath.startswith('..'):
+						#files in current dir, reset to initial state
+						package_dir = project_dir
+						package_name = project_dir.split(os.path.sep)[-1]
+						relpath = os.path.relpath(dirpath, package_dir)
+
+					if relpath == '.':
+						relpath = []
+					else:
+						relpath = relpath.split(os.path.sep)
+
+					package = ".".join([package_name] + relpath)
+					self.component_path_map[filename] = dirpath
+					promise = self.process_file(pool, generator, package, dirpath, filename)
+					if promise is not None:
+						promises.append(promise)
+				
+
+		for name, is_component, promise in promises:
+			self.finalize_qml_file(generator, name, is_component, *promise.get())
+
+	def pre_process_files(self, pool, generator):
+		promises = []
+		root_manifest = self.root_manifest
+
+		for project_dir in self.project_dirs:
+			path = project_dir.split(os.path.sep)
+
+			for dirpath, dirnames, filenames in os.walk(project_dir, topdown = True):
+				dirnames[:] = [name for name in dirnames if not name[:6].startswith("build.") and name != "dist"]
+
+				queue_replace = {}
+
+				try:
+					with open('.cache/signals', 'r') as f:
+						for line in f:
+							temp = line.replace('\n', '').split('=>')
+							queue_replace[temp[0]] = temp[1]
+				except:
+					pass
+
+				for filename in filenames:
+					fullpath = '/'.join([dirpath.replace('\\', '/'), filename])
 					file = open(fullpath, 'r', encoding='utf-8')
 	
 					try:
@@ -318,42 +360,10 @@ class Compiler(object):
 					
 					file.close()
 
-				try:
-					with open('.cache/signals', 'r') as f:
-						for line in f:
-							temp = line.replace('\n', '').split('=>')
-							queue_replace[temp[0]] = temp[1]
-				except:
-					pass
-
 				with open('.cache/signals', 'w') as f:
 					for key in queue_replace:
 						if(key):
 							f.write('{}=>{}\n'.format(key, queue_replace[key]))
-
-				
-				for filename in filenames:
-					relpath = os.path.relpath(dirpath, package_dir)
-					if relpath.startswith('..'):
-						#files in current dir, reset to initial state
-						package_dir = project_dir
-						package_name = project_dir.split(os.path.sep)[-1]
-						relpath = os.path.relpath(dirpath, package_dir)
-
-					if relpath == '.':
-						relpath = []
-					else:
-						relpath = relpath.split(os.path.sep)
-
-					package = ".".join([package_name] + relpath)
-					self.component_path_map[filename] = dirpath
-					promise = self.process_file(pool, generator, package, dirpath, filename)
-					if promise is not None:
-						promises.append(promise)
-				
-
-		for name, is_component, promise in promises:
-			self.finalize_qml_file(generator, name, is_component, *promise.get())
 
 	def generate(self):
 		namespace = "qml"
@@ -429,6 +439,32 @@ class Compiler(object):
 
 		print("done", file=sys.stderr)
 
+	def pre_generate(self):
+		namespace = "qml"
+		partner = self.root_manifest.partner
+		if partner not in self.partners:
+			raise parser.error('\n\nInvalid client id \'%s\'. Consider become our partner! You will be advertised on our site (and change splash screen lol).\n\n*** WARNING: Using counterfeit id is a hanging offense, you will be reported to KGB immediately. ***\n' %partner)
+		generator = compiler.js.generator(namespace, 'Powered by PureQML ' + self.partners.get(partner).get('engine') + ' Edition Engine')
+
+		def init_worker():
+			import signal
+			signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+		if self.jobs != 1:
+			try:
+				pool = Pool(self.jobs, init_worker)
+				self.pre_process_files(pool, generator)
+			except KeyboardInterrupt:
+				pool.terminate()
+				pool.join()
+				sys.exit(1)
+			else:
+				pool.close()
+				pool.join()
+		else:
+			self.pre_process_files(None, generator)
+
+
 	def __init__(self, output_dir, root, project_dirs, root_manifest, app, platforms, doc = None, release = False, verbose = False, jobs = 1, cache_dir = ".cache"):
 		self.cache = Cache(cache_dir)
 		self.root = root
@@ -502,6 +538,7 @@ def compile_qml(output_dir, root, project_dirs, root_manifest, app, platforms = 
 
 	while True:
 		try:
+			c.pre_generate()
 			c.generate()
 		except Exception as ex:
 			if not wait:
