@@ -49,7 +49,12 @@ Item {
 
     CollectionView {
         id: productCollectionView;
-        anchors.fill: parent;
+//        anchors.fill: parent;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+        anchors.bottom: parent.bottom;
+        anchors.right: productCollectionMetaInfo.left;
+
         autoRefresh: true;
         Component.onCompleted: {
             productCollectionView.gqlModelInfo = "ProductCollectionInfo"
@@ -73,5 +78,17 @@ Item {
                 productCollectionContainer.commandsChanged("Products")
             }
         }
+    }
+
+    MetaInfo {
+        id: productCollectionMetaInfo;
+
+        anchors.top: parent.top;
+        anchors.right: parent.right;
+
+        height: parent.height;
+        width: 200;
+
+        color: Style.backgroundColor;
     }
 }

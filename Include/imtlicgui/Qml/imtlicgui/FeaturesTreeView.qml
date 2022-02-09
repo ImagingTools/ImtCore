@@ -4,8 +4,9 @@ import imtqml 1.0
 
 Item {
     id: container;
-    property TreeItemModel model;
+    property Item packageItem;
 
+    property TreeItemModel model;
     property TreeItemModel dependModel;
     //property alias dependModel: dependModel;
 
@@ -17,10 +18,6 @@ Item {
         console.log( "FeaturesTreeView Component.onCompleted");
         container.loadFeaturesModel();
         container.loadDependModel();
-    }
-
-    onDependModelChanged: {
-        console.log( "FeaturesTreeView onDependModelChanged");
     }
 
     function printInfo() {
@@ -39,10 +36,28 @@ Item {
         }
     }
 
+    function getIndexFromTreeViewByPackageId(packageId){
+
+        if (!container.model){
+            return -1;
+        }
+
+        for (var i = 0; i < container.model.GetItemsCount(); i++){
+            var curId = container.model.GetData("Id", i);
+
+            if (curId === packageId){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     function addFeatureInTreeViewModel(packageId, featureId, featureName){
         console.log("FeaturesTreeView addFeatureInTreeViewModel", packageId, featureId, featureName);
 
         if (!container.model){
+            console.log("!container.model return");
             return;
         }
 
@@ -81,6 +96,8 @@ Item {
                 if (childIndex === -1){
                     childIndex = childModel.InsertNewItem();
                 }
+
+                console.log(childIndex, featureId, featureName, stateChecked, level, visible, isActive, packageId);
 
                 childModel.SetData("Id", featureId, childIndex);
                 childModel.SetData("Name", featureName, childIndex);
@@ -366,7 +383,20 @@ Item {
                     dataModelLocal = dataModelLocal.GetData("FeaturesTree");
                     if (dataModelLocal.ContainsKey("TreeModel")) {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
+
+//                        var index = container.getIndexFromTreeViewByPackageId(container.packageItem.itemId);
+//                        var childModel;
+
+//                        if (index !== -1){
+//                            childModel = container.model.GetData("childItemModel", index);
+//                        }
+                        console.log( "FeaturesTreeView GqlModel assign a new model");
                         container.model = dataModelLocal;
+                        console.log();
+
+//                        if (index !== -1){
+//                            container.model.SetData("childItemModel", childModel, index);
+//                        }
                     }
                 }
 
@@ -397,6 +427,7 @@ Item {
                     dataModelLocal = dataModelLocal.GetData("FeaturesDependencies");
                     if (dataModelLocal.ContainsKey("TreeModel")) {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
+
                         container.dependModel = dataModelLocal;
                     }
                 }

@@ -333,8 +333,6 @@ Item {
             onTextChanged: {
                 productsCollectionViewContainer.itemId = tfcProductId.text;
             }
-
-//            borderColor: "gray";
         }
 
 
@@ -416,6 +414,7 @@ Item {
 //            anchors.leftMargin: 5;
             anchors.right: parent.right;
             anchors.rightMargin: 5;
+            clip: true;
 
             anchors.bottom: parent.bottom;
 //            width: 200;

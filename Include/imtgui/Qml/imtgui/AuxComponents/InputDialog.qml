@@ -116,6 +116,7 @@ Rectangle {
             anchors.horizontalCenter: dialogBody.horizontalCenter;
 //            anchors.topMargin: 10;
             color: "transparent";
+
             Text {
                 id: mainTextRemoveDialog;
                 anchors.fill: parent;

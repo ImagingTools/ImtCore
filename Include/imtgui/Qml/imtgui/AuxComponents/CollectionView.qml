@@ -50,6 +50,7 @@ Rectangle {
         }
 
         if (collectionViewContainer.model && collectionViewContainer.model.ContainsKey("data")){
+            console.log("CollectionView refresh ");
             var dataModelLocal = collectionViewContainer.model.GetData("data");
             tableInternal.elements = 0;
             tableInternal.elements = dataModelLocal;

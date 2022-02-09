@@ -122,8 +122,8 @@ Item {
 
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
-                //tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
-                tableContainer.selectItem(model["Id"], model["Name"]);
+                tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
+//                tableContainer.selectItem(model["Id"], model["Name"]);
             }
         }
 

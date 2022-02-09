@@ -108,7 +108,7 @@ Item {
                     renameModel.rename(value);
                 }
             }
-//            packageCollectionView.refresh();
+            packageCollectionView.refresh();
         }
         else if (parameters["status"] === "Edit") {
             packageCollectionContainer.menuActivated("Edit");

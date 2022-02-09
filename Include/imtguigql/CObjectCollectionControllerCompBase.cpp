@@ -169,11 +169,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
 	else{
-		QString name, description, errorMessage;
+		QString name, description;
 		QByteArray objectId;
+
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
 			newObjectId = m_objectCollectionCompPtr->InsertNewObject("",name,description, newObject, objectId);
+		}
+
+		if (newObjectId.isEmpty()){
+			errorMessage = "Object with this id already exists!";
 		}
 	}
 
@@ -209,7 +216,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	}
 	else{
 		QString name, description, errorMessage;
-		QByteArray objectId;
+		//QByteArray objectId;
 		istd::IChangeable* savedObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (savedObject != nullptr){
 			if (m_objectCollectionCompPtr->SetObjectData(objectId, *savedObject) == false){

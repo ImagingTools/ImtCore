@@ -5,10 +5,10 @@ import imtqml 1.0
 
 Rectangle {
     id: popupMenuContainer;
-    x: 100;
-    y: 100;
-//    x: popupMenuContainer.resultItem.getMenuButtonsX();
-//    y: popupMenuContainer.resultItem.getMenuButtonsY();
+//    x: 100;
+//    y: 100;
+    x: popupMenuContainer.resultItem.getMenuButtonsX();
+    y: popupMenuContainer.resultItem.getMenuButtonsY();
     width: popupMenuContainer.itemWidth;
 //    height: model.count * popupMenuContainer.itemHeight - popupMenuContainer.emptyItemCount * popupMenuContainer.itemHeight;
 //    width: 100;
@@ -17,15 +17,36 @@ Rectangle {
     radius: 3;
     clip: true;
 
-//    layer.enabled: true;
-//     DropShadow {
-////        transparentBorder: true;
-//        horizontalOffset: 1;
-//        verticalOffset: 1;
-//        color: Style.textColor;
-//        spread: 0.05;
-//        source: popupMenuContainer;
-//     }
+//    Rectangle{
+//        width: 500;
+//        height: 500;
+//        color: "dark grey";
+
+
+//        Rectangle {
+//            id: backgroundRect;
+//            width: 200;
+//            height: 150;
+//            radius: 5;
+//            anchors.centerIn: parent;
+//            color: "red";
+
+//            Rectangle {
+//                id: dropShadowRect;
+//                property real offset: Math.min(parent.width*0.025, parent.height*0.025);
+//                color: "purple";
+//                width: parent.width;
+//                height: parent.height;
+//                z: -1;
+//                opacity: 0.75;
+//                radius: backgroundRect.radius + 2;
+//                anchors.left: parent.left;
+//                anchors.leftMargin: -offset;
+//                anchors.top: parent.top;
+//                anchors.topMargin: offset;
+//            }
+//        }
+//    }
 
     property Item resultItem;
     property var model;

@@ -82,6 +82,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
+
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
@@ -100,6 +101,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 		featurePackagePtr->SetPackageId(objectId);
 		featurePackagePtr->SetObjectDescription(objectId, description);
+
 
 		imtbase::CTreeItemModel* featuresModelPtr = nullptr;
 
@@ -157,6 +159,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				}
 			}
 		}
+
 
 		return featurePackagePtr.PopPtr();
 	}
@@ -320,7 +323,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 					childItemModel->SetData("stateChecked", 0, childItemIndex);
 					childItemModel->SetData("level", 1, childItemIndex);
 					childItemModel->SetData("visible", 1, childItemIndex);
-					childItemModel->SetData("isActive", 0, childItemIndex);
+					childItemModel->SetData("isActive", 1, childItemIndex);
 
 					childItemModel->SetData("packageId", collectionId, childItemIndex);
 				}

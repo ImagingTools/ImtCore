@@ -47,10 +47,10 @@ Item {
         }
 
         onSelectItem: {
-            console.log("Item id = ", itemId);
+            console.log("Item id = ", selectedId);
             console.log("Name = ", name);
             var typeOperation = "Open";
-            if (itemId === "") {
+            if (selectedId === "") {
                 name = "New Account";
                 typeOperation = "New";
             }

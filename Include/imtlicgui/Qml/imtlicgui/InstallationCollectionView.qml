@@ -50,12 +50,12 @@ Item {
         onSelectItem: {
 
             var typeOperation = "Open";
-            if (itemId === "") {
+            if (selectedId === "") {
                 name = "New Installation";
                 typeOperation = "New";
             }
             installationCollectionContainer.multiDocViewItem.activeCollectionItem = installationCollectionContainer;
-            installationCollectionContainer.multiDocViewItem.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
+            installationCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
 //            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit")
         }
 
