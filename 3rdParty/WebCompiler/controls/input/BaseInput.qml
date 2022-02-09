@@ -14,6 +14,7 @@ Item {
 	property string inputMode;					///< inputmode attribute, numeric keyboard, etc
 	property string autocomplete;				///< autocomplete variants (username, current-password, etc)
 	signal change; 								///< emit signal when input loses focus or IME closes
+	signal accepted;
 	cssPointerTouchEvents: true;
 	property Color selectionColor: '#000080';
 	property Color selectedTextColor: '#fff';

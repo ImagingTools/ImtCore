@@ -24,6 +24,20 @@ BaseInput {
 			
 			
 		}.bind(this))
+		this.element.on("keyup", function(e) { 
+			if(e.key === "Enter" || e.key === "Return"){
+				if(this.validator){
+					let text = this._getValue()
+					if(!this.validator.regExp || this.validator.regExp.test(text)){
+						this.accepted()
+					} else {
+						// not accepted
+					}
+				} else {
+					this.accepted()
+				}
+			}
+		}.bind(this))
 		this.element.dom.style.background = "none"
 	}
 

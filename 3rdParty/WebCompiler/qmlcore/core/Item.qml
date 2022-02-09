@@ -56,6 +56,8 @@ Object {
 
 			this._createElement(this.getTag(), this.getClass())
 		} //no parent == top level element, skip
+
+		
 		
 	}
 
@@ -65,6 +67,12 @@ Object {
 		})
 		if(this._uid > 0)
 		this.element.dom.id = `el-${this._uid}`
+		this.element.on("focusin", (e)=>{
+			this.focus = true
+		})
+		this.element.on("focusout", (e)=>{
+			this.focus = false
+		})
 		
 	}
 
