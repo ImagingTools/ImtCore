@@ -17,7 +17,7 @@ Item {
     Component.onCompleted: {
         if (model.childItemModel)
         {
-            console.log("Model childCount ", model.childItemModel.GetItemsCount());
+           // console.log("Model childCount ", model.childItemModel.GetItemsCount());
             treeItemRepeater.model = model.childItemModel;
         }
     }

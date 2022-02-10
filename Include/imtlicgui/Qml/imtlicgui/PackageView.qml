@@ -313,17 +313,17 @@ Item {
                 treeView.visible = false;
             }
 
-            featureCollectionViewContainer.updateFeaturesTreeView();
+            //featureCollectionViewContainer.updateFeaturesTreeView();
         }
     }
 
     function updateFeaturesTreeView(){
         console.log("PackageView updateFeaturesTreeView");
         //treeView.modelItems.Refresh();
-        featureCollectionViewContainer.hideCurrentFeatureTreeView();
-        featureCollectionViewContainer.updateStateCheckedCheckBox();
-        featureCollectionViewContainer.checkInActiveItems();
-        treeView.modelItems.Refresh();
+//        featureCollectionViewContainer.hideCurrentFeatureTreeView();
+//        featureCollectionViewContainer.updateStateCheckedCheckBox();
+//        featureCollectionViewContainer.checkInActiveItems();
+//        treeView.modelItems.Refresh();
     }
 
     function clearCheckedCheckBox() {
@@ -405,7 +405,8 @@ Item {
     }
 
     function updateStateCheckedCheckBox() {
-        console.log("PackageView updateStateCheckedCheckBox");
+        console.log("PackageView updateStateCheckedCheckBox", featuresTreeView);
+
         var curFeatureId = featureCollectionView.table.getSelectedId();
         var curPackageId = featureCollectionView.itemId;
 
@@ -646,7 +647,7 @@ Item {
             width: 200;
             height: parent.height;
 
-            modelItems: featuresTreeView.model;
+//            modelItems: featuresTreeView.modelTreeView;
 
             visible: false;
 
@@ -729,16 +730,14 @@ Item {
 
             onDependModelChanged: {
                 console.log( "PackageView FeaturesTreeView onDependModelChanged");
-                featureCollectionViewContainer.updateFeaturesTreeView();
+                //featureCollectionViewContainer.updateFeaturesTreeView();
             }
 
-            onModelChanged: {
-                console.log( "PackageView FeaturesTreeView onModelChanged");
-                featureCollectionViewContainer.updateFeaturesTreeView();
+            onModelTreeViewChanged: {
+                console.log("PackageView FeaturesTreeView onModelTreeViewChanged");
+                //featureCollectionViewContainer.updateFeaturesTreeView();
 
-                treeView.modelItems = featuresTreeView.model;
-
-//                treeView.modelItems.Refresh();
+                treeView.modelItems = featuresTreeView.modelTreeView;
             }
         }
     }

@@ -142,35 +142,35 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* metaInfoModel = nullptr;
+	imtbase::CTreeItemModel* features = nullptr;
 
-	if (!itemData.isEmpty()){
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
 
-		imtbase::CTreeItemModel itemModel;
-		imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* features = new imtbase::CTreeItemModel();
-
-		itemModel.Parse(itemData);
-
-		QByteArray objectId;
-		if (itemModel.ContainsKey("Id")){
-			objectId = itemModel.GetData("Id").toByteArray();
-
-			itemsModel->SetData("Id", objectId);
-		}
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		metaInfoModel = new imtbase::CTreeItemModel();
+		features = new imtbase::CTreeItemModel();
 
 		idoc::CStandardDocumentMetaInfo metaInfo;
 
-		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-			QVariant date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+		QByteArray packageId = GetObjectIdFromInputParams(inputParams);
 
-			itemsModel->SetData("ModificationTime", date);
+		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(packageId, metaInfo)){
+			QVariant date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+			metaInfoModel->SetData("ModificationTime", date);
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+		m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr);
 
 		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
 
@@ -190,16 +190,15 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 				}
 			}
 
-			itemsModel->SetExternTreeModel("features", features);
+			metaInfoModel->SetExternTreeModel("Features", features);
 		}
 
-		dataModel->SetExternTreeModel("item", itemsModel);
-		rootModel->SetExternTreeModel("data", dataModel);
-
-		return rootModel;
+		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
 
-	return nullptr;
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

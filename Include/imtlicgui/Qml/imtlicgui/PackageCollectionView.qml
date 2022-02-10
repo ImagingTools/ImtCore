@@ -226,27 +226,17 @@ Item {
 
         function getMetaInfo() {
             console.log( "PackageCollectionView metaInfo getMetaInfo");
-            var query;
-            var queryFields;
+            var query = Gql.GqlRequest("query", "FeaturePackageMetaInfo");;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("query", "FeaturePackageMetaInfo");
             inputParams.InsertField("Id");
             inputParams.InsertFieldArgument("Id", packageCollectionView.table.getSelectedId());
-            queryFields = Gql.GqlObject("metaInfo");
+
+            var queryFields = Gql.GqlObject("metaInfo");
             query.AddParam(inputParams);
-
-            metaInfo.SetData("Id", packageCollectionView.table.getSelectedId())
-
-            var jsonString = metaInfo.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-
-            inputParams.InsertField("Item");
-            inputParams.InsertFieldArgument ("Item", jsonString);
-
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Successed");
-
+            queryFields.InsertField("ModificationTime");
+            queryFields.InsertField("Checksum");
+            queryFields.InsertField("Features");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -257,22 +247,28 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, metaInfo);
             if (this.state === "Ready"){
-                var dataModelLocal = metaInfo.GetData("data");
+                var dataModelLocal;
+
+                if (metaInfo.ContainsKey("errors")){
+                    return;
+                }
+
+                dataModelLocal = metaInfo.GetData("data");
+
                 if (dataModelLocal.ContainsKey("FeaturePackageMetaInfo")) {
                     dataModelLocal = dataModelLocal.GetData("FeaturePackageMetaInfo");
-                    if (dataModelLocal.ContainsKey("item")) {
-                        dataModelLocal = dataModelLocal.GetData("item");
+
+                    if (dataModelLocal.ContainsKey("metaInfo")) {
+                        dataModelLocal = dataModelLocal.GetData("metaInfo");
 
                         var time = dataModelLocal.GetData("ModificationTime");
-                        var featuresModel = dataModelLocal.GetData("features");
+                        var featuresModel = dataModelLocal.GetData("Features");
 
                         packageCollectionMetaInfo.modTimeValue = time;
                         packageCollectionMetaInfo.modelData = featuresModel;
                         packageCollectionMetaInfo.modTimeTitle = "Modification Time";
                         packageCollectionMetaInfo.checkSumTitle = "Checksum";
                         packageCollectionMetaInfo.dataTitle = "Features";
-
-                        //packageCollectionContainer.updatePackageAfterRename(newId, newName);
                     }
                 }
             }
