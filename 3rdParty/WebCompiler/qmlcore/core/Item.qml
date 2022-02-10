@@ -236,7 +236,7 @@ Object {
 		for(var i = 0, n = children.length; i < n; ++i) {
 			var child = children[i]
 			this._updateVisibilityForChild(child, value)
-			child._context._processActions()
+			if(child && child._context) child._context._processActions()
 		}
 
 		if (!value && this.parent)
