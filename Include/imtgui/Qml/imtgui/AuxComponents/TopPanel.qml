@@ -46,7 +46,6 @@ Rectangle {
             if (modelButtons.get(i).id === id) {
                 modelButtons.get(i).mode = mode;
                 modelButtons.get(i).imageSource = "../../../Icons/" + Style.theme + "/" + modelButtons.get(i).name + "_Off" + "_" + mode + ".svg";
-//                console.log("Menu buttons id", id, "change mode", mode);
                 break;
             }
         }
@@ -55,7 +54,7 @@ Rectangle {
 //            var temp = modelButtons.get(i);
 //            console.log("\tid: ", temp.id, ' mode:', temp.mode, ' imageSource:', temp.imageSource);
 //        }
-
+         console.log("TopPanel updateModeModelMenuButtons");
     }
 
     function dialogResult(parameters) {
@@ -116,13 +115,17 @@ Rectangle {
     AuxButton {
         id: preferenceButton;
         z: 100;
+
         anchors.top: parent.top;
         anchors.right: parent.right;
         anchors.rightMargin: 10;
         anchors.topMargin: 10;
+
         width: 24;
         height: 24;
+
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
+
         onClicked: {
             console.log("Preference button clicked !");
             var source = "AuxComponents/Preference.qml";
@@ -136,13 +139,17 @@ Rectangle {
         anchors.leftMargin: 10;
         anchors.right: menuButton.left;
         anchors.rightMargin: 10;
+
         height: parent.height;
 
         ListView {
             id: lvButtons;
+
             anchors.horizontalCenter: parent.horizontalCenter;
+
             height: parent.height;
             width: contentWidth > parent.width ? parent.width : contentWidth;
+
             clip: true;
             orientation: ListView.Horizontal;
             boundsBehavior: Flickable.StopAtBounds;

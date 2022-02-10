@@ -35,6 +35,10 @@ Item {
         }
     }
 
+    TreeItemModel {
+        id: modelMetaInfo;
+    }
+
     function commandsChanged(commandsId) {
         console.log("PackageCollectionView commandsChanged!", commandsId, packageCollectionContainer.rootItem);
         if (commandsId !== "Packages"){
@@ -204,7 +208,26 @@ Item {
             if (packageCollectionView.selectedIndex > -1){
                 packageCollectionContainer.commandsChanged("Packages")
 
-                metaInfo.getMetaInfo();
+                var index = -1;
+                for (var i = 0; i < modelMetaInfo.GetItemsCount(); i++){
+                    var curId = modelMetaInfo.GetData("Id", i);
+
+                    if (curId === packageCollectionView.table.getSelectedId()){
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index !== -1){
+                    packageCollectionMetaInfo.modTimeValue = modelMetaInfo.GetData("ModificationTime", index);
+                    packageCollectionMetaInfo.modelData = modelMetaInfo.GetData("Features", index);
+//                    packageCollectionMetaInfo.modTimeTitle = modelMetaInfo.GetData("ModificationTime", index);
+//                    packageCollectionMetaInfo.checkSumTitle = modelMetaInfo.GetData("CheckSum", index);
+//                    packageCollectionMetaInfo.dataTitle = "Features";
+                }
+                else{
+                    metaInfo.getMetaInfo();
+                }
             }
         }
     }
@@ -264,9 +287,16 @@ Item {
                         var time = dataModelLocal.GetData("ModificationTime");
                         var featuresModel = dataModelLocal.GetData("Features");
 
-                        packageCollectionMetaInfo.modTimeValue = time;
+                        var index = modelMetaInfo.InsertNewItem();
+
+                        modelMetaInfo.SetData("Id", packageCollectionView.table.getSelectedId(), index);
+                        modelMetaInfo.SetData("ModificationTime", time, index);
+                        modelMetaInfo.SetData("Features", featuresModel, index);
+
+                        packageCollectionMetaInfo.modTimeValue = time
                         packageCollectionMetaInfo.modelData = featuresModel;
-                        packageCollectionMetaInfo.modTimeTitle = "Modification Time";
+
+                        packageCollectionMetaInfo.modTimeTitle =  "Modification Time";
                         packageCollectionMetaInfo.checkSumTitle = "Checksum";
                         packageCollectionMetaInfo.dataTitle = "Features";
                     }
