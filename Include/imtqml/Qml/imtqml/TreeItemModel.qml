@@ -139,5 +139,45 @@ JSONListModel {
         return retModel;
     }
 
+    function toJSON(){
+        var retVal = ""
+        if (this.isArray || this.count > 1)
+            retVal += "["
+        else
+            retVal += "{"
+        for (var i = 0; i < this.count; i++){
+            var modelObject = this.get(i)
+            if (this.count > 0){
+                retVal += ","
+            }
+            if (this.isArray || this.count > 1)
+                retVal += "{"
+
+            for (var property in modelObject) {
+                retVal += "\"" + property + "\":"
+                var modelVal = modelObject[property]
+                if (modelVal === null)
+                    modelVal += "null"
+                else if(typeof modelVal === 'object' && modelVal._qmlName == 'TreeItemModel.qml'){
+                    retVal += modelVal.toJSON()
+                }
+                else if(typeof modelVal === 'string' || modelVal instanceof String){
+                    retVal += "\"" + modelVal + "\""
+                }
+                else
+                    retVal += modelVal
+            }
+            if (this.isArray || this.count > 1)
+                retVal += "}"
+
+
+        }
+        if (this.isArray || this.count > 1)
+            retVal += "]"
+        else
+            retVal += "}"
+        return retVal
+    }
+
 
 }
