@@ -146,6 +146,8 @@ Item {
 	onItemCompleted: {
 		let tempTimer = setInterval(()=>{
 			if(this.__properties.item && this.__properties.item.value && this.__properties.item.value.__finished === true){
+				this.width = this.__properties.item.value.width
+				this.height = this.__properties.item.value.height
 				for(let func of this.__properties.item.onChanged){
 					func(this.__properties.item.value)
 				}
