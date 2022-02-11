@@ -4,8 +4,8 @@ import Acf 1.0
 Item {
     id: treeItemDelegate;
     width: 100;
-    height: 50;
-//    height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
+    //height: 50;
+    height: mainRect.height + childrenColumn.height;
 //    height:  mainRect.height + childrenColumn.height;
     property bool isOpened: true;
 
@@ -21,11 +21,13 @@ Item {
            // console.log("Model childCount ", model.childItemModel.GetItemsCount());
             treeItemRepeater.model = model.childItemModel;
         }
+
     }
 
 //    onCheckBoxStateChanged: {
 //        //treeItemRepeater.model = treeItemDelegate.childItemModel;
 //    }
+
 
     Rectangle {
         id: mainRect;
@@ -33,9 +35,9 @@ Item {
         color: Style.baseColor;
         anchors.top: parent.top;
         anchors.right: parent.right;
-        height: model.visible === 1 ? 30 : 0;
+        height: 30;
 
-        visible: model.visible === 1;
+        //visible: model.visible === 1;
 
 //        MouseArea {
 //            anchors.fill: parent;
@@ -123,7 +125,8 @@ Item {
         id: childrenColumn;
         width: treeItemDelegate.width;
         anchors.top: mainRect.bottom;
-        visible: treeItemDelegate.isOpened;
+        //height: 0;
+        //visible: treeItemDelegate.isOpened;
 
         Repeater {
              id: treeItemRepeater;
@@ -131,16 +134,27 @@ Item {
                  id: loader;
 
 //                 height: 50;
-                 width: 200;
+                 //width: 200;
 
                  source: "TreeItemDelegate.qml";
                  onItemChanged: {
                      if (loader.item) {
-                         loader.height = loader.item.height;
+                         //loader.height = loader.item.height;
+                         //childrenColumn.height += item.height;
                          loader.item.listViewItem = treeItemDelegate.listViewItem;
                      }
                  }
              }
+             onHeightChanged: {
+                 console.log('============================')
+                 console.log('treeItemRepeater height: ', height)
+                 console.log('============================')
+             }
        }
+
+        onHeightChanged: {
+            parent.height = height + mainRect.height;
+        }
+
     }
 }
