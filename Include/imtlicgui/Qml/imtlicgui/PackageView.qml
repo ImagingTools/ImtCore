@@ -320,10 +320,10 @@ Item {
     function updateFeaturesTreeView(){
         console.log("PackageView updateFeaturesTreeView");
         //treeView.modelItems.Refresh();
-        featureCollectionViewContainer.hideCurrentFeatureTreeView();
-        featureCollectionViewContainer.updateStateCheckedCheckBox();
-        featureCollectionViewContainer.checkInActiveItems();
-        treeView.modelItems.Refresh();
+//        featureCollectionViewContainer.hideCurrentFeatureTreeView();
+//        featureCollectionViewContainer.updateStateCheckedCheckBox();
+//        featureCollectionViewContainer.checkInActiveItems();
+//        treeView.modelItems.Refresh();
     }
 
     function clearCheckedCheckBox() {
@@ -343,7 +343,8 @@ Item {
         }
 
         treeView.modelItems = modelItems;
-       // printModelItems(treeView.modelItems);
+        console.log("PackageView clearCheckedCheckBox", treeView.modelItems);
+//        printModelItems(treeView.modelItems);
     }
 
     function printModelItems(modelItems) {

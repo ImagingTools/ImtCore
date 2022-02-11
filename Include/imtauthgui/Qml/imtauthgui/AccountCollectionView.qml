@@ -71,6 +71,23 @@ Item {
         onSelectedIndexChanged: {
             if (accountCollectionView.selectedIndex > -1){
                 accountCollectionContainer.commandsChanged("Accounts");
+
+                var index = -1;
+                for (var i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
+                    var curId = accountsMetaInfoModels.GetData("Id", i);
+
+                    if (curId === accountCollectionView.table.getSelectedId()){
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index !== -1){
+                    accountCollectionMetaInfo.modelData = accountsMetaInfoModels.GetData("ModelData", index);
+                }
+                else{
+                    metaInfo.getMetaInfo();
+                }
             }
         }
     }

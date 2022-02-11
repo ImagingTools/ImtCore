@@ -24,6 +24,17 @@ Item {
 
     }
 
+//    onIsOpenedChanged: {
+//        console.log("TreeItemDelegate onIsOpenedChanged");
+//        if (treeItemDelegate.isOpened){
+//            console.log(" = model.childItemModel");
+//            treeItemRepeater.model = model.childItemModel;
+//        } else {
+//            console.log(" = 0");
+//            treeItemRepeater.model = 0;
+//        }
+//    }
+
 //    onCheckBoxStateChanged: {
 //        //treeItemRepeater.model = treeItemDelegate.childItemModel;
 //    }
@@ -130,6 +141,21 @@ Item {
 
         Repeater {
              id: treeItemRepeater;
+
+
+             property bool isOpened: treeItemDelegate.isOpened;
+
+             onIsOpenedChanged: {
+                 console.log("TreeItemDelegate onIsOpenedChanged");
+                 if (treeItemDelegate.isOpened){
+                     console.log(" = model.childItemModel");
+                     treeItemRepeater.model = model.childItemModel;
+                 } else {
+                     console.log(" = 0");
+                     treeItemRepeater.model = 0;
+                 }
+             }
+
              delegate: Loader {
                  id: loader;
 
@@ -149,6 +175,10 @@ Item {
                  console.log('============================')
                  console.log('treeItemRepeater height: ', height)
                  console.log('============================')
+             }
+
+             onVisibleChanged: {
+                console.log('Repeater onVisibleChanged', treeItemRepeater.visible);
              }
        }
 

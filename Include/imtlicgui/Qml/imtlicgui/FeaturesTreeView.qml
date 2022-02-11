@@ -397,6 +397,12 @@ Item {
 //                        if (index !== -1){
 //                            childModel = featuresTreeViewContainer.modelTreeView.GetData("childItemModel", index);
 //                        }
+
+                        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+                            var childModel = dataModelLocal.GetData("childItemModel", i);
+                            dataModelLocal.SetData("childItemModel", childModel, i);
+                        }
+
                         console.log( "FeaturesTreeView GqlModel assign a new modelTreeView");
                         featuresTreeViewContainer.modelTreeView = dataModelLocal;
                         console.log();

@@ -47,9 +47,16 @@ istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<im
 		imtauth::CAccountInfo *accountInfo = new imtauth::CAccountInfo();
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
-		objectId = itemModel.GetData("Id").toByteArray();
-		description = itemModel.GetData("AccountDescription").toString();
-		name = itemModel.GetData("AccountName").toString();
+
+		if (itemModel.ContainsKey("AccountName")){
+			name = itemModel.GetData("AccountName").toString();
+			objectId = itemModel.GetData("AccountName").toByteArray();
+		}
+
+		if (itemModel.ContainsKey("AccountDescription")){
+			description = itemModel.GetData("AccountDescription").toString();
+		}
+
 		accountInfo->SetAccountName(name);
 		accountInfo->SetAccountDescription(description);
 
@@ -69,7 +76,9 @@ istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<im
 			QString firstName = itemModel.GetData("FirstName").toString();
 			contactInfo.SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, firstName);
 		}
+
 		accountInfo->SetAccountOwner(contactInfo);
+
 		return accountInfo;
 	}
 
@@ -84,6 +93,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
+	imtbase::CTreeItemModel* childs = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -94,6 +104,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
+
 		dataModel = new imtbase::CTreeItemModel();
 		metaInfoModel = new imtbase::CTreeItemModel();
 
@@ -101,11 +112,63 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 		QByteArray accountId = GetObjectIdFromInputParams(inputParams);
 
-		if (m_objectCollectionCompPtr->GetDataMetaInfo(accountId, metaInfoPtr)){
-
-		}
-
 		imtbase::IObjectCollection::DataPtr dataPtr;
+
+		m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr);
+
+		const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
+
+		const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
+
+		int index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Last Name", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
+		QString lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
+		childs->SetData("Value", lastName);
+
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "First Name", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
+		QString firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
+		childs->SetData("Value", firstName);
+
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Email", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
+		QString mail = ownerPtr->GetMail();
+		childs->SetData("Value", mail);
+
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Description", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
+		QString description = accountInfoPtr->GetAccountDescription();
+
+		childs->SetData("Value", description);
+
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Account Name", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
+		QString name = accountInfoPtr->GetAccountName();
+
+		childs->SetData("Value", name);
+
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Account Type", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
+		imtauth::IAccountInfo::AccountType type = accountInfoPtr->GetAccountType();
+
+		if (type == imtauth::IAccountInfo::AT_COMPANY){
+			childs->SetData("Value", "Company");
+		}
+		else{
+			childs->SetData("Value", "Private");
+		}
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}

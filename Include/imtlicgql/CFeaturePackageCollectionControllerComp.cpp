@@ -145,7 +145,6 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
-	imtbase::CTreeItemModel* features = nullptr;
 	imtbase::CTreeItemModel* childs = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -159,7 +158,6 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 	else{
 		dataModel = new imtbase::CTreeItemModel();
 		metaInfoModel = new imtbase::CTreeItemModel();
-		features = new imtbase::CTreeItemModel();
 
 		idoc::CStandardDocumentMetaInfo metaInfo;
 
@@ -171,7 +169,6 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 
 		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(packageId, metaInfo)){
 			QString date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			//metaInfoModel->SetData("ModificationTime", date);
 			childs->SetData("Value", date);
 		}
 
@@ -186,6 +183,7 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 			metaInfoModel->SetData("Name", "Features", index);
 			childs = metaInfoModel->AddTreeModel("Childs", index);
 			int childIndex;
+
 			for (const QByteArray& featureCollectionId : featureCollectionIds){
 				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 
@@ -194,16 +192,8 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 					QByteArray featureId = featureInfoPtr->GetFeatureId();
 					QString featureName = featureInfoPtr->GetFeatureName();
 					childs->SetData("Value", featureName, childIndex);
-//					index = features->InsertNewItem();
-//					QByteArray featureId = featureInfoPtr->GetFeatureId();
-//					QString featureName = featureInfoPtr->GetFeatureName();
-
-//					features->SetData("Id", featureId, index);
-//					features->SetData("Name", featureName, index);
 				}
 			}
-
-			//metaInfoModel->SetExternTreeModel("Features", features);
 		}
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);

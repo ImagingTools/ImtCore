@@ -39,7 +39,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
-	imtbase::CTreeItemModel* licenses = nullptr;
+	imtbase::CTreeItemModel* childs = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -52,15 +52,18 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 	else{
 		dataModel = new imtbase::CTreeItemModel();
 		metaInfoModel = new imtbase::CTreeItemModel();
-		licenses = new imtbase::CTreeItemModel();
 
 		idoc::CStandardDocumentMetaInfo metaInfo;
 
 		QByteArray productId = GetObjectIdFromInputParams(inputParams);
 
+		int index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Modification Time", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
 		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(productId, metaInfo)){
 			QString date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			metaInfoModel->SetData("ModificationTime", date);
+			childs->SetData("Value", date);
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -69,16 +72,17 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 
 		if (licensePtr != nullptr){
 			QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
-			int itemIndex;
+
+			index = metaInfoModel->InsertNewItem();
+			metaInfoModel->SetData("Name", "Licenses", index);
+			childs = metaInfoModel->AddTreeModel("Childs", index);
+			int childIndex;
 
 			for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-				itemIndex = licenses->InsertNewItem();
+				childIndex = childs->InsertNewItem();
 				QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-				licenses->SetData("Id", licenseCollectionId, itemIndex);
-				licenses->SetData("Name", licenseName, itemIndex);
+				childs->SetData("Value", licenseName, childIndex);
 			}
-
-			metaInfoModel->SetExternTreeModel("Licenses", licenses);
 		}
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);

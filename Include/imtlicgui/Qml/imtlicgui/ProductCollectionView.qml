@@ -89,7 +89,7 @@ Item {
                 }
 
                 if (index !== -1){
-                    productCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData", index);
+                    productCollectionMetaInfo.modelData = productsMetaInfoModels.GetData("ModelData", index);
                 }
                 else{
                     metaInfo.getMetaInfo();
