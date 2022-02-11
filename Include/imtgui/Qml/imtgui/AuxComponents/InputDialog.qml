@@ -89,15 +89,20 @@ Rectangle {
             anchors.right: inputDialogTopPanel.right;
             anchors.verticalCenter: inputDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
-            width: 15;
-            height: 15;
+            width: 17;
+            height: 17;
             iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
-           MouseArea {
-               anchors.fill: parent;
-               onClicked: {
-                   container.exit("close");
-                   loaderDialog.closeItem();
-               }
+//           MouseArea {
+//               anchors.fill: parent;
+//               onClicked: {
+//                   container.exit("close");
+//                   loaderDialog.closeItem();
+//               }
+//           }
+
+           onClicked: {
+               container.exit("close");
+               loaderDialog.closeItem();
            }
         }
     }

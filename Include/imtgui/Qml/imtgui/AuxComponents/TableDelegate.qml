@@ -21,7 +21,7 @@ Rectangle{
     property string maxSizeText: "";
 
     signal clicked;
-    signal rightButtonMouseClicked(int mouseX, int mouseY);
+    signal tableDelegateRrightButtonMouseClicked(int mouseX, int mouseY);
     signal doubleClicked;
 
     onBodyArrayChanged: {
@@ -116,7 +116,7 @@ Rectangle{
             if (mouse.button === Qt.RightButton) {
                 console.log("TableDelegate onRightButtonMouseClicked");
                 thubnailDecoratorContainer.closeDialog();
-                container.rightButtonMouseClicked(this.mouseX, this.mouseY);
+                container.tableDelegateRrightButtonMouseClicked(this.mouseX, this.mouseY);
             }
 
             console.log("TableDelegate Clicked", this.mouseX, this.mouseY);

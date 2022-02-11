@@ -418,6 +418,9 @@ Rectangle {
                     var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).text.toLowerCase();
                     console.log("ContactInfoEditor ComboBox onCurrentIndexChanged", accountType);
                     containerContactInfo.contactInfoModel.SetData("AccountType", accountType);
+
+                    containerContactInfo.wasChanged = true;
+                    containerContactInfo.activateSaveButton();
                 }
             }
 
@@ -772,6 +775,8 @@ Rectangle {
                         onCurrentIndexChanged: {
                             var gender = genderModel.get(genderCB.currentIndex).text.toLowerCase();
                             containerContactInfo.contactInfoModel.SetData("Gender", gender);
+                            containerContactInfo.wasChanged = true;
+                            containerContactInfo.activateSaveButton();
                         }
                     }
                 }

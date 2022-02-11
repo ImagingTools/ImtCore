@@ -28,7 +28,7 @@ Item {
 
     property int textSize: 15;
 
-    //signal focusChanged();
+    signal focusChanged();
     signal inputTextChanged();
 
     Rectangle {
@@ -38,18 +38,6 @@ Item {
         border.color: textField.focus ? container.borderColor : Style.hover;
         border.width: 1;
     }
-
-//    Timer {
-//        id: timer;
-//        interval: 3000;
-//        onTriggered: {
-//            console.log("onTriggered",container.isTextChanged);
-//            if (container.isTextChanged === true){
-//                container.accepted();
-//                container.isTextChanged = false;
-//            }
-//        }
-//    }
 
     TextInput {
         id: textField;
@@ -66,10 +54,10 @@ Item {
         selectByMouse: true;
         clip: true;
 
-//        onFocusChanged: {
-//            container.focusChanged();
-//            container.wasFocus = true;
-//        }
+        onFocusChanged: {
+            container.focusChanged();
+            container.wasFocus = true;
+        }
 
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged");

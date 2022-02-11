@@ -10,7 +10,7 @@ Item {
     property Item multiDocViewItem;
     property alias itemId: packageCollectionView.itemId;
     property alias itemName: packageCollectionView.itemName;
-    property alias model: packageCollectionView.model;
+    property alias model: packageCollectionView.collectionViewModel;
 
     property int contextMenuX;
     property int contextMenuY;
@@ -36,7 +36,7 @@ Item {
     }
 
     TreeItemModel {
-        id: modelMetaInfo;
+        id: metaInfoModels;
     }
 
     function commandsChanged(commandsId) {
@@ -56,25 +56,25 @@ Item {
     }
 
     function getDescriptionBySelectedItem(){
-        var dataModelLocal = packageCollectionView.model.GetData("data");
+        var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
         var description = dataModelLocal.GetData("Description", packageCollectionView.table.selectedIndex);
         return description;
     }
 
     function getNameBySelectedItem(){
-        var dataModelLocal = packageCollectionView.model.GetData("data");
+        var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
         var name = dataModelLocal.GetData("Name", packageCollectionView.table.selectedIndex);
         return name;
     }
 
     function updatePackageAfterRename(newId, newName) {
         console.log("PackageCollectionView updatePackageAfterRename", newId, newName);
-        var dataModelLocal = packageCollectionView.model.GetData("data");
+        var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
 
         dataModelLocal.SetData("Id", newId, packageCollectionView.table.selectedIndex);
         dataModelLocal.SetData("Name", newName, packageCollectionView.table.selectedIndex);
 
-        packageCollectionView.model.SetData("data", dataModelLocal);
+        packageCollectionView.collectionViewModel.SetData("data", dataModelLocal);
 //        packageCollectionView.refresh();
         console.log("Model: ");
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
@@ -90,12 +90,12 @@ Item {
 
     function updatePackageAfterSetDescription(description) {
         console.log("PackageCollectionView updatePackageAfterSetDescription", newId, newName);
-       // packageCollectionView.model.SetData("Description", description, packageCollectionView.selectedIndex);
-        var dataModelLocal = packageCollectionView.model.GetData("data");
+       // packageCollectionView.collectionViewModel.SetData("Description", description, packageCollectionView.selectedIndex);
+        var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
 
         dataModelLocal.SetData("Description", description, packageCollectionView.table.selectedIndex);
 
-        packageCollectionView.model.SetData("data", dataModelLocal);
+        packageCollectionView.collectionViewModel.SetData("data", dataModelLocal);
 
         //packageCollectionView.refresh();
     }
@@ -172,7 +172,7 @@ Item {
 
     CollectionView {
         id: packageCollectionView;
-//        anchors.fill: parent;
+
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
@@ -209,8 +209,8 @@ Item {
                 packageCollectionContainer.commandsChanged("Packages")
 
                 var index = -1;
-                for (var i = 0; i < modelMetaInfo.GetItemsCount(); i++){
-                    var curId = modelMetaInfo.GetData("Id", i);
+                for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
+                    var curId = metaInfoModels.GetData("Id", i);
 
                     if (curId === packageCollectionView.table.getSelectedId()){
                         index = i;
@@ -219,11 +219,7 @@ Item {
                 }
 
                 if (index !== -1){
-                    packageCollectionMetaInfo.modTimeValue = modelMetaInfo.GetData("ModificationTime", index);
-                    packageCollectionMetaInfo.modelData = modelMetaInfo.GetData("Features", index);
-//                    packageCollectionMetaInfo.modTimeTitle = modelMetaInfo.GetData("ModificationTime", index);
-//                    packageCollectionMetaInfo.checkSumTitle = modelMetaInfo.GetData("CheckSum", index);
-//                    packageCollectionMetaInfo.dataTitle = "Features";
+                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData", index);
                 }
                 else{
                     metaInfo.getMetaInfo();
@@ -284,21 +280,11 @@ Item {
                     if (dataModelLocal.ContainsKey("metaInfo")) {
                         dataModelLocal = dataModelLocal.GetData("metaInfo");
 
-                        var time = dataModelLocal.GetData("ModificationTime");
-                        var featuresModel = dataModelLocal.GetData("Features");
+                        packageCollectionMetaInfo.modelData = dataModelLocal;
 
-                        var index = modelMetaInfo.InsertNewItem();
-
-                        modelMetaInfo.SetData("Id", packageCollectionView.table.getSelectedId(), index);
-                        modelMetaInfo.SetData("ModificationTime", time, index);
-                        modelMetaInfo.SetData("Features", featuresModel, index);
-
-                        packageCollectionMetaInfo.modTimeValue = time
-                        packageCollectionMetaInfo.modelData = featuresModel;
-
-                        packageCollectionMetaInfo.modTimeTitle =  "Modification Time";
-                        packageCollectionMetaInfo.checkSumTitle = "Checksum";
-                        packageCollectionMetaInfo.dataTitle = "Features";
+                        var index = metaInfoModels.InsertNewItem();
+                        metaInfoModels.SetData("Id", packageCollectionView.table.getSelectedId(), index);
+                        metaInfoModels.SetData("ModelData", dataModelLocal, index);
                     }
                 }
             }

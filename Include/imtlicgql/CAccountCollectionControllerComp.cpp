@@ -72,8 +72,47 @@ istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<im
 		accountInfo->SetAccountOwner(contactInfo);
 		return accountInfo;
 	}
-	return nullptr;
 
+	return nullptr;
+}
+
+imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
+		const QList<imtgql::CGqlObject> &inputParams,
+		const imtgql::CGqlObject &gqlObject,
+		QString &errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* metaInfoModel = nullptr;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		metaInfoModel = new imtbase::CTreeItemModel();
+
+		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
+
+		QByteArray accountId = GetObjectIdFromInputParams(inputParams);
+
+		if (m_objectCollectionCompPtr->GetDataMetaInfo(accountId, metaInfoPtr)){
+
+		}
+
+		imtbase::IObjectCollection::DataPtr dataPtr;
+
+		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

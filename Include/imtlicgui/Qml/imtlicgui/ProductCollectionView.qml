@@ -10,7 +10,7 @@ Item {
     property Item multiDocViewItem;
     property alias itemId: productCollectionView.itemId;
     property alias itemName: productCollectionView.itemName;
-    property alias model: productCollectionView.model;
+    property alias model: productCollectionView.collectionViewModel;
 
     function refresh() {
         productCollectionView.refresh();
@@ -19,7 +19,7 @@ Item {
     function menuActivated(menuId) {
         console.log("ProductCollectionView menuActivated", menuId);
         if (menuId === "Duplicate") {
-            var dataModelLocal = productCollectionView.model.GetData("data");
+            var dataModelLocal = productCollectionView.collectionViewModel.GetData("data");
             var currentName = dataModelLocal.GetData("Name", productCollectionView.selectedIndex);
             var currentId = dataModelLocal.GetData("Id", productCollectionView.selectedIndex);
             var name = "Copy of " + currentName;
@@ -69,6 +69,7 @@ Item {
                 name = "New Product";
                 typeOperation = "New";
             }
+
             productCollectionContainer.multiDocViewItem.activeCollectionItem = productCollectionContainer;
             productCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", typeOperation)
         }
@@ -76,8 +77,29 @@ Item {
         onSelectedIndexChanged: {
             if (productCollectionView.selectedIndex > -1){
                 productCollectionContainer.commandsChanged("Products")
+
+                var index = -1;
+                for (var i = 0; i < productsMetaInfoModels.GetItemsCount(); i++){
+                    var curId = productsMetaInfoModels.GetData("Id", i);
+
+                    if (curId === productCollectionView.table.getSelectedId()){
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index !== -1){
+                    productCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData", index);
+                }
+                else{
+                    metaInfo.getMetaInfo();
+                }
             }
         }
+    }
+
+    TreeItemModel {
+        id: productsMetaInfoModels;
     }
 
     MetaInfo {
@@ -90,5 +112,58 @@ Item {
         width: 200;
 
         color: Style.backgroundColor;
+    }
+
+    GqlModel {
+        id: metaInfo;
+
+        function getMetaInfo() {
+            console.log( "ProductCollectionView metaInfo getMetaInfo");
+            var query = Gql.GqlRequest("query", "ProductMetaInfo");;
+            var inputParams = Gql.GqlObject("input");
+
+            inputParams.InsertField("Id");
+            inputParams.InsertFieldArgument("Id", productCollectionView.table.getSelectedId());
+
+            var queryFields = Gql.GqlObject("metaInfo");
+            query.AddParam(inputParams);
+            queryFields.InsertField("ModificationTime");
+            queryFields.InsertField("Checksum");
+            queryFields.InsertField("Licenses");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("ProductCollectionView metaInfo query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, metaInfo);
+            if (this.state === "Ready"){
+                var dataModelLocal;
+
+                if (metaInfo.ContainsKey("errors")){
+                    return;
+                }
+
+                dataModelLocal = metaInfo.GetData("data");
+
+                if (dataModelLocal.ContainsKey("ProductMetaInfo")) {
+                    dataModelLocal = dataModelLocal.GetData("ProductMetaInfo");
+
+                    if (dataModelLocal.ContainsKey("metaInfo")) {
+                        dataModelLocal = dataModelLocal.GetData("metaInfo");
+
+                        productCollectionMetaInfo.modelData = dataModelLocal;
+
+                        var index = productsMetaInfoModels.InsertNewItem();
+
+                        productsMetaInfoModels.SetData("Id", productCollectionView.table.getSelectedId(), index);
+                        productsMetaInfoModels.SetData("ModelData", dataModelLocal, index);
+
+                    }
+                }
+            }
+        }
     }
 }

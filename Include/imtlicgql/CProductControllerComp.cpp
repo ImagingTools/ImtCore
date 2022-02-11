@@ -45,7 +45,7 @@ imtbase::CTreeItemModel* CProductControllerComp::ListObjects(
 		itemsModel = new imtbase::CTreeItemModel();
 		QByteArray productId = GetObjectIdFromInputParams(inputParams);
 
-		QByteArrayList featureIds;
+//		QByteArrayList featureIds;
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (productId != "" && m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
 			imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());

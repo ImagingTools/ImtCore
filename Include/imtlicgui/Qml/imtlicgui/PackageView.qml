@@ -12,7 +12,7 @@ Item {
     property Item multiDocViewItem;
     property alias itemId: featureCollectionView.itemId;
     property alias itemName: featureCollectionView.itemName;
-    property alias model: featureCollectionView.model;
+    property alias model: featureCollectionView.collectionViewModel;
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
@@ -71,7 +71,7 @@ Item {
     }
 
     function getDescriptionBySelectedItem(){
-        var dataModelLocal = featureCollectionView.model.GetData("data");
+        var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
         var description = dataModelLocal.GetData("Description", featureCollectionView.table.selectedIndex);
         return description;
     }
@@ -94,7 +94,7 @@ Item {
     }
 
     function alreadyExistIdHasEmpty() {
-        var dataModelLocal = featureCollectionView.model.GetData("data")
+        var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data")
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
             if (dataModelLocal.GetData("Id", i) === "#") {
                 return dataModelLocal.GetData("Name", i);
@@ -109,12 +109,12 @@ Item {
         if (parameters["status"] === "ok") {
 
             if (parameters["dialog"] === "EditFeature") {
-                var dataModelLocal = featureCollectionView.model.GetData("data");
+                var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
                 console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
                 dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);
                 dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
                 dataModelLocal.SetData("Description", "", featureCollectionView.selectedIndex);
-                featureCollectionView.model.SetData("data", dataModelLocal);
+                featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                 featureCollectionView.refresh();
 
                 featuresTreeView.addFeatureInTreeViewModel(featureCollectionViewContainer.itemId,
@@ -129,10 +129,10 @@ Item {
                 }
                 else if (parameters["typeOperation"] === "SetDescription") {
                     var value = parameters["value"];
-                    var dataModelLocal = featureCollectionView.model.GetData("data");
+                    var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
 
                     dataModelLocal.SetData("Description", value, featureCollectionView.table.selectedIndex);
-                    featureCollectionView.model.SetData("data", dataModelLocal);
+                    featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
 
                     featureCollectionView.refresh();
                 }
@@ -140,11 +140,11 @@ Item {
         }
         else if (parameters["status"] === "yes") {
 
-            if (featureCollectionView.model.ContainsKey("data")) {
-                var dataModelLocal = featureCollectionView.model.GetData("data");
+            if (featureCollectionView.collectionViewModel.ContainsKey("data")) {
+                var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
                 dataModelLocal.RemoveItem(featureCollectionView.table.selectedIndex);
-                featureCollectionView.model.SetData("data", dataModelLocal);
-                featureCollectionView.model.Refresh();
+                featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                featureCollectionView.collectionViewModel.Refresh();
                 featureCollectionView.refresh();
 
                 featureCollectionView.table.selectedIndex = -1;
@@ -156,7 +156,7 @@ Item {
             }
         }
         else if (parameters["status"] === "Edit") {
-//            var dataModelLocal = featureCollectionView.model.GetData("data");
+//            var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
 //            var id = dataModelLocal.GetData("Id", featureCollectionView.table.selectedIndex);
 //            var name = dataModelLocal.GetData("Id", featureCollectionView.table.selectedIndex);
 //            featureCollectionView.selectItem(id, name);
@@ -313,17 +313,17 @@ Item {
                 treeView.visible = false;
             }
 
-            //featureCollectionViewContainer.updateFeaturesTreeView();
+            featureCollectionViewContainer.updateFeaturesTreeView();
         }
     }
 
     function updateFeaturesTreeView(){
         console.log("PackageView updateFeaturesTreeView");
         //treeView.modelItems.Refresh();
-//        featureCollectionViewContainer.hideCurrentFeatureTreeView();
-//        featureCollectionViewContainer.updateStateCheckedCheckBox();
-//        featureCollectionViewContainer.checkInActiveItems();
-//        treeView.modelItems.Refresh();
+        featureCollectionViewContainer.hideCurrentFeatureTreeView();
+        featureCollectionViewContainer.updateStateCheckedCheckBox();
+        featureCollectionViewContainer.checkInActiveItems();
+        treeView.modelItems.Refresh();
     }
 
     function clearCheckedCheckBox() {
@@ -518,7 +518,7 @@ Item {
                 packageModel.SetData("Name", featureCollectionViewContainer.itemName);
             }
 
-            packageModel.SetExternTreeModel("features", featureCollectionView.model.GetData("data"));
+            packageModel.SetExternTreeModel("features", featureCollectionView.collectionViewModel.GetData("data"));
             packageModel.SetExternTreeModel("dependencies", featuresTreeView.dependModel);
 
             //featureCollectionViewContainer.model.SetIsArray(false);
@@ -730,7 +730,7 @@ Item {
 
             onDependModelChanged: {
                 console.log( "PackageView FeaturesTreeView onDependModelChanged");
-                //featureCollectionViewContainer.updateFeaturesTreeView();
+                featureCollectionViewContainer.updateFeaturesTreeView();
             }
 
             onModelTreeViewChanged: {

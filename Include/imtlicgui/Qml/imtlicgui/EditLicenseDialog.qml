@@ -8,7 +8,7 @@ import imtauthgui 1.0
 Rectangle {
     id: container;
     width: 400;
-    height: 300;
+    height: 280;
     radius: 2;
     color: Style.backgroundColor;
     clip: true;
@@ -75,8 +75,8 @@ Rectangle {
             anchors.right: editLicenseDialogTopPanel.right;
             anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
-            width: 15;
-            height: 15;
+            width: 17;
+            height: 17;
             iconSource: "../../../" + "Icons/" + "Light" + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 
             onClicked: {
@@ -89,13 +89,13 @@ Rectangle {
 
     Rectangle {
         id: editLicenseDialogBody;
-        anchors.topMargin: 40;
+        anchors.topMargin: 20;
         color: container.color;
         anchors.top: editLicenseDialogTopPanel.bottom;
         anchors.horizontalCenter: container.horizontalCenter;
         anchors.verticalCenter: container.verticalCenter;
         width: container.width - 50;
-        height: container.height - 100;
+        height: container.height - 50;
 
         Text {
             id: titleLicenseName;
@@ -127,7 +127,7 @@ Rectangle {
         Text {
             id: titleLicenseId;
             anchors.top: tfcLicenseName.bottom;
-            anchors.topMargin: 20;
+            anchors.topMargin: 25;
             text: qsTr("License - ID");
 
             color: Style.textColor;
@@ -155,69 +155,54 @@ Rectangle {
             }
         }
 
-        Rectangle {
+        AuxButton {
             id: okButton;
+
             anchors.top: tfcLicenseId.bottom;
             anchors.right: cancelButton.left;
             anchors.rightMargin: 15;
             anchors.topMargin: 30;
+
             width: 70;
             height: 25;
-            color: Style.backgroundColor;
-            border.color: okButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                text: qsTr("ОК");
-                font.family: Style.fontFamily;
-            }
+            hasText: true;
+            hasIcon: false;
 
-            MouseArea {
-                id: okButtonMa;
-                anchors.fill: parent;
-                hoverEnabled: enabled;
-                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-                onClicked: {
-//                    editLicenseDialog.visible = false;
-                    container.exit("ok");
-                    loaderDialog.closeItem();
-                }
+            textButton: "OK";
+            borderColor: okButton.highlighted ? Style.iconColorOnSelected :
+                                              okButton.enabled ? Style.buttonColor :
+                                                                 Style.imagingToolsGradient2;
+            backgroundColor: okButton.enabled ? Style.imagingToolsGradient1 : Style.backgroundColor;
+
+            enabled: true;
+
+            onClicked: {
+                container.exit("ok");
+                loaderDialog.closeItem();
             }
         }
 
-        Rectangle {
+        AuxButton {
             id: cancelButton;
-            width: 70;
-            height: 25;
-            color: Style.backgroundColor;
-            border.color: cancelButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
             anchors.top: tfcLicenseId.bottom;
-           // anchors.bottomMargin: 15;
             anchors.topMargin: 30;
             anchors.right: tfcLicenseId.right;
 
+            width: 70;
+            height: 25;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                text: qsTr("Cancel");
-            }
+            hasText: true;
+            hasIcon: false;
 
-            MouseArea {
-                id: cancelButtonMa;
-                anchors.fill: parent;
-                hoverEnabled: enabled;
-                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+            textButton: "Cancel";
+            borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+            backgroundColor: Style.imagingToolsGradient1;
 
-                onClicked: {
-                    container.exit("cancel");
-                    loaderDialog.closeItem();
-                }
-
+            onClicked: {
+                container.exit("cancel");
+                loaderDialog.closeItem();
             }
         }
     }

@@ -146,6 +146,7 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
 	imtbase::CTreeItemModel* features = nullptr;
+	imtbase::CTreeItemModel* childs = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -164,33 +165,45 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 
 		QByteArray packageId = GetObjectIdFromInputParams(inputParams);
 
+		int index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Modification Time", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+
 		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(packageId, metaInfo)){
-			QVariant date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			metaInfoModel->SetData("ModificationTime", date);
+			QString date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+			//metaInfoModel->SetData("ModificationTime", date);
+			childs->SetData("Value", date);
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr);
 
 		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
-
 		if (packagePtr != nullptr){
 			imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
-			int index;
+
+			index = metaInfoModel->InsertNewItem();
+			metaInfoModel->SetData("Name", "Features", index);
+			childs = metaInfoModel->AddTreeModel("Childs", index);
+			int childIndex;
 			for (const QByteArray& featureCollectionId : featureCollectionIds){
 				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 
 				if (featureInfoPtr != nullptr){
-					index = features->InsertNewItem();
+					childIndex = childs->InsertNewItem();
 					QByteArray featureId = featureInfoPtr->GetFeatureId();
 					QString featureName = featureInfoPtr->GetFeatureName();
+					childs->SetData("Value", featureName, childIndex);
+//					index = features->InsertNewItem();
+//					QByteArray featureId = featureInfoPtr->GetFeatureId();
+//					QString featureName = featureInfoPtr->GetFeatureName();
 
-					features->SetData("Id", featureId, index);
-					features->SetData("Name", featureName, index);
+//					features->SetData("Id", featureId, index);
+//					features->SetData("Name", featureName, index);
 				}
 			}
 
-			metaInfoModel->SetExternTreeModel("Features", features);
+			//metaInfoModel->SetExternTreeModel("Features", features);
 		}
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);

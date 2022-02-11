@@ -76,16 +76,13 @@ Rectangle {
             anchors.right: removeDialogTopPanel.right;
             anchors.verticalCenter: removeDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
-            width: 15;
-            height: 15;
+            width: 17;
+            height: 17;
             iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
-           MouseArea {
-               anchors.fill: parent;
-               onClicked: {
-//                   container.visible = false
-                   container.exit("close");
-                   loaderDialog.closeItem();
-               }
+
+           onClicked: {
+               container.exit("close");
+               loaderDialog.closeItem();
            }
         }
     }
@@ -121,72 +118,55 @@ Rectangle {
             anchors.topMargin: 15;
         }
 
-        Rectangle {
+        AuxButton {
             id: yesButton;
+
             anchors.bottom: removeDialogBody.bottom;
             anchors.bottomMargin: 20;
             anchors.right: noButton.left;
             anchors.rightMargin: 15;
+
             width: 70;
             height: 25;
-            color: Style.backgroundColor;
-            border.color: yesButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
+            hasText: true;
+            hasIcon: false;
+
+            textButton: "Yes";
+            borderColor: yesButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+            backgroundColor: Style.imagingToolsGradient1;
+
             visible: container.okButtonVisible;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                text: container.textOkButton;
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
-
-            MouseArea {
-                id: yesButtonMa;
-                anchors.fill: parent;
-                hoverEnabled: true;
-                onClicked: {
-                    container.exit(container.textOkButton.toLowerCase());
-                    container.okButtonClicked();
-                    loaderDialog.closeItem();
-                }
+            onClicked: {
+                container.exit(container.textOkButton.toLowerCase());
+                container.okButtonClicked();
+                loaderDialog.closeItem();
             }
         }
 
-        Rectangle {
+        AuxButton {
             id: noButton;
-            width: 70;
-            height: 25;
-            color: Style.backgroundColor;
-            border.color: noButtonMa.containsMouse ? Style.iconColorOnSelected : Style.theme === "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
             anchors.bottom: removeDialogBody.bottom;
             anchors.right: removeDialogBody.right;
             anchors.bottomMargin: 20;
             anchors.rightMargin: 15;
 
-            visible: container.noButtonVisible;
+            width: 70;
+            height: 25;
 
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter;
-                anchors.verticalCenter: parent.verticalCenter;
-                color: Style.textColor;
-                text: qsTr("No");
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
+            hasText: true;
+            hasIcon: false;
 
-            MouseArea {
-                id: noButtonMa;
-                anchors.fill: parent;
-                hoverEnabled: true;
+            textButton: "No";
+            borderColor: noButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+            backgroundColor: Style.imagingToolsGradient1;
 
-                onClicked: {
-                    container.exit("no");
-                    container.noButtonClicked();
-                    loaderDialog.closeItem();
-                }
-
+            onClicked: {
+                container.exit("no");
+                container.noButtonClicked();
+                loaderDialog.closeItem();
             }
         }
     }

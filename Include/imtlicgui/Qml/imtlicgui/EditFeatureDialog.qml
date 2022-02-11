@@ -96,6 +96,7 @@ Rectangle {
         height: 40;
         border.color: container.color;
         color: Style.baseColor;
+
         Image {
             id: iconEditFeatureDialog;
             width: 15;

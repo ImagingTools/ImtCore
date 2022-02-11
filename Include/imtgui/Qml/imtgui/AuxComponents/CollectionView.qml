@@ -9,7 +9,7 @@ Rectangle {
     height: 100;
     width: 100;
     color: "transparent";
-    property TreeItemModel model;
+    property TreeItemModel collectionViewModel;
     property var table: tableInternal;
     property int selectedIndex: -1;
     property string gqlModelInfo;
@@ -40,8 +40,8 @@ Rectangle {
     function refresh() {
         var isHeaderUpdated = false;
         console.log("CollectionView refresh()", collectionViewContainer.gqlModelInfo)
-        if (collectionViewContainer.model && collectionViewContainer.model.ContainsKey("headers")){
-            var dataModelLocal = collectionViewContainer.model.GetData("headers");
+        if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("headers")){
+            var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("headers");
             tableInternal.headers = dataModelLocal;
         }
         else {
@@ -49,13 +49,13 @@ Rectangle {
             isHeaderUpdated = true
         }
 
-        if (collectionViewContainer.model && collectionViewContainer.model.ContainsKey("data")){
+        if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("data")){
             console.log("CollectionView refresh ");
-            var dataModelLocal = collectionViewContainer.model.GetData("data");
+            var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
             tableInternal.elements = 0;
             tableInternal.elements = dataModelLocal;
 
-            var selectedIndexLocal = collectionViewContainer.model.GetData("selectedIndex");
+            var selectedIndexLocal = collectionViewContainer.collectionViewModel.GetData("selectedIndex");
 
             if (selectedIndexLocal) {
                 tableInternal.selectedIndex = selectedIndexLocal;
@@ -70,7 +70,7 @@ Rectangle {
         }
     }
 
-    onModelChanged: {
+    onCollectionViewModelChanged: {
         console.log("CollectionView onModelChanged",collectionViewContainer.itemId, collectionViewContainer.itemName);
         collectionViewContainer.refresh();
     }
@@ -127,7 +127,7 @@ Rectangle {
             console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
             if (tableInternal.selectedIndex != -1) {
                 //collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
-                collectionViewContainer.model.SetData("selectedIndex", tableInternal.selectedIndex);
+                collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
             }
             collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
             //console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
@@ -159,7 +159,7 @@ Rectangle {
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo)
                     if(dataModelLocal.ContainsKey("headers")){
                         tableInternal.headers = dataModelLocal.GetData("headers")
-                        collectionViewContainer.model.SetExternTreeModel('headers',tableInternal.headers)
+                        collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
 
                         itemsModel.updateModel();
                     }
@@ -176,10 +176,10 @@ Rectangle {
 
     Timer {
         id: elementsTimer;
-        property var model;
+        property var elementsmodel;
         interval: 10;
         onTriggered: {
-            tableInternal.elements = elementsTimer.model;
+            tableInternal.elements = elementsTimer.elementsmodel;
         }
     }
 
@@ -218,15 +218,15 @@ Rectangle {
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         tableInternal.elements = dataModelLocal.GetData("items");
-//                        elementsTimer.model = dataModelLocal.GetData("items");
+//                        elementsTimer.collectionViewModel = dataModelLocal.GetData("items");
 //                        elementsTimer.start();
 
 //                        if (!collectionViewContainer.autoRefresh) {
 //                            console.log("CollectionView itemsModel onStateChanged update data");
-//                            collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
+//                            collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
 //                        }
 
-                        collectionViewContainer.model.SetExternTreeModel('data', tableInternal.elements);
+                        collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
 //                        tableInternal._context._processActions()
 
 //                        collectionViewContainer.itemId = "";

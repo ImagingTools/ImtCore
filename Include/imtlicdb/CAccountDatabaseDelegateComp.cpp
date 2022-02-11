@@ -40,6 +40,17 @@ istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(const QB
 
 		accountInfoPtr->SetAccountDescription(accountDescription);
 	}
+
+	if (record.contains("Type")){
+		QString type = record.value("Type").toString();
+
+		if (type == "private"){
+			accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_PERSON);
+		}
+		else {
+			accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_COMPANY);
+		}
+	}
 	
 	imtauth::CContactInfo contactInfo;
 

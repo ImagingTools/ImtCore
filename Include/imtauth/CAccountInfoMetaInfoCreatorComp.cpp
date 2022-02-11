@@ -39,7 +39,7 @@ bool CAccountInfoMetaInfoCreatorComp::CreateMetaInfo(
 
 	switch (accountPtr->GetAccountType()){
 	case IAccountInfo::AT_PERSON:
-		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Person"));
+		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Private"));
 		break;
 	case IAccountInfo::AT_COMPANY:
 		metaInfoPtr->SetMetaInfo(IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Company"));

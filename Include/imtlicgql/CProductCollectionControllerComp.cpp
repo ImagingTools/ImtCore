@@ -8,6 +8,9 @@
 //#include <imtbase/IObjectCollectionInfo.h>
 //#include <imtlic/IProductInfo.h>
 
+#include <imtlic/CProductLicensingInfo.h>
+#include <imtlic/CLicenseInfo.h>
+
 
 namespace imtlicgql
 {
@@ -26,6 +29,64 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(const QByteArray
 	}
 
 	return QVariant();
+}
+
+imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
+		const QList<imtgql::CGqlObject> &inputParams,
+		const imtgql::CGqlObject &gqlObject,
+		QString &errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* metaInfoModel = nullptr;
+	imtbase::CTreeItemModel* licenses = nullptr;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		metaInfoModel = new imtbase::CTreeItemModel();
+		licenses = new imtbase::CTreeItemModel();
+
+		idoc::CStandardDocumentMetaInfo metaInfo;
+
+		QByteArray productId = GetObjectIdFromInputParams(inputParams);
+
+		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(productId, metaInfo)){
+			QString date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+			metaInfoModel->SetData("ModificationTime", date);
+		}
+
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		m_objectCollectionCompPtr->GetObjectData(productId, dataPtr);
+		imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
+
+		if (licensePtr != nullptr){
+			QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
+			int itemIndex;
+
+			for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+				itemIndex = licenses->InsertNewItem();
+				QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
+				licenses->SetData("Id", licenseCollectionId, itemIndex);
+				licenses->SetData("Name", licenseName, itemIndex);
+			}
+
+			metaInfoModel->SetExternTreeModel("Licenses", licenses);
+		}
+
+		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

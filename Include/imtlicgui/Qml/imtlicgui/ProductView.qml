@@ -15,7 +15,7 @@ Item {
     property alias itemId: productCollectionView.itemId;
     property alias itemName: productCollectionView.itemName;
 
-    property alias model: productCollectionView.model;
+    property alias model: productCollectionView.collectionViewModel;
 
     property string typeOperation: multiDocViewItem.typeOperation;
 
@@ -29,12 +29,12 @@ Item {
         if (parameters["status"] === "ok") {
 
             if (parameters["dialog"] === "EditLicense") {
-                var dataModelLocal = productCollectionView.model.GetData("data");
+                var dataModelLocal = productCollectionView.collectionViewModel.GetData("data");
                 console.log("ProductView onClicked ", dataModelLocal.GetItemsCount())
                 dataModelLocal.SetData("Id", parameters["newLicenseId"] , productCollectionView.selectedIndex);//
                 dataModelLocal.SetData("Name", parameters["newLicenseName"], productCollectionView.selectedIndex);
 
-                productCollectionView.model.SetData("data", dataModelLocal);
+                productCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                 productCollectionView.refresh();
             }
             else if (parameters["dialog"] === "InputDialog") {
@@ -46,15 +46,23 @@ Item {
         }
         else if (parameters["status"] === "yes") {
 
-            if (productCollectionView.model.ContainsKey("data")) {
-                var dataModelLocal = productCollectionView.model.GetData("data");
+            if (productCollectionView.collectionViewModel.ContainsKey("data")) {
+                var dataModelLocal = productCollectionView.collectionViewModel.GetData("data");
                 dataModelLocal.RemoveItem(productCollectionView.table.selectedIndex);
 
-                productCollectionView.model.SetData("data", dataModelLocal);
-                productCollectionView.model.Refresh();
+                productCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                productCollectionView.collectionViewModel.Refresh();
                 productCollectionView.refresh();
+
+                productCollectionView.table.selectedIndex = -1;
+                productsCollectionViewContainer.commandsChanged("ProductEdit");
+                productsCollectionViewContainer.makeCommandActive("Save");
             }
         }
+    }
+
+    function makeCommandActive(commandId){
+        productsCollectionViewContainer.rootItem.setModeMenuButton(commandId, "Normal");
     }
 
     function createLicense(id, name) {
@@ -176,6 +184,10 @@ Item {
             console.log("PackageView CollectionView onSelectedIndexChanged", productCollectionView.selectedIndex);
             if (productCollectionView.selectedIndex > -1){
                 productsCollectionViewContainer.commandsChanged("ProductEdit")
+
+                 treeView.visible = true;
+            } else {
+                treeView.visible = false;
             }
         }
     }
@@ -220,7 +232,7 @@ Item {
 
             productModel.SetData("Id", productsCollectionViewContainer.itemId)
             productModel.SetData("Name", productsCollectionViewContainer.itemName)
-            productModel.SetExternTreeModel("licenses", productCollectionView.model.GetData("data"));
+            productModel.SetExternTreeModel("licenses", productCollectionView.collectionViewModel.GetData("data"));
 
             //featureCollectionViewContainer.model.SetIsArray(false);
             var jsonString = productModel.toJSON();
@@ -320,25 +332,25 @@ Item {
             }
         }
 
-        TextFieldCustom {
-            id: tfcProductId;
+//        TextFieldCustom {
+//            id: tfcProductId;
 
-            anchors.top: productIdTextRect.bottom;
+//            anchors.top: productIdTextRect.bottom;
 
-            width: parent.width - 3;
-            height: 30;
+//            width: parent.width - 3;
+//            height: 30;
 
-            text: productsCollectionViewContainer.itemId;
+//            text: productsCollectionViewContainer.itemId;
 
-            onTextChanged: {
-                productsCollectionViewContainer.itemId = tfcProductId.text;
-            }
-        }
+//            onTextChanged: {
+//                productsCollectionViewContainer.itemId = tfcProductId.text;
+//            }
+//        }
 
 
         Rectangle {
             id: productNameTextRect;
-            anchors.top: tfcProductId.bottom;
+//            anchors.top: tfcProductId.bottom;
 
             width: parent.width;
             height: 20;
@@ -359,22 +371,22 @@ Item {
             }
         }
 
-        TextFieldCustom {
-            id: tfcProductName;
-            anchors.top: productNameTextRect.bottom;
-            width: parent.width - 3;
-            height: 30;
+//        TextFieldCustom {
+//            id: tfcProductName;
+//            anchors.top: productNameTextRect.bottom;
+//            width: parent.width - 3;
+//            height: 30;
 
-            text: productsCollectionViewContainer.itemName;
+//            text: productsCollectionViewContainer.itemName;
 
-            onTextChanged: {
-                productsCollectionViewContainer.itemName = tfcProductName.text;
-            }
-        }
+//            onTextChanged: {
+//                productsCollectionViewContainer.itemName = tfcProductName.text;
+//            }
+//        }
 
         Rectangle {
             id: headerTreeView;
-            anchors.top: tfcProductName.bottom;
+//            anchors.top: tfcProductName.bottom;
             anchors.topMargin: 5;
 //            anchors.horizontalCenter: parent.horizontalCenter;
             width: parent.width - 5;
@@ -424,6 +436,18 @@ Item {
 
         FeaturesTreeView {
             id: featuresTreeView;
+
+            onDependModelChanged: {
+                console.log( "PackageView FeaturesTreeView onDependModelChanged");
+                //featureCollectionViewContainer.updateFeaturesTreeView();
+            }
+
+            onModelTreeViewChanged: {
+                console.log("PackageView FeaturesTreeView onModelTreeViewChanged");
+                //featureCollectionViewContainer.updateFeaturesTreeView();
+
+                treeView.modelItems = featuresTreeView.modelTreeView;
+            }
         }
     }
 }

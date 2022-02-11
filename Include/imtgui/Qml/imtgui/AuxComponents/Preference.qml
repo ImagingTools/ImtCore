@@ -16,6 +16,7 @@ Rectangle {
 //    border.color: "#2b2d2d";
     property real backgroundOpacity: 0.4;
     property bool centered: true;
+    property bool clickBackgroundClose: false;
 
     Component.onCompleted: {
 //        preferenceContainer.changeThemeIcons("Light");

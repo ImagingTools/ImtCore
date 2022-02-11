@@ -4,7 +4,8 @@ import Acf 1.0
 Item {
     id: treeItemDelegate;
     width: 100;
-    height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
+    height: 50;
+//    height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
 //    height:  mainRect.height + childrenColumn.height;
     property bool isOpened: true;
 
@@ -128,9 +129,14 @@ Item {
              id: treeItemRepeater;
              delegate: Loader {
                  id: loader;
+
+//                 height: 50;
+                 width: 200;
+
                  source: "TreeItemDelegate.qml";
                  onItemChanged: {
                      if (loader.item) {
+                         loader.height = loader.item.height;
                          loader.item.listViewItem = treeItemDelegate.listViewItem;
                      }
                  }
