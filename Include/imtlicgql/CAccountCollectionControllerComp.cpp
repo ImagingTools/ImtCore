@@ -36,54 +36,54 @@ QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray
 }
 
 
-istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
-																	 QString& name, QString& description, QString &errorMessage) const
-{
-	if (inputParams.isEmpty()){
-		return nullptr;
-	}
-	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
-	if (!itemData.isEmpty()){
-		imtauth::CAccountInfo *accountInfo = new imtauth::CAccountInfo();
-		imtbase::CTreeItemModel itemModel;
-		itemModel.Parse(itemData);
+//istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
+//																	 QString& name, QString& description, QString &errorMessage) const
+//{
+//	if (inputParams.isEmpty()){
+//		return nullptr;
+//	}
+//	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+//	if (!itemData.isEmpty()){
+//		imtauth::CAccountInfo *accountInfo = new imtauth::CAccountInfo();
+//		imtbase::CTreeItemModel itemModel;
+//		itemModel.Parse(itemData);
 
-		if (itemModel.ContainsKey("AccountName")){
-			name = itemModel.GetData("AccountName").toString();
-			objectId = itemModel.GetData("AccountName").toByteArray();
-		}
+//		if (itemModel.ContainsKey("AccountName")){
+//			name = itemModel.GetData("AccountName").toString();
+//			objectId = itemModel.GetData("AccountName").toByteArray();
+//		}
 
-		if (itemModel.ContainsKey("AccountDescription")){
-			description = itemModel.GetData("AccountDescription").toString();
-		}
+//		if (itemModel.ContainsKey("AccountDescription")){
+//			description = itemModel.GetData("AccountDescription").toString();
+//		}
 
-		accountInfo->SetAccountName(name);
-		accountInfo->SetAccountDescription(description);
+//		accountInfo->SetAccountName(name);
+//		accountInfo->SetAccountDescription(description);
 
-		imtauth::CContactInfo contactInfo;
+//		imtauth::CContactInfo contactInfo;
 
-		if (itemModel.ContainsKey("Email")) {
-			QString email = itemModel.GetData("Email").toString();
-			contactInfo.SetEmail(email);
-		}
+//		if (itemModel.ContainsKey("Email")) {
+//			QString email = itemModel.GetData("Email").toString();
+//			contactInfo.SetEmail(email);
+//		}
 
-		if (itemModel.ContainsKey("LastName")) {
-			QString lastName = itemModel.GetData("LastName").toString();
-			contactInfo.SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, lastName);
-		}
+//		if (itemModel.ContainsKey("LastName")) {
+//			QString lastName = itemModel.GetData("LastName").toString();
+//			contactInfo.SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, lastName);
+//		}
 
-		if (itemModel.ContainsKey("FirstName")) {
-			QString firstName = itemModel.GetData("FirstName").toString();
-			contactInfo.SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, firstName);
-		}
+//		if (itemModel.ContainsKey("FirstName")) {
+//			QString firstName = itemModel.GetData("FirstName").toString();
+//			contactInfo.SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, firstName);
+//		}
 
-		accountInfo->SetAccountOwner(contactInfo);
+//		accountInfo->SetAccountOwner(contactInfo);
 
-		return accountInfo;
-	}
+//		return accountInfo;
+//	}
 
-	return nullptr;
-}
+//	return nullptr;
+//}
 
 imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,

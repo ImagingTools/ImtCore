@@ -25,6 +25,11 @@ Rectangle {
 
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
 
+    onCollectionViewModelChanged: {
+        console.log("CollectionView onModelChanged",collectionViewContainer.itemId, collectionViewContainer.itemName);
+        collectionViewContainer.refresh();
+    }
+
     function dialogResult(parameters) {
          console.log("CollectionView dialogResult", parameters["status"]);
 
@@ -68,11 +73,6 @@ Rectangle {
         else if(!isHeaderUpdated){
             itemsModel.updateModel();
         }
-    }
-
-    onCollectionViewModelChanged: {
-        console.log("CollectionView onModelChanged",collectionViewContainer.itemId, collectionViewContainer.itemName);
-        collectionViewContainer.refresh();
     }
 
     function menuActivated(menuId) {
@@ -216,7 +216,7 @@ Rectangle {
                 var dataModelLocal = this.GetData("data");
                 if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
                     dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+                    if(dataModelLocal.ContainsKey("items")){
                         tableInternal.elements = dataModelLocal.GetData("items");
 //                        elementsTimer.collectionViewModel = dataModelLocal.GetData("items");
 //                        elementsTimer.start();

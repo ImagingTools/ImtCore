@@ -132,7 +132,7 @@ Rectangle {
             hasText: true;
             hasIcon: false;
 
-            textButton: "Yes";
+            textButton: container.textOkButton;
             borderColor: yesButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 
@@ -162,6 +162,8 @@ Rectangle {
             textButton: "No";
             borderColor: noButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
+
+            visible: container.noButtonVisible;
 
             onClicked: {
                 container.exit("no");

@@ -214,9 +214,11 @@ Rectangle {
                         else {
                             dataModelLocal = pagesData.AddTreeModel("DocsData",model.index)
                         }
+
+                        loader.item.multiDocViewItem = multiDocView;
                         loader.item.model = dataModelLocal
                         loader.item.rootItem = docsDataDeleg;
-                        loader.item.multiDocViewItem = multiDocView;
+
                         if (tabPanelInternal.selectedIndex === model.index) {
                             multiDocView.activeItem = loader.item;
                             multiDocView.updateCommandId();

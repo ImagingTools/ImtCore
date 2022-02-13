@@ -20,6 +20,8 @@ Item {
 
     function refresh() {
         accountCollectionView.refresh();
+
+        metaInfo.getMetaInfo();
     }
 
     function commandsChanged(commandsId) {
@@ -96,6 +98,51 @@ Item {
         id: accountsMetaInfoModels;
     }
 
+    function updateMetaInfoById(accountId, newMetaInfo){
+        var index = -1;
+        for (var i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
+            var curId = accountsMetaInfoModels.GetData("Id", i);
+
+            if (curId === accountId){
+                index = i;
+                break;
+            }
+        }
+
+        if (index !== -1){
+
+            var modelData =  accountsMetaInfoModels.GetData("ModelData", index);
+
+            for (var i = 0; i < modelData.GetItemsCount(); i++){
+                var name = modelData.GetData("Name", i);
+                if (name === "LastName"){
+                    modelData.SetData("Childs", newMetaInfo.GetData("LastName"), i);
+                }
+                else if (name === "FirstName") {
+                    modelData.SetData("Childs", newMetaInfo.GetData("FirstName"), i);
+                }
+                else if (name === "Email") {
+                    modelData.SetData("Childs", newMetaInfo.GetData("Email"), i);
+
+                }
+                else if (name === "Description") {
+                    modelData.SetData("Childs", newMetaInfo.GetData("AccountDescription"), i);
+
+                }
+                else if (name === "AccountName") {
+                    modelData.SetData("Childs", newMetaInfo.GetData("AccountName"), i);
+                }
+                else if (name === "AccountType") {
+                    modelData.SetData("Childs", newMetaInfo.GetData("AccountType"), i);
+                }
+            }
+
+            accountsMetaInfoModels.SetData("ModelData", modelData, index)
+
+            accountCollectionMetaInfo.modelData = modelData;
+        }
+    }
+
     MetaInfo {
         id: accountCollectionMetaInfo;
 
@@ -153,7 +200,19 @@ Item {
 
                         accountCollectionMetaInfo.modelData = dataModelLocal;
 
-                        var index = accountsMetaInfoModels.InsertNewItem();
+                        var index = -1;
+                        for (var i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
+                            var curId = accountsMetaInfoModels.GetData("Id", i);
+
+                            if (curId === accountCollectionView.table.getSelectedId()){
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (index == -1){
+                            index = accountsMetaInfoModels.InsertNewItem();
+                        }
 
                         accountsMetaInfoModels.SetData("Id", accountCollectionView.table.getSelectedId(), index);
                         accountsMetaInfoModels.SetData("ModelData", dataModelLocal, index);

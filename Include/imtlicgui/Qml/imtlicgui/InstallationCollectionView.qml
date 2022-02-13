@@ -49,7 +49,7 @@ Item {
         Component.onCompleted: {
             installationCollectionView.gqlModelInfo = "InstallationInfo"
             installationCollectionView.gqlModelItems = "InstallationList"
-            installationCollectionView.gqlModelItems = "InstallationRemove"
+            installationCollectionView.gqlModelRemove = "InstallationRemove"
         }
 
         onSelectItem: {

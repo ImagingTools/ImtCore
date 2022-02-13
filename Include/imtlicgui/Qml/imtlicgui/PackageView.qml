@@ -589,21 +589,45 @@ Item {
         Rectangle {
             id: leftBorder;
 
+
+
             anchors.right: packageMetaInfo.left;
             anchors.top: packageMetaInfo.top;
 
             height: packageMetaInfo.height;
-            width: 3;
+            width: 4;
 
             color: Style.backgroundColor;
 
-            property bool pressed: false;
-
             MouseArea {
                 id: leftBorderMA;
+
                 anchors.fill: parent;
+
+                drag.target: featureCollectionViewContainer;
+
                 acceptedButtons: Qt.LeftButton;
                 cursorShape: Qt.SplitHCursor;
+
+                onMouseXChanged: {
+                    if(drag.active){
+
+                        packageMetaInfo.width = packageMetaInfo.width - mouseX
+//                        packageMetaInfo.x = packageMetaInfo.x + mouseX
+
+                        if (packageMetaInfo.width <= titleHeader.width){
+                            packageMetaInfo.width = 0;
+                        }
+
+                        if (featureCollectionViewContainer.width - packageMetaInfo.width <= 250){
+                            packageMetaInfo.width = featureCollectionViewContainer.width - 250;
+                        }
+
+//                        if (packageMetaInfo.width > featureCollectionView.width && packageMetaInfo.width - featureCollectionView.width >= 800){
+//                            packageMetaInfo.width = packageMetaInfo.width - featureCollectionView.width;
+//                        }
+                    }
+                }
             }
         }
 
@@ -611,10 +635,12 @@ Item {
             id: headerTreeView;
 
             anchors.top: parent.top;
+
             width: parent.width;
             height: 35;
-//            color: "transparent";
+
             color: Style.theme === "Light" ? "white": Style.backgroundColor;
+
             Text {
                 id: titleHeader;
 

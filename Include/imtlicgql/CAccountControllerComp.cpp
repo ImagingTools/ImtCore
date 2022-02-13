@@ -24,7 +24,6 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemModel = nullptr;
-	bool isSetResponce = false;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -124,6 +123,8 @@ istd::IChangeable* CAccountControllerComp::CreateObject(const QList<imtgql::CGql
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 
+	objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+
 	if (!itemData.isEmpty()) {
 //		istd::TDelPtr<imtauth::IAccountInfo> accountInfoPtr = m_accountInfoFactCompPtr.CreateInstance();
 
@@ -132,13 +133,14 @@ istd::IChangeable* CAccountControllerComp::CreateObject(const QList<imtgql::CGql
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
-		if (itemModel.ContainsKey("Id")) {
-			objectId = itemModel.GetData("Id").toByteArray();
-		}
+//		if (itemModel.ContainsKey("Id")) {
+//			objectId = itemModel.GetData("Id").toByteArray();
+//		}
 
 		if (itemModel.ContainsKey("AccountName")) {
 			name = itemModel.GetData("AccountName").toString();
 			accountInfoPtr->SetAccountName(name);
+//			objectId = itemModel.GetData("AccountName").toByteArray();
 		}
 
 		if (itemModel.ContainsKey("AccountDescription")) {

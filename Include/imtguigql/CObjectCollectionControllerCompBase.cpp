@@ -172,7 +172,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		QString name, description;
 		QByteArray objectId;
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+//		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
@@ -215,7 +215,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
 	else{
-		QString name, description, errorMessage;
+		QString name, description;
 		//QByteArray objectId;
 		istd::IChangeable* savedObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (savedObject != nullptr){
@@ -271,7 +271,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
-	bool isSetResponce = false;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -287,6 +286,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 		imtbase::IObjectCollection::DataPtr dataPtr;
+
 		for (const QByteArray& collectionId : collectionIds){
 			int itemIndex = itemsModel->InsertNewItem();
 			if (itemIndex >= 0){

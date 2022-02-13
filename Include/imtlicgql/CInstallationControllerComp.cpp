@@ -22,14 +22,14 @@ namespace imtlicgql
 {
 
 
-imtbase::CTreeItemModel* CInstallationControllerComp::ListObjects(
+imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
+	imtbase::CTreeItemModel* itemModel = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -41,36 +41,68 @@ imtbase::CTreeItemModel* CInstallationControllerComp::ListObjects(
 	}
 	else{
 		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		QByteArray productId = GetObjectIdFromInputParams(inputParams);
+		itemModel = new imtbase::CTreeItemModel();
 
-		QByteArrayList featureIds;
+		QByteArray instanceId = GetObjectIdFromInputParams(inputParams);
+
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (productId != "" && m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
-			imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
+		if (m_objectCollectionCompPtr->GetObjectData(instanceId, dataPtr)){
+//			istd::TDelPtr<imtlic::IProductInstanceInfo> productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 
-			if (licensePtr != nullptr){
-				QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
-				for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-					int itemIndex = itemsModel->InsertNewItem();
-					QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-					QString licenseDescription = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-					itemsModel->SetData("Id", licenseCollectionId, itemIndex);
-					itemsModel->SetData("Name", licenseName, itemIndex);
-					itemsModel->SetData("Description", licenseDescription, itemIndex);
+			imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+
+			QByteArray accountId = productInstancePtr->GetCustomerId();
+
+			QByteArray productId = productInstancePtr->GetProductId();
+
+			if (instanceId != ""){
+				itemModel->SetData("Id", instanceId);
+			}
+
+			if (accountId != ""){
+				itemModel->SetData("AccountId", accountId);
+			}
+
+			if (productId != ""){
+				itemModel->SetData("ProductId", productId);
+			}
+
+			imtbase::CTreeItemModel* activeLicenses = itemModel->AddTreeModel("ActiveLicenses");
+
+
+			const imtbase::ICollectionInfo& licenseInstances = productInstancePtr->GetLicenseInstances();
+
+			imtbase::ICollectionInfo::Ids licenseIds = licenseInstances.GetElementIds();
+
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
+				imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
+				int index;
+
+				if (licensePtr != nullptr){
+					QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
+
+					for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+						const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(licenseCollectionId);
+						index = activeLicenses->InsertNewItem();
+						activeLicenses->SetData("Id", licenseCollectionId, index);
+
+						QDateTime date = licenseInstancePtr->GetExpiration();
+						activeLicenses->SetData("Expiration", date, index);
+					}
 				}
+
 			}
 		}
 
-		itemsModel->SetIsArray(true);
-
-		dataModel->SetExternTreeModel("items", itemsModel);
+		dataModel->SetExternTreeModel("item", itemModel);
 	}
 
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
 }
+
 
 istd::IChangeable* CInstallationControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
 																	 QString& name, QString& description, QString &errorMessage) const
@@ -95,21 +127,21 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(const QList<imtgql:
 		itemModel.Parse(itemData);
 
 		if (itemModel.ContainsKey("Id")) {
-			objectId = itemModel.GetData("Id").toByteArray();;
+			objectId = itemModel.GetData("Id").toByteArray();
 		}
 
 		if (itemModel.ContainsKey("Name")) {
-			name = itemModel.GetData("Name").toByteArray();;
+			name = itemModel.GetData("Name").toByteArray();
 		}
 
 		QByteArray productId;
 		if (itemModel.ContainsKey("ProductId")) {
-			productId = itemModel.GetData("ProductId").toByteArray();;
+			productId = itemModel.GetData("ProductId").toByteArray();
 		}
 
 		QByteArray accountId;
 		if (itemModel.ContainsKey("AccountId")) {
-			accountId = itemModel.GetData("AccountId").toByteArray();;
+			accountId = itemModel.GetData("AccountId").toByteArray();
 		}
 
 		productInstancePtr->SetupProductInstance(productId, objectId, accountId);

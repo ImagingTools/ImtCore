@@ -6,7 +6,9 @@ import Acf 1.0
 
 Rectangle {
     id: containerInstallation;
+
     anchors.fill: parent;
+
     width: 500;
     height: 500;
 
@@ -23,6 +25,7 @@ Rectangle {
 
     property string typeOperation: multiDocViewItem.typeOperation;
 
+    property TreeItemModel installationInfoModel;
     property TreeItemModel model;
 
     color: Style.backgroundColor;
@@ -33,6 +36,73 @@ Rectangle {
             containerInstallation.gqlModelCollectionInfo = "ProductList"
             headerInfoModel.updateModel();
 //        }
+    }
+
+    onModelChanged: {
+        console.log("InstallationInfoEditor onModelChanged", containerInstallation.typeOperation);
+        if (containerInstallation.model.ContainsKey("data")){
+            containerInstallation.contactInfoModel = containerContactInfo.model.GetData('data');
+            containerInstallation.updateData();
+        }
+        else {
+            if(containerInstallation.typeOperation === "New"){
+                //containerContactInfo.accountType = "company";
+//                cbTypeAccount.currentIndex = 0;
+//                containerContactInfo.contactInfoModel = model.AddTreeModel("data");
+//                containerContactInfo.contactInfoModel.SetData("Email","")
+//                containerContactInfo.contactInfoModel.SetData("FirstName","")
+//                containerContactInfo.contactInfoModel.SetData("LastName","")
+            }
+            else{
+
+            }
+        }
+    }
+
+    onInstallationInfoModelChanged: {
+        console.log("InstallationInfoEditor onInstallationInfoModelChanged");
+        if (containerInstallation.typeOperation !== "New"){
+            containerInstallation.updateData();
+        }
+    }
+
+    function updateData() {
+        console.log("containerContactInfo updateData");
+
+        instanceIdText.text = containerInstallation.installationInfoModel.GetData("Id");
+
+        var accountId = containerInstallation.installationInfoModel.GetData("AccountId");
+        var producId = containerInstallation.installationInfoModel.GetData("ProductId");
+
+        var accountIndex = -1;
+        var accountsData = accounts.GetData("data");
+        for (var i = 0; i < accountsData.GetItemsCount(); i++){
+
+            var accId = accountsData.GetData("Id", i);
+
+            if (accId === accountId){
+                accountIndex = i;
+            }
+        }
+
+        if (accountIndex !== -1){
+            customerCB.currentIndex = accountIndex;
+        }
+
+        var productIndex = -1;
+        var productsData = products.GetData("data");
+        for (var i = 0; i < productsData.GetItemsCount(); i++){
+
+            var prId = productsData.GetData("Id", i);
+
+            if (prId === producId){
+                productIndex = i;
+            }
+        }
+
+        if (productIndex !== -1){
+            productCB.currentIndex = productIndex;
+        }
     }
 
     TreeItemModel {
@@ -90,6 +160,8 @@ Rectangle {
         }
     }
 
+    function refresh(){}
+
     function commandsChanged(commandsId){
         if (commandsId !== "InstallationEdit") {
             return;
@@ -102,6 +174,7 @@ Rectangle {
 
     Flickable {
         anchors.fill: parent;
+
         contentWidth: container.width;
         contentHeight: container.height + 50;
         boundsBehavior: Flickable.StopAtBounds;
@@ -109,24 +182,31 @@ Rectangle {
 
         Column {
              id: container;
+
              width: 500;
+
              spacing: 7;
 
              Text {
                  id: titleInstance;
+
+                 anchors.left: container.left;
+                 anchors.leftMargin: 10;
+
                  text: qsTr("Instance-ID");
                  color: Style.textColor;
                  font.family: Style.fontFamily;
-                 anchors.left: container.left;
-                 anchors.leftMargin: 10;
                  font.pixelSize: Style.fontSize_common;
              }
 
              Rectangle {
                  id: tfcInstance;
-                 width: container.width - 20;
+
                  anchors.horizontalCenter: container.horizontalCenter;
+
+                 width: container.width - 20;
                  height: 45;
+
                  color: Style.imagingToolsGradient1;
                  border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
@@ -141,11 +221,14 @@ Rectangle {
 
              Text {
                  id: titleCustomer;
-                 text: qsTr("Customer");
-                 color: Style.textColor;
-                 font.family: Style.fontFamily;
+
                  anchors.left: container.left;
                  anchors.leftMargin: 10;
+
+                 text: qsTr("Customer");
+                 color: Style.textColor;
+
+                 font.family: Style.fontFamily;
                  font.pixelSize: Style.fontSize_common;
              }
 
@@ -169,6 +252,7 @@ Rectangle {
 
                      width: customerBlock.width - 22;
                      height: 23;
+
                      radius: 3;
                      model: listModelAccounts;
 
@@ -177,7 +261,9 @@ Rectangle {
                      textCentered: false;
 
                      onCurrentIndexChanged: {
+                         console.log("InstallationInfoEditor customerCB onCurrentIndexChanged");
                          containerInstallation.accountId = listModelAccounts.get(customerCB.currentIndex).id;
+                         customerCB.currentText = listModelAccounts.get(customerCB.currentIndex).text;
                      }
                  }
              }
@@ -186,12 +272,12 @@ Rectangle {
                  id: titleProduct;
                  z : 5;
 
+                 anchors.left: container.left;
+                 anchors.leftMargin: 10;
+
                  text: qsTr("Product");
                  color: Style.textColor;
                  font.family: Style.fontFamily;
-
-                 anchors.left: container.left;
-                 anchors.leftMargin: 10;
                  font.pixelSize: Style.fontSize_common;
              }
 
@@ -200,8 +286,10 @@ Rectangle {
                  z : 5;
 
                  anchors.horizontalCenter: container.horizontalCenter;
+
                  height: 45;
                  width: container.width - 20;
+
                  color: Style.imagingToolsGradient1;
                  border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
@@ -223,7 +311,10 @@ Rectangle {
                      textCentered: false;
 
                      onCurrentIndexChanged: {
+                         console.log("InstallationInfoEditor productCB onCurrentIndexChanged");
                          containerInstallation.productId = listModelProducts.get(productCB.currentIndex).id;
+                         productCB.currentText = listModelProducts.get(productCB.currentIndex).text;
+
                          licensesModel.updateModel(containerInstallation.productId);
                      }
 
@@ -232,17 +323,21 @@ Rectangle {
 
              Text {
                  id: titleLicenses;
+
+                 anchors.left: container.left;
+                 anchors.leftMargin: 10;
+
                  text: qsTr("Licenses");
                  color: Style.textColor;
                  font.family: Style.fontFamily;
-                 anchors.left: container.left;
-                 anchors.leftMargin: 10;
                  font.pixelSize: Style.fontSize_common;
              }
 
              Rectangle {
                  id: licensesBlock;
+
                  anchors.horizontalCenter: container.horizontalCenter;
+
                  width: container.width - 20;
                  height: 200;
 
@@ -251,10 +346,7 @@ Rectangle {
 
                  AuxTable {
                      id: licensesTable;
-//                     anchors.fill: parent;
 
-//                     height: 300;
-//                     width: 200;
                      anchors.top: licensesBlock.top;
                      anchors.topMargin: 10;
                      anchors.bottom: parent.bottom;
@@ -262,19 +354,21 @@ Rectangle {
                      anchors.leftMargin: 10;
                      anchors.right: parent.right;
                      anchors.rightMargin: 10;
+
                      headers: headersModelLicenses;
 
                      delegate: TableInstanceLicensesDelegate {
                          id: delegate;
+
                          width: licensesTable.width;
                          height: 35;
+
                          name: model.Name;
 
                          selected: licensesTable.selectedIndex === model.index;
 
                          onClicked: {
-//                             licensesTable.selectedId = model["Id"];
-//                             licensesTable.selectedName = model["Name"];
+
                              licensesTable.selectedIndex = model.index;
                          }
 
@@ -345,6 +439,64 @@ Rectangle {
 
     ListModel {
         id: listModelAccounts;
+    }
+
+    GqlModel {
+        id: installItemModel;
+
+        function updateModel() {
+            console.log( "updateModel InstallationItem");
+
+            var query = Gql.GqlRequest("query", "InstallationItem");
+
+            if (containerInstallation.typeOperation !== "New"){
+                var inputParams = Gql.GqlObject("input");
+                inputParams.InsertField("Id");
+                inputParams.InsertFieldArgument("Id", containerInstallation.itemId);
+                query.AddParam(inputParams);
+            }
+
+            var queryFields = Gql.GqlObject("item");
+
+            queryFields.InsertField("Id");
+            queryFields.InsertField("AccountId");
+            queryFields.InsertField("ProductId");
+            queryFields.InsertField("Name");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("InstallationItem query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, installItemModel);
+            if (this.state === "Ready"){
+                var dataModelLocal;
+
+                if (installItemModel.ContainsKey("errors")){
+                    return;
+                }
+
+                dataModelLocal = installItemModel.GetData("data");
+                if(dataModelLocal.ContainsKey("InstallationItem")){
+                    dataModelLocal = dataModelLocal.GetData("InstallationItem");
+                    if(dataModelLocal.ContainsKey("item")){
+                        //containerContactInfo.accountType = dataModelLocal.GetData("item").GetData("AccountType");
+
+                        dataModelLocal = dataModelLocal.GetData("item");
+
+//                        var installId = dataModelLocal.GetData("Id");
+//                        var accountId = dataModelLocal.GetData("AccountId");
+//                        var productId = dataModelLocal.GetData("ProductId");
+
+                        containerInstallation.installationInfoModel = dataModelLocal;
+                        containerInstallation.model.SetExternTreeModel('data', containerInstallation.installationInfoModel)
+                    }
+                }
+            }
+        }
     }
 
     GqlModel {
@@ -436,7 +588,8 @@ Rectangle {
                 var dataModelLocal = this.GetData("data");
                 if(dataModelLocal.ContainsKey(containerInstallation.gqlModelCollectionInfo)){
                     dataModelLocal = dataModelLocal.GetData(containerInstallation.gqlModelCollectionInfo);
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+
+                    if(dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items");
 
                         if (containerInstallation.gqlModelCollectionInfo === "ProductList") {
@@ -456,6 +609,8 @@ Rectangle {
                             for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
                                 listModelAccounts.append({"id": dataModelLocal.GetData("Id", i), "text": dataModelLocal.GetData("AccountName", i)});
                             }
+
+                            installItemModel.updateModel();
                         }
                     }
                     else if(itemsModel.ContainsKey("errors")){

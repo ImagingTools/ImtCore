@@ -3,8 +3,10 @@ import Acf 1.0
 
 Item {
     id: container;
+
     width: 90;
     height: 30;
+
     property var model;
     property int currentIndex: -1;
     property color borderColor: Style.textColor;
@@ -26,7 +28,9 @@ Item {
 
     Rectangle {
         id: cbMainRect;
+
         anchors.fill: parent;
+
         border.color: container.borderColor;
         radius: container.radius;
         color: container.backgroundColor;
@@ -40,7 +44,9 @@ Item {
 
         Text {
             id: cbTitleTxt;
+
             anchors.verticalCenter: parent.verticalCenter;
+
             color: Style.textColor;
             text: container.currentText;
             font.family: Style.fontFamily;
@@ -49,7 +55,9 @@ Item {
 
         MouseArea {
             id: cbMouseArea;
+
             anchors.fill: parent;
+
             onClicked: {
                 console.log("ComboBox clicked !");
                 console.log("text color ", Style.textColor);
@@ -63,12 +71,13 @@ Item {
 
         Canvas {
             id: cbArrowIcon;
-            height: 5;
-            width: 10;
 
             anchors.right: parent.right;
             anchors.verticalCenter: parent.verticalCenter;
             anchors.rightMargin: 5;
+
+            height: 5;
+            width: 10;
 
             onPaint:{
                 var ctx = getContext('2d');
@@ -85,34 +94,40 @@ Item {
 
     Rectangle {
         id: cbMenu;
+
+        anchors.top: cbMainRect.bottom;
+
         width: container.width;
         height: cbListView.count * container.height;
-        anchors.top: cbMainRect.bottom;
+
 
         color: Style.baseColor;
         border.color: container.borderColor;
         radius: container.radius;
         visible: container.menuVisible;
 
-
         ListView {
             id: cbListView;
+
             anchors.fill: parent;
+
             model: container.model;
             clip: true;
             currentIndex: 0;
+
             delegate: Item {
                 id: cbListDelegate;
+
                 width: cbListView.width;
-                //height: container.height;
                 height: cbMainRect.height;
 
                 Rectangle {
-                    width: cbListDelegate.width - 2;
-                    height: cbListDelegate.height - 2;
-//                    anchors.fill: parent;
                     anchors.verticalCenter: cbListDelegate.verticalCenter;
                     anchors.horizontalCenter: cbListDelegate.horizontalCenter;
+
+                    width: cbListDelegate.width - 2;
+                    height: cbListDelegate.height - 2;
+
                     visible: container.currentIndex === model.index;
                     color: Style.selectedColor;
                     radius: container.radius;
@@ -120,10 +135,12 @@ Item {
 
                 Text {
                     id: cbTitleModel;
+
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.horizontalCenter: container.textCentered ? parent.horizontalCenter : null;
                     anchors.left: !container.textCentered ? cbListDelegate.left : null;
                     anchors.leftMargin: 10;
+
                     text: model.text;
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -143,9 +160,11 @@ Item {
 
 
                 Rectangle {
+                    anchors.top: cbListDelegate.bottom;
+
                     width: cbListDelegate.width;
                     height: 1;
-                    anchors.top: cbListDelegate.bottom;
+
                     color: Style.textColor;
                     visible: model.index !== cbListView.count - 1;
                 }
