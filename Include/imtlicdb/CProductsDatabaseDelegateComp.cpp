@@ -284,6 +284,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& collectionLicenseId : updatedLicenses){
 		const imtlic::ILicenseInfo* newLicenseInfoPtr = newProductPtr->GetLicenseInfo(collectionLicenseId);
 		const imtlic::ILicenseInfo* oldLicenseInfoPtr = oldProductPtr->GetLicenseInfo(collectionLicenseId);
+		QByteArray productId = newProductPtr->GetProductId();
 		if (newLicenseInfoPtr != nullptr && oldLicenseInfoPtr != nullptr){
 			QString licenseName = newLicenseInfoPtr->GetLicenseName();
 			QString licenseDescription = newProductPtr->GetLicenseList().GetElementInfo(
@@ -316,18 +317,21 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 				QByteArrayList data = addedFeatureId.split('.');
 
 				QByteArray featureId = data[1];
+				QByteArray packageId = data[0];
 
 				retVal += "\n" +
-							QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId) VALUES('%1', '%2');")
+							QString("INSERT INTO ProductLicenseFeatures(ProductId, LicenseId, PackageId, FeatureId) VALUES('%1', '%2', '%3', '%4');")
+							.arg(qPrintable(productId))
 							.arg(qPrintable(collectionLicenseId))
+							.arg(qPrintable(packageId))
 							.arg(qPrintable(featureId))
 							.toLocal8Bit();
 			}
 
 			// Delete removed features to the license:
 			for (const QByteArray& removedFeatureId : removedFeatures){
-//				QByteArrayList data = removedFeatureId.split('.');
-				QByteArray featureId = removedFeatureId;
+				QByteArrayList data = removedFeatureId.split('.');
+				QByteArray featureId = data[1];
 
 				retVal += "\n" +
 							QString("DELETE FROM ProductLicenseFeatures WHERE FeatureId = '%1' AND LicenseId = '%2';")
@@ -478,8 +482,8 @@ void CProductsDatabaseDelegateComp::GenerateDifferences(
 	imtlic::ILicenseInfo::FeatureInfos newFeatures = newLicensePtr->GetFeatureInfos();
 
 	for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : newFeatures){
-		QByteArray newId = featureInfo.id.split('.')[1];
-		newFeatureIds.push_back(newId);
+//		QByteArray newId = featureInfo.id.split('.')[1];
+		newFeatureIds.push_back(featureInfo.id);
 	}
 
 	// Calculate added features:

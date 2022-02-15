@@ -27,6 +27,7 @@
         <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/InputDialog.qml">Qml/imtgui/AuxComponents/InputDialog.qml</file>
         <file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
+        <file alias="imtgui/AuxComponents/Splitter.qml">Qml/imtgui/AuxComponents/Splitter.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

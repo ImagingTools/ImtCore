@@ -8,3 +8,4 @@ AuxTable 1.0 ./AuxComponents/AuxTable.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
 MessageDialog 1.0 ./AuxComponents/MessageDialog.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
+Splitter 1.0 ./AuxComponents/Splitter.qml

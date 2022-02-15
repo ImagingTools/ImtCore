@@ -148,8 +148,10 @@ Item {
 
     CollectionView {
         id: productCollectionView;
+
         anchors.left: parent.left;
-        anchors.right: productMetaInfo.left;
+        anchors.right: productSplitter.left;
+
         height: parent.height;
 
         Component.onCompleted: {
@@ -291,25 +293,33 @@ Item {
         }
     }
 
+    Splitter {
+        id: productSplitter;
+        x: productsCollectionViewContainer.width - 300;
+
+        height: parent.height;
+        width: 4;
+
+        onXChanged: {
+                if (productSplitter.x > productsCollectionViewContainer.width - titleHeader.width){
+                    productSplitter.x = productsCollectionViewContainer.width - productSplitter.width;
+                }
+
+                if (productSplitter.x < 250){
+                    productSplitter.x = 250;
+                }
+        }
+    }
+
     Rectangle {
         id: productMetaInfo;
+
         anchors.right: parent.right;
+        anchors.left: productSplitter.right;
+
         height: parent.height;
-        width: 200;
-//        color: "transparent";
-        color: Style.backgroundColor;
 
-        Rectangle {
-            id: leftBorder;
-
-            anchors.right: productMetaInfo.left;
-            anchors.top: productMetaInfo.top;
-
-            height: productMetaInfo.height;
-            width: 3;
-
-            color: Style.backgroundColor;
-        }
+        color: "transparent";
 
 
         Rectangle {
@@ -397,6 +407,7 @@ Item {
             width: parent.width - 5;
 
             height: 35;
+            color: Style.theme === "Light" ? "white": Style.backgroundColor;
 
             Text {
                 id: titleHeader;
@@ -472,6 +483,13 @@ Item {
 
                 treeView.modelItems = featuresTreeView.modelTreeView;
             }
+
+            onProductLicenseFeaturesChanged: {
+                console.log("PackageView FeaturesTreeView onProductLicenseFeaturesChanged");
+                productMetaInfo.clearTreeView();
+                productMetaInfo.updateTreeView();
+//                treeView.modelItems.Refresh();
+            }
         }
 
         function clearTreeView(){
@@ -509,6 +527,11 @@ Item {
             var selectProductId = productsCollectionViewContainer.itemId;
 
             var packagesModel;
+
+            if (!featuresTreeView.productLicenseFeatures){
+                return;
+            }
+
             for (i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
                 var curRootLicenseId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
                 var curRootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
@@ -629,6 +652,11 @@ Item {
             console.log("ProductView updateLicenseFeatures", productId, licenseId, packageId, featureId, state);
             var licenseIndex = -1;
             var i;
+
+            if (!featuresTreeView.productLicenseFeatures){
+                return;
+            }
+
             for (i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
 
                 var curRootLicenseId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);

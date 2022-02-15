@@ -8,18 +8,19 @@ Item {
 
     property TreeItemModel modelTreeView;
     property TreeItemModel dependModel;
-    property alias productLicenseFeatures: productLicenseFeatures;
+    property TreeItemModel productLicenseFeatures;
+//    property alias productLicenseFeatures: productLicenseFeatures;
 
-    TreeItemModel {
-        id: productLicenseFeatures;
-    }
+//    TreeItemModel {
+//        id: productLicenseFeatures;
+//    }
 
     Component.onCompleted: {
         console.log( "FeaturesTreeView Component.onCompleted");
         featuresTreeViewContainer.loadFeaturesModel();
         featuresTreeViewContainer.loadDependModel();
 
-//        licensesDependenciesModel.loadLicenseDependModel();
+        licensesDependenciesModel.loadLicenseDependModel();
     }
 
     onModelTreeViewChanged: {
@@ -266,7 +267,6 @@ Item {
         return -1;
     }
 
-
     function featureIdHasDependency(featureId) {
         if (!featuresTreeViewContainer.dependModel) {
             return false;
@@ -469,8 +469,10 @@ Item {
             console.log("State:", this.state, dependenciesModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
-                if (dataModelLocal.ContainsKey("FeaturesDependencies")) {
-                    dataModelLocal = dataModelLocal.GetData("FeaturesDependencies");
+
+                if (dataModelLocal.ContainsKey("LicensesDependencies")) {
+                    dataModelLocal = dataModelLocal.GetData("LicensesDependencies");
+
                     if (dataModelLocal.ContainsKey("TreeModel")) {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
                         featuresTreeViewContainer.productLicenseFeatures = dataModelLocal;

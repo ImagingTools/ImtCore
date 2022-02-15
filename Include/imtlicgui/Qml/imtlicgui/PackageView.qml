@@ -264,8 +264,10 @@ Item {
 
     CollectionView {
         id: featureCollectionView;
+
         anchors.left: parent.left;
-        anchors.right: packageMetaInfo.left;
+        anchors.right: packageSplitter.left;
+
         height: parent.height;
 
         Component.onCompleted: {
@@ -581,67 +583,32 @@ Item {
         }
     }
 
+    Splitter {
+        id: packageSplitter;
+        x: featureCollectionViewContainer.width - 300;
+
+        height: parent.height;
+        width: 4;
+
+        onXChanged: {
+                if (packageSplitter.x > featureCollectionViewContainer.width - titleHeader.width){
+                    packageSplitter.x = featureCollectionViewContainer.width - packageSplitter.width;
+                }
+
+                if (packageSplitter.x < 250){
+                    packageSplitter.x = 250;
+                }
+        }
+    }
+
     Rectangle {
         id: packageMetaInfo;
+
         anchors.right: parent.right;
+        anchors.left: packageSplitter.right;
+
         height: parent.height;
-        width: 300;
         color: "transparent";
-
-        Rectangle {
-            id: leftBorder;
-
-            anchors.right: packageMetaInfo.left;
-            anchors.top: packageMetaInfo.top;
-
-            height: packageMetaInfo.height;
-            width: 4;
-
-            color: Style.backgroundColor;
-
-            MouseArea {
-                id: leftBorderMA;
-
-                anchors.fill: parent;
-//                drag.target: featureCollectionViewContainer;
-
-                acceptedButtons: Qt.LeftButton;
-                cursorShape: Qt.SplitHCursor;
-
-                onMouseXChanged: {
-
-                    if (leftBorderMA.pressed){
-                        console.log("Мышь зажата!");
-
-                        packageMetaInfo.width = packageMetaInfo.width - mouseX
-
-                        if (packageMetaInfo.width <= titleHeader.width){
-                            packageMetaInfo.width = 0;
-                        }
-
-                        if (featureCollectionViewContainer.width - packageMetaInfo.width <= 250){
-                            packageMetaInfo.width = featureCollectionViewContainer.width - 250;
-                        }
-                    }
-
-//                    if(drag.active){
-
-////                        leftBorderMA.cursorShape = Qt.SplitHCursor;
-
-//                        packageMetaInfo.width = packageMetaInfo.width - mouseX
-
-//                        if (packageMetaInfo.width <= titleHeader.width){
-//                            packageMetaInfo.width = 0;
-//                        }
-
-//                        if (featureCollectionViewContainer.width - packageMetaInfo.width <= 250){
-//                            packageMetaInfo.width = featureCollectionViewContainer.width - 250;
-//                        }
-
-//                    }
-                }
-            }
-        }
 
         Rectangle {
             id: headerTreeView;
