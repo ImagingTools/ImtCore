@@ -320,10 +320,10 @@ Item {
     function updateFeaturesTreeView(){
         console.log("PackageView updateFeaturesTreeView");
         //treeView.modelItems.Refresh();
-//        featureCollectionViewContainer.hideCurrentFeatureTreeView();
-//        featureCollectionViewContainer.updateStateCheckedCheckBox();
-//        featureCollectionViewContainer.checkInActiveItems();
-//        treeView.modelItems.Refresh();
+        featureCollectionViewContainer.hideCurrentFeatureTreeView();
+        featureCollectionViewContainer.updateStateCheckedCheckBox();
+        featureCollectionViewContainer.checkInActiveItems();
+        //treeView.modelItems.Refresh();
     }
 
     function clearCheckedCheckBox() {
@@ -381,6 +381,7 @@ Item {
             var packageId = modelItems.GetData("Id", i);
             var childModel = modelItems.GetData("childItemModel", i);
             console.log("Current Package Id", packageId);
+
             if (!childModel) {
                 continue;
             }
@@ -473,7 +474,8 @@ Item {
                         childModelItems.SetData("visible", 1, j);
                     }
 
-                    if (childModelItems.GetData("Id", j) === featureCollectionView.table.getSelectedId()) {
+                    if (childModelItems.GetData("Id", j) === featureCollectionView.table.getSelectedId()){
+                        console.log("PackageView element hided", featureCollectionView.table.getSelectedId());
                         childModelItems.SetData("visible", 0, j);
                     }
                 }
@@ -589,8 +591,6 @@ Item {
         Rectangle {
             id: leftBorder;
 
-
-
             anchors.right: packageMetaInfo.left;
             anchors.top: packageMetaInfo.top;
 
@@ -603,17 +603,17 @@ Item {
                 id: leftBorderMA;
 
                 anchors.fill: parent;
-
-                drag.target: featureCollectionViewContainer;
+//                drag.target: featureCollectionViewContainer;
 
                 acceptedButtons: Qt.LeftButton;
                 cursorShape: Qt.SplitHCursor;
 
                 onMouseXChanged: {
-                    if(drag.active){
+
+                    if (leftBorderMA.pressed){
+                        console.log("Мышь зажата!");
 
                         packageMetaInfo.width = packageMetaInfo.width - mouseX
-//                        packageMetaInfo.x = packageMetaInfo.x + mouseX
 
                         if (packageMetaInfo.width <= titleHeader.width){
                             packageMetaInfo.width = 0;
@@ -622,11 +622,23 @@ Item {
                         if (featureCollectionViewContainer.width - packageMetaInfo.width <= 250){
                             packageMetaInfo.width = featureCollectionViewContainer.width - 250;
                         }
-
-//                        if (packageMetaInfo.width > featureCollectionView.width && packageMetaInfo.width - featureCollectionView.width >= 800){
-//                            packageMetaInfo.width = packageMetaInfo.width - featureCollectionView.width;
-//                        }
                     }
+
+//                    if(drag.active){
+
+////                        leftBorderMA.cursorShape = Qt.SplitHCursor;
+
+//                        packageMetaInfo.width = packageMetaInfo.width - mouseX
+
+//                        if (packageMetaInfo.width <= titleHeader.width){
+//                            packageMetaInfo.width = 0;
+//                        }
+
+//                        if (featureCollectionViewContainer.width - packageMetaInfo.width <= 250){
+//                            packageMetaInfo.width = featureCollectionViewContainer.width - 250;
+//                        }
+
+//                    }
                 }
             }
         }

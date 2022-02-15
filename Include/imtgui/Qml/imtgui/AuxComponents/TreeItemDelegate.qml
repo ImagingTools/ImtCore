@@ -48,7 +48,7 @@ Item {
         anchors.right: parent.right;
         height: 30;
 
-        //visible: model.visible === 1;
+        visible: model.visible === 1;
 
 //        MouseArea {
 //            anchors.fill: parent;

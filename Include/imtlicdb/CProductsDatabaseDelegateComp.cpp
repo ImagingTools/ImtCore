@@ -89,9 +89,18 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 
 			imtlic::ILicenseInfo::FeatureInfo featureInfo;
 
+			QByteArray featureId, packageId;
 			if (licenseFeatureRecord.contains("FeatureId")){
-				featureInfo.id = licenseFeatureRecord.value("FeatureId").toByteArray();
+//				featureInfo.id = licenseFeatureRecord.value("FeatureId").toByteArray();
+				featureId = licenseFeatureRecord.value("FeatureId").toByteArray();
 			}
+
+			if (licenseFeatureRecord.contains("PackageId")){
+//				featureInfo.id = licenseFeatureRecord.value("PackageId").toByteArray();
+				packageId = licenseFeatureRecord.value("PackageId").toByteArray();
+			}
+
+			featureInfo.id = packageId + '.' + featureId;
 
 			if (featureInfo.id.isEmpty()){
 				return nullptr;
@@ -282,7 +291,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 			QByteArray newLicenseId = newLicenseInfoPtr->GetLicenseId();
 			QByteArray oldLicenseId = oldLicenseInfoPtr->GetLicenseId();
-			const imtbase::IObjectCollection* packagesCollectionPtr = newProductPtr->GetFeaturePackages();
+			//const imtbase::IObjectCollection* packagesCollectionPtr = newProductPtr->GetFeaturePackages();
 
 			retVal += "\n" +
 						QString("UPDATE ProductLicenses SET Id = '%1', Name = '%2', Description = '%3' WHERE Id = '%4' AND ProductId = '%5';")
@@ -300,25 +309,29 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 			// Add new features to the license:
 			for (const QByteArray& addedFeatureId : addedFeatures){
-				const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, addedFeatureId);
-				if (packagePtr == nullptr){
-					continue;
-				}
-				QByteArray packageId = packagePtr->GetPackageId();
+//				const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, addedFeatureId);
+//				if (packagePtr == nullptr){
+//					continue;
+//				}
+				QByteArrayList data = addedFeatureId.split('.');
+
+				QByteArray featureId = data[1];
 
 				retVal += "\n" +
-							QString("INSERT INTO ProductLicenseFeatures(FeatureId, LicenseId, PackageId) VALUES('%1', '%2', '%3');")
-							.arg(qPrintable(addedFeatureId))
+							QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId) VALUES('%1', '%2');")
 							.arg(qPrintable(collectionLicenseId))
-							.arg(qPrintable(packageId))
+							.arg(qPrintable(featureId))
 							.toLocal8Bit();
 			}
 
 			// Delete removed features to the license:
 			for (const QByteArray& removedFeatureId : removedFeatures){
+//				QByteArrayList data = removedFeatureId.split('.');
+				QByteArray featureId = removedFeatureId;
+
 				retVal += "\n" +
 							QString("DELETE FROM ProductLicenseFeatures WHERE FeatureId = '%1' AND LicenseId = '%2';")
-							.arg(qPrintable(removedFeatureId))
+							.arg(qPrintable(featureId))
 							.arg(qPrintable(collectionLicenseId)).toLocal8Bit();
 			}
 		}
@@ -465,7 +478,8 @@ void CProductsDatabaseDelegateComp::GenerateDifferences(
 	imtlic::ILicenseInfo::FeatureInfos newFeatures = newLicensePtr->GetFeatureInfos();
 
 	for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : newFeatures){
-		newFeatureIds.push_back(featureInfo.id);
+		QByteArray newId = featureInfo.id.split('.')[1];
+		newFeatureIds.push_back(newId);
 	}
 
 	// Calculate added features:

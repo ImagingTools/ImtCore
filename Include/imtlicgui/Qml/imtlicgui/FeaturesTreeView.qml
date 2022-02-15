@@ -8,16 +8,18 @@ Item {
 
     property TreeItemModel modelTreeView;
     property TreeItemModel dependModel;
-    //property alias dependModel: dependModel;
+    property alias productLicenseFeatures: productLicenseFeatures;
 
-//    TreeItemModel {
-//        id: dependModel;
-//    }
+    TreeItemModel {
+        id: productLicenseFeatures;
+    }
 
     Component.onCompleted: {
         console.log( "FeaturesTreeView Component.onCompleted");
         featuresTreeViewContainer.loadFeaturesModel();
         featuresTreeViewContainer.loadDependModel();
+
+//        licensesDependenciesModel.loadLicenseDependModel();
     }
 
     onModelTreeViewChanged: {
@@ -328,6 +330,7 @@ Item {
 
     function findInAllRootFeaturesDependFeatureById(packageId, featureId) {
 
+        console.log("FeaturesTreeView findInAllRootFeaturesDependFeatureById", packageId, featureId);
         if (!featuresTreeViewContainer.dependModel) {
             return false;
         }
@@ -442,6 +445,35 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
 
                         featuresTreeViewContainer.dependModel = dataModelLocal;
+                    }
+                }
+            }
+        }
+    }
+
+    GqlModel {
+        id: licensesDependenciesModel;
+
+        function loadLicenseDependModel() {
+            console.log( "FeaturesTreeView GqlModel loadLicenseDependModel");
+            var query = Gql.GqlRequest("query", "LicensesDependencies");
+            var queryFields = Gql.GqlObject("dependencies");
+            queryFields.InsertField("TreeModel");
+            query.AddField(queryFields);
+            var gqlData = query.GetQuery();
+            console.log("TreeView loadLicenseDependModel query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, dependenciesModel);
+            if (this.state === "Ready"){
+                var dataModelLocal = this.GetData("data");
+                if (dataModelLocal.ContainsKey("FeaturesDependencies")) {
+                    dataModelLocal = dataModelLocal.GetData("FeaturesDependencies");
+                    if (dataModelLocal.ContainsKey("TreeModel")) {
+                        dataModelLocal = dataModelLocal.GetData("TreeModel");
+                        featuresTreeViewContainer.productLicenseFeatures = dataModelLocal;
                     }
                 }
             }

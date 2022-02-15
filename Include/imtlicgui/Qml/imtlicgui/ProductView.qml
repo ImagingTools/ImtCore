@@ -185,7 +185,11 @@ Item {
             if (productCollectionView.selectedIndex > -1){
                 productsCollectionViewContainer.commandsChanged("ProductEdit")
 
-                 treeView.visible = true;
+                treeView.visible = true;
+
+                productMetaInfo.clearTreeView();
+                productMetaInfo.updateTreeView();
+                treeView.modelItems.Refresh();
             } else {
                 treeView.visible = false;
             }
@@ -233,6 +237,7 @@ Item {
             productModel.SetData("Id", productsCollectionViewContainer.itemId)
             productModel.SetData("Name", productsCollectionViewContainer.itemName)
             productModel.SetExternTreeModel("licenses", productCollectionView.collectionViewModel.GetData("data"));
+            productModel.SetExternTreeModel("dependencies", featuresTreeView.productLicenseFeatures);
 
             //featureCollectionViewContainer.model.SetIsArray(false);
             var jsonString = productModel.toJSON();
@@ -428,10 +433,29 @@ Item {
             anchors.rightMargin: 5;
             clip: true;
 
+            visible: false;
+
             anchors.bottom: parent.bottom;
 //            width: 200;
 //            height: 500;
             modelItems: featuresTreeView.model;
+
+            onItemTreeViewCheckBoxStateChanged: {
+                console.log("ProductView TreeView onItemTreeViewCheckBoxStateChanged",
+                            productsCollectionViewContainer.itemId,
+                            productCollectionView.table.getSelectedId(),
+                            packageId,
+                            featureId,
+                            state);
+                productMetaInfo.clearTreeView();
+                productMetaInfo.updateLicenseFeatures(productsCollectionViewContainer.itemId,
+                                                      productCollectionView.table.getSelectedId(),
+                                                      packageId,
+                                                      featureId,
+                                                      state);
+                productMetaInfo.updateTreeView();
+
+            }
         }
 
         FeaturesTreeView {
@@ -448,6 +472,252 @@ Item {
 
                 treeView.modelItems = featuresTreeView.modelTreeView;
             }
+        }
+
+        function clearTreeView(){
+            console.log("ProductView clearTreeView");
+            var modelItems = treeView.modelItems;
+
+            for(var i = 0; i < modelItems.GetItemsCount(); i++){
+
+                var childModel = modelItems.GetData("childItemModel", i);
+
+                for (var j = 0; j < childModel.GetItemsCount(); j++){
+                    var isActive = childModel.GetData("isActive", j);
+                    var state = childModel.GetData("stateChecked", j);
+
+                    if (isActive === 0){
+                        childModel.SetData("isActive", 1, j);
+                    }
+
+                    if (state === 2){
+                        childModel.SetData("stateChecked", 0, j);
+                    }
+                }
+
+                modelItems.SetData("childItemModel", childModel, i);
+            }
+
+            treeView.modelItems =  modelItems;
+        }
+
+        function updateTreeView(){
+            console.log("ProductView updateTreeView");
+            var i, j, k;
+
+            var selectLicenseId = productCollectionView.table.getSelectedId();
+            var selectProductId = productsCollectionViewContainer.itemId;
+
+            var packagesModel;
+            for (i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
+                var curRootLicenseId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
+                var curRootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
+
+                if (selectLicenseId === curRootLicenseId && selectProductId === curRootProductId){
+                    packagesModel = featuresTreeView.productLicenseFeatures.GetData("Packages", i);
+                    break;
+                }
+            }
+
+            if (!packagesModel){
+                return;
+            }
+
+            for(i = 0; i < treeView.modelItems.GetItemsCount(); i++){
+                var treeViewPackageId = treeView.modelItems.GetData("Id", i);
+
+                var packageIndex = -1;
+
+                for (j = 0; j < packagesModel.GetItemsCount(); j++){
+                    var licenseFeaturesPackageId = packagesModel.GetData("Id", j);
+
+                    if (licenseFeaturesPackageId === treeViewPackageId){
+                        packageIndex = j;
+                        break;
+                    }
+                }
+
+                if (packageIndex === -1){
+                    continue;
+                }
+
+                var treeViewFeaturesModel = treeView.modelItems.GetData("childItemModel", i);
+                var licenseFeaturesPackageFeaturesModel = packagesModel.GetData("Features", packageIndex);
+
+                for (j = 0; j < treeViewFeaturesModel.GetItemsCount(); j++){
+                    var treeViewFeatureId = treeViewFeaturesModel.GetData("Id", j);
+                    var ok = false;
+
+                    for (k = 0; k < licenseFeaturesPackageFeaturesModel.GetItemsCount(); k++){
+                        var licenseFeaturesFeatureId = licenseFeaturesPackageFeaturesModel.GetData("Id", k);
+
+                        if (treeViewFeatureId === licenseFeaturesFeatureId){
+                            ok = true;
+                            break;
+                        }
+                    }
+
+                    if (ok){
+                        treeViewFeaturesModel.SetData("stateChecked", 2, j);
+
+                        //Ищем фичи  от которых зависит выбранная, чтобы сделать их неактивными
+                        productMetaInfo.updateDependsFeatures(treeViewPackageId, treeViewFeatureId);
+                    }
+                }
+
+                treeView.modelItems.SetData("childItemModel", treeViewFeaturesModel, i);
+            }
+        }
+
+        function updateDependsFeatures(treeViewPackageId, treeViewFeatureId) {
+            console.log("ProductView updateDependsFeatures", treeViewPackageId, treeViewFeatureId);
+            var i, j, k, l;
+
+            var dependsFeaturesIndex = -1;
+
+            for (i = 0; i < featuresTreeView.dependModel.GetItemsCount(); i++){
+                var depFeatureId = featuresTreeView.dependModel.GetData("RootFeatureId", i);
+                var depPackageId = featuresTreeView.dependModel.GetData("RootPackageId", i);
+
+                if (depFeatureId === treeViewFeatureId && depPackageId === treeViewPackageId){
+                    dependsFeaturesIndex = i;
+                    break;
+                }
+            }
+
+            if (dependsFeaturesIndex === -1){
+                return;
+            }
+
+            var dependsPackagesModel = featuresTreeView.dependModel.GetData("Packages", dependsFeaturesIndex);
+
+            for (i = 0; i < treeView.modelItems.GetItemsCount(); i++) {
+                var packageId = treeView.modelItems.GetData("Id", i);
+                var childModel = treeView.modelItems.GetData("childItemModel", i);
+
+
+                if (!childModel) {
+                    continue;
+                }
+
+                for (j = 0; j < childModel.GetItemsCount(); j++) {
+
+                    var id = childModel.GetData("Id", j);
+
+                    for (k = 0; k < dependsPackagesModel.GetItemsCount(); k++){
+                        var pId = dependsPackagesModel.GetData("Id", k);
+
+                        var childItemModel = dependsPackagesModel.GetData("childItemModel", k);
+
+                        for (l = 0; l < childItemModel.GetItemsCount(); l++){
+                            var fId = childItemModel.GetData("Id", l);
+
+                            if (pId === packageId && fId === id){
+                                console.log("Find depend feature", packageId, id);
+                                childModel.SetData("isActive", 0, j);
+                                childModel.SetData("stateChecked", 2, j);
+                            }
+
+                        }
+                    }
+                }
+                treeView.modelItems.SetData("childItemModel", childModel, i);
+            }
+        }
+
+        function updateLicenseFeatures(productId, licenseId, packageId, featureId, state){
+            console.log("ProductView updateLicenseFeatures", productId, licenseId, packageId, featureId, state);
+            var licenseIndex = -1;
+            var i;
+            for (i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
+
+                var curRootLicenseId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
+                var curRootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
+
+                if (curRootLicenseId === licenseId && productId === curRootProductId){
+                    licenseIndex = i;
+                    break;
+                }
+            }
+
+            if (licenseIndex === -1){
+                licenseIndex = featuresTreeView.productLicenseFeatures.InsertNewItem();
+                featuresTreeView.productLicenseFeatures.SetData("RootLicenseId", licenseId, licenseIndex);
+                featuresTreeView.productLicenseFeatures.SetData("RootProductId", productId, licenseIndex);
+                featuresTreeView.productLicenseFeatures.AddTreeModel("Packages", licenseIndex)
+            }
+
+            var packagesIndex = -1;
+
+            var packagesModel = featuresTreeView.productLicenseFeatures.GetData("Packages", licenseIndex);
+
+            for (i = 0; i < packagesModel.GetItemsCount(); i++){
+                var curPackageId = packagesModel.GetData("Id", i);
+
+                if (curPackageId === packageId){
+                    packagesIndex = i;
+                    break;
+                }
+            }
+
+            if (packagesIndex === -1){
+                packagesIndex = packagesModel.InsertNewItem();
+                packagesModel.SetData("Id", packageId, packagesIndex);
+                packagesModel.AddTreeModel("Features", packagesIndex);
+            }
+
+            var featureIndex = -1;
+
+            var featuresModel = packagesModel.GetData("Features", packagesIndex);
+
+            for (i = 0; i < featuresModel.GetItemsCount(); i++){
+
+                var curFeatureId = featuresModel.GetData("Id", i);
+
+                if (curFeatureId === featureId){
+                    featureIndex = i;
+                    break;
+                }
+            }
+
+            if (state === 2 && featureIndex === -1){
+                featureIndex = featuresModel.InsertNewItem();
+                featuresModel.SetData("Id", featureId, featureIndex);
+            }
+            else if (state === 0 && featureIndex !== -1){
+                featuresModel.RemoveItem(featureIndex);
+            }
+
+            packagesModel.SetData("Features", featuresModel, packagesIndex);
+
+            if (featuresModel.GetItemsCount() === 0){
+                packagesModel.RemoveItem(packagesIndex);
+            }
+
+            featuresTreeView.productLicenseFeatures.SetData("Packages", packagesModel, licenseIndex);
+
+            if (packagesModel.GetItemsCount() === 0){
+                featuresTreeView.productLicenseFeatures.RemoveItem(licenseIndex);
+            }
+
+            //PRINT
+            console.log();
+            for (var i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
+                console.log("Root LicenseId", featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i));
+                var packageModel = featuresTreeView.productLicenseFeatures.GetData("Packages", i);
+
+                for (var j = 0; j < packageModel.GetItemsCount(); j++){
+                    console.log("\tPackageId", packageModel.GetData("Id", j));
+
+                    var featureModel = packageModel.GetData("Features", j);
+
+                    for (var k = 0; k < featureModel.GetItemsCount(); k++){
+                        console.log("\t\tFeatureId", featureModel.GetData("Id", k));
+                    }
+                }
+            }
+
+
         }
     }
 }
