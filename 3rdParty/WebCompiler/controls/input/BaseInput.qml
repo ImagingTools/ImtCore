@@ -26,6 +26,9 @@ Item {
 		this.element.on("focus", function() { this.forceActiveFocus(); }.bind(this))
 		this.element.on("blur", function() { /* fixme: remove focus from current input */ }.bind(this))
 		this.element.on("change", function() { this.change() }.bind(this))
+		this.element.on('touchstart', ()=>{this._isMoved = false})
+		this.element.on('touchend', ()=>{if(!this._isMoved) this.element.dom.focus({preventScroll:true})})
+		this.element.on('touchmove', ()=>{this._isMoved = true})
 	}
 
 	function _updateCursorPos(){

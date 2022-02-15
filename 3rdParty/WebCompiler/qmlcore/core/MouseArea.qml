@@ -41,6 +41,7 @@ Item {
 			this._touchBinder = new $core.EventBinder(this.element)
 
 			var touchStart = function(event) { 
+				this._isMoved = false
 				if(this.acceptedButtons & 1){
 					this.touchStart(event); 
 					this.mousePressed(event); 
@@ -48,7 +49,7 @@ Item {
 				}  
 			}.bind(this)
 			var touchEnd = function(event) {
-				if(this.acceptedButtons & 1){ 
+				if(!this._isMoved && this.acceptedButtons & 1){ 
 					this.touchEnd(event); 
 					this.mouseReleased(event); 
 
@@ -70,7 +71,11 @@ Item {
 					event.stopPropagation(); 
 				} 
 			}.bind(this)
-			var touchMove = (function(event) { this.touchMove(event); if(this.mouse.accepted) event.stopPropagation();  }).bind(this)
+			var touchMove = (function(event) { 
+				this.touchMove(event);
+				this._isMoved = true 
+				if(this.mouse.accepted) event.stopPropagation();  
+			}).bind(this)
 
 			this._touchBinder.on('touchstart', touchStart)
 			this._touchBinder.on('touchend', touchEnd)
@@ -425,6 +430,7 @@ Item {
 	/// @private
 	constructor: {
 		let os = this._context.system.os.toLowerCase()
+		
 
 		if (os.indexOf("android") >= 0)
 			this._bindTouch(this.enabled)
@@ -457,6 +463,10 @@ Item {
 		this.wheel.modifiers = 0;
 		this.wheel.x = 0;
 		this.wheel.y = 0;
+	}
+
+	onCompleted: {
+		this.element.dom.classList.add('MouseArea')
 	}
 	
 }
