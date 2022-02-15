@@ -7,8 +7,10 @@ import imtauthgui 1.0
 
 Rectangle {
     id: container;
+
     width: 400;
     height: 280;
+
     radius: 2;
     color: Style.backgroundColor;
     clip: true;
@@ -17,14 +19,18 @@ Rectangle {
     property Item resultItem;
     property Item loaderDialog;
     property Item collectionViewFeatures;
+
     property string featureId;
     property string featureName;
+
     property real backgroundOpacity: 0.4;
-    signal okClicked(string newId, string newName);
-    signal cancelClicked();
+
     property bool backgroundExist: true;
     property bool clickBackgroundClose: false;
     property bool centered: true;
+
+    signal okClicked(string newId, string newName);
+    signal cancelClicked();
 
     Keys.onPressed: {
         console.log("EditFeatureDialog Keys.onPressed", event.key);
@@ -92,26 +98,33 @@ Rectangle {
 
     Rectangle {
         id: editFeatureDialogTopPanel;
+
         width: container.width;
         height: 40;
+
         border.color: container.color;
         color: Style.baseColor;
 
         Image {
             id: iconEditFeatureDialog;
-            width: 15;
-            height: 15;
+
             anchors.left: editFeatureDialogTopPanel.left;
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
+
+            width: 15;
+            height: 15;
+
             source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
         }
 
         Text {
             id: titleEditFeatureDialog;
+
             anchors.left: iconEditFeatureDialog.right;
             anchors.leftMargin: 10;
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
             anchors.horizontalCenter: editFeatureDialogTopPanel.horizontalCenter;
+
             text: "Edit feature";
             //color: Style.theme == "Dark"? "black": Style.textColor;
             color: Style.textColor;
@@ -121,11 +134,14 @@ Rectangle {
 
         AuxButton {
             id: editFeatureDialogCloseButton;
+
             anchors.right: editFeatureDialogTopPanel.right;
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
+
             width: 17;
             height: 17;
+
             iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
 
             onClicked: {
@@ -137,16 +153,20 @@ Rectangle {
 
     Rectangle {
         id: editFeatureDialogBody;
+
         anchors.topMargin: 20;
-        color: container.color;
         anchors.top: editFeatureDialogTopPanel.bottom;
         anchors.horizontalCenter: container.horizontalCenter;
         anchors.verticalCenter: container.verticalCenter;
+
         width: container.width - 50;
         height: container.height - 50;
 
+        color: container.color;
+
         Text {
             id: titleFeatureName;
+
             text: qsTr("Feature Name");
             color: Style.textColor;
             font.family: Style.fontFamily;
@@ -155,23 +175,28 @@ Rectangle {
 
         Rectangle {
             id: tfcFeatureName;
+
+            anchors.top: titleFeatureName.bottom;
+
             width: editFeatureDialogBody.width;
             height: 45;
-            anchors.top: titleFeatureName.bottom;
+
             color: Style.imagingToolsGradient1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
                 id: tfcFeatureNameText;
+
+                anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
+                anchors.verticalCenter: tfcFeatureName.verticalCenter;
+
                 width: tfcFeatureName.width - 22;
                 height: 23;
+
                 text: container.featureName;
                 focus: true;
                 correctData: errorNameMessage.text !== "";
-
                 borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
-                anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
-                anchors.verticalCenter: tfcFeatureName.verticalCenter;
 
                 onTextChanged: {
                     errorNameMessage.text = "";
@@ -186,8 +211,10 @@ Rectangle {
 
         Text {
             id: titleFeatureId;
+
             anchors.top: tfcFeatureName.bottom;
             anchors.topMargin: 25;
+
             text: qsTr("Feature - ID");
 
             color: Style.textColor;
@@ -197,19 +224,25 @@ Rectangle {
 
         Rectangle {
             id: tfcFeatureId;
+
+            anchors.top: titleFeatureId.bottom;
+
             width: editFeatureDialogBody.width;
             height: 45;
-            anchors.top: titleFeatureId.bottom;
+
             color: Style.imagingToolsGradient1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
                 id: tfcFeatureIdText;
-                width: tfcFeatureId.width - 22;
-                height: 23;
-                text: container.featureId;
+
                 anchors.horizontalCenter: tfcFeatureId.horizontalCenter;
                 anchors.verticalCenter: tfcFeatureId.verticalCenter;
+
+                width: tfcFeatureId.width - 22;
+                height: 23;
+
+                text: container.featureId;
                 borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
                 correctData: errorIdMessage.text !== "";
 

@@ -177,6 +177,7 @@ Item {
             var parameters = {};
             parameters["licenseId"] = selectedId;
             parameters["licenseName"] = name;
+            parameters["collectionViewLicenses"] = productCollectionView;
             parameters["resultItem"] = productsCollectionViewContainer;
 
             thubnailDecoratorContainer.openDialog(source, parameters);

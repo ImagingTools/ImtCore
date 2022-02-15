@@ -591,13 +591,13 @@ Item {
         width: 4;
 
         onXChanged: {
-                if (packageSplitter.x > featureCollectionViewContainer.width - titleHeader.width){
-                    packageSplitter.x = featureCollectionViewContainer.width - packageSplitter.width;
-                }
+            if (packageSplitter.x > featureCollectionViewContainer.width - titleHeader.width){
+                packageSplitter.x = featureCollectionViewContainer.width - packageSplitter.width;
+            }
 
-                if (packageSplitter.x < 250){
-                    packageSplitter.x = 250;
-                }
+            if (packageSplitter.x < 250){
+                packageSplitter.x = 250;
+            }
         }
     }
 

@@ -7,23 +7,30 @@ import imtauthgui 1.0
 
 Rectangle {
     id: container;
+
     width: 400;
     height: 280;
+
     radius: 2;
     color: Style.backgroundColor;
     clip: true;
     focus: true;
 
     property Item resultItem;
+    property Item loaderDialog;
+    property Item collectionViewLicenses;
+
     property string licenseId;
     property string licenseName;
+
     property real backgroundOpacity: 0.4;
-    signal okClicked(string newId, string newName);
-    signal cancelClicked();
 
     property bool backgroundExist: true;
     property bool clickBackgroundClose: false;
     property bool centered: true;
+
+    signal okClicked(string newId, string newName);
+    signal cancelClicked();
 
     function exit(status) {
         var parameters  = {};
@@ -38,45 +45,82 @@ Rectangle {
         container.resultItem.dialogResult(parameters);
     }
 
+    function validateId(id) {
+        if (id === "") {
+            return "Id can't be empty!";
+        }
+
+        var dataModelLocal = collectionViewLicenses.model.GetData("data");
+
+        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+
+            if (dataModelLocal.GetData("Id", i ) === id &&
+                    collectionViewLicenses.selectedIndex !== i) {
+                return "Id already exist!";
+            }
+        }
+
+        return "";
+    }
+
+    function validateName(name) {
+        if (name === "") {
+            return "Name can't be empty!";
+        }
+
+        return "";
+    }
+
     MouseArea {
         anchors.fill: parent;
     }
 
     Rectangle {
         id: editLicenseDialogTopPanel;
+
         width: container.width;
         height: 40;
+
         border.color: container.color;
         color: Style.baseColor;
 
         Image {
             id: iconEditLicenseDialog;
-            width: 15;
-            height: 15;
+
             anchors.left: editLicenseDialogTopPanel.left;
             anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
+
+            width: 15;
+            height: 15;
+
             source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
         }
 
         Text {
             id: titleEditFeatureDialog;
+
             anchors.left: iconEditLicenseDialog.right;
             anchors.leftMargin: 10;
             anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
             anchors.horizontalCenter: editLicenseDialogTopPanel.horizontalCenter;
+
             text: "Edit License";
             color: Style.textColor;
+
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
         }
 
         AuxButton {
             id: editLicenseDialogCloseButton;
+
             anchors.right: editLicenseDialogTopPanel.right;
             anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
+
             width: 17;
             height: 17;
+
             iconSource: "../../../" + "Icons/" + "Light" + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 
             onClicked: {
@@ -89,17 +133,22 @@ Rectangle {
 
     Rectangle {
         id: editLicenseDialogBody;
+
         anchors.topMargin: 20;
-        color: container.color;
         anchors.top: editLicenseDialogTopPanel.bottom;
         anchors.horizontalCenter: container.horizontalCenter;
         anchors.verticalCenter: container.verticalCenter;
+
         width: container.width - 50;
         height: container.height - 50;
 
+        color: container.color;
+
         Text {
             id: titleLicenseName;
+
             text: qsTr("License Name");
+
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -107,27 +156,46 @@ Rectangle {
 
         Rectangle {
             id: tfcLicenseName;
+
+            anchors.top: titleLicenseName.bottom;
+
             width: editLicenseDialogBody.width;
             height: 45;
-            anchors.top: titleLicenseName.bottom;
+
             color: Style.imagingToolsGradient1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
             TextFieldCustom {
                 id: tfcLicenseNameText;
-                width: tfcLicenseName.width - 22;
-                height: 23;
+
                 anchors.horizontalCenter: tfcLicenseName.horizontalCenter;
                 anchors.verticalCenter: tfcLicenseName.verticalCenter;
 
+                width: tfcLicenseName.width - 22;
+                height: 23;
+
                 text: container.licenseName;
+                focus: true;
+                correctData: errorNameMessage.text !== "";
+                borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
+
+                onTextChanged: {
+                    errorNameMessage.text = "";
+
+                    var nameMessage = container.validateName(tfcLicenseNameText.text);
+                    if (nameMessage !== "") {
+                       errorNameMessage.text = nameMessage;
+                    }
+                }
             }
         }
 
-
         Text {
             id: titleLicenseId;
+
             anchors.top: tfcLicenseName.bottom;
             anchors.topMargin: 25;
+
             text: qsTr("License - ID");
 
             color: Style.textColor;
@@ -137,21 +205,36 @@ Rectangle {
 
         Rectangle {
             id: tfcLicenseId;
+
+            anchors.top: titleLicenseId.bottom;
+
             width: editLicenseDialogBody.width;
             height: 45;
-            anchors.top: titleLicenseId.bottom;
+
             color: Style.imagingToolsGradient1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
                 id: tfcLicenseIdText;
-                width: tfcLicenseId.width - 22;
-                height: 23;
 
                 anchors.horizontalCenter: tfcLicenseId.horizontalCenter;
                 anchors.verticalCenter: tfcLicenseId.verticalCenter;
 
+                width: tfcLicenseId.width - 22;
+                height: 23;
+
                 text: container.licenseId;
+                borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
+                correctData: errorIdMessage.text !== "";
+
+                onTextChanged: {
+                    errorIdMessage.text = "";
+
+                    var idMessage = container.validateId(tfcLicenseIdText.text);
+                    if (idMessage !== "") {
+                       errorIdMessage.text = idMessage;
+                    }
+                }
             }
         }
 
@@ -175,9 +258,10 @@ Rectangle {
                                                                  Style.imagingToolsGradient2;
             backgroundColor: okButton.enabled ? Style.imagingToolsGradient1 : Style.backgroundColor;
 
-            enabled: true;
+            enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
 
             onClicked: {
+                container.okClicked(tfcLicenseIdText.text, tfcLicenseNameText.text);
                 container.exit("ok");
                 loaderDialog.closeItem();
             }
@@ -204,6 +288,38 @@ Rectangle {
                 container.exit("cancel");
                 loaderDialog.closeItem();
             }
+        }
+
+        Text {
+            id: errorIdMessage;
+
+            anchors.top: tfcLicenseId.bottom;
+            anchors.topMargin: 3;
+            anchors.left: editLicenseDialogBody.left;
+            anchors.leftMargin: 10;
+
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+
+            color: Style.errorTextColor;
+
+            text: "";
+        }
+
+        Text {
+            id: errorNameMessage;
+
+            anchors.top: tfcLicenseName.bottom;
+            anchors.topMargin: 3;
+            anchors.left: editLicenseDialogBody.left;
+            anchors.leftMargin: 10;
+
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+
+            color: Style.errorTextColor;
+
+            text: "";
         }
     }
 }

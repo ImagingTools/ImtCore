@@ -29,14 +29,14 @@ Rectangle {
         }
 
         onMouseYChanged: {
-            console.log("MouseY =", mouseX);
+            console.log("MouseY =", mouseY);
 
             if (splitterContainer.type !== Qt.Vertical){
                 return;
             }
 
             if (splitterMA.pressed){
-                splitterContainer.y += mousey;
+                splitterContainer.y += mouseY;
             }
         }
     }

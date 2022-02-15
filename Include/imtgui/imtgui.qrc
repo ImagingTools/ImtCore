@@ -28,6 +28,7 @@
         <file alias="imtgui/AuxComponents/InputDialog.qml">Qml/imtgui/AuxComponents/InputDialog.qml</file>
         <file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
         <file alias="imtgui/AuxComponents/Splitter.qml">Qml/imtgui/AuxComponents/Splitter.qml</file>
+        <file alias="imtgui/MouseTest.qml">Qml/imtgui/MouseTest.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

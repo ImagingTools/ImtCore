@@ -1,5 +1,6 @@
 modude imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
+MouseTest 1.0 MouseTest.qml
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
 MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
 ComboBox 1.0 ./AuxComponents/ComboBox.qml
