@@ -221,7 +221,7 @@ Rectangle
                           console.log(key, model.parameters[key]);
                           loaderDialog.item[key]  = model.parameters[key];
                       }
-                      //loaderDialog.item["loaderDialog"] = loaderDialog;
+                      loaderDialog.item["loaderDialog"] = loaderDialog;
                       console.log(loaderDialog.item.activeFocus);
                   }
 

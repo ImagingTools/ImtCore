@@ -301,13 +301,18 @@ Item {
         width: 4;
 
         onXChanged: {
-//                if (productSplitter.x > productsCollectionViewContainer.width - titleHeader.width){
-//                    productSplitter.x = productsCollectionViewContainer.width - productSplitter.width;
-//                }
 
-//                if (productSplitter.x < 250){
-//                    productSplitter.x = 250;
-//                }
+            if (!productsCollectionViewContainer.visible){
+                return;
+            }
+
+            if (productSplitter.x > productsCollectionViewContainer.width - titleHeader.width){
+                productSplitter.x = productsCollectionViewContainer.width - productSplitter.width;
+            }
+
+            if (productSplitter.x < 250){
+                productSplitter.x = 250;
+            }
         }
     }
 
