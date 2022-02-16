@@ -540,12 +540,13 @@ void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::run()
 
 	while (sqlQuery.next() && !isInterruptionRequested()){
 		QSqlRecord record = sqlQuery.record();
-
 		QByteArray objectId = m_parent.m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_parent.m_typeIdAttrPtr, record);
 
 		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
 		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+
 		bool isOk = m_parent.m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_parent.m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+
 		if (isOk){
 			ObjectInfo objectInfo;
 			objectInfo.typeId = *m_parent.m_typeIdAttrPtr;

@@ -381,10 +381,14 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 
 
 QString CDatabaseEngineComp::GetConnectionName() const
-{
+{	
 	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
+	QString suffix;
+	if (m_suffixAttrPtr.IsValid()){
+		suffix = *m_suffixAttrPtr;
+	}
 
-	return GetDatabaseName() + QString(" - %1").arg(threadId);
+	return GetDatabaseName() + QString(" - %1 - %2").arg(threadId).arg(suffix);
 
 }
 

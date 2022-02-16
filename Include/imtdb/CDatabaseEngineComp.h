@@ -17,13 +17,24 @@
 namespace imtdb
 {
 
+class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
+{
+public:
+		typedef ilog::CLoggerComponentBase BaseClass;
+	I_BEGIN_COMPONENT(CDatabaseEngineAttr);
+		I_ASSIGN(m_suffixAttrPtr, "Suffix", "Suffix for connection name", false, "");
+	I_END_COMPONENT;
+
+protected:
+	I_ATTR(QString, m_suffixAttrPtr);
+};
 
 class CDatabaseEngineComp:
-			public ilog::CLoggerComponentBase,
+			virtual public CDatabaseEngineAttr,
 			virtual public IDatabaseEngine
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef CDatabaseEngineAttr BaseClass;
 
 	I_BEGIN_COMPONENT(CDatabaseEngineComp);
 		I_REGISTER_INTERFACE(IDatabaseEngine)
