@@ -5,9 +5,12 @@ import imtgui 1.0
 
 Item {
     id: productCollectionContainer;
+
     anchors.fill: parent;
+
     property Item rootItem;
     property Item multiDocViewItem;
+
     property alias itemId: productCollectionView.itemId;
     property alias itemName: productCollectionView.itemName;
     property alias model: productCollectionView.collectionViewModel;

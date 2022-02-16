@@ -6,7 +6,7 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property int type: Qt.Horizontal;
+    property int type: 0x1;
 
     MouseArea {
         id: splitterMA;
@@ -19,7 +19,7 @@ Rectangle {
 
         onMouseXChanged: {
             console.log("MouseX =", mouseX);
-            if (splitterContainer.type !== Qt.Horizontal){
+            if (splitterContainer.type !== 0x1){
                 return;
             }
 
@@ -31,13 +31,13 @@ Rectangle {
         onMouseYChanged: {
             console.log("MouseY =", mouseY);
 
-            if (splitterContainer.type !== Qt.Vertical){
-                return;
-            }
+//            if (splitterContainer.type !== Qt.Vertical){
+//                return;
+//            }
 
-            if (splitterMA.pressed){
-                splitterContainer.y += mouseY;
-            }
+//            if (splitterMA.pressed){
+//                splitterContainer.y += mouseY;
+//            }
         }
     }
 

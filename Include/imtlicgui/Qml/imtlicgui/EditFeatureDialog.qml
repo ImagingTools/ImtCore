@@ -6,7 +6,7 @@ import imtauthgui 1.0
 //import '../../../imtgui/Qml/imtgui/AuxComponents'
 
 Rectangle {
-    id: container;
+    id: containerFeatureEdit;
 
     width: 400;
     height: 280;
@@ -17,7 +17,7 @@ Rectangle {
     focus: true;
 
     property Item resultItem;
-    property Item loaderDialog;
+//    property Item loaderDialog;
     property Item collectionViewFeatures;
 
     property string featureId;
@@ -31,13 +31,6 @@ Rectangle {
 
     signal okClicked(string newId, string newName);
     signal cancelClicked();
-
-    Keys.onPressed: {
-        console.log("EditFeatureDialog Keys.onPressed", event.key);
-        if (event.key === Qt.Key_Tab) {
-            console.log("event.key tab", event.key);
-        }
-    }
 
     function validateId(id) {
         if (id === "") {
@@ -86,10 +79,10 @@ Rectangle {
             parameters["newFeatureName"] = tfcFeatureNameText.text;
 
             parameters["dialog"] = "EditFeature";
-            parameters["loaderDialog"] = container.loaderDialog;
+            parameters["loaderDialog"] = containerFeatureEdit.loaderDialog;
         }
         parameters["status"] = status;
-        container.resultItem.dialogResult(parameters);
+        containerFeatureEdit.resultItem.dialogResult(parameters);
     }
 
     MouseArea {
@@ -99,10 +92,11 @@ Rectangle {
     Rectangle {
         id: editFeatureDialogTopPanel;
 
-        width: container.width;
+        width: containerFeatureEdit.width;
+//        width: 300;
         height: 40;
 
-        border.color: container.color;
+        border.color: containerFeatureEdit.color;
         color: Style.baseColor;
 
         Image {
@@ -145,7 +139,7 @@ Rectangle {
             iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
 
             onClicked: {
-                container.exit("close");
+                containerFeatureEdit.exit("close");
                 loaderDialog.closeItem();
             }
         }
@@ -156,13 +150,13 @@ Rectangle {
 
         anchors.topMargin: 20;
         anchors.top: editFeatureDialogTopPanel.bottom;
-        anchors.horizontalCenter: container.horizontalCenter;
-        anchors.verticalCenter: container.verticalCenter;
+        anchors.horizontalCenter: containerFeatureEdit.horizontalCenter;
+        anchors.verticalCenter: containerFeatureEdit.verticalCenter;
 
-        width: container.width - 50;
-        height: container.height - 50;
+        width: containerFeatureEdit.width - 50;
+        height: containerFeatureEdit.height - 50;
 
-        color: container.color;
+        color: containerFeatureEdit.color;
 
         Text {
             id: titleFeatureName;
@@ -193,7 +187,7 @@ Rectangle {
                 width: tfcFeatureName.width - 22;
                 height: 23;
 
-                text: container.featureName;
+                text: containerFeatureEdit.featureName;
                 focus: true;
                 correctData: errorNameMessage.text !== "";
                 borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
@@ -201,7 +195,7 @@ Rectangle {
                 onTextChanged: {
                     errorNameMessage.text = "";
 
-                    var nameMessage = container.validateName(tfcFeatureNameText.text);
+                    var nameMessage = containerFeatureEdit.validateName(tfcFeatureNameText.text);
                     if (nameMessage !== "") {
                        errorNameMessage.text = nameMessage;
                     }
@@ -242,21 +236,21 @@ Rectangle {
                 width: tfcFeatureId.width - 22;
                 height: 23;
 
-                text: container.featureId;
+                text: containerFeatureEdit.featureId;
                 borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
                 correctData: errorIdMessage.text !== "";
 
                 onTextChanged: {
                     errorIdMessage.text = "";
 
-                    var idMessage = container.validateId(tfcFeatureIdText.text);
+                    var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
                     if (idMessage !== "") {
                        errorIdMessage.text =idMessage;
                     }
                 }
 
                 onFocusChanged: {
-                    container.generateKey();
+                    containerFeatureEdit.generateKey();
                 }
             }
         }
@@ -288,8 +282,8 @@ Rectangle {
                     tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
                 }
 
-                container.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
-                container.exit("ok");
+                containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
+                containerFeatureEdit.exit("ok");
                 loaderDialog.closeItem();
             }
         }
@@ -312,7 +306,7 @@ Rectangle {
             backgroundColor: Style.imagingToolsGradient1;
 
             onClicked: {
-                container.exit("cancel");
+                containerFeatureEdit.exit("cancel");
                 loaderDialog.closeItem();
             }
         }

@@ -5,9 +5,12 @@ import imtgui 1.0
 
 Item {
     id: packageCollectionContainer;
+
     anchors.fill: parent;
+
     property Item rootItem;
     property Item multiDocViewItem;
+
     property alias itemId: packageCollectionView.itemId;
     property alias itemName: packageCollectionView.itemName;
     property alias model: packageCollectionView.collectionViewModel;
@@ -179,6 +182,7 @@ Item {
         anchors.right: packageCollectionMetaInfo.left;
 
         autoRefresh: true;
+
         Component.onCompleted: {
             packageCollectionView.gqlModelInfo = "FeaturePackageInfo"
             packageCollectionView.gqlModelItems = "FeaturePackageList";

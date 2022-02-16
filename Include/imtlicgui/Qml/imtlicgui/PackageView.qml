@@ -6,13 +6,16 @@ import imtgui 1.0
 
 Item {
     id: featureCollectionViewContainer;
+
     anchors.fill: parent;
 
     property Item rootItem;
     property Item multiDocViewItem;
+
     property alias itemId: featureCollectionView.itemId;
     property alias itemName: featureCollectionView.itemName;
     property alias model: featureCollectionView.collectionViewModel;
+
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
@@ -591,13 +594,13 @@ Item {
         width: 4;
 
         onXChanged: {
-            if (packageSplitter.x > featureCollectionViewContainer.width - titleHeader.width){
-                packageSplitter.x = featureCollectionViewContainer.width - packageSplitter.width;
-            }
+//            if (packageSplitter.x > featureCollectionViewContainer.width - titleHeader.width){
+//                packageSplitter.x = featureCollectionViewContainer.width - packageSplitter.width;
+//            }
 
-            if (packageSplitter.x < 250){
-                packageSplitter.x = 250;
-            }
+//            if (packageSplitter.x < 250){
+//                packageSplitter.x = 250;
+//            }
         }
     }
 

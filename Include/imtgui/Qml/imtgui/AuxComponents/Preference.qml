@@ -8,38 +8,17 @@ Rectangle {
     width: 450;
     height: 450;
 
-    property string styleColor: "Light";
-    property int radiusValue: 5;
-
     radius: radiusValue;
     color: Style.baseColor;
-//    border.color: "#2b2d2d";
+
+    property string styleColor: "Light";
+
+    property int radiusValue: 5;
+
     property real backgroundOpacity: 0.4;
+
     property bool centered: true;
     property bool clickBackgroundClose: false;
-
-    Component.onCompleted: {
-//        preferenceContainer.changeThemeIcons("Light");
-    }
-
-    function changeThemeIcons(theme)
-    {
-//        var type1 = ["On", "Off"];
-//        var type2 = ["Active", "Disabled", "Normal", "Selected"];
-//        for (var i = 0; i < IconStyle.iconNames.length; i++)
-//        {
-//            for (var j = 0; j < type1.length; j++)
-//            {
-//                for (var k = 0; k < type2.length; k++)
-//                {
-//                    var propName = "icon_" + IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
-//                    var fileName = IconStyle.iconNames[i] + "_" + type1[j] + "_" + type2[k];
-//                    var command = "IconStyle." + propName + " = \"/Icons/" + theme + "/" + fileName + ".svg\"";
-//                    eval(command);
-//                }
-//            }
-//        }
-    }
 
     MouseArea {
         anchors.fill: parent;

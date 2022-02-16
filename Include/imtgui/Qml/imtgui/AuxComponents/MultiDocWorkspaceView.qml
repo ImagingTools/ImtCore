@@ -5,19 +5,23 @@ import Acf 1.0
 
 Rectangle {
     id: multiDocView;
+
     height: 100;
     width: 100;
-    color: "transparent";
-    property TabPanel tabPanel: tabPanelInternal;
-    property Item activeItem;
 
+    color: "transparent";
+
+    property TabPanel tabPanel: tabPanelInternal;
+
+    property Item activeItem;
     property Item activeCollectionItem;
     property Item rootItem;
-    property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
-//    property TreeItemModel model;
+
     property var pagesSources: [];
     property var pagesItems: [];
+
     property alias pagesCount: docsData.count;
+    property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
 
     property string typeOperation;
 
@@ -85,6 +89,8 @@ Rectangle {
     }
 
     function closeTab(index) {
+        console.log("MultiDocWorkspaceView closeTab", index);
+
         pagesData.RemoveItem(index)
         if (tabPanelInternal.selectedIndex >= index){
             tabPanelInternal.selectedIndex--;
@@ -107,8 +113,10 @@ Rectangle {
 
     TabPanel {
         id: tabPanelInternal;
+
         anchors.left: parent.left;
         anchors.right: parent.right;
+
         visible: true;
         model: pagesData;
 
@@ -143,11 +151,13 @@ Rectangle {
 
     ListView {
         id: docsData;
+
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: parent.top;
         anchors.topMargin: tabPanelInternal.height;
         anchors.bottom: parent.bottom;
+
         clip: true;
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
@@ -156,8 +166,10 @@ Rectangle {
         property int  currentIndex: -1;
         delegate: Rectangle {
             id: docsDataDeleg;
+
             width: visible ? docsData.width : 0;
             height: docsData.height;
+
             color: "transparent";
             visible: tabPanelInternal.selectedIndex === model.index;
 

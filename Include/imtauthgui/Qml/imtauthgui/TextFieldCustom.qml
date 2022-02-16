@@ -2,7 +2,8 @@ import QtQuick 2.0
 import Acf 1.0;
 
 Item {
-    id: container;
+    id: containerTextField;
+
     height: 40;
 
     //signal accepted();
@@ -12,10 +13,11 @@ Item {
 
     property bool correctData: true;
 
-    property bool isFocus: textField.focus;
-
+//    property bool isFocus: textField.focus;
+   // property string text;
     property alias text: textField.text;
-    property alias textField: textField;
+//    property alias textField: textField;
+
     property bool isTextChanged: false;
     property string placeHolderText: "Наименование";
 
@@ -35,52 +37,54 @@ Item {
         id: mainRect;
         anchors.fill: parent;
         color: Style.baseColor;
-        border.color: textField.focus ? container.borderColor : Style.hover;
+        border.color: textField.focus ? containerTextField.borderColor : Style.hover;
         border.width: 1;
     }
 
     TextInput {
         id: textField;
+
         anchors.fill: parent;
         anchors.leftMargin: 5;
         anchors.rightMargin: 5;
 
         color: Style.textColor;
-        font.pixelSize: container.textSize;
+        font.pixelSize: containerTextField.textSize;
+        //text: containerTextField.text;
         text: "";
 
         verticalAlignment: TextInput.AlignVCenter;
-//        selectionColor: Style.textSelected;
+        selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
 
         onFocusChanged: {
-            container.focusChanged();
-            container.wasFocus = true;
+            containerTextField.focusChanged();
+            containerTextField.wasFocus = true;
         }
 
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged");
 
-            if (container.wasFocus) {
-               container.inputTextChanged();
+            if (containerTextField.wasFocus) {
+               containerTextField.inputTextChanged();
             }
 
-            container.isTextChanged = true;
+            containerTextField.isTextChanged = true;
             //timer.restart();
         }
 
         onAccepted: {
             console.log("TextFieldCustom onAccepted");
-            //container.accepted();
-            container.isTextChanged = false;
+            //containerTextField.accepted();
+            containerTextField.isTextChanged = false;
         }
 
-//        onCursorVisibleChanged: {
-//            if (!cursorVisible) {
-//                cursorVisible = true;
-//            }
-//        }
+        onCursorVisibleChanged: {
+            if (!cursorVisible) {
+                cursorVisible = true;
+            }
+        }
     }
 
     Text {

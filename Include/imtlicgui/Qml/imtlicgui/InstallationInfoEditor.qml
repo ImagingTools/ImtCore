@@ -212,10 +212,12 @@ Rectangle {
 
                  TextFieldCustom {
                      id: instanceIdText;
-                     width: tfcInstance.width - 22;
-                     height: 23;
+
                      anchors.horizontalCenter: tfcInstance.horizontalCenter;
                      anchors.verticalCenter: tfcInstance.verticalCenter;
+
+                     width: tfcInstance.width - 22;
+                     height: 23;
                  }
              }
 

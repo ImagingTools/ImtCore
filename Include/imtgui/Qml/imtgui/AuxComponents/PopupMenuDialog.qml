@@ -9,14 +9,16 @@ Item {
 //    y: 100;
     x: popupMenuContainer.resultItem.getMenuButtonsX();
     y: popupMenuContainer.resultItem.getMenuButtonsY();
+
     width: popupMenuContainer.itemWidth;
     height: columnPopupMenu.height;
 //    clip: true;
 
-
     property Item resultItem;
+
     property var model;
     property var backgroundOpacity;
+
     property bool backgroundExist: false;
     property bool clickBackgroundClose: true;
     property bool centered: false;

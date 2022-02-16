@@ -9,11 +9,14 @@ import imtgui 1.0;
 Rectangle
 {
     id: thubnailDecoratorContainer;
+
     anchors.fill: parent;
+
     width: 300;
     height: 200;
-   // color: "white";
+
     color: Style.baseColor;
+
     property Item activeItem;
 
     function updateModels() {
@@ -74,6 +77,7 @@ Rectangle
 
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
+
         onPagesCountChanged: {
             console.log("ThumbnailDecorator MenuPanel onPagesCountChanged", menuPanel.pagesCount);
             pagesData.model = menuPanel.pagesCount
@@ -97,10 +101,12 @@ Rectangle
 
         delegate: Rectangle {
             id: pagesDeleg;
+
             anchors.left: menuPanel.right;
             anchors.right: thubnailDecoratorContainer.right;
             anchors.top: topPanel.bottom;
             anchors.bottom: thubnailDecoratorContainer.bottom;
+
             color: "transparent";
             visible: menuPanel.activePageIndex === model.index;
 
@@ -132,6 +138,7 @@ Rectangle
 
             Loader {
                 id: pagesLoader;
+
                 anchors.fill: parent;
 
                 Component.onCompleted: {
@@ -173,6 +180,7 @@ Rectangle
             //anchors.fill:thubnailDecoratorContainer;
             width: thubnailDecoratorContainer.width;
             height: thubnailDecoratorContainer.height;
+
             color: "transparent";
 
             Rectangle {
@@ -183,7 +191,9 @@ Rectangle
 
                 MouseArea {
                     anchors.fill: parent;
+
                     visible: loaderDialog.item.clickBackgroundClose;
+
                     onClicked: {
                         thubnailDecoratorContainer.closeDialog();
                     }
@@ -192,6 +202,7 @@ Rectangle
 
             Loader {
                   id: loaderDialog;
+
                   anchors.centerIn: loaderDialog.item.centered ? delegateListViewDialogs : "";
 
                   function closeItem() {
@@ -210,7 +221,7 @@ Rectangle
                           console.log(key, model.parameters[key]);
                           loaderDialog.item[key]  = model.parameters[key];
                       }
-                      loaderDialog.item["loaderDialog"] = loaderDialog;
+                      //loaderDialog.item["loaderDialog"] = loaderDialog;
                       console.log(loaderDialog.item.activeFocus);
                   }
 
@@ -218,8 +229,4 @@ Rectangle
              }
         }
     }
-
-//    MouseTest {
-
-//    }
 }

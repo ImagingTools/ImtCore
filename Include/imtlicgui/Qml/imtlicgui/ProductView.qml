@@ -8,10 +8,9 @@ Item {
     id: productsCollectionViewContainer;
     anchors.fill: parent;
 
-//    visible: false;
-
     property Item rootItem;
     property Item multiDocViewItem;
+
     property alias itemId: productCollectionView.itemId;
     property alias itemName: productCollectionView.itemName;
 
@@ -302,13 +301,13 @@ Item {
         width: 4;
 
         onXChanged: {
-                if (productSplitter.x > productsCollectionViewContainer.width - titleHeader.width){
-                    productSplitter.x = productsCollectionViewContainer.width - productSplitter.width;
-                }
+//                if (productSplitter.x > productsCollectionViewContainer.width - titleHeader.width){
+//                    productSplitter.x = productsCollectionViewContainer.width - productSplitter.width;
+//                }
 
-                if (productSplitter.x < 250){
-                    productSplitter.x = 250;
-                }
+//                if (productSplitter.x < 250){
+//                    productSplitter.x = 250;
+//                }
         }
     }
 
