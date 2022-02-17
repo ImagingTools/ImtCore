@@ -260,13 +260,13 @@ CoreObjectComponentPrototype._get = function(name, unsafe) {
 		return this[name]
 
 	if (name in this._local){
-		if(name === 'model' && this._local[name].value && typeof this._local[name] === 'object' && Object.keys(this._local[name].value).length) {
-			let temp = {
-				index: this._local[name].index,
-				...this._local[name].value
-			}	
-			return temp
-		}
+        if(name === 'model' && this._local[name].value && typeof this._local[name].value === 'object' && typeof this._local[name] === 'object' && Object.keys(this._local[name].value).length) {
+            let temp = {
+                index: this._local[name].index,
+                ...this._local[name].value
+            }
+            return temp
+        }
 		return this._local[name]
 	}
 	if (unsafe)
