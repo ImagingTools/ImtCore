@@ -32,7 +32,40 @@ Item {
 
 		this.backend = _globals._backend()
 
+		this.listId = {}
+		this.eventState = {
+			target: null,
+			blocked: function(obj){
+				this.target = obj
+			},
+			release: function(){
+				this.target = null
+			}
+		}
+		
+
 		this._init()
+	}
+
+	onCompleted: {
+		let events = ['mousedown', 'mouseup', 'mousemove', 'mouseenter', 'mouseleave', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove']
+		
+		for(let event of events){
+			this.element.on(event, (e)=>{
+				//if(e.type.indexOf('touch') < 0) e.preventDefault()
+				if(this.eventState.target && this.eventState.target[`_${e.type}`]){
+					this.eventState.target[`_${e.type}`](e, this.eventState)
+				} else {
+					for(let p of e.path){
+						let obj = this.listId[p.id]
+						if(!this.eventState.target && obj && obj[`_${e.type}`]){
+							obj[`_${e.type}`](e, this.eventState)
+						}
+					}
+				}
+				
+			})
+		}
 	}
 
 	///@private

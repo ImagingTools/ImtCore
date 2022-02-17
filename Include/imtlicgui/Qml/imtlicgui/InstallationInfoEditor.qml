@@ -12,23 +12,42 @@ Rectangle {
     width: 500;
     height: 500;
 
+    color: Style.backgroundColor;
+
     property Item rootItem;
     property Item multiDocViewItem;
+
     property string itemId;
     property string itemName;
-
     property string accountId;
     property string productId;
-
     property string gqlModelInfo;
     property string gqlModelCollectionInfo;
-
     property string typeOperation: multiDocViewItem.typeOperation;
+    property string gqlModelQueryType;
+    property string gqlModelQueryTypeNotification;
 
     property TreeItemModel installationInfoModel;
     property TreeItemModel model;
+    property TreeItemModel activeLicenses;
 
-    color: Style.backgroundColor;
+    property bool wasChanged: false;
+
+    TreeItemModel {
+        id: products;
+    }
+
+    TreeItemModel {
+        id: licenses;
+    }
+
+    TreeItemModel {
+        id: accounts;
+    }
+
+    TreeItemModel {
+        id: installationModel;
+    }
 
     Component.onCompleted: {
 //        if (containerInstallation.typeOperation === "New") {
@@ -36,6 +55,12 @@ Rectangle {
             containerInstallation.gqlModelCollectionInfo = "ProductList"
             headerInfoModel.updateModel();
 //        }
+    }
+
+    onWasChangedChanged: {
+        console.log("InstallationInfoEditor onWasChangedChanged", containerInstallation.wasChanged);
+
+        containerInstallation.commandsChanged("InstallationEdit");
     }
 
     onModelChanged: {
@@ -59,11 +84,49 @@ Rectangle {
         }
     }
 
+    onActiveLicensesChanged: {
+        var licenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
+
+        if (licenses && licenses.GetItemsCount() > 0){
+            var index;
+
+            var count =  activeLicenses.GetItemsCount();
+            for (var i = 0; i < count; i++){
+
+                var curId = activeLicenses.GetData("Id", i);
+
+                for (var j = 0; j < licenses.GetItemsCount(); j++){
+                    var licId = licenses.GetData("Id", j);
+                    var expiration = licenses.GetData("Expiration", j);
+
+                    if (curId === licId){
+                        activeLicenses.SetData("LicenseState", 2, i);
+
+                        if (expiration && expiration !== "Unlimited"){
+                            activeLicenses.SetData("ExpirationState", 2, i);
+                            activeLicenses.SetData("Expiration", expiration, i);
+                        }
+                    }
+                }
+            }
+
+            licensesTable.elements = containerInstallation.activeLicenses;
+        }
+    }
+
     onInstallationInfoModelChanged: {
         console.log("InstallationInfoEditor onInstallationInfoModelChanged");
         if (containerInstallation.typeOperation !== "New"){
             containerInstallation.updateData();
         }
+    }
+
+    ListModel {
+        id: listModelProducts;
+    }
+
+    ListModel {
+        id: listModelAccounts;
     }
 
     function updateData() {
@@ -91,7 +154,7 @@ Rectangle {
 
         var productIndex = -1;
         var productsData = products.GetData("data");
-        for (var i = 0; i < productsData.GetItemsCount(); i++){
+        for (i = 0; i < productsData.GetItemsCount(); i++){
 
             var prId = productsData.GetData("Id", i);
 
@@ -105,26 +168,6 @@ Rectangle {
         }
     }
 
-    TreeItemModel {
-        id: products;
-    }
-
-    TreeItemModel {
-        id: licenses;
-    }
-
-    TreeItemModel {
-        id: activeLicenses;
-    }
-
-    TreeItemModel {
-        id: accounts;
-    }
-
-    TreeItemModel {
-        id: installationModel;
-    }
-
     function dialogResult(parameters) {
          console.log("InstallationInfoEditor dialogResult", parameters["status"]);
 
@@ -133,7 +176,6 @@ Rectangle {
             if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
-                containerInstallation.rootItem.updateTitleTab(containerInstallation.itemId, value);
                 saveModel.updateModel(value);
             }
         }
@@ -145,7 +187,6 @@ Rectangle {
 //            collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Save") {
-            //saveModel.updateModel();
             if (containerInstallation.typeOperation === "New") {
                 var source = "AuxComponents/InputDialog.qml";
                 var parameters = {};
@@ -154,10 +195,26 @@ Rectangle {
                 parameters["resultItem"] = containerInstallation;
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
+            else{
+                saveModel.updateModel();
+            }
         }
         else if (menuId === "Close") {
             containerInstallation.rootItem.closeTab();
         }
+    }
+
+    function openMessageDialog(nameDialog, message) {
+
+        var source = "AuxComponents/MessageDialog.qml";
+        var parameters = {};
+        parameters["resultItem"] = containerInstallation;
+        parameters["noButtonVisible"] = false;
+        parameters["textOkButton"] = "Ok";
+        parameters["message"] = message;
+        parameters["nameDialog"] = nameDialog;
+
+        thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
     function refresh(){}
@@ -167,9 +224,14 @@ Rectangle {
             return;
         }
 
-        containerInstallation.rootItem.setModeMenuButton("Save", "Normal");
         containerInstallation.rootItem.setModeMenuButton("New", "Normal");
         containerInstallation.rootItem.setModeMenuButton("Close", "Normal");
+
+        if (containerInstallation.wasChanged){
+            containerInstallation.rootItem.setModeMenuButton("Save", "Normal");
+        } else {
+            containerInstallation.rootItem.setModeMenuButton("Save", "Disabled");
+        }
     }
 
     Flickable {
@@ -178,6 +240,7 @@ Rectangle {
         contentWidth: container.width;
         contentHeight: container.height + 50;
         boundsBehavior: Flickable.StopAtBounds;
+
         clip: true;
 
         Column {
@@ -218,6 +281,10 @@ Rectangle {
 
                      width: tfcInstance.width - 22;
                      height: 23;
+
+                     onInputTextChanged: {
+                         containerInstallation.wasChanged = true;
+                     }
                  }
              }
 
@@ -242,12 +309,12 @@ Rectangle {
 
                  height: 45;
                  width: container.width - 20;
+
                  color: Style.imagingToolsGradient1;
                  border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
                  ComboBox {
                      id: customerCB;
-                     //z: 10;
 
                      anchors.horizontalCenter: customerBlock.horizontalCenter;
                      anchors.verticalCenter: customerBlock.verticalCenter;
@@ -262,10 +329,19 @@ Rectangle {
                      borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
                      textCentered: false;
 
+                     property bool wasFocus: false;
+
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor customerCB onCurrentIndexChanged");
                          containerInstallation.accountId = listModelAccounts.get(customerCB.currentIndex).id;
                          customerCB.currentText = listModelAccounts.get(customerCB.currentIndex).text;
+
+                         if (containerInstallation.typeOperation !== "New" && !customerCB.wasFocus){
+                             customerCB.wasFocus = true;
+                             return;
+                         }
+
+                         containerInstallation.wasChanged = true;
                      }
                  }
              }
@@ -312,12 +388,21 @@ Rectangle {
                      borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
                      textCentered: false;
 
+                     property bool wasFocus: false;
+
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor productCB onCurrentIndexChanged");
                          containerInstallation.productId = listModelProducts.get(productCB.currentIndex).id;
                          productCB.currentText = listModelProducts.get(productCB.currentIndex).text;
 
                          licensesModel.updateModel(containerInstallation.productId);
+
+                         if (containerInstallation.typeOperation !== "New" && !productCB.wasFocus){
+                             productCB.wasFocus = true;
+                             return;
+                         }
+
+                         containerInstallation.wasChanged = true;
                      }
 
                  }
@@ -365,58 +450,45 @@ Rectangle {
                          width: licensesTable.width;
                          height: 35;
 
-                         name: model.Name;
-
                          selected: licensesTable.selectedIndex === model.index;
 
                          onClicked: {
-
                              licensesTable.selectedIndex = model.index;
                          }
 
                          onCheckBoxLicenseClicked: {
-                             var licensesLocal = licenses.GetData("data");
-                             if (state == 2) {
-                                 var licenseId = licensesLocal.GetData("Id", modelIndex);
-                                 var index = activeLicenses.InsertNewItem();
-                                 activeLicenses.SetData("Id", licenseId, index);
-                                 activeLicenses.SetData("Expiration", "unlimited", index);
-                             } else {
-                                var licenseId = licensesLocal.GetData("Id", modelIndex);
-
-                                 for (var i = 0; i < activeLicenses.GetItemsCount(); i++) {
-                                    if (activeLicenses.GetData("Id", i) === licenseId) {
-                                       activeLicenses.RemoveItem(i);
-                                        break;
-                                    }
-                                 }
+                             console.log("InstallationInfoEditor AuxTable onCheckBoxLicenseClicked", modelIndex, state);
+                             if (modelIndex >= 0){
+                                 activeLicenses.SetData("LicenseState", state, modelIndex);
                              }
+
+                             containerInstallation.wasChanged = true;
                          }
 
                          onCheckBoxExpirationClicked: {
-                             var licensesLocal = licenses.GetData("data");
-                             if (state == 0) {
-                                 var licenseId = licensesLocal.GetData("Id", modelIndex);
-
-                                 for (var i = 0; i < activeLicenses.GetItemsCount(); i++) {
-                                     if (activeLicenses.GetData("Id", i) === licenseId) {
-                                         activeLicenses.SetData("Expiration", "unlimited", i);
-                                         break;
-                                     }
-                                 }
+                             console.log("InstallationInfoEditor AuxTable onCheckBoxExpirationClicked", modelIndex, state);
+                             if (modelIndex >= 0){
+                                 activeLicenses.SetData("ExpirationState", state, modelIndex);
                              }
+
+                             if (state == 0){
+                                 activeLicenses.SetData("Expiration", "Unlimited", modelIndex);
+                             }
+                             else{
+                                 activeLicenses.SetData("Expiration", "01.01.2023", modelIndex);
+                             }
+
+                             containerInstallation.wasChanged = true;
                          }
 
                          onExpirationTextChanged: {
-                             var licensesLocal = licenses.GetData("data");
-                             var licenseId = licensesLocal.GetData("Id", modelIndex);
+                             console.log("InstallationInfoEditor AuxTable onExpirationTextChanged", modelIndex, value);
 
-                             for (var i = 0; i < activeLicenses.GetItemsCount(); i++) {
-                                 if (activeLicenses.GetData("Id", i) === licenseId) {
-                                     activeLicenses.SetData("Expiration", value, i);
-                                     break;
-                                 }
+                             if (modelIndex >= 0){
+                                 activeLicenses.SetData("Expiration", value, modelIndex);
                              }
+
+                             containerInstallation.wasChanged = true;
                          }
                      }
                  }
@@ -433,14 +505,6 @@ Rectangle {
                  }
              }
         }
-    }
-
-    ListModel {
-        id: listModelProducts;
-    }
-
-    ListModel {
-        id: listModelAccounts;
     }
 
     GqlModel {
@@ -533,7 +597,6 @@ Rectangle {
                         else if (gqlModelInfo == "AccountInfo") {
                             accounts.SetExternTreeModel("headers", dataModelLocal);
                         }
-
 
                         itemsModel.updateModel();
                     }
@@ -658,14 +721,32 @@ Rectangle {
             console.log("State:", this.state, "LicenseList");
             if (this.state === "Ready") {
                 var dataModelLocal = this.GetData("data");
+
                 if(dataModelLocal.ContainsKey("LicenseList")){
                     dataModelLocal = dataModelLocal.GetData("LicenseList");
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+
+                    if(dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items");
                         licenses.SetExternTreeModel("data", dataModelLocal);
 
                         console.log("InstallationInfoEditor GqlModel licensesModel");
-                        licensesTable.elements = dataModelLocal;
+
+                        if (dataModelLocal){
+                            for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
+                                var curName = dataModelLocal.GetData("Name", i);
+                                var curId = dataModelLocal.GetData("Id", i);
+
+                                var newName = curName + " (" + curId + ")";
+
+                                dataModelLocal.SetData("ExpirationState", 0, i);
+                                dataModelLocal.SetData("LicenseState", 0, i);
+                                dataModelLocal.SetData("Expiration", "01.01.2023", i);
+                                dataModelLocal.SetData("Name", newName, i);
+                            }
+                        }
+                        containerInstallation.activeLicenses = dataModelLocal;
+
+//                        licensesTable.elements = dataModelLocal;
                     }
                     else if(licensesModel.ContainsKey("errors")){
                         var errorsModel = itemsModel.GetData("errors");
@@ -689,13 +770,17 @@ Rectangle {
             var inputParams = Gql.GqlObject("input");
 
             if (containerInstallation.typeOperation == "New") {
+                containerInstallation.gqlModelQueryType = "InstallationAdd";
+                containerInstallation.gqlModelQueryTypeNotification = "addedNotification";
                 query = Gql.GqlRequest("query", "InstallationAdd");
                 queryFields = Gql.GqlObject("addedNotification");
 
-                containerInstallation.itemId = instanceIdText.text;
+                //containerInstallation.itemId = instanceIdText.text;
                 containerInstallation.itemName = newName;
             }
             else {
+                containerInstallation.gqlModelQueryType = "InstallationUpdate";
+                containerInstallation.gqlModelQueryTypeNotification = "updatedNotification";
                 query = Gql.GqlRequest("query", "InstallationUpdate");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", containerInstallation.itemId);
@@ -704,7 +789,7 @@ Rectangle {
 
             query.AddParam(inputParams);
 
-            installationModel.SetData("Id", containerInstallation.itemId)
+            installationModel.SetData("Id", instanceIdText.text)
             installationModel.SetData("Name", containerInstallation.itemName)
 
             installationModel.SetData("AccountId", containerInstallation.accountId);
@@ -734,20 +819,42 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, saveModel);
             if (this.state === "Ready"){
-                containerInstallation.multiDocViewItem.activeCollectionItem.refresh();
-                var dataModelLocal = saveModel.GetData("data");
-                if(dataModelLocal.ContainsKey("addedNotification")){
-                    dataModelLocal = dataModelLocal.GetData("addedNotification");
+                var dataModelLocal;
 
-                    if(dataModelLocal.ContainsKey("Id") && containerInstallation.typeOperation === "New"){
-                        containerInstallation.itemId = dataModelLocal.GetData("Id");
+                if (saveModel.ContainsKey("errors")){
+
+                    dataModelLocal = saveModel.GetData("errors");
+
+                    dataModelLocal = dataModelLocal.GetData(containerInstallation.gqlModelQueryType);
+
+                    if (dataModelLocal){
+                        console.log("Message errors");
+                        var messageError = dataModelLocal.GetData("message");
+                        containerInstallation.openMessageDialog("Error Dialog", messageError);
                     }
-                    else if(saveModel.ContainsKey("errors")){
-                        var errorsModel = accountItemModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
-                            console.log("message", errorsModel.GetData(containerInstallation.gqlModelItems).GetData("message"));
+
+                    return;
+                }
+
+                if (saveModel.ContainsKey("data")){
+                    dataModelLocal = saveModel.GetData("data");
+
+                    if (dataModelLocal.ContainsKey(containerInstallation.gqlModelQueryType)){
+
+                        dataModelLocal = dataModelLocal.GetData(containerInstallation.gqlModelQueryType);
+
+                        if (dataModelLocal.ContainsKey(containerInstallation.gqlModelQueryTypeNotification)){
+                            dataModelLocal = dataModelLocal.GetData(containerInstallation.gqlModelQueryTypeNotification);
+
+                            if (dataModelLocal.ContainsKey("Id")){
+                                containerInstallation.itemId = dataModelLocal.GetData("Id");
+                            }
                         }
                     }
+                    containerInstallation.rootItem.updateTitleTab(containerInstallation.itemId, containerInstallation.itemName);
+                    containerInstallation.multiDocViewItem.activeCollectionItem.refresh();
+
+                    containerInstallation.wasChanged = false;
                 }
             }
         }

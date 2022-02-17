@@ -503,20 +503,14 @@ Rectangle {
                         return;
                     }
 
-                    console.log("ContactInfoEditor ComboBox 1");
                     containerContactInfo.contactInfoModel.SetData("AccountType", accountType);
                     containerContactInfo.contactInfoModel.SetData("AccountTypeComboBoxIndex", cbTypeAccount.currentIndex)
 
                     if (containerContactInfo.typeOperation !== "New" && !cbTypeAccount.wasFocus){
-                        console.log("ContactInfoEditor ComboBox 1.5");
                         cbTypeAccount.wasFocus = true;
                         return;
                     }
-                    console.log("ContactInfoEditor ComboBox 2");
                     containerContactInfo.wasChanged = true;
-
-                   // containerContactInfo.wasChanged = true;
-//                    containerContactInfo.activateSaveButton();
                 }
             }
 
@@ -1036,23 +1030,28 @@ Rectangle {
 
                 Text {
                     id: titleAddresses;
-                    text: qsTr("Addresses");
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
+
                     anchors.top: nickNameBlock.bottom;
                     anchors.topMargin: 7;
                     anchors.left: accountOwnerBlock.left;
                     anchors.leftMargin: 10;
+
+                    text: qsTr("Addresses");
+                    color: Style.textColor;
+                    font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     visible: cbTypeAccount.currentIndex === 0;
                 }
 
                 Rectangle {
                     id: addressesBlock;
-                    width: accountOwnerBlock.width - 20;
+
                     anchors.horizontalCenter: accountOwnerBlock.horizontalCenter;
-                    height: 200;
                     anchors.top: titleAddresses.bottom;
+
+                    height: 200;
+                    width: accountOwnerBlock.width - 20;
+
                     //color: Style.baseColor;
                     visible: cbTypeAccount.currentIndex === 0;
                     color: Style.imagingToolsGradient1;
@@ -1060,35 +1059,45 @@ Rectangle {
 
                     Rectangle {
                         id: addressesBlockButtons;
-                        width: 50;
-                        height: 20;
-                        color: "transparent";
+
                         anchors.top: addressesBlock.top;
                         anchors.topMargin: 10;
                         anchors.left: addressesBlock.left;
                         anchors.leftMargin: 10;
 
+                        width: 50;
+                        height: 20;
+
+                        color: "transparent";
+
                         AuxButton {
                             id: addButton;
+
                             anchors.verticalCenter: addressesBlockButtons.verticalCenter;
                             anchors.left: addressesBlockButtons.left;
+
                             width: 15;
                             height: 15;
+
                             iconSource: "../../../Icons/" + Style.theme + "/Add_On_Normal.svg";
                         }
 
                         AuxButton {
                             id: removeButton;
+
                             anchors.verticalCenter: addressesBlockButtons.verticalCenter;
                             anchors.right: addressesBlockButtons.right;
+
                             width: 15;
                             height: 15;
+
                             iconSource: "../../../Icons/" + Style.theme + "/Remove_On_Normal.svg";
                         }
                     }
 
                     AuxTable {
                         id: addressesTable;
+
                         anchors.top: addressesBlockButtons.bottom;
                         anchors.topMargin: 5;
                         anchors.bottom: parent.bottom;
@@ -1097,12 +1106,12 @@ Rectangle {
                         anchors.right: parent.right;
                         anchors.rightMargin: 10;
 
-//                        anchors.fill: parent;
                         headers: headersModel;
                     }
 
                     TreeItemModel {
                         id: headersModel;
+
                         Component.onCompleted: {
                             headersModel.SetData("Name", "Country", 0)
                             headersModel.InsertNewItem()

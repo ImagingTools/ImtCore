@@ -9,18 +9,20 @@ Rectangle {
 
     property bool selected: false;
     property string name;
+   // property string expirationText: "01.01.2023";
 
     signal clicked;
     signal doubleClicked;
     signal checkBoxLicenseClicked(int modelIndex, int state);
     signal checkBoxExpirationClicked(int modelIndex, int state);
-
     signal expirationTextChanged(int modelIndex, string value);
 
     Rectangle{
         id: selectionBackGround;
+
         anchors.fill: parent;
         color: "#4682B4";
+
         opacity: 0.2;
         radius: 2;
         visible: licensesTableDelegate.selected;
@@ -28,6 +30,7 @@ Rectangle {
 
     MouseArea {
         id: ma;
+
         anchors.fill: parent;
 
         onClicked: {
@@ -44,9 +47,11 @@ Rectangle {
 
         anchors.left: parent.left;
         anchors.verticalCenter: parent.verticalCenter;
-        color: "transparent";
+
         width: licensesTableDelegate.width / 2;
         height: parent.height;
+
+        color: "transparent";
 
         CheckBox {
             id: checkBoxLicense;
@@ -57,6 +62,8 @@ Rectangle {
 
             width: 10;
             height: width;
+
+            checkState: model.LicenseState;
 
             MouseArea {
                 anchors.fill: parent;
@@ -78,7 +85,8 @@ Rectangle {
             anchors.left: checkBoxLicense.right;
             anchors.leftMargin: 10;
 
-            text: licensesTableDelegate.name;
+            //text: licensesTableDelegate.name;
+            text: model.Name;
 
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -105,18 +113,26 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: rightPart.left;
-    //            anchors.leftMargin: 10;
 
             width: 10;
             height: width;
+
+            checkState: model.ExpirationState;
 
             MouseArea {
                 anchors.fill: parent;
 
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-                    checkBoxExpiration.checkState === 2 ? checkBoxExpiration.checkState = 0 : checkBoxExpiration.checkState = 2;
-                    licensesTableDelegate.checkBoxExpirationClicked(model.index, checkBoxLicense.checkState);
+
+                    if (checkBoxExpiration.checkState === 2){
+                        checkBoxExpiration.checkState = 0 ;
+                    }
+                    else{
+                        checkBoxExpiration.checkState = 2;
+                    }
+
+                    licensesTableDelegate.checkBoxExpirationClicked(model.index, checkBoxExpiration.checkState);
                 }
             }
         }
@@ -144,13 +160,19 @@ Rectangle {
             anchors.left: checkBoxExpiration.right;
             anchors.leftMargin: 5;
 
-            text: "01.01.2023";
-            textSize: 12;
-
             height: 20;
             width: 100;
 
+//            text: licensesTableDelegate.expirationText;
+            text: model.ExpirationState === 2 ? model.Expiration : "Unlimited";
+//            text: model.Expiration;
+            textSize: 12;
+
             visible: checkBoxExpiration.checkState === 2;
+
+//            onTextChanged: {
+//                licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);
+//            }
 
             onInputTextChanged: {
                 licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);

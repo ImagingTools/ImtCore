@@ -67,6 +67,9 @@ Object {
 		})
 		if(this._uid > 0)
 		this.element.dom.id = `el-${this._uid}`
+
+		this._context.listId[this.element.dom.id] = this
+
 		this.element.on("focusin", (e)=>{
 			this.focus = true
 		})

@@ -8,38 +8,31 @@ Rectangle {
 //    radius: container.height * 0.15;
     radius: 2;
     border.color: container.borderColor;
+    color: container.highlighted ? Style.hover : container.backgroundColor;
+
     property bool highlighted: ma.containsMouse;
-
     property bool hasIcon: container.iconSource !== "";
-
     property bool hasText: false;
     property bool borderExist: false;
-
     property bool enabled: true;
 
     property string borderColor: "transparent";
     property string backgroundColor: "transparent";
+    property string textButton;
 
     property int iconWidth: container.width;
     property int iconHeight: container.height;
-
     property int fontPixelSize: Style.fontSize_common;
 
-    color: container.highlighted ? Style.hover : container.backgroundColor;
-
-//    color: "red";
-
-    property string textButton;
-//    border.color: container.highlighted ? Style.buttonBorderColor : "transparent";
-//    border.color: Style.buttonColor;
     signal clicked;
-
 
     Image {
         id: image;
         anchors.centerIn: parent;
+
         height: container.iconHeight - 3;
         width: container.iconWidth - 3;
+
         sourceSize.width: width;
         sourceSize.height: height;
 
@@ -87,11 +80,16 @@ Rectangle {
     MouseArea {
         id: ma;
         anchors.fill: parent;
+
         hoverEnabled: true;
-        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+        //acceptedButtons: Qt.LeftButton;
+//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+        cursorShape: Qt.PointingHandCursor;
+
         visible: container.enabled;
+
         onPressed: {
-            image.anchors.verticalCenterOffset = 1;
+            //image.anchors.verticalCenterOffset = 1;
         }
 
         onClicked: {

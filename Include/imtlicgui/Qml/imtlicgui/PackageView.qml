@@ -19,7 +19,6 @@ Item {
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
-
     property int contextMenuX;
     property int contextMenuY;
 
