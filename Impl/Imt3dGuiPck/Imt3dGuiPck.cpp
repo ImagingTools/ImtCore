@@ -36,6 +36,26 @@ I_EXPORT_COMPONENT(
 			"Design Manager",
 			"Style Design Manager");
 
+I_EXPORT_COMPONENT(
+			AxisShape,
+			"3D-axis shape",
+			"3D Shape Axis");
+
+I_EXPORT_COMPONENT(
+			GridShape,
+			"3D-grid shape",
+			"3D Shape Grid");
+
+I_EXPORT_COMPONENT(
+			PointCloudShape,
+			"3D-point could shape",
+			"3D Shape Point-Cloud");
+
+I_EXPORT_COMPONENT(
+			MeshShape,
+			"3D-mesh shape",
+			"3D Shape Mesh");
+
 
 } // namespace Imt3dGuiPck
 
