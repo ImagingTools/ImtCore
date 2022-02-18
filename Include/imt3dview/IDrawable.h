@@ -5,6 +5,9 @@
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLShaderProgram>
 
+// ACF includes
+#include <istd/IPolymorphic.h>
+
 
 namespace imt3dview
 {
