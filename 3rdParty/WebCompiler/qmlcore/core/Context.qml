@@ -48,7 +48,7 @@ Item {
 	}
 
 	onCompleted: {
-		let events = ['mousedown', 'mouseup', 'mousemove', 'mouseenter', 'mouseleave', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove']
+		let events = ['mousedown', 'mouseup', 'mousemove', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove']
 		
 		for(let event of events){
 			this.element.on(event, (e)=>{

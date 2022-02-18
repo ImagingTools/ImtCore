@@ -2,16 +2,17 @@ import QtQuick 2.12
 import Acf 1.0
 
 Rectangle {
-    id: container;
+    id: auxButtonContainer;
 
-    property alias iconSource: image.source;
-//    radius: container.height * 0.15;
     radius: 2;
-    border.color: container.borderColor;
-    color: container.highlighted ? Style.hover : container.backgroundColor;
+
+    border.width: 1;
+    border.color: auxButtonContainer.borderColor;
+
+    color: auxButtonContainer.highlighted ? Style.hover : auxButtonContainer.backgroundColor;
 
     property bool highlighted: ma.containsMouse;
-    property bool hasIcon: container.iconSource !== "";
+    property bool hasIcon: auxButtonContainer.iconSource !== "";
     property bool hasText: false;
     property bool borderExist: false;
     property bool enabled: true;
@@ -20,59 +21,58 @@ Rectangle {
     property string backgroundColor: "transparent";
     property string textButton;
 
-    property int iconWidth: container.width;
-    property int iconHeight: container.height;
+    property int iconWidth: auxButtonContainer.width;
+    property int iconHeight: auxButtonContainer.height;
     property int fontPixelSize: Style.fontSize_common;
+
+    property alias iconSource: image.source;
 
     signal clicked;
 
     Image {
         id: image;
+
         anchors.centerIn: parent;
 
-        height: container.iconHeight - 3;
-        width: container.iconWidth - 3;
+        height: auxButtonContainer.iconHeight - 3;
+        width: auxButtonContainer.iconWidth - 3;
 
         sourceSize.width: width;
         sourceSize.height: height;
 
-        visible: container.hasIcon;
+        visible: auxButtonContainer.hasIcon;
 
         Component.onCompleted: {
-//            if (container.hasIcon) {
-//                image.anchors.left = container.left;
-//                image.anchors.leftMargin = 5;
-//                image.anchors.verticalCenter = container.verticalCenter;
-//            } else {
-//                image.anchors.centerIn = container;
-//            }
         }
     }
 
     Text {
-        id: text;
-//        anchors.left: image.right;
+//        id: text;
 
-        color: container.enabled ? Style.textColor : Style.disabledInActiveTextColor;
-        font.pixelSize: container.fontPixelSize;
+        anchors.horizontalCenter: auxButtonContainer.horizontalCenter;
+        anchors.verticalCenter: auxButtonContainer.verticalCenter;
+
+        color: auxButtonContainer.enabled ? Style.textColor : Style.disabledInActiveTextColor;
+
+        font.pixelSize: auxButtonContainer.fontPixelSize;
         font.family: Style.fontFamily;
-        text: container.textButton;
+        text: auxButtonContainer.textButton;
 
-        visible: container.hasText;
+        visible: auxButtonContainer.hasText;
 
         Component.onCompleted: {
-            if (container.hasText) {
+            if (auxButtonContainer.hasText) {
 
-//                if (container.hasIcon) {
+//                if (auxButtonContainer.hasIcon) {
 //                    text.anchors.left = image.right;
 //                    text.anchors.leftMargin = 5;
-//                    image.anchors.verticalCenter = container.verticalCenter;
+//                    image.anchors.verticalCenter = auxButtonContainer.verticalCenter;
 //                } else{
-//                    text.anchors.horizontalCenter = container.horizontalCenter;
-//                    text.anchors.verticalCenter = container.verticalCenter;
+//                    text.anchors.horizontalCenter = auxButtonContainer.horizontalCenter;
+//                    text.anchors.verticalCenter = auxButtonContainer.verticalCenter;
 //                }
-                text.anchors.horizontalCenter = container.horizontalCenter;
-                text.anchors.verticalCenter = container.verticalCenter;
+//                text.anchors.horizontalCenter = auxButtonContainer.horizontalCenter;
+//                text.anchors.verticalCenter = auxButtonContainer.verticalCenter;
             }
         }
     }
@@ -86,14 +86,14 @@ Rectangle {
 //        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         cursorShape: Qt.PointingHandCursor;
 
-        visible: container.enabled;
+        visible: auxButtonContainer.enabled;
 
         onPressed: {
             //image.anchors.verticalCenterOffset = 1;
         }
 
         onClicked: {
-            container.clicked();
+            auxButtonContainer.clicked();
         }
     }
 

@@ -19,7 +19,8 @@ namespace imtlicdb
 
 istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
-			const QSqlRecord& record) const
+			const QSqlRecord& record,
+			const QSqlQuery& query) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -55,7 +56,13 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 	QByteArray productLicenses = QString("SELECT * from ProductInstanceLicenses WHERE InstanceId = '%1'").arg(qPrintable(productInstanceId)).toUtf8();
 
 	QSqlError error;
-	QSqlQuery productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error);
+	QSqlQuery productLicensesQuery(query);
+
+	productLicensesQuery.exec(productLicenses);
+
+//	productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error);
+
+//	QSqlQuery productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error);
 
 	while (productLicensesQuery.next()){
 		QSqlRecord licenseRecord = productLicensesQuery.record();
@@ -216,7 +223,7 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QString timestamp = QDateTime::currentDateTime().toString(Qt::ISODate);
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET InstanceId = '%1', ProductId = '%2', AccountId = '%3', Name = '%4', Description = '%5', LastModified = '%6' WHERE InstanceId = '%5';")
+	QByteArray retVal = QString("UPDATE ProductInstances SET InstanceId = '%1', ProductId = '%2', AccountId = '%3', Name = '%4', Description = '%5', LastModified = '%6' WHERE InstanceId = '%7';")
 							.arg(qPrintable(newProductInstanceId))
 							.arg(qPrintable(productId))
 							.arg(qPrintable(accountId))
@@ -408,7 +415,7 @@ idoc::IDocumentMetaInfo* CProductInstanceDatabaseDelegateComp::CreateObjectMetaI
 
 bool CProductInstanceDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record, QSqlQuery());
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
 		imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductInstanceInfo", retVal)){

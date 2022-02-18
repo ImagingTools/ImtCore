@@ -23,13 +23,15 @@ Rectangle {
     property string productId;
     property string gqlModelInfo;
     property string gqlModelCollectionInfo;
-    property string typeOperation: multiDocViewItem.typeOperation;
+//    property string operation: multiDocViewItem.operation;
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
     property TreeItemModel installationInfoModel;
     property TreeItemModel model;
     property TreeItemModel activeLicenses;
+
+    property string operation;
 
     property bool wasChanged: false;
 
@@ -46,11 +48,11 @@ Rectangle {
     }
 
     TreeItemModel {
-        id: installationModel;
+        id: modelInstallations;
     }
 
     Component.onCompleted: {
-//        if (containerInstallation.typeOperation === "New") {
+//        if (containerInstallation.operation === "New") {
             containerInstallation.gqlModelInfo = "ProductInfo";
             containerInstallation.gqlModelCollectionInfo = "ProductList"
             headerInfoModel.updateModel();
@@ -64,13 +66,13 @@ Rectangle {
     }
 
     onModelChanged: {
-        console.log("InstallationInfoEditor onModelChanged", containerInstallation.typeOperation);
+        console.log("InstallationInfoEditor onModelChanged", containerInstallation.operation);
         if (containerInstallation.model.ContainsKey("data")){
             containerInstallation.contactInfoModel = containerContactInfo.model.GetData('data');
             containerInstallation.updateData();
         }
         else {
-            if(containerInstallation.typeOperation === "New"){
+            if(containerInstallation.operation === "New"){
                 //containerContactInfo.accountType = "company";
 //                cbTypeAccount.currentIndex = 0;
 //                containerContactInfo.contactInfoModel = model.AddTreeModel("data");
@@ -90,21 +92,21 @@ Rectangle {
         if (licenses && licenses.GetItemsCount() > 0){
             var index;
 
-            var count =  activeLicenses.GetItemsCount();
+            var count =  containerInstallation.activeLicenses.GetItemsCount();
             for (var i = 0; i < count; i++){
 
-                var curId = activeLicenses.GetData("Id", i);
+                var curId = containerInstallation.activeLicenses.GetData("Id", i);
 
                 for (var j = 0; j < licenses.GetItemsCount(); j++){
                     var licId = licenses.GetData("Id", j);
                     var expiration = licenses.GetData("Expiration", j);
 
                     if (curId === licId){
-                        activeLicenses.SetData("LicenseState", 2, i);
+                        containerInstallation.activeLicenses.SetData("LicenseState", 2, i);
 
                         if (expiration && expiration !== "Unlimited"){
-                            activeLicenses.SetData("ExpirationState", 2, i);
-                            activeLicenses.SetData("Expiration", expiration, i);
+                            containerInstallation.activeLicenses.SetData("ExpirationState", 2, i);
+                            containerInstallation.activeLicenses.SetData("Expiration", expiration, i);
                         }
                     }
                 }
@@ -116,7 +118,7 @@ Rectangle {
 
     onInstallationInfoModelChanged: {
         console.log("InstallationInfoEditor onInstallationInfoModelChanged");
-        if (containerInstallation.typeOperation !== "New"){
+        if (containerInstallation.operation !== "New"){
             containerInstallation.updateData();
         }
     }
@@ -176,7 +178,7 @@ Rectangle {
             if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
-                saveModel.updateModel(value);
+                installationSaveQuery.updateModel(value);
             }
         }
     }
@@ -187,7 +189,7 @@ Rectangle {
 //            collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Save") {
-            if (containerInstallation.typeOperation === "New") {
+            if (containerInstallation.operation === "New") {
                 var source = "AuxComponents/InputDialog.qml";
                 var parameters = {};
                 parameters["message"] = "Please enter the name of the document: ";
@@ -196,7 +198,7 @@ Rectangle {
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
             else{
-                saveModel.updateModel();
+                installationSaveQuery.updateModel();
             }
         }
         else if (menuId === "Close") {
@@ -237,14 +239,14 @@ Rectangle {
     Flickable {
         anchors.fill: parent;
 
-        contentWidth: container.width;
-        contentHeight: container.height + 50;
+        contentWidth: containerColumn.width;
+        contentHeight: containerColumn.height + 50;
         boundsBehavior: Flickable.StopAtBounds;
 
         clip: true;
 
         Column {
-             id: container;
+             id: containerColumn;
 
              width: 500;
 
@@ -253,7 +255,7 @@ Rectangle {
              Text {
                  id: titleInstance;
 
-                 anchors.left: container.left;
+                 anchors.left: containerColumn.left;
                  anchors.leftMargin: 10;
 
                  text: qsTr("Instance-ID");
@@ -265,12 +267,14 @@ Rectangle {
              Rectangle {
                  id: tfcInstance;
 
-                 anchors.horizontalCenter: container.horizontalCenter;
+                 anchors.horizontalCenter: containerColumn.horizontalCenter;
 
-                 width: container.width - 20;
+                 width: containerColumn.width - 20;
                  height: 45;
 
                  color: Style.imagingToolsGradient1;
+
+                 border.width: 1;
                  border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
                  TextFieldCustom {
@@ -291,7 +295,7 @@ Rectangle {
              Text {
                  id: titleCustomer;
 
-                 anchors.left: container.left;
+                 anchors.left: containerColumn.left;
                  anchors.leftMargin: 10;
 
                  text: qsTr("Customer");
@@ -305,12 +309,14 @@ Rectangle {
                  id: customerBlock;
                  z: 10;
 
-                 anchors.horizontalCenter: container.horizontalCenter;
+                 anchors.horizontalCenter: containerColumn.horizontalCenter;
 
                  height: 45;
-                 width: container.width - 20;
+                 width: containerColumn.width - 20;
 
                  color: Style.imagingToolsGradient1;
+
+                 border.width: 1;
                  border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
                  ComboBox {
@@ -336,7 +342,7 @@ Rectangle {
                          containerInstallation.accountId = listModelAccounts.get(customerCB.currentIndex).id;
                          customerCB.currentText = listModelAccounts.get(customerCB.currentIndex).text;
 
-                         if (containerInstallation.typeOperation !== "New" && !customerCB.wasFocus){
+                         if (containerInstallation.operation !== "New" && !customerCB.wasFocus){
                              customerCB.wasFocus = true;
                              return;
                          }
@@ -350,7 +356,7 @@ Rectangle {
                  id: titleProduct;
                  z : 5;
 
-                 anchors.left: container.left;
+                 anchors.left: containerColumn.left;
                  anchors.leftMargin: 10;
 
                  text: qsTr("Product");
@@ -363,17 +369,18 @@ Rectangle {
                  id: productBlock;
                  z : 5;
 
-                 anchors.horizontalCenter: container.horizontalCenter;
+                 anchors.horizontalCenter: containerColumn.horizontalCenter;
 
                  height: 45;
-                 width: container.width - 20;
+                 width: containerColumn.width - 20;
 
                  color: Style.imagingToolsGradient1;
+
+                 border.width: 1;
                  border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
                  ComboBox {
                      id: productCB;
-                   //  z: 5;
 
                      anchors.horizontalCenter: productBlock.horizontalCenter;
                      anchors.verticalCenter: productBlock.verticalCenter;
@@ -385,6 +392,7 @@ Rectangle {
                      model: listModelProducts;
 
                      backgroundColor: "#d0d0d0";
+
                      borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
                      textCentered: false;
 
@@ -397,7 +405,7 @@ Rectangle {
 
                          licensesModel.updateModel(containerInstallation.productId);
 
-                         if (containerInstallation.typeOperation !== "New" && !productCB.wasFocus){
+                         if (containerInstallation.operation !== "New" && !productCB.wasFocus){
                              productCB.wasFocus = true;
                              return;
                          }
@@ -411,7 +419,7 @@ Rectangle {
              Text {
                  id: titleLicenses;
 
-                 anchors.left: container.left;
+                 anchors.left: containerColumn.left;
                  anchors.leftMargin: 10;
 
                  text: qsTr("Licenses");
@@ -423,12 +431,14 @@ Rectangle {
              Rectangle {
                  id: licensesBlock;
 
-                 anchors.horizontalCenter: container.horizontalCenter;
+                 anchors.horizontalCenter: containerColumn.horizontalCenter;
 
-                 width: container.width - 20;
+                 width: containerColumn.width - 20;
                  height: 200;
 
                  color: Style.imagingToolsGradient1;
+
+                 border.width: 1;
                  border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
                  AuxTable {
@@ -459,7 +469,7 @@ Rectangle {
                          onCheckBoxLicenseClicked: {
                              console.log("InstallationInfoEditor AuxTable onCheckBoxLicenseClicked", modelIndex, state);
                              if (modelIndex >= 0){
-                                 activeLicenses.SetData("LicenseState", state, modelIndex);
+                                 containerInstallation.activeLicenses.SetData("LicenseState", state, modelIndex);
                              }
 
                              containerInstallation.wasChanged = true;
@@ -468,14 +478,14 @@ Rectangle {
                          onCheckBoxExpirationClicked: {
                              console.log("InstallationInfoEditor AuxTable onCheckBoxExpirationClicked", modelIndex, state);
                              if (modelIndex >= 0){
-                                 activeLicenses.SetData("ExpirationState", state, modelIndex);
+                                 containerInstallation.activeLicenses.SetData("ExpirationState", state, modelIndex);
                              }
 
                              if (state == 0){
-                                 activeLicenses.SetData("Expiration", "Unlimited", modelIndex);
+                                 containerInstallation.activeLicenses.SetData("Expiration", "Unlimited", modelIndex);
                              }
                              else{
-                                 activeLicenses.SetData("Expiration", "01.01.2023", modelIndex);
+                                 containerInstallation.activeLicenses.SetData("Expiration", "01.01.2023", modelIndex);
                              }
 
                              containerInstallation.wasChanged = true;
@@ -485,7 +495,7 @@ Rectangle {
                              console.log("InstallationInfoEditor AuxTable onExpirationTextChanged", modelIndex, value);
 
                              if (modelIndex >= 0){
-                                 activeLicenses.SetData("Expiration", value, modelIndex);
+                                 containerInstallation.activeLicenses.SetData("Expiration", value, modelIndex);
                              }
 
                              containerInstallation.wasChanged = true;
@@ -515,7 +525,7 @@ Rectangle {
 
             var query = Gql.GqlRequest("query", "InstallationItem");
 
-            if (containerInstallation.typeOperation !== "New"){
+            if (containerInstallation.operation !== "New"){
                 var inputParams = Gql.GqlObject("input");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", containerInstallation.itemId);
@@ -591,10 +601,10 @@ Rectangle {
                     if(dataModelLocal.ContainsKey("headers")){
                         dataModelLocal = dataModelLocal.GetData("headers")
 
-                        if (gqlModelInfo == "ProductInfo") {
+                        if (containerInstallation.gqlModelInfo == "ProductInfo") {
                             products.SetExternTreeModel("headers", dataModelLocal);
                         }
-                        else if (gqlModelInfo == "AccountInfo") {
+                        else if (containerInstallation.gqlModelInfo == "AccountInfo") {
                             accounts.SetExternTreeModel("headers", dataModelLocal);
                         }
 
@@ -760,16 +770,16 @@ Rectangle {
     }
 
     GqlModel {
-        id: saveModel;
+        id: installationSaveQuery;
 
         function updateModel(newName) {
-            console.log( "InstallationInfoEditor saveModel updateModel");
+            console.log( "InstallationInfoEditor installationSaveQuery updateModel");
 
             var query;
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            if (containerInstallation.typeOperation == "New") {
+            if (containerInstallation.operation == "New") {
                 containerInstallation.gqlModelQueryType = "InstallationAdd";
                 containerInstallation.gqlModelQueryTypeNotification = "addedNotification";
                 query = Gql.GqlRequest("query", "InstallationAdd");
@@ -789,18 +799,18 @@ Rectangle {
 
             query.AddParam(inputParams);
 
-            installationModel.SetData("Id", instanceIdText.text)
-            installationModel.SetData("Name", containerInstallation.itemName)
+            modelInstallations.SetData("Id", instanceIdText.text)
+            modelInstallations.SetData("Name", containerInstallation.itemName)
 
-            installationModel.SetData("AccountId", containerInstallation.accountId);
-            installationModel.SetData("ProductId", containerInstallation.productId);
+            modelInstallations.SetData("AccountId", containerInstallation.accountId);
+            modelInstallations.SetData("ProductId", containerInstallation.productId);
 
-           // installationModel.SetData("ActiveLicenses", containerInstallation.productId);
+           // modelInstallations.SetData("ActiveLicenses", containerInstallation.productId);
 
            // var licensesModelLocal = licenses.GetData("data");
-            installationModel.SetExternTreeModel("ActiveLicenses", activeLicenses);
+            modelInstallations.SetExternTreeModel("ActiveLicenses", containerInstallation.activeLicenses);
 
-            var jsonString = installationModel.toJSON();
+            var jsonString = modelInstallations.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField("Item");
@@ -817,13 +827,13 @@ Rectangle {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, saveModel);
+            console.log("State:", this.state, installationSaveQuery);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (saveModel.ContainsKey("errors")){
+                if (installationSaveQuery.ContainsKey("errors")){
 
-                    dataModelLocal = saveModel.GetData("errors");
+                    dataModelLocal = installationSaveQuery.GetData("errors");
 
                     dataModelLocal = dataModelLocal.GetData(containerInstallation.gqlModelQueryType);
 
@@ -836,8 +846,8 @@ Rectangle {
                     return;
                 }
 
-                if (saveModel.ContainsKey("data")){
-                    dataModelLocal = saveModel.GetData("data");
+                if (installationSaveQuery.ContainsKey("data")){
+                    dataModelLocal = installationSaveQuery.GetData("data");
 
                     if (dataModelLocal.ContainsKey(containerInstallation.gqlModelQueryType)){
 

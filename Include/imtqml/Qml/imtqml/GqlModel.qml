@@ -14,9 +14,32 @@ TreeItemModel {
 //        xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
-                this.updateJSONModel()
+                this.updateTreeItemJSONModel()
                 this.state = "Ready"
             }
         }
+    }
+
+    function updateTreeItemJSONModel() {
+        if ( this.json === "" )
+            return;
+
+        this.clear();
+        var d1 = new Date()
+        var objectArray = this.parseJSONString(this.json, this.inquiry);
+        var dict = {};
+        for ( var key in objectArray ) {
+            var jo = objectArray[key];
+            if(typeof jo === 'object' && jo._qmlName !== 'TreeItemModel.qml'){
+                var retModel
+                retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
+                retModel.append(jo);
+                jo = retModel
+            }
+            dict[key] = jo
+        }
+            this.append(dict);
+        var d2 = new Date()
+        console.log(d2.getMilliseconds() - d1.getMilliseconds())
     }
 }

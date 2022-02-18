@@ -2,24 +2,31 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
-import imtauthgui 1.0
+//import imtauthgui 1.0
 
 Item {
     id: productsCollectionViewContainer;
+
     anchors.fill: parent;
 
     property Item rootItem;
     property Item multiDocViewItem;
 
-    property alias itemId: productCollectionView.itemId;
-    property alias itemName: productCollectionView.itemName;
+//    property var model;
 
-    property alias model: productCollectionView.collectionViewModel;
+    property alias itemId: productsCollectionView.itemId;
+    property alias itemName: productsCollectionView.itemName;
+    property alias model: productsCollectionView.collectionViewModel;
 
-    property string typeOperation: multiDocViewItem.typeOperation;
+    property string operation;
 
     Component.onCompleted: {
-        console.log("ProductView Component.onCompleted", productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
+        console.log("ProductView onCompleted",  productsCollectionView.selectedIndex);
+
+        console.log("ProductView onCompleted",  productsCollectionView.height);
+        console.log("ProductView onCompleted",  productsCollectionView.width);
+
+        console.log("ProductView collection size",   productsCollectionView.table);
     }
 
     function dialogResult(parameters) {
@@ -28,32 +35,32 @@ Item {
         if (parameters["status"] === "ok") {
 
             if (parameters["dialog"] === "EditLicense") {
-                var dataModelLocal = productCollectionView.collectionViewModel.GetData("data");
+                var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
                 console.log("ProductView onClicked ", dataModelLocal.GetItemsCount())
-                dataModelLocal.SetData("Id", parameters["newLicenseId"] , productCollectionView.selectedIndex);//
-                dataModelLocal.SetData("Name", parameters["newLicenseName"], productCollectionView.selectedIndex);
+                dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);//
+                dataModelLocal.SetData("Name", parameters["newLicenseName"], productsCollectionView.selectedIndex);
 
-                productCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-                productCollectionView.refresh();
+                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                productsCollectionView.refresh();
             }
             else if (parameters["dialog"] === "InputDialog") {
                 var value = parameters["value"];
                 console.log("LicenseCollectionViewContainer dialogResult", value);
                 productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, value);
-                saveModel.updateModel(value);
+                productViewSaveQuery.updateModel(value);
             }
         }
         else if (parameters["status"] === "yes") {
 
-            if (productCollectionView.collectionViewModel.ContainsKey("data")) {
-                var dataModelLocal = productCollectionView.collectionViewModel.GetData("data");
-                dataModelLocal.RemoveItem(productCollectionView.table.selectedIndex);
+            if (productsCollectionView.collectionViewModel.ContainsKey("data")) {
+                var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
+                dataModelLocal.RemoveItem(productsCollectionView.table.selectedIndex);
 
-                productCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-                productCollectionView.collectionViewModel.Refresh();
-                productCollectionView.refresh();
+                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                productsCollectionView.collectionViewModel.Refresh();
+                productsCollectionView.refresh();
 
-                productCollectionView.table.selectedIndex = -1;
+                productsCollectionView.table.selectedIndex = -1;
                 productsCollectionViewContainer.commandsChanged("ProductEdit");
                 productsCollectionViewContainer.makeCommandActive("Save");
             }
@@ -73,7 +80,7 @@ Item {
 
         model.SetData("data", dataModelLocal);
         model.Refresh();
-        productCollectionView.refresh();
+        productsCollectionView.refresh();
     }
 
     function menuActivated(menuId) {
@@ -83,7 +90,7 @@ Item {
             productsCollectionViewContainer.createLicense("", "License Name");
         }
         else if (menuId  === "Save") {
-            if (productCollectionView.itemId === "") {
+            if (productsCollectionView.itemId === "") {
                 var source = "AuxComponents/InputDialog.qml";
                 var parameters = {};
                 parameters["message"] = "Please enter the name of the document: ";
@@ -92,7 +99,7 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
             else {
-                saveModel.updateModel()
+                productViewSaveQuery.updateModel()
             }
         }else if (menuId  === "Remove") {
             var source = "AuxComponents/MessageDialog.qml";
@@ -105,18 +112,18 @@ Item {
             productsCollectionViewContainer.rootItem.closeTab();
         } else if (menuId  === "Duplicate") {
             var dataModelLocal = model.GetData("data");
-            var duplicateName = "Copy of " + dataModelLocal.GetData("Name", productCollectionView.selectedIndex);
-            var duplicateId = dataModelLocal.GetData("Id", productCollectionView.selectedIndex);
+            var duplicateName = "Copy of " + dataModelLocal.GetData("Name", productsCollectionView.selectedIndex);
+            var duplicateId = dataModelLocal.GetData("Id", productsCollectionView.selectedIndex);
             productsCollectionViewContainer.createLicense(duplicateId, duplicateName);
 
         } else {
-            productCollectionView.menuActivated(menuId)
+            productsCollectionView.menuActivated(menuId)
         }
     }
 
     function refresh() {
         console.log("PackageView refresh()");
-        productCollectionView.refresh();
+        productsCollectionView.refresh();
     }
 
     function commandsChanged(commandsId){
@@ -124,7 +131,7 @@ Item {
             return;
         }
 
-        if (productCollectionView.selectedIndex > -1) {
+        if (productsCollectionView.selectedIndex > -1) {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
@@ -142,11 +149,11 @@ Item {
     }
 
     TreeItemModel {
-        id: productModel;
+        id: modelProducts;
     }
 
     CollectionView {
-        id: productCollectionView;
+        id: productsCollectionView;
 
         anchors.left: parent.left;
         anchors.right: productSplitter.left;
@@ -155,17 +162,17 @@ Item {
 
         Component.onCompleted: {
             console.log("ProductView CollectionView onCompleted");
-            productCollectionView.gqlModelInfo = "ProductInfo"
-            productCollectionView.gqlModelItems = "LicenseList"
-            productCollectionView.gqlModelRemove = "";
+            productsCollectionView.gqlModelInfo = "ProductInfo"
+            productsCollectionView.gqlModelItems = "LicenseList"
+            productsCollectionView.gqlModelRemove = "";
         }
 
         onItemIdChanged: {
-            if (productCollectionView.itemId){
+            if (productsCollectionView.itemId){
                 console.log("ProductView onItemIdChanged")
-                productCollectionView.gqlModelInfo = "ProductInfo"
-                productCollectionView.gqlModelItems = "LicenseList"
-                productCollectionView.gqlModelRemove = "";
+                productsCollectionView.gqlModelInfo = "ProductInfo"
+                productsCollectionView.gqlModelItems = "LicenseList"
+                productsCollectionView.gqlModelRemove = "";
             }
         }
 
@@ -176,15 +183,15 @@ Item {
             var parameters = {};
             parameters["licenseId"] = selectedId;
             parameters["licenseName"] = name;
-            parameters["collectionViewLicenses"] = productCollectionView;
+            parameters["collectionViewLicenses"] = productsCollectionView;
             parameters["resultItem"] = productsCollectionViewContainer;
 
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
 
         onSelectedIndexChanged: {
-            console.log("PackageView CollectionView onSelectedIndexChanged", productCollectionView.selectedIndex);
-            if (productCollectionView.selectedIndex > -1){
+            console.log("PackageView CollectionView onSelectedIndexChanged", productsCollectionView.selectedIndex);
+            if (productsCollectionView.selectedIndex > -1){
                 productsCollectionViewContainer.commandsChanged("ProductEdit")
 
                 treeView.visible = true;
@@ -199,16 +206,16 @@ Item {
     }
 
     GqlModel {
-        id: saveModel;
+        id: productViewSaveQuery;
 
         function updateModel() {
-            console.log( "updateModel saveModel", productsCollectionViewContainer.typeOperation);
+            console.log( "updateModel productViewSaveQuery", productsCollectionViewContainer.operation);
 
             var query;
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            if (productsCollectionViewContainer.typeOperation == "Open") {
+            if (productsCollectionViewContainer.operation == "Open") {
                 query = Gql.GqlRequest("query", "ProductUpdate");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", productsCollectionViewContainer.itemId);
@@ -218,7 +225,7 @@ Item {
                 queryFields = Gql.GqlObject("addedNotification");
             }
 
-//            if(productsCollectionViewContainer.itemId != "" && productsCollectionViewContainer.typeOperation != "Copy"){
+//            if(productsCollectionViewContainer.itemId != "" && productsCollectionViewContainer.operation != "Copy"){
 //                query = Gql.GqlRequest("query", "ProductUpdate");
 //                inputParams.InsertField("Id");
 //                inputParams.InsertFieldArgument("Id", productsCollectionViewContainer.itemId);
@@ -236,13 +243,13 @@ Item {
 //                productsCollectionViewContainer.itemName = newId;
 //            }
 
-            productModel.SetData("Id", productsCollectionViewContainer.itemId)
-            productModel.SetData("Name", productsCollectionViewContainer.itemName)
-            productModel.SetExternTreeModel("licenses", productCollectionView.collectionViewModel.GetData("data"));
-            productModel.SetExternTreeModel("dependencies", featuresTreeView.productLicenseFeatures);
+            modelProducts.SetData("Id", productsCollectionViewContainer.itemId)
+            modelProducts.SetData("Name", productsCollectionViewContainer.itemName)
+            modelProducts.SetExternTreeModel("licenses", productsCollectionView.collectionViewModel.GetData("data"));
+            modelProducts.SetExternTreeModel("dependencies", featuresTreeView.productLicenseFeatures);
 
             //featureCollectionViewContainer.model.SetIsArray(false);
-            var jsonString = productModel.toJSON();
+            var jsonString = modelProducts.toJSON();
             console.log("jsonString", jsonString)
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             console.log("jsonString", jsonString)
@@ -261,27 +268,27 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, saveModel);
+            console.log("State:", this.state, productViewSaveQuery);
             if (this.state === "Ready"){
 
                 productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.refresh();
 
-                var dataModelLocal = saveModel.GetData("data");
+                var dataModelLocal = productViewSaveQuery.GetData("data");
                 if (dataModelLocal.ContainsKey("ProductAdd")) {
                     dataModelLocal = dataModelLocal.GetData("ProductAdd");
 
                     if(dataModelLocal.ContainsKey("addedNotification")){
                         dataModelLocal = dataModelLocal.GetData("addedNotification");
-                        console.log("ProductView saveModel addedNotification exist");
-                         productCollectionView.refresh();
+                        console.log("ProductView productViewSaveQuery addedNotification exist");
+                         productsCollectionView.refresh();
                         if(dataModelLocal.ContainsKey("Id")){
-                            console.log("ProductView saveModel addedNotification  Id exist");
+                            console.log("ProductView productViewSaveQuery addedNotification  Id exist");
                             productsCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
                             //productsCollectionViewContainer.itemName = dataModelLocal.GetData("Name");
 
                             productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
                         }
-                        else if(saveModel.ContainsKey("errors")){
+                        else if(productViewSaveQuery.ContainsKey("errors")){
                             var errorsModel = accountItemModel.GetData("errors");
                             if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
                                 console.log("message", errorsModel.GetData(productsCollectionViewContainer.gqlModelItems).GetData("message"));
@@ -442,30 +449,29 @@ Item {
 
         TreeView {
             id: treeView;
+
             anchors.top: headerBottomBorder.bottom;
             anchors.left: parent.left;
-//            anchors.leftMargin: 5;
             anchors.right: parent.right;
             anchors.rightMargin: 5;
+            anchors.bottom: parent.bottom;
+
             clip: true;
 
             visible: false;
 
-            anchors.bottom: parent.bottom;
-//            width: 200;
-//            height: 500;
             modelItems: featuresTreeView.model;
 
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("ProductView TreeView onItemTreeViewCheckBoxStateChanged",
                             productsCollectionViewContainer.itemId,
-                            productCollectionView.table.getSelectedId(),
+                            productsCollectionView.table.getSelectedId(),
                             packageId,
                             featureId,
                             state);
                 productMetaInfo.clearTreeView();
                 productMetaInfo.updateLicenseFeatures(productsCollectionViewContainer.itemId,
-                                                      productCollectionView.table.getSelectedId(),
+                                                      productsCollectionView.table.getSelectedId(),
                                                       packageId,
                                                       featureId,
                                                       state);
@@ -503,22 +509,22 @@ Item {
 
             for(var i = 0; i < modelItems.GetItemsCount(); i++){
 
-                var childModel = modelItems.GetData("childItemModel", i);
+                var modelChildren = modelItems.GetData("childItemModel", i);
 
-                for (var j = 0; j < childModel.GetItemsCount(); j++){
-                    var isActive = childModel.GetData("isActive", j);
-                    var state = childModel.GetData("stateChecked", j);
+                for (var j = 0; j < modelChildren.GetItemsCount(); j++){
+                    var isActive = modelChildren.GetData("isActive", j);
+                    var state = modelChildren.GetData("stateChecked", j);
 
                     if (isActive === 0){
-                        childModel.SetData("isActive", 1, j);
+                        modelChildren.SetData("isActive", 1, j);
                     }
 
                     if (state === 2){
-                        childModel.SetData("stateChecked", 0, j);
+                        modelChildren.SetData("stateChecked", 0, j);
                     }
                 }
 
-                modelItems.SetData("childItemModel", childModel, i);
+                modelItems.SetData("childItemModel", modelChildren, i);
             }
 
             treeView.modelItems =  modelItems;
@@ -528,10 +534,10 @@ Item {
             console.log("ProductView updateTreeView");
             var i, j, k;
 
-            var selectLicenseId = productCollectionView.table.getSelectedId();
+            var selectLicenseId = productsCollectionView.table.getSelectedId();
             var selectProductId = productsCollectionViewContainer.itemId;
 
-            var packagesModel;
+            var modelPackages;
 
             if (!featuresTreeView.productLicenseFeatures){
                 return;
@@ -542,12 +548,12 @@ Item {
                 var curRootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
 
                 if (selectLicenseId === curRootLicenseId && selectProductId === curRootProductId){
-                    packagesModel = featuresTreeView.productLicenseFeatures.GetData("Packages", i);
+                    modelPackages = featuresTreeView.productLicenseFeatures.GetData("Packages", i);
                     break;
                 }
             }
 
-            if (!packagesModel){
+            if (!modelPackages){
                 return;
             }
 
@@ -556,8 +562,8 @@ Item {
 
                 var packageIndex = -1;
 
-                for (j = 0; j < packagesModel.GetItemsCount(); j++){
-                    var licenseFeaturesPackageId = packagesModel.GetData("Id", j);
+                for (j = 0; j < modelPackages.GetItemsCount(); j++){
+                    var licenseFeaturesPackageId = modelPackages.GetData("Id", j);
 
                     if (licenseFeaturesPackageId === treeViewPackageId){
                         packageIndex = j;
@@ -570,7 +576,7 @@ Item {
                 }
 
                 var treeViewFeaturesModel = treeView.modelItems.GetData("childItemModel", i);
-                var licenseFeaturesPackageFeaturesModel = packagesModel.GetData("Features", packageIndex);
+                var licenseFeaturesPackageFeaturesModel = modelPackages.GetData("Features", packageIndex);
 
                 for (j = 0; j < treeViewFeaturesModel.GetItemsCount(); j++){
                     var treeViewFeatureId = treeViewFeaturesModel.GetData("Id", j);
@@ -603,9 +609,9 @@ Item {
 
             var dependsFeaturesIndex = -1;
 
-            for (i = 0; i < featuresTreeView.dependModel.GetItemsCount(); i++){
-                var depFeatureId = featuresTreeView.dependModel.GetData("RootFeatureId", i);
-                var depPackageId = featuresTreeView.dependModel.GetData("RootPackageId", i);
+            for (i = 0; i < featuresTreeView.modelDepends.GetItemsCount(); i++){
+                var depFeatureId = featuresTreeView.modelDepends.GetData("RootFeatureId", i);
+                var depPackageId = featuresTreeView.modelDepends.GetData("RootPackageId", i);
 
                 if (depFeatureId === treeViewFeatureId && depPackageId === treeViewPackageId){
                     dependsFeaturesIndex = i;
@@ -617,20 +623,20 @@ Item {
                 return;
             }
 
-            var dependsPackagesModel = featuresTreeView.dependModel.GetData("Packages", dependsFeaturesIndex);
+            var dependsPackagesModel = featuresTreeView.modelDepends.GetData("Packages", dependsFeaturesIndex);
 
             for (i = 0; i < treeView.modelItems.GetItemsCount(); i++) {
                 var packageId = treeView.modelItems.GetData("Id", i);
-                var childModel = treeView.modelItems.GetData("childItemModel", i);
+                var modelChildren = treeView.modelItems.GetData("childItemModel", i);
 
 
-                if (!childModel) {
+                if (!modelChildren) {
                     continue;
                 }
 
-                for (j = 0; j < childModel.GetItemsCount(); j++) {
+                for (j = 0; j < modelChildren.GetItemsCount(); j++) {
 
-                    var id = childModel.GetData("Id", j);
+                    var id = modelChildren.GetData("Id", j);
 
                     for (k = 0; k < dependsPackagesModel.GetItemsCount(); k++){
                         var pId = dependsPackagesModel.GetData("Id", k);
@@ -642,14 +648,14 @@ Item {
 
                             if (pId === packageId && fId === id){
                                 console.log("Find depend feature", packageId, id);
-                                childModel.SetData("isActive", 0, j);
-                                childModel.SetData("stateChecked", 2, j);
+                                modelChildren.SetData("isActive", 0, j);
+                                modelChildren.SetData("stateChecked", 2, j);
                             }
 
                         }
                     }
                 }
-                treeView.modelItems.SetData("childItemModel", childModel, i);
+                treeView.modelItems.SetData("childItemModel", modelChildren, i);
             }
         }
 
@@ -682,10 +688,10 @@ Item {
 
             var packagesIndex = -1;
 
-            var packagesModel = featuresTreeView.productLicenseFeatures.GetData("Packages", licenseIndex);
+            var modelPackages = featuresTreeView.productLicenseFeatures.GetData("Packages", licenseIndex);
 
-            for (i = 0; i < packagesModel.GetItemsCount(); i++){
-                var curPackageId = packagesModel.GetData("Id", i);
+            for (i = 0; i < modelPackages.GetItemsCount(); i++){
+                var curPackageId = modelPackages.GetData("Id", i);
 
                 if (curPackageId === packageId){
                     packagesIndex = i;
@@ -694,14 +700,14 @@ Item {
             }
 
             if (packagesIndex === -1){
-                packagesIndex = packagesModel.InsertNewItem();
-                packagesModel.SetData("Id", packageId, packagesIndex);
-                packagesModel.AddTreeModel("Features", packagesIndex);
+                packagesIndex = modelPackages.InsertNewItem();
+                modelPackages.SetData("Id", packageId, packagesIndex);
+                modelPackages.AddTreeModel("Features", packagesIndex);
             }
 
             var featureIndex = -1;
 
-            var featuresModel = packagesModel.GetData("Features", packagesIndex);
+            var featuresModel = modelPackages.GetData("Features", packagesIndex);
 
             for (i = 0; i < featuresModel.GetItemsCount(); i++){
 
@@ -721,15 +727,15 @@ Item {
                 featuresModel.RemoveItem(featureIndex);
             }
 
-            packagesModel.SetData("Features", featuresModel, packagesIndex);
+            modelPackages.SetData("Features", featuresModel, packagesIndex);
 
             if (featuresModel.GetItemsCount() === 0){
-                packagesModel.RemoveItem(packagesIndex);
+                modelPackages.RemoveItem(packagesIndex);
             }
 
-            featuresTreeView.productLicenseFeatures.SetData("Packages", packagesModel, licenseIndex);
+            featuresTreeView.productLicenseFeatures.SetData("Packages", modelPackages, licenseIndex);
 
-            if (packagesModel.GetItemsCount() === 0){
+            if (modelPackages.GetItemsCount() === 0){
                 featuresTreeView.productLicenseFeatures.RemoveItem(licenseIndex);
             }
 

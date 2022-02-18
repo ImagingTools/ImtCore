@@ -50,7 +50,7 @@ Rectangle {
             return "Id can't be empty!";
         }
 
-        var dataModelLocal = collectionViewLicenses.model.GetData("data");
+        var dataModelLocal = collectionViewLicenses.collectionViewModel.GetData("data");
 
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
 

@@ -23,7 +23,8 @@ public:
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
-				const QSqlRecord& record) const override;
+				const QSqlRecord& record,
+				const QSqlQuery& query) const override;
 	virtual QByteArray CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,

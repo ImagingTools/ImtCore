@@ -24,7 +24,8 @@ Item {
 	// property bool clickable: true;		///< enable mouse click event handling flag
 	// property bool pressable: true;		///< enable mouse click event handling flag
 	// property bool touchEnabled: true;	///< enable touch events handling flag
-	property bool hoverEnabled: true;	///< enable mouse hover event handling flag
+	property bool hoverEnabled: false;	///< enable mouse hover event handling flag
+	property bool hover: containsMouse;
 	// property bool wheelEnabled: true;	///< enable mouse click event handling flag
 	
 	/// @private
@@ -462,20 +463,23 @@ Item {
 
 	onCompleted: {
 		this.element.dom.classList.add('MouseArea')
+
+		this.element.dom.addEventListener('mouseenter', this._mouseenter.bind(this))
+		this.element.dom.addEventListener('mouseleave', this._mouseleave.bind(this))
 	}
-	function _feelMouse(e){
+	function _fillMouse(e){
 		this.mouse.accepted = false
-		let rect = this.element.dom.getBoundingClientRect()
+		let rrr = this.element.dom.getBoundingClientRect()
 		if(e.type.indexOf('touch') >= 0){
-			this.mouse.x = e.changedTouches[0].pageX - rect.x
-			this.mouse.y = e.changedTouches[0].pageY - rect.y
+			this.mouse.x = e.changedTouches[0].pageX - rrr.x
+			this.mouse.y = e.changedTouches[0].pageY - rrr.y
 		} else {
-			this.mouse.x = e.pageX - rect.x
-			this.mouse.y = e.pageY - rect.y
+			this.mouse.x = e.pageX - rrr.x
+			this.mouse.y = e.pageY - rrr.y
 		}
 		
 		this.mouseX = this.mouse.x
-		this.mouseY = this.mouse.Y
+		this.mouseY = this.mouse.y
 		this.mouse.modifiers = 0x00000000
 		if(e.altKey) this.mouse.modifiers |= 0x08000000
 		if(e.shiftKey) this.mouse.modifiers |= 0x02000000
@@ -516,17 +520,107 @@ Item {
 		return false
 	}
 	function _mousedown(e, state) {
-		state.blocked(this)
-		if(this.availableButton(e.button)){
-			this._feelMouse(e)
-			this.pressed = true
-			this.mousePressed()
+		if(this.enabled){
+			state.blocked(this)
+			if(this.availableButton(e.button)){
+				this._fillMouse(e)
+				this.pressed = true
+				this.mousePressed()
+			}
+
+			if(!this.hoverEnabled){
+				this.containsMouse = true
+				this.hover = true
+			}
+
+			if(this._timerPressAndHold) clearTimeout(this._timerPressAndHold)
+			this._timerPressAndHold = setTimeout(()=>{
+				this.pressAndHold()
+			}, this.pressAndHoldInterval)
+			
 		}
 	}
 	function _mouseup(e, state) {
-		state.release()
-		if(this.availableButton(e.button)){
-			this._feelMouse(e)
+		if(this.enabled){
+			state.release()
+			if(this.availableButton(e.button)){
+				this._fillMouse(e)
+				this.pressed = false
+				this.mouseReleased()
+
+				let now = new Date().getTime()
+				if(this._lastClickOrTouch){
+					if(now - this._lastClickOrTouch > 400){
+						this.clicked();
+						this._lastClickOrTouch = now
+					} else {
+						this.doubleClicked();
+						this._lastClickOrTouch = now
+					}
+				} else {
+					this.clicked();
+					this._lastClickOrTouch = now
+				}
+			}
+			if(!this.hoverEnabled){
+				this.containsMouse = false
+				this.hover = false
+			}
+			if(this._timerPressAndHold) clearTimeout(this._timerPressAndHold)
+		}
+	}
+	function _mousemove(e, state) {
+		if(this.enabled && (this.pressed || this.hoverEnabled)){
+			this._fillMouse(e)
+			this.positionChanged()
+		}
+		
+	}
+	function _mousewheel(e, state) {
+		this._feelWheel(e)
+	}
+	function _contextmenu(e, state) {
+
+	}
+	function _mouseenter(e, state){
+		if(this.hoverEnabled && this.enabled){
+			this._fillMouse(e)
+			this.containsMouse = true
+			this.hover = true
+			this.entered()
+		}
+	}
+	function _mouseleave(e, state){
+		if(this.hoverEnabled && this.enabled){
+			//this._fillMouse(e)
+			this.containsMouse = false
+			this.hover = false
+			this.exited()
+		}
+	}
+	function _touchstart(e, state) {
+		if(this.enabled){
+			state.blocked(this)
+			this._fillMouse(e)
+			this.pressed = true
+			this.mousePressed()
+
+			if(!this.hoverEnabled){
+				this.containsMouse = true
+				this.hover = true
+			}
+
+			if(this._timerPressAndHold) clearTimeout(this._timerPressAndHold)
+			this._timerPressAndHold = setTimeout(()=>{
+				this.pressAndHold()
+			}, this.pressAndHoldInterval)
+		}
+
+	}
+	function _touchend(e, state) {
+		if(this.enabled){
+			state.release()
+			this._fillMouse(e)
 			this.pressed = false
 			this.mouseReleased()
 
@@ -543,53 +637,19 @@ Item {
 				this.clicked();
 				this._lastClickOrTouch = now
 			}
-		}
-	}
-	function _mousemove(e, state) {
-		if(this.pressed) this._feelMouse(e)
-	}
-	function _mousewheel(e, state) {
-		this._feelWheel(e)
-	}
-	function _contextmenu(e, state) {
 
-	}
-	function _mouseenter(e, state){
-		this._feelMouse(e)
-		this.entered()
-	}
-	function _mouseleave(e, state){
-		this._feelMouse(e)
-		this.exited()
-	}
-	function _touchstart(e, state) {
-		state.blocked(this)
-		this._feelMouse(e)
-		this.pressed = true
-		this.mousePressed()
-
-	}
-	function _touchend(e, state) {
-		state.release()
-		this._feelMouse(e)
-		this.pressed = false
-		this.mouseReleased()
-
-		let now = new Date().getTime()
-		if(this._lastClickOrTouch){
-			if(now - this._lastClickOrTouch > 400){
-				this.clicked();
-				this._lastClickOrTouch = now
-			} else {
-				this.doubleClicked();
-				this._lastClickOrTouch = now
+			if(!this.hoverEnabled){
+				this.containsMouse = false
+				this.hover = false
 			}
-		} else {
-			this.clicked();
-			this._lastClickOrTouch = now
+
+			if(this._timerPressAndHold) clearTimeout(this._timerPressAndHold)
 		}
 	}
 	function _touchmove(e, state) {
-		if(this.pressed) this._feelMouse(e)
+		if(this.enabled && (this.pressed || this.hoverEnabled)){
+			this._fillMouse(e)
+			this.positionChanged()
+		}
 	}
 }

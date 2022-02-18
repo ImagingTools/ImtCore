@@ -26,41 +26,52 @@ Rectangle
 
     function openDialog(source, parameters) {
         console.log("ThumbnailDecorator openDialog", source, parameters);
-//        modelLayers.insert(0, {"source": source, "parameters": parameters})
-        modelLayers.append({"source": source, "parameters": parameters});
+        var index = modelLayers.InsertNewItem();
 
-        for (var i = 0; i < modelLayers.count; i++) {
-            console.log(i, modelLayers.get(i).source);
-        }
+        modelLayers.SetData("source", source, index);
+        modelLayers.SetData("parameters", parameters, index);
+
+        listViewDialogs.visible = true;
 
         console.log("ThumbnailDecorator listViewDialogs.count", listViewDialogs.count);
-        return modelLayers.count - 1;
+        return modelLayers.GetItemsCount() - 1;
     }
 
     function dialogIsActive() {
-        return modelLayers.count > 0;
-    }
-
-    function getIndexActiveDialog() {
-        return modelLayers.count - 1;
+        return modelLayers.GetItemsCount() > 0;
     }
 
     function closeDialog() {
+//        var index = thubnailDecoratorContainer.getIndexActiveDialog();
+//        var index = modelLayers.count - 1;
+//        console.log("ThumbnailDecorator closeDialog ", index);
 
-        var index = thubnailDecoratorContainer.getIndexActiveDialog();
-        console.log("ThumbnailDecorator closeDialog ", index);
-        if (index > -1) {
-            modelLayers.remove(index);
+//        console.log("Models dialog count =", modelLayers.count);
+
+//        if (index > -1) {
+//            modelLayers.remove(index);
+//        }
+        var index = modelLayers.GetItemsCount() - 1;
+
+        if (index > -1){
+            modelLayers.RemoveItem(index);
         }
+        listViewDialogs.visible = false;
     }
 
-    ListModel {
+//    ListModel {
+//        id: modelLayers;
+//    }
+
+    TreeItemModel {
         id: modelLayers;
     }
 
     TopPanel {
         id: topPanel;
+
         title: menuPanel.activePageName;
+
         onMenuActivatedSignal: {
             console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal", menuId, thubnailDecoratorContainer.activeItem);
             thubnailDecoratorContainer.activeItem.menuActivated(menuId);
@@ -96,6 +107,7 @@ Rectangle
 
     Repeater {
         id: pagesData;
+
         clip: true;
         model: menuPanel.model;
 
@@ -158,16 +170,18 @@ Rectangle
         }
     }
 
-//    Loader {
-//        id: dialogLoader;
-//    }
-
     ListView {
         id: listViewDialogs;
-        anchors.fill: parent;
-        model: modelLayers;
-        visible: modelLayers.count > 0;
         z: 10;
+
+        anchors.fill: parent;
+
+        model: modelLayers;
+       // visible: modelLayers.count > 0;
+
+//        visible: listViewDialogs.model.count > 0;
+        visible: false;
+
         boundsBehavior: Flickable.StopAtBounds;
 
         onModelChanged: {
@@ -177,7 +191,7 @@ Rectangle
 
         delegate: Rectangle {
             id: delegateListViewDialogs;
-            //anchors.fill:thubnailDecoratorContainer;
+
             width: thubnailDecoratorContainer.width;
             height: thubnailDecoratorContainer.height;
 
@@ -185,17 +199,21 @@ Rectangle
 
             Rectangle {
                 id: darkBackground;
+
                 anchors.fill: parent;
+
                 color: "gray";
-                opacity: loaderDialog.item.backgroundOpacity;
 
                 MouseArea {
                     anchors.fill: parent;
 
-                    visible: loaderDialog.item.clickBackgroundClose;
-
                     onClicked: {
-                        thubnailDecoratorContainer.closeDialog();
+                        console.log("ThumbnailDecorator dialog background clicked!");
+
+                        if (loaderDialog.item.clickBackgroundClose){
+                            loaderDialog.closeItem();
+                        }
+
                     }
                 }
             }
@@ -203,11 +221,11 @@ Rectangle
             Loader {
                   id: loaderDialog;
 
-                  anchors.centerIn: loaderDialog.item.centered ? delegateListViewDialogs : "";
-
                   function closeItem() {
-                      console.log("ThummnailDecorator close dialog", model.index);
-                      modelLayers.remove(model.index);
+                      console.log("ThumbnailDecorator close dialog", model.index);
+
+                      modelLayers.RemoveItem(model.index);
+                      listViewDialogs.visible = false;
                   }
 
                   Component.onCompleted: {
@@ -222,7 +240,13 @@ Rectangle
                           loaderDialog.item[key]  = model.parameters[key];
                       }
                       loaderDialog.item["loaderDialog"] = loaderDialog;
-                      console.log(loaderDialog.item.activeFocus);
+
+                      if (loaderDialog.item.centered){
+                          loaderDialog.anchors.centerIn = delegateListViewDialogs;
+                      }
+
+                      darkBackground.opacity = loaderDialog.item.backgroundOpacity;
+
                   }
 
 

@@ -23,10 +23,11 @@ Rectangle {
     property alias pagesCount: docsData.count;
     property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
 
-    property string typeOperation;
+    property string operation;
 
-    onActiveItemChanged: {
-
+    Component.onCompleted: {
+        console.log("MultidocWorkspaceView onCompleted", tabPanelInternal.selectedIndex)
+        docsData.anchors.topMargin = tabPanelInternal.height;
     }
 
     function menuActivated(menuId){
@@ -41,11 +42,6 @@ Rectangle {
             multiDocView.rootItem.changeCommandsId(commandsId);
         }
     }
-
-//    function setItemSelectedIndex(selectedIndex) {
-//        console.log("MultidocWorkspaceView setItemSelectedIndex", selectedIndex, tabPanelInternal.selectedIndex)
-//        pagesData.SetData("ItemSelectedIndex", selectedIndex, tabPanelInternal.selectedIndex);
-//    }
 
     function commandsChanged(commandsId){
         console.log("MultidocWorkspaceView commandsChanged")
@@ -63,10 +59,10 @@ Rectangle {
         return false;
     }
 
-    function addToHeadersArray(itemId, title, source, commandsId, typeOperation){
-        console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId, typeOperation)
-        if (typeOperation) {
-            multiDocView.typeOperation = typeOperation;
+    function addToHeadersArray(itemId, title, source, commandsId, operation){
+        console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId, operation)
+        if (operation) {
+            multiDocView.operation = operation;
         }
         var findPage = false;
         if (itemId !== "" && multiDocView.tabIsOpened(itemId)) {
@@ -101,10 +97,6 @@ Rectangle {
         console.log("MultidocWorkspaceView updateTitleTab()", index, title);
         pagesData.SetData("Title", title, index);
         pagesData.SetData("ItemId", itemId, index);
-    }
-
-    Component.onCompleted: {
-       docsData.anchors.topMargin = tabPanelInternal.height;
     }
 
     TreeItemModel {
@@ -175,6 +167,7 @@ Rectangle {
 
             onVisibleChanged: {
                 console.log("MultiDocView ListView onVisibleChanged", this.visible);
+
                 if(this.visible){
                     multiDocView.activeItem = loader.item;
                     multiDocView.activeItem.refresh();
@@ -203,11 +196,13 @@ Rectangle {
 
             Loader {
                 id: loader;
+
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    console.log("MultidocWorkspaceView model index ", model.Source)
+                    console.log("MultidocWorkspaceView model index ", loader.source, model.Source)
                     loader.source = model.Source
+                    console.log("MultidocWorkspaceView model index 2", loader.source, model.Source)
                 }
 
                 onItemChanged: {
@@ -217,6 +212,8 @@ Rectangle {
                         loader.item.rootItem = docsDataDeleg;
                         loader.item.itemId = model.ItemId
                         loader.item.itemName = model.Title
+                        loader.item.operation = multiDocView.operation
+
                         docsData.currentIndex = model.index;
 
                         var dataModelLocal

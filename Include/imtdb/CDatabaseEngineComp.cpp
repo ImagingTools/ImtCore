@@ -385,11 +385,10 @@ QString CDatabaseEngineComp::GetConnectionName() const
 	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
 	QString suffix;
 	if (m_suffixAttrPtr.IsValid()){
-		suffix = *m_suffixAttrPtr;
+		//suffix = *m_suffixAttrPtr;
 	}
 
 	return GetDatabaseName() + QString(" - %1 - %2").arg(threadId).arg(suffix);
-
 }
 
 

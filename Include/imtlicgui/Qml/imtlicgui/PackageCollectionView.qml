@@ -18,6 +18,8 @@ Item {
     property int contextMenuX;
     property int contextMenuY;
 
+    property string operation;
+
     function refresh() {
         packageCollectionView.refresh();
     }
@@ -157,10 +159,14 @@ Item {
     }
 
     function openContextMenu(item, mouseX, mouseY) {
+        console.log("PackageCollectionView openContextMenu", mouseX, mouseY);
         var point = packageCollectionContainer.mapToItem(item, mouseX, mouseY);
 
-        contextMenuX = point.x;
-        contextMenuY = point.y;
+        packageCollectionContainer.contextMenuX = point.x;
+        packageCollectionContainer.contextMenuY = point.y;
+
+        console.log("point.x", point.x);
+        console.log("point.y", point.y);
 
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
@@ -169,7 +175,9 @@ Item {
         parameters["resultItem"] = packageCollectionContainer;
         parameters["itemHeight"] = 25;
         parameters["itemWidth"] = 150;
-        parameters["styleColor"] = Style.theme == "Dark" ? "Light" : "Dark";
+        parameters["x"] = packageCollectionContainer.contextMenuX;
+        parameters["y"] = packageCollectionContainer.contextMenuY;
+//        parameters["styleColor"] = Style.theme == "Dark" ? "Light" : "Dark";
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 

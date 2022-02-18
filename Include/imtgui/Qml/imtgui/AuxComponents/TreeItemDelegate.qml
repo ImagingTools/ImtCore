@@ -3,10 +3,10 @@ import Acf 1.0
 
 Item {
     id: treeItemDelegate;
+
     width: 100;
-    //height: 50;
     height: mainRect.height + childrenColumn.height;
-//    height:  mainRect.height + childrenColumn.height;
+
     property bool isOpened: true;
 
     property TreeItemModel childItemModel;
@@ -42,11 +42,14 @@ Item {
 
     Rectangle {
         id: mainRect;
-        width: parent.width - model.level * 20;
-        color: Style.baseColor;
+
         anchors.top: parent.top;
         anchors.right: parent.right;
+
+        width: parent.width - model.level * 20;
         height: 30;
+
+        color: Style.baseColor;
 
         visible: model.visible === 1;
 
@@ -69,18 +72,26 @@ Item {
 
         Image {
             id: iconArrow;
-            width: 10;
-            height: 10;
+
             anchors.left: parent.left;
             anchors.leftMargin: 10;
             anchors.verticalCenter: parent.verticalCenter;
+
+            width: 10;
+            height: 10;
+
             visible: model.level === 0;
             source: treeItemDelegate.isOpened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                                 "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
+            sourceSize.height: height;
+            sourceSize.width: width;
+
             MouseArea {
                 id: mouseArea;
+
                 anchors.fill: parent;
+
                 onClicked: {
                     treeItemDelegate.isOpened = !treeItemDelegate.isOpened;
                 }
@@ -89,10 +100,13 @@ Item {
 
         CheckBox {
              id: checkBox;
-             checkState: model.stateChecked;
+
              anchors.rightMargin: 10;
              anchors.right: titleModel.left;
              anchors.verticalCenter: parent.verticalCenter;
+
+             checkState: model.stateChecked;
+
              visible: model.level === 1;
 
              onCheckStateChanged: {
@@ -104,7 +118,9 @@ Item {
 
              MouseArea {
                  anchors.fill: parent;
+
                  visible: model.isActive === 1;
+
                  onClicked: {
                      console.log("TreeItemDelegate CheckBox MouseArea onClicked", checkBox.checkState);
                      if (checkBox.checkState == 2) {
@@ -122,9 +138,11 @@ Item {
 
         Text {
             id: titleModel;
+
             anchors.left: iconArrow.right;
             anchors.leftMargin: 10;
             anchors.verticalCenter: parent.verticalCenter;
+
             text: model.Name;
             color: model.isActive === 1 ? Style.textColor : Style.disabledInActiveTextColor;
             font.pixelSize: Style.fontSize_common;
@@ -134,8 +152,10 @@ Item {
 
     Column {
         id: childrenColumn;
-        width: treeItemDelegate.width;
+
         anchors.top: mainRect.bottom;
+
+        width: treeItemDelegate.width;
         //height: 0;
         //visible: treeItemDelegate.isOpened;
 
@@ -163,6 +183,7 @@ Item {
                  //width: 200;
 
                  source: "TreeItemDelegate.qml";
+
                  onItemChanged: {
                      if (loader.item) {
                          //loader.height = loader.item.height;
@@ -185,6 +206,5 @@ Item {
         onHeightChanged: {
             parent.height = height + mainRect.height;
         }
-
     }
 }

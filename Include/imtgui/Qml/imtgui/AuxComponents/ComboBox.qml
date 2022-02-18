@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 
 Item {
-    id: container;
+    id: comboBoxContainer;
 
     width: 90;
     height: 30;
@@ -17,7 +17,7 @@ Item {
     property int radius: 5;
 
     Component.onCompleted: {
-        if (container.textCentered){
+        if (comboBoxContainer.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
            // cbTitleModel.anchors.horizontalCenter = cbListDelegate.horizontalCenter;
         } else {
@@ -31,9 +31,11 @@ Item {
 
         anchors.fill: parent;
 
-        border.color: container.borderColor;
-        radius: container.radius;
-        color: container.backgroundColor;
+        border.color: comboBoxContainer.borderColor;
+        border.width: 1;
+
+        radius: comboBoxContainer.radius;
+        color: comboBoxContainer.backgroundColor;
 
         gradient: Gradient {
                  GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
@@ -48,9 +50,25 @@ Item {
             anchors.verticalCenter: parent.verticalCenter;
 
             color: Style.textColor;
-            text: container.currentText;
+            text: comboBoxContainer.currentText;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+        }
+
+        Image {
+            id: cbArrowIcon;
+
+            anchors.right: cbMainRect.right;
+            anchors.verticalCenter: cbMainRect.verticalCenter;
+            anchors.rightMargin: 5;
+
+            width: 12;
+            height: 10;
+
+            source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+
+            sourceSize.width: width;
+            sourceSize.height: height;
         }
 
         MouseArea {
@@ -60,34 +78,7 @@ Item {
 
             onClicked: {
                 console.log("ComboBox clicked !");
-                console.log("text color ", Style.textColor);
-                container.menuVisible = !container.menuVisible;
-                console.log("menu width ", cbMenu.width);
-                console.log("menu height ", cbMenu.height);
-                console.log("menu visible ", cbMenu.visible);
-                console.log("listview count  ", cbListView.count);
-            }
-        }
-
-        Canvas {
-            id: cbArrowIcon;
-
-            anchors.right: parent.right;
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.rightMargin: 5;
-
-            height: 5;
-            width: 10;
-
-            onPaint:{
-                var ctx = getContext('2d');
-                ctx.beginPath();
-                ctx.moveTo(0,0);
-                ctx.lineTo(width,0);
-                ctx.lineTo(width * 0.5,height);
-                ctx.lineTo(0,0);
-                ctx.fillStyle = Style.textColor;
-                ctx.fill();
+                comboBoxContainer.menuVisible = !comboBoxContainer.menuVisible;
             }
         }
     }
@@ -97,21 +88,23 @@ Item {
 
         anchors.top: cbMainRect.bottom;
 
-        width: container.width;
-        height: cbListView.count * container.height;
-
+        width: comboBoxContainer.width;
+        height: cbListView.count * comboBoxContainer.height;
 
         color: Style.baseColor;
-        border.color: container.borderColor;
-        radius: container.radius;
-        visible: container.menuVisible;
+
+        border.width: 1;
+        border.color: comboBoxContainer.borderColor;
+
+        radius: comboBoxContainer.radius;
+        visible: comboBoxContainer.menuVisible;
 
         ListView {
             id: cbListView;
 
             anchors.fill: parent;
 
-            model: container.model;
+            model: comboBoxContainer.model;
             clip: true;
             currentIndex: 0;
 
@@ -128,17 +121,17 @@ Item {
                     width: cbListDelegate.width - 2;
                     height: cbListDelegate.height - 2;
 
-                    visible: container.currentIndex === model.index;
+                    visible: comboBoxContainer.currentIndex === model.index;
                     color: Style.selectedColor;
-                    radius: container.radius;
+                    radius: comboBoxContainer.radius;
                 }
 
                 Text {
                     id: cbTitleModel;
 
                     anchors.verticalCenter: parent.verticalCenter;
-                    anchors.horizontalCenter: container.textCentered ? parent.horizontalCenter : null;
-                    anchors.left: !container.textCentered ? cbListDelegate.left : null;
+                    anchors.horizontalCenter: comboBoxContainer.textCentered ? parent.horizontalCenter : null;
+                    anchors.left: !comboBoxContainer.textCentered ? cbListDelegate.left : null;
                     anchors.leftMargin: 10;
 
                     text: model.text;
@@ -151,10 +144,10 @@ Item {
                     anchors.fill: parent;
 
                     onClicked: {
-                        container.currentIndex = model.index;
+                        comboBoxContainer.currentIndex = model.index;
                         cbTitleTxt.text = model.text;
 //                            menu.visible = false;
-                        container.menuVisible = false;
+                        comboBoxContainer.menuVisible = false;
                     }
                 }
 

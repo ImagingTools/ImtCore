@@ -15,6 +15,8 @@ Item {
     property alias itemName: productCollectionView.itemName;
     property alias model: productCollectionView.collectionViewModel;
 
+    property string operation;
+
     function refresh() {
         productCollectionView.refresh();
     }
@@ -59,6 +61,7 @@ Item {
         anchors.right: productCollectionMetaInfo.left;
 
         autoRefresh: true;
+
         Component.onCompleted: {
             productCollectionView.gqlModelInfo = "ProductCollectionInfo"
             productCollectionView.gqlModelItems = "ProductList"

@@ -17,7 +17,7 @@ Rectangle {
     focus: true;
 
     property Item resultItem;
-//    property Item loaderDialog;
+    property Item loaderDialog;
     property Item collectionViewFeatures;
 
     property string featureId;
@@ -37,7 +37,11 @@ Rectangle {
             return "Id can't be empty!";
         }
 
-        var dataModelLocal = collectionViewFeatures.model.GetData("data");
+        if (!containerFeatureEdit.collectionViewFeatures){
+            return "";
+        }
+
+        var dataModelLocal = containerFeatureEdit.collectionViewFeatures.collectionViewModel.GetData("data");
 
         if (id[0] !== "#") {
             id = "#" + id;
@@ -46,7 +50,7 @@ Rectangle {
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
 
             if (dataModelLocal.GetData("Id", i ) === id &&
-                    collectionViewFeatures.selectedIndex !== i) {
+                    containerFeatureEdit.collectionViewFeatures.selectedIndex !== i) {
                 return "Id already exist!";
             }
         }
@@ -93,7 +97,6 @@ Rectangle {
         id: editFeatureDialogTopPanel;
 
         width: containerFeatureEdit.width;
-//        width: 300;
         height: 40;
 
         border.color: containerFeatureEdit.color;
@@ -120,7 +123,6 @@ Rectangle {
             anchors.horizontalCenter: editFeatureDialogTopPanel.horizontalCenter;
 
             text: "Edit feature";
-            //color: Style.theme == "Dark"? "black": Style.textColor;
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -176,6 +178,8 @@ Rectangle {
             height: 45;
 
             color: Style.imagingToolsGradient1;
+
+            border.width: 1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
@@ -225,6 +229,8 @@ Rectangle {
             height: 45;
 
             color: Style.imagingToolsGradient1;
+
+            border.width: 1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
@@ -241,11 +247,12 @@ Rectangle {
                 correctData: errorIdMessage.text !== "";
 
                 onTextChanged: {
+
                     errorIdMessage.text = "";
 
                     var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
                     if (idMessage !== "") {
-                       errorIdMessage.text =idMessage;
+                       errorIdMessage.text = idMessage;
                     }
                 }
 

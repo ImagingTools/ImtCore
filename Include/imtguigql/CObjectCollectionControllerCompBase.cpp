@@ -209,22 +209,24 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
-	QByteArray objectId;
+
+	QByteArray oldObjectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+	QByteArray newObjectId;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
 	else{
 		QString name, description;
-		//QByteArray objectId;
-		istd::IChangeable* savedObject = CreateObject(inputParams, objectId, name, description, errorMessage);
+		istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
+
 		if (savedObject != nullptr){
-			if (m_objectCollectionCompPtr->SetObjectData(objectId, *savedObject) == false){
-				errorMessage = QObject::tr("Can not update object: &1").arg(QString(objectId));
+			if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
+				errorMessage = QObject::tr("Can not update object: %1").arg(QString(oldObjectId));
 			}
 		}
 		else {
-			errorMessage = QObject::tr("Can not create object for update: &1").arg(QString(objectId));
+			errorMessage = QObject::tr("Can not create object for update: %1").arg(QString(oldObjectId));
 		}
 	}
 
@@ -235,7 +237,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	else{
 		dataModel = new imtbase::CTreeItemModel();
 		notificationModel = new imtbase::CTreeItemModel();
-		notificationModel->SetData("Id", objectId);
+		notificationModel->SetData("Id", newObjectId);
 		dataModel->SetExternTreeModel("updatedNotification", notificationModel);
 	}
 
@@ -437,10 +439,12 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 {
 	bool retVal = true;
 	QByteArrayList informationIds = GetInformationIds(gqlObject);
+
 	if (!informationIds.isEmpty()){
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
+
 			if(informationId == "Id"){
 				elementInformation = QString(collectionId);
 			}

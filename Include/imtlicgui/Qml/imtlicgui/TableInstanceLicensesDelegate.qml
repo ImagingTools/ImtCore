@@ -7,6 +7,8 @@ import Acf 1.0
 Rectangle {
     id: licensesTableDelegate;
 
+    color: Style.baseColor;
+
     property bool selected: false;
     property string name;
    // property string expirationText: "01.01.2023";
@@ -60,9 +62,6 @@ Rectangle {
             anchors.left: leftPart.left;
             anchors.leftMargin: 10;
 
-            width: 10;
-            height: width;
-
             checkState: model.LicenseState;
 
             MouseArea {
@@ -113,9 +112,6 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: rightPart.left;
-
-            width: 10;
-            height: width;
 
             checkState: model.ExpirationState;
 

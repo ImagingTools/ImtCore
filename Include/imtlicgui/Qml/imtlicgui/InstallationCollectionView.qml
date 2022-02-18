@@ -12,6 +12,8 @@ Item {
     property alias itemName: installationCollectionView.itemName;
     property alias model: installationCollectionView.collectionViewModel;
 
+    property string operation;
+
     function menuActivated(menuId) {
         installationCollectionView.menuActivated(menuId)
     }
@@ -45,6 +47,8 @@ Item {
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
         anchors.right: installCollectionMetaInfo.left;
+
+        autoRefresh: true;
 
         Component.onCompleted: {
             installationCollectionView.gqlModelInfo = "InstallationInfo"

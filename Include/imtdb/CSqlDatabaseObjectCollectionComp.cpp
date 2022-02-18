@@ -356,7 +356,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	dataPtr.SetPtr(m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record()));
+	dataPtr.SetPtr(m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record(), sqlQuery));
 
 	return dataPtr.IsValid();
 }

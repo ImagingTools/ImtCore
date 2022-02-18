@@ -147,13 +147,17 @@ JSONListModel {
             retVal += "{"
         for (var i = 0; i < this.count; i++){
             var modelObject = this.get(i)
-            if (this.count > 0){
+            if (i > 0){
                 retVal += ","
             }
             if (this.isArray || this.count > 1)
                 retVal += "{"
 
+            var j = 0;
             for (var property in modelObject) {
+                if (j > 0)
+                    retVal += ","
+                j++;
                 retVal += "\"" + property + "\":"
                 var modelVal = modelObject[property]
                 if (modelVal === null)

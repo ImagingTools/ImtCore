@@ -37,7 +37,8 @@ public:
 	*/
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
-				const QSqlRecord& record) const = 0;
+				const QSqlRecord& record,
+				const QSqlQuery& query) const = 0;
 
 };
 

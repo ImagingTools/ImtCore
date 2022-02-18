@@ -6,12 +6,17 @@ import imtlicgui 1.0
 
 Item {
     id: accountCollectionContainer;
+
     anchors.fill: parent;
+
     property Item rootItem;
     property Item multiDocViewItem;
+
     property alias itemId: accountCollectionView.itemId;
     property alias itemName: accountCollectionView.itemName;
     property alias model: accountCollectionView.collectionViewModel;
+
+    property string operation;
 
     function menuActivated(menuId) {
         console.log("AccountCollectionView menuActivated ", menuId);

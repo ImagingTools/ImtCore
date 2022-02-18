@@ -5,12 +5,13 @@ import imtgui 1.0
 
 Item {
     id: packagesMultiDocViewContainer;
+
     anchors.fill: parent;
+
     visible: false;
 
     property Item rootItem;
     property alias firstElementImageSource: packagesMultiDocView.firstElementImageSource;
-//    property alias model: packagesMultiDocView.model;
 
     function menuActivated(menuId) {
         packagesMultiDocView.menuActivated(menuId);

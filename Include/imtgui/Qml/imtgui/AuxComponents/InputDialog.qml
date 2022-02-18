@@ -5,15 +5,13 @@ import imtauthgui 1.0
 
 
 Rectangle {
-    id: container;
-//    anchors.centerIn: parent;
+    id: inputDialogContainer;
 
     width: 300;
     height: 160;
 
     color: Style.backgroundColor;
     clip: true;
-    focus: true;
 
     radius: 2;
 
@@ -32,6 +30,7 @@ Rectangle {
     property bool clickBackgroundClose: false;
 
     property Item resultItem;
+    property Item loaderDialog;
 
     signal okButtonClicked();
     signal cancelButtonClicked();
@@ -40,14 +39,9 @@ Rectangle {
         var parameters  = {};
         parameters["status"] = status;
         parameters["value"] = value;
-        parameters["typeOperation"] = container.typeOperation;
+        parameters["typeOperation"] = inputDialogContainer.typeOperation;
         parameters["dialog"] = "InputDialog";
-        container.resultItem.dialogResult(parameters);
-    }
-
-    Component.onCompleted: {
-        tfcInputDialog.textField.focus = true;
-        tfcInputDialog.textField.cursorVisible = true;
+        inputDialogContainer.resultItem.dialogResult(parameters);
     }
 
     MouseArea {
@@ -56,29 +50,36 @@ Rectangle {
 
     Rectangle {
         id: inputDialogTopPanel;
-        width: container.width;
+
+        width: inputDialogContainer.width;
         height: 40;
-        border.color: container.color;
+
+        border.width: 1;
+        border.color: inputDialogContainer.color;
+
         color: Style.baseColor;
-        radius: container.radius;
+        radius: inputDialogContainer.radius;
 
         Image {
             id: iconDialog;
-            width: 15;
-            height: 15;
+
             anchors.left: inputDialogTopPanel.left;
             anchors.verticalCenter: inputDialogTopPanel.verticalCenter;
+
+            width: 15;
+            height: 15;
+
             source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
         }
 
         Text {
             id: titleRemoveDialog;
+
             anchors.left: iconDialog.right;
             anchors.leftMargin: 10;
             anchors.verticalCenter: inputDialogTopPanel.verticalCenter;
-//            text: "Remove";
-            text: container.nameDialog;
-//            color: Style.theme == "Dark"? "black": Style.textColor;
+
+            text: inputDialogContainer.nameDialog;
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -86,63 +87,68 @@ Rectangle {
 
         AuxButton {
             id: dialogCloseButton;
+
             anchors.right: inputDialogTopPanel.right;
             anchors.verticalCenter: inputDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
+
             width: 17;
             height: 17;
-            iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
-//           MouseArea {
-//               anchors.fill: parent;
-//               onClicked: {
-//                   container.exit("close");
-//                   loaderDialog.closeItem();
-//               }
-//           }
 
-           onClicked: {
-               container.exit("close");
-               loaderDialog.closeItem();
-           }
+            iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
+
+            onClicked: {
+                inputDialogContainer.exit("close");
+                loaderDialog.closeItem();
+            }
         }
     }
 
     Rectangle {
         id: dialogBody;
-        color: container.color;
+
         anchors.top: inputDialogTopPanel.bottom;
-        width: container.width;
-        height: container.height - inputDialogTopPanel.height;
+
+        width: inputDialogContainer.width;
+        height: inputDialogContainer.height - inputDialogTopPanel.height;
+
+        color: inputDialogContainer.color;
 
         Rectangle {
             id: rectText;
+
+            anchors.horizontalCenter: dialogBody.horizontalCenter;
+
             height: 30;
             width: dialogBody.width - 20;
-            anchors.horizontalCenter: dialogBody.horizontalCenter;
-//            anchors.topMargin: 10;
+
             color: "transparent";
 
             Text {
                 id: mainTextRemoveDialog;
+
                 anchors.fill: parent;
                 anchors.verticalCenter: dialogBody.verticalCenter;
                 anchors.topMargin: 10;
+
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
-                text: container.message;
+                text: inputDialogContainer.message;
             }
         }
 
         TextFieldCustom {
             id: tfcInputDialog;
+
             anchors.top: rectText.bottom;
             anchors.topMargin: 5;
             anchors.horizontalCenter: dialogBody.horizontalCenter;
-            text: container.startingValue;
 
             width: dialogBody.width - 20;
             height: 30;
+
+            text: inputDialogContainer.startingValue;
         }
 
         AuxButton {
@@ -163,13 +169,11 @@ Rectangle {
             borderColor: okButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 
-            //enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
-
-            visible: container.okButtonVisible;
+            visible: inputDialogContainer.okButtonVisible;
 
             onClicked: {
-                container.exit("ok", tfcInputDialog.text);
-                container.okButtonClicked();
+                inputDialogContainer.exit("ok", tfcInputDialog.text);
+                inputDialogContainer.okButtonClicked();
                 loaderDialog.closeItem();
             }
         }
@@ -193,8 +197,8 @@ Rectangle {
             backgroundColor: Style.imagingToolsGradient1;
 
             onClicked: {
-                container.exit("cancel", "");
-                container.cancelButtonClicked();
+                inputDialogContainer.exit("cancel", "");
+                inputDialogContainer.cancelButtonClicked();
                 loaderDialog.closeItem();
             }
         }

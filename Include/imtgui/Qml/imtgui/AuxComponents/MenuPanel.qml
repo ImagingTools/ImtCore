@@ -4,18 +4,25 @@ import imtqml 1.0
 
 Rectangle {
     id: menuPanel;
+
     width: 75;
+
     color: Style.backgroundColor;
+
     property string textColor: Style.textColor;
     property string fontName: "Helvetica";
-    property alias model: lvPages.model;
     property string activePageId;
     property string activePageName;
     property string activeIcon;
-    property var pagesSources: [];
     property string firstElementImageSources: [];
+
+    property alias model: lvPages.model;
+
+    property var pagesSources: [];
+
     property int activePageIndex: -1;
     property int pagesCount: 0;
+
     signal activePageChanged;
 
     function updateModels(){
@@ -24,11 +31,15 @@ Rectangle {
 
     ListView {
         id: lvPages;
+
         anchors.fill: parent;
+
         boundsBehavior: Flickable.StopAtBounds;
+
         delegate:  MenuPanelButton{
             width: menuPanel.width;
             height: width * 0.88;
+
             text:  model[PageEnum.NAME];
             textColor: Style.textColor;
             fontName: menuPanel.fontName;
@@ -42,7 +53,7 @@ Rectangle {
                 menuPanel.activePageName = model[PageEnum.NAME];
                 menuPanel.activeIcon = model[PageEnum.ICON];
                 menuPanel.activePageIndex = model.index;
-                 menuPanel.activePageId = model[PageEnum.ID];
+                menuPanel.activePageId = model[PageEnum.ID];
 
                 console.log("menuPanel.activePageName ", menuPanel.activePageName);
                 console.log("menuPanel.activePageId ", menuPanel.activePageId);
@@ -51,13 +62,15 @@ Rectangle {
                 console.log("menuPanel.imageSource ", this.imageSource);
             }
         }
-
     }
 
     Timer {
         id: pageIndexTimer;
-        property int pageIndex: -1;
+
         interval: 10;
+
+        property int pageIndex: -1;
+
         onTriggered: {
             menuPanel.activePageIndex  = pageIndexTimer.pageIndex;
         }

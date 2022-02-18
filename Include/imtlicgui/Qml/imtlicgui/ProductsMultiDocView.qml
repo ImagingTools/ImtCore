@@ -28,7 +28,7 @@ Item {
     onVisibleChanged: {
         if (productsMultiDocViewContainer.visible && productsMultiDocView.pagesCount === 0) {
             console.log("ProductsMultiDocView first page loaded !");
-            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products", "Open")
+            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
         }
     }
 

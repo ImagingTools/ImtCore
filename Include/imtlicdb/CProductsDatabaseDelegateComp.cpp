@@ -17,7 +17,8 @@ namespace imtlicdb
 
 istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 		const QByteArray& /*typeId*/,
-		const QSqlRecord& record) const
+		const QSqlRecord& record,
+		const QSqlQuery& query) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;

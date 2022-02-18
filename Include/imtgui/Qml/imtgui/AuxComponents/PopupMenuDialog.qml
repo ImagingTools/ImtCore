@@ -7,8 +7,6 @@ Item {
     id: popupMenuContainer;
 //    x: 100;
 //    y: 100;
-    x: popupMenuContainer.resultItem.getMenuButtonsX();
-    y: popupMenuContainer.resultItem.getMenuButtonsY();
 
     width: popupMenuContainer.itemWidth;
     height: columnPopupMenu.height;
@@ -16,8 +14,12 @@ Item {
 
     property Item resultItem;
 
+//        x: popupMenuContainer.resultItem.getMenuButtonsX();
+//        y: popupMenuContainer.resultItem.getMenuButtonsY();
+    property Item loaderDialog;
+
     property var model;
-    property var backgroundOpacity;
+    property real backgroundOpacity: 0;
 
     property bool backgroundExist: false;
     property bool clickBackgroundClose: true;
@@ -44,28 +46,33 @@ Item {
         console.log("PopupMenuDialog popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
     }
 
-//    DropShadow {
-//        anchors.fill: popupMenuContainer;
+    DropShadow {
+        anchors.fill: mainBody;
 
-//        horizontalOffset: 5;
-//        verticalOffset: 5;
+        horizontalOffset: 5;
+        verticalOffset: 5;
 
-//        radius: 5;
+        radius: 5;
 //        samples: 5;
-//        color: "#80000000";
-//        source: mainBody;
-//    }
+        color: "#80000000";
+        source: mainBody;
+    }
 
     Rectangle {
         id: mainBody;
 
         anchors.fill: parent;
+//        anchors.leftMargin:  10;
+//        anchors.rightMargin:  10;
+//        anchors.topMargin:  10;
+//        anchors.bottomMargin:  10;
 
         color: Style.baseColor;
         radius: 3;
 
         Column {
             id: columnPopupMenu;
+
             width: parent.width;
 
             Repeater {
@@ -73,11 +80,15 @@ Item {
 
                 delegate: Rectangle {
                     id: delegateListViewPopup;
+
                     width: popupMenuContainer.width;
                     height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
+
                     color: "transparent";
+
                     Rectangle {
                         id: highlightRect;
+
                         anchors.horizontalCenter: parent.horizontalCenter;
 
                         width: parent.width - 1;
@@ -88,43 +99,51 @@ Item {
                     }
 
                     Text {
-                        text: model.name;
-                        color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
-                        font.pixelSize: Style.fontSize_common;
-                        font.family: Style.fontFamily;
-
                         anchors.left: iconDelegateListViewPopup.right;
                         anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
                         anchors.leftMargin: 10;
                         anchors.rightMargin: 10;
+
+                        text: model.name;
+                        color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
+                        font.pixelSize: Style.fontSize_common;
+                        font.family: Style.fontFamily;
                     }
 
                     Image {
                         id: iconDelegateListViewPopup;
-                        width: 18;
-                        height: width;
-                        visible: model.name !== "";
-                        //source: "../../../Icons//_On_Normal.svg";
-                        source: model.imageSource;
 
                         anchors.left: delegateListViewPopup.left;
                         anchors.verticalCenter: delegateListViewPopup.verticalCenter;
                         anchors.leftMargin: 10;
+
+                        width: 18;
+                        height: width;
+
+                        visible: model.name !== "";
+                        //source: "../../../Icons//_On_Normal.svg";
+                        source: model.imageSource;
+                        sourceSize.width: width;
+                        sourceSize.height: height;
                     }
 
                     Rectangle {
-                        width: parent.width - 20;
                         anchors.horizontalCenter: parent.horizontalCenter;
                         anchors.bottom: delegateListViewPopup.bottom;
-                        //anchors.topMargin: 5;
-                        visible: model.id === "";
+
+                        width: parent.width - 20;
                         height: 1;
+
+                        visible: model.id === "";
+
                         color: Style.hover;
                     }
 
                     MouseArea {
                         id: delegateListViewPopupMA;
+
                         anchors.fill: parent;
+
                         hoverEnabled: true;
                         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
