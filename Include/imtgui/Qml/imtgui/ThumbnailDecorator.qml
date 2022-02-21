@@ -31,7 +31,9 @@ Rectangle
         modelLayers.SetData("source", source, index);
         modelLayers.SetData("parameters", parameters, index);
 
-        listViewDialogs.visible = true;
+        if (!listViewDialogs.visible){
+            listViewDialogs.visible = true;
+        }
 
         console.log("ThumbnailDecorator listViewDialogs.count", listViewDialogs.count);
         return modelLayers.GetItemsCount() - 1;
@@ -56,7 +58,12 @@ Rectangle
         if (index > -1){
             modelLayers.RemoveItem(index);
         }
-        listViewDialogs.visible = false;
+
+        if (modelLayers.GetItemsCount() === 0){
+            listViewDialogs.visible = false;
+        }
+
+//        listViewDialogs.visible = false;
     }
 
 //    ListModel {
@@ -179,7 +186,7 @@ Rectangle
         model: modelLayers;
        // visible: modelLayers.count > 0;
 
-//        visible: listViewDialogs.model.count > 0;
+//        visible: modelLayers.GetItemsCount() > 0 ? true :  false;
         visible: false;
 
         boundsBehavior: Flickable.StopAtBounds;
@@ -225,7 +232,10 @@ Rectangle
                       console.log("ThumbnailDecorator close dialog", model.index);
 
                       modelLayers.RemoveItem(model.index);
-                      listViewDialogs.visible = false;
+
+                      if (modelLayers.GetItemsCount() === 0){
+                          listViewDialogs.visible = false;
+                      }
                   }
 
                   Component.onCompleted: {

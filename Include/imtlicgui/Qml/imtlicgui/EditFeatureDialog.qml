@@ -78,13 +78,11 @@ Rectangle {
     function exit(status) {
         var parameters  = {};
         if (status === "ok") {
-
             parameters["newFeatureId"] = tfcFeatureIdText.text;
             parameters["newFeatureName"] = tfcFeatureNameText.text;
-
-            parameters["dialog"] = "EditFeature";
             parameters["loaderDialog"] = containerFeatureEdit.loaderDialog;
         }
+        parameters["dialog"] = "EditFeature";
         parameters["status"] = status;
         containerFeatureEdit.resultItem.dialogResult(parameters);
     }

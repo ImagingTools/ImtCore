@@ -18,6 +18,101 @@ Item {
 
     property string operation;
 
+    ListModel {
+        id: contextMenuModel;
+
+        Component.onCompleted: {
+            contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": "Set Description", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "Rename", "name": "Rename", "imageSource": "", "mode": "Normal"});
+        }
+    }
+
+    function openContextMenu(item, mouseX, mouseY) {
+        console.log("AccountCollectionView openContextMenu", mouseX, mouseY);
+        var source = "AuxComponents/PopupMenuDialog.qml";
+        var parameters = {};
+        parameters["model"] = contextMenuModel;
+        parameters["resultItem"] = accountCollectionContainer;
+        parameters["itemHeight"] = 25;
+        parameters["itemWidth"] = 150;
+        parameters["x"] = mouseX + 75;
+        parameters["y"] = mouseY + 130;
+
+        thubnailDecoratorContainer.openDialog(source, parameters);
+    }
+
+    function dialogResult(parameters) {
+        console.log("AccountCollectionView dialogResult", parameters["dialog"], parameters["status"]);
+        if (parameters["dialog"] === "PopupMenu"){
+
+            var source = "AuxComponents/InputDialog.qml";
+            var prmtrs= {};
+
+            if (parameters["status"] === "Set Description") {
+
+                prmtrs["message"] = "Please enter the description of the account: ";
+                prmtrs["nameDialog"] = "Set description";
+                prmtrs["typeOperation"] = "SetDescription";
+
+                prmtrs["startingValue"] = accountCollectionView.getDescriptionBySelectedItem();
+
+                prmtrs["resultItem"] = accountCollectionContainer;
+
+                thubnailDecoratorContainer.openDialog(source, prmtrs);
+            }
+            else if (parameters["status"] === "Rename") {
+
+                prmtrs["message"] = "Please enter the name of the account: ";
+                prmtrs["nameDialog"] = "Rename Dialog";
+                prmtrs["typeOperation"] = "Rename";
+
+                prmtrs["startingValue"] = accountCollectionView.getNameBySelectedItem();
+                prmtrs["resultItem"] = accountCollectionContainer;
+
+                thubnailDecoratorContainer.openDialog(source, prmtrs);
+            }
+            else if (parameters["status"] === "Edit") {
+
+                accountCollectionContainer.menuActivated("Edit");
+            }
+            else if (parameters["status"] === "Remove") {
+
+                accountCollectionContainer.menuActivated("Remove");
+            }
+        }
+        else if (parameters["dialog"] === "InputDialog"){
+
+            if (parameters["status"] === "yes") {
+
+                if (accountCollectionView.gqlModelRemove !== "") {
+                    accountCollectionView.removeSelectedItem();
+                }
+
+                accountCollectionContainer.refresh();
+                accountCollectionView.table.selectedIndex = -1;
+            }
+
+            if (parameters["status"] === "ok") {
+                var value = parameters["value"];
+
+                if (parameters["typeOperation"] === "SetDescription") {
+
+                    accountCollectionView.gqlModelSetDescription = "AccountSetDescription";
+                    accountCollectionView.callSetDescriptionQuery(value);
+                }
+                else if (parameters["typeOperation"] === "Rename"){
+                    accountCollectionView.gqlModelRename = "AccountRename";
+                    accountCollectionView.callRenameQuery(value);
+                }
+
+                accountCollectionView.refresh();
+            }
+        }
+    }
+
     function menuActivated(menuId) {
         console.log("AccountCollectionView menuActivated ", menuId);
         accountCollectionView.menuActivated(menuId)
@@ -75,6 +170,11 @@ Item {
             accountCollectionContainer.multiDocViewItem.addToHeadersArray(id, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit", typeOperation);
         }
 
+        onCollectionViewRightButtonMouseClicked: {
+            console.log("AccountCollectionView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
+            accountCollectionContainer.openContextMenu(item, mouseX, mouseY);
+        }
+
         onSelectedIndexChanged: {
             if (accountCollectionView.selectedIndex > -1){
                 accountCollectionContainer.commandsChanged("Accounts");
@@ -103,50 +203,50 @@ Item {
         id: accountsMetaInfoModels;
     }
 
-    function updateMetaInfoById(accountId, newMetaInfo){
-        var index = -1;
-        for (var i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
-            var curId = accountsMetaInfoModels.GetData("Id", i);
+//    function updateMetaInfoById(accountId, newMetaInfo){
+//        var index = -1;
+//        for (var i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
+//            var curId = accountsMetaInfoModels.GetData("Id", i);
 
-            if (curId === accountId){
-                index = i;
-                break;
-            }
-        }
+//            if (curId === accountId){
+//                index = i;
+//                break;
+//            }
+//        }
 
-        if (index !== -1){
+//        if (index !== -1){
 
-            var modelData =  accountsMetaInfoModels.GetData("ModelData", index);
+//            var modelData =  accountsMetaInfoModels.GetData("ModelData", index);
 
-            for (var i = 0; i < modelData.GetItemsCount(); i++){
-                var name = modelData.GetData("Name", i);
-                if (name === "LastName"){
-                    modelData.SetData("Childs", newMetaInfo.GetData("LastName"), i);
-                }
-                else if (name === "FirstName") {
-                    modelData.SetData("Childs", newMetaInfo.GetData("FirstName"), i);
-                }
-                else if (name === "Email") {
-                    modelData.SetData("Childs", newMetaInfo.GetData("Email"), i);
+//            for (var i = 0; i < modelData.GetItemsCount(); i++){
+//                var name = modelData.GetData("Name", i);
+//                if (name === "LastName"){
+//                    modelData.SetData("Childs", newMetaInfo.GetData("LastName"), i);
+//                }
+//                else if (name === "FirstName") {
+//                    modelData.SetData("Childs", newMetaInfo.GetData("FirstName"), i);
+//                }
+//                else if (name === "Email") {
+//                    modelData.SetData("Childs", newMetaInfo.GetData("Email"), i);
 
-                }
-                else if (name === "Description") {
-                    modelData.SetData("Childs", newMetaInfo.GetData("AccountDescription"), i);
+//                }
+//                else if (name === "AccountDescription") {
+//                    modelData.SetData("Childs", newMetaInfo.GetData("AccountDescription"), i);
 
-                }
-                else if (name === "AccountName") {
-                    modelData.SetData("Childs", newMetaInfo.GetData("AccountName"), i);
-                }
-                else if (name === "AccountType") {
-                    modelData.SetData("Childs", newMetaInfo.GetData("AccountType"), i);
-                }
-            }
+//                }
+//                else if (name === "AccountName") {
+//                    modelData.SetData("Childs", newMetaInfo.GetData("AccountName"), i);
+//                }
+//                else if (name === "AccountType") {
+//                    modelData.SetData("Childs", newMetaInfo.GetData("AccountType"), i);
+//                }
+//            }
 
-            accountsMetaInfoModels.SetData("ModelData", modelData, index)
+//            accountsMetaInfoModels.SetData("ModelData", modelData, index)
 
-            accountCollectionMetaInfo.modelData = modelData;
-        }
-    }
+//            accountCollectionMetaInfo.modelData = modelData;
+//        }
+//    }
 
     MetaInfo {
         id: accountCollectionMetaInfo;
@@ -158,6 +258,10 @@ Item {
         width: 200;
 
         color: Style.backgroundColor;
+    }
+
+    function callMetaInfoQuery(){
+        metaInfo.getMetaInfo();
     }
 
     GqlModel {
@@ -176,7 +280,7 @@ Item {
             queryFields.InsertField("LastName");
             queryFields.InsertField("FirstName");
             queryFields.InsertField("Email");
-            queryFields.InsertField("Description");
+            queryFields.InsertField("AccountDescription");
             queryFields.InsertField("AccountName");
             queryFields.InsertField("AccountType");
             query.AddField(queryFields);

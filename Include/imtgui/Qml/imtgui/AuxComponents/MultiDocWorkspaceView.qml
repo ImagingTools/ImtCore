@@ -169,6 +169,8 @@ Rectangle {
                 console.log("MultiDocView ListView onVisibleChanged", this.visible);
 
                 if(this.visible){
+                    console.log("multiDocView.activeItem", multiDocView.activeItem);
+                    console.log("loader.item", loader.item);
                     multiDocView.activeItem = loader.item;
                     multiDocView.activeItem.refresh();
                     multiDocView.updateCommandId();

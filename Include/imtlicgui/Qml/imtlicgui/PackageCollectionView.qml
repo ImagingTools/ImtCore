@@ -80,17 +80,6 @@ Item {
         dataModelLocal.SetData("Name", newName, packageCollectionView.table.selectedIndex);
 
         packageCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-//        packageCollectionView.refresh();
-        console.log("Model: ");
-        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-            console.log("\tId =", dataModelLocal.GetData("Id", i), " Name =", dataModelLocal.GetData("Name", i));
-        }
-        console.log("Elements: ");
-        dataModelLocal = packageCollectionView.table.elements;
-
-        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-            console.log("\tId =", dataModelLocal.GetData("Id", i), " Name =", dataModelLocal.GetData("Name", i));
-        }
     }
 
     function updatePackageAfterSetDescription(description) {
@@ -107,77 +96,84 @@ Item {
 
     function dialogResult(parameters) {
         console.log("PackageCollectionView dialogResult", parameters["status"]);
-        if (parameters["status"] === "ok") {
-            if (parameters["dialog"] === "InputDialog") {
+        if (parameters["dialog"] === "PopupMenu"){
+
+            var source = "AuxComponents/InputDialog.qml";
+            var prmtrs= {};
+
+            if (parameters["status"] === "Set Description") {
+
+                prmtrs["message"] = "Please enter the description of the package: ";
+                prmtrs["nameDialog"] = "Set description";
+                prmtrs["typeOperation"] = "SetDescription";
+
+                prmtrs["startingValue"] = packageCollectionView.getDescriptionBySelectedItem();
+
+                prmtrs["resultItem"] = packageCollectionContainer;
+
+                thubnailDecoratorContainer.openDialog(source, prmtrs);
+            }
+            else if (parameters["status"] === "Rename") {
+
+                prmtrs["message"] = "Please enter the name of the package: ";
+                prmtrs["nameDialog"] = "Rename Dialog";
+                prmtrs["typeOperation"] = "Rename";
+
+                prmtrs["startingValue"] = packageCollectionView.getNameBySelectedItem();
+                prmtrs["resultItem"] = packageCollectionContainer;
+
+                thubnailDecoratorContainer.openDialog(source, prmtrs);
+            }
+            else if (parameters["status"] === "Edit") {
+
+                packageCollectionContainer.menuActivated("Edit");
+            }
+            else if (parameters["status"] === "Remove") {
+
+                packageCollectionContainer.menuActivated("Remove");
+            }
+        }
+        else if (parameters["dialog"] === "InputDialog"){
+
+            if (parameters["status"] === "yes") {
+
+                if (packageCollectionView.gqlModelRemove !== "") {
+                    packageCollectionView.removeSelectedItem();
+                }
+
+                packageCollectionContainer.refresh();
+                packageCollectionView.table.selectedIndex = -1;
+            }
+
+            if (parameters["status"] === "ok") {
                 var value = parameters["value"];
+
                 if (parameters["typeOperation"] === "SetDescription") {
-                    setDescriptionModel.setDescription(value);
+
+                    packageCollectionView.gqlModelSetDescription = "FeaturePackageSetDescription";
+                    packageCollectionView.callSetDescriptionQuery(value);
                 }
                 else if (parameters["typeOperation"] === "Rename"){
-                    renameModel.rename(value);
+                    packageCollectionView.gqlModelRename = "FeaturePackageRename";
+                    packageCollectionView.callRenameQuery(value);
                 }
+
+                packageCollectionView.refresh();
             }
-            packageCollectionView.refresh();
         }
-        else if (parameters["status"] === "Edit") {
-            packageCollectionContainer.menuActivated("Edit");
-        }
-        else if (parameters["status"] === "Remove") {
-            packageCollectionContainer.menuActivated("Remove");
-        }
-        else if (parameters["status"] === "Set Description") {
-            var source = "AuxComponents/InputDialog.qml";
-            var parameters = {};
-            parameters["message"] = "Please enter the description of the package: ";
-            parameters["nameDialog"] = "Set description";
-            parameters["typeOperation"] = "SetDescription";
-
-            parameters["startingValue"] = packageCollectionContainer.getDescriptionBySelectedItem();
-
-            parameters["resultItem"] = packageCollectionContainer;
-            thubnailDecoratorContainer.openDialog(source, parameters);
-        }
-        else if (parameters["status"] === "Rename") {
-            var source = "AuxComponents/InputDialog.qml";
-            var parameters = {};
-            parameters["message"] = "Please enter the name of the package: ";
-            parameters["nameDialog"] = "Rename Dialog";
-            parameters["typeOperation"] = "Rename";
-
-            parameters["startingValue"] = packageCollectionContainer.getNameBySelectedItem();
-            parameters["resultItem"] = packageCollectionContainer;
-            thubnailDecoratorContainer.openDialog(source, parameters);
-        }
-    }
-
-    function getMenuButtonsX() {
-        return packageCollectionContainer.contextMenuX + 75;
-    }
-
-    function getMenuButtonsY() {
-        return packageCollectionContainer.contextMenuY + 132;
     }
 
     function openContextMenu(item, mouseX, mouseY) {
         console.log("PackageCollectionView openContextMenu", mouseX, mouseY);
-        var point = packageCollectionContainer.mapToItem(item, mouseX, mouseY);
-
-        packageCollectionContainer.contextMenuX = point.x;
-        packageCollectionContainer.contextMenuY = point.y;
-
-        console.log("point.x", point.x);
-        console.log("point.y", point.y);
 
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;
-        parameters["backgroundOpacity"] = 0;
         parameters["resultItem"] = packageCollectionContainer;
         parameters["itemHeight"] = 25;
         parameters["itemWidth"] = 150;
-        parameters["x"] = packageCollectionContainer.contextMenuX;
-        parameters["y"] = packageCollectionContainer.contextMenuY;
-//        parameters["styleColor"] = Style.theme == "Dark" ? "Light" : "Dark";
+        parameters["x"] = mouseX + 75;
+        parameters["y"] = mouseY + 130;
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
@@ -207,6 +203,8 @@ Item {
                 name = "New Package";
                 typeOperation = "New";
             }
+
+            packageCollectionContainer.multiDocViewItem.activeCollectionItem = packageCollectionContainer;
             packageCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 
@@ -249,7 +247,44 @@ Item {
         height: parent.height;
         width: 200;
 
+        contentVisible: packageCollectionView.table.selectedIndex !== -1;
+
         color: Style.backgroundColor;
+    }
+
+//    function updateMetaInfoById(packageId, newMetaInfo){
+//        var index = -1;
+//        for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
+//            var curId = metaInfoModels.GetData("Id", i);
+
+//            if (curId === packageId){
+//                index = i;
+//                break;
+//            }
+//        }
+
+//        if (index !== -1){
+
+//            var modelData =  metaInfoModels.GetData("ModelData", index);
+
+//            for (var i = 0; i < modelData.GetItemsCount(); i++){
+//                var name = modelData.GetData("Name", i);
+//                if (name === "ModificationTime"){
+//                    modelData.SetData("Childs", newMetaInfo.GetData("ModificationTime"), i);
+//                }
+//                else if (name === "Features") {
+//                    modelData.SetData("Childs", newMetaInfo.GetData("Features"), i);
+//                }
+//            }
+
+//            metaInfoModels.SetData("ModelData", modelData, index)
+
+//            packageCollectionMetaInfo.modelData = modelData;
+//        }
+//    }
+
+    function callMetaInfoQuery(){
+        metaInfo.getMetaInfo();
     }
 
     GqlModel {
@@ -294,115 +329,23 @@ Item {
 
                         packageCollectionMetaInfo.modelData = dataModelLocal;
 
-                        var index = metaInfoModels.InsertNewItem();
+                        var index = -1;
+                        for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
+
+                            if (metaInfoModels.GetData("Id", i) === packageCollectionView.table.getSelectedId()){
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (index === -1){
+                            index = metaInfoModels.InsertNewItem();
+                        }
+
                         metaInfoModels.SetData("Id", packageCollectionView.table.getSelectedId(), index);
                         metaInfoModels.SetData("ModelData", dataModelLocal, index);
+//                        metaInfoModels.Refresh();
                     }
-                }
-            }
-        }
-    }
-
-    GqlModel {
-        id: renameModel;
-
-        function rename(newName) {
-            console.log( "PackageCollectionView renameModel rename");
-            var query;
-            var queryFields;
-            var inputParams = Gql.GqlObject("input");
-
-            query = Gql.GqlRequest("query", "FeaturePackageRename");
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", packageCollectionView.table.getSelectedId());
-            queryFields = Gql.GqlObject("rename");
-            query.AddParam(inputParams);
-
-            renameModel.SetData("Id", packageCollectionView.table.getSelectedId())
-            renameModel.SetData("NewName", newName)
-
-            var jsonString = renameModel.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-
-            inputParams.InsertField("Item");
-            inputParams.InsertFieldArgument ("Item", jsonString);
-
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Successed");
-
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-            console.log("PackageCollectionView rename query ", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, renameModel);
-            if (this.state === "Ready"){
-                var dataModelLocal = renameModel.GetData("data");
-                if (dataModelLocal.ContainsKey("FeaturePackageRename")) {
-                    dataModelLocal = dataModelLocal.GetData("FeaturePackageRename");
-                    if (dataModelLocal.ContainsKey("item")) {
-                        dataModelLocal = dataModelLocal.GetData("item");
-                        var newId = dataModelLocal.GetData("NewId");
-                        var newName = dataModelLocal.GetData("NewName");
-
-                        packageCollectionContainer.updatePackageAfterRename(newId, newName);
-                    }
-                }
-
-                renameModel.Clear();
-            }
-        }
-    }
-
-    GqlModel {
-        id: setDescriptionModel;
-
-        function setDescription(description) {
-            console.log( "PackageCollectionView renameModel rename");
-
-            var query;
-            var queryFields;
-            var inputParams = Gql.GqlObject("input");
-
-            query = Gql.GqlRequest("query", "FeaturePackageSetDescription");
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", packageCollectionView.table.getSelectedId());
-            queryFields = Gql.GqlObject("setDescription");
-            query.AddParam(inputParams);
-
-            setDescriptionModel.SetData("Id", packageCollectionView.table.getSelectedId())
-            setDescriptionModel.SetData("Description", description)
-
-            var jsonString = setDescriptionModel.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"");
-
-            inputParams.InsertField("Item");
-            inputParams.InsertFieldArgument ("Item", jsonString);
-
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Successed");
-
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-            console.log("PackageCollectionView setDescription query ", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, setDescriptionModel);
-            if (this.state === "Ready"){
-                var dataModelLocal = this.GetData("data");
-
-                if (dataModelLocal && dataModelLocal.ContainsKey("item")) {
-                    dataModelLocal = dataModelLocal.GetData("item");
-
-                    var description = dataModelLocal.GetData("Description");
-
-                    packageCollectionContainer.updatePackageAfterSetDescription(description);
                 }
             }
         }

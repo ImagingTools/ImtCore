@@ -21,6 +21,9 @@ Rectangle {
     property string gqlModelInfo;
     property string gqlModelItems;
     property string gqlModelRemove;
+    property string gqlModelRename;
+    property string gqlModelSetDescription;
+
     property string itemId;
     property string itemName;
 
@@ -35,6 +38,83 @@ Rectangle {
         collectionViewContainer.refresh();
     }
 
+    function getDescriptionBySelectedItem(){
+        console.log("CollectionView getDescriptionBySelectedItem");
+        var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
+        console.log("dataModelLocal", dataModelLocal);
+
+        var description;
+        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
+            description = dataModelLocal.GetData("AccountDescription", tableInternal.selectedIndex);
+        }
+        else{
+            description = dataModelLocal.GetData("Description", tableInternal.selectedIndex);
+        }
+
+        return description;
+    }
+
+    function getNameBySelectedItem(){
+        console.log("CollectionView getNameBySelectedItem");
+        var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
+
+        var name;
+
+        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
+            name = dataModelLocal.GetData("AccountName", tableInternal.selectedIndex);
+        }
+        else{
+            name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
+        }
+
+//        var name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
+        return name;
+    }
+
+    function callSetDescriptionQuery(value){
+        console.log("CollectionView callSetDescriptionQuery", value);
+        setDescriptionQuery.setDescription(value);
+    }
+
+    function callRenameQuery(value){
+        console.log("CollectionView callRenameQuery", value);
+        renameQuery.rename(value);
+    }
+
+    function updateItemAfterRename(newId, newName) {
+        console.log("CollectionView updateItemAfterRename", newId, newName);
+        var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
+
+        dataModelLocal.SetData("Id", newId, tableInternal.selectedIndex);
+
+        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
+            dataModelLocal.SetData("AccountName", newName, tableInternal.selectedIndex);
+        }
+        else{
+            dataModelLocal.SetData("Name", newName, tableInternal.selectedIndex);
+        }
+
+        collectionViewContainer.collectionViewModel.SetData("data", dataModelLocal);
+    }
+
+    function updateItemAfterSetDescription(description) {
+        console.log("CollectionView updateItemAfterSetDescription", description);
+        var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
+
+        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
+            console.log("set AccountDescription", description);
+            dataModelLocal.SetData("AccountDescription", description, tableInternal.selectedIndex);
+        }
+        else{
+            console.log("set Description", description);
+            dataModelLocal.SetData("Description", description, tableInternal.selectedIndex);
+        }
+
+        collectionViewContainer.collectionViewModel.SetData("data", dataModelLocal);
+
+//        collectionViewContainer.collectionViewModel.Refresh();
+    }
+
     function dialogResult(parameters) {
          console.log("CollectionView dialogResult", parameters["status"]);
 
@@ -42,8 +122,10 @@ Rectangle {
 
             if (collectionViewContainer.gqlModelRemove !== "") {
                 collectionViewContainer.removeSelectedItem();
+
             }
             collectionViewContainer.refresh();
+            tableInternal.selectedIndex = -1;
         }
     }
 
@@ -91,9 +173,11 @@ Rectangle {
             collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Edit") {
-            if (itemId !== "" && name !== "") {
-                collectionViewContainer.selectItem(itemId, name);
-            }
+//            if (itemId !== "" && name !== "") {
+//                collectionViewContainer.selectItem(itemId, name);
+//            }
+
+            collectionViewContainer.selectItem(itemId, name);
         }
         else if (menuId  === "Remove") {
             console.log("CollectionView try remove element with id", itemId);
@@ -304,6 +388,137 @@ Rectangle {
                         var errorsModel = removeModel.GetData("errors");
                         if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
                             console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    GqlModel {
+        id: renameQuery;
+
+        function rename(newName) {
+            console.log( "CollectionView renameQuery rename");
+
+            var query;
+            var queryFields;
+            var inputParams = Gql.GqlObject("input");
+
+            query = Gql.GqlRequest("query", collectionViewContainer.gqlModelRename);
+            inputParams.InsertField("Id");
+            inputParams.InsertFieldArgument("Id", tableInternal.getSelectedId());
+
+            inputParams.InsertField("NewName");
+            inputParams.InsertFieldArgument("NewName", newName);
+
+            query.AddParam(inputParams);
+
+            queryFields = Gql.GqlObject("rename");
+            queryFields.InsertField("NewName");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("CollectionView renameQuery rename", gqlData);
+
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, renameQuery);
+            if (this.state === "Ready"){
+
+                var dataModelLocal;
+
+                if (renameQuery.ContainsKey("errors")){
+                    dataModelLocal = renameQuery.GetData("errors");
+
+                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRename);
+
+                    var message = dataModelLocal.GetData("message");
+
+                    return;
+                }
+
+                if (renameQuery.ContainsKey("data")){
+                    dataModelLocal = renameQuery.GetData("data");
+
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelRename)) {
+
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRename);
+
+                        if (dataModelLocal.ContainsKey("item")) {
+                            dataModelLocal = dataModelLocal.GetData("item");
+                            var newId = dataModelLocal.GetData("NewId");
+                            var newName = dataModelLocal.GetData("NewName");
+
+                            collectionViewContainer.updateItemAfterRename(newId, newName);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    GqlModel {
+        id: setDescriptionQuery;
+
+        function setDescription(description){
+            console.log( "CollectionView renameQuery rename");
+
+            var query;
+            var queryFields;
+            var inputParams = Gql.GqlObject("input");
+
+            query = Gql.GqlRequest("query", collectionViewContainer.gqlModelSetDescription);
+            inputParams.InsertField("Id");
+            inputParams.InsertFieldArgument("Id", tableInternal.getSelectedId());
+
+            inputParams.InsertField("Description");
+            inputParams.InsertFieldArgument("Description", description);
+
+            query.AddParam(inputParams);
+
+            queryFields = Gql.GqlObject("setDescription");
+            queryFields.InsertField("Description");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("CollectionView setDescription query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, setDescriptionQuery);
+            if (this.state === "Ready"){
+
+                var dataModelLocal;
+
+                if (setDescriptionQuery.ContainsKey("errors")){
+                    dataModelLocal = setDescriptionQuery.GetData("errors");
+
+                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelSetDescription);
+
+                    var message = dataModelLocal.GetData("message");
+
+                    return;
+                }
+
+                if (setDescriptionQuery.ContainsKey("data")){
+                    dataModelLocal = setDescriptionQuery.GetData("data");
+
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelSetDescription)) {
+
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelSetDescription);
+
+                        if (dataModelLocal.ContainsKey("item")) {
+                            dataModelLocal = dataModelLocal.GetData("item");
+
+                            var description = dataModelLocal.GetData("Description");
+
+                            collectionViewContainer.updateItemAfterSetDescription(description);
                         }
                     }
                 }

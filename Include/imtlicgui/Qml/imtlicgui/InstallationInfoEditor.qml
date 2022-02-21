@@ -862,7 +862,8 @@ Rectangle {
                         }
                     }
                     containerInstallation.rootItem.updateTitleTab(containerInstallation.itemId, containerInstallation.itemName);
-                    containerInstallation.multiDocViewItem.activeCollectionItem.refresh();
+                    containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+//                    containerInstallation.multiDocViewItem.activeCollectionItem.refresh();
 
                     containerInstallation.wasChanged = false;
                 }

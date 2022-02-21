@@ -34,6 +34,7 @@ Item {
 
     MultiDocWorkspaceView {
         id: productsMultiDocView;
+
         anchors.fill: parent;
 
         rootItem: productsMultiDocViewContainer.rootItem;

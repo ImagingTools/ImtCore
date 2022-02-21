@@ -15,6 +15,8 @@ Rectangle {
 
     property int elementHeight: 20;
 
+    property bool contentVisible: true;
+
     onModelDataChanged: {
         console.log("MetaInfo onModelDataChanged", collectionMetaInfo.modelData);
     }
@@ -24,6 +26,8 @@ Rectangle {
 
         anchors.top: collectionMetaInfo.top;
         anchors.topMargin: 5;
+
+        visible: collectionMetaInfo.contentVisible;
 
         width: collectionMetaInfo.width;
 

@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
-//import imtauthgui 1.0
+import imtauthgui 1.0
 
 Item {
     id: productsCollectionViewContainer;
@@ -19,6 +19,8 @@ Item {
     property alias model: productsCollectionView.collectionViewModel;
 
     property string operation;
+    property string gqlModelQueryType;
+    property string gqlModelQueryTypeNotification;
 
     Component.onCompleted: {
         console.log("ProductView onCompleted",  productsCollectionView.selectedIndex);
@@ -29,12 +31,36 @@ Item {
         console.log("ProductView collection size",   productsCollectionView.table);
     }
 
+    ListModel {
+        id: contextMenuModel;
+
+        Component.onCompleted: {
+            contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": "Set Description", "imageSource": "", "mode": "Normal"});
+        }
+    }
+
+    function openContextMenu(item, mouseX, mouseY) {
+        var source = "AuxComponents/PopupMenuDialog.qml";
+        var parameters = {};
+        parameters["model"] = contextMenuModel;
+        parameters["resultItem"] = productsCollectionViewContainer;
+        parameters["itemHeight"] = 25;
+        parameters["itemWidth"] = 150;
+        parameters["x"] = mouseX + 75;
+        parameters["y"] = mouseY + 130;
+
+        thubnailDecoratorContainer.openDialog(source, parameters);
+    }
+
     function dialogResult(parameters) {
-         console.log("ProductView dialogResult", parameters["status"]);
+         console.log("ProductView dialogResult", parameters["dialog"], parameters["status"]);
 
-        if (parameters["status"] === "ok") {
+        if (parameters["dialog"] === "EditLicense"){
 
-            if (parameters["dialog"] === "EditLicense") {
+            if (parameters["status"] === "ok") {
                 var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
                 console.log("ProductView onClicked ", dataModelLocal.GetItemsCount())
                 dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);//
@@ -43,28 +69,116 @@ Item {
                 productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                 productsCollectionView.refresh();
             }
-            else if (parameters["dialog"] === "InputDialog") {
+        }
+        else if (parameters["dialog"] === "InputDialog"){
+
+//            if (parameters["status"] === "ok") {
+//                var value = parameters["value"];
+//                console.log("LicenseCollectionViewContainer dialogResult", value);
+//                productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, value);
+//                productViewSaveQuery.updateModel(value);
+//            }
+
+            if (parameters["typeOperation"] === "Save") {
                 var value = parameters["value"];
-                console.log("LicenseCollectionViewContainer dialogResult", value);
-                productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, value);
                 productViewSaveQuery.updateModel(value);
             }
-        }
-        else if (parameters["status"] === "yes") {
-
-            if (productsCollectionView.collectionViewModel.ContainsKey("data")) {
+            else if (parameters["typeOperation"] === "SetDescription") {
+                var value = parameters["value"];
                 var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
-                dataModelLocal.RemoveItem(productsCollectionView.table.selectedIndex);
 
+                dataModelLocal.SetData("Description", value, productsCollectionView.table.selectedIndex);
                 productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-                productsCollectionView.collectionViewModel.Refresh();
-                productsCollectionView.refresh();
 
-                productsCollectionView.table.selectedIndex = -1;
-                productsCollectionViewContainer.commandsChanged("ProductEdit");
-                productsCollectionViewContainer.makeCommandActive("Save");
+                productsCollectionView.refresh();
             }
+
         }
+        else if (parameters["dialog"] === "RemoveDialog"){
+
+            if (parameters["status"] === "yes") {
+                if (productsCollectionView.collectionViewModel.ContainsKey("data")) {
+                    var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
+                    dataModelLocal.RemoveItem(productsCollectionView.table.selectedIndex);
+
+                    productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                    productsCollectionView.collectionViewModel.Refresh();
+                    productsCollectionView.refresh();
+
+                    productsCollectionView.table.selectedIndex = -1;
+                    productsCollectionViewContainer.commandsChanged("ProductEdit");
+                    productsCollectionViewContainer.makeCommandActive("Save");
+                }
+            }
+
+        }
+        else if (parameters["dialog"] === "PopupMenu"){
+
+            if (parameters["status"] === "Edit") {
+                productsCollectionViewContainer.menuActivated("Edit");
+            }
+            else if (parameters["status"] === "Remove") {
+                productsCollectionViewContainer.menuActivated("Remove");
+            }
+            else if (parameters["status"] === "Set Description") {
+                var source = "AuxComponents/InputDialog.qml";
+                var parameters = {};
+                parameters["message"] = "Please enter the description of the license: ";
+                parameters["nameDialog"] = "Set description";
+                parameters["typeOperation"] = "SetDescription";
+                parameters["startingValue"] = productsCollectionView.getDescriptionBySelectedItem();
+                parameters["resultItem"] = productsCollectionViewContainer;
+                thubnailDecoratorContainer.openDialog(source, parameters);
+            }
+
+        }
+
+//        if (parameters["status"] === "ok") {
+
+//            if (parameters["dialog"] === "EditLicense") {
+//                var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
+//                console.log("ProductView onClicked ", dataModelLocal.GetItemsCount())
+//                dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);//
+//                dataModelLocal.SetData("Name", parameters["newLicenseName"], productsCollectionView.selectedIndex);
+
+//                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+//                productsCollectionView.refresh();
+//            }
+//            else if (parameters["dialog"] === "InputDialog") {
+//                var value = parameters["value"];
+//                console.log("LicenseCollectionViewContainer dialogResult", value);
+//                productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, value);
+//                productViewSaveQuery.updateModel(value);
+//            }
+//        }
+//        else if (parameters["status"] === "yes") {
+
+//            if (productsCollectionView.collectionViewModel.ContainsKey("data")) {
+//                var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
+//                dataModelLocal.RemoveItem(productsCollectionView.table.selectedIndex);
+
+//                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+//                productsCollectionView.collectionViewModel.Refresh();
+//                productsCollectionView.refresh();
+
+//                productsCollectionView.table.selectedIndex = -1;
+//                productsCollectionViewContainer.commandsChanged("ProductEdit");
+//                productsCollectionViewContainer.makeCommandActive("Save");
+//            }
+//        }
+    }
+
+    function openMessageDialog(nameDialog, message) {
+
+        var source = "AuxComponents/MessageDialog.qml";
+        var parameters = {};
+        parameters["resultItem"] = productsCollectionViewContainer;
+        parameters["noButtonVisible"] = false;
+        parameters["textOkButton"] = "Ok";
+        parameters["message"] = message;
+        parameters["nameDialog"] = nameDialog;
+
+        thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
     function makeCommandActive(commandId){
@@ -77,9 +191,10 @@ Item {
 
         dataModelLocal.SetData("Name", name, index);
         dataModelLocal.SetData("Id", id, index);
+        dataModelLocal.SetData("Description", "", index);
 
         model.SetData("data", dataModelLocal);
-        model.Refresh();
+//        model.Refresh();
         productsCollectionView.refresh();
     }
 
@@ -176,6 +291,11 @@ Item {
             }
         }
 
+        onCollectionViewRightButtonMouseClicked: {
+            console.log("ProductView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
+            productsCollectionViewContainer.openContextMenu(item, mouseX, mouseY);
+        }
+
         onSelectItem: {
             console.log("ProductView CollectionView onSelectItem", selectedId, name);
 
@@ -216,11 +336,17 @@ Item {
             var inputParams = Gql.GqlObject("input");
 
             if (productsCollectionViewContainer.operation == "Open") {
+                productsCollectionViewContainer.gqlModelQueryType = "ProductUpdate";
+                productsCollectionViewContainer.gqlModelQueryTypeNotification = "updatedNotification";
+
                 query = Gql.GqlRequest("query", "ProductUpdate");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", productsCollectionViewContainer.itemId);
                 queryFields = Gql.GqlObject("updatedNotification");
             } else {
+                productsCollectionViewContainer.gqlModelQueryType = "ProductAdd";
+                productsCollectionViewContainer.gqlModelQueryTypeNotification = "addedNotification";
+
                 query = Gql.GqlRequest("query", "ProductAdd");
                 queryFields = Gql.GqlObject("addedNotification");
             }
@@ -271,30 +397,54 @@ Item {
             console.log("State:", this.state, productViewSaveQuery);
             if (this.state === "Ready"){
 
-                productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.refresh();
+                var dataModelLocal;
 
-                var dataModelLocal = productViewSaveQuery.GetData("data");
-                if (dataModelLocal.ContainsKey("ProductAdd")) {
-                    dataModelLocal = dataModelLocal.GetData("ProductAdd");
+                if (productViewSaveQuery.ContainsKey("errors")){
+                    dataModelLocal = productViewSaveQuery.GetData("errors");
 
-                    if(dataModelLocal.ContainsKey("addedNotification")){
-                        dataModelLocal = dataModelLocal.GetData("addedNotification");
-                        console.log("ProductView productViewSaveQuery addedNotification exist");
-                         productsCollectionView.refresh();
-                        if(dataModelLocal.ContainsKey("Id")){
-                            console.log("ProductView productViewSaveQuery addedNotification  Id exist");
-                            productsCollectionViewContainer.itemId = dataModelLocal.GetData("Id");
-                            //productsCollectionViewContainer.itemName = dataModelLocal.GetData("Name");
-
-                            productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
-                        }
-                        else if(productViewSaveQuery.ContainsKey("errors")){
-                            var errorsModel = accountItemModel.GetData("errors");
-                            if(errorsModel !== null && errorsModel.ContainsKey(containerContactInfo.gqlModelItems)){
-                                console.log("message", errorsModel.GetData(productsCollectionViewContainer.gqlModelItems).GetData("message"));
-                            }
-                        }
+                    dataModelLocal = dataModelLocal.GetData(productsCollectionViewContainer.gqlModelQueryType);
+                    if (dataModelLocal){
+                        var messageError = dataModelLocal.GetData("message");
+                        productsCollectionViewContainer.openMessageDialog("Error Dialog", messageError);
                     }
+                    return;
+                }
+
+                if (productViewSaveQuery.ContainsKey("data")){
+                    dataModelLocal = productViewSaveQuery.GetData("data");
+
+                    dataModelLocal = dataModelLocal.GetData(productsCollectionViewContainer.gqlModelQueryType);
+
+                    dataModelLocal = dataModelLocal.GetData(productsCollectionViewContainer.gqlModelQueryTypeNotification);
+
+                    productsCollectionView.refresh();
+
+                    var newId, newName;
+
+                    if(dataModelLocal.ContainsKey("Id")){
+                        newId = dataModelLocal.GetData("Id");
+                    }
+
+                    if (dataModelLocal.ContainsKey("Name")){
+                        newName = dataModelLocal.GetData("Name");
+                    }
+
+                    if (productsCollectionView.itemId !== newId){
+                        productsCollectionView.itemId = newId;
+                        productsCollectionView.itemName = newId;
+
+                        productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
+                    }
+
+
+
+//                    if (productsCollectionView.itemName !== newName){
+//                        productsCollectionView.itemName = newName;
+//                        productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
+//                    }
+
+                    productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+//                    productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.refresh();
                 }
             }
         }
@@ -331,8 +481,7 @@ Item {
 
         height: parent.height;
 
-        color: "transparent";
-
+        color: Style.backgroundColor;
 
         Rectangle {
             id: productIdTextRect;
@@ -359,25 +508,25 @@ Item {
             }
         }
 
-//        TextFieldCustom {
-//            id: tfcProductId;
+        TextFieldCustom {
+            id: tfcProductId;
 
-//            anchors.top: productIdTextRect.bottom;
+            anchors.top: productIdTextRect.bottom;
 
-//            width: parent.width - 3;
-//            height: 30;
+            width: parent.width - 3;
+            height: 30;
 
-//            text: productsCollectionViewContainer.itemId;
+            text: productsCollectionViewContainer.itemId;
 
-//            onTextChanged: {
-//                productsCollectionViewContainer.itemId = tfcProductId.text;
-//            }
-//        }
+            onTextChanged: {
+                productsCollectionViewContainer.itemId = tfcProductId.text;
+            }
+        }
 
 
         Rectangle {
             id: productNameTextRect;
-//            anchors.top: tfcProductId.bottom;
+            anchors.top: tfcProductId.bottom;
 
             width: parent.width;
             height: 20;
@@ -398,34 +547,38 @@ Item {
             }
         }
 
-//        TextFieldCustom {
-//            id: tfcProductName;
-//            anchors.top: productNameTextRect.bottom;
-//            width: parent.width - 3;
-//            height: 30;
+        TextFieldCustom {
+            id: tfcProductName;
 
-//            text: productsCollectionViewContainer.itemName;
+            anchors.top: productNameTextRect.bottom;
 
-//            onTextChanged: {
-//                productsCollectionViewContainer.itemName = tfcProductName.text;
-//            }
-//        }
+            width: parent.width - 3;
+            height: 30;
+
+            text: productsCollectionViewContainer.itemName;
+
+            onTextChanged: {
+                productsCollectionViewContainer.itemName = tfcProductName.text;
+            }
+        }
 
         Rectangle {
             id: headerTreeView;
-//            anchors.top: tfcProductName.bottom;
-            anchors.topMargin: 5;
-//            anchors.horizontalCenter: parent.horizontalCenter;
-            width: parent.width - 5;
 
+            anchors.top: tfcProductName.bottom;
+            anchors.topMargin: 5;
+
+            width: parent.width - 5;
             height: 35;
+
             color: Style.theme === "Light" ? "white": Style.backgroundColor;
+
+//            color: "red";
 
             Text {
                 id: titleHeader;
 
                 anchors.verticalCenter: headerTreeView.verticalCenter;
-
                 anchors.left: headerTreeView.left;
                 anchors.leftMargin: 10;
 
@@ -444,6 +597,7 @@ Item {
 
             height: 1;
             width: parent.width;
+
             color: "lightgray";
         }
 
@@ -483,16 +637,15 @@ Item {
         FeaturesTreeView {
             id: featuresTreeView;
 
-            onDependModelChanged: {
+            onModelDependsChanged: {
                 console.log( "PackageView FeaturesTreeView onDependModelChanged");
-                //featureCollectionViewContainer.updateFeaturesTreeView();
             }
 
-            onModelTreeViewChanged: {
+            onModelTreeItemsChanged: {
                 console.log("PackageView FeaturesTreeView onModelTreeViewChanged");
                 //featureCollectionViewContainer.updateFeaturesTreeView();
 
-                treeView.modelItems = featuresTreeView.modelTreeView;
+                treeView.modelItems = featuresTreeView.modelTreeItems;
             }
 
             onProductLicenseFeaturesChanged: {
@@ -505,6 +658,11 @@ Item {
 
         function clearTreeView(){
             console.log("ProductView clearTreeView");
+
+            if(!treeView.modelItems){
+                return;
+            }
+
             var modelItems = treeView.modelItems;
 
             for(var i = 0; i < modelItems.GetItemsCount(); i++){

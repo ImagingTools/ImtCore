@@ -252,7 +252,29 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 			const imtgql::CGqlObject& gqlObject,
 			QString& errorMessage) const
 {
-	return nullptr;
+
+	QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+	QString newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
+
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+
+	imtbase::CTreeItemModel* dataModel = nullptr;
+
+	if (!objectId.isEmpty()){
+
+		dataModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
+
+		itemsModel->SetData("NewId", newName);
+		itemsModel->SetData("NewName", newName);
+
+		m_objectCollectionCompPtr->SetObjectName(objectId, newName);
+		dataModel->SetExternTreeModel("item", itemsModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 
@@ -261,7 +283,29 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 			const imtgql::CGqlObject& gqlObject,
 			QString& errorMessage) const
 {
-	return nullptr;
+	QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+	QString description = inputParams.at(0).GetFieldArgumentValue("Description").toString();
+
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+
+	imtbase::CTreeItemModel* dataModel = nullptr;
+
+	if (!objectId.isEmpty()){
+
+		dataModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
+
+		itemsModel->SetData("Id", objectId);
+		itemsModel->SetData("Description", description);
+
+		dataModel->SetExternTreeModel("item", itemsModel);
+
+		m_objectCollectionCompPtr->SetObjectDescription(objectId, description);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

@@ -6,7 +6,7 @@ import imtauthgui 1.0
 //import '../../../imtgui/Qml/imtgui/AuxComponents'
 
 Rectangle {
-    id: container;
+    id: editLicenseContainer;
 
     width: 400;
     height: 280;
@@ -38,11 +38,10 @@ Rectangle {
 
             parameters["newLicenseId"] = tfcLicenseIdText.text;
             parameters["newLicenseName"] = tfcLicenseNameText.text;
-
-            parameters["dialog"] = "EditLicense";
         }
+        parameters["dialog"] = "EditLicense";
         parameters["status"] = status;
-        container.resultItem.dialogResult(parameters);
+        editLicenseContainer.resultItem.dialogResult(parameters);
     }
 
     function validateId(id) {
@@ -50,12 +49,16 @@ Rectangle {
             return "Id can't be empty!";
         }
 
-        var dataModelLocal = collectionViewLicenses.collectionViewModel.GetData("data");
+        if (!editLicenseContainer.collectionViewLicenses){
+            return "";
+        }
+
+        var dataModelLocal = editLicenseContainer.collectionViewLicenses.collectionViewModel.GetData("data");
 
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
 
             if (dataModelLocal.GetData("Id", i ) === id &&
-                    collectionViewLicenses.selectedIndex !== i) {
+                    editLicenseContainer.collectionViewLicenses.selectedIndex !== i) {
                 return "Id already exist!";
             }
         }
@@ -78,10 +81,12 @@ Rectangle {
     Rectangle {
         id: editLicenseDialogTopPanel;
 
-        width: container.width;
+        width: editLicenseContainer.width;
         height: 40;
 
-        border.color: container.color;
+        border.width: 1;
+        border.color: editLicenseContainer.color;
+
         color: Style.baseColor;
 
         Image {
@@ -124,8 +129,8 @@ Rectangle {
             iconSource: "../../../" + "Icons/" + "Light" + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 
             onClicked: {
-                container.exit("close");
-                loaderDialog.closeItem();
+                editLicenseContainer.exit("close");
+                editLicenseContainer.loaderDialog.closeItem();
             }
         }
     }
@@ -136,13 +141,13 @@ Rectangle {
 
         anchors.topMargin: 20;
         anchors.top: editLicenseDialogTopPanel.bottom;
-        anchors.horizontalCenter: container.horizontalCenter;
-        anchors.verticalCenter: container.verticalCenter;
+        anchors.horizontalCenter: editLicenseContainer.horizontalCenter;
+        anchors.verticalCenter: editLicenseContainer.verticalCenter;
 
-        width: container.width - 50;
-        height: container.height - 50;
+        width: editLicenseContainer.width - 50;
+        height: editLicenseContainer.height - 50;
 
-        color: container.color;
+        color: editLicenseContainer.color;
 
         Text {
             id: titleLicenseName;
@@ -163,6 +168,8 @@ Rectangle {
             height: 45;
 
             color: Style.imagingToolsGradient1;
+
+            border.width: 1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
@@ -174,7 +181,7 @@ Rectangle {
                 width: tfcLicenseName.width - 22;
                 height: 23;
 
-                text: container.licenseName;
+                text: editLicenseContainer.licenseName;
                 focus: true;
                 correctData: errorNameMessage.text !== "";
                 borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
@@ -182,7 +189,7 @@ Rectangle {
                 onTextChanged: {
                     errorNameMessage.text = "";
 
-                    var nameMessage = container.validateName(tfcLicenseNameText.text);
+                    var nameMessage = editLicenseContainer.validateName(tfcLicenseNameText.text);
                     if (nameMessage !== "") {
                        errorNameMessage.text = nameMessage;
                     }
@@ -212,6 +219,8 @@ Rectangle {
             height: 45;
 
             color: Style.imagingToolsGradient1;
+
+            border.width: 1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
             TextFieldCustom {
@@ -223,14 +232,14 @@ Rectangle {
                 width: tfcLicenseId.width - 22;
                 height: 23;
 
-                text: container.licenseId;
+                text: editLicenseContainer.licenseId;
                 borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
                 correctData: errorIdMessage.text !== "";
 
                 onTextChanged: {
                     errorIdMessage.text = "";
 
-                    var idMessage = container.validateId(tfcLicenseIdText.text);
+                    var idMessage = editLicenseContainer.validateId(tfcLicenseIdText.text);
                     if (idMessage !== "") {
                        errorIdMessage.text = idMessage;
                     }
@@ -261,9 +270,9 @@ Rectangle {
             enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
 
             onClicked: {
-                container.okClicked(tfcLicenseIdText.text, tfcLicenseNameText.text);
-                container.exit("ok");
-                loaderDialog.closeItem();
+                editLicenseContainer.okClicked(tfcLicenseIdText.text, tfcLicenseNameText.text);
+                editLicenseContainer.exit("ok");
+                editLicenseContainer.loaderDialog.closeItem();
             }
         }
 
@@ -285,8 +294,8 @@ Rectangle {
             backgroundColor: Style.imagingToolsGradient1;
 
             onClicked: {
-                container.exit("cancel");
-                loaderDialog.closeItem();
+                editLicenseContainer.exit("cancel");
+                editLicenseContainer.loaderDialog.closeItem();
             }
         }
 

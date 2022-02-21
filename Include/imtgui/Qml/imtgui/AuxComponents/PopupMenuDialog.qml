@@ -5,17 +5,11 @@ import imtqml 1.0
 
 Item {
     id: popupMenuContainer;
-//    x: 100;
-//    y: 100;
 
     width: popupMenuContainer.itemWidth;
     height: columnPopupMenu.height;
-//    clip: true;
 
     property Item resultItem;
-
-//        x: popupMenuContainer.resultItem.getMenuButtonsX();
-//        y: popupMenuContainer.resultItem.getMenuButtonsY();
     property Item loaderDialog;
 
     property var model;
@@ -33,7 +27,12 @@ Item {
     function exit(status) {
         var parameters  = {};
         parameters["status"] = status;
+        parameters["dialog"] = "PopupMenu";
         popupMenuContainer.resultItem.dialogResult(parameters);
+    }
+
+    onResultItemChanged: {
+        console.log("PopupMenuDialog onResultItemChanged", popupMenuContainer.resultItem);
     }
 
     onModelChanged: {
@@ -45,30 +44,28 @@ Item {
         }
         console.log("PopupMenuDialog popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
     }
+//    DropShadow {
+//        anchors.fill: mainBody;
 
-    DropShadow {
-        anchors.fill: mainBody;
+//        horizontalOffset: 5;
+//        verticalOffset: 5;
 
-        horizontalOffset: 5;
-        verticalOffset: 5;
-
-        radius: 5;
-//        samples: 5;
-        color: "#80000000";
-        source: mainBody;
-    }
+//        radius: 5;
+////        samples: 5;
+//        color: "#80000000";
+//        source: mainBody;
+//    }
 
     Rectangle {
         id: mainBody;
 
         anchors.fill: parent;
-//        anchors.leftMargin:  10;
-//        anchors.rightMargin:  10;
-//        anchors.topMargin:  10;
-//        anchors.bottomMargin:  10;
 
         color: Style.baseColor;
         radius: 3;
+
+        border.width: 1;
+        border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
         Column {
             id: columnPopupMenu;
@@ -90,9 +87,10 @@ Item {
                         id: highlightRect;
 
                         anchors.horizontalCenter: parent.horizontalCenter;
+                        anchors.verticalCenter: parent.verticalCenter;
 
-                        width: parent.width - 1;
-                        height: parent.height;
+                        width: parent.width - 2;
+                        height: parent.height - 2;
 
                         color: Style.selectedColor;
                         visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
@@ -150,6 +148,7 @@ Item {
                         visible: model.mode !== "Disabled";
 
                         onClicked: {
+
                             popupMenuContainer.exit(model.name);
                             loaderDialog.closeItem();
                         }

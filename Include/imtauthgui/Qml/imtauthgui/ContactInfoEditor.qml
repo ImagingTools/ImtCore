@@ -1096,9 +1096,9 @@ Rectangle {
 
             containerContactInfo.contactInfoModel.SetIsArray(false);
             var jsonString = containerContactInfo.contactInfoModel.toJSON();
-            console.log("jsonString", jsonString)
+//            console.log("jsonString", jsonString)
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            console.log("jsonString", jsonString)
+//            console.log("jsonString", jsonString)
 
             inputParams.InsertField("Item");
             inputParams.InsertFieldArgument ("Item", jsonString);
@@ -1146,6 +1146,7 @@ Rectangle {
                             var oldId = containerContactInfo.itemId;
                             containerContactInfo.itemId = dataModelLocal.GetData("Id");
 
+                            containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
 //                            containerContactInfo.multiDocViewItem.activeCollectionItem.updateMetaInfoById(containerContactInfo.itemId, containerContactInfo.contactInfoModel);
                         }
                     }

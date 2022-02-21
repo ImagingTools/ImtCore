@@ -118,6 +118,7 @@ Rectangle {
             id: rectText;
 
             anchors.horizontalCenter: dialogBody.horizontalCenter;
+//            anchors.verticalCenter: dialogBody.verticalCenter;
 
             height: 30;
             width: dialogBody.width - 20;

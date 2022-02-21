@@ -17,6 +17,101 @@ Item {
 
     property string operation;
 
+    ListModel {
+        id: contextMenuModel;
+
+        Component.onCompleted: {
+            contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": "Set Description", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "Rename", "name": "Rename", "imageSource": "", "mode": "Normal"});
+        }
+    }
+
+    function openContextMenu(item, mouseX, mouseY) {
+        console.log("ProductCollectionView openContextMenu", mouseX, mouseY);
+        var source = "AuxComponents/PopupMenuDialog.qml";
+        var parameters = {};
+        parameters["model"] = contextMenuModel;
+        parameters["resultItem"] = productCollectionContainer;
+        parameters["itemHeight"] = 25;
+        parameters["itemWidth"] = 150;
+        parameters["x"] = mouseX + 75;
+        parameters["y"] = mouseY + 130;
+
+        thubnailDecoratorContainer.openDialog(source, parameters);
+    }
+
+    function dialogResult(parameters) {
+        console.log("ProductCollectionView dialogResult", parameters["dialog"], parameters["status"]);
+        if (parameters["dialog"] === "PopupMenu"){
+
+            var source = "AuxComponents/InputDialog.qml";
+            var prmtrs= {};
+
+            if (parameters["status"] === "Set Description") {
+
+                prmtrs["message"] = "Please enter the description of the product: ";
+                prmtrs["nameDialog"] = "Set description";
+                prmtrs["typeOperation"] = "SetDescription";
+
+                prmtrs["startingValue"] = productCollectionView.getDescriptionBySelectedItem();
+
+                prmtrs["resultItem"] = productCollectionContainer;
+
+                thubnailDecoratorContainer.openDialog(source, prmtrs);
+            }
+            else if (parameters["status"] === "Rename") {
+
+                prmtrs["message"] = "Please enter the name of the product: ";
+                prmtrs["nameDialog"] = "Rename Dialog";
+                prmtrs["typeOperation"] = "Rename";
+
+                prmtrs["startingValue"] = productCollectionView.getNameBySelectedItem();
+                prmtrs["resultItem"] = productCollectionContainer;
+
+                thubnailDecoratorContainer.openDialog(source, prmtrs);
+            }
+            else if (parameters["status"] === "Edit") {
+
+                productCollectionContainer.menuActivated("Edit");
+            }
+            else if (parameters["status"] === "Remove") {
+
+                productCollectionContainer.menuActivated("Remove");
+            }
+        }
+        else if (parameters["dialog"] === "InputDialog"){
+
+            if (parameters["status"] === "yes") {
+
+                if (productCollectionView.gqlModelRemove !== "") {
+                    productCollectionView.removeSelectedItem();
+                }
+
+                productCollectionContainer.refresh();
+                productCollectionView.table.selectedIndex = -1;
+            }
+
+            if (parameters["status"] === "ok") {
+                var value = parameters["value"];
+
+                if (parameters["typeOperation"] === "SetDescription") {
+
+                    productCollectionView.gqlModelSetDescription = "ProductSetDescription";
+                    productCollectionView.callSetDescriptionQuery(value);
+                }
+                else if (parameters["typeOperation"] === "Rename"){
+                    productCollectionView.gqlModelRename = "ProductRename";
+                    productCollectionView.callRenameQuery(value);
+                }
+
+                productCollectionView.refresh();
+            }
+        }
+    }
+
     function refresh() {
         productCollectionView.refresh();
     }
@@ -80,6 +175,11 @@ Item {
             productCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", typeOperation)
         }
 
+        onCollectionViewRightButtonMouseClicked: {
+            console.log("ProductCollectionView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
+            productCollectionContainer.openContextMenu(item, mouseX, mouseY);
+        }
+
         onSelectedIndexChanged: {
             if (productCollectionView.selectedIndex > -1){
                 productCollectionContainer.commandsChanged("Products")
@@ -118,6 +218,10 @@ Item {
         width: 200;
 
         color: Style.backgroundColor;
+    }
+
+    function callMetaInfoQuery(){
+        metaInfo.getMetaInfo();
     }
 
     GqlModel {
@@ -162,7 +266,20 @@ Item {
 
                         productCollectionMetaInfo.modelData = dataModelLocal;
 
-                        var index = productsMetaInfoModels.InsertNewItem();
+                        var index = -1;
+                        for (var i = 0; i < productsMetaInfoModels.GetItemsCount(); i++){
+
+                            if (productsMetaInfoModels.GetData("Id", i) === productCollectionView.table.getSelectedId()){
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (index === -1){
+                            index = productsMetaInfoModels.InsertNewItem();
+                        }
+
+//                        var index = productsMetaInfoModels.InsertNewItem();
 
                         productsMetaInfoModels.SetData("Id", productCollectionView.table.getSelectedId(), index);
                         productsMetaInfoModels.SetData("ModelData", dataModelLocal, index);

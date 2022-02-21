@@ -5,17 +5,22 @@ import Acf 1.0
 
 Rectangle {
     id: tabPanelContainer;
+
     height: 40;
     width: 1000;
+
     color: Style.theme === "Dark" ? Style.baseColor: Style.backgroundColor;
 
     property int selectedIndex: -1;
     property int count: 0;
-    property string firstElementImageSource;
-    property var headersArray: [];
-    property alias model: list.model;
-    signal closeItem(int index);
 
+    property string firstElementImageSource;
+
+    property var headersArray: [];
+
+    property alias model: list.model;
+
+    signal closeItem(int index);
     signal rightClicked();
     signal leftClicked();
 
@@ -41,6 +46,7 @@ Rectangle {
 
     ListView{
         id: list;
+
         width: externButtons.visible ? parent.width - externButtons.width :  parent.width;
         height: parent.height;
 
@@ -51,14 +57,18 @@ Rectangle {
         model: 4;
 
         boundsBehavior: Flickable.StopAtBounds;
+
         delegate: TabDelegate{
+
             height: list.height;
             width: 200;
+
             selected: model.index === tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
             firstElementText: tabPanelContainer.firstElementName;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
+
             onClicked: {
                 console.log("TabDelegate onClicked")
                 tabPanelContainer.selectedIndex = model.index;
@@ -85,16 +95,17 @@ Rectangle {
                  GradientStop { position: 0.5; color: "#00ffffff"; }
                  GradientStop { position: 1.0; color: Style.imagingToolsGradient2; }
              }
-
     }
 
     Rectangle {
         id: externButtons;
-        height: parent.height;
-        width: height;
-        color: Style.backgroundColor;
 
         anchors.right: parent.right;
+
+        height: parent.height;
+        width: height;
+
+        color: Style.backgroundColor;
 
         visible: list.contentWidth > tabPanelContainer.width;
 
