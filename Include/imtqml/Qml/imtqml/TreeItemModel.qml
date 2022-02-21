@@ -183,5 +183,22 @@ JSONListModel {
         return retVal
     }
 
+    function updateTreeItemJSONModel(){
+        for(var row = 0; row < this.GetItemsCount(); row++){
+            var modelObject = this.get(row)
+            var keys = Object.keys(modelObject)
+            for ( var index in keys ) {
+                var retVal = modelObject[keys[index]]
+                if(typeof retVal === 'object' && retVal._qmlName !== 'TreeItemModel.qml'){
+                    var retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
+                    retModel.append(retVal);
+                    retVal = retModel
+                    retVal.updateTreeItemJSONModel()
+                }
+                this.SetData(keys[index],retVal,row)
+            }
+        }
+    }
+
 
 }
