@@ -660,7 +660,7 @@ QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collect
 		}
 	}
 	else if (!IsPathInsideRepository(sourceFilePath)){
-		istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(sourceFilePath, typeId));
+		DataPtr dataObjectPtr = CreateObjectFromFile(sourceFilePath, typeId);
 		if (dataObjectPtr.IsValid()){
 			QByteArray objectId = (const_cast<CFileCollectionComp*>(this))->InsertFile(sourceFilePath, typeId, QFileInfo(sourceFilePath).completeBaseName());
 

@@ -146,7 +146,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable* defaultValuePtr = nullptr,
+				DataPtr defaultValuePtr = DataPtr(),
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
@@ -170,10 +170,8 @@ public:
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
 	// reimplemented (IObjectCollection::IDataFactory)
-	istd::IChangeable* CreateInstance(const QByteArray& keyId = "") const override;
-
-	// reimplemented (istd::IFactoryInfo)
-	istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
+	virtual DataPtr CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 protected:
 	class ResourceLocker
@@ -347,12 +345,12 @@ protected:
 	/**
 		Create data object for the given type.
 	*/
-	virtual istd::IChangeable* CreateDataObject(const QByteArray& typeId) const;
+	virtual DataPtr CreateDataObject(const QByteArray& typeId) const;
 
 	/**
 		Create object data from the file.
 	*/
-	virtual istd::IChangeable* CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
+	virtual DataPtr CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const;
 
 	/**
 		Write a file collection item to file system.

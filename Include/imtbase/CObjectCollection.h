@@ -37,7 +37,7 @@ public:
 
 protected:
 	// reimplemented (CObjectCollectionBase)
-	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;
+	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const override;
 
 private:
 	int m_operationFlags;

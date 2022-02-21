@@ -430,18 +430,18 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			const istd::IChangeable * defaultValuePtr,
+			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
 			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
 {
-	istd::TOptDelPtr<const istd::IChangeable> newObjectPtr;
+	DataPtr newObjectPtr;
 
-	if (defaultValuePtr != nullptr){
-		newObjectPtr.SetPtr(defaultValuePtr, false);
+	if (defaultValuePtr.IsValid()){
+		newObjectPtr = defaultValuePtr;
 	}
 	else{
-		newObjectPtr.SetPtr(CreateDataObject(typeId), true);
+		newObjectPtr = CreateDataObject(typeId);
 	}
 
 	if (newObjectPtr.IsValid()){
@@ -503,34 +503,34 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 			Q_ASSERT(dataObjectPtr.IsValid());
 
 			if (!dataPtr.IsValid()){
-				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateDataObject(typeId));
+				DataPtr newInstancePtr = CreateDataObject(typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*dataObjectPtr)){
-						dataPtr.SetPtr(newInstancePtr.PopPtr());
+						dataPtr = newInstancePtr;
 
 						return true;
 					}
 				}
 			}
 			else{
-				return dataPtr->CopyFrom(*dataObjectPtr);
+				return dataPtr->CopyFrom(*dataObjectPtr.GetPtr());
 			}
 		}
 	}
 
 	for (const CollectionItem& item : m_files){
 		if (item.fileId == objectId){
-			istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(item.filePathInRepository, typeId));
+			DataPtr dataObjectPtr = CreateObjectFromFile(item.filePathInRepository, typeId);
 			if (!dataObjectPtr.IsValid()){
 				return false;
 			}
 
 			
 			if (!dataPtr.IsValid()){
-				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateDataObject(typeId));
+				DataPtr newInstancePtr = CreateDataObject(typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*dataObjectPtr)){
-						dataPtr.SetPtr(newInstancePtr.PopPtr());
+						dataPtr = newInstancePtr;
 
 						QWriteLocker lockCache(&m_objectCacheLock);
 
@@ -749,7 +749,7 @@ QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 
 // reimplemented (IObjectCollection::IDataFactory)
 
-istd::IChangeable* CFileCollectionCompBase::CreateInstance(const QByteArray& keyId) const
+CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateInstance(const QByteArray& keyId) const
 {
 	return CreateDataObject(keyId);
 }
@@ -759,7 +759,7 @@ istd::IChangeable* CFileCollectionCompBase::CreateInstance(const QByteArray& key
 
 istd::IFactoryInfo::KeyList CFileCollectionCompBase::GetFactoryKeys() const
 {
-	KeyList retVal;
+	istd::IFactoryInfo::KeyList retVal;
 
 	for (int i = 0; i < m_resourceTypeConstraints.GetOptionsCount(); ++i){
 		retVal.insert(m_resourceTypeConstraints.GetOptionId(i));
@@ -826,7 +826,7 @@ QString CFileCollectionCompBase::GetWorkingExt(
 }
 
 
-istd::IChangeable* CFileCollectionCompBase::CreateDataObject(const QByteArray& typeId) const
+CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateDataObject(const QByteArray& typeId) const
 {
 	int factoryIndex = -1;
 
@@ -840,17 +840,22 @@ istd::IChangeable* CFileCollectionCompBase::CreateDataObject(const QByteArray& t
 	}
 
 	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
-		return m_objectFactoryListCompPtr.CreateInstance(factoryIndex);
+		icomp::IComponent* compPtr = m_objectFactoryListCompPtr.CreateComponent(factoryIndex);
+		return CFileCollectionCompBase::DataPtr(
+			DataPtr::RootObjectPtr(compPtr),
+			[this, compPtr]() {
+				return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
+			});
 	}
 
-	return nullptr;
+	return CFileCollectionCompBase::DataPtr();
 }
 
 
-istd::IChangeable* CFileCollectionCompBase::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
+CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateObjectFromFile(const QString& filePath, const QByteArray& typeId) const
 {
-	istd::IChangeable* retVal = CreateDataObject(typeId);
-	if (retVal != nullptr){
+	CFileCollectionCompBase::DataPtr retVal = CreateDataObject(typeId);
+	if (retVal.IsValid()){
 		const ifile::IFilePersistence* filePersistenceCompPtr = GetPersistenceForObjectType(typeId);
 		if (filePersistenceCompPtr != nullptr){
 			int loadState = filePersistenceCompPtr->LoadFromFile(*retVal, filePath);
@@ -860,7 +865,7 @@ istd::IChangeable* CFileCollectionCompBase::CreateObjectFromFile(const QString& 
 		}
 	}
 
-	return nullptr;
+	return CFileCollectionCompBase::DataPtr();
 }
 
 
@@ -1013,7 +1018,7 @@ imtbase::IObjectCollection::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaI
 	QFileInfo fileInfo(dataObjectFilePath);
 	if (fileInfo.exists()){
 		if (m_metaInfoCreatorMap.contains(typeId)){
-			istd::TDelPtr<istd::IChangeable> dataObjectPtr(CreateObjectFromFile(dataObjectFilePath, typeId));
+			DataPtr dataObjectPtr = CreateObjectFromFile(dataObjectFilePath, typeId);
 			if (!dataObjectPtr.IsValid()){
 				return retVal;
 			}

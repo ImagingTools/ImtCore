@@ -12,11 +12,11 @@ namespace imtbase
 
 // public methods
 
-void CStaticObjectCollection::SetObject(const QByteArray& objectId, istd::IChangeable* objectPtr)
+void CStaticObjectCollection::SetObject(const QByteArray& objectId, DataPtr objectPtr)
 {
 	ObjectInfo* objectInfoPtr = GetObjectInfo(objectId);
 	if (objectInfoPtr != nullptr){
-		objectInfoPtr->objectPtr.SetPtr(objectPtr, false);
+		objectInfoPtr->objectPtr = objectPtr;
 	}
 }
 
@@ -26,11 +26,11 @@ QByteArray CStaticObjectCollection::RegisterObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			istd::IChangeable* objectPtr)
+			DataPtr objectPtr)
 {
 	ObjectInfo info;
 
-	info.objectPtr.SetPtr(objectPtr, false);
+	info.objectPtr = objectPtr;
 	info.description = description;
 	info.name = name;
 	info.typeId = typeId;
@@ -65,7 +65,7 @@ QByteArray CStaticObjectCollection::InsertNewObject(
 			const QByteArray& /*typeId*/,
 			const QString& /*name*/,
 			const QString& /*description*/,
-			const istd::IChangeable* /*defaultValuePtr*/,
+			DataPtr /*defaultValuePtr*/,
 			const QByteArray& /*proposedObjectId*/,
 			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
 			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
@@ -95,14 +95,9 @@ istd::IChangeable* CStaticObjectCollection::CloneMe(CompatibilityMode mode) cons
 
 // protected methods
 
-istd::IChangeable* CStaticObjectCollection::CreateObjectInstance(const QByteArray& /*typeId*/) const
+CStaticObjectCollection::DataPtr CStaticObjectCollection::CreateObjectInstance(const QByteArray& /*typeId*/) const
 {
 	return nullptr;
-}
-
-
-void CStaticObjectCollection::DestroyObjectInstance(istd::IChangeable* /*objectPtr*/) const
-{
 }
 
 

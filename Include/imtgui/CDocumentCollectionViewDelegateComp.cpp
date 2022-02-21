@@ -86,7 +86,7 @@ QByteArray CDocumentCollectionViewDelegateComp::ImportObject(const QByteArray& t
 	if ((m_collectionPtr != nullptr) && m_objectImportPersistenceCompPtr.IsValid()){
 		const imtbase::IObjectCollection::IDataFactory* objectFactorPtr = dynamic_cast<const imtbase::IObjectCollection::IDataFactory*>(m_collectionPtr);
 		if (objectFactorPtr != nullptr){
-			istd::TDelPtr<istd::IChangeable> documentPtr(objectFactorPtr->CreateInstance(typeId));
+			imtbase::IObjectCollection::DataPtr documentPtr = objectFactorPtr->CreateInstance(typeId);
 			if (documentPtr.IsValid()){
 				int state = m_objectImportPersistenceCompPtr->LoadFromFile(*documentPtr, sourcePath);
 				if (state == ifile::IFilePersistence::OS_OK){

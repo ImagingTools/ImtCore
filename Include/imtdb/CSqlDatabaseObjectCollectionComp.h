@@ -64,7 +64,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable* defaultValuePtr = nullptr,
+				DataPtr defaultValuePtr = DataPtr(),
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;

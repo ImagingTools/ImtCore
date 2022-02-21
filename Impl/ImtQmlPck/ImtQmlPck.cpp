@@ -32,17 +32,6 @@ I_EXPORT_COMPONENT(
 			"Container object for QuickObject",
 			"Quick QML");
 
-
-I_EXPORT_COMPONENT(
-			ApplicationDataProvider,
-			"Application item based data provider",
-			"Application item based data provider");
-
-I_EXPORT_COMPONENT(
-			ApplicationRepresentationDataProvider,
-			"Application representation data provider",
-			"Application representation data provider");
-
 I_EXPORT_COMPONENT(
 			CommandDataProvider,
 			"Command item based data provider",

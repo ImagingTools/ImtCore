@@ -34,37 +34,19 @@ const ifile::IFilePersistence* CObjectCollectionComp::GetPersistenceForObjectTyp
 
 // protected methods
 
-istd::IChangeable* CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
+CObjectCollectionComp::DataPtr CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
 {
 	int factoryIndex = m_typeIdsAttrPtr.FindValue(typeId);
 	if (factoryIndex >= 0){
 		if (factoryIndex < m_objectFactoriesCompPtr.GetCount()){
-			return m_objectFactoriesCompPtr.CreateInstance(factoryIndex);
+			icomp::IComponent* compPtr = m_objectFactoriesCompPtr.CreateComponent(factoryIndex);
+			return DataPtr(DataPtr::RootObjectPtr(compPtr), [compPtr, this]() {
+				return m_objectFactoriesCompPtr.ExtractInterface(compPtr);
+			});
 		}
 	}
 
 	return nullptr;
-}
-
-
-void CObjectCollectionComp::DestroyObjectInstance(istd::IChangeable* objectPtr) const
-{
-	if (objectPtr != nullptr){
-		icomp::IComponent* componentPtr = dynamic_cast<icomp::IComponent*>(objectPtr);
-		if (componentPtr != nullptr){
-			const icomp::ICompositeComponent* parentComponentPtr = nullptr;
-			while ((parentComponentPtr = componentPtr->GetParentComponent(true)) != nullptr){
-				componentPtr = const_cast<icomp::ICompositeComponent*>(parentComponentPtr);
-			}
-
-			if (componentPtr != nullptr){
-				delete componentPtr;
-			}
-		}
-		else{
-			delete objectPtr;
-		}
-	}
 }
 
 
@@ -105,7 +87,7 @@ void CObjectCollectionComp::OnComponentCreated()
 			object.isEnabled = true;
 			object.name = objectName;
 			object.flags = OF_ALL & ~OF_SUPPORT_DELETE;
-			object.objectPtr.SetPtr(objectPtr, false);
+			object.objectPtr = objectPtr;
 			object.typeId = typeId;
 			object.id = uuid;
 

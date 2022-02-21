@@ -132,7 +132,7 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
-			const istd::IChangeable* defaultValuePtr,
+			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
@@ -145,9 +145,9 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 		}
 	}
 
-	info.objectPtr.SetPtr(CreateObjectInstance(typeId), true);
+	info.objectPtr = CreateObjectInstance(typeId);
 	if (info.objectPtr.IsValid()){
-		if (defaultValuePtr != nullptr){
+		if (defaultValuePtr.IsValid()){
 			if (!info.objectPtr->CopyFrom(*defaultValuePtr)){
 				return QByteArray();
 			}
@@ -198,8 +198,6 @@ bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
 				modelPtr->DetachObserver(&m_modelUpdateBridge);
 			}
 
-			DestroyObjectInstance((*iter).objectPtr.PopPtr());
-
 			m_objects.erase(iter);
 
 			break;
@@ -227,10 +225,10 @@ bool CObjectCollectionBase::GetObjectData(const QByteArray& objectId, DataPtr& d
 	for (const ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
 			if (!dataPtr.IsValid()){
-				istd::TDelPtr<istd::IChangeable> newInstancePtr(CreateObjectInstance(objectInfo.typeId));
+				DataPtr newInstancePtr = CreateObjectInstance(objectInfo.typeId);
 				if (newInstancePtr.IsValid()){
 					if (newInstancePtr->CopyFrom(*objectInfo.objectPtr)){
-						dataPtr.SetPtr(newInstancePtr.PopPtr());
+						dataPtr = newInstancePtr;
 
 						return true;
 					}
@@ -248,7 +246,7 @@ bool CObjectCollectionBase::GetObjectData(const QByteArray& objectId, DataPtr& d
 
 bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
 {
-	for (const ObjectInfo& objectInfo : m_objects){
+	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
 			istd::TSmartPtr<istd::IChangeable> eventPtr;
 			eventPtr.SetPtr(new CObjectCollectionUpdateEvent(
@@ -496,7 +494,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 
 		istd::IChangeable* objectPtr = nullptr;
 		if (!archive.IsStoring()){
-			elementInfo.objectPtr.SetPtr(CreateObjectInstance(elementInfo.typeId), true);
+			elementInfo.objectPtr = CreateObjectInstance(elementInfo.typeId);
 
 			objectPtr = elementInfo.objectPtr.GetPtr();
 		}
@@ -600,18 +598,13 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 
 					if (sourceObjectPtr != nullptr){
 						if (!targetInfoPtr->objectPtr.IsValid()){
-							targetInfoPtr->objectPtr.SetPtr(CreateObjectInstance(typeId));
+							targetInfoPtr->objectPtr = CreateObjectInstance(typeId);
 						}
 
 						if (targetInfoPtr->objectPtr.IsValid()){
 							if (!targetInfoPtr->objectPtr->CopyFrom(*sourceObjectPtr)){
 								return false;
 							}
-						}
-					}
-					else{
-						if (targetInfoPtr->objectPtr.IsToRelase()){
-							targetInfoPtr->objectPtr.Reset();
 						}
 					}
 				}
@@ -635,7 +628,7 @@ bool CObjectCollectionBase::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-bool CObjectCollectionBase::InsertObjectIntoCollection(const ObjectInfo& info)
+bool CObjectCollectionBase::InsertObjectIntoCollection(ObjectInfo info)
 {
 	imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(info.objectPtr.GetPtr());
 	if (modelPtr != nullptr){
@@ -651,14 +644,6 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(const ObjectInfo& info)
 	m_objects.push_back(info);
 
 	return true;
-}
-
-
-void CObjectCollectionBase::DestroyObjectInstance(istd::IChangeable* objectPtr) const
-{
-	if (objectPtr != nullptr){
-		delete objectPtr;
-	}
 }
 
 
@@ -685,12 +670,6 @@ void CObjectCollectionBase::RemoveAllObjects()
 	m_modelUpdateBridge.EnsureModelsDetached();
 
 	istd::CChangeNotifier changeNotifier(this);
-
-	for (ObjectInfo& info : m_objects){
-		if (info.objectPtr.IsToRelase()){
-			DestroyObjectInstance(info.objectPtr.PopPtr());
-		}
-	}
 
 	m_objects.clear();
 }

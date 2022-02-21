@@ -47,7 +47,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable* defaultValuePtr = nullptr,
+				DataPtr defaultValuePtr = DataPtr(),
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
@@ -79,7 +79,6 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	typedef istd::TOptDelPtr<istd::IChangeable> ObjectPtr;
 
 	struct ObjectInfo
 	{
@@ -92,7 +91,7 @@ protected:
 
 		ObjectInfo(const ObjectInfo& object)
 		{
-			this->objectPtr.TakeOver(const_cast<ObjectInfo&>(object).objectPtr);
+			this->objectPtr = object.objectPtr;
 
 			this->id = object.id;
 			this->typeId = object.typeId;
@@ -105,7 +104,7 @@ protected:
 		}
 
 		bool isEnabled;
-		ObjectPtr objectPtr;
+		DataPtr objectPtr;
 		QString name;
 		QString description;
 		QByteArray id;
@@ -126,11 +125,10 @@ protected:
 
 protected:
 	// abstract methods
-	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const = 0;
+	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const = 0;
 
 protected:
-	virtual bool InsertObjectIntoCollection(const ObjectInfo& info);
-	virtual void DestroyObjectInstance(istd::IChangeable* objectPtr) const;
+	virtual bool InsertObjectIntoCollection(ObjectInfo info);
 	virtual int GetItemDefaultFlags() const;
 	ObjectInfo* GetObjectInfo(const QByteArray& id) const;
 	virtual void RemoveAllObjects();

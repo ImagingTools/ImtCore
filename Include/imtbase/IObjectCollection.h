@@ -4,6 +4,7 @@
 // ACF includes
 #include <istd/TIFactory.h>
 #include <istd/TSmartPtr.h>
+#include <icomp/IComponent.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
@@ -25,8 +26,43 @@ class ICollectionDataController;
 class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
-	typedef istd::TSmartPtr<istd::IChangeable> DataPtr;
-	typedef istd::TIFactory<istd::IChangeable> IDataFactory;
+	class DataPtr
+	{
+	public:
+		typedef std::shared_ptr<istd::IPolymorphic> RootObjectPtr;
+		typedef std::function<istd::IChangeable*()> ExtractInterfaceFunc;
+
+		DataPtr() : m_objectPtr(nullptr) {}
+
+		DataPtr(const istd::IChangeable* ptr) : m_objectPtr(ptr) {}// pure pointer
+
+		DataPtr(const RootObjectPtr& rootObjPtr, const ExtractInterfaceFunc& extractInterface)
+			: m_rootPtr(rootObjPtr),
+			m_objectPtr(extractInterface())
+		{
+		}
+
+		bool IsValid() const { return m_objectPtr != nullptr; }
+		const istd::IChangeable* GetPtr() const { return m_objectPtr; }
+		const istd::IChangeable* operator->() const { return m_objectPtr; }
+		const istd::IChangeable& operator*() const { return *m_objectPtr; }
+
+		istd::IChangeable* GetPtr() { return const_cast<istd::IChangeable*>(m_objectPtr); }
+		istd::IChangeable& operator*() { return *const_cast<istd::IChangeable*>(m_objectPtr); }
+		istd::IChangeable* operator->() { return const_cast<istd::IChangeable*>(m_objectPtr); }
+
+	private:
+		RootObjectPtr m_rootPtr;
+		const istd::IChangeable* m_objectPtr;
+	};
+
+	class IDataFactory
+	{
+	public:
+		virtual DataPtr CreateInstance(const QByteArray& keyId = "") const = 0;
+		virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const = 0;
+	};
+
 	typedef istd::TSmartPtr<idoc::IDocumentMetaInfo> MetaInfoPtr;
 
 	/**
@@ -165,7 +201,7 @@ public:
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable* defaultValuePtr = nullptr,
+				DataPtr defaultValuePtr = DataPtr(),
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) = 0;
