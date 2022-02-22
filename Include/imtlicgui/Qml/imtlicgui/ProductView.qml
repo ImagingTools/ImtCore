@@ -43,14 +43,19 @@ Item {
     }
 
     function openContextMenu(item, mouseX, mouseY) {
+
+        var point = productsCollectionViewContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
+
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;
         parameters["resultItem"] = productsCollectionViewContainer;
         parameters["itemHeight"] = 25;
         parameters["itemWidth"] = 150;
-        parameters["x"] = mouseX + 75;
-        parameters["y"] = mouseY + 130;
+//        parameters["x"] = mouseX + 75;
+//        parameters["y"] = mouseY + 130;
+        parameters["x"] = point.x;
+        parameters["y"] = point.y;
 
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
@@ -237,7 +242,7 @@ Item {
     }
 
     function refresh() {
-        console.log("PackageView refresh()");
+        console.log("ProductView refresh()");
         productsCollectionView.refresh();
     }
 
@@ -369,16 +374,18 @@ Item {
 //                productsCollectionViewContainer.itemName = newId;
 //            }
 
-            modelProducts.SetData("Id", productsCollectionViewContainer.itemId)
-            modelProducts.SetData("Name", productsCollectionViewContainer.itemName)
+//            modelProducts.SetData("Id", productsCollectionViewContainer.itemId)
+//            modelProducts.SetData("Name", productsCollectionViewContainer.itemName)
+            modelProducts.SetData("Id", tfcProductId.text)
+            modelProducts.SetData("Name", tfcProductName.text)
             modelProducts.SetExternTreeModel("licenses", productsCollectionView.collectionViewModel.GetData("data"));
             modelProducts.SetExternTreeModel("dependencies", featuresTreeView.productLicenseFeatures);
 
             //featureCollectionViewContainer.model.SetIsArray(false);
             var jsonString = modelProducts.toJSON();
-            console.log("jsonString", jsonString)
+//            console.log("jsonString", jsonString)
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            console.log("jsonString", jsonString)
+//            console.log("jsonString", jsonString)
 
             inputParams.InsertField("Item");
             inputParams.InsertFieldArgument ("Item", jsonString);
@@ -518,9 +525,9 @@ Item {
 
             text: productsCollectionViewContainer.itemId;
 
-            onTextChanged: {
-                productsCollectionViewContainer.itemId = tfcProductId.text;
-            }
+//            onTextChanged: {
+//                productsCollectionViewContainer.itemId = tfcProductId.text;
+//            }
         }
 
 
@@ -557,9 +564,9 @@ Item {
 
             text: productsCollectionViewContainer.itemName;
 
-            onTextChanged: {
-                productsCollectionViewContainer.itemName = tfcProductName.text;
-            }
+//            onTextChanged: {
+//                productsCollectionViewContainer.itemName = tfcProductName.text;
+//            }
         }
 
         Rectangle {

@@ -131,7 +131,7 @@ Item {
                          checkBox.checkState = 2
 //                         model.stateChecked = 2;
                      }
-                     listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
+                     treeItemDelegate.listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
                  }
              }
         }
@@ -168,19 +168,14 @@ Item {
              onIsOpenedChanged: {
                  console.log("TreeItemDelegate onIsOpenedChanged");
                  if (treeItemDelegate.isOpened){
-                     console.log(" = model.childItemModel");
                      treeItemRepeater.model = model.childItemModel;
                  } else {
-                     console.log(" = 0");
                      treeItemRepeater.model = 0;
                  }
              }
 
              delegate: Loader {
                  id: loader;
-
-//                 height: 50;
-                 //width: 200;
 
                  source: "TreeItemDelegate.qml";
 

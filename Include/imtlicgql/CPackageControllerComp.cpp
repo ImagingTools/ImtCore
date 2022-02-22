@@ -82,6 +82,11 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
 
+		if (featurePackagePtr == nullptr){
+			errorMessage = "Unable to get an feature package";
+			return nullptr;
+		}
+
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
@@ -153,12 +158,9 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 					}
 				}
 
-				if (featurePackagePtr != nullptr){
-					featurePackagePtr->SetFeatureDependencies(rootPackageId + "." + rootFeatureId, featuresDependencies);
-				}
+				featurePackagePtr->SetFeatureDependencies(rootPackageId + "." + rootFeatureId, featuresDependencies);
 			}
 		}
-
 
 		return featurePackagePtr.PopPtr();
 	}
@@ -175,7 +177,6 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dependenciesModel = nullptr;
 	imtbase::CTreeItemModel* dataModel = nullptr;
-	QByteArrayList fields;
 
 	if (!m_viewDelegateCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -195,7 +196,11 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 		for (const QByteArray& collectionId : collectionIds){
 
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr);
+
+			if (!m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+				continue;
+			}
+
 			const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
 
 			if (packagePtr != nullptr){
@@ -276,8 +281,6 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* treeItemModel = nullptr;
 	imtbase::CTreeItemModel* dataModel = nullptr;
-	bool isSetResponce = false;
-	QByteArrayList fields;
 
 	if (!m_viewDelegateCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();

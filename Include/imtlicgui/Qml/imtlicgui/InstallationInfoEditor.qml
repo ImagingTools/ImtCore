@@ -335,6 +335,9 @@ Rectangle {
                      borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
                      textCentered: false;
 
+                     menuX: customerCB.x;
+                     menuY: customerCB.y;
+
                      property bool wasFocus: false;
 
                      onCurrentIndexChanged: {

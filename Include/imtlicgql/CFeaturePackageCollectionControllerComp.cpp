@@ -32,111 +32,6 @@ QVariant CFeaturePackageCollectionControllerComp::GetObjectInformation(const QBy
 	return QVariant();
 }
 
-
-//imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::SetObjectDescription(
-//			const QList<imtgql::CGqlObject>& inputParams,
-//			const imtgql::CGqlObject& gqlObject,
-//			QString& errorMessage) const
-//{
-//	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
-
-//	if (!itemData.isEmpty()){
-//		const imtlic::CFeaturePackage* currentPackagePtr = nullptr;
-//		imtbase::IObjectCollection::DataPtr objectPtr;
-
-//		imtbase::CTreeItemModel itemModel;
-//		imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-//		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-//		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
-
-//		itemModel.Parse(itemData);
-
-//		QByteArray objectId;
-//		if (itemModel.ContainsKey("Id")){
-//			objectId = itemModel.GetData("Id").toByteArray();
-
-//			itemsModel->SetData("Id", objectId);
-//		}
-
-//		QString description;
-//		if (itemModel.ContainsKey("Description")){
-//			description = itemModel.GetData("Description").toString();
-
-//			itemsModel->SetData("Description", description);
-//		}
-
-//		if (m_objectCollectionCompPtr->GetObjectData(objectId, objectPtr)){
-//			currentPackagePtr = dynamic_cast<const imtlic::CFeaturePackage*>(objectPtr.GetPtr());
-//		}
-
-//		if (currentPackagePtr == nullptr){
-//			return nullptr;
-//		}
-
-//		m_objectCollectionCompPtr->SetObjectDescription(objectId, description);
-
-//		dataModel->SetExternTreeModel("item", itemsModel);
-//		rootModel->SetExternTreeModel("data", dataModel);
-
-//		return rootModel;
-//	}
-
-//	return nullptr;
-//}
-
-//imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::RenameObject(
-//			const QList<imtgql::CGqlObject>& inputParams,
-//			const imtgql::CGqlObject& gqlObject,
-//			QString& errorMessage) const
-//{
-//	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
-
-//	if (!itemData.isEmpty()){
-//		const imtlic::CFeaturePackage* currentPackagePtr = nullptr;
-//		imtbase::IObjectCollection::DataPtr objectPtr;
-
-//		imtbase::CTreeItemModel itemModel;
-//		imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-//		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-//		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
-
-//		itemModel.Parse(itemData);
-
-//		QByteArray objectId;
-//		if (itemModel.ContainsKey("Id")){
-//			objectId = itemModel.GetData("Id").toByteArray();
-
-//			itemsModel->SetData("Id", objectId);
-//		}
-
-//		QString newObjectName;
-//		if (itemModel.ContainsKey("NewName")){
-//			newObjectName = itemModel.GetData("NewName").toString();
-
-//			itemsModel->SetData("NewName", newObjectName);
-//			itemsModel->SetData("NewId", newObjectName);
-//		}
-
-//		if (m_objectCollectionCompPtr->GetObjectData(objectId, objectPtr)){
-//			currentPackagePtr = dynamic_cast<const imtlic::CFeaturePackage*>(objectPtr.GetPtr());
-//		}
-
-//		if (currentPackagePtr == nullptr){
-//			return nullptr;
-//		}
-
-//		m_objectCollectionCompPtr->SetObjectName(objectId, newObjectName);
-
-//		dataModel->SetExternTreeModel("item", itemsModel);
-//		rootModel->SetExternTreeModel("data", dataModel);
-
-//		return rootModel;
-//	}
-
-//	return nullptr;
-//}
-
-
 imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
@@ -173,26 +68,34 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr);
+
+		if (!m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
+			errorMessage = "Unable to load an object data";
+			return nullptr;
+		}
 
 		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
-		if (packagePtr != nullptr){
-			imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
 
-			index = metaInfoModel->InsertNewItem();
-			metaInfoModel->SetData("Name", "Features", index);
-			childs = metaInfoModel->AddTreeModel("Childs", index);
-			int childIndex;
+		if (packagePtr == nullptr){
+			errorMessage = "Unable to get an package info provider";
+			return nullptr;
+		}
 
-			for (const QByteArray& featureCollectionId : featureCollectionIds){
-				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+		imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
 
-				if (featureInfoPtr != nullptr){
-					childIndex = childs->InsertNewItem();
-					QByteArray featureId = featureInfoPtr->GetFeatureId();
-					QString featureName = featureInfoPtr->GetFeatureName();
-					childs->SetData("Value", featureName, childIndex);
-				}
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", "Features", index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+		int childIndex;
+
+		for (const QByteArray& featureCollectionId : featureCollectionIds){
+			const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+
+			if (featureInfoPtr != nullptr){
+				childIndex = childs->InsertNewItem();
+				QByteArray featureId = featureInfoPtr->GetFeatureId();
+				QString featureName = featureInfoPtr->GetFeatureName();
+				childs->SetData("Value", featureName, childIndex);
 			}
 		}
 

@@ -47,9 +47,13 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(instanceId, dataPtr)){
-//			istd::TDelPtr<imtlic::IProductInstanceInfo> productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 
 			imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+
+			if (productInstancePtr == nullptr){
+				errorMessage = "Unable to get an product instance";
+				return nullptr;
+			}
 
 			QByteArray accountId = productInstancePtr->GetCustomerId();
 

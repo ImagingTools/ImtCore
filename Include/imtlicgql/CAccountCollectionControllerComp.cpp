@@ -36,55 +36,6 @@ QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray
 }
 
 
-//istd::IChangeable* CAccountCollectionControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
-//																	 QString& name, QString& description, QString &errorMessage) const
-//{
-//	if (inputParams.isEmpty()){
-//		return nullptr;
-//	}
-//	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
-//	if (!itemData.isEmpty()){
-//		imtauth::CAccountInfo *accountInfo = new imtauth::CAccountInfo();
-//		imtbase::CTreeItemModel itemModel;
-//		itemModel.Parse(itemData);
-
-//		if (itemModel.ContainsKey("AccountName")){
-//			name = itemModel.GetData("AccountName").toString();
-//			objectId = itemModel.GetData("AccountName").toByteArray();
-//		}
-
-//		if (itemModel.ContainsKey("AccountDescription")){
-//			description = itemModel.GetData("AccountDescription").toString();
-//		}
-
-//		accountInfo->SetAccountName(name);
-//		accountInfo->SetAccountDescription(description);
-
-//		imtauth::CContactInfo contactInfo;
-
-//		if (itemModel.ContainsKey("Email")) {
-//			QString email = itemModel.GetData("Email").toString();
-//			contactInfo.SetEmail(email);
-//		}
-
-//		if (itemModel.ContainsKey("LastName")) {
-//			QString lastName = itemModel.GetData("LastName").toString();
-//			contactInfo.SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, lastName);
-//		}
-
-//		if (itemModel.ContainsKey("FirstName")) {
-//			QString firstName = itemModel.GetData("FirstName").toString();
-//			contactInfo.SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, firstName);
-//		}
-
-//		accountInfo->SetAccountOwner(contactInfo);
-
-//		return accountInfo;
-//	}
-
-//	return nullptr;
-//}
-
 imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
@@ -114,11 +65,24 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
-		m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr);
+		if (!m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
+			errorMessage = "Unable to load an object data";
+			return nullptr;
+		}
 
 		const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
 
+		if (accountInfoPtr == nullptr){
+			errorMessage = "Unable to get an account info";
+			return nullptr;
+		}
+
 		const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
+
+		if (ownerPtr == nullptr){
+			errorMessage = "Unable to get an account owner";
+			return nullptr;
+		}
 
 		int index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", "Last Name", index);

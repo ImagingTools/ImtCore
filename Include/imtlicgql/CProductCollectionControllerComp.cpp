@@ -67,7 +67,12 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		m_objectCollectionCompPtr->GetObjectData(productId, dataPtr);
+
+		if (!m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
+			errorMessage = "Unable to get an product object data";
+			return nullptr;
+		}
+
 		imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
 
 		if (licensePtr != nullptr){

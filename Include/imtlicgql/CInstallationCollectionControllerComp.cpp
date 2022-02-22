@@ -79,9 +79,18 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", productInstanceId);
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		m_objectCollectionCompPtr->GetObjectData(productInstanceId, dataPtr);
+
+		if (!m_objectCollectionCompPtr->GetObjectData(productInstanceId, dataPtr)){
+			errorMessage = "Unable to get an installation object data";
+			return nullptr;
+		}
 
 		const imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<const imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+
+		if (productInstancePtr == nullptr){
+			errorMessage = "Unable to get an installation info";
+			return nullptr;
+		}
 
 		const imtbase::ICollectionInfo& licenseList = productInstancePtr->GetLicenseInstances();
 

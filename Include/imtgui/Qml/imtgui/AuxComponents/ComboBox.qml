@@ -8,22 +8,50 @@ Item {
     height: 30;
 
     property var model;
-    property int currentIndex: -1;
-    property color borderColor: Style.textColor;
-    property bool menuVisible: false;
+
+    property color borderColor: Style.textColor; 
     property color backgroundColor: Style.baseColor;
+
     property string currentText;
+
     property bool textCentered: true;
+    property bool menuVisible: false;
+
     property int radius: 5;
+    property int currentIndex: -1;
+    property int menuX;
+    property int menuY;
 
     Component.onCompleted: {
         if (comboBoxContainer.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
-           // cbTitleModel.anchors.horizontalCenter = cbListDelegate.horizontalCenter;
         } else {
             cbTitleTxt.anchors.left = cbMainRect.left;
             cbTitleTxt.anchors.leftMargin = 10;
         }
+    }
+
+    function dialogResult(parameters){
+        console.log("ComboBox dialogResult");
+
+        comboBoxContainer.currentText = parameters["status"];
+    }
+
+    function openContextMenu(startX, startY) {
+        var point = comboBoxContainer.mapToItem(thubnailDecoratorContainer, 0, comboBoxContainer.height);
+        var source = "AuxComponents/PopupMenuDialog.qml";
+        var parameters = {};
+
+        parameters["model"] = comboBoxContainer.model;
+        parameters["resultItem"] = comboBoxContainer;
+        parameters["hasIcon"] = false;
+
+        parameters["itemHeight"] = comboBoxContainer.height;
+        parameters["itemWidth"] = comboBoxContainer.width;
+
+        parameters["x"] = point.x;
+        parameters["y"] = point.y;
+        thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
     Rectangle {
@@ -78,6 +106,8 @@ Item {
 
             onClicked: {
                 console.log("ComboBox clicked !");
+
+//                comboBoxContainer.openContextMenu(0, 0);
                 comboBoxContainer.menuVisible = !comboBoxContainer.menuVisible;
             }
         }
@@ -146,7 +176,6 @@ Item {
                     onClicked: {
                         comboBoxContainer.currentIndex = model.index;
                         cbTitleTxt.text = model.text;
-//                            menu.visible = false;
                         comboBoxContainer.menuVisible = false;
                     }
                 }

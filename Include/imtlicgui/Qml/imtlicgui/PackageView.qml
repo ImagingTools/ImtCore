@@ -18,10 +18,6 @@ Item {
 
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
-
-//    property int contextMenuX;
-//    property int contextMenuY;
-
     property string operation;
 
     Component.onCompleted: {
@@ -29,7 +25,7 @@ Item {
     }
 
     function refresh() {
-        console.log("PackageView refresh()");
+        console.log("PackageView refresh");
         featureCollectionView.refresh();
         featuresTreeView.loadFeaturesModel();
         featuresTreeView.loadDependModel();
@@ -59,16 +55,6 @@ Item {
         }
     }
 
-//    function getMenuButtonsX() {
-//        console.log("PackageView getMenuButtonsX");
-//        return featureCollectionViewContainer.contextMenuX + 75;
-//    }
-
-//    function getMenuButtonsY() {
-//        console.log("PackageView getMenuButtonsY");
-//        return featureCollectionViewContainer.contextMenuY + 132;
-//    }
-
     function getDescriptionBySelectedItem(){
         var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
         var description = dataModelLocal.GetData("Description", featureCollectionView.table.selectedIndex);
@@ -76,10 +62,7 @@ Item {
     }
 
     function openContextMenu(item, mouseX, mouseY) {
-//        var point = featureCollectionViewContainer.mapToItem(item, mouseX, mouseY);
-
-//        featureCollectionViewContainer.contextMenuX = point.x;
-//        featureCollectionViewContainer.contextMenuY = point.y;
+        var point = featureCollectionViewContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
 
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
@@ -87,8 +70,8 @@ Item {
         parameters["resultItem"] = featureCollectionViewContainer;
         parameters["itemHeight"] = 25;
         parameters["itemWidth"] = 150;
-        parameters["x"] = mouseX + 75;
-        parameters["y"] = mouseY + 130;
+        parameters["x"] = point.x;
+        parameters["y"] = point.y;
 
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
@@ -355,9 +338,7 @@ Item {
             console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
             if (featureCollectionView.selectedIndex > -1){
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
-
                 treeView.visible = true;
-//                multiDocViewItem.setItemSelectedIndex(featureCollectionView.selectedIndex);
             } else {
                 treeView.visible = false;
             }
@@ -368,14 +349,13 @@ Item {
 
     function updateFeaturesTreeView(){
         console.log("PackageView updateFeaturesTreeView");
-        //treeView.modelItems.Refresh();
         featureCollectionViewContainer.hideCurrentFeatureTreeView();
         featureCollectionViewContainer.updateStateCheckedCheckBox();
         featureCollectionViewContainer.checkInActiveItems();
-        //treeView.modelItems.Refresh();
     }
 
     function clearCheckedCheckBox() {
+        console.log("PackageView clearCheckedCheckBox");
         var modelItems = treeView.modelItems;
 
         for (var i = 0; i < modelItems.GetItemsCount(); i++) {
@@ -392,7 +372,7 @@ Item {
         }
 
         treeView.modelItems = modelItems;
-        console.log("PackageView clearCheckedCheckBox", treeView.modelItems);
+
 //        printModelItems(treeView.modelItems);
     }
 
@@ -539,6 +519,8 @@ Item {
                 break;
             }
         }
+
+        treeView.modelItems.Refresh();
     }
 
     GqlModel {
@@ -578,15 +560,13 @@ Item {
             modelPackages.SetExternTreeModel("features", featureCollectionView.collectionViewModel.GetData("data"));
             modelPackages.SetExternTreeModel("dependencies", featuresTreeView.modelDepends);
 
-            //featureCollectionViewContainer.model.SetIsArray(false);
             var jsonString = modelPackages.toJSON();
-            console.log("jsonString", jsonString)
+//            console.log("jsonString", jsonString)
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            console.log("jsonString", jsonString)
+//            console.log("jsonString", jsonString)
 
             inputParams.InsertField("Item");
             inputParams.InsertFieldArgument ("Item", jsonString);
-//            inputParams.InsertFieldArgument ("Item", modelPackages);
 
             queryFields.InsertField("Id");
             queryFields.InsertField("Successed");
@@ -739,10 +719,8 @@ Item {
                 var modelPackages;
                 if (featuresTreeView.rootFeatureIdHasDependPackage(rootIndex)) {
                     modelPackages = featuresTreeView.modelDepends.GetData("Packages", rootIndex);
-                    //console.log("packages exist", rootIndex);
                 }
                 else {
-                  //  console.log("packages not exist", rootIndex);
                     modelPackages = featuresTreeView.modelDepends.AddTreeModel("Packages", rootIndex);
                 }
 
@@ -771,7 +749,6 @@ Item {
 
                 } else {
                     if (state === 0) {
-                      //  console.log("Feature Id remove ", childIndex);
                         modelChildren.RemoveItem(childIndex);
                     }
                 }
@@ -803,8 +780,6 @@ Item {
 
             onModelTreeItemsChanged: {
                 console.log("PackageView FeaturesTreeView onModelTreeItemsChanged");
-                //featureCollectionViewContainer.updateFeaturesTreeView();
-
                 treeView.modelItems = featuresTreeView.modelTreeItems;
             }
 

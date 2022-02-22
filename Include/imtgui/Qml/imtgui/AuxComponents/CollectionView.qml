@@ -131,7 +131,7 @@ Rectangle {
 
     function refresh() {
         var isHeaderUpdated = false;
-        console.log("CollectionView refresh()", collectionViewContainer.gqlModelInfo)
+        console.log("CollectionView refresh", collectionViewContainer.gqlModelInfo)
         if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("headers")){
             var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("headers");
             tableInternal.headers = dataModelLocal;
@@ -142,7 +142,7 @@ Rectangle {
         }
 
         if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("data")){
-            console.log("CollectionView refresh ");
+//            console.log("CollectionView refresh ");
             var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
             tableInternal.elements = 0;

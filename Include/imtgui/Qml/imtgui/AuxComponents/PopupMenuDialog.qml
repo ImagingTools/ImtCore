@@ -18,6 +18,7 @@ Item {
     property bool backgroundExist: false;
     property bool clickBackgroundClose: true;
     property bool centered: false;
+    property bool hasIcon: true;
 
     property int itemWidth: 100;
     property int itemHeight: 26;
@@ -97,7 +98,7 @@ Item {
                     }
 
                     Text {
-                        anchors.left: iconDelegateListViewPopup.right;
+                        anchors.left: popupMenuContainer.hasIcon ? iconDelegateListViewPopup.right : delegateListViewPopup.left;
                         anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
                         anchors.leftMargin: 10;
                         anchors.rightMargin: 10;
@@ -118,7 +119,7 @@ Item {
                         width: 18;
                         height: width;
 
-                        visible: model.name !== "";
+                        visible: popupMenuContainer.hasIcon && model.name !== "";
                         //source: "../../../Icons//_On_Normal.svg";
                         source: model.imageSource;
                         sourceSize.width: width;

@@ -222,6 +222,10 @@ Rectangle
                         }
 
                     }
+
+                    onWheel: {
+
+                    }
                 }
             }
 

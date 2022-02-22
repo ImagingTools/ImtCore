@@ -141,7 +141,7 @@ Item {
             onTableDelegateRrightButtonMouseClicked: {
                 console.log("AuxTable onRightButtonMouseClicked", mX, mY);
                 var tempX = mX;
-                var tempY = model.index * tableDelegate.height + mY;
+                var tempY = (model.index + 1) * tableDelegate.height + mY;
 
                 console.log("tableDelegate.height =", tableDelegate.height);
                 console.log("AuxTable tempY =", tempY);
@@ -149,7 +149,7 @@ Item {
                 console.log("AuxTable tempX =", tempX);
                 console.log("AuxTable tempY =", tempY);
 
-                tableContainer.rightButtonMouseClicked(tableContainer, tempX, tempY);
+                tableContainer.rightButtonMouseClicked(thubnailDecoratorContainer, tempX, tempY);
             }
 
             onDoubleClicked: {

@@ -10,19 +10,16 @@ Rectangle {
 
     signal itemTreeViewCheckBoxStateChanged(int state, string packageId, string featureId);
 
-    Component.onCompleted: {
-    }
-
     onModelItemsChanged: {
-        console.log("TreeView onModelItemsChanged");
+//        console.log("TreeView onModelItemsChanged");
 
-        if (treeViewContainer.modelItems){
-            console.log("onModelItemsChanged", treeViewContainer.modelItems.GetItemsCount());
-            for (var i = 0; i < treeViewContainer.modelItems.GetItemsCount(); i++){
-                console.log("Package Id: ", treeViewContainer.modelItems.GetData("Id", i));
-            }
+//        if (treeViewContainer.modelItems){
+//            console.log("onModelItemsChanged", treeViewContainer.modelItems.GetItemsCount());
+//            for (var i = 0; i < treeViewContainer.modelItems.GetItemsCount(); i++){
+//                console.log("Package Id: ", treeViewContainer.modelItems.GetData("Id", i));
+//            }
 
-        }
+//        }
     }
 
     TreeItemModel {

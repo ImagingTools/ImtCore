@@ -32,15 +32,17 @@ Item {
 
     function openContextMenu(item, mouseX, mouseY) {
         console.log("AccountCollectionView openContextMenu", mouseX, mouseY);
+        var point = accountCollectionContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
+
+
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;
         parameters["resultItem"] = accountCollectionContainer;
         parameters["itemHeight"] = 25;
         parameters["itemWidth"] = 150;
-        parameters["x"] = mouseX + 75;
-        parameters["y"] = mouseY + 130;
-
+        parameters["x"] = point.x;
+        parameters["y"] = point.y;
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 

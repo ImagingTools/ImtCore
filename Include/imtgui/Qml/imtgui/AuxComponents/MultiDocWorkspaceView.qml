@@ -156,6 +156,7 @@ Rectangle {
         model: pagesData;
 
         property int  currentIndex: -1;
+
         delegate: Rectangle {
             id: docsDataDeleg;
 
@@ -170,8 +171,8 @@ Rectangle {
 
                 if(this.visible){
                     console.log("multiDocView.activeItem", multiDocView.activeItem);
-                    console.log("loader.item", loader.item);
-                    multiDocView.activeItem = loader.item;
+                    console.log("dataLoader.item", dataLoader.item);
+                    multiDocView.activeItem = dataLoader.item;
                     multiDocView.activeItem.refresh();
                     multiDocView.updateCommandId();
                 }
@@ -197,24 +198,24 @@ Rectangle {
             }
 
             Loader {
-                id: loader;
+                id: dataLoader;
 
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    console.log("MultidocWorkspaceView model index ", loader.source, model.Source)
-                    loader.source = model.Source
-                    console.log("MultidocWorkspaceView model index 2", loader.source, model.Source)
+                    console.log("MultidocWorkspaceView model index ", dataLoader.source, model.Source)
+                    dataLoader.source = model.Source
+                    console.log("MultidocWorkspaceView model index 2", dataLoader.source, model.Source)
                 }
 
                 onItemChanged: {
-                    console.log("MultidocWorkspaceView Loader onItemChanged", loader.source, docsDataDeleg)
-                    if (loader.item && loader.source != ""){
+                    console.log("MultidocWorkspaceView dataLoader onItemChanged", dataLoader.source, docsDataDeleg)
+                    if (dataLoader.item && dataLoader.source != ""){
 
-                        loader.item.rootItem = docsDataDeleg;
-                        loader.item.itemId = model.ItemId
-                        loader.item.itemName = model.Title
-                        loader.item.operation = multiDocView.operation
+                        dataLoader.item.rootItem = docsDataDeleg;
+                        dataLoader.item.itemId = model.ItemId
+                        dataLoader.item.itemName = model.Title
+                        dataLoader.item.operation = multiDocView.operation
 
                         docsData.currentIndex = model.index;
 
@@ -226,12 +227,12 @@ Rectangle {
                             dataModelLocal = pagesData.AddTreeModel("DocsData",model.index)
                         }
 
-                        loader.item.multiDocViewItem = multiDocView;
-                        loader.item.model = dataModelLocal
-                        loader.item.rootItem = docsDataDeleg;
+                        dataLoader.item.multiDocViewItem = multiDocView;
+                        dataLoader.item.model = dataModelLocal
+                        dataLoader.item.rootItem = docsDataDeleg;
 
                         if (tabPanelInternal.selectedIndex === model.index) {
-                            multiDocView.activeItem = loader.item;
+                            multiDocView.activeItem = dataLoader.item;
                             multiDocView.updateCommandId();
                         }
                     }

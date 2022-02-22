@@ -137,6 +137,11 @@ istd::IChangeable* CProductControllerComp::CreateObject(const QList<imtgql::CGql
 			}
 
 			istd::TDelPtr<imtlic::CLicenseInfo> licenseInfoPtr = new imtlic::CLicenseInfo;
+
+			if (licenseInfoPtr == nullptr){
+				continue;
+			}
+
 			licenseInfoPtr->SetLicenseId(licenseId);
 			licenseInfoPtr->SetLicenseName(licenseName);
 
@@ -176,72 +181,6 @@ istd::IChangeable* CProductControllerComp::CreateObject(const QList<imtgql::CGql
 	return nullptr;
 }
 
-imtbase::CTreeItemModel* CProductControllerComp::GetTreeItemModel(
-		const QList<imtgql::CGqlObject>& inputParams,
-		const imtgql::CGqlObject& gqlObject,
-		QString& errorMessage) const
-{
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* treeItemModel = nullptr;
-	imtbase::CTreeItemModel* dataModel = nullptr;
-
-	if (!m_viewDelegateCompPtr.IsValid()) {
-		errorMessage = QObject::tr("Internal error").toUtf8();
-	}
-
-//	if (!errorMessage.isEmpty()) {
-//		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-//		errorsItemModel->SetData("message", errorMessage);
-//	}
-//	else {
-//		dataModel = new imtbase::CTreeItemModel();
-//		treeItemModel = new imtbase::CTreeItemModel();
-//		treeItemModel->SetIsArray(true);
-//		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-//		int index;
-//		for (const QByteArray& collectionId : collectionIds) {
-//			index = treeItemModel->InsertNewItem();
-
-//			treeItemModel->SetData("Id", collectionId, index);
-//			treeItemModel->SetData("Name", collectionId, index);
-//			treeItemModel->SetData("stateChecked", 0, index);
-//			treeItemModel->SetData("level", 0, index);
-//			treeItemModel->SetData("visible", 1, index);
-//			treeItemModel->SetData("isActive", 1, index);
-
-
-//			imtbase::IObjectCollection::DataPtr dataPtr;
-//			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)) {
-//				const imtlic::IFeaturePackage* packagePtr  = dynamic_cast<const imtlic::IFeaturePackage*>(dataPtr.GetPtr());
-//				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
-
-//				imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("childItemModel", index);
-
-//				for (const QByteArray& featureCollectionId : featureCollectionIds) {
-//					QString featureId = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureId();
-//					QString featureName = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureName();
-
-//					int childItemIndex = childItemModel->InsertNewItem();
-
-//					childItemModel->SetData("Id", featureId, childItemIndex);
-//					childItemModel->SetData("Name", featureName, childItemIndex);
-//					childItemModel->SetData("stateChecked", 0, childItemIndex);
-//					childItemModel->SetData("level", 1, childItemIndex);
-//					childItemModel->SetData("visible", 1, childItemIndex);
-//					childItemModel->SetData("isActive", 1, childItemIndex);
-
-//					childItemModel->SetData("packageId", collectionId, childItemIndex);
-//				}
-//			}
-//		}
-//		dataModel->SetExternTreeModel("TreeModel", treeItemModel);
-//	}
-
-	rootModel->SetExternTreeModel("data", dataModel);
-
-	return rootModel;
-}
-
 imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
@@ -279,6 +218,10 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 
 				for ( const QByteArray& licenseId : licenseCollectionIds){
 					const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
+
+					if (licenseInfoPtr == nullptr){
+						continue;
+					}
 
 					imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
 
