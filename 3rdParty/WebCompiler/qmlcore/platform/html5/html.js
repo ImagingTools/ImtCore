@@ -653,6 +653,40 @@ exports.pushAnimation = function(obj){
 exports.window = window
 exports.document = document
 
+exports.cookies = {
+	get: function(name){
+		let matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+		return matches ? decodeURIComponent(matches[1]) : undefined;
+	},
+	set: function(name, value, options = {}){
+		options = {
+			path: '/',
+			...options
+		};
+	
+		if (options.expires instanceof Date) {
+			options.expires = options.expires.toUTCString();
+		}
+	
+		let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+	
+		for (let optionKey in options) {
+			updatedCookie += "; " + optionKey;
+			let optionValue = options[optionKey];
+			if (optionValue !== true) {
+				updatedCookie += "=" + optionValue;
+			}
+		}
+	
+		document.cookie = updatedCookie;
+	},
+	delete: function(name){
+		this.set(name, "", {
+			'max-age': -1
+		})
+	}
+}
+
 history.pushState = ( f => function pushState(){
     var ret = f.apply(this, arguments);
     window.dispatchEvent(new Event('pushState'));

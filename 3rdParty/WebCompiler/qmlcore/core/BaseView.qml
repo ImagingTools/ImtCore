@@ -9,8 +9,8 @@ BaseLayout {
 	property Item highlight;		///< an object that follows currentIndex and placed below other elements
 	property Object model;			///< model object to attach to
 	property Item delegate;			///< delegate - template object, filled with model row
-	property int contentX: -content.x;			///< x offset to visible part of the content surface
-	property int contentY: -content.y;			///< y offset to visible part of the content surface
+	property int contentX: 0;			///< x offset to visible part of the content surface
+	property int contentY: 0;			///< y offset to visible part of the content surface
 	property int scrollingStep: 0;	///< scrolling step
 	property int animationDuration: 0;
 	property bool webScroll: false; 
@@ -54,10 +54,8 @@ BaseLayout {
 	property ContentMargin contentMargin: ContentMargin { }
 
 	onContentXChanged: {
-		// if (this.nativeScrolling)
-		// 	this.element.setScrollX(value)
-		// else
-			this.content.x = -value
+		if(this.element.dom.scrollLeft !== value){
+			this.element.dom.scrollLeft = value
 
 			if(!this._flickTimer) {
 				this.flickStarted()
@@ -68,12 +66,11 @@ BaseLayout {
 				this.flickEnded()
 				this._flickTimer = null
 			}, 100)
+		}
 	}
 	onContentYChanged: {
-		// if (this.nativeScrolling)
-		// 	this.element.setScrollY(value)
-		// else
-			this.content.y = -value
+		if(this.element.dom.scrollTop !== value){
+			this.element.dom.scrollTop = value
 
 			if(!this._flickTimer) {
 				this.flickStarted()
@@ -84,6 +81,7 @@ BaseLayout {
 				this.flickEnded()
 				this._flickTimer = null
 			}, 100)
+		}
 	}
 
 	/// @private
@@ -385,9 +383,9 @@ BaseLayout {
 
 	///@private silently updates scroll positions, because browser animates scroll
 	function _updateScrollPositions(x, y, layout) {
-		this._setProperty('contentX', x)
-		this._setProperty('contentY', y)
-		this.content._updateScrollPositions(x, y, layout)
+		// this._setProperty('contentX', x)
+		// this._setProperty('contentY', y)
+		// this.content._updateScrollPositions(x, y, layout)
 	}
 
 	function positionViewAtItemHorizontally(itemBox, center, centerOversized) {
@@ -462,127 +460,146 @@ BaseLayout {
 
 	onCompleted: {
 		var self = this
-		this.element.dom.addEventListener('scroll', function(e) {
-			e.preventDefault()
-			self._context._processActions()
+		// this.element.dom.addEventListener('scroll', (e)=>{
+			
+		// 	//console.log(this.contentX, this.contentY)
+		// 	if(this.contentX !== this.element.dom.scrollLeft) this.element.dom.scrollLeft = this.contentX
+		// 	if(this.contentY !== this.element.dom.scrollTop) this.element.dom.scrollTop = this.contentY
+		// 	// if(!this.interactive || !this.enabled){
+		// 	// 	e.preventDefault()
+		// 	// 	e.stopPropagation()
+		// 	// }
+		// 	//this.contentX = this.element.dom.scrollLeft
+		// 	//this.contentY = this.element.dom.scrollTop
+			
+		// 	//e.preventDefault()
+		// 	//console.log(this.content.width, this.content.height)
+			
+			
+			
+		// 	//this._processUpdates()
+		// 	//this._scheduleLayout(true)
+		// 	//this._context.backend.tick(this._context)
+		// 	//self._context._processActions()
+		// 	//self.content._context._processActions()
 
-		}.bind(this))
+		// })
 
-		this.element.dom.addEventListener("wheel", (e) => {
-			if(this.interactive && this.enabled){
-				//console.log('wheel')
-				e.preventDefault()
-				switch(this.flickableDirection){
-					case BaseView.AutoFlickDirection:
-						this.content._scroll(e.deltaX, e.deltaY)
-						break;
-					case BaseView.AutoFlickIfNeeded:
-						this.content._scroll(e.deltaX, e.deltaY)
-						break;
-					case BaseView.HorizontalFlick:
-						this.content._scroll(e.deltaX, 0)
-						break;
-					case BaseView.VerticalFlick:
-						this.content._scroll(0, e.deltaY)
-						break;
-					case BaseView.HorizontalAndVerticalFlick:
-						this.content._scroll(e.deltaX, e.deltaY)
-						break;
-				}
+		// this.element.dom.addEventListener("wheel", (e) => {
+		// 	if(this.interactive && this.enabled){
+		// 		//console.log('wheel')
+		// 		e.preventDefault()
+		// 		switch(this.flickableDirection){
+		// 			case BaseView.AutoFlickDirection:
+		// 				this.content._scroll(e.deltaX, e.deltaY)
+		// 				break;
+		// 			case BaseView.AutoFlickIfNeeded:
+		// 				this.content._scroll(e.deltaX, e.deltaY)
+		// 				break;
+		// 			case BaseView.HorizontalFlick:
+		// 				this.content._scroll(e.deltaX, 0)
+		// 				break;
+		// 			case BaseView.VerticalFlick:
+		// 				this.content._scroll(0, e.deltaY)
+		// 				break;
+		// 			case BaseView.HorizontalAndVerticalFlick:
+		// 				this.content._scroll(e.deltaX, e.deltaY)
+		// 				break;
+		// 		}
 
-				let posState = {
-					dx: -e.deltaX,
-					dy: -e.deltaY,
-					cx: this.content.x,
-					cy: this.content.y,
-				}
-				if(this.snapMode === BaseView.SnapToItem){
-					this._snapTo(posState)
-				}
-				if(this.snapMode === BaseView.SnapOneItem){
-					this._snapOne(posState)
+		// 		let posState = {
+		// 			dx: -e.deltaX,
+		// 			dy: -e.deltaY,
+		// 			cx: this.content.x,
+		// 			cy: this.content.y,
+		// 		}
+		// 		if(this.snapMode === BaseView.SnapToItem){
+		// 			this._snapTo(posState)
+		// 		}
+		// 		if(this.snapMode === BaseView.SnapOneItem){
+		// 			this._snapOne(posState)
 					
-				}
-			}
+		// 		}
+		// 	}
 
-			if(!this.enabled){
-				e.stopPropagation()
-				e.preventDefault()
-			}
-		})
+		// 	if(!this.enabled){
+		// 		e.stopPropagation()
+		// 		e.preventDefault()
+		// 	}
+		// })
 
-		this.element.dom.addEventListener("touchstart", (e) => {
-			e.preventDefault()
-			this._stateTouch = e.changedTouches[0]
-			this._isTouchOnly = true
-			this._startPos = {
-				x: e.changedTouches[0].clientX,
-				y: e.changedTouches[0].clientY,
-			}
+		// this.element.dom.addEventListener("touchstart", (e) => {
+		// 	e.preventDefault()
+		// 	this._stateTouch = e.changedTouches[0]
+		// 	this._isTouchOnly = true
+		// 	this._startPos = {
+		// 		x: e.changedTouches[0].clientX,
+		// 		y: e.changedTouches[0].clientY,
+		// 	}
 
-		});
-        this.element.dom.addEventListener("touchend", (e) => {
-			e.preventDefault()
-			e.stopPropagation()
-			if(this._isTouchOnly === true){
-				let clickEvent = this._context.backend.document.createEvent('MouseEvents');
-				clickEvent.initMouseEvent(
-					'click', true, true, this._context.backend.window, 0,
-					0, 0, e.changedTouches[0].clientX, e.changedTouches[0].clientY, false, false,
-					false, false, 0, null
-				);
-				e.target.dispatchEvent(clickEvent);
-			} else {
-				let posState = {
-					dx: e.changedTouches[0].clientX - this._startPos.x,
-					dy: e.changedTouches[0].clientY - this._startPos.y,
-					cx: this.content.x,
-					cy: this.content.y,
-				}
-				if(this.snapMode === BaseView.SnapToItem){
-					this._snapTo(posState)
-				}
-				if(this.snapMode === BaseView.SnapOneItem){
-					this._snapOne(posState)
+		// });
+        // this.element.dom.addEventListener("touchend", (e) => {
+		// 	e.preventDefault()
+		// 	e.stopPropagation()
+		// 	if(this._isTouchOnly === true){
+		// 		let clickEvent = this._context.backend.document.createEvent('MouseEvents');
+		// 		clickEvent.initMouseEvent(
+		// 			'click', true, true, this._context.backend.window, 0,
+		// 			0, 0, e.changedTouches[0].clientX, e.changedTouches[0].clientY, false, false,
+		// 			false, false, 0, null
+		// 		);
+		// 		e.target.dispatchEvent(clickEvent);
+		// 	} else {
+		// 		let posState = {
+		// 			dx: e.changedTouches[0].clientX - this._startPos.x,
+		// 			dy: e.changedTouches[0].clientY - this._startPos.y,
+		// 			cx: this.content.x,
+		// 			cy: this.content.y,
+		// 		}
+		// 		if(this.snapMode === BaseView.SnapToItem){
+		// 			this._snapTo(posState)
+		// 		}
+		// 		if(this.snapMode === BaseView.SnapOneItem){
+		// 			this._snapOne(posState)
 					
-				}
-			}
+		// 		}
+		// 	}
 
-		});
+		// });
 
-        this.element.dom.addEventListener("touchmove", (e) => {
-			this._isTouchOnly = false
-			if(this.interactive && this.enabled){
-				e.preventDefault()
+        // this.element.dom.addEventListener("touchmove", (e) => {
+		// 	this._isTouchOnly = false
+		// 	if(this.interactive && this.enabled){
+		// 		e.preventDefault()
 				
-				let nextTouch = e.changedTouches[0]
-				//if(this._stateTouch)
-				switch(this.flickableDirection){
-					case BaseView.AutoFlickDirection:
-						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
-						break;
-					case BaseView.AutoFlickIfNeeded:
-						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
-						break;
-					case BaseView.HorizontalFlick:
-						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, 0)
-						break;
-					case BaseView.VerticalFlick:
-						this.content._scroll(0, this._stateTouch.clientY-nextTouch.clientY)
-						break;
-					case BaseView.HorizontalAndVerticalFlick:
-						this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
-						break;
+		// 		let nextTouch = e.changedTouches[0]
+		// 		//if(this._stateTouch)
+		// 		switch(this.flickableDirection){
+		// 			case BaseView.AutoFlickDirection:
+		// 				this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+		// 				break;
+		// 			case BaseView.AutoFlickIfNeeded:
+		// 				this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+		// 				break;
+		// 			case BaseView.HorizontalFlick:
+		// 				this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, 0)
+		// 				break;
+		// 			case BaseView.VerticalFlick:
+		// 				this.content._scroll(0, this._stateTouch.clientY-nextTouch.clientY)
+		// 				break;
+		// 			case BaseView.HorizontalAndVerticalFlick:
+		// 				this.content._scroll(this._stateTouch.clientX-nextTouch.clientX, this._stateTouch.clientY-nextTouch.clientY)
+		// 				break;
 						
-				}
+		// 		}
 				
-				this._stateTouch = nextTouch
-			}
-			if(!this.enabled){
-				e.stopPropagation()
-				e.preventDefault()
-			}
-		});
+		// 		this._stateTouch = nextTouch
+		// 	}
+		// 	if(!this.enabled){
+		// 		e.stopPropagation()
+		// 		e.preventDefault()
+		// 	}
+		// });
 
 		if(this.webScroll){
 			this.element.dom.classList.remove('scroll-hide')
@@ -591,11 +608,126 @@ BaseLayout {
 		}
 
 		this.style({
-			'overflow': 'auto',
+			'overflow': 'hidden',
 			'pointer-events': 'auto',
 			'touch-action': 'auto',
 		})
 
+	}
+
+	function _mousewheel(e, state) {
+		if(this.interactive && this.enabled){
+			this._scroll(e.deltaX, e.deltaY)
+
+			//this._context.backend.tick(this._context)
+		}
+
+		//console.log(e.deltaX, e.deltaY, this.element.dom.scrollHeight, this. height)
+
+		//if(this.contentX + e.deltaX >= 0 && this.contentX + e.deltaX <= this.contentWidth - this.width) this.contentX += e.deltaX
+		//if(this.contentY + e.deltaY >= 0 && this.contentY + e.deltaY <= this.contentHeight - this.height) this.contentY += e.deltaY
+
+		//console.log(e)
+		//
+		//console.log(e)
+		//this._feelWheel(e)
+	}
+	function _scroll(deltaX, deltaY){
+		if(this.orientation === ListView.Horizontal){
+			if(deltaX > 0)
+			if(this.contentX + deltaX <= this.element.dom.scrollWidth - this.width){
+				this.contentX += deltaX
+			} else {
+				this.contentX = this.element.dom.scrollWidth - this.width
+			}
+			if(deltaX < 0)
+			if(this.contentX + deltaX >= 0){
+				this.contentX += deltaX
+			} else {
+				this.contentX = 0
+			}
+		}
+		
+		if(this.orientation === ListView.Vertical){
+			if(deltaY > 0)
+			if(this.contentY + deltaY <= this.element.dom.scrollHeight - this.height){
+				this.contentY += deltaY
+			} else {
+				this.contentY = this.element.dom.scrollHeight - this.height
+			}
+			if(deltaY < 0)
+			if(this.contentY + deltaY >= 0){
+				this.contentY += deltaY
+			} else {
+				this.contentY = 0
+			}
+		}
+	}
+	function _fillMouse(e){
+		let rrr = this.element.dom.getBoundingClientRect()
+		if(e.type.indexOf('touch') >= 0){
+			this._mouseX = e.changedTouches[0].pageX - rrr.x
+			this._mouseY = e.changedTouches[0].pageY - rrr.y
+		} else {
+			this._mouseX = e.pageX - rrr.x
+			this._mouseY = e.pageY - rrr.y
+		}	
+		//console.log(e, this._mouseX, this._mouseY)	
+	}
+	function _mousedown(e, state) {
+		if(this.enabled && this.interactive){
+			state.blocked(this)
+			this._fillMouse(e)
+			this._pressed = true
+		}
+	}
+	function _mouseup(e, state) {
+		if(this.enabled && this.interactive){
+			state.release()
+			this._fillMouse(e)
+			this._pressed = false
+		}
+	}
+	function _mousemove(e, state) {
+		if(this.enabled && this.interactive && this._pressed){
+			let deltaX = this._mouseX
+			let deltaY = this._mouseY
+			this._fillMouse(e)
+			deltaX -= this._mouseX
+			deltaY -= this._mouseY
+
+			this._scroll(deltaX, deltaY)
+		}
+		
+	}
+
+	function _touchstart(e, state) {
+		if(this.enabled && this.interactive){
+			state.blocked(this)
+			this._fillMouse(e)
+			this._pressed = true
+		}
+
+	}
+	function _touchend(e, state) {
+		if(this.enabled && this.interactive){
+			state.release()
+			this._fillMouse(e)
+			this._pressed = false
+			
+		}
+	}
+	function _touchmove(e, state) {
+		if(this.enabled && this.interactive && this._pressed){
+			let deltaX = this._mouseX
+			let deltaY = this._mouseY
+			this._fillMouse(e)
+			deltaX -= this._mouseX
+			deltaY -= this._mouseY
+
+			
+			this._scroll(deltaX, deltaY)
+		}
 	}
 
 	function _snapTo(posState){}

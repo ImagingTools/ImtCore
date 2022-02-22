@@ -44,10 +44,10 @@ Item {
 	}
 	///@private silently updates scroll positions, because browser animates scroll
 	function _updateScrollPositions(x, y, layout) {
-		this._setProperty('x', -x)
-		this._setProperty('y', -y)
-		if (layout === undefined || layout) //default true
-			this.parent._scheduleLayout(true) //schedule layout but skip positioning
+		// this._setProperty('x', -x)
+		// this._setProperty('y', -y)
+		// if (layout === undefined || layout) //default true
+		// 	this.parent._scheduleLayout(true) //schedule layout but skip positioning
 	}
 
 	onCompleted: {

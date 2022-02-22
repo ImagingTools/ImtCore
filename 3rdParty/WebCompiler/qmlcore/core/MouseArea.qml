@@ -550,7 +550,7 @@ Item {
 
 				let now = new Date().getTime()
 				if(this._lastClickOrTouch){
-					if(now - this._lastClickOrTouch > 400){
+					if(now - this._lastClickOrTouch > 250){
 						this.clicked();
 						this._lastClickOrTouch = now
 					} else {
@@ -626,7 +626,7 @@ Item {
 
 			let now = new Date().getTime()
 			if(this._lastClickOrTouch){
-				if(now - this._lastClickOrTouch > 400){
+				if(now - this._lastClickOrTouch > 250){
 					this.clicked();
 					this._lastClickOrTouch = now
 				} else {

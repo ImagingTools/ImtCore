@@ -187,6 +187,7 @@ BaseView {
 
 	///@private
 	function _layout(noPrerender) {
+		//console.log('begin', this.element.dom.scrollTop)
 		var model = this._attached
 		if (!model) {
 			this.layoutFinished()
@@ -211,7 +212,7 @@ BaseView {
 		var created = false
 		var startPos = horizontal? paddingLeft: paddingTop
 		var p = startPos
-		var c = horizontal? this.content.x: this.content.y
+		var c = horizontal? this.contentX: this.contentY
 		var size = horizontal? w: h
 		var maxW = 0, maxH = 0
 
@@ -220,18 +221,18 @@ BaseView {
 		var prerender = noPrerender? 0: this.prerender * size
 		var leftMargin = -prerender
 		var rightMargin = size + prerender
-		if (this._scrollDelta != 0) {
-			if (this.nativeScrolling) {
-				if (horizontal)
-					this.element.setScrollX(this.element.getScrollX() - this._scrollDelta)
-				else
-					this.element.setScrollY(this.element.getScrollY() - this._scrollDelta)
-			}
-			this._scrollDelta = 0
-		}
+		// if (this._scrollDelta != 0) {
+		// 	if (this.nativeScrolling) {
+		// 		if (horizontal)
+		// 			this.element.setScrollX(this.element.getScrollX() - this._scrollDelta)
+		// 		else
+		// 			this.element.setScrollY(this.element.getScrollY() - this._scrollDelta)
+		// 	}
+		// 	this._scrollDelta = 0
+		// }
 
 		if (this.trace)
-			log("layout " + n + " into " + w + "x" + h + " @ " + this.content.x + "," + this.content.y + ", prerender: " + prerender + ", range: " + leftMargin + ":" + rightMargin)
+			log("layout " + n + " into " + w + "x" + h + " @ " + this.contentX + "," + this.contentY + ", prerender: " + prerender + ", range: " + leftMargin + ":" + rightMargin)
 
 		var getItemSize = horizontal?
 			function(item) { return item.width }:
@@ -239,7 +240,7 @@ BaseView {
 
 		var itemsCount = 0
 		var refSize
-		for(var i = 0; i < n && (refSize === undefined || p + c < rightMargin); ++i, ++itemsCount) {
+		for(var i = 0; i < n; ++i, ++itemsCount) {
 			var item = items[i]
 			var viewPos = p + c
 
@@ -247,7 +248,8 @@ BaseView {
 			if (refSize === undefined && s !== undefined)
 				refSize = s
 
-			var renderable = (viewPos + (s !== undefined? s: 0) >= leftMargin && viewPos < rightMargin) || currentIndex === i
+			//var renderable = (viewPos + (s !== undefined? s: 0) >= leftMargin && viewPos < rightMargin) || currentIndex === i
+			var renderable = true
 
 			if (!item) {
 				//we can render, or no sizes available
@@ -261,7 +263,7 @@ BaseView {
 				s = refSize = sizes[i] = getItemSize(item)
 
 			if (item) {
-				var visible = (viewPos + s >= 0 && viewPos < size) //checking real delegate visibility, without prerender margin
+				var visible = true//(viewPos + s >= 0 && viewPos < size) //checking real delegate visibility, without prerender margin
 
 				if (item.x + item.width > maxW)
 					maxW = item.width + item.x
@@ -337,6 +339,10 @@ BaseView {
 		this.layoutFinished()
 		if (created)
 			this._context.scheduleComplete()
+		
+		//console.log('end', this.element.dom.scrollTop)
+		this.element.dom.scrollLeft = this.contentX
+		this.element.dom.scrollTop = this.contentY
 	}
 
 	/// @private creates delegate in given item slot
@@ -381,17 +387,17 @@ BaseView {
 	}
 
 	onOrientationChanged: {
-		this._updateOverflow()
+		//this._updateOverflow()
 		this._scheduleLayout()
 		this._sizes = []
 	}
 
 	onNativeScrollingChanged: {
-		this._updateOverflow()
+		//this._updateOverflow()
 	}
 
 	onCompleted: {
-		this._updateOverflow()
+		//this._updateOverflow()
 	}
 
 	function _snapTo(posState){
@@ -420,7 +426,7 @@ BaseView {
 				}
 				i++
 			}
-			if(find || posY === 0) this.content.y = -posY
+			if(find || posY === 0) this.contentY = -posY
 			this.parent._context._processActions()
 		} else {
 			let posX = 0
@@ -447,7 +453,7 @@ BaseView {
 				}
 				i++
 			}
-			if(find || posX === 0) this.content.x = -posX
+			if(find || posX === 0) this.contentX = -posX
 			this.parent._context._processActions()
 		}
 	}
