@@ -84,9 +84,10 @@ protected:
 private:
 	/**
 		Internal method for reconnection database on disconnect or not connected.
+		\value sqlError[optional] - use it to track sql errors during the connection check
 		\return \c true if the database could not be connected successfully or \c false otherwise.
 	 */
-	bool EnsureDatabaseConnected() const;
+	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
 
 	QString GetConnectionName() const;
 	QString GetDatabaseName() const;

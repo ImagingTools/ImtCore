@@ -40,7 +40,7 @@ bool CDatabaseEngineComp::CancelTransaction() const
 
 QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlErrorPtr, bool isForwardOnly) const
 {
-	if (!EnsureDatabaseConnected()){
+	if (!EnsureDatabaseConnected(sqlErrorPtr)){
 		return QSqlQuery();
 	}
 
@@ -79,7 +79,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 
 QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError, bool isForwardOnly) const
 {
-	if (!EnsureDatabaseConnected()){
+	if (!EnsureDatabaseConnected(sqlError)){
 		return QSqlQuery();
 	}
 
@@ -360,7 +360,7 @@ void CDatabaseEngineComp::OnComponentDestroyed()
 
 // private methods
 
-bool CDatabaseEngineComp::EnsureDatabaseConnected() const
+bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 {
 	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
 
@@ -374,6 +374,10 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected() const
 						<< "\n\t| Unable to open database"
 						<< "\n\t| Error: " << databaseConnection.lastError().text();
 		}
+	}
+
+	if(sqlError != nullptr){
+		*sqlError = databaseConnection.lastError();
 	}
 
 	return isOpened;
