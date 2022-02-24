@@ -30,6 +30,11 @@ I_EXPORT_COMPONENT(
 			"Get Style data controller",
 			"Style Data Controller");
 
+I_EXPORT_COMPONENT(
+			SettingsController,
+			"Settings controller",
+			"Settings Controller");
+
 
 } // namespace ImtGuiGqlPck
 

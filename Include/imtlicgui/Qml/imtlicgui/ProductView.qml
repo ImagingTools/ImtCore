@@ -12,8 +12,6 @@ Item {
     property Item rootItem;
     property Item multiDocViewItem;
 
-//    property var model;
-
     property alias itemId: productsCollectionView.itemId;
     property alias itemName: productsCollectionView.itemName;
     property alias model: productsCollectionView.collectionViewModel;
@@ -22,6 +20,8 @@ Item {
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
+    property bool wasChanged: false;
+
     Component.onCompleted: {
         console.log("ProductView onCompleted",  productsCollectionView.selectedIndex);
 
@@ -29,6 +29,10 @@ Item {
         console.log("ProductView onCompleted",  productsCollectionView.width);
 
         console.log("ProductView collection size",   productsCollectionView.table);
+    }
+
+    onWasChangedChanged: {
+        productsCollectionViewContainer.commandsChanged("ProductEdit");
     }
 
     ListModel {
@@ -52,8 +56,7 @@ Item {
         parameters["resultItem"] = productsCollectionViewContainer;
         parameters["itemHeight"] = 25;
         parameters["itemWidth"] = 150;
-//        parameters["x"] = mouseX + 75;
-//        parameters["y"] = mouseY + 130;
+
         parameters["x"] = point.x;
         parameters["y"] = point.y;
 
@@ -67,22 +70,22 @@ Item {
 
             if (parameters["status"] === "ok") {
                 var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
-                console.log("ProductView onClicked ", dataModelLocal.GetItemsCount())
-                dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);//
-                dataModelLocal.SetData("Name", parameters["newLicenseName"], productsCollectionView.selectedIndex);
+                console.log("ProductView onClicked ", dataModelLocal.GetItemsCount());
 
-                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-                productsCollectionView.refresh();
+                var oldId =  dataModelLocal.GetData("Id", productsCollectionView.selectedIndex);
+                var oldName =  dataModelLocal.GetData("Name", productsCollectionView.selectedIndex);
+
+                if (oldId !== parameters["newLicenseId"] || oldName !== parameters["newLicenseName"]){
+                    dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);
+                    dataModelLocal.SetData("Name", parameters["newLicenseName"], productsCollectionView.selectedIndex);
+                    productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                    productsCollectionView.refresh();
+
+                    productsCollectionViewContainer.wasChanged = true;
+                }
             }
         }
         else if (parameters["dialog"] === "InputDialog"){
-
-//            if (parameters["status"] === "ok") {
-//                var value = parameters["value"];
-//                console.log("LicenseCollectionViewContainer dialogResult", value);
-//                productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, value);
-//                productViewSaveQuery.updateModel(value);
-//            }
 
             if (parameters["typeOperation"] === "Save") {
                 var value = parameters["value"];
@@ -92,10 +95,15 @@ Item {
                 var value = parameters["value"];
                 var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
 
-                dataModelLocal.SetData("Description", value, productsCollectionView.table.selectedIndex);
-                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                var oldDescription = dataModelLocal.GetData("Description", productsCollectionView.table.selectedIndex);
 
-                productsCollectionView.refresh();
+                if (oldDescription !== value){
+                    dataModelLocal.SetData("Description", value, productsCollectionView.table.selectedIndex);
+                    productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                    productsCollectionView.refresh();
+
+                    productsCollectionViewContainer.wasChanged = true;
+                }
             }
 
         }
@@ -111,8 +119,6 @@ Item {
                     productsCollectionView.refresh();
 
                     productsCollectionView.table.selectedIndex = -1;
-                    productsCollectionViewContainer.commandsChanged("ProductEdit");
-                    productsCollectionViewContainer.makeCommandActive("Save");
                 }
             }
 
@@ -137,40 +143,6 @@ Item {
             }
 
         }
-
-//        if (parameters["status"] === "ok") {
-
-//            if (parameters["dialog"] === "EditLicense") {
-//                var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
-//                console.log("ProductView onClicked ", dataModelLocal.GetItemsCount())
-//                dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);//
-//                dataModelLocal.SetData("Name", parameters["newLicenseName"], productsCollectionView.selectedIndex);
-
-//                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-//                productsCollectionView.refresh();
-//            }
-//            else if (parameters["dialog"] === "InputDialog") {
-//                var value = parameters["value"];
-//                console.log("LicenseCollectionViewContainer dialogResult", value);
-//                productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, value);
-//                productViewSaveQuery.updateModel(value);
-//            }
-//        }
-//        else if (parameters["status"] === "yes") {
-
-//            if (productsCollectionView.collectionViewModel.ContainsKey("data")) {
-//                var dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
-//                dataModelLocal.RemoveItem(productsCollectionView.table.selectedIndex);
-
-//                productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-//                productsCollectionView.collectionViewModel.Refresh();
-//                productsCollectionView.refresh();
-
-//                productsCollectionView.table.selectedIndex = -1;
-//                productsCollectionViewContainer.commandsChanged("ProductEdit");
-//                productsCollectionViewContainer.makeCommandActive("Save");
-//            }
-//        }
     }
 
     function openMessageDialog(nameDialog, message) {
@@ -190,35 +162,40 @@ Item {
         productsCollectionViewContainer.rootItem.setModeMenuButton(commandId, "Normal");
     }
 
-    function createLicense(id, name) {
+    function createLicense(id, name, description) {
         var dataModelLocal = model.GetData("data");
         var index = dataModelLocal.InsertNewItem();
 
         dataModelLocal.SetData("Name", name, index);
         dataModelLocal.SetData("Id", id, index);
-        dataModelLocal.SetData("Description", "", index);
+        dataModelLocal.SetData("Description", description, index);
 
         model.SetData("data", dataModelLocal);
-//        model.Refresh();
         productsCollectionView.refresh();
     }
 
     function menuActivated(menuId) {
-
         console.log("ProductView menuActivated", menuId);
         if (menuId  === "New"){
-            productsCollectionViewContainer.createLicense("", "License Name");
+            productsCollectionViewContainer.createLicense("", "License Name", "");
         }
         else if (menuId  === "Save") {
-            if (productsCollectionView.itemId === "") {
-                var source = "AuxComponents/InputDialog.qml";
-                var parameters = {};
-                parameters["message"] = "Please enter the name of the document: ";
-                parameters["nameDialog"] = "Document Name";
-                parameters["resultItem"] = productsCollectionViewContainer;
-                thubnailDecoratorContainer.openDialog(source, parameters);
+//            if (productsCollectionView.itemId === "") {
+//                var source = "AuxComponents/InputDialog.qml";
+//                var parameters = {};
+//                parameters["message"] = "Please enter the name of the document: ";
+//                parameters["nameDialog"] = "Document Name";
+//                parameters["resultItem"] = productsCollectionViewContainer;
+//                thubnailDecoratorContainer.openDialog(source, parameters);
+//            }
+//            else {
+//                productViewSaveQuery.updateModel()
+//            }
+
+            if (tfcProductId.text === ""){
+                productsCollectionView.openMessageDialog("ErrorDialog", "Id can't be empty!");
             }
-            else {
+            else{
                 productViewSaveQuery.updateModel()
             }
         }else if (menuId  === "Remove") {
@@ -234,15 +211,18 @@ Item {
             var dataModelLocal = model.GetData("data");
             var duplicateName = "Copy of " + dataModelLocal.GetData("Name", productsCollectionView.selectedIndex);
             var duplicateId = dataModelLocal.GetData("Id", productsCollectionView.selectedIndex);
-            productsCollectionViewContainer.createLicense(duplicateId, duplicateName);
+            var duplicateDescription = dataModelLocal.GetData("Description", productsCollectionView.selectedIndex);
 
+            productsCollectionViewContainer.createLicense(duplicateId, duplicateName, duplicateDescription);
+
+            productsCollectionViewContainer.wasChanged = true;
         } else {
             productsCollectionView.menuActivated(menuId)
         }
     }
 
     function refresh() {
-        console.log("ProductView refresh()");
+        console.log("ProductView refresh");
         productsCollectionView.refresh();
     }
 
@@ -257,13 +237,19 @@ Item {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
-            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
+//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
+        }
+
+        if (productsCollectionViewContainer.wasChanged){
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+        } else {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
         }
     }
@@ -356,36 +342,17 @@ Item {
                 queryFields = Gql.GqlObject("addedNotification");
             }
 
-//            if(productsCollectionViewContainer.itemId != "" && productsCollectionViewContainer.operation != "Copy"){
-//                query = Gql.GqlRequest("query", "ProductUpdate");
-//                inputParams.InsertField("Id");
-//                inputParams.InsertFieldArgument("Id", productsCollectionViewContainer.itemId);
-//                queryFields = Gql.GqlObject("updatedNotification");
-//            }
-//            else{
-//                query = Gql.GqlRequest("query", "ProductAdd");
-//                queryFields = Gql.GqlObject("addedNotification");
-//            }
             query.AddParam(inputParams);
 
-//            if (newId !== undefined && newId !== "") {
-//                //console.log();
-//                productsCollectionViewContainer.itemId = newId;
-//                productsCollectionViewContainer.itemName = newId;
-//            }
-
-//            modelProducts.SetData("Id", productsCollectionViewContainer.itemId)
-//            modelProducts.SetData("Name", productsCollectionViewContainer.itemName)
             modelProducts.SetData("Id", tfcProductId.text)
             modelProducts.SetData("Name", tfcProductName.text)
+//            modelProducts.SetData("Id", productsCollectionViewContainer.itemId)
+//            modelProducts.SetData("Name", productsCollectionViewContainer.itemName)
             modelProducts.SetExternTreeModel("licenses", productsCollectionView.collectionViewModel.GetData("data"));
             modelProducts.SetExternTreeModel("dependencies", featuresTreeView.productLicenseFeatures);
 
-            //featureCollectionViewContainer.model.SetIsArray(false);
             var jsonString = modelProducts.toJSON();
-//            console.log("jsonString", jsonString)
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-//            console.log("jsonString", jsonString)
 
             inputParams.InsertField("Item");
             inputParams.InsertFieldArgument ("Item", jsonString);
@@ -414,6 +381,7 @@ Item {
                         var messageError = dataModelLocal.GetData("message");
                         productsCollectionViewContainer.openMessageDialog("Error Dialog", messageError);
                     }
+
                     return;
                 }
 
@@ -422,7 +390,15 @@ Item {
 
                     dataModelLocal = dataModelLocal.GetData(productsCollectionViewContainer.gqlModelQueryType);
 
+                    if (!dataModelLocal){
+                        return;
+                    }
+
                     dataModelLocal = dataModelLocal.GetData(productsCollectionViewContainer.gqlModelQueryTypeNotification);
+
+                    if (!dataModelLocal){
+                        return;
+                    }
 
                     productsCollectionView.refresh();
 
@@ -432,26 +408,19 @@ Item {
                         newId = dataModelLocal.GetData("Id");
                     }
 
-                    if (dataModelLocal.ContainsKey("Name")){
-                        newName = dataModelLocal.GetData("Name");
-                    }
-
                     if (productsCollectionView.itemId !== newId){
                         productsCollectionView.itemId = newId;
-                        productsCollectionView.itemName = newId;
-
-                        productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
                     }
 
-
-
-//                    if (productsCollectionView.itemName !== newName){
-//                        productsCollectionView.itemName = newName;
-//                        productsCollectionViewContainer.rootItem.updateTitleTab(productsCollectionViewContainer.itemId, productsCollectionViewContainer.itemName);
-//                    }
+                    if (productsCollectionView.itemName !== tfcProductName.text){
+                        productsCollectionViewContainer.rootItem.updateTitleTab(
+                                    productsCollectionViewContainer.itemId,
+                                    productsCollectionViewContainer.itemName);
+                    }
 
                     productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
-//                    productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.refresh();
+
+                    productsCollectionViewContainer.wasChanged = false;
                 }
             }
         }
@@ -525,11 +494,10 @@ Item {
 
             text: productsCollectionViewContainer.itemId;
 
-//            onTextChanged: {
-//                productsCollectionViewContainer.itemId = tfcProductId.text;
-//            }
+            onInputTextChanged: {
+                productsCollectionViewContainer.wasChanged = true;
+            }
         }
-
 
         Rectangle {
             id: productNameTextRect;
@@ -564,9 +532,9 @@ Item {
 
             text: productsCollectionViewContainer.itemName;
 
-//            onTextChanged: {
-//                productsCollectionViewContainer.itemName = tfcProductName.text;
-//            }
+            onInputTextChanged: {
+                productsCollectionViewContainer.wasChanged = true;
+            }
         }
 
         Rectangle {
@@ -579,8 +547,6 @@ Item {
             height: 35;
 
             color: Style.theme === "Light" ? "white": Style.backgroundColor;
-
-//            color: "red";
 
             Text {
                 id: titleHeader;
@@ -630,6 +596,7 @@ Item {
                             packageId,
                             featureId,
                             state);
+                productsCollectionViewContainer.wasChanged = true;
                 productMetaInfo.clearTreeView();
                 productMetaInfo.updateLicenseFeatures(productsCollectionViewContainer.itemId,
                                                       productsCollectionView.table.getSelectedId(),
@@ -676,15 +643,23 @@ Item {
 
                 var modelChildren = modelItems.GetData("childItemModel", i);
 
+                if (!modelChildren){
+                    continue;
+                }
+
                 for (var j = 0; j < modelChildren.GetItemsCount(); j++){
                     var isActive = modelChildren.GetData("isActive", j);
                     var state = modelChildren.GetData("stateChecked", j);
 
+                    var id = modelChildren.GetData("Id", j);
+
                     if (isActive === 0){
+                        console.log(id + " set active 1");
                         modelChildren.SetData("isActive", 1, j);
                     }
 
                     if (state === 2){
+                        console.log(id + " set state 0");
                         modelChildren.SetData("stateChecked", 0, j);
                     }
                 }
@@ -693,6 +668,8 @@ Item {
             }
 
             treeView.modelItems =  modelItems;
+
+            treeView.modelItems.Refresh();
         }
 
         function updateTreeView(){
@@ -741,7 +718,16 @@ Item {
                 }
 
                 var treeViewFeaturesModel = treeView.modelItems.GetData("childItemModel", i);
+
+                if (!treeViewFeaturesModel){
+                    continue;
+                }
+
                 var licenseFeaturesPackageFeaturesModel = modelPackages.GetData("Features", packageIndex);
+
+                if (!licenseFeaturesPackageFeaturesModel){
+                    continue;
+                }
 
                 for (j = 0; j < treeViewFeaturesModel.GetItemsCount(); j++){
                     var treeViewFeatureId = treeViewFeaturesModel.GetData("Id", j);
@@ -813,6 +799,8 @@ Item {
 
                             if (pId === packageId && fId === id){
                                 console.log("Find depend feature", packageId, id);
+                                console.log("set isActive 0");
+                                console.log("set state 2");
                                 modelChildren.SetData("isActive", 0, j);
                                 modelChildren.SetData("stateChecked", 2, j);
                             }
@@ -905,21 +893,21 @@ Item {
             }
 
             //PRINT
-            console.log();
-            for (var i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
-                console.log("Root LicenseId", featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i));
-                var packageModel = featuresTreeView.productLicenseFeatures.GetData("Packages", i);
+//            console.log();
+//            for (var i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
+//                console.log("Root LicenseId", featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i));
+//                var packageModel = featuresTreeView.productLicenseFeatures.GetData("Packages", i);
 
-                for (var j = 0; j < packageModel.GetItemsCount(); j++){
-                    console.log("\tPackageId", packageModel.GetData("Id", j));
+//                for (var j = 0; j < packageModel.GetItemsCount(); j++){
+//                    console.log("\tPackageId", packageModel.GetData("Id", j));
 
-                    var featureModel = packageModel.GetData("Features", j);
+//                    var featureModel = packageModel.GetData("Features", j);
 
-                    for (var k = 0; k < featureModel.GetItemsCount(); k++){
-                        console.log("\t\tFeatureId", featureModel.GetData("Id", k));
-                    }
-                }
-            }
+//                    for (var k = 0; k < featureModel.GetItemsCount(); k++){
+//                        console.log("\t\tFeatureId", featureModel.GetData("Id", k));
+//                    }
+//                }
+//            }
 
 
         }

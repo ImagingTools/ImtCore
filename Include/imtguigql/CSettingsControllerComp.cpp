@@ -1,0 +1,42 @@
+#include <imtguigql/CSettingsControllerComp.h>
+
+
+namespace imtguigql
+{
+
+
+// reimplemented (imtgql::IGqlRepresentationDataController)
+
+imtbase::CTreeItemModel* CSettingsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
+		return nullptr;
+	}
+
+	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
+	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
+
+	int count = fieldList->count();
+
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* itemsModel = nullptr;
+	bool isSetResponce = false;
+	QByteArrayList fields;
+
+	for (int i = 0; i < count; i++){
+		if (fieldList->at(i).GetId() == "items"){
+			fields = fieldList->at(i).GetFieldIds();
+			isSetResponce = true;
+		}
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
+}
+
+
+} // namespace imtgql
+
+

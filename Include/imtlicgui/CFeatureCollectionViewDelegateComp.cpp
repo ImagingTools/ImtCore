@@ -24,7 +24,7 @@ imtgui::ICollectionViewDelegate::SummaryInformation CFeatureCollectionViewDelega
 				retVal.text = featureInfoPtr->GetFeatureName();
 				retVal.sortValue = retVal.text;
 			}
-			else if (informationId == QByteArray("Id")){ //изменил FeatureId на Id
+			else if (informationId == QByteArray("Id")){
 				retVal.text = featureInfoPtr->GetFeatureId();
 				retVal.sortValue = retVal.text;
 			}

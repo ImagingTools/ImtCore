@@ -20,8 +20,14 @@ Item {
     property string gqlModelQueryTypeNotification;
     property string operation;
 
+    property bool wasChanged: false;
+
     Component.onCompleted: {
         console.log("PackageView onCompleted", featureCollectionView.selectedIndex);
+    }
+
+    onWasChangedChanged: {
+        featureCollectionViewContainer.commandsChanged("PackageEdit");
     }
 
     function refresh() {
@@ -147,11 +153,21 @@ Item {
             if (parameters["dialog"] === "EditFeature") {
                 var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
                 console.log("PackageView onClicked ", dataModelLocal.GetItemsCount())
-                dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);
-                dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
-                //dataModelLocal.SetData("Description", "", featureCollectionView.selectedIndex);
-                featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-                featureCollectionView.refresh();
+
+
+                var oldId = dataModelLocal.GetData("Id", featureCollectionView.selectedIndex);
+                var oldName = dataModelLocal.GetData("Name", featureCollectionView.selectedIndex);
+
+                if (oldId !== parameters["newFeatureId"] || oldName !== parameters["newFeatureName"]){
+                    dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);
+                    dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
+                    featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                    featureCollectionView.refresh();
+
+                    featureCollectionViewContainer.updateDependsModelAfterEdit(oldId, parameters["newFeatureId"]);
+
+                    featureCollectionViewContainer.wasChanged = true;
+                }
 
                 featuresTreeView.addFeatureInTreeViewModel(featureCollectionViewContainer.itemId,
                                                            parameters["newFeatureId"],
@@ -167,10 +183,14 @@ Item {
                     var value = parameters["value"];
                     var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
 
-                    dataModelLocal.SetData("Description", value, featureCollectionView.table.selectedIndex);
-                    featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                    var oldDescription =  dataModelLocal.GetData("Description", featureCollectionView.table.selectedIndex);
 
-                    featureCollectionView.refresh();
+                    if (oldDescription !== value){
+                        dataModelLocal.SetData("Description", value, featureCollectionView.table.selectedIndex);
+                        featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                        featureCollectionView.refresh();
+                        featureCollectionViewContainer.wasChanged = true;
+                    }
                 }
             }
         }
@@ -208,6 +228,63 @@ Item {
         }
     }
 
+    function updateDependsModelAfterEdit(oldFeatureId, newFeatureId){
+        console.log("PackageView updateDependsModelAfterEdit", oldFeatureId, newFeatureId);
+        featuresTreeView.printInfo();
+
+        if (!featuresTreeView.modelDepends){
+            return;
+        }
+
+        for (var i = 0; i < featuresTreeView.modelDepends.GetItemsCount(); i++){
+            var rootFeatureId = featuresTreeView.modelDepends.GetData("RootFeatureId", i);
+            var rootPackageId = featuresTreeView.modelDepends.GetData("RootPackageId", i);
+
+            if (rootFeatureId === oldFeatureId && rootPackageId === featureCollectionViewContainer.itemId){
+                featuresTreeView.modelDepends.SetData("RootFeatureId", newFeatureId, i);
+            }
+
+            var packages = featuresTreeView.modelDepends.GetData("Packages", i);
+
+            if (!packages){
+                continue;
+            }
+
+            var indexChild = -1;
+            for (var j = 0; j < packages.GetItemsCount(); j++){
+                 var packageId = packages.GetData("Id", j);
+
+                if (packageId === featureCollectionViewContainer.itemId){
+                    indexChild = j;
+                }
+            }
+
+            if (indexChild === -1){
+                continue;
+            }
+
+            var childItems = packages.GetData("childItemModel", indexChild);
+
+            if (!childItems){
+                continue;
+            }
+
+            for (j = 0; j < childItems.GetItemsCount(); j++){
+                var curId = childItems.GetData("Id", j);
+
+                if (curId === oldFeatureId){
+                    childItems.SetData("Id", newFeatureId, j);
+                }
+            }
+
+            packages.SetData("childItemModel", childItems, indexChild);
+            featuresTreeView.modelDepends.GetData("Packages", packages, i);
+        }
+        featuresTreeView.printInfo();
+
+        featuresTreeView.modelDepends.Refresh();
+    }
+
     function menuActivated(menuId) {
         console.log("PackageView menuActivated", menuId);
         if (menuId  === "New"){
@@ -238,7 +315,9 @@ Item {
             else {
                 var emptyId = featureCollectionViewContainer.alreadyExistIdHasEmpty();
                 if (emptyId !== "") {
-                    featureCollectionViewContainer.openMessageDialog("ErrorDialog", emptyId + " has an empty id !");
+//                    featureCollectionViewContainer.openMessageDialog("ErrorDialog", emptyId + " has an empty id !");
+
+                    featureCollectionView.openMessageDialog("ErrorDialog", emptyId + " has an empty id !");
                     return;
                 }
 
@@ -278,12 +357,18 @@ Item {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
-            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+//            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
+//            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
+        }
+
+        if (featureCollectionViewContainer.wasChanged){
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+        } else {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
         }
     }
@@ -481,7 +566,7 @@ Item {
 
             }
             treeView.modelItems = modelItems;
-            //printModelItems(treeView.modelItems);
+            printModelItems(treeView.modelItems);
         } else {
             featureCollectionViewContainer.clearCheckedCheckBox();
         }
@@ -515,11 +600,12 @@ Item {
                 }
                 modelItems.SetData("childItemModel", childModelItems, i);
                 treeView.modelItems = modelItems;
-                //printModelItems(treeView.modelItems);
+
                 break;
             }
         }
 
+        printModelItems(treeView.modelItems);
         treeView.modelItems.Refresh();
     }
 
@@ -589,7 +675,8 @@ Item {
                     if (dataModelLocal){
                         console.log("Message errors");
                         var messageError = dataModelLocal.GetData("message");
-                        featureCollectionViewContainer.openMessageDialog("Error Dialog", messageError);
+//                        featureCollectionViewContainer.openMessageDialog("Error Dialog", messageError);
+                        featureCollectionView.openMessageDialog("Error Dialog", messageError);
                     }
                     return;
                 }
@@ -613,6 +700,7 @@ Item {
                         }
 
                         featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                        featureCollectionViewContainer.wasChanged = false;
                     }
                 }
 
@@ -704,13 +792,13 @@ Item {
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("PackageView TreeView onItemTreeViewCheckBoxStateChanged", state, packageId, featureId);
 
+                featureCollectionViewContainer.wasChanged = true;
+
                 var curFeatureId = featureCollectionView.table.getSelectedId();
                 var curPackageId = featureCollectionView.itemId;
 
                 var rootIndex = featuresTreeView.getIndexByRootFeatureId(curFeatureId);
-
                 if (rootIndex === -1) {
-
                     rootIndex = featuresTreeView.modelDepends.InsertNewItem();
                     featuresTreeView.modelDepends.SetData("RootFeatureId", curFeatureId, rootIndex);
                     featuresTreeView.modelDepends.SetData("RootPackageId", curPackageId, rootIndex);
@@ -725,7 +813,6 @@ Item {
                 }
 
                 var packageIndex = featuresTreeView.getPackageIndexByPackageId(packageId, rootIndex);
-
                 if (packageIndex === -1) {
                     packageIndex = featuresTreeView.addNewPackageToRootFeatureByRootIndex(packageId, rootIndex);
                 }

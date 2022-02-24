@@ -256,37 +256,6 @@ Item {
         color: Style.backgroundColor;
     }
 
-//    function updateMetaInfoById(packageId, newMetaInfo){
-//        var index = -1;
-//        for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
-//            var curId = metaInfoModels.GetData("Id", i);
-
-//            if (curId === packageId){
-//                index = i;
-//                break;
-//            }
-//        }
-
-//        if (index !== -1){
-
-//            var modelData =  metaInfoModels.GetData("ModelData", index);
-
-//            for (var i = 0; i < modelData.GetItemsCount(); i++){
-//                var name = modelData.GetData("Name", i);
-//                if (name === "ModificationTime"){
-//                    modelData.SetData("Childs", newMetaInfo.GetData("ModificationTime"), i);
-//                }
-//                else if (name === "Features") {
-//                    modelData.SetData("Childs", newMetaInfo.GetData("Features"), i);
-//                }
-//            }
-
-//            metaInfoModels.SetData("ModelData", modelData, index)
-
-//            packageCollectionMetaInfo.modelData = modelData;
-//        }
-//    }
-
     function callMetaInfoQuery(){
         metaInfo.getMetaInfo();
     }

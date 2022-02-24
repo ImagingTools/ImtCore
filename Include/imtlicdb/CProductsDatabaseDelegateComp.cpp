@@ -240,9 +240,15 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	QByteArray oldProductId = oldProductPtr->GetProductId();
-	QByteArray newProductId = oldProductPtr->GetProductId();
+	QByteArray newProductId = newProductPtr->GetProductId();
 
-	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%1' WHERE Id ='%2';").arg(qPrintable(newProductId)).arg(qPrintable(oldProductId)).toLocal8Bit();
+	QString oldProductName = oldProductPtr->GetName();
+	QString newProductName = newProductPtr->GetName();
+
+	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%2' WHERE Id ='%3';")
+			.arg(qPrintable(newProductId))
+			.arg(qPrintable(newProductName))
+			.arg(qPrintable(oldProductId)).toLocal8Bit();
 
 	QByteArrayList addedLicenses;
 	QByteArrayList removedLicenses;
@@ -368,7 +374,13 @@ QByteArray CProductsDatabaseDelegateComp::CreateRenameObjectQuery(
 	QByteArray oldProductId = productPtr->GetProductId();
 	QByteArray newProductId = newObjectName.toLocal8Bit();
 
-	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%1' WHERE Id ='%2';").arg(qPrintable(newProductId)).arg(qPrintable(oldProductId)).toLocal8Bit();
+//	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%1' WHERE Id ='%2';")
+//			.arg(qPrintable(newProductId))
+//			.arg(qPrintable(oldProductId)).toLocal8Bit();
+
+	QByteArray retVal = QString("UPDATE Products SET Name = '%1' WHERE Id ='%2';")
+			.arg(qPrintable(newObjectName))
+			.arg(qPrintable(oldProductId)).toLocal8Bit();
 
 	return retVal;
 }

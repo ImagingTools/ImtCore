@@ -38,6 +38,19 @@ Rectangle {
         collectionViewContainer.refresh();
     }
 
+    function openMessageDialog(nameDialog, message) {
+
+        var source = "AuxComponents/MessageDialog.qml";
+        var parameters = {};
+        parameters["resultItem"] = collectionViewContainer;
+        parameters["noButtonVisible"] = false;
+        parameters["textOkButton"] = "Ok";
+        parameters["message"] = message;
+        parameters["nameDialog"] = nameDialog;
+
+        thubnailDecoratorContainer.openDialog(source, parameters);
+    }
+
     function getDescriptionBySelectedItem(){
         console.log("CollectionView getDescriptionBySelectedItem");
         var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
@@ -59,15 +72,12 @@ Rectangle {
         var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
         var name;
-
         if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
             name = dataModelLocal.GetData("AccountName", tableInternal.selectedIndex);
         }
         else{
             name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
         }
-
-//        var name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
         return name;
     }
 
@@ -111,8 +121,6 @@ Rectangle {
         }
 
         collectionViewContainer.collectionViewModel.SetData("data", dataModelLocal);
-
-//        collectionViewContainer.collectionViewModel.Refresh();
     }
 
     function dialogResult(parameters) {
@@ -216,10 +224,11 @@ Rectangle {
 
         onSelectedIndexChanged: {
             console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
-            if (tableInternal.selectedIndex != -1) {
-                //collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
-                collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
-            }
+//            if (tableInternal.selectedIndex != -1) {
+//                //collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
+//                collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
+//            }
+            collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
             collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
             //console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
         }
@@ -245,22 +254,56 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, headerInfoModel);
             if (this.state === "Ready"){
-                var dataModelLocal = this.GetData("data");
-                if(dataModelLocal && dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
-                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo)
-                    if(dataModelLocal.ContainsKey("headers")){
-                        tableInternal.headers = dataModelLocal.GetData("headers")
-                        collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
 
-                        itemsModel.updateModel();
+                var dataModelLocal;
+
+                if (headerInfoModel.ContainsKey("errors")){
+
+                    dataModelLocal = headerInfoModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo);
+
+                        if (dataModelLocal.ContainsKey("message")){
+
+                            var message = dataModelLocal.GetData("message");
+                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                        }
+
                     }
-                    else if(packageInfoModel.ContainsKey("errors")){
-                        var errorsModelLocal = packageInfoModel.GetData("errors");
-                        if(errorsModelLocal !== null && errorsModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
-                            console.log("message", errorsModelLocal.GetData(collectionViewContainer.gqlModelInfo).GetData("message"));
+
+                    return;
+                }
+
+                if (headerInfoModel.ContainsKey("data")){
+                    dataModelLocal = headerInfoModel.GetData("data");
+
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo);
+
+                        if(dataModelLocal.ContainsKey("headers")){
+                            tableInternal.headers = dataModelLocal.GetData("headers")
+                            collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
+                            itemsModel.updateModel();
                         }
                     }
                 }
+
+//                if(dataModelLocal && dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
+//                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo)
+//                    if(dataModelLocal.ContainsKey("headers")){
+//                        tableInternal.headers = dataModelLocal.GetData("headers")
+//                        collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
+
+//                        itemsModel.updateModel();
+//                    }
+//                    else if(packageInfoModel.ContainsKey("errors")){
+//                        var errorsModelLocal = packageInfoModel.GetData("errors");
+//                        if(errorsModelLocal !== null && errorsModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
+//                            console.log("message", errorsModelLocal.GetData(collectionViewContainer.gqlModelInfo).GetData("message"));
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -304,39 +347,72 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, itemsModel);
             if (this.state === "Ready"){
-                var dataModelLocal = this.GetData("data");
-                if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
-                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
-                    if(dataModelLocal.ContainsKey("items")){
 
+                var dataModelLocal;
 
-                        if (tableInternal.elements){
-                            console.log("Old elements:");
-                            for (var i = 0; i < tableInternal.elements.GetItemsCount(); i++){
-                                var id = tableInternal.elements.GetData("Id", i);
+                if (itemsModel.ContainsKey("errors")){
+                    dataModelLocal = itemsModel.GetData("errors");
 
-                                console.log("\tElement Id", id);
-                            }
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
+
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
+
+                        if (dataModelLocal.ContainsKey("message")){
+                            var message = dataModelLocal.GetData("message");
+                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
                         }
-
-                        tableInternal.elements = dataModelLocal.GetData("items");
-
-                        console.log("New elements:");
-                        for (var i = 0; i < tableInternal.elements.GetItemsCount(); i++){
-                            var id = tableInternal.elements.GetData("Id", i);
-
-                            console.log("\tElement Id", id);
-                        }
-
-                        collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
                     }
-                    else if(itemsModel.ContainsKey("errors")){
-                        var errorsModel = itemsModel.GetData("errors");
-                        if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
-                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
+
+                    return;
+                }
+
+                if (itemsModel.ContainsKey("data")){
+                    dataModelLocal = itemsModel.GetData("data");
+
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
+
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
+
+                        if (dataModelLocal.ContainsKey("items")){
+                            tableInternal.elements = dataModelLocal.GetData("items");
+                            collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
                         }
                     }
                 }
+
+//                var dataModelLocal = this.GetData("data");
+//                if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
+//                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
+//                    if(dataModelLocal.ContainsKey("items")){
+
+
+//                        if (tableInternal.elements){
+//                            console.log("Old elements:");
+//                            for (var i = 0; i < tableInternal.elements.GetItemsCount(); i++){
+//                                var id = tableInternal.elements.GetData("Id", i);
+
+//                                console.log("\tElement Id", id);
+//                            }
+//                        }
+
+//                        tableInternal.elements = dataModelLocal.GetData("items");
+
+//                        console.log("New elements:");
+//                        for (var i = 0; i < tableInternal.elements.GetItemsCount(); i++){
+//                            var id = tableInternal.elements.GetData("Id", i);
+
+//                            console.log("\tElement Id", id);
+//                        }
+
+//                        collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
+//                    }
+//                    else if(itemsModel.ContainsKey("errors")){
+//                        var errorsModel = itemsModel.GetData("errors");
+//                        if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
+//                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -374,23 +450,55 @@ Rectangle {
             console.log("State:", this.state, removeModel);
             if (this.state === "Ready"){
 
-                var dataModelLocal = this.GetData("data");
-                console.log("dataModelLocal:", dataModelLocal);
-                if(dataModelLocal.ContainsKey("removedNotification")){
-                    dataModelLocal = dataModelLocal.GetData("removedNotification");
+                var dataModelLocal;
 
-                    if(dataModelLocal.ContainsKey("Id")){
-                        var itemId = dataModelLocal.GetData("Id");
-                        console.log("Remove item by id = ", itemId);
-                        collectionViewContainer.removedItem(itemId)
+                if (removeModel.ContainsKey("errors")){
+                    dataModelLocal = removeModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey("removedNotification")){
+
+                        dataModelLocal = dataModelLocal.GetData("removedNotification");
+
+                        if (dataModelLocal.ContainsKey("message")){
+                            var message = dataModelLocal.GetData("message");
+                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                        }
                     }
-                    else if(removeModel.ContainsKey("errors")){
-                        var errorsModel = removeModel.GetData("errors");
-                        if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
-                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
+
+                    return;
+                }
+
+                if (removeModel.ContainsKey("data")){
+                    dataModelLocal = removeModel.GetData("data");
+
+                    if (dataModelLocal.ContainsKey("removedNotification")){
+
+                        dataModelLocal = dataModelLocal.GetData("removedNotification");
+
+                        if (dataModelLocal.ContainsKey("Id")){
+                            var itemId = dataModelLocal.GetData("Id");
+                            collectionViewContainer.removedItem(itemId)
                         }
                     }
                 }
+
+//                var dataModelLocal = this.GetData("data");
+//                console.log("dataModelLocal:", dataModelLocal);
+//                if(dataModelLocal.ContainsKey("removedNotification")){
+//                    dataModelLocal = dataModelLocal.GetData("removedNotification");
+
+//                    if(dataModelLocal.ContainsKey("Id")){
+//                        var itemId = dataModelLocal.GetData("Id");
+//                        console.log("Remove item by id = ", itemId);
+//                        collectionViewContainer.removedItem(itemId)
+//                    }
+//                    else if(removeModel.ContainsKey("errors")){
+//                        var errorsModel = removeModel.GetData("errors");
+//                        if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
+//                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -434,9 +542,14 @@ Rectangle {
                 if (renameQuery.ContainsKey("errors")){
                     dataModelLocal = renameQuery.GetData("errors");
 
-                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRename);
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelRename)){
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRename);
 
-                    var message = dataModelLocal.GetData("message");
+                        if (dataModelLocal.ContainsKey("message")){
+                            var message = dataModelLocal.GetData("message");
+                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                        }
+                    }
 
                     return;
                 }
@@ -450,10 +563,16 @@ Rectangle {
 
                         if (dataModelLocal.ContainsKey("item")) {
                             dataModelLocal = dataModelLocal.GetData("item");
+
                             var newId = dataModelLocal.GetData("NewId");
+
+                            if (collectionViewContainer.gqlModelInfo === "ProductCollectionInfo"){
+                                newId = tableInternal.getSelectedId();
+                            }
+
                             var newName = dataModelLocal.GetData("NewName");
 
-                            collectionViewContainer.updateItemAfterRename(newId, newName);
+                            //collectionViewContainer.updateItemAfterRename(newId, newName);
                         }
                     }
                 }
@@ -499,9 +618,14 @@ Rectangle {
                 if (setDescriptionQuery.ContainsKey("errors")){
                     dataModelLocal = setDescriptionQuery.GetData("errors");
 
-                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelSetDescription);
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelSetDescription)){
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelSetDescription);
 
-                    var message = dataModelLocal.GetData("message");
+                        if (dataModelLocal.ContainsKey("message")){
+                            var message = dataModelLocal.GetData("message");
+                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                        }
+                    }
 
                     return;
                 }

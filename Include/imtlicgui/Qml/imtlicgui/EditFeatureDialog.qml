@@ -32,6 +32,27 @@ Rectangle {
     signal okClicked(string newId, string newName);
     signal cancelClicked();
 
+    Component.onCompleted: {
+        console.log("EditFeatureDialog onCompleted");
+//        tfcFeatureNameText.activeFocusOnPress = true;
+
+//        containerFeatureEdit.forceActiveFocus();
+//        tfcFeatureName.forceActiveFocus();
+
+        tfcFeatureNameText.forceActiveFocus();
+
+        if (tfcFeatureNameText.activeFocus){
+            console.log("EditFeatureDialog active focus on textinput");
+        }
+    }
+
+//    Keys.onPressed: {
+//        if (event.key === Qt.Key_Tab) {
+//            console.log('Key tab was pressed');
+//            event.accepted = true;
+//        }
+//    }
+
     function validateId(id) {
         if (id === "") {
             return "Id can't be empty!";
@@ -166,6 +187,66 @@ Rectangle {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
         }
+
+//        Rectangle {
+//            id: tfcFeatureName;
+
+//            anchors.top: titleFeatureName.bottom;
+
+//            width: editFeatureDialogBody.width;
+//            height: 45;
+
+//            color: Style.imagingToolsGradient1;
+
+//            border.width: 1;
+//            border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+
+//            TextInput {
+//                id: tfcFeatureNameText;
+
+//                anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
+//                anchors.verticalCenter: tfcFeatureName.verticalCenter;
+
+//                width: tfcFeatureName.width - 22;
+//                height: 23;
+
+//                color: Style.textColor;
+////                cursorVisible: true;
+
+//                font.pixelSize: 15;
+//                verticalAlignment: TextInput.AlignVCenter;
+//                selectionColor: Style.textSelected;
+//                selectByMouse: true;
+//            }
+
+////            TextFieldCustom {
+////                id: tfcFeatureNameText;
+
+////                anchors.horizontalCenter: tfcFeatureName.horizontalCenter;
+////                anchors.verticalCenter: tfcFeatureName.verticalCenter;
+
+////                width: tfcFeatureName.width - 22;
+////                height: 23;
+
+////               // text: containerFeatureEdit.featureName;
+//////                focus: true;
+////                correctData: errorNameMessage.text !== "";
+////                borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
+
+////                Component.onCompleted: {
+////                    tfcFeatureNameText.setFocus();
+////                }
+
+////                onTextChanged: {
+////                    errorNameMessage.text = "";
+
+////                    var nameMessage = containerFeatureEdit.validateName(tfcFeatureNameText.text);
+////                    if (nameMessage !== "") {
+////                       errorNameMessage.text = nameMessage;
+////                    }
+////                }
+////            }
+//        }
 
         Rectangle {
             id: tfcFeatureName;

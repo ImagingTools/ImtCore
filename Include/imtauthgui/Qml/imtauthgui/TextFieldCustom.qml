@@ -6,25 +6,17 @@ Item {
 
     height: 40;
 
-    //signal accepted();
-
-    property string focusColor: Style.textSelected;
-    property bool enabled:  true;
-
-    property bool correctData: true;
-
-//    property bool isFocus: textField.focus;
-   // property string text;
     property alias text: textField.text;
-//    property alias textField: textField;
 
-    property bool isTextChanged: false;
     property string placeHolderText: "Наименование";
+    property string focusColor: Style.textSelected;
 
     property bool canReduce: false;
     property bool reduced: false;
-
+    property bool isTextChanged: false;
     property bool wasFocus: false;
+    property bool enabled:  true;
+    property bool correctData: true;
 
     property color borderColor: Style.iconColorOnSelected;
 
@@ -33,10 +25,22 @@ Item {
     signal focusChanged();
     signal inputTextChanged();
 
+    function setFocus(){
+//        textField.activeFocusOnPress = true;
+
+        textField.forceActiveFocus();
+//        textField.focus = true;
+//        textField.selectAll();
+
+    }
+
     Rectangle {
         id: mainRect;
+
         anchors.fill: parent;
+
         color: Style.baseColor;
+
         border.color: textField.focus ? containerTextField.borderColor : Style.hover;
         border.width: 1;
     }
@@ -51,12 +55,14 @@ Item {
         color: Style.textColor;
         font.pixelSize: containerTextField.textSize;
         //text: containerTextField.text;
-        text: "";
+       // text: "";
 
         verticalAlignment: TextInput.AlignVCenter;
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
+
+//        focus: false;
 
         onFocusChanged: {
             containerTextField.focusChanged();

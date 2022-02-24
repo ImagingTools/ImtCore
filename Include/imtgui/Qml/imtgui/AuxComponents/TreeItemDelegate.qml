@@ -5,7 +5,9 @@ Item {
     id: treeItemDelegate;
 
     width: 100;
-    height: mainRect.height + childrenColumn.height;
+//    height: mainRect.height + childrenColumn.height;
+
+    height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
 
     property bool isOpened: true;
 
@@ -13,7 +15,7 @@ Item {
 
     property Item listViewItem;
 
-//    signal checkBoxStateChanged(int state, string packageId, string featureId);
+    signal checkBoxState(int state, string packageId, string featureId);
 
     Component.onCompleted: {
         if (model.childItemModel)
@@ -47,7 +49,7 @@ Item {
         anchors.right: parent.right;
 
         width: parent.width - model.level * 20;
-        height: 30;
+        height: model.visible ? 30 : 0;
 
         color: Style.baseColor;
 
@@ -112,7 +114,7 @@ Item {
              onCheckStateChanged: {
                 // console.log("TreeItemDelegate CheckBox onCheckStateChanged", checkBox.checkState, model.packageId, model.Id);
 
-//                 treeItemDelegate.checkBoxStateChanged(checkBox.checkState, model.packageId, model.Id);
+//                 treeItemDelegate.checkBoxState(checkBox.checkState, model.packageId, model.Id);
                 // listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
              }
 
@@ -131,6 +133,8 @@ Item {
                          checkBox.checkState = 2
 //                         model.stateChecked = 2;
                      }
+
+//                     treeItemDelegate.checkBoxState(checkBox.checkState, model.packageId, model.Id);
                      treeItemDelegate.listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
                  }
              }
@@ -157,22 +161,20 @@ Item {
 
         width: treeItemDelegate.width;
         //height: 0;
-        //visible: treeItemDelegate.isOpened;
+        visible: treeItemDelegate.isOpened;
 
         Repeater {
              id: treeItemRepeater;
+//             property bool isOpened: treeItemDelegate.isOpened;
 
-
-             property bool isOpened: treeItemDelegate.isOpened;
-
-             onIsOpenedChanged: {
-                 console.log("TreeItemDelegate onIsOpenedChanged");
-                 if (treeItemDelegate.isOpened){
-                     treeItemRepeater.model = model.childItemModel;
-                 } else {
-                     treeItemRepeater.model = 0;
-                 }
-             }
+//             onIsOpenedChanged: {
+//                 console.log("TreeItemDelegate onIsOpenedChanged");
+//                 if (treeItemDelegate.isOpened){
+//                     treeItemRepeater.model = model.childItemModel;
+//                 } else {
+//                     treeItemRepeater.model = 0;
+//                 }
+//             }
 
              delegate: Loader {
                  id: loader;
@@ -181,25 +183,25 @@ Item {
 
                  onItemChanged: {
                      if (loader.item) {
-                         //loader.height = loader.item.height;
+                         loader.height = loader.item.height;
                          //childrenColumn.height += item.height;
                          loader.item.listViewItem = treeItemDelegate.listViewItem;
                      }
                  }
              }
-             onHeightChanged: {
-                 console.log('============================')
-                 console.log('treeItemRepeater height: ', height)
-                 console.log('============================')
-             }
+//             onHeightChanged: {
+//                 console.log('============================')
+//                 console.log('treeItemRepeater height: ', height)
+//                 console.log('============================')
+//             }
 
-             onVisibleChanged: {
-                console.log('Repeater onVisibleChanged', treeItemRepeater.visible);
-             }
+//             onVisibleChanged: {
+//                console.log('Repeater onVisibleChanged', treeItemRepeater.visible);
+//             }
        }
 
-        onHeightChanged: {
-            parent.height = height + mainRect.height;
-        }
+//        onHeightChanged: {
+//            parent.height = height + mainRect.height;
+//        }
     }
 }
