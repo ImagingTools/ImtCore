@@ -35,6 +35,7 @@ Item {
         console.log("ComboBox dialogResult");
 
         comboBoxContainer.currentText = parameters["status"];
+
     }
 
     function openContextMenu(startX, startY) {

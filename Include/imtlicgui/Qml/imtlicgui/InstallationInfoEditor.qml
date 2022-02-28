@@ -284,7 +284,7 @@ Rectangle {
                      anchors.verticalCenter: tfcInstance.verticalCenter;
 
                      width: tfcInstance.width - 22;
-                     height: 23;
+                     height: 30;
 
                      onInputTextChanged: {
                          containerInstallation.wasChanged = true;

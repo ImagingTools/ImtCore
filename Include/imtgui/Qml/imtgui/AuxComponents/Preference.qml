@@ -275,7 +275,6 @@ Rectangle {
         Style.backgroundColor = preferenceContainer.getThemeColor("ActiveColors", "Background", themeType);
         Style.textColor = preferenceContainer.getThemeColor("ActiveColors", "Text", themeType);
         Style.textSelected = preferenceContainer.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
-        console.log("Style.textSelected ", Style.textSelected);
         Style.selectedColor = preferenceContainer.getThemeColor("ActiveColors", "ItemSelected", themeType);
         Style.buttonColor = preferenceContainer.getThemeColor("ActiveColors", "HeaderBorder", themeType);
         Style.buttonBorderColor = preferenceContainer.getThemeColor("ActiveColors", "ButtonBorder", themeType);

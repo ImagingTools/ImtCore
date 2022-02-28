@@ -328,7 +328,7 @@ Rectangle {
                 anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
 
                 width: contactInfoColumn.width;
-                height: 23;
+                height: 30;
 
                 onInputTextChanged: {
                     console.log("ContactInfoEditor TextFieldCustom AccountName onInputTextChanged");
@@ -353,7 +353,7 @@ Rectangle {
                 anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
 
                 width: contactInfoColumn.width;
-                height: 23;
+                height: 30;
 
                 onInputTextChanged: {
                     console.log("ContactInfoEditor TextFieldCustom AccountDescription onInputTextChanged");
@@ -422,7 +422,7 @@ Rectangle {
                         anchors.verticalCenter: countryBlock.verticalCenter;
 
                         width: countryBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom Country onInputTextChanged");
@@ -468,7 +468,7 @@ Rectangle {
                         anchors.verticalCenter: cityBlock.verticalCenter;
 
                         width: cityBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom City onInputTextChanged");
@@ -514,7 +514,7 @@ Rectangle {
                         anchors.verticalCenter: postalCodeBlock.verticalCenter;
 
                         width: postalCodeBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         text: "5";
 
@@ -561,7 +561,7 @@ Rectangle {
                         anchors.verticalCenter: streetBlock.verticalCenter;
 
                         width: streetBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom Street onInputTextChanged");
@@ -628,7 +628,7 @@ Rectangle {
                         anchors.verticalCenter: emailBlock.verticalCenter;
 
                         width: emailBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom Email onInputTextChanged");
@@ -678,7 +678,7 @@ Rectangle {
                         anchors.verticalCenter: bdBlock.verticalCenter;
 
                         width: bdBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom BirthDay onInputTextChanged");
@@ -780,7 +780,7 @@ Rectangle {
                         anchors.verticalCenter: firstNameBlock.verticalCenter;
 
                         width: firstNameBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom FirstName onInputTextChanged");
@@ -825,7 +825,7 @@ Rectangle {
                         anchors.verticalCenter: lastNameBlock.verticalCenter;
 
                         width: lastNameBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom LastName onInputTextChanged");
@@ -873,7 +873,7 @@ Rectangle {
                         anchors.verticalCenter: nickNameBlock.verticalCenter;
 
                         width: nickNameBlock.width - 22;
-                        height: 23;
+                        height: 30;
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom NickName onInputTextChanged");

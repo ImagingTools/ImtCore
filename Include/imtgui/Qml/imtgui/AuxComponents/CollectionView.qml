@@ -163,11 +163,11 @@ Rectangle {
             }
 
             if (collectionViewContainer.autoRefresh) {
-                itemsModel.updateModel();
+                modelItems.updateModel();
             }
         }
         else if(!isHeaderUpdated){
-            itemsModel.updateModel();
+            modelItems.updateModel();
         }
     }
 
@@ -284,7 +284,7 @@ Rectangle {
                         if(dataModelLocal.ContainsKey("headers")){
                             tableInternal.headers = dataModelLocal.GetData("headers")
                             collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
-                            itemsModel.updateModel();
+                            modelItems.updateModel();
                         }
                     }
                 }
@@ -295,7 +295,7 @@ Rectangle {
 //                        tableInternal.headers = dataModelLocal.GetData("headers")
 //                        collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
 
-//                        itemsModel.updateModel();
+//                        modelItems.updateModel();
 //                    }
 //                    else if(packageInfoModel.ContainsKey("errors")){
 //                        var errorsModelLocal = packageInfoModel.GetData("errors");
@@ -318,7 +318,7 @@ Rectangle {
     }
 
     GqlModel {
-        id: itemsModel;
+        id: modelItems;
 
         function updateModel() {
             console.log( "collectionViewContainer updateModel", collectionViewContainer.gqlModelItems, collectionViewContainer.itemId);
@@ -331,7 +331,7 @@ Rectangle {
                 query.AddParam(inputParams);
             }
 
-            var queryFields = Gql.GqlObject("items");            
+            var queryFields = Gql.GqlObject("items");
 
             queryFields.InsertField("Id");
             for(var i = 0; i < tableInternal.headers.GetItemsCount(); i++){
@@ -345,13 +345,13 @@ Rectangle {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, itemsModel);
+            console.log("State:", this.state, modelItems);
             if (this.state === "Ready"){
 
                 var dataModelLocal;
 
-                if (itemsModel.ContainsKey("errors")){
-                    dataModelLocal = itemsModel.GetData("errors");
+                if (modelItems.ContainsKey("errors")){
+                    dataModelLocal = modelItems.GetData("errors");
 
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
 
@@ -366,8 +366,8 @@ Rectangle {
                     return;
                 }
 
-                if (itemsModel.ContainsKey("data")){
-                    dataModelLocal = itemsModel.GetData("data");
+                if (modelItems.ContainsKey("data")){
+                    dataModelLocal = modelItems.GetData("data");
 
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
 
@@ -406,8 +406,8 @@ Rectangle {
 
 //                        collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
 //                    }
-//                    else if(itemsModel.ContainsKey("errors")){
-//                        var errorsModel = itemsModel.GetData("errors");
+//                    else if(modelItems.ContainsKey("errors")){
+//                        var errorsModel = modelItems.GetData("errors");
 //                        if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
 //                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
 //                        }

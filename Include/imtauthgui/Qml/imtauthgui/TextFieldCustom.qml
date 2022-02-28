@@ -54,6 +54,7 @@ Item {
 
         color: Style.textColor;
         font.pixelSize: containerTextField.textSize;
+        font.family: Style.fontFamily;
         //text: containerTextField.text;
        // text: "";
 

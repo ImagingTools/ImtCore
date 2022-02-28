@@ -29,6 +29,10 @@
         <file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
         <file alias="imtgui/AuxComponents/Splitter.qml">Qml/imtgui/AuxComponents/Splitter.qml</file>
         <file alias="imtgui/MouseTest.qml">Qml/imtgui/MouseTest.qml</file>
+        <file alias="imtgui/AuxComponents/SettingsComboBox.qml">Qml/imtgui/AuxComponents/SettingsComboBox.qml</file>
+        <file alias="imtgui/AuxComponents/SettingsIntegerInput.qml">Qml/imtgui/AuxComponents/SettingsIntegerInput.qml</file>
+        <file alias="imtgui/AuxComponents/SettingsTextInput.qml">Qml/imtgui/AuxComponents/SettingsTextInput.qml</file>
+        <file alias="imtgui/AuxComponents/DatabaseInput.qml">Qml/imtgui/AuxComponents/DatabaseInput.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

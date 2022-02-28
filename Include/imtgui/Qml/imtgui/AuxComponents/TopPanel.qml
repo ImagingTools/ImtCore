@@ -128,7 +128,7 @@ Rectangle {
 
         onClicked: {
             console.log("Preference button clicked !");
-            var source = "AuxComponents/Preference.qml";
+            var source = "AuxComponents/PreferenceDialog.qml";
             var parameters = {};
             thubnailDecoratorContainer.openDialog(source, parameters);
         }

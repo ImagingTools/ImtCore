@@ -9,7 +9,7 @@ Rectangle {
     border.width: 1;
     border.color: auxButtonContainer.borderColor;
 
-    color: auxButtonContainer.highlighted ? Style.hover : auxButtonContainer.backgroundColor;
+    color: auxButtonContainer.highlighted ? Style.selectedColor : auxButtonContainer.backgroundColor;
 
     property bool highlighted: ma.containsMouse;
     property bool hasIcon: auxButtonContainer.iconSource !== "";
