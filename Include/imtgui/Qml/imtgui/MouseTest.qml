@@ -5,6 +5,7 @@ import imtauthgui 1.0
 import imtlicgui 1.0
 import imtqml 1.0;
 import imtgui 1.0;
+import QtQuick.Dialogs 1.3
 
 Rectangle
 {
@@ -15,71 +16,55 @@ Rectangle
 
     color: "red";
 
-    MouseArea {
-        anchors.fill: parent;
-
-        onPressed: {
-            console.log("RED onPressed", mouseX);
+    FileDialog {
+        id: fileDialog;
+        title: "Выберите файл";
+        folder: shortcuts.home;
+        onAccepted: {
+            console.log(fileDialog.fileUrl)
         }
-
-        onMouseXChanged: {
-            console.log("RED onMouseXChanged", mouseX);
-        }
-
-        onReleased: {
-            console.log("RED onReleased", mouseX);
+        onRejected: {
+            console.log("Canceled")
         }
     }
 
-    Rectangle {
-        id: greenRect;
-
-        anchors.centerIn: parent;
-
-        width: 200;
-        height: width;
-
-        color: "green";
-
-        MouseArea {
-            anchors.fill: parent;
-
-            onPressed: {
-                console.log("GREEN onPressed", mouseX);
-            }
-
-            onMouseXChanged: {
-                console.log("GREEN onMouseXChanged", mouseX);
-            }
-
-            onReleased: {
-                console.log("GREEN onReleased", mouseX);
+    Rectangle{
+        width: 500;
+        height: 500;
+        x: 500;
+        Rectangle{
+            width: 50;
+            height: 50;
+            color: 'blue';
+            MouseArea{
+                anchors.fill: parent;
+                onClicked:{
+                    fileDialog.visible = true
+                    //this._context.location.changeHref('/newurl/')
+                }
             }
         }
-
-        Rectangle {
-            id: blueRect;
-
-            anchors.centerIn: parent;
-
-            width: 100;
-            height: width;
-
-            color: "blue";
-
-            MouseArea {
+        Rectangle{
+            width: 50;
+            height: 50;
+            x: 60;
+            color: 'blue';
+            MouseArea{
                 anchors.fill: parent;
-
-                onPressed: {
-                    console.log("BLUE pressed", mouseX);
+                onClicked:{
+                    //this._context.location.changeHref('newurl/')
                 }
-
-                onMouseXChanged: {
-                    console.log("BLUE onMouseXChanged", mouseX);
-                }
-
-                onReleased: {
-                    console.log("BLUE onReleased", mouseX);
+            }
+        }
+        Rectangle{
+            width: 50;
+            height: 50;
+            color: 'blue';
+            x: 120;
+            MouseArea{
+                anchors.fill: parent;
+                onClicked:{
+                    //this._context.location.changeHref('../newurl/')
                 }
             }
         }
