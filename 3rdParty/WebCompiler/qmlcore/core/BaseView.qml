@@ -632,6 +632,10 @@ BaseLayout {
 		//console.log(e)
 		//this._feelWheel(e)
 	}
+	function _wheel(e, state) {
+		this._mousewheel(e, state)
+
+	}
 	function _scroll(deltaX, deltaY){
 		if(this.orientation === ListView.Horizontal){
 			if(deltaX > 0)

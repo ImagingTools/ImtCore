@@ -48,15 +48,21 @@ Item {
 	}
 
 	onCompleted: {
-		let events = ['mousedown', 'mouseup', 'mousemove', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove']
+		let events = ['mousedown', 'mouseup', 'mousemove', 'wheel', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove']
 		
 		for(let event of events){
 			this.element.on(event, (e)=>{
-				//if(e.type.indexOf('touch') < 0) e.preventDefault()
+	
+				let path = [e. target]
+				let parent = e.target.parentNode
+				while(parent){
+					path.push(parent)
+					parent = parent.parentNode
+				}
 				if(this.eventState.target && this.eventState.target[`_${e.type}`]){
 					this.eventState.target[`_${e.type}`](e, this.eventState)
 				} else {
-					for(let p of e.path){
+					for(let p of path){
 						let obj = this.listId[p.id]
 						if(!this.eventState.target && obj && obj[`_${e.type}`]){
 							obj[`_${e.type}`](e, this.eventState)

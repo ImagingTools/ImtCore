@@ -579,6 +579,9 @@ Item {
 	function _mousewheel(e, state) {
 		this._feelWheel(e)
 	}
+	function _wheel(e, state) {
+		this._mousewheel(e, state)
+	}
 	function _contextmenu(e, state) {
 
 	}
