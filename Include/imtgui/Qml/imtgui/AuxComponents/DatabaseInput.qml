@@ -6,12 +6,14 @@ import imtauthgui 1.0
 Item {
     id: settingsDatabaseInputContainer;
 
-    property string value;
+//    property string value;
     property string itemId;
 
     property Item rootItem;
 
     property var modelDatabase;
+
+    property int currentItemIndex: -1;
 
     Component.onCompleted: {
         console.log("SettingsDatabaseInput onCompleted");
@@ -25,13 +27,20 @@ Item {
     function dataChanged(id, value){
         console.log("DatabaseSettingsInput dataChanged", id, value);
 
-        var parameters = {}
+        if (!settingsDatabaseInputContainer.modelDatabase){
+            return;
+        }
 
-        parameters["dbId"] = settingsDatabaseInputContainer.itemId;
-        parameters["itemId"] = id;
-        parameters["itemValue"] = value;
+        for (var i = 0; i < settingsDatabaseInputContainer.modelDatabase.GetItemsCount(); i++){
+            var curId = settingsDatabaseInputContainer.modelDatabase.GetData("Id", i);
 
-        settingsDatabaseInputContainer.rootItem.databaseDataChanged(parameters);
+            if (curId === id){
+                settingsDatabaseInputContainer.modelDatabase.SetData("Value", value, i);
+            }
+        }
+
+        settingsDatabaseInputContainer.rootItem.dataChanged(settingsDatabaseInputContainer.currentItemIndex,
+                                                                    settingsDatabaseInputContainer.modelDatabase);
     }
 
     Column {

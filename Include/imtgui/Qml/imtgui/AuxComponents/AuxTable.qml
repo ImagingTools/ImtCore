@@ -75,7 +75,7 @@ Item {
                     anchors.left: parent.left;
                     anchors.leftMargin: 8;
 
-                    font.pixelSize: Style.fontSize_small;
+                    font.pixelSize: Style.fontSize_common;
                     font.family: Style.fontFamilyBold;
                     font.bold: true;
                     color: Style.textColor;
@@ -83,7 +83,6 @@ Item {
                 }
             }
         }
-
 
         Rectangle{
             id: bottomLine;

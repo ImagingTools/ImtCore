@@ -179,7 +179,7 @@ Rectangle {
                 anchors.verticalCenter: tfcLicenseName.verticalCenter;
 
                 width: tfcLicenseName.width - 22;
-                height: 23;
+                height: 30;
 
                 text: editLicenseContainer.licenseName;
                 focus: true;
@@ -230,7 +230,7 @@ Rectangle {
                 anchors.verticalCenter: tfcLicenseId.verticalCenter;
 
                 width: tfcLicenseId.width - 22;
-                height: 23;
+                height: 30;
 
                 text: editLicenseContainer.licenseId;
                 borderColor: errorIdMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;

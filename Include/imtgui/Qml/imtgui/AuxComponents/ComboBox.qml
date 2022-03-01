@@ -105,6 +105,8 @@ Item {
 
             anchors.fill: parent;
 
+            cursorShape: Qt.PointingHandCursor;
+
             onClicked: {
                 console.log("ComboBox clicked !");
 
@@ -116,6 +118,7 @@ Item {
 
     Rectangle {
         id: cbMenu;
+        z: 100;
 
         anchors.top: cbMainRect.bottom;
 
@@ -173,6 +176,8 @@ Item {
 
                 MouseArea {
                     anchors.fill: parent;
+
+                    cursorShape: Qt.PointingHandCursor;
 
                     onClicked: {
                         comboBoxContainer.currentIndex = model.index;

@@ -19,6 +19,8 @@ Rectangle {
 
     property TreeItemModel modelSettings;
 
+    property string currentSettingsBodyId;
+
     Component.onCompleted: {
         settingsQuery.getSettings();
     }
@@ -27,6 +29,10 @@ Rectangle {
         console.log("PreferenceDialog onModelSettingsChanged");
 
         var dataModelLocal = preferenceContainer.modelSettings;
+
+        if (!dataModelLocal){
+            return;
+        }
 
         if (dataModelLocal.ContainsKey("SettingsTypes")){
 
@@ -38,35 +44,8 @@ Rectangle {
         }
     }
 
-    function dataChanged(parameters){
+    function dataChanged(index, modelElements){
         console.log("PreferenceDialog dataChanged");
-
-        var parentModel = parameters["parentModel"];
-
-
-
-    }
-
-    function generalSettingsChanged(parameters){
-        console.log("PreferenceDialog generalSettingsChanged", parameters);
-
-        var itemId = parameters["itemId"];
-        var selectedId = parameters["selectedId"];
-        var parentModel = parameters["parentModel"];
-
-//        for (var i = 0; i < parentModel.GetItemsCount(); i++){
-
-//        }
-
-        console.log("parentModel", parentModel);
-        console.log(parentModel.GetData("Id"));
-
-        console.log("itemId:", itemId);
-        console.log("selectedId:", selectedId);
-
-        if (!itemId || !selectedId){
-            return;
-        }
 
         var dataModelLocal = preferenceContainer.modelSettings.GetData("SettingsTypes");
 
@@ -74,61 +53,18 @@ Rectangle {
             return;
         }
 
-        var indexGeneral = -1;
+        var curBodyId = dataModelLocal.GetData("Id", mainPanelRepeater.selectedIndex);
 
-        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-
-            var id = dataModelLocal.GetData("Id", i);
-            if (id === "General"){
-                indexGeneral = i;
-                break;
-            }
-        }
-
-        if (indexGeneral === -1){
+        if (!curBodyId){
             return;
         }
 
-        var generalBodyLocal = dataModelLocal.GetData("SettingBody", indexGeneral);
-
-        for (var i = 0; i < generalBodyLocal.GetItemsCount(); i++){
-            var curId = generalBodyLocal.GetData("Id", i);
-
-            if (curId === itemId){
-                var elements = generalBodyLocal.GetData("Elements", i);
-
-                if (!elements){
-                    return;
-                }
-
-                for (var j = 0; j < elements.GetItemsCount(); j++){
-                    var curItemId = elements.GetData("Id", j);
-                    var curValue = elements.GetData("Value", j);
-
-                    if (curValue === 1){
-                        elements.SetData("Value", 0, j);
-                    }
-
-                    if (curItemId === selectedId){
-                        elements.SetData("Value", 1, j);
-
-                        if (curId === "DesignSchema"){
-                            stylesQuery.getStyle(curItemId);
-                            Style.theme = selectedId;
-                        }
-                        else if (curId === "Language"){
-
-                        }
-                    }
-                }
-
-                generalBodyLocal.SetData("Elements", elements, i);
-                break;
-            }
+        if (curBodyId === "General"){
+            preferenceContainer.generalSettingsChanged(index, modelElements);
         }
-
-        dataModelLocal.SetData("SettingBody", generalBodyLocal, indexGeneral);
-        preferenceContainer.modelSettings.SetData("SettingsTypes", dataModelLocal);
+        else if (curBodyId === "DBSettings"){
+            preferenceContainer.databaseDataChanged(index, modelElements);
+        }
 
 //        dataModelLocal = preferenceContainer.modelSettings.GetData("SettingsTypes");
 
@@ -156,104 +92,67 @@ Rectangle {
 //        }
     }
 
-    function databaseDataChanged(parameters){
-        console.log("PreferenceDialog databaseDataChanged", parameters);
-
-        var dbId = parameters["dbId"];
-        var itemId = parameters["itemId"];
-        var itemValue = parameters["itemValue"];
-
-        console.log("dbId:", dbId);
-        console.log("itemId:", itemId);
-        console.log("itemValue:", itemValue);
-
-        if (!dbId || !itemValue || !itemId){
-            return;
-        }
-
+    function generalSettingsChanged(index, modelElements){
+        console.log("PreferenceDialog generalSettingsChanged", index, modelElements);
         var dataModelLocal = preferenceContainer.modelSettings.GetData("SettingsTypes");
 
         if (!dataModelLocal){
             return;
         }
 
-        var indexDBSettings = -1;
+        var modelSettingsBody = dataModelLocal.GetData("SettingBody", mainPanelRepeater.selectedIndex);
 
-        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
+        if (!modelSettingsBody){
+            return;
+        }
 
-            var id = dataModelLocal.GetData("Id", i);
-            if (id === "DBSettings"){
-                indexDBSettings = i;
+        var curId = modelSettingsBody.GetData("Id", index);
+
+        if (!curId){
+            return;
+        }
+
+        var selectedId;
+        for (var i = 0; i < modelElements.GetItemsCount(); i++){
+            var curElementsValue = modelElements.GetData("Value", i);
+            var curElementsId = modelElements.GetData("Id", i);
+
+            if (curElementsValue === 1){
+                selectedId = curElementsId;
                 break;
             }
         }
 
-        if (indexDBSettings === -1){
+        if (!selectedId){
             return;
         }
 
-        var dbSettingsBodyLocal = dataModelLocal.GetData("SettingBody", indexDBSettings);
+        if (curId === "DesignSchema"){
+            Style.theme = selectedId;
+            stylesQuery.getStyle(selectedId);
+        }
+        else if (curId === "Language"){
 
-        if (!dbSettingsBodyLocal){
-            return;
         }
 
-        for (var i = 0; i < dbSettingsBodyLocal.GetItemsCount(); i++){
-            var curId = dbSettingsBodyLocal.GetData("Id", i);
+        modelSettingsBody.SetData("Elements", modelElements, index);
 
-            if (curId === dbId){
+        dataModelLocal.SetData("SettingBody", modelSettingsBody, mainPanelRepeater.selectedIndex)
 
-                var elements = dbSettingsBodyLocal.GetData("Elements", i);
+        preferenceContainer.modelSettings.SetData("SettingsTypes", dataModelLocal);
+    }
 
-                if (!elements){
-                    return;
-                }
+    function databaseDataChanged(index, modelElements){
+        console.log("PreferenceDialog databaseDataChanged", index, modelElements);
+        var dataModelLocal = preferenceContainer.modelSettings.GetData("SettingsTypes");
 
-                for (var j = 0; j < elements.GetItemsCount(); j++){
-                    var curItemId = elements.GetData("Id", j);
-                    if (curItemId === itemId){
-                        console.log("Value changed to ", itemValue);
-                        elements.SetData("Value", itemValue, j);
-                        break;
-                    }
-                }
+        var modelSettingsBody = dataModelLocal.GetData("SettingBody", mainPanelRepeater.selectedIndex);
 
-                dbSettingsBodyLocal.SetData("Elements", elements, i);
-                break;
-            }
-        }
+        modelSettingsBody.SetData("Elements", modelElements, index);
 
-        dataModelLocal.SetData("SettingBody", dbSettingsBodyLocal, indexDBSettings);
+        dataModelLocal.SetData("SettingBody", modelSettingsBody, mainPanelRepeater.selectedIndex)
 
-        preferenceContainer.modelSettings.SetData("SettingsTypes", dataModelLocal)
-
-
-        dataModelLocal = preferenceContainer.modelSettings.GetData("SettingsTypes");
-
-        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-
-            console.log("Name: ", dataModelLocal.GetData("Name", i));
-
-            var settBody = dataModelLocal.GetData("SettingBody", i);
-
-            for (var j = 0; j < settBody.GetItemsCount(); j++){
-                var name = settBody.GetData("Name", j);
-                console.log("\tName: ", name);
-                var elements = settBody.GetData("Elements", j);
-
-                for (var k = 0; k < elements.GetItemsCount(); k++){
-
-                    console.log("\t\tName: ", elements.GetData("Name", k));
-                    var value = elements.GetData("Value", k);
-
-                    if (value){
-                        console.log("\t\tValue: ", value);
-                    }
-
-                }
-            }
-
-        }
+        preferenceContainer.modelSettings.SetData("SettingsTypes", dataModelLocal);
     }
 
     function settingsBodyChanged(){
@@ -264,6 +163,7 @@ Rectangle {
             var dataModelLocal = preferenceContainer.modelSettings.GetData("SettingsTypes");
 
             if (dataModelLocal.ContainsKey("SettingBody", mainPanelRepeater.selectedIndex)){
+                preferenceContainer.currentSettingsBodyId = dataModelLocal.GetData("Id", mainPanelRepeater.selectedIndex);
                 dataModelLocal = dataModelLocal.GetData("SettingBody", mainPanelRepeater.selectedIndex);
                 dependentPanelRepeater.model = dataModelLocal;
             }
@@ -305,7 +205,7 @@ Rectangle {
         id: topPan;
 
         width: parent.width;
-        height: 30;
+        height: 40;
 
         color: Style.baseColor;
 
@@ -345,8 +245,8 @@ Rectangle {
             anchors.rightMargin: 10;
             anchors.verticalCenter: topPan.verticalCenter;
 
-            width: 17;
-            height: 17;
+            width: 20;
+            height: 20;
 
             iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 
@@ -409,10 +309,6 @@ Rectangle {
                     console.log("PreferenceDialog Repeater onSelectedIndexChanged");
                     preferenceContainer.settingsBodyChanged();
                 }
-
-                onModelChanged: {
-                    console.log("PreferenceDialog main Column onModelChanged", mainPanelRepeater.model.GetItemsCount());
-                }
             }
         }
     }
@@ -434,8 +330,6 @@ Rectangle {
            id: dependentPanelRepeater;
 
            width: dependentPanelColumn.width;
-
-           property Item currentItem;
 
            delegate: Item {
 
@@ -478,36 +372,18 @@ Rectangle {
                        if (componentType === "ComboBox"){
                            dependentPanelLoader.source = "SettingsComboBox.qml";
                            dependentPanelLoader.item.modelElements = model.Elements;
-                           dependentPanelLoader.item.type = model.Id;
                            dependentPanelLoader.item.width = dependentPanelColumn.width / 2;
-
-                           if (dependentPanelRepeater.currentItem){
-                               dependentPanelLoader.item.z = dependentPanelRepeater.currentItem.z - 1;
-                           }
-                           dependentPanelRepeater.currentItem = dependentPanelLoader.item;
                        }
-
-                       if (componentType === "DatabaseSettingsInput"){
-
+                       else if (componentType === "DatabaseSettingsInput"){
                            dependentPanelLoader.source = "DatabaseInput.qml";
-
                            dependentPanelLoader.item.width = dependentPanelColumn.width;
-
-//                           console.log("item.width", dependentPanelLoader.item.width );
-//                           console.log("dependentPanelColumn.width", dependentPanelColumn.width);
-
                            dependentPanelLoader.item.modelDatabase = model.Elements;
-
                        }
-
+                       dependentPanelLoader.item.currentItemIndex = model.index;
                        dependentPanelLoader.item.itemId = itemId;
                        dependentPanelLoader.item.rootItem = preferenceContainer;
                    }
                }
-           }
-
-           onModelChanged: {
-               console.log("PreferenceDialog depend Column onModelChanged");
            }
        }
    }

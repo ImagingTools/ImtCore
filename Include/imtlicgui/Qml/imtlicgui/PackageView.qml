@@ -303,6 +303,13 @@ Item {
         }
         else if (menuId  === "Save") {
             console.log("PackageView operation save", featureCollectionViewContainer.itemId);
+
+            var emptyId = featureCollectionViewContainer.alreadyExistIdHasEmpty();
+            if (emptyId !== "") {
+                featureCollectionView.openMessageDialog("ErrorDialog", emptyId + " has an empty id !");
+                return;
+            }
+
             if (featureCollectionViewContainer.itemId == "") {
                 var source = "AuxComponents/InputDialog.qml";
                 var parameters = {};
@@ -313,14 +320,6 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
             else {
-                var emptyId = featureCollectionViewContainer.alreadyExistIdHasEmpty();
-                if (emptyId !== "") {
-//                    featureCollectionViewContainer.openMessageDialog("ErrorDialog", emptyId + " has an empty id !");
-
-                    featureCollectionView.openMessageDialog("ErrorDialog", emptyId + " has an empty id !");
-                    return;
-                }
-
                 packageViewSaveQuery.updateModel()
             }
         }
@@ -351,19 +350,17 @@ Item {
         if (commandsId !== "PackageEdit") {
             return;
         }
-        //featureCollectionView.refresh();
+
         if (featureCollectionView.table.selectedIndex > -1) {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
-//            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
-//            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
         }
 
         if (featureCollectionViewContainer.wasChanged){
