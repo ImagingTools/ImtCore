@@ -704,7 +704,7 @@ imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::G
 
 // reimplemented (imtbase::ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds() const
+imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return Ids();
 }

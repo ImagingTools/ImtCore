@@ -136,7 +136,7 @@ private:
 		virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 
 		// reimplemented (imtbase::ICollectionInfo)
-		virtual Ids GetElementIds() const override;
+		virtual Ids GetElementIds(const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 		virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
 		// reimplemented (iser::ISerializable)

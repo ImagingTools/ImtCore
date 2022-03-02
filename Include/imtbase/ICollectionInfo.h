@@ -1,14 +1,11 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QVector>
-#include <QtCore/QVariant>
+// ACF includes
+#include <iprm/IParamsSet.h>
 
 // ACF includes
-#include <istd/IChangeable.h>
+#include <imtbase/ICollectionInfoProvider.h>
 
 
 namespace imtbase
@@ -16,62 +13,17 @@ namespace imtbase
 
 
 /**
-	Interface for describing the contents of a collection.
-	Assuming that elements of a collection can be identified by a unique ID,
-	this interface provides access to the general properties of an element in such collection.
+	Interface for non-iterable colllection info.
 	\ingroup Collection
 */
-class ICollectionInfo: virtual public istd::IChangeable
+class ICollectionInfo: virtual public ICollectionInfoProvider
 {
 public:
-	typedef QByteArray Id;
-	typedef QVector<Id> Ids;
-
-	/**
-		Type of the element information.
-	*/
-	enum ElementInfoType
-	{
-		/**
-			Name of the element given as a QString.
-		*/
-		EIT_NAME,
-
-		/**
-			Human-readable description of the element given as a QString.
-		*/
-		EIT_DESCRIPTION,
-
-		/**
-			Enabled/Disabled status of the element as a boolean.
-		*/
-		EIT_ENABLED,
-
-		/**
-			Type-ID of the element given as a QByteArray.
-		*/
-		EIT_TYPE_ID,
-
-		/**
-			Human-readable name of the element type given as a QString.
-		*/
-		EIT_TYPE_NAME,
-
-		/**
-			Start value for user-defined info types.
-		*/
-		EIT_USER = 1000
-	};
-
 	/**
 		Get all IDs of the elements inside the collection.
+		\param selectionParamsPtr
 	*/
-	virtual Ids GetElementIds() const = 0;
-
-	/**
-		Get information about a given element.
-	*/
-	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const = 0;
+	virtual Ids GetElementIds(const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 };
 
 

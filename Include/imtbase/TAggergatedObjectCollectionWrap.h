@@ -70,7 +70,7 @@ public:
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual Ids GetElementIds() const override;
+	virtual Ids GetElementIds(const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
 	// reimplemented (iser::ISerializable)
@@ -255,7 +255,7 @@ inline imtbase::ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterfac
 // reimplemented (ICollectionInfo)
 
 template<class BaseInterface, class ObjectImpl>
-inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementIds() const
+inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return m_collection.GetElementIds();
 }

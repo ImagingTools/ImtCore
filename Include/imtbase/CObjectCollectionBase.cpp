@@ -391,7 +391,7 @@ ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const QByteArray& obj
 
 // reimplemented (ICollectionInfo)
 
-ICollectionInfo::Ids CObjectCollectionBase::GetElementIds() const
+ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 

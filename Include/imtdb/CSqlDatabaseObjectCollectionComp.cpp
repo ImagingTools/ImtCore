@@ -31,7 +31,7 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 
 // reimplemented (ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds() const
+imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	QReadLocker readLock(&m_objectInfoMapMutex);
 

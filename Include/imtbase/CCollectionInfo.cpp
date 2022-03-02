@@ -83,7 +83,7 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 
 // reimplemented (ICollectionInfo)
 
-ICollectionInfo::Ids CCollectionInfo::GetElementIds() const
+ICollectionInfo::Ids CCollectionInfo::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 
