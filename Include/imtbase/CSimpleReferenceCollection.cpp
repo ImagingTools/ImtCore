@@ -102,7 +102,10 @@ imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetObjectTypeId(const Q
 
 // reimplemented (imtbase::ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
+imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 

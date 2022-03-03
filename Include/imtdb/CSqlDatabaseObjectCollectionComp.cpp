@@ -31,7 +31,10 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 
 // reimplemented (ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
+imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	QReadLocker readLock(&m_objectInfoMapMutex);
 
@@ -337,7 +340,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQueryForObject(objectId, nullptr);
+	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, -1, -1, nullptr);
 	if (objectSelectionQuery.isEmpty()){
 		return false;
 	}
@@ -529,7 +532,7 @@ void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::run()
 		return;
 	}
 
-	QByteArray objectSelectionQuery = m_parent.m_objectDelegateCompPtr->GetSelectionQueryForObject(QByteArray(), m_parent.m_filterParamsCompPtr.GetPtr());
+	QByteArray objectSelectionQuery = m_parent.m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), -1, -1, m_parent.m_filterParamsCompPtr.GetPtr());
 	if (objectSelectionQuery.isEmpty()){
 		return;
 	}

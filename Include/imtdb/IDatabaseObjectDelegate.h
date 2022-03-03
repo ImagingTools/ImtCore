@@ -24,9 +24,17 @@ class IDatabaseObjectDelegate: virtual public istd::IPolymorphic
 {
 public:
 	/**
-		Get selection query for the given object-ID.
+		Get selection query for the listing objects in the collection.
+		\param objectId		If non empty, the given object will be selected.
+		\param offset		if positive, first N rows given by \c offset will be skipped from the result.
+		\param count		if positive, only N rows given by \c count will be returned in the result object.
+		\param paramsPtr	additional query parameters (e.g. filtering, searching, sorting and so on).
 	*/
-	virtual QByteArray GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* paramsPtr) const = 0;
+	virtual QByteArray GetSelectionQuery(
+				const QByteArray& objectId = QByteArray(),
+				int offset = -1,
+				int count = -1,
+				const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
 
 	/**
 		Create query for insertion of a new object into the database.

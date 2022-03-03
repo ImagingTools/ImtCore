@@ -14,16 +14,27 @@ namespace imtdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQueryForObject(const QByteArray& objectId, const iprm::IParamsSet* /*paramsPtr*/) const
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
+	QString paginationString;
+	if (offset > -1 && count > 0){
+		paginationString = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count);
+	}
+
 	if (objectId.isEmpty()){
-		return QString("SELECT * from %1").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
+		return QString("SELECT * from %1 %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(paginationString).toLocal8Bit();
 	}
 	else{
-		return QString("SELECT * from %1 WHERE %2 = '%3'")
+		return QString("SELECT * from %1 WHERE %2 = '%3' %4")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId)).toLocal8Bit();
+					.arg(qPrintable(objectId))
+					.arg(paginationString)
+					.toLocal8Bit();
 	}
 }
 

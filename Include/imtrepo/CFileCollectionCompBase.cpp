@@ -704,7 +704,10 @@ imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase::GetObjectTypeId(cons
 
 // reimplemented (ICollectionInfo)
 
-imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(const iprm::IParamsSet* /*selectionParamsPtr*/) const
+imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 
