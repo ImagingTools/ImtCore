@@ -43,6 +43,16 @@ I_EXPORT_COMPONENT(
 			"Page item based data provider");
 
 I_EXPORT_COMPONENT(
+			ParamsDataProvider,
+			"Params data provider",
+			"Params data provider");
+
+I_EXPORT_COMPONENT(
+			DBSettingsDataProvider,
+			"Database settings data provider",
+			"Database settings data provider");
+
+I_EXPORT_COMPONENT(
 			ApplicationDataEnumProvider,
 			"Application data enum provider",
 			"Application data enum provider");

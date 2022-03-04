@@ -1,0 +1,159 @@
+#include <imtqml/CDBSettingsDataProviderCompBase.h>
+
+// ACF includes
+#include <iprm/ISelectionParam.h>
+#include <iprm/IOptionsList.h>
+#include <istd/CChangeGroup.h>
+
+#include <iprm/IParamsSet.h>
+
+namespace imtqml
+{
+
+
+// public methods
+
+// reimplemented (imtbase::IItemBasedRepresentationProvider)
+
+QByteArray CDBSettingsDataProviderCompBase::GetModelId() const
+{
+	return *m_paramIdAttrPtr;
+}
+
+
+imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,
+																	   const QByteArrayList& fields)
+{
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+
+	QByteArray paramId;
+	QString paramName;
+
+	if (m_paramIdAttrPtr.IsValid()){
+		paramId = *m_paramIdAttrPtr;
+		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
+	}
+
+	if (m_paramNameAttrPtr.IsValid()){
+		paramName = *m_paramNameAttrPtr;
+		rootModelPtr->SetData("Name", paramName);
+	}
+
+	rootModelPtr->SetData("ComponentType", "DatabaseSettingsInput");
+
+	if (m_databaseSettingsCompPtr.IsValid()){
+
+		if (params.size() > 0){
+			QByteArray itemData = params.at(0).GetFieldArgumentValue("Item").toByteArray();
+
+			if (!itemData.isEmpty()){
+				imtbase::CTreeItemModel itemModel;
+				itemModel.Parse(itemData);
+
+				if (itemModel.ContainsKey("items")){
+
+					QByteArray itemsData = itemModel.GetData("items").toByteArray();
+
+					imtbase::CTreeItemModel* itemsModel = itemModel.GetTreeItemModel("items");
+
+					if (itemsModel != nullptr){
+						for (int i = 0; i < itemsModel->GetItemsCount(); i++){
+							QByteArray itemId = itemsModel->GetData("Id", i).toByteArray();
+
+							if (itemId == "DBSettings"){
+								imtbase::CTreeItemModel* elementsDB  = itemsModel->GetTreeItemModel("Elements", i);
+
+								if (elementsDB != nullptr){
+
+									for (int j = 0; j < elementsDB->GetItemsCount(); j++){
+										QByteArray dbId = elementsDB->GetData("Id", j).toByteArray();
+
+										if (dbId == paramId){
+
+											imtbase::CTreeItemModel* parameters = elementsDB->GetTreeItemModel("Parameters", j);
+
+											if (parameters != nullptr){
+												istd::CChangeGroup changeGroup(m_databaseSettingsCompPtr.GetPtr());
+
+												for (int k = 0; k < parameters->GetItemsCount(); k++){
+													QByteArray parameterId = parameters->GetData("Id", k).toByteArray();
+													QString parameterValue = parameters->GetData("Value", k).toString();
+													if (parameterId == "DBName"){
+														m_databaseSettingsCompPtr->SetDatabaseName(parameterValue);
+													}
+													else if (parameterId == "Host"){
+														m_databaseSettingsCompPtr->SetHost(parameterValue);
+													}
+													else if (parameterId == "Password"){
+														m_databaseSettingsCompPtr->SetPassword(parameterValue);
+													}
+													else if (parameterId == "Port"){
+														m_databaseSettingsCompPtr->SetPort(parameterValue.toInt());
+													}
+													else if (parameterId == "Username"){
+														m_databaseSettingsCompPtr->SetUserName(parameterValue);
+													}
+												}
+											}
+											break;
+										}
+									}
+								}
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
+
+		int index = parametersPtr->InsertNewItem();
+
+		QString dbName = m_databaseSettingsCompPtr->GetDatabaseName();
+		parametersPtr->SetData("Id", "DBName", index);
+		parametersPtr->SetData("Name", "DB Name", index);
+		parametersPtr->SetData("Value", dbName, index);
+		parametersPtr->SetData("ComponentType", "TextInput", index);
+
+		index = parametersPtr->InsertNewItem();
+
+		QString hostName = m_databaseSettingsCompPtr->GetHost();
+		parametersPtr->SetData("Id", "Host", index);
+		parametersPtr->SetData("Name", "Host", index);
+		parametersPtr->SetData("Value", hostName, index);
+		parametersPtr->SetData("ComponentType", "TextInput", index);
+
+		index = parametersPtr->InsertNewItem();
+
+		QString password = m_databaseSettingsCompPtr->GetPassword();
+		parametersPtr->SetData("Id", "Password", index);
+		parametersPtr->SetData("Name", "Password", index);
+		parametersPtr->SetData("Value", password, index);
+		parametersPtr->SetData("ComponentType", "TextInput", index);
+
+		index = parametersPtr->InsertNewItem();
+
+		int port = m_databaseSettingsCompPtr->GetPort();
+		parametersPtr->SetData("Id", "Port", index);
+		parametersPtr->SetData("Name", "Port", index);
+		parametersPtr->SetData("Value", port, index);
+		parametersPtr->SetData("ComponentType", "IntegerInput", index);
+
+		index = parametersPtr->InsertNewItem();
+
+		QString userName = m_databaseSettingsCompPtr->GetUserName();
+		parametersPtr->SetData("Id", "Username", index);
+		parametersPtr->SetData("Name", "User name", index);
+		parametersPtr->SetData("Value", userName, index);
+		parametersPtr->SetData("ComponentType", "TextInput", index);
+	}
+
+	return rootModelPtr;
+}
+
+
+} // namespace imtqml
+
+

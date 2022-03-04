@@ -1,0 +1,50 @@
+﻿#pragma once
+
+
+// ACF includes
+#include <imod/TModelWrap.h>
+#include <icomp/CComponentBase.h>
+
+// ImtCore includes
+#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtbase/IItemBasedRepresentationDataController.h>
+#include <imtdb/IDatabaseLoginSettings.h>
+
+
+namespace imtqml
+{
+
+
+/**
+	Basic implementation for the controller of the application page representation data model.
+*/
+class CDBSettingsDataProviderCompBase:
+			public icomp::CComponentBase,
+			public imtbase::IItemBasedRepresentationDataProvider
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	I_BEGIN_COMPONENT(CDBSettingsDataProviderCompBase);
+		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
+		I_ASSIGN(m_paramIdAttrPtr, "ParamId", "ID of the database", true, "");
+		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the database", false, "");
+		I_ASSIGN(m_paramComponentTypeAttrPtr, "ComponentType", "Type of component\n0 - UNKNOWN\n1 - TEXT\n2 - INTEGER\n3 - COMBOBOX", false, 0);
+		I_ASSIGN(m_databaseSettingsCompPtr, "Parameter", "Parameter of database settings", false, "");
+	I_END_COMPONENT;
+
+	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	virtual QByteArray GetModelId() const override;
+	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields) override;
+
+private:
+	I_ATTR(QByteArray, m_paramIdAttrPtr);
+	I_TEXTATTR(m_paramNameAttrPtr);
+	I_ATTR(int, m_paramComponentTypeAttrPtr);
+	I_REF(imtdb::IDatabaseLoginSettings, m_databaseSettingsCompPtr);
+};
+
+
+} // namespace imtqml
+
+

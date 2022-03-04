@@ -4,8 +4,10 @@ import imtqml 1.0
 
 Rectangle {
     id: topPanel;
+
     height: 55;
     width: parent.width;
+
     color: Style.baseColor;
     property string fontName: "";
     property string activeCommandsModelId;

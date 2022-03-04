@@ -556,9 +556,13 @@ Item {
                 anchors.leftMargin: 10;
 
                 text: "Features";
-                font.family: Style.fontFamilyBold;
+//                font.family: Style.fontFamilyBold;
                 color: Style.textColor;
-                font.pixelSize: Style.fontSize_small;
+//                font.pixelSize: Style.fontSize_small;
+//                font.bold: true;
+
+                font.pixelSize: Style.fontSize_common;
+                font.family: Style.fontFamilyBold;
                 font.bold: true;
             }
         }

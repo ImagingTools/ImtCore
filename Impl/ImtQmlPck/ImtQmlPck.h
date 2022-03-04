@@ -11,6 +11,8 @@
 #include <imtqml/CGuiQuickWrapComp.h>
 #include <imtqml/CCommandDataProviderCompBase.h>
 #include <imtqml/CPageDataProviderCompBase.h>
+#include <imtqml/CParamsDataProviderCompBase.h>
+#include <imtqml/CDBSettingsDataProviderCompBase.h>
 #include <imtqml/CApplicationDataEnumProviderComp.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
 #include <imtqml/CCommandDataEnumProviderComp.h>
@@ -30,6 +32,8 @@ typedef imtqml::CQuickObjectCompBase QuickObject;
 typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 typedef imtqml::CCommandDataProviderCompBase CommandDataProvider;
 typedef imtqml::CPageDataProviderCompBase PageDataProvider;
+typedef imtqml::CParamsDataProviderCompBase ParamsDataProvider;
+typedef imtqml::CDBSettingsDataProviderCompBase DBSettingsDataProvider;
 typedef imtqml::CApplicationDataEnumProviderComp ApplicationDataEnumProvider;
 typedef imtqml::CPageDataEnumProviderComp PageDataEnumProvider;
 typedef imtqml::CCommandDataEnumProviderComp CommandDataEnumProvider;

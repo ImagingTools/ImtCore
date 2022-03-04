@@ -2,6 +2,7 @@
 	"ColorPalette": {
 		"GrayBlue": "#e6e6e8",
 		"LightGray": "#c0c0c0",
+		"LightGray 1": "#aaaaaa",
 		"LightGray 2": "#CCCCCC",
 		"LightGray 3": "#dfdfdf",
 		"White": "#ffffff",
@@ -15,6 +16,7 @@
 		"LightYellow": "#FFFFB0",
 		"Orange": "#eb6225",
 		"Orange 2": "#f15a17",
+	        "ImagingToolsGradient0": "#f6f6f6",
 		"ImagingToolsGradient1": "#e3e3e5",
 		"ImagingToolsGradient2": "#d4d4d6",
 		"ImagingToolsGradient3": "#bebec0",
@@ -69,7 +71,8 @@
 			"BackgroundSelected": "White",
 			"TextSelected": "DarkGrayBlue",
 			"TextSelectedBackground": "VividBlue",
-			"BlueLabel2": "LightBlue 2"
+			"BlueLabel2": "LightBlue 2",
+			"Shadow": "LightGray 1"
 		},
 		"InactiveColors": {
 			"Background": "GrayBlue",

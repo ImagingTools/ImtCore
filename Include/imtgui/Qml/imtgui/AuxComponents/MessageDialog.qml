@@ -60,8 +60,8 @@ Rectangle {
             anchors.left: removeDialogTopPanel.left;
             anchors.verticalCenter: removeDialogTopPanel.verticalCenter;
 
-            width: 15;
-            height: 15;
+            width: 20;
+            height: 20;
 
             source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
         }
@@ -76,7 +76,7 @@ Rectangle {
             text: messageDialogContainer.nameDialog;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSize_subtitle;
         }
 
         AuxButton {
@@ -86,8 +86,8 @@ Rectangle {
             anchors.verticalCenter: removeDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
 
-            width: 17;
-            height: 17;
+            width: 20;
+            height: 20;
 
             iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 

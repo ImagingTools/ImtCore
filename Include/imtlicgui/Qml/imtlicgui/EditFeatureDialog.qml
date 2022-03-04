@@ -127,8 +127,8 @@ Rectangle {
             anchors.left: editFeatureDialogTopPanel.left;
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
 
-            width: 15;
-            height: 15;
+            width: 20;
+            height: 20;
 
             source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
         }
@@ -144,7 +144,7 @@ Rectangle {
             text: "Edit feature";
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: Style.fontSize_subtitle;
         }
 
         AuxButton {
@@ -154,8 +154,8 @@ Rectangle {
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
             anchors.rightMargin: 15;
 
-            width: 17;
-            height: 17;
+            width: 20;
+            height: 20;
 
             iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
 

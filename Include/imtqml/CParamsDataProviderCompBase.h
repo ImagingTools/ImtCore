@@ -1,0 +1,77 @@
+﻿#pragma once
+
+
+// ACF includes
+#include <imod/TModelWrap.h>
+#include <icomp/CComponentBase.h>
+
+// ImtCore includes
+#include <imtauth/IContactInfo.h>
+#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtbase/IItemBasedRepresentationDataController.h>
+
+
+namespace imtqml
+{
+
+
+/**
+	Basic implementation for the controller of the application page representation data model.
+*/
+class CParamsDataProviderCompBase:
+			public icomp::CComponentBase,
+			public imtbase::IItemBasedRepresentationDataProvider
+{
+public:
+	typedef icomp::CComponentBase BaseClass;
+
+	enum ComponentType
+	{
+		/**
+			Component type is unknown.
+		*/
+		CT_UNKNOWN,
+
+		/**
+			Component type is text.
+		*/
+		CT_TEXT_INPUT,
+
+		/**
+			Component type is integer.
+		*/
+		CT_INTEGER_INPUT,
+
+		/**
+			Component type is ComboBox.
+		*/
+		CT_COMBOBOX
+	};
+
+	I_BEGIN_COMPONENT(CParamsDataProviderCompBase);
+		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
+		I_ASSIGN(m_paramIdAttrPtr, "ParamId", "ID of the param", true, "");
+		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the param", false, "");
+		I_ASSIGN(m_paramComponentTypeAttrPtr, "ComponentType", "Type of component\n0 - UNKNOWN\n1 - TEXT\n2 - INTEGER\n3 - COMBOBOX", false, 0);
+		I_ASSIGN(m_paramSubElementCompPtr, "ParamCommandProvider", "Subparam of the param", false, "");
+		I_ASSIGN(m_parameterCompPtr, "Parameter", "Parameter of params data", false, "");
+	I_END_COMPONENT;
+
+	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	virtual QByteArray GetModelId() const override;
+	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields) override;
+
+private:
+	I_ATTR(QByteArray, m_paramIdAttrPtr);
+	I_TEXTATTR(m_paramNameAttrPtr);
+//	I_ATTR(QString, m_paramNameAttrPtr);
+	I_ATTR(int, m_paramComponentTypeAttrPtr);
+//	I_ATTR(QString, m_paramComponentTypeAttrPtr);
+	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_paramSubElementCompPtr);
+	I_REF(iser::ISerializable, m_parameterCompPtr);
+};
+
+
+} // namespace imtqml
+
+

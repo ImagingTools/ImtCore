@@ -34,11 +34,13 @@ Item {
     property string tabSelectedColor: "#FF4500";
 
     property string errorTextColor: "#FF4500";
+    property string shadowColor: "#aaaaaa";
 
     property string buttonColor: "#C0C0C0";
     property string buttonBorderColor: "#CCCCCC";
     property string borderColor2: "#a4a4a6";
 
+    property string imagingToolsGradient0: "#f6f6f6";
     property string imagingToolsGradient1: "#e3e3e5";
     property string imagingToolsGradient2: "#d4d4d6";
     property string imagingToolsGradient3: "#bebec0";

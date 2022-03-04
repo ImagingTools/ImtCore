@@ -14,28 +14,27 @@ Item {
 //    property string selectedItemId;
 
     property int currentItemIndex: -1;
+    property int currentValue: 0;
 
     property Item rootItem;
 
     onModelElementsChanged: {
-        console.log("SettingsComboBox onModelElementsChanged");
+        console.log("SettingsComboBox onModelElementsChanged", settingsComboBox.currentIndex);
 
         if (!settingsComboBoxContainer.modelElements){
             return;
         }
 
         for (var i = 0; i < settingsComboBoxContainer.modelElements.GetItemsCount(); i++){
-            var id = settingsComboBoxContainer.modelElements.GetData("Id", i);
             var name = settingsComboBoxContainer.modelElements.GetData("Name", i);
-            var value = settingsComboBoxContainer.modelElements.GetData("Value", i);
-
             settingsComboBoxContainer.modelElements.SetData("text", name, i);
 
-            if (value === 1){
+            if (i == settingsComboBoxContainer.currentValue){
                 settingsComboBox.currentText = name;
-                settingsComboBox.currentIndex = i;
             }
         }
+
+        settingsComboBox.currentIndex = settingsComboBoxContainer.currentValue;
     }
 
     function dataChanged(){
@@ -45,16 +44,18 @@ Item {
             return;
         }
 
-        for (var i = 0; i < settingsComboBoxContainer.modelElements.GetItemsCount(); i++){
-            if (settingsComboBoxContainer.modelElements.GetData("Value", i) === 1){
-                settingsComboBoxContainer.modelElements.SetData("Value", 0, i);
-                break;
-            }
-        }
+//        for (var i = 0; i < settingsComboBoxContainer.modelElements.GetItemsCount(); i++){
+//            if (settingsComboBoxContainer.modelElements.GetData("Value", i) === 1){
+//                settingsComboBoxContainer.modelElements.SetData("Value", 0, i);
+//                break;
+//            }
+//        }
 
-        settingsComboBoxContainer.modelElements.SetData("Value", 1, settingsComboBox.currentIndex);
+//        settingsComboBoxContainer.modelElements.SetData("Value", 1, settingsComboBox.currentIndex);
+        settingsComboBoxContainer.currentValue = settingsComboBox.currentIndex;
         settingsComboBoxContainer.rootItem.dataChanged(settingsComboBoxContainer.currentItemIndex,
-                                                                  settingsComboBoxContainer.modelElements);
+                                                       settingsComboBoxContainer.modelElements,
+                                                       settingsComboBoxContainer.currentValue);
     }
 
     ComboBox {

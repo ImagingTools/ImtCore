@@ -45,17 +45,22 @@ Item {
         }
         console.log("PopupMenuDialog popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
     }
-//    DropShadow {
-//        anchors.fill: mainBody;
 
-//        horizontalOffset: 5;
-//        verticalOffset: 5;
+    DropShadow {
+       id: dropShadow;
 
-//        radius: 5;
-////        samples: 5;
-//        color: "#80000000";
-//        source: mainBody;
-//    }
+       anchors.fill: mainBody;
+
+       horizontalOffset: 2;
+       verticalOffset: 2;
+
+       radius: 4;
+       samples: 10;
+       color: Style.shadowColor;
+       source: mainBody;
+
+//       opacity: 0.5;
+    }
 
     Rectangle {
         id: mainBody;
@@ -120,7 +125,6 @@ Item {
                         height: width;
 
                         visible: popupMenuContainer.hasIcon && model.name !== "";
-                        //source: "../../../Icons//_On_Normal.svg";
                         source: model.imageSource;
                         sourceSize.width: width;
                         sourceSize.height: height;

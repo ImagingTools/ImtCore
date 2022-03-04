@@ -16,57 +16,57 @@ Rectangle
 
     color: "red";
 
-    FileDialog {
-        id: fileDialog;
-        title: "Выберите файл";
-        folder: shortcuts.home;
-        onAccepted: {
-            console.log(fileDialog.fileUrl)
-        }
-        onRejected: {
-            console.log("Canceled")
-        }
-    }
+//    FileDialog {
+//        id: fileDialog;
+//        title: "Выберите файл";
+//        folder: shortcuts.home;
+//        onAccepted: {
+//            console.log(fileDialog.fileUrl)
+//        }
+//        onRejected: {
+//            console.log("Canceled")
+//        }
+//    }
 
-    Rectangle{
-        width: 500;
-        height: 500;
-        x: 500;
-        Rectangle{
-            width: 50;
-            height: 50;
-            color: 'blue';
-            MouseArea{
-                anchors.fill: parent;
-                onClicked:{
-                    fileDialog.visible = true
-                    //this._context.location.changeHref('/newurl/')
-                }
-            }
-        }
-        Rectangle{
-            width: 50;
-            height: 50;
-            x: 60;
-            color: 'blue';
-            MouseArea{
-                anchors.fill: parent;
-                onClicked:{
-                    //this._context.location.changeHref('newurl/')
-                }
-            }
-        }
-        Rectangle{
-            width: 50;
-            height: 50;
-            color: 'blue';
-            x: 120;
-            MouseArea{
-                anchors.fill: parent;
-                onClicked:{
-                    //this._context.location.changeHref('../newurl/')
-                }
-            }
-        }
-    }
+//    Rectangle{
+//        width: 500;
+//        height: 500;
+//        x: 500;
+//        Rectangle{
+//            width: 50;
+//            height: 50;
+//            color: 'blue';
+//            MouseArea{
+//                anchors.fill: parent;
+//                onClicked:{
+//                    fileDialog.visible = true
+//                    //this._context.location.changeHref('/newurl/')
+//                }
+//            }
+//        }
+//        Rectangle{
+//            width: 50;
+//            height: 50;
+//            x: 60;
+//            color: 'blue';
+//            MouseArea{
+//                anchors.fill: parent;
+//                onClicked:{
+//                    //this._context.location.changeHref('newurl/')
+//                }
+//            }
+//        }
+//        Rectangle{
+//            width: 50;
+//            height: 50;
+//            color: 'blue';
+//            x: 120;
+//            MouseArea{
+//                anchors.fill: parent;
+//                onClicked:{
+//                    //this._context.location.changeHref('../newurl/')
+//                }
+//            }
+//        }
+//    }
 }

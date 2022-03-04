@@ -256,8 +256,6 @@ Rectangle {
                     height: 150;
                     width: 150;
 
-//                    source: "../../../Icons/Light/Account_On_Normal.svg";
-
                     source: "../../Icons/Light/Account_On_Normal.svg";
 
                     sourceSize.width: width;
