@@ -91,6 +91,13 @@ def parse_qml_file(cache, com, path):
 				data = data.replace('sourceSize.width', 'sourceWidth') # by Artur, for compatibility sourceSize
 				data = data.replace('sourceSize.height', 'sourceHeight') # by Artur, for compatibility sourceSize
 
+				data = data.replace('shortcuts.desktop', '""')
+				data = data.replace('shortcuts.document', '""')
+				data = data.replace('shortcuts.home', '""')
+				data = data.replace('shortcuts.music', '""')
+				data = data.replace('shortcuts.movies', '""')
+				data = data.replace('shortcuts.pictures', '""')
+
 				qts = re.findall(r'Qt.openUrlExternally[(,),a-z,A-Z,0-9,.,+,-,*,/,=,?,:, ]+', data)
 				for q in qts:
 					left = 0
