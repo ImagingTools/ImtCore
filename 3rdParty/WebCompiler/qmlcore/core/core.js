@@ -293,7 +293,19 @@ var Color = $core.Color = function(value) {
 	}
 	var triplet
 	if (value[0] === '#') {
-		triplet = value.substring(1)
+		if(value.length === 9){
+			this.r = parseInt(value[3]+value[4], 16)
+			this.g = parseInt(value[5]+value[6], 16)
+			this.b = parseInt(value[7]+value[8], 16)
+			this.a = parseInt(value[1]+value[2], 16)
+			return
+		} else if(value.length === 5) {
+			this.r = parseInt(value[2]+value[2], 16)
+			this.g = parseInt(value[3]+value[3], 16)
+			this.b = parseInt(value[4]+value[4], 16)
+			this.a = parseInt(value[1]+value[1], 16)
+			return
+		} else triplet = value.substring(1)
 	} else if (value.substring(0, 4) === "rgba") {
 		var b = value.indexOf('('), e = value.lastIndexOf(')')
 		value = value.substring(b + 1, e).split(',')
