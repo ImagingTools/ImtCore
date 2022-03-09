@@ -84,7 +84,11 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix)
 
 // reimplemented (IRequestHandler)
 
-IRequestServlet::ConstResponsePtr CHttpFileProviderBasedServletComp::ProcessRequest(const IRequest& request) const
+IRequestServlet::ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
+		const QByteArray& commandId,
+		const imtrest::IRequest::CommandParams& commandParams,
+		const HeadersMap& headers,
+		const imtrest::CHttpRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";

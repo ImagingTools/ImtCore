@@ -33,18 +33,24 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpFileProviderBasedServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
-		I_ASSIGN_MULTI_0(m_binaryDataProvidersCompPtr, "Bynary data providers", "Bynary data providers", true);
+		I_ASSIGN_MULTI_0(m_binaryDataProvidersCompPtr, "BinaryDataProviders", "Binary data providers", true);
 	I_END_COMPONENT
 
 	QByteArray GetMimeType(QByteArray fileSuffix) const;
 
 // reimplemented (IRequestHandler)
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
+	virtual ConstResponsePtr OnGet(
+				const QByteArray& commandId,
+				const imtrest::IRequest::CommandParams& commandParams,
+				const HeadersMap& headers,
+				const imtrest::CHttpRequest& request) const override;
 	virtual QByteArray GetSupportedCommandId() const override;
 
-private:
+protected:
 	I_MULTIREF(imtbase::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
 
+
+private:
 	QByteArray m_beginOfMessage;
 	QByteArray m_endOfMessage;
 
