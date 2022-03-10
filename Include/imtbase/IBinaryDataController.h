@@ -23,7 +23,7 @@ public:
 		\param dataId [INPUT] - name of providing file
 		\return result of extracting data
 	 */
-	virtual bool SetData(const QByteArray& data, const QByteArray& dataId) const = 0;
+    virtual bool SetData(const QByteArray& data, QByteArray& dataId) const = 0;
 
 	/**
 		\brief removes data from providing file
