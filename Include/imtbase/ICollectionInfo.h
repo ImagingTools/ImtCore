@@ -20,7 +20,7 @@ class ICollectionInfo: virtual public ICollectionInfoProvider
 {
 public:
 	/**
-		Get all IDs of the elements inside the collection.
+		Get IDs of the elements inside the collection.
 		\param offset
 		\param count
 		\param selectionParamsPtr	 [optional] Additional parameters for filtering/ordering elements.

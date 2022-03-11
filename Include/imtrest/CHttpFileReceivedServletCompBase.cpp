@@ -12,35 +12,25 @@ namespace imtrest
 {
 
 
-// reimplemented (IProtocolEngine)
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CHttpFileReceivedServletCompBase::OnComponentCreated()
-{
-    BaseClass::OnComponentCreated();
-}
+// reimplemented (imtrest::IRequestServlet)
 
 CHttpFileReceivedServletCompBase::ConstResponsePtr CHttpFileReceivedServletCompBase::ProcessRequest(const IRequest& request) const
 {
+	QByteArray body;
+	body = R"(<head> <meta http-equiv="refresh" content="0; URL=)";
+	body.append(*m_redirectToCommandIdAttrPtr);
+	body.append(R"(" /></head>)");
 
+	qDebug() << request.GetBody(); // file_data
+	qDebug() << request.GetCommandParams(); // params
+	qDebug() << request.GetCommandId(); // URL
 
-    QByteArray body;
-    body = R"(<head> <meta http-equiv="refresh" content="0; URL=)";
-    body.append(*m_redirectToCommandID);
-    body.append(R"(" /></head>)");
-
-    qDebug() << request.GetBody(); // file_data
-    qDebug() << request.GetCommandParams(); // params
-    qDebug() << request.GetCommandId(); // URL
-
-    ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
-                                               .CreateResponse(request,
-                                                               IProtocolEngine::SC_MOVED_PERMANENTLY,
-                                                               body,
-                                                               "text/html; charset=UTF-8")
-                                               );
+	ConstResponsePtr retval = ConstResponsePtr(request.GetProtocolEngine()
+				.CreateResponse(
+							request,
+							IProtocolEngine::SC_MOVED_PERMANENTLY,
+							body,
+							"text/html; charset=UTF-8"));
    imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));     
 
 //   if (httpRequestPtr != nullptr && httpRequestPtr->GetMethodType() == imtrest::CHttpRequest::MT_POST)
@@ -71,11 +61,15 @@ CHttpFileReceivedServletCompBase::ConstResponsePtr CHttpFileReceivedServletCompB
 //       }
 //   }
 //    return retval;
+
+
+  return CHttpFileReceivedServletCompBase::ConstResponsePtr();
 }
+
 
 QByteArray CHttpFileReceivedServletCompBase::GetSupportedCommandId() const
 {
-    return *m_commandIdAttrPtr;
+	return *m_commandIdAttrPtr;
 }
 
 
