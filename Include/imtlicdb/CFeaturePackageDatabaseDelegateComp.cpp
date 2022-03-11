@@ -97,7 +97,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 }
 
 
-QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
@@ -112,13 +112,17 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 			packageId = objectName.toLocal8Bit();
 		}
 
-		QByteArray retVal = QString("INSERT INTO Packages(Id, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5');")
+		NewObjectQuery retVal;
+
+		retVal.query = QString("INSERT INTO Packages(Id, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5');")
 					.arg(qPrintable(packageId))
 					.arg(objectName)
 					.arg(objectDescription)
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.toLocal8Bit();
+
+		retVal.objectName = objectName;
 
 		imtbase::ICollectionInfo::Ids featureIds = featurePackagePtr->GetElementIds();
 		for (const QByteArray& collectionId : featureIds){
@@ -127,7 +131,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 				QByteArray featureId = featureInfoPtr->GetFeatureId();
 				QString featureName = featureInfoPtr->GetFeatureName();
 				QString featureDescription = featurePackagePtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-				retVal += "\n" + 
+				retVal.query += "\n" + 
 							QString("INSERT INTO Features(Id, Name, Description, PackageId) VALUES('%1', '%2', '%3', '%4');")
 										.arg(qPrintable(featureId))
 										.arg(featureName)
@@ -139,7 +143,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateNewObjectQuery(
 		return retVal;
 	}
 
-	return QByteArray();
+	return NewObjectQuery();
 }
 
 
@@ -164,7 +168,6 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 	return QByteArray();
 }
-
 
 QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
@@ -428,13 +431,13 @@ void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-idoc::IDocumentMetaInfo* CFeaturePackageDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+idoc::IDocumentMetaInfo* CFeaturePackageDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return nullptr;
 }
 
 
-bool CFeaturePackageDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+bool CFeaturePackageDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& /*record*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
 {
 	return true;
 }

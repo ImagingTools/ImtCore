@@ -121,14 +121,14 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateNewObjectQuery(typeId, objectId, name, description, defaultValuePtr.GetPtr());
-	if (query.isEmpty()){
+	imtdb::IDatabaseObjectDelegate::NewObjectQuery objectQuery = m_objectDelegateCompPtr->CreateNewObjectQuery(typeId, objectId, name, description, defaultValuePtr.GetPtr());
+	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
 		return nullptr;
 	}
 
-	if (ExecuteTransaction(query)){
+	if (ExecuteTransaction(objectQuery.query)){
 		istd::CChangeNotifier changeNotifier(this);
 
 		idoc::CStandardDocumentMetaInfo collectionMetaInfo;
@@ -155,7 +155,7 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 
 		objectInfo.typeId = typeId;
 		objectInfo.collectionMetaInfoPtr.SetCastedOrRemove(collectionItemMetaInfoPtr->CloneMe());
-		objectInfo.collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, name);
+		objectInfo.collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectQuery.objectName);
 		objectInfo.collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, description);
 
 		if (dataMetaInfoPtr != nullptr){

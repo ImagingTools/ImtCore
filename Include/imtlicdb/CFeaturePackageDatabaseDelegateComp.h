@@ -23,7 +23,7 @@ public:
 				const QByteArray& typeId,
 				const QSqlRecord& record,
 				const QSqlQuery& query) const override;
-	virtual QByteArray CreateNewObjectQuery(
+	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
 				const QString& objectName,

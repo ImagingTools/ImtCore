@@ -23,6 +23,19 @@ namespace imtdb
 class IDatabaseObjectDelegate: virtual public istd::IPolymorphic
 {
 public:
+	struct NewObjectQuery
+	{
+		/**
+			Resulting query for object insertion.
+		*/
+		QByteArray query;
+
+		/**
+			Name of the object.
+		*/
+		QString objectName;
+	};
+
 	/**
 		Get selection query for the listing objects in the collection.
 		\param objectId		If non empty, the given object will be selected.
@@ -39,7 +52,7 @@ public:
 	/**
 		Create query for insertion of a new object into the database.
 	*/
-	virtual QByteArray CreateNewObjectQuery(
+	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
 				const QString& objectName,

@@ -72,7 +72,7 @@ istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(const QB
 }
 
 
-QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
@@ -81,7 +81,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 {
 	const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(valuePtr);
 	if (accountInfoPtr == nullptr){
-		return QByteArray();
+		return NewObjectQuery();
 	}
 
 	QString accountName = accountInfoPtr->GetAccountName();
@@ -90,7 +90,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 	}
 
 	if (accountName.isEmpty()){
-		return QByteArray();
+		return NewObjectQuery();
 	}
 
 	QByteArray accountId = accountName.toUtf8();
@@ -117,7 +117,9 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 		firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
 	}
 
-	QByteArray retVal = QString("INSERT INTO Accounts(Id, Name, Description, Type, OwnerMail, OwnerLastName, OwnerFirstName) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+	NewObjectQuery retVal;
+
+	retVal.query = QString("INSERT INTO Accounts(Id, Name, Description, Type, OwnerMail, OwnerLastName, OwnerFirstName) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 							.arg(qPrintable(accountId))
 							.arg(accountName)
 							.arg(accountDescription)
@@ -126,6 +128,8 @@ QByteArray CAccountDatabaseDelegateComp::CreateNewObjectQuery(
 							.arg(lastName)
 							.arg(firstName)
 							.toLocal8Bit();
+
+	retVal.objectName = accountName;
 
 	return retVal;
 }

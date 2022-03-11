@@ -115,13 +115,13 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 }
 
 
-idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateObjectMetaInfo(const QByteArray& typeId) const
+idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
 	return nullptr;
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+bool CSqlDatabaseObjectDelegateCompBase::SetObjectMetaInfoFromRecord(const QSqlRecord& /*record*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
 {
 	return false;
 }

@@ -119,7 +119,7 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 }
 
 
-QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
@@ -128,13 +128,13 @@ QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 {
 	const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(valuePtr);
 	if (productPtr == nullptr){
-		return QByteArray();
+		return NewObjectQuery();
 	}
 
 	const imtbase::IObjectCollection* packagesCollectionPtr = productPtr->GetFeaturePackages();
-//	if (packagesCollectionPtr == nullptr){
-//		return QByteArray();
-//	}
+	if (packagesCollectionPtr == nullptr){
+		return NewObjectQuery();
+	}
 
 	QByteArray productId = productPtr->GetProductId();
 	if (productId.isEmpty()){
@@ -142,7 +142,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 	}
 
 	if (productId.isEmpty()){
-		return QByteArray();
+		return NewObjectQuery();
 	}
 
 	QString productName = productPtr->GetName();
@@ -150,10 +150,12 @@ QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 		productName = objectName;
 	}
 
-	QByteArray retVal = QString("INSERT INTO Products(Id, Name, Description) VALUES('%1', '%2', '%3');")
+	NewObjectQuery retVal;
+	retVal.query = QString("INSERT INTO Products(Id, Name, Description) VALUES('%1', '%2', '%3');")
 				.arg(qPrintable(productId))
 				.arg(productName)
 				.arg(objectDescription).toLocal8Bit();
+	retVal.objectName = productName;
 
 	imtbase::ICollectionInfo::Ids licenseIds = productPtr->GetLicenseList().GetElementIds();
 	for (const QByteArray& collectionId : licenseIds){
@@ -162,7 +164,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 			QByteArray licenseId = licenseInfoPtr->GetLicenseId();
 			QString licenseName = licenseInfoPtr->GetLicenseName();
 			QString licenseDescription = productPtr->GetLicenseList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-			retVal += "\n" +
+			retVal.query += "\n" +
 						QString("INSERT INTO ProductLicenses(Id, Name, Description, ProductId) VALUES('%1', '%2', '%3', '%4');")
 						.arg(qPrintable(licenseId))
 						.arg(licenseName)
@@ -176,12 +178,12 @@ QByteArray CProductsDatabaseDelegateComp::CreateNewObjectQuery(
 
 				const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, featureInfo.id);
 				if (packagePtr == nullptr){
-					return QByteArray();
+					return NewObjectQuery();
 				}
 
 				packageId = packagePtr->GetPackageId();
 
-				retVal += "\n" +
+				retVal.query += "\n" +
 							QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId) VALUES('%1', '%2');")
 							.arg(qPrintable(licenseId))
 							.arg(qPrintable(featureInfo.id))

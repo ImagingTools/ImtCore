@@ -84,7 +84,7 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 }
 
 
-QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
@@ -93,17 +93,17 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 {
 	const imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<const imtlic::IProductInstanceInfo*>(valuePtr);
 	if (productInstancePtr == nullptr){
-		return QByteArray();
+		return NewObjectQuery();
 	}
 
 	QByteArray productId = productInstancePtr->GetProductId();
 	if (productId.isEmpty()){
-		return QByteArray();
+		return NewObjectQuery();
 	}
 
 	QByteArray accountId = productInstancePtr->GetCustomerId();
 	if (accountId.isEmpty()){
-		return QByteArray();
+		return NewObjectQuery();
 	}
 
 	QByteArray productInstanceId = productInstancePtr->GetProductInstanceId();
@@ -113,7 +113,9 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 
 	QString timestamp = QDateTime::currentDateTime().toString(Qt::ISODate);
 
-	QByteArray retVal = QString("INSERT INTO ProductInstances(InstanceId, ProductId, AccountId, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+	NewObjectQuery retVal;
+
+	retVal.query = QString("INSERT INTO ProductInstances(InstanceId, ProductId, AccountId, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 				.arg(qPrintable(productInstanceId))
 				.arg(qPrintable(productId))
 				.arg(qPrintable(accountId))
@@ -122,6 +124,8 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 				.arg(timestamp)
 				.arg(timestamp)
 				.toLocal8Bit();
+
+	retVal.objectName = objectName;
 
 	const imtbase::ICollectionInfo& licenseList = productInstancePtr->GetLicenseInstances();
 
@@ -134,13 +138,13 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateNewObjectQuery(
 			QDateTime expirationTime = licensePtr->GetExpiration();
 
 			if (expirationTime.isNull()){
-				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId) VALUES('%1', '%2');")
+				retVal.query += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId) VALUES('%1', '%2');")
 							.arg(qPrintable(productInstanceId))
 							.arg(qPrintable(licenseId))
 							.toLocal8Bit();
 			}
 			else{
-				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ExpirationDate) VALUES('%1', '%2', '%3');")
+				retVal.query += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ExpirationDate) VALUES('%1', '%2', '%3');")
 							.arg(qPrintable(productInstanceId))
 							.arg(qPrintable(licenseId))
 							.arg(expirationTime.date().toString(Qt::ISODate))
