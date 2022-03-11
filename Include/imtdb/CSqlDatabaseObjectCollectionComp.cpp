@@ -357,7 +357,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record(), sqlQuery);
+	istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
 	dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr]() {
 		return dataObjPtr;
 	});
@@ -542,9 +542,13 @@ void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::run()
 
 	ObjectInfoMap objectInfoMap;
 
-	while (sqlQuery.next() && !isInterruptionRequested()){
-		QSqlRecord record = sqlQuery.record();
+	QList<QSqlRecord> records;
 
+	while (sqlQuery.next()){
+		records.append(sqlQuery.record());
+	}
+
+	for (const QSqlRecord& record : records){
 		QByteArray objectId = m_parent.m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_parent.m_typeIdAttrPtr, record);
 
 		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
@@ -559,6 +563,23 @@ void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::run()
 			objectInfoMap[objectId] = objectInfo;
 		}
 	}
+//	while (sqlQuery.next() && !isInterruptionRequested()){
+//		QSqlRecord record = sqlQuery.record();
+
+//		QByteArray objectId = m_parent.m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_parent.m_typeIdAttrPtr, record);
+
+//		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+//		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+//		bool isOk = m_parent.m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_parent.m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+//		if (isOk){
+//			ObjectInfo objectInfo;
+//			objectInfo.typeId = *m_parent.m_typeIdAttrPtr;
+//			objectInfo.collectionMetaInfoPtr = collectionMetaInfoPtr;
+//			objectInfo.metaInfoPtr = objectMetaInfoPtr;
+
+//			objectInfoMap[objectId] = objectInfo;
+//		}
+//	}
 
 	QMutexLocker lock(&m_dataMutex);
 

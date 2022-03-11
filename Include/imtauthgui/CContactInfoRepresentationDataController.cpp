@@ -17,100 +17,99 @@ namespace imtauthgui
 
 
 CContactInfoRepresentationDataController::CContactInfoRepresentationDataController()
-	: imtbase::IItemBasedRepresentationDataController()
 {
 	m_isUpdateFromRepresentation = false;
 }
 
 
-void CContactInfoRepresentationDataController::UpdateRepresentationFromBaseModel(
-		istd::IChangeable *baseModel,
-		istd::IChangeable *representationModel,
-		const istd::IChangeable::ChangeSet &changeSet)
-{
-	if (m_isUpdateFromRepresentation == true){
-		return;
-	}
+//void CContactInfoRepresentationDataController::UpdateRepresentationFromBaseModel(
+//		istd::IChangeable *baseModel,
+//		istd::IChangeable *representationModel,
+//		const istd::IChangeable::ChangeSet &changeSet)
+//{
+//	if (m_isUpdateFromRepresentation == true){
+//		return;
+//	}
 
-	imtbase::CTreeItemModel* treeItemModel = dynamic_cast<imtbase::CTreeItemModel*>(representationModel);
-	imtauth::IContactInfo* contactPtr = dynamic_cast<imtauth::IContactInfo*>(baseModel);
+//	imtbase::CTreeItemModel* treeItemModel = dynamic_cast<imtbase::CTreeItemModel*>(representationModel);
+//	imtauth::IContactInfo* contactPtr = dynamic_cast<imtauth::IContactInfo*>(baseModel);
 
-	Q_ASSERT(treeItemModel != nullptr);
-	Q_ASSERT(contactPtr != nullptr);
+//	Q_ASSERT(treeItemModel != nullptr);
+//	Q_ASSERT(contactPtr != nullptr);
 
-	istd::IChangeable::ChangeInfoMap infoMap = changeSet.GetChangeInfoMap();
-	if (infoMap.isEmpty()){
-		this->FullUpdateRepresentationModel(contactPtr, treeItemModel);
-	}
-	else{
-		if (infoMap.contains("key0") && infoMap.value("key0") == "addresses"){
-			treeItemModel = treeItemModel->GetTreeItemModel("addresses",infoMap.value("index0",0).toInt());
-		}
-		istd::IChangeable::ChangeInfoMap infoUpdate;
-		infoUpdate.insert("fromModel",true);
-		treeItemModel->SetData(infoMap.value("key").toByteArray(),infoMap.value("value"), infoMap.value("index").toInt(), infoUpdate);
-	}
-}
+//	istd::IChangeable::ChangeInfoMap infoMap = changeSet.GetChangeInfoMap();
+//	if (infoMap.isEmpty()){
+//		this->FullUpdateRepresentationModel(contactPtr, treeItemModel);
+//	}
+//	else{
+//		if (infoMap.contains("key0") && infoMap.value("key0") == "addresses"){
+//			treeItemModel = treeItemModel->GetTreeItemModel("addresses",infoMap.value("index0",0).toInt());
+//		}
+//		istd::IChangeable::ChangeInfoMap infoUpdate;
+//		infoUpdate.insert("fromModel",true);
+//		treeItemModel->SetData(infoMap.value("key").toByteArray(),infoMap.value("value"), infoMap.value("index").toInt(), infoUpdate);
+//	}
+//}
 
 
-void CContactInfoRepresentationDataController::UpdateBaseModelFromRepresentation(
-		istd::IChangeable *baseModel,
-		istd::IChangeable *representationModel,
-		const istd::IChangeable::ChangeSet &changeSet)
-{
-	istd::IChangeable::ChangeInfoMap infoMap = changeSet.GetChangeInfoMap();
-	if (infoMap.contains("fromModel")){
-		return;
-	}
-	imtbase::CTreeItemModel* treeItemModel = dynamic_cast<imtbase::CTreeItemModel*>(representationModel);
-	imtauth::IContactInfo* contactPtr = dynamic_cast<imtauth::IContactInfo*>(baseModel);
+//void CContactInfoRepresentationDataController::UpdateBaseModelFromRepresentation(
+//		istd::IChangeable *baseModel,
+//		istd::IChangeable *representationModel,
+//		const istd::IChangeable::ChangeSet &changeSet)
+//{
+//	istd::IChangeable::ChangeInfoMap infoMap = changeSet.GetChangeInfoMap();
+//	if (infoMap.contains("fromModel")){
+//		return;
+//	}
+//	imtbase::CTreeItemModel* treeItemModel = dynamic_cast<imtbase::CTreeItemModel*>(representationModel);
+//	imtauth::IContactInfo* contactPtr = dynamic_cast<imtauth::IContactInfo*>(baseModel);
 
-	Q_ASSERT(treeItemModel != nullptr);
-	Q_ASSERT(contactPtr != nullptr);
+//	Q_ASSERT(treeItemModel != nullptr);
+//	Q_ASSERT(contactPtr != nullptr);
 
-	if (infoMap.isEmpty()){
-		this->FullUpdateBaseModel(contactPtr, treeItemModel);
-	}
-	else{
-		m_isUpdateFromRepresentation = true;
+//	if (infoMap.isEmpty()){
+//		this->FullUpdateBaseModel(contactPtr, treeItemModel);
+//	}
+//	else{
+//		m_isUpdateFromRepresentation = true;
 
-		if (infoMap.value("key") == "firstName"){
-			contactPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, treeItemModel->GetData("firstName").toString());
-		}
-		if (infoMap.value("key") == "lastName"){
-			contactPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, treeItemModel->GetData("lastName").toString());
-		}
-		if (infoMap.value("key") == "nickName"){
-			contactPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, treeItemModel->GetData("nickName").toString());
-		}
+//		if (infoMap.value("key") == "firstName"){
+//			contactPtr->SetNameField(imtauth::IContactInfo::NFT_FIRST_NAME, treeItemModel->GetData("firstName").toString());
+//		}
+//		if (infoMap.value("key") == "lastName"){
+//			contactPtr->SetNameField(imtauth::IContactInfo::NFT_LAST_NAME, treeItemModel->GetData("lastName").toString());
+//		}
+//		if (infoMap.value("key") == "nickName"){
+//			contactPtr->SetNameField(imtauth::IContactInfo::NFT_NICKNAME, treeItemModel->GetData("nickName").toString());
+//		}
 
-		if (infoMap.value("key0") == "addresses"){
-			imtbase::CTreeItemModel* addressesModel = treeItemModel->GetTreeItemModel("addresses",infoMap.value("index0",0).toInt());
-			imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
-						const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
+//		if (infoMap.value("key0") == "addresses"){
+//			imtbase::CTreeItemModel* addressesModel = treeItemModel->GetTreeItemModel("addresses",infoMap.value("index0",0).toInt());
+//			imtauth::IAddressManager* addressesPtr = dynamic_cast<imtauth::IAddressManager*>(
+//						const_cast<imtauth::IAddressProvider*>(contactPtr->GetAddresses()));
 
-			if (addressesPtr != nullptr && addressesModel != nullptr){
-				QByteArray id = treeItemModel->GetData("addressId").toByteArray();
-//				imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
-//				int index = infoMap.value("index").toInt();
-//				if (infoMap.value("key") == "country"){
-//					addressPtr->SetCountry(addressesModel->GetData("country",index).toString());
-//				}
-//				if (infoMap.value("key") == "city"){
-//					addressPtr->SetCity(addressesModel->GetData("city",index).toString());
-//				}
-//				if (infoMap.value("key") == "postalCode"){
-//					addressPtr->SetPostalCode(addressesModel->GetData("postalCode",index).toInt());
-//				}
-//				if (infoMap.value("key") == "street"){
-//					addressPtr->SetStreet(addressesModel->GetData("street",index).toString());
-//				}
-			}
-		}
-		this->m_isUpdateFromRepresentation = false;
+//			if (addressesPtr != nullptr && addressesModel != nullptr){
+//				QByteArray id = treeItemModel->GetData("addressId").toByteArray();
+////				imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
+////				int index = infoMap.value("index").toInt();
+////				if (infoMap.value("key") == "country"){
+////					addressPtr->SetCountry(addressesModel->GetData("country",index).toString());
+////				}
+////				if (infoMap.value("key") == "city"){
+////					addressPtr->SetCity(addressesModel->GetData("city",index).toString());
+////				}
+////				if (infoMap.value("key") == "postalCode"){
+////					addressPtr->SetPostalCode(addressesModel->GetData("postalCode",index).toInt());
+////				}
+////				if (infoMap.value("key") == "street"){
+////					addressPtr->SetStreet(addressesModel->GetData("street",index).toString());
+////				}
+//			}
+//		}
+//		this->m_isUpdateFromRepresentation = false;
 
-	}
-}
+//	}
+//}
 
 
 void CContactInfoRepresentationDataController::FullUpdateRepresentationModel(

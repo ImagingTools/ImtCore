@@ -4,6 +4,7 @@
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
 #include <istd/CChangeGroup.h>
+#include <imod/TModelWrap.h>
 
 #include <iprm/IParamsSet.h>
 
@@ -22,7 +23,7 @@ QByteArray CDBSettingsDataProviderCompBase::GetModelId() const
 
 
 imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,
-																	   const QByteArrayList& fields)
+																		const QByteArrayList& fields)
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
@@ -42,70 +43,6 @@ imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::GetTreeItemModel(const
 	rootModelPtr->SetData("ComponentType", "DatabaseSettingsInput");
 
 	if (m_databaseSettingsCompPtr.IsValid()){
-
-		if (params.size() > 0){
-			QByteArray itemData = params.at(0).GetFieldArgumentValue("Item").toByteArray();
-
-			if (!itemData.isEmpty()){
-				imtbase::CTreeItemModel itemModel;
-				itemModel.Parse(itemData);
-
-				if (itemModel.ContainsKey("items")){
-
-					QByteArray itemsData = itemModel.GetData("items").toByteArray();
-
-					imtbase::CTreeItemModel* itemsModel = itemModel.GetTreeItemModel("items");
-
-					if (itemsModel != nullptr){
-						for (int i = 0; i < itemsModel->GetItemsCount(); i++){
-							QByteArray itemId = itemsModel->GetData("Id", i).toByteArray();
-
-							if (itemId == "DBSettings"){
-								imtbase::CTreeItemModel* elementsDB  = itemsModel->GetTreeItemModel("Elements", i);
-
-								if (elementsDB != nullptr){
-
-									for (int j = 0; j < elementsDB->GetItemsCount(); j++){
-										QByteArray dbId = elementsDB->GetData("Id", j).toByteArray();
-
-										if (dbId == paramId){
-
-											imtbase::CTreeItemModel* parameters = elementsDB->GetTreeItemModel("Parameters", j);
-
-											if (parameters != nullptr){
-												istd::CChangeGroup changeGroup(m_databaseSettingsCompPtr.GetPtr());
-
-												for (int k = 0; k < parameters->GetItemsCount(); k++){
-													QByteArray parameterId = parameters->GetData("Id", k).toByteArray();
-													QString parameterValue = parameters->GetData("Value", k).toString();
-													if (parameterId == "DBName"){
-														m_databaseSettingsCompPtr->SetDatabaseName(parameterValue);
-													}
-													else if (parameterId == "Host"){
-														m_databaseSettingsCompPtr->SetHost(parameterValue);
-													}
-													else if (parameterId == "Password"){
-														m_databaseSettingsCompPtr->SetPassword(parameterValue);
-													}
-													else if (parameterId == "Port"){
-														m_databaseSettingsCompPtr->SetPort(parameterValue.toInt());
-													}
-													else if (parameterId == "Username"){
-														m_databaseSettingsCompPtr->SetUserName(parameterValue);
-													}
-												}
-											}
-											break;
-										}
-									}
-								}
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
 
 		imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
 
@@ -148,9 +85,65 @@ imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::GetTreeItemModel(const
 		parametersPtr->SetData("Name", "User name", index);
 		parametersPtr->SetData("Value", userName, index);
 		parametersPtr->SetData("ComponentType", "TextInput", index);
+
+		rootModelPtr->SetData("Status", "OK");
 	}
 
 	return rootModelPtr;
+}
+
+
+// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
+
+imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::UpdateBaseModelFromRepresentation(
+		const QList<imtgql::CGqlObject> &params,
+		imtbase::CTreeItemModel *baseModel)
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+
+	if (!m_databaseSettingsCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	if (baseModel->ContainsKey("Parameters")){
+		imtbase::CTreeItemModel* parameters = baseModel->GetTreeItemModel("Parameters");
+
+		for (int k = 0; k < parameters->GetItemsCount(); k++){
+			QByteArray parameterId = parameters->GetData("Id", k).toByteArray();
+			QString parameterValue = parameters->GetData("Value", k).toString();
+
+			if (parameterId == "DBName"){
+				m_databaseSettingsCompPtr->SetDatabaseName(parameterValue);
+			}
+			else if (parameterId == "Host"){
+				m_databaseSettingsCompPtr->SetHost(parameterValue);
+			}
+			else if (parameterId == "Password"){
+				m_databaseSettingsCompPtr->SetPassword(parameterValue);
+			}
+			else if (parameterId == "Port"){
+				m_databaseSettingsCompPtr->SetPort(parameterValue.toInt());
+			}
+			else if (parameterId == "Username"){
+				m_databaseSettingsCompPtr->SetUserName(parameterValue);
+			}
+		}
+
+		QByteArray paramId;
+		QString paramName;
+
+		if (baseModel->ContainsKey("Id")){
+			paramId = baseModel->GetData("Id").toByteArray();
+			rootModel->SetData("Id", paramId);
+		}
+
+		if (baseModel->ContainsKey("Name")){
+			paramName = baseModel->GetData("Name").toString();
+			rootModel->SetData("Name", paramName);
+		}
+	}
+
+	return rootModel;
 }
 
 

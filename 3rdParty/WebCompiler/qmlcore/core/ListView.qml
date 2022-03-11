@@ -168,7 +168,7 @@ BaseView {
 				var item = items[i]
 				if (!item)
 					continue
-				var vx = item.viewX
+				var vx = item.x
 				if (x >= vx && x < vx + item.width)
 					return i
 			}
@@ -177,7 +177,7 @@ BaseView {
 				var item = items[i]
 				if (!item)
 					continue
-				var vy = item.viewY
+				var vy = item.y
 				if (y >= vy && y < vy + item.height)
 					return i
 			}
@@ -271,9 +271,10 @@ BaseView {
 					maxH = item.height + item.y
 
 				if (horizontal)
-					item.viewX = p
+					item.x = p //item.viewX = p
 				else
-					item.viewY = p
+					item.y = p //item.viewY = p
+			
 
 				if (currentIndex === i && !item.focused) {
 					this.focusChild(item)
@@ -355,7 +356,7 @@ BaseView {
 			if (this.nativeScrolling && viewHorizontal == horizontal) {
 				//if delegate updates its width and it's on the left/top of scrolling position
 				//it will cause annoying jumps
-				var itemPos = viewHorizontal? item.viewX: item.viewY
+				var itemPos = viewHorizontal? item.x: item.y
 				var itemSize = viewHorizontal? item.width: item.height
 				var scrollPos = viewHorizontal? this.element.getScrollX(): this.element.getScrollY()
 				if (itemPos < scrollPos) {

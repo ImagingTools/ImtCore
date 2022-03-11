@@ -140,6 +140,7 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 	return true;
 }
 
+
 bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex)
 {
 	bool retVal = false;
@@ -152,6 +153,25 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 			break;
 		}
 	}
+	return retVal;
+}
+
+
+bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel *externTreeModel, int externIndex)
+{
+	bool retVal = false;
+	QList<QByteArray> keys;
+	this->GetKeys(keys, index);
+
+	for (QByteArray key : keys){
+		QVariant value = GetData(key, index);
+		retVal = externTreeModel->SetData(key, value, externIndex);
+
+		if (retVal == false){
+			break;
+		}
+	}
+
 	return retVal;
 }
 

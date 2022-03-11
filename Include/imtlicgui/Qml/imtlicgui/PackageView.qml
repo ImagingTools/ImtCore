@@ -455,7 +455,7 @@ Item {
 
         treeView.modelItems = modelItems;
 
-//        printModelItems(treeView.modelItems);
+        featureCollectionViewContainer.printModelItems(treeView.modelItems);
     }
 
     function printModelItems(modelItems) {
@@ -470,6 +470,7 @@ Item {
                     console.log("\tFeature id ", modelChildren.GetData("Id", j));
                     console.log("\tstateChecked ", modelChildren.GetData("stateChecked", j));
                     console.log("\tisActive ", modelChildren.GetData("isActive", j));
+                    console.log("\tvisible ", modelChildren.GetData("visible", j));
                 }
             }
         }
@@ -514,7 +515,7 @@ Item {
             modelItems.SetData("childItemModel", modelChildren, i);
         }
         treeView.modelItems = modelItems;
-        //printModelItems(treeView.modelItems);
+        featureCollectionViewContainer.printModelItems(treeView.modelItems);
     }
 
     function updateStateCheckedCheckBox() {
@@ -563,7 +564,7 @@ Item {
 
             }
             treeView.modelItems = modelItems;
-            printModelItems(treeView.modelItems);
+            featureCollectionViewContainer.printModelItems(treeView.modelItems);
         } else {
             featureCollectionViewContainer.clearCheckedCheckBox();
         }
@@ -602,7 +603,7 @@ Item {
             }
         }
 
-        printModelItems(treeView.modelItems);
+        featureCollectionViewContainer.printModelItems(treeView.modelItems);
         treeView.modelItems.Refresh();
     }
 
@@ -852,13 +853,13 @@ Item {
                     featuresTreeView.dependModelRemoveRootFeatureByIndex(rootIndex);
                 }
 
-//                featuresTreeView.printInfo();
+                featuresTreeView.printInfo();
             }
         }
 
         FeaturesTreeView {
             id: featuresTreeView;
-            packageItem: featureCollectionViewContainer;
+            //packageItem: featureCollectionViewContainer;
 
             onModelDependsChanged: {
                 console.log( "PackageView FeaturesTreeView onModelDependsChanged");

@@ -4,7 +4,7 @@ import imtqml 1.0
 
 Item {
     id: featuresTreeViewContainer;
-    property Item packageItem;
+//    property Item packageItem;
 
     property TreeItemModel modelTreeItems;
     property TreeItemModel modelDepends;

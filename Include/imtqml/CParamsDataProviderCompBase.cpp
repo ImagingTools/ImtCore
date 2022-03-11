@@ -18,6 +18,7 @@ QByteArray CParamsDataProviderCompBase::GetModelId() const
 	return *m_paramIdAttrPtr;
 }
 
+
 imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,
 																	   const QByteArrayList& fields)
 {
@@ -59,51 +60,22 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QLi
 
 	rootModelPtr->SetData("ComponentType", componentType);
 
-	if (m_parameterCompPtr.IsValid()){
+	if (m_paramSubElementsCompPtr.IsValid()){
+		imtbase::CTreeItemModel* externModel = new imtbase::CTreeItemModel();
+		externModel->SetIsArray(true);
+
+		for (int i = 0; i < m_paramSubElementsCompPtr.GetCount(); i++){
+			imtbase::CTreeItemModel* elementModel = m_paramSubElementsCompPtr[i]->GetTreeItemModel(params, fields);
+			externModel->InsertNewItem();
+			externModel->CopyItemDataFromModel(i, elementModel);
+		}
+
+		rootModelPtr->SetExternTreeModel("Elements", externModel);
+	}
+	else{
 		iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
 
 		if (selectionParam != nullptr){
-
-			if (params.size() > 0){
-				QByteArray itemData = params.at(0).GetFieldArgumentValue("Item").toByteArray();
-
-				if (!itemData.isEmpty()){
-					imtbase::CTreeItemModel itemModel;
-					itemModel.Parse(itemData);
-
-					if (itemModel.ContainsKey("items")){
-
-						QByteArray itemsData = itemModel.GetData("items").toByteArray();
-
-						imtbase::CTreeItemModel* itemsModel = itemModel.GetTreeItemModel("items");
-
-						if (itemsModel != nullptr){
-							for (int i = 0; i < itemsModel->GetItemsCount(); i++){
-								QByteArray itemId = itemsModel->GetData("Id", i).toByteArray();
-
-								if (itemId == "General"){
-									imtbase::CTreeItemModel* elements  = itemsModel->GetTreeItemModel("Elements", i);
-
-									if (elements != nullptr){
-
-										for (int j = 0; j < elements->GetItemsCount(); j++){
-											QByteArray id = elements->GetData("Id", j).toByteArray();
-											int value = elements->GetData("Value", j).toInt();
-
-											if (id == paramId){
-												selectionParam->SetSelectedOptionIndex(value);
-												break;
-											}
-										}
-									}
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-
 			const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
 
 			int defaultIndex = selectionParam->GetSelectedOptionIndex();
@@ -126,12 +98,62 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QLi
 		}
 	}
 
-	if (m_paramSubElementCompPtr.IsValid()){
-		imtbase::CTreeItemModel* externModel = m_paramSubElementCompPtr->GetTreeItemModel(params, fields);
-		rootModelPtr->SetExternTreeModel("Elements", externModel);
+	return rootModelPtr;
+}
+
+
+// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
+
+imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromRepresentation(
+		const QList<imtgql::CGqlObject> &params,
+		imtbase::CTreeItemModel *baseModel)
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+
+	if (m_paramIdAttrPtr.IsValid()){
+		rootModel->SetData("Id", *m_paramIdAttrPtr);
 	}
 
-	return rootModelPtr;
+	if (m_paramNameAttrPtr.IsValid()){
+		rootModel->SetData("Name", *m_paramNameAttrPtr);
+	}
+
+	if (!m_parameterCompPtr.IsValid()){
+
+		if (m_mutationDataDelegateCompPtr.IsValid()){
+			imtbase::CTreeItemModel* elementsModel = baseModel->GetTreeItemModel("Elements");
+
+			imtbase::CTreeItemModel* rootElementsModel = rootModel->AddTreeModel("Elements");
+
+			for (int index = 0; index < m_mutationDataDelegateCompPtr.GetCount(); index++){
+				imtbase::CTreeItemModel* elementModel = new imtbase::CTreeItemModel();
+				elementsModel->CopyItemDataToModel(index, elementModel);
+
+				imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[index]->UpdateBaseModelFromRepresentation(params, elementModel);
+				rootElementsModel->InsertNewItem();
+				rootElementsModel->CopyItemDataFromModel(index, externModel);
+			}
+		}
+	}
+	else{
+		iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
+
+		if (selectionParam == nullptr){
+			return nullptr;
+		}
+
+		int value = 0;
+
+		if (baseModel->ContainsKey("Value")){
+			value = baseModel->GetData("Value").toInt();
+		}
+
+		selectionParam->SetSelectedOptionIndex(value);
+
+		rootModel->SetData("Status", "OK");
+	}
+
+	return rootModel;
 }
 
 

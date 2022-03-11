@@ -71,6 +71,8 @@ public:
 	static void DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what);
 	static void DrectBindValueUpdateDefault(QByteArray* string, const QByteArray& what);
 
+	QString GetConnectionName() const;
+
 protected:
 	virtual bool OpenDatabase() const;
 	virtual bool CreateDatabase() const;
@@ -89,7 +91,6 @@ private:
 	 */
 	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
 
-	QString GetConnectionName() const;
 	QString GetDatabaseName() const;
 	QString GetHostName() const;
 	int GetPort() const;

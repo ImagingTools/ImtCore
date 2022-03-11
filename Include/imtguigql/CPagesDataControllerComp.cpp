@@ -31,14 +31,48 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 		}
 	}
 
-	if(m_pagesDataProviderCompPtr.IsValid() && isSetResponce){
-		itemsModel = m_pagesDataProviderCompPtr->GetTreeItemModel(*paramList, fields);
-		if (itemsModel == nullptr){
-			errorMessage = QObject::tr("Pages is empty").toUtf8();
+	if (gqlRequest.GetRequestType() == imtgql::IGqlRequest::RT_MUTATION){
+		if (m_mutationDataDelegateCompPtr.IsValid() && isSetResponce){
+			if (paramList->size() <= 0){
+				errorMessage = QObject::tr("Parameters of mutation is incorrect").toUtf8();
+			}
+
+			QByteArray itemData = paramList->at(0).GetFieldArgumentValue("Item").toByteArray();
+
+			if (itemData.isEmpty()){
+				errorMessage = QObject::tr("Mutation is empty").toUtf8();
+			}
+			else{
+				imtbase::CTreeItemModel itemModel;
+				itemModel.Parse(itemData);
+//				itemsModel = m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(*paramList, &itemModel);
+				if (itemModel.ContainsKey("items")){
+					imtbase::CTreeItemModel* items = itemModel.GetTreeItemModel("items");
+					itemsModel = m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(*paramList, items);
+				}
+			}
+
+			if (itemsModel == nullptr){
+				errorMessage = QObject::tr("Mutation is empty").toUtf8();
+			}
+
+		}
+		else{
+			errorMessage = QObject::tr("Incorrect query").toUtf8();
 		}
 	}
-	else{
-		errorMessage = QObject::tr("Incorrect query").toUtf8();
+	else if(gqlRequest.GetRequestType() == imtgql::IGqlRequest::RT_QUERY){
+		if(m_pagesDataProviderCompPtr.IsValid() && isSetResponce){
+
+			itemsModel = m_pagesDataProviderCompPtr->GetTreeItemModel(*paramList, fields);
+
+			if (itemsModel == nullptr){
+				errorMessage = QObject::tr("Pages is empty").toUtf8();
+			}
+		}
+		else{
+			errorMessage = QObject::tr("Incorrect query").toUtf8();
+		}
 	}
 
 	if (!errorMessage.isEmpty()){

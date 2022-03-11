@@ -40,20 +40,8 @@ Rectangle {
             listViewItem: mainTreeView;
 
             onCheckBoxState: {
-                console.log("TreeView ListView onCheckBoxStateChanged", state, packageId, featureId);
-                treeViewContainer.itemTreeViewCheckBoxStateChanged(state, packageId, featureId);
+                console.log("TreeView onCheckBoxState", state, packageId, featureId);
             }
-
-//            onCheckBoxStateChanged: {
-//                console.log("TreeView ListView onCheckBoxStateChanged", state, packageId, featureId);
-//                treeViewContainer.itemTreeViewCheckBoxStateChanged(state, packageId, featureId);
-//            }
-
-//            onCheckBoxStateChangedChanged: {
-//                console.log("TreeView ListView onCheckBoxStateChanged", state, packageId, featureId);
-//                treeViewContainer.itemTreeViewCheckBoxStateChanged(state, packageId, featureId);
-//            }
-
         }
 
         function changeCheckBoxState(state, packageId, featureId) {

@@ -7,7 +7,12 @@ Item {
     width: 100;
 //    height: mainRect.height + childrenColumn.height;
 
-    height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
+//    height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
+    height: childrenColumn.visible ?
+                mainRect.height + (childrenColumn.height ?
+                                       childrenColumn.height : (model.childItemModel ?
+                                                                    model.childItemModel._rows.length * 30 : 0)) :
+                mainRect.height;
 
     property bool isOpened: true;
 
@@ -17,11 +22,20 @@ Item {
 
     signal checkBoxState(int state, string packageId, string featureId);
 
+    onCheckBoxState: {
+        console.log("TreeItemDelegate onCheckBoxState", state, packageId, featureId);
+    }
+
+//    onHeightChanged: {
+//        console.log("TreeItemDelegate onHeightChanged", treeItemDelegate.height);
+//    }
+
     Component.onCompleted: {
         if (model.childItemModel)
         {
            // console.log("Model childCount ", model.childItemModel.GetItemsCount());
             treeItemRepeater.model = model.childItemModel;
+//            childrenColumn.model = model.childItemModel;
         }
 
     }
@@ -95,7 +109,14 @@ Item {
                 anchors.fill: parent;
 
                 onClicked: {
+                    console.log("TreeItemDelegate Image onClicked");
                     treeItemDelegate.isOpened = !treeItemDelegate.isOpened;
+//                    isOpened = !isOpened;
+                    console.log("treeItemDelegate", treeItemDelegate);
+//                    console.log("TreeItemDelegate onHeightChanged", treeItemDelegate.height);
+//                    console.log("treeItemDelegate.isOpened", treeItemDelegate.isOpened);
+//                    console.log("Model id", model.Id);
+//                    console.log("Model packageId", model.packageId);
                 }
             }
         }
@@ -135,7 +156,8 @@ Item {
                      }
 
 //                     treeItemDelegate.checkBoxState(checkBox.checkState, model.packageId, model.Id);
-                     treeItemDelegate.listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
+//                     treeItemDelegate.listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
+                     mainTreeView.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
                  }
              }
         }
@@ -154,13 +176,42 @@ Item {
         }
     }
 
+//    ListView {
+//        id: childrenColumn;
+
+//        anchors.top: mainRect.bottom;
+
+//        height: childrenColumn.count * 30;
+//        width: treeItemDelegate.width;
+
+//        visible: treeItemDelegate.isOpened;
+
+
+//        delegate: Loader {
+//            id: loader;
+
+//            source: "TreeItemDelegate.qml";
+
+//            onItemChanged: {
+//                if (loader.item) {
+//                    console.log("TreeItemDelegate child load");
+//                    console.log("treeItemDelegate.listViewItem", treeItemDelegate.listViewItem);
+//                    loader.height = loader.item.height;
+//                    //childrenColumn.height += item.height;
+//                    loader.item.listViewItem = treeItemDelegate.listViewItem;
+//                    console.log("loader.item.listViewItem", loader.item.listViewItem);
+//                }
+//            }
+//        }
+//    }
+
     Column {
         id: childrenColumn;
 
         anchors.top: mainRect.bottom;
 
         width: treeItemDelegate.width;
-        //height: 0;
+
         visible: treeItemDelegate.isOpened;
 
         Repeater {
@@ -183,9 +234,12 @@ Item {
 
                  onItemChanged: {
                      if (loader.item) {
+                         console.log("TreeItemDelegate child load");
+                         console.log("treeItemDelegate.listViewItem", treeItemDelegate.listViewItem);
                          loader.height = loader.item.height;
                          //childrenColumn.height += item.height;
                          loader.item.listViewItem = treeItemDelegate.listViewItem;
+                         console.log("loader.item.listViewItem", loader.item.listViewItem);
                      }
                  }
              }

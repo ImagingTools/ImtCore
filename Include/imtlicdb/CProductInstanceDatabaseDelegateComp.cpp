@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtlic/ILicenseInstance.h>
 #include <imtlic/CProductInstanceMetaInfo.h>
+#include <imtdb/CDatabaseEngineComp.h>
 
 
 namespace imtlicdb
@@ -19,8 +20,7 @@ namespace imtlicdb
 
 istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 			const QByteArray& /*typeId*/,
-			const QSqlRecord& record,
-			const QSqlQuery& query) const
+			const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -56,13 +56,11 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 	QByteArray productLicenses = QString("SELECT * from ProductInstanceLicenses WHERE InstanceId = '%1'").arg(qPrintable(productInstanceId)).toUtf8();
 
 	QSqlError error;
-	QSqlQuery productLicensesQuery(query);
+	QSqlQuery productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error, true);
 
-	productLicensesQuery.exec(productLicenses);
-
-//	productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error);
-
-//	QSqlQuery productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error);
+	if (error.type() != QSqlError::NoError){
+		return nullptr;
+	}
 
 	while (productLicensesQuery.next()){
 		QSqlRecord licenseRecord = productLicensesQuery.record();
@@ -419,7 +417,8 @@ idoc::IDocumentMetaInfo* CProductInstanceDatabaseDelegateComp::CreateObjectMetaI
 
 bool CProductInstanceDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record, QSqlQuery());
+//	QSqlRecord record = query.record();
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
 		imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductInstanceInfo", retVal)){

@@ -16,5 +16,6 @@
         <file alias="imtlicgui/FeaturesTreeView.qml">Qml/imtlicgui/FeaturesTreeView.qml</file>
         <file alias="imtlicgui/TableInstanceLicensesDelegate.qml">Qml/imtlicgui/TableInstanceLicensesDelegate.qml</file>
         <file alias="imtlicgui/MetaInfo.qml">Qml/imtlicgui/MetaInfo.qml</file>
+        <file alias="imtlicgui/TestMultiDocView.qml">Qml/imtlicgui/TestMultiDocView.qml</file>
     </qresource>
 </RCC>

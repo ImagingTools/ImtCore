@@ -99,11 +99,6 @@ Rectangle {
         }
     }
 
-//    function getCurrentMode(){
-//        console.log("PreferenceDialog getCurrentMode");
-
-//    }
-
     function generalSettingsChanged(index, modelElements, activeValue){
         console.log("PreferenceDialog generalSettingsChanged", index, modelElements, activeValue);
         var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
@@ -398,8 +393,8 @@ Rectangle {
    AuxButton {
        id: preferenceSaveButton;
 
-       anchors.right: parent.right;
-       anchors.rightMargin: 20;
+       anchors.right: preferenceCloseButton.left;
+       anchors.rightMargin: 10;
        anchors.bottom: parent.bottom;
        anchors.bottomMargin: 10;
 
@@ -409,7 +404,7 @@ Rectangle {
        hasText: true;
        hasIcon: false;
 
-       textButton: "Save";
+       textButton: "Apply";
        borderColor: preferenceSaveButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
        backgroundColor: Style.imagingToolsGradient1;
 
@@ -422,6 +417,30 @@ Rectangle {
            }
 
            preferenceSaveQuery.save();
+       }
+   }
+
+   AuxButton {
+       id: preferenceCloseButton;
+
+       anchors.right: parent.right;
+       anchors.rightMargin: 20;
+       anchors.bottom: parent.bottom;
+       anchors.bottomMargin: 10;
+
+       width: 70;
+       height: 25;
+
+       hasText: true;
+       hasIcon: false;
+
+       textButton: "Close";
+       borderColor: preferenceCloseButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+       backgroundColor: Style.imagingToolsGradient1;
+
+       onClicked: {
+           console.log("PreferenceDialog closeButton onClicked");
+           preferenceContainer.loaderDialog.closeItem();
        }
    }
 
@@ -507,7 +526,7 @@ Rectangle {
        id: preferenceSaveQuery;
 
        function save(){
-           var query = Gql.GqlRequest("query", "SaveSettings");
+           var query = Gql.GqlRequest("mutation", "SaveSettings");
 
            var inputParams = Gql.GqlObject("input");
 

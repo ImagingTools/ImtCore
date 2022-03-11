@@ -392,7 +392,7 @@ QString CDatabaseEngineComp::GetConnectionName() const
 		//suffix = *m_suffixAttrPtr;
 	}
 
-	return GetDatabaseName() + QString(" - %1 - %2").arg(threadId).arg(suffix);
+	return GetDatabaseName() + QString(" - %1").arg(threadId);
 }
 
 

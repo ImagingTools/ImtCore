@@ -42,6 +42,7 @@ public Q_SLOTS:
 	imtbase::CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
 	bool SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index = 0);
 	bool CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0);
+	bool CopyItemDataToModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0);
 	bool SetData(const QByteArray &key, const QVariant &value, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	bool RemoveData(const QByteArray &key, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	QVariant GetData(const QByteArray &key, int index = 0) const;
