@@ -65,6 +65,11 @@ I_EXPORT_COMPONENT(
 		"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
+		HttpFileControllerServlet,
+		"Edits file by name \n Note: name - is a part of commandID",
+		"FileProvider - based HTTP servlet");
+
+I_EXPORT_COMPONENT(
 		JsonModelBasedServlet,
 		"Generates Json model for QML??",
 		"JSON Model");

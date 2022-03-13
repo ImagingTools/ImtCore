@@ -37,7 +37,7 @@ CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp:
 		return ConstResponsePtr(engine.CreateResponse(request, _errorCode, generatedErrorBody, reponseTypeId));
 	};
 
-	QByteArray body;
+
 
 	QByteArray commandIdFileName;
 	{
@@ -60,27 +60,17 @@ CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp:
 
 	bool loadRes = false;
 
+	ConstResponsePtr responsePtr;
 	for (int i = 0; i < m_binaryDataControllersCompPtr.GetCount(); ++i){
-
-		if ((loadRes = (m_binaryDataControllersCompPtr[i]->SetData(request.GetBody(), commandIdFileName)))){
-			QByteArray fileSuffix;
-			int index = commandIdFileName.lastIndexOf('.');
-			if (index > 0){
-				index = commandIdFileName.count() - index;
-				fileSuffix = commandIdFileName.right(index);
-			}
-			reponseTypeId = this->GetMimeType(fileSuffix);
-			reponseTypeId.append(QByteArray("; charset=utf-8"));
+		loadRes = m_binaryDataControllersCompPtr[i]->SetData(request.GetBody(), commandIdFileName);
+		if (loadRes){
+			responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, commandIdFileName, "text/plain;charset=utf-8"));
 			break;
 		}
 	}
 
-	ConstResponsePtr responsePtr;
-	if (loadRes){
-		responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
-	}
-	else{
-		responsePtr = generateErrorResponsePtr("Unable to open file", IProtocolEngine::SC_NOT_FOUND);
+	if(!loadRes){
+		responsePtr = generateErrorResponsePtr("Unable to open file", IProtocolEngine::SC_INTERNAL_SERVER_ERROR);
 	}
 
 	return responsePtr;
