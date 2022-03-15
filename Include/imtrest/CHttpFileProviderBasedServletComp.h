@@ -33,6 +33,8 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpFileProviderBasedServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
+		I_ASSIGN(m_fileIdCommandParamAttrPtr, "FileIdCommandParam", "The command param for data providers", true, "FileId");
+
 		I_ASSIGN_MULTI_0(m_binaryDataProvidersCompPtr, "BinaryDataProviders", "Binary data providers", true);
 	I_END_COMPONENT
 
@@ -47,6 +49,8 @@ public:
 	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
+	I_ATTR(QString, m_fileIdCommandParamAttrPtr);
+
 	I_MULTIREF(imtbase::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
 
 
