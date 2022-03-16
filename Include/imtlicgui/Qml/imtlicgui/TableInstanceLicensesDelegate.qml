@@ -122,7 +122,7 @@ Rectangle {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
 
                     if (checkBoxExpiration.checkState === 2){
-                        checkBoxExpiration.checkState = 0 ;
+                        checkBoxExpiration.checkState = 0;
                     }
                     else{
                         checkBoxExpiration.checkState = 2;
@@ -149,30 +149,73 @@ Rectangle {
             wrapMode: Text.WordWrap;
         }
 
-        TextFieldCustom {
-            id: tfcDate;
+        Calendar {
+            id: expirationDate;
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: checkBoxExpiration.right;
             anchors.leftMargin: 5;
 
-            height: 20;
-            width: 100;
-
-//            text: licensesTableDelegate.expirationText;
-            text: model.ExpirationState === 2 ? model.Expiration : "Unlimited";
-//            text: model.Expiration;
-            textSize: 12;
-
             visible: checkBoxExpiration.checkState === 2;
 
-//            onTextChanged: {
-//                licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);
-//            }
+            //selectedDate: model.Expiration;
 
-            onInputTextChanged: {
-                licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);
+            Component.onCompleted: {
+                console.log("TableInstanceLicensesDelegate Calendar onCompleted");
+
+                //expirationDate.selectedDate = model.Expiration;
+
+                var date = new Date(model.Expiration);
+
+                if (date){
+                    expirationDate.setDate(date);
+                }
+
+                //console.log("Date from delegate: ", expirationDate.selectedDate.toLocaleDateString());
+            }
+
+            onDateChanged: {
+                console.log("TableInstanceLicensesDelegate Calendar onDateChanged");
+
+                var str =  expirationDate.toString();
+                console.log(expirationDate.selectedDate.toLocaleDateString());
+
+                if ((new Date(expirationDate.selectedDate) === "Invalid Date") ||
+                        isNaN(new Date(expirationDate.selectedDate))){
+                    console.log("TableInstanceLicensesDelegate Calendar Invalid Date!");
+                    return;
+                }
+               // var dateStr = expirationDate.selectedDate.format('dd.mm.yyyy');
+
+                var dateStr = expirationDate.formatDate();
+                licensesTableDelegate.expirationTextChanged(model.index, dateStr);
             }
         }
+
+//        TextFieldCustom {
+//            id: tfcDate;
+
+//            anchors.verticalCenter: parent.verticalCenter;
+//            anchors.left: checkBoxExpiration.right;
+//            anchors.leftMargin: 5;
+
+//            height: 20;
+//            width: 100;
+
+////            text: licensesTableDelegate.expirationText;
+//            text: model.ExpirationState === 2 ? model.Expiration : "Unlimited";
+////            text: model.Expiration;
+//            textSize: 12;
+
+//            visible: checkBoxExpiration.checkState === 2;
+
+////            onTextChanged: {
+////                licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);
+////            }
+
+//            onInputTextChanged: {
+//                licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);
+//            }
+//        }
     }
 }

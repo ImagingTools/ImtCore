@@ -102,11 +102,21 @@ Rectangle {
                     var expiration = licenses.GetData("Expiration", j);
 
                     if (curId === licId){
+
                         containerInstallation.activeLicenses.SetData("LicenseState", 2, i);
 
                         if (expiration && expiration !== "Unlimited"){
+                            var parts = expiration.split('.');
+                            //var date = new Date(parts[0], parts[1] - 1, parts[2]);
+
+                            var date = new Date(parts[2], parts[1] - 1, parts[0]);
+
+                            //console.log("expiration", expiration);
+                            //console.log("parts", parts[2], parts[1] - 1, parts[0]);
+
+                            //console.log("DATE ", date.toLocaleString());
                             containerInstallation.activeLicenses.SetData("ExpirationState", 2, i);
-                            containerInstallation.activeLicenses.SetData("Expiration", expiration, i);
+                            containerInstallation.activeLicenses.SetData("Expiration", date, i);
                         }
                     }
                 }
@@ -144,12 +154,13 @@ Rectangle {
         for (var i = 0; i < accountsData.GetItemsCount(); i++){
 
             var accId = accountsData.GetData("Id", i);
-
+            console.log("accId", accId);
             if (accId === accountId){
                 accountIndex = i;
             }
         }
-
+        console.log("accountId", accountId);
+        console.log("Account index = ", accountIndex);
         if (accountIndex !== -1){
             customerCB.currentIndex = accountIndex;
         }
@@ -488,6 +499,7 @@ Rectangle {
                                  containerInstallation.activeLicenses.SetData("Expiration", "Unlimited", modelIndex);
                              }
                              else{
+                                 //containerInstallation.activeLicenses.SetData("Expiration", "2023-01-01", modelIndex);
                                  containerInstallation.activeLicenses.SetData("Expiration", "01.01.2023", modelIndex);
                              }
 
@@ -753,6 +765,7 @@ Rectangle {
 
                                 dataModelLocal.SetData("ExpirationState", 0, i);
                                 dataModelLocal.SetData("LicenseState", 0, i);
+
                                 dataModelLocal.SetData("Expiration", "01.01.2023", i);
                                 dataModelLocal.SetData("Name", newName, i);
                             }

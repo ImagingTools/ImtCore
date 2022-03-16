@@ -14,11 +14,13 @@ Item {
 
     property string currentText;
 
-    property bool textCentered: true;
+    property bool textCentered: false;
     property bool menuVisible: false;
 
     property int radius: 5;
     property int currentIndex: -1;
+    property int menuWidth: comboBoxContainer.width;
+    property int menuHeight: cbListView.count * comboBoxContainer.height;
     property int menuX;
     property int menuY;
 
@@ -35,15 +37,24 @@ Item {
         console.log("ComboBox dialogResult");
 
         comboBoxContainer.currentText = parameters["status"];
-
     }
 
     function openContextMenu(startX, startY) {
         var point = comboBoxContainer.mapToItem(thubnailDecoratorContainer, 0, comboBoxContainer.height);
+
+        console.log("point.x", point.x);
+        console.log("point.y", point.y);
+
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
 
-        parameters["model"] = comboBoxContainer.model;
+        var modelItems = comboBoxContainer.model;
+
+        for (var i = 0; i < modelItems.count; i++){
+            modelItems.setProperty(i, "name", modelItems.get(i).text);
+        }
+
+        parameters["model"] = modelItems;
         parameters["resultItem"] = comboBoxContainer;
         parameters["hasIcon"] = false;
 
@@ -110,8 +121,8 @@ Item {
             onClicked: {
                 console.log("ComboBox clicked !");
 
-//                comboBoxContainer.openContextMenu(0, 0);
-                comboBoxContainer.menuVisible = !comboBoxContainer.menuVisible;
+                comboBoxContainer.openContextMenu(0, 0);
+//                comboBoxContainer.menuVisible = !comboBoxContainer.menuVisible;
             }
         }
     }
@@ -122,8 +133,8 @@ Item {
 
         anchors.top: cbMainRect.bottom;
 
-        width: comboBoxContainer.width;
-        height: cbListView.count * comboBoxContainer.height;
+        width: comboBoxContainer.menuWidth;
+        height: comboBoxContainer.menuHeight;
 
         color: Style.baseColor;
 
@@ -141,6 +152,8 @@ Item {
             model: comboBoxContainer.model;
             clip: true;
             currentIndex: 0;
+
+            boundsBehavior: Flickable.StopAtBounds;
 
             delegate: Item {
                 id: cbListDelegate;
@@ -164,8 +177,8 @@ Item {
                     id: cbTitleModel;
 
                     anchors.verticalCenter: parent.verticalCenter;
-                    anchors.horizontalCenter: comboBoxContainer.textCentered ? parent.horizontalCenter : null;
-                    anchors.left: !comboBoxContainer.textCentered ? cbListDelegate.left : null;
+                    //anchors.horizontalCenter: comboBoxContainer.textCentered ? parent.horizontalCenter : "";
+                    anchors.left:/* !comboBoxContainer.textCentered ? */cbListDelegate.left;
                     anchors.leftMargin: 10;
 
                     text: model.text;
@@ -180,8 +193,9 @@ Item {
                     cursorShape: Qt.PointingHandCursor;
 
                     onClicked: {
+                        comboBoxContainer.currentText = model.text;
                         comboBoxContainer.currentIndex = model.index;
-                        cbTitleTxt.text = model.text;
+                       // cbTitleTxt.text = model.text;
                         comboBoxContainer.menuVisible = false;
                     }
                 }

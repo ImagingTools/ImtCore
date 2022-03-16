@@ -27,7 +27,7 @@ Item {
 
         for (var i = 0; i < settingsComboBoxContainer.modelElements.GetItemsCount(); i++){
             var name = settingsComboBoxContainer.modelElements.GetData("Name", i);
-            settingsComboBoxContainer.modelElements.SetData("text", name, i);
+            settingsComboBoxContainer.modelElements.SetData("name", name, i);
 
             if (i == settingsComboBoxContainer.currentValue){
                 settingsComboBox.currentText = name;

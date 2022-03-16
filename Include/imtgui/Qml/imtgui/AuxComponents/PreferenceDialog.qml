@@ -10,6 +10,8 @@ Rectangle {
 
     radius: 3;
 
+    clip: true;
+
     color: Style.backgroundColor;
 
     property real backgroundOpacity: 0.4;

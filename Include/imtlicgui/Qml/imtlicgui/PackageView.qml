@@ -572,15 +572,15 @@ Item {
 
     function hideCurrentFeatureTreeView() {
         console.log("PackageView hideCurrentFeatureTreeView");
-        var modelItems = treeView.modelItems;
+        //var modelItems = treeView.modelItems;
 
-        if (!modelItems){
+        if (!treeView.modelItems){
             return;
         }
 
-        for (var i = 0; i < modelItems.GetItemsCount(); i++) {
-            if (modelItems.GetData("Name", i) === featureCollectionViewContainer.itemId) {
-                var childModelItems = modelItems.GetData("childItemModel", i);
+        for (var i = 0; i < treeView.modelItems.GetItemsCount(); i++) {
+            if (treeView.modelItems.GetData("Name", i) === featureCollectionViewContainer.itemId) {
+                var childModelItems = treeView.modelItems.GetData("childItemModel", i);
 
                 if (!childModelItems){
                     continue;
@@ -596,14 +596,13 @@ Item {
                         childModelItems.SetData("visible", 0, j);
                     }
                 }
-                modelItems.SetData("childItemModel", childModelItems, i);
-                treeView.modelItems = modelItems;
-
+                treeView.modelItems.SetData("childItemModel", childModelItems, i);
+                //treeView.modelItems = modelItems;
                 break;
             }
         }
 
-        featureCollectionViewContainer.printModelItems(treeView.modelItems);
+        //featureCollectionViewContainer.printModelItems(treeView.modelItems);
         treeView.modelItems.Refresh();
     }
 
@@ -671,9 +670,7 @@ Item {
 
                     dataModelLocal = dataModelLocal.GetData(featureCollectionViewContainer.gqlModelQueryType);
                     if (dataModelLocal){
-                        console.log("Message errors");
                         var messageError = dataModelLocal.GetData("message");
-//                        featureCollectionViewContainer.openMessageDialog("Error Dialog", messageError);
                         featureCollectionView.openMessageDialog("Error Dialog", messageError);
                     }
                     return;

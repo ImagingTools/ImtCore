@@ -33,6 +33,7 @@
         <file alias="imtgui/AuxComponents/SettingsIntegerInput.qml">Qml/imtgui/AuxComponents/SettingsIntegerInput.qml</file>
         <file alias="imtgui/AuxComponents/SettingsTextInput.qml">Qml/imtgui/AuxComponents/SettingsTextInput.qml</file>
         <file alias="imtgui/AuxComponents/DatabaseInput.qml">Qml/imtgui/AuxComponents/DatabaseInput.qml</file>
+        <file alias="imtgui/AuxComponents/Calendar.qml">Qml/imtgui/AuxComponents/Calendar.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

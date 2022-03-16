@@ -26,17 +26,15 @@ Rectangle
 
     function openDialog(source, parameters) {
         console.log("ThumbnailDecorator openDialog", source, parameters);
-        var index = modelLayers.InsertNewItem();
 
-        modelLayers.SetData("source", source, index);
-        modelLayers.SetData("parameters", parameters, index);
+        modelLayers.append({"source": source, "parameters": parameters})
 
         if (!listViewDialogs.visible){
             listViewDialogs.visible = true;
         }
 
         console.log("ThumbnailDecorator listViewDialogs.count", listViewDialogs.count);
-        return modelLayers.GetItemsCount() - 1;
+        return modelLayers.count - 1;
     }
 
     function dialogIsActive() {
@@ -44,35 +42,23 @@ Rectangle
     }
 
     function closeDialog() {
-//        var index = thubnailDecoratorContainer.getIndexActiveDialog();
-//        var index = modelLayers.count - 1;
-//        console.log("ThumbnailDecorator closeDialog ", index);
-
-//        console.log("Models dialog count =", modelLayers.count);
-
-//        if (index > -1) {
-//            modelLayers.remove(index);
-//        }
-        var index = modelLayers.GetItemsCount() - 1;
-
-        if (index > -1){
-            modelLayers.RemoveItem(index);
+        var index = modelLayers.count - 1;
+        if (index > -1) {
+            modelLayers.remove(index);
         }
 
-        if (modelLayers.GetItemsCount() === 0){
+        if (modelLayers.count === 0){
             listViewDialogs.visible = false;
         }
-
-//        listViewDialogs.visible = false;
     }
 
-//    ListModel {
-//        id: modelLayers;
-//    }
-
-    TreeItemModel {
+    ListModel {
         id: modelLayers;
     }
+
+//    TreeItemModel {
+//        id: modelLayers;
+//    }
 
     TopPanel {
         id: topPanel;
@@ -177,23 +163,17 @@ Rectangle
         }
     }
 
-    ListView {
+    Repeater {
         id: listViewDialogs;
         z: 10;
 
         anchors.fill: parent;
 
         model: modelLayers;
-       // visible: modelLayers.count > 0;
-
-//        visible: modelLayers.GetItemsCount() > 0 ? true :  false;
         visible: false;
-
-        boundsBehavior: Flickable.StopAtBounds;
 
         onModelChanged: {
             console.log("ThumbnailDecorator ListView onModelChanged!");
-//            loaderDialog.source = model.source;
         }
 
         delegate: Rectangle {
@@ -235,15 +215,19 @@ Rectangle
                   function closeItem() {
                       console.log("ThumbnailDecorator close dialog", model.index);
 
-                      modelLayers.RemoveItem(model.index);
+                      modelLayers.remove(model.index);
 
-                      if (modelLayers.GetItemsCount() === 0){
-                          listViewDialogs.visible = false;
-                      }
+//                      if (modelLayers.count === 0){
+//                          listViewDialogs.visible = false;
+//                      }
                   }
 
                   Component.onCompleted: {
                       console.log("model.source", model.source);
+                      if (!model.source){
+                          return;
+                      }
+
                       loaderDialog.source = model.source;
                   }
 
@@ -260,10 +244,7 @@ Rectangle
                       }
 
                       darkBackground.opacity = loaderDialog.item.backgroundOpacity;
-
                   }
-
-
              }
         }
     }
