@@ -38,7 +38,7 @@ Rectangle
     }
 
     function dialogIsActive() {
-        return modelLayers.GetItemsCount() > 0;
+        return modelLayers.count > 0;
     }
 
     function closeDialog() {
@@ -170,7 +170,7 @@ Rectangle
         anchors.fill: parent;
 
         model: modelLayers;
-        visible: false;
+//        visible: false;
 
         onModelChanged: {
             console.log("ThumbnailDecorator ListView onModelChanged!");
@@ -200,7 +200,6 @@ Rectangle
                         if (loaderDialog.item.clickBackgroundClose){
                             loaderDialog.closeItem();
                         }
-
                     }
 
                     onWheel: {

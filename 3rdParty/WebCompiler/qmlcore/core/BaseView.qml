@@ -236,9 +236,28 @@ BaseLayout {
 		model.on('rowsRemoved', this._modelRowsRemoved)
 
 		this._attached = model
+		if(model.__deps) model.__deps[this._uid] = this
 		this._onReset()
 	}
+	function _clearItems(idx, n){
+		console.log('_clearItems')
+		let removed = this._items.splice(idx, n)
 
+		let i = 0
+		let find = false
+		while(!find && i < this._changedConnections.length){
+			if(removed[0]._uid === this._changedConnections[i]._uid){
+				find = true
+			} else {
+				i += 3
+			}
+		}
+		this._changedConnections.splice(i, 6*removed.length)
+		for(let r of removed){
+
+			r.discard()
+		}
+	}
 	/// @private
 	function _detach() {
 		var model = this._attached
@@ -249,6 +268,7 @@ BaseLayout {
 			log('detaching model...')
 
 		this._attached = null
+		if(model.__deps) delete model.__deps[this._uid]
 
 		model.removeListener('reset', this._modelReset)
 		model.removeListener('rowsInserted', this._modelRowsInserted)

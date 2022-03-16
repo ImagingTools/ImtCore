@@ -13,6 +13,8 @@ Rectangle {
 
     property var selectedDate;
 
+    property var monthsNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
     signal dateChanged();
 
     Component.onCompleted: {
@@ -28,11 +30,13 @@ Rectangle {
         }
 
         for (i = 0; i < 12; i++){
-            modelMonth.append({"text": Qt.locale().standaloneMonthName(i, Locale.LongFormat)})
+           // modelMonth.append({"text": Qt.locale().standaloneMonthName(i, Locale.LongFormat)})
+
+            modelMonth.append({"text": calendarContainer.monthsNames[i]})
         }
 
-        yearCB.currentText = selectedDate.getFullYear();
-        monthCB.currentText = Qt.locale().standaloneMonthName(0, Locale.LongFormat);
+        yearCB.currentText = calendarContainer.selectedDate.getFullYear();
+        monthCB.currentText = calendarContainer.monthsNames[0];
         dayCB.currentText = 1;
 
         for (i = 1; i <= 31; i++){
@@ -74,7 +78,7 @@ Rectangle {
         console.log(y, m, d);
 
         yearCB.currentText = y;
-        monthCB.currentText = Qt.locale().standaloneMonthName(m, Locale.LongFormat);
+        monthCB.currentText = calendarContainer.monthsNames[m];
         dayCB.currentText = d;
 
         for (i = 0; i < modelYear.count; i++){

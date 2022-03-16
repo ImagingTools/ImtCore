@@ -7,7 +7,9 @@ Item {
     id: popupMenuContainer;
 
     width: popupMenuContainer.itemWidth;
-    height: columnPopupMenu.height;
+//    height: columnPopupMenu.height;
+
+    height: popupRepeater.count * popupMenuContainer.itemHeight;
 
     property Item resultItem;
     property Item loaderDialog;
@@ -25,9 +27,10 @@ Item {
 
     property int emptyItemCount: 0;
 
-    function exit(status) {
+    function exit(index, name) {
         var parameters  = {};
-        parameters["status"] = status;
+        parameters["index"] = index;
+        parameters["status"] = name;
         parameters["dialog"] = "PopupMenu";
         popupMenuContainer.resultItem.dialogResult(parameters);
     }
@@ -43,6 +46,7 @@ Item {
                 popupMenuContainer.emptyItemCount++;
             }
         }
+
         console.log("PopupMenuDialog popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
     }
 
@@ -65,101 +69,266 @@ Item {
     Rectangle {
         id: mainBody;
 
-        anchors.fill: parent;
+        width: parent.width;
+        height: parent.height;
 
         color: Style.baseColor;
         radius: 3;
+        clip: true;
 
         border.width: 1;
         border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
-        Column {
-            id: columnPopupMenu;
+        onHeightChanged: {
+            console.log("mainBody onHeightChanged", mainBody.height);
+        }
 
-            width: parent.width;
+        Flickable {
+            anchors.fill: parent;
 
-            Repeater {
-                model: popupMenuContainer.model;
+            contentWidth: columnPopupMenu.width;
+            contentHeight: columnPopupMenu.height;
+            boundsBehavior: Flickable.StopAtBounds;
 
-                delegate: Rectangle {
-                    id: delegateListViewPopup;
+            clip: true;
 
-                    width: popupMenuContainer.width;
-                    height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
+            Column {
+                id: columnPopupMenu;
 
-                    color: "transparent";
+                width: parent.width;
+                //height: mainBody.height;
 
-                    Rectangle {
-                        id: highlightRect;
+                onHeightChanged: {
+                    console.log("Column onHeightChanged", columnPopupMenu.height);
+                }
 
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        anchors.verticalCenter: parent.verticalCenter;
+                Repeater {
+                    id: popupRepeater;
 
-                        width: parent.width - 2;
-                        height: parent.height - 2;
+                    model: popupMenuContainer.model;
 
-                        color: Style.selectedColor;
-                        visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
+                    onModelChanged: {
+                        console.log("PopupMenuDialog onModelChanged");
+
+                        console.log("popupMenuContainer.model", popupMenuContainer.model);
+                        console.log("popupMenuContainer.model.count", popupMenuContainer.model.count);
+                        console.log("popupMenuContainer.itemHeight", popupMenuContainer.itemHeight);
+
+                        console.log("popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
+                        var height = popupRepeater.count * popupMenuContainer.itemHeight -
+                                popupMenuContainer.emptyItemCount * popupMenuContainer.itemHeight;
+
+                        if (height > 130){
+                            mainBody.height = 130;
+                        }
+                        else {
+                            mainBody.height = height;
+                        }
+
+                        console.log("height", height);
                     }
 
-                    Text {
-                        anchors.left: popupMenuContainer.hasIcon ? iconDelegateListViewPopup.right : delegateListViewPopup.left;
-                        anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
-                        anchors.leftMargin: 10;
-                        anchors.rightMargin: 10;
 
-                        text: model.name;
-                        color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
-                        font.pixelSize: Style.fontSize_common;
-                        font.family: Style.fontFamily;
-                    }
+                    delegate: Rectangle {
+                        id: delegateListViewPopup;
 
-                    Image {
-                        id: iconDelegateListViewPopup;
+                        width: popupMenuContainer.width;
+                        height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
 
-                        anchors.left: delegateListViewPopup.left;
-                        anchors.verticalCenter: delegateListViewPopup.verticalCenter;
-                        anchors.leftMargin: 10;
+                        onHeightChanged: {
+                            console.log("Rectangle onHeightChanged", delegateListViewPopup.height);
+                        }
 
-                        width: 18;
-                        height: width;
+                        color: "transparent";
 
-                        visible: popupMenuContainer.hasIcon && model.name !== "";
-                        source: model.imageSource;
-                        sourceSize.width: width;
-                        sourceSize.height: height;
-                    }
+                        Component.onCompleted: {
+                            console.log("delegateListViewPopup onCompleted");
 
-                    Rectangle {
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        anchors.bottom: delegateListViewPopup.bottom;
+                            console.log("delegateListViewPopup onCompleted", model.name, delegateListViewPopup.height);
+                        }
 
-                        width: parent.width - 20;
-                        height: 1;
+                        Rectangle {
+                            id: highlightRect;
 
-                        visible: model.id === "";
+                            anchors.horizontalCenter: parent.horizontalCenter;
+                            anchors.verticalCenter: parent.verticalCenter;
 
-                        color: Style.hover;
-                    }
+                            width: parent.width - 2;
+                            height: parent.height - 2;
 
-                    MouseArea {
-                        id: delegateListViewPopupMA;
+                            color: Style.selectedColor;
+                            visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
+                        }
 
-                        anchors.fill: parent;
+                        Text {
+                            anchors.left: popupMenuContainer.hasIcon ? iconDelegateListViewPopup.right : delegateListViewPopup.left;
+                            anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
+                            anchors.leftMargin: 10;
+                            anchors.rightMargin: 10;
 
-                        hoverEnabled: true;
-                        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+                            text: model.name;
+                            color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
+                            font.pixelSize: Style.fontSize_common;
+                            font.family: Style.fontFamily;
+                        }
 
-                        visible: model.mode !== "Disabled";
+                        Image {
+                            id: iconDelegateListViewPopup;
 
-                        onClicked: {
+                            anchors.left: delegateListViewPopup.left;
+                            anchors.verticalCenter: delegateListViewPopup.verticalCenter;
+                            anchors.leftMargin: 10;
 
-                            popupMenuContainer.exit(model.name);
-                            loaderDialog.closeItem();
+                            width: 18;
+                            height: width;
+
+                            visible: popupMenuContainer.hasIcon && model.name !== "";
+                            source: model.imageSource;
+                            sourceSize.width: width;
+                            sourceSize.height: height;
+                        }
+
+                        Rectangle {
+                            anchors.horizontalCenter: parent.horizontalCenter;
+                            anchors.bottom: delegateListViewPopup.bottom;
+
+                            width: parent.width - 20;
+                            height: 1;
+
+                            visible: model.id === "";
+
+                            color: Style.hover;
+                        }
+
+                        MouseArea {
+                            id: delegateListViewPopupMA;
+
+                            anchors.fill: parent;
+
+                            hoverEnabled: true;
+                            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+                            visible: model.mode !== "Disabled";
+
+                            onClicked: {
+                                popupMenuContainer.exit(model.index, model.name);
+                                loaderDialog.closeItem();
+                            }
                         }
                     }
                 }
             }
         }
+
+//        Column {
+//            id: columnPopupMenu;
+
+//            width: parent.width;
+//            height: mainBody.height;
+
+//            onHeightChanged: {
+//                console.log("Column onHeightChanged", columnPopupMenu.height);
+//            }
+
+//            Repeater {
+//                id: popupRepeater;
+
+//                model: popupMenuContainer.model;
+
+//                anchors.fill: parent;
+
+//                onModelChanged: {
+//                    console.log("PopupMenuDialog onModelChanged");
+//                    var height = popupMenuContainer.model.count * popupMenuContainer.itemHeight -
+//                            popupMenuContainer.emptyItemCount * popupMenuContainer.itemHeight;
+
+//                    if (height > 150){
+//                        mainBody.height = 150;
+//                    }
+//                    else {
+//                        mainBody.height = height;
+//                    }
+//                }
+
+//                delegate: Rectangle {
+//                    id: delegateListViewPopup;
+
+//                    width: popupMenuContainer.width;
+//                    height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
+
+//                    color: "transparent";
+
+//                    Rectangle {
+//                        id: highlightRect;
+
+//                        anchors.horizontalCenter: parent.horizontalCenter;
+//                        anchors.verticalCenter: parent.verticalCenter;
+
+//                        width: parent.width - 2;
+//                        height: parent.height - 2;
+
+//                        color: Style.selectedColor;
+//                        visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
+//                    }
+
+//                    Text {
+//                        anchors.left: popupMenuContainer.hasIcon ? iconDelegateListViewPopup.right : delegateListViewPopup.left;
+//                        anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
+//                        anchors.leftMargin: 10;
+//                        anchors.rightMargin: 10;
+
+//                        text: model.name;
+//                        color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
+//                        font.pixelSize: Style.fontSize_common;
+//                        font.family: Style.fontFamily;
+//                    }
+
+//                    Image {
+//                        id: iconDelegateListViewPopup;
+
+//                        anchors.left: delegateListViewPopup.left;
+//                        anchors.verticalCenter: delegateListViewPopup.verticalCenter;
+//                        anchors.leftMargin: 10;
+
+//                        width: 18;
+//                        height: width;
+
+//                        visible: popupMenuContainer.hasIcon && model.name !== "";
+//                        source: model.imageSource;
+//                        sourceSize.width: width;
+//                        sourceSize.height: height;
+//                    }
+
+//                    Rectangle {
+//                        anchors.horizontalCenter: parent.horizontalCenter;
+//                        anchors.bottom: delegateListViewPopup.bottom;
+
+//                        width: parent.width - 20;
+//                        height: 1;
+
+//                        visible: model.id === "";
+
+//                        color: Style.hover;
+//                    }
+
+//                    MouseArea {
+//                        id: delegateListViewPopupMA;
+
+//                        anchors.fill: parent;
+
+//                        hoverEnabled: true;
+//                        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+//                        visible: model.mode !== "Disabled";
+
+//                        onClicked: {
+
+//                            popupMenuContainer.exit(model.index, model.name);
+//                            loaderDialog.closeItem();
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
 }

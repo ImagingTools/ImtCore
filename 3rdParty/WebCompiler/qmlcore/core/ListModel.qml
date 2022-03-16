@@ -5,6 +5,8 @@ Model {
 	///@private
 	constructor: {
 		this._rows = []
+
+		this.__deps = {}
 	}
 
 	/**@param rows:Object raw rows array object
@@ -99,6 +101,10 @@ Model {
 			throw new Error('index ' + idx + ' out of bounds')
 		if (n === undefined)
 			n = 1
+		
+		for(let key in this.__deps){
+			this.__deps[key]._clearItems(idx, n)
+		}
 		this._rows.splice(idx, n)
 		this.count = this._rows.length
 		this.rowsRemoved(idx, idx + n)

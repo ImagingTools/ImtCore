@@ -156,34 +156,36 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(const QList<imtgql:
 		productInstancePtr->SetupProductInstance(productId, objectId, accountId);
 
 		imtbase::CTreeItemModel* activeLicenses = itemModel.GetTreeItemModel("ActiveLicenses");
-		int licenseState, expirationState = 0;
 
-		for (int i = 0; i < activeLicenses->GetItemsCount(); i++) {
-			QByteArray licenseId;
-			if (activeLicenses->ContainsKey("Id")) {
-				licenseId = activeLicenses->GetData("Id", i).toByteArray();
-			}
+		if (activeLicenses != nullptr){
+			int licenseState, expirationState = 0;
 
-			QDateTime expirationDate;
-
-			if (activeLicenses->ContainsKey("LicenseState")){
-				licenseState = activeLicenses->GetData("LicenseState", i).toInt();
-			}
-
-			if (licenseState == 2){
-
-				if (activeLicenses->ContainsKey("ExpirationState")){
-					expirationState = activeLicenses->GetData("ExpirationState", i).toInt();
+			for (int i = 0; i < activeLicenses->GetItemsCount(); i++) {
+				QByteArray licenseId;
+				if (activeLicenses->ContainsKey("Id")) {
+					licenseId = activeLicenses->GetData("Id", i).toByteArray();
 				}
 
-				if (expirationState == 2 && activeLicenses->ContainsKey("Expiration")) {
-					QString dateExpirationStr = activeLicenses->GetData("Expiration", i).toString();
-					expirationDate = QDateTime::fromString(dateExpirationStr, "dd.MM.yyyy");
+				QDateTime expirationDate;
+
+				if (activeLicenses->ContainsKey("LicenseState")){
+					licenseState = activeLicenses->GetData("LicenseState", i).toInt();
 				}
 
-				productInstancePtr->AddLicense(licenseId, expirationDate);
-			}
+				if (licenseState == 2){
 
+					if (activeLicenses->ContainsKey("ExpirationState")){
+						expirationState = activeLicenses->GetData("ExpirationState", i).toInt();
+					}
+
+					if (expirationState == 2 && activeLicenses->ContainsKey("Expiration")) {
+						QString dateExpirationStr = activeLicenses->GetData("Expiration", i).toString();
+						expirationDate = QDateTime::fromString(dateExpirationStr, "dd.MM.yyyy");
+					}
+
+					productInstancePtr->AddLicense(licenseId, expirationDate);
+				}
+			}
 		}
 
 		return productInstancePtr.PopPtr();

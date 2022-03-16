@@ -33,15 +33,15 @@ Rectangle {
 
         model: treeViewContainer.modelItems;
 
-        delegate: TreeItemDelegate {
+        delegate: TreeItemDelegateTest {
             width: parent.width;
             //childItemModel: model.childItemModel;
 
-            listViewItem: mainTreeView;
+//            listViewItem: mainTreeView;
 
-            onCheckBoxState: {
-                console.log("TreeView onCheckBoxState", state, packageId, featureId);
-            }
+//            onCheckBoxState: {
+//                console.log("TreeView onCheckBoxState", state, packageId, featureId);
+//            }
         }
 
         function changeCheckBoxState(state, packageId, featureId) {

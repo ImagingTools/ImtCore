@@ -62,21 +62,42 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 		return nullptr;
 	}
 
+	QList<QSqlRecord> records;
+
 	while (productLicensesQuery.next()){
-		QSqlRecord licenseRecord = productLicensesQuery.record();
+		records.append(productLicensesQuery.record());
+	}
+
+	for (const QSqlRecord& record : records){
 		QByteArray licenseId;
 
-		if (licenseRecord.contains("LicenseId")){
-			licenseId = licenseRecord.value("LicenseId").toByteArray();
+		if (record.contains("LicenseId")){
+			licenseId = record.value("LicenseId").toByteArray();
 		}
 
 		QDateTime expirationDate;
-		if (licenseRecord.contains("ExpirationDate")){
-			expirationDate = licenseRecord.value("ExpirationDate").toDateTime();
+		if (record.contains("ExpirationDate")){
+			expirationDate = record.value("ExpirationDate").toDateTime();
 		}
 
 		productInstancePtr->AddLicense(licenseId, expirationDate);
 	}
+
+//	while (productLicensesQuery.next()){
+//		QSqlRecord licenseRecord = productLicensesQuery.record();
+//		QByteArray licenseId;
+
+//		if (licenseRecord.contains("LicenseId")){
+//			licenseId = licenseRecord.value("LicenseId").toByteArray();
+//		}
+
+//		QDateTime expirationDate;
+//		if (licenseRecord.contains("ExpirationDate")){
+//			expirationDate = licenseRecord.value("ExpirationDate").toDateTime();
+//		}
+
+//		productInstancePtr->AddLicense(licenseId, expirationDate);
+//	}
 
 	return productInstancePtr.PopPtr();
 }

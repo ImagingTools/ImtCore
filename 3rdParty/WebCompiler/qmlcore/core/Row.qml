@@ -31,7 +31,8 @@ Layout {
 			var b = c.y + c.height
 			if (b > h)
 				h = b
-			c.viewX = p + rm
+			//c.viewX = p + rm
+			c.x = p + rm
 			if (c.recursiveVisible)
 				p += c.width + this.spacing + rm + lm
 		}

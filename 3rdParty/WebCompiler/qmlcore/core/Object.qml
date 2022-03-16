@@ -118,11 +118,17 @@ EventEmitter {
 		this._local = {}
 
 		var properties = this.__properties
-		for(var name in properties) //fixme: it was added once, then removed, is it needed at all? it double-deletes callbacks
-			properties[name].discard()
+		for(var name in this.__properties) //fixme: it was added once, then removed, is it needed at all? it double-deletes callbacks
+			this.__properties[name].discard()
+		this.__properties = {}
+
+		var properties = this._properties
+		for(var name in this._properties) //fixme: it was added once, then removed, is it needed at all? it double-deletes callbacks
+			this._properties[name].discard()
 		this._properties = {}
 
 		$core.EventEmitter.prototype.discard.apply(this)
+
 	}
 
 	/**@param child:Object object to add
