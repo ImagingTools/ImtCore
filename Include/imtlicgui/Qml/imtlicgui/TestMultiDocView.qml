@@ -8,103 +8,94 @@ Item {
 
     anchors.fill: parent;
 
-    property int number: 0;
+    Component.onCompleted: {
 
-    Calendar {
-        id: calendar;
+        for (var i = 0; i < 10; i++){
+            modelCb1.append({'name': i})
+        }
+
+        for (var i = 0; i < 20; i++){
+            modelCb2.append({'name': i + 20})
+        }
     }
 
-//    AuxButton{
-//        id: add;
+    ListModel {
+        id: modelCb1;
+    }
 
-//        width: 50;
-//        height: 25;
+    ListModel {
+        id: modelCb2;
+    }
 
-//        textButton: "Add";
+    ComboBox {
+        id: cb1;
 
-//        hasText: true;
+        width: 100;
+        height: 30;
 
-//        borderColor: "#000000";
+        radius: 3;
 
-//        onClicked: {
+        model: modelCb1;
+    }
 
-//            for (var i = 0; i < 5000; i++)
-//            {
-//                modelTest.append({"Text": testMultiDocViewContainer.number});
-////                modelTest.InsertNewItem();
-////                modelTest.SetData("Text", testMultiDocViewContainer.number, i);
-//                testMultiDocViewContainer.number++;
-//            }
+    ComboBox {
+        id: cb2;
 
-//            //var index = modelTest.InsertNewItem();
-//        }
-//    }
+        anchors.top: cb1.bottom;
+        anchors.topMargin: 10;
 
-//    AuxButton{
-//        id: del;
+        width: 100;
+        height: 30;
 
-//        anchors.left: add.right;
-//        anchors.leftMargin: 10;
+        radius: 3;
 
-//        width: 50;
-//        height: 25;
+        model: modelCb2;
+    }
 
-//        textButton: "Del";
+    ComboBox {
+        id: cb3;
 
-//        hasText: true;
+        anchors.top: cb2.top;
+        anchors.left: cb2.right;
+        anchors.leftMargin: 50;
 
-//        borderColor: "#000000";
+        width: 100;
+        height: 30;
 
-//        onClicked: {
-//            //modelTest.RemoveItem(testMultiDocViewContainer.number - 1);
-//          //  testMultiDocViewContainer.number--;
+        radius: 3;
 
-//            for (var i = 0; i < 5000; i++)
-//            {
-//                //modelTest.RemoveItem(0);
-//                modelTest.remove(0);
-//            }
+        model: modelCb2;
+    }
 
-//            testMultiDocViewContainer.number = 0;
-//        }
-//    }
+    Column {
+        x: 0;
+        y: 200;
 
-////    TreeItemModel {
-////        id: modelTest;
-////    }
+        width: 100;
+        height: 200;
 
-//    ListModel {
-//        id: modelTest;
-//    }
+        spacing: 20;
 
+        ComboBox {
+            id: c3;
 
-//    ListView {
-//        id: listview;
+            width: 100;
+            height: 30;
 
-//        anchors.top: del.bottom;
-//        anchors.topMargin: 10;
-//        anchors.left: parent.left;
-//        width: 200;
+            radius: 3;
 
-//        height: 500;
+            model: modelCb2;
+        }
 
-//        model: modelTest;
+        ComboBox {
+            id: c4;
 
-//        delegate: Rectangle{
-//            width: listview.width;
-//            height: 30;
+            width: 100;
+            height: 30;
 
-//            color: "#c0c0c0";
+            radius: 3;
 
-//            Text {
-//                id: text;
-
-//                anchors.horizontalCenter: parent.horizontalCenter;
-//                anchors.verticalCenter: parent.verticalCenter;
-
-//                text: model.Text;
-//            }
-//        }
-
-//    }
+            model: modelCb2;
+        }
+    }
 }
