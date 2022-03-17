@@ -34,7 +34,7 @@ QtObject {
     }
 
     function GetFile(fileHash, fileUrl) {
-        open(`../../get_files/${fileUrl.name}?FileId=${fileHash}`)
+        open(`../../files/${fileUrl.name}?FileId=${fileHash}`)
     }
 
     function DeleteFile(fileHash){
