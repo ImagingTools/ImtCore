@@ -33,15 +33,15 @@ QtObject {
 
     }
 
-    function GetFile(fileId, fileUrl) {
-        open(`../../get_files/${fileUrl.name}?FileId=${fileId}`)
+    function GetFile(fileHash, fileUrl) {
+        open(`../../get_files/${fileUrl.name}?FileId=${fileHash}`)
     }
 
-    function DeleteFile(fileId){
+    function DeleteFile(fileHash){
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
-        xhr.open("DELETE", `../../files/${fileId}`);
-        xhr.send(fileId)
+        xhr.open("DELETE", `../../files/${fileHash}`);
+        xhr.send(fileHash)
 
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE){

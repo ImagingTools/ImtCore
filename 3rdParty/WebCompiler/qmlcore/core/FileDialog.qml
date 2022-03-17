@@ -21,6 +21,7 @@ Item {
 
     onVisibleChanged: {
         if(this.visible){
+            this.element.dom.value = ""
             this.element.dom.click()
             this.visible = false
         }
