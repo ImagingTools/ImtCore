@@ -2,9 +2,12 @@
 
 
 // Qt includes
+#include <QtCore/QUrlQuery>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlEngine>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+#include <QtCore/QFileInfo>
 
 // ACF includes
 #include <iser/CJsonStringReadArchive.h>
@@ -49,43 +52,213 @@ CFileSender::~CFileSender()
 
 }
 
-bool CFileSender::SendFile(QString query)
+bool CFileSender::DeleteFile(const QString& fileId)
 {
-//    QQmlEngine* engine = qmlEngine(this);
-//    if (engine != nullptr){
-//        SetState("Loading");
-//        QNetworkAccessManager* accessManager = engine->networkAccessManager();
-//        qDebug() << "baseUrl" << engine->baseUrl();
-//        QNetworkReply* reply = accessManager->post(QNetworkRequest(engine->baseUrl()), query.toUtf8());
-//        connect(reply, &QNetworkReply::finished,
-//                this, &CFileSender::replyFinished);
-//        return true;
-//    }
+	QQmlEngine* engine = qmlEngine(this);
+	if (engine != nullptr){
+		SetState("Loading");
+		QNetworkAccessManager* accessManager = engine->networkAccessManager();
+		qDebug() << "baseUrl" << engine->baseUrl();
+		QUrl requestUrl = engine->baseUrl();
 
-    return false;
+		QString path = requestUrl.path();
+		path.replace("${fileId}",fileId);
+		requestUrl.setPath(path);
+		QNetworkReply* reply = accessManager->deleteResource(QNetworkRequest(requestUrl));
+		connect(reply, &QNetworkReply::finished, this, &CFileSender::OnFileDeleted);
+		return true;
+	}
+
+	return false;
+}
+
+bool CFileSender::GetFile(const QString& fileId, const QString& fileName)
+{
+	m_preferredFileNameForSave = fileName;
+	QQmlEngine* engine = qmlEngine(this);
+	if (engine != nullptr){
+		SetState("Loading");
+		QNetworkAccessManager* accessManager = engine->networkAccessManager();
+		qDebug() << "baseUrl" << engine->baseUrl();
+		QUrl requestUrl = engine->baseUrl();
+
+		QString path = requestUrl.path();
+		path.append("/").append(fileName);
+		requestUrl.setPath(path);
+
+		QUrlQuery urlQuery;
+		urlQuery.addQueryItem("FileId", fileId);
+		requestUrl.setQuery(urlQuery);
+
+		QNetworkReply* reply = accessManager->get(QNetworkRequest(requestUrl));
+		connect(reply, &QNetworkReply::finished, this, &CFileSender::OnFileDownloaded);
+		return true;
+	}
+	return false;
+}
+
+bool CFileSender::SendFile(const QString& fileUrl)
+{
+	QQmlEngine* engine = qmlEngine(this);
+	if (engine != nullptr){
+		SetState("Loading");
+		QNetworkAccessManager* accessManager = engine->networkAccessManager();
+		qDebug() << "baseUrl" << engine->baseUrl();
+		QUrl requestUrl = engine->baseUrl();
+
+		QFileInfo uploadingFileInfo(fileUrl);
+		QString fileName = uploadingFileInfo.completeBaseName();
+
+		QFile uploadingFile(uploadingFileInfo.absoluteFilePath());
+		uploadingFile.open(QFile::ReadOnly);
+		QByteArray payload = uploadingFile.readAll();
+		uploadingFile.close();
+
+		QString path = requestUrl.path();
+		path.append("/").append(fileName);
+		requestUrl.setPath(path);
+
+		QNetworkRequest request(requestUrl);
+		request.setHeader(QNetworkRequest::ContentLengthHeader, payload.size());
+
+		QNetworkReply* reply = accessManager->post(request, payload);
+		connect(reply, &QNetworkReply::finished, this, &CFileSender::OnFileUploaded);
+		return true;
+	}
+	return false;
 }
 
 
-void CFileSender::replyFinished()
+
+void CFileSender::OnFileDeleted()
 {
-//    QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
-//    if(reply){
-//        QByteArray representationData = reply->readAll();
-//        qDebug() << representationData;
-////        Parse(representationData);
-//        SetState("Ready");
-//        reply->deleteLater();
-//    }
+	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	if(reply){
+		QByteArray representationData = reply->readAll();
+		qDebug() << representationData;
+		SetState("Ready");
+		reply->deleteLater();
+	}
 }
 
-//void CTreeItemModel::SetState(const QString &newState)
-//{
-//    if (m_state != newState){
-//        m_state = newState;
+void CFileSender::OnFileDownloaded()
+{
+	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	if(reply){
+		QByteArray representationData = reply->readAll();
+		QFile downloadedFile(m_downloadedFileLocation +'/' + m_preferredFileNameForSave);
+		downloadedFile.open(QFile::WriteOnly);
+		downloadedFile.write(representationData);
+		downloadedFile.close();
+		SetState("Ready");
+		reply->deleteLater();
+	}
+}
 
-//        emit stateChanged(m_state);
-//    }
-//}
+void CFileSender::OnFileUploaded()
+{
+	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	if(reply){
+		QByteArray representationData = reply->readAll();
+		SetState("Ready");
+		reply->deleteLater();
+		qDebug() << "File id is: "<< representationData;
+	}
+}
+
+
+
+/*
+function SendFile(fileUrl){
+	//        console.log("SendFile", fileUrl)
+	this.state = "Loading"
+			var xhr = new XMLHttpRequest;
+
+	let reader = new FileReader()
+			reader.readAsArrayBuffer(fileUrl)
+
+			reader.onload = ()=>{
+			//            xhr.open("POST", `../../files?name=${fileUrl.name}`);
+			xhr.open("POST", `../../files/${fileUrl.name}`);
+			xhr.send(reader.result)
+}
+
+			xhr.onreadystatechange = () => {
+			if (xhr.readyState === XMLHttpRequest.DONE){
+			this.json = xhr.responseText;
+			this.state = "Ready"
+		}
+	}
+	xhr.onprogress = (event)=>{
+		this.progress(event.loaded, event.total)
+	}
+
+}
+
+
+
+
+function GetFile(fileId, fileUrl)
+{
+	open(`../../get_files/${fileUrl.name}?FileId=${fileId}`)
+}
+
+function DeleteFile(fileId)
+{
+	this.state = "Loading"
+	var xhr = new XMLHttpRequest;
+	xhr.open("DELETE", `../../files/${fileId}`);
+	xhr.send(fileId)
+
+	xhr.onreadystatechange = () => {
+		if (xhr.readyState === XMLHttpRequest.DONE){
+			this.json = xhr.responseText;
+			this.state = "Done"
+		}
+	}
+}
+*/
+
+const QString& CFileSender::state() const
+{
+	return m_state;
+}
+
+
+void CFileSender::SetState(const QString& newState)
+{
+	if (m_state == newState)
+		return;
+	m_state = newState;
+	emit stateChanged();
+}
+
+const QString& CFileSender::downloadedFilePath() const
+{
+	return m_downloadedFilePath;
+}
+
+void CFileSender::setDownloadedFilePath(const QString& newDownloadedFilePath)
+{
+	if (m_downloadedFilePath == newDownloadedFilePath)
+		return;
+	m_downloadedFilePath = newDownloadedFilePath;
+	emit downloadedFilePathChanged();
+}
+
+const QString& CFileSender::downloadedFileLocation() const
+{
+	return m_downloadedFileLocation;
+}
+
+void CFileSender::setDownloadedFileLocation(const QString& newDownloadedFileLocation)
+{
+	if (m_downloadedFileLocation == newDownloadedFileLocation)
+		return;
+	m_downloadedFileLocation = newDownloadedFileLocation;
+	emit downloadedFileLocationChanged();
+}
+
 
 } // namespace imtrest
 
