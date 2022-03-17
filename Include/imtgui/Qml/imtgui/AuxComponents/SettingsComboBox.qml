@@ -27,7 +27,8 @@ Item {
 
         for (var i = 0; i < settingsComboBoxContainer.modelElements.GetItemsCount(); i++){
             var name = settingsComboBoxContainer.modelElements.GetData("Name", i);
-            settingsComboBoxContainer.modelElements.SetData("name", name, i);
+            //settingsComboBoxContainer.modelElements.SetData("name", name, i);
+            settingsComboBoxModelList.append({'name': name})
 
             if (i == settingsComboBoxContainer.currentValue){
                 settingsComboBox.currentText = name;
@@ -58,6 +59,10 @@ Item {
                                                        settingsComboBoxContainer.currentValue);
     }
 
+    ListModel {
+        id: settingsComboBoxModelList;
+    }
+
     ComboBox {
         id: settingsComboBox;
 
@@ -66,7 +71,8 @@ Item {
 
         radius: 3;
 
-        model: settingsComboBoxContainer.modelElements;
+        //model: settingsComboBoxContainer.modelElements;
+        model: settingsComboBoxModelList;
 
         borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
         textCentered: false;

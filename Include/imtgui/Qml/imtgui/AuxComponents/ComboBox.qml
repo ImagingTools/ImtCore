@@ -49,13 +49,13 @@ Item {
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
 
-        var modelItems = comboBoxContainer.model;
+//        var modelItems = comboBoxContainer.model;
 
-        for (var i = 0; i < modelItems.count; i++){
-            modelItems.setProperty(i, "name", modelItems.get(i).text);
-        }
+//        for (var i = 0; i < modelItems.count; i++){
+//            modelItems.setProperty(i, "name", modelItems.get(i).text);
+//        }
 
-        parameters["model"] = modelItems;
+        parameters["model"] = comboBoxContainer.model;
         parameters["resultItem"] = comboBoxContainer;
         parameters["hasIcon"] = false;
 
