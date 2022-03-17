@@ -110,11 +110,11 @@ Item {
                     onModelChanged: {
                         console.log("PopupMenuDialog onModelChanged");
 
-                        console.log("popupMenuContainer.model", popupMenuContainer.model);
-                        console.log("popupMenuContainer.model.count", popupMenuContainer.model.count);
-                        console.log("popupMenuContainer.itemHeight", popupMenuContainer.itemHeight);
+//                        console.log("popupMenuContainer.model", popupMenuContainer.model);
+//                        console.log("popupMenuContainer.model.count", popupMenuContainer.model.count);
+//                        console.log("popupMenuContainer.itemHeight", popupMenuContainer.itemHeight);
 
-                        console.log("popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
+//                        console.log("popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
                         var height = popupRepeater.count * popupMenuContainer.itemHeight -
                                 popupMenuContainer.emptyItemCount * popupMenuContainer.itemHeight;
 
@@ -125,7 +125,7 @@ Item {
                             mainBody.height = height;
                         }
 
-                        console.log("height", height);
+//                        console.log("height", height);
                     }
 
 

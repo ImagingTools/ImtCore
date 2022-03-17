@@ -71,23 +71,26 @@ Rectangle {
             containerInstallation.contactInfoModel = containerContactInfo.model.GetData('data');
             containerInstallation.updateData();
         }
-        else {
-            if(containerInstallation.operation === "New"){
-                //containerContactInfo.accountType = "company";
-//                cbTypeAccount.currentIndex = 0;
-//                containerContactInfo.contactInfoModel = model.AddTreeModel("data");
-//                containerContactInfo.contactInfoModel.SetData("Email","")
-//                containerContactInfo.contactInfoModel.SetData("FirstName","")
-//                containerContactInfo.contactInfoModel.SetData("LastName","")
-            }
-            else{
+//        else {
+//            if(containerInstallation.operation === "New"){
+//                //containerContactInfo.accountType = "company";
+////                cbTypeAccount.currentIndex = 0;
+////                containerContactInfo.contactInfoModel = model.AddTreeModel("data");
+////                containerContactInfo.contactInfoModel.SetData("Email","")
+////                containerContactInfo.contactInfoModel.SetData("FirstName","")
+////                containerContactInfo.contactInfoModel.SetData("LastName","")
+//            }
+//            else{
 
-            }
-        }
+//            }
+//        }
     }
 
     onActiveLicensesChanged: {
+        console.log("InstallationInfoEditor onActiveLicensesChanged");
         var licenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
+
+        console.log("licenses", licenses);
 
         if (licenses && licenses.GetItemsCount() > 0){
             var index;
@@ -121,9 +124,8 @@ Rectangle {
                     }
                 }
             }
-
-            licensesTable.elements = containerInstallation.activeLicenses;
         }
+        licensesTable.elements = containerInstallation.activeLicenses;
     }
 
     onInstallationInfoModelChanged: {
