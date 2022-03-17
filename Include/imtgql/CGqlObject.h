@@ -21,12 +21,16 @@ public:
 	QByteArray GetId() const;
 	QByteArrayList GetFieldIds() const;
 	QVariant GetFieldArgumentValue(const QByteArray& fieldId) const;
+	CGqlObject *CreateFieldObject(const QByteArray& fieldId);
 	const CGqlObject *GetFieldArgumentObjectPtr(const QByteArray& fieldId) const;
 	void InsertField(const QByteArray& fieldId);
 	void InsertFieldArgument(const QByteArray& fieldId, const QVariant& value);
-	void InsertFieldObject(CGqlObject *objectPtr);
+	bool InsertFieldObject(const CGqlObject& objectPtr);
 	bool IsObject(const QByteArray& fieldId) const;
 	CGqlObject* GetParentObject() const;
+
+protected:
+	void InsertFieldObject(istd::TSmartPtr<CGqlObject> objectPtr);
 
 protected:
 	struct Field

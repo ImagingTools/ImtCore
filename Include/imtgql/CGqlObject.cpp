@@ -36,6 +36,20 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 }
 
 
+
+CGqlObject *CGqlObject::CreateFieldObject(const QByteArray& fieldId)
+{
+	if (m_fieldsMap.contains(fieldId)){
+		return nullptr;
+	}
+
+	istd::TSmartPtr<CGqlObject> gqlObjectPtr(new CGqlObject(fieldId));
+	InsertFieldObject(gqlObjectPtr);
+
+	return gqlObjectPtr.GetPtr();
+}
+
+
 const CGqlObject* CGqlObject::GetFieldArgumentObjectPtr(const QByteArray &fieldId) const
 {
 	const CGqlObject* retVal = nullptr;
@@ -68,19 +82,17 @@ void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const QVariant &
 }
 
 
-void CGqlObject::InsertFieldObject(CGqlObject *objectPtr)
+bool CGqlObject::InsertFieldObject(const CGqlObject& object)
 {
-	if (objectPtr != nullptr){
-		QByteArray fieldId = objectPtr->GetId();
-		if (!m_fieldsMap.contains(fieldId)){
-			Field newField;
-			newField.id = fieldId;
-			newField.objectPtr.SetPtr(objectPtr);
-
-			m_fieldsMap[fieldId] = newField;
-			objectPtr->m_parentPtr = this;
-		}
+	if (m_fieldsMap.contains(object.GetId())){
+		return false;
 	}
+
+	istd::TSmartPtr<CGqlObject> objectPtr(new CGqlObject());
+	*objectPtr = object;
+	InsertFieldObject(objectPtr);
+
+	return true;
 }
 
 
@@ -99,6 +111,24 @@ bool CGqlObject::IsObject(const QByteArray &fieldId) const
 CGqlObject *CGqlObject::GetParentObject() const
 {
 	return m_parentPtr;
+}
+
+
+// protected methods
+
+void CGqlObject::InsertFieldObject(istd::TSmartPtr<CGqlObject> objectPtr)
+{
+	if (objectPtr.IsValid()){
+		QByteArray fieldId = objectPtr->GetId();
+		if (!m_fieldsMap.contains(fieldId)){
+			Field newField;
+			newField.id = fieldId;
+			newField.objectPtr = objectPtr;
+
+			m_fieldsMap[fieldId] = newField;
+			objectPtr->m_parentPtr = this;
+		}
+	}
 }
 
 
