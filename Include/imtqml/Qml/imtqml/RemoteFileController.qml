@@ -49,7 +49,7 @@ QtObject {
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
-                this.state = "Done"
+                this.fileDeleted()
             }
         }
     }

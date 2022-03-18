@@ -91,7 +91,8 @@ bool CRemoteFileController::GetFile(const QString& fileId, const QString& fileNa
 		urlQuery.addQueryItem("FileId", fileId);
 		requestUrl.setQuery(urlQuery);
 
-		QNetworkReply* reply = accessManager->get(QNetworkRequest(requestUrl));
+		QNetworkReply* reply = accessManager->get(QNetworkRequest(requestUrl));        
+        connect(reply, &QNetworkReply::downloadProgress, this, &CRemoteFileController::OnProgressChanged);
         connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDownloaded);
 		return true;
 	}
@@ -122,8 +123,8 @@ bool CRemoteFileController::SendFile(const QString& fileUrl)
 		QNetworkRequest request(requestUrl);
 		request.setHeader(QNetworkRequest::ContentLengthHeader, payload.size());
 
-		QNetworkReply* reply = accessManager->post(request, payload);
-//        connect(reply, &QNetworkReply::uploadProgress, this, &CRemoteFileController::OnProgressChanged);
+        QNetworkReply* reply = accessManager->post(request, payload);
+        connect(reply, &QNetworkReply::uploadProgress, this, &CRemoteFileController::OnProgressChanged);
         connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileUploaded);
 		return true;
 	}
@@ -176,8 +177,8 @@ void CRemoteFileController::OnFileUploaded()
 
 void CRemoteFileController::OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal)
 {
-    qDebug() << __FILE__ << __LINE__ << bytesLoaded/bytesTotal;
-
+    qDebug() << __FILE__ << __LINE__ << "File load progress" << bytesLoaded/bytesTotal;
+    Q_EMIT progress(bytesLoaded, bytesTotal);
 }
 
 const QString& CRemoteFileController::state() const
