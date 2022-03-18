@@ -1,4 +1,4 @@
-#include <imtrest/CFileSender.h>
+#include <imtrest/CRemoteFileController.h>
 
 
 // Qt includes
@@ -43,17 +43,17 @@ namespace imtrest
 {
 
 
-CFileSender::CFileSender(QObject *parent) : QObject(parent)
+CRemoteFileController::CRemoteFileController(QObject *parent) : QObject(parent)
 {
 
 }
 
-CFileSender::~CFileSender()
+CRemoteFileController::~CRemoteFileController()
 {
 
 }
 
-bool CFileSender::DeleteFile(const QString& fileId)
+bool CRemoteFileController::DeleteFile(const QString& fileId)
 {
 	QQmlEngine* engine = qmlEngine(this);
 	if (engine != nullptr){
@@ -66,14 +66,14 @@ bool CFileSender::DeleteFile(const QString& fileId)
 		requestUrl.setPath(path);
 
 		QNetworkReply* reply = accessManager->deleteResource(QNetworkRequest(requestUrl));
-		connect(reply, &QNetworkReply::finished, this, &CFileSender::OnFileDeleted);
+        connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDeleted);
 		return true;
 	}
 
 	return false;
 }
 
-bool CFileSender::GetFile(const QString& fileId, const QString& fileName)
+bool CRemoteFileController::GetFile(const QString& fileId, const QString& fileName)
 {
 	m_preferredFileNameForSave = fileName;
 	QQmlEngine* engine = qmlEngine(this);
@@ -92,13 +92,13 @@ bool CFileSender::GetFile(const QString& fileId, const QString& fileName)
 		requestUrl.setQuery(urlQuery);
 
 		QNetworkReply* reply = accessManager->get(QNetworkRequest(requestUrl));
-		connect(reply, &QNetworkReply::finished, this, &CFileSender::OnFileDownloaded);
+        connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDownloaded);
 		return true;
 	}
 	return false;
 }
 
-bool CFileSender::SendFile(const QString& fileUrl)
+bool CRemoteFileController::SendFile(const QString& fileUrl)
 {
 	QQmlEngine* engine = qmlEngine(this);
 	if (engine != nullptr){
@@ -123,7 +123,8 @@ bool CFileSender::SendFile(const QString& fileUrl)
 		request.setHeader(QNetworkRequest::ContentLengthHeader, payload.size());
 
 		QNetworkReply* reply = accessManager->post(request, payload);
-		connect(reply, &QNetworkReply::finished, this, &CFileSender::OnFileUploaded);
+//        connect(reply, &QNetworkReply::uploadProgress, this, &CRemoteFileController::OnProgressChanged);
+        connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileUploaded);
 		return true;
 	}
 	return false;
@@ -131,7 +132,7 @@ bool CFileSender::SendFile(const QString& fileUrl)
 
 
 
-void CFileSender::OnFileDeleted()
+void CRemoteFileController::OnFileDeleted()
 {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	if(reply){
@@ -143,7 +144,7 @@ void CFileSender::OnFileDeleted()
 	}
 }
 
-void CFileSender::OnFileDownloaded()
+void CRemoteFileController::OnFileDownloaded()
 {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	if(reply){
@@ -161,7 +162,7 @@ void CFileSender::OnFileDownloaded()
 	}
 }
 
-void CFileSender::OnFileUploaded()
+void CRemoteFileController::OnFileUploaded()
 {
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	if(reply){
@@ -173,66 +174,19 @@ void CFileSender::OnFileUploaded()
 	}
 }
 
-
-
-/*
-function SendFile(fileUrl){
-	//        console.log("SendFile", fileUrl)
-	this.state = "Loading"
-			var xhr = new XMLHttpRequest;
-
-	let reader = new FileReader()
-			reader.readAsArrayBuffer(fileUrl)
-
-			reader.onload = ()=>{
-			//            xhr.open("POST", `../../files?name=${fileUrl.name}`);
-			xhr.open("POST", `../../files/${fileUrl.name}`);
-			xhr.send(reader.result)
-}
-
-			xhr.onreadystatechange = () => {
-			if (xhr.readyState === XMLHttpRequest.DONE){
-			this.json = xhr.responseText;
-			this.state = "Ready"
-		}
-	}
-	xhr.onprogress = (event)=>{
-		this.progress(event.loaded, event.total)
-	}
-
-}
-
-
-
-
-function GetFile(fileId, fileUrl)
+void CRemoteFileController::OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal)
 {
-	open(`../../get_files/${fileUrl.name}?FileId=${fileId}`)
+    qDebug() << __FILE__ << __LINE__ << bytesLoaded/bytesTotal;
+
 }
 
-function DeleteFile(fileId)
-{
-	this.state = "Loading"
-	var xhr = new XMLHttpRequest;
-	xhr.open("DELETE", `../../files/${fileId}`);
-	xhr.send(fileId)
-
-	xhr.onreadystatechange = () => {
-		if (xhr.readyState === XMLHttpRequest.DONE){
-			this.json = xhr.responseText;
-			this.state = "Done"
-		}
-	}
-}
-*/
-
-const QString& CFileSender::state() const
+const QString& CRemoteFileController::state() const
 {
 	return m_state;
 }
 
 
-void CFileSender::SetState(const QString& newState)
+void CRemoteFileController::SetState(const QString& newState)
 {
 	if (m_state == newState)
 		return;
@@ -240,12 +194,12 @@ void CFileSender::SetState(const QString& newState)
 	emit stateChanged();
 }
 
-const QString& CFileSender::downloadedFilePath() const
+const QString& CRemoteFileController::downloadedFilePath() const
 {
 	return m_downloadedFilePath;
 }
 
-void CFileSender::setDownloadedFilePath(const QString& newDownloadedFilePath)
+void CRemoteFileController::setDownloadedFilePath(const QString& newDownloadedFilePath)
 {
 	if (m_downloadedFilePath == newDownloadedFilePath)
 		return;
@@ -253,12 +207,12 @@ void CFileSender::setDownloadedFilePath(const QString& newDownloadedFilePath)
 	emit downloadedFilePathChanged();
 }
 
-const QString& CFileSender::downloadedFileLocation() const
+const QString& CRemoteFileController::downloadedFileLocation() const
 {
 	return m_downloadedFileLocation;
 }
 
-void CFileSender::setDownloadedFileLocation(const QString& newDownloadedFileLocation)
+void CRemoteFileController::setDownloadedFileLocation(const QString& newDownloadedFileLocation)
 {
 	if (m_downloadedFileLocation == newDownloadedFileLocation)
 		return;
@@ -266,12 +220,12 @@ void CFileSender::setDownloadedFileLocation(const QString& newDownloadedFileLoca
 	emit downloadedFileLocationChanged();
 }
 
-const QByteArray& CFileSender::json() const
+const QByteArray& CRemoteFileController::json() const
 {
 	return m_json;
 }
 
-void CFileSender::setJson(const QByteArray& newJson)
+void CRemoteFileController::setJson(const QByteArray& newJson)
 {
 	if (m_json == newJson)
 		return;

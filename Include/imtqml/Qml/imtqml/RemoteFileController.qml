@@ -3,12 +3,16 @@ import QtQuick 2.0
 QtObject {
 
     property string state: "";
-    property string json;
+    property string downloadedFileLocation;
+    property string downloadedFilePath;
+    property string json;    
 
-    signal progress(real loaded, real total);
+    signal progress(real bytesLoaded, real bytesTotal);
+    signal fileDeleted();
+    signal fileDownloaded(string filePath);
+    signal fileUploaded();
 
     function SendFile(fileUrl){
-//        console.log("SendFile", fileUrl)
         this.state = "Loading"
         var xhr = new XMLHttpRequest;        
 
@@ -16,7 +20,6 @@ QtObject {
         reader.readAsArrayBuffer(fileUrl)
 
         reader.onload = ()=>{
-//            xhr.open("POST", `../../files?name=${fileUrl.name}`);
             xhr.open("POST", `../../files/${fileUrl.name}`);
             xhr.send(reader.result)
         }

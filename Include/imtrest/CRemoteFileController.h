@@ -14,7 +14,7 @@ namespace imtrest
     Universal data controller for UI representations
     \ingroup LicenseManagement
 */
-class CFileSender: public QObject
+class CRemoteFileController: public QObject
 {
     Q_OBJECT
 	Q_PROPERTY(QString state READ state WRITE SetState NOTIFY stateChanged)
@@ -27,8 +27,8 @@ class CFileSender: public QObject
 	QString m_downloadedFilePath;
 
 public:
-    explicit CFileSender(QObject* parent = nullptr);
-    ~CFileSender();
+    explicit CRemoteFileController(QObject* parent = nullptr);
+    ~CRemoteFileController();
 
 	const QString& state() const;
 	void SetState(const QString& newState);
@@ -52,6 +52,7 @@ private Q_SLOTS:
 	void OnFileDeleted();
 	void OnFileDownloaded();
 	void OnFileUploaded();
+    void OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal);
 
 signals:
 	void stateChanged();
@@ -59,17 +60,20 @@ signals:
 	void downloadedFileLocationChanged();
 	void jsonChanged();
 	void fileDownloaded(const QString& filePath);
+    void progress(qint64 bytesLoaded, qint64 bytesTotal);
 
 private:
 	QString m_preferredFileNameForSave;
 	QString m_downloadedFileLocation;
 	QByteArray m_json;
+    qint64 m_bytesLoaded;
+    qint64 m_bytesTotal;
 };
 
 
 } // namespace imtrest
 
-Q_DECLARE_METATYPE(imtrest::CFileSender*)
+Q_DECLARE_METATYPE(imtrest::CRemoteFileController*)
 
 
 
