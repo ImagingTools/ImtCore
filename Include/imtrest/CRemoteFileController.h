@@ -61,6 +61,8 @@ signals:
 	void jsonChanged();
 	void fileDownloaded(const QString& filePath);
     void progress(qint64 bytesLoaded, qint64 bytesTotal);
+	void fileUploaded();
+	void fileDeleted();
 
 private:
 	QString m_preferredFileNameForSave;

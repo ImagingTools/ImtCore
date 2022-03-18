@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QUrlQuery>
+#include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlEngine>
@@ -141,6 +142,7 @@ void CRemoteFileController::OnFileDeleted()
 		qDebug() << representationData;
 		setJson(representationData);
 		SetState("Ready");
+		Q_EMIT fileDeleted();
 		reply->deleteLater();
 	}
 }
@@ -150,8 +152,11 @@ void CRemoteFileController::OnFileDownloaded()
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	if(reply){
 		QByteArray representationData = reply->readAll();
-		if(!m_downloadedFileLocation.isNull()){
+		if(m_downloadedFileLocation.isEmpty()){
 			m_downloadedFileLocation = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+		}
+		if(!QDir().exists(m_downloadedFileLocation)){
+			QDir().mkpath(m_downloadedFileLocation);
 		}
 		QFile downloadedFile(m_downloadedFileLocation +'/' + m_preferredFileNameForSave);
 		downloadedFile.open(QFile::WriteOnly);
@@ -171,6 +176,7 @@ void CRemoteFileController::OnFileUploaded()
 		setJson(representationData);
 		SetState("Ready");
 		reply->deleteLater();
+		Q_EMIT fileUploaded();
 		qDebug() << "File id is: "<< representationData;
 	}
 }
