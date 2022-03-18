@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QUrlQuery>
+#include <QtCore/QStandardPaths>
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlEngine>
 #include <QtNetwork/QNetworkAccessManager>
@@ -58,12 +59,12 @@ bool CFileSender::DeleteFile(const QString& fileId)
 	if (engine != nullptr){
 		SetState("Loading");
 		QNetworkAccessManager* accessManager = engine->networkAccessManager();
-		qDebug() << "baseUrl" << engine->baseUrl();
 		QUrl requestUrl = engine->baseUrl();
 
 		QString path = requestUrl.path();
-		path.replace("${fileId}",fileId);
+		path.append("/files/").append(fileId);
 		requestUrl.setPath(path);
+
 		QNetworkReply* reply = accessManager->deleteResource(QNetworkRequest(requestUrl));
 		connect(reply, &QNetworkReply::finished, this, &CFileSender::OnFileDeleted);
 		return true;
@@ -83,7 +84,7 @@ bool CFileSender::GetFile(const QString& fileId, const QString& fileName)
 		QUrl requestUrl = engine->baseUrl();
 
 		QString path = requestUrl.path();
-		path.append("/").append(fileName);
+		path.append("/files/").append(fileName);
 		requestUrl.setPath(path);
 
 		QUrlQuery urlQuery;
@@ -107,7 +108,7 @@ bool CFileSender::SendFile(const QString& fileUrl)
 		QUrl requestUrl = engine->baseUrl();
 
 		QFileInfo uploadingFileInfo(fileUrl);
-		QString fileName = uploadingFileInfo.completeBaseName();
+		QString fileName = uploadingFileInfo.fileName();
 
 		QFile uploadingFile(uploadingFileInfo.absoluteFilePath());
 		uploadingFile.open(QFile::ReadOnly);
@@ -115,7 +116,7 @@ bool CFileSender::SendFile(const QString& fileUrl)
 		uploadingFile.close();
 
 		QString path = requestUrl.path();
-		path.append("/").append(fileName);
+		path.append("/files/").append(fileName);
 		requestUrl.setPath(path);
 
 		QNetworkRequest request(requestUrl);
@@ -136,6 +137,7 @@ void CFileSender::OnFileDeleted()
 	if(reply){
 		QByteArray representationData = reply->readAll();
 		qDebug() << representationData;
+		setJson(representationData);
 		SetState("Ready");
 		reply->deleteLater();
 	}
@@ -146,10 +148,14 @@ void CFileSender::OnFileDownloaded()
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	if(reply){
 		QByteArray representationData = reply->readAll();
+		if(!m_downloadedFileLocation.isNull()){
+			m_downloadedFileLocation = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+		}
 		QFile downloadedFile(m_downloadedFileLocation +'/' + m_preferredFileNameForSave);
 		downloadedFile.open(QFile::WriteOnly);
 		downloadedFile.write(representationData);
 		downloadedFile.close();
+		Q_EMIT fileDownloaded(downloadedFile.fileName());
 		SetState("Ready");
 		reply->deleteLater();
 	}
@@ -160,6 +166,7 @@ void CFileSender::OnFileUploaded()
 	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
 	if(reply){
 		QByteArray representationData = reply->readAll();
+		setJson(representationData);
 		SetState("Ready");
 		reply->deleteLater();
 		qDebug() << "File id is: "<< representationData;
@@ -257,6 +264,19 @@ void CFileSender::setDownloadedFileLocation(const QString& newDownloadedFileLoca
 		return;
 	m_downloadedFileLocation = newDownloadedFileLocation;
 	emit downloadedFileLocationChanged();
+}
+
+const QByteArray& CFileSender::json() const
+{
+	return m_json;
+}
+
+void CFileSender::setJson(const QByteArray& newJson)
+{
+	if (m_json == newJson)
+		return;
+	m_json = newJson;
+	emit jsonChanged();
 }
 
 

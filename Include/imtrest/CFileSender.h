@@ -20,6 +20,7 @@ class CFileSender: public QObject
 	Q_PROPERTY(QString state READ state WRITE SetState NOTIFY stateChanged)
 	Q_PROPERTY(QString downloadedFileLocation READ downloadedFileLocation WRITE setDownloadedFileLocation NOTIFY downloadedFileLocationChanged)
 	Q_PROPERTY(QString downloadedFilePath READ downloadedFilePath WRITE setDownloadedFilePath NOTIFY downloadedFilePathChanged)
+	Q_PROPERTY(QByteArray json READ json WRITE setJson NOTIFY jsonChanged)
 
 	QString m_state;
 
@@ -38,6 +39,9 @@ public:
 	const QString& downloadedFileLocation() const;
 	void setDownloadedFileLocation(const QString& newDownloadedFileLocation);
 
+	const QByteArray& json() const;
+	void setJson(const QByteArray& newJson);
+
 public Q_SLOTS:
 	bool DeleteFile(const QString& fileId);
 	bool GetFile(const QString& fileId, const QString& fileName);
@@ -52,12 +56,14 @@ private Q_SLOTS:
 signals:
 	void stateChanged();
 	void downloadedFilePathChanged();
-
 	void downloadedFileLocationChanged();
+	void jsonChanged();
+	void fileDownloaded(const QString& filePath);
 
 private:
 	QString m_preferredFileNameForSave;
 	QString m_downloadedFileLocation;
+	QByteArray m_json;
 };
 
 

@@ -31,9 +31,15 @@ bool CGqlModel::SetGqlQuery(QString query)
 	QQmlEngine* engine = qmlEngine(this);
 	if (engine != nullptr){
 		SetState("Loading");
-		QNetworkAccessManager* accessManager = engine->networkAccessManager();
-		qDebug() << "baseUrl" << engine->baseUrl();
-		QNetworkReply* reply = accessManager->post(QNetworkRequest(engine->baseUrl()), query.toUtf8());
+		QNetworkAccessManager* accessManager = engine->networkAccessManager();		
+
+		QUrl requestUrl = engine->baseUrl();
+
+		QString urlPath = requestUrl.path();
+		urlPath.append("/graphql");
+		requestUrl.setPath(urlPath);
+
+		QNetworkReply* reply = accessManager->post(QNetworkRequest(requestUrl), query.toUtf8());
 		connect(reply, &QNetworkReply::finished,
 				this, &CGqlModel::replyFinished);
 		return true;
