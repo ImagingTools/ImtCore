@@ -11,6 +11,7 @@ QtObject {
     signal fileDeleted();
     signal fileDownloaded(string filePath);
     signal fileUploaded();
+    signal fileExists();
 
     function SendFile(fileUrl){
         this.state = "Loading"
@@ -19,13 +20,20 @@ QtObject {
         let reader = new FileReader()
         reader.readAsArrayBuffer(fileUrl)
 
+        xhr.overrideMimeType('text/xml');
+
         reader.onload = ()=>{
             xhr.open("POST", `../../files/${fileUrl.name}`);
             xhr.send(reader.result)
         }
 
         xhr.onreadystatechange = () => {
-            if (xhr.readyState === XMLHttpRequest.DONE){
+            if (xhr.readyState === xhr.DONE && xhr.status === 409) {
+                var existingHash = xhr.responseXML.getElementsByTagName("p")[2].innerHTML;
+                this.json = existingHash;
+                this.fileExists()
+              }
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 409){
                 this.json = xhr.responseText;
                 this.state = "Ready"
                 this.fileUploaded()

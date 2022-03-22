@@ -37,8 +37,6 @@ CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp:
 		return ConstResponsePtr(engine.CreateResponse(request, _errorCode, generatedErrorBody, reponseTypeId));
 	};
 
-
-
 	QByteArray commandIdFileName;
 	{
 		QByteArray commandId = request.GetCommandId();
@@ -59,7 +57,7 @@ CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp:
 	}
 
 	bool loadRes = false;
-
+	bool fileExists = false;
 	ConstResponsePtr responsePtr;
 	for (int i = 0; i < m_binaryDataControllersCompPtr.GetCount(); ++i){
 		loadRes = m_binaryDataControllersCompPtr[i]->SetData(request.GetBody(), commandIdFileName);
@@ -67,9 +65,17 @@ CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp:
 			responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, commandIdFileName, "text/plain;charset=utf-8"));
 			break;
 		}
+		else {
+			fileExists = m_binaryDataControllersCompPtr[i]->EnsureDataExists(commandIdFileName);
+		}
 	}
 
-	if(!loadRes){
+	if(fileExists){
+		QString errorString = QString("<p>File already exists</p><p>%1</p>");
+		errorString = errorString.arg(QString(commandIdFileName));
+		return generateErrorResponsePtr(errorString.toUtf8(), IProtocolEngine::SC_CONFLICT);
+	}
+	else if(!loadRes){
 		responsePtr = generateErrorResponsePtr("Unable to open file", IProtocolEngine::SC_INTERNAL_SERVER_ERROR);
 	}
 

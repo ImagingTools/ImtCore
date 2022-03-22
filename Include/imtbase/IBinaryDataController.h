@@ -31,6 +31,14 @@ public:
 		\return result of extracting data
 	 */
 	virtual bool RemoveData(const QByteArray& dataId) const = 0;
+
+	/**
+		\brief Checks if file by provided id alerady exists
+		\param dataId - id for checking file
+		\return existence of file
+		\returns \c true if file exists and \c false otherwise
+	 */
+	virtual bool EnsureDataExists(const QByteArray& dataId) const = 0;
 };
 
 
