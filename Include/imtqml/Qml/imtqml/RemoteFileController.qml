@@ -28,6 +28,7 @@ QtObject {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
                 this.state = "Ready"
+                this.fileUploaded()
             }
         }
         xhr.onprogress = (event)=>{
@@ -49,6 +50,7 @@ QtObject {
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
+                this.state = "Ready"
                 this.fileDeleted()
             }
         }
