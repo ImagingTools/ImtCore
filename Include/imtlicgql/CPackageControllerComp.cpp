@@ -306,6 +306,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 			treeItemModel->SetData("level", 0, index);
 			treeItemModel->SetData("visible", 1, index);
 			treeItemModel->SetData("isActive", 1, index);
+			treeItemModel->SetData("isOpened", 1, index);
 
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){

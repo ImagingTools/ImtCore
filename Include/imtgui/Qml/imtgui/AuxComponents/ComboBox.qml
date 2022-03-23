@@ -21,8 +21,8 @@ Item {
     property int currentIndex: -1;
     property int menuWidth: comboBoxContainer.width;
     property int menuHeight: cbListView.count * comboBoxContainer.height;
-    property int menuX;
-    property int menuY;
+//    property int menuX;
+//    property int menuY;
 
     Component.onCompleted: {
         if (comboBoxContainer.textCentered){

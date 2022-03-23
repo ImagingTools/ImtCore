@@ -19,6 +19,10 @@ Rectangle
 
     property Item activeItem;
 
+    function setFocusOnMenuPanel(){
+        menuPanel.forceActiveFocus();
+    }
+
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
         menuPanel.updateModels();
@@ -56,10 +60,6 @@ Rectangle
         id: modelLayers;
     }
 
-//    TreeItemModel {
-//        id: modelLayers;
-//    }
-
     TopPanel {
         id: topPanel;
 
@@ -81,6 +81,34 @@ Rectangle
 
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
+
+        focus: true;
+
+        Keys.onPressed: {
+            console.log("ThumbnailDecorator MenuPanel keys pressed")
+            if (event.key === Qt.Key_Tab){
+                console.log('Key tab was pressed');
+                //event.accepted = true;
+//                pagesLoader.item.setFocus();
+                thubnailDecoratorContainer.activeItem.setFocus();
+            }
+            else if (event.key === Qt.Key_Up){
+                console.log('Key up was pressed');
+                if (menuPanel.activePageIndex == 0){
+                    menuPanel.activePageIndex = menuPanel.pagesCount - 1;
+                }
+                else
+                    menuPanel.activePageIndex--;
+            }
+            else if (event.key === Qt.Key_Down){
+                console.log('Key down was pressed');
+                if (menuPanel.activePageIndex == menuPanel.pagesCount - 1){
+                    menuPanel.activePageIndex = 0;
+                }
+                else
+                    menuPanel.activePageIndex++;
+            }
+        }
 
         onPagesCountChanged: {
             console.log("ThumbnailDecorator MenuPanel onPagesCountChanged", menuPanel.pagesCount);
@@ -155,6 +183,8 @@ Rectangle
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
                     if (pagesLoader.item){
                         pagesLoader.item.rootItem = pagesDeleg;
+
+//                        pagesLoader.item.forceActiveFocus();
                         console.log("ThumbnailDecorator pagesLoader.item.rootItem", pagesLoader.item.rootItem)
                         pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
                     }
@@ -228,6 +258,10 @@ Rectangle
                       }
 
                       loaderDialog.source = model.source;
+
+//                      thubnailDecoratorContainer.activeFocus = false;
+//                      loaderDialog.item.activeFocus = true;
+//                      loaderDialog.item.forceActiveFocus();
                   }
 
                   onItemChanged: {

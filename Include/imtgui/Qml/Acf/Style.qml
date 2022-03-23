@@ -1,7 +1,10 @@
 pragma Singleton
 import QtQuick 2.0
+import Acf 1.0
+import imtqml 1.0
 
 Item {
+    id: styleContainer;
 
     property string mainText: "STYLE!!!";
 
@@ -64,6 +67,11 @@ Item {
 
     property var iconNames: ["Camera", "CameraFlash", "CameraLens2"];
 
+    Component.onCompleted: {
+        console.log("Style onCompleted");
+        styleContainer.changeSchemeDesign("");
+    }
+
     function getImageSource (name, styleTheme, buttonState, buttonMode)
     {
         var imageSource = "Icons/" + styleTheme + "/" + name + "_" + buttonState + "_" + buttonMode + ".svg";
@@ -78,6 +86,94 @@ Item {
     FontLoader{
         id: boldFont;
         source: "../../Fonts/Ubuntu-Medium.ttf";
+    }
+
+    function changeSchemeDesign(theme){
+        console.log("PreferenceDialog callGetStyleQuery", theme);
+        styleQuery.getStyle(theme);
+    }
+
+    function getThemeColor(colorType, colorKey, themeType) {
+        var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
+        return themeType.GetData("ColorPalette").GetData(colorPalette);
+    }
+
+    function parseStyleTheme(themeType) {
+        console.log("PreferenceDialog parseStyleTheme");
+
+        Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", themeType);
+        Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", themeType);
+        Style.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", themeType);
+        Style.textColor = styleContainer.getThemeColor("ActiveColors", "Text", themeType);
+        Style.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
+        Style.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", themeType);
+        Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "HeaderBorder", themeType);
+        Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+
+        Style.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", themeType);
+
+        Style.hover = styleContainer.getThemeColor("ActiveColors", "Hover", themeType);
+
+        Style.imagingToolsGradient0 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient0");
+        Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
+        Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
+        Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
+        Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
+
+        Style.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", themeType);
+        Style.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", themeType);
+        Style.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", themeType);
+
+        Style.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", themeType);
+    }
+
+    GqlModel {
+        id: styleQuery;
+
+        function getStyle(theme){
+            var query = Gql.GqlRequest("query", "GetStyle");
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("theme");
+            inputParams.InsertFieldArgument("theme", theme);
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("style");
+            queryFields.InsertField("theme");
+            queryFields.InsertField("source");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("Preference GqlModel getStyle query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, styleQuery);
+            if (this.state === "Ready") {
+                var dataModelLocal;
+
+                if (styleQuery.ContainsKey("errors")){
+                    return;
+                }
+
+                if (styleQuery.ContainsKey("data")){
+                    dataModelLocal = styleQuery.GetData("data");
+
+                    if(dataModelLocal.ContainsKey("GetStyle")) {
+                        dataModelLocal = dataModelLocal.GetData("GetStyle");
+                    }
+
+                    if (dataModelLocal.ContainsKey("theme")){
+                        styleContainer.theme = dataModelLocal.GetData("theme");
+                    }
+
+                    if(dataModelLocal.ContainsKey("source")){
+                        dataModelLocal = dataModelLocal.GetData("source");
+                        styleContainer.parseStyleTheme(dataModelLocal);
+                    }
+                }
+            }
+        }
     }
 
 }

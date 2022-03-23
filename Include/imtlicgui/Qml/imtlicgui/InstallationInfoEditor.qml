@@ -348,15 +348,15 @@ Rectangle {
                      borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
                      textCentered: false;
 
-                     menuX: customerCB.x;
-                     menuY: customerCB.y;
+//                     menuX: customerCB.x;
+//                     menuY: customerCB.y;
 
                      property bool wasFocus: false;
 
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor customerCB onCurrentIndexChanged");
                          containerInstallation.accountId = listModelAccounts.get(customerCB.currentIndex).id;
-                         customerCB.currentText = listModelAccounts.get(customerCB.currentIndex).text;
+                         customerCB.currentText = listModelAccounts.get(customerCB.currentIndex).name;
 
                          if (containerInstallation.operation !== "New" && !customerCB.wasFocus){
                              customerCB.wasFocus = true;
@@ -417,7 +417,7 @@ Rectangle {
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor productCB onCurrentIndexChanged");
                          containerInstallation.productId = listModelProducts.get(productCB.currentIndex).id;
-                         productCB.currentText = listModelProducts.get(productCB.currentIndex).text;
+                         productCB.currentText = listModelProducts.get(productCB.currentIndex).name;
 
                          licensesModel.updateModel(containerInstallation.productId);
 
@@ -688,7 +688,7 @@ Rectangle {
                             products.SetExternTreeModel('data', dataModelLocal);
 
                             for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-                                listModelProducts.append({"id": dataModelLocal.GetData("Id", i), "text": dataModelLocal.GetData("Name", i)});
+                                listModelProducts.append({"id": dataModelLocal.GetData("Id", i), "name": dataModelLocal.GetData("Name", i)});
                             }
 
                             containerInstallation.gqlModelCollectionInfo = "AccountList";
@@ -699,7 +699,7 @@ Rectangle {
                             accounts.SetExternTreeModel('data', dataModelLocal);
 
                             for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-                                listModelAccounts.append({"id": dataModelLocal.GetData("Id", i), "text": dataModelLocal.GetData("AccountName", i)});
+                                listModelAccounts.append({"id": dataModelLocal.GetData("Id", i), "name": dataModelLocal.GetData("AccountName", i)});
                             }
 
                             installItemModel.updateModel();

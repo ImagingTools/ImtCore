@@ -82,6 +82,9 @@ def parse_qml_file(cache, com, path):
 		try:
 
 			if(path[0:3] == 'src'):
+				data = data.replace('Keys.onPressed', 'onKeyspressed') # by Artur
+				data = data.replace('Keys.onReleased', 'onKeysreleased') # by Artur
+				
 				data = data.replace('pragma Singleton', '') # by Artur
 				data = data.replace('property bool webScroll', 'webScroll') # by Artur
 				data = data.replace('Component.onCompleted', 'onCompleted') # by Artur, for compatibility completed signal

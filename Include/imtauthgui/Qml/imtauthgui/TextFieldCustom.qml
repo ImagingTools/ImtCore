@@ -22,17 +22,22 @@ Item {
 
     property int textSize: 15;
 
-    signal focusChanged();
+//    signal focusChanged();
     signal inputTextChanged();
 
     function setFocus(){
-//        textField.activeFocusOnPress = true;
-
-        textField.forceActiveFocus();
-//        textField.focus = true;
-//        textField.selectAll();
-
+//        textField.forceActiveFocus();
+        textField.focus = true;
+        textField.selectAll();
     }
+
+//    onFocusChanged: {
+//        console.log("TextFieldCustom onFocusChanged");
+
+//        if (containerTextField.focus){
+//            textField.forceActiveFocus();
+//        }
+//    }
 
     Rectangle {
         id: mainRect;
@@ -66,7 +71,7 @@ Item {
 //        focus: false;
 
         onFocusChanged: {
-            containerTextField.focusChanged();
+//            containerTextField.focusChanged();
             containerTextField.wasFocus = true;
         }
 

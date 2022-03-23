@@ -33,6 +33,12 @@ Rectangle {
     signal removedItem(string itemId);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
 
+    Component.onCompleted: {
+        console.log("CollectionView onCompleted");
+
+       // tableInternal.forceActiveFocus();
+    }
+
     onCollectionViewModelChanged: {
         console.log("CollectionView onModelChanged", collectionViewContainer.itemId, collectionViewContainer.itemName);
         collectionViewContainer.refresh();
@@ -79,6 +85,17 @@ Rectangle {
             name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
         }
         return name;
+    }
+
+    function getCountItems(){
+        console.log("CollectionView getCountItems");
+        var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
+
+        if (!dataModelLocal){
+            return -1;
+        }
+
+        return dataModelLocal.GetItemsCount();
     }
 
     function callSetDescriptionQuery(value){
@@ -207,10 +224,18 @@ Rectangle {
         removeModel.updateModel();
     }
 
+//    function setFocus(){
+//        tableInternal.fo
+//    }
+
     AuxTable {
         id: tableInternal;
 
         anchors.fill: parent;
+
+        onFocusChanged: {
+            console.log("CollectionView AuxTable onFocusChanged!", tableInternal.focus)
+        }
 
         onSelectItem: {
             console.log("CollectionView AuxTable onSelectItem", selectedId, name);

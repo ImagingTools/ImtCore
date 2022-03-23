@@ -25,9 +25,56 @@ Rectangle {
 
     property string operation;
 
+    onFocusChanged: {
+        console.log("MultidocWorkspaceView onFocusChanged", multiDocView.focus);
+
+        if (multiDocView.focus){
+            multiDocView.activeItem.forceActiveFocus();
+        }
+    }
+
+//    Keys.onPressed: {
+//        console.log("MultidocWorkspaceView keys pressed")
+//        if (event.key === Qt.Key_Tab){
+//            console.log('Key tab was pressed');
+
+//            tabPanelInternal.rightClicked();
+//            multiDocView.activeItem.forceActiveFocus();
+//            if (tabPanelInternal.selectedIndex === pagesData.GetItemsCount() - 1){
+////                tabPanelInternal.selectedIndex = 0;
+////                thubnailDecoratorContainer.setFocusOnMenuPanel();
+
+//               // multiDocView.activeItem.setFocusOnTreeView();
+//            }
+//            else{
+//                tabPanelInternal.rightClicked();
+//                //multiDocView.activeItem.forceActiveFocus();
+//            }
+//        }
+//        else if (event.key === Qt.Key_Up){
+//            console.log('Key up was pressed');
+//            multiDocView.activeItem.selectedIndexDecr();
+//        }
+//        else if (event.key === Qt.Key_Down){
+//            console.log('Key down was pressed');
+//             multiDocView.activeItem.selectedIndexIncr();
+//        }
+//        else if (event.key === Qt.Key_Return){
+//            console.log('Key down was pressed');
+//             multiDocView.activeItem.selectItem();
+//            multiDocView.activeItem.forceActiveFocus();
+//        }
+//    }
+
     Component.onCompleted: {
         console.log("MultidocWorkspaceView onCompleted", tabPanelInternal.selectedIndex)
         docsData.anchors.topMargin = tabPanelInternal.height;
+    }
+
+    function setFocus(){
+      //  packagesMultiDocView.setFocus();
+        console.log("MultidocWorkspaceView setFocus");
+        multiDocView.forceActiveFocus();
     }
 
     function menuActivated(menuId){
@@ -154,6 +201,10 @@ Rectangle {
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
         model: pagesData;
+
+        onFocusChanged: {
+            console.log("MultiDocWorkspaceView ListView onFocusChanged");
+        }
 
         property int  currentIndex: -1;
 

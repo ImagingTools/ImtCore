@@ -6,96 +6,52 @@ import imtgui 1.0
 Item {
     id: testMultiDocViewContainer;
 
-    anchors.fill: parent;
-
     Component.onCompleted: {
-
-        for (var i = 0; i < 10; i++){
-            modelCb1.append({'name': i})
-        }
-
-        for (var i = 0; i < 20; i++){
-            modelCb2.append({'name': i + 20})
-        }
+        //rect1.forceActiveFocus();
     }
 
-    ListModel {
-        id: modelCb1;
-    }
-
-    ListModel {
-        id: modelCb2;
-    }
-
-    ComboBox {
-        id: cb1;
+    Rectangle {
+        id: rect1;
 
         width: 100;
-        height: 30;
+        height: 100;
 
-        radius: 3;
+        focus: true;
 
-        model: modelCb1;
+        KeyNavigation.right: rect2;
+        KeyNavigation.tab: rect2;
+
+        color: focus ? "red" : "blue";
     }
 
-    ComboBox {
-        id: cb2;
+    Rectangle {
+        id: rect2;
 
-        anchors.top: cb1.bottom;
-        anchors.topMargin: 10;
+        anchors.left: rect1.right;
+        anchors.leftMargin: 20;
 
         width: 100;
-        height: 30;
+        height: 100;
 
-        radius: 3;
+        KeyNavigation.right: rect3;
+        KeyNavigation.tab: rect3;
 
-        model: modelCb2;
+        color: focus ? "red" : "blue";
+
     }
 
-    ComboBox {
-        id: cb3;
+    Rectangle {
+        id: rect3;
 
-        anchors.top: cb2.top;
-        anchors.left: cb2.right;
-        anchors.leftMargin: 50;
-
-        width: 100;
-        height: 30;
-
-        radius: 3;
-
-        model: modelCb2;
-    }
-
-    Column {
-        x: 0;
-        y: 200;
+        anchors.left: rect2.right;
+        anchors.leftMargin: 20;
 
         width: 100;
-        height: 200;
+        height: 100;
 
-        spacing: 20;
+        KeyNavigation.right: rect1;
+        KeyNavigation.tab: rect1;
 
-        ComboBox {
-            id: c3;
-
-            width: 100;
-            height: 30;
-
-            radius: 3;
-
-            model: modelCb2;
-        }
-
-        ComboBox {
-            id: c4;
-
-            width: 100;
-            height: 30;
-
-            radius: 3;
-
-            model: modelCb2;
-        }
+        color: focus ? "red" : "blue";
     }
 }

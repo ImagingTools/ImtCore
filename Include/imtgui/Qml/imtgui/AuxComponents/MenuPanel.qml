@@ -21,12 +21,20 @@ Rectangle {
     property var pagesSources: [];
 
     property int activePageIndex: -1;
-    property int pagesCount: 0;
+    property int pagesCount: lvPages.count;
 
     signal activePageChanged;
 
     function updateModels(){
         pagesModel.updateModel();
+    }
+
+    onActivePageIndexChanged: {
+        console.log("MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
+
+//        lvPages.model.GetData("activePageId", menuPanel.activePageIndex);
+
+        lvPages.currentIndex = menuPanel.activePageIndex;
     }
 
     ListView {
@@ -49,7 +57,7 @@ Rectangle {
             selected: lvPages.currentIndex === model.index ? true : false;
 
             onClicked: {
-                lvPages.currentIndex = model.index;              
+                lvPages.currentIndex = model.index;
                 menuPanel.activePageName = model[PageEnum.NAME];
                 menuPanel.activeIcon = model[PageEnum.ICON];
                 menuPanel.activePageIndex = model.index;

@@ -13,6 +13,8 @@ Item {
 
     property TreeItemModel headers; //: elementsList.model;
 
+    property Item activeItem; //: elementsList.model;
+
     property alias delegate: elementsList.delegate;
     property alias elements: elementsList.model;
 
@@ -25,6 +27,13 @@ Item {
 
     function getSelectedName(){
         return elementsList.selectedName;
+    }
+
+    function changeDataByIndex(index){
+        console.log("AuxTable changeDataByIndex", index);
+        elementsList.selectedId = elements.GetData("Id", index);
+        elementsList.selectedName  = elements.GetData("Name", index);
+        tableContainer.selectedIndex = index;
     }
 
     MouseArea {

@@ -20,6 +20,7 @@ Item {
 		this.options = arguments[2]
 		this.l10n = this.options.l10n || {}
 
+		this._currentFocus = null
 		this._local['context'] = this
 		this._context = this
 		this._started = false
@@ -43,6 +44,27 @@ Item {
 			}
 		}
 		
+		this.Qt = {
+			NoModifier: 0,
+			ShiftModifier: 0x02000000,
+			ControlModifier: 0x04000000,
+			AltModifier: 0x08000000,
+			MetaModifier: 0x10000000,
+
+			Key_Tab: 9,
+			Key_Enter: 13,
+			Key_Return: 13,
+			Key_Shift: 16,
+			Key_Alt: 18,
+			Key_Escape: 27,
+			Key_Space: 32,
+			Key_Left: 37,
+			Key_Up: 38,
+			Key_Right: 39,
+			Key_Down: 40,
+			Key_Delete: 46,
+			
+		}
 
 		this._init()
 	}
@@ -72,6 +94,53 @@ Item {
 				
 			})
 		}
+
+		this.backend.document.body.addEventListener('keydown', (e)=>{
+			if(e.keyCode === 9 ) {
+				if(e.shiftKey){
+					if(this._currentFocus.KeyNavigation.backtab){
+						this._currentFocus.focus = false
+						this._currentFocus.KeyNavigation.backtab.focus = true
+						e.preventDefault()
+					}
+				} else {
+					if(this._currentFocus.KeyNavigation.tab){
+						this._currentFocus.focus = false
+						this._currentFocus.KeyNavigation.tab.focus = true
+						e.preventDefault()
+					}
+				}
+
+				
+			}
+			if(e.keyCode === 37 && this._currentFocus.KeyNavigation.left) {
+				this._currentFocus.focus = false
+				this._currentFocus.KeyNavigation.left.focus = true
+				e.preventDefault()
+			}
+			if(e.keyCode === 38 && this._currentFocus.KeyNavigation.up) {
+				this._currentFocus.focus = false
+				this._currentFocus.KeyNavigation.up.focus = true
+				e.preventDefault()
+			}
+			if(e.keyCode === 39 && this._currentFocus.KeyNavigation.right) {
+				this._currentFocus.focus = false
+				this._currentFocus.KeyNavigation.right.focus = true
+				e.preventDefault()
+			}
+			if(e.keyCode === 40 && this._currentFocus.KeyNavigation.down) {
+				this._currentFocus.focus = false
+				this._currentFocus.KeyNavigation.down.focus = true
+				e.preventDefault()
+			}
+			
+			if(this._currentFocus._keyDown) this._currentFocus._keyDown(e)
+			//console.log('code', e.keyCode)
+		})
+
+		this.backend.document.body.addEventListener('keydown', (e)=>{
+			if(this._currentFocus._keyUp) this._currentFocus._keyUp(e)
+		})
 	}
 
 	///@private

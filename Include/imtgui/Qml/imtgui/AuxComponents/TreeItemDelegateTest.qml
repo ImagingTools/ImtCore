@@ -4,20 +4,44 @@ import Acf 1.0
 Item {
     id: treeItemDelegate;
 
-    width: 100;
+    width: parent.width;
 
-    height: childrenColumn.visible ? 30 + childModelRepeater.count * 30 : 30;
+//    height: childrenColumn.visible ? childModelRepeater.count * treeItemDelegate.itemHeight : treeItemDelegate.itemHeight;
 
-    property bool isOpened: true;
+    height: childrenColumn.visible ? childrenColumn.height + treeItemDelegate.itemHeight : treeItemDelegate.itemHeight;
+
+
+    property bool isOpened: model.isOpened;
+
+    property int itemHeight: 30;
+
+    property int index: model.index;
+
+    signal isOpenedWasChanged(int index, int state);
+
+    signal isOk(int index, int state);
+
+    onIsOpenedChanged: {
+        console.log("TreeItem onIsOpenedChanged", treeItemDelegate.isOpened);
+    }
 
     Component.onCompleted: {
         console.log("TreeItemDelegate onCompleted");
 
-        console.log("model.visible", model.visible);
-
-        if (model.childItemModel)
-        {
+        if (model.childItemModel){
             childModelRepeater.model = model.childItemModel;
+        }
+
+        console.log("Id", model.Id);
+        console.log("Name", model.Name);
+        console.log("isOpened", model.isOpened);
+        console.log("visible", model.visible);
+        console.log("\n")
+    }
+
+    function changeParentIndex(){
+        if (model.index !== mainTreeView.currentParentIndex){
+            mainTreeView.currentParentIndex = model.index;
         }
     }
 
@@ -28,11 +52,20 @@ Item {
         anchors.right: parent.right;
 
         width: parent.width;
-        height: model.visible === 1 ? 30 : 0;
+        height: model.visible === 1 ? treeItemDelegate.itemHeight : 0;
 
-        color: Style.baseColor;
+        color: mainTreeView.currentParentIndex == model.index &&
+               childModelRepeater.indexChild === -1 ? "#4682B4" : Style.baseColor;
 
-        visible: model.visible === 1;
+        MouseArea {
+            anchors.fill: parent;
+
+            onClicked: {
+                console.log("Main rect clicked", mainTreeView.currentParentIndex, model.index);
+                mainTreeView.currentParentIndex = model.index;
+                childModelRepeater.indexChild = -1;
+            }
+        }
 
         Image {
             id: iconArrow;
@@ -58,7 +91,13 @@ Item {
 
                 onClicked: {
                     console.log("TreeItemDelegate Image onClicked");
-                    treeItemDelegate.isOpened = !treeItemDelegate.isOpened;
+//                    treeItemDelegate.isOpened = !treeItemDelegate.isOpened;
+                    if (treeItemDelegate.isOpened){
+                        treeItemDelegate.isOpenedWasChanged(model.index, 0)
+                    }
+                    else{
+                        treeItemDelegate.isOpenedWasChanged(model.index, 1)
+                    }
                 }
             }
         }
@@ -86,6 +125,10 @@ Item {
 
             visible: treeItemDelegate.isOpened;
 
+            onHeightChanged: {
+                console.log("TreeItemDelegate Column onHeightChanged", childrenColumn.height);
+            }
+
             Repeater {
                  id: childModelRepeater;
 
@@ -93,11 +136,29 @@ Item {
                      console.log("TreeItemDelegate onModelChanged", childModelRepeater.model.GetItemsCount());
                  }
 
+                 property int indexChild: mainTreeView.currentChildIndex;
+
                  delegate: Rectangle {
                      id: childRect;
 
                      width: treeItemDelegate.width;
-                     height: 30;
+                     height: childRect.visible ? treeItemDelegate.itemHeight : 0;
+
+                     visible: model.visible === 1;
+//                     color: "transparent";
+
+                     color: treeItemDelegate.index === mainTreeView.currentParentIndex &&
+                            childModelRepeater.indexChild === model.index ? "#4682B4" : "transparent";
+
+                     MouseArea {
+                         anchors.fill: parent;
+                         onClicked: {
+                             console.log("Child rect clicked", childModelRepeater.indexChild, model.index);
+                             mainTreeView.currentChildIndex = model.index;
+                             childModelRepeater.indexChild = model.index
+                             treeItemDelegate.changeParentIndex();
+                         }
+                     }
 
                      CheckBox {
                           id: checkBox;

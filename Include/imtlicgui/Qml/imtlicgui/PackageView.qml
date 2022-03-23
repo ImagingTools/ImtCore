@@ -30,6 +30,30 @@ Item {
         featureCollectionViewContainer.commandsChanged("PackageEdit");
     }
 
+    Keys.onPressed: {
+        console.log("PackageView keys pressed")
+
+        if (treeView.focus){
+            return;
+        }
+
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+            treeView.forceActiveFocus();
+        }
+        else if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+            featureCollectionViewContainer.selectedIndexDecr();
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+             featureCollectionViewContainer.selectedIndexIncr();
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key down was pressed');
+        }
+    }
+
     function refresh() {
         console.log("PackageView refresh");
         featureCollectionView.refresh();
@@ -374,6 +398,36 @@ Item {
         id: modelPackages;
     }
 
+    function selectedIndexIncr(){
+        console.log("PackageView selectedIndexIncr");
+        if (featureCollectionView.table.selectedIndex == featureCollectionView.getCountItems() - 1){
+            featureCollectionView.table.selectedIndex = 0;
+        }
+        else
+            featureCollectionView.table.selectedIndex++;
+
+        featureCollectionView.table.changeDataByIndex(featureCollectionView.table.selectedIndex);
+    }
+
+    function selectedIndexDecr(){
+        console.log("PackageView selectedIndexDecr");
+        if (featureCollectionView.table.selectedIndex == 0){
+            featureCollectionView.table.selectedIndex = featureCollectionView.getCountItems() - 1;
+        }
+        else
+            featureCollectionView.table.selectedIndex--;
+        featureCollectionView.table.changeDataByIndex(featureCollectionView.table.selectedIndex);
+
+    }
+
+    function selectItem(){
+        console.log("PackageCollectionView selectItem");
+
+        var itemId = featureCollectionView.table.getSelectedId();
+        var name = featureCollectionView.table.getSelectedName();
+        featureCollectionView.selectItem(itemId, name);
+    }
+
     CollectionView {
         id: featureCollectionView;
 
@@ -602,7 +656,7 @@ Item {
             }
         }
 
-        //featureCollectionViewContainer.printModelItems(treeView.modelItems);
+        featureCollectionViewContainer.printModelItems(treeView.modelItems);
         treeView.modelItems.Refresh();
     }
 
@@ -726,6 +780,11 @@ Item {
         }
     }
 
+//    function setFocusOnTreeView(){
+//        console.log("PackageView setFocusOnTreeView");
+//        treeView.forceActiveFocus();
+//    }
+
     Rectangle {
         id: packageMetaInfo;
 
@@ -786,6 +845,23 @@ Item {
             visible: false;
 
             clip: true;
+
+//            Keys.onPressed: {
+//                console.log("TreeView keys pressed")
+//                if (event.key === Qt.Key_Tab){
+//                    console.log('Key tab was pressed');
+//                    thubnailDecoratorContainer.setFocusOnMenuPanel();
+//                }
+//                else if (event.key === Qt.Key_Up){
+//                    console.log('Key up was pressed');
+////                    treeViewContainer.selectedIndexDecr();
+//                }
+//                else if (event.key === Qt.Key_Down){
+//                    console.log('Key down was pressed');
+
+////                    treeViewContainer.selectedIndexIncr();
+//                }
+//            }
 
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("PackageView TreeView onItemTreeViewCheckBoxStateChanged", state, packageId, featureId);

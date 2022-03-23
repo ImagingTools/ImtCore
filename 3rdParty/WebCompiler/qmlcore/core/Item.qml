@@ -21,6 +21,8 @@ Object {
 	property real opacity: 1;				///< opacity of the item
 
 	property lazy anchors: Anchors { }
+	property lazy KeyNavigation: KeyNavigation { }
+
 	property lazy effects: Effects { }
 	property lazy transform: Transform { }
 	property real rotation: 0;
@@ -47,6 +49,9 @@ Object {
 
 	property int keyProcessDelay;			///< delay time between key pressed events
 
+	signal keyspressed;
+	signal keysreleased;
+
 	constructor: {
 		this._pressedHandlers = {}
 		this._topPadding = 0
@@ -57,8 +62,43 @@ Object {
 			this._createElement(this.getTag(), this.getClass())
 		} //no parent == top level element, skip
 
+		this.event = {
+			accepted: false,
+			count: 0,
+			isAutoRepeat: false,
+			key: 0,
+			modifiers: 0,
+			nativeScanCode: 0,
+			text: '',
+		}
+
 		
 		
+	}
+
+	function _keyDown(e){
+		this.event.accepted = false
+		this.event.key = e.keyCode
+		this.event.modifiers = 0x00000000
+		if(e.altKey) this.event.modifiers |= 0x08000000
+		if(e.shiftKey) this.event.modifiers |= 0x02000000
+		if(e.ctrlKey) this.event.modifiers |= 0x04000000
+		if(e.metaKey) this.event.modifiers |= 0x10000000
+		this.keyspressed()
+
+		if(this.event.accepted) e.stopPropagation()
+	}
+	function _keyUp(e){
+		this.event.accepted = false
+		this.event.key = e.keyCode
+		this.event.modifiers = 0x00000000
+		if(e.altKey) this.event.modifiers |= 0x08000000
+		if(e.shiftKey) this.event.modifiers |= 0x02000000
+		if(e.ctrlKey) this.event.modifiers |= 0x04000000
+		if(e.metaKey) this.event.modifiers |= 0x10000000
+		this.keysreleased()
+
+		if(this.event.accepted) e.stopPropagation()
 	}
 
 	onCompleted: {
@@ -76,7 +116,7 @@ Object {
 		this.element.on("focusout", (e)=>{
 			this.focus = false
 		})
-		
+		this.Qt = this._context.Qt
 	}
 
 	function mapToItem(item, x, y){
@@ -251,8 +291,15 @@ Object {
 	}
 
 	onFocusChanged: {
-		if (this.parent)
+		// if(value){
+		// 	this.element.dom.focus()
+		// 	this._context._currentFocus = this
+		// }
+		
+		if (this.parent){
 			this.parent._tryFocus()
+			this._context._currentFocus = this
+		}
 	}
 
 	onVisibleChanged:		{ 

@@ -26,6 +26,11 @@ Item {
         packagesMultiDocView.commandsChanged(commandsId);
     }
 
+    function setFocus(){
+        console.log("PackagesMultiDocView setFocus");
+        packagesMultiDocView.setFocus();
+    }
+
     onVisibleChanged: {
         if (packagesMultiDocViewContainer.visible && packagesMultiDocView.pagesCount === 0) {
             console.log("PackagesMultiDocView first page loaded !");

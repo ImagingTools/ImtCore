@@ -1,5 +1,8 @@
 #include <imtguigql/CGetStyleDataControllerComp.h>
 
+// ACF includes
+#include <iprm/ISelectionParam.h>
+#include <iprm/IOptionsList.h>
 
 // Qt includes
 #include <QtCore/QObject>
@@ -54,14 +57,34 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 	}
 	else{
 		dataModelPtr = new imtbase::CTreeItemModel();
-		dataModelPtr->SetData("theme", theme);
-
 		QString pathToTheme;
+
+		if (theme == ""){
+			if (m_parameterCompPtr.IsValid()){
+				iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
+
+				if (selectionParam != nullptr){
+					const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
+
+					if (optionList != nullptr){
+						int index = selectionParam->GetSelectedOptionIndex();
+
+						if (index >= 0){
+							theme = optionList->GetOptionName(index).toUtf8();
+						}
+					}
+				}
+			}
+		}
+
+		dataModelPtr->SetData("theme", theme);
 		if (theme == "Dark"){
 			pathToTheme = ":/dark.theme";
-		} else{
+		}
+		else if (theme == "Light"){
 			pathToTheme = ":/light.theme";
 		}
+
 		QFile resource(pathToTheme);
 		if (resource.open(QIODevice::ReadOnly)){
 			QByteArray resources = resource.readAll();

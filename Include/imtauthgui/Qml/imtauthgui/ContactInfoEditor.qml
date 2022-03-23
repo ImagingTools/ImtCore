@@ -156,11 +156,11 @@ Rectangle {
         id: typeAccountModel;
 
         ListElement {
-            text: "Private";
+            name: "Private";
         }
 
         ListElement {
-            text: "Company";
+            name: "Company";
         }
     }
 
@@ -168,15 +168,15 @@ Rectangle {
         id: genderModel;
 
         ListElement {
-            text: "Diverse";
+            name: "Diverse";
         }
 
         ListElement {
-            text: "Male";
+            name: "Male";
         }
 
         ListElement {
-            text: "Female";
+            name: "Female";
         }
     }
 
@@ -292,7 +292,7 @@ Rectangle {
                 property bool wasFocus: false;
 
                 onCurrentIndexChanged: {
-                    var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).text.toLowerCase();
+                    var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).name.toLowerCase();
                     console.log("ContactInfoEditor ComboBox onCurrentIndexChanged", accountType);
 
                     if (!containerContactInfo.contactInfoModel){
@@ -736,7 +736,7 @@ Rectangle {
 
                         onCurrentIndexChanged: {
                             console.log("ContactInfoEditor TextFieldCustom Gender onInputTextChanged");
-                            var gender = genderModel.get(genderCB.currentIndex).text.toLowerCase();
+                            var gender = genderModel.get(genderCB.currentIndex).name.toLowerCase();
                             containerContactInfo.contactInfoModel.SetData("Gender", gender);
                             containerContactInfo.wasChanged = true;
                         }

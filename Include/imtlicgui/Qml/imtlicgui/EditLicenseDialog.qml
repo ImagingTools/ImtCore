@@ -32,6 +32,11 @@ Rectangle {
     signal okClicked(string newId, string newName);
     signal cancelClicked();
 
+    Component.onCompleted: {
+        console.log("EditLicenseDialog onCompleted");
+
+    }
+
     function exit(status) {
         var parameters  = {};
         if (status === "ok") {

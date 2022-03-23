@@ -21,7 +21,7 @@ Rectangle{
 
     property real delegateWidth: count == 0 ? 0 : width/count;
 
-    signal clicked;
+    signal clicked();
     signal tableDelegateRrightButtonMouseClicked(int mX, int mY);
     signal doubleClicked;
 

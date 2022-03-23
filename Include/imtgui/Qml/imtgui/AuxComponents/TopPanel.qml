@@ -128,6 +128,10 @@ Rectangle {
 
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
 
+        Component.onCompleted: {
+            console.log("Preference button onCompleted!");
+        }
+
         onClicked: {
             console.log("Preference button clicked !");
             var source = "AuxComponents/PreferenceDialog.qml";

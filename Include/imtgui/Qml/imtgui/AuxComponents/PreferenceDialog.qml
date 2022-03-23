@@ -28,6 +28,14 @@ Rectangle {
         settingsQuery.getSettings();
     }
 
+    Keys.onReleased:
+    {
+        console.log("PreferenceDialog Key clicked!")
+        if(event.key === Qt.Key_Tab) {
+            console.log("PreferenceDialog Tab clicked!")
+        }
+     }
+
     onModelSettingsChanged: {
         console.log("PreferenceDialog onModelSettingsChanged");
 
@@ -46,6 +54,11 @@ Rectangle {
             preferenceContainer.settingsBodyChanged();
         }
     }
+
+//    function callGetStyleQuery(theme){
+//        console.log("PreferenceDialog callGetStyleQuery", theme);
+//        stylesQuery.getStyle(theme);
+//    }
 
     function dataChanged(index, modelElements, activeValue){
         console.log("PreferenceDialog dataChanged");
@@ -170,39 +183,39 @@ Rectangle {
         }
     }
 
-    function getThemeColor(colorType, colorKey, themeType) {
-        var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
-        return themeType.GetData("ColorPalette").GetData(colorPalette);
-    }
+//    function getThemeColor(colorType, colorKey, themeType) {
+//        var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
+//        return themeType.GetData("ColorPalette").GetData(colorPalette);
+//    }
 
-    function parseStyleTheme(themeType) {
-        console.log("PreferenceDialog parseStyleTheme");
+//    function parseStyleTheme(themeType) {
+//        console.log("PreferenceDialog parseStyleTheme");
 
-        Style.baseColor = preferenceContainer.getThemeColor("ActiveColors", "Base", themeType);
-        Style.alternateBaseColor = preferenceContainer.getThemeColor("ActiveColors", "AlternateBase", themeType);
-        Style.backgroundColor = preferenceContainer.getThemeColor("ActiveColors", "Background", themeType);
-        Style.textColor = preferenceContainer.getThemeColor("ActiveColors", "Text", themeType);
-        Style.textSelected = preferenceContainer.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
-        Style.selectedColor = preferenceContainer.getThemeColor("ActiveColors", "ItemSelected", themeType);
-        Style.buttonColor = preferenceContainer.getThemeColor("ActiveColors", "HeaderBorder", themeType);
-        Style.buttonBorderColor = preferenceContainer.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+//        Style.baseColor = preferenceContainer.getThemeColor("ActiveColors", "Base", themeType);
+//        Style.alternateBaseColor = preferenceContainer.getThemeColor("ActiveColors", "AlternateBase", themeType);
+//        Style.backgroundColor = preferenceContainer.getThemeColor("ActiveColors", "Background", themeType);
+//        Style.textColor = preferenceContainer.getThemeColor("ActiveColors", "Text", themeType);
+//        Style.textSelected = preferenceContainer.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
+//        Style.selectedColor = preferenceContainer.getThemeColor("ActiveColors", "ItemSelected", themeType);
+//        Style.buttonColor = preferenceContainer.getThemeColor("ActiveColors", "HeaderBorder", themeType);
+//        Style.buttonBorderColor = preferenceContainer.getThemeColor("ActiveColors", "ButtonBorder", themeType);
 
-        Style.disabledInActiveTextColor = preferenceContainer.getThemeColor("DisabledInActiveColors", "Text", themeType);
+//        Style.disabledInActiveTextColor = preferenceContainer.getThemeColor("DisabledInActiveColors", "Text", themeType);
 
-        Style.hover = preferenceContainer.getThemeColor("ActiveColors", "Hover", themeType);
+//        Style.hover = preferenceContainer.getThemeColor("ActiveColors", "Hover", themeType);
 
-        Style.imagingToolsGradient0 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient0");
-        Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
-        Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
-        Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
-        Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
+//        Style.imagingToolsGradient0 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient0");
+//        Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
+//        Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
+//        Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
+//        Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
 
-        Style.iconColorOnSelected = preferenceContainer.getThemeColor("IconColor", "OnSelected", themeType);
-        Style.tabSelectedColor = preferenceContainer.getThemeColor("ActiveColors", "TabSelected", themeType);
-        Style.errorTextColor = preferenceContainer.getThemeColor("ActiveColors", "ErrorText", themeType);
+//        Style.iconColorOnSelected = preferenceContainer.getThemeColor("IconColor", "OnSelected", themeType);
+//        Style.tabSelectedColor = preferenceContainer.getThemeColor("ActiveColors", "TabSelected", themeType);
+//        Style.errorTextColor = preferenceContainer.getThemeColor("ActiveColors", "ErrorText", themeType);
 
-        Style.shadowColor = preferenceContainer.getThemeColor("ActiveColors", "Shadow", themeType);
-    }
+//        Style.shadowColor = preferenceContainer.getThemeColor("ActiveColors", "Shadow", themeType);
+//    }
 
     Rectangle {
         id: topPan;
@@ -359,7 +372,6 @@ Rectangle {
                    height: 1;
 
                    color: Style.buttonBorderColor;
-
                }
 
                Loader {
@@ -415,7 +427,9 @@ Rectangle {
 
            if (preferenceContainer.currentModeId !== Style.theme){
                Style.theme = preferenceContainer.currentModeId;
-               stylesQuery.getStyle(preferenceContainer.currentModeId);
+//               stylesQuery.getStyle(preferenceContainer.currentModeId);
+
+               Style.changeSchemeDesign(preferenceContainer.currentModeId);
            }
 
            preferenceSaveQuery.save();
@@ -487,42 +501,42 @@ Rectangle {
        }
    }
 
-   GqlModel {
-       id: stylesQuery;
+//   GqlModel {
+//       id: stylesQuery;
 
-       function getStyle(theme){
-           var query = Gql.GqlRequest("query", "GetStyle");
-           var inputParams = Gql.GqlObject("input");
-           inputParams.InsertField("theme");
-           inputParams.InsertFieldArgument("theme", theme);
-           query.AddParam(inputParams);
+//       function getStyle(theme){
+//           var query = Gql.GqlRequest("query", "GetStyle");
+//           var inputParams = Gql.GqlObject("input");
+//           inputParams.InsertField("theme");
+//           inputParams.InsertFieldArgument("theme", theme);
+//           query.AddParam(inputParams);
 
-           var queryFields = Gql.GqlObject("style");
-           queryFields.InsertField("theme");
-           queryFields.InsertField("source");
-           query.AddField(queryFields);
+//           var queryFields = Gql.GqlObject("style");
+//           queryFields.InsertField("theme");
+//           queryFields.InsertField("source");
+//           query.AddField(queryFields);
 
-           var gqlData = query.GetQuery();
-           console.log("Preference GqlModel getStyle query ", gqlData);
-           this.SetGqlQuery(gqlData);
-       }
+//           var gqlData = query.GetQuery();
+//           console.log("Preference GqlModel getStyle query ", gqlData);
+//           this.SetGqlQuery(gqlData);
+//       }
 
-       onStateChanged: {
-           console.log("State:", this.state, stylesQuery);
-           if (this.state === "Ready") {
-               var dataModelLocal = this.GetData("data");
+//       onStateChanged: {
+//           console.log("State:", this.state, stylesQuery);
+//           if (this.state === "Ready") {
+//               var dataModelLocal = this.GetData("data");
 
-               if(dataModelLocal.ContainsKey("GetStyle")) {
-                   dataModelLocal = dataModelLocal.GetData("GetStyle");
-               }
+//               if(dataModelLocal.ContainsKey("GetStyle")) {
+//                   dataModelLocal = dataModelLocal.GetData("GetStyle");
+//               }
 
-               if(dataModelLocal.ContainsKey("source")){
-                   dataModelLocal = dataModelLocal.GetData("source");
-                   preferenceContainer.parseStyleTheme(dataModelLocal);
-               }
-           }
-       }
-   }
+//               if(dataModelLocal.ContainsKey("source")){
+//                   dataModelLocal = dataModelLocal.GetData("source");
+//                   preferenceContainer.parseStyleTheme(dataModelLocal);
+//               }
+//           }
+//       }
+//   }
 
    GqlModel {
        id: preferenceSaveQuery;

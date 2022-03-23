@@ -14,7 +14,7 @@ Rectangle {
     radius: 2;
     color: Style.backgroundColor;
     clip: true;
-    focus: true;
+    //focus: true;
 
     property Item resultItem;
     property Item loaderDialog;
@@ -34,16 +34,7 @@ Rectangle {
 
     Component.onCompleted: {
         console.log("EditFeatureDialog onCompleted");
-//        tfcFeatureNameText.activeFocusOnPress = true;
-
-//        containerFeatureEdit.forceActiveFocus();
-//        tfcFeatureName.forceActiveFocus();
-
-        tfcFeatureNameText.forceActiveFocus();
-
-        if (tfcFeatureNameText.activeFocus){
-            console.log("EditFeatureDialog active focus on textinput");
-        }
+        tfcFeatureName.forceActiveFocus();
     }
 
 //    Keys.onPressed: {
@@ -105,6 +96,7 @@ Rectangle {
         }
         parameters["dialog"] = "EditFeature";
         parameters["status"] = status;
+        containerFeatureEdit.resultItem.forceActiveFocus();
         containerFeatureEdit.resultItem.dialogResult(parameters);
     }
 
@@ -201,6 +193,15 @@ Rectangle {
             border.width: 1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
+            onFocusChanged: {
+                console.log("Rectangle tfcFeatureName onFocusChanged");
+
+                tfcFeatureNameText.setFocus();
+//                tfcFeatureNameText.focus = true;
+            }
+
+//            KeyNavigation.tab: tfcFeatureId;
+
             TextFieldCustom {
                 id: tfcFeatureNameText;
 
@@ -211,7 +212,7 @@ Rectangle {
                 height: 30;
 
                 text: containerFeatureEdit.featureName;
-                focus: true;
+                //focus: true;
                 correctData: errorNameMessage.text !== "";
                 borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
 
@@ -223,6 +224,21 @@ Rectangle {
                        errorNameMessage.text = nameMessage;
                     }
                 }
+
+                KeyNavigation.tab: tfcFeatureId;
+
+                onFocusChanged: {
+                    console.log("TextFieldCustom tfcFeatureNameText onFocusChanged");
+
+//                    tfcFeatureNameText.setFocus();
+//                    if (containerTextField.focus){
+//                        textField.forceActiveFocus();
+//                    }
+                }
+
+//                Keys.onTabPressed: {
+//                    console.log("EditFeatureDialog tfcFeatureNameText pressed!")
+//                }
             }
         }
 
@@ -252,6 +268,18 @@ Rectangle {
             border.width: 1;
             border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
+            onFocusChanged: {
+                console.log("Rectangle tfcFeatureId onFocusChanged");
+
+//                tfcFeatureIdText.focus = true;
+
+//                tfcFeatureIdText.forceActiveFocus();
+
+                tfcFeatureIdText.setFocus();
+            }
+
+            KeyNavigation.tab: tfcFeatureName;
+
             TextFieldCustom {
                 id: tfcFeatureIdText;
 
@@ -275,9 +303,8 @@ Rectangle {
                     }
                 }
 
-                onFocusChanged: {
-                    containerFeatureEdit.generateKey();
-                }
+//                KeyNavigation.tab: tfcFeatureName;
+                KeyNavigation.tab: okButton;
             }
         }
 
@@ -303,6 +330,8 @@ Rectangle {
 
             enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
 
+            KeyNavigation.tab: cancelButton;
+
             onClicked: {
                 if (tfcFeatureIdText.text[0] !== "#") {
                     tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
@@ -312,6 +341,31 @@ Rectangle {
                 containerFeatureEdit.exit("ok");
                 loaderDialog.closeItem();
             }
+
+            onFocusChanged: {
+                console.log("EditFeatureDialog okButton onFocusChanged");
+
+                if (okButton.focus){
+                    okButton.highlighted = true;
+                }
+                else{
+                    okButton.highlighted = false;
+                }
+            }
+
+            Keys.onReleased: {
+                console.log("AuxButton okButton Key pressed!")
+                if(event.key === Qt.Key_Return){
+                    console.log("key_enter");
+                    if (tfcFeatureIdText.text[0] !== "#") {
+                        tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
+                    }
+
+                    containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
+                    containerFeatureEdit.exit("ok");
+                    loaderDialog.closeItem();
+                }
+             }
         }
 
         AuxButton {
@@ -331,10 +385,32 @@ Rectangle {
             borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 
+            KeyNavigation.tab: tfcFeatureName;
+
             onClicked: {
                 containerFeatureEdit.exit("cancel");
                 loaderDialog.closeItem();
             }
+
+            onFocusChanged: {
+                console.log("EditFeatureDialog cancelButton onFocusChanged");
+
+                if (cancelButton.focus){
+                    cancelButton.highlighted = true;
+                }
+                else{
+                    cancelButton.highlighted = false;
+                }
+            }
+
+            Keys.onReleased: {
+                console.log("AuxButton cancelButton Key pressed!")
+                if(event.key === Qt.Key_Return) {
+                    console.log("key_enter");
+                    containerFeatureEdit.exit("cancel");
+                    loaderDialog.closeItem();
+                }
+             }
         }
 
         Text {

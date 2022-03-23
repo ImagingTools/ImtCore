@@ -20,12 +20,43 @@ Item {
 
     property string operation;
 
-    function refresh() {
+    function refresh(){
         packageCollectionView.refresh();
     }
 
-    function menuActivated(menuId) {
+    function menuActivated(menuId){
         packageCollectionView.menuActivated(menuId)
+    }
+
+    Keys.onPressed: {
+        console.log("PackageCollectionView keys pressed")
+
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+//            packageCollectionContainer.selectedIndexDecr();
+
+            if (packageCollectionContainer.multiDocViewItem.tabPanel.count > 1){
+                packageCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
+                packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+            }
+            else{
+                thubnailDecoratorContainer.setFocusOnMenuPanel();
+            }
+        }
+        else if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+            packageCollectionContainer.selectedIndexDecr();
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+             packageCollectionContainer.selectedIndexIncr();
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key down was pressed');
+            packageCollectionContainer.selectItem();
+
+            packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+        }
     }
 
     ListModel {
@@ -181,6 +212,36 @@ Item {
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
+    function selectedIndexIncr(){
+        console.log("PackageCollectionView selectedIndexIncr");
+        if (packageCollectionView.table.selectedIndex == packageCollectionView.getCountItems() - 1){
+            packageCollectionView.table.selectedIndex = 0;
+        }
+        else
+            packageCollectionView.table.selectedIndex++;
+
+        packageCollectionView.table.changeDataByIndex(packageCollectionView.table.selectedIndex);
+    }
+
+    function selectedIndexDecr(){
+        console.log("PackageCollectionView selectedIndexDecr");
+        if (packageCollectionView.table.selectedIndex == 0){
+            packageCollectionView.table.selectedIndex = packageCollectionView.getCountItems() - 1;
+        }
+        else
+            packageCollectionView.table.selectedIndex--;
+
+        packageCollectionView.table.changeDataByIndex(packageCollectionView.table.selectedIndex);
+    }
+
+    function selectItem(){
+        console.log("PackageCollectionView selectItem");
+
+        var itemId = packageCollectionView.table.getSelectedId();
+        var name = packageCollectionView.table.getSelectedName();
+        packageCollectionView.selectItem(itemId, name);
+    }
+
     CollectionView {
         id: packageCollectionView;
 
@@ -218,26 +279,35 @@ Item {
         }
 
         onSelectedIndexChanged: {
-            console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.selectedIndex);
-            if (packageCollectionView.selectedIndex > -1){
-                packageCollectionContainer.commandsChanged("Packages")
+            console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.table.selectedIndex);
+            if (packageCollectionView.table.selectedIndex > -1){
+                packageCollectionContainer.commandsChanged("Packages");
 
-                var index = -1;
-                for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
-                    var curId = metaInfoModels.GetData("Id", i);
+                if (metaInfoModels.GetItemsCount() >= packageCollectionView.table.selectedIndex + 1){
 
-                    if (curId === packageCollectionView.table.getSelectedId()){
-                        index = i;
-                        break;
-                    }
-                }
-
-                if (index !== -1){
-                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData", index);
+                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData",
+                                                                                 packageCollectionView.table.selectedIndex);
                 }
                 else{
                     metaInfo.getMetaInfo();
                 }
+
+//                var index = -1;
+//                for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
+//                    var curId = metaInfoModels.GetData("Id", i);
+
+//                    if (curId === packageCollectionView.table.getSelectedId()){
+//                        index = i;
+//                        break;
+//                    }
+//                }
+
+//                if (index !== -1){
+//                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData", index);
+//                }
+//                else{
+//                    metaInfo.getMetaInfo();
+//                }
             }
         }
     }
