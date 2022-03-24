@@ -328,7 +328,7 @@ ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSu
 			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("TypeId")){
-			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_ID).toByteArray();
+			result.text = m_collectionPtr->GetObjectTypeId(objectId);
 			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("Description")){

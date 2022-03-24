@@ -172,7 +172,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 			return OS_FAILED;
 		}
 
-		QByteArray typeId = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_TYPE_ID).toByteArray();
+		QByteArray typeId = documentPtr->GetObjectTypeId(objectId);
 		QString name = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_NAME).toByteArray();
 
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);

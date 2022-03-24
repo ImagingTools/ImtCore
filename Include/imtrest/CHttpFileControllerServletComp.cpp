@@ -7,7 +7,6 @@
 #include <imtrest/IProtocolEngine.h>
 
 
-
 namespace imtrest
 {
 

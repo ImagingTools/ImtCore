@@ -48,16 +48,6 @@ public:
 		EIT_ENABLED,
 
 		/**
-			Type-ID of the element given as a QByteArray.
-		*/
-		EIT_TYPE_ID,
-
-		/**
-			Human-readable name of the element type given as a QString.
-		*/
-		EIT_TYPE_NAME,
-
-		/**
 			Start value for user-defined info types.
 		*/
 		EIT_USER = 1000

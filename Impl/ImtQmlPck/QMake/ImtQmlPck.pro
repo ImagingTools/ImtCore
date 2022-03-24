@@ -27,6 +27,6 @@ include($(ACFCONFIGDIR)/QMake/AcfStd.pri)
 
 # Set OS-specific build options:
 win32-msvc*{
-    # copying all Qt DLLs to destination directory
+	# copying all Qt DLLs to destination directory
 	greaterThan(QT_MAJOR_VERSION, 4): QMAKE_POST_LINK = $(QTDIR)\bin\windeployqt $$DESTDIR\ImtQmlPck.arp
 }

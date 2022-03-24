@@ -122,42 +122,6 @@ public:
 		OF_ALL = OF_SUPPORT_RENAME | OF_SUPPORT_INSERT | OF_SUPPORT_DELETE | OF_SUPPORT_EDIT | OF_SUPPORT_USING
 	};
 
-	/**
-		Type of the meta-informations supported by the collection.
-	*/
-	enum MetaInfoType
-	{
-		/**
-			Name of the user who has added the element.
-		*/
-		MIT_INSERTION_USER = idoc::IDocumentMetaInfo::MIT_USER + 10000,
-
-		/**
-			Timestamp of the element inserting into the collection.
-		*/
-		MIT_INSERTION_TIME,
-
-		/**
-			Name of the user who has modified the element.
-		*/
-		MIT_LAST_OPERATION_USER,
-
-		/**
-			Timestamp of the last operation on the element in the collection.
-		*/
-		MIT_LAST_OPERATION_TIME,
-
-		/**
-			Tumbnail for the item preview.
-		*/
-		MIT_PREVIEW_THUMBNAIL,
-
-		/**
-			Current element revision.
-		*/
-		MIT_REVISION = idoc::IDocumentMetaInfo::MIT_USER + 20000
-	};
-
 	I_DECLARE_FLAGS(OperationalFlags, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_EDIT, OF_SUPPORT_USING, OF_ALL);
 
 

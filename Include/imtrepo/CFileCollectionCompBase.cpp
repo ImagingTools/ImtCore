@@ -734,15 +734,9 @@ QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 		switch (infoType){
 		case EIT_NAME:
 			return item.objectName;
-			break;
 
 		case EIT_DESCRIPTION:
 			return item.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
-			break;
-
-		case EIT_TYPE_ID:
-			return item.typeId;
-			break;
 		}
 	}
 

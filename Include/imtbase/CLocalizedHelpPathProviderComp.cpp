@@ -78,20 +78,20 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 			request.setRawHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 			request.setRawHeader("Accept-Language", "en-us,en;q=0.5");
 			request.setRawHeader("Connection", "Keep-Alive");
-			QNetworkReply *reply = manager.get(request);
+			QNetworkReply* replyPtr = manager.get(request);
 
 			QEventLoop loop;
 			QTimer timer;
 			timer.setSingleShot(true);
 			timer.connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-			timer.connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+			timer.connect(replyPtr, &QNetworkReply::finished, &loop, &QEventLoop::quit);
 			timer.start(10000);
 			loop.exec();
 
 			if (timer.isActive()){
 				timer.stop();
-				if (reply->error() == 0){
-					int attribute = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+				if (replyPtr->error() == 0){
+					int attribute = replyPtr->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
 					if (attribute >= 200 && attribute < 400){
 						return url;
@@ -99,8 +99,8 @@ QString CLocalizedHelpPathProviderComp::GetPathForLocale(int languageIndex) cons
 				}
 			}
 			else{
-				reply->disconnect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-				reply->abort();
+				replyPtr->disconnect(replyPtr, &QNetworkReply::finished, &loop, &QEventLoop::quit);
+				replyPtr->abort();
 			}
 		}
 	}

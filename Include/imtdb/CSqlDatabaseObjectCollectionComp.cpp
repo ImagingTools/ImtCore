@@ -55,10 +55,6 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 
 		case EIT_DESCRIPTION:
 			return item.collectionMetaInfoPtr.IsValid() ? item.collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString() : QString();
-
-		case EIT_TYPE_ID:
-			return item.typeId;
-			break;
 		}
 	}
 

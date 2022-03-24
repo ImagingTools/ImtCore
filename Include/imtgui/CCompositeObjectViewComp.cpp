@@ -88,7 +88,7 @@ void CCompositeObjectViewComp::CreateView()
 			continue;
 		}
 
-		QByteArray objectTypeId = objectProviderPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_TYPE_ID).toByteArray();
+		QByteArray objectTypeId = objectProviderPtr->GetObjectTypeId(objectId);
 		QString objectName = objectProviderPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 		int factoryCount = qMin(m_objectViewFactoryListCompPtr.GetCount(), m_objectTypeAttrPtr.GetCount());

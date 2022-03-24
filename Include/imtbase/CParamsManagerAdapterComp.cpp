@@ -253,7 +253,7 @@ void CParamsManagerAdapterComp::UpdateList()
 		imtbase::ICollectionInfo::Ids elementIds = m_collectionCompPtr->GetElementIds();
 		for (const QByteArray& id : elementIds){
 			if (m_typeIdsAttrPtr.IsValid()){
-				QByteArray typeId = m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_TYPE_ID).toByteArray();
+				QByteArray typeId = m_collectionCompPtr->GetObjectTypeId(id);
 				
 				int index = m_typeIdsAttrPtr.FindValue(typeId);
 				if (index < 0){

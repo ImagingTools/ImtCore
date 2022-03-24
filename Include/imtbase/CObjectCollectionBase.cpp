@@ -424,9 +424,6 @@ QVariant CObjectCollectionBase::GetElementInfo(const QByteArray& elementId, int 
 		case EIT_NAME:
 			return m_objects[objectIndex].name;
 
-		case EIT_TYPE_ID:
-			return m_objects[objectIndex].typeId;
-
 		case EIT_ENABLED:
 			return m_objects[objectIndex].isEnabled;
 		}
