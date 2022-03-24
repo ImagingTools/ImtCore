@@ -595,7 +595,7 @@ void CObjectCollectionViewComp::UpdateItem(const imtbase::IObjectCollectionInfo:
 		}
 
 		columns[0]->setData(objectId, DR_OBJECT_ID);
-		columns[0]->setData(objectCollectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_TYPE_ID), DR_TYPE_ID);
+		columns[0]->setData(objectCollectionPtr->GetObjectTypeId(objectId));
 
 		for (int i = 0; i < columns.count(); i++){
 			columns[i]->setFlags(flags);
