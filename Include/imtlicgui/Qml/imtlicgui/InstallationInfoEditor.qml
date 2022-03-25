@@ -23,7 +23,6 @@ Rectangle {
     property string productId;
     property string gqlModelInfo;
     property string gqlModelCollectionInfo;
-//    property string operation: multiDocViewItem.operation;
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
@@ -52,16 +51,13 @@ Rectangle {
     }
 
     Component.onCompleted: {
-//        if (containerInstallation.operation === "New") {
-            containerInstallation.gqlModelInfo = "ProductInfo";
-            containerInstallation.gqlModelCollectionInfo = "ProductList"
-            headerInfoModel.updateModel();
-//        }
+        containerInstallation.gqlModelInfo = "ProductInfo";
+        containerInstallation.gqlModelCollectionInfo = "ProductList"
+        headerInfoModel.updateModel();
     }
 
     onWasChangedChanged: {
         console.log("InstallationInfoEditor onWasChangedChanged", containerInstallation.wasChanged);
-
         containerInstallation.commandsChanged("InstallationEdit");
     }
 
@@ -71,33 +67,17 @@ Rectangle {
             containerInstallation.contactInfoModel = containerContactInfo.model.GetData('data');
             containerInstallation.updateData();
         }
-//        else {
-//            if(containerInstallation.operation === "New"){
-//                //containerContactInfo.accountType = "company";
-////                cbTypeAccount.currentIndex = 0;
-////                containerContactInfo.contactInfoModel = model.AddTreeModel("data");
-////                containerContactInfo.contactInfoModel.SetData("Email","")
-////                containerContactInfo.contactInfoModel.SetData("FirstName","")
-////                containerContactInfo.contactInfoModel.SetData("LastName","")
-//            }
-//            else{
-
-//            }
-//        }
     }
 
     onActiveLicensesChanged: {
         console.log("InstallationInfoEditor onActiveLicensesChanged");
         var licenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
 
-        console.log("licenses", licenses);
-
         if (licenses && licenses.GetItemsCount() > 0){
             var index;
 
             var count =  containerInstallation.activeLicenses.GetItemsCount();
             for (var i = 0; i < count; i++){
-
                 var curId = containerInstallation.activeLicenses.GetData("Id", i);
 
                 for (var j = 0; j < licenses.GetItemsCount(); j++){
@@ -105,19 +85,11 @@ Rectangle {
                     var expiration = licenses.GetData("Expiration", j);
 
                     if (curId === licId){
-
                         containerInstallation.activeLicenses.SetData("LicenseState", 2, i);
 
                         if (expiration && expiration !== "Unlimited"){
                             var parts = expiration.split('.');
-                            //var date = new Date(parts[0], parts[1] - 1, parts[2]);
-
                             var date = new Date(parts[2], parts[1] - 1, parts[0]);
-
-                            //console.log("expiration", expiration);
-                            //console.log("parts", parts[2], parts[1] - 1, parts[0]);
-
-                            //console.log("DATE ", date.toLocaleString());
                             containerInstallation.activeLicenses.SetData("ExpirationState", 2, i);
                             containerInstallation.activeLicenses.SetData("Expiration", date, i);
                         }
@@ -220,7 +192,6 @@ Rectangle {
     }
 
     function openMessageDialog(nameDialog, message) {
-
         var source = "AuxComponents/MessageDialog.qml";
         var parameters = {};
         parameters["resultItem"] = containerInstallation;
@@ -228,7 +199,6 @@ Rectangle {
         parameters["textOkButton"] = "Ok";
         parameters["message"] = message;
         parameters["nameDialog"] = nameDialog;
-
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
@@ -288,7 +258,7 @@ Rectangle {
                  color: Style.imagingToolsGradient1;
 
                  border.width: 1;
-                 border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                 border.color: Style.borderColor;
 
                  TextFieldCustom {
                      id: instanceIdText;
@@ -330,7 +300,7 @@ Rectangle {
                  color: Style.imagingToolsGradient1;
 
                  border.width: 1;
-                 border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                 border.color: Style.borderColor;
 
                  ComboBox {
                      id: customerCB;
@@ -344,12 +314,9 @@ Rectangle {
                      radius: 3;
                      model: listModelAccounts;
 
-                     backgroundColor: "#d0d0d0";
-                     borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+//                     backgroundColor: "#d0d0d0";
+                     borderColor: Style.alternateBaseColor;
                      textCentered: false;
-
-//                     menuX: customerCB.x;
-//                     menuY: customerCB.y;
 
                      property bool wasFocus: false;
 
@@ -364,6 +331,10 @@ Rectangle {
                          }
 
                          containerInstallation.wasChanged = true;
+                     }
+
+                     onClicked: {
+                         customerCB.openContextMenu();
                      }
                  }
              }
@@ -393,7 +364,7 @@ Rectangle {
                  color: Style.imagingToolsGradient1;
 
                  border.width: 1;
-                 border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                 border.color: Style.borderColor;
 
                  ComboBox {
                      id: productCB;
@@ -407,9 +378,9 @@ Rectangle {
                      radius: 3;
                      model: listModelProducts;
 
-                     backgroundColor: "#d0d0d0";
+//                     backgroundColor: "#d0d0d0";
 
-                     borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+                     borderColor: Style.alternateBaseColor;
                      textCentered: false;
 
                      property bool wasFocus: false;
@@ -429,6 +400,9 @@ Rectangle {
                          containerInstallation.wasChanged = true;
                      }
 
+                     onClicked: {
+                         productCB.openContextMenu();
+                     }
                  }
              }
 
@@ -455,7 +429,7 @@ Rectangle {
                  color: Style.imagingToolsGradient1;
 
                  border.width: 1;
-                 border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                 border.color: Style.borderColor;
 
                  AuxTable {
                      id: licensesTable;
@@ -501,7 +475,6 @@ Rectangle {
                                  containerInstallation.activeLicenses.SetData("Expiration", "Unlimited", modelIndex);
                              }
                              else{
-                                 //containerInstallation.activeLicenses.SetData("Expiration", "2023-01-01", modelIndex);
                                  containerInstallation.activeLicenses.SetData("Expiration", "01.01.2023", modelIndex);
                              }
 

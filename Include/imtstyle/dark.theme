@@ -4,6 +4,7 @@
 		"DeepGray": "#2b2d2d",
 		"DeepGray2": "#5b5d5d",
 		"DarkGray": "#1e2020",
+		"DarkGray 2": "#3a3b3b",
 		"LightGray2": "#edefef",
 		"White": "#cecece",
 		"Black": "#000000",
@@ -25,7 +26,8 @@
 		"ImagingToolsGradient2": "#232325",
 		"ImagingToolsGradient3": "#232325",
 		"ImagingToolsGradient4": "#232325",
-		"Red": "#FF4500"
+		"Red": "#FF4500",
+		"Green": "#00FF00"
 	},
 	"Style": {
 		"Name": "Dark",
@@ -75,7 +77,8 @@
 			"BackgroundSelected": "DarkGray",
 			"TextSelected": "VividBlue",
 			"TextSelectedBackground": "VividBlue",
-			"Shadow": "Black"
+			"Shadow": "Black",
+			"BorderColor": "DarkGray 2"
 		},
 		"InactiveColors": {
 			"Background": "DeepGray",

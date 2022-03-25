@@ -5,12 +5,14 @@ import Acf 1.0
 
 Item {
     id: container;
+
     property alias selectedIndex: elementsList.selectedIndex;
-    property string textColor: "#335777";
-    property real delegateWidth: count == 0 ? 0 : headersList.width / headersList.count;
-    property int count: headersArray.length;
     property alias headers: headersList.model;
     property alias elements: elementsList.model;
+
+    property real delegateWidth: count == 0 ? 0 : headersList.width / headersList.count;
+
+    property int count: headersArray.length;
 
     property var headersArray: ["First", "Second", "Third"];
 
@@ -25,76 +27,86 @@ Item {
 
     Rectangle {
         id: headersPanel;
+
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: parent.top;
+
         height: 30;
+
         color: "transparent";
 
         Row {
             height: parent.height;
-        Repeater {
-            id: headersList;
-            clip: true;
 
-            model: 3;
-            delegate: Rectangle {
-                id:deleg;
-                width: headersPanel.width/headersList.count;
-                height: headersPanel.height;
-                color: "transparent";
-                Text {
-                    id: name;
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: parent.left;
-                    anchors.leftMargin: 8;
-//                    font.pixelSize: container.fontSize;
-//                    font.family: container.fontName;
-                    font.bold: true; //container.fontBold
-//                    color: container.textColor
-                    color: Style.textColor;
-                    text: container.headersArray[model.index];
+            Repeater {
+                id: headersList;
+                clip: true;
 
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_subtitle;
+                model: 3;
+
+                delegate: Rectangle {
+                    id:deleg;
+
+                    width: headersPanel.width/headersList.count;
+                    height: headersPanel.height;
+
+                    color: "transparent";
+
+                    Text {
+                        id: name;
+
+                        anchors.verticalCenter: parent.verticalCenter;
+                        anchors.left: parent.left;
+                        anchors.leftMargin: 8;
+
+                        font.bold: true; //container.fontBold
+                        color: Style.textColor;
+                        text: container.headersArray[model.index];
+
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_subtitle;
+                    }
                 }
             }
         }
-        }
-
 
         Rectangle {
             id: bottomLine;
+
             anchors.left: parent.left;
             anchors.right: parent.right;
             anchors.bottom: parent.bottom;
+
             height: 1;
+
             color: "lightgray";
         }
-
     }//headers
 
     ListView {
         id: elementsList;
-        property int selectedIndex: -1;
+
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
+
         clip: true;
-//        boundsBehavior: Flickable.StopAtBounds;
+
         spacing: 0;
         model: 10;
+
+        property int selectedIndex: -1;
+
         delegate: TableDelegate {
             width: elementsList.width;
-            //textColor: container.textColor;
+
             selected: elementsList.selectedIndex === model.index;
+
             onClicked: {
                 elementsList.selectedIndex = model.index;
             }
-
         }
     }
-
-
 }

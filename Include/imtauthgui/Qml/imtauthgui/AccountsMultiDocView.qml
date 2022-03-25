@@ -10,7 +10,6 @@ Item {
     visible: false;
     property Item rootItem;
     property alias firstElementImageSource: accountsMultiDocView.firstElementImageSource;
-//    property alias model: accountsMultiDocView.model;
 
     function menuActivated(menuId) {
         accountsMultiDocView.menuActivated(menuId);

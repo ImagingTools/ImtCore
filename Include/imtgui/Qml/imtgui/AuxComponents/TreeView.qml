@@ -3,17 +3,14 @@ import Acf 1.0
 
 Rectangle {
     id: treeViewContainer;
+
     color: Style.baseColor;
 
-//    property alias modelItems: mainTreeView.model;
     property var modelItems;
 
     property int countItems: modelItems.GetItemsCount();
 
     signal itemTreeViewCheckBoxStateChanged(int state, string packageId, string featureId);
-
-    onModelItemsChanged: {
-    }
 
     Keys.onPressed: {
         console.log("TreeView keys pressed")
@@ -36,16 +33,44 @@ Rectangle {
                 treeViewContainer.closeTreeItem(mainTreeView.currentParentIndex);
             }
         }
-        else if (event.key === Qt.Key_Right){
-            console.log('Key right was pressed');
-            if (mainTreeView.currentParentIndex != -1 && mainTreeView.currentChildIndex === -1){
-                treeViewContainer.openTreeItem(mainTreeView.currentParentIndex);
+        else if (event.key === Qt.Key_Space){
+            console.log('Key space was pressed');
+
+            if (mainTreeView.currentChildIndex !== -1){
+
+                var parentId = treeViewContainer.modelItems.GetData("Id", mainTreeView.currentParentIndex);
+                var childModel = treeViewContainer.modelItems.GetData("childItemModel", mainTreeView.currentParentIndex);
+
+                if (!childModel){
+                    return;
+                }
+
+                var childId = childModel.GetData("Id", mainTreeView.currentChildIndex);
+                var state = childModel.GetData("stateChecked", mainTreeView.currentChildIndex);
+
+               // treeViewContainer.itemTreeViewCheckBoxStateChanged(2 - state, parentId, childId);
+                treeViewContainer.setStateCheckBox(2 - state);
             }
         }
     }
 
     TreeItemModel {
         id: treeItemModel;
+    }
+
+    function setStateCheckBox(state){
+        console.log('TreeView setStateCheckBox', state);
+
+        var childModel = treeViewContainer.modelItems.GetData("childItemModel", mainTreeView.currentParentIndex);
+
+        if (!childModel){
+            return;
+        }
+
+        childModel.SetData("stateChecked", state, mainTreeView.currentChildIndex);
+        treeViewContainer.modelItems.SetData("childItemModel", childModel, mainTreeView.currentParentIndex);
+
+//        treeViewContainer.modelItems.Refresh();
     }
 
     function openTreeItem(index){
@@ -59,7 +84,7 @@ Rectangle {
     }
 
     function selectedIndexIncr(){
-        console.log("PackageCollectionView selectedIndexIncr");
+        console.log("PackageCollectionView selectedIndexIncr было", mainTreeView.currentParentIndex, mainTreeView.currentChildIndex);
 
         if (mainTreeView.currentParentIndex === -1){
             mainTreeView.currentParentIndex++;
@@ -93,6 +118,8 @@ Rectangle {
                 mainTreeView.currentParentIndex++;
             }
         }
+
+         console.log("PackageCollectionView selectedIndexIncr стало", mainTreeView.currentParentIndex, mainTreeView.currentChildIndex);
     }
 
     function selectedIndexDecr(){
@@ -118,85 +145,40 @@ Rectangle {
             isOpened = treeViewContainer.modelItems.GetData("isOpened", treeViewContainer.countItems - 1);
         }
 
-//        if (mainTreeView.currentChildIndex == -1){
-//            mainTreeView.currentParentIndex--;
+        if (mainTreeView.currentChildIndex == -1){
+            mainTreeView.currentParentIndex--;
+            if (isOpened){
 
-//            var modelChild = treeViewContainer.modelItems.GetData("childItemModel", mainTreeView.currentParentIndex);
+                var modelChild = treeViewContainer.modelItems.GetData("childItemModel", mainTreeView.currentParentIndex);
 
-//            if (!modelChild){
-//                return;
-//            }
-
-//            mainTreeView.currentChildIndex = modelChild.GetItemsCount() - 1;
-//        }
-//        else if (mainTreeView.currentChildIndex > -1){
-//            mainTreeView.currentChildIndex--;
-//        }
-//        else if (mainTreeView.currentChildIndex == 0){
-//            mainTreeView.currentChildIndex = -1;
-//        }
-
-//        if (!isOpened){
-
-//            if (mainTreeView.currentParentIndex > 0){
-//                mainTreeView.currentParentIndex--;
-//                mainTreeView.currentChildIndex = -1;
-//            }
-//            else{
-//                mainTreeView.currentParentIndex = treeViewContainer.countItems - 1;
-//            }
-//        }
-//        else{
-            if (mainTreeView.currentChildIndex == -1){
-                mainTreeView.currentParentIndex--;
-                if (isOpened){
-
-                    var modelChild = treeViewContainer.modelItems.GetData("childItemModel", mainTreeView.currentParentIndex);
-
-                    if (!modelChild){
-                        return;
-                    }
-
-                    mainTreeView.currentChildIndex = modelChild.GetItemsCount() - 1;
+                if (!modelChild){
+                    return;
                 }
+
+                mainTreeView.currentChildIndex = modelChild.GetItemsCount() - 1;
             }
-            else if (mainTreeView.currentChildIndex == 0){
-                mainTreeView.currentChildIndex = -1;
-            }
-            else{
-                mainTreeView.currentChildIndex--;
-            }
-//        }
+        }
+        else if (mainTreeView.currentChildIndex == 0){
+            mainTreeView.currentChildIndex = -1;
+        }
+        else{
+            mainTreeView.currentChildIndex--;
+        }
     }
 
     ListView {
         id: mainTreeView;
+
         anchors.fill: treeViewContainer;
+
         boundsBehavior: Flickable.StopAtBounds;
-
         model: treeViewContainer.modelItems;
-
-        onModelChanged: {
-            console.log("TreeView ListView onModelChanged");
-
-//            for (var i = 0; i < countItems; i++){
-//                treeViewContainer.modelItems.SetData("isOpened", true, i)
-
-//            }
-        }
 
         property int currentParentIndex: -1;
         property int currentChildIndex: -1;
 
         delegate: TreeItemDelegateTest {
             width: parent.width;
-            //childItemModel: model.childItemModel;
-
-//            listViewItem: mainTreeView;
-
-//            onCheckBoxState: {
-//                console.log("TreeView onCheckBoxState", state, packageId, featureId);
-//            }
 
             onIsOpenedWasChanged: {
                 console.log("TreeItemDelegateTest onIsOpenedWasChanged");
@@ -207,11 +189,21 @@ Rectangle {
                     treeViewContainer.openTreeItem(index);
                 }
             }
+
+            onSetActiveFocusFromTreeItemDelegate: {
+                console.log("TreeView TreeItemDelegateTest onSetActiveFocusFromTreeItemDelegate");
+
+                if (!treeViewContainer.focus){
+                    treeViewContainer.forceActiveFocus();
+                }
+            }
         }
 
         function changeCheckBoxState(state, packageId, featureId) {
             console.log("TreeView ListView onCheckBoxStateChanged()", state, packageId, featureId);
             treeViewContainer.itemTreeViewCheckBoxStateChanged(state, packageId, featureId);
+
+            treeViewContainer.setStateCheckBox(state);
         }
 
     }

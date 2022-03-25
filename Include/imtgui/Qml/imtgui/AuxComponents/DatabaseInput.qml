@@ -10,10 +10,19 @@ Item {
     property string itemId;
 
     property Item rootItem;
+    property Item delegateItem;
 
     property var modelDatabase;
 
     property int currentItemIndex: -1;
+
+    property bool active: false;
+
+    onFocusChanged: {
+        if (settingsDatabaseInputContainer.focus){
+            settingsDatabaseInputRepeater.focusOnNextItem();
+        }
+    }
 
     Component.onCompleted: {
         console.log("SettingsDatabaseInput onCompleted");
@@ -44,16 +53,43 @@ Item {
     }
 
     Column {
+        id: databaseInputColumn;
+
         width: settingsDatabaseInputContainer.width;
+
+        property int currentFocusIndex: -1;
+        property Item activeItem;
 
         Repeater {
             id: settingsDatabaseInputRepeater;
+
+            function focusOnNextItem(){
+                console.log("DatabaseInput Repeater focusOnNextItem");
+
+                databaseInputColumn.currentFocusIndex++;
+
+                if (databaseInputColumn.currentFocusIndex == settingsDatabaseInputRepeater.count){
+                    databaseInputColumn.currentFocusIndex = -1;
+                    settingsDatabaseInputContainer.rootItem.focusOnButtons();
+                }
+                else{
+                    databaseInputColumn.activeItem = settingsDatabaseInputRepeater.itemAt(databaseInputColumn.currentFocusIndex);
+                    databaseInputColumn.activeItem.setFocus(true);
+                }
+            }
 
             delegate: Item {
                 id: databaseInputDelegate;
 
                 width: settingsDatabaseInputContainer.width;
                 height: 60;
+
+                function setFocus(state){
+                    console.log("DatabaseInput Item setFocus");
+                    if (state === true){
+                       settingsDatabaseInputLoader.item.forceActiveFocus();
+                    }
+                }
 
                 Text {
                     id: settingsDatabaseInputTitle;
@@ -87,6 +123,7 @@ Item {
                         settingsDatabaseInputLoader.item.width = databaseInputDelegate.width;
                         settingsDatabaseInputLoader.item.value = value;
                         settingsDatabaseInputLoader.item.rootItem = settingsDatabaseInputContainer;
+                        settingsDatabaseInputLoader.item.repeaterItem = settingsDatabaseInputRepeater;
                     }
                 }
             }

@@ -546,7 +546,7 @@ Item {
             width: parent.width - 5;
             height: 35;
 
-            color: Style.theme === "Light" ? "white": Style.backgroundColor;
+            color: Style.baseColor;
 
             Text {
                 id: titleHeader;
@@ -556,10 +556,7 @@ Item {
                 anchors.leftMargin: 10;
 
                 text: "Features";
-//                font.family: Style.fontFamilyBold;
                 color: Style.textColor;
-//                font.pixelSize: Style.fontSize_small;
-//                font.bold: true;
 
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;
@@ -621,7 +618,6 @@ Item {
 
             onModelTreeItemsChanged: {
                 console.log("PackageView FeaturesTreeView onModelTreeViewChanged");
-                //featureCollectionViewContainer.updateFeaturesTreeView();
 
                 treeView.modelItems = featuresTreeView.modelTreeItems;
             }
@@ -630,7 +626,6 @@ Item {
                 console.log("PackageView FeaturesTreeView onProductLicenseFeaturesChanged");
                 productMetaInfo.clearTreeView();
                 productMetaInfo.updateTreeView();
-//                treeView.modelItems.Refresh();
             }
         }
 
@@ -895,25 +890,6 @@ Item {
             if (modelPackages.GetItemsCount() === 0){
                 featuresTreeView.productLicenseFeatures.RemoveItem(licenseIndex);
             }
-
-            //PRINT
-//            console.log();
-//            for (var i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
-//                console.log("Root LicenseId", featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i));
-//                var packageModel = featuresTreeView.productLicenseFeatures.GetData("Packages", i);
-
-//                for (var j = 0; j < packageModel.GetItemsCount(); j++){
-//                    console.log("\tPackageId", packageModel.GetData("Id", j));
-
-//                    var featureModel = packageModel.GetData("Features", j);
-
-//                    for (var k = 0; k < featureModel.GetItemsCount(); k++){
-//                        console.log("\t\tFeatureId", featureModel.GetData("Id", k));
-//                    }
-//                }
-//            }
-
-
         }
     }
 }

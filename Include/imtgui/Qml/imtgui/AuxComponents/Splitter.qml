@@ -27,18 +27,5 @@ Rectangle {
                 splitterContainer.x += mouseX;
             }
         }
-
-        onMouseYChanged: {
-            console.log("MouseY =", mouseY);
-
-//            if (splitterContainer.type !== Qt.Vertical){
-//                return;
-//            }
-
-//            if (splitterMA.pressed){
-//                splitterContainer.y += mouseY;
-//            }
-        }
     }
-
 }

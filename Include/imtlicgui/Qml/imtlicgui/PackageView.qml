@@ -51,6 +51,8 @@ Item {
         }
         else if (event.key === Qt.Key_Return){
             console.log('Key down was pressed');
+
+            featureCollectionViewContainer.selectItem();
         }
     }
 
@@ -481,6 +483,11 @@ Item {
 
             featureCollectionViewContainer.updateFeaturesTreeView();
         }
+
+        onSetActiveFocusFromCollectionView: {
+            console.log("PackageView CollectionView onSetActiveFocusFromCollectionView");
+            featureCollectionViewContainer.forceActiveFocus();
+        }
     }
 
     function updateFeaturesTreeView(){
@@ -780,11 +787,6 @@ Item {
         }
     }
 
-//    function setFocusOnTreeView(){
-//        console.log("PackageView setFocusOnTreeView");
-//        treeView.forceActiveFocus();
-//    }
-
     Rectangle {
         id: packageMetaInfo;
 
@@ -802,7 +804,7 @@ Item {
             width: parent.width;
             height: 35;
 
-            color: Style.theme === "Light" ? "white": Style.backgroundColor;
+            color: Style.baseColor;
 
             Text {
                 id: titleHeader;
@@ -840,28 +842,9 @@ Item {
             width: 200;
             height: parent.height;
 
-//            modelItems: featuresTreeView.modelTreeItems;
-
             visible: false;
 
             clip: true;
-
-//            Keys.onPressed: {
-//                console.log("TreeView keys pressed")
-//                if (event.key === Qt.Key_Tab){
-//                    console.log('Key tab was pressed');
-//                    thubnailDecoratorContainer.setFocusOnMenuPanel();
-//                }
-//                else if (event.key === Qt.Key_Up){
-//                    console.log('Key up was pressed');
-////                    treeViewContainer.selectedIndexDecr();
-//                }
-//                else if (event.key === Qt.Key_Down){
-//                    console.log('Key down was pressed');
-
-////                    treeViewContainer.selectedIndexIncr();
-//                }
-//            }
 
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("PackageView TreeView onItemTreeViewCheckBoxStateChanged", state, packageId, featureId);

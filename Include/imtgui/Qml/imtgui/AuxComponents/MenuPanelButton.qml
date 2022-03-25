@@ -39,7 +39,7 @@ Item {
         sourceSize.width: width;
     }
 
-    Rectangle{
+    Rectangle {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;

@@ -34,7 +34,6 @@ Item {
         console.log("AccountCollectionView openContextMenu", mouseX, mouseY);
         var point = accountCollectionContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
 
-
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;

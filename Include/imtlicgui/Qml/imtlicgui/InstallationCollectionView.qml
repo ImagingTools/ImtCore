@@ -5,9 +5,12 @@ import imtgui 1.0
 
 Item {
     id: installationCollectionContainer;
+
     anchors.fill: parent;
+
     property Item rootItem;
     property Item multiDocViewItem;
+
     property alias itemId: installationCollectionView.itemId;
     property alias itemName: installationCollectionView.itemName;
     property alias model: installationCollectionView.collectionViewModel;
@@ -162,7 +165,6 @@ Item {
             }
             installationCollectionContainer.multiDocViewItem.activeCollectionItem = installationCollectionContainer;
             installationCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
-//            multiDocView.addToHeadersArray(itemId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit")
         }
 
         onCollectionViewRightButtonMouseClicked: {
@@ -272,8 +274,6 @@ Item {
                         if (index === -1){
                             index = installMetaInfoModels.InsertNewItem();
                         }
-
-//                        var index = installMetaInfoModels.InsertNewItem();
 
                         installMetaInfoModels.SetData("Id", installationCollectionView.table.getSelectedId(), index);
                         installMetaInfoModels.SetData("ModelData", dataModelLocal, index);

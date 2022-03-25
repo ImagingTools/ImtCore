@@ -18,16 +18,16 @@ Rectangle {
 
     function setModeMenuButton(commandId, mode) {
         console.log("TopPanel setModeMenuButton!", commandId, mode, topPanel.activeCommandsModelId);
+
         if (buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
             var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-            //console.log("buttonsModelItem GetItemsCount!", buttonsModelLocal.GetItemsCount());
             var itemsCount = buttonsModelLocal.GetItemsCount();
-            console.log("TopPanel setModeMenuButton itemsCount", itemsCount);
+
             for (var i = 0; i < itemsCount; i++) {
                 var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
+
                 if (id === commandId) {
                     buttonsModelLocal.SetData("Mode", mode, i);
-//                    console.log("TopPanel Mode changed", buttonsModelLocal, lvButtons.model)
                     lvButtons.model = 0
                     lvButtons.model =  buttonsModelLocal
                     console.log("Command", commandId, " change mode", mode);
@@ -39,11 +39,6 @@ Rectangle {
     }
 
     function updateModeModelMenuButtons(id, mode) {
-//        console.log("Menu buttons model 1:");
-//        for (var i = 0; i < modelButtons.count; i++) {
-//            var temp = modelButtons.get(i);
-//            console.log("\tid: ", temp.id, ' mode:', temp.mode, ' imageSource:', temp.imageSource);
-//        }
         for (var i = 0; i < modelButtons.count; i++) {
             if (modelButtons.get(i).id === id) {
                 modelButtons.get(i).mode = mode;
@@ -51,16 +46,10 @@ Rectangle {
                 break;
             }
         }
-//        console.log("Menu buttons model 2:");
-//        for (var i = 0; i < modelButtons.count; i++) {
-//            var temp = modelButtons.get(i);
-//            console.log("\tid: ", temp.id, ' mode:', temp.mode, ' imageSource:', temp.imageSource);
-//        }
-         console.log("TopPanel updateModeModelMenuButtons");
     }
 
     function dialogResult(parameters) {
-         console.log("TopPanel dialogResult", parameters["status"]);
+        console.log("TopPanel dialogResult", parameters["status"]);
         topPanel.menuActivatedSignal(parameters["status"]);
     }
 
@@ -105,11 +94,6 @@ Rectangle {
         topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
     }
 
-    onTitleChanged: {
-        console.log("onTitleChanged", topPanel.title);
-        console.log("activeCommandsModelId", topPanel.activeCommandsModelId);
-    }
-
     TreeItemModel {
         id: buttonsModelItem;
     }
@@ -127,10 +111,6 @@ Rectangle {
         height: 24;
 
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
-
-        Component.onCompleted: {
-            console.log("Preference button onCompleted!");
-        }
 
         onClicked: {
             console.log("Preference button clicked !");
@@ -159,8 +139,10 @@ Rectangle {
             clip: true;
             orientation: ListView.Horizontal;
             boundsBehavior: Flickable.StopAtBounds;
+
             delegate: TopButton {
                 id: topButtonDelegate;
+
                 text: model[CommandEnum.NAME];
                 isEmpty: model[CommandEnum.NAME] === "";
                 imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "Off" + "_" + model["Mode"] + ".svg";
@@ -177,7 +159,8 @@ Rectangle {
                             }
                         }
                         modelButtons.append({"id": model[CommandEnum.ID], "imageSource": topButtonDelegate.imageSource, "name": topButtonDelegate.text, "mode": model["Mode"]});
-                    } else if (topButtonDelegate.visible && lvButtons.width !== 0) {
+                    }
+                    else if (topButtonDelegate.visible && lvButtons.width !== 0) {
                         var j;
                         for (var i = 0; i < modelButtons.count; i++) {
                             if (modelButtons.get(i).id === model[CommandEnum.ID]) {
@@ -229,7 +212,6 @@ Rectangle {
             parameters["styleColor"] = Style.theme == "Dark" ? "Light" : "Dark";
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
-
     }
 
     ListModel {
@@ -291,7 +273,6 @@ Rectangle {
                         var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
                         dataModelLocal = dataModelLocal.GetData("items");
                         buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
-//                        updateTimer.model = dataModelLocal;
                         lvButtons.model = dataModelLocal;
                         commandsModel.isFirst = !commandsModel.isFirst
                         topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);

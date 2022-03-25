@@ -10,6 +10,23 @@ Item {
     property string itemId;
 
     property Item rootItem;
+    property Item repeaterItem;
+
+    onFocusChanged: {
+        if (settingsIntegerInputContainer.focus){
+            tfcIntegerInput.setFocus(true);
+        }
+    }
+
+    Keys.onPressed: {
+        console.log("SettingsIntegerInput keys pressed")
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+
+            tfcIntegerInput.setFocus(false);
+            settingsIntegerInputContainer.repeaterItem.focusOnNextItem();
+        }
+    }
 
     function dataChanged(id, value){
         console.log("SettingsIntegerInput dataChanged", id, value);

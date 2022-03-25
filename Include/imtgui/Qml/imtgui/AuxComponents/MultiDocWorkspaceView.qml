@@ -1,7 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-//import '../UxAdvancedComponents' as AUX
-
 
 Rectangle {
     id: multiDocView;
@@ -33,46 +31,12 @@ Rectangle {
         }
     }
 
-//    Keys.onPressed: {
-//        console.log("MultidocWorkspaceView keys pressed")
-//        if (event.key === Qt.Key_Tab){
-//            console.log('Key tab was pressed');
-
-//            tabPanelInternal.rightClicked();
-//            multiDocView.activeItem.forceActiveFocus();
-//            if (tabPanelInternal.selectedIndex === pagesData.GetItemsCount() - 1){
-////                tabPanelInternal.selectedIndex = 0;
-////                thubnailDecoratorContainer.setFocusOnMenuPanel();
-
-//               // multiDocView.activeItem.setFocusOnTreeView();
-//            }
-//            else{
-//                tabPanelInternal.rightClicked();
-//                //multiDocView.activeItem.forceActiveFocus();
-//            }
-//        }
-//        else if (event.key === Qt.Key_Up){
-//            console.log('Key up was pressed');
-//            multiDocView.activeItem.selectedIndexDecr();
-//        }
-//        else if (event.key === Qt.Key_Down){
-//            console.log('Key down was pressed');
-//             multiDocView.activeItem.selectedIndexIncr();
-//        }
-//        else if (event.key === Qt.Key_Return){
-//            console.log('Key down was pressed');
-//             multiDocView.activeItem.selectItem();
-//            multiDocView.activeItem.forceActiveFocus();
-//        }
-//    }
-
     Component.onCompleted: {
         console.log("MultidocWorkspaceView onCompleted", tabPanelInternal.selectedIndex)
         docsData.anchors.topMargin = tabPanelInternal.height;
     }
 
     function setFocus(){
-      //  packagesMultiDocView.setFocus();
         console.log("MultidocWorkspaceView setFocus");
         multiDocView.forceActiveFocus();
     }
@@ -116,17 +80,12 @@ Rectangle {
             findPage = true;
         }
         if (!findPage) {
-//            multiDocView.activeItem = null
             var index = pagesData.InsertNewItem();
-            console.log("MultidicWorkspaceView addToHeadersArray index", index);
             pagesData.SetData("ItemId", itemId, index);
             pagesData.SetData("Title", title, index);
             pagesData.SetData("Source", source, index);
             pagesData.SetData("CommandsId", commandsId, index);
-//            pagesData.SetData("ItemSelectedIndex", -1, index);
 
-//            tabPanelInternal.model = 0;
-//            tabPanelInternal.model = pagesData;
             tabPanelInternal.selectedIndex = pagesData.GetItemsCount() - 1;
         }
     }
@@ -166,11 +125,6 @@ Rectangle {
 
         onSelectedIndexChanged: {
             console.log("MultiDocWorkspaceView TabPanel onSelectedIndexChanged", tabPanelInternal.selectedIndex);
-
-//            if(multiDocView.activeItem) {
-//                multiDocView.updateCommandId();
-//            }
-
         }
 
         onRightClicked: {
@@ -221,8 +175,6 @@ Rectangle {
                 console.log("MultiDocView ListView onVisibleChanged", this.visible);
 
                 if(this.visible){
-                    console.log("multiDocView.activeItem", multiDocView.activeItem);
-                    console.log("dataLoader.item", dataLoader.item);
                     multiDocView.activeItem = dataLoader.item;
                     multiDocView.activeItem.refresh();
                     multiDocView.updateCommandId();
@@ -254,9 +206,7 @@ Rectangle {
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    console.log("MultidocWorkspaceView model index ", dataLoader.source, model.Source)
                     dataLoader.source = model.Source
-                    console.log("MultidocWorkspaceView model index 2", dataLoader.source, model.Source)
                 }
 
                 onItemChanged: {

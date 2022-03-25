@@ -6,24 +6,16 @@ Item {
 
     width: parent.width;
 
-//    height: childrenColumn.visible ? childModelRepeater.count * treeItemDelegate.itemHeight : treeItemDelegate.itemHeight;
-
     height: childrenColumn.visible ? childrenColumn.height + treeItemDelegate.itemHeight : treeItemDelegate.itemHeight;
-
 
     property bool isOpened: model.isOpened;
 
     property int itemHeight: 30;
-
     property int index: model.index;
 
     signal isOpenedWasChanged(int index, int state);
-
     signal isOk(int index, int state);
-
-    onIsOpenedChanged: {
-        console.log("TreeItem onIsOpenedChanged", treeItemDelegate.isOpened);
-    }
+    signal setActiveFocusFromTreeItemDelegate();
 
     Component.onCompleted: {
         console.log("TreeItemDelegate onCompleted");
@@ -31,12 +23,6 @@ Item {
         if (model.childItemModel){
             childModelRepeater.model = model.childItemModel;
         }
-
-        console.log("Id", model.Id);
-        console.log("Name", model.Name);
-        console.log("isOpened", model.isOpened);
-        console.log("visible", model.visible);
-        console.log("\n")
     }
 
     function changeParentIndex(){
@@ -55,7 +41,7 @@ Item {
         height: model.visible === 1 ? treeItemDelegate.itemHeight : 0;
 
         color: mainTreeView.currentParentIndex == model.index &&
-               childModelRepeater.indexChild === -1 ? "#4682B4" : Style.baseColor;
+               childModelRepeater.indexChild === -1 ? Style.selectedColor : Style.baseColor;
 
         MouseArea {
             anchors.fill: parent;
@@ -63,7 +49,9 @@ Item {
             onClicked: {
                 console.log("Main rect clicked", mainTreeView.currentParentIndex, model.index);
                 mainTreeView.currentParentIndex = model.index;
+                mainTreeView.currentChildIndex = -1;
                 childModelRepeater.indexChild = -1;
+                treeItemDelegate.setActiveFocusFromTreeItemDelegate();
             }
         }
 
@@ -125,16 +113,8 @@ Item {
 
             visible: treeItemDelegate.isOpened;
 
-            onHeightChanged: {
-                console.log("TreeItemDelegate Column onHeightChanged", childrenColumn.height);
-            }
-
             Repeater {
                  id: childModelRepeater;
-
-                 onModelChanged: {
-                     console.log("TreeItemDelegate onModelChanged", childModelRepeater.model.GetItemsCount());
-                 }
 
                  property int indexChild: mainTreeView.currentChildIndex;
 
@@ -145,18 +125,19 @@ Item {
                      height: childRect.visible ? treeItemDelegate.itemHeight : 0;
 
                      visible: model.visible === 1;
-//                     color: "transparent";
 
                      color: treeItemDelegate.index === mainTreeView.currentParentIndex &&
-                            childModelRepeater.indexChild === model.index ? "#4682B4" : "transparent";
+                            childModelRepeater.indexChild === model.index ? Style.selectedColor : "transparent";
 
                      MouseArea {
                          anchors.fill: parent;
+
                          onClicked: {
                              console.log("Child rect clicked", childModelRepeater.indexChild, model.index);
                              mainTreeView.currentChildIndex = model.index;
+                             mainTreeView.currentParentIndex = treeItemDelegate.index;
                              childModelRepeater.indexChild = model.index
-                             treeItemDelegate.changeParentIndex();
+                             treeItemDelegate.setActiveFocusFromTreeItemDelegate();
                          }
                      }
 

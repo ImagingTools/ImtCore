@@ -132,7 +132,6 @@ Rectangle {
             borderColor: Style.buttonColor;
 
             onClicked: {
-                console.log("left button clicked");
                 tabPanelContainer.leftClicked();
             }
         }
@@ -154,7 +153,6 @@ Rectangle {
             borderColor: Style.buttonColor;
 
             onClicked: {
-                console.log("right button clicked");
                 tabPanelContainer.rightClicked();
             }
         }

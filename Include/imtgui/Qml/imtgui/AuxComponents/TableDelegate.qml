@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 
-Rectangle{
+Rectangle {
     id: tableDelegateContainer;
 
     width: 1000;
@@ -52,18 +52,18 @@ Rectangle{
         }
     }
 
-    Rectangle{
+    Rectangle {
         id: selectionBackGround;
 
         anchors.fill: parent;
 
-        color: "#4682B4";
-        opacity: 0.2;
+        color: Style.selectedColor;
+
         radius: 2;
         visible: selected;
     }
 
-    Item{
+    Item {
         id: maxHeightElement;
 
         height: maxSizeName.height + tableDelegateContainer.textTopMargin*2;
@@ -120,7 +120,7 @@ Rectangle{
 
                 color: Style.textColor;
                 text: tableDelegateContainer.bodyArray[model.index];
-                //wrapMode: Text.WordWrap;
+
                 elide: Text.ElideRight;
 
                 font.family: Style.fontFamily;
@@ -144,8 +144,6 @@ Rectangle{
 
                 tableDelegateContainer.tableDelegateRrightButtonMouseClicked(this.mouseX, this.mouseY);
             }
-
-            console.log("TableDelegate Clicked", this.mouseX, this.mouseY);
             tableDelegateContainer.clicked();
         }
 

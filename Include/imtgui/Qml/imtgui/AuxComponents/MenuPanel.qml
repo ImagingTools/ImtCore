@@ -31,9 +31,6 @@ Rectangle {
 
     onActivePageIndexChanged: {
         console.log("MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
-
-//        lvPages.model.GetData("activePageId", menuPanel.activePageIndex);
-
         lvPages.currentIndex = menuPanel.activePageIndex;
     }
 
@@ -63,11 +60,9 @@ Rectangle {
                 menuPanel.activePageIndex = model.index;
                 menuPanel.activePageId = model[PageEnum.ID];
 
-                console.log("menuPanel.activePageName ", menuPanel.activePageName);
-                console.log("menuPanel.activePageId ", menuPanel.activePageId);
-                console.log("menuPanel.activeIcon ", model[PageEnum.ICON]);
-
-                console.log("menuPanel.imageSource ", this.imageSource);
+                if (!menuPanel.focus){
+                    menuPanel.forceActiveFocus();
+                }
             }
         }
     }
@@ -83,7 +78,6 @@ Rectangle {
             menuPanel.activePageIndex  = pageIndexTimer.pageIndex;
         }
     }
-
 
     GqlModel {
         id: pagesModel;
@@ -109,7 +103,6 @@ Rectangle {
                     dataModelLocal = dataModelLocal.GetData("PagesData")
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items")
-                        console.log("PageModel pagesData !");
                         lvPages.model = dataModelLocal
 
                         menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
@@ -118,9 +111,6 @@ Rectangle {
 
                         pageIndexTimer.pageIndex = 0;
                         pageIndexTimer.start();
-
-//                        menuPanel.activePageIndex = 0;
-                        console.log("PageModel pagesData end!");
                     }
                     else if(this.ContainsKey("errors")){
                         var errorsModel = pagesModel.GetData("errors");

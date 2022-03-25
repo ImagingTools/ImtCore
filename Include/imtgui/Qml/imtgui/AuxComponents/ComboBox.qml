@@ -21,8 +21,9 @@ Item {
     property int currentIndex: -1;
     property int menuWidth: comboBoxContainer.width;
     property int menuHeight: cbListView.count * comboBoxContainer.height;
-//    property int menuX;
-//    property int menuY;
+
+    signal clicked();
+    signal dialogResultChanged();
 
     Component.onCompleted: {
         if (comboBoxContainer.textCentered){
@@ -36,11 +37,15 @@ Item {
     function dialogResult(parameters){
         console.log("ComboBox dialogResult");
 
-        comboBoxContainer.currentText = parameters["status"];
-        comboBoxContainer.currentIndex = parameters["index"];
+        if (parameters){
+            comboBoxContainer.currentText = parameters["status"];
+            comboBoxContainer.currentIndex = parameters["index"];
+        }
+
+        comboBoxContainer.dialogResultChanged();
     }
 
-    function openContextMenu(startX, startY) {
+    function openContextMenu(){
         var point = comboBoxContainer.mapToItem(thubnailDecoratorContainer, 0, comboBoxContainer.height);
 
         console.log("point.x", point.x);
@@ -48,12 +53,6 @@ Item {
 
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
-
-//        var modelItems = comboBoxContainer.model;
-
-//        for (var i = 0; i < modelItems.count; i++){
-//            modelItems.setProperty(i, "name", modelItems.get(i).text);
-//        }
 
         parameters["model"] = comboBoxContainer.model;
         parameters["resultItem"] = comboBoxContainer;
@@ -122,8 +121,7 @@ Item {
             onClicked: {
                 console.log("ComboBox clicked !");
 
-                comboBoxContainer.openContextMenu(0, 0);
-//                comboBoxContainer.menuVisible = !comboBoxContainer.menuVisible;
+                comboBoxContainer.clicked();
             }
         }
     }
@@ -178,8 +176,7 @@ Item {
                     id: cbTitleModel;
 
                     anchors.verticalCenter: parent.verticalCenter;
-                    //anchors.horizontalCenter: comboBoxContainer.textCentered ? parent.horizontalCenter : "";
-                    anchors.left:/* !comboBoxContainer.textCentered ? */cbListDelegate.left;
+                    anchors.left: cbListDelegate.left;
                     anchors.leftMargin: 10;
 
                     text: model.text;
@@ -196,7 +193,6 @@ Item {
                     onClicked: {
                         comboBoxContainer.currentText = model.text;
                         comboBoxContainer.currentIndex = model.index;
-                       // cbTitleTxt.text = model.text;
                         comboBoxContainer.menuVisible = false;
                     }
                 }

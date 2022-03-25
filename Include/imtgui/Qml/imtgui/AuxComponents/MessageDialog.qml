@@ -6,8 +6,6 @@ import imtqml 1.0
 Rectangle {
     id: messageDialogContainer;
 
-//    anchors.centerIn: parent;
-
     width: 350;
     height: 150;
 
@@ -29,6 +27,7 @@ Rectangle {
 
     property Item resultItem;
     property Item loaderDialog;
+    property Item thumbnailItem;
 
     signal okButtonClicked();
     signal noButtonClicked();

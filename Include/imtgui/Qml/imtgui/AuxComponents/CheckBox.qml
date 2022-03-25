@@ -6,7 +6,7 @@ Rectangle {
 
     width: 13;
     height: width;
-    //color: container.checkState == 2 ? "green" : (container.checkState == 0) ? "white" : "black";
+
     color: "transparent";
 
     border.width: 1;

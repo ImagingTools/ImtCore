@@ -23,6 +23,7 @@ Item {
 
     property string mainColor: "#e6e6e8";
 
+    property string greenColor: "#00ff00";
     property string secondColor: "#F18C16";
     property string titleColor: "#055A85";
     property string subtitleColor: "#6A6E6F";
@@ -41,6 +42,7 @@ Item {
 
     property string buttonColor: "#C0C0C0";
     property string buttonBorderColor: "#CCCCCC";
+    property string borderColor: "#d0d0d2";
     property string borderColor2: "#a4a4a6";
 
     property string imagingToolsGradient0: "#f6f6f6";
@@ -101,6 +103,7 @@ Item {
     function parseStyleTheme(themeType) {
         console.log("PreferenceDialog parseStyleTheme");
 
+        Style.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", themeType);
         Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", themeType);
         Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", themeType);
         Style.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", themeType);
@@ -119,6 +122,7 @@ Item {
         Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
         Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
         Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
+        Style.greenColor = themeType.GetData("ColorPalette").GetData("Green");
 
         Style.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", themeType);
         Style.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", themeType);

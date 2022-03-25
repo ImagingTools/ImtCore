@@ -9,6 +9,7 @@ Item {
 
     property Item resultItem;
     property Item loaderDialog;
+    property Item thumbnailItem;
 
     property var model;
     property real backgroundOpacity: 0;
@@ -30,12 +31,9 @@ Item {
         popupMenuContainer.resultItem.dialogResult(parameters);
     }
 
-    onHeightChanged: {
-        console.log("PopupMenuDialog onHeightChanged", popupMenuContainer.height);
-    }
-
-    onResultItemChanged: {
-        console.log("PopupMenuDialog onResultItemChanged", popupMenuContainer.resultItem);
+    onFocusChanged: {
+        console.log("PopupMenuDialog onFocusChanged");
+        mainBody.forceActiveFocus();
     }
 
     onModelChanged: {
@@ -45,8 +43,6 @@ Item {
                 popupMenuContainer.emptyItemCount++;
             }
         }
-
-        console.log("PopupMenuDialog popupMenuContainer.emptyItemCount", popupMenuContainer.emptyItemCount);
     }
 
     DropShadow {
@@ -61,8 +57,6 @@ Item {
        samples: 10;
        color: Style.shadowColor;
        source: mainBody;
-
-//       opacity: 0.5;
     }
 
     Rectangle {
@@ -75,10 +69,38 @@ Item {
         clip: true;
 
         border.width: 1;
-        border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
 
-        onHeightChanged: {
-            console.log("mainBody onHeightChanged", mainBody.height);
+        border.color: Style.alternateBaseColor;
+
+        Keys.onPressed: {
+            console.log("PopupMenuDialog mainBody keys pressed")
+            if (event.key === Qt.Key_Up){
+                console.log('Key up was pressed');
+
+                if (popupMenuListView.currentIndex == 0){
+                    popupMenuListView.currentIndex = popupMenuListView.count - 1;
+                }
+                else
+                    popupMenuListView.currentIndex--;
+            }
+            else if (event.key === Qt.Key_Down){
+                console.log('Key down was pressed');
+                if (popupMenuListView.currentIndex == popupMenuListView.count){
+                    popupMenuListView.currentIndex = 0;
+                }
+                else
+                    popupMenuListView.currentIndex++;
+            }
+            else if (event.key === Qt.Key_Return){
+                console.log('Key return was pressed');
+                popupMenuListView.itemAtIndex(popupMenuListView.currentIndex).click();
+            }
+            else if (event.key === Qt.Key_Escape){
+                console.log('Key esc was pressed');
+
+                popupMenuContainer.resultItem.dialogResult();
+                loaderDialog.closeItem();
+            }
         }
 
         ListView {
@@ -100,7 +122,6 @@ Item {
                 else {
                     mainBody.height = height;
                 }
-                console.log("height", height);
             }
 
             delegate: Rectangle {
@@ -109,17 +130,12 @@ Item {
                 width: popupMenuContainer.width;
                 height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
 
-                Component.onCompleted: {
-                    console.log("delegateListViewPopup onCompleted");
-
-                    console.log("delegateListViewPopup onCompleted", model.name, delegateListViewPopup.height);
-                }
-
-                onHeightChanged: {
-                    console.log("Rectangle onHeightChanged", delegateListViewPopup.height);
-                }
-
                 color: "transparent";
+
+                function click(){
+                    popupMenuContainer.exit(model.index, model.name);
+                    loaderDialog.closeItem();
+                }
 
                 Rectangle {
                     id: highlightRect;
@@ -131,7 +147,8 @@ Item {
                     height: parent.height - 2;
 
                     color: Style.selectedColor;
-                    visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
+                    visible: (model.index === popupMenuListView.currentIndex ||
+                              delegateListViewPopupMA.containsMouse) && model.id !== "" && model.mode !== "Disabled";
                 }
 
                 Text {
@@ -185,8 +202,7 @@ Item {
                     visible: model.mode !== "Disabled";
 
                     onClicked: {
-                        popupMenuContainer.exit(model.index, model.name);
-                        loaderDialog.closeItem();
+                        delegateListViewPopup.click();
                     }
                 }
             }

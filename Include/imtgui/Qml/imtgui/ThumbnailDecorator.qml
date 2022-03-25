@@ -249,7 +249,9 @@ Rectangle
 //                      if (modelLayers.count === 0){
 //                          listViewDialogs.visible = false;
 //                      }
+
                   }
+
 
                   Component.onCompleted: {
                       console.log("model.source", model.source);
@@ -277,6 +279,9 @@ Rectangle
                       }
 
                       darkBackground.opacity = loaderDialog.item.backgroundOpacity;
+
+                      loaderDialog.item.forceActiveFocus();
+                      loaderDialog.item["thumbnailItem"] = thubnailDecoratorContainer;
                   }
              }
         }

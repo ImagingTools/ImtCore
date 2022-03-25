@@ -18,23 +18,24 @@ Rectangle {
     property bool centered: true;
 
     property Item loaderDialog;
+    property Item thumbnailItem;
 
     property TreeItemModel modelSettings;
 
     property string currentSettingsBodyId;
     property string currentModeId;
 
+    property int countMainItems: -1;
+
     Component.onCompleted: {
         settingsQuery.getSettings();
     }
 
-    Keys.onReleased:
-    {
-        console.log("PreferenceDialog Key clicked!")
-        if(event.key === Qt.Key_Tab) {
-            console.log("PreferenceDialog Tab clicked!")
+    onFocusChanged: {
+        if (preferenceContainer.focus){
+            mainPanelColumn.forceActiveFocus();
         }
-     }
+    }
 
     onModelSettingsChanged: {
         console.log("PreferenceDialog onModelSettingsChanged");
@@ -48,17 +49,13 @@ Rectangle {
         if (dataModelLocal.ContainsKey("items")){
 
             dataModelLocal = dataModelLocal.GetData("items");
-            console.log("items contains", dataModelLocal.GetItemsCount());
+
+            preferenceContainer.countMainItems = dataModelLocal.GetItemsCount();
             mainPanelRepeater.model = dataModelLocal;
 
             preferenceContainer.settingsBodyChanged();
         }
     }
-
-//    function callGetStyleQuery(theme){
-//        console.log("PreferenceDialog callGetStyleQuery", theme);
-//        stylesQuery.getStyle(theme);
-//    }
 
     function dataChanged(index, modelElements, activeValue){
         console.log("PreferenceDialog dataChanged");
@@ -80,37 +77,6 @@ Rectangle {
         }
         else if (curBodyId === "DBSettings"){
             preferenceContainer.databaseDataChanged(index, modelElements, activeValue);
-        }
-
-        dataModelLocal = preferenceContainer.modelSettings.GetData("items");
-
-        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-
-            console.log("Name: ", dataModelLocal.GetData("Name", i));
-
-            var settBody = dataModelLocal.GetData("Elements", i);
-
-            for (var j = 0; j < settBody.GetItemsCount(); j++){
-                var name = settBody.GetData("Name", j);
-                console.log("\tName: ", name);
-                var elements = settBody.GetData("Parameters", j);
-
-                var value = settBody.GetData("Value", j);
-
-                if (value !== undefined){
-                    console.log("\tValue: ", value);
-                }
-
-                for (var k = 0; k < elements.GetItemsCount(); k++){
-                    console.log("\t\tName: ", elements.GetData("Name", k));
-
-                    var curValue = elements.GetData("Value", k);
-
-                    if (curValue){
-                        console.log("\t\tValue ", curValue);
-                    }
-                }
-            }
         }
     }
 
@@ -139,15 +105,8 @@ Rectangle {
 
             var selectedId = modelElements.GetData("Id", activeValue);
             preferenceContainer.currentModeId = selectedId;
-
-            if (curId === "Mode"){
-//                Style.theme = selectedId;
-//                stylesQuery.getStyle(selectedId);
-            }
-            else if (curId === "Language"){
-
-            }
         }
+
         modelSettingsBody.SetData("Parameters", modelElements, index);
 
         dataModelLocal.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
@@ -158,13 +117,9 @@ Rectangle {
     function databaseDataChanged(index, modelElements){
         console.log("PreferenceDialog databaseDataChanged", index, modelElements);
         var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
-
         var modelSettingsBody = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
-
         modelSettingsBody.SetData("Parameters", modelElements, index);
-
         dataModelLocal.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
-
         preferenceContainer.modelSettings.SetData("items", dataModelLocal);
     }
 
@@ -172,7 +127,6 @@ Rectangle {
         console.log("PreferenceDialog settingsBodyChanged");
 
         if (preferenceContainer.modelSettings.ContainsKey("items")){
-
             var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
 
             if (dataModelLocal.ContainsKey("Elements", mainPanelRepeater.selectedIndex)){
@@ -182,40 +136,6 @@ Rectangle {
             }
         }
     }
-
-//    function getThemeColor(colorType, colorKey, themeType) {
-//        var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
-//        return themeType.GetData("ColorPalette").GetData(colorPalette);
-//    }
-
-//    function parseStyleTheme(themeType) {
-//        console.log("PreferenceDialog parseStyleTheme");
-
-//        Style.baseColor = preferenceContainer.getThemeColor("ActiveColors", "Base", themeType);
-//        Style.alternateBaseColor = preferenceContainer.getThemeColor("ActiveColors", "AlternateBase", themeType);
-//        Style.backgroundColor = preferenceContainer.getThemeColor("ActiveColors", "Background", themeType);
-//        Style.textColor = preferenceContainer.getThemeColor("ActiveColors", "Text", themeType);
-//        Style.textSelected = preferenceContainer.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
-//        Style.selectedColor = preferenceContainer.getThemeColor("ActiveColors", "ItemSelected", themeType);
-//        Style.buttonColor = preferenceContainer.getThemeColor("ActiveColors", "HeaderBorder", themeType);
-//        Style.buttonBorderColor = preferenceContainer.getThemeColor("ActiveColors", "ButtonBorder", themeType);
-
-//        Style.disabledInActiveTextColor = preferenceContainer.getThemeColor("DisabledInActiveColors", "Text", themeType);
-
-//        Style.hover = preferenceContainer.getThemeColor("ActiveColors", "Hover", themeType);
-
-//        Style.imagingToolsGradient0 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient0");
-//        Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
-//        Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
-//        Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
-//        Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
-
-//        Style.iconColorOnSelected = preferenceContainer.getThemeColor("IconColor", "OnSelected", themeType);
-//        Style.tabSelectedColor = preferenceContainer.getThemeColor("ActiveColors", "TabSelected", themeType);
-//        Style.errorTextColor = preferenceContainer.getThemeColor("ActiveColors", "ErrorText", themeType);
-
-//        Style.shadowColor = preferenceContainer.getThemeColor("ActiveColors", "Shadow", themeType);
-//    }
 
     Rectangle {
         id: topPan;
@@ -297,6 +217,39 @@ Rectangle {
 
             spacing: 10;
 
+            Keys.onPressed: {
+                console.log("PreferenceDialog main Column Key clicked!", preferenceContainer.focus, dependentPanelColumn.currentFocusIndex)
+
+                if(event.key === Qt.Key_Tab) {
+                    console.log('Key tab was pressed');
+                    dependentPanelRepeater.focusOnNextItem();
+                }
+                else if (event.key === Qt.Key_Up){
+                    console.log('Key up was pressed');
+
+                    if (mainPanelRepeater.selectedIndex == 0){
+                        mainPanelRepeater.selectedIndex = preferenceContainer.countMainItems - 1;
+                    }
+                    else{
+                        mainPanelRepeater.selectedIndex--;
+                    }
+                }
+                else if (event.key === Qt.Key_Down){
+                    console.log('Key down was pressed');
+
+                    if (mainPanelRepeater.selectedIndex == preferenceContainer.countMainItems - 1){
+                        mainPanelRepeater.selectedIndex = 0;
+                    }
+                    else{
+                        mainPanelRepeater.selectedIndex++;
+                    }
+                }
+                else if (event.key === Qt.Key_Escape){
+                    console.log('Key esc was pressed');
+                    preferenceCloseButton.clicked();
+                }
+             }
+
             Repeater {
                 id: mainPanelRepeater;
 
@@ -318,6 +271,10 @@ Rectangle {
                     onClicked: {
                         console.log("PreferenceDialog AuxButton onClicked");
                         mainPanelRepeater.selectedIndex = model.index;
+
+                        if (!mainPanelColumn.focus){
+                            mainPanelColumn.forceActiveFocus();
+                        }
                     }
                 }
 
@@ -342,15 +299,45 @@ Rectangle {
 
        height: parent.height;
 
+       property int currentFocusIndex: -1;
+
+       property Item activeItem;
+
        Repeater {
            id: dependentPanelRepeater;
 
            width: dependentPanelColumn.width;
 
+           function focusOnNextItem(){
+               console.log("Repeater focusOnNextItem");
+               if (dependentPanelColumn.activeItem){
+                   dependentPanelColumn.activeItem.setFocus(false);
+               }
+
+               dependentPanelColumn.currentFocusIndex++;
+
+               if (dependentPanelColumn.currentFocusIndex == dependentPanelRepeater.count){
+                   preferenceContainer.focusOnButtons();
+               }
+               else{
+                   dependentPanelColumn.activeItem = dependentPanelRepeater.itemAt(dependentPanelColumn.currentFocusIndex);
+                   dependentPanelColumn.activeItem.setFocus(true);
+               }
+           }
+
            delegate: Item {
+               id: dependentDelegate;
 
                width: dependentPanelColumn.width;
                height: 100;
+
+               function setFocus(state){
+                   console.log("PreferenceDialog setFocus");
+                   if (state === true){
+                      dependentPanelLoader.item.forceActiveFocus();
+                   }
+                   dependentPanelLoader.item.active = state;
+               }
 
                Text {
                    id: titleItem;
@@ -398,10 +385,15 @@ Rectangle {
                        dependentPanelLoader.item.currentItemIndex = model.index;
                        dependentPanelLoader.item.itemId = itemId;
                        dependentPanelLoader.item.rootItem = preferenceContainer;
+                       dependentPanelLoader.item.delegateItem = dependentPanelRepeater;
                    }
                }
            }
        }
+   }
+
+   function focusOnButtons(){
+       preferenceSaveButton.forceActiveFocus();
    }
 
    AuxButton {
@@ -419,16 +411,26 @@ Rectangle {
        hasIcon: false;
 
        textButton: "Apply";
-       borderColor: preferenceSaveButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+       borderColor: (preferenceSaveButton.highlighted || preferenceSaveButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
        backgroundColor: Style.imagingToolsGradient1;
+
+       Keys.onPressed: {
+           console.log("PreferenceDialog preferenceSaveButton keys pressed")
+           if (event.key === Qt.Key_Tab){
+               console.log('Key tab was pressed');
+               preferenceCloseButton.forceActiveFocus();
+           }
+           else if (event.key === Qt.Key_Return){
+               console.log('Key return was pressed');
+               preferenceSaveButton.clicked();
+           }
+       }
 
        onClicked: {
            console.log("PreferenceDialog saveButton onClicked");
 
            if (preferenceContainer.currentModeId !== Style.theme){
                Style.theme = preferenceContainer.currentModeId;
-//               stylesQuery.getStyle(preferenceContainer.currentModeId);
-
                Style.changeSchemeDesign(preferenceContainer.currentModeId);
            }
 
@@ -451,11 +453,25 @@ Rectangle {
        hasIcon: false;
 
        textButton: "Close";
-       borderColor: preferenceCloseButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+       borderColor: (preferenceCloseButton.highlighted || preferenceCloseButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
        backgroundColor: Style.imagingToolsGradient1;
+
+       Keys.onPressed: {
+           console.log("PreferenceDialog preferenceCloseButton keys pressed")
+           if (event.key === Qt.Key_Tab){
+               console.log('Key tab was pressed');
+               preferenceContainer.forceActiveFocus();
+               dependentPanelColumn.currentFocusIndex = -1;
+           }
+           else if (event.key === Qt.Key_Return){
+               console.log('Key return was pressed');
+               preferenceCloseButton.clicked();
+           }
+       }
 
        onClicked: {
            console.log("PreferenceDialog closeButton onClicked");
+           preferenceContainer.thumbnailItem.setFocusOnMenuPanel();
            preferenceContainer.loaderDialog.closeItem();
        }
    }
@@ -501,43 +517,6 @@ Rectangle {
        }
    }
 
-//   GqlModel {
-//       id: stylesQuery;
-
-//       function getStyle(theme){
-//           var query = Gql.GqlRequest("query", "GetStyle");
-//           var inputParams = Gql.GqlObject("input");
-//           inputParams.InsertField("theme");
-//           inputParams.InsertFieldArgument("theme", theme);
-//           query.AddParam(inputParams);
-
-//           var queryFields = Gql.GqlObject("style");
-//           queryFields.InsertField("theme");
-//           queryFields.InsertField("source");
-//           query.AddField(queryFields);
-
-//           var gqlData = query.GetQuery();
-//           console.log("Preference GqlModel getStyle query ", gqlData);
-//           this.SetGqlQuery(gqlData);
-//       }
-
-//       onStateChanged: {
-//           console.log("State:", this.state, stylesQuery);
-//           if (this.state === "Ready") {
-//               var dataModelLocal = this.GetData("data");
-
-//               if(dataModelLocal.ContainsKey("GetStyle")) {
-//                   dataModelLocal = dataModelLocal.GetData("GetStyle");
-//               }
-
-//               if(dataModelLocal.ContainsKey("source")){
-//                   dataModelLocal = dataModelLocal.GetData("source");
-//                   preferenceContainer.parseStyleTheme(dataModelLocal);
-//               }
-//           }
-//       }
-//   }
-
    GqlModel {
        id: preferenceSaveQuery;
 
@@ -569,15 +548,6 @@ Rectangle {
            console.log("State:", this.state, preferenceSaveQuery);
            if (this.state === "Ready") {
                var dataModelLocal = this.GetData("data");
-
-               if(dataModelLocal.ContainsKey("GetStyle")) {
-//                   dataModelLocal = dataModelLocal.GetData("GetStyle");
-               }
-
-               if(dataModelLocal.ContainsKey("source")){
-                   dataModelLocal = dataModelLocal.GetData("source");
-//                   preferenceContainer.parseStyleTheme(dataModelLocal);
-               }
            }
        }
    }

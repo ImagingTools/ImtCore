@@ -32,11 +32,10 @@ Rectangle {
     signal selectItem(string selectedId, string name);
     signal removedItem(string itemId);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
+    signal setActiveFocusFromCollectionView();
 
     Component.onCompleted: {
         console.log("CollectionView onCompleted");
-
-       // tableInternal.forceActiveFocus();
     }
 
     onCollectionViewModelChanged: {
@@ -60,7 +59,6 @@ Rectangle {
     function getDescriptionBySelectedItem(){
         console.log("CollectionView getDescriptionBySelectedItem");
         var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
-        console.log("dataModelLocal", dataModelLocal);
 
         var description;
         if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
@@ -154,20 +152,19 @@ Rectangle {
         }
     }
 
-    function refresh() {
+    function refresh(){
         var isHeaderUpdated = false;
         console.log("CollectionView refresh", collectionViewContainer.gqlModelInfo)
         if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("headers")){
             var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("headers");
             tableInternal.headers = dataModelLocal;
         }
-        else {
+        else{
             headerInfoModel.updateModel()
             isHeaderUpdated = true
         }
 
         if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("data")){
-//            console.log("CollectionView refresh ");
             var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
             tableInternal.elements = 0;
@@ -179,7 +176,7 @@ Rectangle {
                 tableInternal.selectedIndex = selectedIndexLocal;
             }
 
-            if (collectionViewContainer.autoRefresh) {
+            if (collectionViewContainer.autoRefresh){
                 modelItems.updateModel();
             }
         }
@@ -188,7 +185,7 @@ Rectangle {
         }
     }
 
-    function menuActivated(menuId) {
+    function menuActivated(menuId){
         console.log("CollectionView menuActivated", menuId);
 
         var itemId = tableInternal.getSelectedId();
@@ -197,16 +194,11 @@ Rectangle {
         if (menuId  === "New"){
             collectionViewContainer.selectItem("", "")
         }
-        else if (menuId  === "Edit") {
-//            if (itemId !== "" && name !== "") {
-//                collectionViewContainer.selectItem(itemId, name);
-//            }
-
+        else if (menuId  === "Edit"){
             collectionViewContainer.selectItem(itemId, name);
         }
-        else if (menuId  === "Remove") {
-            console.log("CollectionView try remove element with id", itemId);
-            if (itemId !== "") {
+        else if (menuId  === "Remove"){
+            if (itemId !== ""){
                 var source = "AuxComponents/MessageDialog.qml";
                 var parameters = {};
                 parameters["message"] = "Remove selected file from the database ?";
@@ -218,24 +210,16 @@ Rectangle {
         }
     }
 
-    function removeSelectedItem() {
+    function removeSelectedItem(){
         console.log("CollectionView removeSelectedItem", collectionViewContainer.itemId);
         collectionViewContainer.itemId = tableInternal.getSelectedId();
         removeModel.updateModel();
     }
 
-//    function setFocus(){
-//        tableInternal.fo
-//    }
-
     AuxTable {
         id: tableInternal;
 
         anchors.fill: parent;
-
-        onFocusChanged: {
-            console.log("CollectionView AuxTable onFocusChanged!", tableInternal.focus)
-        }
 
         onSelectItem: {
             console.log("CollectionView AuxTable onSelectItem", selectedId, name);
@@ -249,13 +233,13 @@ Rectangle {
 
         onSelectedIndexChanged: {
             console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
-//            if (tableInternal.selectedIndex != -1) {
-//                //collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
-//                collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
-//            }
             collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
             collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
-            //console.log("collectionViewContainer.selectedIndex 2", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
+        }
+
+        onSetActiveFocusFromTable: {
+            console.log("CollectionView AuxTable onSetActiveFocusFromTable");
+            collectionViewContainer.setActiveFocusFromCollectionView();
         }
     }
 
@@ -313,22 +297,6 @@ Rectangle {
                         }
                     }
                 }
-
-//                if(dataModelLocal && dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
-//                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo)
-//                    if(dataModelLocal.ContainsKey("headers")){
-//                        tableInternal.headers = dataModelLocal.GetData("headers")
-//                        collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
-
-//                        modelItems.updateModel();
-//                    }
-//                    else if(packageInfoModel.ContainsKey("errors")){
-//                        var errorsModelLocal = packageInfoModel.GetData("errors");
-//                        if(errorsModelLocal !== null && errorsModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
-//                            console.log("message", errorsModelLocal.GetData(collectionViewContainer.gqlModelInfo).GetData("message"));
-//                        }
-//                    }
-//                }
             }
         }
     }
@@ -404,40 +372,6 @@ Rectangle {
                         }
                     }
                 }
-
-//                var dataModelLocal = this.GetData("data");
-//                if(dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
-//                    dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
-//                    if(dataModelLocal.ContainsKey("items")){
-
-
-//                        if (tableInternal.elements){
-//                            console.log("Old elements:");
-//                            for (var i = 0; i < tableInternal.elements.GetItemsCount(); i++){
-//                                var id = tableInternal.elements.GetData("Id", i);
-
-//                                console.log("\tElement Id", id);
-//                            }
-//                        }
-
-//                        tableInternal.elements = dataModelLocal.GetData("items");
-
-//                        console.log("New elements:");
-//                        for (var i = 0; i < tableInternal.elements.GetItemsCount(); i++){
-//                            var id = tableInternal.elements.GetData("Id", i);
-
-//                            console.log("\tElement Id", id);
-//                        }
-
-//                        collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
-//                    }
-//                    else if(modelItems.ContainsKey("errors")){
-//                        var errorsModel = modelItems.GetData("errors");
-//                        if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
-//                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
-//                        }
-//                    }
-//                }
             }
         }
     }
@@ -506,24 +440,6 @@ Rectangle {
                         }
                     }
                 }
-
-//                var dataModelLocal = this.GetData("data");
-//                console.log("dataModelLocal:", dataModelLocal);
-//                if(dataModelLocal.ContainsKey("removedNotification")){
-//                    dataModelLocal = dataModelLocal.GetData("removedNotification");
-
-//                    if(dataModelLocal.ContainsKey("Id")){
-//                        var itemId = dataModelLocal.GetData("Id");
-//                        console.log("Remove item by id = ", itemId);
-//                        collectionViewContainer.removedItem(itemId)
-//                    }
-//                    else if(removeModel.ContainsKey("errors")){
-//                        var errorsModel = removeModel.GetData("errors");
-//                        if(errorsModel.ContainsKey(collectionViewContainer.gqlModelItems)){
-//                            console.log("message", errorsModel.GetData(collectionViewContainer.gqlModelItems).GetData("message"));
-//                        }
-//                    }
-//                }
             }
         }
     }
@@ -596,8 +512,6 @@ Rectangle {
                             }
 
                             var newName = dataModelLocal.GetData("NewName");
-
-                            //collectionViewContainer.updateItemAfterRename(newId, newName);
                         }
                     }
                 }

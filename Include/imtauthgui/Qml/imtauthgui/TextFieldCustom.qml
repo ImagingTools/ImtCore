@@ -25,10 +25,11 @@ Item {
 //    signal focusChanged();
     signal inputTextChanged();
 
-    function setFocus(){
-//        textField.forceActiveFocus();
-        textField.focus = true;
-        textField.selectAll();
+    function setFocus(state){
+        if (state === true){
+           textField.selectAll();
+        }
+        textField.focus = state;
     }
 
 //    onFocusChanged: {
@@ -60,35 +61,27 @@ Item {
         color: Style.textColor;
         font.pixelSize: containerTextField.textSize;
         font.family: Style.fontFamily;
-        //text: containerTextField.text;
-       // text: "";
 
         verticalAlignment: TextInput.AlignVCenter;
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
 
-//        focus: false;
-
         onFocusChanged: {
-//            containerTextField.focusChanged();
             containerTextField.wasFocus = true;
         }
 
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged");
-
             if (containerTextField.wasFocus) {
                containerTextField.inputTextChanged();
             }
 
             containerTextField.isTextChanged = true;
-            //timer.restart();
         }
 
         onAccepted: {
             console.log("TextFieldCustom onAccepted");
-            //containerTextField.accepted();
             containerTextField.isTextChanged = false;
         }
 

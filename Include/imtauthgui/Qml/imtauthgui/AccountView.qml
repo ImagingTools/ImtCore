@@ -12,8 +12,6 @@ Item {
         accountsCollectionView.menuActivated(menuId)
     }
 
-
-
     CollectionView {
         id: accountsCollectionView;
         anchors.left: parent.left;

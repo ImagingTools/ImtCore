@@ -110,7 +110,8 @@ Rectangle {
                 id: modelYear;
             }
 
-            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+//            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+            borderColor: Style.alternateBaseColor;
 
             onCurrentIndexChanged: {
                 console.log("YearCB onCurrentIndexChanged");
@@ -143,6 +144,10 @@ Rectangle {
 
                 calendarContainer.dateChanged();
             }
+
+            onClicked: {
+                yearCB.openContextMenu();
+            }
         }
 
         ComboBox {
@@ -159,7 +164,8 @@ Rectangle {
                 id: modelMonth;
             }
 
-            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+//            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+            borderColor: Style.alternateBaseColor;
 
             onCurrentIndexChanged: {
                 console.log("monthCB onCurrentIndexChanged");
@@ -189,6 +195,10 @@ Rectangle {
 
                 calendarContainer.dateChanged();
             }
+
+            onClicked: {
+                monthCB.openContextMenu();
+            }
         }
 
         ComboBox {
@@ -206,13 +216,18 @@ Rectangle {
                 id: modelDay;
             }
 
-            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+//            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+            borderColor: Style.alternateBaseColor;
 
             onCurrentIndexChanged: {
                 console.log("dayCB onCurrentIndexChanged");
                 calendarContainer.selectedDate.setDate(dayCB.currentIndex + 1);
 
                 calendarContainer.dateChanged();
+            }
+
+            onClicked: {
+                dayCB.openContextMenu();
             }
         }
     }

@@ -3,7 +3,6 @@ import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
 import imtauthgui 1.0
-//import '../../../imtgui/Qml/imtgui/AuxComponents'
 
 Rectangle {
     id: containerFeatureEdit;
@@ -14,11 +13,11 @@ Rectangle {
     radius: 2;
     color: Style.backgroundColor;
     clip: true;
-    //focus: true;
 
     property Item resultItem;
     property Item loaderDialog;
     property Item collectionViewFeatures;
+    property Item thumbnailItem;
 
     property string featureId;
     property string featureName;
@@ -34,15 +33,8 @@ Rectangle {
 
     Component.onCompleted: {
         console.log("EditFeatureDialog onCompleted");
-        tfcFeatureName.forceActiveFocus();
+        tfcFeatureNameText.setFocus(true);
     }
-
-//    Keys.onPressed: {
-//        if (event.key === Qt.Key_Tab) {
-//            console.log('Key tab was pressed');
-//            event.accepted = true;
-//        }
-//    }
 
     function validateId(id) {
         if (id === "") {
@@ -83,7 +75,6 @@ Rectangle {
             var key = "#" + tfcFeatureNameText.text;
             key = key.replace(/\s+/g, '');
             tfcFeatureIdText.text = key;
-            console.log("EditFeatureDialog key has been generated!");
         }
     }
 
@@ -189,18 +180,13 @@ Rectangle {
             height: 45;
 
             color: Style.imagingToolsGradient1;
-
             border.width: 1;
-            border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+            border.color: Style.borderColor;
 
             onFocusChanged: {
                 console.log("Rectangle tfcFeatureName onFocusChanged");
-
-                tfcFeatureNameText.setFocus();
-//                tfcFeatureNameText.focus = true;
+                tfcFeatureNameText.setFocus(true);
             }
-
-//            KeyNavigation.tab: tfcFeatureId;
 
             TextFieldCustom {
                 id: tfcFeatureNameText;
@@ -212,7 +198,7 @@ Rectangle {
                 height: 30;
 
                 text: containerFeatureEdit.featureName;
-                //focus: true;
+
                 correctData: errorNameMessage.text !== "";
                 borderColor: errorNameMessage.text !== "" ? Style.errorTextColor : Style.iconColorOnSelected;
 
@@ -225,20 +211,7 @@ Rectangle {
                     }
                 }
 
-                KeyNavigation.tab: tfcFeatureId;
-
-                onFocusChanged: {
-                    console.log("TextFieldCustom tfcFeatureNameText onFocusChanged");
-
-//                    tfcFeatureNameText.setFocus();
-//                    if (containerTextField.focus){
-//                        textField.forceActiveFocus();
-//                    }
-                }
-
-//                Keys.onTabPressed: {
-//                    console.log("EditFeatureDialog tfcFeatureNameText pressed!")
-//                }
+//                KeyNavigation.tab: tfcFeatureId;
             }
         }
 
@@ -264,18 +237,12 @@ Rectangle {
             height: 45;
 
             color: Style.imagingToolsGradient1;
-
             border.width: 1;
-            border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+            border.color: Style.borderColor;
 
             onFocusChanged: {
                 console.log("Rectangle tfcFeatureId onFocusChanged");
-
-//                tfcFeatureIdText.focus = true;
-
-//                tfcFeatureIdText.forceActiveFocus();
-
-                tfcFeatureIdText.setFocus();
+                tfcFeatureIdText.setFocus(true);
             }
 
             KeyNavigation.tab: tfcFeatureName;
@@ -390,6 +357,7 @@ Rectangle {
             onClicked: {
                 containerFeatureEdit.exit("cancel");
                 loaderDialog.closeItem();
+                containerFeatureEdit.resultItem.forceActiveFocus();
             }
 
             onFocusChanged: {
@@ -403,12 +371,13 @@ Rectangle {
                 }
             }
 
-            Keys.onReleased: {
+            Keys.onPressed: {
                 console.log("AuxButton cancelButton Key pressed!")
                 if(event.key === Qt.Key_Return) {
-                    console.log("key_enter");
-                    containerFeatureEdit.exit("cancel");
-                    loaderDialog.closeItem();
+//                    containerFeatureEdit.exit("cancel");
+//                    loaderDialog.closeItem();
+//                    containerFeatureEdit.resultItem.forceActiveFocus();
+                    cancelButton.clicked();
                 }
              }
         }

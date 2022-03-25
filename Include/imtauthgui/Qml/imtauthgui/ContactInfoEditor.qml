@@ -32,7 +32,6 @@ Rectangle {
 
     onWasChangedChanged: {
         console.log("ContactInfoEditor onWasChangedChanged", containerContactInfo.wasChanged);
-
         containerContactInfo.commandsChanged("AccountEdit");
     }
 
@@ -51,7 +50,6 @@ Rectangle {
         }
         else {
             if(containerContactInfo.operation === "New"){
-                //containerContactInfo.accountType = "company";
                 cbTypeAccount.currentIndex = 0;
                 containerContactInfo.contactInfoModel = model.AddTreeModel("data");
                 containerContactInfo.contactInfoModel.SetData("Email","")
@@ -69,7 +67,6 @@ Rectangle {
                 addresses.SetData("City","");
                 addresses.SetData("PostalCode","");
                 addresses.SetData("Street","");
-                //containerContactInfo.updateData();
             }
             else{
                 accountItemModel.updateModel();
@@ -78,7 +75,6 @@ Rectangle {
     }
 
     function openMessageDialog(nameDialog, message) {
-
         var source = "AuxComponents/MessageDialog.qml";
         var parameters = {};
         parameters["resultItem"] = containerContactInfo;
@@ -86,11 +82,7 @@ Rectangle {
         parameters["textOkButton"] = "OK";
         parameters["message"] = message;
         parameters["nameDialog"] = nameDialog;
-
         thubnailDecoratorContainer.openDialog(source, parameters);
-    }
-
-    function dialogResult(parameters){
     }
 
     function updateData() {
@@ -219,7 +211,6 @@ Rectangle {
 
                     hasText: true;
                     textButton: "Load";
-
                 }
 
                 AuxButton {
@@ -286,8 +277,8 @@ Rectangle {
                 model: typeAccountModel;
                 currentText: cbTypeAccount.currentIndex === 0 ? "Private" : "Company";
                 textCentered: false;
-                backgroundColor: "#d0d0d0";
-                borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+
+                borderColor: Style.alternateBaseColor;
 
                 property bool wasFocus: false;
 
@@ -307,6 +298,10 @@ Rectangle {
                         return;
                     }
                     containerContactInfo.wasChanged = true;
+                }
+
+                onClicked: {
+                    cbTypeAccount.openContextMenu();
                 }
             }
 
@@ -381,7 +376,7 @@ Rectangle {
                 color: Style.imagingToolsGradient1;
 
                 border.width: 1;
-                border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                border.color: Style.borderColor;
 
                 visible: cbTypeAccount.currentIndex === 1;
 
@@ -411,7 +406,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcCountryText;
@@ -457,7 +452,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcCity;
@@ -502,7 +497,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: postalCode;
@@ -550,7 +545,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcStreet;
@@ -588,7 +583,7 @@ Rectangle {
                 color: Style.imagingToolsGradient1;
 
                 border.width: 1;
-                border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                border.color: Style.borderColor;
 
                 Text {
                     id: titleEmail;
@@ -617,7 +612,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcEmail;
@@ -667,7 +662,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcBD;
@@ -717,7 +712,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     ComboBox {
                         id: genderCB;
@@ -731,7 +726,7 @@ Rectangle {
                         radius: 3;
                         model: genderModel;
                         backgroundColor: "#d0d0d0";
-                        borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+                        borderColor: Style.alternateBaseColor;
                         textCentered: false;
 
                         onCurrentIndexChanged: {
@@ -739,6 +734,10 @@ Rectangle {
                             var gender = genderModel.get(genderCB.currentIndex).name.toLowerCase();
                             containerContactInfo.contactInfoModel.SetData("Gender", gender);
                             containerContactInfo.wasChanged = true;
+                        }
+
+                        onClicked: {
+                            genderCB.openContextMenu();
                         }
                     }
                 }
@@ -769,7 +768,7 @@ Rectangle {
                     height: 45;
 
                     color: Style.imagingToolsGradient1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcFirstNameText;
@@ -814,7 +813,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcLastName;
@@ -862,7 +861,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     TextFieldCustom {
                         id: tfcNickName;
@@ -909,7 +908,7 @@ Rectangle {
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;
-                    border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+                    border.color: Style.borderColor;
 
                     Rectangle {
                         id: addressesBlockButtons;
@@ -977,10 +976,7 @@ Rectangle {
                             headersModelAddresses.Refresh()
                         }
                     }
-
                 }
-
-
             }
         }
     }

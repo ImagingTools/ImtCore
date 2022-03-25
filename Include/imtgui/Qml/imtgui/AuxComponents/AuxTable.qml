@@ -20,6 +20,7 @@ Item {
 
     signal selectItem(string selectedId, string name);
     signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
+    signal setActiveFocusFromTable();
 
     function getSelectedId(){
         return elementsList.selectedId;
@@ -75,7 +76,7 @@ Item {
                 width: headersList.width/headersList.count;
                 height: headersList.height;
 
-                color: Style.theme === "Light" ? "white": Style.backgroundColor;
+                color: Style.baseColor;
 
                 Text {
                     id: name;
@@ -130,20 +131,16 @@ Item {
             selected: tableContainer.selectedIndex === model.index;
 
             Component.onCompleted: {
-
-                console.log("elementsList tableDelegate", model["Id"], model.index)
-                console.log("elements.GetItemsCount",tableContainer.elements.GetItemsCount())
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
                     tableDelegate.addToArray(model[tableContainer.headers.GetData("Id",i)]);
                 }
             }
 
             onClicked: {
-                console.log("elements.GetItemsCount", tableContainer.selectedIndex, model.index, elementsList.selectedId, elementsList.selectedName)
                 elementsList.selectedId = model["Id"];
                 elementsList.selectedName = model[tableContainer.headers.GetData("Id",0)];
                 tableContainer.selectedIndex = model.index;
-                console.log("TableDelegate onClicked", tableContainer.selectedIndex, elementsList.selectedId, elementsList.selectedName)
+                tableContainer.setActiveFocusFromTable();
             }
 
             onTableDelegateRrightButtonMouseClicked: {
@@ -151,19 +148,12 @@ Item {
                 var tempX = mX;
                 var tempY = (model.index + 1) * tableDelegate.height + mY;
 
-                console.log("tableDelegate.height =", tableDelegate.height);
-                console.log("AuxTable tempY =", tempY);
-
-                console.log("AuxTable tempX =", tempX);
-                console.log("AuxTable tempY =", tempY);
-
                 tableContainer.rightButtonMouseClicked(thubnailDecoratorContainer, tempX, tempY);
             }
 
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
                 tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
-//                tableContainer.selectItem(model["Id"], model["Name"]);
             }
         }
     }

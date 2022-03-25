@@ -10,6 +10,24 @@ Item {
     property string itemId;
 
     property Item rootItem;
+    property Item repeaterItem;
+
+    onFocusChanged: {
+        console.log("SettingsTextInput onFocusChanged", settingsTextInputContainer.focus);
+        if (settingsTextInputContainer.focus){
+            tfcTextInput.setFocus(true);
+        }
+    }
+
+    Keys.onPressed: {
+        console.log("SettingsTextInput keys pressed")
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+
+            tfcTextInput.setFocus(false);
+            settingsTextInputContainer.repeaterItem.focusOnNextItem();
+        }
+    }
 
     function dataChanged(id, value){
         console.log("SettingsTextInput dataChanged", id, value);

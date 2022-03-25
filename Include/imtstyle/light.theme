@@ -5,6 +5,7 @@
 		"LightGray 1": "#aaaaaa",
 		"LightGray 2": "#CCCCCC",
 		"LightGray 3": "#dfdfdf",
+		"LightGray 4": "#d0d0d2",
 		"White": "#ffffff",
 		"VividBlue": "#0078d7",
 		"ImagingTools Blue": "#335777",
@@ -21,7 +22,8 @@
 		"ImagingToolsGradient2": "#d4d4d6",
 		"ImagingToolsGradient3": "#bebec0",
 		"ImagingToolsGradient4": "#b4b4b6",
-		"Red": "#FF4500"
+		"Red": "#FF4500",
+		"Green": "#00FF00"
 	},
 	"Style": {
 		"Name": "Light",
@@ -72,7 +74,8 @@
 			"TextSelected": "DarkGrayBlue",
 			"TextSelectedBackground": "VividBlue",
 			"BlueLabel2": "LightBlue 2",
-			"Shadow": "LightGray 1"
+			"Shadow": "LightGray 1",
+			"BorderColor": "LightGray 4"
 		},
 		"InactiveColors": {
 			"Background": "GrayBlue",

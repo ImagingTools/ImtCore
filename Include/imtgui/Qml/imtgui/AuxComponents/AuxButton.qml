@@ -41,14 +41,9 @@ Rectangle {
         sourceSize.height: height;
 
         visible: auxButtonContainer.hasIcon;
-
-        Component.onCompleted: {
-        }
     }
 
     Text {
-//        id: text;
-
         anchors.horizontalCenter: auxButtonContainer.horizontalCenter;
         anchors.verticalCenter: auxButtonContainer.verticalCenter;
 
@@ -59,22 +54,6 @@ Rectangle {
         text: auxButtonContainer.textButton;
 
         visible: auxButtonContainer.hasText;
-
-        Component.onCompleted: {
-            if (auxButtonContainer.hasText) {
-
-//                if (auxButtonContainer.hasIcon) {
-//                    text.anchors.left = image.right;
-//                    text.anchors.leftMargin = 5;
-//                    image.anchors.verticalCenter = auxButtonContainer.verticalCenter;
-//                } else{
-//                    text.anchors.horizontalCenter = auxButtonContainer.horizontalCenter;
-//                    text.anchors.verticalCenter = auxButtonContainer.verticalCenter;
-//                }
-//                text.anchors.horizontalCenter = auxButtonContainer.horizontalCenter;
-//                text.anchors.verticalCenter = auxButtonContainer.verticalCenter;
-            }
-        }
     }
 
     MouseArea {
@@ -82,15 +61,10 @@ Rectangle {
         anchors.fill: parent;
 
         hoverEnabled: true;
-        //acceptedButtons: Qt.LeftButton;
-//        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
         cursorShape: Qt.PointingHandCursor;
 
         visible: auxButtonContainer.enabled;
-
-        onPressed: {
-            //image.anchors.verticalCenterOffset = 1;
-        }
 
         onClicked: {
             auxButtonContainer.clicked();

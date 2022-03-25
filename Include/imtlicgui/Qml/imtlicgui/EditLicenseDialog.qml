@@ -14,11 +14,11 @@ Rectangle {
     radius: 2;
     color: Style.backgroundColor;
     clip: true;
-    focus: true;
 
     property Item resultItem;
     property Item loaderDialog;
     property Item collectionViewLicenses;
+    property Item thumbnailItem;
 
     property string licenseId;
     property string licenseName;
@@ -175,7 +175,7 @@ Rectangle {
             color: Style.imagingToolsGradient1;
 
             border.width: 1;
-            border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+            border.color: Style.borderColor;
 
             TextFieldCustom {
                 id: tfcLicenseNameText;
@@ -226,7 +226,7 @@ Rectangle {
             color: Style.imagingToolsGradient1;
 
             border.width: 1;
-            border.color: Style.theme == "Light" ? "#d0d0d2" : "#3a3b3b" ;
+            border.color: Style.borderColor;
 
             TextFieldCustom {
                 id: tfcLicenseIdText;

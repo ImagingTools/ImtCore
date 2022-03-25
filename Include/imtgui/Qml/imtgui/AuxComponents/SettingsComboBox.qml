@@ -9,6 +9,8 @@ Item {
 
     property var modelElements;
 
+    property bool active: false;
+
 //    property string type;
     property string itemId;
 //    property string selectedItemId;
@@ -17,6 +19,39 @@ Item {
     property int currentValue: 0;
 
     property Item rootItem;
+    property Item delegateItem;
+
+    onFocusChanged: {
+        console.log("SettingsComboBox onFocusChanged", settingsComboBoxContainer.focus)
+
+//        if (!settingsComboBoxContainer.focus){
+//            settingsComboBoxContainer.active = false;
+//        }
+//        else{
+//            settingsComboBoxContainer.active = true;
+//        }
+    }
+
+    Keys.onPressed: {
+        console.log("SettingsComboBox keys pressed")
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+            settingsComboBoxContainer.delegateItem.focusOnNextItem();
+        }
+        else if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key return was pressed');
+        }
+        else if (event.key === Qt.Key_Space){
+            console.log('Key space was pressed');
+            settingsComboBox.clicked();
+        }
+    }
 
     onModelElementsChanged: {
         console.log("SettingsComboBox onModelElementsChanged", settingsComboBox.currentIndex);
@@ -74,7 +109,10 @@ Item {
         //model: settingsComboBoxContainer.modelElements;
         model: settingsComboBoxModelList;
 
-        borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
+        borderColor: settingsComboBoxContainer.active ? Style.iconColorOnSelected :
+                                                        Style.alternateBaseColor;
+
+
         textCentered: false;
 
         onCurrentIndexChanged: {
@@ -82,6 +120,15 @@ Item {
                 return;
             }
             settingsComboBoxContainer.dataChanged();
+        }
+
+        onClicked: {
+            settingsComboBox.openContextMenu();
+        }
+
+        onDialogResultChanged: {
+            console.log("SettingsComboBox ComboBox onDialogResultChanged");
+            settingsComboBoxContainer.rootItem.forceActiveFocus();
         }
     }
 }

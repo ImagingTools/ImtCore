@@ -7,6 +7,5 @@
         <file alias="imtauthgui/qmldir">Qml/imtauthgui/qmldir</file>
         <file alias="imtauthgui/AccountCollectionView.qml">Qml/imtauthgui/AccountCollectionView.qml</file>
         <file alias="imtauthgui/AccountsMultiDocView.qml">Qml/imtauthgui/AccountsMultiDocView.qml</file>
-        <file alias="imtauthgui/AccountView.qml">Qml/imtauthgui/AccountView.qml</file>
     </qresource>
 </RCC>

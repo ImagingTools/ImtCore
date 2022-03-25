@@ -61,14 +61,8 @@ Item {
         visible: !container.isEmpty;
 
         color: Style.baseColor;
-//        color: Style.theme == "Dark" ? "#424242" : "#f0f0f3";
 
         gradient: selection.visible ? pressedGradientButton : standardGradientButton;
-
-//        gradient: Gradient {
-//            GradientStop { position: 0.0; color: Style.imagingToolsGradient0; }
-//            GradientStop { position: 1.0; color: Style.imagingToolsGradient1; }
-//        }
 
         Gradient {
             id: standardGradientButton;
@@ -108,8 +102,7 @@ Item {
 
         height: 4;
         width: button.width/1.8;
-
-        color: "#00FF00";
+        color: Style.greenColor;
         visible: container.checkable && container.highlighted;
     }
 
@@ -123,20 +116,17 @@ Item {
         cursorShape: containsMouse && container.checkable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
-            console.log("onClicked")
             if (container.checkable) {
                 container.clicked();
             }
         }
 
         onPressed: {
-            console.log("onPressed")
             container.highlighted = container.checkable;
             container.scale = 0.985;
         }
 
         onReleased: {
-            console.log("onReleased")
             container.scale = 1;
             container.highlighted = false;
         }

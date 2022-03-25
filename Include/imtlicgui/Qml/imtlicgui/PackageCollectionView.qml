@@ -291,24 +291,13 @@ Item {
                 else{
                     metaInfo.getMetaInfo();
                 }
-
-//                var index = -1;
-//                for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
-//                    var curId = metaInfoModels.GetData("Id", i);
-
-//                    if (curId === packageCollectionView.table.getSelectedId()){
-//                        index = i;
-//                        break;
-//                    }
-//                }
-
-//                if (index !== -1){
-//                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData", index);
-//                }
-//                else{
-//                    metaInfo.getMetaInfo();
-//                }
             }
+        }
+
+        onSetActiveFocusFromCollectionView: {
+            console.log("PackageCollection CollectionView onSetActiveFocusFromCollectionView");
+
+            packageCollectionContainer.forceActiveFocus();
         }
     }
 
