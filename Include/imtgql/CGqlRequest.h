@@ -17,6 +17,7 @@ public:
 
 	void AddParam(const CGqlObject& param);
 	void AddField(const CGqlObject& field);
+	void AddSimpleField(const QByteArray& fieldId);
 	const QList<CGqlObject>* GetFields() const;
 	const QList<CGqlObject>* GetParams() const;
 

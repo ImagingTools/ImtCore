@@ -21,15 +21,24 @@ QByteArray CGqlObject::GetId() const
 
 QByteArrayList CGqlObject::GetFieldIds() const
 {
-	return m_fieldsMap.keys();
+	QByteArrayList retVal = m_emptyFields;
+	retVal += m_simpleFields.keys();
+	retVal += m_enumFields.keys();
+	retVal += m_objectFields.keys();
+	retVal += m_objectFieldsArray.keys();
+
+	return retVal;
 }
 
 
 QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 {
 	QVariant retVal;
-	if (m_fieldsMap.contains(fieldId)){
-		retVal = m_fieldsMap[fieldId].value;
+	if (m_simpleFields.contains(fieldId)){
+		retVal = m_simpleFields[fieldId];
+	}
+	if (m_enumFields.contains(fieldId)){
+		retVal = m_enumFields[fieldId];
 	}
 
 	return retVal;
@@ -39,23 +48,39 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 
 CGqlObject *CGqlObject::CreateFieldObject(const QByteArray& fieldId)
 {
-	if (m_fieldsMap.contains(fieldId)){
+	if (m_objectFields.contains(fieldId)){
 		return nullptr;
 	}
 
-	istd::TSmartPtr<CGqlObject> gqlObjectPtr(new CGqlObject(fieldId));
-	InsertFieldObject(gqlObjectPtr);
+	CGqlObject gqlObject(fieldId);
+	InsertFieldObject(gqlObject);
 
-	return gqlObjectPtr.GetPtr();
+	return m_objectFields[fieldId].GetPtr();
 }
 
 
-const CGqlObject* CGqlObject::GetFieldArgumentObjectPtr(const QByteArray &fieldId) const
+const CGqlObject* CGqlObject::GetFieldArgumentObjectPtr(const QByteArray &fieldId,int index) const
 {
 	const CGqlObject* retVal = nullptr;
 
-	if (m_fieldsMap.contains(fieldId)){
-		retVal = m_fieldsMap[fieldId].objectPtr.GetPtr();
+	if (m_objectFields.contains(fieldId)){
+		retVal = m_objectFields[fieldId].GetPtr();
+	}
+	else if (m_objectFieldsArray.contains(fieldId)){
+		retVal = m_objectFieldsArray[fieldId][index].GetPtr();
+	}
+
+	return retVal;
+}
+
+QList<const CGqlObject *> CGqlObject::GetFieldArgumentObjectPtrList(const QByteArray &fieldId) const
+{
+	QList<const CGqlObject*> retVal;
+	if (m_objectFieldsArray.contains(fieldId)){
+		for (int i = 0; i < m_objectFieldsArray[fieldId].count(); i++){
+			const CGqlObject* gqlObject = m_objectFieldsArray[fieldId][i].GetPtr();
+			retVal.append(gqlObject);
+		}
 	}
 
 	return retVal;
@@ -64,33 +89,58 @@ const CGqlObject* CGqlObject::GetFieldArgumentObjectPtr(const QByteArray &fieldI
 
 void CGqlObject::InsertField(const QByteArray &fieldId)
 {
-	if (!m_fieldsMap.contains(fieldId)){
-		Field newField;
-		newField.id = fieldId;
-
-		m_fieldsMap[fieldId] = newField;
+	if (!m_emptyFields.contains(fieldId)){
+		m_emptyFields.append(fieldId);
 	}
 }
 
 
-void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const QVariant &value)
+void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const QByteArray &value)
 {
-	if (m_fieldsMap.contains(fieldId)){
-		Field& field = m_fieldsMap[fieldId];
-		field.value = value;
-	}
+	m_simpleFields.insert(fieldId, value);
+}
+
+
+void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const int &value)
+{
+	m_simpleFields.insert(fieldId, value);
+}
+
+
+void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const double &value)
+{
+	m_simpleFields.insert(fieldId, value);
+}
+
+
+void CGqlObject::InsertFieldArgumentEnum(const QByteArray &fieldId, const QByteArray &value)
+{
+	m_enumFields.insert(fieldId, value);
 }
 
 
 bool CGqlObject::InsertFieldObject(const CGqlObject& object)
 {
-	if (m_fieldsMap.contains(object.GetId())){
-		return false;
-	}
-
 	istd::TSmartPtr<CGqlObject> objectPtr(new CGqlObject());
 	*objectPtr = object;
-	InsertFieldObject(objectPtr);
+	objectPtr->m_parentPtr = this;
+	RemoveField(objectPtr->GetId());
+	m_objectFields.insert(objectPtr->GetId(),objectPtr);
+
+	return true;
+}
+
+bool CGqlObject::InsertFieldObjectList(const QByteArray &fieldId, const QList<CGqlObject> objectList)
+{
+	QList<istd::TSmartPtr<CGqlObject>> objectPtrList;
+	for (int i = 0; i < objectList.count(); i++){
+		istd::TSmartPtr<CGqlObject> objectPtr(new CGqlObject());
+		*objectPtr = objectList[i];
+		objectPtr->m_parentPtr = this;
+		objectPtrList.append(objectPtr);
+	}
+	RemoveField(fieldId);
+	m_objectFieldsArray.insert(fieldId,objectPtrList);
 
 	return true;
 }
@@ -99,11 +149,42 @@ bool CGqlObject::InsertFieldObject(const CGqlObject& object)
 bool CGqlObject::IsObject(const QByteArray &fieldId) const
 {
 	bool retVal = false;
-	if (m_fieldsMap.contains(fieldId)){
-		if (m_fieldsMap[fieldId].objectPtr.IsValid()){
-			retVal = true;
-		}
+	if (m_objectFields.contains(fieldId)){
+		retVal = true;
 	}
+
+	return retVal;
+}
+
+
+bool CGqlObject::IsObjectList(const QByteArray &fieldId) const
+{
+	bool retVal = false;
+	if (m_objectFieldsArray.contains(fieldId)){
+		retVal = true;
+	}
+
+	return retVal;
+}
+
+
+bool CGqlObject::IsEnum(const QByteArray &fieldId) const
+{
+	bool retVal = false;
+	if (m_enumFields.contains(fieldId)){
+		retVal = true;
+	}
+
+	return retVal;
+}
+
+int CGqlObject::GetObjectsCount(const QByteArray &fieldId) const
+{
+	int retVal = 0;
+	if (m_objectFieldsArray.contains(fieldId)){
+		retVal = m_objectFieldsArray[fieldId].count();
+	}
+
 	return retVal;
 }
 
@@ -116,19 +197,13 @@ CGqlObject *CGqlObject::GetParentObject() const
 
 // protected methods
 
-void CGqlObject::InsertFieldObject(istd::TSmartPtr<CGqlObject> objectPtr)
+void CGqlObject::RemoveField(const QByteArray &fieldId)
 {
-	if (objectPtr.IsValid()){
-		QByteArray fieldId = objectPtr->GetId();
-		if (!m_fieldsMap.contains(fieldId)){
-			Field newField;
-			newField.id = fieldId;
-			newField.objectPtr = objectPtr;
-
-			m_fieldsMap[fieldId] = newField;
-			objectPtr->m_parentPtr = this;
-		}
-	}
+	m_emptyFields.removeAll(fieldId);
+	m_simpleFields.remove(fieldId);
+	m_enumFields.remove(fieldId);
+	m_objectFields.remove(fieldId);
+	m_objectFieldsArray.remove(fieldId);
 }
 
 

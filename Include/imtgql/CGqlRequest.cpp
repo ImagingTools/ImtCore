@@ -35,6 +35,12 @@ void CGqlRequest::AddField(const CGqlObject &field)
 	m_fields.append(field);
 }
 
+void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
+{
+	CGqlObject gqlObject(fieldId);
+	AddField(gqlObject);
+}
+
 
 const QList<CGqlObject> *CGqlRequest::GetFields() const
 {
@@ -472,12 +478,31 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 		if (gqlObject.IsObject(fieldId)) {
 			retVal += AddObjectParamPart(*gqlObject.GetFieldArgumentObjectPtr(fieldId));
 		}
+		else if (gqlObject.IsObjectList(fieldId)){
+			retVal += fieldId + " :[";
+			int objectsCount = gqlObject.GetObjectsCount(fieldId);
+			for (int objectIndex = 0; objectIndex < objectsCount; objectIndex++){
+				if (objectIndex > 0){
+					retVal += ",";
+				}
+				retVal += " {";
+				const CGqlObject* paramsObject = gqlObject.GetFieldArgumentObjectPtr(fieldId, objectIndex);
+				if (paramsObject != nullptr){
+					retVal += AddObjectParamPart(*paramsObject);
+				}
+				retVal += "}";
+			}
+			retVal += " ]";
+		}
 		else {
 			retVal += fieldId;
 			retVal += ": ";
 			QVariant value = gqlObject.GetFieldArgumentValue(fieldId);
 			int valueType = value.type();
 			bool isString = (valueType == QVariant::String) || (valueType == QVariant::ByteArray);
+			if (gqlObject.IsEnum(fieldId)){
+				isString = false;
+			}
 			if (isString) {
 				retVal += "\\\"";
 			}
