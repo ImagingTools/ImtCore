@@ -63,6 +63,9 @@ signals:
     void progress(qint64 bytesLoaded, qint64 bytesTotal);
 	void fileUploaded();
 	void fileDeleted();
+    void fileUploadFailed();
+    void fileDeleteFailed();
+    void fileDownloadFailed();
 
 private:
 	QString m_preferredFileNameForSave;

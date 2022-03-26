@@ -142,8 +142,13 @@ void CRemoteFileController::OnFileDeleted()
 		qDebug() << representationData;
 		setJson(representationData);
 		SetState("Ready");
-		Q_EMIT fileDeleted();
-		reply->deleteLater();
+        if (!reply->error()){
+            Q_EMIT fileDeleted();
+        }
+        else {
+            Q_EMIT fileDeleteFailed();
+        }
+        reply->deleteLater();
 	}
 }
 
@@ -162,8 +167,14 @@ void CRemoteFileController::OnFileDownloaded()
 		downloadedFile.open(QFile::WriteOnly);
 		downloadedFile.write(representationData);
 		downloadedFile.close();
-		Q_EMIT fileDownloaded(downloadedFile.fileName());
 		SetState("Ready");
+        if(!reply->error()){
+            Q_EMIT fileDownloaded(downloadedFile.fileName());
+        }
+        else {
+            Q_EMIT fileDownloadFailed();
+        }
+
 		reply->deleteLater();
 	}
 }
@@ -174,17 +185,23 @@ void CRemoteFileController::OnFileUploaded()
 	if(reply){
 		QByteArray representationData = reply->readAll();
 		setJson(representationData);
-		SetState("Ready");
-		reply->deleteLater();
-		Q_EMIT fileUploaded();
-		qDebug() << "File id is: "<< representationData;
+        SetState("Ready");
+        if (!reply->error()){
+            Q_EMIT fileUploaded();
+        }
+        else {
+            Q_EMIT fileUploadFailed();
+        }
+        reply->deleteLater();
 	}
 }
 
 void CRemoteFileController::OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal)
 {
-    qDebug() << __FILE__ << __LINE__ << "File load progress" << bytesLoaded/bytesTotal;
-    Q_EMIT progress(bytesLoaded, bytesTotal);
+    if(bytesLoaded > 0 && bytesTotal > 0){
+        qDebug() << __FILE__ << __LINE__ << "File load progress" << bytesLoaded/bytesTotal;
+        Q_EMIT progress(bytesLoaded, bytesTotal);
+    }
 }
 
 const QString& CRemoteFileController::state() const
