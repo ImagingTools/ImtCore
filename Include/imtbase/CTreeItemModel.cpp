@@ -19,7 +19,8 @@ namespace imtbase
 
 CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
-	m_parentUpdateBridge(dynamic_cast<CTreeItemModel*>(parent))
+    m_parentUpdateBridge(dynamic_cast<CTreeItemModel*>(parent)),
+    m_isArray(false)
 {
 	CTreeItemModel* parentModel = dynamic_cast<CTreeItemModel*>(parent);
 	if (parentModel != nullptr){
@@ -505,8 +506,10 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	if (countSize < 1 && m_isArray == false){
 		return false;
 	}
+    if(m_isArray || countSize > 1){
+        isMultiTag = true;
+    }
 
-	isMultiTag = countSize > 1 || m_isArray == true;
 	if (isMultiTag == false){
 		retVal = retVal && archive.BeginTag(objectTag);
 	}
