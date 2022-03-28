@@ -166,9 +166,10 @@ public:
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
+	virtual int GetElementsCount() const override;
 	virtual Ids GetElementIds(
-				int offset = -1,
-				int count = 0,
+				int offset = 0,
+				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 
@@ -212,8 +213,8 @@ protected:
 	};
 
 	class RepositoryItemInfoProvider:
-		virtual public imtbase::ICollectionInfo,
-		virtual public IRepositoryItemInfoProvider
+				virtual public imtbase::ICollectionInfo,
+				virtual public IRepositoryItemInfoProvider
 	{
 	public:
 		RepositoryItemInfoProvider(CFileCollectionCompBase& parent);
@@ -225,9 +226,10 @@ protected:
 		virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
 
 		// reimplemented (imtbase::ICollectionInfo)
+		virtual int GetElementsCount() const override;
 		virtual Ids GetElementIds(
-					int offset = -1,
-					int count = 0,
+					int offset = 0,
+					int count = -1,
 					const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 		virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 

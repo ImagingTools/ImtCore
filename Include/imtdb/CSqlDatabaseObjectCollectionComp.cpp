@@ -29,11 +29,17 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 }
 
 
+int CSqlDatabaseObjectCollectionComp::GetElementsCount() const
+{
+	return 0;
+}
+
+
 // reimplemented (ICollectionInfo)
 
 imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
-			int /*offset*/,
-			int /*count*/,
+			int offset,
+			int count,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	QReadLocker readLock(&m_objectInfoMapMutex);

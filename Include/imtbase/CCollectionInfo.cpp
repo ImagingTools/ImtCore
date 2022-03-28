@@ -83,15 +83,25 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 
 // reimplemented (ICollectionInfo)
 
+int CCollectionInfo::GetElementsCount() const
+{
+	return m_items.size();
+}
+
+
 ICollectionInfo::Ids CCollectionInfo::GetElementIds(
-			int /*offset*/,
-			int /*count*/,
+			int offset,
+			int count,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 
-	for (const Item& item : m_items){
-		retVal.push_back(item.id);
+	Q_ASSERT(offset >= 0);
+
+	int realCount = qMax(count, m_items.count());
+
+	for (int i = offset; i < realCount; ++i){
+		retVal.push_back(m_items[i].id);
 	}
 
 	return retVal;

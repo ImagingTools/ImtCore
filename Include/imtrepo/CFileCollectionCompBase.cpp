@@ -704,16 +704,30 @@ imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase::GetObjectTypeId(cons
 
 // reimplemented (ICollectionInfo)
 
+int CFileCollectionCompBase::GetElementsCount() const
+{
+	m_filesLock.lockForRead();
+
+	int retVal = m_files.count();
+
+	m_filesLock.unlock();
+
+	return retVal;
+}
+
+
 imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
-			int /*offset*/,
-			int /*count*/,
+			int offset,
+			int count,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 
 	m_filesLock.lockForRead();
 
-	for (int fileIndex = 0; fileIndex < m_files.count(); ++fileIndex){
+	int realCount = qMax(count, m_files.count());
+
+	for (int fileIndex = offset; fileIndex < realCount; ++fileIndex){
 		retVal.append(m_files[fileIndex].fileId);
 	}
 

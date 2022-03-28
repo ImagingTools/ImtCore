@@ -958,9 +958,17 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 
 // reimplemented (imtbase::ICollectionInfo)
 
+int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount() const
+{
+	QReadLocker locker(&m_lock);
+
+	return m_repositoryItems.count();
+}
+
+
 imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::GetElementIds(
-			int /*offset*/,
-			int /*count*/,
+			int offset,
+			int count,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	QReadLocker locker(&m_lock);
