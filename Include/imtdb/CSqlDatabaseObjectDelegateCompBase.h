@@ -28,6 +28,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),
 				int offset = -1,

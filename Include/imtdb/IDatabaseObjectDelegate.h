@@ -36,6 +36,12 @@ public:
 		QString objectName;
 	};
 
+
+	/**
+		Get query for getting of count of objects in the collection, optionaly filtered by some criteria.
+	*/
+	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const = 0;
+
 	/**
 		Get selection query for the listing objects in the collection.
 		\param objectId		If non empty, the given object will be selected.

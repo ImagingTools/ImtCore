@@ -31,6 +31,26 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 
 int CSqlDatabaseObjectCollectionComp::GetElementsCount() const
 {
+	if (m_objectDelegateCompPtr.IsValid()){
+		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery();
+		if (!countQuery.isEmpty()){
+			QSqlError sqlError;
+			QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
+
+			if (sqlError.type() == QSqlError::NoError){
+				if (result.first()) {
+					return result.value(0).toInt();
+				}
+			}
+			else{
+				SendErrorMessage(0, sqlError.text(), "Database collection");
+			}
+		}
+		else{
+			SendErrorMessage(0, "Database query could not be created", "Database collection");
+		}
+	}
+
 	return 0;
 }
 

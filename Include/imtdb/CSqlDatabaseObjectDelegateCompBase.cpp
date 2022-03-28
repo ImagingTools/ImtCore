@@ -14,6 +14,12 @@ namespace imtdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	return QString("SELECT COUNT(*) FROM %1").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
+}
+
+
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const QByteArray& objectId,
 			int offset,
@@ -21,7 +27,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QString paginationString;
-	if (offset > -1 && count > 0){
+	if (offset > 0 && count > 0){
 		paginationString = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count);
 	}
 
