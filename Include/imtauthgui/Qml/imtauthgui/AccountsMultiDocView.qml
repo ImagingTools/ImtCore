@@ -24,6 +24,11 @@ Item {
         accountsMultiDocView.commandsChanged(commandsId);
     }
 
+    function setFocus(){
+        console.log("accountsMultiDocView setFocus");
+        accountsMultiDocView.setFocus();
+    }
+
     onVisibleChanged: {
         if (accountsMultiDocViewContainer.visible && accountsMultiDocView.pagesCount === 0) {
             console.log("AccountsMultiDocView first page loaded !");

@@ -33,7 +33,22 @@ Rectangle {
 
     Component.onCompleted: {
         console.log("EditFeatureDialog onCompleted");
-        tfcFeatureNameText.setFocus(true);
+    }
+
+    onFocusChanged: {
+        console.log("EditFeatureDialog onFocusChanged", containerFeatureEdit.focus);
+
+        if (containerFeatureEdit.focus){
+            tfcFeatureNameText.setFocus(true);
+        }
+    }
+
+    Keys.onPressed: {
+        console.log("EditFeatureDialog keys pressed")
+        if (event.key === Qt.Key_Escape){
+            console.log('Key tab was pressed');
+            cancelButton.clicked();
+        }
     }
 
     function validateId(id) {
@@ -184,8 +199,11 @@ Rectangle {
             border.color: Style.borderColor;
 
             onFocusChanged: {
-                console.log("Rectangle tfcFeatureName onFocusChanged");
-                tfcFeatureNameText.setFocus(true);
+                console.log("Rectangle tfcFeatureName onFocusChanged", tfcFeatureName.focus);
+
+                if (tfcFeatureName.focus){
+                    tfcFeatureNameText.setFocus(true);
+                }
             }
 
             TextFieldCustom {
@@ -211,7 +229,7 @@ Rectangle {
                     }
                 }
 
-//                KeyNavigation.tab: tfcFeatureId;
+                KeyNavigation.tab: tfcFeatureId;
             }
         }
 
@@ -245,7 +263,7 @@ Rectangle {
                 tfcFeatureIdText.setFocus(true);
             }
 
-            KeyNavigation.tab: tfcFeatureName;
+//            KeyNavigation.tab: tfcFeatureName;
 
             TextFieldCustom {
                 id: tfcFeatureIdText;
@@ -320,17 +338,18 @@ Rectangle {
                 }
             }
 
-            Keys.onReleased: {
+            Keys.onPressed: {
                 console.log("AuxButton okButton Key pressed!")
                 if(event.key === Qt.Key_Return){
-                    console.log("key_enter");
-                    if (tfcFeatureIdText.text[0] !== "#") {
-                        tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
-                    }
+                    okButton.clicked();
+//                    console.log("key_enter");
+//                    if (tfcFeatureIdText.text[0] !== "#") {
+//                        tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
+//                    }
 
-                    containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
-                    containerFeatureEdit.exit("ok");
-                    loaderDialog.closeItem();
+//                    containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
+//                    containerFeatureEdit.exit("ok");
+//                    loaderDialog.closeItem();
                 }
              }
         }

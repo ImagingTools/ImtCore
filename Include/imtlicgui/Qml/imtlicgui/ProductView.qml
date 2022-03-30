@@ -35,6 +35,32 @@ Item {
         productsCollectionViewContainer.commandsChanged("ProductEdit");
     }
 
+    Keys.onPressed: {
+        console.log("ProductView keys pressed")
+
+        if (treeView.focus){
+            return;
+        }
+
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+            treeView.forceActiveFocus();
+        }
+        else if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+            productsCollectionViewContainer.selectedIndexDecr();
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+             productsCollectionViewContainer.selectedIndexIncr();
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key down was pressed');
+
+            productsCollectionViewContainer.selectItem();
+        }
+    }
+
     ListModel {
         id: contextMenuModel;
 
@@ -256,6 +282,35 @@ Item {
 
     TreeItemModel {
         id: modelProducts;
+    }
+
+    function selectedIndexIncr(){
+        console.log("ProductView selectedIndexIncr");
+        if (productsCollectionView.table.selectedIndex == productsCollectionView.getCountItems() - 1){
+            productsCollectionView.table.selectedIndex = 0;
+        }
+        else
+            productsCollectionView.table.selectedIndex++;
+
+        productsCollectionView.table.changeDataByIndex(productsCollectionView.table.selectedIndex);
+    }
+
+    function selectedIndexDecr(){
+        console.log("ProductView selectedIndexDecr");
+        if (productsCollectionView.table.selectedIndex == 0){
+            productsCollectionView.table.selectedIndex = productsCollectionView.getCountItems() - 1;
+        }
+        else
+            productsCollectionView.table.selectedIndex--;
+        productsCollectionView.table.changeDataByIndex(productsCollectionView.table.selectedIndex);
+    }
+
+    function selectItem(){
+        console.log("ProductView selectItem");
+
+        var itemId = productsCollectionView.table.getSelectedId();
+        var name = productsCollectionView.table.getSelectedName();
+        productsCollectionView.selectItem(itemId, name);
     }
 
     CollectionView {

@@ -34,6 +34,14 @@ Rectangle {
 
     property bool wasChanged: false;
 
+    onFocusChanged: {
+        console.log("InstallationInfoEditor onFocusChanged", containerInstallation.focus);
+
+        if (containerInstallation.focus){
+            instanceIdText.setFocus(true);
+        }
+    }
+
     TreeItemModel {
         id: products;
     }
@@ -272,6 +280,14 @@ Rectangle {
                      onInputTextChanged: {
                          containerInstallation.wasChanged = true;
                      }
+
+                     onFocusChanged: {
+                         if (instanceIdText.focus){
+                             instanceIdText.setFocus(true);
+                         }
+                     }
+
+                     KeyNavigation.tab: customerCB;
                  }
              }
 
@@ -315,10 +331,25 @@ Rectangle {
                      model: listModelAccounts;
 
 //                     backgroundColor: "#d0d0d0";
-                     borderColor: Style.alternateBaseColor;
+//                     borderColor: Style.alternateBaseColor;
+                     borderColor: customerCB.focus ? Style.iconColorOnSelected :
+                                                                     Style.alternateBaseColor;
+
                      textCentered: false;
 
                      property bool wasFocus: false;
+
+                     Keys.onPressed: {
+                         console.log("customerCB keys pressed")
+                         if (event.key === Qt.Key_Space){
+                             console.log('Key space was pressed');
+                             customerCB.clicked();
+                         }
+                         else if (event.key === Qt.Key_Tab){
+                             console.log('Key tab was pressed')
+                             productCB.forceActiveFocus();
+                         }
+                     }
 
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor customerCB onCurrentIndexChanged");
@@ -335,6 +366,12 @@ Rectangle {
 
                      onClicked: {
                          customerCB.openContextMenu();
+                     }
+
+                     onDialogResultChanged: {
+                         console.log("ComboBox onDialogResultChanged");
+//                         settingsComboBoxContainer.rootItem.forceActiveFocus();
+                         customerCB.forceActiveFocus();
                      }
                  }
              }
@@ -380,10 +417,26 @@ Rectangle {
 
 //                     backgroundColor: "#d0d0d0";
 
-                     borderColor: Style.alternateBaseColor;
+//                     borderColor: Style.alternateBaseColor;
                      textCentered: false;
+                     borderColor: productCB.focus ? Style.iconColorOnSelected :
+                                                                     Style.alternateBaseColor;
 
                      property bool wasFocus: false;
+
+                     Keys.onPressed: {
+                         console.log("productCB keys pressed")
+                         if (event.key === Qt.Key_Space){
+                             console.log('Key space was pressed');
+                             productCB.clicked();
+                         }
+                         else if (event.key === Qt.Key_Tab){
+                             console.log('Key tab was pressed')
+//                             licensesTable.forceActiveFocus();
+
+                             instanceIdText.forceActiveFocus();
+                         }
+                     }
 
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor productCB onCurrentIndexChanged");
@@ -402,6 +455,11 @@ Rectangle {
 
                      onClicked: {
                          productCB.openContextMenu();
+                     }
+
+                     onDialogResultChanged: {
+                         console.log("ComboBox onDialogResultChanged");
+                         productCB.forceActiveFocus();
                      }
                  }
              }

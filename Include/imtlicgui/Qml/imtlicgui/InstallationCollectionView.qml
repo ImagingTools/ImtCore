@@ -17,6 +17,33 @@ Item {
 
     property string operation;
 
+    Keys.onPressed: {
+        console.log("InstallationCollectionView keys pressed")
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+            if (installationCollectionContainer.multiDocViewItem.tabPanel.count > 1){
+                installationCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
+                installationCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+            }
+            else{
+                thubnailDecoratorContainer.setFocusOnMenuPanel();
+            }
+        }
+        else if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+            installationCollectionContainer.selectedIndexDecr();
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+             installationCollectionContainer.selectedIndexIncr();
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key down was pressed');
+            installationCollectionContainer.selectItem();
+            installationCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+        }
+    }
+
     ListModel {
         id: contextMenuModel;
 
@@ -138,6 +165,36 @@ Item {
                 installationCollectionView.refresh();
             }
         }
+    }
+
+    function selectedIndexIncr(){
+        console.log("PackageCollectionView selectedIndexIncr");
+        if (installationCollectionView.table.selectedIndex == installationCollectionView.getCountItems() - 1){
+            installationCollectionView.table.selectedIndex = 0;
+        }
+        else
+            installationCollectionView.table.selectedIndex++;
+
+        installationCollectionView.table.changeDataByIndex(installationCollectionView.table.selectedIndex);
+    }
+
+    function selectedIndexDecr(){
+        console.log("installationCollectionView selectedIndexDecr");
+        if (installationCollectionView.table.selectedIndex == 0){
+            installationCollectionView.table.selectedIndex = installationCollectionView.getCountItems() - 1;
+        }
+        else
+            installationCollectionView.table.selectedIndex--;
+
+        installationCollectionView.table.changeDataByIndex(installationCollectionView.table.selectedIndex);
+    }
+
+    function selectItem(){
+        console.log("installationCollectionView selectItem");
+
+        var itemId = installationCollectionView.table.getSelectedId();
+        var name = installationCollectionView.table.getSelectedName();
+        installationCollectionView.selectItem(itemId, name);
     }
 
     CollectionView {

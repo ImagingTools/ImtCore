@@ -41,7 +41,6 @@ public:
 	bool CreateQrcRecursivly(const QString& inputDirName, const QByteArray& outputFileName) const override;
 	bool ModifyQrc(const QString& prefix, const QString& path, const QFileInfoList& files, const QByteArray& outputFileName) const override;
 
-
 private:
 	bool CreateSingleEntry(const QString& prefix, const QString& inputDirPath, const QString& path, QXmlStreamWriter& xmlWriter) const;
 	bool CreateSingleEntryInCurrentPrefix(const QString& inputDirPath, const QString& path, QXmlStreamWriter& xmlWriter) const;

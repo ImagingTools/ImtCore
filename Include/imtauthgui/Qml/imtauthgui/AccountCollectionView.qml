@@ -18,6 +18,36 @@ Item {
 
     property string operation;
 
+    Keys.onPressed: {
+        console.log("accountCollectionContainer keys pressed")
+
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+
+            if (accountCollectionContainer.multiDocViewItem.tabPanel.count > 1){
+                accountCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
+                accountCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+            }
+            else{
+                thubnailDecoratorContainer.setFocusOnMenuPanel();
+            }
+        }
+        else if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+            accountCollectionContainer.selectedIndexDecr();
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+             accountCollectionContainer.selectedIndexIncr();
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key down was pressed');
+            accountCollectionContainer.selectItem();
+
+            accountCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+        }
+    }
+
     ListModel {
         id: contextMenuModel;
 
@@ -137,6 +167,36 @@ Item {
             accountCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             accountCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
         }
+    }
+
+    function selectedIndexIncr(){
+        console.log("accountCollectionView selectedIndexIncr");
+        if (accountCollectionView.table.selectedIndex == accountCollectionView.getCountItems() - 1){
+            accountCollectionView.table.selectedIndex = 0;
+        }
+        else
+            accountCollectionView.table.selectedIndex++;
+
+        accountCollectionView.table.changeDataByIndex(accountCollectionView.table.selectedIndex);
+    }
+
+    function selectedIndexDecr(){
+        console.log("accountCollectionView selectedIndexDecr");
+        if (accountCollectionView.table.selectedIndex == 0){
+            accountCollectionView.table.selectedIndex = accountCollectionView.getCountItems() - 1;
+        }
+        else
+            accountCollectionView.table.selectedIndex--;
+
+        accountCollectionView.table.changeDataByIndex(accountCollectionView.table.selectedIndex);
+    }
+
+    function selectItem(){
+        console.log("accountCollectionView selectItem");
+
+        var itemId = accountCollectionView.table.getSelectedId();
+        var name = accountCollectionView.table.getSelectedName();
+        accountCollectionView.selectItem(itemId, name);
     }
 
     CollectionView {

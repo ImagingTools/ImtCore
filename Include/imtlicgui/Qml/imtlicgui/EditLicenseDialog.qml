@@ -34,7 +34,22 @@ Rectangle {
 
     Component.onCompleted: {
         console.log("EditLicenseDialog onCompleted");
+    }
 
+    onFocusChanged: {
+        console.log("EditLicenseDialog onFocusChanged", editLicenseContainer.focus);
+
+        if (editLicenseContainer.focus){
+            tfcLicenseNameText.setFocus(true);
+        }
+    }
+
+    Keys.onPressed: {
+        console.log("EditLicenseDialog keys pressed")
+        if (event.key === Qt.Key_Escape){
+            console.log('Key tab was pressed');
+            cancelButton.clicked();
+        }
     }
 
     function exit(status) {
@@ -177,6 +192,14 @@ Rectangle {
             border.width: 1;
             border.color: Style.borderColor;
 
+            onFocusChanged: {
+                console.log("Rectangle tfcLicenseName onFocusChanged", tfcLicenseName.focus);
+
+                if (tfcLicenseName.focus){
+                    tfcLicenseNameText.setFocus(true);
+                }
+            }
+
             TextFieldCustom {
                 id: tfcLicenseNameText;
 
@@ -199,6 +222,8 @@ Rectangle {
                        errorNameMessage.text = nameMessage;
                     }
                 }
+
+                KeyNavigation.tab: tfcLicenseId;
             }
         }
 
@@ -228,6 +253,14 @@ Rectangle {
             border.width: 1;
             border.color: Style.borderColor;
 
+            onFocusChanged: {
+                console.log("Rectangle tfcLicenseId onFocusChanged");
+
+                if (tfcLicenseId.focus){
+                    tfcLicenseIdText.setFocus(true);
+                }
+            }
+
             TextFieldCustom {
                 id: tfcLicenseIdText;
 
@@ -249,6 +282,8 @@ Rectangle {
                        errorIdMessage.text = idMessage;
                     }
                 }
+
+                KeyNavigation.tab: okButton;
             }
         }
 
@@ -279,6 +314,26 @@ Rectangle {
                 editLicenseContainer.exit("ok");
                 editLicenseContainer.loaderDialog.closeItem();
             }
+
+            KeyNavigation.tab: cancelButton;
+
+            onFocusChanged: {
+                console.log("EditLicenseDialog okButton onFocusChanged");
+
+                if (okButton.focus){
+                    okButton.highlighted = true;
+                }
+                else{
+                    okButton.highlighted = false;
+                }
+            }
+
+            Keys.onPressed: {
+                console.log("AuxButton okButton Key pressed!")
+                if(event.key === Qt.Key_Return){
+                    okButton.clicked();
+                }
+             }
         }
 
         AuxButton {
@@ -302,6 +357,26 @@ Rectangle {
                 editLicenseContainer.exit("cancel");
                 editLicenseContainer.loaderDialog.closeItem();
             }
+
+            onFocusChanged: {
+                console.log("EditFeatureDialog cancelButton onFocusChanged");
+
+                if (cancelButton.focus){
+                    cancelButton.highlighted = true;
+                }
+                else{
+                    cancelButton.highlighted = false;
+                }
+            }
+
+            Keys.onPressed: {
+                console.log("AuxButton cancelButton Key pressed!")
+                if(event.key === Qt.Key_Return) {
+                    cancelButton.clicked();
+                }
+             }
+
+            KeyNavigation.tab: tfcLicenseName;
         }
 
         Text {

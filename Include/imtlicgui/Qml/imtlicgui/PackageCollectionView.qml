@@ -33,7 +33,6 @@ Item {
 
         if (event.key === Qt.Key_Tab){
             console.log('Key tab was pressed');
-//            packageCollectionContainer.selectedIndexDecr();
 
             if (packageCollectionContainer.multiDocViewItem.tabPanel.count > 1){
                 packageCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
@@ -260,9 +259,6 @@ Item {
         }
 
         onSelectItem: {
-            console.log("packageCollectionView onSelectItem", packageCollectionView.selectedIndex);
-            console.log("Item id = ", selectedId);
-            console.log("Name = ", name);
             var typeOperation = "Open";
             if (selectedId === "") {
                 name = "New Package";

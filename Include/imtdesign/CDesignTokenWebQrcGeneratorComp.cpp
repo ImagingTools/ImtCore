@@ -12,10 +12,8 @@ namespace imtdesign
 {
 
 
-
 int CDesignTokenWebQrcGeneratorComp::Exec()
 {
-
 	if(!m_argumentParserAttrPtr->IsWebGenerateResourceRequired()){
 		return 0;
 	}
@@ -33,12 +31,10 @@ int CDesignTokenWebQrcGeneratorComp::Exec()
 	QFileInfoList dirs = QDir(resourceDirPath).entryInfoList(filters, sort);
 
 	for (const QFileInfo& fileInFo: ::qAsConst(dirs)){
-		if (typesOfResources.contains(fileInFo.fileName()))
-		{
+		if (typesOfResources.contains(fileInFo.fileName())){
 			QFileInfoList iconsDirs = QDir(fileInFo.absoluteFilePath()).entryInfoList(filters, sort);
 			for (const QFileInfo& iconsFileInFo: ::qAsConst(iconsDirs)){
-				if (!iconsFileInFo.baseName().isEmpty())
-				{
+				if (!iconsFileInFo.baseName().isEmpty()){
 					styles << iconsFileInFo.fileName().toUtf8();
 				}
 			}
@@ -47,10 +43,11 @@ int CDesignTokenWebQrcGeneratorComp::Exec()
 
 	QStringList dirsForTheme;
 	for (const QByteArray& styleName: ::qAsConst(styles)){
-		for(const QString& resType: ::qAsConst(typesOfResources)) {
+		for(const QString& resType: ::qAsConst(typesOfResources)){
 			 dirsForTheme << resourceDirPath + dirSeparator + resType + dirSeparator + styleName;
 		}
 	}
+
 	if(!CreateQrcForDirs(dirsForTheme, QByteArray(outputDirPath) + dirSeparator + "Web" + projectName + ".qrc")){
 		return -1;
 	}

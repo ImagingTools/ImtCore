@@ -25,6 +25,11 @@ Item {
         productsMultiDocView.commandsChanged(commandsId);
     }
 
+    function setFocus(){
+        console.log("productsMultiDocView setFocus");
+        productsMultiDocView.setFocus();
+    }
+
     onVisibleChanged: {
         if (productsMultiDocViewContainer.visible && productsMultiDocView.pagesCount === 0) {
             console.log("ProductsMultiDocView first page loaded !");

@@ -280,8 +280,9 @@ Rectangle
 
                       darkBackground.opacity = loaderDialog.item.backgroundOpacity;
 
-                      loaderDialog.item.forceActiveFocus();
+
                       loaderDialog.item["thumbnailItem"] = thubnailDecoratorContainer;
+                      loaderDialog.item.forceActiveFocus();
                   }
              }
         }

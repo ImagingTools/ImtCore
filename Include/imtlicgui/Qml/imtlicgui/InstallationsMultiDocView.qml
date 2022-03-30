@@ -26,6 +26,11 @@ Item {
         installationsMultiDocView.commandsChanged(commandsId);
     }
 
+    function setFocus(){
+        console.log("installationsMultiDocView setFocus");
+        installationsMultiDocView.setFocus();
+    }
+
     onVisibleChanged: {
         if (installationsMultiDocViewContainer.visible && installationsMultiDocView.pagesCount === 0) {
             console.log("InstallationsMultiDocView first page loaded !");

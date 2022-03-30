@@ -68,6 +68,7 @@ Item {
         clip: true;
 
         onFocusChanged: {
+            console.log("TextInput onFocusChanged", textField.focus);
             containerTextField.wasFocus = true;
         }
 

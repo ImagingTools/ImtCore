@@ -17,6 +17,36 @@ Item {
 
     property string operation;
 
+    Keys.onPressed: {
+        console.log("ProductollectionView keys pressed")
+
+        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+
+            if (productCollectionContainer.multiDocViewItem.tabPanel.count > 1){
+                productCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
+                productCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+            }
+            else{
+                thubnailDecoratorContainer.setFocusOnMenuPanel();
+            }
+        }
+        else if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+            productCollectionContainer.selectedIndexDecr();
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+             productCollectionContainer.selectedIndexIncr();
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key down was pressed');
+            productCollectionContainer.selectItem();
+
+            productCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+        }
+    }
+
     ListModel {
         id: contextMenuModel;
 
@@ -149,9 +179,39 @@ Item {
         }
     }
 
+    function selectedIndexIncr(){
+        console.log("ProductCollectionView selectedIndexIncr");
+        if (productCollectionView.table.selectedIndex == productCollectionView.getCountItems() - 1){
+            productCollectionView.table.selectedIndex = 0;
+        }
+        else
+            productCollectionView.table.selectedIndex++;
+
+        productCollectionView.table.changeDataByIndex(productCollectionView.table.selectedIndex);
+    }
+
+    function selectedIndexDecr(){
+        console.log("ProductCollectionView selectedIndexDecr");
+        if (productCollectionView.table.selectedIndex == 0){
+            productCollectionView.table.selectedIndex = productCollectionView.getCountItems() - 1;
+        }
+        else
+            productCollectionView.table.selectedIndex--;
+
+        productCollectionView.table.changeDataByIndex(productCollectionView.table.selectedIndex);
+    }
+
+    function selectItem(){
+        console.log("ProductCollectionView selectItem");
+
+        var itemId = productCollectionView.table.getSelectedId();
+        var name = productCollectionView.table.getSelectedName();
+        productCollectionView.selectItem(itemId, name);
+    }
+
     CollectionView {
         id: productCollectionView;
-//        anchors.fill: parent;
+
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;

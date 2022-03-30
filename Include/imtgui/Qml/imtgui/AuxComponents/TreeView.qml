@@ -8,9 +8,13 @@ Rectangle {
 
     property var modelItems;
 
-    property int countItems: modelItems.GetItemsCount();
+    property int countItems;
 
     signal itemTreeViewCheckBoxStateChanged(int state, string packageId, string featureId);
+
+    onModelItemsChanged: {
+        treeViewContainer.countItems = modelItems.GetItemsCount();
+    }
 
     Keys.onPressed: {
         console.log("TreeView keys pressed")

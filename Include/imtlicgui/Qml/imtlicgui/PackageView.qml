@@ -419,7 +419,6 @@ Item {
         else
             featureCollectionView.table.selectedIndex--;
         featureCollectionView.table.changeDataByIndex(featureCollectionView.table.selectedIndex);
-
     }
 
     function selectItem(){

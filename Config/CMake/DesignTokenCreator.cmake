@@ -107,8 +107,6 @@ add_custom_command(
 	     ${DESIGN_TOKEN_CREATOR_COMMAND_PARAMS} -W -F ${_file} --ignore-errors
 	DEPENDS
 	    ${QRC_QRC_FILES}
-#	    ${DESIGN_TOKEN_CREATOR_EXE_BIN}
-#        ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/qrc_${LOWER_PROJECT_NAME}light.cpp
         COMMENT
 		"[DesignToken::${LOWER_PROJECT_NAME}] Creating QRC ${QRC_QRC_WEB_CURRENT_FILE}"
 	VERBATIM
