@@ -12,6 +12,16 @@
 namespace imtgql
 {
 
+class CGqlEnum
+{
+public:
+	CGqlEnum(QByteArray value = "") { m_value = value; }
+	QByteArray GetValue() { return m_value; }
+
+protected:
+	QByteArray m_value;
+};
+
 
 class CGqlObject
 {
@@ -25,10 +35,7 @@ public:
 	const CGqlObject *GetFieldArgumentObjectPtr(const QByteArray& fieldId, int index = 0) const;
 	QList<const CGqlObject*> GetFieldArgumentObjectPtrList(const QByteArray& fieldId) const;
 	void InsertField(const QByteArray& fieldId);
-	void InsertFieldArgument(const QByteArray& fieldId, const QByteArray& value);
-	void InsertFieldArgument(const QByteArray& fieldId, const int& value);
-	void InsertFieldArgument(const QByteArray& fieldId, const double& value);
-	void InsertFieldArgumentEnum(const QByteArray& fieldId, const QByteArray& value);
+	void InsertFieldArgument(const QByteArray& fieldId, const QVariant& value);
 	bool InsertFieldObject(const CGqlObject& objectPtr);
 	bool InsertFieldObjectList(const QByteArray& fieldId, const QList<CGqlObject> objectList);
 	bool IsObject(const QByteArray& fieldId) const;
@@ -54,4 +61,6 @@ protected:
 
 } // namespace imtgql
 
+
+Q_DECLARE_METATYPE(imtgql::CGqlEnum)
 

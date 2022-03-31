@@ -500,13 +500,20 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 			QVariant value = gqlObject.GetFieldArgumentValue(fieldId);
 			int valueType = value.type();
 			bool isString = (valueType == QVariant::String) || (valueType == QVariant::ByteArray);
+			bool isEnum = false;
 			if (gqlObject.IsEnum(fieldId)){
 				isString = false;
+				isEnum = true;
 			}
 			if (isString) {
 				retVal += "\\\"";
 			}
-			retVal += value.toString();
+			if (isEnum){
+				retVal += value.value<imtgql::CGqlEnum>().GetValue();
+			}
+			else{
+				retVal += value.toString();
+			}
 			if (isString) {
 				retVal += "\\\"";
 			}

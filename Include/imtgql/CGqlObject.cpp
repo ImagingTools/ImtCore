@@ -95,27 +95,10 @@ void CGqlObject::InsertField(const QByteArray &fieldId)
 }
 
 
-void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const QByteArray &value)
+void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const QVariant &value)
 {
+	RemoveField(fieldId);
 	m_simpleFields.insert(fieldId, value);
-}
-
-
-void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const int &value)
-{
-	m_simpleFields.insert(fieldId, value);
-}
-
-
-void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const double &value)
-{
-	m_simpleFields.insert(fieldId, value);
-}
-
-
-void CGqlObject::InsertFieldArgumentEnum(const QByteArray &fieldId, const QByteArray &value)
-{
-	m_enumFields.insert(fieldId, value);
 }
 
 
@@ -171,8 +154,11 @@ bool CGqlObject::IsObjectList(const QByteArray &fieldId) const
 bool CGqlObject::IsEnum(const QByteArray &fieldId) const
 {
 	bool retVal = false;
-	if (m_enumFields.contains(fieldId)){
-		retVal = true;
+
+	if (m_simpleFields.contains(fieldId)){
+		if (m_simpleFields[fieldId].canConvert<CGqlEnum>()){
+			retVal = true;
+		}
 	}
 
 	return retVal;
@@ -201,7 +187,6 @@ void CGqlObject::RemoveField(const QByteArray &fieldId)
 {
 	m_emptyFields.removeAll(fieldId);
 	m_simpleFields.remove(fieldId);
-	m_enumFields.remove(fieldId);
 	m_objectFields.remove(fieldId);
 	m_objectFieldsArray.remove(fieldId);
 }
