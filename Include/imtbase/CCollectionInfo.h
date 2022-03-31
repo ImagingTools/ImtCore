@@ -33,7 +33,7 @@ public:
 	virtual void UpdateItem(const QByteArray& id, const QString& name, const QString& description);
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount() const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,

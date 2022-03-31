@@ -70,7 +70,7 @@ public:
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount() const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
@@ -259,9 +259,9 @@ inline imtbase::ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterfac
 // reimplemented (ICollectionInfo)
 
 template<class BaseInterface, class ObjectImpl>
-inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount() const
+inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
 {
-	return m_collection.GetElementsCount();
+	return m_collection.GetElementsCount(selectionParamPtr);
 }
 
 

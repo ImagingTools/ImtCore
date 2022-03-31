@@ -166,7 +166,7 @@ public:
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount() const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
@@ -226,7 +226,7 @@ protected:
 		virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
 
 		// reimplemented (imtbase::ICollectionInfo)
-		virtual int GetElementsCount() const override;
+		virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 		virtual Ids GetElementIds(
 					int offset = 0,
 					int count = -1,

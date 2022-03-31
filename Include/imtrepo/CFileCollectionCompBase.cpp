@@ -704,7 +704,7 @@ imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase::GetObjectTypeId(cons
 
 // reimplemented (ICollectionInfo)
 
-int CFileCollectionCompBase::GetElementsCount() const
+int CFileCollectionCompBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	m_filesLock.lockForRead();
 

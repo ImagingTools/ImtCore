@@ -102,7 +102,7 @@ imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetObjectTypeId(const Q
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CSimpleReferenceCollection::GetElementsCount() const
+int CSimpleReferenceCollection::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	return m_references.count();
 }

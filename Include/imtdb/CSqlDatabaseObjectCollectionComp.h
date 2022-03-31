@@ -51,7 +51,7 @@ public:
 	CSqlDatabaseObjectCollectionComp();
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount() const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
@@ -98,6 +98,7 @@ protected:
 
 protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
+	QSqlRecord GetObjectRecord(const QByteArray& objectId) const;
 
 	void OnFilterParamsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* filterParamsPtr);
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
@@ -125,10 +126,6 @@ private:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 
 	iprm::COptionsManager m_typesInfo;
-
-	ObjectInfoMap m_objectInfoMap;
-
-	mutable QReadWriteLock m_objectInfoMapMutex;
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;

@@ -391,7 +391,7 @@ ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const QByteArray& obj
 
 // reimplemented (ICollectionInfo)
 
-int CObjectCollectionBase::GetElementsCount() const
+int CObjectCollectionBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	return m_objects.count();
 }

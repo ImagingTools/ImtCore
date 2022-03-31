@@ -20,8 +20,7 @@ namespace imtdb
 // public methods
 
 CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
-	:m_objectInfoMapMutex(QReadWriteLock::Recursive),
-	m_filterParamsObserver(*this),
+	:m_filterParamsObserver(*this),
 	m_databaseAccessObserver(*this),
 	m_databaseCreationThread(*this),
 	m_isInitialized(false)
@@ -29,16 +28,17 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 }
 
 
-int CSqlDatabaseObjectCollectionComp::GetElementsCount() const
+int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
-		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery();
+		const iprm::IParamsSet* workingSelectionParamsPtr = (selectionParamPtr != nullptr) ? selectionParamPtr : m_filterParamsCompPtr.GetPtr();
+		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(workingSelectionParamsPtr);
 		if (!countQuery.isEmpty()){
 			QSqlError sqlError;
 			QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
 
 			if (sqlError.type() == QSqlError::NoError){
-				if (result.first()) {
+				if (result.first()){
 					return result.value(0).toInt();
 				}
 			}
@@ -60,27 +60,49 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount() const
 imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	QReadLocker readLock(&m_objectInfoMapMutex);
+	Ids retVal;
 
-	return m_objectInfoMap.keys().toVector();
+	if (m_objectDelegateCompPtr.IsValid()){
+		const iprm::IParamsSet* workingSelectionParamsPtr = (selectionParamsPtr != nullptr) ? selectionParamsPtr : m_filterParamsCompPtr.GetPtr();
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, workingSelectionParamsPtr);
+		if (objectSelectionQuery.isEmpty()){
+			return Ids();
+		}
+
+		QSqlError sqlError;
+		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+
+		while (sqlQuery.next()){
+			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
+			Q_ASSERT(!objectId.isEmpty());
+
+			retVal.push_back(objectId);
+		}
+	}
+
+	return retVal;
 }
 
 
 QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
-	QReadLocker readLock(&m_objectInfoMapMutex);
+	if (m_objectDelegateCompPtr.IsValid()){
+		QSqlRecord record = GetObjectRecord(elementId);
+		if (!record.isEmpty()){
+			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+			bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+			if (isOk){
+				switch (infoType){
+				case EIT_NAME:
+					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString() : QString();
 
-	if (m_objectInfoMap.contains(elementId)){
-		const ObjectInfo& item = m_objectInfoMap[elementId];
-
-		switch (infoType){
-		case EIT_NAME:
-			return item.collectionMetaInfoPtr.IsValid() ? item.collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString() : QString();
-
-		case EIT_DESCRIPTION:
-			return item.collectionMetaInfoPtr.IsValid() ? item.collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString() : QString();
+				case EIT_DESCRIPTION:
+					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString() : QString();
+				}
+			}
 		}
 	}
 
@@ -92,12 +114,15 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 
 bool CSqlDatabaseObjectCollectionComp::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	QReadLocker readLock(&m_objectInfoMapMutex);
-
-	if (m_objectInfoMap.contains(objectId)){
-		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr = m_objectInfoMap[objectId].collectionMetaInfoPtr;
-		if (objectMetaInfoPtr.IsValid()){
-			return metaInfo.CopyFrom(*objectMetaInfoPtr);
+	if (m_objectDelegateCompPtr.IsValid()){
+		QSqlRecord record = GetObjectRecord(objectId);
+		if (!record.isEmpty()){
+			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+			if (collectionMetaInfoPtr.IsValid()){
+				return metaInfo.CopyFrom(*collectionMetaInfoPtr);
+			}
 		}
 	}
 
@@ -111,15 +136,9 @@ const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo()
 }
 
 
-imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& objectId) const
+imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
-	QReadLocker readLock(&m_objectInfoMapMutex);
-
-	if (m_objectInfoMap.contains(objectId)){
-		return m_objectInfoMap[objectId].typeId;
-	}
-
-	return Id();
+	return *m_typeIdAttrPtr;
 }
 
 
@@ -131,8 +150,8 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			const QString& description,
 			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
-			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
+			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
+			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return nullptr;
@@ -152,43 +171,6 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 
 	if (ExecuteTransaction(objectQuery.query)){
 		istd::CChangeNotifier changeNotifier(this);
-
-		idoc::CStandardDocumentMetaInfo collectionMetaInfo;
-
-		if (collectionItemMetaInfoPtr == nullptr){
-			collectionMetaInfo.SetMetaInfo(IObjectCollection::MIT_INSERTION_TIME, QDateTime::currentDateTime());
-			collectionMetaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, QDateTime::currentDateTime());
-			collectionMetaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
-	
-			collectionItemMetaInfoPtr = &collectionMetaInfo;
-		}
-
-		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
-
-		if (dataMetaInfoPtr == nullptr){
-			if (m_metaInfoCreatorCompPtr.IsValid() && (defaultValuePtr.IsValid())){
-				if (m_metaInfoCreatorCompPtr->CreateMetaInfo(defaultValuePtr.GetPtr(), *m_typeIdAttrPtr, metaInfoPtr)){
-					dataMetaInfoPtr = metaInfoPtr.GetPtr();
-				}
-			}
-		}
-
-		ObjectInfo objectInfo;
-
-		objectInfo.typeId = typeId;
-		objectInfo.collectionMetaInfoPtr.SetCastedOrRemove(collectionItemMetaInfoPtr->CloneMe());
-		objectInfo.collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectQuery.objectName);
-		objectInfo.collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, description);
-
-		if (dataMetaInfoPtr != nullptr){
-			objectInfo.metaInfoPtr.SetCastedOrRemove(dataMetaInfoPtr->CloneMe());
-		}
-
-		{
-			QWriteLocker writeLock(&m_objectInfoMapMutex);
-
-			m_objectInfoMap[objectId] = objectInfo;
-		}
 
 		return objectId;
 	}
@@ -212,12 +194,6 @@ bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 
 	if (ExecuteTransaction(query)){
 		istd::CChangeNotifier changeNotifier(this);
-
-		{
-			QWriteLocker writeLock(&m_objectInfoMapMutex);
-
-			m_objectInfoMap.remove(objectId);
-		}
 
 		return true;
 	}
@@ -245,8 +221,6 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (ExecuteTransaction(query)){
-		m_metaInfoCreatorCompPtr->CreateMetaInfo(&object, *m_typeIdAttrPtr, m_objectInfoMap[objectId].metaInfoPtr);
-
 		return true;
 	}
 	else{
@@ -269,19 +243,11 @@ void CSqlDatabaseObjectCollectionComp::SetObjectName(const QByteArray& objectId,
 
 		return;
 	}
+	
+	istd::CChangeNotifier changeNotifier(this);
 
-	if (ExecuteTransaction(query)){
-		QWriteLocker writeLock(&m_objectInfoMapMutex);
-
-		if (m_objectInfoMap.contains(objectId)){
-			istd::CChangeNotifier changeNotifier(this);
-
-			if (m_objectInfoMap[objectId].collectionMetaInfoPtr.IsValid()){
-				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, objectName);
-			}
-
-			writeLock.unlock();
-		}
+	if (!ExecuteTransaction(query)){
+		changeNotifier.Abort();
 	}
 }
 
@@ -298,19 +264,11 @@ void CSqlDatabaseObjectCollectionComp::SetObjectDescription(const QByteArray& ob
 
 		return;
 	}
+	
+	istd::CChangeNotifier changeNotifier(this);
 
-	if (ExecuteTransaction(query)){
-		QWriteLocker writeLock(&m_objectInfoMapMutex);
-
-		if (m_objectInfoMap.contains(objectId)){
-			istd::CChangeNotifier changeNotifier(this);
-
-			if (m_objectInfoMap[objectId].collectionMetaInfoPtr.IsValid()){
-				m_objectInfoMap[objectId].collectionMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
-			}
-
-			writeLock.unlock();
-		}
+	if (!ExecuteTransaction(query)){
+		changeNotifier.Abort();
 	}
 }
 
@@ -335,14 +293,13 @@ int CSqlDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*obje
 
 bool CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const
 {
-	QReadLocker readLock(&m_objectInfoMapMutex);
-
-	if (m_objectInfoMap.contains(objectId)){
-		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr = m_objectInfoMap[objectId].metaInfoPtr;
-		if (objectMetaInfoPtr.IsValid()){
-			metaInfoPtr.SetCastedOrRemove(objectMetaInfoPtr->CloneMe());
-
-			return metaInfoPtr.IsValid();
+	if (m_objectDelegateCompPtr.IsValid()){
+		QSqlRecord record = GetObjectRecord(objectId);
+		if (!record.isEmpty()){
+			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+			
+			return m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, metaInfoPtr, collectionMetaInfoPtr);
 		}
 	}
 
@@ -380,7 +337,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 	}
 
 	istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
-	dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr]() {
+	dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
 		return dataObjPtr;
 	});
 
@@ -432,20 +389,39 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 	return true;
 }
 
+QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& objectId) const
+{
+	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId);
+	if (!objectSelectionQuery.isEmpty()){
+		QSqlError sqlError;
+		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+		if (sqlError.type() != QSqlError::NoError){
+			SendErrorMessage(0, sqlError.text(), "Database collection");
+		}
+
+		QSqlRecord record;
+		if (sqlQuery.next()){
+			return sqlQuery.record();
+		}
+	}
+
+	return QSqlRecord();
+}
+
 
 void CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IParamsSet* /*filterParamsPtr*/)
 {
-	if (m_isInitialized){
-		m_databaseCreationThread.StartCollectionCreation();
-	}
+	//if (m_isInitialized){
+	//	m_databaseCreationThread.StartCollectionCreation();
+	//}
 }
 
 
 void CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdb::IDatabaseLoginSettings* /*databaseAccessSettingsPtr*/)
 {
-	if (m_isInitialized){
-		m_databaseCreationThread.StartCollectionCreation();
-	}
+	//if (m_isInitialized){
+	//	m_databaseCreationThread.StartCollectionCreation();
+	//}
 }
 
 
@@ -467,7 +443,7 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 	m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
 	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
 	
-	m_databaseCreationThread.StartCollectionCreation();
+//	m_databaseCreationThread.StartCollectionCreation();
 
 	m_isInitialized = true;
 }
@@ -478,7 +454,7 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
 
-	m_databaseCreationThread.CancelCollectionCreation();
+//	m_databaseCreationThread.CancelCollectionCreation();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -491,9 +467,9 @@ void CSqlDatabaseObjectCollectionComp::OnCollectionCreated()
 	istd::CChangeNotifier changeNotifier(this);
 
 	{
-		QWriteLocker writeLock(&m_objectInfoMapMutex);
+		//QWriteLocker writeLock(&m_objectInfoMapMutex);
 
-		m_databaseCreationThread.CopyData(m_objectInfoMap);
+		//m_databaseCreationThread.CopyData(m_objectInfoMap);
 	}
 }
 

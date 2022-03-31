@@ -83,7 +83,7 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 
 // reimplemented (ICollectionInfo)
 
-int CCollectionInfo::GetElementsCount() const
+int CCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	return m_items.size();
 }
