@@ -1,4 +1,4 @@
-#include "CGqlRepresentationDataControllerCompBase.h"
+#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 
 
 namespace imtgql
@@ -18,28 +18,6 @@ QByteArrayList CGqlRepresentationDataControllerCompBase::GetModelIds() const
 	}
 
 	return retVal;
-}
-
-
-imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateResponse(const CGqlRequest &gqlRequest, QString &errorMessage) const
-{
-	return nullptr;
-}
-
-
-// protected methods
-
-// reimplemented (icomp::CComponentBase)
-
-void CGqlRepresentationDataControllerCompBase::OnComponentCreated()
-{
-	ilog::CLoggerComponentBase::OnComponentCreated();
-}
-
-
-void CGqlRepresentationDataControllerCompBase::OnComponentDestroyed()
-{
-	ilog::CLoggerComponentBase::OnComponentDestroyed();
 }
 
 

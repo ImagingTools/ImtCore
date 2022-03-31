@@ -38,8 +38,7 @@ public:
 		OT_METAINFO,
 		OT_USER_OPERATION = 1000
 	};
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
+
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
@@ -81,6 +80,9 @@ protected:
 		Create object from the GraphQL
 	*/
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 protected:
 	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);

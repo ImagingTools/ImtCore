@@ -18,25 +18,21 @@ class CGqlRepresentationDataControllerCompBase: public ilog::CLoggerComponentBas
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CGqlRepresentationDataControllerCompBase);
+	I_BEGIN_BASE_COMPONENT(CGqlRepresentationDataControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRepresentationDataController);
-		I_ASSIGN_MULTI_0(m_modelIdsCompPtr, "ModelIds", "List of model-IDs for graphQl response", true);
-		I_ASSIGN(m_databaseCompPtr, "Database", "Database for working", false, "IDataBaseEngine");
+		I_ASSIGN_MULTI_0(m_modelIdsCompPtr, "ModelIds", "List of model-IDs for GraphQL-response", true);
+		I_ASSIGN(m_databaseEngineCompPtr, "Database", "Database for working", false, "IDataBaseEngine");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual QByteArrayList GetModelIds() const override;
-	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
-protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
 
 protected:
 	I_MULTIATTR(QByteArray, m_modelIdsCompPtr);
-	I_REF(imtdb::IDatabaseEngine, m_databaseCompPtr);
+	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 };
 
 
-} // namespace rtsgql
+} // namespace imtgql
+
+

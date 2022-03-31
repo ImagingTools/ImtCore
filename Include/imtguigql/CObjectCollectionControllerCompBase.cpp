@@ -11,7 +11,9 @@
 namespace imtguigql
 {
 
+
 // reimplemented (icomp::CComponentBase)
+
 void CObjectCollectionControllerCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
@@ -22,7 +24,9 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 	}
 }
 
+
 // reimplemented (imtgql::IGqlRepresentationDataController)
+
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
@@ -71,6 +75,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 
 
 // protected methods
+
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest, 
 			imtgql::CGqlObject& gqlObject,
@@ -171,8 +176,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	else{
 		QString name, description;
 		QByteArray objectId;
-
-//		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
@@ -372,13 +375,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	}
 
 	bool retVal = m_objectCollectionCompPtr->RemoveObject(objectId);
-	if (retVal){
-		// CREATE SUCCESS RESPONSE!
-
-//		Q_ASSERT_X(false, "CObjectCollectionControllerCompBase::DeleteObject", "Not implemented");
-
-	}
-	else{
+	if (!retVal){
 		errorMessage = QObject::tr("Can not remove object: %1").arg(QString(objectId));
 	}
 
@@ -452,7 +449,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetTreeItemModel(
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
-
 	return nullptr;
 }
 
@@ -464,6 +460,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDependencies(
 {
 	return nullptr;
 }
+
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
@@ -538,12 +535,15 @@ QVariant CObjectCollectionControllerCompBase::GetObjectInformation(const QByteAr
 }
 
 
-istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
-																	 QString& name, QString& description, QString &errorMessage) const
+istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString &errorMessage) const
 {
 	return nullptr;
 }
-
 
 
 } // namespace imtgql
