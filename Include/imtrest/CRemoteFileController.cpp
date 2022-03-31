@@ -18,6 +18,7 @@
 
 #ifdef Q_OS_ANDROID
 #include <QtAndroidExtras/QAndroidJniObject>
+#include <QtAndroidExtras/QtAndroid>
 #endif
 
 // ACF includes
@@ -160,6 +161,7 @@ void CRemoteFileController::OnFileDownloaded()
 		downloadedFile.close();
 		SetState("Ready");
         if(!reply->error()){
+            setOpenableUrl(CalculateOpenableUrl(downloadedFile.fileName()));
             Q_EMIT fileDownloaded(downloadedFile.fileName());
         }
         else {
