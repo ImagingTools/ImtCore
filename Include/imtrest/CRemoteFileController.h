@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
+#include <QtCore/QUrl>
 
 
 
@@ -20,6 +21,7 @@ class CRemoteFileController: public QObject
 	Q_PROPERTY(QString state READ state WRITE SetState NOTIFY stateChanged)
 	Q_PROPERTY(QString downloadedFileLocation READ downloadedFileLocation WRITE setDownloadedFileLocation NOTIFY downloadedFileLocationChanged)
 	Q_PROPERTY(QString downloadedFilePath READ downloadedFilePath WRITE setDownloadedFilePath NOTIFY downloadedFilePathChanged)
+	Q_PROPERTY(QUrl openableUrl READ openableUrl WRITE setOpenableUrl NOTIFY openableUrlChanged)
 	Q_PROPERTY(QByteArray json READ json WRITE setJson NOTIFY jsonChanged)
 
 	QString m_state;
@@ -32,15 +34,14 @@ public:
 
 	const QString& state() const;
 	void SetState(const QString& newState);
-
 	const QString& downloadedFilePath() const;
 	void setDownloadedFilePath(const QString& newDownloadedFilePath);
-
 	const QString& downloadedFileLocation() const;
 	void setDownloadedFileLocation(const QString& newDownloadedFileLocation);
-
 	const QByteArray& json() const;
 	void setJson(const QByteArray& newJson);
+	const QUrl& openableUrl() const;
+	void setOpenableUrl(const QUrl& newOpenableUrl);
 
 public Q_SLOTS:
 	bool DeleteFile(const QString& fileId);
@@ -67,12 +68,33 @@ signals:
     void fileDeleteFailed();
     void fileDownloadFailed();
 
+	void openableUrlChanged();
+
+private:
+	/**
+		\brief Calculates openable url for the specific OS
+		\param filePath - path to the file for calculating the Url
+		\return Openable url, that can be opened with \c QDesktopServices::openUrl()
+		\warning The ANDROID required to update gradle and mainfest and do not forget to add permissons for read and write storage
+				gradle
+					dependencies {
+						implementation 'androidx.core:core:1.3.2'
+					}
+
+				manifest
+					<provider android:name="androidx.core.content.FileProvider" android:authorities="--%%INSERT_PACKAGE_NAME%%--.provider" android:exported="false" android:grantUriPermissions="true">
+							<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
+					</provider>
+	 */
+	QUrl CalculateOpenableUrl(const QString& filePath) const;
+
 private:
 	QString m_preferredFileNameForSave;
 	QString m_downloadedFileLocation;
 	QByteArray m_json;
     qint64 m_bytesLoaded;
-    qint64 m_bytesTotal;
+	qint64 m_bytesTotal;
+	QUrl m_openableUrl;
 };
 
 

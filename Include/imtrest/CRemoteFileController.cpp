@@ -10,30 +10,21 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtCore/QFileInfo>
-
-// ACF includes
-#include <iser/CJsonStringReadArchive.h>
-
-
-
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QtDebug>
 
+#ifdef Q_OS_ANDROID
+#include <QtAndroidExtras/QAndroidJniObject>
+#endif
+
 // ACF includes
+#include <iser/CJsonStringReadArchive.h>
 #include <iser/ISerializable.h>
 #include <imod/CModelUpdateBridge.h>
 #include <imod/CModelBase.h>
-
-
-
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-
-// ACF includes
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CJsonStringWriteArchive.h>
@@ -201,7 +192,41 @@ void CRemoteFileController::OnProgressChanged(qint64 bytesLoaded, qint64 bytesTo
     if(bytesLoaded > 0 && bytesTotal > 0){
         qDebug() << __FILE__ << __LINE__ << "File load progress" << bytesLoaded/bytesTotal;
         Q_EMIT progress(bytesLoaded, bytesTotal);
-    }
+	}
+}
+
+
+QUrl CRemoteFileController::CalculateOpenableUrl(const QString& filePath) const
+{
+	QFileInfo fileInfo(filePath);
+	if(!fileInfo.exists()){
+		qWarning() << "Uttempting to aquire unexisted file" << fileInfo.absoluteFilePath();
+
+		return QUrl();
+	}
+	if(!fileInfo.isReadable()){
+		qWarning() << "Uttempting to aquire unreaddable file" << fileInfo.absoluteFilePath();
+	}
+
+#ifdef Q_OS_ANDROID
+	QString absoluteFilePath = fileInfo.absoluteFilePath();
+	QAndroidJniObject jniFile("java/io/File","(Ljava/lang/String;)V", QAndroidJniObject::fromString(absoluteFilePath).object());
+	QAndroidJniObject jniPkgNameProvider = QtAndroid::androidActivity().callObjectMethod("getPackageName", "()Ljava/lang/String;");
+	QString pkgNameProvider = jniPkgNameProvider.toString();
+	pkgNameProvider += ".provider";
+	jniPkgNameProvider = QAndroidJniObject::fromString(pkgNameProvider);
+	QAndroidJniObject jniFileUri = QAndroidJniObject::callStaticObjectMethod(
+				"androidx/core/content/FileProvider",
+				"getUriForFile",
+				"(Landroid/content/Context;Ljava/lang/String;Ljava/io/File;)Landroid/net/Uri;",
+				QtAndroid::androidActivity().object(),
+				jniPkgNameProvider.object(),
+				jniFile.object());
+
+	return QUrl(jniFileUri.toString());
+#else
+	return QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+#endif
 }
 
 const QString& CRemoteFileController::state() const
@@ -229,6 +254,7 @@ void CRemoteFileController::setDownloadedFilePath(const QString& newDownloadedFi
 		return;
 	m_downloadedFilePath = newDownloadedFilePath;
 	emit downloadedFilePathChanged();
+	setOpenableUrl(CalculateOpenableUrl(newDownloadedFilePath));
 }
 
 const QString& CRemoteFileController::downloadedFileLocation() const
@@ -255,6 +281,19 @@ void CRemoteFileController::setJson(const QByteArray& newJson)
 		return;
 	m_json = newJson;
 	emit jsonChanged();
+}
+
+const QUrl& CRemoteFileController::openableUrl() const
+{
+	return m_openableUrl;
+}
+
+void CRemoteFileController::setOpenableUrl(const QUrl& newOpenableUrl)
+{
+	if (m_openableUrl == newOpenableUrl)
+		return;
+	m_openableUrl = newOpenableUrl;
+	emit openableUrlChanged();
 }
 
 
