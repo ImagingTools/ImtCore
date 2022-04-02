@@ -974,8 +974,13 @@ imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::G
 	QReadLocker locker(&m_lock);
 
 	imtbase::ICollectionInfo::Ids ids;
-	for (const Item& item : m_repositoryItems){
-		ids.append(item.id);
+
+	Q_ASSERT(offset >= 0);
+
+	int elementsCount = count >= 0 ? qMin(count, m_repositoryItems.count()) : m_repositoryItems.count();
+
+	for (int i = offset; i < elementsCount; ++i){
+		ids.append(m_repositoryItems[i].id);
 	}
 
 	return ids;

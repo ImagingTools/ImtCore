@@ -711,8 +711,8 @@ int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(const ipr
 
 
 imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds(
-			int offset,
-			int count,
+			int /*offset*/,
+			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return Ids();

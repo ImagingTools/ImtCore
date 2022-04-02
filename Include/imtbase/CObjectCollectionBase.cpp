@@ -404,8 +404,12 @@ ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 {
 	Ids retVal;
 
-	for (const ObjectInfo& objectInfo : m_objects){
-		retVal.push_back(objectInfo.id);
+	Q_ASSERT(offset >= 0);
+
+	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
+
+	for (int i = offset; i < objectsCount; i++){
+		retVal.push_back(m_objects[i].id);
 	}
 
 	return retVal;
@@ -655,7 +659,7 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(ObjectInfo info)
 
 int CObjectCollectionBase::GetItemDefaultFlags() const
 {
-	return OF_ALL;
+	return OF_ALL & ~OF_SUPPORT_PAGINATION;
 }
 
 

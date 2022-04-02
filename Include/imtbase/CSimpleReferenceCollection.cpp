@@ -115,8 +115,12 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 {
 	Ids retVal;
 
-	for (const Reference& ref : m_references){
-		retVal.push_back(ref.id);
+	Q_ASSERT(offset >= 0);
+
+	int elementsCount = count >= 0 ? qMin(count, m_references.count()) : m_references.count();
+
+	for (int i = offset; i < elementsCount; ++i) {
+		retVal.push_back(m_references[i].id);
 	}
 
 	return retVal;

@@ -725,9 +725,9 @@ imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
 
 	m_filesLock.lockForRead();
 
-	int realCount = qMax(count, m_files.count());
+	int objectsCount = count >= 0 ? qMin(count, m_files.count()) : m_files.count();
 
-	for (int fileIndex = offset; fileIndex < realCount; ++fileIndex){
+	for (int fileIndex = offset; fileIndex < objectsCount; ++fileIndex){
 		retVal.append(m_files[fileIndex].fileId);
 	}
 

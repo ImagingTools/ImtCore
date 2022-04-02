@@ -98,9 +98,9 @@ ICollectionInfo::Ids CCollectionInfo::GetElementIds(
 
 	Q_ASSERT(offset >= 0);
 
-	int realCount = qMax(count, m_items.count());
+	int elementsCount = count >= 0 ? qMin(count, m_items.count()) : m_items.count();
 
-	for (int i = offset; i < realCount; ++i){
+	for (int i = offset; i < elementsCount; ++i){
 		retVal.push_back(m_items[i].id);
 	}
 

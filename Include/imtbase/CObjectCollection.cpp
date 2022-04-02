@@ -12,7 +12,7 @@ namespace imtbase
 // public methods
 
 CObjectCollection::CObjectCollection()
-	:m_operationFlags(IObjectCollection::OF_ALL)
+	:m_operationFlags(IObjectCollection::OF_ALL & ~OF_SUPPORT_PAGINATION)
 {
 }
 
