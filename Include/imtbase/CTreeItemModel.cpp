@@ -1,5 +1,6 @@
 #include <imtbase/CTreeItemModel.h>
 
+
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
@@ -19,8 +20,8 @@ namespace imtbase
 
 CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
-    m_parentUpdateBridge(dynamic_cast<CTreeItemModel*>(parent)),
-    m_isArray(false)
+	m_parentUpdateBridge(dynamic_cast<CTreeItemModel*>(parent)),
+	m_isArray(false)
 {
 	CTreeItemModel* parentModel = dynamic_cast<CTreeItemModel*>(parent);
 	if (parentModel != nullptr){
@@ -69,7 +70,7 @@ int CTreeItemModel::InsertNewItem()
 }
 
 
-int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap &infoMap)
+int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 {
 	if (index < 0 || index > m_items.count() - 1){
 		return false;
@@ -109,8 +110,6 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int
 		return nullptr;
 	}
 
-	Item *item = m_items[index];
-
 	CTreeItemModel* retVal = new CTreeItemModel(this);
 
 	QVariant v = QVariant::fromValue(retVal);
@@ -131,10 +130,10 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 		return false;
 	}
 
-	Item *item = m_items[index];
 	if (externTreeModel != nullptr){
 		externTreeModel->setParent(this);
 	}
+
 	QVariant v = QVariant::fromValue(externTreeModel);
 	SetData(key, v, index);
 
@@ -218,15 +217,18 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 	if (keyRole > -1){
 		QModelIndex topLeft = QAbstractListModel::index(index - 1);
 		QModelIndex bottomRight = QAbstractListModel::index(index);
-		QVector<int> roles;
-		roles.append(keyRole);
-		emit dataChanged(topLeft,bottomRight,roles);
+
+		QVector<int> keyRoles;
+		keyRoles.append(keyRole);
+
+		emit dataChanged(topLeft, bottomRight, keyRoles);
 	}
 
 	return true;
 }
 
-bool CTreeItemModel::RemoveData(const QByteArray &key, int index, const ChangeInfoMap &infoMap)
+
+bool CTreeItemModel::RemoveData(const QByteArray& key, int index, const ChangeInfoMap& /*infoMap*/)
 {
 	if (index < 0 || index > m_items.count() - 1){
 		return false;
@@ -390,10 +392,11 @@ QMap<QByteArray, QByteArray> &CTreeItemModel::GetQueryParams()
 }
 
 
-void CTreeItemModel::ClearQueryParams(const QByteArray &key)
+void CTreeItemModel::ClearQueryParams(const QByteArray& /*key*/)
 {
 	m_queryParams.clear();
 }
+
 
 void CTreeItemModel::Refresh()
 {
@@ -401,13 +404,17 @@ void CTreeItemModel::Refresh()
 	endResetModel();
 }
 
+
 QString CTreeItemModel::toJSON()
 {
 	QByteArray representationData;
+
 	{
 		iser::CJsonStringWriteArchive archive(representationData);
+
 		Serialize(archive);
 	}
+
 	return QString(representationData);
 }
 
@@ -506,9 +513,10 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	if (countSize < 1 && m_isArray == false){
 		return false;
 	}
-    if(m_isArray || countSize > 1){
-        isMultiTag = true;
-    }
+
+	if (m_isArray || countSize > 1){
+		isMultiTag = true;
+	}
 
 	if (isMultiTag == false){
 		retVal = retVal && archive.BeginTag(objectTag);
@@ -516,7 +524,6 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	else{
 		retVal = retVal && archive.BeginMultiTag(arrayTag, subArrayTag, countSize);
 	}
-
 
 	for (int i = 0; i < countSize; i++){
 		Item *item = m_items[i];
@@ -572,7 +579,6 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 				}
 				retVal = retVal && archive.EndTag(keyTag);
 			}
-
 		}
 		if (isMultiTag == true && !keys.isEmpty() && keys[0] != ""){
 			retVal = retVal && archive.EndTag(subArrayTag);
