@@ -22,7 +22,6 @@ namespace imtdb
 CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 	:m_filterParamsObserver(*this),
 	m_databaseAccessObserver(*this),
-	m_databaseCreationThread(*this),
 	m_isInitialized(false)
 {
 }
@@ -169,10 +168,13 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 		return nullptr;
 	}
 
-	if (ExecuteTransaction(objectQuery.query)){
-		istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this);
 
+	if (ExecuteTransaction(objectQuery.query)){
 		return objectId;
+	}
+	else {
+		changeNotifier.Abort();
 	}
 
 	return QByteArray();
@@ -192,10 +194,13 @@ bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 		return false;
 	}
 
-	if (ExecuteTransaction(query)){
-		istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this);
 
+	if (ExecuteTransaction(query)){
 		return true;
+	}
+	else {
+		changeNotifier.Abort();
 	}
 
 	return false;
@@ -389,6 +394,7 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 	return true;
 }
 
+
 QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& objectId) const
 {
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId);
@@ -411,17 +417,13 @@ QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& o
 
 void CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IParamsSet* /*filterParamsPtr*/)
 {
-	//if (m_isInitialized){
-	//	m_databaseCreationThread.StartCollectionCreation();
-	//}
+	istd::CChangeNotifier changeNotifier(this);
 }
 
 
 void CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdb::IDatabaseLoginSettings* /*databaseAccessSettingsPtr*/)
 {
-	//if (m_isInitialized){
-	//	m_databaseCreationThread.StartCollectionCreation();
-	//}
+	istd::CChangeNotifier changeNotifier(this);
 }
 
 
@@ -434,8 +436,6 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 	m_dbEngineCompPtr.EnsureInitialized();
 	m_objectDelegateCompPtr.EnsureInitialized();
 
-	connect (this, &CSqlDatabaseObjectCollectionComp::EmitCollectionReady, this, &CSqlDatabaseObjectCollectionComp::OnCollectionCreated, Qt::QueuedConnection);
-
 	m_typesInfo.InsertOption(*m_typeNameAttrPtr, *m_typeIdAttrPtr);
 
 	m_isInitialized = false;
@@ -443,8 +443,6 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 	m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
 	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnDatabaseAccessChanged);
 	
-//	m_databaseCreationThread.StartCollectionCreation();
-
 	m_isInitialized = true;
 }
 
@@ -454,136 +452,7 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
 
-//	m_databaseCreationThread.CancelCollectionCreation();
-
 	BaseClass::OnComponentDestroyed();
-}
-
-
-// private slots
-
-void CSqlDatabaseObjectCollectionComp::OnCollectionCreated()
-{
-	istd::CChangeNotifier changeNotifier(this);
-
-	{
-		//QWriteLocker writeLock(&m_objectInfoMapMutex);
-
-		//m_databaseCreationThread.CopyData(m_objectInfoMap);
-	}
-}
-
-
-// public methods of the embedded class DatabaseCreationThread
-
-CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::DatabaseCreationThread(CSqlDatabaseObjectCollectionComp & parent)
-	:m_parent(parent),
-	m_dataMutex(QMutex::Recursive)
-{
-}
-
-void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::CopyData(ObjectInfoMap& collectionData) const
-{
-	collectionData = std::move(m_objectInfoMap);
-}
-
-
-void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::StartCollectionCreation()
-{
-	if (isRunning()){
-		requestInterruption();
-
-		wait();
-	}
-
-	{
-		QMutexLocker lock(&m_dataMutex);
-
-		m_objectInfoMap.clear();
-	}
-
-	start();
-}
-
-
-void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::CancelCollectionCreation()
-{
-	requestInterruption();
-
-	wait();
-
-	QMutexLocker lock(&m_dataMutex);
-
-	m_objectInfoMap.clear();
-}
-
-
-// reimplemented (QThread)
-
-void CSqlDatabaseObjectCollectionComp::DatabaseCreationThread::run()
-{
-	if (!m_parent.m_dbEngineCompPtr.IsValid()){
-		return;
-	}
-
-	if (!m_parent.m_objectDelegateCompPtr.IsValid()){
-		return;
-	}
-
-	QByteArray objectSelectionQuery = m_parent.m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), -1, -1, m_parent.m_filterParamsCompPtr.GetPtr());
-	if (objectSelectionQuery.isEmpty()){
-		return;
-	}
-
-	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_parent.m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
-
-	ObjectInfoMap objectInfoMap;
-
-	QList<QSqlRecord> records;
-
-	while (sqlQuery.next()){
-		records.append(sqlQuery.record());
-	}
-
-	for (const QSqlRecord& record : records){
-		QByteArray objectId = m_parent.m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_parent.m_typeIdAttrPtr, record);
-
-		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
-		bool isOk = m_parent.m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_parent.m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
-		if (isOk){
-			ObjectInfo objectInfo;
-			objectInfo.typeId = *m_parent.m_typeIdAttrPtr;
-			objectInfo.collectionMetaInfoPtr = collectionMetaInfoPtr;
-			objectInfo.metaInfoPtr = objectMetaInfoPtr;
-
-			objectInfoMap[objectId] = objectInfo;
-		}
-	}
-//	while (sqlQuery.next() && !isInterruptionRequested()){
-//		QSqlRecord record = sqlQuery.record();
-
-//		QByteArray objectId = m_parent.m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_parent.m_typeIdAttrPtr, record);
-
-//		imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-//		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
-//		bool isOk = m_parent.m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_parent.m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
-//		if (isOk){
-//			ObjectInfo objectInfo;
-//			objectInfo.typeId = *m_parent.m_typeIdAttrPtr;
-//			objectInfo.collectionMetaInfoPtr = collectionMetaInfoPtr;
-//			objectInfo.metaInfoPtr = objectMetaInfoPtr;
-
-//			objectInfoMap[objectId] = objectInfo;
-//		}
-//	}
-
-	QMutexLocker lock(&m_dataMutex);
-
-	m_objectInfoMap = std::move(objectInfoMap);
-
-	Q_EMIT m_parent.EmitCollectionReady();
 }
 
 

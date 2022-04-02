@@ -107,12 +107,6 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-private Q_SLOTS:
-	void OnCollectionCreated();
-
-Q_SIGNALS:
-	void EmitCollectionReady();
-
 protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
 
@@ -129,30 +123,6 @@ private:
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;
-
-	class DatabaseCreationThread: protected QThread
-	{
-	public:
-		DatabaseCreationThread(CSqlDatabaseObjectCollectionComp& parent);
-
-		void CopyData(ObjectInfoMap& collectionData) const;
-
-		void StartCollectionCreation();
-		void CancelCollectionCreation();
-
-	protected:
-		// reimplemented (QThread)
-		virtual void run() override;
-
-	private:
-		CSqlDatabaseObjectCollectionComp& m_parent;
-
-		ObjectInfoMap m_objectInfoMap;
-
-		QMutex m_dataMutex;
-	};
-
-	DatabaseCreationThread m_databaseCreationThread;
 
 	bool m_isInitialized;
 };
