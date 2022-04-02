@@ -69,7 +69,8 @@ public:
 	enum DataRole
 	{
 		DR_TYPE_ID = Qt::UserRole,
-		DR_OBJECT_ID, DR_SORT_VALUE
+		DR_OBJECT_ID,
+		DR_SORT_VALUE
 	};
 
 	enum ModelId
@@ -190,47 +191,14 @@ protected:
 		virtual KeyList GetFactoryKeys() const;
 	};
 
-	class ReadCollectionThread: public QThread
-	{
-	public:
-		explicit ReadCollectionThread(CObjectCollectionViewComp* parentPtr);
-		void SetModels(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr);
-
-	private:
-		virtual void run() override;
-
-	private:
-		CObjectCollectionViewComp* m_parentPtr;
-		QStandardItemModel* m_typeModelPtr;
-		QStandardItemModel* m_itemModelPtr;
-	};
-
 private:
-	enum ReadCollectionThreadState
-	{
-		/*
-			Read collection thread is idle
-		*/
-		RCTS_IDLE = 0,
-
-		/*
-			Read collection thread is running
-		*/
-		RCTS_RUNNING,
-
-		/*
-			Read collection thread is running and next run is pending
-		*/
-		RCTS_PENDING
-	};
-
 	void UpdateCommands();
 
 	QVector<QByteArray> GetMetaInfoIds(const QByteArray& typeId) const;
 	QStringList GetMetaInfoHeaders(const QByteArray& typeId) const;
 	ObjectMetaInfo GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const;
 
-	void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId, QStandardItemModel* modelPtr);
+	void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId, QAbstractTableModel* modelPtr);
 	void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 
 	void EnsureColumnsSettingsSynchronized() const;
@@ -271,6 +239,10 @@ private Q_SLOTS:
 	void OnEscShortCut();
 	void OnDelShortCut();
 	void OnRenameShortCut();
+	void DoUpdateGui(const istd::IChangeable::ChangeSet& changeSet);
+
+Q_SIGNALS:
+	void EmitUpdateGui(const istd::IChangeable::ChangeSet& changeSet);
 
 private:
 	class SignalSemaphore
@@ -296,9 +268,6 @@ private:
 
 	int m_semaphoreCounter;
 
-	ReadCollectionThread m_readCollectionThread;
-	ReadCollectionThreadState m_readCollectionThreadState;
-
 	QShortcut* m_searchShortCutPtr;
 	QShortcut* m_escShortCutPtr;
 	QShortcut* m_delShortCutPtr;
@@ -307,10 +276,35 @@ private:
 	FocusDecorationFactory m_graphicsEffectFactory;
 	QPropertyAnimation* m_filterPanelAnimationPtr;
 
-	QStandardItemModel* m_itemModelPtr;
-	QStandardItemModel m_itemModel1;
-	QStandardItemModel m_itemModel2;
+	class TableModel: public QAbstractTableModel
+	{
+	public:
+		TableModel(CObjectCollectionViewComp& parent);
+		void UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes);
+
+		// reimplemented (QAbstractTableModel)
+		virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+		virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+		virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+		virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+	protected:
+		// reimplemented (QAbstractTableModel)
+		virtual bool canFetchMore(const QModelIndex &parent) const override;
+		virtual void fetchMore(const QModelIndex &parent) override;
+	
+	private:
+		int m_batchSize;
+		int m_fetchedRowCount;
+		mutable imtbase::ICollectionInfo::Ids m_ids;
+		int m_totalRowCount;
+		ObjectMetaInfo m_metaInfo;
+
+		CObjectCollectionViewComp& m_parent;
+		mutable QMap<QByteArray, ObjectMetaInfo> m_metaInfoMap;
+	};
+
 	QStandardItemModel m_typeModel;
+	TableModel m_tableModel;
 
 	imod::TModelWrap<CObjectCollectionViewDelegate> m_defaultViewDelegate;
 
