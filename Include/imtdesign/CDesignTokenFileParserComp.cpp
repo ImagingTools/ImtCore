@@ -14,7 +14,7 @@ namespace imtdesign
 {
 
 
-QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const
+QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& /*styleName*/, QPalette::ColorGroup group, QPalette::ColorRole role) const
 {
 	for(const RawColor& color: ::qAsConst(m_styleSheetColors)){
 		if (color.group == group && color.role == role){

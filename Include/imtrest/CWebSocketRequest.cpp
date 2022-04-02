@@ -136,13 +136,13 @@ bool CWebSocketRequest::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-void CWebSocketRequest::OnWebSocketTextMessage(const QString& textMessage)
+void CWebSocketRequest::OnWebSocketTextMessage(const QString& /*textMessage*/)
 {
 	m_requestHandler.ProcessRequest(*this);
 }
 
 
-void CWebSocketRequest::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
+void CWebSocketRequest::OnWebSocketBinaryMessage(const QByteArray& /*dataMessage*/)
 {
 	m_requestHandler.ProcessRequest(*this);
 }

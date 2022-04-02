@@ -26,7 +26,7 @@ const iser::IVersionInfo* CWebSocketProtocolEngineComp::GetProtocolVersion() con
 }
 
 
-bool CWebSocketProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const
+bool CWebSocketProtocolEngineComp::GetProtocolStatusCode(int /*statusCode*/, int& protocolStatusCode, QByteArray& statusCodeLiteral) const
 {
 	protocolStatusCode = 200;
 	statusCodeLiteral = "OK";
@@ -47,12 +47,14 @@ IRequest* CWebSocketProtocolEngineComp::CreateRequest(QObject* socketPtr, const 
 IRequest *CWebSocketProtocolEngineComp::CreateRequestForSend(
 		QObject* socketPtr,
 		const IRequestServlet& requestHandler,
-		int statusCode,
-		const QByteArray &data,
-		const QByteArray &dataTypeId) const
+		int /*statusCode*/,
+		const QByteArray& data,
+		const QByteArray& /*dataTypeId*/) const
 {
 	CWebSocketRequest *webSocketRequest = new CWebSocketRequest(*socketPtr, requestHandler, *this);
+
 	webSocketRequest->SetBody(data);
+
 	return webSocketRequest;
 }
 
@@ -81,8 +83,6 @@ void CWebSocketProtocolEngineComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 }
-
-
 
 
 } // namespace imtrest
