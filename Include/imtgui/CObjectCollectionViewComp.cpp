@@ -1645,8 +1645,7 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 	case Qt::DisplayRole:
 		return metaInfo[index.column()].text;
 	case Qt::DecorationRole:
-		return QVariant();
-			return metaInfo[index.column()].icon;
+		return metaInfo[index.column()].icon;
 	case DR_TYPE_ID:
 		return itemTypeId;
 	case DR_OBJECT_ID:
