@@ -19,6 +19,8 @@
 #ifdef Q_OS_ANDROID
 #include <QtAndroidExtras/QAndroidJniObject>
 #include <QtAndroidExtras/QtAndroid>
+#else
+#include <QtGui/QDesktopServices>
 #endif
 
 // ACF includes
@@ -44,6 +46,89 @@ CRemoteFileController::CRemoteFileController(QObject *parent) : QObject(parent)
 CRemoteFileController::~CRemoteFileController()
 {
 
+}
+
+bool CRemoteFileController::OpenFile(const QString& filePath) const
+{
+	QFileInfo fileInfo(filePath.length() > 2 ? filePath : m_downloadedFilePath);
+	if(!fileInfo.exists()){
+		qWarning() << "Uttempting to aquire unexisted file" << fileInfo.absoluteFilePath();
+
+		return false;
+	}
+	if(!fileInfo.isReadable()){
+		qWarning() << "Uttempting to aquire unreaddable file" << fileInfo.absoluteFilePath();
+	}
+#ifdef Q_OS_ANDROID
+	QString type = "*/*";
+	if (filePath.contains(".doc") || filePath.contains(".docx")) {
+		// Word document
+		type = "application/msword";
+	}
+	else if (filePath.contains(".pdf")) {
+		// PDF file
+		type = "application/pdf";
+	}
+	else if (filePath.contains(".ppt") || filePath.contains(".pptx")) {
+		// Powerpoint file
+		type = "application/vnd.ms-powerpoint";
+	}
+	else if (filePath.contains(".xls") || filePath.contains(".xlsx")) {
+		// Excel file
+		type = "application/vnd.ms-excel";
+	}
+	else if (filePath.contains(".zip") || filePath.contains(".rar")) {
+		// WAV audio file
+		type = "application/x-wav";
+	}
+	else if (filePath.contains(".rtf")) {
+		// RTF file
+		type = "application/rtf";
+	}
+	else if (filePath.contains(".wav") || filePath.contains(".mp3")) {
+		// WAV audio file
+		type = "audio/x-wav";
+	}
+	else if (filePath.contains(".gif")) {
+		// GIF file
+		type = "image/gif";
+	}
+	else if (filePath.contains(".jpg") || filePath.contains(".jpeg") || filePath.contains(".png")) {
+		// JPG file
+		type = "image/jpeg";
+	}
+	else if (filePath.contains(".txt")) {
+		// Text file
+		type = "text/plain";
+	}
+	else if (filePath.contains(".3gp") || filePath.contains(".mpg") || filePath.contains(".mpeg") || filePath.contains(".mpe") || filePath.contains(".mp4") || filePath.contains(".avi")) {
+		// Video files
+		type = "video/*";
+	}
+
+	QString absoluteFilePath = QUrl::fromLocalFile(fileInfo.absoluteFilePath()).toString();
+	QAndroidJniObject jniUri = QAndroidJniObject::callStaticObjectMethod(
+				"android/net/Uri",
+				"parse",
+				"(Ljava/lang/String;)Landroid/net/Uri;",
+				QAndroidJniObject::fromString(absoluteFilePath).object());
+
+	QAndroidJniObject jniIntent = QAndroidJniObject("android/content/Intent");
+	QAndroidJniObject jniIntentAction = QAndroidJniObject::getStaticObjectField("android/content/Intent","ACTION_VIEW", "Ljava/lang/String;");
+	jint jniIntentFlags = QAndroidJniObject::getStaticField<jint>("android/content/Intent","FLAG_ACTIVITY_NEW_TASK");
+	jint jniIntentFlags2 = QAndroidJniObject::getStaticField<jint>("android/content/Intent","FLAG_GRANT_READ_URI_PERMISSION");
+	jniIntent.callObjectMethod("setAction", "(Ljava/lang/String;)Landroid/content/Intent;", jniIntentAction.object());
+	jniIntent.callObjectMethod("addFlags", "(I)Landroid/content/Intent;", jniIntentFlags);
+	jniIntent.callObjectMethod("addFlags", "(I)Landroid/content/Intent;", jniIntentFlags2);
+	jniIntent.callObjectMethod("setDataAndType",
+				"(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;",
+				jniUri.object(),
+				QAndroidJniObject::fromString(type).object());
+	QtAndroid::androidActivity().callMethod<void>("startActivity", "(Landroid/content/Intent;)V", jniIntent.object());
+	return true;
+#else
+	return QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
+#endif
 }
 
 bool CRemoteFileController::DeleteFile(const QString& fileId)
@@ -160,8 +245,7 @@ void CRemoteFileController::OnFileDownloaded()
 		downloadedFile.write(representationData);
 		downloadedFile.close();
 		SetState("Ready");
-        if(!reply->error()){
-            setOpenableUrl(CalculateOpenableUrl(downloadedFile.fileName()));
+		if(!reply->error()){
             Q_EMIT fileDownloaded(downloadedFile.fileName());
         }
         else {
@@ -197,40 +281,6 @@ void CRemoteFileController::OnProgressChanged(qint64 bytesLoaded, qint64 bytesTo
 	}
 }
 
-
-QUrl CRemoteFileController::CalculateOpenableUrl(const QString& filePath) const
-{
-	QFileInfo fileInfo(filePath);
-	if(!fileInfo.exists()){
-		qWarning() << "Uttempting to aquire unexisted file" << fileInfo.absoluteFilePath();
-
-		return QUrl();
-	}
-	if(!fileInfo.isReadable()){
-		qWarning() << "Uttempting to aquire unreaddable file" << fileInfo.absoluteFilePath();
-	}
-
-#ifdef Q_OS_ANDROID
-	QString absoluteFilePath = fileInfo.absoluteFilePath();
-	QAndroidJniObject jniFile("java/io/File","(Ljava/lang/String;)V", QAndroidJniObject::fromString(absoluteFilePath).object());
-	QAndroidJniObject jniPkgNameProvider = QtAndroid::androidActivity().callObjectMethod("getPackageName", "()Ljava/lang/String;");
-	QString pkgNameProvider = jniPkgNameProvider.toString();
-	pkgNameProvider += ".provider";
-	jniPkgNameProvider = QAndroidJniObject::fromString(pkgNameProvider);
-	QAndroidJniObject jniFileUri = QAndroidJniObject::callStaticObjectMethod(
-				"androidx/core/content/FileProvider",
-				"getUriForFile",
-				"(Landroid/content/Context;Ljava/lang/String;Ljava/io/File;)Landroid/net/Uri;",
-				QtAndroid::androidActivity().object(),
-				jniPkgNameProvider.object(),
-				jniFile.object());
-
-	return QUrl(jniFileUri.toString());
-#else
-	return QUrl::fromLocalFile(fileInfo.absoluteFilePath());
-#endif
-}
-
 const QString& CRemoteFileController::state() const
 {
 	return m_state;
@@ -252,11 +302,10 @@ const QString& CRemoteFileController::downloadedFilePath() const
 
 void CRemoteFileController::setDownloadedFilePath(const QString& newDownloadedFilePath)
 {
-	if (m_downloadedFilePath == newDownloadedFilePath)
-		return;
-	m_downloadedFilePath = newDownloadedFilePath;
-	emit downloadedFilePathChanged();
-	setOpenableUrl(CalculateOpenableUrl(newDownloadedFilePath));
+    if (m_downloadedFilePath == newDownloadedFilePath)
+        return;
+    m_downloadedFilePath = newDownloadedFilePath;
+    emit downloadedFilePathChanged();
 }
 
 const QString& CRemoteFileController::downloadedFileLocation() const
@@ -285,18 +334,7 @@ void CRemoteFileController::setJson(const QByteArray& newJson)
 	emit jsonChanged();
 }
 
-const QUrl& CRemoteFileController::openableUrl() const
-{
-	return m_openableUrl;
-}
 
-void CRemoteFileController::setOpenableUrl(const QUrl& newOpenableUrl)
-{
-	if (m_openableUrl == newOpenableUrl)
-		return;
-	m_openableUrl = newOpenableUrl;
-	emit openableUrlChanged();
-}
 
 
 } // namespace imtrest

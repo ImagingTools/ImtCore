@@ -21,7 +21,6 @@ class CRemoteFileController: public QObject
 	Q_PROPERTY(QString state READ state WRITE SetState NOTIFY stateChanged)
 	Q_PROPERTY(QString downloadedFileLocation READ downloadedFileLocation WRITE setDownloadedFileLocation NOTIFY downloadedFileLocationChanged)
 	Q_PROPERTY(QString downloadedFilePath READ downloadedFilePath WRITE setDownloadedFilePath NOTIFY downloadedFilePathChanged)
-	Q_PROPERTY(QUrl openableUrl READ openableUrl WRITE setOpenableUrl NOTIFY openableUrlChanged)
 	Q_PROPERTY(QByteArray json READ json WRITE setJson NOTIFY jsonChanged)
 
 	QString m_state;
@@ -40,8 +39,6 @@ public:
 	void setDownloadedFileLocation(const QString& newDownloadedFileLocation);
 	const QByteArray& json() const;
 	void setJson(const QByteArray& newJson);
-	const QUrl& openableUrl() const;
-	void setOpenableUrl(const QUrl& newOpenableUrl);
 
 public Q_SLOTS:
 	bool DeleteFile(const QString& fileId);
@@ -53,7 +50,8 @@ private Q_SLOTS:
 	void OnFileDeleted();
 	void OnFileDownloaded();
 	void OnFileUploaded();
-    void OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal);
+	void OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal);
+	bool OpenFile(const QString& filePath = QString()) const;
 
 signals:
 	void stateChanged();
@@ -66,9 +64,7 @@ signals:
 	void fileDeleted();
     void fileUploadFailed();
     void fileDeleteFailed();
-    void fileDownloadFailed();
-
-	void openableUrlChanged();
+	void fileDownloadFailed();
 
 private:
 	/**
@@ -86,7 +82,6 @@ private:
 							<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths"/>
 					</provider>
 	 */
-	QUrl CalculateOpenableUrl(const QString& filePath) const;
 
 private:
 	QString m_preferredFileNameForSave;
@@ -94,7 +89,6 @@ private:
 	QByteArray m_json;
     qint64 m_bytesLoaded;
 	qint64 m_bytesTotal;
-	QUrl m_openableUrl;
 };
 
 
