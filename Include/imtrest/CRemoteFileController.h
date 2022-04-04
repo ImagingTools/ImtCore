@@ -44,6 +44,7 @@ public Q_SLOTS:
 	bool DeleteFile(const QString& fileId);
 	bool GetFile(const QString& fileId, const QString& fileName);
 	bool SendFile(const QString& fileUrl);
+    bool OpenFile(const QString& filePath = QString()) const;
 
 
 private Q_SLOTS:
@@ -51,7 +52,6 @@ private Q_SLOTS:
 	void OnFileDownloaded();
 	void OnFileUploaded();
 	void OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal);
-	bool OpenFile(const QString& filePath = QString()) const;
 
 signals:
 	void stateChanged();
