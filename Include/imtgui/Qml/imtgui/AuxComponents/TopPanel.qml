@@ -70,13 +70,13 @@ Rectangle {
 
     onWidthChanged: {
         if (thubnailDecoratorContainer.dialogIsActive()) {
-            thubnailDecoratorContainer.closeDialog();
+            //thubnailDecoratorContainer.closeDialog();
         }
     }
 
     onHeightChanged: {
         if (thubnailDecoratorContainer.dialogIsActive()) {
-            thubnailDecoratorContainer.closeDialog();
+            //thubnailDecoratorContainer.closeDialog();
         }
     }
 

@@ -101,10 +101,14 @@ Rectangle {
         }
 
         if (activeValue !== undefined){
-            modelSettingsBody.SetData("Value", activeValue, index);
 
+            var itemId = modelSettingsBody.GetData("Id", index);
+            modelSettingsBody.SetData("Value", activeValue, index);
             var selectedId = modelElements.GetData("Id", activeValue);
-            preferenceContainer.currentModeId = selectedId;
+
+            if (itemId === "Mode"){
+                preferenceContainer.currentModeId = selectedId;
+            }
         }
 
         modelSettingsBody.SetData("Parameters", modelElements, index);
@@ -427,7 +431,7 @@ Rectangle {
        }
 
        onClicked: {
-           console.log("PreferenceDialog saveButton onClicked");
+           console.log("PreferenceDialog saveButton onClicked", preferenceContainer.currentModeId, Style.theme);
 
            if (preferenceContainer.currentModeId !== Style.theme){
                Style.theme = preferenceContainer.currentModeId;

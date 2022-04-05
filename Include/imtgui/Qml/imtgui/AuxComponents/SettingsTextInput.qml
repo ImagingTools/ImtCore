@@ -19,6 +19,12 @@ Item {
         }
     }
 
+    onItemIdChanged: {
+        if (settingsTextInputContainer.itemId === "Password"){
+            tfcTextInput.echoMode = TextInput.Password;
+        }
+    }
+
     Keys.onPressed: {
         console.log("SettingsTextInput keys pressed")
         if (event.key === Qt.Key_Tab){
@@ -35,8 +41,7 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("SettingsTextInput onCompleted");
-        console.log("width", settingsTextInputContainer.width);
+        console.log("SettingsTextInput onCompleted", settingsTextInputContainer.itemId);
     }
 
     TextFieldCustom {

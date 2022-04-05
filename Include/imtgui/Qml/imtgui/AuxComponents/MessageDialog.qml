@@ -32,6 +32,17 @@ Rectangle {
     signal okButtonClicked();
     signal noButtonClicked();
 
+    Keys.onPressed: {
+        console.log("MessageDialog keys pressed")
+        if (event.key === Qt.Key_Escape){
+            console.log('Key tab was pressed');
+            noButton.clicked();
+        }
+        else if (event.key === Qt.Key_Return){
+            yesButton.clicked();
+        }
+    }
+
     function exit(status) {
         var parameters  = {};
         parameters["status"] = status;

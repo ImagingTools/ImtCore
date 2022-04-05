@@ -156,6 +156,10 @@ Item {
             if (this.state === "Ready") {
                 var dataModelLocal;
 
+                if (styleQuery === ""){
+                    thumbnailDecorator.setNoConnection(true);
+                }
+
                 if (styleQuery.ContainsKey("errors")){
                     return;
                 }

@@ -49,6 +49,9 @@ Rectangle {
             console.log('Key tab was pressed');
             cancelButton.clicked();
         }
+        else if (event.key === Qt.Key_Return){
+            okButton.clicked();
+        }
     }
 
     function validateId(id) {
@@ -263,8 +266,6 @@ Rectangle {
                 tfcFeatureIdText.setFocus(true);
             }
 
-//            KeyNavigation.tab: tfcFeatureName;
-
             TextFieldCustom {
                 id: tfcFeatureIdText;
 
@@ -279,16 +280,24 @@ Rectangle {
                 correctData: errorIdMessage.text !== "";
 
                 onTextChanged: {
-
+                    console.log("TextFieldCustom onTextChanged");
                     errorIdMessage.text = "";
-
                     var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
+
                     if (idMessage !== "") {
                        errorIdMessage.text = idMessage;
                     }
                 }
 
-//                KeyNavigation.tab: tfcFeatureName;
+//                onClicked: {
+//                    errorIdMessage.text = "";
+//                    var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
+
+//                    if (idMessage !== "") {
+//                       errorIdMessage.text = idMessage;
+//                    }
+//                }
+
                 KeyNavigation.tab: okButton;
             }
         }

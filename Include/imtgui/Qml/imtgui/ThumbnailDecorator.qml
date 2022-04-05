@@ -37,7 +37,6 @@ Rectangle
             listViewDialogs.visible = true;
         }
 
-        console.log("ThumbnailDecorator listViewDialogs.count", listViewDialogs.count);
         return modelLayers.count - 1;
     }
 
@@ -74,6 +73,24 @@ Rectangle
             console.log("ThumbnailDecorator TopPanel onCommandsChangedSignal", commandsId);
             thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
         }
+    }
+
+    function setInvalidConnection(state){
+        textNoConnection.visible = state;
+    }
+
+    Text {
+        id: textNoConnection;
+
+        anchors.centerIn: parent;
+
+        text: qsTr("There is no connection to the server!");
+
+        visible: false;
+
+        color: "red";
+        font.pixelSize: 20;
+        font.family: Style.fontFamily;
     }
 
     MenuPanel {
@@ -197,10 +214,11 @@ Rectangle
         id: listViewDialogs;
         z: 10;
 
-        anchors.fill: parent;
+//        anchors.fill: parent;
+        width: parent.width;
+        height: parent.height;
 
         model: modelLayers;
-//        visible: false;
 
         onModelChanged: {
             console.log("ThumbnailDecorator ListView onModelChanged!");
@@ -232,9 +250,7 @@ Rectangle
                         }
                     }
 
-                    onWheel: {
-
-                    }
+                    onWheel: {}
                 }
             }
 
@@ -258,12 +274,7 @@ Rectangle
                       if (!model.source){
                           return;
                       }
-
                       loaderDialog.source = model.source;
-
-//                      thubnailDecoratorContainer.activeFocus = false;
-//                      loaderDialog.item.activeFocus = true;
-//                      loaderDialog.item.forceActiveFocus();
                   }
 
                   onItemChanged: {

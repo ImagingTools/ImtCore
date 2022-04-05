@@ -260,6 +260,7 @@ Item {
 
         onSelectItem: {
             var typeOperation = "Open";
+
             if (selectedId === "") {
                 name = "New Package";
                 typeOperation = "New";

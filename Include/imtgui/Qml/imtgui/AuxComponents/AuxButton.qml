@@ -9,13 +9,16 @@ Rectangle {
     border.width: 1;
     border.color: auxButtonContainer.borderColor;
 
-    color: auxButtonContainer.highlighted ? Style.selectedColor : auxButtonContainer.backgroundColor;
+    color: auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
+                                        auxButtonContainer.highlighted ? Style.selectedColor :
+                                                                         auxButtonContainer.backgroundColor;
 
     property bool highlighted: ma.containsMouse;
     property bool hasIcon: auxButtonContainer.iconSource !== "";
     property bool hasText: false;
     property bool borderExist: false;
     property bool enabled: true;
+    property bool pressed: false;
 
     property string borderColor: "transparent";
     property string backgroundColor: "transparent";
@@ -69,6 +72,13 @@ Rectangle {
         onClicked: {
             auxButtonContainer.clicked();
         }
-    }
 
+        onPressed: {
+            auxButtonContainer.pressed = true;
+        }
+
+        onReleased: {
+            auxButtonContainer.pressed = false;
+        }
+    }
 }

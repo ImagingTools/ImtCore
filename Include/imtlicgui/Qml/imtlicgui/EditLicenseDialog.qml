@@ -50,6 +50,9 @@ Rectangle {
             console.log('Key tab was pressed');
             cancelButton.clicked();
         }
+        else if (event.key === Qt.Key_Return){
+            okButton.clicked();
+        }
     }
 
     function exit(status) {

@@ -92,6 +92,8 @@ Rectangle {
             queryFields.InsertField(PageEnum.SOURCE);
             query.AddField(queryFields);
             var gqlData = query.GetQuery();
+
+            console.log("MenuPanel PagesData", gqlData);
             this.SetGqlQuery(gqlData)
         }
 
@@ -99,6 +101,13 @@ Rectangle {
             console.log("State:",this.state, pagesModel)
             if (this.state == "Ready"){
                 var dataModelLocal = this.GetData("data");
+
+                if (!dataModelLocal){
+//                    thumbnailDecorator.setInvalidConnection(true);
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
+
                 if(dataModelLocal.ContainsKey("PagesData")){
                     dataModelLocal = dataModelLocal.GetData("PagesData")
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){

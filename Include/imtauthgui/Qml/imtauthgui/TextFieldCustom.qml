@@ -21,9 +21,17 @@ Item {
     property color borderColor: Style.iconColorOnSelected;
 
     property int textSize: 15;
+    property int echoMode: TextInput.Normal;
 
-//    signal focusChanged();
     signal inputTextChanged();
+    signal clicked();
+
+    onFocusChanged: {
+        console.log('TextFieldCustom onFocusChanged', containerTextField.focus);
+        if (!containerTextField.focus){
+            containerTextField.setFocus(false);
+        }
+    }
 
     function setFocus(state){
         if (state === true){
@@ -31,14 +39,6 @@ Item {
         }
         textField.focus = state;
     }
-
-//    onFocusChanged: {
-//        console.log("TextFieldCustom onFocusChanged");
-
-//        if (containerTextField.focus){
-//            textField.forceActiveFocus();
-//        }
-//    }
 
     Rectangle {
         id: mainRect;
@@ -62,6 +62,8 @@ Item {
         font.pixelSize: containerTextField.textSize;
         font.family: Style.fontFamily;
 
+        echoMode: containerTextField.echoMode;
+
         verticalAlignment: TextInput.AlignVCenter;
         selectionColor: Style.textSelected;
         selectByMouse: true;
@@ -84,12 +86,6 @@ Item {
         onAccepted: {
             console.log("TextFieldCustom onAccepted");
             containerTextField.isTextChanged = false;
-        }
-
-        onCursorVisibleChanged: {
-            if (!cursorVisible) {
-                cursorVisible = true;
-            }
         }
     }
 
