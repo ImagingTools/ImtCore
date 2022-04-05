@@ -57,7 +57,7 @@ public:
 		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the param", false, "");
 		I_ASSIGN(m_paramComponentTypeAttrPtr, "ComponentType", "Type of component\n0 - UNKNOWN\n1 - TEXT\n2 - INTEGER\n3 - COMBOBOX", false, 0);
 		I_ASSIGN_MULTI_0(m_paramSubElementsCompPtr, "ParamSubElements", "Subelements of the param", false);
-		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "m_mutationDataDelegateCompPtr", "Mutation data delegate", false);
+		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false);
 		I_ASSIGN(m_parameterCompPtr, "Parameter", "Parameter of params data", false, "");
 	I_END_COMPONENT;
 

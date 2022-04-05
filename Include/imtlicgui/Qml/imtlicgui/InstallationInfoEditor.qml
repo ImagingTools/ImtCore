@@ -123,6 +123,8 @@ Rectangle {
         id: listModelAccounts;
     }
 
+    function dialogResult(parameters){}
+
     function updateData() {
         console.log("containerContactInfo updateData");
 

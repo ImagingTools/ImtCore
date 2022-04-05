@@ -74,6 +74,8 @@ Rectangle {
         }
     }
 
+    function dialogResult(parameters){}
+
     function openMessageDialog(nameDialog, message) {
         var source = "AuxComponents/MessageDialog.qml";
         var parameters = {};
@@ -139,7 +141,8 @@ Rectangle {
 
         if (containerContactInfo.wasChanged){
             containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
-        } else {
+        }
+        else {
             containerContactInfo.rootItem.setModeMenuButton("Save", "Disabled");
         }
     }
@@ -1036,13 +1039,6 @@ Rectangle {
                         }
 
                         containerContactInfo.contactInfoModel = dataModelLocal;
-
-//                        console.log("Email", containerContactInfo.contactInfoModel.GetData("Email"));
-//                        console.log("AccountName", containerContactInfo.contactInfoModel.GetData("AccountName"));
-//                        console.log("FirstName", containerContactInfo.contactInfoModel.GetData("FirstName"));
-//                        console.log("LastName", containerContactInfo.contactInfoModel.GetData("LastName"));
-//                        console.log("Addresses", addressesTable.elements = containerContactInfo.contactInfoModel.GetData("Addresses"))
-
                         containerContactInfo.model.SetExternTreeModel('data', containerContactInfo.contactInfoModel)
                         //dataModelLocal.RemoveData("item");
                     }
@@ -1120,7 +1116,7 @@ Rectangle {
                         dataModelLocal = dataModelLocal.GetData(containerContactInfo.gqlModelQueryType);
                         var messageError = dataModelLocal.GetData("message");
 
-                        containerContactInfo.openMessageDialog("Error Dialog", messageError);
+                        containerContactInfo.openMessageDialog("Error ", messageError);
                     }
 
                     return;

@@ -19,7 +19,7 @@ public:
 
 	I_BEGIN_COMPONENT(CPagesDataControllerComp);
 		I_ASSIGN(m_pagesDataProviderCompPtr, "PagesDataProviderCompPtr", "List of pages providers for join", true, "");
-		I_ASSIGN(m_mutationDataDelegateCompPtr, "m_mutationDataDelegateCompPtr", "Mutation data delegate", true, "");
+		I_ASSIGN(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", true, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)

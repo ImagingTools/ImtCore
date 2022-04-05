@@ -95,12 +95,12 @@ Item {
         styleQuery.getStyle(theme);
     }
 
-    function getThemeColor(colorType, colorKey, themeType) {
+    function getThemeColor(colorType, colorKey, themeType){
         var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
         return themeType.GetData("ColorPalette").GetData(colorPalette);
     }
 
-    function parseStyleTheme(themeType) {
+    function parseStyleTheme(themeType){
         console.log("PreferenceDialog parseStyleTheme");
 
         Style.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", themeType);
@@ -179,5 +179,4 @@ Item {
             }
         }
     }
-
 }

@@ -6,11 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtauth/IContactInfo.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
-#include <imtbase/IItemBasedRepresentationDataController.h>
-#include <imod/TModelWrap.h>
-#include <imtrest/ISuscriberEngine.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
 #include <imtgql/IGqlMutationDataControllerDelegate.h>
 
@@ -20,8 +16,8 @@ namespace imtqml
 
 
 /**
-	Represenatation controller for contact info data model.
-	\ingroup LicenseManagement
+	An implementation for a data model controller
+	that combines data from multiple models.
 */
 class CJoinDataProviderComp:
 		public icomp::CComponentBase,
@@ -36,9 +32,9 @@ public:
 	I_BEGIN_COMPONENT(CJoinDataProviderComp);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
 		I_REGISTER_INTERFACE(imtgql::IGqlMutationDataControllerDelegate);
-		I_ASSIGN(m_commandIdAttrPtr, "commandId", "Command Id", true, "");
-		I_ASSIGN_MULTI_0(m_representationDataProviderCompPtr, "m_representationDataProviderCompPtr", "List of data providers for join", false);
-		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "m_mutationDataDelegateCompPtr", "Mutation data delegate", false);
+		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "Command Id", true, "");
+		I_ASSIGN_MULTI_0(m_representationDataProviderCompPtr, "RepresentationDataProvider", "List of data providers for join", false);
+		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false);
 	I_END_COMPONENT;
 
 	CJoinDataProviderComp();
