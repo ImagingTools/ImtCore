@@ -15,9 +15,15 @@ namespace imtbase
 
 // reimplemented (IMultiSelection)
 
-const iprm::IOptionsList* CMultiSelection::GetSelectionConstraints() const
+const ICollectionInfo* CMultiSelection::GetSelectionConstraints() const
 {
 	return nullptr;
+}
+
+
+IMultiSelection::SelectionMode CMultiSelection::GetSelectionMode() const
+{
+	return SelectionMode::SM_MULTI_SELECTION;
 }
 
 

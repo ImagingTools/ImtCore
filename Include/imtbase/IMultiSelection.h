@@ -9,14 +9,11 @@
 #include <iser/ISerializable.h>
 
 
-namespace iprm
-{
-	class IOptionsList;
-}
-
-
 namespace imtbase
 {
+
+
+class ICollectionInfo;
 
 
 /**
@@ -35,10 +32,21 @@ public:
 		CF_SELECTION_CHANGED = 0x373978
 	};
 
+	enum class SelectionMode
+	{
+		SM_SINGLE_SELECTION = 0,
+		SM_MULTI_SELECTION
+	};
+
 	/**
 		Get the list of options defining possible selection range.
 	*/
-	virtual const iprm::IOptionsList* GetSelectionConstraints() const = 0;
+	virtual const ICollectionInfo* GetSelectionConstraints() const = 0;
+
+	/**
+		Get selection mode.
+	*/
+	virtual SelectionMode GetSelectionMode() const = 0;
 
 	/**
 		Get selected IDs.

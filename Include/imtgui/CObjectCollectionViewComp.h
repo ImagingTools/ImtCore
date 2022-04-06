@@ -89,7 +89,8 @@ public:
 	virtual void OnCollectionConnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
 
 	// reimplemented (imtbase::IMultiSelection)
-	virtual const iprm::IOptionsList* GetSelectionConstraints() const override;
+	virtual const imtbase::ICollectionInfo* GetSelectionConstraints() const override;
+	virtual SelectionMode GetSelectionMode() const override;
 	virtual Ids GetSelectedIds() const override;
 	virtual bool SetSelectedIds(const Ids& selectedIds) override;
 

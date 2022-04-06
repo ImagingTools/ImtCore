@@ -60,9 +60,15 @@ void CObjectCollectionViewComp::OnCollectionConnected(const imtbase::IObjectColl
 
 // reimplemented (imtbase::IMultiSelection)
 
-const iprm::IOptionsList* CObjectCollectionViewComp::GetSelectionConstraints() const
+const imtbase::ICollectionInfo* CObjectCollectionViewComp::GetSelectionConstraints() const
 {
 	return nullptr;
+}
+
+
+imtbase::IMultiSelection::SelectionMode CObjectCollectionViewComp::GetSelectionMode() const
+{
+	return SelectionMode::SM_MULTI_SELECTION;
 }
 
 

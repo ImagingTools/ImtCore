@@ -16,12 +16,13 @@ class CMultiSelection: virtual public IMultiSelection
 {
 public:
 	// reimplemented (IMultiSelection)
-	virtual const iprm::IOptionsList* GetSelectionConstraints() const;
-	virtual Ids GetSelectedIds() const;
-	virtual bool SetSelectedIds(const Ids& selectedIds);
+	virtual const ICollectionInfo* GetSelectionConstraints() const override;
+	virtual SelectionMode GetSelectionMode() const override;
+	virtual Ids GetSelectedIds() const override;
+	virtual bool SetSelectedIds(const Ids& selectedIds) override;
 
 	// reimplement (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
