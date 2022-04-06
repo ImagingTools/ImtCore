@@ -23,7 +23,6 @@
 // ImtCore includes
 #include <imtbase/IMultiSelection.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/TObjectCollectionEventHandlerCompWrap.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
 
@@ -33,26 +32,23 @@ namespace imtgui
 
 
 class CObjectCollectionViewComp:
-			public imtbase::TObjectCollectionEventHandlerCompWrap<
-						iqtgui::TRestorableGuiWrap<
-									iqtgui::TDesignerGuiObserverCompBase<
-												Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>>,
-			public imod::CMultiModelDispatcherBase,
-			virtual public ibase::IProgressManager,
-			virtual public imtbase::IMultiSelection
+		public iqtgui::TRestorableGuiWrap<
+		iqtgui::TDesignerGuiObserverCompBase<
+		Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
+		public imod::CMultiModelDispatcherBase,
+		virtual public ibase::IProgressManager,
+		virtual public imtbase::IMultiSelection
 {
 	Q_OBJECT
 public:
-	typedef imtbase::TObjectCollectionEventHandlerCompWrap<
-				iqtgui::TRestorableGuiWrap<
-							iqtgui::TDesignerGuiObserverCompBase<
-										Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>> BaseClass;
+	typedef iqtgui::TRestorableGuiWrap<
+	iqtgui::TDesignerGuiObserverCompBase<
+	Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_INTERFACE(ibase::IProgressManager);
 		I_REGISTER_INTERFACE(imtbase::IMultiSelection);
-		I_REGISTER_INTERFACE(imtbase::IObjectCollectionEventHandler);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
@@ -85,9 +81,6 @@ public:
 
 	void SetFilterString(const QString& text);
 
-	// reimplemented (imtbase::IObjectCollectionEventHandler)
-	virtual void OnCollectionConnected(const imtbase::IObjectCollection* objectCollectionPtr) override;
-
 	// reimplemented (imtbase::IMultiSelection)
 	virtual const imtbase::ICollectionInfo* GetSelectionConstraints() const override;
 	virtual SelectionMode GetSelectionMode() const override;
@@ -109,11 +102,6 @@ public:
 protected:
 	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
 	const ICollectionViewDelegate& GetViewDelegate(const QByteArray& typeId) const;
-
-	// reimplemented (imtbase::TObjectCollectionEventHandlerCompWrap)
-	virtual void ProcessObjectCollectionEvent(
-		const imtbase::IObjectCollection* objectCollectionPtr,
-		const imtbase::IObjectCollectionEvent* eventPtr) override;
 
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	virtual void OnRestoreSettings(const QSettings& settings) override;
@@ -215,10 +203,6 @@ private:
 	void StartCollectionRead();
 	Q_INVOKABLE void OnUpdateProgress(int progress);
 	Q_INVOKABLE void OnCollectionReadFinished();
-
-	Q_INVOKABLE void ProcessObjectCollectionEventSync(
-		ObjectCollectionPtr objectCollectionPtr,
-		ObjectCollectionEventPtr eventPtr);
 
 	bool eventFilter(QObject* object, QEvent* event);
 
