@@ -255,12 +255,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 			const imtgql::CGqlObject& gqlObject,
 			QString& errorMessage) const
 {
-
 	QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QString newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
 
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
 	if (!objectId.isEmpty()){
@@ -391,7 +389,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		dataModel = new imtbase::CTreeItemModel();
 		notificationModel = new imtbase::CTreeItemModel();
 		notificationModel->SetData("Id", objectId);
-		dataModel->SetExternTreeModel("updatedNotification", notificationModel);
+		dataModel->SetExternTreeModel("removedNotification", notificationModel);
 	}
 
 	rootModel->SetExternTreeModel("data", dataModel);
@@ -410,7 +408,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
-	bool isSetResponce = false;
 	QByteArrayList fields;
 
 	if (!m_viewDelegateCompPtr.IsValid()){

@@ -24,7 +24,10 @@ Item {
     property int echoMode: TextInput.Normal;
 
     signal inputTextChanged();
+
+    signal textInputFocusChanged();
     signal clicked();
+
 
     onFocusChanged: {
         console.log('TextFieldCustom onFocusChanged', containerTextField.focus);
@@ -72,14 +75,19 @@ Item {
         onFocusChanged: {
             console.log("TextInput onFocusChanged", textField.focus);
             containerTextField.wasFocus = true;
+
+            if (textField.focus){
+                containerTextField.textInputFocusChanged();
+            }
         }
 
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged");
             if (containerTextField.wasFocus) {
-               containerTextField.inputTextChanged();
+                containerTextField.inputTextChanged();
             }
 
+//            containerTextField.customTextChanged();
             containerTextField.isTextChanged = true;
         }
 

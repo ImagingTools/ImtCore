@@ -16,47 +16,47 @@ Rectangle {
         treeViewContainer.countItems = modelItems.GetItemsCount();
     }
 
-    Keys.onPressed: {
-        console.log("TreeView keys pressed")
-        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-            thubnailDecoratorContainer.setFocusOnMenuPanel();
-        }
-        else if (event.key === Qt.Key_Up){
-            console.log('Key up was pressed');
-            treeViewContainer.selectedIndexDecr();
-        }
-        else if (event.key === Qt.Key_Down){
-            console.log('Key down was pressed');
+//    Keys.onPressed: {
+//        console.log("TreeView keys pressed")
+//        if (event.key === Qt.Key_Tab){
+//            console.log('Key tab was pressed');
+//            thubnailDecoratorContainer.setFocusOnMenuPanel();
+//        }
+//        else if (event.key === Qt.Key_Up){
+//            console.log('Key up was pressed');
+//            treeViewContainer.selectedIndexDecr();
+//        }
+//        else if (event.key === Qt.Key_Down){
+//            console.log('Key down was pressed');
 
-            treeViewContainer.selectedIndexIncr();
-        }
-        else if (event.key === Qt.Key_Left){
-            console.log('Key left was pressed');
-            if (mainTreeView.currentParentIndex != -1 && mainTreeView.currentChildIndex === -1){
-                treeViewContainer.closeTreeItem(mainTreeView.currentParentIndex);
-            }
-        }
-        else if (event.key === Qt.Key_Space){
-            console.log('Key space was pressed');
+//            treeViewContainer.selectedIndexIncr();
+//        }
+//        else if (event.key === Qt.Key_Left){
+//            console.log('Key left was pressed');
+//            if (mainTreeView.currentParentIndex != -1 && mainTreeView.currentChildIndex === -1){
+//                treeViewContainer.closeTreeItem(mainTreeView.currentParentIndex);
+//            }
+//        }
+//        else if (event.key === Qt.Key_Space){
+//            console.log('Key space was pressed');
 
-            if (mainTreeView.currentChildIndex !== -1){
+//            if (mainTreeView.currentChildIndex !== -1){
 
-                var parentId = treeViewContainer.modelItems.GetData("Id", mainTreeView.currentParentIndex);
-                var childModel = treeViewContainer.modelItems.GetData("childItemModel", mainTreeView.currentParentIndex);
+//                var parentId = treeViewContainer.modelItems.GetData("Id", mainTreeView.currentParentIndex);
+//                var childModel = treeViewContainer.modelItems.GetData("childItemModel", mainTreeView.currentParentIndex);
 
-                if (!childModel){
-                    return;
-                }
+//                if (!childModel){
+//                    return;
+//                }
 
-                var childId = childModel.GetData("Id", mainTreeView.currentChildIndex);
-                var state = childModel.GetData("stateChecked", mainTreeView.currentChildIndex);
+//                var childId = childModel.GetData("Id", mainTreeView.currentChildIndex);
+//                var state = childModel.GetData("stateChecked", mainTreeView.currentChildIndex);
 
-               // treeViewContainer.itemTreeViewCheckBoxStateChanged(2 - state, parentId, childId);
-                treeViewContainer.setStateCheckBox(2 - state);
-            }
-        }
-    }
+//               // treeViewContainer.itemTreeViewCheckBoxStateChanged(2 - state, parentId, childId);
+//                treeViewContainer.setStateCheckBox(2 - state);
+//            }
+//        }
+//    }
 
     TreeItemModel {
         id: treeItemModel;
@@ -207,7 +207,7 @@ Rectangle {
             console.log("TreeView ListView onCheckBoxStateChanged()", state, packageId, featureId);
             treeViewContainer.itemTreeViewCheckBoxStateChanged(state, packageId, featureId);
 
-            treeViewContainer.setStateCheckBox(state);
+//            treeViewContainer.setStateCheckBox(state);
         }
 
     }

@@ -14,6 +14,7 @@ Rectangle {
 
     property string message;
     property string nameDialog;
+    property string dialogId;
 
     property string textOkButton: "Yes";
 
@@ -22,7 +23,7 @@ Rectangle {
     property bool backgroundExist: true;
     property bool clickBackgroundClose: false;
 
-    property real backgroundOpacity: 0.4;
+    property real backgroundOpacity: 0.3;
     property bool centered: true;
 
     property Item resultItem;
@@ -46,7 +47,7 @@ Rectangle {
     function exit(status) {
         var parameters  = {};
         parameters["status"] = status;
-        parameters["dialog"] = messageDialogContainer.nameDialog;
+        parameters["dialog"] = messageDialogContainer.dialogId;
 
         messageDialogContainer.resultItem.dialogResult(parameters);
     }

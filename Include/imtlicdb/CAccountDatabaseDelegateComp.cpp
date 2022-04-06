@@ -229,7 +229,11 @@ QByteArray CAccountDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE Accounts SET Name = '%1' WHERE Id ='%2';").arg(newObjectName).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray newId = newObjectName.toUtf8();
+	QByteArray retVal = QString("UPDATE Accounts SET Id = '%1', Name = '%2' WHERE Id = '%3';")
+			.arg(qPrintable(newId))
+			.arg(newObjectName)
+			.arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }

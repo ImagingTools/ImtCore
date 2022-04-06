@@ -23,7 +23,7 @@ Rectangle {
     property string licenseId;
     property string licenseName;
 
-    property real backgroundOpacity: 0.4;
+    property real backgroundOpacity: 0.3;
 
     property bool backgroundExist: true;
     property bool clickBackgroundClose: false;

@@ -14,7 +14,7 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property real backgroundOpacity: 0.4;
+    property real backgroundOpacity: 0.3;
     property bool centered: true;
 
     property Item loaderDialog;
@@ -54,6 +54,18 @@ Rectangle {
             mainPanelRepeater.model = dataModelLocal;
 
             preferenceContainer.settingsBodyChanged();
+        }
+    }
+
+    Keys.onPressed: {
+        console.log("Preference keys pressed")
+        if (event.key === Qt.Key_Escape){
+            console.log('Key tab was pressed');
+            preferenceCloseButton.clicked();
+        }
+        else if (event.key === Qt.Key_Return){
+            preferenceSaveButton.clicked();
+            preferenceCloseButton.clicked();
         }
     }
 

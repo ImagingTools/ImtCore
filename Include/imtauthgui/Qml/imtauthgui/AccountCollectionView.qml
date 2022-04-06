@@ -258,6 +258,22 @@ Item {
                 }
             }
         }
+
+        onRemovedItem: {
+            console.log("AccountCollection CollectionView onRemovedItem");
+            var index = accountCollectionContainer.multiDocViewItem.getTabIndexById(itemId);
+            if (index !== -1){
+                accountCollectionContainer.multiDocViewItem.closeTab(index);
+            }
+        }
+
+        onRenamedItem: {
+            console.log("AccountCollection CollectionView onRenamedItem");
+            var index = accountCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
+            if (index !== -1){
+                accountCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
+            }
+        }
     }
 
     TreeItemModel {
@@ -318,6 +334,8 @@ Item {
         height: parent.height;
         width: 200;
 
+        contentVisible: accountCollectionView.table.selectedIndex !== -1;
+
         color: Style.backgroundColor;
     }
 
@@ -361,6 +379,9 @@ Item {
                 }
 
                 dataModelLocal = metaInfo.GetData("data");
+                if (!dataModelLocal){
+                    return;
+                }
 
                 if (dataModelLocal.ContainsKey("AccountMetaInfo")) {
                     dataModelLocal = dataModelLocal.GetData("AccountMetaInfo");

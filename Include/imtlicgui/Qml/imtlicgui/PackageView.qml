@@ -460,14 +460,12 @@ Item {
 
         onSelectItem: {
             console.log("PackageView CollectionView onSelectItem", selectedId, name);
-
             var source = "../imtlicgui/EditFeatureDialog.qml";
             var parameters = {};
             parameters["featureId"] = selectedId;
             parameters["featureName"] = name;
             parameters["collectionViewFeatures"] = featureCollectionView;
             parameters["resultItem"] = featureCollectionViewContainer;
-
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
 
@@ -494,6 +492,8 @@ Item {
         featureCollectionViewContainer.hideCurrentFeatureTreeView();
         featureCollectionViewContainer.updateStateCheckedCheckBox();
         featureCollectionViewContainer.checkInActiveItems();
+
+        featuresTreeView.printInfo();
     }
 
     function clearCheckedCheckBox() {
@@ -502,6 +502,10 @@ Item {
 
         for (var i = 0; i < modelItems.GetItemsCount(); i++) {
             var modelChildren = modelItems.GetData("childItemModel", i);
+
+            if (!modelChildren){
+                continue;
+            }
 
             for (var j = 0; j < modelChildren.GetItemsCount(); j++) {
 
@@ -512,10 +516,8 @@ Item {
 
             modelItems.SetData("childItemModel", modelChildren, i);
         }
-
         treeView.modelItems = modelItems;
-
-        featureCollectionViewContainer.printModelItems(treeView.modelItems);
+//        featureCollectionViewContainer.printModelItems(treeView.modelItems);
     }
 
     function printModelItems(modelItems) {
@@ -559,7 +561,6 @@ Item {
             }
 
             for (var j = 0; j < modelChildren.GetItemsCount(); j++) {
-
                 var id = modelChildren.GetData("Id", j);
                 modelChildren.SetData("isActive", 1, j);
                 for (var k = 0; k < dependsFeatures.length; k++) {
@@ -575,18 +576,16 @@ Item {
             modelItems.SetData("childItemModel", modelChildren, i);
         }
         treeView.modelItems = modelItems;
-        featureCollectionViewContainer.printModelItems(treeView.modelItems);
+//        featureCollectionViewContainer.printModelItems(treeView.modelItems);
     }
 
     function updateStateCheckedCheckBox() {
         console.log("PackageView updateStateCheckedCheckBox", featuresTreeView);
-
         var curFeatureId = featureCollectionView.table.getSelectedId();
         var curPackageId = featureCollectionView.itemId;
 
         var modelItems = treeView.modelItems;
         var rootIndex = featuresTreeView.getIndexByRootFeatureId(curFeatureId);
-       // console.log("Current feature Id", curFeatureId, rootIndex);
 
         if (!modelItems){
             return;
@@ -599,8 +598,6 @@ Item {
                 var packageId = modelItems.GetData("Id", i);
                 var modelChildren = modelItems.GetData("childItemModel", i);
 
-               // console.log("\tPackageId", packageId);
-
                 var packageIndex = featuresTreeView.getIndexByPackageId(rootIndex, packageId);
 
                 if (!modelChildren || packageIndex === -1) {
@@ -608,24 +605,20 @@ Item {
                 }
 
                 for (var j = 0; j < modelChildren.GetItemsCount(); j++) {
-
                     var id = modelChildren.GetData("Id", j);
-                   // console.log("\t\tFeature Id", id);
                     if (featuresTreeView.dependModePackageGetIndexByFeatureId(rootIndex, packageIndex, id) !== -1) {
                         modelChildren.SetData("stateChecked", 2, j);
-                        // console.log("\t\t\tState", 2);
-                    } else {
+                    }
+                    else {
                         modelChildren.SetData("stateChecked", 0, j);
-                       // console.log("\t\t\tState", 0);
                     }
                 }
                 modelItems.SetData("childItemModel", modelChildren, i);
-//                treeView.modelItems = modelItems;
-
             }
             treeView.modelItems = modelItems;
-            featureCollectionViewContainer.printModelItems(treeView.modelItems);
-        } else {
+//            featureCollectionViewContainer.printModelItems(treeView.modelItems);
+        }
+        else {
             featureCollectionViewContainer.clearCheckedCheckBox();
         }
     }
@@ -657,12 +650,10 @@ Item {
                     }
                 }
                 treeView.modelItems.SetData("childItemModel", childModelItems, i);
-                //treeView.modelItems = modelItems;
                 break;
             }
         }
 
-        featureCollectionViewContainer.printModelItems(treeView.modelItems);
         treeView.modelItems.Refresh();
     }
 
@@ -695,7 +686,8 @@ Item {
             if (featureCollectionViewContainer.gqlModelQueryType == "PackageAdd"){
                 modelPackages.SetData("Id", newId);
                 modelPackages.SetData("Name", newId);
-            } else {
+            }
+            else {
                 modelPackages.SetData("Id", featureCollectionViewContainer.itemId );
                 modelPackages.SetData("Name", featureCollectionViewContainer.itemName);
             }
@@ -704,9 +696,7 @@ Item {
             modelPackages.SetExternTreeModel("dependencies", featuresTreeView.modelDepends);
 
             var jsonString = modelPackages.toJSON();
-//            console.log("jsonString", jsonString)
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-//            console.log("jsonString", jsonString)
 
             inputParams.InsertField("Item");
             inputParams.InsertFieldArgument ("Item", jsonString);
@@ -727,12 +717,12 @@ Item {
                 var dataModelLocal;
                 if (packageViewSaveQuery.ContainsKey("errors")){
                     dataModelLocal = packageViewSaveQuery.GetData("errors");
-
                     dataModelLocal = dataModelLocal.GetData(featureCollectionViewContainer.gqlModelQueryType);
                     if (dataModelLocal){
                         var messageError = dataModelLocal.GetData("message");
                         featureCollectionView.openMessageDialog("Error Dialog", messageError);
                     }
+
                     return;
                 }
 
@@ -743,7 +733,6 @@ Item {
 
                     if (dataModelLocal && dataModelLocal.ContainsKey(featureCollectionViewContainer.gqlModelQueryTypeNotification)){
                         dataModelLocal = dataModelLocal.GetData(featureCollectionViewContainer.gqlModelQueryTypeNotification);
-
 
                         var newId = dataModelLocal.GetData("Id");
 
@@ -771,7 +760,6 @@ Item {
         width: 4;
 
         onXChanged: {
-
             if (!featureCollectionViewContainer.visible){
                 return;
             }
@@ -814,10 +802,7 @@ Item {
                 anchors.leftMargin: 10;
 
                 text: "Features";
-//                font.family: Style.fontFamilyBold;
                 color: Style.textColor;
-//                font.pixelSize: Style.fontSize_small;
-//                font.bold: true;
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;
                 font.bold: true;
@@ -831,6 +816,7 @@ Item {
 
             height: 1;
             width: parent.width;
+
             color: "lightgray";
         }
 
@@ -838,6 +824,7 @@ Item {
             id: treeView;
 
             anchors.top: headerBottomBorder.bottom;
+
             width: 200;
             height: parent.height;
 
@@ -847,7 +834,6 @@ Item {
 
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("PackageView TreeView onItemTreeViewCheckBoxStateChanged", state, packageId, featureId);
-
                 featureCollectionViewContainer.wasChanged = true;
 
                 var curFeatureId = featureCollectionView.table.getSelectedId();
@@ -890,7 +876,8 @@ Item {
                         modelChildren.SetData("stateChecked", state, childIndex);
                     }
 
-                } else {
+                }
+                else {
                     if (state === 0) {
                         modelChildren.RemoveItem(childIndex);
                     }

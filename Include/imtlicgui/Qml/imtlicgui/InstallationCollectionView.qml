@@ -60,8 +60,6 @@ Item {
         console.log("InstallationCollectionView openContextMenu", mouseX, mouseY);
 
         var point = installationCollectionContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
-
-
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;
@@ -75,7 +73,12 @@ Item {
     }
 
     function menuActivated(menuId) {
-        installationCollectionView.menuActivated(menuId)
+        if (menuId === "Duplicate"){
+            var dataModelLocal = installationCollectionView.collectionViewModel.GetData("data");
+        }
+        else{
+            installationCollectionView.menuActivated(menuId)
+        }
     }
 
     function refresh() {
@@ -252,6 +255,22 @@ Item {
                 }
             }
         }
+
+        onRemovedItem: {
+            console.log("InstallationCollection CollectionView onRemovedItem");
+            var index = installationCollectionContainer.multiDocViewItem.getTabIndexById(itemId);
+            if (index !== -1){
+                installationCollectionContainer.multiDocViewItem.closeTab(index);
+            }
+        }
+
+        onRenamedItem: {
+            console.log("InstallationCollection CollectionView onRenamedItem");
+            var index = installationCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
+            if (index !== -1){
+                installationCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
+            }
+        }
     }
 
     TreeItemModel {
@@ -266,6 +285,8 @@ Item {
 
         height: parent.height;
         width: 200;
+
+        contentVisible: installationCollectionView.table.selectedIndex !== -1;
 
         color: Style.backgroundColor;
     }

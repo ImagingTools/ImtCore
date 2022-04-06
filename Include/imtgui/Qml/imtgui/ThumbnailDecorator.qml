@@ -200,7 +200,6 @@ Rectangle
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
                     if (pagesLoader.item){
                         pagesLoader.item.rootItem = pagesDeleg;
-
 //                        pagesLoader.item.forceActiveFocus();
                         console.log("ThumbnailDecorator pagesLoader.item.rootItem", pagesLoader.item.rootItem)
                         pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
@@ -259,13 +258,10 @@ Rectangle
 
                   function closeItem() {
                       console.log("ThumbnailDecorator close dialog", model.index);
-
                       modelLayers.remove(model.index);
-
 //                      if (modelLayers.count === 0){
 //                          listViewDialogs.visible = false;
 //                      }
-
                   }
 
 
@@ -288,10 +284,7 @@ Rectangle
                       if (loaderDialog.item.centered){
                           loaderDialog.anchors.centerIn = delegateListViewDialogs;
                       }
-
                       darkBackground.opacity = loaderDialog.item.backgroundOpacity;
-
-
                       loaderDialog.item["thumbnailItem"] = thubnailDecoratorContainer;
                       loaderDialog.item.forceActiveFocus();
                   }

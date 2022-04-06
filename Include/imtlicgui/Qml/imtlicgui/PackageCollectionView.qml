@@ -93,35 +93,30 @@ Item {
     function getDescriptionBySelectedItem(){
         var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
         var description = dataModelLocal.GetData("Description", packageCollectionView.table.selectedIndex);
+
         return description;
     }
 
     function getNameBySelectedItem(){
         var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
         var name = dataModelLocal.GetData("Name", packageCollectionView.table.selectedIndex);
+
         return name;
     }
 
     function updatePackageAfterRename(newId, newName) {
         console.log("PackageCollectionView updatePackageAfterRename", newId, newName);
         var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
-
         dataModelLocal.SetData("Id", newId, packageCollectionView.table.selectedIndex);
         dataModelLocal.SetData("Name", newName, packageCollectionView.table.selectedIndex);
-
         packageCollectionView.collectionViewModel.SetData("data", dataModelLocal);
     }
 
     function updatePackageAfterSetDescription(description) {
         console.log("PackageCollectionView updatePackageAfterSetDescription", newId, newName);
-       // packageCollectionView.collectionViewModel.SetData("Description", description, packageCollectionView.selectedIndex);
         var dataModelLocal = packageCollectionView.collectionViewModel.GetData("data");
-
         dataModelLocal.SetData("Description", description, packageCollectionView.table.selectedIndex);
-
         packageCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-
-        //packageCollectionView.refresh();
     }
 
     function dialogResult(parameters) {
@@ -131,7 +126,7 @@ Item {
             var source = "AuxComponents/InputDialog.qml";
             var prmtrs= {};
 
-            if (parameters["status"] === "Set Description") {
+            if (parameters["status"] === "Set Description"){
 
                 prmtrs["message"] = "Please enter the description of the package: ";
                 prmtrs["nameDialog"] = "Set description";
@@ -143,8 +138,7 @@ Item {
 
                 thubnailDecoratorContainer.openDialog(source, prmtrs);
             }
-            else if (parameters["status"] === "Rename") {
-
+            else if (parameters["status"] === "Rename"){
                 prmtrs["message"] = "Please enter the name of the package: ";
                 prmtrs["nameDialog"] = "Rename Dialog";
                 prmtrs["typeOperation"] = "Rename";
@@ -154,31 +148,28 @@ Item {
 
                 thubnailDecoratorContainer.openDialog(source, prmtrs);
             }
-            else if (parameters["status"] === "Edit") {
-
+            else if (parameters["status"] === "Edit"){
                 packageCollectionContainer.menuActivated("Edit");
             }
-            else if (parameters["status"] === "Remove") {
-
+            else if (parameters["status"] === "Remove"){
                 packageCollectionContainer.menuActivated("Remove");
             }
         }
         else if (parameters["dialog"] === "InputDialog"){
 
-            if (parameters["status"] === "yes") {
+            if (parameters["status"] === "yes"){
 
-                if (packageCollectionView.gqlModelRemove !== "") {
+                if (packageCollectionView.gqlModelRemove !== ""){
                     packageCollectionView.removeSelectedItem();
                 }
-
                 packageCollectionContainer.refresh();
                 packageCollectionView.table.selectedIndex = -1;
             }
 
-            if (parameters["status"] === "ok") {
+            if (parameters["status"] === "ok"){
                 var value = parameters["value"];
 
-                if (parameters["typeOperation"] === "SetDescription") {
+                if (parameters["typeOperation"] === "SetDescription"){
 
                     packageCollectionView.gqlModelSetDescription = "FeaturePackageSetDescription";
                     packageCollectionView.callSetDescriptionQuery(value);
@@ -261,7 +252,7 @@ Item {
         onSelectItem: {
             var typeOperation = "Open";
 
-            if (selectedId === "") {
+            if (selectedId === ""){
                 name = "New Package";
                 typeOperation = "New";
             }
@@ -281,7 +272,6 @@ Item {
                 packageCollectionContainer.commandsChanged("Packages");
 
                 if (metaInfoModels.GetItemsCount() >= packageCollectionView.table.selectedIndex + 1){
-
                     packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData",
                                                                                  packageCollectionView.table.selectedIndex);
                 }
@@ -293,8 +283,27 @@ Item {
 
         onSetActiveFocusFromCollectionView: {
             console.log("PackageCollection CollectionView onSetActiveFocusFromCollectionView");
-
             packageCollectionContainer.forceActiveFocus();
+        }
+
+        onRemovedItem: {
+            console.log("PackageCollection CollectionView onRemovedItem");
+
+            var index = packageCollectionContainer.multiDocViewItem.getTabIndexById(itemId);
+
+            if (index !== -1){
+                packageCollectionContainer.multiDocViewItem.closeTab(index);
+            }
+        }
+
+        onRenamedItem: {
+            console.log("PackageCollection CollectionView onRenamedItem");
+
+            var index = packageCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
+
+            if (index !== -1){
+                packageCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
+            }
         }
     }
 
@@ -319,7 +328,7 @@ Item {
     GqlModel {
         id: metaInfo;
 
-        function getMetaInfo() {
+        function getMetaInfo(){
             console.log( "PackageCollectionView metaInfo getMetaInfo");
             var query = Gql.GqlRequest("query", "FeaturePackageMetaInfo");;
             var inputParams = Gql.GqlObject("input");
@@ -350,10 +359,10 @@ Item {
 
                 dataModelLocal = metaInfo.GetData("data");
 
-                if (dataModelLocal.ContainsKey("FeaturePackageMetaInfo")) {
+                if (dataModelLocal.ContainsKey("FeaturePackageMetaInfo")){
                     dataModelLocal = dataModelLocal.GetData("FeaturePackageMetaInfo");
 
-                    if (dataModelLocal.ContainsKey("metaInfo")) {
+                    if (dataModelLocal.ContainsKey("metaInfo")){
                         dataModelLocal = dataModelLocal.GetData("metaInfo");
 
                         packageCollectionMetaInfo.modelData = dataModelLocal;
@@ -373,7 +382,6 @@ Item {
 
                         metaInfoModels.SetData("Id", packageCollectionView.table.getSelectedId(), index);
                         metaInfoModels.SetData("ModelData", dataModelLocal, index);
-//                        metaInfoModels.Refresh();
                     }
                 }
             }

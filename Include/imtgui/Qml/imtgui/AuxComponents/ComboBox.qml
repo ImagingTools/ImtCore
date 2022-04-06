@@ -28,7 +28,8 @@ Item {
     Component.onCompleted: {
         if (comboBoxContainer.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
-        } else {
+        }
+        else {
             cbTitleTxt.anchors.left = cbMainRect.left;
             cbTitleTxt.anchors.leftMargin = 10;
         }

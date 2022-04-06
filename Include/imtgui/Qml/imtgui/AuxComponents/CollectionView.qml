@@ -31,6 +31,7 @@ Rectangle {
 
     signal selectItem(string selectedId, string name);
     signal removedItem(string itemId);
+    signal renamedItem(string oldId, string newId);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromCollectionView();
 
@@ -43,8 +44,7 @@ Rectangle {
         collectionViewContainer.refresh();
     }
 
-    function openMessageDialog(nameDialog, message) {
-
+    function openMessageDialog(nameDialog, message, type) {
         var source = "AuxComponents/MessageDialog.qml";
         var parameters = {};
         parameters["resultItem"] = collectionViewContainer;
@@ -52,6 +52,7 @@ Rectangle {
         parameters["textOkButton"] = "Ok";
         parameters["message"] = message;
         parameters["nameDialog"] = nameDialog;
+        parameters["dialogId"] = type;
 
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
@@ -127,11 +128,9 @@ Rectangle {
         var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
         if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
-            console.log("set AccountDescription", description);
             dataModelLocal.SetData("AccountDescription", description, tableInternal.selectedIndex);
         }
         else{
-            console.log("set Description", description);
             dataModelLocal.SetData("Description", description, tableInternal.selectedIndex);
         }
 
@@ -139,13 +138,12 @@ Rectangle {
     }
 
     function dialogResult(parameters) {
-         console.log("CollectionView dialogResult", parameters["status"]);
+        console.log("CollectionView dialogResult", parameters["status"]);
 
         if (parameters["status"] === "yes") {
 
             if (collectionViewContainer.gqlModelRemove !== "") {
                 collectionViewContainer.removeSelectedItem();
-
             }
             collectionViewContainer.refresh();
             tableInternal.selectedIndex = -1;
@@ -202,7 +200,8 @@ Rectangle {
                 var source = "AuxComponents/MessageDialog.qml";
                 var parameters = {};
                 parameters["message"] = "Remove selected file from the database ?";
-                parameters["nameDialog"] = "RemoveDialog";
+                parameters["nameDialog"] = "Remove dialog";
+                parameters["dialogId"] = "RemoveDialog";
                 parameters["resultItem"] = collectionViewContainer;
 
                 thubnailDecoratorContainer.openDialog(source, parameters);
@@ -276,7 +275,7 @@ Rectangle {
                         if (dataModelLocal.ContainsKey("message")){
 
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
                         }
 
                     }
@@ -352,7 +351,7 @@ Rectangle {
 
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
                         }
                     }
 
@@ -389,7 +388,6 @@ Rectangle {
             if(collectionViewContainer.itemId != ""){
                 query = Gql.GqlRequest("query", collectionViewContainer.gqlModelRemove);
                 inputParams.InsertField("Id");
-                //inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
                 inputParams.InsertFieldArgument("Id", tableInternal.getSelectedId());
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
@@ -414,14 +412,8 @@ Rectangle {
                 if (removeModel.ContainsKey("errors")){
                     dataModelLocal = removeModel.GetData("errors");
 
-                    if (dataModelLocal.ContainsKey("removedNotification")){
-
-                        dataModelLocal = dataModelLocal.GetData("removedNotification");
-
-                        if (dataModelLocal.ContainsKey("message")){
-                            var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
-                        }
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelRemove)){
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRemove);
                     }
 
                     return;
@@ -430,13 +422,16 @@ Rectangle {
                 if (removeModel.ContainsKey("data")){
                     dataModelLocal = removeModel.GetData("data");
 
-                    if (dataModelLocal.ContainsKey("removedNotification")){
+                    if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelRemove)){
+                        dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRemove);
 
-                        dataModelLocal = dataModelLocal.GetData("removedNotification");
+                        if (dataModelLocal.ContainsKey("removedNotification")){
+                            dataModelLocal = dataModelLocal.GetData("removedNotification");
 
-                        if (dataModelLocal.ContainsKey("Id")){
-                            var itemId = dataModelLocal.GetData("Id");
-                            collectionViewContainer.removedItem(itemId)
+                            if (dataModelLocal.ContainsKey("Id")){
+                                var itemId = dataModelLocal.GetData("Id");
+                                collectionViewContainer.removedItem(itemId)
+                            }
                         }
                     }
                 }
@@ -488,7 +483,7 @@ Rectangle {
 
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
                         }
                     }
 
@@ -499,7 +494,6 @@ Rectangle {
                     dataModelLocal = renameQuery.GetData("data");
 
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelRename)) {
-
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRename);
 
                         if (dataModelLocal.ContainsKey("item")) {
@@ -507,11 +501,12 @@ Rectangle {
 
                             var newId = dataModelLocal.GetData("NewId");
 
-                            if (collectionViewContainer.gqlModelInfo === "ProductCollectionInfo"){
-                                newId = tableInternal.getSelectedId();
-                            }
+//                            if (collectionViewContainer.gqlModelInfo === "ProductCollectionInfo"){
+//                                newId = tableInternal.getSelectedId();
+//                            }
 
                             var newName = dataModelLocal.GetData("NewName");
+                            collectionViewContainer.renamedItem(tableInternal.getSelectedId(), newId);
                         }
                     }
                 }
@@ -523,7 +518,7 @@ Rectangle {
         id: setDescriptionQuery;
 
         function setDescription(description){
-            console.log( "CollectionView renameQuery rename");
+            console.log( "CollectionView setDescriptionQuery");
 
             var query;
             var queryFields;
@@ -562,7 +557,7 @@ Rectangle {
 
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("ErrorDialog", message);
+                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
                         }
                     }
 
@@ -588,5 +583,4 @@ Rectangle {
             }
         }
     }
-
 }

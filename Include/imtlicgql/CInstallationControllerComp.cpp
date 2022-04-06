@@ -113,8 +113,12 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 }
 
 
-istd::IChangeable* CInstallationControllerComp::CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray& objectId,
-																	 QString& name, QString& description, QString &errorMessage) const
+istd::IChangeable* CInstallationControllerComp::CreateObject(
+		const QList<imtgql::CGqlObject>& inputParams,
+		QByteArray& objectId,
+		QString& name,
+		QString& description,
+		QString &errorMessage) const
 {
 	if (inputParams.isEmpty()) {
 		return nullptr;
@@ -166,14 +170,12 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(const QList<imtgql:
 					licenseId = activeLicenses->GetData("Id", i).toByteArray();
 				}
 
-				QDateTime expirationDate;
-
 				if (activeLicenses->ContainsKey("LicenseState")){
 					licenseState = activeLicenses->GetData("LicenseState", i).toInt();
 				}
 
+				QDateTime expirationDate;
 				if (licenseState == 2){
-
 					if (activeLicenses->ContainsKey("ExpirationState")){
 						expirationState = activeLicenses->GetData("ExpirationState", i).toInt();
 					}
@@ -190,6 +192,7 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(const QList<imtgql:
 
 		return productInstancePtr.PopPtr();
 	}
+
 	return nullptr;
 }
 

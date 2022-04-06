@@ -43,17 +43,17 @@ Item {
         color: mainTreeView.currentParentIndex == model.index &&
                childModelRepeater.indexChild === -1 ? Style.selectedColor : Style.baseColor;
 
-        MouseArea {
-            anchors.fill: parent;
+//        MouseArea {
+//            anchors.fill: parent;
 
-            onClicked: {
-                console.log("Main rect clicked", mainTreeView.currentParentIndex, model.index);
-                mainTreeView.currentParentIndex = model.index;
-                mainTreeView.currentChildIndex = -1;
-                childModelRepeater.indexChild = -1;
-                treeItemDelegate.setActiveFocusFromTreeItemDelegate();
-            }
-        }
+//            onClicked: {
+//                console.log("Main rect clicked", mainTreeView.currentParentIndex, model.index);
+//                mainTreeView.currentParentIndex = model.index;
+//                mainTreeView.currentChildIndex = -1;
+//                childModelRepeater.indexChild = -1;
+//                treeItemDelegate.setActiveFocusFromTreeItemDelegate();
+//            }
+//        }
 
         Image {
             id: iconArrow;
@@ -129,17 +129,17 @@ Item {
                      color: treeItemDelegate.index === mainTreeView.currentParentIndex &&
                             childModelRepeater.indexChild === model.index ? Style.selectedColor : "transparent";
 
-                     MouseArea {
-                         anchors.fill: parent;
+//                     MouseArea {
+//                         anchors.fill: parent;
 
-                         onClicked: {
-                             console.log("Child rect clicked", childModelRepeater.indexChild, model.index);
-                             mainTreeView.currentChildIndex = model.index;
-                             mainTreeView.currentParentIndex = treeItemDelegate.index;
-                             childModelRepeater.indexChild = model.index
-                             treeItemDelegate.setActiveFocusFromTreeItemDelegate();
-                         }
-                     }
+//                         onClicked: {
+//                             console.log("Child rect clicked", childModelRepeater.indexChild, model.index);
+//                             mainTreeView.currentChildIndex = model.index;
+//                             mainTreeView.currentParentIndex = treeItemDelegate.index;
+//                             childModelRepeater.indexChild = model.index
+//                             treeItemDelegate.setActiveFocusFromTreeItemDelegate();
+//                         }
+//                     }
 
                      CheckBox {
                           id: checkBox;
@@ -157,13 +157,7 @@ Item {
 
                               onClicked: {
                                   console.log("TreeItemDelegate CheckBox MouseArea onClicked", checkBox.checkState);
-                                  if (checkBox.checkState == 2) {
-                                      checkBox.checkState = 0
-                                  }
-                                  else {
-                                      checkBox.checkState = 2
-                                  }
-
+                                  checkBox.checkState = 2 - checkBox.checkState;
                                   mainTreeView.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
                               }
                           }

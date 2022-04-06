@@ -25,12 +25,13 @@ Rectangle {
     property bool cancelButtonVisible: true;
     property bool centered: true;
 
-    property real backgroundOpacity: 0.4;
+    property real backgroundOpacity: 0.3;
     property bool backgroundExist: true;
     property bool clickBackgroundClose: false;
 
     property Item resultItem;
     property Item loaderDialog;
+    property Item thumbnailItem;
 
     signal okButtonClicked();
     signal cancelButtonClicked();
@@ -43,6 +44,14 @@ Rectangle {
         }
         else if (event.key === Qt.Key_Return){
             okButton.clicked();
+        }
+    }
+
+    onFocusChanged: {
+        console.log("InputDialog onFocusChanged", inputDialogContainer.focus);
+
+        if (inputDialogContainer.focus){
+            tfcInputDialog.setFocus(true);
         }
     }
 
@@ -160,6 +169,8 @@ Rectangle {
             height: 30;
 
             text: inputDialogContainer.startingValue;
+
+            KeyNavigation.tab: okButton;
         }
 
         AuxButton {
@@ -187,6 +198,17 @@ Rectangle {
                 inputDialogContainer.okButtonClicked();
                 loaderDialog.closeItem();
             }
+
+            KeyNavigation.tab: cancelButton;
+
+            onFocusChanged: {
+                if (okButton.focus){
+                    okButton.highlighted = true;
+                }
+                else{
+                    okButton.highlighted = false;
+                }
+            }
         }
 
         AuxButton {
@@ -212,6 +234,17 @@ Rectangle {
                 inputDialogContainer.cancelButtonClicked();
                 loaderDialog.closeItem();
             }
+
+            onFocusChanged: {
+                if (cancelButton.focus){
+                    cancelButton.highlighted = true;
+                }
+                else{
+                    cancelButton.highlighted = false;
+                }
+            }
+
+            KeyNavigation.tab: tfcInputDialog;
         }
     }
 }

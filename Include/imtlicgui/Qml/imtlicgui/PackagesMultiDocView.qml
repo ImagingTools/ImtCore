@@ -33,7 +33,6 @@ Item {
 
     onVisibleChanged: {
         if (packagesMultiDocViewContainer.visible && packagesMultiDocView.pagesCount === 0) {
-            console.log("PackagesMultiDocView first page loaded !");
             packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
         }
     }
@@ -46,7 +45,5 @@ Item {
         onRootItemChanged: {
             console.log("packagesMultiDocView onRootItemChanged", packagesMultiDocView.rootItem)
         }
-
-
     }
 }

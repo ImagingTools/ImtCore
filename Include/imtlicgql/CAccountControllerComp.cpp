@@ -125,8 +125,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 	}
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
-
-	objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+//	objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 
 	if (!itemData.isEmpty()){
 		imtauth::CAccountInfo *accountInfoPtr = new imtauth::CAccountInfo();
@@ -142,6 +141,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		if (itemModel.ContainsKey("AccountName")){
 			name = itemModel.GetData("AccountName").toString();
 			accountInfoPtr->SetAccountName(name);
+			objectId = name.toUtf8();
 		}
 
 		if (itemModel.ContainsKey("AccountDescription")){
@@ -151,7 +151,6 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("AccountType")){
 			QString accountType = itemModel.GetData("AccountType").toString();
-
 			if (accountType == "company"){
 				accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_COMPANY);
 			}
@@ -191,7 +190,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			else if (gender == "female"){
 				contactInfo.SetGenderType(imtauth::IContactInfo::GenderType::GT_FEMALE);
 			}
-			else {
+			else{
 				contactInfo.SetGenderType(imtauth::IContactInfo::GenderType::GT_DIVERSE);
 			}
 		}

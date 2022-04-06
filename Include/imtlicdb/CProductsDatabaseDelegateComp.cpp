@@ -129,11 +129,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 	if (productPtr == nullptr){
 		return NewObjectQuery();
 	}
-
 	const imtbase::IObjectCollection* packagesCollectionPtr = productPtr->GetFeaturePackages();
-	if (packagesCollectionPtr == nullptr){
-		return NewObjectQuery();
-	}
+//	if (packagesCollectionPtr == nullptr){
+//		return NewObjectQuery();
+//	}
 
 	QByteArray productId = productPtr->GetProductId();
 	if (productId.isEmpty()){
@@ -174,7 +173,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 			imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
 			for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
 				QByteArray packageId;
-
 				const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, featureInfo.id);
 				if (packagePtr == nullptr){
 					return NewObjectQuery();
@@ -300,7 +298,6 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 			QByteArray newLicenseId = newLicenseInfoPtr->GetLicenseId();
 			QByteArray oldLicenseId = oldLicenseInfoPtr->GetLicenseId();
-			//const imtbase::IObjectCollection* packagesCollectionPtr = newProductPtr->GetFeaturePackages();
 
 			retVal += "\n" +
 						QString("UPDATE ProductLicenses SET Id = '%1', Name = '%2', Description = '%3' WHERE Id = '%4' AND ProductId = '%5';")
@@ -318,12 +315,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 			// Add new features to the license:
 			for (const QByteArray& addedFeatureId : addedFeatures){
-//				const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, addedFeatureId);
-//				if (packagePtr == nullptr){
-//					continue;
-//				}
 				QByteArrayList data = addedFeatureId.split('.');
-
 				QByteArray featureId = data[1];
 				QByteArray packageId = data[0];
 

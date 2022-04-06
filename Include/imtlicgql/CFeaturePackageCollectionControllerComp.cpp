@@ -32,6 +32,7 @@ QVariant CFeaturePackageCollectionControllerComp::GetObjectInformation(const QBy
 	return QVariant();
 }
 
+
 imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
@@ -98,10 +99,8 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 				childs->SetData("Value", featureName, childIndex);
 			}
 		}
-
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

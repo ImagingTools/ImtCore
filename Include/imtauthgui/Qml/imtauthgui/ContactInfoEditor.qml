@@ -191,48 +191,48 @@ Rectangle {
 
             spacing: 7;
 
-            Rectangle {
-                id: buttonsAvatar;
+//            Rectangle {
+//                id: buttonsAvatar;
 
-                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
+//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
 
-                width: 125;
-                height: 30;
+//                width: 125;
+//                height: 30;
 
-                color: "transparent";
+//                color: "transparent";
 
-                AuxButton {
-                    id: loadAvatarButton;
+//                AuxButton {
+//                    id: loadAvatarButton;
 
-                    anchors.left: buttonsAvatar.left;
-                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
+//                    anchors.left: buttonsAvatar.left;
+//                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
 
-                    width: 50;
-                    height:  20;
+//                    width: 50;
+//                    height:  20;
 
-                    fontPixelSize: 12;
+//                    fontPixelSize: 12;
 
-                    hasText: true;
-                    textButton: "Load";
-                }
+//                    hasText: true;
+//                    textButton: "Load";
+//                }
 
-                AuxButton {
-                    id: removeAvatarButton;
+//                AuxButton {
+//                    id: removeAvatarButton;
 
-                    anchors.left: loadAvatarButton.right;
-                    anchors.leftMargin: 5;
-                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
+//                    anchors.left: loadAvatarButton.right;
+//                    anchors.leftMargin: 5;
+//                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
 
-                    width: 50;
-                    height:  20;
+//                    width: 50;
+//                    height:  20;
 
-                    fontPixelSize: 12;
+//                    fontPixelSize: 12;
 
-                    hasText: true;
+//                    hasText: true;
 
-                    textButton: "Remove";
-                }
-            }
+//                    textButton: "Remove";
+//                }
+//            }
 
             Rectangle {
                 id: avatarRect;
@@ -1115,8 +1115,7 @@ Rectangle {
                     if (dataModelLocal.ContainsKey(containerContactInfo.gqlModelQueryType)){
                         dataModelLocal = dataModelLocal.GetData(containerContactInfo.gqlModelQueryType);
                         var messageError = dataModelLocal.GetData("message");
-
-                        containerContactInfo.openMessageDialog("Error ", messageError);
+                        containerContactInfo.openMessageDialog("Error dialog", messageError, "ErrorDialog");
                     }
 
                     return;
@@ -1136,8 +1135,18 @@ Rectangle {
                             var oldId = containerContactInfo.itemId;
                             containerContactInfo.itemId = dataModelLocal.GetData("Id");
 
+                            var accName = containerContactInfo.contactInfoModel.GetData("AccountName");
+                            if (containerContactInfo.itemName !== accName){
+
+                                containerContactInfo.rootItem.updateTitleTab(containerContactInfo.itemId, accName);
+                                containerContactInfo.itemName = accName;
+                            }
+
+//                            if (oldId !== containerContactInfo.itemId){
+//                                var accName = containerContactInfo.contactInfoModel.GetData("AccountName");
+//                                containerContactInfo.rootItem.updateTitleTab(containerContactInfo.itemId, accName);
+//                            }
                             containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
-//                            containerContactInfo.multiDocViewItem.activeCollectionItem.updateMetaInfoById(containerContactInfo.itemId, containerContactInfo.contactInfoModel);
                         }
                     }
                 }

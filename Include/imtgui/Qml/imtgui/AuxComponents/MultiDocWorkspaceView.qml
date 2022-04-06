@@ -79,6 +79,7 @@ Rectangle {
         if (itemId !== "" && multiDocView.tabIsOpened(itemId)) {
             findPage = true;
         }
+
         if (!findPage) {
             var index = pagesData.InsertNewItem();
             pagesData.SetData("ItemId", itemId, index);
@@ -103,6 +104,23 @@ Rectangle {
         console.log("MultidocWorkspaceView updateTitleTab()", index, title);
         pagesData.SetData("Title", title, index);
         pagesData.SetData("ItemId", itemId, index);
+    }
+
+    function getTabIndexById(tabId){
+        console.log("MultidocWorkspaceView getTabIndexById", tabId);
+        if (!pagesData){
+            return;
+        }
+
+        for (var i = 1; i < pagesData.GetItemsCount(); i++){
+            var id = pagesData.GetData("ItemId", i);
+            console.log("TabId", id);
+            if (id === tabId){
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     TreeItemModel {
@@ -188,7 +206,6 @@ Rectangle {
             function setModeMenuButton(commandId, mode){
                 console.log("MultiDocView ListView setModeMenuButton", commandId, mode);
                 multiDocView.rootItem.setModeMenuButton(commandId, mode);
-
             }
 
             function updateTitleTab(itemId, name) {

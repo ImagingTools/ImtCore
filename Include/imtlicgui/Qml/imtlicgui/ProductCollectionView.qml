@@ -264,6 +264,22 @@ Item {
                 }
             }
         }
+
+        onRemovedItem: {
+            console.log("ProductCollection CollectionView onRemovedItem");
+            var index = productCollectionContainer.multiDocViewItem.getTabIndexById(itemId);
+            if (index !== -1){
+                productCollectionContainer.multiDocViewItem.closeTab(index);
+            }
+        }
+
+        onRenamedItem: {
+            console.log("ProductCollection CollectionView onRenamedItem");
+            var index = productCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
+            if (index !== -1){
+                productCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
+            }
+        }
     }
 
     TreeItemModel {
@@ -279,6 +295,7 @@ Item {
         height: parent.height;
         width: 200;
 
+        contentVisible: productCollectionView.table.selectedIndex !== -1;
         color: Style.backgroundColor;
     }
 
@@ -320,6 +337,10 @@ Item {
 
                 dataModelLocal = metaInfo.GetData("data");
 
+                if (!dataModelLocal){
+                    return;
+                }
+
                 if (dataModelLocal.ContainsKey("ProductMetaInfo")) {
                     dataModelLocal = dataModelLocal.GetData("ProductMetaInfo");
 
@@ -345,7 +366,6 @@ Item {
 
                         productsMetaInfoModels.SetData("Id", productCollectionView.table.getSelectedId(), index);
                         productsMetaInfoModels.SetData("ModelData", dataModelLocal, index);
-
                     }
                 }
             }

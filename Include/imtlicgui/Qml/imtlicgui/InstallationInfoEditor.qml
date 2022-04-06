@@ -79,6 +79,11 @@ Rectangle {
 
     onActiveLicensesChanged: {
         console.log("InstallationInfoEditor onActiveLicensesChanged");
+
+        if (!containerInstallation.installationInfoModel){
+            return;
+        }
+
         var licenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
 
         if (licenses && licenses.GetItemsCount() > 0){
@@ -606,18 +611,16 @@ Rectangle {
                 dataModelLocal = installItemModel.GetData("data");
                 if(dataModelLocal.ContainsKey("InstallationItem")){
                     dataModelLocal = dataModelLocal.GetData("InstallationItem");
-                    if(dataModelLocal.ContainsKey("item")){
-                        //containerContactInfo.accountType = dataModelLocal.GetData("item").GetData("AccountType");
 
-                        dataModelLocal = dataModelLocal.GetData("item");
-
-//                        var installId = dataModelLocal.GetData("Id");
-//                        var accountId = dataModelLocal.GetData("AccountId");
-//                        var productId = dataModelLocal.GetData("ProductId");
-
+                    if (containerInstallation.operation === "New"){
                         containerInstallation.installationInfoModel = dataModelLocal;
-                        containerInstallation.model.SetExternTreeModel('data', containerInstallation.installationInfoModel)
                     }
+
+                    if(dataModelLocal.ContainsKey("item")){
+                        dataModelLocal = dataModelLocal.GetData("item");
+                        containerInstallation.installationInfoModel = dataModelLocal;
+                    }
+                    containerInstallation.model.SetExternTreeModel('data', containerInstallation.installationInfoModel)
                 }
             }
         }
@@ -850,13 +853,9 @@ Rectangle {
 
             modelInstallations.SetData("Id", instanceIdText.text)
             modelInstallations.SetData("Name", containerInstallation.itemName)
-
             modelInstallations.SetData("AccountId", containerInstallation.accountId);
             modelInstallations.SetData("ProductId", containerInstallation.productId);
 
-           // modelInstallations.SetData("ActiveLicenses", containerInstallation.productId);
-
-           // var licensesModelLocal = licenses.GetData("data");
             modelInstallations.SetExternTreeModel("ActiveLicenses", containerInstallation.activeLicenses);
 
             var jsonString = modelInstallations.toJSON();

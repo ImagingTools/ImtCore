@@ -227,15 +227,13 @@ Item {
     }
 
     function getIndexByRootFeatureId(featureId) {
-        console.log("FeaturesTreeView getIndexByRootFeatureId", featureId, featuresTreeViewContainer.modelDepends)
+        console.log("FeaturesTreeView getIndexByRootFeatureId", featureId)
 
         for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
             if (featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i) === featureId) {
                 return i;
             }
         }
-
-        console.log("FeaturesTreeView getIndexByRootFeatureId end")
 
         return -1;
     }

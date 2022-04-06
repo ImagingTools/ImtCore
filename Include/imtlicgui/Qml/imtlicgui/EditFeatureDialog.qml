@@ -22,7 +22,7 @@ Rectangle {
     property string featureId;
     property string featureName;
 
-    property real backgroundOpacity: 0.4;
+    property real backgroundOpacity: 0.3;
 
     property bool backgroundExist: true;
     property bool clickBackgroundClose: false;
@@ -289,7 +289,21 @@ Rectangle {
                     }
                 }
 
-//                onClicked: {
+                onTextInputFocusChanged: {
+                    containerFeatureEdit.generateKey();
+                }
+
+//                onInputTextChanged: {
+//                    console.log("TextFieldCustom onTextChanged");
+//                    errorIdMessage.text = "";
+//                    var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
+
+//                    if (idMessage !== "") {
+//                       errorIdMessage.text = idMessage;
+//                    }
+//                }
+
+//                onCustomTextChanged: {
 //                    errorIdMessage.text = "";
 //                    var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
 
@@ -349,16 +363,8 @@ Rectangle {
 
             Keys.onPressed: {
                 console.log("AuxButton okButton Key pressed!")
-                if(event.key === Qt.Key_Return){
+                if (event.key === Qt.Key_Return){
                     okButton.clicked();
-//                    console.log("key_enter");
-//                    if (tfcFeatureIdText.text[0] !== "#") {
-//                        tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
-//                    }
-
-//                    containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
-//                    containerFeatureEdit.exit("ok");
-//                    loaderDialog.closeItem();
                 }
              }
         }
@@ -380,7 +386,7 @@ Rectangle {
             borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 
-            KeyNavigation.tab: tfcFeatureName;
+            KeyNavigation.tab: containerFeatureEdit;
 
             onClicked: {
                 containerFeatureEdit.exit("cancel");
@@ -402,9 +408,6 @@ Rectangle {
             Keys.onPressed: {
                 console.log("AuxButton cancelButton Key pressed!")
                 if(event.key === Qt.Key_Return) {
-//                    containerFeatureEdit.exit("cancel");
-//                    loaderDialog.closeItem();
-//                    containerFeatureEdit.resultItem.forceActiveFocus();
                     cancelButton.clicked();
                 }
              }
