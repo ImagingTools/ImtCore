@@ -20,9 +20,6 @@
 
 // ImtCore includes
 #include <imtcore/Version.h>
-#include <imtbase/CObjectCollectionInsertEvent.h>
-#include <imtbase/CObjectCollectionUpdateEvent.h>
-#include <imtbase/CObjectCollectionRemoveEvent.h>
 
 
 namespace imtrepo
@@ -156,10 +153,9 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 
 						writeLocker.unlock();
 
-						imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DATA);
-						for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-							eventHandlerPtr->OnObjectCollectionEvent(this, &event);
-						}
+						static ChangeSet changes(CF_UPDATED);
+						changes.SetChangeInfo(s_cidUpdated, objectId);
+						istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 						tempDir.removeRecursively();
 						return newRevision;
@@ -240,6 +236,10 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const QByte
 									collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
 
 									writeLocker.unlock();
+
+									static ChangeSet changes(CF_UPDATED);
+									changes.SetChangeInfo(s_cidUpdated, objectId);
+									istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 									bool result = const_cast<CFileCollectionComp*>(this)->UpdateFile(newObjectDataFilePath, objectId);
 									tempDir.removeRecursively();
@@ -393,18 +393,13 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 
 		{
 			static ChangeSet changes(CF_REMOVED);
-
+			changes.SetChangeInfo(s_cidRemoved, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			// Remove the repository item with the corresponding object-ID:
 			m_files.removeAt(fileIndex);
 
 			repositoryDataLocker.unlock();
-		}
-
-		imtbase::CObjectCollectionRemoveEvent event(objectId);
-		for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 		}
 
 		return true;
@@ -436,8 +431,9 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 					return;
 				}
 			}
-
-			istd::CChangeNotifier changeNotifier(this);
+			static ChangeSet changes(CF_UPDATED);
+			changes.SetChangeInfo(s_cidUpdated, objectId);
+			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			QFileInfo fileInfo(item.filePathInRepository);
 			QDir resourceDir = fileInfo.absoluteDir();
@@ -503,11 +499,6 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			SaveCollectionItem(item);
 
 			locker.unlock();
-
-			imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_NAME);
-			for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				eventHandlerPtr->OnObjectCollectionEvent(this, &event);
-			}
 
 			return;
 		}

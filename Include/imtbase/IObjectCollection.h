@@ -8,7 +8,6 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
-#include <imtbase/IObjectCollectionEventHandler.h>
 
 
 namespace imtbase
@@ -26,6 +25,11 @@ class ICollectionDataController;
 class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
+	// Change info ids
+	static const QByteArray s_cidRemoved;
+	static const QByteArray s_cidAdded;
+	static const QByteArray s_cidUpdated;
+
 	class DataPtr
 	{
 	public:
@@ -211,15 +215,6 @@ public:
 	*/
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) = 0;
 
-	/**
-		Add an event handler to the notification list
-	*/
-	virtual bool RegisterEventHandler(IObjectCollectionEventHandler* eventHandler) = 0;
-
-	/**
-		Remove an event handler from the notification list
-	*/
-	virtual bool UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler) = 0;
 };
 
 

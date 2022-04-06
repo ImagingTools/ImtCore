@@ -355,18 +355,6 @@ void CSqlDatabaseObjectCollectionComp::SetObjectEnabled(const QByteArray& /*obje
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::RegisterEventHandler(imtbase::IObjectCollectionEventHandler* /*eventHandler*/)
-{
-	return false;
-}
-
-
-bool CSqlDatabaseObjectCollectionComp::UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* /*eventHandler*/)
-{
-	return false;
-}
-
-
 // protected methods
 
 bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const

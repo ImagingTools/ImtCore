@@ -14,9 +14,6 @@
 // ImtCore includes
 #include <imtcore/Version.h>
 #include <imtbase/MetaTypes.h>
-#include <imtbase/CObjectCollectionInsertEvent.h>
-#include <imtbase/CObjectCollectionRemoveEvent.h>
-#include <imtbase/CObjectCollectionUpdateEvent.h>
 
 
 namespace imtbase
@@ -167,11 +164,8 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 		}
 
 		if (InsertObjectIntoCollection(info)){
-			istd::TSmartPtr<istd::IChangeable> eventPtr;
-			eventPtr.SetPtr(new CObjectCollectionInsertEvent(info.id));
-
 			istd::IChangeable::ChangeSet changeSet(CF_ADDED);
-			changeSet.SetChangeInfo("ObjectCollection", QVariant::fromValue(eventPtr));
+			changeSet.SetChangeInfo(s_cidAdded, info.id);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			return info.id;
@@ -186,11 +180,8 @@ bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == objectId){
-			istd::TSmartPtr<istd::IChangeable> eventPtr;
-			eventPtr.SetPtr(new CObjectCollectionRemoveEvent(objectId));
-
 			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-			changeSet.SetChangeInfo("ObjectCollection", QVariant::fromValue(eventPtr));
+			changeSet.SetChangeInfo(s_cidRemoved, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>((*iter).objectPtr.GetPtr());
@@ -248,13 +239,8 @@ bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd
 {
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
-			istd::TSmartPtr<istd::IChangeable> eventPtr;
-			eventPtr.SetPtr(new CObjectCollectionUpdateEvent(
-						objectId,
-						CObjectCollectionUpdateEvent::UT_DATA));
-
 			istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-			changeSet.SetChangeInfo("ObjectCollection", QVariant::fromValue<IChangeablePtr>(eventPtr));
+			changeSet.SetChangeInfo(s_cidUpdated, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			return objectInfo.objectPtr->CopyFrom(object, mode);
@@ -270,15 +256,8 @@ void CObjectCollectionBase::SetObjectName(const QByteArray& objectId, const QStr
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
 			if (objectInfo.name != objectName){
-				istd::TSmartPtr<istd::IChangeable> eventPtr;
-				eventPtr.SetPtr(new CObjectCollectionUpdateEvent(
-							objectId,
-							CObjectCollectionUpdateEvent::UT_NAME,
-							objectInfo.name,
-							objectName));
-
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo("ObjectCollection", QVariant::fromValue<IChangeablePtr>(eventPtr));
+				changeSet.SetChangeInfo(s_cidUpdated, objectId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.name = objectName;
@@ -293,15 +272,8 @@ void CObjectCollectionBase::SetObjectDescription(const QByteArray& objectId, con
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
 			if (objectInfo.description!= objectDescription) {
-				istd::TSmartPtr<istd::IChangeable> eventPtr;
-				eventPtr.SetPtr(new CObjectCollectionUpdateEvent(
-							objectId,
-							CObjectCollectionUpdateEvent::UT_DESCRIPTION,
-							objectInfo.description,
-							objectDescription));
-
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo("ObjectCollection", QVariant::fromValue<IChangeablePtr>(eventPtr));
+				changeSet.SetChangeInfo(s_cidUpdated, objectId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.description = objectDescription;
@@ -316,44 +288,14 @@ void CObjectCollectionBase::SetObjectEnabled(const QByteArray& objectId, bool is
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
 			if (objectInfo.isEnabled != isEnabled) {
-				istd::TSmartPtr<istd::IChangeable> eventPtr;
-				eventPtr.SetPtr(new CObjectCollectionUpdateEvent(
-							objectId,
-							CObjectCollectionUpdateEvent::UT_ENABLED,
-							objectInfo.isEnabled,
-							isEnabled));
-
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo("ObjectCollection", QVariant::fromValue<IChangeablePtr>(eventPtr));
+				changeSet.SetChangeInfo(s_cidUpdated, objectId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.isEnabled = isEnabled;
 			}
 		}
 	}
-}
-
-
-bool CObjectCollectionBase::RegisterEventHandler(IObjectCollectionEventHandler* eventHandler)
-{
-	if (!m_eventHandlerList.contains(eventHandler)){
-		m_eventHandlerList.append(eventHandler);
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CObjectCollectionBase::UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler)
-{
-	int index = m_eventHandlerList.indexOf(eventHandler, 0);
-	if (index >= 0){
-		m_eventHandlerList.removeAt(index);
-		return true;
-	}
-
-	return false;
 }
 
 

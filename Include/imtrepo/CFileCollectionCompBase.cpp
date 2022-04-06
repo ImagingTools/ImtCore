@@ -20,9 +20,6 @@
 
 // ImtCore includes
 #include <imtcore/Version.h>
-#include <imtbase/CObjectCollectionInsertEvent.h>
-#include <imtbase/CObjectCollectionUpdateEvent.h>
-#include <imtbase/CObjectCollectionRemoveEvent.h>
 #include <imtbase/CTempDir.h>
 
 
@@ -311,6 +308,7 @@ bool CFileCollectionCompBase::UpdateFile(
 		locker.relock();
 
 		static ChangeSet changes(CF_UPDATED);
+		changes.SetChangeInfo(s_cidUpdated, objectId);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		m_files[fileIndex].CopyFrom(collectionItem);
@@ -323,11 +321,6 @@ bool CFileCollectionCompBase::UpdateFile(
 		}
 
 		locker.unlock();
-
-		imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DATA);
-		for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-			eventHandlerPtr->OnObjectCollectionEvent(this, &event);
-		}
 
 		return true;
 	}
@@ -607,18 +600,15 @@ void CFileCollectionCompBase::SetObjectDescription(const QByteArray& objectId, c
 		QString oldDescription = item.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 
 		if (oldDescription != objectDescription){
-			istd::CChangeNotifier changeNotifier(this);
+			static ChangeSet changes(CF_UPDATED);
+			changes.SetChangeInfo(s_cidAdded, objectId);
+			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			item.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
 
 			SaveCollectionItem(item);
 
 			locker.unlock();
-
-			imtbase::CObjectCollectionUpdateEvent event(objectId, imtbase::CObjectCollectionUpdateEvent::UT_DESCRIPTION);
-			for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				eventHandlerPtr->OnObjectCollectionEvent(this, &event);
-			}
 		}
 	}
 }
@@ -627,36 +617,6 @@ void CFileCollectionCompBase::SetObjectDescription(const QByteArray& objectId, c
 void CFileCollectionCompBase::SetObjectEnabled(const QByteArray& /*objectId*/, bool /*isEnabled*/)
 {
 }
-
-
-bool CFileCollectionCompBase::RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
-{
-	if (eventHandler != nullptr && !m_eventHandlerList.contains(eventHandler)){
-		m_eventHandlerList.append(eventHandler);
-
-		eventHandler->OnCollectionConnected(this);
-
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CFileCollectionCompBase::UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
-{
-	int index = m_eventHandlerList.indexOf(eventHandler, 0);
-	if (index >= 0){
-		eventHandler->OnCollectionDisconnected(this);
-
-		m_eventHandlerList.removeAt(index);
-
-		return true;
-	}
-
-	return false;
-}
-
 
 // reimplemented (IObjectCollectionInfo)
 
@@ -1245,16 +1205,12 @@ bool CFileCollectionCompBase::FinishInsertFileTransaction(
 		if (result){
 			{
 				static ChangeSet changes(CF_ADDED);
+				changes.SetChangeInfo(s_cidAdded, fileId);
 				istd::CChangeNotifier changeNotifier(this, &changes);
 
 				QWriteLocker locker(&m_filesLock);
 				m_files.push_back(collectionItem);
 				locker.unlock();
-			}
-
-			imtbase::CObjectCollectionInsertEvent event(fileId);
-			for (imtbase::IObjectCollectionEventHandler* eventHandlerPtr : m_eventHandlerList){
-				eventHandlerPtr->OnObjectCollectionEvent(this, &event);
 			}
 		}
 		else{
@@ -1292,12 +1248,6 @@ void CFileCollectionCompBase::OnComponentCreated()
 			SendCriticalMessage(0, QObject::tr("Root folder for the file collection could not be created in '%1'").arg(path));
 		}
 	}
-
-	if (m_eventHandlerListCompPtr.IsValid()){
-		for (int i = 0; i < m_eventHandlerListCompPtr.GetCount(); i++){
-			RegisterEventHandler(m_eventHandlerListCompPtr[i]);
-		}
-	}
 }
 
 
@@ -1307,7 +1257,6 @@ void CFileCollectionCompBase::OnComponentDestroyed()
 	m_readerThread.wait();
 
 	m_filesLock.lockForWrite();
-	m_eventHandlerList.clear();
 	m_files.clear();
 	m_filesLock.unlock();
 

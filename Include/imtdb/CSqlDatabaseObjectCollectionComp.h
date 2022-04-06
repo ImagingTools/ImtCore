@@ -83,8 +83,6 @@ public:
 	virtual const istd::IChangeable * GetObjectPtr(const QByteArray & objectId) const override;
 	virtual bool GetObjectData(const QByteArray & objectId, DataPtr & dataPtr) const override;
 	virtual void SetObjectEnabled(const QByteArray & objectId, bool isEnabled = true) override;
-	virtual bool RegisterEventHandler(imtbase::IObjectCollectionEventHandler * eventHandler) override;
-	virtual bool UnregisterEventHandler(imtbase::IObjectCollectionEventHandler * eventHandler) override;
 	
 protected:
 	struct ObjectInfo

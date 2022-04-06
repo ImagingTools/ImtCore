@@ -58,8 +58,6 @@ public:
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
-	virtual bool RegisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
-	virtual bool UnregisterEventHandler(IObjectCollectionEventHandler* eventHandler) override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
@@ -123,7 +121,6 @@ protected:
 	};
 
 	typedef QVector<ObjectInfo> Objects;
-	typedef QList<IObjectCollectionEventHandler*> EventHandlerList;
 
 	Objects m_objects;
 
@@ -139,8 +136,6 @@ protected:
 
 private:
 	imod::CModelUpdateBridge m_modelUpdateBridge;
-
-	EventHandlerList m_eventHandlerList;
 };
 
 

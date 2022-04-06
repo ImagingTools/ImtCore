@@ -105,7 +105,6 @@ public:
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for data object loading", false);
 		I_ASSIGN_MULTI_0(m_resourceFileTypesCompPtr, "FileTypeInfos", "List of file type infos for corresponding resource type", false);
 		I_ASSIGN_MULTI_0(m_metaInfoCreatorListCompPtr, "MetaInfoCreatorList", "List of meta-info creators related to the object types", false);
-		I_ASSIGN_MULTI_0(m_eventHandlerListCompPtr, "EventHandlerList", "List of event handler components", false);
 		I_ASSIGN_MULTI_0(m_objectFactoryListCompPtr, "ObjectFactoryList", "List of factories used for data object instance creation", false);
 	I_END_COMPONENT;
 
@@ -157,8 +156,6 @@ public:
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
-	virtual bool RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
-	virtual bool UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
@@ -338,7 +335,6 @@ protected:
 
 	typedef imod::TModelWrap<ResourceTypeConstraints> ResourceTypeConstraintsModel;
 
-	typedef QList<imtbase::IObjectCollectionEventHandler*> EventHandlerList;
 
 protected:
 	static RepositoryInfo GetRepositoryInfo();
@@ -475,7 +471,6 @@ protected:
 	mutable ObjectCache m_objectCache;
 	mutable QReadWriteLock m_objectCacheLock;
 
-	EventHandlerList m_eventHandlerList;
 
 protected:
 	/**
@@ -533,7 +528,6 @@ protected:
 	/**
 		Event handlers
 	*/
-	I_MULTIREF(imtbase::IObjectCollectionEventHandler, m_eventHandlerListCompPtr);
 
 	/**
 		List of data object factories related to registered resource types.

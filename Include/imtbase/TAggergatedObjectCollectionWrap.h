@@ -61,8 +61,6 @@ public:
 	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
 	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
-	virtual bool RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
-	virtual bool UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler) override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
@@ -217,20 +215,6 @@ template<class BaseInterface, class ObjectImpl>
 inline void TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjectEnabled(const QByteArray& objectId, bool isEnabled)
 {
 	m_collection.SetObjectEnabled(objectId, isEnabled);
-}
-
-
-template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RegisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
-{
-	return m_collection.RegisterEventHandler(eventHandler);
-}
-
-
-template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::UnregisterEventHandler(imtbase::IObjectCollectionEventHandler* eventHandler)
-{
-	return m_collection.UnregisterEventHandler(eventHandler);
 }
 
 
