@@ -1335,9 +1335,7 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 				}
 			}
 
-
 			if (changeInfoMap.isEmpty()){
-
 				TypeList->clear();
 
 				QTreeWidgetItem* activeTypeItemPtr = nullptr;
@@ -1547,9 +1545,9 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 
 CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& parent)
 	:m_fetchedRowCount(0),
-	  m_totalRowCount(0),
-	  m_batchSize(10),
-	  m_parent(parent)
+	m_totalRowCount(0),
+	m_batchSize(100),
+	m_parent(parent)
 {
 }
 
