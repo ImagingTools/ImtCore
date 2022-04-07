@@ -154,7 +154,7 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 						writeLocker.unlock();
 
 						static ChangeSet changes(CF_UPDATED);
-						changes.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
+						changes.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
 						istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 						tempDir.removeRecursively();
@@ -238,7 +238,7 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const QByte
 									writeLocker.unlock();
 
 									static ChangeSet changes(CF_UPDATED);
-									changes.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
+									changes.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
 									istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 									bool result = const_cast<CFileCollectionComp*>(this)->UpdateFile(newObjectDataFilePath, objectId);
@@ -393,7 +393,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 
 		{
 			static ChangeSet changes(CF_REMOVED);
-			changes.SetChangeInfo(CN_OBJECT_REMOVED_NOTIFICATION, objectId);
+			changes.SetChangeInfo(CN_OBJECT_REMOVED, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			// Remove the repository item with the corresponding object-ID:
@@ -432,7 +432,7 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 				}
 			}
 			static ChangeSet changes(CF_UPDATED);
-			changes.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
+			changes.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			QFileInfo fileInfo(item.filePathInRepository);

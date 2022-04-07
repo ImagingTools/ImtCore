@@ -1476,29 +1476,25 @@ CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& par
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes)
 {
 	istd::IChangeable::ChangeInfoMap changeInfoMap = changes.GetChangeInfoMap();
-	bool is_all_updated = false;
-	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_REMOVED_NOTIFICATION)){
-		RemoveItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_REMOVED_NOTIFICATION].toByteArray());
-		is_all_updated = true;
+	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_REMOVED)){
+		RemoveItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_REMOVED].toByteArray());
 	}
 
-	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_ADDED_NOTIFICATION)){
-		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_ADDED_NOTIFICATION].toByteArray());
+	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_ADDED)){
+		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_ADDED].toByteArray());
 		if (!m_parent.m_itemsSelection.isEmpty()){
 			m_parent.UpdateCommands();
 		}
-		is_all_updated = true;
 	}
 
-	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_UPDATED_NOTIFICATION)){
-		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_UPDATED_NOTIFICATION].toByteArray());
+	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_UPDATED)){
+		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_UPDATED].toByteArray());
 		if (!m_parent.m_itemsSelection.isEmpty()){
 			m_parent.UpdateCommands();
 		}
-		is_all_updated = true;
 	}
 
-	if (!is_all_updated){
+	if (changeInfoMap.isEmpty()){
 		beginResetModel();
 
 		m_totalRowCount = collection.GetElementsCount();
