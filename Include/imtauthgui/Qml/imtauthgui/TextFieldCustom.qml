@@ -34,6 +34,9 @@ Item {
         if (!containerTextField.focus){
             containerTextField.setFocus(false);
         }
+//        else{
+//            containerTextField.setFocus(true);
+//        }
     }
 
     function setFocus(state){

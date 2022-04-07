@@ -148,15 +148,11 @@ Item {
                      console.log("TreeItemDelegate CheckBox MouseArea onClicked", checkBox.checkState);
                      if (checkBox.checkState == 2) {
                          checkBox.checkState = 0
-//                         model.stateChecked = 0;
                      }
                      else {
                          checkBox.checkState = 2
-//                         model.stateChecked = 2;
                      }
 
-//                     treeItemDelegate.checkBoxState(checkBox.checkState, model.packageId, model.Id);
-//                     treeItemDelegate.listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
                      mainTreeView.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
                  }
              }
@@ -176,35 +172,6 @@ Item {
         }
     }
 
-//    ListView {
-//        id: childrenColumn;
-
-//        anchors.top: mainRect.bottom;
-
-//        height: childrenColumn.count * 30;
-//        width: treeItemDelegate.width;
-
-//        visible: treeItemDelegate.isOpened;
-
-
-//        delegate: Loader {
-//            id: loader;
-
-//            source: "TreeItemDelegate.qml";
-
-//            onItemChanged: {
-//                if (loader.item) {
-//                    console.log("TreeItemDelegate child load");
-//                    console.log("treeItemDelegate.listViewItem", treeItemDelegate.listViewItem);
-//                    loader.height = loader.item.height;
-//                    //childrenColumn.height += item.height;
-//                    loader.item.listViewItem = treeItemDelegate.listViewItem;
-//                    console.log("loader.item.listViewItem", loader.item.listViewItem);
-//                }
-//            }
-//        }
-//    }
-
     Column {
         id: childrenColumn;
 
@@ -216,16 +183,6 @@ Item {
 
         Repeater {
              id: treeItemRepeater;
-//             property bool isOpened: treeItemDelegate.isOpened;
-
-//             onIsOpenedChanged: {
-//                 console.log("TreeItemDelegate onIsOpenedChanged");
-//                 if (treeItemDelegate.isOpened){
-//                     treeItemRepeater.model = model.childItemModel;
-//                 } else {
-//                     treeItemRepeater.model = 0;
-//                 }
-//             }
 
              delegate: Loader {
                  id: loader;
@@ -243,19 +200,6 @@ Item {
                      }
                  }
              }
-//             onHeightChanged: {
-//                 console.log('============================')
-//                 console.log('treeItemRepeater height: ', height)
-//                 console.log('============================')
-//             }
-
-//             onVisibleChanged: {
-//                console.log('Repeater onVisibleChanged', treeItemRepeater.visible);
-//             }
        }
-
-//        onHeightChanged: {
-//            parent.height = height + mainRect.height;
-//        }
     }
 }

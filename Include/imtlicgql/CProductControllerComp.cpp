@@ -113,13 +113,11 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		}
 
 		imtbase::CTreeItemModel *licenses = nullptr;
-
 		if (itemModel.ContainsKey("licenses")){
 			licenses = itemModel.GetTreeItemModel("licenses");
 		}
 
 		imtbase::CTreeItemModel *dependencies = nullptr;
-
 		if (itemModel.ContainsKey("dependencies")){
 			dependencies = itemModel.GetTreeItemModel("dependencies");
 		}
@@ -184,6 +182,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	return nullptr;
 }
 
+
 imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
@@ -210,7 +209,6 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 		int rootIndex;
 
 		for (const QByteArray& collectionId : collectionIds){
-
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (collectionId != "" && m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 
@@ -287,13 +285,13 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 	return rootModel;
 }
 
+
 bool CProductControllerComp::GetOperationFromRequest(
 			const imtgql::CGqlRequest& gqlRequest,
 			imtgql::CGqlObject& gqlObject,
 			QString& errorMessage,
 			int& operationType) const
 {
-
 	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
 	if(fieldList == nullptr){
 		return false;

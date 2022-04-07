@@ -158,7 +158,8 @@ Item {
 
             productCollectionContainer.multiDocViewItem.addToHeadersArray(currentId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", "Copy")
 
-        } else {
+        }
+        else {
             productCollectionView.menuActivated(menuId)
         }
     }
@@ -172,7 +173,8 @@ Item {
             productCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
             productCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
             productCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
-        } else {
+        }
+        else {
             productCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             productCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             productCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");

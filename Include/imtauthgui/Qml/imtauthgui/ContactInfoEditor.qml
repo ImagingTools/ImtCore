@@ -30,6 +30,10 @@ Rectangle {
 
     property bool wasChanged: false;
 
+    Component.onCompleted: {
+        rectTfcAccountName.forceActiveFocus();
+    }
+
     onWasChangedChanged: {
         console.log("ContactInfoEditor onWasChangedChanged", containerContactInfo.wasChanged);
         containerContactInfo.commandsChanged("AccountEdit");
@@ -281,13 +285,13 @@ Rectangle {
                 currentText: cbTypeAccount.currentIndex === 0 ? "Private" : "Company";
                 textCentered: false;
 
-                borderColor: Style.alternateBaseColor;
+                //borderColor: Style.alternateBaseColor;
 
                 property bool wasFocus: false;
 
                 onCurrentIndexChanged: {
                     var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).name.toLowerCase();
-                    console.log("ContactInfoEditor ComboBox onCurrentIndexChanged", accountType);
+                    containerContactInfo.accountType = accountType;
 
                     if (!containerContactInfo.contactInfoModel){
                         return;
@@ -304,8 +308,21 @@ Rectangle {
                 }
 
                 onClicked: {
+                    cbTypeAccount.focus = true;
                     cbTypeAccount.openContextMenu();
                 }
+
+                onDialogResultChanged: {
+                    cbTypeAccount.focus = true;
+                }
+
+                Keys.onPressed: {
+                    if (event.key === Qt.Key_Space){
+                        cbTypeAccount.clicked();
+                    }
+                }
+
+                KeyNavigation.tab: rectTfcAccountName;
             }
 
             Text {
@@ -318,20 +335,52 @@ Rectangle {
                 font.pixelSize: Style.fontSize_common;
             }
 
-            TextFieldCustom {
-                id: tfcAccountName;
+            Rectangle {
+                id: rectTfcAccountName;
 
                 anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
 
                 width: contactInfoColumn.width;
                 height: 30;
 
-                onInputTextChanged: {
-                    console.log("ContactInfoEditor TextFieldCustom AccountName onInputTextChanged");
-                    containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
-                    containerContactInfo.wasChanged = true;
+                TextFieldCustom {
+                    id: tfcAccountName;
+
+                    anchors.fill: parent;
+
+                    onInputTextChanged: {
+                        console.log("ContactInfoEditor TextFieldCustom AccountName onInputTextChanged");
+                        containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
+                        containerContactInfo.wasChanged = true;
+                    }
                 }
+
+                onFocusChanged: {
+                    if (rectTfcAccountName.focus){
+                        tfcAccountName.setFocus(true);
+                    }
+                }
+
+                KeyNavigation.tab: rectTfcAccountDescription;
+                KeyNavigation.backtab: cbTypeAccount;
             }
+
+//            TextFieldCustom {
+//                id: tfcAccountName;
+
+//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
+
+//                width: contactInfoColumn.width;
+//                height: 30;
+
+//                onInputTextChanged: {
+//                    console.log("ContactInfoEditor TextFieldCustom AccountName onInputTextChanged");
+//                    containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
+//                    containerContactInfo.wasChanged = true;
+//                }
+
+//                KeyNavigation.tab: tfcAccountDescription;
+//            }
 
             Text {
                 id: titleAccountDescription;
@@ -343,20 +392,53 @@ Rectangle {
                 font.pixelSize: Style.fontSize_common;
             }
 
-            TextFieldCustom {
-                id: tfcAccountDescription;
+            Rectangle {
+                id: rectTfcAccountDescription;
 
                 anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
 
                 width: contactInfoColumn.width;
                 height: 30;
 
-                onInputTextChanged: {
-                    console.log("ContactInfoEditor TextFieldCustom AccountDescription onInputTextChanged");
-                    containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
-                    containerContactInfo.wasChanged = true;
+                TextFieldCustom {
+                    id: tfcAccountDescription;
+
+                    anchors.fill: parent;
+
+                    onInputTextChanged: {
+                        console.log("ContactInfoEditor TextFieldCustom AccountDescription onInputTextChanged");
+                        containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
+                        containerContactInfo.wasChanged = true;
+                    }
                 }
+
+                onFocusChanged: {
+                    if (rectTfcAccountDescription.focus){
+                        tfcAccountDescription.setFocus(true);
+                    }
+                }
+
+                KeyNavigation.backtab: rectTfcAccountName;
+                KeyNavigation.tab: containerContactInfo.accountType === "company" ? countryBlock : emailBlock;
             }
+
+//            TextFieldCustom {
+//                id: tfcAccountDescription;
+
+//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
+
+//                width: contactInfoColumn.width;
+//                height: 30;
+
+//                onInputTextChanged: {
+//                    console.log("ContactInfoEditor TextFieldCustom AccountDescription onInputTextChanged");
+//                    containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
+//                    containerContactInfo.wasChanged = true;
+//                }
+
+//                KeyNavigation.tab: tfcAccountDescription;
+//                KeyNavigation.backtab: tfcAccountName;
+//            }
 
             Text {
                 id: companyAddressBlockTitle;
@@ -426,6 +508,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (countryBlock.focus){
+                            tfcCountryText.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: cityBlock;
+                    KeyNavigation.backtab: rectTfcAccountDescription;
                 }
 
                 Text {
@@ -472,6 +563,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (cityBlock.focus){
+                            tfcCity.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: postalCodeBlock;
+                    KeyNavigation.backtab: countryBlock;
                 }
 
                 Text {
@@ -520,6 +620,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (postalCodeBlock.focus){
+                            postalCode.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: streetBlock;
+                    KeyNavigation.backtab: cityBlock;
                 }
 
                 Text {
@@ -565,6 +674,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (streetBlock.focus){
+                            tfcStreet.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: emailBlock;
+                    KeyNavigation.backtab: postalCodeBlock;
                 }
             }
 
@@ -633,6 +751,15 @@ Rectangle {
 //                            containerContactInfo.activateSaveButton();
                         }
                     }
+
+                    onFocusChanged: {
+                        if (emailBlock.focus){
+                            tfcEmail.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? firstNameBlock : bdBlock;
+                    KeyNavigation.backtab: containerContactInfo.accountType === "company" ? streetBlock : rectTfcAccountDescription;
                 }
 
                 Text {
@@ -682,6 +809,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (bdBlock.focus){
+                            tfcBD.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: genderCB;
+                    KeyNavigation.backtab: emailBlock;
                 }
 
                 Text {
@@ -729,7 +865,7 @@ Rectangle {
                         radius: 3;
                         model: genderModel;
                         backgroundColor: "#d0d0d0";
-                        borderColor: Style.alternateBaseColor;
+                        //borderColor: Style.alternateBaseColor;
                         textCentered: false;
 
                         onCurrentIndexChanged: {
@@ -742,6 +878,20 @@ Rectangle {
                         onClicked: {
                             genderCB.openContextMenu();
                         }
+
+                        onDialogResultChanged: {
+                            genderCB.forceActiveFocus();
+                        }
+
+                        Keys.onPressed: {
+                            console.log("genderCB keys pressed")
+                            if (event.key === Qt.Key_Space){
+                                genderCB.clicked();
+                            }
+                        }
+
+                        KeyNavigation.tab: firstNameBlock;
+                        KeyNavigation.backtab: bdBlock;
                     }
                 }
 
@@ -788,6 +938,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (firstNameBlock.focus){
+                            tfcFirstNameText.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: lastNameBlock;
+                    KeyNavigation.backtab: containerContactInfo.accountType === "company" ? emailBlock : genderCB;
                 }
 
                 Text {
@@ -833,6 +992,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (lastNameBlock.focus){
+                            tfcLastName.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? lastNameBlock : nickNameBlock;
+                    KeyNavigation.backtab: firstNameBlock;
                 }
 
                 Text {
@@ -881,6 +1049,15 @@ Rectangle {
                             containerContactInfo.wasChanged = true;
                         }
                     }
+
+                    onFocusChanged: {
+                        if (nickNameBlock.focus){
+                            tfcNickName.setFocus(true);
+                        }
+                    }
+
+                    KeyNavigation.tab: nickNameBlock;
+                    KeyNavigation.backtab: lastNameBlock;
                 }
 
                 Text {

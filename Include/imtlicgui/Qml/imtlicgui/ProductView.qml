@@ -37,7 +37,6 @@ Item {
 
     Keys.onPressed: {
         console.log("ProductView keys pressed")
-
         if (treeView.focus){
             return;
         }
@@ -73,9 +72,7 @@ Item {
     }
 
     function openContextMenu(item, mouseX, mouseY) {
-
         var point = productsCollectionViewContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
-
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;
@@ -270,21 +267,21 @@ Item {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
-//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");//
             productsCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
-//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");//
         }
 
-        if (productsCollectionViewContainer.wasChanged){
-            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
-        } else {
-            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
-        }
+//        if (productsCollectionViewContainer.wasChanged){
+//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+//        } else {
+//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
+//        }
     }
 
     TreeItemModel {
@@ -372,7 +369,8 @@ Item {
                 productMetaInfo.clearTreeView();
                 productMetaInfo.updateTreeView();
                 treeView.modelItems.Refresh();
-            } else {
+            }
+            else {
                 treeView.visible = false;
             }
         }
@@ -649,7 +647,7 @@ Item {
                             packageId,
                             featureId,
                             state);
-                productsCollectionViewContainer.wasChanged = true;
+               // productsCollectionViewContainer.wasChanged = true;
                 productMetaInfo.clearTreeView();
                 productMetaInfo.updateLicenseFeatures(productsCollectionViewContainer.itemId,
                                                       productsCollectionView.table.getSelectedId(),
@@ -657,7 +655,6 @@ Item {
                                                       featureId,
                                                       state);
                 productMetaInfo.updateTreeView();
-
             }
         }
 
@@ -745,6 +742,7 @@ Item {
                 return;
             }
 
+            console.log("A");
             for (i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
                 var curRootLicenseId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
                 var curRootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
@@ -876,7 +874,7 @@ Item {
             if (!featuresTreeView.productLicenseFeatures){
                 return;
             }
-
+            console.log("ProductView 1");
             for (i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
                 var curRootLicenseId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
                 var curRootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);

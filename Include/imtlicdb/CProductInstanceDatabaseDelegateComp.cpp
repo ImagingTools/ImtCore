@@ -387,8 +387,8 @@ void CProductInstanceDatabaseDelegateComp::GenerateDifferencesLicenses(const imt
 		}
 	}
 
-
 	imtbase::ICollectionInfo::Ids newLicenseIds = newProductInstancePtr->GetLicenseInstances().GetElementIds();
+	int count = newProductInstancePtr->GetLicenseInstances().GetElementsCount();
 	for (const QByteArray& licenseCollectionId : newLicenseIds){
 		const imtlic::ILicenseInstance* licensePtr = newProductInstancePtr->GetLicenseInstance(licenseCollectionId);
 		if (licensePtr != nullptr && !newLicenseIds.contains(licenseCollectionId)){

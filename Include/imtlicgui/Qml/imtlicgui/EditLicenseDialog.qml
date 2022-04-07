@@ -287,6 +287,7 @@ Rectangle {
                 }
 
                 KeyNavigation.tab: okButton;
+                KeyNavigation.backtab: tfcLicenseName;
             }
         }
 

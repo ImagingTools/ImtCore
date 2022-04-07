@@ -107,7 +107,8 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 			if (licensePtr != nullptr){
 				childIndex = childs->InsertNewItem();
 				QString licenseName = licensePtr->GetLicenseName();
-				childs->SetData("Value", licenseName, childIndex);
+				QString value = licenseName + " (" + licenseCollectionId + ")";
+				childs->SetData("Value", value, childIndex);
 			}
 		}
 

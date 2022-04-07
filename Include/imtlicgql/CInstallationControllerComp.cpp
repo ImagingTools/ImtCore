@@ -184,12 +184,21 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 						QString dateExpirationStr = activeLicenses->GetData("Expiration", i).toString();
 						expirationDate = QDateTime::fromString(dateExpirationStr, "dd.MM.yyyy");
 					}
-
+					QString strdate = expirationDate.toString("dd.MM.yyyy");
 					productInstancePtr->AddLicense(licenseId, expirationDate);
+
+					const imtlic::ILicenseInstance* lic = productInstancePtr->GetLicenseInstance(licenseId);
+					QByteArray id = lic->GetLicenseId();
 				}
 			}
 		}
 
+		//const imtbase::ICollectionInfo newLicenseIds = productInstancePtr->GetLicenseInstances();
+
+		QByteArray id = productInstancePtr->GetProductInstanceId();
+
+
+		int count = productInstancePtr->GetLicenseInstances().GetElementsCount();
 		return productInstancePtr.PopPtr();
 	}
 

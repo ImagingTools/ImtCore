@@ -9,7 +9,9 @@ Item {
 
     property var model;
 
-    property color borderColor: Style.textColor; 
+//    property color borderColor: Style.textColor;
+    property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
+
     property color backgroundColor: Style.baseColor;
 
     property string currentText;
@@ -180,7 +182,7 @@ Item {
                     anchors.left: cbListDelegate.left;
                     anchors.leftMargin: 10;
 
-                    text: model.text;
+                    text: model.text ? model.text : "";
                     color: Style.textColor;
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
@@ -197,7 +199,6 @@ Item {
                         comboBoxContainer.menuVisible = false;
                     }
                 }
-
 
                 Rectangle {
                     anchors.top: cbListDelegate.bottom;

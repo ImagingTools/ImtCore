@@ -102,11 +102,15 @@ Rectangle {
             if (this.state == "Ready"){
                 var dataModelLocal = this.GetData("data");
 
+                refreshButton.enabled = true;
+
                 if (!dataModelLocal){
-//                    thumbnailDecorator.setInvalidConnection(true);
+
                     thubnailDecoratorContainer.setInvalidConnection(true);
                     return;
                 }
+
+                thubnailDecoratorContainer.setInvalidConnection(false);
 
                 if(dataModelLocal.ContainsKey("PagesData")){
                     dataModelLocal = dataModelLocal.GetData("PagesData")

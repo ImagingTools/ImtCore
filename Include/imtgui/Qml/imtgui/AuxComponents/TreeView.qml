@@ -181,6 +181,10 @@ Rectangle {
         property int currentParentIndex: -1;
         property int currentChildIndex: -1;
 
+//        delegate: TreeItemDelegate {
+//            width: parent.width;
+//        }
+
         delegate: TreeItemDelegateTest {
             width: parent.width;
 

@@ -462,13 +462,14 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
 
-                if (dataModelLocal.ContainsKey("LicensesDependencies")) {
+                if (dataModelLocal.ContainsKey("LicensesDependencies")){
                     dataModelLocal = dataModelLocal.GetData("LicensesDependencies");
 
-                    if (dataModelLocal.ContainsKey("TreeModel")) {
+                    if (dataModelLocal.ContainsKey("TreeModel")){
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
-                        featuresTreeViewContainer.productLicenseFeatures = dataModelLocal;
                     }
+
+                    featuresTreeViewContainer.productLicenseFeatures = dataModelLocal;
                 }
             }
         }

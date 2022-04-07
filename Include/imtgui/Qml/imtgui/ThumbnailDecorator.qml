@@ -93,6 +93,32 @@ Rectangle
         font.family: Style.fontFamily;
     }
 
+    AuxButton {
+        id: refreshButton;
+
+        anchors.top: textNoConnection.bottom;
+        anchors.topMargin: 20;
+        anchors.horizontalCenter: parent.horizontalCenter;
+
+        width: 70;
+        height: 25;
+
+        hasText: true;
+        hasIcon: false;
+
+        visible: textNoConnection.visible;
+
+        textButton: "Refresh";
+
+        backgroundColor: Style.imagingToolsGradient1;
+        borderColor: (refreshButton.highlighted || refreshButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
+
+        onClicked: {
+            refreshButton.enabled = false;
+            thubnailDecoratorContainer.updateModels();
+        }
+    }
+
     MenuPanel {
         id: menuPanel;
 

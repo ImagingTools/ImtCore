@@ -61,7 +61,8 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 	if (m_productCollectionPtr != nullptr){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
-		QByteArray productCollectionId = FindProductByName(m_productId);
+//		QByteArray productCollectionId = FindProductByName(m_productId);
+		QByteArray productCollectionId = m_productId;
 
 		if (m_productCollectionPtr->GetObjectData(productCollectionId, dataPtr)){
 			const imtlic::IProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());

@@ -75,6 +75,12 @@ Item {
     function menuActivated(menuId) {
         if (menuId === "Duplicate"){
             var dataModelLocal = installationCollectionView.collectionViewModel.GetData("data");
+            var currentName = dataModelLocal.GetData("Name", installationCollectionView.selectedIndex);
+            var currentId = dataModelLocal.GetData("Id", installationCollectionView.selectedIndex);
+            var name = "Copy of " + currentName;
+
+            installationCollectionContainer.multiDocViewItem.addToHeadersArray(currentId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", "Copy")
+
         }
         else{
             installationCollectionView.menuActivated(menuId)

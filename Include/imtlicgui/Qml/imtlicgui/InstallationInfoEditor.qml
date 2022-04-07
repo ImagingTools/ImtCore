@@ -38,7 +38,9 @@ Rectangle {
         console.log("InstallationInfoEditor onFocusChanged", containerInstallation.focus);
 
         if (containerInstallation.focus){
-            instanceIdText.setFocus(true);
+            //instanceIdText.setFocus(true);
+
+            tfcInstance.forceActiveFocus();
         }
     }
 
@@ -79,16 +81,13 @@ Rectangle {
 
     onActiveLicensesChanged: {
         console.log("InstallationInfoEditor onActiveLicensesChanged");
-
         if (!containerInstallation.installationInfoModel){
             return;
         }
 
         var licenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
-
         if (licenses && licenses.GetItemsCount() > 0){
             var index;
-
             var count =  containerInstallation.activeLicenses.GetItemsCount();
             for (var i = 0; i < count; i++){
                 var curId = containerInstallation.activeLicenses.GetData("Id", i);
@@ -225,11 +224,14 @@ Rectangle {
         containerInstallation.rootItem.setModeMenuButton("New", "Normal");
         containerInstallation.rootItem.setModeMenuButton("Close", "Normal");
 
-        if (containerInstallation.wasChanged){
-            containerInstallation.rootItem.setModeMenuButton("Save", "Normal");
-        } else {
-            containerInstallation.rootItem.setModeMenuButton("Save", "Disabled");
-        }
+        containerInstallation.rootItem.setModeMenuButton("Save", "Normal");
+
+//        if (containerInstallation.wasChanged){
+//            containerInstallation.rootItem.setModeMenuButton("Save", "Normal");
+//        }
+//        else {
+//            containerInstallation.rootItem.setModeMenuButton("Save", "Disabled");
+//        }
     }
 
     Flickable {
@@ -286,14 +288,20 @@ Rectangle {
                          containerInstallation.wasChanged = true;
                      }
 
-                     onFocusChanged: {
-                         if (instanceIdText.focus){
-                             instanceIdText.setFocus(true);
-                         }
-                     }
-
-                     KeyNavigation.tab: customerCB;
+//                     onFocusChanged: {
+//                         if (instanceIdText.focus){
+//                             instanceIdText.setFocus(true);
+//                         }
+//                     }
                  }
+
+                 onFocusChanged: {
+                     if (tfcInstance.focus){
+                         instanceIdText.setFocus(true);
+                     }
+                 }
+
+                 KeyNavigation.tab: customerCB;
              }
 
              Text {
@@ -337,8 +345,8 @@ Rectangle {
 
 //                     backgroundColor: "#d0d0d0";
 //                     borderColor: Style.alternateBaseColor;
-                     borderColor: customerCB.focus ? Style.iconColorOnSelected :
-                                                                     Style.alternateBaseColor;
+//                     borderColor: customerCB.focus ? Style.iconColorOnSelected :
+//                                                                     Style.alternateBaseColor;
 
                      textCentered: false;
 
@@ -350,11 +358,14 @@ Rectangle {
                              console.log('Key space was pressed');
                              customerCB.clicked();
                          }
-                         else if (event.key === Qt.Key_Tab){
-                             console.log('Key tab was pressed')
-                             productCB.forceActiveFocus();
-                         }
+//                         else if (event.key === Qt.Key_Tab){
+//                             console.log('Key tab was pressed')
+//                             productCB.forceActiveFocus();
+//                         }
                      }
+
+                     KeyNavigation.tab: productCB;
+                     KeyNavigation.backtab: tfcInstance;
 
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor customerCB onCurrentIndexChanged");
@@ -424,8 +435,8 @@ Rectangle {
 
 //                     borderColor: Style.alternateBaseColor;
                      textCentered: false;
-                     borderColor: productCB.focus ? Style.iconColorOnSelected :
-                                                                     Style.alternateBaseColor;
+//                     borderColor: productCB.focus ? Style.iconColorOnSelected :
+//                                                                     Style.alternateBaseColor;
 
                      property bool wasFocus: false;
 
@@ -435,13 +446,16 @@ Rectangle {
                              console.log('Key space was pressed');
                              productCB.clicked();
                          }
-                         else if (event.key === Qt.Key_Tab){
-                             console.log('Key tab was pressed')
-//                             licensesTable.forceActiveFocus();
+//                         else if (event.key === Qt.Key_Tab){
+//                             console.log('Key tab was pressed')
+////                             licensesTable.forceActiveFocus();
 
-                             instanceIdText.forceActiveFocus();
-                         }
+//                             instanceIdText.forceActiveFocus();
+//                         }
                      }
+
+                     KeyNavigation.tab: tfcInstance;
+                     KeyNavigation.backtab: customerCB;
 
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor productCB onCurrentIndexChanged");
@@ -831,22 +845,26 @@ Rectangle {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            if (containerInstallation.operation == "New") {
-                containerInstallation.gqlModelQueryType = "InstallationAdd";
-                containerInstallation.gqlModelQueryTypeNotification = "addedNotification";
-                query = Gql.GqlRequest("query", "InstallationAdd");
-                queryFields = Gql.GqlObject("addedNotification");
-
-                //containerInstallation.itemId = instanceIdText.text;
-                containerInstallation.itemName = newName;
-            }
-            else {
+            if (containerInstallation.operation == "Open"){
                 containerInstallation.gqlModelQueryType = "InstallationUpdate";
                 containerInstallation.gqlModelQueryTypeNotification = "updatedNotification";
                 query = Gql.GqlRequest("query", "InstallationUpdate");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", containerInstallation.itemId);
                 queryFields = Gql.GqlObject("updatedNotification");
+            }
+            else{
+                containerInstallation.gqlModelQueryType = "InstallationAdd";
+                containerInstallation.gqlModelQueryTypeNotification = "addedNotification";
+                query = Gql.GqlRequest("query", "InstallationAdd");
+                queryFields = Gql.GqlObject("addedNotification");
+
+                if (newName){
+                    containerInstallation.itemName = newName;
+                }
+//                else{
+//                    containerInstallation.itemName = newName;
+//                }
             }
 
             query.AddParam(inputParams);

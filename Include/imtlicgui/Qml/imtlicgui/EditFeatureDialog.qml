@@ -313,6 +313,7 @@ Rectangle {
 //                }
 
                 KeyNavigation.tab: okButton;
+                KeyNavigation.backtab: tfcFeatureName;
             }
         }
 

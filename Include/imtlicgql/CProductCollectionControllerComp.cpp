@@ -16,7 +16,9 @@ namespace imtlicgql
 {
 
 
-QVariant CProductCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
+QVariant CProductCollectionControllerComp::GetObjectInformation(
+		const QByteArray &informationId,
+		const QByteArray &objectId) const
 {
 	idoc::CStandardDocumentMetaInfo metaInfo;
 	if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
@@ -30,6 +32,7 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(const QByteArray
 
 	return QVariant();
 }
+
 
 imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
@@ -77,22 +80,19 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 
 		if (licensePtr != nullptr){
 			QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
-
 			index = metaInfoModel->InsertNewItem();
 			metaInfoModel->SetData("Name", "Licenses", index);
 			childs = metaInfoModel->AddTreeModel("Childs", index);
 			int childIndex;
-
 			for (const QByteArray& licenseCollectionId : licenseCollectionIds){
 				childIndex = childs->InsertNewItem();
 				QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-				childs->SetData("Value", licenseName, childIndex);
+				QString value = licenseName + " (" + licenseCollectionId + ")";
+				childs->SetData("Value", value, childIndex);
 			}
 		}
-
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

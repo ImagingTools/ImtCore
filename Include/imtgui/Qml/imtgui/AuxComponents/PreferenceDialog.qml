@@ -6,7 +6,7 @@ Rectangle {
     id: preferenceContainer;
 
     width: 450;
-    height: 500;
+    height: 480;
 
     radius: 3;
 
