@@ -518,69 +518,6 @@ CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo
 }
 
 
-void CObjectCollectionViewComp::UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId, QAbstractTableModel* modelPtr)
-{
-	imtbase::IObjectCollection* objectCollectionPtr = GetObservedObject();
-	Q_ASSERT(objectCollectionPtr != nullptr);
-
-	int row = -1;
-	for (int i = 0; i < modelPtr->rowCount(); i++){
-		if (modelPtr->data(modelPtr->index(i, 0), DR_OBJECT_ID) == objectId){
-			row = i;
-			break;
-		}
-	}
-
-	QByteArray itemTypeId = objectCollectionPtr->GetObjectTypeId(objectId);
-
-	ObjectMetaInfo metaInfo = GetMetaInfo(objectId, itemTypeId);
-	if (metaInfo.isEmpty()){
-		return;
-	}
-
-	if (row == -1){
-		modelPtr->insertRow(modelPtr->rowCount());
-
-		row = modelPtr->rowCount() - 1;
-
-		QModelIndex index = modelPtr->index(row, 0);
-
-		modelPtr->setData(index, objectId, DR_OBJECT_ID);
-		modelPtr->setData(index, objectCollectionPtr->GetObjectTypeId(objectId), DR_TYPE_ID);
-
-		//for (int i = 0; i < columns.count(); i++){
-		//	columns[i]->setFlags(flags);
-		//}
-	}
-
-	Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-	if (objectCollectionPtr->GetOperationFlags(objectId) & imtbase::IObjectCollection::OF_SUPPORT_EDIT){
-		flags |= Qt::ItemIsEditable;
-	}
-
-	for (int i = 0; i < metaInfo.count(); i++){
-		QModelIndex index = modelPtr->index(row, i);
-
-		modelPtr->setData(index, metaInfo[i].text, Qt::DisplayRole);
-		modelPtr->setData(index, metaInfo[i].sortValue, DR_SORT_VALUE);
-		if (!metaInfo[i].icon.isNull()){
-			modelPtr->setData(index, metaInfo[i].icon, Qt::DecorationRole);
-		}
-	}
-}
-
-
-void CObjectCollectionViewComp::RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId)
-{
-	for (int i = 0; i < m_tableModel.rowCount(); i++){
-		if (m_tableModel.data(m_tableModel.index(i, 0), DR_OBJECT_ID) == objectId){
-			m_tableModel.removeRow(i);
-			break;
-		}
-	}
-}
-
-
 void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 {
 	ColumnsList columnsList;
@@ -816,7 +753,7 @@ void CObjectCollectionViewComp::ReadCollection(QStandardItemModel* typeModelPtr,
 			int count = collectionItemIds.count();
 
 			for (int i = 0; i < count; i++){
-				UpdateItem(collectionItemIds[i], &m_tableModel);
+				m_tableModel.UpdateItem(collectionItemIds[i]);
 
 				if (*m_useAsyncReadAttrPtr && *m_viewProgressAttrPtr){
 					int currentProgress = i * 100 / count;
@@ -1317,25 +1254,9 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 			QByteArray lastTypeId = m_currentTypeId;
 
 			istd::IChangeable::ChangeInfoMap changeInfoMap = changeSet.GetChangeInfoMap();
-			if (changeInfoMap.contains(imtbase::IObjectCollection::s_cidRemoved)){
-				RemoveItem(changeInfoMap[imtbase::IObjectCollection::s_cidRemoved].toByteArray());
-			}
-
-			if (changeInfoMap.contains(imtbase::IObjectCollection::s_cidAdded)){
-				UpdateItem(changeInfoMap[imtbase::IObjectCollection::s_cidAdded].toByteArray(), &m_tableModel);
-				if (!m_itemsSelection.isEmpty()){
-					UpdateCommands();
-				}
-			}
-
-			if (changeInfoMap.contains(imtbase::IObjectCollection::s_cidUpdated)){
-				UpdateItem(changeInfoMap[imtbase::IObjectCollection::s_cidUpdated].toByteArray(), &m_tableModel);
-				if (!m_itemsSelection.isEmpty()){
-					UpdateCommands();
-				}
-			}
 
 			if (changeInfoMap.isEmpty()){
+
 				TypeList->clear();
 
 				QTreeWidgetItem* activeTypeItemPtr = nullptr;
@@ -1545,34 +1466,117 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 
 CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& parent)
 	:m_fetchedRowCount(0),
-	m_totalRowCount(0),
-	m_batchSize(100),
-	m_parent(parent)
+	  m_totalRowCount(0),
+	  m_batchSize(100),
+	  m_parent(parent)
 {
 }
 
 
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes)
 {
-	beginResetModel();
+	istd::IChangeable::ChangeInfoMap changeInfoMap = changes.GetChangeInfoMap();
+	bool is_all_updated = false;
+	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_REMOVED_NOTIFICATION)){
+		RemoveItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_REMOVED_NOTIFICATION].toByteArray());
+		is_all_updated = true;
+	}
 
-	m_totalRowCount = collection.GetElementsCount();
-	m_fetchedRowCount = 0;
-	m_ids.clear();
+	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_ADDED_NOTIFICATION)){
+		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_ADDED_NOTIFICATION].toByteArray());
+		if (!m_parent.m_itemsSelection.isEmpty()){
+			m_parent.UpdateCommands();
+		}
+		is_all_updated = true;
+	}
 
-	m_metaInfo.clear();
-	m_metaInfoMap.clear();
+	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_UPDATED_NOTIFICATION)){
+		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_UPDATED_NOTIFICATION].toByteArray());
+		if (!m_parent.m_itemsSelection.isEmpty()){
+			m_parent.UpdateCommands();
+		}
+		is_all_updated = true;
+	}
 
-	if (m_totalRowCount > 0){
-		imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1);
-		if (!elementIds.isEmpty()){
-			QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
+	if (!is_all_updated){
+		beginResetModel();
 
-			m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
+		m_totalRowCount = collection.GetElementsCount();
+		m_fetchedRowCount = 0;
+		m_ids.clear();
+
+		m_metaInfo.clear();
+		m_metaInfoMap.clear();
+
+		if (m_totalRowCount > 0){
+			imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1);
+			if (!elementIds.isEmpty()){
+				QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
+
+				m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
+			}
+		}
+		endResetModel();
+	}
+}
+
+
+void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId)
+{
+	imtbase::IObjectCollection* objectCollectionPtr = m_parent.GetObservedObject();
+	Q_ASSERT(objectCollectionPtr != nullptr);
+
+	int row = -1;
+	for (int i = 0; i < rowCount(); i++){
+		if (data(index(i, 0), DR_OBJECT_ID) == objectId){
+			row = i;
+			break;
 		}
 	}
 
-	endResetModel();
+	QByteArray itemTypeId = objectCollectionPtr->GetObjectTypeId(objectId);
+
+	ObjectMetaInfo metaInfo = m_parent.GetMetaInfo(objectId, itemTypeId);
+	if (metaInfo.isEmpty()){
+		return;
+	}
+
+	if (row == -1){
+		this->insertRow(rowCount());
+
+		row = rowCount() - 1;
+
+		QModelIndex modelIndex = index(row, 0);
+
+		setData(modelIndex, objectId, DR_OBJECT_ID);
+		setData(modelIndex, objectCollectionPtr->GetObjectTypeId(objectId), DR_TYPE_ID);
+	}
+
+	Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	if (objectCollectionPtr->GetOperationFlags(objectId) & imtbase::IObjectCollection::OF_SUPPORT_EDIT){
+		flags |= Qt::ItemIsEditable;
+	}
+
+	for (int i = 0; i < metaInfo.count(); i++){
+		QModelIndex modelIndex = index(row, i);
+
+		this->setData(modelIndex, metaInfo[i].text, Qt::DisplayRole);
+		this->setData(modelIndex, metaInfo[i].sortValue, DR_SORT_VALUE);
+		if (!metaInfo[i].icon.isNull()){
+			this->setData(modelIndex, metaInfo[i].icon, Qt::DecorationRole);
+		}
+	}
+}
+
+
+void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId)
+{
+	for (int i = 0; i < rowCount(); i++){
+		if (data(index(i, 0), DR_OBJECT_ID) == objectId){
+			removeRow(i);
+			break;
+		}
+	}
 }
 
 

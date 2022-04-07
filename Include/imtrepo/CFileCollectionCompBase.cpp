@@ -308,7 +308,7 @@ bool CFileCollectionCompBase::UpdateFile(
 		locker.relock();
 
 		static ChangeSet changes(CF_UPDATED);
-		changes.SetChangeInfo(s_cidUpdated, objectId);
+		changes.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		m_files[fileIndex].CopyFrom(collectionItem);
@@ -601,7 +601,7 @@ void CFileCollectionCompBase::SetObjectDescription(const QByteArray& objectId, c
 
 		if (oldDescription != objectDescription){
 			static ChangeSet changes(CF_UPDATED);
-			changes.SetChangeInfo(s_cidAdded, objectId);
+			changes.SetChangeInfo(CN_OBJECT_ADDED_NOTIFICATION, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			item.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
@@ -1205,7 +1205,7 @@ bool CFileCollectionCompBase::FinishInsertFileTransaction(
 		if (result){
 			{
 				static ChangeSet changes(CF_ADDED);
-				changes.SetChangeInfo(s_cidAdded, fileId);
+				changes.SetChangeInfo(CN_OBJECT_ADDED_NOTIFICATION, fileId);
 				istd::CChangeNotifier changeNotifier(this, &changes);
 
 				QWriteLocker locker(&m_filesLock);

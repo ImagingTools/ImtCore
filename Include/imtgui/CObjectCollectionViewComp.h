@@ -187,9 +187,6 @@ private:
 	QStringList GetMetaInfoHeaders(const QByteArray& typeId) const;
 	ObjectMetaInfo GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const;
 
-	void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId, QAbstractTableModel* modelPtr);
-	void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
-
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();
 	void ValidateSectionSize(int logicalIndex, int newSize);
@@ -266,12 +263,15 @@ private:
 	public:
 		TableModel(CObjectCollectionViewComp& parent);
 		void UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes);
+		void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId);
+		void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 
 		// reimplemented (QAbstractTableModel)
 		virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
 		virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 		virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 		virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+
 	protected:
 		// reimplemented (QAbstractTableModel)
 		virtual bool canFetchMore(const QModelIndex &parent) const override;

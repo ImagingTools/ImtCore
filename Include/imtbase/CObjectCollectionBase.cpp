@@ -165,7 +165,7 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 
 		if (InsertObjectIntoCollection(info)){
 			istd::IChangeable::ChangeSet changeSet(CF_ADDED);
-			changeSet.SetChangeInfo(s_cidAdded, info.id);
+			changeSet.SetChangeInfo(CN_OBJECT_ADDED_NOTIFICATION, info.id);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			return info.id;
@@ -181,7 +181,7 @@ bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == objectId){
 			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-			changeSet.SetChangeInfo(s_cidRemoved, objectId);
+			changeSet.SetChangeInfo(CN_OBJECT_REMOVED_NOTIFICATION, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>((*iter).objectPtr.GetPtr());
@@ -240,7 +240,7 @@ bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
 			istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-			changeSet.SetChangeInfo(s_cidUpdated, objectId);
+			changeSet.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			return objectInfo.objectPtr->CopyFrom(object, mode);
@@ -257,7 +257,7 @@ void CObjectCollectionBase::SetObjectName(const QByteArray& objectId, const QStr
 		if (objectInfo.id == objectId){
 			if (objectInfo.name != objectName){
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(s_cidUpdated, objectId);
+				changeSet.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.name = objectName;
@@ -273,7 +273,7 @@ void CObjectCollectionBase::SetObjectDescription(const QByteArray& objectId, con
 		if (objectInfo.id == objectId){
 			if (objectInfo.description!= objectDescription) {
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(s_cidUpdated, objectId);
+				changeSet.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.description = objectDescription;
@@ -289,7 +289,7 @@ void CObjectCollectionBase::SetObjectEnabled(const QByteArray& objectId, bool is
 		if (objectInfo.id == objectId){
 			if (objectInfo.isEnabled != isEnabled) {
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(s_cidUpdated, objectId);
+				changeSet.SetChangeInfo(CN_OBJECT_UPDATED_NOTIFICATION, objectId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.isEnabled = isEnabled;

@@ -26,9 +26,9 @@ class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
 	// Change info ids
-	static const QByteArray s_cidRemoved;
-	static const QByteArray s_cidAdded;
-	static const QByteArray s_cidUpdated;
+	static const QByteArray CN_OBJECT_REMOVED_NOTIFICATION;
+	static const QByteArray CN_OBJECT_ADDED_NOTIFICATION;
+	static const QByteArray CN_OBJECT_UPDATED_NOTIFICATION;
 
 	class DataPtr
 	{

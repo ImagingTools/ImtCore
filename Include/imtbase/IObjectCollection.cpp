@@ -5,9 +5,9 @@ namespace imtbase
 {
 
 
-const QByteArray IObjectCollection::s_cidRemoved = QByteArrayLiteral("imtbase:IObjectCollection::Removed");
-const QByteArray IObjectCollection::s_cidAdded = QByteArrayLiteral("imtbase:IObjectCollection::Added");
-const QByteArray IObjectCollection::s_cidUpdated = QByteArrayLiteral("imtbase:IObjectCollection::Updated");
+const QByteArray IObjectCollection::CN_OBJECT_REMOVED_NOTIFICATION = QByteArrayLiteral("imtbase:IObjectCollection::Removed");
+const QByteArray IObjectCollection::CN_OBJECT_ADDED_NOTIFICATION = QByteArrayLiteral("imtbase:IObjectCollection::Added");
+const QByteArray IObjectCollection::CN_OBJECT_UPDATED_NOTIFICATION = QByteArrayLiteral("imtbase:IObjectCollection::Updated");
 
 
 } // namespace imtbase
