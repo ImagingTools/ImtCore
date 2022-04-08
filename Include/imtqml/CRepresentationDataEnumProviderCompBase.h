@@ -32,7 +32,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRepresentationDataEnumProviderCompBase);
 		I_REGISTER_INTERFACE(imtbase::IBinaryDataProvider);
-		I_ASSIGN(m_dataIdAttrPtr, "Data Id", "Data Id", true, "");
+		I_ASSIGN(m_dataIdAttrPtr, "DataId", "Data Id", true, "");
 	I_END_COMPONENT;
 
 	CRepresentationDataEnumProviderCompBase() : BaseClass() {}

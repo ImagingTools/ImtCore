@@ -11,29 +11,29 @@ namespace ImtGuiGqlPck
 
 I_EXPORT_PACKAGE(
 			"ImtGuiGqlPck",
-			"ImagingTools core framework Gql-component package",
-			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
+			"ImagingTools core framework GraphQL-component package",
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") "GraphQL");
 
 I_EXPORT_COMPONENT(
 			PagesDataController,
 			"Pages data controller",
-			"Pages Data Controller");
+			"Pages Data Controller" IM_AUTHOR("\"Viktor Shcherbina\""));
 
 I_EXPORT_COMPONENT(
 			CommandsDataController,
 			"Commands data controller",
-			"Commands Data Controller");
+			"Commands Data Controller" IM_AUTHOR("\"Viktor Shcherbina\""));
 
 
 I_EXPORT_COMPONENT(
 			GetStyleDataController,
-			"Get Style data controller",
-			"Style Data Controller");
+			"Controller providing application style in GraphQL representation",
+			"Style Data Controller" IM_AUTHOR("\"Viktor Shcherbina\""));
 
 I_EXPORT_COMPONENT(
 			SettingsController,
-			"Settings controller",
-			"Settings Controller");
+			"Provider of GraphQL data respresentation for the application settings",
+			"Application Settings Controller" IM_TAG("Client GraphQL Server") IM_AUTHOR("\"Viktor Shcherbina\""));
 
 
 } // namespace ImtGuiGqlPck

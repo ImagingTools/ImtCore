@@ -2,8 +2,8 @@
 
 
 // ImtCore includes
-#include <imtrest/CHttpServletCompBase.h>
 #include <imtrest/IProtocolEngine.h>
+#include <imtrest/CHttpServletCompBase.h>
 #include <imtgql/IGqlRepresentationDataController.h>
 
 
@@ -17,7 +17,6 @@ public:
 	typedef imtrest::CHttpServletCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
-		I_REGISTER_INTERFACE(imtrest::CHttpServletCompBase);
 		I_ASSIGN_MULTI_0(m_gqlRepresentationDataControllerCompPtr, "GqlRepresentationDataController", "Gql representationDataController", true);
 	I_END_COMPONENT;
 
