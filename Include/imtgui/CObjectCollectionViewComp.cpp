@@ -1536,9 +1536,13 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 	if (metaInfo.isEmpty()){
 		return;
 	}
+	else{
+		m_metaInfo = metaInfo;
+		m_metaInfoMap[objectId] = m_metaInfo;
+	}
 
 	if (row == -1){
-		this->insertRow(rowCount());
+		insertRow(rowCount());
 
 		row = rowCount() - 1;
 
@@ -1546,6 +1550,9 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 
 		setData(modelIndex, objectId, DR_OBJECT_ID);
 		setData(modelIndex, objectCollectionPtr->GetObjectTypeId(objectId), DR_TYPE_ID);
+		m_totalRowCount++;
+		m_fetchedRowCount++;
+		m_ids.append(objectId);
 	}
 
 	Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -1556,10 +1563,10 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 	for (int i = 0; i < metaInfo.count(); i++){
 		QModelIndex modelIndex = index(row, i);
 
-		this->setData(modelIndex, metaInfo[i].text, Qt::DisplayRole);
-		this->setData(modelIndex, metaInfo[i].sortValue, DR_SORT_VALUE);
+		setData(modelIndex, metaInfo[i].text, Qt::DisplayRole);
+		setData(modelIndex, metaInfo[i].sortValue, DR_SORT_VALUE);
 		if (!metaInfo[i].icon.isNull()){
-			this->setData(modelIndex, metaInfo[i].icon, Qt::DecorationRole);
+			setData(modelIndex, metaInfo[i].icon, Qt::DecorationRole);
 		}
 	}
 }
@@ -1570,6 +1577,10 @@ void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCol
 	for (int i = 0; i < rowCount(); i++){
 		if (data(index(i, 0), DR_OBJECT_ID) == objectId){
 			removeRow(i);
+			m_totalRowCount -=1;
+			m_fetchedRowCount -=1;
+			m_ids.removeOne(objectId);
+			m_metaInfoMap.remove(objectId);
 			break;
 		}
 	}
