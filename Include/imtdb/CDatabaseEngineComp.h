@@ -91,6 +91,13 @@ private:
 	 */
 	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
 
+	bool EnsureDatabaseCreated() const;
+
+	/**
+		Check if the database server is connected.
+	*/
+	bool IsDatabaseServerConnected() const;
+
 	QString GetDatabaseName() const;
 	QString GetHostName() const;
 	int GetPort() const;

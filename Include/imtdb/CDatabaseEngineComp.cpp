@@ -207,9 +207,6 @@ bool CDatabaseEngineComp::OpenDatabase() const
 	}
 	databaseConnection.setDatabaseName(databaseName);
 	retVal = databaseConnection.open();
-	if (!retVal){
-		SendErrorMessage(0, "Database could not be connected", "Database engine");
-	}
 
 	return retVal;
 }
@@ -327,11 +324,7 @@ bool CDatabaseEngineComp::CreateTables() const
 
 void CDatabaseEngineComp::OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr)
 {
-	bool isOpened = OpenDatabase();
-
-	if (!isOpened || *m_autoCreateDatabaseAttrPtr == 2){
-		CreateDatabase();
-	}
+	EnsureDatabaseCreated();
 
 	Q_ASSERT(databaseAccessSettingsPtr != nullptr);
 	if (databaseAccessSettingsPtr != nullptr){
@@ -346,7 +339,12 @@ void CDatabaseEngineComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CDatabaseEngineComp::OnDatabaseAccessChanged);
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		m_databaseAccessObserver.RegisterObject(m_databaseAccessSettingsCompPtr.GetPtr(), &CDatabaseEngineComp::OnDatabaseAccessChanged);
+	}
+	else{
+		EnsureDatabaseCreated();
+	}
 }
 
 
@@ -373,6 +371,8 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 			qCritical() << __FILE__ << __LINE__
 						<< "\n\t| Unable to open database"
 						<< "\n\t| Error: " << databaseConnection.lastError().text();
+
+			SendErrorMessage(0, QString("Database '%1' could not be connected").arg(GetDatabaseName()), "Database engine");
 		}
 	}
 
@@ -381,6 +381,27 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 	}
 
 	return isOpened;
+}
+
+
+bool CDatabaseEngineComp::EnsureDatabaseCreated() const
+{
+	bool isOpened = OpenDatabase();
+	if (!isOpened) {
+		bool isServerConnected = IsDatabaseServerConnected();
+		if (isServerConnected) {
+			if (*m_autoCreateDatabaseAttrPtr >= 1){
+				return CreateDatabase();
+			}
+		}
+	}
+	else {
+		if (*m_autoCreateDatabaseAttrPtr == 2){
+			return CreateDatabase();
+		}
+	}
+
+	return true;
 }
 
 
@@ -393,6 +414,23 @@ QString CDatabaseEngineComp::GetConnectionName() const
 	}
 
 	return GetDatabaseName() + QString(" - %1").arg(threadId);
+}
+
+
+bool CDatabaseEngineComp::IsDatabaseServerConnected() const
+{
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+	maintainanceDb.setHostName(GetHostName());
+	maintainanceDb.setUserName(GetUserName());
+	maintainanceDb.setPassword(GetPassword());
+	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
+	maintainanceDb.setPort(GetPort());
+
+	bool isConnected = maintainanceDb.open();
+
+	maintainanceDb.close();
+
+	return isConnected;
 }
 
 
