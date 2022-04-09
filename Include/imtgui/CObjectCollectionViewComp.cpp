@@ -1256,7 +1256,6 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 			istd::IChangeable::ChangeInfoMap changeInfoMap = changeSet.GetChangeInfoMap();
 
 			if (changeInfoMap.isEmpty()){
-
 				TypeList->clear();
 
 				QTreeWidgetItem* activeTypeItemPtr = nullptr;

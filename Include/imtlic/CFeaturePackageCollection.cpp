@@ -13,7 +13,9 @@ namespace imtlic
 
 CFeaturePackageCollection::CFeaturePackageCollection()
 {
-	RegisterFactory(new istd::TSingleFactory<istd::IChangeable, imtlic::CFeaturePackage>("FeaturePackage"), true);
+	typedef istd::TSingleFactory<istd::IChangeable, imtlic::CFeaturePackage> FactoryImpl;
+
+	RegisterFactory<FactoryImpl>("FeaturePackage");
 }
 
 

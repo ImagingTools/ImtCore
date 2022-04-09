@@ -105,7 +105,9 @@ inline TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::TAggergatedOb
 {
 	m_collection.AttachObserver(&m_updateBridge);
 
-	m_collection.RegisterFactory(new istd::TSingleFactory<istd::IChangeable, imod::TModelWrap<ObjectImpl>>(typeId), true);
+	typedef istd::TSingleFactory<istd::IChangeable, imod::TModelWrap<ObjectImpl>> FactoryImpl;
+
+	m_collection.RegisterFactory<FactoryImpl>(typeId);
 
 	m_types.InsertOption(typeName, typeId);
 }
