@@ -361,7 +361,6 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(m_renameShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnRenameShortCut);
 
 	ItemList->setContextMenuPolicy(Qt::CustomContextMenu);
-	//	ItemList->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ItemList->header()->setFirstSectionMovable(true);
 	ItemList->installEventFilter(this);
 
@@ -561,7 +560,11 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 		fieldIds.append(tempFieldId);
 	}
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+	QSet<QString> fieldSet(fieldIds.begin(), fieldIds.end());
+#else
 	QSet<QString> fieldSet = fieldIds.toSet();
+#endif
 
 	// Compare restored column set with actual column set:
 	bool compareOk = true;
@@ -1465,9 +1468,9 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 
 CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& parent)
 	:m_fetchedRowCount(0),
-	  m_totalRowCount(0),
-	  m_batchSize(100),
-	  m_parent(parent)
+	m_totalRowCount(0),
+	 m_batchSize(100),
+	m_parent(parent)
 {
 }
 
@@ -1541,32 +1544,16 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 	}
 
 	if (row == -1){
+		beginInsertRows(QModelIndex(), rowCount(), rowCount());
+
 		insertRow(rowCount());
 
-		row = rowCount() - 1;
-
-		QModelIndex modelIndex = index(row, 0);
-
-		setData(modelIndex, objectId, DR_OBJECT_ID);
-		setData(modelIndex, objectCollectionPtr->GetObjectTypeId(objectId), DR_TYPE_ID);
 		m_totalRowCount++;
 		m_fetchedRowCount++;
-		m_ids.append(objectId);
-	}
 
-	Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-	if (objectCollectionPtr->GetOperationFlags(objectId) & imtbase::IObjectCollection::OF_SUPPORT_EDIT){
-		flags |= Qt::ItemIsEditable;
-	}
+		m_ids.push_back(objectId);
 
-	for (int i = 0; i < metaInfo.count(); i++){
-		QModelIndex modelIndex = index(row, i);
-
-		setData(modelIndex, metaInfo[i].text, Qt::DisplayRole);
-		setData(modelIndex, metaInfo[i].sortValue, DR_SORT_VALUE);
-		if (!metaInfo[i].icon.isNull()){
-			setData(modelIndex, metaInfo[i].icon, Qt::DecorationRole);
-		}
+		endInsertRows();
 	}
 }
 
@@ -1658,6 +1645,31 @@ QVariant CObjectCollectionViewComp::TableModel::headerData(int section, Qt::Orie
 	}
 
 	return QVariant();
+}
+
+
+Qt::ItemFlags CObjectCollectionViewComp::TableModel::flags(const QModelIndex& index) const
+{
+	imtbase::IObjectCollection* collectionPtr = m_parent.GetObservedObject();
+	if (collectionPtr == nullptr) {
+		return Qt::NoItemFlags;
+	}
+
+	int rowIndex = index.row();
+	if (rowIndex  < 0){
+		return Qt::NoItemFlags;
+	}
+
+	Q_ASSERT(rowIndex < m_ids.count());
+
+	QByteArray objectId = m_ids[rowIndex];
+
+	Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+	if (collectionPtr->GetOperationFlags(objectId) & imtbase::IObjectCollection::OF_SUPPORT_EDIT) {
+		flags |= Qt::ItemIsEditable;
+	}
+
+	return flags;
 }
 
 

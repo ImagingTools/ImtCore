@@ -168,7 +168,10 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 		return nullptr;
 	}
 
-	istd::CChangeNotifier changeNotifier(this);
+	istd::IChangeable::ChangeSet changeSet(CF_ADDED);
+	changeSet.SetChangeInfo(CN_OBJECT_ADDED, objectId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (ExecuteTransaction(objectQuery.query)){
 		return objectId;
@@ -194,7 +197,10 @@ bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 		return false;
 	}
 
-	istd::CChangeNotifier changeNotifier(this);
+	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+	changeSet.SetChangeInfo(CN_OBJECT_REMOVED, objectId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (ExecuteTransaction(query)){
 		return true;
@@ -223,7 +229,10 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 		return false;
 	}
 
-	istd::CChangeNotifier changeNotifier(this);
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (ExecuteTransaction(query)){
 		return true;
@@ -248,8 +257,11 @@ void CSqlDatabaseObjectCollectionComp::SetObjectName(const QByteArray& objectId,
 
 		return;
 	}
-	
-	istd::CChangeNotifier changeNotifier(this);
+
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (!ExecuteTransaction(query)){
 		changeNotifier.Abort();
@@ -269,8 +281,11 @@ void CSqlDatabaseObjectCollectionComp::SetObjectDescription(const QByteArray& ob
 
 		return;
 	}
-	
-	istd::CChangeNotifier changeNotifier(this);
+
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (!ExecuteTransaction(query)){
 		changeNotifier.Abort();
