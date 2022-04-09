@@ -1,14 +1,10 @@
 #pragma once
 
 
-// Qt includes
-#include <QtSql/QtSql>
-
 // ACF includes
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
-#include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IObjectCollection.h>
 
 
