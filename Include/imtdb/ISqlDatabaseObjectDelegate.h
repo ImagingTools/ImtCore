@@ -5,6 +5,7 @@
 #include <QtSql/QSqlRecord>
 
 // ImtCore includes
+#include <imtbase/IMetaInfoCreator.h>
 #include <imtdb/IDatabaseObjectDelegate.h>
 
 
