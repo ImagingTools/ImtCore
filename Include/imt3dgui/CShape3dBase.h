@@ -2,7 +2,14 @@
 
 
 // Qt includes
+#include <QtCore>
+
+#if QT_VERSION < 0x060000
 #include <QtGui/QOpenGLBuffer>
+#else
+#include <QtOpenGL/QOpenGLBuffer>
+#endif
+
 #include <QtGui/QOpenGLFunctions>
 
 // ACF includes

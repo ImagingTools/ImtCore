@@ -26,7 +26,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp
 			}
 			else if (informationId == QByteArray("Birthday")){
 				QDate birthday = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_BIRTHDAY).toDate();
-				result.text = birthday.toString(Qt::DateFormat::SystemLocaleDate);
+				QLocale locale;
+				result.text = locale.toString(birthday, QLocale::ShortFormat);
 				result.sortValue = result.text;
 			}
 			else if (informationId == QByteArray("FirstName")){

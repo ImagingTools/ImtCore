@@ -3,7 +3,11 @@
 
 // Qt includes
 #include <QtGui/QPainter>
+#if QT_VERSION < 0x060000
 #include <QtGui/QOpenGLShaderProgram>
+#else
+#include <QtOpenGL/QOpenGLShaderProgram>
+#endif
 
 // ACF includes
 #include <istd/IPolymorphic.h>

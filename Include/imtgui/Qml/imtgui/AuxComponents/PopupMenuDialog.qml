@@ -1,5 +1,6 @@
 import QtQuick 2.12
-import QtGraphicalEffects 1.12
+//import QtGraphicalEffects 1.12
+import Qt5Compat.GraphicalEffects
 import Acf 1.0
 import imtqml 1.0
 
@@ -54,7 +55,7 @@ Item {
        verticalOffset: 2;
 
        radius: 4;
-       samples: 10;
+//       samples: 10;
        color: Style.shadowColor;
        source: mainBody;
     }

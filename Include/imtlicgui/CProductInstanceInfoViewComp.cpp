@@ -134,7 +134,8 @@ void CProductInstanceInfoViewComp::UpdateFeatureTree()
 
 			QDate date = licenseInstancePtr->GetExpiration().date();
 			if (date.isValid()){
-				licenseExpirationText = licenseInstancePtr->GetExpiration().date().toString(Qt::DateFormat::SystemLocaleDate);
+				QLocale locale;
+				licenseExpirationText = locale.toString(licenseInstancePtr->GetExpiration().date(), QLocale::ShortFormat);
 			}
 			else{
 				licenseExpirationText = tr("Unlimited");

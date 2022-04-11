@@ -68,8 +68,8 @@ int CObjPointCloudPersistenceComp::LoadFromFile(
 
 	while (!stream.atEnd()){
 		QString line = stream.readLine();
+		QStringList components = line.split(" ", Qt::SkipEmptyParts);
 
-		QStringList components = line.split(" ", QString::SkipEmptyParts);
 		if (components.count() >= 4){
 
 			QString valueKey = components[0].simplified();

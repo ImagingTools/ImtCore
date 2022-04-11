@@ -148,7 +148,7 @@ QFont CAxisShape::GetAxeLabelFont() const
 
 	QFont font("Verdana");
 	font.setPointSizeF(fontSize);
-	font.setWeight(80);
+	font.setWeight(QFont::Weight(80));
 
 	return font;
 }

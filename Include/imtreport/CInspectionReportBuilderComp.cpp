@@ -1,6 +1,9 @@
 #include <imtreport/CInspectionReportBuilderComp.h>
 
 
+// Qt includes
+#include <QtCore/QLocale>
+
 // ACF includes
 #include <i2d/CRectangle.h>
 
@@ -194,7 +197,9 @@ void CInspectionReportBuilderComp::AddHeader(const ReportInputData& reportData,
 	tablePtr->SetItem(0, 2, CTextTableItem(productName));
 
 	tablePtr->SetItem(1, 0, CTextTableItem(reportData.appVersion));
-	tablePtr->SetItem(1, 1, CTextTableItem(reportData.time.toString(Qt::DateFormat::SystemLocaleShortDate)));
+	QLocale locale;
+	QString dateTimeString = locale.toString(reportData.time,QLocale::ShortFormat);
+	tablePtr->SetItem(1, 1, CTextTableItem(dateTimeString));
 	tablePtr->SetItem(1, 2, CTextTableItem(GetStatusText(status), Qt::AlignLeft, CFont("Arial", 10.0, CFont::FF_BOLD), GetStatusColor(status)));
 
 	topLeft.SetY(topLeft.GetY() + tableHeight);

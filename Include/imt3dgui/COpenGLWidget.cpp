@@ -387,7 +387,7 @@ void COpenGLWidget::closeEvent(QCloseEvent* eventPtr)
 
 void COpenGLWidget::wheelEvent(QWheelEvent* eventPtr)
 {
-	if (eventPtr->delta() > 0){
+	if (eventPtr->pixelDelta().y() > 0 || eventPtr->angleDelta().y() > 0){
 		OnZoomIn();
 	}
 	else{

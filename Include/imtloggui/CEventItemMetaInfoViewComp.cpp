@@ -29,7 +29,8 @@ void CEventItemMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /
 		idoc::IDocumentMetaInfo* metaInfoPtr = GetObservedObject();
 		Q_ASSERT(metaInfoPtr != nullptr);
 
-		QList<int> types = metaInfoPtr->GetMetaInfoTypes().toList();
+		QSet<int> typesSet = metaInfoPtr->GetMetaInfoTypes();
+		QList<int> types(typesSet.begin(), typesSet.end());
 		std::sort(types.begin(), types.end());
 
 		for (int type : types){

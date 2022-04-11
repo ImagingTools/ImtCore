@@ -178,7 +178,7 @@ bool CMultiDocumentWorkspaceGuiCompBase::AddTab(const QString& name, iqtgui::IGu
 
 	QWidget* tabFrame = new QWidget;
 	QVBoxLayout* tabFrameLayout = new QVBoxLayout(tabFrame);
-	tabFrameLayout->setMargin(0);
+	tabFrameLayout->setContentsMargins(0,0,0,0);
 
 	m_fixedTabs.push_back(guiPtr);
 

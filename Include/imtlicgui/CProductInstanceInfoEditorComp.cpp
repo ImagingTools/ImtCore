@@ -183,7 +183,8 @@ void CProductInstanceInfoEditorComp::on_LicenseInstancesEdit_itemChanged(QTreeWi
 		}
 		else{
 			item->setData(1, Qt::UserRole, cachedDateTime);
-			item->setText(1, cachedDateTime.date().toString(Qt::DateFormat::SystemLocaleDate));
+			QLocale locale;
+			item->setText(1, locale.toString(cachedDateTime.date(), QLocale::ShortFormat));
 		}
 	}
 
@@ -355,7 +356,8 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 							QDate date = licenseInstancePtr->GetExpiration().date();
 							if (date.isValid()){
 								itemPtr->setCheckState(1, Qt::Checked);
-								itemPtr->setText(1, licenseInstancePtr->GetExpiration().date().toString(Qt::DateFormat::SystemLocaleDate));
+								QLocale locale;
+								itemPtr->setText(1, locale.toString(licenseInstancePtr->GetExpiration().date(), QLocale::ShortFormat));
 							}
 							else{
 								itemPtr->setCheckState(1, Qt::Unchecked);
@@ -463,7 +465,8 @@ void CProductInstanceInfoEditorComp::DateTimeDelegate::setModelData(QWidget* edi
 	if (dateEditPtr != nullptr){
 		if (index.column() == 1){
 			model->setData(index, dateEditPtr->dateTime(), Qt::UserRole);
-			model->setData(index, dateEditPtr->dateTime().date().toString(Qt::DateFormat::SystemLocaleDate), Qt::DisplayRole);
+			QLocale locale;
+			model->setData(index, locale.toString(dateEditPtr->dateTime().date(), QLocale::ShortFormat), Qt::DisplayRole);
 		}
 	}
 }

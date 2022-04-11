@@ -248,12 +248,21 @@ bool CDesignTokenBasedResourceProviderComp::StringToColor(const QString& colorSt
 	tempColorString.replace(" ", "");
 	tempColorString.replace("\t", "");
 
+#if QT_VERSION < 0x060000
 	QRegExp stdFormat("^#[0-9A-Fa-f]{6,6}$");
 	if (stdFormat.exactMatch(tempColorString)){
 		color = QColor(tempColorString);
 
 		return true;
 	}
+#else
+	QRegularExpression stdFormat("^#[0-9A-Fa-f]{6,6}$");
+	if (stdFormat.match(tempColorString).hasMatch()){
+		color = QColor(tempColorString);
+
+		return true;
+	}
+#endif
 
 	if (tempColorString.startsWith("rgba(") && tempColorString.endsWith(")")){
 		QStringList values = tempColorString.mid(5, tempColorString.count() - 6).split(QChar(','));

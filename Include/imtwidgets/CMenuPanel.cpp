@@ -744,7 +744,11 @@ void CMenuPanel::timerEvent(QTimerEvent* /*event*/)
 
 // reimplemented (QWidget)
 
+#if QT_VERSION < 0x060000
 void CMenuPanel::enterEvent(QEvent* /*event*/)
+#else
+void CMenuPanel::enterEvent(QEnterEvent* /*event*/)
+#endif
 {
 	if (m_animationEnabled == false)
 		return;

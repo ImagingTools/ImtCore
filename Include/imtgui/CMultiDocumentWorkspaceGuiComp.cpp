@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtGui/QRegExpValidator>
+#include <QtGui/QRegularExpressionValidator>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QTabBar>
@@ -55,7 +55,7 @@ QString CMultiDocumentWorkspaceGuiComp::GetSaveFilePath(const QByteArray& docume
 	}
 
 	if (!resourceName.isEmpty()){
-		QRegExpValidator inputValidator(QRegExp("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
+		QRegularExpressionValidator inputValidator(QRegularExpression("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
 		int pos;
 		if (inputValidator.validate(resourceName, pos) != QValidator::Acceptable){
 			QMessageBox::critical(NULL, tr("Error"), tr("The document name contains some not allowed characters"));

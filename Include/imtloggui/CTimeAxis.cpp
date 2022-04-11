@@ -234,7 +234,7 @@ void CTimeAxis::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 	// Fill the full axis rectangle with the background color:
 	painter->setPen(Qt::transparent);
-	painter->setBrush(QApplication::palette().color(QPalette::Background));
+	painter->setBrush(QApplication::palette().color(QPalette::Window));
 	QRectF visibleRect = GetItemVisibleRect();
 	painter->drawRect(boundingRect());
 

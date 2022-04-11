@@ -102,7 +102,7 @@ QLayout* CLayoutManagerGuiComp::CreateCustomLayoutWidget(ILayout* layout)
 		m_splitterMap.insert(splitterPtr, layout->GetLayoutId());
 
 		retVal->addWidget(splitterPtr);
-		retVal->setMargin(0);
+		retVal->setContentsMargins(0,0,0,0);
 
 		if (layout->GetType() == ILayout::LT_HORIZONTAL_SPLITTER){
 			splitterPtr->setOrientation(Qt::Horizontal);

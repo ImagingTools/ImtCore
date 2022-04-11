@@ -10,8 +10,11 @@ if(WIN32)
 endif()
 
 if(UNIX)
-		target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${CMAKE_BUILD_TYPE}${TARGETNAME}/libquazip.a)
-#        target_link_libraries(${PROJECT_NAME} -lquazip)
+	if(QT_VERSION_MAJOR EQUAL 5)
+		target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${TARGETNAME}/libquazip.a)
+	elseif(QT_VERSION_MAJOR EQUAL 6)
+		target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${TARGETNAME}/libquazip-qt6.a)
+	endif()
 endif()
 
 

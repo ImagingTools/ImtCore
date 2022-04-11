@@ -93,7 +93,8 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 					activeLicenses->SetData("Name", name, index);
 
 					if (date.isValid()){
-						licenseExpirationText = date.toString(Qt::DateFormat::SystemLocaleDate);
+						QLocale locale;
+						licenseExpirationText = locale.toString(date, QLocale::ShortFormat);
 						activeLicenses->SetData("Expiration", licenseExpirationText, index);
 					}
 					else{

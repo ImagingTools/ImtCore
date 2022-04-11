@@ -3,9 +3,13 @@
 
 // Qt includes
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QSplitter>
 #include <QtCore/QTimer>
+#if QT_VERSION >= 0x050000 && QT_VERSION < 0x060000
+#include <QtWidgets/QAction>
+#else
+#include <QtGui/QAction>
+#endif
 
 // ACF includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>

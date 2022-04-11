@@ -9,4 +9,4 @@ target_link_libraries(${PROJECT_NAME} imtreport imtbase)
 
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 
-qt5_use_modules(${PROJECT_NAME} PrintSupport)
+target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::PrintSupport)

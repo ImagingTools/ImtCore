@@ -10,9 +10,10 @@ include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
-qt5_use_modules(${PROJECT_NAME} WebSockets)
 
 target_link_libraries(${PROJECT_NAME} imtbase imtrest)
+target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::WebSockets)
+
 
 
 if (WIN32)

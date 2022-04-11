@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QtGui/QRegExpValidator>
+#include <QtGui/QRegularExpressionValidator>
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QInputDialog>
@@ -297,7 +297,7 @@ bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, con
 			}
 		}
 
-		QRegExpValidator inputValidator(QRegExp("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
+		QRegularExpressionValidator inputValidator(QRegularExpression("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
 		int pos;
 		name = name.trimmed();
 		if (inputValidator.validate(name, pos) == QValidator::Acceptable){

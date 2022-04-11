@@ -359,7 +359,7 @@ inline QDateTime GetQuorterEnd(const QDateTime& dt)
 
 inline QDateTime GetYearBegin(const QDateTime& dt)
 {
-	return QDateTime(QDate(dt.date().year(), 1, 1));
+	return QDateTime(QDate(dt.date().year(), 1, 1), QTime());
 }
 
 

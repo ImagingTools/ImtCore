@@ -8,9 +8,4 @@ set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_STYIES_INPUT_DIR "${PROJECT_SOURCE_DIR}/.
 set(DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}")
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DesignTokenCreator.cmake)
 
-find_package(Qt5 COMPONENTS Gui REQUIRED)
-target_link_libraries(imtstyle Qt5::Gui)
-
-find_package(Qt5 COMPONENTS Xml REQUIRED)
-target_link_libraries(imtstyle Qt5::Xml)
 

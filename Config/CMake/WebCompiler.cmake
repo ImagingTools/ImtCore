@@ -89,7 +89,7 @@ function(imtcore_compile_web)
 	add_custom_command(
 		OUTPUT ${QRC_CPP_WEB_FILE}
 		COMMAND
-		${Qt5Core_RCC_EXECUTABLE}
+		Qt${QT_VERSION_MAJOR}::rcc
 		ARGS
 		-name ${PROJECT_NAME}Web ${QRC_WEB_FILE} -o ${QRC_CPP_WEB_FILE}
 		DEPENDS

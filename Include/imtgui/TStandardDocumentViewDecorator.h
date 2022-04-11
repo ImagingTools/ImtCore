@@ -170,7 +170,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	m_openCommand.setShortcut(Qt::CTRL + Qt::Key_O);
 	m_saveCommand.setShortcut(Qt::CTRL + Qt::Key_S);
 	m_undoCommand.setShortcut(Qt::CTRL + Qt::Key_Z);
-	m_redoCommand.setShortcut(Qt::CTRL + Qt::SHIFT + Qt::Key_Z);
+	m_redoCommand.setShortcut(int(Qt::CTRL) + int(Qt::SHIFT) + Qt::Key_Z);
 
 	idoc::IDocumentMetaInfo* metaInfoPtr = CompCastPtr<idoc::IDocumentMetaInfo>(documentPtr);
 	if (metaInfoPtr != nullptr){

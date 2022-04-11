@@ -5,7 +5,6 @@
 #include <QtCore/QMimeData>
 #include <QtCore/QUuid>
 #include <QtGui/QPixmap>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QSplitter>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QToolButton>
@@ -13,6 +12,13 @@
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QSpacerItem>
+
+#if QT_VERSION >= 0x050000 && QT_VERSION < 0x060000
+#include <QtWidgets/QAction>
+#else
+#include <QtGui/QAction>
+#endif
+
 
 // ACF includes
 #include <iser/IArchive.h>
@@ -186,7 +192,7 @@ CCustomLayoutWidget::CCustomLayoutWidget(
 void CCustomLayoutWidget::SetDefaultPalette()
 {
 	QPalette pal = palette();
-	pal.setColor(QPalette::Background, QColor("transparent"));
+	pal.setColor(QPalette::Window, QColor("transparent"));
 
 	setPalette(pal);
 }
@@ -195,7 +201,7 @@ void CCustomLayoutWidget::SetDefaultPalette()
 void CCustomLayoutWidget::SetHighLightPalette()
 {
 	QPalette pal = palette();
-	pal.setColor(QPalette::Background, QColor("lightblue"));
+	pal.setColor(QPalette::Window, QColor("lightblue"));
 
 	setPalette(pal);
 }
@@ -297,7 +303,11 @@ QByteArray CCustomLayoutWidget::GetId()
 
 QPixmap CCustomLayoutWidget::GetIcon()
 {
+#if QT_VERSION < 0x060000
 	QPixmap pixmap = *TitleIcon->pixmap();
+#else
+	QPixmap pixmap = TitleIcon->pixmap();
+#endif
 	return pixmap;
 }
 

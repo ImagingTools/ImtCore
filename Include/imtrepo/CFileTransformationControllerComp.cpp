@@ -166,7 +166,7 @@ bool CFileTransformationControllerComp::TransformRepository(IFileObjectCollectio
 					repositoryItemInfo.m_files[fileId] = filePath + ".new";
 
 					if (fileId == IRepositoryItemInfo::RFT_INFO){
-						itemInfo = filePath;
+						itemInfo = QFileInfo(filePath);
 					}
 				}
 			}

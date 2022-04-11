@@ -512,7 +512,7 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 				retVal += value.value<imtgql::CGqlEnum>().GetValue();
 			}
 			else{
-				retVal += value.toString();
+				retVal += value.toByteArray();
 			}
 			if (isString) {
 				retVal += "\\\"";

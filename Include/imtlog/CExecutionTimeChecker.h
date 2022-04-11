@@ -3,7 +3,8 @@
 
 // Qt includes
 #include <QtCore/QDebug>
-#include <QtCore/QDateTime>
+#include <QtCore/QElapsedTimer>
+
 
 namespace imtlog
 {
@@ -17,7 +18,7 @@ public:
 
 private:
 	QString m_text;
-	QTime m_time;
+	QElapsedTimer m_time;
 };
 
 

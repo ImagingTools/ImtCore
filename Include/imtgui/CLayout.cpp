@@ -495,7 +495,11 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 		QByteArray iconAsByteArray;
 		if (archive.IsStoring()){
+#if QT_VERSION < 0x060000
 			QDataStream stream(&iconAsByteArray, QIODevice::WriteOnly);
+#else
+			QDataStream stream(&iconAsByteArray, QIODeviceBase::WriteOnly);
+#endif
 			stream << m_icon;
 		}
 
@@ -509,7 +513,11 @@ bool CLayout::InternalSerializeItemRecursive(iser::IArchive& archive)
 
 		if (!archive.IsStoring()){
 			iconAsByteArray = QByteArray::fromBase64(iconAsBase64);
-			QDataStream stream(&iconAsByteArray, QIODevice::ReadWrite);
+#if QT_VERSION < 0x060000
+			QDataStream stream(&iconAsByteArray, QIODevice::WriteOnly);
+#else
+			QDataStream stream(&iconAsByteArray, QIODeviceBase::WriteOnly);
+#endif
 			stream >> m_icon;
 		}
 	}

@@ -65,8 +65,12 @@ int CReportDocumentPdfPersistenceComp::SaveToFile(
 	}
 
 	QPrinter printer(QPrinter::HighResolution);
-	printer.setPageSize(QPrinter::A4);
-	printer.setOrientation(QPrinter::Portrait);
+#if QT_VERSION < 0x060000
+	printer.setPageSize(QPagedPaintDevice::A4);
+#else
+	printer.setPageSize(QPageSize::A4);
+#endif
+	printer.setPageOrientation(QPageLayout::Portrait);
 	printer.setOutputFormat(QPrinter::PdfFormat);
 	printer.setOutputFileName(filePath);
 	printer.setPageMargins({0.0, 0.0, 0.0, 0.0});

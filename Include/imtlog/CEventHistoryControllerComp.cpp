@@ -67,10 +67,12 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 	QSet<int> ids;
 
 	if (filterParamsPtr->GetFilterMode() == imtlog::IMessageFilterParams::FM_INCLUDE){
-		ids = m_controllers.keys().toSet() & filterParamsPtr->GetMessageFilterIds();
+		QList<int> keys = m_controllers.keys();
+		ids = QSet<int>(keys.begin(), keys.end()) & filterParamsPtr->GetMessageFilterIds();
 	}
 	else{
-		ids = m_controllers.keys().toSet() - filterParamsPtr->GetMessageFilterIds();
+		QList<int> keys = m_controllers.keys();
+		ids = QSet<int>(keys.begin(), keys.end()) - filterParamsPtr->GetMessageFilterIds();
 	}
 
 	//istd::TOptDelPtr<CEventHistoryResultContainer> containerPtr(new CEventHistoryResultContainer());

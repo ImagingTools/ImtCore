@@ -8,7 +8,12 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 #include <QtWidgets/QMenu>
+#if QT_VERSION >= 0x050000 && QT_VERSION < 0x060000
 #include <QtWidgets/QShortcut>
+#else
+#include <QtGui/QShortcut>
+#endif
+
 
 // ACF includes
 #include <imod/CMultiModelDispatcherBase.h>

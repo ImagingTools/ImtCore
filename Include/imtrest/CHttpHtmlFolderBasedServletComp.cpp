@@ -94,22 +94,22 @@ QByteArray CHttpHtmlFolderBasedServletComp::GenerateSingleEntry(const QFileInfo&
 		if (fileSize >1073741824){
 			sizeValue = QByteArray::number(fileSize / 1073741824.00, 'f', 2);
 			sizeValue.append(' ');
-			sizeValue.append(QObject::tr("GB"));
+			sizeValue.append(QObject::tr("GB").toUtf8());
 		}
 		else if (fileSize > 1048576){
 			sizeValue = QByteArray::number(fileSize / 1048576.00, 'f', 2);
 			sizeValue.append(' ');
-			sizeValue.append(QObject::tr("MB"));
+			sizeValue.append(QObject::tr("MB").toUtf8());
 		}
 		else if (fileSize > 1024){
 			sizeValue = QByteArray::number(fileSize / 1024.00, 'f', 2);
 			sizeValue.append(' ');
-			sizeValue.append(QObject::tr("KB"));
+			sizeValue.append(QObject::tr("KB").toUtf8());
 		}
 		else{
 			sizeValue = QByteArray::number(fileSize);
 			sizeValue.append(' ');
-			sizeValue.append(QObject::tr("B"));
+			sizeValue.append(QObject::tr("B").toUtf8());
 		}
 		retval.append(QObject::tr("File"));
 		retval.append('[');
@@ -280,10 +280,10 @@ IRequestServlet::ConstResponsePtr CHttpHtmlFolderBasedServletComp::ProcessReques
 		QFile destinationFile(destinationFileAbsoluteFilePath);
 
 		if (!destinationFile.open(QFile::ReadOnly)){
-			generateErrorResponsePtr(QByteArray("Cannot open file for read ").append(destinationFile.fileName()));
+			generateErrorResponsePtr(QByteArray("Cannot open file for read ").append(destinationFile.fileName().toUtf8()));
 		}
 
-		reponseTypeId = this->GetMimeType(destinationFileAbsoluteFilePath);
+		reponseTypeId = this->GetMimeType(QFileInfo(destinationFileAbsoluteFilePath));
 		reponseTypeId.append(QByteArray("; charset=utf-8"));
 
 		body = destinationFile.readAll();

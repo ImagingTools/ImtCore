@@ -58,8 +58,8 @@ const QMap<QString, QPalette::ColorRole>CDesignTokenStyleUtils::s_colorRolesName
 	std::make_pair("ToolTipBase", QPalette::ColorRole::ToolTipBase),
 	std::make_pair("ToolTipText", QPalette::ColorRole::ToolTipText),
 	std::make_pair("PlaceholderText", QPalette::ColorRole::PlaceholderText),
-	std::make_pair("Foreground", QPalette::ColorRole::Foreground),
-	std::make_pair("Background", QPalette::ColorRole::Background)
+	std::make_pair("Foreground", QPalette::ColorRole::WindowText),
+	std::make_pair("Background", QPalette::ColorRole::Window)
 };
 
 
@@ -88,12 +88,12 @@ const QMap<QString, QFont::Style> CDesignTokenStyleUtils::s_fontStyleNamesMap = 
 
 
 const QMap<QString, QFont::StyleStrategy> CDesignTokenStyleUtils::s_fontStyleStrategyNamesMap = {
-	std::make_pair("ForceIntegerMetrics", QFont::StyleStrategy::ForceIntegerMetrics),
+	std::make_pair("ForceIntegerMetrics",QFont::StyleStrategy(0x0400)), //QFont::StyleStrategy::ForceIntegerMetrics
 	std::make_pair("ForceOutline", QFont::StyleStrategy::ForceOutline),
 	std::make_pair("NoAntialias", QFont::StyleStrategy::NoAntialias),
 	std::make_pair("NoFontMerging", QFont::StyleStrategy::NoFontMerging),
 	std::make_pair("NoSubpixelAntialias", QFont::StyleStrategy::NoSubpixelAntialias),
-	std::make_pair("OpenGLCompatible", QFont::StyleStrategy::OpenGLCompatible),
+	std::make_pair("OpenGLCompatible", QFont::StyleStrategy(0x0200)), //QFont::StyleStrategy::OpenGLCompatible
 	std::make_pair("PreferAntialias", QFont::StyleStrategy::PreferAntialias),
 	std::make_pair("PreferBitmap", QFont::StyleStrategy::PreferBitmap),
 	std::make_pair("PreferDefault", QFont::StyleStrategy::PreferDefault),
@@ -566,7 +566,7 @@ bool CDesignTokenStyleUtils::GetFontsFromEntry(const QJsonValue& fontsEntry, QMa
 				font.setWeight(QFont::Weight::Bold);
 			}
 			else{
-				font.setWeight(weight);
+				font.setWeight(QFont::Weight(weight));
 			}
 		}
 
