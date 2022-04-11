@@ -5,20 +5,20 @@
 Copyright (C) 2010 Roberto Pompermaier
 Copyright (C) 2005-2016 Sergey A. Tachenov
 
-This file is part of QuaZIP.
+This file is part of QuaZip.
 
-QuaZIP is free software: you can redistribute it and/or modify
+QuaZip is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 2.1 of the License, or
 (at your option) any later version.
 
-QuaZIP is distributed in the hope that it will be useful,
+QuaZip is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with QuaZIP.  If not, see <http://www.gnu.org/licenses/>.
+along with QuaZip.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYING file for the full LGPL text.
 
@@ -29,11 +29,11 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #include "quazip.h"
 #include "quazipfile.h"
 #include "quazipfileinfo.h"
+#include "quazip_qt_compat.h"
 #include <QtCore/QString>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFile>
-#include <QtCore/QTextCodec>
 
 /// Utility class for typical operations.
 /**

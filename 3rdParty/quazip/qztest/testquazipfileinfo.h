@@ -1,7 +1,7 @@
 #ifndef TESTQUAZIPFILEINFO_H
 #define TESTQUAZIPFILEINFO_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 class TestQuaZipFileInfo : public QObject
 {
@@ -9,6 +9,7 @@ class TestQuaZipFileInfo : public QObject
 public:
     explicit TestQuaZipFileInfo(QObject *parent = 0);
 private slots:
+    void getNTFSTime_data();
     void getNTFSTime();
     void getExtTime_data();
     void getExtTime();
