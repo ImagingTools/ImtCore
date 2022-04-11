@@ -1479,18 +1479,32 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 {
 	istd::IChangeable::ChangeInfoMap changeInfoMap = changes.GetChangeInfoMap();
 	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_REMOVED)){
-		RemoveItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_REMOVED].toByteArray());
+		QList<QVariant> objects = changeInfoMap.values(imtbase::IObjectCollection::CN_OBJECT_REMOVED);
+
+		for (const QVariant& object : objects){
+			RemoveItem(object.toByteArray());
+		}
 	}
 
 	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_ADDED)){
-		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_ADDED].toByteArray());
+		QList<QVariant> objects = changeInfoMap.values(imtbase::IObjectCollection::CN_OBJECT_ADDED);
+
+		for (const QVariant& object : objects) {
+			UpdateItem(object.toByteArray());
+		}
+
 		if (!m_parent.m_itemsSelection.isEmpty()){
 			m_parent.UpdateCommands();
 		}
 	}
 
 	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_UPDATED)){
-		UpdateItem(changeInfoMap[imtbase::IObjectCollection::CN_OBJECT_UPDATED].toByteArray());
+		QList<QVariant> objects = changeInfoMap.values(imtbase::IObjectCollection::CN_OBJECT_UPDATED);
+
+		for (const QVariant& object : objects){
+			UpdateItem(object.toByteArray());
+		}
+
 		if (!m_parent.m_itemsSelection.isEmpty()){
 			m_parent.UpdateCommands();
 		}
@@ -1562,11 +1576,17 @@ void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCol
 {
 	for (int i = 0; i < rowCount(); i++){
 		if (data(index(i, 0), DR_OBJECT_ID) == objectId){
+			beginRemoveRows(QModelIndex(), i, i);
+
 			removeRow(i);
+
 			m_totalRowCount -=1;
 			m_fetchedRowCount -=1;
 			m_ids.removeOne(objectId);
 			m_metaInfoMap.remove(objectId);
+
+			endRemoveRows();
+
 			break;
 		}
 	}
