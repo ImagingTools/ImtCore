@@ -38,6 +38,7 @@ QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByte
 	return QVariant();
 }
 
+
 imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
@@ -79,14 +80,12 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", productInstanceId);
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-
 		if (!m_objectCollectionCompPtr->GetObjectData(productInstanceId, dataPtr)){
 			errorMessage = "Unable to get an installation object data";
 			return nullptr;
 		}
 
 		const imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<const imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
-
 		if (productInstancePtr == nullptr){
 			errorMessage = "Unable to get an installation info";
 			return nullptr;
@@ -104,17 +103,22 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		for (const QByteArray& licenseCollectionId : licenseIds){
 			const imtlic::ILicenseInstance* licensePtr = productInstancePtr->GetLicenseInstance(licenseCollectionId);
 
+			QDateTime date = licensePtr->GetExpiration();
 			if (licensePtr != nullptr){
 				childIndex = childs->InsertNewItem();
 				QString licenseName = licensePtr->GetLicenseName();
-				QString value = licenseName + " (" + licenseCollectionId + ")";
+				QString value = licenseName + " (Valid until: ";
+				if (date.isValid()){
+					value += date.toString("dd.MM.yyyy") + ")";
+				}
+				else{
+					value += "Unlimited)";
+				}
 				childs->SetData("Value", value, childIndex);
 			}
 		}
-
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

@@ -14,6 +14,7 @@
 #include <imtlicgql/CPackageControllerComp.h>
 #include <imtlicgql/CProductControllerComp.h>
 #include <imtlicgql/CAccountControllerComp.h>
+#include <imtlicgql/CKeyDataProviderComp.h>
 
 
 /**
@@ -31,6 +32,7 @@ typedef imtlicgql::CInstallationCollectionControllerComp InstallationCollectionC
 typedef imtlicgql::CInstallationControllerComp InstallationController;
 typedef imtlicgql::CPackageControllerComp PackageController;
 typedef imtlicgql::CProductControllerComp ProductController;
+typedef imtlicgql::CKeyDataProviderComp KeyDataProvider;
 
 
 } // namespace ImtLicenseGqlPck

@@ -56,7 +56,7 @@ Item {
     property int fontSize_title: 20;
     property int fontSize_subtitle: 18; // mobile ? 16 :18;
     property int fontSize_common: 13; // mobile ? 14 :16;
-    property int fontSize_small: 12;
+    property int fontSize_small: 10;
 
     property string hover: "#e6e6e8";
 

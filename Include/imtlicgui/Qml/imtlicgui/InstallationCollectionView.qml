@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
+import QtQuick.Dialogs 1.3
 
 Item {
     id: installationCollectionContainer;
@@ -81,6 +82,13 @@ Item {
 
             installationCollectionContainer.multiDocViewItem.addToHeadersArray(currentId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", "Copy")
 
+        }
+        else if (menuId === "CreateLicense"){
+            //licenseFile.createLicenseFile();
+
+            fileDialogSave.open();
+//            var id = installationCollectionView.table.getSelectedId();
+//            remoteFileController.GetFile(id, "test");
         }
         else{
             installationCollectionView.menuActivated(menuId)
@@ -297,6 +305,46 @@ Item {
         color: Style.backgroundColor;
     }
 
+    RemoteFileController {
+        id: remoteFileController;
+
+        onFileDownloaded: {
+            console.log('onFileDownloaded', filePath);
+           // console.log('onopening file', remoteFileController.OpenFile(filePath));
+        }
+    }
+
+    FileDialog {
+        id: fileDialogSave;
+
+        title: qsTr("Save file");
+        selectExisting: false;
+        folder: shortcuts.home;
+
+        nameFilters: ["License files (*.lic)", "All files (*)"];
+
+        onAccepted: {
+            console.log("You chose: " + fileDialogSave.fileUrl);
+            console.log("You chose folder: " + fileDialogSave.folder);
+
+            var pathDir = fileDialogSave.folder.toString();
+            remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
+            var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
+
+            console.log("You chose file name: ", fileName);
+            var id = installationCollectionView.table.getSelectedId();
+
+            if (fileName == ""){
+                fileName = {};
+                fileName["name"] = id + ".lic";
+            }
+
+            console.log("id ",id);
+            console.log("fileName ",fileName);
+            remoteFileController.GetFile(id, fileName);
+        }
+    }
+
     function callMetaInfoQuery(){
         metaInfo.getMetaInfo();
     }
@@ -363,6 +411,47 @@ Item {
                         installMetaInfoModels.SetData("ModelData", dataModelLocal, index);
                     }
                 }
+            }
+        }
+    }
+
+
+    GqlModel {
+        id: licenseFile;
+
+        function createLicenseFile() {
+            console.log( "InstallationCollectionView licenseFile createLicenseFile");
+            var query = Gql.GqlRequest("query", "CreateLicenseFile");;
+            var inputParams = Gql.GqlObject("input");
+
+            inputParams.InsertField("Id");
+            inputParams.InsertFieldArgument("Id", installationCollectionView.table.getSelectedId());
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("createLicenseFile");
+            queryFields.InsertField("Status");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("InstallationCollectionView licenseFile query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, licenseFile);
+            if (this.state === "Ready"){
+                var dataModelLocal;
+
+                if (licenseFile.ContainsKey("errors")){
+                    return;
+                }
+
+                dataModelLocal = licenseFile.GetData("data");
+
+//                if (dataModelLocal.ContainsKey("InstallationMetaInfo")) {
+
+//                }
+
             }
         }
     }

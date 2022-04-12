@@ -13,7 +13,7 @@ Rectangle {
     property string activeCommandsModelId;
     property string title;
 
-    signal menuActivatedSignal(string menuId);
+    signal menuActivatedSignal(string idMenu);
     signal commandsChangedSignal(string commandsId);
 
     function setModeMenuButton(commandId, mode) {
@@ -176,7 +176,7 @@ Rectangle {
                 }
 
                 onClicked: {
-                    console.log("TopPanel menuActivited", model[CommandEnum.ID])
+                    console.log("TopPanel menuActivited", model.Id)
                     topPanel.menuActivatedSignal(model.Id);
                 }
             }

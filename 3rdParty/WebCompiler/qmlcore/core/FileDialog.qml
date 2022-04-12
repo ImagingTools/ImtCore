@@ -7,6 +7,7 @@ Item {
     property var fileUrl: '';
     property var fileUrls: [];
     property string folder: '';
+    property bool selectExisting: false;
 
     signal accepted;
     signal rejected;
@@ -45,6 +46,10 @@ Item {
             this.fileUrl = e.target.files[0]
         }
         
+        this.accepted()
+    }
+
+    function open(){
         this.accepted()
     }
 }

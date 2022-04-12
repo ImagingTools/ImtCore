@@ -47,9 +47,7 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(instanceId, dataPtr)){
-
 			imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
-
 			if (productInstancePtr == nullptr){
 				errorMessage = "Unable to get an product instance";
 				return nullptr;
@@ -79,13 +77,9 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 
 			for (const QByteArray& licenseCollectionId : licenseIds){
 				const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(licenseCollectionId);
-
 				if (licenseInstancePtr != nullptr){
-
 					QDate date = licenseInstancePtr->GetExpiration().date();
-
 					QString name = licenseInstancePtr->GetLicenseName();
-
 					QString licenseExpirationText;
 
 					index = activeLicenses->InsertNewItem();
@@ -100,14 +94,11 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 					else{
 						activeLicenses->SetData("Expiration", "Unlimited", index);
 					}
-
 				}
 			}
 		}
-
 		dataModel->SetExternTreeModel("item", itemModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
@@ -130,7 +121,7 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 	}
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
-	if (!itemData.isEmpty()) {
+	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::IProductInstanceInfo> productInstancePtr = m_productInstanceFactCompPtr.CreateInstance();
 
 		if (!productInstancePtr.IsValid()) {
@@ -161,7 +152,6 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 		productInstancePtr->SetupProductInstance(productId, objectId, accountId);
 
 		imtbase::CTreeItemModel* activeLicenses = itemModel.GetTreeItemModel("ActiveLicenses");
-
 		if (activeLicenses != nullptr){
 			int licenseState, expirationState = 0;
 
@@ -185,21 +175,11 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 						QString dateExpirationStr = activeLicenses->GetData("Expiration", i).toString();
 						expirationDate = QDateTime::fromString(dateExpirationStr, "dd.MM.yyyy");
 					}
-					QString strdate = expirationDate.toString("dd.MM.yyyy");
 					productInstancePtr->AddLicense(licenseId, expirationDate);
-
-					const imtlic::ILicenseInstance* lic = productInstancePtr->GetLicenseInstance(licenseId);
-					QByteArray id = lic->GetLicenseId();
 				}
 			}
 		}
 
-		//const imtbase::ICollectionInfo newLicenseIds = productInstancePtr->GetLicenseInstances();
-
-		QByteArray id = productInstancePtr->GetProductInstanceId();
-
-
-		int count = productInstancePtr->GetLicenseInstances().GetElementsCount();
 		return productInstancePtr.PopPtr();
 	}
 

@@ -135,6 +135,7 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			return true;
 		}
 	}
+
 	return false;
 }
 

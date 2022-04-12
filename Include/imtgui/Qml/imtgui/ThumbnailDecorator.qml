@@ -65,8 +65,9 @@ Rectangle
         title: menuPanel.activePageName;
 
         onMenuActivatedSignal: {
-            console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal", menuId, thubnailDecoratorContainer.activeItem);
-            thubnailDecoratorContainer.activeItem.menuActivated(menuId);
+            console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal");
+            console.log("menuId", idMenu);
+            thubnailDecoratorContainer.activeItem.menuActivated(idMenu);
         }
 
         onCommandsChangedSignal: {

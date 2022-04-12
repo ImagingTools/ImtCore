@@ -63,6 +63,12 @@ I_EXPORT_COMPONENT(
 			"Installation Controller");
 
 
+I_EXPORT_COMPONENT(
+			KeyDataProvider,
+			"KeyDataProvider",
+			"Key data provider");
+
+
 } // namespace ImtLicenseGuiPck
 
 

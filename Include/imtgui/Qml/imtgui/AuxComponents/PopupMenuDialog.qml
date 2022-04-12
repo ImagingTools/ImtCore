@@ -1,6 +1,6 @@
 import QtQuick 2.12
-//import QtGraphicalEffects 1.12
-import Qt5Compat.GraphicalEffects
+import QtGraphicalEffects 1.12
+//import Qt5Compat.GraphicalEffects
 import Acf 1.0
 import imtqml 1.0
 
