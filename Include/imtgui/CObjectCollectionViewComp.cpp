@@ -1351,13 +1351,13 @@ bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, 
 		return true;
 	}
 
-	QRegExp internalFilterRegExp = filterRegExp();
+    QRegularExpression internalFilterRegExp = filterRegularExpression();
 	int internalFilterColumn = filterKeyColumn();
 	int internalFilterRole = filterRole();
 
 	QString internalFilterData = sourceModel()->index(sourceRow, internalFilterColumn).data(internalFilterRole).toString();
 
-	if (!internalFilterRegExp.exactMatch(internalFilterData)){
+    if (!internalFilterRegExp.match(internalFilterData).hasMatch()){
 		return false;
 	}
 

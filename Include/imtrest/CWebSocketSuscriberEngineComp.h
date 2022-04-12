@@ -32,7 +32,7 @@ public:
 
 	CWebSocketSubscriberEngineComp();
 
-	// reimplemented (ISuscriberEngine)
+	// reimplemented (ISubscriberEngine)
 	virtual ISubscriber* RegisterSubscriber(
 				QObject* socketPtr,
 				const IRequestServlet& requestHandler,
