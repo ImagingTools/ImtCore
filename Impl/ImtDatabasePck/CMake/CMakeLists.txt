@@ -10,7 +10,7 @@ target_link_libraries(${PROJECT_NAME} imtbase imtdb)
 if(WIN32)
 
 	list(APPEND listOptions "")
-	set(files  \"${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}${TARGETNAME}/${PROJECT_NAME}.arp\")
+	set(files  \"${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)

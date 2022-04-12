@@ -10,11 +10,7 @@ if(WIN32)
 endif()
 
 if(UNIX)
-	if(QT_VERSION_MAJOR EQUAL 5)
-		target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${TARGETNAME}/libquazip.a)
-	elseif(QT_VERSION_MAJOR EQUAL 6)
-		target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${TARGETNAME}/libquazip-qt6.a)
-	endif()
+	target_link_libraries(${PROJECT_NAME} ${QUAZIP}/lib/${TARGETNAME}/libquazip.a)
 endif()
 
 

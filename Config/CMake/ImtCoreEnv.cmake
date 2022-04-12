@@ -43,8 +43,8 @@ endif()
 
 include(${IACFDIR}/Config/CMake/IAcfEnv.cmake)
 
-include_directories("${IMTCOREDIR}/AuxInclude/Qt${QT_VERSION_MAJOR}_${TARGETNAME}")
+include_directories("${IMTCOREDIR}/AuxInclude/${TARGETNAME}")
 include_directories("${IMTCOREDIR}/Include")
 include_directories("${IMTCOREDIR}/Impl")
 
-link_directories("${IMTCOREDIR}/Lib/${CMAKE_BUILD_TYPE}${TARGETNAME}")
+link_directories("${IMTCOREDIR}/Lib/${CMAKE_BUILD_TYPE}_${TARGETNAME}")

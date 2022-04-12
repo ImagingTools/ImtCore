@@ -1,6 +1,6 @@
 #----------------------------------------------------------- The DESIGN TOKEN CREATOR config
 # Setting the executable file name for specific OS
-set(COMPILER_DIR ${CMAKE_BUILD_TYPE}${TARGETNAME})
+set(COMPILER_DIR ${CMAKE_BUILD_TYPE}_${TARGETNAME})
 string(FIND "$ENV{ARXCHOST}" "VC" POSITION_OF_VC)
 if (WIN32 OR (${POSITION_OF_VC} EQUAL 0))
 	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator.exe")

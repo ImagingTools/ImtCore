@@ -16,7 +16,7 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} User32 Advapi32)
 
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
-	set(files  \"${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}${TARGETNAME}/${PROJECT_NAME}.arp\")
+	set(files  \"${IMTCOREDIR}/Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.arp\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)
