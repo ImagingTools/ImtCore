@@ -113,9 +113,10 @@ Rectangle {
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
 
         onClicked: {
-            console.log("Preference button clicked !");
+            console.log("Preference button clicked !", thubnailDecoratorContainer.localSettings);
             var source = "AuxComponents/PreferenceDialog.qml";
             var parameters = {};
+            parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
     }

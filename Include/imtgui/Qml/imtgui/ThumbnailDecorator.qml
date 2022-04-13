@@ -18,6 +18,36 @@ Rectangle
     color: Style.baseColor;
 
     property Item activeItem;
+    property TreeItemModel localSettings;
+    property bool serverIsConnection: false;
+
+    onLocalSettingsChanged: {
+        console.log("ThumbnailDecorator onLocalSettingsChanged");
+
+        for (var i = 0; i < thubnailDecoratorContainer.localSettings.GetItemsCount(); i++){
+            var id = thubnailDecoratorContainer.localSettings.GetData("Id", i);
+            var name = thubnailDecoratorContainer.localSettings.GetData("Name", i);
+            var type = thubnailDecoratorContainer.localSettings.GetData("ComponentType", i);
+            console.log("Local ID:", id);
+            console.log("Name:", name);
+            console.log("ComponentType:", type);
+
+            var elements = thubnailDecoratorContainer.localSettings.GetData("Elements", i);
+
+            if (elements){
+                for (var j = 0; j < elements.GetItemsCount(); j++){
+                    id = elements.GetData("Id", i);
+                    name = elements.GetData("Name", i);
+                    var type = elements.GetData("ComponentType", i);
+                    var value = elements.GetData("Value", i);
+                    console.log("Local ID:", id);
+                    console.log("Name:", name);
+                    console.log("ComponentType:", type);
+                    console.log("Value:", value);
+                }
+            }
+        }
+    }
 
     function setFocusOnMenuPanel(){
         menuPanel.forceActiveFocus();
@@ -77,6 +107,7 @@ Rectangle
     }
 
     function setInvalidConnection(state){
+        thubnailDecoratorContainer.serverIsConnection = !state;
         textNoConnection.visible = state;
     }
 
@@ -169,6 +200,10 @@ Rectangle
             console.log("ThumbnailDecorator MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
         }
     }
+
+//    TreeItemModel {
+//        id: localSettings;
+//    }
 
     Repeater {
         id: pagesData;

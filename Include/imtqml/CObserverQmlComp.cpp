@@ -15,6 +15,12 @@ void CObserverQmlComp::OnComponentCreated()
 		connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
 		QMetaObject::invokeMethod(quickItem, "updateModels");
 
+		QList<imtgql::CGqlObject> params;
+		QByteArrayList fields;
+		fields.append("LocalSettings");
+		imtbase::CTreeItemModel* rootModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);
+		QVariant data = QVariant::fromValue(rootModelPtr);
+		quickItem->setProperty("localSettings", data);
     }
 }
 

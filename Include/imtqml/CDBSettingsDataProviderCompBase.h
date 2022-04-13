@@ -7,7 +7,6 @@
 
 // ImtCore includes
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
-#include <imtbase/IItemBasedRepresentationDataController.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 #include <imtgql/IGqlMutationDataControllerDelegate.h>
 

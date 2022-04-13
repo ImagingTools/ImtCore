@@ -1,4 +1,4 @@
-modude imtqml
+module imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
 MouseTest 1.0 MouseTest.qml
 CollectionView 1.0 ./AuxComponents/CollectionView.qml

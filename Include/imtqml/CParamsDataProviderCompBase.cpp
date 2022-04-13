@@ -3,6 +3,7 @@
 // ACF includes
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
+#include <iprm/ITextParam.h>
 
 
 namespace imtqml
@@ -73,27 +74,33 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QLi
 		rootModelPtr->SetExternTreeModel("Elements", externModel);
 	}
 	else{
-		iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
+		if (type == CT_COMBOBOX){
+			iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
 
-		if (selectionParam != nullptr){
-			const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
+			if (selectionParam != nullptr){
+				const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
+				int defaultIndex = selectionParam->GetSelectedOptionIndex();
+				rootModelPtr->SetData("Value", defaultIndex);
+				imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
+				parametersPtr->SetIsArray(true);
 
-			int defaultIndex = selectionParam->GetSelectedOptionIndex();
+				for (int i = 0; i < optionList->GetOptionsCount(); i++){
+					QByteArray id = optionList->GetOptionId(i);
+					QString name = optionList->GetOptionName(i);
 
-			rootModelPtr->SetData("Value", defaultIndex);
+					int index = parametersPtr->InsertNewItem();
 
-			imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
+					parametersPtr->SetData("Id", id, index);
+					parametersPtr->SetData("Name", name, index);
+				}
+			}
+		}
+		else if (type == CT_TEXT_INPUT){
+			iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
 
-			parametersPtr->SetIsArray(true);
-
-			for (int i = 0; i < optionList->GetOptionsCount(); i++){
-				QByteArray id = optionList->GetOptionId(i);
-				QString name = optionList->GetOptionName(i);
-
-				int index = parametersPtr->InsertNewItem();
-
-				parametersPtr->SetData("Id", id, index);
-				parametersPtr->SetData("Name", name, index);
+			if (sourcePtr != nullptr){
+				QString value = sourcePtr->GetText();
+				rootModelPtr->SetData("Value", value);
 			}
 		}
 	}

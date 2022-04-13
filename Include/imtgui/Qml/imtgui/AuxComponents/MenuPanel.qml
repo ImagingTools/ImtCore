@@ -105,7 +105,6 @@ Rectangle {
                 refreshButton.enabled = true;
 
                 if (!dataModelLocal){
-
                     thubnailDecoratorContainer.setInvalidConnection(true);
                     return;
                 }

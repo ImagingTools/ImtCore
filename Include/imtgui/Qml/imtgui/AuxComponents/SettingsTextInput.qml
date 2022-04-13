@@ -37,7 +37,13 @@ Item {
 
     function dataChanged(id, value){
         console.log("SettingsTextInput dataChanged", id, value);
-        settingsTextInputContainer.rootItem.dataChanged(id, value);
+
+        if (id === "ServerUrl"){
+            settingsTextInputContainer.rootItem.dataChanged(0, null , value);
+        }
+        else{
+            settingsTextInputContainer.rootItem.dataChanged(id, value);
+        }
     }
 
     Component.onCompleted: {

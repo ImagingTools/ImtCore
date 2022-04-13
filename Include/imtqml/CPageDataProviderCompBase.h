@@ -8,7 +8,6 @@
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
-#include <imtbase/IItemBasedRepresentationDataController.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
 
 
