@@ -92,6 +92,11 @@ Item {
 					}
 				}
 				
+				setTimeout(()=>{
+					//this.backend.tick(this)
+					this._processActions()
+				}, 50)
+				
 			})
 		}
 
