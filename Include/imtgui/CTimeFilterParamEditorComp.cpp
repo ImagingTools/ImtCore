@@ -19,7 +19,17 @@ CTimeFilterParamEditorComp::CTimeFilterParamEditorComp()
 void CTimeFilterParamEditorComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
-
+	QBoxLayout *layout = nullptr;
+	if(*m_horizontalOrientationFlag){
+		layout = new QHBoxLayout();
+	}
+	else{
+		layout = new QVBoxLayout();
+	}
+	layout->setContentsMargins(0, 0, 0, 0);
+	GetWidget()->setLayout(layout);
+	layout->addWidget(TimeCombo);
+	layout->addWidget(CustomRangeFrame);
 	CustomRangeFrame->setVisible(false);
 
 	CustomBeginDate->setDateTime(QDateTime::currentDateTime().addMonths(-6));

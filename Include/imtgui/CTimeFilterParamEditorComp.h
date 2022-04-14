@@ -24,6 +24,7 @@ public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<Ui::CTimeFilterParamEditorComp, imtbase::ITimeFilterParam> BaseClass;
 
 	I_BEGIN_COMPONENT(CTimeFilterParamEditorComp);
+		I_ASSIGN(m_horizontalOrientationFlag, "HorizontalOrientation", "Set time filter in horizontal orientation", true, true);
 	I_END_COMPONENT;
 
 	CTimeFilterParamEditorComp();
@@ -39,6 +40,7 @@ private Q_SLOTS:
 	void on_CustomEndDate_dateTimeChanged(const QDateTime& dateTime);
 
 private:
+	I_ATTR(bool, m_horizontalOrientationFlag);
 	void SetFilterTimeRange(const QDateTime& beginTime, const QDateTime& endTime);
 	void SetTimeUnit(imtbase::ITimeFilterParam::TimeUnit timeUnit, imtbase::ITimeFilterParam::InterpretationMode mode, int mulitplier);
 };

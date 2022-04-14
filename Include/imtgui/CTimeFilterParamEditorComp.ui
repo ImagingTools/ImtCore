@@ -6,140 +6,136 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>282</width>
-    <height>46</height>
+    <width>295</width>
+    <height>65</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
+  <widget class="QComboBox" name="TimeCombo">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>89</width>
+     <height>20</height>
+    </rect>
    </property>
    <item>
-    <widget class="QComboBox" name="TimeCombo">
-     <item>
-      <property name="text">
-       <string>Total Period</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last Hour</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last 4 Hours</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last 8 Hours</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last Day</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last Week</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last Month</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last Quarter</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Last Year</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>User-Defined</string>
-      </property>
-     </item>
-    </widget>
+    <property name="text">
+     <string>Total Period</string>
+    </property>
    </item>
    <item>
-    <widget class="QFrame" name="CustomRangeFrame">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>From</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="CustomBeginDate"/>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>To</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QDateTimeEdit" name="CustomEndDate"/>
-      </item>
-     </layout>
-    </widget>
+    <property name="text">
+     <string>Last Hour</string>
+    </property>
    </item>
-  </layout>
+   <item>
+    <property name="text">
+     <string>Last 4 Hours</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Last 8 Hours</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Last Day</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Last Week</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Last Month</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Last Quarter</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Last Year</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>User-Defined</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QFrame" name="CustomRangeFrame">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>35</y>
+     <width>270</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>From</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDateTimeEdit" name="CustomBeginDate"/>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>To</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QDateTimeEdit" name="CustomEndDate"/>
+    </item>
+   </layout>
+  </widget>
  </widget>
- <resources>
-  <include location="../../../Acula/AuxInclude/Qt5_VC15_64/GeneratedFiles/aculastatgui/aculastatguilight.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
