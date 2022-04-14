@@ -109,6 +109,8 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 
 					QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
 					if (window != nullptr){
+						window->setIcon(QGuiApplication::windowIcon());
+						window->setTitle(QGuiApplication::applicationName());
 						QQuickItem* mainItem = window->contentItem();
 						if (mainItem != nullptr){
 							quickObjectPtr->CreateQuickItem(mainItem);

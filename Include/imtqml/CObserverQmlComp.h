@@ -6,10 +6,12 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtqml/IQuickObject.h>
 #include <imtbase/CTreeItemModel.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtgql/IGqlMutationDataControllerDelegate.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 
@@ -32,11 +34,14 @@ public:
 		I_ASSIGN(m_quickObjectComp, "QuickObject", "Main QML Component", true, "QuickObject");
 	I_END_COMPONENT;
 
+	CObserverQmlComp();
+
 // reimplemented (ilog::CLoggerComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
 protected:
+	void OnSettingsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::CTreeItemModel* settingsModelPtr);
 
 private Q_SLOTS:
 	void OnChangeSourceItem(QString src);
@@ -45,6 +50,9 @@ private:
     I_REF(imtqml::IQuickObject, m_quickObjectComp);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);
 	I_REF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
+
+	imtbase::CTreeItemModel* m_settingsModelPtr;
+	imtbase::TModelUpdateBinder<imtbase::CTreeItemModel, CObserverQmlComp> m_settingsObserver;
 };
 
 
