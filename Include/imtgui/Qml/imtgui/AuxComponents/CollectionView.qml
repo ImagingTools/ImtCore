@@ -29,7 +29,7 @@ Rectangle {
 
     property bool autoRefresh: false;
 
-    signal selectItem(string selectedId, string name);
+    signal selectItem(string idSelected, string name);
     signal removedItem(string itemId);
     signal renamedItem(string oldId, string newId);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
@@ -221,8 +221,8 @@ Rectangle {
         anchors.fill: parent;
 
         onSelectItem: {
-            console.log("CollectionView AuxTable onSelectItem", selectedId, name);
-            collectionViewContainer.selectItem(selectedId, name);
+            console.log("CollectionView AuxTable onSelectItem", idSelected, name);
+            collectionViewContainer.selectItem(idSelected, name);
         }
 
         onRightButtonMouseClicked: {

@@ -21,18 +21,20 @@ Rectangle {
     property Item thumbnailItem;
 
     property TreeItemModel localSettings;
-    property TreeItemModel modelSettings: modelSet;
+    property TreeItemModel serverSettings;
 
     property string currentSettingsBodyId;
     property string currentModeId;
 
     property int countMainItems: -1;
 
+
     TreeItemModel {
-        id: modelSet;
+        id: globalSettings;
     }
 
     Component.onCompleted: {
+        console.log("PreferenceDialog onCompleted");
         settingsQuery.getSettings();
     }
 
@@ -42,103 +44,51 @@ Rectangle {
         }
     }
 
-    onLocalSettingsChanged: {
-        console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings);
-
-        if (!preferenceContainer.modelSettings){
-            return;
-        }
-
-        var dataModelLocal = preferenceContainer.modelSettings;
-        var allModelItems = dataModelLocal.GetData("items");
-
-        if (!allModelItems){
-            allModelItems = dataModelLocal.AddTreeModel("items");
-        }
-
-        for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
-            console.log("2");
-            var id = preferenceContainer.localSettings.GetData("Id", i);
-            var name = preferenceContainer.localSettings.GetData("Name", i);
-            var elements = preferenceContainer.localSettings.GetData("Elements", i);
-            var componentType = preferenceContainer.localSettings.GetData("ComponentType", i);
-
-            var index = allModelItems.InsertNewItem();
-            console.log("id", id);
-            console.log("name", name);
-            console.log("componentType", componentType);
-            console.log("index", index);
-            allModelItems.SetData("Id", id, index);
-            allModelItems.SetData("Name", name, index);
-            allModelItems.SetData("ComponentType", componentType, index);
-
-            if (elements){
-                allModelItems.SetExternTreeModel("Elements", elements, index)
-            }
-        }
-
-        dataModelLocal.SetData("items", allModelItems);
-
-        console.log("preferenceContainer.modelSettings", dataModelLocal.toJSON())
-        preferenceContainer.modelSettings = dataModelLocal;
-        preferenceContainer.modelSettingsChange();
-    }
-
     function modelSettingsChange(){
         console.log("PreferenceDialog modelSettingsChanged");
 
-        if (!preferenceContainer.modelSettings){
-            return;
-        }
-        if (preferenceContainer.modelSettings.ContainsKey("items")){
-            var items = preferenceContainer.modelSettings.GetData("items");
-            console.log("items", items.toJSON())
-            preferenceContainer.countMainItems = items.GetItemsCount();
-            mainPanelRepeater.model = items;
-            preferenceContainer.settingsBodyChanged();
-        }
+        preferenceContainer.countMainItems = globalSettings.GetItemsCount();
+        mainPanelRepeater.model = globalSettings;
+        preferenceContainer.settingsBodyChanged();
     }
 
-    onModelSettingsChanged: {
+    onLocalSettingsChanged: {
+        console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.toJSON());
+        console.log("PreferenceDialog globalSettings", globalSettings.toJSON());
+
+        if (preferenceContainer.localSettings){
+            console.log("11");
+            //console.log("LocalSettings add", preferenceContainer.localSettings.toJSON());
+            for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
+                console.log("FOR", i);
+                var index = globalSettings.InsertNewItem();
+                globalSettings.SetData("Id", preferenceContainer.localSettings.GetData("Id", i), index);
+                globalSettings.SetData("Name", preferenceContainer.localSettings.GetData("Name", i), index);
+                globalSettings.SetData("ComponentType", preferenceContainer.localSettings.GetData("ComponentType", i), index);
+                globalSettings.SetData("Elements", preferenceContainer.localSettings.GetData("Elements", i), index);
+            }
+        }
+        preferenceContainer.modelSettingsChange();
+    }
+
+    onServerSettingsChanged: {
         console.log("PreferenceDialog onModelSettingsChanged");
 
-        //var dataModelLocal = preferenceContainer.modelSettings;
-
-        if (!preferenceContainer.modelSettings){
-            return;
-        }
-        console.log("0");
-
-
-            var items = preferenceContainer.modelSettings.GetData("items");
-            if (preferenceContainer.localSettings){
-                console.log("1");
-                for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
-                    console.log("2");
-                    var id = preferenceContainer.localSettings.GetData("Id", i);
-                    var name = preferenceContainer.localSettings.GetData("Name", i);
-                    var elements = preferenceContainer.localSettings.GetData("Elements", i);
-                    var componentType = preferenceContainer.localSettings.GetData("ComponentType", i);
-
-                    var index = items.InsertNewItem();
-
-                    items.SetData("Id", id, index);
-                    items.SetData("Name", name, index);
-                    items.SetData("ComponentType", componentType, index);
-
-                    if (elements){
-                        items.SetExternTreeModel("Elements", elements, index)
-                    }
+        var index, i;
+        if (preferenceContainer.serverSettings){
+          //  console.log("ServerSettings add", preferenceContainer.serverSettings.toJSON());
+            if (preferenceContainer.serverSettings.ContainsKey("items")){
+                var serverItems = preferenceContainer.serverSettings.GetData("items");
+                for (i = 0; i < serverItems.GetItemsCount(); i++){
+                    index = globalSettings.InsertNewItem();
+                    globalSettings.SetData("Id", serverItems.GetData("Id", i), index);
+                    globalSettings.SetData("Name", serverItems.GetData("Name", i), index);
+                    globalSettings.SetData("ComponentType", serverItems.GetData("ComponentType", i), index);
+                    globalSettings.SetData("Elements", serverItems.GetData("Elements", i), index);
                 }
             }
-            preferenceContainer.modelSettings.SetData("items", items);
-            preferenceContainer.modelSettingsChange();
-
-//            console.log("items", items.toJSON())
-//            preferenceContainer.countMainItems = items.GetItemsCount();
-//            mainPanelRepeater.model = items;
-
-//            preferenceContainer.settingsBodyChanged();
+        }
+        preferenceContainer.modelSettingsChange();
     }
 
     Keys.onPressed: {
@@ -156,18 +106,13 @@ Rectangle {
     function dataChanged(index, modelElements, activeValue){
         console.log("PreferenceDialog dataChanged", index, modelElements, activeValue);
 
-        var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
+//        var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
 
-        if (!dataModelLocal){
-            return;
-        }
+//        if (!dataModelLocal){
+//            return;
+//        }
 
-        var curBodyId = dataModelLocal.GetData("Id", mainPanelRepeater.selectedIndex);
-
-        if (!curBodyId){
-            return;
-        }
-        console.log("curBodyId", curBodyId);
+        var curBodyId = globalSettings.GetData("Id", mainPanelRepeater.selectedIndex);
         if (curBodyId === "General"){
             preferenceContainer.generalSettingsChanged(index, modelElements, activeValue);
         }
@@ -181,35 +126,40 @@ Rectangle {
 
     function settingsLocalChanged(index, activeValue){
         console.log("PreferenceDialog settingsLocalChanged", index, activeValue);
-        var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
 
-        if (!dataModelLocal){
-            return;
-        }
-
-        var modelSettingsBody = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
-
+        var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
         modelSettingsBody.SetData("Value", activeValue, index);
-        dataModelLocal.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
+        globalSettings.SetExternTreeModel("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
 
-        preferenceContainer.modelSettings.SetData("items", dataModelLocal);
+//        var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
 
-        console.log("preferenceContainer.modelSettings", preferenceContainer.modelSettings.toJSON());
+//        if (!dataModelLocal){
+//            return;
+//        }
+
+//        var modelSettingsBody = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
+
+//        modelSettingsBody.SetData("Value", activeValue, index);
+//        dataModelLocal.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
+
+//        preferenceContainer.serverSettings.SetData("items", dataModelLocal);
+
+     //   console.log("preferenceContainer.globalSettings", globalSettings.toJSON());
     }
 
     function generalSettingsChanged(index, modelElements, activeValue){
         console.log("PreferenceDialog generalSettingsChanged", index, modelElements, activeValue);
-        var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
+//        var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
 
-        if (!dataModelLocal){
-            return;
-        }
+//        if (!dataModelLocal){
+//            return;
+//        }
 
-        var modelSettingsBody = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
+        var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
 
-        if (!modelSettingsBody){
-            return;
-        }
+//        if (!modelSettingsBody){
+//            return;
+//        }
 
         var curId = modelSettingsBody.GetData("Id", index);
 
@@ -218,7 +168,6 @@ Rectangle {
         }
 
         if (activeValue !== undefined){
-
             var itemId = modelSettingsBody.GetData("Id", index);
             modelSettingsBody.SetData("Value", activeValue, index);
             var selectedId = modelElements.GetData("Id", activeValue);
@@ -227,35 +176,38 @@ Rectangle {
                 preferenceContainer.currentModeId = selectedId;
             }
         }
-
         modelSettingsBody.SetData("Parameters", modelElements, index);
-
-        dataModelLocal.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
-
-        preferenceContainer.modelSettings.SetData("items", dataModelLocal);
+        globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
+      //  console.log("preferenceContainer.globalSettings", globalSettings.toJSON());
     }
 
     function databaseDataChanged(index, modelElements){
         console.log("PreferenceDialog databaseDataChanged", index, modelElements);
-        var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
-        var modelSettingsBody = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
+       // var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
+        var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
         modelSettingsBody.SetData("Parameters", modelElements, index);
-        dataModelLocal.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
-        preferenceContainer.modelSettings.SetData("items", dataModelLocal);
+        globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
+       // preferenceContainer.serverSettings.SetData("items", dataModelLocal);
+        console.log("preferenceContainer.globalSettings", globalSettings.toJSON());
     }
 
     function settingsBodyChanged(){
         console.log("PreferenceDialog settingsBodyChanged");
 
-        if (preferenceContainer.modelSettings.ContainsKey("items")){
-            var dataModelLocal = preferenceContainer.modelSettings.GetData("items");
-
-            if (dataModelLocal.ContainsKey("Elements", mainPanelRepeater.selectedIndex)){
-                preferenceContainer.currentSettingsBodyId = dataModelLocal.GetData("Id", mainPanelRepeater.selectedIndex);
-                dataModelLocal = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
-                dependentPanelRepeater.model = dataModelLocal;
-            }
+        if (globalSettings.ContainsKey("Elements", mainPanelRepeater.selectedIndex)){
+            preferenceContainer.currentSettingsBodyId = globalSettings.GetData("Id", mainPanelRepeater.selectedIndex);
+            dependentPanelRepeater.model = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex)
         }
+
+//        if (preferenceContainer.serverSettings.ContainsKey("items")){
+//            var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
+
+//            if (dataModelLocal.ContainsKey("Elements", mainPanelRepeater.selectedIndex)){
+//                preferenceContainer.currentSettingsBodyId = dataModelLocal.GetData("Id", mainPanelRepeater.selectedIndex);
+//                dataModelLocal = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
+//                dependentPanelRepeater.model = dataModelLocal;
+//            }
+//        }
     }
 
     Rectangle {
@@ -512,8 +464,15 @@ Rectangle {
 
                        dependentPanelLoader.item.itemId = itemId;
                        dependentPanelLoader.item.rootItem = preferenceContainer;
-                       dependentPanelLoader.item.delegateItem = dependentPanelRepeater;
-                       dependentPanelLoader.item.currentItemIndex = model.index;
+
+                       if (dependentPanelLoader.item.delegateItem){
+                           dependentPanelLoader.item.delegateItem = dependentPanelRepeater;
+                       }
+
+                       if (dependentPanelLoader.item.currentItemIndex){
+                           dependentPanelLoader.item.currentItemIndex = model.index;
+                       }
+
                    }
                }
            }
@@ -557,16 +516,33 @@ Rectangle {
        onClicked: {
            console.log("PreferenceDialog saveButton onClicked", preferenceContainer.currentModeId, Style.theme);
 
-           if (thumbnailItem.serverIsConnection){
+           var indexLocalSettings = -1;
+           for (var i = 0; i < globalSettings.GetItemsCount(); i++){
+               var id = globalSettings.GetData("Id", i);
+               if (id == "NetworkSettings"){
+                   indexLocalSettings = i;
+                   break;
+               }
+           }
+
+           if (indexLocalSettings !== -1){
+               var elements = globalSettings.GetData("Elements", indexLocalSettings);
+               var newValue = elements.GetData("Value");
+
+               var oldElements = thubnailDecoratorContainer.localSettings.GetData("Elements");
+               var oldValue = oldElements.GetData("Value");
+
+               if (oldValue != newValue){
+                   oldElements.SetData("Value", newValue);
+                   thubnailDecoratorContainer.localSettings.SetData("Elements", oldElements);
+               }
+           }
+           if (thubnailDecoratorContainer.serverIsConnection){
                if (preferenceContainer.currentModeId !== Style.theme){
                    Style.theme = preferenceContainer.currentModeId;
                    Style.changeSchemeDesign(preferenceContainer.currentModeId);
                }
-
                preferenceSaveQuery.save();
-           }
-           else{
-
            }
        }
    }
@@ -643,16 +619,10 @@ Rectangle {
 
                if (dataModelLocal.ContainsKey("GetSettings")){
                    dataModelLocal = dataModelLocal.GetData("GetSettings");
-
-                   preferenceContainer.modelSettings = dataModelLocal;
+                   preferenceContainer.serverSettings = dataModelLocal;
                }
            }
 
-//           if (!dataModelLocal){
-//               emptyModel.AddTreeModel("items");
-//               emptyModel.SetIsArray(true);
-//               preferenceContainer.modelSettings = emptyModel;
-//           }
        }
    }
 
@@ -667,8 +637,9 @@ Rectangle {
            var query = Gql.GqlRequest("mutation", "SaveSettings");
 
            var inputParams = Gql.GqlObject("input");
-
-           var jsonString = preferenceContainer.modelSettings.toJSON();
+           emptyModel.InsertNewItem();
+           emptyModel.SetExternTreeModel("items", globalSettings);
+           var jsonString = emptyModel.toJSON();
            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
            inputParams.InsertField("Item");
@@ -680,10 +651,12 @@ Rectangle {
            queryFields.InsertField("Mode");
            queryFields.InsertField("Language");
            queryFields.InsertField("DBSettings");
+           queryFields.InsertField("NetworkSettings");
            query.AddField(queryFields);
 
            var gqlData = query.GetQuery();
            console.log("Preference GqlModel SaveSettings query ", gqlData);
+           emptyModel.Clear();
            this.SetGqlQuery(gqlData);
        }
 

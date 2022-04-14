@@ -459,10 +459,10 @@ Item {
         }
 
         onSelectItem: {
-            console.log("PackageView CollectionView onSelectItem", selectedId, name);
+            console.log("PackageView CollectionView onSelectItem", idSelected, name);
             var source = "../imtlicgui/EditFeatureDialog.qml";
             var parameters = {};
-            parameters["featureId"] = selectedId;
+            parameters["featureId"] = idSelected;
             parameters["featureName"] = name;
             parameters["collectionViewFeatures"] = featureCollectionView;
             parameters["resultItem"] = featureCollectionViewContainer;

@@ -23,30 +23,7 @@ Rectangle
 
     onLocalSettingsChanged: {
         console.log("ThumbnailDecorator onLocalSettingsChanged");
-
-        for (var i = 0; i < thubnailDecoratorContainer.localSettings.GetItemsCount(); i++){
-            var id = thubnailDecoratorContainer.localSettings.GetData("Id", i);
-            var name = thubnailDecoratorContainer.localSettings.GetData("Name", i);
-            var type = thubnailDecoratorContainer.localSettings.GetData("ComponentType", i);
-            console.log("Local ID:", id);
-            console.log("Name:", name);
-            console.log("ComponentType:", type);
-
-            var elements = thubnailDecoratorContainer.localSettings.GetData("Elements", i);
-
-            if (elements){
-                for (var j = 0; j < elements.GetItemsCount(); j++){
-                    id = elements.GetData("Id", i);
-                    name = elements.GetData("Name", i);
-                    var type = elements.GetData("ComponentType", i);
-                    var value = elements.GetData("Value", i);
-                    console.log("Local ID:", id);
-                    console.log("Name:", name);
-                    console.log("ComponentType:", type);
-                    console.log("Value:", value);
-                }
-            }
-        }
+        //console.log("localSettings", thubnailDecoratorContainer.localSettings.toJSON());
     }
 
     function setFocusOnMenuPanel(){

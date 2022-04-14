@@ -1,5 +1,8 @@
 #include "CObserverQmlComp.h"
 
+// Qt includes
+#include <QtQml/QQmlEngine>
+
 
 namespace imtqml
 {
@@ -16,7 +19,26 @@ CObserverQmlComp::CObserverQmlComp()
 //protected methods
 void CObserverQmlComp::OnSettingsUpdated(const istd::IChangeable::ChangeSet &changeSet, const imtbase::CTreeItemModel *settingsModelPtr)
 {
+	imtbase::CTreeItemModel* model = const_cast<imtbase::CTreeItemModel*>(settingsModelPtr);
+	QList<imtgql::CGqlObject> params;
 
+	if (changeSet.GetChangeInfoMap().count() > 0){
+		ApplyUrl(settingsModelPtr);
+		m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(params, model);
+	}
+}
+
+
+void CObserverQmlComp::ApplyUrl(const imtbase::CTreeItemModel *settingsModelPtr)
+{
+	imtbase::CTreeItemModel* elementsModel = settingsModelPtr->GetTreeItemModel("Elements");
+	if (elementsModel != nullptr && m_quickObjectComp.IsValid()){
+		QString serverUrl = elementsModel->GetData("Value").toString();
+		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
+		QQmlEngine* engine = qmlEngine(quickItem);
+		engine->setBaseUrl(serverUrl + "/Lisa");
+		QMetaObject::invokeMethod(quickItem, "updateModels");
+	}
 }
 
 
@@ -33,11 +55,13 @@ void CObserverQmlComp::OnComponentCreated()
 		if (m_pagesDataProviderCompPtr.IsValid()){
 			QList<imtgql::CGqlObject> params;
 			QByteArrayList fields;
-			fields.append("LocalSettings");
+			fields.append("NetworkSettings");
 			m_settingsModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);
 			QVariant data = QVariant::fromValue(m_settingsModelPtr);
 			quickItem->setProperty("localSettings", data);
 			m_settingsObserver.RegisterObject(m_settingsModelPtr, &CObserverQmlComp::OnSettingsUpdated);
+
+			ApplyUrl(m_settingsModelPtr);
 		}
     }
 }

@@ -143,20 +143,36 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromReprese
 		}
 	}
 	else{
-		iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
-
-		if (selectionParam == nullptr){
-			return nullptr;
+		int type = 0;;
+		if (m_paramComponentTypeAttrPtr.IsValid()){
+			type = *m_paramComponentTypeAttrPtr;
 		}
 
-		int value = 0;
+		if (type == CT_COMBOBOX){
+			iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
+			if (selectionParam == nullptr){
+				return nullptr;
+			}
 
-		if (baseModel->ContainsKey("Value")){
-			value = baseModel->GetData("Value").toInt();
+			int value = 0;
+			if (baseModel->ContainsKey("Value")){
+				value = baseModel->GetData("Value").toInt();
+			}
+
+			selectionParam->SetSelectedOptionIndex(value);
 		}
+		else if (type == CT_TEXT_INPUT){
+			iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
 
-		selectionParam->SetSelectedOptionIndex(value);
+			QString value;
+			if (baseModel->ContainsKey("Value")){
+				value = baseModel->GetData("Value").toString();
+			}
 
+			if (sourcePtr != nullptr){
+				sourcePtr->SetText(value);
+			}
+		}
 		rootModel->SetData("Status", "OK");
 	}
 

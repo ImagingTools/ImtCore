@@ -42,6 +42,7 @@ public:
 
 protected:
 	void OnSettingsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::CTreeItemModel* settingsModelPtr);
+	void ApplyUrl(const imtbase::CTreeItemModel* settingsModelPtr);
 
 private Q_SLOTS:
 	void OnChangeSourceItem(QString src);

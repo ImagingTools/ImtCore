@@ -252,13 +252,13 @@ Item {
         onSelectItem: {
             var typeOperation = "Open";
 
-            if (selectedId === ""){
+            if (idSelected === ""){
                 name = "New Package";
                 typeOperation = "New";
             }
 
             packageCollectionContainer.multiDocViewItem.activeCollectionItem = packageCollectionContainer;
-            packageCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
+            packageCollectionContainer.multiDocViewItem.addToHeadersArray(idSelected, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {

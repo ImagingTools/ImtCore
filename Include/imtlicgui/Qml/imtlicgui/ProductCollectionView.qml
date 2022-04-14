@@ -228,15 +228,15 @@ Item {
         }
 
         onSelectItem: {
-            console.log("ProductCollectionView productCollectionView onSelectItem", selectedId, name);
+            console.log("ProductCollectionView productCollectionView onSelectItem", idSelected, name);
             var typeOperation = "Open";
-            if (selectedId === "") {
+            if (idSelected === "") {
                 name = "New Product";
                 typeOperation = "New";
             }
 
             productCollectionContainer.multiDocViewItem.activeCollectionItem = productCollectionContainer;
-            productCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", typeOperation)
+            productCollectionContainer.multiDocViewItem.addToHeadersArray(idSelected, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {

@@ -231,14 +231,14 @@ Item {
         }
 
         onSelectItem: {
-            console.log("InstallationCollectionView onSelectItem", selectedId, name);
+            console.log("InstallationCollectionView onSelectItem", idSelected, name);
             var typeOperation = "Open";
-            if (selectedId === "") {
+            if (idSelected === "") {
                 name = "New Installation";
                 typeOperation = "New";
             }
             installationCollectionContainer.multiDocViewItem.activeCollectionItem = installationCollectionContainer;
-            installationCollectionContainer.multiDocViewItem.addToHeadersArray(selectedId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
+            installationCollectionContainer.multiDocViewItem.addToHeadersArray(idSelected, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {

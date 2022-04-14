@@ -18,7 +18,7 @@ Item {
     property alias delegate: elementsList.delegate;
     property alias elements: elementsList.model;
 
-    signal selectItem(string selectedId, string name);
+    signal selectItem(string idSelected, string name);
     signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromTable();
 
