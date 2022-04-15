@@ -221,7 +221,7 @@ Rectangle
             height: 300;
 
             color: Style.backgroundColor;
-            opacity: 0.5;
+            opacity: 0.8;
 
             Text {
                 id: textNoConnection;
@@ -232,7 +232,7 @@ Rectangle
                 text: qsTr("There is no connection to the server!");
                 //visible: false;
                 color: "red";
-                font.pixelSize: 20;
+                font.pixelSize: Style.fontSize_title;
                 font.family: Style.fontFamily;
             }
         }

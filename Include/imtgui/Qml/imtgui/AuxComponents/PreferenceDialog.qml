@@ -540,11 +540,13 @@ Rectangle {
                }
            }
            if (thubnailDecoratorContainer.serverIsConnection){
-//               if (preferenceContainer.currentModeId !== Style.theme){
-//                   Style.theme = preferenceContainer.currentModeId;
-//                   Style.changeSchemeDesign(preferenceContainer.currentModeId);
-//               }
-//               preferenceSaveQuery.save();
+               if ((preferenceContainer.currentModeId == "Light" ||
+                       preferenceContainer.currentModeId == "Dark") &&
+                       preferenceContainer.currentModeId !== Style.theme){
+                   Style.theme = preferenceContainer.currentModeId;
+                   Style.changeSchemeDesign(preferenceContainer.currentModeId);
+               }
+               preferenceSaveQuery.save();
            }
        }
    }
