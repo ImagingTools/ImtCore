@@ -7,10 +7,10 @@ import Acf 1.0
 Rectangle {
     id: containerInstallation;
 
-   // anchors.fill: thubnailDecoratorContainer;
+//    anchors.fill: thubnailDecoratorContainer;
 
-//    width: 500;
-//    height: 500;
+    width: 500;
+    height: 500;
 
     color: Style.backgroundColor;
 
@@ -490,7 +490,7 @@ Rectangle {
 //                 anchors.bottom: containerInstallation.bottom;
 
                  width: containerColumn.width - 20;
-                 height: 700;
+                 height: 200;
 
                  color: Style.imagingToolsGradient1;
 

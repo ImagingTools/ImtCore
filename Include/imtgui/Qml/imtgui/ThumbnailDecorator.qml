@@ -66,66 +66,13 @@ Rectangle
         id: modelLayers;
     }
 
-    TopPanel {
-        id: topPanel;
 
-        title: menuPanel.activePageName;
-
-        onMenuActivatedSignal: {
-            console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal");
-            console.log("menuId", idMenu);
-            thubnailDecoratorContainer.activeItem.menuActivated(idMenu);
-        }
-
-        onCommandsChangedSignal: {
-            console.log("ThumbnailDecorator TopPanel onCommandsChangedSignal", commandsId);
-            thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
-        }
-    }
 
     function setInvalidConnection(state){
+        console.log("ThumbnailDecorator setInvalidConnection", state);
         thubnailDecoratorContainer.serverIsConnection = !state;
-        textNoConnection.visible = state;
-    }
-
-    Text {
-        id: textNoConnection;
-
-        anchors.centerIn: parent;
-
-        text: qsTr("There is no connection to the server!");
-
-        visible: false;
-
-        color: "red";
-        font.pixelSize: 20;
-        font.family: Style.fontFamily;
-    }
-
-    AuxButton {
-        id: refreshButton;
-
-        anchors.top: textNoConnection.bottom;
-        anchors.topMargin: 20;
-        anchors.horizontalCenter: parent.horizontalCenter;
-
-        width: 70;
-        height: 25;
-
-        hasText: true;
-        hasIcon: false;
-
-        visible: textNoConnection.visible;
-
-        textButton: "Refresh";
-
-        backgroundColor: Style.imagingToolsGradient1;
-        borderColor: (refreshButton.highlighted || refreshButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
-
-        onClicked: {
-            refreshButton.enabled = false;
-            thubnailDecoratorContainer.updateModels();
-        }
+//        textNoConnection.visible = state;
+        errorBackground.visible = state;
     }
 
     MenuPanel {
@@ -248,21 +195,95 @@ Rectangle
         }
     }
 
-    Connections {
-        target: Qt.application;
+//    Connections {
+//        target: Qt.application;
 
-        onAboutToQuit: {
-            console.log("Quit application");
-            listViewDialogs.destroy();
+//        onAboutToQuit: {
+//            console.log("Quit application");
+//            listViewDialogs.destroy();
+//        }
+//    }
+
+    Rectangle {
+        id: errorBackground;
+
+        anchors.fill: parent;
+
+        color: "transparent";
+
+        visible: false;
+
+        Rectangle {
+            anchors.verticalCenter: errorBackground.verticalCenter;
+            anchors.left: errorBackground.left;
+            anchors.right: errorBackground.right;
+
+            height: 300;
+
+            color: Style.backgroundColor;
+            opacity: 0.5;
+
+            Text {
+                id: textNoConnection;
+
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                text: qsTr("There is no connection to the server!");
+                //visible: false;
+                color: "red";
+                font.pixelSize: 20;
+                font.family: Style.fontFamily;
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent;
         }
     }
 
-//    Timer {
-//        id: timer;
+    TopPanel {
+        id: topPanel;
 
-//        onTriggered: {
-//            darkBackground.visible = true;
-//            timer.stop();
+        title: menuPanel.activePageName;
+
+        onMenuActivatedSignal: {
+            console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal");
+            console.log("menuId", idMenu);
+            thubnailDecoratorContainer.activeItem.menuActivated(idMenu);
+        }
+
+        onCommandsChangedSignal: {
+            console.log("ThumbnailDecorator TopPanel onCommandsChangedSignal", commandsId);
+            thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
+        }
+    }
+
+
+
+//    AuxButton {
+//        id: refreshButton;
+
+//        anchors.top: textNoConnection.bottom;
+//        anchors.topMargin: 20;
+//        anchors.horizontalCenter: parent.horizontalCenter;
+
+//        width: 70;
+//        height: 25;
+
+//        hasText: true;
+//        hasIcon: false;
+
+//        visible: textNoConnection.visible;
+
+//        textButton: "Refresh";
+
+//        backgroundColor: Style.imagingToolsGradient1;
+//        borderColor: (refreshButton.highlighted || refreshButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
+
+//        onClicked: {
+//            refreshButton.enabled = false;
+//            thubnailDecoratorContainer.updateModels();
 //        }
 //    }
 
@@ -270,7 +291,6 @@ Rectangle
         id: listViewDialogs;
         z: 10;
 
-//        anchors.fill: parent;
         width: parent.width;
         height: parent.height;
 

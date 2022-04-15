@@ -355,13 +355,13 @@ void CTreeItemModel::SetIsArray(const bool &isArray)
 
 bool CTreeItemModel::Parse(const QByteArray &data)
 {
+	Clear();
 	QJsonParseError error;
 	QJsonDocument document = QJsonDocument::fromJson(data, &error);
 	if (error.error != QJsonParseError::NoError){
 		qCritical()  << "Error for parsing json document:" << error.errorString();
 		return false;
 	}
-	Clear();
 	InsertNewItem();
 	bool retVal = ParseRecursive(document.object(), 0);
 	return retVal;

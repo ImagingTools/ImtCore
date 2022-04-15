@@ -268,6 +268,11 @@ Rectangle {
             console.log("State:", this.state, commandsModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
+
+                if (!dataModelLocal){
+                    return;
+                }
+
                 if(dataModelLocal.ContainsKey("CommandsData")){
                     dataModelLocal = dataModelLocal.GetData("CommandsData");
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){

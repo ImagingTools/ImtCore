@@ -36,6 +36,7 @@ void CObserverQmlComp::ApplyUrl(const imtbase::CTreeItemModel *settingsModelPtr)
 		QString serverUrl = elementsModel->GetData("Value").toString();
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		QQmlEngine* engine = qmlEngine(quickItem);
+		qDebug() << "ApplyUrl" << serverUrl;
 		engine->setBaseUrl(serverUrl + "/Lisa");
 		QMetaObject::invokeMethod(quickItem, "updateModels");
 	}
@@ -50,7 +51,7 @@ void CObserverQmlComp::OnComponentCreated()
 
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
-		QMetaObject::invokeMethod(quickItem, "updateModels");
+		//QMetaObject::invokeMethod(quickItem, "updateModels");
 
 		if (m_pagesDataProviderCompPtr.IsValid()){
 			QList<imtgql::CGqlObject> params;

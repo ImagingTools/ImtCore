@@ -100,20 +100,23 @@ Rectangle {
         onStateChanged: {
             console.log("State:",this.state, pagesModel)
             if (this.state == "Ready"){
+               // console.log("pagesModel toJSON", pagesModel.toJSON());
                 var dataModelLocal = this.GetData("data");
 
-                refreshButton.enabled = true;
+                //refreshButton.enabled = true;
 
                 if (!dataModelLocal){
+                    console.log("!dataModelLocal");
                     thubnailDecoratorContainer.setInvalidConnection(true);
                     return;
                 }
 
                 thubnailDecoratorContainer.setInvalidConnection(false);
-
                 if(dataModelLocal.ContainsKey("PagesData")){
                     dataModelLocal = dataModelLocal.GetData("PagesData")
+                    console.log("dataModelLocal", dataModelLocal);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+                        console.log("Corrected pagesModel");
                         dataModelLocal = dataModelLocal.GetData("items")
                         lvPages.model = dataModelLocal
 

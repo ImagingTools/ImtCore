@@ -39,6 +39,8 @@ bool CGqlModel::SetGqlQuery(QString query)
 		urlPath.append("/graphql");
 		requestUrl.setPath(urlPath);
 
+		qDebug() << "SetGqlQuery" << requestUrl << " " << query.toUtf8();
+
 		QNetworkReply* reply = accessManager->post(QNetworkRequest(requestUrl), query.toUtf8());
 		connect(reply, &QNetworkReply::finished,
 				this, &CGqlModel::replyFinished);

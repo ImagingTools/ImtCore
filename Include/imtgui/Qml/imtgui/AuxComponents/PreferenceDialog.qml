@@ -25,6 +25,7 @@ Rectangle {
 
     property string currentSettingsBodyId;
     property string currentModeId;
+    property string networkUrl;
 
     property int countMainItems: -1;
 
@@ -62,10 +63,16 @@ Rectangle {
             for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
                 console.log("FOR", i);
                 var index = globalSettings.InsertNewItem();
-                globalSettings.SetData("Id", preferenceContainer.localSettings.GetData("Id", i), index);
+                var id = preferenceContainer.localSettings.GetData("Id", i);
+                globalSettings.SetData("Id", id, index);
                 globalSettings.SetData("Name", preferenceContainer.localSettings.GetData("Name", i), index);
                 globalSettings.SetData("ComponentType", preferenceContainer.localSettings.GetData("ComponentType", i), index);
-                globalSettings.SetData("Elements", preferenceContainer.localSettings.GetData("Elements", i), index);
+                var elements = preferenceContainer.localSettings.GetData("Elements", i);
+
+                if (elements){
+                    preferenceContainer.networkUrl = elements.GetData("Value");
+                    globalSettings.SetData("Elements", elements, index);
+                }
             }
         }
         preferenceContainer.modelSettingsChange();
@@ -129,8 +136,9 @@ Rectangle {
 
         var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
         modelSettingsBody.SetData("Value", activeValue, index);
-        globalSettings.SetExternTreeModel("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
+        globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
 
+        console.log(thubnailDecoratorContainer.localSettings.toJSON());
 //        var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
 
 //        if (!dataModelLocal){
@@ -515,7 +523,6 @@ Rectangle {
 
        onClicked: {
            console.log("PreferenceDialog saveButton onClicked", preferenceContainer.currentModeId, Style.theme);
-
            var indexLocalSettings = -1;
            for (var i = 0; i < globalSettings.GetItemsCount(); i++){
                var id = globalSettings.GetData("Id", i);
@@ -524,25 +531,20 @@ Rectangle {
                    break;
                }
            }
-
            if (indexLocalSettings !== -1){
                var elements = globalSettings.GetData("Elements", indexLocalSettings);
                var newValue = elements.GetData("Value");
 
-               var oldElements = thubnailDecoratorContainer.localSettings.GetData("Elements");
-               var oldValue = oldElements.GetData("Value");
-
-               if (oldValue != newValue){
-                   oldElements.SetData("Value", newValue);
-                   thubnailDecoratorContainer.localSettings.SetData("Elements", oldElements);
+               if (newValue != preferenceContainer.networkUrl){
+                   thubnailDecoratorContainer.localSettings.SetData("Elements", elements);
                }
            }
            if (thubnailDecoratorContainer.serverIsConnection){
-               if (preferenceContainer.currentModeId !== Style.theme){
-                   Style.theme = preferenceContainer.currentModeId;
-                   Style.changeSchemeDesign(preferenceContainer.currentModeId);
-               }
-               preferenceSaveQuery.save();
+//               if (preferenceContainer.currentModeId !== Style.theme){
+//                   Style.theme = preferenceContainer.currentModeId;
+//                   Style.changeSchemeDesign(preferenceContainer.currentModeId);
+//               }
+//               preferenceSaveQuery.save();
            }
        }
    }
@@ -634,12 +636,16 @@ Rectangle {
        id: preferenceSaveQuery;
 
        function save(){
+           if (!preferenceContainer.serverSettings){
+               return;
+           }
            var query = Gql.GqlRequest("mutation", "SaveSettings");
+//           console.log("preferenceContainer.serverSettings", preferenceContainer.serverSettings.toJSON())
 
            var inputParams = Gql.GqlObject("input");
-           emptyModel.InsertNewItem();
-           emptyModel.SetExternTreeModel("items", globalSettings);
-           var jsonString = emptyModel.toJSON();
+//           emptyModel.InsertNewItem();
+//           emptyModel.SetExternTreeModel("items", globalSettings);
+           var jsonString = preferenceContainer.serverSettings.toJSON();
            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
            inputParams.InsertField("Item");

@@ -57,10 +57,10 @@ class Cache(object):
 			f.write((hashkey + "\n").encode('utf-8'))
 			pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
 
-
+queue_replace = {}
 
 def parse_qml_file(cache, com, path):
-	queue_replace = {} # by Artur
+	#queue_replace = {} # by Artur
 
 	try:
 		with open('.cache/signals', 'r') as f:
@@ -76,6 +76,13 @@ def parse_qml_file(cache, com, path):
 
 	cached = cache.read(com, h)
 	if cached:
+		for key in queue_replace:
+			data = data.replace(key, queue_replace[key])
+
+		# if 'MultiDocWorkspaceView.qml' in ''.join(path):
+		# 	print('__debug__', path)
+		# 	print('__debug__', data[0:100])
+		
 		return cached, data
 	else:
 		print("parsing", path, "...", com, file=sys.stderr)
@@ -153,6 +160,9 @@ def parse_qml_file(cache, com, path):
 					data = data.replace(but, buttons[but])
 
 				lines = data.split('\n')
+
+				# for key in queue_replace:
+				# 	data = data.replace(key, queue_replace[key])
 				
 				new_lines = []
 				for line in lines:
@@ -194,7 +204,7 @@ def parse_qml_file(cache, com, path):
 							new_params = []
 							for param in params:
 								new_params.append(param.split(' ')[-1])
-							queue_replace['on'+name_signal[0].upper()+name_signal[1:]] = 'on'+name_signal[0].upper()+name_signal[1:]+'('+','.join(new_params)+')'
+							#queue_replace['on'+name_signal[0].upper()+name_signal[1:]] = 'on'+name_signal[0].upper()+name_signal[1:]+'('+','.join(new_params)+')'
 						else:
 							line = line.replace('()', '')
 					else:
@@ -204,6 +214,9 @@ def parse_qml_file(cache, com, path):
 							if not find and key in line:
 								line = line.replace(key, queue_replace[key])
 								find = True
+							
+
+
 					new_lines.append(line)
 
 				'''
@@ -214,7 +227,7 @@ def parse_qml_file(cache, com, path):
 
 				data = '\n'.join(new_lines) # by Artur, for compatibility signals
 				#print(data)
-			
+
 			tree = compiler.grammar.parse(data)
 			cache.write(com, h, tree)
 			return tree, data
@@ -322,18 +335,20 @@ class Compiler(object):
 		for project_dir in self.project_dirs:
 			path = project_dir.split(os.path.sep)
 
+			try:
+				with open('.cache/signals', 'r') as f:
+					for line in f:
+						temp = line.replace('\n', '').split('=>')
+						queue_replace[temp[0]] = temp[1]
+			except:
+				pass
+
 			for dirpath, dirnames, filenames in os.walk(project_dir, topdown = True):
 				dirnames[:] = [name for name in dirnames if not name[:6].startswith("build.") and name != "dist"]
 
-				queue_replace = {}
+				
 
-				try:
-					with open('.cache/signals', 'r') as f:
-						for line in f:
-							temp = line.replace('\n', '').split('=>')
-							queue_replace[temp[0]] = temp[1]
-				except:
-					pass
+				
 
 				for filename in filenames:
 					fullpath = '/'.join([dirpath.replace('\\', '/'), filename])
@@ -370,11 +385,25 @@ class Compiler(object):
 					
 					file.close()
 
-				with open('.cache/signals', 'w') as f:
-					for key in queue_replace:
-						if(key):
-							f.write('{}=>{}\n'.format(key, queue_replace[key]))
+				# if len(queue_replace):
+					
+				# 	with open('.cache/signals', 'w') as f:
+				# 		for key in queue_replace:
+				# 			if(key):
+				# 				f.write('{}=>{}\n'.format(key, queue_replace[key]))
+		#print('DEBUG::', queue_replace)
+		try:
+			with open('.cache/signals', 'r') as f:
+				for line in f:
+					temp = line.replace('\n', '').split('=>')
+					queue_replace[temp[0]] = temp[1]
+		except:
+			pass
 
+		with open('.cache/signals', 'w') as f:
+			for key in queue_replace:
+				if(key):
+					f.write('{}=>{}\n'.format(key, queue_replace[key]))
 	def generate(self):
 		namespace = "qml"
 		partner = self.root_manifest.partner
