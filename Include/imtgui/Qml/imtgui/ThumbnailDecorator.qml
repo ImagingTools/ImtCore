@@ -248,6 +248,24 @@ Rectangle
         }
     }
 
+    Connections {
+        target: Qt.application;
+
+        onAboutToQuit: {
+            console.log("Quit application");
+            listViewDialogs.destroy();
+        }
+    }
+
+//    Timer {
+//        id: timer;
+
+//        onTriggered: {
+//            darkBackground.visible = true;
+//            timer.stop();
+//        }
+//    }
+
     Repeater {
         id: listViewDialogs;
         z: 10;
@@ -292,6 +310,11 @@ Rectangle
                 }
             }
 
+            function setLoaderItem(mySource){
+               // loaderDialog.source = mySource;
+                loaderDialog.destroy();
+            }
+
             Loader {
                   id: loaderDialog;
 
@@ -314,6 +337,7 @@ Rectangle
 
                   onItemChanged: {
                       console.log("ThumbnailDecorator loader onItemChanged!");
+
                       for (var key in model.parameters) {
                           console.log(key, model.parameters[key]);
                           loaderDialog.item[key]  = model.parameters[key];
@@ -326,6 +350,8 @@ Rectangle
                       darkBackground.opacity = loaderDialog.item.backgroundOpacity;
                       loaderDialog.item["thumbnailItem"] = thubnailDecoratorContainer;
                       loaderDialog.item.forceActiveFocus();
+
+//                      timer.start(50);
                   }
              }
         }

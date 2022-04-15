@@ -196,7 +196,7 @@ Item {
 
         var itemId = accountCollectionView.table.getSelectedId();
         var name = accountCollectionView.table.getSelectedName();
-        accountCollectionView.selectItem(itemId, name);
+        accountCollectionView.itemSelect(itemId, name);
     }
 
     CollectionView {
@@ -214,16 +214,13 @@ Item {
             accountCollectionView.gqlModelItems = "AccountList"
             accountCollectionView.gqlModelRemove = "AccountRemove"
         }
-
-        onSelectItem: {
+        onItemSelect: {
             var typeOperation = "Open";
-            if (idSelected === "") {
+            if (idSelect === "") {
                 name = "New Account";
                 typeOperation = "New";
             }
-//            name.replace(/[^a-zа-яё^0-9]/gi, ''); удалить все кроме букв и цифр
 
-//            var id = name.replace(/\s/g, '');
             var id = name;
             accountCollectionContainer.multiDocViewItem.activeCollectionItem = accountCollectionContainer;
             accountCollectionContainer.multiDocViewItem.addToHeadersArray(id, name,  "../../imtauthgui/ContactInfoEditor.qml", "AccountEdit", typeOperation);

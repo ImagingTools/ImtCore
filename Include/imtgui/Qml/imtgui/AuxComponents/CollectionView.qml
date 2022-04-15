@@ -29,7 +29,7 @@ Rectangle {
 
     property bool autoRefresh: false;
 
-    signal selectItem(string idSelected, string name);
+    signal itemSelect(string idSelect, string name);
     signal removedItem(string itemId);
     signal renamedItem(string oldId, string newId);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
@@ -190,10 +190,10 @@ Rectangle {
         var name = tableInternal.getSelectedName();
 
         if (menuId  === "New"){
-            collectionViewContainer.selectItem("", "")
+            collectionViewContainer.itemSelect("", "")
         }
         else if (menuId  === "Edit"){
-            collectionViewContainer.selectItem(itemId, name);
+            collectionViewContainer.itemSelect(itemId, name);
         }
         else if (menuId  === "Remove"){
             if (itemId !== ""){
@@ -222,7 +222,7 @@ Rectangle {
 
         onSelectItem: {
             console.log("CollectionView AuxTable onSelectItem", idSelected, name);
-            collectionViewContainer.selectItem(idSelected, name);
+            collectionViewContainer.itemSelect(idSelected, name);
         }
 
         onRightButtonMouseClicked: {

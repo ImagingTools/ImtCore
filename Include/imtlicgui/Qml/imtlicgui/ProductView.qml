@@ -128,7 +128,6 @@ Item {
                     productsCollectionViewContainer.wasChanged = true;
                 }
             }
-
         }
         else if (parameters["dialog"] === "RemoveDialog"){
             if (parameters["status"] === "yes") {
@@ -231,8 +230,9 @@ Item {
             var source = "AuxComponents/MessageDialog.qml";
             var parameters = {};
             parameters["message"] = "Remove selected file from the database ?";
-            parameters["nameDialog"] = "RemoveDialog";
+            parameters["nameDialog"] = "Remove Dialog";
             parameters["resultItem"] = productsCollectionViewContainer;
+            parameters["dialogId"] = "RemoveDialog";
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
         else if (menuId  === "Close") {
@@ -314,7 +314,7 @@ Item {
 
         var itemId = productsCollectionView.table.getSelectedId();
         var name = productsCollectionView.table.getSelectedName();
-        productsCollectionView.selectItem(itemId, name);
+        productsCollectionView.itemSelect(itemId, name);
     }
 
     CollectionView {
@@ -346,12 +346,12 @@ Item {
             productsCollectionViewContainer.openContextMenu(item, mouseX, mouseY);
         }
 
-        onSelectItem: {
-            console.log("ProductView CollectionView onSelectItem", idSelected, name);
+        onItemSelect: {
+            console.log("ProductView CollectionView onSelectItem", idSelect, name);
 
             var source = "../imtlicgui/EditLicenseDialog.qml";
             var parameters = {};
-            parameters["licenseId"] = idSelected;
+            parameters["licenseId"] = idSelect;
             parameters["licenseName"] = name;
             parameters["collectionViewLicenses"] = productsCollectionView;
             parameters["resultItem"] = productsCollectionViewContainer;

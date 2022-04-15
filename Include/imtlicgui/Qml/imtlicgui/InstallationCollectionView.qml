@@ -84,11 +84,7 @@ Item {
 
         }
         else if (menuId === "CreateLicense"){
-            //licenseFile.createLicenseFile();
-
             fileDialogSave.open();
-//            var id = installationCollectionView.table.getSelectedId();
-//            remoteFileController.GetFile(id, "test");
         }
         else{
             installationCollectionView.menuActivated(menuId)
@@ -211,7 +207,7 @@ Item {
 
         var itemId = installationCollectionView.table.getSelectedId();
         var name = installationCollectionView.table.getSelectedName();
-        installationCollectionView.selectItem(itemId, name);
+        installationCollectionView.itemSelect(itemId, name);
     }
 
     CollectionView {
@@ -230,15 +226,16 @@ Item {
             installationCollectionView.gqlModelRemove = "InstallationRemove"
         }
 
-        onSelectItem: {
-            console.log("InstallationCollectionView onSelectItem", idSelected, name);
+        onItemSelect: {
+            console.log("InstallationCollectionView onSelectItem", idSelect, name);
             var typeOperation = "Open";
-            if (idSelected === "") {
+            if (idSelect === "") {
                 name = "New Installation";
                 typeOperation = "New";
             }
             installationCollectionContainer.multiDocViewItem.activeCollectionItem = installationCollectionContainer;
-            installationCollectionContainer.multiDocViewItem.addToHeadersArray(idSelected, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
+            installationCollectionContainer.multiDocViewItem.addToHeadersArray(idSelect, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
+
         }
 
         onCollectionViewRightButtonMouseClicked: {

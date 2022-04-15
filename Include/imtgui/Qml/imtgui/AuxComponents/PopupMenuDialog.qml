@@ -70,7 +70,6 @@ Item {
         clip: true;
 
         border.width: 1;
-
         border.color: Style.alternateBaseColor;
 
         Keys.onPressed: {
@@ -110,6 +109,7 @@ Item {
             width: parent.width;
             height: parent.height;
             model: popupMenuContainer.model;
+            currentIndex: -1;
 
             onModelChanged: {
                 console.log("PopupMenuDialog onModelChanged");
@@ -148,8 +148,10 @@ Item {
                     height: parent.height - 2;
 
                     color: Style.selectedColor;
-                    visible: (model.index === popupMenuListView.currentIndex ||
-                              delegateListViewPopupMA.containsMouse) && model.id !== "" && model.mode !== "Disabled";
+
+                    visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
+//                    visible: (model.index === popupMenuListView.currentIndex ||
+//                              delegateListViewPopupMA.containsMouse) && model.id !== "" && model.mode !== "Disabled";
                 }
 
                 Text {

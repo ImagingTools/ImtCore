@@ -108,6 +108,11 @@ Item {
 
     }//headers
 
+    Rectangle {
+        anchors.fill: elementsList;
+        color: Style.baseColor;
+    }
+
     ListView {
         id: elementsList;
 
@@ -147,13 +152,14 @@ Item {
                 console.log("AuxTable onRightButtonMouseClicked", mX, mY);
                 var tempX = mX;
                 var tempY = (model.index + 1) * tableDelegate.height + mY;
-
+                console.log("tempX", tempX);
+                console.log("tempY", tempY);
                 tableContainer.rightButtonMouseClicked(thubnailDecoratorContainer, tempX, tempY);
             }
 
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
-                tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id",0)]);
+                tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id", 0)]);
             }
         }
     }

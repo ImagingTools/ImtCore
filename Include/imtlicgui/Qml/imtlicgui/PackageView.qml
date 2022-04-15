@@ -426,7 +426,7 @@ Item {
 
         var itemId = featureCollectionView.table.getSelectedId();
         var name = featureCollectionView.table.getSelectedName();
-        featureCollectionView.selectItem(itemId, name);
+        featureCollectionView.itemSelect(itemId, name);
     }
 
     CollectionView {
@@ -458,15 +458,16 @@ Item {
             featureCollectionViewContainer.openContextMenu(item, mouseX, mouseY);
         }
 
-        onSelectItem: {
-            console.log("PackageView CollectionView onSelectItem", idSelected, name);
+        onItemSelect: {
+            console.log("PackageView CollectionView onSelectItem", idSelect, name);
             var source = "../imtlicgui/EditFeatureDialog.qml";
             var parameters = {};
-            parameters["featureId"] = idSelected;
+            parameters["featureId"] = idSelect;
             parameters["featureName"] = name;
             parameters["collectionViewFeatures"] = featureCollectionView;
             parameters["resultItem"] = featureCollectionViewContainer;
             thubnailDecoratorContainer.openDialog(source, parameters);
+
         }
 
         onSelectedIndexChanged: {

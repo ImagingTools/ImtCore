@@ -208,7 +208,7 @@ Item {
 
         var itemId = productCollectionView.table.getSelectedId();
         var name = productCollectionView.table.getSelectedName();
-        productCollectionView.selectItem(itemId, name);
+        productCollectionView.itemSelect(itemId, name);
     }
 
     CollectionView {
@@ -227,16 +227,16 @@ Item {
             productCollectionView.gqlModelRemove = "ProductRemove"
         }
 
-        onSelectItem: {
-            console.log("ProductCollectionView productCollectionView onSelectItem", idSelected, name);
+        onItemSelect: {
+            console.log("ProductCollectionView productCollectionView onSelectItem", idSelect, name);
             var typeOperation = "Open";
-            if (idSelected === "") {
+            if (idSelect === "") {
                 name = "New Product";
                 typeOperation = "New";
             }
 
             productCollectionContainer.multiDocViewItem.activeCollectionItem = productCollectionContainer;
-            productCollectionContainer.multiDocViewItem.addToHeadersArray(idSelected, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", typeOperation)
+            productCollectionContainer.multiDocViewItem.addToHeadersArray(idSelect, name,  "../../imtlicgui/ProductView.qml", "ProductEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {

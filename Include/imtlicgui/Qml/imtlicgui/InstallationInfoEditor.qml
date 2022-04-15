@@ -7,10 +7,10 @@ import Acf 1.0
 Rectangle {
     id: containerInstallation;
 
-    anchors.fill: parent;
+   // anchors.fill: thubnailDecoratorContainer;
 
-    width: 500;
-    height: 500;
+//    width: 500;
+//    height: 500;
 
     color: Style.backgroundColor;
 
@@ -430,13 +430,7 @@ Rectangle {
 
                      radius: 3;
                      model: listModelProducts;
-
-//                     backgroundColor: "#d0d0d0";
-
-//                     borderColor: Style.alternateBaseColor;
                      textCentered: false;
-//                     borderColor: productCB.focus ? Style.iconColorOnSelected :
-//                                                                     Style.alternateBaseColor;
 
                      property bool wasFocus: false;
 
@@ -446,12 +440,6 @@ Rectangle {
                              console.log('Key space was pressed');
                              productCB.clicked();
                          }
-//                         else if (event.key === Qt.Key_Tab){
-//                             console.log('Key tab was pressed')
-////                             licensesTable.forceActiveFocus();
-
-//                             instanceIdText.forceActiveFocus();
-//                         }
                      }
 
                      KeyNavigation.tab: tfcInstance;
@@ -499,9 +487,10 @@ Rectangle {
                  id: licensesBlock;
 
                  anchors.horizontalCenter: containerColumn.horizontalCenter;
+//                 anchors.bottom: containerInstallation.bottom;
 
                  width: containerColumn.width - 20;
-                 height: 200;
+                 height: 700;
 
                  color: Style.imagingToolsGradient1;
 
@@ -514,6 +503,7 @@ Rectangle {
                      anchors.top: licensesBlock.top;
                      anchors.topMargin: 10;
                      anchors.bottom: parent.bottom;
+                     anchors.bottomMargin: 10;
                      anchors.left: parent.left;
                      anchors.leftMargin: 10;
                      anchors.right: parent.right;

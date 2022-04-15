@@ -229,7 +229,7 @@ Item {
 
         var itemId = packageCollectionView.table.getSelectedId();
         var name = packageCollectionView.table.getSelectedName();
-        packageCollectionView.selectItem(itemId, name);
+        packageCollectionView.itemSelect(itemId, name);
     }
 
     CollectionView {
@@ -249,16 +249,16 @@ Item {
             console.log("packageCollectionView onCompleted", packageCollectionView.gqlModelInfo)
         }
 
-        onSelectItem: {
+        onItemSelect: {
             var typeOperation = "Open";
 
-            if (idSelected === ""){
+            if (idSelect === ""){
                 name = "New Package";
                 typeOperation = "New";
             }
 
             packageCollectionContainer.multiDocViewItem.activeCollectionItem = packageCollectionContainer;
-            packageCollectionContainer.multiDocViewItem.addToHeadersArray(idSelected, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
+            packageCollectionContainer.multiDocViewItem.addToHeadersArray(idSelect, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {

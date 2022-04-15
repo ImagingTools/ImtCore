@@ -142,6 +142,9 @@ Rectangle {
                 console.log("TableDelegate onRightButtonMouseClicked");
                 thubnailDecoratorContainer.closeDialog();
 
+                console.log("this.mouseX", this.mouseX);
+                console.log("this.mouseY", this.mouseY);
+
                 tableDelegateContainer.tableDelegateRrightButtonMouseClicked(this.mouseX, this.mouseY);
             }
             tableDelegateContainer.clicked();
