@@ -8,6 +8,13 @@
 #include <imtbase/ICollectionInfo.h>
 
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#define QT_ENDL Qt::endl
+#else
+#define QT_ENDL endl
+#endif
+
+
 namespace imtdesign
 {
 
@@ -40,9 +47,9 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 	out.setCodec("UTF-8");
 #endif
 
-	out << "pragma Singleton" << Qt::endl;
-	out << "import QtQuick 2.0" << Qt::endl;
-	out << "Item {" << Qt::endl;
+	out << "pragma Singleton" << QT_ENDL;
+	out << "import QtQuick 2.0" << QT_ENDL;
+	out << "Item {" << QT_ENDL;
 
 
 	for (const QByteArray& dir: ::qAsConst(argumentsDirs)){
@@ -53,7 +60,7 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 				for (const QString& typesActive: ::qAsConst(typesOfActive)){
 					for (const QString& typesState: ::qAsConst(typesOfState)){
 						QString propertyName = "icon_" + fileInfo.baseName() + '_' + typesActive + '_' + typesState;
-						out << "property string " + propertyName + ";" << Qt::endl;
+						out << "property string " + propertyName + ";" << QT_ENDL;
 					}
 				}
 				properties.append(fileInfo.baseName());
@@ -68,8 +75,8 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 		}
 		out << "\""  << properties[i] << "\"";
 	}
-	out << "];" << Qt::endl;
-	out << "}" << Qt::endl;
+	out << "];" << QT_ENDL;
+	out << "}" << QT_ENDL;
 	outputFile.close();
 	return 0;
 }
