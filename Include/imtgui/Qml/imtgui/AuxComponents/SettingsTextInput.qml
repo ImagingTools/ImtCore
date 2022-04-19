@@ -15,7 +15,7 @@ Item {
     onFocusChanged: {
         console.log("SettingsTextInput onFocusChanged", settingsTextInputContainer.focus);
         if (settingsTextInputContainer.focus){
-            tfcTextInput.setFocus(true);
+            //tfcTextInput.setFocus(true);
         }
     }
 
@@ -30,8 +30,8 @@ Item {
         if (event.key === Qt.Key_Tab){
             console.log('Key tab was pressed');
 
-            tfcTextInput.setFocus(false);
-            settingsTextInputContainer.repeaterItem.focusOnNextItem();
+            //tfcTextInput.setFocus(false);
+            //settingsTextInputContainer.repeaterItem.focusOnNextItem();
         }
     }
 

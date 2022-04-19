@@ -2,19 +2,9 @@
 
 // ImtCore includes
 #include <imtlic/CFeaturePackageCollectionUtility.h>
-//#include <imtlic/CFeatureInfo.h>
-//#include <imtlic/IFeaturePackage.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
-
 #include <imtlic/CLicenseInstance.h>
-#include <imtlic/CLicenseInfo.h>
-
-#include <imtlic/IProductLicensingInfo.h>
-
-#include <imtlic/ILicenseInstance.h>
-#include <imtlic/CFeaturePackage.h>
-
 #include <imtbase/ICollectionInfo.h>
 
 
@@ -54,7 +44,6 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 			}
 
 			QByteArray accountId = productInstancePtr->GetCustomerId();
-
 			QByteArray productId = productInstancePtr->GetProductId();
 
 			if (instanceId != ""){
@@ -74,7 +63,6 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 			imtbase::ICollectionInfo::Ids licenseIds = licenseInstances.GetElementIds();
 
 			int index;
-
 			for (const QByteArray& licenseCollectionId : licenseIds){
 				const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(licenseCollectionId);
 				if (licenseInstancePtr != nullptr){
@@ -123,7 +111,6 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::IProductInstanceInfo> productInstancePtr = m_productInstanceFactCompPtr.CreateInstance();
-
 		if (!productInstancePtr.IsValid()) {
 			return nullptr;
 		}
@@ -139,18 +126,27 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 			name = itemModel.GetData("Name").toByteArray();
 		}
 
-		QByteArray productId;
-		if (itemModel.ContainsKey("ProductId")) {
-			productId = itemModel.GetData("ProductId").toByteArray();
-		}
-
 		QByteArray accountId;
 		if (itemModel.ContainsKey("AccountId")) {
 			accountId = itemModel.GetData("AccountId").toByteArray();
 		}
 
-		productInstancePtr->SetupProductInstance(productId, objectId, accountId);
+		if (accountId.isEmpty()){
+			errorMessage = "Account cannot be empty!";
+			return nullptr;
+		}
 
+		QByteArray productId;
+		if (itemModel.ContainsKey("ProductId")) {
+			productId = itemModel.GetData("ProductId").toByteArray();
+		}
+
+		if (productId.isEmpty()){
+			errorMessage = "Product cannot be empty!";
+			return nullptr;
+		}
+
+		productInstancePtr->SetupProductInstance(productId, objectId, accountId);
 		imtbase::CTreeItemModel* activeLicenses = itemModel.GetTreeItemModel("ActiveLicenses");
 		if (activeLicenses != nullptr){
 			int licenseState, expirationState = 0;

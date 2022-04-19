@@ -6,7 +6,9 @@ import imtqml 1.0
 
 Item {
     id: popupMenuContainer;
+
     width: popupMenuContainer.itemWidth;
+ //   visible: false;
 
     property Item resultItem;
     property Item loaderDialog;
@@ -35,6 +37,10 @@ Item {
     onFocusChanged: {
         console.log("PopupMenuDialog onFocusChanged");
         mainBody.forceActiveFocus();
+    }
+
+    onHeightChanged: {
+        console.log("PopupMenuDialog onHeightChanged", popupMenuContainer.height);
     }
 
     onModelChanged: {
@@ -113,7 +119,6 @@ Item {
 
             onModelChanged: {
                 console.log("PopupMenuDialog onModelChanged");
-
                 var height = popupMenuListView.count * popupMenuContainer.itemHeight -
                         popupMenuContainer.emptyItemCount * popupMenuContainer.itemHeight;
 
@@ -123,6 +128,8 @@ Item {
                 else {
                     mainBody.height = height;
                 }
+
+               // popupMenuContainer.height = mainBody.height;
             }
 
             delegate: Rectangle {

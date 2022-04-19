@@ -60,9 +60,12 @@ Item {
     }
 
     function openContextMenu(item, mouseX, mouseY) {
+        if (productCollectionView.table.height - mouseY <= 100){
+            mouseY = mouseY - 100;
+        }
+
         var point = productCollectionContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
 
-        console.log("ProductCollectionView openContextMenu", mouseX, mouseY);
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;
@@ -281,6 +284,11 @@ Item {
             if (index !== -1){
                 productCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
             }
+            metaInfo.getMetaInfo();
+        }
+
+        onSetDescriptionItem: {
+            metaInfo.getMetaInfo();
         }
     }
 

@@ -32,6 +32,7 @@ Rectangle {
     signal itemSelect(string idSelect, string name);
     signal removedItem(string itemId);
     signal renamedItem(string oldId, string newId);
+    signal setDescriptionItem(string newDescription);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromCollectionView();
 
@@ -45,6 +46,7 @@ Rectangle {
     }
 
     function openMessageDialog(nameDialog, message, type) {
+        console.log("CollectionView openMessageDialog", nameDialog, message, type);
         var source = "AuxComponents/MessageDialog.qml";
         var parameters = {};
         parameters["resultItem"] = collectionViewContainer;
@@ -199,7 +201,7 @@ Rectangle {
             if (itemId !== ""){
                 var source = "AuxComponents/MessageDialog.qml";
                 var parameters = {};
-                parameters["message"] = "Remove selected file from the database ?";
+                parameters["message"] = "Remove selected file from the collection ?";
                 parameters["nameDialog"] = "Remove dialog";
                 parameters["dialogId"] = "RemoveDialog";
                 parameters["resultItem"] = collectionViewContainer;
@@ -577,6 +579,7 @@ Rectangle {
                             var description = dataModelLocal.GetData("Description");
 
                             collectionViewContainer.updateItemAfterSetDescription(description);
+                            collectionViewContainer.setDescriptionItem(description);
                         }
                     }
                 }

@@ -72,6 +72,9 @@ Item {
     }
 
     function openContextMenu(item, mouseX, mouseY) {
+        if (productsCollectionView.table.height - mouseY <= 75){
+            mouseY = mouseY - 75;
+        }
         var point = productsCollectionViewContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
@@ -104,7 +107,7 @@ Item {
                     productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                     productsCollectionView.refresh();
 
-                    productsCollectionViewContainer.wasChanged = true;
+//                    productsCollectionViewContainer.wasChanged = true;
                 }
             }
         }
@@ -125,7 +128,7 @@ Item {
                     productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                     productsCollectionView.refresh();
 
-                    productsCollectionViewContainer.wasChanged = true;
+//                    productsCollectionViewContainer.wasChanged = true;
                 }
             }
         }
@@ -164,16 +167,16 @@ Item {
         }
     }
 
-    function openMessageDialog(nameDialog, message) {
-        var source = "AuxComponents/MessageDialog.qml";
-        var parameters = {};
-        parameters["resultItem"] = productsCollectionViewContainer;
-        parameters["noButtonVisible"] = false;
-        parameters["textOkButton"] = "Ok";
-        parameters["message"] = message;
-        parameters["nameDialog"] = nameDialog;
-        thubnailDecoratorContainer.openDialog(source, parameters);
-    }
+//    function openMessageDialog(nameDialog, message) {
+//        var source = "AuxComponents/MessageDialog.qml";
+//        var parameters = {};
+//        parameters["resultItem"] = productsCollectionViewContainer;
+//        parameters["noButtonVisible"] = false;
+//        parameters["textOkButton"] = "Ok";
+//        parameters["message"] = message;
+//        parameters["nameDialog"] = nameDialog;
+//        thubnailDecoratorContainer.openDialog(source, parameters);
+//    }
 
     function makeCommandActive(commandId){
         productsCollectionViewContainer.rootItem.setModeMenuButton(commandId, "Normal");
@@ -244,7 +247,7 @@ Item {
             var duplicateId = dataModelLocal.GetData("Id", productsCollectionView.selectedIndex);
             var duplicateDescription = dataModelLocal.GetData("Description", productsCollectionView.selectedIndex);
             productsCollectionViewContainer.createLicense(duplicateId, duplicateName, duplicateDescription);
-            productsCollectionViewContainer.wasChanged = true;
+//            productsCollectionViewContainer.wasChanged = true;
         }
         else {
             productsCollectionView.menuActivated(menuId)
@@ -267,16 +270,16 @@ Item {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
-            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");//
+//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");//
             productsCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
-            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");//
+//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");//
         }
-
+        productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
 //        if (productsCollectionViewContainer.wasChanged){
 //            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
 //        } else {
@@ -438,7 +441,7 @@ Item {
                     dataModelLocal = dataModelLocal.GetData(productsCollectionViewContainer.gqlModelQueryType);
                     if (dataModelLocal){
                         var messageError = dataModelLocal.GetData("message");
-                        productsCollectionViewContainer.openMessageDialog("Error Dialog", messageError);
+                        productsCollectionView.openMessageDialog("Error Dialog", messageError, "ErrorDialog");
                     }
 
                     return;
@@ -471,7 +474,11 @@ Item {
                                     tfcProductName.text);
                     }
                     productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
-                    productsCollectionViewContainer.wasChanged = false;
+//                    productsCollectionViewContainer.wasChanged = false;
+
+                    if (productsCollectionViewContainer.operation == "New"){
+                        productsCollectionViewContainer.operation = "Open";
+                    }
                 }
             }
         }
@@ -545,7 +552,7 @@ Item {
             text: productsCollectionViewContainer.itemId;
 
             onInputTextChanged: {
-                productsCollectionViewContainer.wasChanged = true;
+//                productsCollectionViewContainer.wasChanged = true;
             }
         }
 
@@ -583,7 +590,7 @@ Item {
             text: productsCollectionViewContainer.itemName;
 
             onInputTextChanged: {
-                productsCollectionViewContainer.wasChanged = true;
+//                productsCollectionViewContainer.wasChanged = true;
             }
         }
 
@@ -802,7 +809,7 @@ Item {
                     if (ok){
                         treeViewFeaturesModel.SetData("stateChecked", 2, j);
 
-                        //Ищем фичи  от которых зависит выбранная, чтобы сделать их неактивными
+                        //Ищем фичи от которых зависит выбранная, чтобы сделать их неактивными
                         productMetaInfo.updateDependsFeatures(treeViewPackageId, treeViewFeatureId);
                     }
                 }
@@ -858,6 +865,7 @@ Item {
                                 console.log("set state 2");
                                 modelChildren.SetData("isActive", 0, j);
                                 modelChildren.SetData("stateChecked", 2, j);
+                                productMetaInfo.updateDependsFeatures(pId, fId);
                             }
                         }
                     }

@@ -20,7 +20,7 @@ Item {
 
     onFocusChanged: {
         if (settingsDatabaseInputContainer.focus){
-            settingsDatabaseInputRepeater.focusOnNextItem();
+           // settingsDatabaseInputRepeater.focusOnNextItem();
         }
     }
 
@@ -66,16 +66,16 @@ Item {
             function focusOnNextItem(){
                 console.log("DatabaseInput Repeater focusOnNextItem");
 
-                databaseInputColumn.currentFocusIndex++;
+//                databaseInputColumn.currentFocusIndex++;
 
-                if (databaseInputColumn.currentFocusIndex == settingsDatabaseInputRepeater.count){
-                    databaseInputColumn.currentFocusIndex = -1;
-                    settingsDatabaseInputContainer.rootItem.focusOnButtons();
-                }
-                else{
-                    databaseInputColumn.activeItem = settingsDatabaseInputRepeater.itemAt(databaseInputColumn.currentFocusIndex);
-                    databaseInputColumn.activeItem.setFocus(true);
-                }
+//                if (databaseInputColumn.currentFocusIndex == settingsDatabaseInputRepeater.count){
+//                    databaseInputColumn.currentFocusIndex = -1;
+//                    settingsDatabaseInputContainer.rootItem.focusOnButtons();
+//                }
+//                else{
+//                    databaseInputColumn.activeItem = settingsDatabaseInputRepeater.itemAt(databaseInputColumn.currentFocusIndex);
+//                    databaseInputColumn.activeItem.setFocus(true);
+//                }
             }
 
             delegate: Item {
@@ -87,7 +87,7 @@ Item {
                 function setFocus(state){
                     console.log("DatabaseInput Item setFocus");
                     if (state === true){
-                       settingsDatabaseInputLoader.item.forceActiveFocus();
+                      // settingsDatabaseInputLoader.item.forceActiveFocus();
                     }
                 }
 

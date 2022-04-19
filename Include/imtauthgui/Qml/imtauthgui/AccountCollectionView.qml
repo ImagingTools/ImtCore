@@ -62,6 +62,10 @@ Item {
 
     function openContextMenu(item, mouseX, mouseY) {
         console.log("AccountCollectionView openContextMenu", mouseX, mouseY);
+
+        if (accountCollectionView.table.height - mouseY <= 100){
+            mouseY = mouseY - 100;
+        }
         var point = accountCollectionContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
 
         var source = "AuxComponents/PopupMenuDialog.qml";
@@ -274,51 +278,6 @@ Item {
     TreeItemModel {
         id: accountsMetaInfoModels;
     }
-
-//    function updateMetaInfoById(accountId, newMetaInfo){
-//        var index = -1;
-//        for (var i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
-//            var curId = accountsMetaInfoModels.GetData("Id", i);
-
-//            if (curId === accountId){
-//                index = i;
-//                break;
-//            }
-//        }
-
-//        if (index !== -1){
-
-//            var modelData =  accountsMetaInfoModels.GetData("ModelData", index);
-
-//            for (var i = 0; i < modelData.GetItemsCount(); i++){
-//                var name = modelData.GetData("Name", i);
-//                if (name === "LastName"){
-//                    modelData.SetData("Childs", newMetaInfo.GetData("LastName"), i);
-//                }
-//                else if (name === "FirstName") {
-//                    modelData.SetData("Childs", newMetaInfo.GetData("FirstName"), i);
-//                }
-//                else if (name === "Email") {
-//                    modelData.SetData("Childs", newMetaInfo.GetData("Email"), i);
-
-//                }
-//                else if (name === "AccountDescription") {
-//                    modelData.SetData("Childs", newMetaInfo.GetData("AccountDescription"), i);
-
-//                }
-//                else if (name === "AccountName") {
-//                    modelData.SetData("Childs", newMetaInfo.GetData("AccountName"), i);
-//                }
-//                else if (name === "AccountType") {
-//                    modelData.SetData("Childs", newMetaInfo.GetData("AccountType"), i);
-//                }
-//            }
-
-//            accountsMetaInfoModels.SetData("ModelData", modelData, index)
-
-//            accountCollectionMetaInfo.modelData = modelData;
-//        }
-//    }
 
     MetaInfo {
         id: accountCollectionMetaInfo;

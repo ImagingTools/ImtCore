@@ -11,6 +11,7 @@ Rectangle {
     radius: 3;
 
     clip: true;
+    visible: false;
 
     color: Style.backgroundColor;
 
@@ -41,7 +42,7 @@ Rectangle {
 
     onFocusChanged: {
         if (preferenceContainer.focus){
-            mainPanelColumn.forceActiveFocus();
+           // mainPanelColumn.forceActiveFocus();
         }
     }
 
@@ -354,7 +355,7 @@ Rectangle {
                         mainPanelRepeater.selectedIndex = model.index;
 
                         if (!mainPanelColumn.focus){
-                            mainPanelColumn.forceActiveFocus();
+                            //mainPanelColumn.forceActiveFocus();
                         }
                     }
                 }
@@ -391,19 +392,19 @@ Rectangle {
 
            function focusOnNextItem(){
                console.log("Repeater focusOnNextItem");
-               if (dependentPanelColumn.activeItem){
-                   dependentPanelColumn.activeItem.setFocus(false);
-               }
+//               if (dependentPanelColumn.activeItem){
+//                   dependentPanelColumn.activeItem.setFocus(false);
+//               }
 
-               dependentPanelColumn.currentFocusIndex++;
+//               dependentPanelColumn.currentFocusIndex++;
 
-               if (dependentPanelColumn.currentFocusIndex == dependentPanelRepeater.count){
-                   preferenceContainer.focusOnButtons();
-               }
-               else{
-                   dependentPanelColumn.activeItem = dependentPanelRepeater.itemAt(dependentPanelColumn.currentFocusIndex);
-                   dependentPanelColumn.activeItem.setFocus(true);
-               }
+//               if (dependentPanelColumn.currentFocusIndex == dependentPanelRepeater.count){
+//                   preferenceContainer.focusOnButtons();
+//               }
+//               else{
+//                   dependentPanelColumn.activeItem = dependentPanelRepeater.itemAt(dependentPanelColumn.currentFocusIndex);
+//                   dependentPanelColumn.activeItem.setFocus(true);
+//               }
            }
 
            delegate: Item {
@@ -414,10 +415,10 @@ Rectangle {
 
                function setFocus(state){
                    console.log("PreferenceDialog setFocus");
-                   if (state === true){
-                      dependentPanelLoader.item.forceActiveFocus();
-                   }
-                   dependentPanelLoader.item.active = state;
+//                   if (state === true){
+//                      dependentPanelLoader.item.forceActiveFocus();
+//                   }
+//                   dependentPanelLoader.item.active = state;
                }
 
                Text {

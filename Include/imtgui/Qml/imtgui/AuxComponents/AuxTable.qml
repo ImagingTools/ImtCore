@@ -111,6 +111,7 @@ Item {
     Rectangle {
         anchors.fill: elementsList;
         color: Style.baseColor;
+//        color: "transparent";
     }
 
     ListView {
@@ -150,10 +151,15 @@ Item {
 
             onTableDelegateRrightButtonMouseClicked: {
                 console.log("AuxTable onRightButtonMouseClicked", mX, mY);
-                var tempX = mX;
-                var tempY = (model.index + 1) * tableDelegate.height + mY;
-                console.log("tempX", tempX);
-                console.log("tempY", tempY);
+//                var tempX = mX;
+//                var tempY = (model.index + 1) * tableDelegate.height + mY;
+                var point = tableDelegate.mapToItem(elementsList, mX, mY);
+
+                console.log("point.x", point.x);
+                console.log("point.y", point.y);
+
+                var tempX = point.x;
+                var tempY = point.y + tableDelegate.height;
                 tableContainer.rightButtonMouseClicked(thubnailDecoratorContainer, tempX, tempY);
             }
 

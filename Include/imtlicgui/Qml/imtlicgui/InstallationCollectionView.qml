@@ -59,7 +59,9 @@ Item {
 
     function openContextMenu(item, mouseX, mouseY) {
         console.log("InstallationCollectionView openContextMenu", mouseX, mouseY);
-
+        if (installationCollectionView.table.height - mouseY <= 100){
+            mouseY = mouseY - 100;
+        }
         var point = installationCollectionContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
@@ -281,6 +283,11 @@ Item {
             if (index !== -1){
                 installationCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
             }
+            metaInfo.getMetaInfo();
+        }
+
+        onSetDescriptionItem: {
+            metaInfo.getMetaInfo();
         }
     }
 

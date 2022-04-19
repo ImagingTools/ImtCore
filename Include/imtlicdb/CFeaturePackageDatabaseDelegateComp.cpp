@@ -328,7 +328,10 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 	QByteArray oldPackageId = currentPackagePtr->GetPackageId();
 	QByteArray newPackageId = newObjectName.toLocal8Bit();
 
-	QByteArray retVal = QString("UPDATE Packages SET Id ='%1', Name = '%1' WHERE Id ='%2';").arg(newObjectName).arg(qPrintable(oldPackageId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE Packages SET Id ='%1', Name = '%1', LastModified = '%2' WHERE Id ='%3';")
+			.arg(newObjectName)
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+			.arg(qPrintable(oldPackageId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -349,7 +352,10 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE Packages SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(packagePtr->GetPackageId())).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE Packages SET Description = '%1', LastModified = '%2' WHERE Id ='%3';")
+			.arg(description)
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+			.arg(qPrintable(packagePtr->GetPackageId())).toLocal8Bit();
 
 	return retVal;
 }

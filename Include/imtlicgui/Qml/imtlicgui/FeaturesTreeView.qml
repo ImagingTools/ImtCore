@@ -320,14 +320,15 @@ Item {
         return -1;
     }
 
-    function findInAllRootFeaturesDependFeatureById(packageId, featureId) {
+    function findInAllRootFeaturesDependFeatureById(packageId, featureId, result) {
 
         console.log("FeaturesTreeView findInAllRootFeaturesDependFeatureById", packageId, featureId);
+        //featuresTreeViewContainer.printInfo();
         if (!featuresTreeViewContainer.modelDepends) {
             return false;
         }
 
-        var result = [];
+      //  var result = [];
         for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
             var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", i);
             var rootFeatureId = featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i);
@@ -349,8 +350,9 @@ Item {
                         var fId = modelChildren.GetData("Id", k);
 
                         if (fId === featureId) {
+                            console.log("result.push", rootPackageId, rootFeatureId);
                             result.push(rootPackageId + "." + rootFeatureId);
-
+                            //featuresTreeViewContainer.findInAllRootFeaturesDependFeatureById(rootPackageId, rootFeatureId, result);
                             break;
                             //return true;
                         }
@@ -361,6 +363,44 @@ Item {
         }
 
         return result;
+    }
+
+    function findInAllDependsFeaturesByRootFeatureId(packageId, featureId, result) {
+        console.log("FeaturesTreeView findInAllRootFeaturesDependFeatureById", packageId, featureId);
+        //featuresTreeViewContainer.printInfo();
+        if (!featuresTreeViewContainer.modelDepends) {
+            return false;
+        }
+
+        for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
+
+            var rootFeatureId = featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i);
+            var rootPackageId = featuresTreeViewContainer.modelDepends.GetData("RootPackageId", i);
+
+
+            if (rootPackageId === packageId && rootFeatureId === featureId){
+                var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", i);
+                if (!modelPackages) {
+                    continue;
+                }
+
+                 for (var j = 0; j < modelPackages.GetItemsCount(); j++) {
+                     var pId = modelPackages.GetData("Id", j);
+
+                     var modelChildren = modelPackages.GetData("childItemModel", j);
+
+                     if (!modelChildren) {
+                         continue;
+                     }
+
+                     for (var k = 0; k < modelChildren.GetItemsCount(); k++) {
+                         var fId = modelChildren.GetData("Id", k);
+                         result.push(pId + "." + fId);
+                         featuresTreeViewContainer.findInAllDependsFeaturesByRootFeatureId(pId, fId, result);
+                     }
+                 }
+            }
+        }
     }
 
     GqlModel {

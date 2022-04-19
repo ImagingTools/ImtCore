@@ -83,22 +83,6 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 		productInstancePtr->AddLicense(licenseId, expirationDate);
 	}
 
-//	while (productLicensesQuery.next()){
-//		QSqlRecord licenseRecord = productLicensesQuery.record();
-//		QByteArray licenseId;
-
-//		if (licenseRecord.contains("LicenseId")){
-//			licenseId = licenseRecord.value("LicenseId").toByteArray();
-//		}
-
-//		QDateTime expirationDate;
-//		if (licenseRecord.contains("ExpirationDate")){
-//			expirationDate = licenseRecord.value("ExpirationDate").toDateTime();
-//		}
-
-//		productInstancePtr->AddLicense(licenseId, expirationDate);
-//	}
-
 	return productInstancePtr.PopPtr();
 }
 
@@ -149,7 +133,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductInstanceDatabaseDelegateC
 	const imtbase::ICollectionInfo& licenseList = productInstancePtr->GetLicenseInstances();
 
 	imtbase::ICollectionInfo::Ids licenseIds = licenseList.GetElementIds();
-
 	for (const QByteArray& licenseCollectionId : licenseIds){
 		const imtlic::ILicenseInstance* licensePtr = productInstancePtr->GetLicenseInstance(licenseCollectionId);
 		if (licensePtr != nullptr){
@@ -157,15 +140,17 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductInstanceDatabaseDelegateC
 			QDateTime expirationTime = licensePtr->GetExpiration();
 
 			if (expirationTime.isNull()){
-				retVal.query += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId) VALUES('%1', '%2');")
+				retVal.query += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ProductId) VALUES('%1', '%2', '%3');")
 							.arg(qPrintable(productInstanceId))
 							.arg(qPrintable(licenseId))
+							.arg(qPrintable(productId))
 							.toLocal8Bit();
 			}
 			else{
-				retVal.query += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ExpirationDate) VALUES('%1', '%2', '%3');")
+				retVal.query += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ProductId, ExpirationDate) VALUES('%1', '%2', '%3', '%4');")
 							.arg(qPrintable(productInstanceId))
 							.arg(qPrintable(licenseId))
+							.arg(qPrintable(productId))
 							.arg(expirationTime.date().toString(Qt::ISODate))
 							.toLocal8Bit();
 			}
@@ -270,15 +255,17 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 			QDateTime expirationTime = licensePtr->GetExpiration();
 
 			if (expirationTime.isNull()){
-				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId) VALUES('%1', '%2');")
+				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ProductId) VALUES('%1', '%2', '%3');")
 							.arg(qPrintable(newProductInstanceId))
 							.arg(qPrintable(licenseId))
+							.arg(qPrintable(productId))
 							.toLocal8Bit();
 			}
 			else{
-				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ExpirationDate) VALUES('%1', '%2', '%3');")
+				retVal += "\n" + QString("INSERT INTO ProductInstanceLicenses(InstanceId, LicenseId, ProductId, ExpirationDate) VALUES('%1', '%2', '%3', '%4');")
 							.arg(qPrintable(newProductInstanceId))
 							.arg(qPrintable(licenseId))
+							.arg(qPrintable(productId))
 							.arg(expirationTime.date().toString(Qt::ISODate))
 							.toLocal8Bit();
 			}
@@ -291,9 +278,10 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 		if (licensePtr != nullptr){
 			QByteArray licenseId = licensePtr->GetLicenseId();
 			retVal += "\n" +
-					QString("DELETE FROM ProductInstanceLicenses WHERE InstanceId = '%1' AND LicenseId = '%2';")
+					QString("DELETE FROM ProductInstanceLicenses WHERE InstanceId = '%1' AND LicenseId = '%2' AND ProductId = '%3' ;")
 							.arg(qPrintable(oldProductInstanceId))
 							.arg(qPrintable(licenseId))
+							.arg(qPrintable(productId))
 							.toLocal8Bit();
 		}
 	}
@@ -308,10 +296,11 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 				expirationDataString = "null";
 			}
 			retVal += "\n" +
-				QString("UPDATE ProductInstanceLicenses SET ExpirationDate = %1 WHERE  InstanceId = '%2' AND LicenseId = '%3';")
+				QString("UPDATE ProductInstanceLicenses SET ExpirationDate = %1 WHERE  InstanceId = '%2' AND LicenseId = '%3' AND ProductId = '%4';")
 							.arg(expirationDataString)
 							.arg(qPrintable(newProductInstanceId))
 							.arg(qPrintable(licenseId))
+							.arg(qPrintable(productId))
 							.toLocal8Bit();
 		}
 
@@ -341,7 +330,10 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET Name = '%1' WHERE InstanceId ='%2';").arg(newObjectName).arg(qPrintable(productInstanceId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE ProductInstances SET Name = '%1', LastModified = '%2' WHERE InstanceId ='%3';")
+			.arg(newObjectName)
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+			.arg(qPrintable(productInstanceId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -367,7 +359,10 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET Description = '%1' WHERE InstanceId ='%2';").arg(description).arg(qPrintable(productInstanceId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE ProductInstances SET Description = '%1', LastModified = '%2' WHERE InstanceId ='%3';")
+			.arg(description)
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+			.arg(qPrintable(productInstanceId)).toLocal8Bit();
 
 	return retVal;
 }

@@ -14,7 +14,7 @@ Item {
 
     onFocusChanged: {
         if (settingsIntegerInputContainer.focus){
-            tfcIntegerInput.setFocus(true);
+//            tfcIntegerInput.setFocus(true);
         }
     }
 
@@ -23,8 +23,8 @@ Item {
         if (event.key === Qt.Key_Tab){
             console.log('Key tab was pressed');
 
-            tfcIntegerInput.setFocus(false);
-            settingsIntegerInputContainer.repeaterItem.focusOnNextItem();
+//            tfcIntegerInput.setFocus(false);
+//            settingsIntegerInputContainer.repeaterItem.focusOnNextItem();
         }
     }
 

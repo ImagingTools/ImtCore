@@ -80,7 +80,7 @@ Rectangle {
 
     function dialogResult(parameters){}
 
-    function openMessageDialog(nameDialog, message) {
+    function openMessageDialog(nameDialog, message, type) {
         var source = "AuxComponents/MessageDialog.qml";
         var parameters = {};
         parameters["resultItem"] = containerContactInfo;
@@ -88,6 +88,7 @@ Rectangle {
         parameters["textOkButton"] = "OK";
         parameters["message"] = message;
         parameters["nameDialog"] = nameDialog;
+        parameters["dialogId"] = type;
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
@@ -111,6 +112,14 @@ Rectangle {
 //            collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Save") {
+
+            var name = containerContactInfo.contactInfoModel.GetData("AccountName");
+            if (name == ""){
+                var message = "Account name can't be empty!";
+                containerContactInfo.openMessageDialog("Error Dialog", message, "ErrorDialog");
+                return;
+            }
+
             contactInfoSaveQuery.updateModel();
         }
         else if (menuId === "Close") {
@@ -143,12 +152,13 @@ Rectangle {
         containerContactInfo.rootItem.setModeMenuButton("New", "Normal");
         containerContactInfo.rootItem.setModeMenuButton("Close", "Normal");
 
-        if (containerContactInfo.wasChanged){
-            containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
-        }
-        else {
-            containerContactInfo.rootItem.setModeMenuButton("Save", "Disabled");
-        }
+        containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
+//        if (containerContactInfo.wasChanged){
+//            containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
+//        }
+//        else {
+//            containerContactInfo.rootItem.setModeMenuButton("Save", "Disabled");
+//        }
     }
 
     ListModel {

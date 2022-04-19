@@ -66,8 +66,6 @@ Rectangle
         id: modelLayers;
     }
 
-
-
     function setInvalidConnection(state){
         console.log("ThumbnailDecorator setInvalidConnection", state);
         thubnailDecoratorContainer.serverIsConnection = !state;
@@ -124,10 +122,6 @@ Rectangle
             console.log("ThumbnailDecorator MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
         }
     }
-
-//    TreeItemModel {
-//        id: localSettings;
-//    }
 
     Repeater {
         id: pagesData;
@@ -195,15 +189,6 @@ Rectangle
         }
     }
 
-//    Connections {
-//        target: Qt.application;
-
-//        onAboutToQuit: {
-//            console.log("Quit application");
-//            listViewDialogs.destroy();
-//        }
-//    }
-
     Rectangle {
         id: errorBackground;
 
@@ -259,6 +244,15 @@ Rectangle
         }
     }
 
+//    Connections {
+//        target: Qt.application;
+
+//        onAboutToQuit: {
+//            console.log("Quit application");
+//            listViewDialogs.destroy();
+//        }
+//    }
+
 
 
 //    AuxButton {
@@ -308,12 +302,27 @@ Rectangle
 
             color: "transparent";
 
+//            Timer {
+//                id: timepBackground;
+
+//                Component.onCompleted: {
+//                    timepBackground.start(100);
+
+//                }
+
+//                onTriggered: {
+//                    darkBackground.visible = true;
+//                }
+//            }
+
+
             Rectangle {
                 id: darkBackground;
 
                 anchors.fill: parent;
 
                 color: "gray";
+//                visible: false;
 
                 MouseArea {
                     anchors.fill: parent;
@@ -357,7 +366,6 @@ Rectangle
 
                   onItemChanged: {
                       console.log("ThumbnailDecorator loader onItemChanged!");
-
                       for (var key in model.parameters) {
                           console.log(key, model.parameters[key]);
                           loaderDialog.item[key]  = model.parameters[key];
@@ -369,9 +377,8 @@ Rectangle
                       }
                       darkBackground.opacity = loaderDialog.item.backgroundOpacity;
                       loaderDialog.item["thumbnailItem"] = thubnailDecoratorContainer;
+                      loaderDialog.item.visible = true;
                       loaderDialog.item.forceActiveFocus();
-
-//                      timer.start(50);
                   }
              }
         }

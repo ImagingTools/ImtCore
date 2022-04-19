@@ -7,8 +7,6 @@ import Acf 1.0
 Rectangle {
     id: containerInstallation;
 
-//    anchors.fill: thubnailDecoratorContainer;
-
     width: 500;
     height: 500;
 
@@ -36,10 +34,7 @@ Rectangle {
 
     onFocusChanged: {
         console.log("InstallationInfoEditor onFocusChanged", containerInstallation.focus);
-
         if (containerInstallation.focus){
-            //instanceIdText.setFocus(true);
-
             tfcInstance.forceActiveFocus();
         }
     }
@@ -170,13 +165,16 @@ Rectangle {
     function dialogResult(parameters) {
          console.log("InstallationInfoEditor dialogResult", parameters["status"]);
 
-        if (parameters["status"] === "ok") {
 
-            if (parameters["dialog"] === "InputDialog") {
+        if (parameters["dialog"] === "InputDialog"){
+            if (parameters["status"] === "ok"){
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
                 installationSaveQuery.updateModel(value);
             }
+        }
+        else if (parameters["dialog"] === "ErrorDialog"){
+
         }
     }
 
@@ -186,6 +184,12 @@ Rectangle {
 //            collectionViewContainer.selectItem("", "")
         }
         else if (menuId  === "Save") {
+
+            if (instanceIdText.text == ""){
+                containerInstallation.openMessageDialog("Error Dialog", "Id can't be empty!", "ErrorDialog");
+                return;
+            }
+
             if (containerInstallation.operation === "New") {
                 var source = "AuxComponents/InputDialog.qml";
                 var parameters = {};
@@ -203,7 +207,7 @@ Rectangle {
         }
     }
 
-    function openMessageDialog(nameDialog, message) {
+    function openMessageDialog(nameDialog, message, type) {
         var source = "AuxComponents/MessageDialog.qml";
         var parameters = {};
         parameters["resultItem"] = containerInstallation;
@@ -211,6 +215,7 @@ Rectangle {
         parameters["textOkButton"] = "Ok";
         parameters["message"] = message;
         parameters["nameDialog"] = nameDialog;
+        parameters["dialogId"] = type;
         thubnailDecoratorContainer.openDialog(source, parameters);
     }
 
@@ -487,10 +492,10 @@ Rectangle {
                  id: licensesBlock;
 
                  anchors.horizontalCenter: containerColumn.horizontalCenter;
-//                 anchors.bottom: containerInstallation.bottom;
+                 //anchors.bottom: containerInstallation.bottom;
 
                  width: containerColumn.width - 20;
-                 height: 200;
+                 height: 300;
 
                  color: Style.imagingToolsGradient1;
 
@@ -896,7 +901,7 @@ Rectangle {
                     if (dataModelLocal){
                         console.log("Message errors");
                         var messageError = dataModelLocal.GetData("message");
-                        containerInstallation.openMessageDialog("Error Dialog", messageError);
+                        containerInstallation.openMessageDialog("Error Dialog", messageError, "ErrorDialog");
                     }
 
                     return;
@@ -918,7 +923,12 @@ Rectangle {
                         }
                     }
                     containerInstallation.rootItem.updateTitleTab(containerInstallation.itemId, containerInstallation.itemName);
-                    containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+
+                    if (containerInstallation.multiDocViewItem.activeCollectionItem){
+                        containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                    }
+
+
 //                    containerInstallation.multiDocViewItem.activeCollectionItem.refresh();
 
                     containerInstallation.wasChanged = false;

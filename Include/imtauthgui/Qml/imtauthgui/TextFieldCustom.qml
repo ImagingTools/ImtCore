@@ -32,7 +32,7 @@ Item {
     onFocusChanged: {
         console.log('TextFieldCustom onFocusChanged', containerTextField.focus);
         if (!containerTextField.focus){
-            containerTextField.setFocus(false);
+            //containerTextField.setFocus(false);
         }
 //        else{
 //            containerTextField.setFocus(true);

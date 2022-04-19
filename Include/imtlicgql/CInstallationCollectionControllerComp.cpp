@@ -69,6 +69,8 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		metaInfoModel->SetData("Name", "Modification Time", index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
+		//QString date = GetObjectInformation("ModificationTime", productInstanceId).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+		//childs->SetData("Value", date);
 		if (m_objectCollectionCompPtr->GetDataMetaInfo(productInstanceId, metaInfo)){
 			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 			childs->SetData("Value", date);

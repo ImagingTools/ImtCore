@@ -92,10 +92,10 @@ Item {
 					}
 				}
 				
-				setTimeout(()=>{
-					//this.backend.tick(this)
-					this._processActions()
-				}, 50)
+                setTimeout(()=>{
+                    //this.backend.tick(this)
+                    this._processActions()
+                }, 50)
 				
 			})
 		}

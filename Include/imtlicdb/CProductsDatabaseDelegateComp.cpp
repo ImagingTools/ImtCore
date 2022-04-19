@@ -149,10 +149,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 	}
 
 	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO Products(Id, Name, Description) VALUES('%1', '%2', '%3');")
+	retVal.query = QString("INSERT INTO Products(Id, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5');")
 				.arg(qPrintable(productId))
 				.arg(productName)
-				.arg(objectDescription).toLocal8Bit();
+				.arg(objectDescription)
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.toLocal8Bit();
 	retVal.objectName = productName;
 
 	imtbase::ICollectionInfo::Ids licenseIds = productPtr->GetLicenseList().GetElementIds();
@@ -244,9 +247,10 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QString oldProductName = oldProductPtr->GetName();
 	QString newProductName = newProductPtr->GetName();
 
-	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%2' WHERE Id ='%3';")
+	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%2', LastModified = '%3' WHERE Id ='%4';")
 			.arg(qPrintable(newProductId))
 			.arg(qPrintable(newProductName))
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(oldProductId)).toLocal8Bit();
 
 	QByteArrayList addedLicenses;
@@ -367,12 +371,9 @@ QByteArray CProductsDatabaseDelegateComp::CreateRenameObjectQuery(
 	QByteArray oldProductId = productPtr->GetProductId();
 	QByteArray newProductId = newObjectName.toLocal8Bit();
 
-//	QByteArray retVal = QString("UPDATE Products SET Id ='%1', Name = '%1' WHERE Id ='%2';")
-//			.arg(qPrintable(newProductId))
-//			.arg(qPrintable(oldProductId)).toLocal8Bit();
-
-	QByteArray retVal = QString("UPDATE Products SET Name = '%1' WHERE Id ='%2';")
+	QByteArray retVal = QString("UPDATE Products SET Name = '%1', LastModified = '%2' WHERE Id ='%3';")
 			.arg(qPrintable(newObjectName))
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(oldProductId)).toLocal8Bit();
 
 	return retVal;
@@ -394,7 +395,10 @@ QByteArray CProductsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE Products SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(productPtr->GetProductId())).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE Products SET Description = '%1', LastModified = '%2' WHERE Id ='%3';")
+			.arg(description)
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+			.arg(qPrintable(productPtr->GetProductId())).toLocal8Bit();
 
 	return retVal;
 }

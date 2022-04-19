@@ -183,7 +183,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 			newObjectId = m_objectCollectionCompPtr->InsertNewObject("",name,description, newObject, objectId);
 		}
 
-		if (newObjectId.isEmpty()){
+		if (errorMessage.isEmpty() && newObjectId.isEmpty()){
 			errorMessage = "Object with this id already exists!";
 		}
 	}
@@ -223,7 +223,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	else{
 		QString name, description;
 		istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
-
 		if (savedObject != nullptr){
 			if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
 				errorMessage = QObject::tr("Can not update object: %1").arg(QString(oldObjectId));
@@ -244,7 +243,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		notificationModel->SetData("Id", newObjectId);
 		dataModel->SetExternTreeModel("updatedNotification", notificationModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
