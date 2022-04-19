@@ -25,6 +25,6 @@ include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 target_link_libraries(${PROJECT_NAME} imtdesign imtbase)
 
 if(WIN32)
-	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}\")
+	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 	windeploy(${PROJECT_NAME} "" "${files}")
 endif()
