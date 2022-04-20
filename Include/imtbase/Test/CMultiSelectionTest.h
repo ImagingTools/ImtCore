@@ -22,8 +22,8 @@
 #include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
-#include <imtbase/IMultiSelection.h>
-#include <imtbase/CMultiSelection.h>
+#include <imtbase/CSelection.h>
+
 
 class CMultiSelectionTest: public QObject
 {
@@ -40,5 +40,7 @@ private slots:
 	void cleanupTestCase();
 
 private:
-	imtbase::IMultiSelection::Ids m_testSelectedIds;
+	imtbase::ISelection::Ids m_testSelectedIds;
 };
+
+
