@@ -15,7 +15,7 @@ Item {
     onFocusChanged: {
         console.log("SettingsTextInput onFocusChanged", settingsTextInputContainer.focus);
         if (settingsTextInputContainer.focus){
-            //tfcTextInput.setFocus(true);
+            tfcTextInput.setFocus(true);
         }
     }
 

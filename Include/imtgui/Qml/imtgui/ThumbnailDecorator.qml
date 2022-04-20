@@ -192,6 +192,8 @@ Rectangle
     Rectangle {
         id: errorBackground;
 
+//        width: parent.width - 100;
+//        height: parent.height;
         anchors.fill: parent;
 
         color: "transparent";
@@ -242,7 +244,19 @@ Rectangle
             console.log("ThumbnailDecorator TopPanel onCommandsChangedSignal", commandsId);
             thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
         }
+
+        MouseArea {
+            id: rectBlock;
+
+            anchors.horizontalCenter: topPanel.horizontalCenter;
+
+            width: topPanel.width - 100;
+            height: topPanel.height;
+
+            visible: errorBackground.visible;
+        }
     }
+
 
 //    Connections {
 //        target: Qt.application;
@@ -250,34 +264,6 @@ Rectangle
 //        onAboutToQuit: {
 //            console.log("Quit application");
 //            listViewDialogs.destroy();
-//        }
-//    }
-
-
-
-//    AuxButton {
-//        id: refreshButton;
-
-//        anchors.top: textNoConnection.bottom;
-//        anchors.topMargin: 20;
-//        anchors.horizontalCenter: parent.horizontalCenter;
-
-//        width: 70;
-//        height: 25;
-
-//        hasText: true;
-//        hasIcon: false;
-
-//        visible: textNoConnection.visible;
-
-//        textButton: "Refresh";
-
-//        backgroundColor: Style.imagingToolsGradient1;
-//        borderColor: (refreshButton.highlighted || refreshButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
-
-//        onClicked: {
-//            refreshButton.enabled = false;
-//            thubnailDecoratorContainer.updateModels();
 //        }
 //    }
 

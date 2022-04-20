@@ -427,7 +427,7 @@ Rectangle {
 
             color: Style.errorTextColor;
 
-            text: "";
+            text: "Id can't be empty!";
         }
 
         Text {

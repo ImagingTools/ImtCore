@@ -55,6 +55,8 @@ Rectangle {
         else {
             if(containerContactInfo.operation === "New"){
                 cbTypeAccount.currentIndex = 0;
+                containerContactInfo.accountType = "private";
+
                 containerContactInfo.contactInfoModel = model.AddTreeModel("data");
                 containerContactInfo.contactInfoModel.SetData("Email","")
                 containerContactInfo.contactInfoModel.SetData("FirstName","")
@@ -62,7 +64,7 @@ Rectangle {
                 containerContactInfo.contactInfoModel.SetData("NickName","")
                 containerContactInfo.contactInfoModel.SetData("AccountName","")
                 containerContactInfo.contactInfoModel.SetData("AccountDescription","")
-                containerContactInfo.contactInfoModel.SetData("AccountType", "company")
+                containerContactInfo.contactInfoModel.SetData("AccountType", "private")
 
                 containerContactInfo.contactInfoModel.SetData("AccountTypeComboBoxIndex", cbTypeAccount.currentIndex)
 
@@ -300,7 +302,10 @@ Rectangle {
                 property bool wasFocus: false;
 
                 onCurrentIndexChanged: {
+                    console.log("cbTypeAccount onCurrentIndexChanged", cbTypeAccount.currentIndex);
+
                     var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).name.toLowerCase();
+                    console.log("accountType", accountType);
                     containerContactInfo.accountType = accountType;
 
                     if (!containerContactInfo.contactInfoModel){
@@ -309,12 +314,11 @@ Rectangle {
 
                     containerContactInfo.contactInfoModel.SetData("AccountType", accountType);
                     containerContactInfo.contactInfoModel.SetData("AccountTypeComboBoxIndex", cbTypeAccount.currentIndex)
-
-                    if (containerContactInfo.operation !== "New" && !cbTypeAccount.wasFocus){
-                        cbTypeAccount.wasFocus = true;
-                        return;
-                    }
-                    containerContactInfo.wasChanged = true;
+//                    if (containerContactInfo.operation !== "New" && !cbTypeAccount.wasFocus){
+//                        cbTypeAccount.wasFocus = true;
+//                        return;
+//                    }
+//                    containerContactInfo.wasChanged = true;
                 }
 
                 onClicked: {

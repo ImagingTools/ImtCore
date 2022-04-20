@@ -56,13 +56,8 @@ Rectangle {
 
     onLocalSettingsChanged: {
         console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.toJSON());
-        console.log("PreferenceDialog globalSettings", globalSettings.toJSON());
-
         if (preferenceContainer.localSettings){
-            console.log("11");
-            //console.log("LocalSettings add", preferenceContainer.localSettings.toJSON());
             for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
-                console.log("FOR", i);
                 var index = globalSettings.InsertNewItem();
                 var id = preferenceContainer.localSettings.GetData("Id", i);
                 globalSettings.SetData("Id", id, index);
@@ -84,7 +79,6 @@ Rectangle {
 
         var index, i;
         if (preferenceContainer.serverSettings){
-          //  console.log("ServerSettings add", preferenceContainer.serverSettings.toJSON());
             if (preferenceContainer.serverSettings.ContainsKey("items")){
                 var serverItems = preferenceContainer.serverSettings.GetData("items");
                 for (i = 0; i < serverItems.GetItemsCount(); i++){
@@ -538,6 +532,21 @@ Rectangle {
 
                if (newValue != preferenceContainer.networkUrl){
                    thubnailDecoratorContainer.localSettings.SetData("Elements", elements);
+                   preferenceContainer.networkUrl = newValue;
+                   //settingsQuery.getSettings();
+//                   //globalSettings.Clear();
+//                   preferenceContainer.serverSettings.Clear();
+//                   settingsQuery.getSettings();
+////                   for (let i = 0; i < globalSettings.GetItemsCount(); i++){
+////                       var id = globalSettings.GetData("Id", i);
+////                       if (id !== "NetworkSettings"){
+////                            globalSettings.RemoveItem(i);
+////                       }
+////                   }
+//                   mainPanelRepeater.model = 0;
+//                   mainPanelRepeater.model = globalSettings;
+////                   preferenceContainer.localSettings = thubnailDecoratorContainer.localSettings;
+////                   settingsQuery.getSettings();
                }
            }
            if (thubnailDecoratorContainer.serverIsConnection){
@@ -627,6 +636,9 @@ Rectangle {
                    preferenceContainer.serverSettings = dataModelLocal;
                }
            }
+//           if (!dataModelLocal && preferenceContainer.serverSettings){
+//                preferenceContainer.serverSettings.Clear();
+//           }
 
        }
    }

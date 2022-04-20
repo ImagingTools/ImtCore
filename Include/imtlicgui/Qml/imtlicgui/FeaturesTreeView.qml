@@ -350,9 +350,9 @@ Item {
                         var fId = modelChildren.GetData("Id", k);
 
                         if (fId === featureId) {
-                            console.log("result.push", rootPackageId, rootFeatureId);
+                            //console.log("result.push", rootPackageId, rootFeatureId);
                             result.push(rootPackageId + "." + rootFeatureId);
-                            //featuresTreeViewContainer.findInAllRootFeaturesDependFeatureById(rootPackageId, rootFeatureId, result);
+                            featuresTreeViewContainer.findInAllRootFeaturesDependFeatureById(rootPackageId, rootFeatureId, result);
                             break;
                             //return true;
                         }
@@ -376,7 +376,6 @@ Item {
 
             var rootFeatureId = featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i);
             var rootPackageId = featuresTreeViewContainer.modelDepends.GetData("RootPackageId", i);
-
 
             if (rootPackageId === packageId && rootFeatureId === featureId){
                 var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", i);

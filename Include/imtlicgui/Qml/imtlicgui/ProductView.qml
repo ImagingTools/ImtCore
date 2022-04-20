@@ -22,6 +22,12 @@ Item {
 
     property bool wasChanged: false;
 
+    onWidthChanged: {
+        if (productsCollectionViewContainer.width - productMetaInfo.width > 250){
+            productSplitter.x = productsCollectionViewContainer.width - productMetaInfo.width;
+        }
+    }
+
     Component.onCompleted: {
         console.log("ProductView onCompleted",  productsCollectionView.selectedIndex);
 
@@ -486,7 +492,7 @@ Item {
 
     Splitter {
         id: productSplitter;
-        x: productsCollectionViewContainer.width - 300;
+        x: productsCollectionViewContainer.width - 250;
 
         height: parent.height;
         width: 4;
@@ -509,11 +515,11 @@ Item {
     Rectangle {
         id: productMetaInfo;
 
-        anchors.right: parent.right;
+        //anchors.right: parent.right;
         anchors.left: productSplitter.right;
 
         height: parent.height;
-
+        width: productsCollectionViewContainer.width > 0 ? productsCollectionViewContainer.width - productsCollectionView.width : 250;
         color: Style.backgroundColor;
 
         Rectangle {
