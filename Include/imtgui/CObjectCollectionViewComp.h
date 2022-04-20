@@ -26,7 +26,7 @@
 #include <iwidgets/CFocusDecorator.h>
 
 // ImtCore includes
-#include <imtbase/IMultiSelection.h>
+#include <imtbase/ISelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
@@ -42,7 +42,7 @@ class CObjectCollectionViewComp:
 		Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
 		public imod::CMultiModelDispatcherBase,
 		virtual public ibase::IProgressManager,
-		virtual public imtbase::IMultiSelection
+		virtual public imtbase::ISelection
 {
 	Q_OBJECT
 public:
@@ -53,7 +53,7 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_INTERFACE(ibase::IProgressManager);
-		I_REGISTER_INTERFACE(imtbase::IMultiSelection);
+		I_REGISTER_INTERFACE(imtbase::ISelection);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
@@ -86,7 +86,7 @@ public:
 
 	void SetFilterString(const QString& text);
 
-	// reimplemented (imtbase::IMultiSelection)
+	// reimplemented (imtbase::ISelection)
 	virtual const imtbase::ICollectionInfo* GetSelectionConstraints() const override;
 	virtual SelectionMode GetSelectionMode() const override;
 	virtual Ids GetSelectedIds() const override;

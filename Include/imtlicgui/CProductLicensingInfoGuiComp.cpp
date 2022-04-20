@@ -202,7 +202,7 @@ void CProductLicensingInfoGuiComp::OnGuiModelAttached()
 		GetObservedModel()->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr());
 
 		m_licenseSelectionObserver.RegisterObject(
-					dynamic_cast<imtbase::IMultiSelection*>(m_objectCollectionViewCompPtr.GetPtr()),
+					dynamic_cast<imtbase::ISelection*>(m_objectCollectionViewCompPtr.GetPtr()),
 					&CProductLicensingInfoGuiComp::OnLicenseSelectionChanged);
 	}
 }
@@ -280,12 +280,12 @@ void CProductLicensingInfoGuiComp::OnGuiDestroyed()
 
 void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const imtbase::IMultiSelection* selectionPtr)
+			const imtbase::ISelection* selectionPtr)
 {
 	m_selectedLicenseId.clear();
 	m_selectedFeatures.clear();
 
-	imtbase::IMultiSelection::Ids licenseIds = selectionPtr->GetSelectedIds();
+	imtbase::ISelection::Ids licenseIds = selectionPtr->GetSelectedIds();
 
 	if (licenseIds.count() == 1){
 		imtlic::IProductLicensingInfo* productLicensingInfo = GetObservedObject();

@@ -7,7 +7,7 @@
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
-#include <imtbase/IMultiSelection.h>
+#include <imtbase/ISelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/IFeatureInfo.h>
@@ -72,7 +72,7 @@ protected:
 private:
 	void OnFeatureSelectionChanged(
 				const istd::IChangeable::ChangeSet& /*changeSet*/,
-				const imtbase::IMultiSelection* selectionPtr);
+				const imtbase::ISelection* selectionPtr);
 
 	template <class InterfaceType>
 	static InterfaceType* ExtractFeaturePackageProxy(CFeaturePackageGuiComp& component)
@@ -120,7 +120,7 @@ private:
 
 	FeaturePackageProxy m_featurePackageProxy;
 
-	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CFeaturePackageGuiComp> m_featureSelectionObserver;
+	imtbase::TModelUpdateBinder<imtbase::ISelection, CFeaturePackageGuiComp> m_featureSelectionObserver;
 
 	QByteArray m_selectedFeatureId;
 	QByteArray m_missingDependenciesIds;

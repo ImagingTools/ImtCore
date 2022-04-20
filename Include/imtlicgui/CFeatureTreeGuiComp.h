@@ -5,7 +5,7 @@
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
-#include <imtbase/IMultiSelection.h>
+#include <imtbase/ISelection.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtlicgui/IItem.h>

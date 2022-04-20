@@ -17,13 +17,13 @@ class ICollectionInfo;
 
 
 /**
-	Multiple selection of the elements identified by an unique ID.
+	Selection of the elements identified by an unique ID.
 */
-class IMultiSelection: virtual public iser::ISerializable
+class ISelection: virtual public iser::ISerializable
 {
 public:
 	typedef QByteArray Id;
-	typedef QVector<QByteArray> Ids;
+	typedef QVector<Id> Ids;
 
 	static const QByteArray CN_SELECTION_CHANGED;
 
@@ -37,8 +37,8 @@ public:
 
 	enum class SelectionMode
 	{
-		SM_MULTI_SELECTION = 0,
-		SM_SINGLE_SELECTION
+		SM_SINGLE = 0,
+		SM_MULTI
 	};
 
 	/**

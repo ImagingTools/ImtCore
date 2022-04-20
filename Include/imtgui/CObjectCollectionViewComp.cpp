@@ -50,7 +50,7 @@ void CObjectCollectionViewComp::SetFilterString(const QString &text)
 }
 
 
-// reimplemented (imtbase::IMultiSelection)
+// reimplemented (imtbase::ISelection)
 
 const imtbase::ICollectionInfo* CObjectCollectionViewComp::GetSelectionConstraints() const
 {
@@ -58,13 +58,13 @@ const imtbase::ICollectionInfo* CObjectCollectionViewComp::GetSelectionConstrain
 }
 
 
-imtbase::IMultiSelection::SelectionMode CObjectCollectionViewComp::GetSelectionMode() const
+imtbase::ISelection::SelectionMode CObjectCollectionViewComp::GetSelectionMode() const
 {
-	return SelectionMode::SM_MULTI_SELECTION;
+	return SelectionMode::SM_MULTI;
 }
 
 
-imtbase::IMultiSelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
+imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 {
 	return m_itemsSelection[m_currentTypeId].toVector();
 }

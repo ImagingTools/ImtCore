@@ -257,7 +257,7 @@ void CFeaturePackageGuiComp::OnGuiModelAttached()
 		GetObservedModel()->AttachObserver(m_objectCollectionObserverCompPtr.GetPtr());
 
 		m_featureSelectionObserver.RegisterObject(
-					dynamic_cast<imtbase::IMultiSelection*>(m_objectCollectionViewCompPtr.GetPtr()),
+					dynamic_cast<imtbase::ISelection*>(m_objectCollectionViewCompPtr.GetPtr()),
 					&CFeaturePackageGuiComp::OnFeatureSelectionChanged);
 	}
 }
@@ -330,11 +330,11 @@ void CFeaturePackageGuiComp::OnGuiDestroyed()
 
 void CFeaturePackageGuiComp::OnFeatureSelectionChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const imtbase::IMultiSelection* selectionPtr)
+			const imtbase::ISelection* selectionPtr)
 {
 	m_selectedFeatureId.clear();
 
-	imtbase::IMultiSelection::Ids featureCollectionIds = selectionPtr->GetSelectedIds();
+	imtbase::ISelection::Ids featureCollectionIds = selectionPtr->GetSelectedIds();
 
 	if (featureCollectionIds.count() == 1){
 		imtlic::IFeaturePackage* packagePtr = GetObservedObject();

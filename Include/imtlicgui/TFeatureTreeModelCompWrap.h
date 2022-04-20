@@ -12,7 +12,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollectionProvider.h>
 #include <imtbase/TModelUpdateBinder.h>
-#include <imtbase/CMultiSelection.h>
+#include <imtbase/CSelection.h>
 #include <imtlic/IFeatureDependenciesProvider.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>

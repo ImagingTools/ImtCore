@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtbase/IMultiSelection.h>
+#include <imtbase/ISelection.h>
 
 
 namespace imtbase
@@ -16,15 +16,15 @@ namespace imtbase
 /**
 	Implementation of the multiple selection.
 */
-class CMultiSelection: virtual public IMultiSelection
+class CSelection: virtual public ISelection
 {
 public:
-	CMultiSelection();
-	CMultiSelection(SelectionMode selectionMode);
+	CSelection();
+	CSelection(SelectionMode selectionMode);
 
 	void SetSelectionConstraints(ICollectionInfo* selectionConstraintsPtr);
 
-	// reimplemented (IMultiSelection)
+	// reimplemented (ISelection)
 	virtual const ICollectionInfo* GetSelectionConstraints() const override;
 	virtual SelectionMode GetSelectionMode() const override;
 	virtual Ids GetSelectedIds() const override;
@@ -44,13 +44,13 @@ private:
 	class ConstraintsObserver: public imod::TSingleModelObserverBase<ICollectionInfo>
 	{
 	public:
-		ConstraintsObserver(CMultiSelection& parent);
+		ConstraintsObserver(CSelection& parent);
 
 	protected:
 		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeset) override;
 
 	private:
-		CMultiSelection& m_parent;
+		CSelection& m_parent;
 	};
 
 private:

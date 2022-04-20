@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
-#include <imtbase/CMultiSelection.h>
+#include <imtbase/CSelection.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlicgui/IItemChangeHandler.h>
 #include <imtlicgui/TFeatureTreeModelCompWrap.h>
@@ -67,7 +67,7 @@ protected:
 private:
 	void OnLicenseSelectionChanged(
 				const istd::IChangeable::ChangeSet& /*changeSet*/,
-				const imtbase::IMultiSelection* selectionPtr);
+				const imtbase::ISelection* selectionPtr);
 	void EnumerateDependencies(const QByteArrayList& featureIds);
 	int FindFeatureById(const QByteArray& featureId, const imtlic::ILicenseInfo::FeatureInfos& featureContainer) const;
 	imtlic::ILicenseInfo::FeatureInfo GetFeatureInfo(const QByteArray& featureId) const;
@@ -86,7 +86,7 @@ private:
 
 	bool m_blockItemChangedHandler;
 
-	imtbase::TModelUpdateBinder<imtbase::IMultiSelection, CProductLicensingInfoGuiComp> m_licenseSelectionObserver;
+	imtbase::TModelUpdateBinder<imtbase::ISelection, CProductLicensingInfoGuiComp> m_licenseSelectionObserver;
 
 	QByteArray m_selectedLicenseId;
 	imtlic::ILicenseInfo::FeatureInfos m_selectedFeatures;

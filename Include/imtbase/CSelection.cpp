@@ -1,4 +1,4 @@
-#include <imtbase/CMultiSelection.h>
+#include <imtbase/CSelection.h>
 
 
 // ACF includes
@@ -15,48 +15,48 @@ namespace imtbase
 
 // public methods
 
-CMultiSelection::CMultiSelection()
-	:CMultiSelection(SelectionMode::SM_MULTI_SELECTION)
+CSelection::CSelection()
+	:CSelection(SelectionMode::SM_SINGLE)
 {
 }
 
 
-CMultiSelection::CMultiSelection(SelectionMode selectionMode)
+CSelection::CSelection(SelectionMode selectionMode)
 	:m_selectionMode(selectionMode),
 	m_constraintsObserver(*this)
 {
 }
 
 
-void CMultiSelection::SetSelectionConstraints(ICollectionInfo* selectionConstraintsPtr)
+void CSelection::SetSelectionConstraints(ICollectionInfo* selectionConstraintsPtr)
 {
 	m_constraintsObserver.AttachOrSetObject(selectionConstraintsPtr);
 }
 
 
-// reimplemented (IMultiSelection)
+// reimplemented (ISelection)
 
-const ICollectionInfo* CMultiSelection::GetSelectionConstraints() const
+const ICollectionInfo* CSelection::GetSelectionConstraints() const
 {
 	return m_constraintsObserver.GetObjectPtr();
 }
 
 
-IMultiSelection::SelectionMode CMultiSelection::GetSelectionMode() const
+ISelection::SelectionMode CSelection::GetSelectionMode() const
 {
 	return m_selectionMode;
 }
 
 
-IMultiSelection::Ids CMultiSelection::GetSelectedIds() const
+ISelection::Ids CSelection::GetSelectedIds() const
 {
 	return m_selectedIds;
 }
 
 
-bool CMultiSelection::SetSelectedIds(const Ids& selectedIds)
+bool CSelection::SetSelectedIds(const Ids& selectedIds)
 {
-	if ((m_selectionMode == SelectionMode::SM_SINGLE_SELECTION) && (selectedIds.count() > 1)){
+	if ((m_selectionMode == SelectionMode::SM_SINGLE) && (selectedIds.count() > 1)){
 		return false;
 	}
 
@@ -73,21 +73,19 @@ bool CMultiSelection::SetSelectedIds(const Ids& selectedIds)
 
 // reimplement (iser::ISerializable)
 
-bool CMultiSelection::Serialize(iser::IArchive& archive)
+bool CSelection::Serialize(iser::IArchive& archive)
 {
 	static iser::CArchiveTag selectedItemsTag("SelectedItems", "List of selected items");
 	static iser::CArchiveTag selectedItemTag("Item", "Single selected item");
 
+	Ids selectedIds;
 	int itemCount = m_selectedIds.count();
-
-	bool retVal = true;
-
-	retVal = retVal && archive.BeginMultiTag(selectedItemsTag, selectedItemTag, itemCount);
-
-	Ids selectedIds = archive.IsStoring() ? m_selectedIds : Ids();
-
+	bool retVal = archive.BeginMultiTag(selectedItemsTag, selectedItemTag, itemCount);
 	for (int i = 0; i < itemCount; ++i){
 		QByteArray id;
+		if (retVal && archive.IsStoring()){
+			id = m_selectedIds[i];
+		}
 
 		retVal = retVal && archive.BeginTag(selectedItemTag);
 		retVal = retVal && archive.Process(id);
@@ -97,12 +95,11 @@ bool CMultiSelection::Serialize(iser::IArchive& archive)
 			selectedIds.push_back(id);
 		}
 	}
-
 	retVal = retVal && archive.EndTag(selectedItemsTag);
 
 	if (retVal && !archive.IsStoring()){
 		Ids filteredIds = FilterIds(selectedIds, true);
-		if ((m_selectionMode == SelectionMode::SM_SINGLE_SELECTION) && filteredIds.count() > 1){
+		if ((m_selectionMode == SelectionMode::SM_SINGLE) && filteredIds.count() > 1){
 			filteredIds = {filteredIds[0]};
 		}
 
@@ -117,19 +114,19 @@ bool CMultiSelection::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
-int CMultiSelection::GetSupportedOperations() const
+int CSelection::GetSupportedOperations() const
 {
 	return SO_CLONE | SO_COMPARE | SO_COPY | SO_RESET;
 }
 
 
-bool CMultiSelection::CopyFrom(const IChangeable & object, CompatibilityMode /*mode*/)
+bool CSelection::CopyFrom(const IChangeable & object, CompatibilityMode /*mode*/)
 {
-	const CMultiSelection* sourcePtr = dynamic_cast<const CMultiSelection*>(&object);
+	const CSelection* sourcePtr = dynamic_cast<const CSelection*>(&object);
 	if (sourcePtr != nullptr){
 		if (m_selectedIds != sourcePtr->m_selectedIds){
 			Ids filteredIds = FilterIds(sourcePtr->m_selectedIds, true);
-			if ((m_selectionMode == SelectionMode::SM_SINGLE_SELECTION) && filteredIds.count() > 1){
+			if ((m_selectionMode == SelectionMode::SM_SINGLE) && filteredIds.count() > 1){
 				filteredIds = {filteredIds[0]};
 			}
 
@@ -143,9 +140,9 @@ bool CMultiSelection::CopyFrom(const IChangeable & object, CompatibilityMode /*m
 }
 
 
-bool CMultiSelection::IsEqual(const IChangeable & object) const
+bool CSelection::IsEqual(const IChangeable & object) const
 {
-	const CMultiSelection* sourcePtr = dynamic_cast<const CMultiSelection*>(&object);
+	const CSelection* sourcePtr = dynamic_cast<const CSelection*>(&object);
 	if (sourcePtr != nullptr){
 		return (m_selectedIds == sourcePtr->m_selectedIds);
 	}
@@ -154,9 +151,9 @@ bool CMultiSelection::IsEqual(const IChangeable & object) const
 }
 
 
-istd::IChangeable* CMultiSelection::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CSelection::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CMultiSelection> clonePtr(new CMultiSelection());
+	istd::TDelPtr<CSelection> clonePtr(new CSelection());
 
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
@@ -166,7 +163,7 @@ istd::IChangeable* CMultiSelection::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CMultiSelection::ResetData(CompatibilityMode /*mode*/)
+bool CSelection::ResetData(CompatibilityMode /*mode*/)
 {
 	ApplyNewIds(Ids());
 
@@ -176,7 +173,7 @@ bool CMultiSelection::ResetData(CompatibilityMode /*mode*/)
 
 // private methods
 
-IMultiSelection::Ids CMultiSelection::FilterIds(Ids ids, bool containedInConstraints) const
+ISelection::Ids CSelection::FilterIds(Ids ids, bool containedInConstraints) const
 {
 	if (m_constraintsObserver.GetObservedObject() != nullptr){
 		Ids filteredIds;
@@ -200,21 +197,21 @@ IMultiSelection::Ids CMultiSelection::FilterIds(Ids ids, bool containedInConstra
 }
 
 
-void CMultiSelection::ApplyNewIds(Ids selectedIds)
+void CSelection::ApplyNewIds(Ids ids)
 {
-	if (m_selectedIds != selectedIds){
+	if (m_selectedIds != ids){
 		istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
-		changeSet.SetChangeInfo(IMultiSelection::CN_SELECTION_CHANGED, QVariant());
+		changeSet.SetChangeInfo(ISelection::CN_SELECTION_CHANGED, QVariant());
 		istd::CChangeNotifier notifier(this, &changeSet);
 
-		m_selectedIds = selectedIds;
+		m_selectedIds = ids;
 	}
 }
 
 
 // public methods of the embedded class ConstraintsObserver
 
-CMultiSelection::ConstraintsObserver::ConstraintsObserver(CMultiSelection& parent)
+CSelection::ConstraintsObserver::ConstraintsObserver(CSelection& parent)
 	:m_parent(parent)
 {
 }
@@ -222,7 +219,7 @@ CMultiSelection::ConstraintsObserver::ConstraintsObserver(CMultiSelection& paren
 
 // protected methods of the embedded class ConstraintsObserver
 
-void CMultiSelection::ConstraintsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeset)
+void CSelection::ConstraintsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeset)
 {
 	Ids constraints = GetObservedObject()->GetElementIds();
 	m_parent.m_constraintsCache = QSet<Id>(constraints.constBegin(), constraints.constEnd());
