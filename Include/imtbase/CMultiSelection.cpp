@@ -13,17 +13,38 @@ namespace imtbase
 {
 
 
+// public methods
+
+CMultiSelection::CMultiSelection()
+	:CMultiSelection(SelectionMode::SM_MULTI_SELECTION)
+{
+}
+
+
+CMultiSelection::CMultiSelection(SelectionMode selectionMode)
+	:m_selectionMode(selectionMode),
+	m_constraintsObserver(*this)
+{
+}
+
+
+void CMultiSelection::SetSelectionConstraints(ICollectionInfo* selectionConstraintsPtr)
+{
+	m_constraintsObserver.AttachOrSetObject(selectionConstraintsPtr);
+}
+
+
 // reimplemented (IMultiSelection)
 
 const ICollectionInfo* CMultiSelection::GetSelectionConstraints() const
 {
-	return nullptr;
+	return m_constraintsObserver.GetObjectPtr();
 }
 
 
 IMultiSelection::SelectionMode CMultiSelection::GetSelectionMode() const
 {
-	return SelectionMode::SM_MULTI_SELECTION;
+	return m_selectionMode;
 }
 
 
@@ -35,13 +56,18 @@ IMultiSelection::Ids CMultiSelection::GetSelectedIds() const
 
 bool CMultiSelection::SetSelectedIds(const Ids& selectedIds)
 {
-	if (m_selectedIds != selectedIds){
-		istd::CChangeNotifier notifier(this);
-
-		m_selectedIds = selectedIds;
+	if ((m_selectionMode == SelectionMode::SM_SINGLE_SELECTION) && (selectedIds.count() > 1)){
+		return false;
 	}
 
-	return true;
+	Ids filteredIds = FilterIds(selectedIds, false);
+	if (filteredIds.isEmpty()){
+		ApplyNewIds(selectedIds);
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -58,7 +84,7 @@ bool CMultiSelection::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.BeginMultiTag(selectedItemsTag, selectedItemTag, itemCount);
 
-	Ids selectedIds = m_selectedIds;
+	Ids selectedIds = archive.IsStoring() ? m_selectedIds : Ids();
 
 	for (int i = 0; i < itemCount; ++i){
 		QByteArray id;
@@ -74,10 +100,15 @@ bool CMultiSelection::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(selectedItemsTag);
 
-	if (retVal && !archive.IsStoring() && (m_selectedIds != selectedIds)){
-		istd::CChangeNotifier changeNotifier(this);
+	if (retVal && !archive.IsStoring()){
+		Ids filteredIds = FilterIds(selectedIds, true);
+		if ((m_selectionMode == SelectionMode::SM_SINGLE_SELECTION) && filteredIds.count() > 1){
+			filteredIds = {filteredIds[0]};
+		}
 
-		m_selectedIds = selectedIds;
+		if (m_selectedIds != filteredIds){
+			ApplyNewIds(filteredIds);
+		}
 	}
 
 	return retVal;
@@ -97,9 +128,12 @@ bool CMultiSelection::CopyFrom(const IChangeable & object, CompatibilityMode /*m
 	const CMultiSelection* sourcePtr = dynamic_cast<const CMultiSelection*>(&object);
 	if (sourcePtr != nullptr){
 		if (m_selectedIds != sourcePtr->m_selectedIds){
-			istd::CChangeNotifier changeNotifier(this);
+			Ids filteredIds = FilterIds(sourcePtr->m_selectedIds, true);
+			if ((m_selectionMode == SelectionMode::SM_SINGLE_SELECTION) && filteredIds.count() > 1){
+				filteredIds = {filteredIds[0]};
+			}
 
-			m_selectedIds = sourcePtr->m_selectedIds;
+			ApplyNewIds(filteredIds);
 		}
 
 		return true;
@@ -134,13 +168,67 @@ istd::IChangeable* CMultiSelection::CloneMe(CompatibilityMode mode) const
 
 bool CMultiSelection::ResetData(CompatibilityMode /*mode*/)
 {
-	if (!m_selectedIds.isEmpty()){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_selectedIds.clear();
-	}
+	ApplyNewIds(Ids());
 
 	return true;
+}
+
+
+// private methods
+
+IMultiSelection::Ids CMultiSelection::FilterIds(Ids ids, bool containedInConstraints) const
+{
+	if (m_constraintsObserver.GetObservedObject() != nullptr){
+		Ids filteredIds;
+
+		for (Id id : ids){
+			bool isContained = m_constraintsCache.contains(id);
+
+			if (isContained && containedInConstraints){
+				filteredIds.append(id);
+			}
+
+			if (!isContained && !containedInConstraints){
+				filteredIds.append(id);
+			}
+		}
+
+		return filteredIds;
+	}
+
+	return ids;
+}
+
+
+void CMultiSelection::ApplyNewIds(Ids selectedIds)
+{
+	if (m_selectedIds != selectedIds){
+		istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
+		changeSet.SetChangeInfo(IMultiSelection::CN_SELECTION_CHANGED, QVariant());
+		istd::CChangeNotifier notifier(this, &changeSet);
+
+		m_selectedIds = selectedIds;
+	}
+}
+
+
+// public methods of the embedded class ConstraintsObserver
+
+CMultiSelection::ConstraintsObserver::ConstraintsObserver(CMultiSelection& parent)
+	:m_parent(parent)
+{
+}
+
+
+// protected methods of the embedded class ConstraintsObserver
+
+void CMultiSelection::ConstraintsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeset)
+{
+	Ids constraints = GetObservedObject()->GetElementIds();
+	m_parent.m_constraintsCache = QSet<Id>(constraints.constBegin(), constraints.constEnd());
+
+	Ids filteredIds = m_parent.FilterIds(m_parent.m_selectedIds, true);
+	m_parent.ApplyNewIds(filteredIds);
 }
 
 

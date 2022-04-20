@@ -22,7 +22,10 @@ class ICollectionInfo;
 class IMultiSelection: virtual public iser::ISerializable
 {
 public:
+	typedef QByteArray Id;
 	typedef QVector<QByteArray> Ids;
+
+	static const QByteArray CN_SELECTION_CHANGED;
 
 	/**
 		Change notification flags.
@@ -34,8 +37,8 @@ public:
 
 	enum class SelectionMode
 	{
-		SM_SINGLE_SELECTION = 0,
-		SM_MULTI_SELECTION
+		SM_MULTI_SELECTION = 0,
+		SM_SINGLE_SELECTION
 	};
 
 	/**
