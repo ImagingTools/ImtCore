@@ -30,7 +30,11 @@ void CEventItemMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /
 		Q_ASSERT(metaInfoPtr != nullptr);
 
 		QSet<int> typesSet = metaInfoPtr->GetMetaInfoTypes();
+#if QT_VERSION < 0x060000
+		QList<int> types = typesSet.toList();
+#else
 		QList<int> types(typesSet.begin(), typesSet.end());
+#endif
 		std::sort(types.begin(), types.end());
 
 		for (int type : types){
