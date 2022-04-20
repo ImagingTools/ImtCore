@@ -68,11 +68,19 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 
 	if (filterParamsPtr->GetFilterMode() == imtlog::IMessageFilterParams::FM_INCLUDE){
 		QList<int> keys = m_controllers.keys();
+#if QT_VERSION < 0x060000
+		ids = keys.toSet() & filterParamsPtr->GetMessageFilterIds();
+#else
 		ids = QSet<int>(keys.begin(), keys.end()) & filterParamsPtr->GetMessageFilterIds();
+#endif
 	}
 	else{
 		QList<int> keys = m_controllers.keys();
+#if QT_VERSION < 0x060000
+		ids = keys.toSet() - filterParamsPtr->GetMessageFilterIds();
+#else
 		ids = QSet<int>(keys.begin(), keys.end()) - filterParamsPtr->GetMessageFilterIds();
+#endif
 	}
 
 	//istd::TOptDelPtr<CEventHistoryResultContainer> containerPtr(new CEventHistoryResultContainer());
