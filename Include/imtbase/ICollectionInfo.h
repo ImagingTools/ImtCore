@@ -19,6 +19,19 @@ namespace imtbase
 class ICollectionInfo: virtual public ICollectionInfoProvider
 {
 public:
+	static const QByteArray s_cidAllChanged;
+	static const QByteArray s_cidElementInserted;
+	struct ElementInsertInfo
+	{
+		QByteArray elementId;
+	};
+
+	static const QByteArray s_cidElementRemoved;
+	typedef ElementInsertInfo ElementRemoveInfo;
+
+	static const QByteArray s_cidElementUpdated;
+	typedef ElementInsertInfo ElementUpdateInfo;
+
 	/**
 		Get number of elements in the collection
 	*/
@@ -38,5 +51,8 @@ public:
 
 
 } // namespace imtbase
+
+
+Q_DECLARE_METATYPE(imtbase::ICollectionInfo::ElementInsertInfo);
 
 

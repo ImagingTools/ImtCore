@@ -33,11 +33,15 @@ QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & nam
 		return QByteArray();
 	}
 
-	istd::CChangeNotifier changeNotifier(this);
-
 	Item newItem(id);
 	newItem.description = description;
 	newItem.name = name;
+
+	ElementInsertInfo info;
+	info.elementId = newItem.id;
+	istd::IChangeable::ChangeSet changeSet(CF_ANY);
+	changeSet.SetChangeInfo(s_cidElementInserted, QVariant::fromValue<ElementInsertInfo>(info));
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (position < 0 || (position > m_items.count() - 1)){
 		m_items.push_back(newItem);
@@ -54,8 +58,12 @@ void CCollectionInfo::RemoveItem(const QByteArray& id)
 {
 	for (const Item& item : m_items){
 		if (item.id == id){
-			istd::CChangeNotifier changeNotifier(this);
-		
+			ElementRemoveInfo info;
+			info.elementId = id;
+			istd::IChangeable::ChangeSet changeSet(CF_ANY);
+			changeSet.SetChangeInfo(s_cidElementRemoved, QVariant::fromValue<ElementRemoveInfo>(info));
+			istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 			m_items.removeOne(item);
 
 			break;
@@ -69,7 +77,11 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 	for (Item& item : m_items){
 		if (item.id == id){
 			if (item.name != name || item.description != description){
-				istd::CChangeNotifier changeNotifier(this);
+				ElementUpdateInfo info;
+				info.elementId = id;
+				istd::IChangeable::ChangeSet changeSet(CF_ANY);
+				changeSet.SetChangeInfo(s_cidElementUpdated, QVariant::fromValue<ElementUpdateInfo>(info));
+				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				item.name = name;
 				item.description = description;
@@ -149,7 +161,9 @@ bool CCollectionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 {
 	const CCollectionInfo* sourcePtr = dynamic_cast<const CCollectionInfo*>(&object);
 	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
+		istd::IChangeable::ChangeSet changeSet(CF_ANY);
+		changeSet.SetChangeInfo(s_cidAllChanged, QVariant());
+		istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 		m_items = sourcePtr->m_items;
 
@@ -183,7 +197,9 @@ istd::IChangeable* CCollectionInfo::CloneMe(CompatibilityMode mode) const
 
 bool CCollectionInfo::ResetData(CompatibilityMode /*mode*/)
 {
-	istd::CChangeNotifier changeNotifier(this);
+	istd::IChangeable::ChangeSet changeSet(CF_ANY);
+	changeSet.SetChangeInfo(s_cidAllChanged, QVariant());
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	m_items.clear();
 
@@ -195,7 +211,9 @@ bool CCollectionInfo::ResetData(CompatibilityMode /*mode*/)
 
 bool CCollectionInfo::Serialize(iser::IArchive& archive)
 {
-	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+	istd::IChangeable::ChangeSet changeSet(CF_ANY);
+	changeSet.SetChangeInfo(s_cidAllChanged, QVariant());
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this, &changeSet);
 
 	int itemCount = m_items.count();
 
