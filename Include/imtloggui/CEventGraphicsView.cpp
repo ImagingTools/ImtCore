@@ -176,6 +176,19 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 
 	double scaleX = GetScaleX();
 
+#if QT_VERSION < 0x060000
+	if (event->delta() > 0){
+		if (scaleX * 1.1 > 500000){
+			ScaleViewRect(mapToScene(event->pos()), 500000 / scaleX, 1);
+		}
+		else{
+			ScaleViewRect(mapToScene(event->pos()), 1 * 1.1, 1);
+		}
+	}
+	else{
+		ScaleViewRect(mapToScene(event->pos()), 1 / 1.1, 1);
+	}
+#else
 	if (!event->pixelDelta().isNull()){
 		if (scaleX * 1.1 > 500000){
 			ScaleViewRect(mapToScene(event->position().x(), event->position().y()), 500000 / scaleX, 1);
@@ -187,6 +200,7 @@ void CEventGraphicsView::wheelEvent(QWheelEvent* event)
 	else{
 		ScaleViewRect(mapToScene(event->position().x(), event->position().y()), 1 / 1.1, 1);
 	}
+#endif
 
 	Q_EMIT EmitViewPortChanged(true);
 }
