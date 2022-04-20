@@ -48,6 +48,26 @@ void CMultiSelectionTest::CloneMeTest()
 	imtbase::CMultiSelection* multiSelectionPtr = dynamic_cast<imtbase::CMultiSelection*>(multiSelection.CloneMe());
 	QVERIFY2(multiSelection.IsEqual(*multiSelectionPtr), qPrintable(QString("Function CMultiSelection::CloneMe is failed")));
 }
+
+void CMultiSelectionTest::SerializeTest()
+{
+	imtbase::CMultiSelection multiSelection;
+	imtbase::CMultiSelection multiSelection2;
+	multiSelection.SetSelectedIds(m_testSelectedIds);
+	iser::CMemoryWriteArchive memoryWritedArchive;
+	bool checkSerializeMemory = multiSelection.Serialize(memoryWritedArchive);
+	QVERIFY2(checkSerializeMemory, qPrintable(QString("Function CMultiSelection::Serialize is failed")));
+	iser::CMemoryReadArchive memoryReadArchive(memoryWritedArchive);
+	multiSelection2.Serialize(memoryReadArchive);
+	QCOMPARE(multiSelection.GetSelectedIds(), multiSelection2.GetSelectedIds());
+	multiSelection2.ResetData();
+	iser::CXmlStringWriteArchive xmlWritedArchive;
+	bool checkSerializeXml = multiSelection.Serialize(xmlWritedArchive);
+	QVERIFY2(checkSerializeXml, qPrintable(QString("Function CMultiSelection::Serialize is failed")));
+	iser::CXmlStringReadArchive xmlReadedArchive(xmlWritedArchive.GetString());
+	multiSelection2.Serialize(xmlReadedArchive);
+	QCOMPARE(multiSelection.GetSelectedIds(), multiSelection2.GetSelectedIds());
+}
 void CMultiSelectionTest::ResetDataTest()
 {
 	imtbase::CMultiSelection multiSelection;

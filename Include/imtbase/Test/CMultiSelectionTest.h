@@ -13,6 +13,12 @@
 #include <iprm/IOptionsList.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CMemoryReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
+#include <iser/CXmlStringWriteArchive.h>
+#include <iser/CXmlStringReadArchive.h>
+#include <iser/CReadArchiveBase.h>
+#include <iser/CWriteArchiveBase.h>
 #include <itest/CStandardTestExecutor.h>
 
 // ImtCore includes
@@ -29,6 +35,7 @@ private slots:
 	void IsEqualTest();
 	void CopyFromTest();
 	void CloneMeTest();
+	void SerializeTest();
 	void ResetDataTest();
 	void cleanupTestCase();
 
