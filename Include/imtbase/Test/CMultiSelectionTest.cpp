@@ -12,7 +12,7 @@ void CMultiSelectionTest::initTestCase()
 
 void CMultiSelectionTest::SetSelectedIdsTest()
 {
-	imtbase::CSelection multiSelection;
+	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	bool checkSelectData = multiSelection.SetSelectedIds(m_testSelectedIds);
 	QVERIFY2(checkSelectData, qPrintable(QString("Function CSelection::SetSelectedIds is failed")));
 	QCOMPARE(multiSelection.GetSelectedIds(), m_testSelectedIds);
@@ -20,8 +20,8 @@ void CMultiSelectionTest::SetSelectedIdsTest()
 
 void CMultiSelectionTest::IsEqualTest()
 {
-	imtbase::CSelection multiSelection;
-	imtbase::CSelection multiSelection2;
+	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
+	imtbase::CSelection multiSelection2(imtbase::ISelection::SelectionMode::SM_MULTI);
 	imtbase::ISelection::Ids selectedIds;
 	QByteArray firstVar("firstKey");
 	selectedIds.append(firstVar);
@@ -32,18 +32,18 @@ void CMultiSelectionTest::IsEqualTest()
 
 void CMultiSelectionTest::CopyFromTest()
 {
-	imtbase::CSelection multiSelection;
-	imtbase::CSelection multiSelection2;
+	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
+	imtbase::CSelection multiSelection2(imtbase::ISelection::SelectionMode::SM_MULTI);
 	multiSelection.SetSelectedIds(m_testSelectedIds);
 	multiSelection2.CopyFrom(multiSelection);
 	imtbase::ISelection::Ids multiSelectionIds = multiSelection.GetSelectedIds();
 	imtbase::ISelection::Ids multiSelection2Ids = multiSelection2.GetSelectedIds();
 	QCOMPARE(multiSelectionIds, multiSelection2Ids);
-}
+	}
 
 void CMultiSelectionTest::CloneMeTest()
 {
-	imtbase::CSelection multiSelection;
+	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	multiSelection.SetSelectedIds(m_testSelectedIds);
 	imtbase::CSelection* multiSelectionPtr = dynamic_cast<imtbase::CSelection*>(multiSelection.CloneMe());
 	QVERIFY2(multiSelection.IsEqual(*multiSelectionPtr), qPrintable(QString("Function CSelection::CloneMe is failed")));
@@ -51,8 +51,9 @@ void CMultiSelectionTest::CloneMeTest()
 
 void CMultiSelectionTest::SerializeTest()
 {
-	imtbase::CSelection multiSelection;
+	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	imtbase::CSelection multiSelection2;
+
 	multiSelection.SetSelectedIds(m_testSelectedIds);
 	iser::CMemoryWriteArchive memoryWritedArchive;
 	bool checkSerializeMemory = multiSelection.Serialize(memoryWritedArchive);
@@ -63,6 +64,7 @@ void CMultiSelectionTest::SerializeTest()
 	multiSelection2.ResetData();
 	iser::CXmlStringWriteArchive xmlWritedArchive;
 	bool checkSerializeXml = multiSelection.Serialize(xmlWritedArchive);
+	QByteArray test = xmlWritedArchive.GetString();
 	QVERIFY2(checkSerializeXml, qPrintable(QString("Function CSelection::Serialize is failed")));
 	iser::CXmlStringReadArchive xmlReadedArchive(xmlWritedArchive.GetString());
 	multiSelection2.Serialize(xmlReadedArchive);
@@ -70,7 +72,7 @@ void CMultiSelectionTest::SerializeTest()
 }
 void CMultiSelectionTest::ResetDataTest()
 {
-	imtbase::CSelection multiSelection;
+	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
 	multiSelection.SetSelectedIds(m_testSelectedIds);
 	multiSelection.ResetData();
 	imtbase::ISelection::Ids multiSelectionIds = multiSelection.GetSelectedIds();
