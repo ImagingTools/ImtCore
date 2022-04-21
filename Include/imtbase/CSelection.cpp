@@ -3,10 +3,14 @@
 
 // ACF includes
 #include <istd/TDelPtr.h>
+#include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
-#include <iprm/IOptionsList.h>
-#include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
+#include <iser/IArchive.h>
+
+// ImtCore includes
+#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtbase
@@ -56,18 +60,15 @@ ISelection::Ids CSelection::GetSelectedIds() const
 
 bool CSelection::SetSelectedIds(const Ids& selectedIds)
 {
-	if ((m_selectionMode == SelectionMode::SM_SINGLE) && (selectedIds.count() > 1)){
+	if ((m_selectionMode == SM_SINGLE) && (selectedIds.count() > 1)){
 		return false;
 	}
 
-	Ids filteredIds = FilterIds(selectedIds, false);
-	if (filteredIds.isEmpty()){
-		ApplyNewIds(selectedIds);
-
-		return true;
+	if (m_selectedIds != selectedIds){
+		ApplySelection(selectedIds);
 	}
 
-	return false;
+	return true;
 }
 
 
@@ -75,12 +76,21 @@ bool CSelection::SetSelectedIds(const Ids& selectedIds)
 
 bool CSelection::Serialize(iser::IArchive& archive)
 {
-	static iser::CArchiveTag selectedItemsTag("SelectedItems", "List of selected items");
-	static iser::CArchiveTag selectedItemTag("Item", "Single selected item");
+	bool retVal = true;
+
+	SelectionMode selectionMode = m_selectionMode;
+
+	static iser::CArchiveTag selectionModeTag("SelectionMode", "Selection mode", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(selectionModeTag);
+	retVal = retVal && I_SERIALIZE_ENUM(SelectionMode, archive, selectionMode);
+	retVal = retVal && archive.EndTag(selectionModeTag);
+
+	static iser::CArchiveTag selectedItemsTag("SelectedItems", "List of selected items", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag selectedItemTag("Item", "Single selected item", iser::CArchiveTag::TT_GROUP);
 
 	Ids selectedIds;
 	int itemCount = m_selectedIds.count();
-	bool retVal = archive.BeginMultiTag(selectedItemsTag, selectedItemTag, itemCount);
+	retVal = archive.BeginMultiTag(selectedItemsTag, selectedItemTag, itemCount);
 	for (int i = 0; i < itemCount; ++i){
 		QByteArray id;
 		if (retVal && archive.IsStoring()){
@@ -98,13 +108,14 @@ bool CSelection::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(selectedItemsTag);
 
 	if (retVal && !archive.IsStoring()){
-		Ids filteredIds = FilterIds(selectedIds, true);
-		if ((m_selectionMode == SelectionMode::SM_SINGLE) && filteredIds.count() > 1){
-			filteredIds = {filteredIds[0]};
+		istd::CChangeGroup group(this);
+
+		if (m_selectionMode != selectionMode){
+			ApplySelectionMode(selectionMode);
 		}
 
-		if (m_selectedIds != filteredIds){
-			ApplyNewIds(filteredIds);
+		if (m_selectedIds != selectedIds){
+			ApplySelection(selectedIds);
 		}
 	}
 
@@ -124,13 +135,14 @@ bool CSelection::CopyFrom(const IChangeable & object, CompatibilityMode /*mode*/
 {
 	const CSelection* sourcePtr = dynamic_cast<const CSelection*>(&object);
 	if (sourcePtr != nullptr){
-		if (m_selectedIds != sourcePtr->m_selectedIds){
-			Ids filteredIds = FilterIds(sourcePtr->m_selectedIds, true);
-			if ((m_selectionMode == SelectionMode::SM_SINGLE) && filteredIds.count() > 1){
-				filteredIds = {filteredIds[0]};
-			}
+		istd::CChangeGroup group(this);
 
-			ApplyNewIds(filteredIds);
+		if (m_selectionMode != sourcePtr->m_selectionMode){
+			ApplySelectionMode(sourcePtr->m_selectionMode);
+		}
+
+		if (m_selectedIds != sourcePtr->m_selectedIds){
+			ApplySelection(sourcePtr->m_selectedIds);
 		}
 
 		return true;
@@ -144,7 +156,7 @@ bool CSelection::IsEqual(const IChangeable & object) const
 {
 	const CSelection* sourcePtr = dynamic_cast<const CSelection*>(&object);
 	if (sourcePtr != nullptr){
-		return (m_selectedIds == sourcePtr->m_selectedIds);
+		return (m_selectionMode == sourcePtr->m_selectionMode) && (m_selectedIds == sourcePtr->m_selectedIds);
 	}
 
 	return false;
@@ -165,7 +177,7 @@ istd::IChangeable* CSelection::CloneMe(CompatibilityMode mode) const
 
 bool CSelection::ResetData(CompatibilityMode /*mode*/)
 {
-	ApplyNewIds(Ids());
+	ApplySelection(Ids());
 
 	return true;
 }
@@ -173,39 +185,23 @@ bool CSelection::ResetData(CompatibilityMode /*mode*/)
 
 // private methods
 
-ISelection::Ids CSelection::FilterIds(Ids ids, bool containedInConstraints) const
+void CSelection::ApplySelection(const Ids& selectionIds)
 {
-	if (m_constraintsObserver.GetObservedObject() != nullptr){
-		Ids filteredIds;
+	istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
+	changeSet.SetChangeInfo(ISelection::CN_SELECTION_CHANGED, QVariant());
+	istd::CChangeNotifier notifier(this, &changeSet);
 
-		for (Id id : ids){
-			bool isContained = m_constraintsCache.contains(id);
-
-			if (isContained && containedInConstraints){
-				filteredIds.append(id);
-			}
-
-			if (!isContained && !containedInConstraints){
-				filteredIds.append(id);
-			}
-		}
-
-		return filteredIds;
-	}
-
-	return ids;
+	m_selectedIds = selectionIds;
 }
 
 
-void CSelection::ApplyNewIds(Ids ids)
+void CSelection::ApplySelectionMode(SelectionMode selectionMode)
 {
-	if (m_selectedIds != ids){
-		istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
-		changeSet.SetChangeInfo(ISelection::CN_SELECTION_CHANGED, QVariant());
-		istd::CChangeNotifier notifier(this, &changeSet);
+	istd::IChangeable::ChangeSet changeSet(CF_SELECTION_MODE_CHANGED);
+	changeSet.SetChangeInfo(ISelection::CN_SELECTION_MODE_CHANGED, QVariant());
+	istd::CChangeNotifier notifier(this, &changeSet);
 
-		m_selectedIds = ids;
-	}
+	m_selectionMode = selectionMode;
 }
 
 
@@ -219,13 +215,24 @@ CSelection::ConstraintsObserver::ConstraintsObserver(CSelection& parent)
 
 // protected methods of the embedded class ConstraintsObserver
 
+// reimplemented (imod::CSingleModelObserverBase)
+
 void CSelection::ConstraintsObserver::OnUpdate(const istd::IChangeable::ChangeSet& changeset)
 {
-	Ids constraints = GetObservedObject()->GetElementIds();
-	m_parent.m_constraintsCache = QSet<Id>(constraints.constBegin(), constraints.constEnd());
+	istd::IChangeable::ChangeSet changeSet(CF_CONSTRAINTS_CHANGED);
+	changeSet.SetChangeInfo(ISelection::CN_CONSTRAINTS_CHANGED, QVariant());
+	istd::CChangeNotifier notifier(&m_parent, &changeSet);
+}
 
-	Ids filteredIds = m_parent.FilterIds(m_parent.m_selectedIds, true);
-	m_parent.ApplyNewIds(filteredIds);
+// reimplemented (imod::IObserver)
+
+bool CSelection::ConstraintsObserver::OnModelDetached(imod::IModel* modelPtr)
+{
+	istd::IChangeable::ChangeSet changeSet(CF_CONSTRAINTS_CHANGED);
+	changeSet.SetChangeInfo(ISelection::CN_CONSTRAINTS_CHANGED, QVariant());
+	istd::CChangeNotifier notifier(&m_parent, &changeSet);
+
+	return BaseClass::OnModelDetached(modelPtr);
 }
 
 

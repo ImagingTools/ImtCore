@@ -5,7 +5,6 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionInfo.h>
 #include <imtbase/ISelection.h>
 
 
@@ -47,7 +46,11 @@ private:
 		ConstraintsObserver(CSelection& parent);
 
 	protected:
+		// reimplemented (imod::CSingleModelObserverBase)
 		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeset) override;
+
+		// reimplemented (imod::IObserver)
+		virtual bool OnModelDetached(imod::IModel* modelPtr) override;
 
 	private:
 		CSelection& m_parent;
@@ -55,21 +58,19 @@ private:
 
 private:
 	/**
-		Returns only identifiers contained (or not contained) in constraints
-	*/
-	Ids FilterIds(Ids ids, bool containedInConstraints) const;
-
-	/**
 		Apply identifiers to selection and emit notification
 	*/
-	void ApplyNewIds(Ids ids);
+	void ApplySelection(const Ids& selectionIds);
+
+	/**
+		Apply selection mode and emit notification
+	*/
+	void ApplySelectionMode(SelectionMode selectionMode);
 
 private:
 	SelectionMode m_selectionMode;
 	Ids m_selectedIds;
 	ConstraintsObserver m_constraintsObserver;
-
-	mutable QSet<Id> m_constraintsCache;
 };
 
 

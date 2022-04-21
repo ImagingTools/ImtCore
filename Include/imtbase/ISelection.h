@@ -25,21 +25,27 @@ public:
 	typedef QByteArray Id;
 	typedef QVector<Id> Ids;
 
+	static const QByteArray CN_SELECTION_MODE_CHANGED;
 	static const QByteArray CN_SELECTION_CHANGED;
+	static const QByteArray CN_CONSTRAINTS_CHANGED;
 
 	/**
 		Change notification flags.
 	*/
 	enum ChangeFlags
 	{
-		CF_SELECTION_CHANGED = 0x373978
+		CF_SELECTION_MODE_CHANGED = 0x373978,
+		CF_SELECTION_CHANGED,
+		CF_CONSTRAINTS_CHANGED
 	};
 
-	enum class SelectionMode
+	enum SelectionMode
 	{
-		SM_SINGLE = 0,
+		SM_SINGLE = 1,
 		SM_MULTI
 	};
+
+	I_DECLARE_ENUM(SelectionMode, SM_SINGLE, SM_MULTI);
 
 	/**
 		Get the list of options defining possible selection range.
