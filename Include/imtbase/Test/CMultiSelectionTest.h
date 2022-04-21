@@ -17,6 +17,8 @@
 #include <iser/CMemoryWriteArchive.h>
 #include <iser/CXmlStringWriteArchive.h>
 #include <iser/CXmlStringReadArchive.h>
+#include <iser/CJsonStringReadArchive.h>
+#include <iser/CJsonStringWriteArchive.h>
 #include <iser/CReadArchiveBase.h>
 #include <iser/CWriteArchiveBase.h>
 #include <itest/CStandardTestExecutor.h>
@@ -35,12 +37,16 @@ private slots:
 	void IsEqualTest();
 	void CopyFromTest();
 	void CloneMeTest();
-	void SerializeTest();
+	void SerializeMemoryTest();
+	void SerializeXmlTest();
+	void SerializeJsonTest();
 	void ResetDataTest();
 	void cleanupTestCase();
 
 private:
-	imtbase::ISelection::Ids m_testSelectedIds;
+	imtbase::ISelection::Ids m_testMultiSelectedIds;
+	imtbase::ISelection::Ids m_testSingleSelectedIds;
+	imtbase::ISelection::Ids m_testEmptySelectedIds;
 };
 
 
