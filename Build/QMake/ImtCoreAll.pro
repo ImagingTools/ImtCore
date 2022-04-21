@@ -112,6 +112,9 @@ imtlicdb.file = ../../Include/imtlicdb/QMake/imtlicdb.pro
 SUBDIRS += imtdbgui
 imtdbgui.file = ../../Include/imtdbgui/QMake/imtdbgui.pro
 
+SUBDIRS += imtimg
+imtimg.file = ../../Include/imtimg/QMake/imtimg.pro
+
 ######### Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro
@@ -220,5 +223,9 @@ ImtLicenseDbPck.depends = imtlic imtlicdb
 SUBDIRS += ImtDatabaseGuiPck
 ImtDatabaseGuiPck.file = ../../Impl/ImtDatabaseGuiPck/QMake/ImtDatabaseGuiPck.pro
 ImtDatabaseGuiPck.depends = imtgui imtdbgui
+
+SUBDIRS += ImtImagePck
+ImtImagePck.file = ../../Impl/ImtImagePck/QMake/ImtImagePck.pro
+ImtImagePck.depends = imtimg
 
 
