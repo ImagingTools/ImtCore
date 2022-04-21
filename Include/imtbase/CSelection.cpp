@@ -9,9 +9,6 @@
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <iser/IArchive.h>
 
-// ImtCore includes
-#include <imtbase/ICollectionInfo.h>
-
 
 namespace imtbase
 {

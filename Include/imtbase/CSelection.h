@@ -5,6 +5,7 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
+#include <imtbase/ICollectionInfo.h>
 #include <imtbase/ISelection.h>
 
 
