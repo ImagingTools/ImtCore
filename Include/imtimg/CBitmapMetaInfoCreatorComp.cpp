@@ -47,8 +47,8 @@ bool CBitmapMetaInfoCreatorComp::CreateMetaInfo(
 	case iimg::IBitmap::PF_GRAY16:
 	case iimg::IBitmap::PF_MONO:
 	case iimg::IBitmap::PF_GRAY:
-		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_BITMAP_FORMAT, QObject::tr("Gray"));
-		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_COLOR_SPACE_TYPE, QObject::tr("Grayscale"));
+		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_BITMAP_FORMAT, QObject::tr("Grayscale"));
+		metaInfoPtr->SetMetaInfo(IBitmapMetaInfo::MIT_COLOR_SPACE_TYPE, QObject::tr("Monochromatic"));
 		break;
 	case iimg::IBitmap::PF_RGB24:
 	case iimg::IBitmap::PF_RGB:

@@ -21,6 +21,7 @@
 #include <idoc/IDocumentMetaInfo.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
+#include <iwidgets/iwidgets.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionEvent.h>
@@ -1068,6 +1069,8 @@ void CObjectCollectionViewComp::OnTypeChanged()
 
 	if ((m_currentInformationViewPtr != nullptr) && m_currentInformationViewPtr->IsGuiCreated()){
 		m_currentInformationViewPtr->DestroyGui();
+
+		iwidgets::ClearLayout(RightPanel->layout());
 	}
 
 	if (!m_currentTypeId.isEmpty()){

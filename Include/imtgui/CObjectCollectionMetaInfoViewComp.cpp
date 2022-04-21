@@ -61,7 +61,7 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 			pixmap.convertFromImage(value.value<QImage>());
 			PreviewPixmap->setPixmap(pixmap.scaledToWidth(250));
 			if (!pixmap.isNull()){
-				PreviewFrame->show();
+				PreviewFrame->setVisible(true);
 			}
 			break;
 		}
@@ -98,7 +98,8 @@ void CObjectCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::Chang
 		layoutPtr->setColumnStretch(0, 1);
 		layoutPtr->setColumnStretch(1, 100);
 		layoutPtr->setColumnStretch(1, 100);
-		layoutPtr->addItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding),layoutPtr->rowCount(), 0);
+
+		layoutPtr->addItem(new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding), layoutPtr->rowCount(), 0);
 	}
 }
 
@@ -125,7 +126,7 @@ void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
 		InfoWidget->setLayout(new QGridLayout());
 	}
 
-	PreviewFrame->hide();
+	PreviewFrame->setVisible(false);
 
 	QGraphicsDropShadowEffect* shadowPtr = new QGraphicsDropShadowEffect;
 	shadowPtr->setXOffset(0);
@@ -134,8 +135,18 @@ void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
 	shadowPtr->setColor(QColor("#555555"));
 
 	PreviewFrame->setGraphicsEffect(shadowPtr);
-
+	
 	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
+}
+
+
+void CObjectCollectionMetaInfoViewComp::OnGuiDestroyed()
+{
+	iwidgets::ClearLayout(InfoWidget->layout());
+
+	InfoWidget->setLayout(nullptr);
+	
+	BaseClass::OnGuiDestroyed();
 }
 
 
@@ -155,7 +166,7 @@ void CObjectCollectionMetaInfoViewComp::OnGuiModelDetached()
 {
 	iwidgets::ClearLayout(InfoWidget->layout());
 
-	PreviewFrame->hide();
+	PreviewFrame->setVisible(false);
 
 	BaseClass::OnGuiModelDetached();
 }

@@ -40,6 +40,7 @@ protected:
 
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
+	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
 
 private:
