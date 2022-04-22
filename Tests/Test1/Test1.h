@@ -9,8 +9,8 @@
 
 // ACF includes
 #include <itest/CStandardTestExecutor.h>
-
-// ImtCore includes
+#include <ipackage/CComponentAccessor.h>
+#include <istd/TDelPtr.h>
 
 
 class Test1: public QObject
@@ -18,9 +18,10 @@ class Test1: public QObject
 	Q_OBJECT
 
 private slots:
-	void initTestCase();
-	void cleanupTestCase();
+	void InitTestCase();
+	void TestCase1();
+	void CleanupTestCase();
 
 private:
-
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 };
