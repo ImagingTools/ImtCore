@@ -2,70 +2,62 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4937" Description="ACF"/>
-            <Version Id="1" Number="2148" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="4993" Description="ACF"/>
+            <Version Id="1" Number="2172" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ComposedGui" PackageId="QtGuiPck" ComponentId="ComposedGui">
+        <Element Id="AccountInfo" PackageId="ImtAuthPck" ComponentId="AccountInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="CompactXmlFileSerializer" PackageId="FilePck" ComponentId="CompactXmlFileSerializer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Guis" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ToolBar</Value>
-                                <Value>ObjectCollectionView</Value>
+                                <Value>account</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ObjectCollectionView" PackageId="ImtGuiPck" ComponentId="ObjectCollectionView">
-            <Data IsEnabled="true" Flags="0">
+        <Element Id="ObjectCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="ObjectCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ViewDelegates" Type="Reference[]" ExportId="ViewDelegates">
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>StandardCollectionViewDelegate</Value>
+                                <Value>AccountInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="StandardCollectionViewDelegate" PackageId="ImtGuiPck" ComponentId="StandardCollectionViewDelegate">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EditDialog" Type="Reference" ExportId="EditDialog">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="ObjectPersistenceList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CompactXmlFileSerializer</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="ObjectTypeId">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AccountInfo</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ToolBar" PackageId="QtGuiPck" ComponentId="CommandsToolBar">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ButtonStyle" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="3"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandsProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ObjectCollectionView/Commands"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="IconSize" Type="Integer" ExportId="IconSize">
-                        <Data IsEnabled="true" Value="24"/>
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AccountInfo</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -73,11 +65,12 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IProgressManager" ComponentId="ObjectCollectionView"/>
-        <Interface InterfaceId="imod::IModelEditor" ComponentId="ObjectCollectionView"/>
-        <Interface InterfaceId="imod::IObserver" ComponentId="ObjectCollectionView"/>
-        <Interface InterfaceId="imtbase::IObjectCollectionEventHandler" ComponentId="ObjectCollectionView"/>
-        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ComposedGui"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="ObjectCollection"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="ObjectCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="ObjectCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="ObjectCollection"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ObjectCollection"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ObjectCollection"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Commands" ComponentId="ObjectCollectionView/Commands"/>

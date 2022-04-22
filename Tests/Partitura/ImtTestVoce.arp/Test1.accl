@@ -2,16 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4937" Description="ACF"/>
-            <Version Id="1" Number="2148" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="4993" Description="ACF"/>
+            <Version Id="1" Number="2172" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ComposedGui" X="575" Y="200" Note=""/>
-        <Element ComponentName="ObjectCollectionView" X="800" Y="375" Note=""/>
-        <Element ComponentName="StandardCollectionViewDelegate" X="800" Y="500" Note=""/>
-        <Element ComponentName="ToolBar" X="225" Y="375" Note=""/>
+        <Element ComponentName="AccountInfo" X="400" Y="350" Note=""/>
+        <Element ComponentName="CompactXmlFileSerializer" X="600" Y="450" Note=""/>
+        <Element ComponentName="ObjectCollection" X="600" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
