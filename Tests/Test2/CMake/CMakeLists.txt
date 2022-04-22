@@ -1,4 +1,4 @@
-project(ImtCore1Test)
+project(ImtCore2Test)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)

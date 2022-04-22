@@ -13,7 +13,7 @@
 // ImtCore includes
 
 
-class Test1: public QObject
+class Test2: public QObject
 {
 	Q_OBJECT
 
