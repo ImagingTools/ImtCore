@@ -10,6 +10,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
+set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
 set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/GeneratedFiles")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
@@ -173,3 +174,9 @@ if(NOT UNIX)
 #	add_subdirectory("${IMPL_DIR}/EagleView/CMake" "${AUX_INCLUDE_DIR}/EagleView")
 #	add_dependencies(EagleView Imt3dViewPck Imt3dGuiPck)
 endif()
+
+
+#-------- Tests --------
+
+add_subdirectory("${TESTS_DIR}/Test1/CMake" "${AUX_INCLUDE_DIR}/Test1")
+add_subdirectory("${TESTS_DIR}/Test2/CMake" "${AUX_INCLUDE_DIR}/Test2")
