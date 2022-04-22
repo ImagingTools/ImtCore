@@ -27,19 +27,34 @@
 #include <imtbase/CSelection.h>
 
 
-class CMultiSelectionTest: public QObject
+class CSelectionTest: public QObject
 {
 	Q_OBJECT
 
 private slots:
 	void initTestCase();
-	void SetSelectedIdsTest();
-	void IsEqualTest();
-	void CopyFromTest();
-	void CloneMeTest();
+	void SetSelectedIdsInMultiSelectTest();
+	void SetSelectedIdsInSingleSelectTest();
+	void SetSelectedEmptyIdsInMultiSelectTest();
+	void SetSelectedEmptyIdsInSingleSelectTest();
+	void SetSelectedManyIdsInSingleSelectTest();
+	void IsEqualMultiSelectTest();
+	void IsNonEqualMultiSelectTest();
+	void IsNonEqualMultiSelectAndSingleSelectTest();
+	void IsEqualSingleSelectTest();
+	void IsNonEqualSingleSelectTest();
+	void IsNonEqualEmptiesSingleSelectAndMultiSelectTest();
+	void CopyFromMultiSelectToMultiSelectTest();
+	void CopyFromSingleSelectToSingleSelectTest();
+	void CopyFromMultiSelectToSingleSelectTest();
+	void CloneMeSingleSelectTest();
+	void CloneMeMultiSelectTest();
+	void CheckSerializeMemoryTest();
+	void CompareSerializeMemoryDataWithInputFileDataTest();
 	void SerializeMemoryTest();
+	void CheckSerializeXmlTest();
+	void CompareSerializeXmlDataWithInputFileDataTest();
 	void SerializeXmlTest();
-	void SerializeJsonTest();
 	void ResetDataTest();
 	void cleanupTestCase();
 
