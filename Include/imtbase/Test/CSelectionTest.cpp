@@ -5,9 +5,11 @@ void CSelectionTest::initTestCase()
 {
 	QByteArray firstVar("firstKey");
 	QByteArray secondVar("secondKey");
+	QByteArray emptyKey("");
 	m_testMultiSelectedIds.append(firstVar);
 	m_testMultiSelectedIds.append(secondVar);
 	m_testSingleSelectedIds.append(secondVar);
+	m_testSelectedWithEmptyKeysIds.append(emptyKey);
 }
 
 
@@ -32,7 +34,7 @@ void CSelectionTest::SetSelectedIdsInSingleSelectTest()
 void CSelectionTest::SetSelectedEmptyIdsInMultiSelectTest()
 {
 	imtbase::CSelection multiSelection(imtbase::ISelection::SelectionMode::SM_MULTI);
-	bool checkMultiSelectWithEmptyData = multiSelection.SetSelectedIds(m_testEmptySelectedIds);
+	bool checkMultiSelectWithEmptyData = multiSelection.SetSelectedIds(m_testSelectedWithEmptyKeysIds);
 	QVERIFY2(!checkMultiSelectWithEmptyData, qPrintable(QString("Function CSelection::SetSelectedIds is failed in multi-select with empty Ids list")));
 }
 
@@ -40,7 +42,7 @@ void CSelectionTest::SetSelectedEmptyIdsInMultiSelectTest()
 void CSelectionTest::SetSelectedEmptyIdsInSingleSelectTest()
 {
 	imtbase::CSelection singleSelection(imtbase::ISelection::SelectionMode::SM_SINGLE);
-	bool checkSingleSelectWithEmptyData = singleSelection.SetSelectedIds(m_testEmptySelectedIds);
+	bool checkSingleSelectWithEmptyData = singleSelection.SetSelectedIds(m_testSelectedWithEmptyKeysIds);
 	QVERIFY2(!checkSingleSelectWithEmptyData, qPrintable(QString("Function CSelection::SetSelectedIds is failed in multi-select with empty Ids list")));
 }
 

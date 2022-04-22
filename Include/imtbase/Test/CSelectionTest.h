@@ -62,6 +62,7 @@ private:
 	imtbase::ISelection::Ids m_testMultiSelectedIds;
 	imtbase::ISelection::Ids m_testSingleSelectedIds;
 	imtbase::ISelection::Ids m_testEmptySelectedIds;
+	imtbase::ISelection::Ids m_testSelectedWithEmptyKeysIds;
 };
 
 
