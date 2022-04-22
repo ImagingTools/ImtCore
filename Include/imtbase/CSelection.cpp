@@ -61,6 +61,12 @@ bool CSelection::SetSelectedIds(const Ids& selectedIds)
 		return false;
 	}
 
+	for (const QByteArray& id : selectedIds){
+		if (id.isEmpty()){
+			return false;
+		}
+	}
+
 	if (m_selectedIds != selectedIds){
 		ApplySelection(selectedIds);
 	}
