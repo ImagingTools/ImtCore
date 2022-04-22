@@ -8,10 +8,10 @@ QtObject {
     property string json;    
 
     signal progress(real bytesLoaded, real bytesTotal);
-    signal fileDeleted();
+    signal fileDeleted(var url);
     signal fileDownloaded(string filePath);
-    signal fileUploaded();
-    signal fileExists();
+    signal fileUploaded(var url);
+    signal fileExists(var url);
 
     function SendFile(fileUrl){
         this.state = "Loading"
@@ -31,12 +31,13 @@ QtObject {
             if (xhr.readyState === xhr.DONE && xhr.status === 409) {
                 var existingHash = xhr.responseXML.getElementsByTagName("p")[2].innerHTML;
                 this.json = existingHash;
-                this.fileExists()
+                this.fileExists(fileUrl)
+                this.fileUploaded(fileUrl)
               }
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 409){
                 this.json = xhr.responseText;
                 this.state = "Ready"
-                this.fileUploaded()
+                this.fileUploaded(fileUrl)
             }
         }
         xhr.onprogress = (event)=>{
@@ -49,7 +50,7 @@ QtObject {
         open(`../../files/${fileUrl.name}?FileId=${fileHash}`)
     }
 
-    function DeleteFile(fileHash){
+    function DeleteFile(fileHash, fileUrl){
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
         xhr.open("DELETE", `../../files/${fileHash}`);
@@ -59,7 +60,7 @@ QtObject {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
                 this.state = "Ready"
-                this.fileDeleted()
+                this.fileDeleted(fileUrl)
             }
         }
     }
