@@ -1,0 +1,52 @@
+#pragma once
+
+// std includes
+#include <memory>
+
+// Qt includes
+#include <QtCore/QObject>
+#include <QtTest/QtTest>
+
+// ACF includes
+#include <istd/TDelPtr.h>
+#include <istd/CChangeNotifier.h>
+#include <iprm/IOptionsList.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+#include <iser/CMemoryReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
+#include <iser/CXmlStringWriteArchive.h>
+#include <iser/CXmlStringReadArchive.h>
+#include <iser/CJsonStringReadArchive.h>
+#include <iser/CJsonStringWriteArchive.h>
+#include <iser/CReadArchiveBase.h>
+#include <iser/CWriteArchiveBase.h>
+#include <itest/CStandardTestExecutor.h>
+
+// ImtCore includes
+#include <imtbase/CSelection.h>
+
+
+class CMultiSelectionTest: public QObject
+{
+	Q_OBJECT
+
+private slots:
+	void initTestCase();
+	void SetSelectedIdsTest();
+	void IsEqualTest();
+	void CopyFromTest();
+	void CloneMeTest();
+	void SerializeMemoryTest();
+	void SerializeXmlTest();
+	void SerializeJsonTest();
+	void ResetDataTest();
+	void cleanupTestCase();
+
+private:
+	imtbase::ISelection::Ids m_testMultiSelectedIds;
+	imtbase::ISelection::Ids m_testSingleSelectedIds;
+	imtbase::ISelection::Ids m_testEmptySelectedIds;
+};
+
+
