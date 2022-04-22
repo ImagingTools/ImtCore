@@ -200,8 +200,8 @@ Item {
                     featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                     featureCollectionView.refresh();
 
-                    featureCollectionViewContainer.updateDependsModelAfterEdit(oldId, parameters["newFeatureId"]);
-
+//                    featureCollectionViewContainer.updateDependsModelAfterEdit(featureCollectionViewContainer.itemId, oldId, parameters["newFeatureId"]);
+                    featureCollectionViewContainer.updateDependModelsAfterFeatureEdit(featureCollectionViewContainer.itemId, oldId, parameters["newFeatureId"]);
                     featureCollectionViewContainer.wasChanged = true;
                 }
 
@@ -236,12 +236,12 @@ Item {
                 var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
                 dataModelLocal.RemoveItem(featureCollectionView.table.selectedIndex);
                 featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-                featureCollectionView.collectionViewModel.Refresh();
+                //featureCollectionView.collectionViewModel.Refresh();
                 featureCollectionView.refresh();
 
                 featureCollectionView.table.selectedIndex = -1;
                 featureCollectionViewContainer.commandsChanged("PackageEdit");
-                featureCollectionViewContainer.makeCommandActive("Save");
+                //featureCollectionViewContainer.makeCommandActive("Save");
 
                 featuresTreeView.removeFeatureInTreeViewModel(featureCollectionViewContainer.itemId, featureCollectionView.table.getSelectedId());
             }
@@ -264,9 +264,134 @@ Item {
         }
     }
 
+    function updateDependModelsAfterPackageEdit(oldPackageId, newPackageId){
+        console.log("PackageView updateDependModelsAfterPackageEdit", oldPackageId, newPackageId);
+
+        if (!featuresTreeView.modelDepends || oldPackageId == newPackageId){
+            return;
+        }
+
+        /*
+           Обновляем данные в featuresTreeView.modelDepends
+        */
+        for (var i = 0; i < featuresTreeView.modelDepends.GetItemsCount(); i++){
+            var rootFeatureId = featuresTreeView.modelDepends.GetData("RootFeatureId", i);
+            var rootPackageId = featuresTreeView.modelDepends.GetData("RootPackageId", i);
+
+            if (rootPackageId === oldPackageId){
+                featuresTreeView.modelDepends.SetData("RootPackageId", newPackageId, i);
+            }
+
+            var packages = featuresTreeView.modelDepends.GetData("Packages", i);
+            if (!packages){
+                continue;
+            }
+
+            for (var j = 0; j < packages.GetItemsCount(); j++){
+                if (packages.GetData("Id", j) === oldPackageId){
+                    packages.SetData("Id", oldPackageId, j);
+                }
+            }
+
+            packages.SetData("childItemModel", childItems, indexChild);
+            featuresTreeView.modelDepends.SetData("Packages", packages, i);
+        }
+
+        if (!treeView.modelItems){
+            return;
+        }
+
+        for (let i = 0; i < treeView.modelItems.GetItemsCount(); i++){
+            let packageId = treeView.modelItems.GetData("Id", i);
+            if (packageId == oldPackageId){
+                treeView.modelItems.SetData("Id", newPackageId, i);
+            }
+        }
+    }
+
+    function updateDependModelsAfterFeatureEdit(packageId, oldFeatureId, newFeatureId){
+        console.log("PackageView updateDependModelsAfterFeatureEdit", packageId, oldFeatureId, newFeatureId);
+        if (!featuresTreeView.modelDepends || oldFeatureId == newFeatureId){
+            return;
+        }
+
+        /*
+           Обновляем данные в featuresTreeView.modelDepends
+        */
+        for (var i = 0; i < featuresTreeView.modelDepends.GetItemsCount(); i++){
+            var rootFeatureId = featuresTreeView.modelDepends.GetData("RootFeatureId", i);
+            var rootPackageId = featuresTreeView.modelDepends.GetData("RootPackageId", i);
+
+            if (rootFeatureId === oldFeatureId && rootPackageId === packageId){
+                featuresTreeView.modelDepends.SetData("RootFeatureId", newFeatureId, i);
+            }
+
+            var packages = featuresTreeView.modelDepends.GetData("Packages", i);
+            if (!packages){
+                continue;
+            }
+
+            var indexChild = -1;
+            for (var j = 0; j < packages.GetItemsCount(); j++){
+                if (packages.GetData("Id", j) === packageId){
+                    indexChild = j;
+                }
+            }
+
+            if (indexChild === -1){
+                continue;
+            }
+
+            var childItems = packages.GetData("childItemModel", indexChild);
+            if (!childItems){
+                continue;
+            }
+
+            for (j = 0; j < childItems.GetItemsCount(); j++){
+                let curId = childItems.GetData("Id", j);
+                if (curId === oldFeatureId){
+                    childItems.SetData("Id", newFeatureId, j);
+                }
+            }
+
+            packages.SetData("childItemModel", childItems, indexChild);
+            featuresTreeView.modelDepends.SetData("Packages", packages, i);
+        }
+
+        /*
+           Обновляем данные в treeView.modelItems
+        */
+        if (!treeView.modelItems){
+            return;
+        }
+
+        for (let i = 0; i < treeView.modelItems.GetItemsCount(); i++){
+            let curPackageId = treeView.modelItems.GetData("Id", i);
+            if (curPackageId == packageId){
+                let modelChild = treeView.modelItems.GetData("childItemModel", i);
+                if (!modelChild){
+                    continue;
+                }
+
+                let wasChanged = false;
+                for (let j = 0; j < modelChild.GetItemsCount(); j++){
+                    let childId = modelChild.GetData("Id", j);
+                    if (childId == oldFeatureId){
+                        wasChanged = true;
+                        modelChild.SetData("Id", newFeatureId, j);
+                    }
+                }
+
+                if (wasChanged){
+                    treeView.modelItems.SetData("childItemModel", modelChild, i);
+                }
+            }
+        }
+    }
+
     function updateDependsModelAfterEdit(oldFeatureId, newFeatureId){
         console.log("PackageView updateDependsModelAfterEdit", oldFeatureId, newFeatureId);
-        featuresTreeView.printInfo();
+       // featuresTreeView.printInfo();
 
         if (!featuresTreeView.modelDepends){
             return;
@@ -281,7 +406,6 @@ Item {
             }
 
             var packages = featuresTreeView.modelDepends.GetData("Packages", i);
-
             if (!packages){
                 continue;
             }
@@ -314,11 +438,11 @@ Item {
             }
 
             packages.SetData("childItemModel", childItems, indexChild);
-            featuresTreeView.modelDepends.GetData("Packages", packages, i);
+            featuresTreeView.modelDepends.SetData("Packages", packages, i);
         }
-        featuresTreeView.printInfo();
+       // featuresTreeView.printInfo();
 
-        featuresTreeView.modelDepends.Refresh();
+        //featuresTreeView.modelDepends.Refresh();
     }
 
     function menuActivated(menuId) {
@@ -342,7 +466,7 @@ Item {
 
             var emptyId = featureCollectionViewContainer.alreadyExistIdHasEmpty();
             if (emptyId !== "") {
-                featureCollectionView.openMessageDialog("ErrorDialog", emptyId + " has an empty id !", "ErrorDialog");
+                featureCollectionView.openMessageDialog("Error Dialog", emptyId + " has an empty id !", "ErrorDialog");
                 return;
             }
 

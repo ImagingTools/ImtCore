@@ -64,6 +64,18 @@ I_EXPORT_COMPONENT(
 
 
 I_EXPORT_COMPONENT(
+			UserCollectionController,
+			"UserCollectionController",
+			"User Collection Controller");
+
+
+I_EXPORT_COMPONENT(
+			UserController,
+			"UserController",
+			"User Controller");
+
+
+I_EXPORT_COMPONENT(
 			KeyDataProvider,
 			"KeyDataProvider",
 			"Key data provider");

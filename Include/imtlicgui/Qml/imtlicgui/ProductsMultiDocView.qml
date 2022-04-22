@@ -35,6 +35,10 @@ Item {
             console.log("ProductsMultiDocView first page loaded !");
             productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
         }
+
+        if (productsMultiDocViewContainer.visible){
+            productsMultiDocView.activeItem.refresh();
+        }
     }
 
     MultiDocWorkspaceView {

@@ -51,7 +51,7 @@ Rectangle {
         var parameters = {};
         parameters["resultItem"] = collectionViewContainer;
         parameters["noButtonVisible"] = false;
-        parameters["textOkButton"] = "Ok";
+        parameters["textOkButton"] = "OK";
         parameters["message"] = message;
         parameters["nameDialog"] = nameDialog;
         parameters["dialogId"] = type;

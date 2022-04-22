@@ -130,9 +130,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 		return NewObjectQuery();
 	}
 	const imtbase::IObjectCollection* packagesCollectionPtr = productPtr->GetFeaturePackages();
-//	if (packagesCollectionPtr == nullptr){
-//		return NewObjectQuery();
-//	}
 
 	QByteArray productId = productPtr->GetProductId();
 	if (productId.isEmpty()){
@@ -172,22 +169,23 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 						.arg(licenseDescription)
 						.arg(qPrintable(productId)).toLocal8Bit();
 
+			if (packagesCollectionPtr != nullptr){
+				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
+				for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
+					QByteArray id =  featureInfo.id;
+					const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, featureInfo.id);
+					if (packagePtr == nullptr){
+						return NewObjectQuery();
+					}
 
-			imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-			for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
-				QByteArray packageId;
-				const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, featureInfo.id);
-				if (packagePtr == nullptr){
-					return NewObjectQuery();
+					QByteArray packageId = packagePtr->GetPackageId();
+
+					retVal.query += "\n" +
+								QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId) VALUES('%1', '%2');")
+								.arg(qPrintable(licenseId))
+								.arg(qPrintable(featureInfo.id))
+								.toLocal8Bit();
 				}
-
-				packageId = packagePtr->GetPackageId();
-
-				retVal.query += "\n" +
-							QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId) VALUES('%1', '%2');")
-							.arg(qPrintable(licenseId))
-							.arg(qPrintable(featureInfo.id))
-							.toLocal8Bit();
 			}
 		}
 	}

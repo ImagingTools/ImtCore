@@ -13,7 +13,11 @@ Item {
         console.log( "FeaturesTreeView Component.onCompleted");
         featuresTreeViewContainer.loadFeaturesModel();
         featuresTreeViewContainer.loadDependModel();
+        featuresTreeViewContainer.loadLicenseDependModel();
+//        licensesDependenciesModel.loadLicenseDependModel();
+    }
 
+    function loadLicenseDependModel(){
         licensesDependenciesModel.loadLicenseDependModel();
     }
 
@@ -34,7 +38,6 @@ Item {
     }
 
     function getIndexFromTreeViewByPackageId(packageId){
-
         if (!featuresTreeViewContainer.modelTreeItems){
             return -1;
         }

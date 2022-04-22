@@ -188,6 +188,20 @@ Item {
         productsCollectionViewContainer.rootItem.setModeMenuButton(commandId, "Normal");
     }
 
+    function checkLicenses(){
+        let dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
+        let nameLic = "";
+        for (let i = 0; i < dataModelLocal.GetItemsCount(); i++){
+            var licenseId = dataModelLocal.GetData("Id", i);
+            if (licenseId == ""){
+                nameLic = dataModelLocal.GetData("Name", i);
+                break;
+            }
+        }
+
+        return nameLic;
+    }
+
     function createLicense(id, name, description) {
         var dataModelLocal = model.GetData("data");
         var index = dataModelLocal.InsertNewItem();
@@ -232,7 +246,14 @@ Item {
                 productsCollectionView.openMessageDialog("Error dialog", "Id can't be empty!", "ErrorDialog");
             }
             else{
-                productViewSaveQuery.updateModel()
+                let name = productsCollectionViewContainer.checkLicenses();
+                if (name == ""){
+                    productViewSaveQuery.updateModel();
+                }
+                else{
+                    let message = name + " has an invalid id!";
+                    productsCollectionView.openMessageDialog("Error dialog", message, "ErrorDialog");
+                }
             }
         }
         else if (menuId  === "Remove") {
@@ -250,7 +271,7 @@ Item {
         else if (menuId  === "Duplicate") {
             var dataModelLocal = model.GetData("data");
             var duplicateName = "Copy of " + dataModelLocal.GetData("Name", productsCollectionView.selectedIndex);
-            var duplicateId = dataModelLocal.GetData("Id", productsCollectionView.selectedIndex);
+            var duplicateId = dataModelLocal.GetData("Id", productsCollectionView.selectedIndex) + "_Copy";
             var duplicateDescription = dataModelLocal.GetData("Description", productsCollectionView.selectedIndex);
             productsCollectionViewContainer.createLicense(duplicateId, duplicateName, duplicateDescription);
 //            productsCollectionViewContainer.wasChanged = true;
@@ -263,10 +284,14 @@ Item {
     function refresh() {
         console.log("ProductView refresh");
         productsCollectionView.refresh();
+
+        featuresTreeView.loadFeaturesModel();
+        featuresTreeView.loadDependModel();
+        featuresTreeView.loadLicenseDependModel();
     }
 
     function commandsChanged(commandsId){
-        if (commandsId !== "ProductEdit") {
+        if (commandsId !== "ProductEdit"){
             return;
         }
 

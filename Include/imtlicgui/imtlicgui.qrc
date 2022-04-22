@@ -17,5 +17,8 @@
         <file alias="imtlicgui/TableInstanceLicensesDelegate.qml">Qml/imtlicgui/TableInstanceLicensesDelegate.qml</file>
         <file alias="imtlicgui/MetaInfo.qml">Qml/imtlicgui/MetaInfo.qml</file>
         <file alias="imtlicgui/TestMultiDocView.qml">Qml/imtlicgui/TestMultiDocView.qml</file>
+        <file alias="imtlicgui/UserView.qml">Qml/imtlicgui/UserView.qml</file>
+        <file alias="imtlicgui/AdminPanelMultiDocView.qml">Qml/imtlicgui/AdminPanelMultiDocView.qml</file>
+        <file alias="imtlicgui/UsersCollectionView.qml">Qml/imtlicgui/UsersCollectionView.qml</file>
     </qresource>
 </RCC>

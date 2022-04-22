@@ -173,9 +173,9 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 	imtbase::CTreeItemModel* dependenciesModel = nullptr;
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
-	if (!m_viewDelegateCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
-	}
+//	if (!m_viewDelegateCompPtr.IsValid()){
+//		errorMessage = QObject::tr("Internal error").toUtf8();
+//	}
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
@@ -268,9 +268,9 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 	imtbase::CTreeItemModel* treeItemModel = nullptr;
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
-	if (!m_viewDelegateCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
-	}
+//	if (!m_viewDelegateCompPtr.IsValid()){
+//		errorMessage = QObject::tr("Internal error").toUtf8();
+//	}
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");

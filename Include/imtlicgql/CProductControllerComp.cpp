@@ -193,9 +193,9 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	QByteArrayList fields;
 
-	if (!m_viewDelegateCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
-	}
+//	if (!m_viewDelegateCompPtr.IsValid()){
+//		errorMessage = QObject::tr("Internal error").toUtf8();
+//	}
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");

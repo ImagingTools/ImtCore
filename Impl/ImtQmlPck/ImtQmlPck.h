@@ -18,6 +18,7 @@
 #include <imtqml/CCommandDataEnumProviderComp.h>
 #include <imtqml/CMenuDataEnumProviderComp.h>
 #include <imtqml/CJoinDataProviderComp.h>
+#include <imtqml/CHeadersDataProviderComp.h>
 #include <imtqml/CObserverQmlComp.h>
 
 /**
@@ -39,6 +40,7 @@ typedef imtqml::CPageDataEnumProviderComp PageDataEnumProvider;
 typedef imtqml::CCommandDataEnumProviderComp CommandDataEnumProvider;
 typedef imtqml::CMenuDataEnumProviderComp MenuDataEnumProvider;
 typedef imtqml::CJoinDataProviderComp JoinDataProvider;
+typedef imtqml::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtqml::CObserverQmlComp ObserverQml;
 
 

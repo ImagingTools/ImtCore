@@ -69,12 +69,16 @@ Rectangle {
             id: iconRemoveDialog;
 
             anchors.left: removeDialogTopPanel.left;
+            anchors.leftMargin: 10;
             anchors.verticalCenter: removeDialogTopPanel.verticalCenter;
 
             width: 20;
             height: 20;
 
-            source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
+            sourceSize.height: height;
+            sourceSize.width: width;
+
+            source: "../../../" + "Icons/" + Style.theme + "/LisaIcon.svg";
         }
 
         Text {
@@ -147,58 +151,57 @@ Rectangle {
             text: messageDialogContainer.message;
         }
 
-        AuxButton {
-            id: yesButton;
-
-            anchors.bottom: removeDialogBody.bottom;
-            anchors.bottomMargin: 20;
-            anchors.right: noButton.left;
-            anchors.rightMargin: 15;
-
-            width: 70;
-            height: 25;
-
-            hasText: true;
-            hasIcon: false;
-
-            textButton: messageDialogContainer.textOkButton;
-            borderColor: yesButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
-            backgroundColor: Style.imagingToolsGradient1;
-
-            visible: messageDialogContainer.okButtonVisible;
-
-            onClicked: {
-                var result = messageDialogContainer.textOkButton.toLowerCase();
-                messageDialogContainer.exit(result);
-                messageDialogContainer.okButtonClicked();
-                loaderDialog.closeItem();
-            }
-        }
-
-        AuxButton {
-            id: noButton;
-
+        Row {
             anchors.bottom: removeDialogBody.bottom;
             anchors.right: removeDialogBody.right;
             anchors.bottomMargin: 20;
             anchors.rightMargin: 15;
 
-            width: 70;
-            height: 25;
+            spacing: 10;
 
-            hasText: true;
-            hasIcon: false;
+            AuxButton {
+                id: yesButton;
 
-            textButton: "No";
-            borderColor: noButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
-            backgroundColor: Style.imagingToolsGradient1;
+                width: 70;
+                height: 25;
 
-            visible: messageDialogContainer.noButtonVisible;
+                hasText: true;
+                hasIcon: false;
 
-            onClicked: {
-                messageDialogContainer.exit("no");
-                messageDialogContainer.noButtonClicked();
-                loaderDialog.closeItem();
+                textButton: messageDialogContainer.textOkButton;
+                borderColor: yesButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+                backgroundColor: Style.imagingToolsGradient1;
+
+                visible: messageDialogContainer.okButtonVisible;
+
+                onClicked: {
+                    var result = messageDialogContainer.textOkButton.toLowerCase();
+                    messageDialogContainer.exit(result);
+                    messageDialogContainer.okButtonClicked();
+                    loaderDialog.closeItem();
+                }
+            }
+
+            AuxButton {
+                id: noButton;
+
+                width: 70;
+                height: 25;
+
+                hasText: true;
+                hasIcon: false;
+
+                textButton: "No";
+                borderColor: noButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+                backgroundColor: Style.imagingToolsGradient1;
+
+                visible: messageDialogContainer.noButtonVisible;
+
+                onClicked: {
+                    messageDialogContainer.exit("no");
+                    messageDialogContainer.noButtonClicked();
+                    loaderDialog.closeItem();
+                }
             }
         }
     }

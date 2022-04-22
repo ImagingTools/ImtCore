@@ -15,9 +15,6 @@ Item {
     property alias itemName: packageCollectionView.itemName;
     property alias model: packageCollectionView.collectionViewModel;
 
-    property int contextMenuX;
-    property int contextMenuY;
-
     property string operation;
 
     function refresh(){

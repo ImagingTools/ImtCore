@@ -78,6 +78,11 @@ I_EXPORT_COMPONENT(
 			"Join data provider");
 
 I_EXPORT_COMPONENT(
+			HeadersDataProvider,
+			"Headers data provider",
+			"Headers data provider");
+
+I_EXPORT_COMPONENT(
 			ObserverQml,
 			"Observer QuickObject",
 			"Observer qml quickobject");

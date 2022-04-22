@@ -116,12 +116,16 @@ Rectangle {
             id: iconEditLicenseDialog;
 
             anchors.left: editLicenseDialogTopPanel.left;
+            anchors.leftMargin: 10;
             anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
 
             width: 20;
             height: 20;
 
-            source: "../../../" + "Icons/" + Style.theme + "/" + "Icon" + "_" + "On" + "_" + "Normal" + ".svg";
+            sourceSize.height: height;
+            sourceSize.width: width;
+
+            source: "../../../" + "Icons/" + Style.theme + "/LisaIcon.svg";
         }
 
         Text {
@@ -396,7 +400,7 @@ Rectangle {
 
             color: Style.errorTextColor;
 
-            text: "";
+            text: "Id can't be empty!";
         }
 
         Text {

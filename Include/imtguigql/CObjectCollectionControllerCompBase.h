@@ -19,8 +19,9 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-		I_ASSIGN(m_viewDelegateCompPtr, "ViewDelegate", "View delegate (corresponding with the object type) used for the collection", true, "ViewDelegate");
+		//I_ASSIGN(m_viewDelegateCompPtr, "ViewDelegate", "View delegate (corresponding with the object type) used for the collection", true, "ViewDelegate");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", true, "HeadersProvider");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -85,8 +86,9 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
-	I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
+	//I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_headersProviderCompPtr);
 };
 
 

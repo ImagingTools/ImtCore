@@ -11,7 +11,6 @@
 namespace imtguigql
 {
 
-
 // reimplemented (icomp::CComponentBase)
 
 void CObjectCollectionControllerCompBase::OnComponentCreated()
@@ -406,36 +405,48 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
 	QByteArrayList fields;
 
-	if (!m_viewDelegateCompPtr.IsValid()){
+	if (!m_headersProviderCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
-	}
-
-	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
 		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		const imtbase::ICollectionInfo& fieldCollection = m_viewDelegateCompPtr->GetSummaryInformationTypes();
-		QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
-		for (QByteArray fieldId : fieldIds){
-			QString headerName = fieldCollection.GetElementInfo(fieldId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			int index = itemsModel->InsertNewItem();
-			itemsModel->SetData("Name", headerName,index);
-			itemsModel->SetData("Id", QString(fieldId),index);
+		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, fields);
+		if (headersModel != nullptr){
+			headersModel->SetIsArray(true);
+			dataModel->SetExternTreeModel("headers", headersModel);
 		}
-		itemsModel->SetIsArray(true);
-
-		dataModel->SetExternTreeModel("headers", itemsModel);
+		rootModel->SetExternTreeModel("data", dataModel);
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
+//	if (!m_viewDelegateCompPtr.IsValid()){
+//		errorMessage = QObject::tr("Internal error").toUtf8();
+//	}
 
+//	if (!errorMessage.isEmpty()){
+//		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+//		errorsItemModel->SetData("message", errorMessage);
+//	}
+//	else{
+//		dataModel = new imtbase::CTreeItemModel();
+//		itemsModel = new imtbase::CTreeItemModel();
+//		const imtbase::ICollectionInfo& fieldCollection = m_viewDelegateCompPtr->GetSummaryInformationTypes();
+//		QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
+
+//		for (QByteArray fieldId : fieldIds){
+//			QString headerName = fieldCollection.GetElementInfo(fieldId, imtbase::ICollectionInfo::EIT_NAME).toString();
+//			int index = itemsModel->InsertNewItem();
+//			itemsModel->SetData("Name", headerName,index);
+//			itemsModel->SetData("Id", QString(fieldId),index);
+//		}
+//		itemsModel->SetIsArray(true);
+
+//		dataModel->SetExternTreeModel("headers", itemsModel);
+//	}
 	return rootModel;
 }
 
