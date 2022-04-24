@@ -240,6 +240,9 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 		if (commandsModelPtr != nullptr){
 			RegisterModel(commandsModelPtr, MI_VIEW_COMMANDS);
 		}
+		else{
+			OnModelChanged(MI_VIEW_COMMANDS, istd::IChangeable::GetAllChanges());
+		}
 	}
 
 	UI::HeaderFrame->setVisible(false);
