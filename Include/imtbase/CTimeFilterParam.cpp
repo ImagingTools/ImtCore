@@ -17,7 +17,8 @@ namespace imtbase
 CTimeFilterParam::CTimeFilterParam()
 	:m_timeUnit(TU_CUSTOM),
 	m_interpretationMode(IM_FOR),
-	m_timeUnitMultiplier(1)
+	m_timeUnitMultiplier(1),
+	m_timeRange(QDateTime(), QDateTime())
 {
 }
 

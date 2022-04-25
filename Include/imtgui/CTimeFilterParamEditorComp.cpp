@@ -18,7 +18,6 @@ CTimeFilterParamEditorComp::CTimeFilterParamEditorComp()
 
 void CTimeFilterParamEditorComp::OnGuiCreated()
 {
-	BaseClass::OnGuiCreated();
 	QBoxLayout *layout = nullptr;
 	if(*m_horizontalOrientationFlag){
 		layout = new QHBoxLayout();
@@ -26,14 +25,17 @@ void CTimeFilterParamEditorComp::OnGuiCreated()
 	else{
 		layout = new QVBoxLayout();
 	}
+
 	layout->setContentsMargins(0, 0, 0, 0);
 	GetWidget()->setLayout(layout);
 	layout->addWidget(TimeCombo);
+
 	layout->addWidget(CustomRangeFrame);
 	CustomRangeFrame->setVisible(false);
-
 	CustomBeginDate->setDateTime(QDateTime::currentDateTime().addMonths(-6));
 	CustomEndDate->setDateTime(QDateTime::currentDateTime());
+
+	BaseClass::OnGuiCreated();
 }
 
 
@@ -45,13 +47,17 @@ void CTimeFilterParamEditorComp::OnGuiRetranslate()
 
 void CTimeFilterParamEditorComp::on_CustomBeginDate_dateTimeChanged(const QDateTime& /*dateTime*/)
 {
-	SetFilterTimeRange(CustomBeginDate->dateTime(), CustomEndDate->dateTime());
+	if (TimeCombo->currentIndex() == 9){
+		SetFilterTimeRange(CustomBeginDate->dateTime(), CustomEndDate->dateTime());
+	}
 }
 
 
 void CTimeFilterParamEditorComp::on_CustomEndDate_dateTimeChanged(const QDateTime & /*dateTime*/)
 {
-	SetFilterTimeRange(CustomBeginDate->dateTime(), CustomEndDate->dateTime());
+	if (TimeCombo->currentIndex() == 9){
+		SetFilterTimeRange(CustomBeginDate->dateTime(), CustomEndDate->dateTime());
+	}
 }
 
 

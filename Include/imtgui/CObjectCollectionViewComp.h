@@ -268,6 +268,7 @@ private:
 	public:
 		TableModel(CObjectCollectionViewComp& parent);
 		void UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes);
+		void AddItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 		void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 		void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 
@@ -305,7 +306,7 @@ private:
 	QByteArray m_currentTypeId;
 	imod::TModelWrap<Commands> m_commands;
 
-	ItemProxyModel* m_proxyModelPtr;
+//	ItemProxyModel* m_proxyModelPtr;
 
 	typedef QMap<QString, QVariant> ColumnSettings;
 	typedef QVector<ColumnSettings> ColumnsList;
