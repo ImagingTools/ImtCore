@@ -48,7 +48,7 @@ I_EXPORT_COMPONENT(
 			"Params data provider");
 
 I_EXPORT_COMPONENT(
-			DBSettingsDataProvider,
+			DatabaseSettingsDataProvider,
 			"Database settings data provider",
 			"Database settings data provider");
 

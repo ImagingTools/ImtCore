@@ -1,12 +1,13 @@
-#include <imtqml/CDBSettingsDataProviderCompBase.h>
+#include <imtqml/CDatabaseSettingsDataProviderComp.h>
+
 
 // ACF includes
-#include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
 #include <istd/CChangeGroup.h>
 #include <imod/TModelWrap.h>
-
+#include <iprm/ISelectionParam.h>
+#include <iprm/IOptionsList.h>
 #include <iprm/IParamsSet.h>
+
 
 namespace imtqml
 {
@@ -16,14 +17,15 @@ namespace imtqml
 
 // reimplemented (imtbase::IItemBasedRepresentationProvider)
 
-QByteArray CDBSettingsDataProviderCompBase::GetModelId() const
+QByteArray CDatabaseSettingsDataProviderComp::GetModelId() const
 {
 	return *m_paramIdAttrPtr;
 }
 
 
-imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,
-																		const QByteArrayList& fields)
+imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
+			const QList<imtgql::CGqlObject>& /*params*/,
+			const QByteArrayList& /*fields*/)
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
@@ -95,18 +97,20 @@ imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::GetTreeItemModel(const
 
 // reimplemented (imtgql::IGqlMutationDataControllerDelegate)
 
-imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::UpdateBaseModelFromRepresentation(
-		const QList<imtgql::CGqlObject> &params,
-		imtbase::CTreeItemModel *baseModel)
+imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::UpdateBaseModelFromRepresentation(
+		const QList<imtgql::CGqlObject>& /*params*/,
+		imtbase::CTreeItemModel* baseModelPtr)
 {
+	Q_ASSERT(baseModelPtr != nullptr);
+
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 
 	if (!m_databaseSettingsCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	if (baseModel->ContainsKey("Parameters")){
-		imtbase::CTreeItemModel* parameters = baseModel->GetTreeItemModel("Parameters");
+	if (baseModelPtr->ContainsKey("Parameters")){
+		imtbase::CTreeItemModel* parameters = baseModelPtr->GetTreeItemModel("Parameters");
 
 		for (int k = 0; k < parameters->GetItemsCount(); k++){
 			QByteArray parameterId = parameters->GetData("Id", k).toByteArray();
@@ -132,16 +136,16 @@ imtbase::CTreeItemModel* CDBSettingsDataProviderCompBase::UpdateBaseModelFromRep
 		QByteArray paramId;
 		QString paramName;
 
-		if (baseModel->ContainsKey("Id")){
-			paramId = baseModel->GetData("Id").toByteArray();
+		if (baseModelPtr->ContainsKey("Id")){
+			paramId = baseModelPtr->GetData("Id").toByteArray();
 			rootModel->SetData("Id", paramId);
 		}
 
-		if (baseModel->ContainsKey("Name")){
-			paramName = baseModel->GetData("Name").toString();
+		if (baseModelPtr->ContainsKey("Name")){
+			paramName = baseModelPtr->GetData("Name").toString();
 			rootModel->SetData("Name", paramName);
 		}
-	}
+	} 
 
 	return rootModel;
 }
