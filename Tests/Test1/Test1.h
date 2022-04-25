@@ -13,15 +13,18 @@
 #include <istd/TDelPtr.h>
 
 
-class Test1: public QObject
+class CObjectCollectionTest: public QObject
 {
 	Q_OBJECT
 
 private slots:
-	void InitTestCase();
-	void TestCase1();
-	void CleanupTestCase();
+	void initTestCase();
+	void CheckSerializeTest();
+	void CreateNewObjectTest_data();
+	void CreateNewObjectTest();
+	void cleanupTestCase();
 
 private:
-	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	istd::TDelPtr<ipackage::CComponentAccessor> m_compositePtr;
+	QByteArray m_typeIdObjectCollection;
 };

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos/>
+    </AcfHeader>
+    <ObjectsList>
+        <Object ID="{ef3a5d84-d8ab-4dd6-830d-f35edb303d5e}" Description="Another description" TypeId="AccountInfo" Name="AnotherName">
+            <Data AccountType="1" AccountName="NameAccount" AccountDescription="DecriptionAccount">
+                <AccountPicture>
+                    <BitmapHeader>
+                        <Size X="0" Y="0"/>
+                        <PixelFormat>0</PixelFormat>
+                    </BitmapHeader>
+                    <BitmapData/>
+                </AccountPicture>
+                <Contact EMail="" GenderType="diverse" Birthday="" FirstName="" LastName="" NickName="">
+                    <Addresses>
+                        <Addresses>
+                            <ObjectsList>
+                                <Object ID="{a16909f4-c8d9-4d60-8881-a8ec40740273}" Description="" TypeId="Address" Name="">
+                                    <Data Country="" City="" PostalCode="0" Street=""/>
+                                </Object>
+                            </ObjectsList>
+                        </Addresses>
+                    </Addresses>
+                </Contact>
+            </Data>
+        </Object>
+    </ObjectsList>
+</Acf>
