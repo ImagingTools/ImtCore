@@ -65,15 +65,14 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 
 		QByteArray productInstanceId = GetObjectIdFromInputParams(inputParams);
 
-		int index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Modification Time", index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		int index;
+		//index = metaInfoModel->InsertNewItem();
+		//metaInfoModel->SetData("Name", "Modification Time", index);
+		//childs = metaInfoModel->AddTreeModel("Childs", index);
 
-		//QString date = GetObjectInformation("ModificationTime", productInstanceId).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-		//childs->SetData("Value", date);
 		if (m_objectCollectionCompPtr->GetDataMetaInfo(productInstanceId, metaInfo)){
 			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			childs->SetData("Value", date);
+			//childs->SetData("Value", date);
 		}
 
 		index = metaInfoModel->InsertNewItem();

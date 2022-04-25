@@ -146,7 +146,6 @@ Rectangle
                     console.log("ThumbnailDecorator Repeater onVisibleChanged visible", pagesDeleg.visible)
                     thubnailDecoratorContainer.activeItem = pagesLoader.item;
                     pagesLoader.item.visible = pagesDeleg.visible;
-
 //                    thubnailDecoratorContainer.activeItem.commandsChanged(commandsId);
                 }
             }

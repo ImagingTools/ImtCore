@@ -1086,7 +1086,8 @@ Rectangle {
                     color: Style.textColor;
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
-                    visible: cbTypeAccount.currentIndex === 0;
+                    visible: false;
+//                    visible: cbTypeAccount.currentIndex === 0;
                 }
 
                 Rectangle {
@@ -1098,7 +1099,8 @@ Rectangle {
                     height: 200;
                     width: accountOwnerBlock.width - 20;
 
-                    visible: cbTypeAccount.currentIndex === 0;
+//                    visible: cbTypeAccount.currentIndex === 0;
+                    visible: false;
                     color: Style.imagingToolsGradient1;
 
                     border.width: 1;

@@ -367,11 +367,4 @@ Item {
             }
         }
     }
-//    Rectangle {
-//        id: packageMetaInfo;
-//        anchors.right: parent.right;
-//        height: parent.height;
-//        width: 100;
-//        color: "green";
-//    }
 }

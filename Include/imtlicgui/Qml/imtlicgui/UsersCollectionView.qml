@@ -57,8 +57,17 @@ Item {
 
     function commandsChanged(commandsId) {
         console.log("usersCollectionView commandsChanged!", commandsId);
-        if (commandsId !== "Installations"){
+        if (commandsId !== "Users"){
             return;
+        }
+
+        if (usersCollectionView.selectedIndex > -1){
+            usersCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
+            usersCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
+        }
+        else{
+            usersCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
+            usersCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
         }
     }
 
@@ -86,6 +95,7 @@ Item {
 
         Component.onCompleted: {
             usersCollectionView.gqlModelInfo = "UserInfo"
+            usersCollectionView.gqlModelItems = "UserList"
             usersCollectionView.gqlModelRemove = "UserRemove"
         }
 
@@ -108,17 +118,6 @@ Item {
 
         onSelectedIndexChanged: {
             if (usersCollectionView.selectedIndex > -1){
-//                usersCollectionContainer.commandsChanged("Installations")
-
-//                var index = -1;
-//                for (var i = 0; i < installMetaInfoModels.GetItemsCount(); i++){
-//                    var curId = installMetaInfoModels.GetData("Id", i);
-
-//                    if (curId === usersCollectionView.table.getSelectedId()){
-//                        index = i;
-//                        break;
-//                    }
-//                }
             }
         }
 

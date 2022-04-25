@@ -113,6 +113,9 @@ Item {
                     productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                     productsCollectionView.refresh();
 
+                    //productsCollectionViewContainer.updateFeatureLicenseModelAfterLicenseEdit(productsCollectionViewContainer.itemId, oldId, parameters["newLicenseId"]);
+
+                    treeView.visible = true;
 //                    productsCollectionViewContainer.wasChanged = true;
                 }
             }
@@ -169,6 +172,37 @@ Item {
                 parameters["startingValue"] = productsCollectionView.getDescriptionBySelectedItem();
                 parameters["resultItem"] = productsCollectionViewContainer;
                 thubnailDecoratorContainer.openDialog(source, parameters);
+            }
+        }
+    }
+
+    function updateFeatureLicenseModelAfterProductEdit(oldProductId, newProductId){
+        console.log("updateFeatureLicenseModelAfterProductEdit", oldProductId, newProductId);
+        if (!featuresTreeView.productLicenseFeatures || oldProductId == newProductId || oldProductId == "", newProductId == ""){
+            return;
+        }
+
+        for (let i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
+            let rootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
+
+            if (rootProductId == oldProductId){
+                featuresTreeView.productLicenseFeatures.SetData("RootProductId", newProductId, i);
+            }
+        }
+    }
+
+    function updateFeatureLicenseModelAfterLicenseEdit(productId, oldLicId, newLicId){
+        console.log("updateFeatureLicenseModelAfterLicenseEdit", productId, oldLicId, newLicId);
+        if (!featuresTreeView.productLicenseFeatures || oldLicId == newLicId || oldLicId == "" || newLicId == "" || productId == ""){
+            return;
+        }
+
+        for (let i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
+            let rootLicId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
+            let rootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
+
+            if (rootLicId == oldLicId && rootProductId == productId){
+                featuresTreeView.productLicenseFeatures.SetData("RootLicenseId", newLicId, i);
             }
         }
     }
@@ -398,7 +432,10 @@ Item {
             if (productsCollectionView.selectedIndex > -1){
                 productsCollectionViewContainer.commandsChanged("ProductEdit")
 
-                treeView.visible = true;
+                let curIdIsEmpty = productsCollectionView.table.getSelectedId() == "";
+                if (!curIdIsEmpty){
+                    treeView.visible = true;
+                }
 
                 productMetaInfo.clearTreeView();
                 productMetaInfo.updateTreeView();
@@ -584,6 +621,14 @@ Item {
 
             onInputTextChanged: {
 //                productsCollectionViewContainer.wasChanged = true;
+                if (tfcProductId.text != ""){
+
+//                    productsCollectionViewContainer.updateFeatureLicenseModelAfterProductEdit(
+//                                productsCollectionViewContainer.itemId,
+//                                tfcProductId.text);
+
+                   // productsCollectionViewContainer.itemId = tfcProductId.text;
+                }
             }
         }
 
@@ -686,13 +731,22 @@ Item {
                             featureId,
                             state);
                // productsCollectionViewContainer.wasChanged = true;
+
                 productMetaInfo.clearTreeView();
+                if (tfcProductId.text == ""){
+                    let message = "Enter the product ID!";
+                    productsCollectionView.openMessageDialog("Error dialog", message, "ErrorDialog");
+
+                    return;
+                }
                 productMetaInfo.updateLicenseFeatures(productsCollectionViewContainer.itemId,
                                                       productsCollectionView.table.getSelectedId(),
                                                       packageId,
                                                       featureId,
                                                       state);
                 productMetaInfo.updateTreeView();
+
+                console.log("onItemTreeViewCheckBoxStateChanged", featuresTreeView.productLicenseFeatures.toJSON());
             }
         }
 
@@ -848,7 +902,7 @@ Item {
                 treeView.modelItems.SetData("childItemModel", treeViewFeaturesModel, i);
             }
 
-            productMetaInfo.printModelItems(treeView.modelItems);
+           // productMetaInfo.printModelItems(treeView.modelItems);
         }
 
         function updateDependsFeatures(treeViewPackageId, treeViewFeatureId) {
@@ -913,7 +967,6 @@ Item {
             if (!featuresTreeView.productLicenseFeatures){
                 return;
             }
-            console.log("ProductView 1");
             for (i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
                 var curRootLicenseId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
                 var curRootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
@@ -978,7 +1031,7 @@ Item {
                 featuresTreeView.productLicenseFeatures.RemoveItem(licenseIndex);
             }
 
-            productMetaInfo.printModelItems(treeView.modelItems);
+           // productMetaInfo.printModelItems(treeView.modelItems);
         }
     }
 }

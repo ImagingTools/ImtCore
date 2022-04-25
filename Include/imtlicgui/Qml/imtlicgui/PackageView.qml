@@ -199,8 +199,6 @@ Item {
                     dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
                     featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
                     featureCollectionView.refresh();
-
-//                    featureCollectionViewContainer.updateDependsModelAfterEdit(featureCollectionViewContainer.itemId, oldId, parameters["newFeatureId"]);
                     featureCollectionViewContainer.updateDependModelsAfterFeatureEdit(featureCollectionViewContainer.itemId, oldId, parameters["newFeatureId"]);
                     featureCollectionViewContainer.wasChanged = true;
                 }
@@ -389,61 +387,60 @@ Item {
         }
     }
 
-    function updateDependsModelAfterEdit(oldFeatureId, newFeatureId){
-        console.log("PackageView updateDependsModelAfterEdit", oldFeatureId, newFeatureId);
-       // featuresTreeView.printInfo();
+//    function updateDependsModelAfterEdit(oldFeatureId, newFeatureId){
+//        console.log("PackageView updateDependsModelAfterEdit", oldFeatureId, newFeatureId);
+//       // featuresTreeView.printInfo();
 
-        if (!featuresTreeView.modelDepends){
-            return;
-        }
+//        if (!featuresTreeView.modelDepends){
+//            return;
+//        }
 
-        for (var i = 0; i < featuresTreeView.modelDepends.GetItemsCount(); i++){
-            var rootFeatureId = featuresTreeView.modelDepends.GetData("RootFeatureId", i);
-            var rootPackageId = featuresTreeView.modelDepends.GetData("RootPackageId", i);
+//        for (var i = 0; i < featuresTreeView.modelDepends.GetItemsCount(); i++){
+//            var rootFeatureId = featuresTreeView.modelDepends.GetData("RootFeatureId", i);
+//            var rootPackageId = featuresTreeView.modelDepends.GetData("RootPackageId", i);
 
-            if (rootFeatureId === oldFeatureId && rootPackageId === featureCollectionViewContainer.itemId){
-                featuresTreeView.modelDepends.SetData("RootFeatureId", newFeatureId, i);
-            }
+//            if (rootFeatureId === oldFeatureId && rootPackageId === featureCollectionViewContainer.itemId){
+//                featuresTreeView.modelDepends.SetData("RootFeatureId", newFeatureId, i);
+//            }
 
-            var packages = featuresTreeView.modelDepends.GetData("Packages", i);
-            if (!packages){
-                continue;
-            }
+//            var packages = featuresTreeView.modelDepends.GetData("Packages", i);
+//            if (!packages){
+//                continue;
+//            }
 
-            var indexChild = -1;
-            for (var j = 0; j < packages.GetItemsCount(); j++){
-                 var packageId = packages.GetData("Id", j);
+//            var indexChild = -1;
+//            for (var j = 0; j < packages.GetItemsCount(); j++){
+//                 var packageId = packages.GetData("Id", j);
 
-                if (packageId === featureCollectionViewContainer.itemId){
-                    indexChild = j;
-                }
-            }
+//                if (packageId === featureCollectionViewContainer.itemId){
+//                    indexChild = j;
+//                }
+//            }
 
-            if (indexChild === -1){
-                continue;
-            }
+//            if (indexChild === -1){
+//                continue;
+//            }
 
-            var childItems = packages.GetData("childItemModel", indexChild);
+//            var childItems = packages.GetData("childItemModel", indexChild);
+//            if (!childItems){
+//                continue;
+//            }
 
-            if (!childItems){
-                continue;
-            }
+//            for (j = 0; j < childItems.GetItemsCount(); j++){
+//                var curId = childItems.GetData("Id", j);
 
-            for (j = 0; j < childItems.GetItemsCount(); j++){
-                var curId = childItems.GetData("Id", j);
+//                if (curId === oldFeatureId){
+//                    childItems.SetData("Id", newFeatureId, j);
+//                }
+//            }
 
-                if (curId === oldFeatureId){
-                    childItems.SetData("Id", newFeatureId, j);
-                }
-            }
+//            packages.SetData("childItemModel", childItems, indexChild);
+//            featuresTreeView.modelDepends.SetData("Packages", packages, i);
+//        }
+//       // featuresTreeView.printInfo();
 
-            packages.SetData("childItemModel", childItems, indexChild);
-            featuresTreeView.modelDepends.SetData("Packages", packages, i);
-        }
-       // featuresTreeView.printInfo();
-
-        //featuresTreeView.modelDepends.Refresh();
-    }
+//        //featuresTreeView.modelDepends.Refresh();
+//    }
 
     function menuActivated(menuId) {
         console.log("PackageView menuActivated", menuId);
@@ -609,9 +606,16 @@ Item {
             console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
             if (featureCollectionView.selectedIndex > -1){
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
-                treeView.visible = true;
-            } else {
+            }
+            else{
                 treeView.visible = false;
+            }
+
+            if (featureCollectionView.selectedIndex < 0 || featureCollectionViewContainer.operation == "New"){
+                treeView.visible = false;
+            }
+            else{
+                treeView.visible = true;
             }
 
             featureCollectionViewContainer.updateFeaturesTreeView();
@@ -967,6 +971,16 @@ Item {
                         }
 
                         featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+
+                        if (featureCollectionViewContainer.operation == "New"){
+                            featuresTreeView.loadFeaturesModel();
+                            featuresTreeView.loadDependModel();
+                            featureCollectionViewContainer.operation = "Open";
+
+                            //featureCollectionView.selectedIndex = -1;
+                            treeView.visible = true;
+                        }
+
                         featureCollectionViewContainer.wasChanged = false;
                     }
                 }
@@ -1059,6 +1073,10 @@ Item {
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("PackageView TreeView onItemTreeViewCheckBoxStateChanged", state, packageId, featureId);
                 featureCollectionViewContainer.wasChanged = true;
+
+                if (featureCollectionViewContainer.itemId == packageId && featureCollectionView.table.getSelectedId() == featureId){
+                    return;
+                }
 
                 if (state == 0){
                     let depends = []
