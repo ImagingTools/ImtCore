@@ -6,6 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
+#include <imtdbgui/CDatabaseLoginSettingsEditorComp.h>
 
 
 /**
@@ -13,6 +14,9 @@
 */
 namespace ImtDatabaseGuiPck
 {
+
+
+typedef imtdbgui::CDatabaseLoginSettingsEditorComp DatabaseLoginSettingsEditor;
 
 
 } // namespace ImtDatabaseGuiPck
