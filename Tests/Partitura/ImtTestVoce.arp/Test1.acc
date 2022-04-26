@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4993" Description="ACF"/>
-            <Version Id="1" Number="2172" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4985" Description="ACF"/>
+            <Version Id="1" Number="2164" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,21 +15,8 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="CompactXmlFileSerializer" PackageId="FilePck" ComponentId="CompactXmlFileSerializer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>account</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ObjectCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
-            <Data IsEnabled="true" Flags="1">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
@@ -41,7 +28,7 @@
                     <AttributeInfo Id="ObjectPersistenceList" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>CompactXmlFileSerializer</Value>
+                                <Value>Persistence</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -62,6 +49,19 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="Persistence" PackageId="FilePck" ComponentId="CompactXmlFileSerializer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>account</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -71,9 +71,7 @@
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="ObjectCollection"/>
         <Interface InterfaceId="iser::ISerializable" ComponentId="ObjectCollection"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="ObjectCollection"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ObjectCollection"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="Commands" ComponentId="ObjectCollectionView/Commands"/>
-        <Component ExportedId="VisualStatus" ComponentId="ComposedGui/VisualStatus"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>
