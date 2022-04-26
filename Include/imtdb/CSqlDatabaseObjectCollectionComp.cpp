@@ -10,6 +10,7 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/CParamsSetJoiner.h>
 #include <imtdb/CDatabaseEngineComp.h>
 
 
@@ -27,11 +28,14 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 }
 
 
+// reimplemented (ICollectionInfo)
+
 int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
 {
+	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
+
 	if (m_objectDelegateCompPtr.IsValid()){
-		const iprm::IParamsSet* workingSelectionParamsPtr = (selectionParamPtr != nullptr) ? selectionParamPtr : m_filterParamsCompPtr.GetPtr();
-		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(workingSelectionParamsPtr);
+		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(&filterParams);
 		if (!countQuery.isEmpty()){
 			QSqlError sqlError;
 			QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
@@ -54,8 +58,6 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* s
 }
 
 
-// reimplemented (ICollectionInfo)
-
 imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
@@ -63,9 +65,10 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 {
 	Ids retVal;
 
+	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+
 	if (m_objectDelegateCompPtr.IsValid()){
-		const iprm::IParamsSet* workingSelectionParamsPtr = (selectionParamsPtr != nullptr) ? selectionParamsPtr : m_filterParamsCompPtr.GetPtr();
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, workingSelectionParamsPtr);
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
 		if (objectSelectionQuery.isEmpty()){
 			return Ids();
 		}

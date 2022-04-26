@@ -153,30 +153,6 @@ protected:
 		return &component.m_commands;
 	}
 
-	class ItemProxyModel: public QSortFilterProxyModel
-	{
-		QString m_filter;
-
-	public:
-		ItemProxyModel(QObject* parent = nullptr): QSortFilterProxyModel(parent)
-		{
-		}
-
-		void SetTextFilter(const QString& filter)
-		{
-			m_filter = filter;
-		}
-
-	protected:
-		// reimplemented (QSortFilterProxyModel)
-		virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
-		virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
-
-	private:
-		bool TryDateTime(QVariant left, QVariant right, bool& result) const;
-		bool TryInt(QVariant left, QVariant right, bool& result) const;
-	};
-
 	class FocusDecorationFactory: public iwidgets::CFocusDecorator::GraphicsEffectFactory
 	{
 	public:
@@ -305,8 +281,6 @@ private:
 
 	QByteArray m_currentTypeId;
 	imod::TModelWrap<Commands> m_commands;
-
-//	ItemProxyModel* m_proxyModelPtr;
 
 	typedef QMap<QString, QVariant> ColumnSettings;
 	typedef QVector<ColumnSettings> ColumnsList;

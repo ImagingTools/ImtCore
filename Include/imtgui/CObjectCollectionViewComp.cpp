@@ -1351,108 +1351,6 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewComp::Commands::GetComma
 }
 
 
-// protected methods of the embedded class ItemProxyModel
-
-
-// reimplemented (QSortFilterProxyModel)
-
-bool CObjectCollectionViewComp::ItemProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex& /*sourceParent*/) const
-{
-	if (m_filter.isEmpty()){
-		return true;
-	}
-
-	QRegularExpression internalFilterRegExp = filterRegularExpression();
-	int internalFilterColumn = filterKeyColumn();
-	int internalFilterRole = filterRole();
-
-	QString internalFilterData = sourceModel()->index(sourceRow, internalFilterColumn).data(internalFilterRole).toString();
-
-	if (!internalFilterRegExp.match(internalFilterData).hasMatch()) {
-		return false;
-	}
-
-	for (int i = 0; i < columnCount(); i++) {
-		QString value = sourceModel()->index(sourceRow, i).data(Qt::DisplayRole).toString();
-		if (value.contains(m_filter, Qt::CaseInsensitive)) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-// reimplemented (QSortFilterProxyModel)
-
-bool CObjectCollectionViewComp::ItemProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
-{
-	QVariant leftValue = sourceModel()->data(left);
-	QVariant rightValue = sourceModel()->data(right);
-
-	bool result;
-
-	if (TryDateTime(leftValue, rightValue, result)){
-		return result;
-	}
-	else if (TryInt(leftValue, rightValue, result)){
-		return result;
-	}
-	else{
-		// if neither DateTime, nor Int or convertible to Int, then sort it as QString
-		QString leftString = leftValue.toString();
-		QString rightString = rightValue.toString();
-		return  QString::localeAwareCompare(leftString, rightString) < 0;
-	}
-}
-
-
-// private methods of embedded class ItemProxyModel
-
-bool CObjectCollectionViewComp::ItemProxyModel::TryDateTime(QVariant left, QVariant right, bool& result) const
-{
-	QString leftString = left.toString();
-	QString rightString = right.toString();
-
-	QDateTime leftDate = left.toDateTime();
-	if (leftDate.isNull()){
-		leftDate = QDateTime::fromString(leftString, CObjectCollectionViewDelegate::s_dateTimeFormat);
-	}
-	QDateTime rightDate = right.toDateTime();
-	if (rightDate.isNull()){
-		rightDate = QDateTime::fromString(rightString, CObjectCollectionViewDelegate::s_dateTimeFormat);
-	}
-
-	if (leftDate.isValid() && rightDate.isValid()){
-		result = (leftDate < rightDate);
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CObjectCollectionViewComp::ItemProxyModel::TryInt(QVariant left, QVariant right, bool& result) const
-{
-	if (left.userType() == QMetaType::Int && right.userType() == QMetaType::Int){
-		result = left.toInt() < right.toInt();
-		return true;
-	}
-
-	bool ok;
-	int valueLeft = left.toInt(&ok);
-	if (ok){
-		int valueRight = right.toInt(&ok);
-		if (ok){
-			result = (valueLeft < valueRight);
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
 // protected methods of the embedded class FocusDecorationFactory
 
 // reimplemented (IGraphicsEffectFactory)
@@ -1488,60 +1386,25 @@ CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& par
 
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes)
 {
-	istd::IChangeable::ChangeInfoMap changeInfoMap = changes.GetChangeInfoMap();
-	//if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_REMOVED)){
-	//	QList<QVariant> objects = changeInfoMap.values(imtbase::IObjectCollection::CN_OBJECT_REMOVED);
+	beginResetModel();
 
-	//	for (const QVariant& object : objects){
-	//		RemoveItem(object.toByteArray());
-	//	}
-	//}
-	//else
-	//if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_ADDED)){
-	//	QList<QVariant> objects = changeInfoMap.values(imtbase::IObjectCollection::CN_OBJECT_ADDED);
+	m_totalRowCount = collection.GetElementsCount();
+	m_fetchedRowCount = 0;
+	m_ids.clear();
 
-	//	for (const QVariant& object : objects){
-	//		AddItem(object.toByteArray());
-	//	}
+	m_metaInfo.clear();
+	m_metaInfoMap.clear();
 
-	//	if (!m_parent.m_itemsSelection.isEmpty()){
-	//		m_parent.UpdateCommands();
-	//	}
-	//}
+	if (m_totalRowCount > 0) {
+		imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1);
+		if (!elementIds.isEmpty()) {
+			QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
 
-	if (changeInfoMap.contains(imtbase::IObjectCollection::CN_OBJECT_UPDATED)){
-		QList<QVariant> objects = changeInfoMap.values(imtbase::IObjectCollection::CN_OBJECT_UPDATED);
-
-		for (const QVariant& object : objects){
-			UpdateItem(object.toByteArray());
-		}
-
-		if (!m_parent.m_itemsSelection.isEmpty()){
-			m_parent.UpdateCommands();
+			m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
 		}
 	}
 
-	else{
-		beginResetModel();
-
-		m_totalRowCount = collection.GetElementsCount();
-		m_fetchedRowCount = 0;
-		m_ids.clear();
-
-		m_metaInfo.clear();
-		m_metaInfoMap.clear();
-
-		if (m_totalRowCount > 0){
-			imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1);
-			if (!elementIds.isEmpty()){
-				QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
-
-				m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
-			}
-		}
-		 
-		endResetModel();
-	}
+	endResetModel();
 }
 
 
@@ -1607,12 +1470,20 @@ void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCol
 
 int CObjectCollectionViewComp::TableModel::rowCount(const QModelIndex& parent) const
 {
+	if (parent.isValid()){
+		return 0;
+	}
+
 	return m_fetchedRowCount;
 }
 
 
 int CObjectCollectionViewComp::TableModel::columnCount(const QModelIndex& parent) const
 {
+	if (parent.isValid()) {
+		return 0;
+	}
+
 	return m_metaInfo.count();
 }
 
