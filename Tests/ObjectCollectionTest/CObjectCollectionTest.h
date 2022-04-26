@@ -19,10 +19,15 @@ class CObjectCollectionTest: public QObject
 
 private slots:
 	void initTestCase();
-	void CheckSerializeTest();
-	void CreateNewObjectTest_data();
-	void CreateNewObjectTest();
+	void InsertNewObjectWithRequiredParamsTest_data();
+	void InsertNewObjectWithRequiredParamsTest();
+	void InsertNewObjectWithDataTest();
+	void InsertNewObjectWithNonExistElementTest();
+	void InsertNewObjectWithExistElementTest();
+	void RemoveExistObjectTest();
+	void RemoveNonExistObjectTest();
 	void cleanupTestCase();
+	void CheckSerializeTest();
 
 private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_compositePtr;

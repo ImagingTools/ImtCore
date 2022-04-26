@@ -4,8 +4,8 @@
         <VersionInfos/>
     </AcfHeader>
     <ObjectsList>
-        <Object ID="{ef3a5d84-d8ab-4dd6-830d-f35edb303d5e}" Description="Another description" TypeId="AccountInfo" Name="AnotherName">
-            <Data AccountType="1" AccountName="NameAccount" AccountDescription="DecriptionAccount">
+        <Object ID="{98c7bd83-2541-427a-a9d2-2427e1d32618}" Description="TestDescription" TypeId="AccountInfo" Name="TestObject">
+            <Data AccountType="1" AccountName="AccountName" AccountDescription="AccountDescription">
                 <AccountPicture>
                     <BitmapHeader>
                         <Size X="0" Y="0"/>
@@ -17,7 +17,7 @@
                     <Addresses>
                         <Addresses>
                             <ObjectsList>
-                                <Object ID="{a16909f4-c8d9-4d60-8881-a8ec40740273}" Description="" TypeId="Address" Name="">
+                                <Object ID="{2eba7ed7-4d4a-4591-bea3-62fbc6cf62c8}" Description="" TypeId="Address" Name="">
                                     <Data Country="" City="" PostalCode="0" Street=""/>
                                 </Object>
                             </ObjectsList>
