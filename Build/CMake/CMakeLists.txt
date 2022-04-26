@@ -178,5 +178,4 @@ endif()
 
 #-------- Tests --------
 
-add_subdirectory("${TESTS_DIR}/Test1/CMake" "${AUX_INCLUDE_DIR}/Test1")
-add_subdirectory("${TESTS_DIR}/Test2/CMake" "${AUX_INCLUDE_DIR}/Test2")
+add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
