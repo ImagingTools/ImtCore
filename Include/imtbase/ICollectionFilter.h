@@ -23,6 +23,8 @@ public:
 		SO_ASC
 	};
 
+	I_DECLARE_ENUM(SortingOrder, SO_NO_ORDER, SO_DESC, SO_ASC);
+
 	virtual QString GetTextFilter() const = 0;
 	virtual void SetTextFilter(const QString& filter) = 0;
 
