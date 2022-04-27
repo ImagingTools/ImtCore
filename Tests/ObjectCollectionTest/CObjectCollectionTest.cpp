@@ -19,7 +19,7 @@ void CObjectCollectionTest::initTestCase()
 	// set type id for tests and declaration component accessor
 	m_typeIdObjectCollection = "AccountInfo";
 	m_compositePtr = new ipackage::CComponentAccessor(registryFileWithoutFixedTypeIds, configFile);
-	m_compositeWithFixedTypeIdPtr = new ipackage::CComponentAccessor(registryFileWithFixedTypeIds, configFile);
+//	m_compositeWithFixedTypeIdPtr = new ipackage::CComponentAccessor(registryFileWithFixedTypeIds, configFile);
 }
 
 
