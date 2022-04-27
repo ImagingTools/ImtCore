@@ -14,8 +14,8 @@ namespace imtbase
 
 CCollectionFilter::CCollectionFilter()
 	:m_filter(QString()),
-	  m_sortingOrder(SO_NO_ORDER),
-	  m_sortingInfoId(QByteArrayList())
+	m_sortingOrder(SO_NO_ORDER),
+	m_sortingInfoId(QByteArrayList())
 {
 }
 
@@ -117,7 +117,7 @@ bool CCollectionFilter::IsEqual(const IChangeable &object) const
 
 istd::IChangeable *CCollectionFilter::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CCollectionFilter> clonePtr(new CCollectionFilter());
+	istd::TDelPtr<CCollectionFilter> clonePtr(new CCollectionFilter);
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
@@ -129,9 +129,15 @@ istd::IChangeable *CCollectionFilter::CloneMe(CompatibilityMode mode) const
 bool CCollectionFilter::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
-	m_filter = QString();
+
+	m_filter.clear();
 	m_sortingOrder = SO_NO_ORDER;
-	m_sortingInfoId = QByteArrayList();
+	m_sortingInfoId.clear();
+
 	return true;
 }
-}
+
+
+} // namespace imtbase
+
+
