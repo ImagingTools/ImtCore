@@ -1,12 +1,8 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QVector>
-
 // ImtCore includes
 #include <imtbase/ICollectionFilter.h>
-#include <imtbase/IObjectCollection.h>
 
 
 namespace imtbase
