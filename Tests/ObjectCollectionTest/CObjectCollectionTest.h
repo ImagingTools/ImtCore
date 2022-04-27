@@ -26,10 +26,12 @@ private slots:
 	void InsertNewObjectWithExistElementTest();
 	void RemoveExistObjectTest();
 	void RemoveNonExistObjectTest();
-	void cleanupTestCase();
 	void CheckSerializeTest();
+	void cleanupTestCase();
+
 
 private:
 	istd::TDelPtr<ipackage::CComponentAccessor> m_compositePtr;
+	istd::TDelPtr<ipackage::CComponentAccessor> m_compositeWithFixedTypeIdPtr;
 	QByteArray m_typeIdObjectCollection;
 };

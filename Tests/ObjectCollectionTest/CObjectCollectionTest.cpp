@@ -10,22 +10,29 @@
 
 void CObjectCollectionTest::initTestCase()
 {
+	// paths to test component accessor and config for him
 	QString imtCorePath = qEnvironmentVariable("IMTCOREDIR");
-	QString registryFile = imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/Test1.acc";
+	QString registryFileWithoutFixedTypeIds = imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/ObjectCollectionWithoutFixedTypeIdsTest.acc";
+	QString registryFileWithFixedTypeIds = imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/ObjectCollectionWithFixedTypeIdsTest.acc";
 	QString configFile = imtCorePath + "/Config/ImtCoreTest.awc";
 
+	// set type id for tests and declaration component accessor
 	m_typeIdObjectCollection = "AccountInfo";
-	m_compositePtr = new ipackage::CComponentAccessor(registryFile, configFile);
+	m_compositePtr = new ipackage::CComponentAccessor(registryFileWithoutFixedTypeIds, configFile);
+	m_compositeWithFixedTypeIdPtr = new ipackage::CComponentAccessor(registryFileWithFixedTypeIds, configFile);
 }
 
 
+// variable decloration for Unit-test InsertNewObjectWithRequiredParamsTest()
 void CObjectCollectionTest::InsertNewObjectWithRequiredParamsTest_data()
 {
+	// variable decloration
 	QTest::addColumn<QByteArray>("typeId");
 	QTest::addColumn<QString>("name");
 	QTest::addColumn<QString>("description");
 	QTest::addColumn<bool>("result");
 
+	// set values and description of test
 	QTest::newRow("all param is empty") << QByteArray("") << "" << "" << true;
 	QTest::newRow("type param is empty") << QByteArray("") << "testObjectName" << "Insert object with empty type id" << true;
 	QTest::newRow("name param is empty") << m_typeIdObjectCollection << "" << "Insert object with empty name" << false;
@@ -37,6 +44,7 @@ void CObjectCollectionTest::InsertNewObjectWithRequiredParamsTest_data()
 
 void CObjectCollectionTest::InsertNewObjectWithRequiredParamsTest()
 {
+	// get values from rows
 	QFETCH(QByteArray, typeId);
 	QFETCH(QString, name);
 	QFETCH(QString, description);
@@ -44,12 +52,18 @@ void CObjectCollectionTest::InsertNewObjectWithRequiredParamsTest()
 
 	if (m_compositePtr != nullptr){
 
+		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 
 		if (objectCollectionPtr != nullptr){
 
+			// reset data from object collection
 			objectCollectionPtr->ResetData();
+
+			// insert object in collection
 			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(typeId, name, description);
+
+			// check get correct result
 			QVERIFY2((idNewObject.isEmpty() == result), "Failed in insert new object with required params");
 		}
 
@@ -66,27 +80,44 @@ void CObjectCollectionTest::InsertNewObjectWithRequiredParamsTest()
 void CObjectCollectionTest::InsertNewObjectWithDataTest()
 {
 	if (m_compositePtr != nullptr){
+
+		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
+
+			// reset data from object collection
 			objectCollectionPtr->ResetData();
+
+			// declaration input and reference data of object
 			imtbase::IObjectCollection::DataPtr inputDataPtr = new imtauth::CAccountInfo();
 			imtbase::IObjectCollection::DataPtr referenceDataPtr;
 
+			// declaration values for object data in type AccountInfo
 			QString nameAccount = "AccountName";
 			QString descriptionAccount = "AccountDescription";
 			QString setNameAccount;
 			QString setDescriptionAccount;
+
+			// set values in input data
 			imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
 			inputImplPtr->SetAccountName(nameAccount);
 			inputImplPtr->SetAccountDescription(descriptionAccount);
 
+			// insert new object with input data in collection
 			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", inputDataPtr);
 			if (!idNewObject.isEmpty()){
+
+				// get reference data
 				objectCollectionPtr->GetObjectData(idNewObject, referenceDataPtr);
 
+				// create reference Impl
 				imtauth::CAccountInfo* referenceImplPtr = dynamic_cast<imtauth::CAccountInfo*>(referenceDataPtr.GetPtr());
+
+				// get values from reference data
 				setNameAccount = referenceImplPtr->GetAccountName();
 				setDescriptionAccount = referenceImplPtr->GetAccountDescription();
+
+				// compare input & reference data
 				QVERIFY2(((nameAccount == setNameAccount) && (descriptionAccount == setDescriptionAccount)), "Insert new object with data is failed");
 			}
 			else{
@@ -103,18 +134,26 @@ void CObjectCollectionTest::InsertNewObjectWithDataTest()
 	}
 }
 
+
 void CObjectCollectionTest::InsertNewObjectWithNonExistElementTest()
 {
 	if (m_compositePtr != nullptr){
+
+		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
+
+			// reset data from object collection
 			objectCollectionPtr->ResetData();
 
+			// insert object in collection
 			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
-			QVector<QByteArray> idsInObject = objectCollectionPtr->GetElementIds();
 
+			// check contains object in collection
+			imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
 			bool checkIdIsExist = idsInObject.contains(idNewObject);
 
+			// if collection don't contains object test will be failed
 			QVERIFY2(checkIdIsExist, "Insert object with set non-exist id is failed");
 		}
 
@@ -131,16 +170,39 @@ void CObjectCollectionTest::InsertNewObjectWithNonExistElementTest()
 void CObjectCollectionTest::InsertNewObjectWithExistElementTest()
 {
 	if (m_compositePtr != nullptr){
+
+		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+
 		if (objectCollectionPtr != nullptr){
+
+			// reset data from object collection
 			objectCollectionPtr->ResetData();
 
+			// insert first object in collection
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::IObjectCollection::DataPtr(), "testId");
 
-			QVector<QByteArray> idsInObject = objectCollectionPtr->GetElementIds();
+			// check contains first object in collection
+			imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
+			bool checkInsertFirstObject = idsInObject.contains("testId");
 
-			QVERIFY2((idsInObject.size() == 2), "Insert new object with set exist id is failed");
+			if(checkInsertFirstObject){
+
+				// insert second object with exist id in collection
+				QByteArray idSecondNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::IObjectCollection::DataPtr(), "testId");
+
+				// check contains insert objects
+				idsInObject = objectCollectionPtr->GetElementIds();
+				checkInsertFirstObject = idsInObject.contains("testId");
+				bool checkInsertSecondObject = idsInObject.contains(idSecondNewObject);
+
+				// if one of conditions is false - test will be failed
+				QVERIFY2((checkInsertFirstObject && checkInsertSecondObject), "Insert new object with set exist id is failed");
+			}
+
+			else{
+				QFAIL("Insert first object in collection is failed");
+			}
 		}
 
 		else{
@@ -156,6 +218,8 @@ void CObjectCollectionTest::InsertNewObjectWithExistElementTest()
 void CObjectCollectionTest::RemoveExistObjectTest()
 {
 	if (m_compositePtr != nullptr){
+
+		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 
 		if (objectCollectionPtr != nullptr){
@@ -193,19 +257,28 @@ void CObjectCollectionTest::RemoveExistObjectTest()
 void CObjectCollectionTest::RemoveNonExistObjectTest()
 {
 	if (m_compositePtr != nullptr){
+
+		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
+
+			// Reset collection
 			objectCollectionPtr->ResetData();
 
+			// Insert two objects into the collection:
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::IObjectCollection::DataPtr(), "testId2");
 
+			// Remove object with non-exist id
 			objectCollectionPtr->RemoveObject("testId3");
 
-			QVector<QByteArray> idsInObjectAfterRemove = objectCollectionPtr->GetElementIds();
+			// Check contains removed object and another objects
+			imtbase::IObjectCollection::Ids idsInObjectAfterRemove = objectCollectionPtr->GetElementIds();
+			bool checkContainsRemovedObject = !idsInObjectAfterRemove.contains("testId3");
 			bool checkExistAnotherId = (idsInObjectAfterRemove.contains("testId2") && idsInObjectAfterRemove.contains("testId"));
 
-			QVERIFY2(((idsInObjectAfterRemove.size() == 2) && checkExistAnotherId), "Remove exist object is failed");
+			// if one of conditios is false - test failed
+			QVERIFY2((checkContainsRemovedObject && checkExistAnotherId), "Remove exist object is failed");
 		}
 
 		else{
@@ -221,16 +294,23 @@ void CObjectCollectionTest::RemoveNonExistObjectTest()
 void CObjectCollectionTest::CheckSerializeTest()
 {
 	if (m_compositePtr != nullptr){
+
+		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
+
+			// Reset collection
 			objectCollectionPtr->ResetData();
 
+			// declaration dataPtr for collection
 			iser::ISerializable* dataPtr = m_compositePtr->GetComponentInterface<iser::ISerializable>();
-			QString pathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/ObjectCollectionTest/TestData/testData.xml";
 
+			// set path to file with test data and serialize in dataPtr
+			QString pathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/ObjectCollectionTest/TestData/testData.xml";
 			ifile::CCompactXmlFileReadArchive readArchive(pathToFile);
 			dataPtr->Serialize(readArchive);
 
+			// get data from object and compare with input data
 			imtbase::IObjectCollection::DataPtr inputDataPtr;
 			if (objectCollectionPtr->GetObjectData("{98c7bd83-2541-427a-a9d2-2427e1d32618}", inputDataPtr)){
 				imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
