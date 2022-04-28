@@ -31,7 +31,9 @@ private slots:
 
 
 private:
-	istd::TDelPtr<ipackage::CComponentAccessor> m_compositePtr;
-	istd::TDelPtr<ipackage::CComponentAccessor> m_compositeWithFixedTypeIdPtr;
+	QString m_imtCorePath;
+	QString m_registryFileWithoutFixedTypeIds;
+	QString m_registryFileWithFixedTypeIds;
+	QString m_configFile;
 	QByteArray m_typeIdObjectCollection;
 };

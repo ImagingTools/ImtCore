@@ -11,15 +11,13 @@
 void CObjectCollectionTest::initTestCase()
 {
 	// paths to test component accessor and config for him
-	QString imtCorePath = qEnvironmentVariable("IMTCOREDIR");
-	QString registryFileWithoutFixedTypeIds = imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/ObjectCollectionWithoutFixedTypeIdsTest.acc";
-	QString registryFileWithFixedTypeIds = imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/ObjectCollectionWithFixedTypeIdsTest.acc";
-	QString configFile = imtCorePath + "/Config/ImtCoreTest.awc";
+	m_imtCorePath = qEnvironmentVariable("IMTCOREDIR");
+	m_registryFileWithoutFixedTypeIds = m_imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/ObjectCollectionWithoutFixedTypeIdsTest.acc";
+	m_registryFileWithFixedTypeIds = m_imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/ObjectCollectionWithFixedTypeIdsTest.acc";
+	m_configFile = m_imtCorePath + "/Config/ImtCoreTest.awc";
 
 	// set type id for tests and declaration component accessor
 	m_typeIdObjectCollection = "AccountInfo";
-	m_compositePtr = new ipackage::CComponentAccessor(registryFileWithoutFixedTypeIds, configFile);
-//	m_compositeWithFixedTypeIdPtr = new ipackage::CComponentAccessor(registryFileWithFixedTypeIds, configFile);
 }
 
 
@@ -50,10 +48,13 @@ void CObjectCollectionTest::InsertNewObjectWithRequiredParamsTest()
 	QFETCH(QString, description);
 	QFETCH(bool, result);
 
-	if (m_compositePtr != nullptr){
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+
+	if (compositePtr.IsValid()){
 
 		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 
 		if (objectCollectionPtr != nullptr){
 
@@ -79,10 +80,12 @@ void CObjectCollectionTest::InsertNewObjectWithRequiredParamsTest()
 
 void CObjectCollectionTest::InsertNewObjectWithDataTest()
 {
-	if (m_compositePtr != nullptr){
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
 
 		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
 
 			// reset data from object collection
@@ -137,10 +140,12 @@ void CObjectCollectionTest::InsertNewObjectWithDataTest()
 
 void CObjectCollectionTest::InsertNewObjectWithNonExistElementTest()
 {
-	if (m_compositePtr != nullptr){
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
 
 		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
 
 			// reset data from object collection
@@ -169,10 +174,12 @@ void CObjectCollectionTest::InsertNewObjectWithNonExistElementTest()
 
 void CObjectCollectionTest::InsertNewObjectWithExistElementTest()
 {
-	if (m_compositePtr != nullptr){
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
 
 		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 
 		if (objectCollectionPtr != nullptr){
 
@@ -217,10 +224,12 @@ void CObjectCollectionTest::InsertNewObjectWithExistElementTest()
 
 void CObjectCollectionTest::RemoveExistObjectTest()
 {
-	if (m_compositePtr != nullptr){
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
 
 		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 
 		if (objectCollectionPtr != nullptr){
 			// Reset collection:
@@ -256,10 +265,12 @@ void CObjectCollectionTest::RemoveExistObjectTest()
 
 void CObjectCollectionTest::RemoveNonExistObjectTest()
 {
-	if (m_compositePtr != nullptr){
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
 
 		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
 
 			// Reset collection
@@ -293,17 +304,19 @@ void CObjectCollectionTest::RemoveNonExistObjectTest()
 
 void CObjectCollectionTest::CheckSerializeTest()
 {
-	if (m_compositePtr != nullptr){
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
 
 		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = m_compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
 
 			// Reset collection
 			objectCollectionPtr->ResetData();
 
 			// declaration dataPtr for collection
-			iser::ISerializable* dataPtr = m_compositePtr->GetComponentInterface<iser::ISerializable>();
+			iser::ISerializable* dataPtr = compositePtr->GetComponentInterface<iser::ISerializable>();
 
 			// set path to file with test data and serialize in dataPtr
 			QString pathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/ObjectCollectionTest/TestData/testData.xml";
@@ -335,8 +348,10 @@ void CObjectCollectionTest::CheckSerializeTest()
 void CObjectCollectionTest::cleanupTestCase()
 {
 	m_typeIdObjectCollection.clear();
-
-	m_compositePtr.Reset();
+	m_imtCorePath.clear();
+	m_registryFileWithoutFixedTypeIds.clear();
+	m_registryFileWithFixedTypeIds.clear();
+	m_configFile.clear();
 }
 
 
