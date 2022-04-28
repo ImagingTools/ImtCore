@@ -28,6 +28,7 @@ QString CCollectionFilter::GetTextFilter() const
 
 void CCollectionFilter::SetTextFilter(const QString &filter)
 {
+	istd::CChangeNotifier changeNotifier(this);
 	m_filter = filter;
 }
 
@@ -40,6 +41,7 @@ ICollectionFilter::SortingOrder CCollectionFilter::GetSortingOrder() const
 
 void CCollectionFilter::SetSortingOrder(SortingOrder sortingOrder)
 {
+	istd::CChangeNotifier changeNotifier(this);
 	m_sortingOrder = sortingOrder;
 }
 
@@ -52,6 +54,7 @@ QByteArrayList CCollectionFilter::GetSortingInfoId() const
 
 void CCollectionFilter::SetSortingInfoId(const QByteArrayList &sortingInfoId)
 {
+	istd::CChangeNotifier changeNotifier(this);
 	m_sortingInfoId = sortingInfoId;
 }
 
