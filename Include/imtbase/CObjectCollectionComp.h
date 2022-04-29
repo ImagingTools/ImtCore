@@ -48,6 +48,9 @@ public:
 	// reimplemented (ICollectionDataController)
 	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
 
+	// reimplemented (istd::IChangeable)
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
 protected:
 	// reimplemented (CObjectCollectionBase)
 	virtual DataPtr CreateObjectInstance(const QByteArray& typeId) const override;

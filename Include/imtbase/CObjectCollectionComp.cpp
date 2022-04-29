@@ -32,6 +32,23 @@ const ifile::IFilePersistence* CObjectCollectionComp::GetPersistenceForObjectTyp
 }
 
 
+bool CObjectCollectionComp::ResetData(CompatibilityMode mode)
+{
+	if (m_fixedObjectIdsAttrPtr.GetCount() == 0){
+		RemoveAllObjects();
+	}
+	else{
+		for (int i = 0; i < m_objects.count(); ++i){
+			int checkIsFixed = m_fixedObjectIdsAttrPtr.FindValue(m_objects[i].id);
+			if (checkIsFixed < 0){
+				RemoveObject(m_objects[i].id);
+			}
+		}
+	}
+	return true;
+}
+
+
 // protected methods
 
 CObjectCollectionComp::DataPtr CObjectCollectionComp::CreateObjectInstance(const QByteArray& typeId) const
