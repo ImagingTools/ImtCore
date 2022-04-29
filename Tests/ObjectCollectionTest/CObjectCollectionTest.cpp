@@ -6,6 +6,8 @@
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
 #include <imtauth/CAccountInfo.h>
+#include <imtauth/CAccountInfoMetaInfo.h>
+#include <imtauth/IAccountInfo.h>
 
 
 void CObjectCollectionTest::initTestCase()
@@ -16,7 +18,7 @@ void CObjectCollectionTest::initTestCase()
 	m_registryFileWithFixedTypeIds = m_imtCorePath + "/Tests/Partitura/ImtTestVoce.arp/ObjectCollectionWithFixedTypeIdsTest.acc";
 	m_configFile = m_imtCorePath + "/Config/ImtCoreTest.awc";
 
-	// set type id for tests and declaration component accessor
+	// set type id for tests
 	m_typeIdObjectCollection = "AccountInfo";
 }
 
@@ -334,6 +336,72 @@ void CObjectCollectionTest::CheckSerializeTest()
 			else{
 				QFAIL("Data from file is not readed");
 			}
+		}
+		else{
+			QFAIL("Object collection is nullptr");
+		}
+	}
+	else{
+		QFAIL("Component is not initialized");
+	}
+}
+
+
+void CObjectCollectionTest::ResetCollectionWithFixedObjectTest()
+{
+	// declaration component accessor
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
+
+		// get component object collection
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		if (objectCollectionPtr != nullptr){
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
+
+			// Reset collection
+			objectCollectionPtr->ResetData();
+
+			//Check exist fixed object and remove inserted object from collection
+			imtbase::IObjectCollection::Ids idsInObjectAfterReset = objectCollectionPtr->GetElementIds();
+			if (!idsInObjectAfterReset.isEmpty()){
+				bool checkExistFixedObject = idsInObjectAfterReset.contains("DefaultAccount");
+				bool checkDeleteAddedObject = !idsInObjectAfterReset.contains("testId");
+				QVERIFY2((checkExistFixedObject && checkDeleteAddedObject), "Reset objects from collection with fixed object is failed");
+			}
+			else{
+				QFAIL("Reset collection with fixed object is failed: collection is empty");
+			}
+		}
+		else{
+			QFAIL("Object collection is nullptr");
+		}
+	}
+	else{
+		QFAIL("Component is not initialized");
+	}
+}
+
+
+void CObjectCollectionTest::ResetCollectionWithoutFixedObjectsTest()
+{
+	// declaration component accessor
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFileWithoutFixedTypeIds, m_configFile));
+	if (compositePtr.IsValid()){
+
+		// get component object collection
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		if (objectCollectionPtr != nullptr){
+			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
+
+			// Reset collection
+			objectCollectionPtr->ResetData();
+
+			//Check remove inserted object from collection
+			imtbase::IObjectCollection::Ids idsInObjectAfterReset = objectCollectionPtr->GetElementIds();
+			bool checkDeleteAddedObject = !idsInObjectAfterReset.contains("testId");
+			QVERIFY2(checkDeleteAddedObject, "Reset objects from collection with fixed object is failed");
 		}
 		else{
 			QFAIL("Object collection is nullptr");

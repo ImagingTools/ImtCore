@@ -27,6 +27,8 @@ private slots:
 	void RemoveExistObjectTest();
 	void RemoveNonExistObjectTest();
 	void CheckSerializeTest();
+	void ResetCollectionWithFixedObjectTest();
+	void ResetCollectionWithoutFixedObjectsTest();
 	void cleanupTestCase();
 
 
