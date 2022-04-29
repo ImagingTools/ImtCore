@@ -10,7 +10,7 @@ Rectangle {
     color: "transparent";
 
     border.width: 1;
-    border.color: Style.alternateBaseColor;
+    border.color: Style.borderColor;
 
     property int checkState: 0;
 

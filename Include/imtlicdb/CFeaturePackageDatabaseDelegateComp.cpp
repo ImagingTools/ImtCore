@@ -137,6 +137,24 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 										.arg(featureName)
 										.arg(featureDescription)
 										.arg(qPrintable(packageId)).toLocal8Bit();
+
+//				const imtlic::IFeatureDependenciesProvider* dependenciesProvider = featurePackagePtr->GetDependenciesInfoProvider();
+//				if (dependenciesProvider != nullptr){
+//					QByteArrayList depIds = dependenciesProvider->GetFeatureDependencies(packageId + '.' + featureId);
+//				}
+				QByteArrayList dependsIds = featurePackagePtr->GetFeatureDependencies(packageId + "." + featureId);
+				if (dependsIds.size() > 0){
+					for (const QByteArray& dependFeatureId : dependsIds){
+						QByteArrayList data = dependFeatureId.split('.');
+						retVal.query += "\n" +
+									QString("INSERT INTO FeatureDependencies(featureid, featurepackageid, dependencyid, dependencypackageid) VALUES('%1', '%2', '%3', '%4');")
+												.arg(qPrintable(featureId))
+												.arg(qPrintable(packageId))
+												.arg(qPrintable(data[1]))
+												.arg(qPrintable(data[0]))
+												.toLocal8Bit();
+					}
+				}
 			}
 		}
 
@@ -226,13 +244,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	// Delete removed features to the package:
 	for (const QByteArray& removedFeatureId : removedFeatures){
-		retVal += "\n" +
-					QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2' OR dependencyid = '%3' AND dependencypackageid = '%4';")
-									.arg(qPrintable(removedFeatureId))
-									.arg(qPrintable(newPackageId))
-									.arg(qPrintable(removedFeatureId))
-									.arg(qPrintable(newPackageId))
-									.toLocal8Bit();
+//		retVal += "\n" +
+//					QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2' OR dependencyid = '%3' AND dependencypackageid = '%4';")
+//									.arg(qPrintable(removedFeatureId))
+//									.arg(qPrintable(newPackageId))
+//									.arg(qPrintable(removedFeatureId))
+//									.arg(qPrintable(newPackageId))
+//									.toLocal8Bit();
 		retVal += "\n" +
 					QString("DELETE FROM Features WHERE Id = '%1' AND PackageId = '%2';")
 								.arg(qPrintable(removedFeatureId))
@@ -288,13 +306,15 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 						for (const QByteArray& dependFeatureId : dependsIds){
 							QByteArrayList data = dependFeatureId.split('.');
-							retVal += "\n" +
-										QString("INSERT INTO FeatureDependencies(featureid, featurepackageid, dependencyid, dependencypackageid) VALUES('%1', '%2', '%3', '%4');")
-													.arg(qPrintable(featureId))
-													.arg(qPrintable(packageId))
-													.arg(qPrintable(data[1]))
-													.arg(qPrintable(data[0]))
-													.toLocal8Bit();
+							if (data.size() == 2){
+								retVal += "\n" +
+											QString("INSERT INTO FeatureDependencies(featureid, featurepackageid, dependencyid, dependencypackageid) VALUES('%1', '%2', '%3', '%4');")
+														.arg(qPrintable(featureId))
+														.arg(qPrintable(packageId))
+														.arg(qPrintable(data[1]))
+														.arg(qPrintable(data[0]))
+														.toLocal8Bit();
+							}
 						}
 					}
 				}

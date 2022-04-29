@@ -1339,7 +1339,7 @@ Rectangle {
 //                                var accName = containerContactInfo.contactInfoModel.GetData("AccountName");
 //                                containerContactInfo.rootItem.updateTitleTab(containerContactInfo.itemId, accName);
 //                            }
-                            containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                            //containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                         }
                     }
                 }

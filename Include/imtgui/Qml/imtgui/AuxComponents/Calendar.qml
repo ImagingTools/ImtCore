@@ -13,7 +13,16 @@ Rectangle {
 
     property var selectedDate;
 
-    property var monthsNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+//    property var monthsNames: [qsTr("January"),   qsTr("February"),
+//                               qsTr("March"),     qsTr("April"),   qsTr("May"),
+//                               qsTr("June"),      qsTr("July"),    qsTr("August"),
+//                               qsTr("September"), qsTr("October"), qsTr("November"),
+//                               qsTr("December")];
+    property var monthsNames: ['January',   'February',
+                               'March',     'April',   'May',
+                               'June',      'July',    'August',
+                               'September', 'October', 'November',
+                               'December'];
 
     signal dateChanged();
 

@@ -149,25 +149,13 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 
 				imtlic::ILicenseInfo::FeatureInfos featureInfos;
 				if (dependencies != nullptr){
-					for (int i = 0; i < dependencies->GetItemsCount(); i++){
-						QByteArray rootLicenseId = dependencies->GetData("RootLicenseId", i).toByteArray();
-						QByteArray rootProductId = dependencies->GetData("RootProductId", i).toByteArray();
-
-						QByteArrayList featuresDependencies;
-						imtbase::CTreeItemModel* packagesModel = dependencies->GetTreeItemModel("Packages", i);
-
-						if (rootLicenseId == licenseId){
-							for (int j = 0; j < packagesModel->GetItemsCount(); j++){
-								QByteArray packageId = packagesModel->GetData("Id", j).toByteArray();
-								imtbase::CTreeItemModel* childModel = packagesModel->GetTreeItemModel("Features", j);
-								imtlic::ILicenseInfo::FeatureInfo featureInfo;
-
-								for (int k = 0; k < childModel->GetItemsCount(); k++){
-									QByteArray featureId = childModel->GetData("Id", k).toByteArray();
-									featureInfo.id = packageId + "." + featureId;
-									featureInfos.push_back(featureInfo);
-								}
-							}
+					QByteArray key = objectId + '.' + licenseId;
+					if (dependencies->ContainsKey(key)){
+						QStringList valuesList = dependencies->GetData(key).toString().split(';');
+						imtlic::ILicenseInfo::FeatureInfo featureInfo;
+						for (const QString& value : valuesList){
+							featureInfo.id = value.toUtf8();
+							featureInfos.push_back(featureInfo);
 						}
 					}
 				}
@@ -193,10 +181,6 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	QByteArrayList fields;
 
-//	if (!m_viewDelegateCompPtr.IsValid()){
-//		errorMessage = QObject::tr("Internal error").toUtf8();
-//	}
-
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
@@ -206,80 +190,36 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 		dependenciesModel = new imtbase::CTreeItemModel();
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-		int rootIndex;
-
 		for (const QByteArray& collectionId : collectionIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (collectionId != "" && m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-
 				const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
-
 				const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
 				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 
 				for ( const QByteArray& licenseId : licenseCollectionIds){
 					const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
-
 					if (licenseInfoPtr == nullptr){
 						continue;
 					}
 
 					imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-
 					if (featureInfos.size() > 0){
-
-						rootIndex = dependenciesModel->InsertNewItem();
-						dependenciesModel->SetData("RootProductId", collectionId, rootIndex);
-						dependenciesModel->SetData("RootLicenseId", licenseId, rootIndex);
-
-						imtbase::CTreeItemModel* packagesModel;
-
-						if (!dependenciesModel->ContainsKey("Packages", rootIndex)){
-							packagesModel = dependenciesModel->AddTreeModel("Packages", rootIndex);
+						QByteArray key = productPtr->GetProductId() + "." + licenseId;
+						QString value;
+						for (int i = 0; i < featureInfos.size(); i++){
+							if (i != 0){
+								value += ';';
+							}
+							value += featureInfos[i].id;
 						}
-						else{
-							packagesModel = dependenciesModel->GetTreeItemModel("Packages", rootIndex);
-						}
-
-						for (imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
-							QByteArrayList data = featureInfo.id.split('.');
-
-							int packageIndex = -1;
-							if (packagesModel->GetItemsCount() > 0){
-								for (int i = 0; i < packagesModel->GetItemsCount(); i++){
-									QByteArray packageItemId = packagesModel->GetData("Id", i).toByteArray();
-
-									if (packageItemId == data[0]){
-										packageIndex = i;
-										break;
-									}
-								}
-							}
-
-							if (packageIndex == -1){
-								packageIndex = packagesModel->InsertNewItem();
-								packagesModel->SetData("Id", data[0], packageIndex);
-							}
-
-							imtbase::CTreeItemModel* childModel;
-							if (!packagesModel->ContainsKey("Features", packageIndex)){
-								childModel = packagesModel->AddTreeModel("Features", packageIndex);
-							}
-							else{
-								childModel = packagesModel->GetTreeItemModel("Features", packageIndex);
-							}
-
-							int childItemIndex = childModel->InsertNewItem();
-							childModel->SetData("Id", data[1], childItemIndex);
-						}
+						dependenciesModel->SetData(key, value);
 					}
 				}
 			}
 		}
-
 		dataModel->SetExternTreeModel("TreeModel", dependenciesModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

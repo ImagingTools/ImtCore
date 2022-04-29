@@ -79,6 +79,7 @@ Rectangle
         anchors.top: topPanel.bottom;
         anchors.bottom: parent.bottom;
 
+        //visible: thubnailDecoratorContainer.serverIsConnection;
         focus: true;
 
         Keys.onPressed: {
@@ -121,6 +122,10 @@ Rectangle
         onActivePageIndexChanged: {
             console.log("ThumbnailDecorator MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
         }
+    }
+
+    FeaturesTreeView {
+        id: featuresTreeView;
     }
 
     Repeater {
@@ -191,8 +196,6 @@ Rectangle
     Rectangle {
         id: errorBackground;
 
-//        width: parent.width - 100;
-//        height: parent.height;
         anchors.fill: parent;
 
         color: "transparent";
@@ -232,7 +235,6 @@ Rectangle
         id: topPanel;
 
         title: menuPanel.activePageName;
-
         onMenuActivatedSignal: {
             console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal");
             console.log("menuId", idMenu);

@@ -247,9 +247,8 @@ Item {
 
 
         onSelectedIndexChanged: {
+            installationCollectionContainer.commandsChanged("Installations")
             if (installationCollectionView.selectedIndex > -1){
-                installationCollectionContainer.commandsChanged("Installations")
-
                 var index = -1;
                 for (var i = 0; i < installMetaInfoModels.GetItemsCount(); i++){
                     var curId = installMetaInfoModels.GetData("Id", i);

@@ -75,6 +75,15 @@ JSONListModel {
         this.SetData(key, value, row)
     }
 
+    function GetKeys(){
+        var keys = []
+        if(this.count > 0){
+            var modelObject = this.get(0)
+            keys = Object.keys(modelObject)
+        }
+        return keys;
+    }
+
 
     function ContainsKey(key,row){
         //        return true

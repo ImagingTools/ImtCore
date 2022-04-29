@@ -63,14 +63,22 @@ Rectangle {
         console.log("CollectionView getDescriptionBySelectedItem");
         var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
-        var description;
-        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
-            description = dataModelLocal.GetData("AccountDescription", tableInternal.selectedIndex);
-        }
-        else{
-            description = dataModelLocal.GetData("Description", tableInternal.selectedIndex);
-        }
+        var description = "";
+//        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
 
+//            console.log("collectionViewContainer.gqlModelInfo", collectionViewContainer.gqlModelInfo);
+//            console.log("dataModelLocal", dataModelLocal.toJSON());
+//            console.log("tableInternal.selectedIndex", tableInternal.selectedIndex);
+
+//            description = dataModelLocal.GetData("AccountDescription", tableInternal.selectedIndex);
+//        }
+//        else{
+//            description = dataModelLocal.GetData("Description", tableInternal.selectedIndex);
+//        }
+
+        description = dataModelLocal.GetData("Description", tableInternal.selectedIndex);
+
+        console.log("description", description);
         return description;
     }
 
@@ -165,15 +173,17 @@ Rectangle {
         }
 
         if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("data")){
-            var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
+            let dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
             tableInternal.elements = 0;
             tableInternal.elements = dataModelLocal;
 
             var selectedIndexLocal = collectionViewContainer.collectionViewModel.GetData("selectedIndex");
-
-            if (selectedIndexLocal) {
+            console.log("selectedIndexLocal", selectedIndexLocal);
+            if (selectedIndexLocal != undefined) {
+                tableInternal.selectedIndex = -1;
                 tableInternal.selectedIndex = selectedIndexLocal;
+                console.log("tableInternal.selectedIndex", tableInternal.selectedIndex);
             }
 
             if (collectionViewContainer.autoRefresh){
@@ -236,6 +246,8 @@ Rectangle {
             console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
             collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
             collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
+
+            //tableInternal.elementsList.selectedId = elements.GetData("Id", tableInternal.selectedIndex);
         }
 
         onSetActiveFocusFromTable: {
@@ -243,6 +255,14 @@ Rectangle {
             collectionViewContainer.setActiveFocusFromCollectionView();
         }
     }
+
+//    Pagination {
+//        id: pagination;
+//        anchors.bottom: tableInternal.bottom;
+//        anchors.bottomMargin: 10;
+//        anchors.horizontalCenter: parent.horizontalCenter;
+//        pagesSize: 100;
+//    }
 
     GqlModel {
         id: headerInfoModel;

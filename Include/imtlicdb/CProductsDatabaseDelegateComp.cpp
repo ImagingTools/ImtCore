@@ -129,7 +129,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 	if (productPtr == nullptr){
 		return NewObjectQuery();
 	}
-	const imtbase::IObjectCollection* packagesCollectionPtr = productPtr->GetFeaturePackages();
 
 	QByteArray productId = productPtr->GetProductId();
 	if (productId.isEmpty()){
@@ -169,21 +168,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 						.arg(licenseDescription)
 						.arg(qPrintable(productId)).toLocal8Bit();
 
-			if (packagesCollectionPtr != nullptr){
-				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-				for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
-					QByteArray id =  featureInfo.id;
-					const imtlic::IFeaturePackage* packagePtr = imtlic::CFeaturePackageCollectionUtility::GetFeaturePackagePtr(*packagesCollectionPtr, featureInfo.id);
-					if (packagePtr == nullptr){
-						return NewObjectQuery();
-					}
-
-					QByteArray packageId = packagePtr->GetPackageId();
-
+			imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
+			for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
+				QByteArrayList data = featureInfo.id.split('.');
+				if (data.size() == 2){
+					QByteArray featureId =  data[1];
+					QByteArray packageId = data[0];
 					retVal.query += "\n" +
-								QString("INSERT INTO ProductLicenseFeatures(LicenseId, FeatureId) VALUES('%1', '%2');")
+								QString("INSERT INTO ProductLicenseFeatures(ProductId, LicenseId, PackageId, FeatureId) VALUES('%1', '%2', '%3', '%4');")
+								.arg(qPrintable(productId))
 								.arg(qPrintable(licenseId))
-								.arg(qPrintable(featureInfo.id))
+								.arg(qPrintable(packageId))
+								.arg(qPrintable(featureId))
 								.toLocal8Bit();
 				}
 			}
@@ -490,7 +486,6 @@ void CProductsDatabaseDelegateComp::GenerateDifferences(
 	imtlic::ILicenseInfo::FeatureInfos newFeatures = newLicensePtr->GetFeatureInfos();
 
 	for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : newFeatures){
-//		QByteArray newId = featureInfo.id.split('.')[1];
 		newFeatureIds.push_back(featureInfo.id);
 	}
 

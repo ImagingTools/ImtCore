@@ -157,8 +157,8 @@ Item {
 
                               onClicked: {
                                   console.log("TreeItemDelegate CheckBox MouseArea onClicked", checkBox.checkState);
-                                  checkBox.checkState = 2 - checkBox.checkState;
-                                  mainTreeView.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
+                                  //checkBox.checkState = 2 - checkBox.checkState;
+                                  mainTreeView.changeCheckBoxState(2 - checkBox.checkState, model.packageId, model.Id);
                               }
                           }
                      }

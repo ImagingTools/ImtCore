@@ -8,13 +8,219 @@ Item {
     property TreeItemModel modelTreeItems;
     property TreeItemModel modelDepends;
     property TreeItemModel productLicenseFeatures;
+    property var featuresDependencies;
 
     Component.onCompleted: {
         console.log( "FeaturesTreeView Component.onCompleted");
-        featuresTreeViewContainer.loadFeaturesModel();
-        featuresTreeViewContainer.loadDependModel();
-        featuresTreeViewContainer.loadLicenseDependModel();
-//        licensesDependenciesModel.loadLicenseDependModel();
+//        featuresTreeViewContainer.loadFeaturesModel();
+//        featuresTreeViewContainer.loadDependModel();
+//        featuresTreeViewContainer.loadLicenseDependModel();
+    }
+
+    function hideCurrentFeatureTreeView(packageId, featureId){
+        console.log("PackageView hideCurrentFeatureTreeView");
+        //var modelItems = treeView.modelItems;
+        //let dataModelLocal = featuresTreeViewContainer.modelTreeItems;
+        if (!featuresTreeViewContainer.modelTreeItems){
+            return;
+        }
+
+        for (var i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++) {
+            if (featuresTreeViewContainer.modelTreeItems.GetData("Name", i) == packageId) {
+                var childModelItems = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+                if (!childModelItems){
+                    continue;
+                }
+
+                for (var j = 0; j < childModelItems.GetItemsCount(); j++) {
+                    if (childModelItems.GetData("visible", j) === 0) {
+                        childModelItems.SetData("visible", 1, j);
+                    }
+
+                    if (childModelItems.GetData("Id", j) === featureId){
+                        childModelItems.SetData("visible", 0, j);
+                    }
+                }
+                featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", childModelItems, i);
+                break;
+            }
+        }
+
+        //featuresTreeViewContainer.modelTreeItems = dataModelLocal;
+//        featuresTreeViewContainer.modelTreeItems.Refresh();
+    }
+
+    function selectFeature(feature){
+       // let dataModelLocal = featuresTreeViewContainer.modelTreeItems;
+        for (let i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            let packageId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
+            let childItems = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+            if (childItems){
+                let featureFind = false;
+                for (let j = 0; j < childItems.GetItemsCount(); j++){
+                    let featureId = childItems.GetData("Id", j);
+                    let value = packageId + "." + featureId;
+                    if (feature == value){
+                        featureFind = true;
+                        childItems.SetData("stateChecked", 2, j);
+                        childItems.SetData("isActive", 1, j);
+                        let downDepends = []
+                        featuresTreeViewContainer.getFeaturesDependsByFeature(feature, downDepends);
+                        console.log("downDepends", downDepends);
+                        if (downDepends.length > 0){
+                            featuresTreeViewContainer.updateDataFeatureList(downDepends, 2, 0);
+                        }
+                        break;
+                    }
+                }
+
+                if (featureFind){
+                    featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", childItems, i);
+                }
+            }
+        }
+        //featuresTreeViewContainer.modelTreeItems = dataModelLocal;
+//        featuresTreeViewContainer.modelTreeItems.Refresh();
+    }
+
+    function deselectFeature(feature){
+        console.log("deselectFeature", feature);
+//        let dataModelLocal = featuresTreeViewContainer.modelTreeItems;
+        for (let i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            let packageId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
+            let childItems = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+            if (childItems){
+                let featureFind = false;
+                for (let j = 0; j < childItems.GetItemsCount(); j++){
+                    let featureId = childItems.GetData("Id", j);
+                    let value = packageId + "." + featureId;
+                    if (feature == value){
+                        featureFind = true;
+                        childItems.SetData("stateChecked", 0, j);
+                        let upDepends = []
+                        featuresTreeViewContainer.getFeaturesDependsByFeature(feature, upDepends);
+                        //console.log("upDepends", upDepends);
+                        if (upDepends.length > 0){
+                            featuresTreeViewContainer.updateDataFeatureList(upDepends, 0, 1);
+                        }
+                        break;
+                    }
+                }
+
+                if (featureFind){
+                    featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", childItems, i);
+                }
+            }
+        }
+//        featuresTreeViewContainer.modelTreeItems = dataModelLocal;
+//        featuresTreeViewContainer.modelTreeItems.Refresh();
+    }
+
+    /*
+      Вернуть список feature от которых зависит переданная
+    */
+    function getFeaturesDependsByFeature(key, list){
+        console.log("getFeaturesDependsByFeature", key, list);
+        if (featuresTreeViewContainer.modelDepends.ContainsKey(key)){
+            let valuesStr = featuresTreeViewContainer.modelDepends.GetData(key);
+            if (valuesStr){
+                let values = valuesStr.split(';');
+                for (let value of values){
+                    list.push(value);
+                }
+
+                for (let value of values) {
+                    featuresTreeViewContainer.getFeaturesDependsByFeature(value, list);
+                }
+            }
+        }
+    }
+
+    /*
+      Вернуть список feature зависящих от переданной
+    */
+    function getFeaturesDependsByFeatureUp(key, list){
+        console.log("getFeaturesDependsByFeatureUp", key, list);
+        var arr = featuresTreeViewContainer.modelDepends.GetKeys();
+        for (let curKey of featuresTreeViewContainer.modelDepends.GetKeys()) {
+            let valuesStr = featuresTreeViewContainer.modelDepends.GetData(curKey);
+            if (valuesStr){
+                let values = valuesStr.split(";");
+                if (values.indexOf(key) > -1){
+                    list.push(curKey);
+                    featuresTreeViewContainer.getFeaturesDependsByFeatureUp(curKey, list);
+                }
+            }
+        }
+    }
+
+    function updateDataFeatureList(features, stateChecked, isActive){
+        console.log("updateDataFeatureList");
+
+        if (features.length <= 0){
+            return;
+        }
+       //let dataModelLocal = featuresTreeViewContainer.modelTreeItems;
+        for (let i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            let packageId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
+            let childItems = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+            if (childItems){
+                for (let j = 0; j < childItems.GetItemsCount(); j++){
+                    let featureId = childItems.GetData("Id", j);
+                    let value = packageId + "." + featureId;
+
+                    if (features.indexOf(value) >= 0){
+                        childItems.SetData("stateChecked", stateChecked, j);
+                        childItems.SetData("isActive", isActive, j);
+                    }
+                }
+                featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", childItems, i);
+            }
+        }
+
+//        featuresTreeViewContainer.modelTreeItems.Refresh();
+        //featuresTreeViewContainer.modelTreeItems = dataModelLocal;
+    }
+
+    /*
+      Сброс всех stateChecked и isActive в дереве
+    */
+    function clearTreeView(){
+        //let dataModelLocal = featuresTreeViewContainer.modelTreeItems;
+        for (let i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            let packageId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
+            let childItems = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+            if (childItems){
+                let wasChanged = false;
+                for (let j = 0; j < childItems.GetItemsCount(); j++){
+                    let featureId = childItems.GetData("Id", j);
+                    let stateChecked = childItems.GetData("stateChecked", j);
+                    let isActive = childItems.GetData("isActive", j);
+                    let visible = childItems.GetData("visible", j);
+
+                    if (stateChecked == 2){
+                        wasChanged = true;
+                        childItems.SetData("stateChecked", 0, j);
+                    }
+
+                    if (isActive == 0){
+                        wasChanged = true;
+                        childItems.SetData("isActive", 1, j);
+                    }
+
+                    if (visible == 0){
+                        wasChanged = true;
+                        childItems.SetData("visible", 1, j);
+                    }
+                }
+
+                if (wasChanged){
+                    featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", childItems, i);
+                }
+            }
+        }
+        //featuresTreeViewContainer.modelTreeItems = dataModelLocal;
+//        featuresTreeViewContainer.modelTreeItems.Refresh();
     }
 
     function loadLicenseDependModel(){
@@ -23,6 +229,7 @@ Item {
 
     function printInfo() {
         for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
+            console.log("Package ID", featuresTreeViewContainer.modelDepends.GetData("RootPackageId", i));
             console.log("Feature ID", featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i));
             var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", i);
 
@@ -35,22 +242,39 @@ Item {
                 }
             }
         }
+
+        console.log("modelTreeItems", modelTreeItems.toJSON());
     }
 
-    function getIndexFromTreeViewByPackageId(packageId){
+    function featureIsNew(packageId, featureId){
         if (!featuresTreeViewContainer.modelTreeItems){
-            return -1;
+            return false;
         }
 
-        for (var i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
-            var curId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
+        if (featureId == ""){
+            return true;
+        }
 
+        for (let i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            let curId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
             if (curId === packageId){
-                return i;
+                let modelChild = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+                if (!modelChild){
+                    return false;
+                }
+
+                for (let j = 0; j < modelChild.GetItemsCount(); j++){
+                    let fId = modelChild.GetData("Id", j);
+                    if (fId == featureId){
+                        return true;
+                    }
+                }
+
+                break;
             }
         }
 
-        return -1;
+        return false;
     }
 
     function addFeatureInTreeViewModel(packageId, featureId, featureName){
@@ -78,17 +302,12 @@ Item {
 
                 for (var j = 0; j < modelChildren.GetItemsCount(); j++){
                     var currentFeatureId = modelChildren.GetData("Id", j);
-                    var currentStateChecked = modelChildren.GetData("stateChecked", j);
-                    var currentLevel = modelChildren.GetData("level", j);
-                    var currentVisible = modelChildren.GetData("visible", j);
-                    var currentIsActive = modelChildren.GetData("isActive", j);
-
                     if (currentFeatureId === featureId){
                         childIndex = j;
-                        stateChecked = currentStateChecked;
-                        level = currentLevel;
-                        visible = currentVisible;
-                        isActive = currentIsActive;
+                        stateChecked = modelChildren.GetData("stateChecked", j);
+                        level = modelChildren.GetData("level", j);
+                        visible = modelChildren.GetData("visible", j);
+                        isActive = modelChildren.GetData("isActive", j);
                         break;
                     }
                 }
@@ -203,206 +422,6 @@ Item {
     function loadDependModel() {
         console.log( "FeaturesTreeView loadDependModel()");
         dependenciesModel.loadDependModel();
-    }
-
-    function getPackageIndexByPackageId(packageId, rootIndex) {
-        var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", rootIndex);
-
-        if (!modelPackages) {
-            return -1;
-        }
-
-        for (var i = 0; i < modelPackages.GetItemsCount(); i++) {
-            if (modelPackages.GetData("Id", i) === packageId) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    function addNewPackageToRootFeatureByRootIndex(packageId, rootIndex) {
-        var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", rootIndex);
-        var index = modelPackages.InsertNewItem();
-        modelPackages.SetData("Id", packageId, index);
-        featuresTreeViewContainer.modelDepends.SetData("Packages", modelPackages, rootIndex)
-        return index;
-    }
-
-    function getIndexByRootFeatureId(featureId) {
-        console.log("FeaturesTreeView getIndexByRootFeatureId", featureId)
-
-        for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
-            if (featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i) === featureId) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    function getIndexByPackageId(rootIndex, packageId) {
-        console.log("FeaturesTreeView getIndexByPackageId", rootIndex, packageId);
-
-        var packages = featuresTreeViewContainer.modelDepends.GetData("Packages", rootIndex);
-
-        if (!packages) {
-            console.log("FeaturesTreeView getIndexByPackageId return -1");
-            return -1;
-        }
-
-        for (var i = 0; i < packages.GetItemsCount(); i++) {
-            if (packages.GetData("Id", i) === packageId) {
-                console.log("FeaturesTreeView getIndexByPackageId return", i);
-                return i;
-            }
-        }
-
-        console.log("FeaturesTreeView getIndexByPackageId return -1");
-        return -1;
-    }
-
-    function featureIdHasDependency(featureId) {
-        if (!featuresTreeViewContainer.modelDepends) {
-            return false;
-        }
-
-        for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
-            if (featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i) === featureId) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    function rootFeatureIdHasDependPackage(rootIndex) {
-        var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", rootIndex);
-
-        if (!modelPackages) {
-            return false;
-        }
-        return true;
-    }
-
-    function dependModelPackageHasChild(rootIndex, packageIndex) {
-        var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", rootIndex);
-        var modelChildren = modelPackages.GetData("childItemModel", packageIndex);
-
-        if (modelChildren && modelChildren.GetItemsCount() > 0) {
-            return true;
-        }
-        return false;
-    }
-
-    function dependModelRemovePackageByIndex(rootIndex, packageIndex) {
-        var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", rootIndex);
-        modelPackages.RemoveItem(packageIndex);
-        featuresTreeViewContainer.modelDepends.SetData("Packages", modelPackages,  rootIndex);
-    }
-
-    function dependModelRemoveRootFeatureByIndex(rootIndex) {
-        featuresTreeViewContainer.modelDepends.RemoveItem(rootIndex);
-    }
-
-    function dependModePackageGetIndexByFeatureId(rootIndex, packageIndex, featureId) {
-        var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", rootIndex);
-
-        var modelChildren = modelPackages.GetData("childItemModel", packageIndex);
-
-        if (!modelPackages || !modelChildren) {
-            return -1;
-        }
-
-        for (var i = 0; i < modelChildren.GetItemsCount(); i++) {
-            if (modelChildren.GetData("Id", i) === featureId) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    function findInAllRootFeaturesDependFeatureById(packageId, featureId, result) {
-
-        console.log("FeaturesTreeView findInAllRootFeaturesDependFeatureById", packageId, featureId);
-        //featuresTreeViewContainer.printInfo();
-        if (!featuresTreeViewContainer.modelDepends) {
-            return false;
-        }
-
-      //  var result = [];
-        for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
-            var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", i);
-            var rootFeatureId = featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i);
-            var rootPackageId = featuresTreeViewContainer.modelDepends.GetData("RootPackageId", i);
-            if (!modelPackages) {
-                continue;
-            }
-
-            for (var j = 0; j < modelPackages.GetItemsCount(); j++) {
-                var pId = modelPackages.GetData("Id", j);
-                if (pId === packageId) {
-                    var modelChildren = modelPackages.GetData("childItemModel", j);
-
-                    if (!modelChildren) {
-                        continue;
-                    }
-
-                    for (var k = 0; k < modelChildren.GetItemsCount(); k++) {
-                        var fId = modelChildren.GetData("Id", k);
-
-                        if (fId === featureId) {
-                            //console.log("result.push", rootPackageId, rootFeatureId);
-                            result.push(rootPackageId + "." + rootFeatureId);
-                            featuresTreeViewContainer.findInAllRootFeaturesDependFeatureById(rootPackageId, rootFeatureId, result);
-                            break;
-                            //return true;
-                        }
-                    }
-                    break;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    function findInAllDependsFeaturesByRootFeatureId(packageId, featureId, result) {
-        console.log("FeaturesTreeView findInAllRootFeaturesDependFeatureById", packageId, featureId);
-        //featuresTreeViewContainer.printInfo();
-        if (!featuresTreeViewContainer.modelDepends) {
-            return false;
-        }
-
-        for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++) {
-
-            var rootFeatureId = featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i);
-            var rootPackageId = featuresTreeViewContainer.modelDepends.GetData("RootPackageId", i);
-
-            if (rootPackageId === packageId && rootFeatureId === featureId){
-                var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", i);
-                if (!modelPackages) {
-                    continue;
-                }
-
-                 for (var j = 0; j < modelPackages.GetItemsCount(); j++) {
-                     var pId = modelPackages.GetData("Id", j);
-
-                     var modelChildren = modelPackages.GetData("childItemModel", j);
-
-                     if (!modelChildren) {
-                         continue;
-                     }
-
-                     for (var k = 0; k < modelChildren.GetItemsCount(); k++) {
-                         var fId = modelChildren.GetData("Id", k);
-                         result.push(pId + "." + fId);
-                         featuresTreeViewContainer.findInAllDependsFeaturesByRootFeatureId(pId, fId, result);
-                     }
-                 }
-            }
-        }
     }
 
     GqlModel {

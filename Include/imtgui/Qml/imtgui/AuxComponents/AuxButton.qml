@@ -22,7 +22,7 @@ Rectangle {
 
     property string borderColor: "transparent";
     property string backgroundColor: "transparent";
-    property string textButton;
+    property var textButton;
 
     property int iconWidth: auxButtonContainer.width;
     property int iconHeight: auxButtonContainer.height;

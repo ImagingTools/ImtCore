@@ -23,7 +23,17 @@ Item {
     signal setActiveFocusFromTable();
 
     function getSelectedId(){
-        return elementsList.selectedId;
+//        console.log("AuxTable getSelectedId", tableContainer.selectedIndex);
+//        let id = elements.GetData("Id", tableContainer.selectedIndex);
+//       // console.log("id", id);
+//        return id;
+        if (tableContainer.selectedIndex > -1){
+             return tableContainer.elements.GetData("Id", tableContainer.selectedIndex);
+        }
+        else{
+            return null;
+        }
+        //return elementsList.selectedId;
     }
 
     function getSelectedName(){

@@ -248,9 +248,8 @@ Item {
         }
 
         onSelectedIndexChanged: {
+            productCollectionContainer.commandsChanged("Products")
             if (productCollectionView.selectedIndex > -1){
-                productCollectionContainer.commandsChanged("Products")
-
                 var index = -1;
                 for (var i = 0; i < productsMetaInfoModels.GetItemsCount(); i++){
                     var curId = productsMetaInfoModels.GetData("Id", i);

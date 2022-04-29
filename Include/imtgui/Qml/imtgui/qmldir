@@ -11,3 +11,4 @@ MessageDialog 1.0 ./AuxComponents/MessageDialog.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
 Splitter 1.0 ./AuxComponents/Splitter.qml
 Calendar 1.0 ./AuxComponents/Calendar.qml
+Pagination 1.0 ./AuxComponents/Pagination.qml

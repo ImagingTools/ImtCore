@@ -268,9 +268,8 @@ Item {
 
         onSelectedIndexChanged: {
             console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.table.selectedIndex);
+            packageCollectionContainer.commandsChanged("Packages");
             if (packageCollectionView.table.selectedIndex > -1){
-                packageCollectionContainer.commandsChanged("Packages");
-
                 if (metaInfoModels.GetItemsCount() >= packageCollectionView.table.selectedIndex + 1){
                     packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData",
                                                                                  packageCollectionView.table.selectedIndex);
@@ -365,7 +364,7 @@ Item {
 
                 dataModelLocal = metaInfo.GetData("data");
 
-                if (dataModelLocal.ContainsKey("FeaturePackageMetaInfo")){
+                if (dataModelLocal && dataModelLocal.ContainsKey("FeaturePackageMetaInfo")){
                     dataModelLocal = dataModelLocal.GetData("FeaturePackageMetaInfo");
 
                     if (dataModelLocal.ContainsKey("metaInfo")){

@@ -97,6 +97,15 @@ Rectangle {
         return "";
     }
 
+    function generateKey() {
+        console.log("EditLicenseDialog generateKey...");
+        if (tfcLicenseIdText.text === "") {
+            var key = "00.0000";
+            //key = key.replace(/\s+/g, '');
+            tfcLicenseIdText.text = key;
+        }
+    }
+
     MouseArea {
         anchors.fill: parent;
     }
@@ -288,6 +297,10 @@ Rectangle {
                     if (idMessage !== "") {
                        errorIdMessage.text = idMessage;
                     }
+                }
+
+                onTextInputFocusChanged: {
+                    editLicenseContainer.generateKey();
                 }
 
                 KeyNavigation.tab: okButton;

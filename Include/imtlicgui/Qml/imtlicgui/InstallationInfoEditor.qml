@@ -925,7 +925,7 @@ Rectangle {
                     containerInstallation.rootItem.updateTitleTab(containerInstallation.itemId, containerInstallation.itemName);
 
                     if (containerInstallation.multiDocViewItem.activeCollectionItem){
-                        containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                        //containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                     }
 
 

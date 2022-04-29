@@ -326,11 +326,19 @@ void CTreeItemModel::GetKeys(QList<QByteArray>& keys, int index)
 }
 
 
-QList<QByteArray> CTreeItemModel::GetKeys(int index)
+QList<QString> CTreeItemModel::GetKeys(int index)
 {
 	QList<QByteArray> keys;
-	GetKeys(keys, index);
-	return keys;
+	if (index >= 0 && index < m_items.count()){
+		m_items[index]->GetKeys(keys);
+	}
+
+	QList<QString> keys2;
+	for (const QByteArray& key : keys){
+		keys2.append(key);
+	}
+
+	return keys2;
 }
 
 

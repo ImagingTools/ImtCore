@@ -1,4 +1,5 @@
-modude imtlicgui
+module imtlicgui
 PackagesView 1.0 PackagesView.qml
 EditFeatureDialog 1.0 EditFeatureDialog.qml
 MetaInfo 1.0 MetaInfo.qml
+FeaturesTreeView 1.0 FeaturesTreeView.qml

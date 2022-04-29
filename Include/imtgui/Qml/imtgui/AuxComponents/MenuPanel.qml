@@ -107,6 +107,7 @@ Rectangle {
 
                 if (!dataModelLocal){
                     console.log("!dataModelLocal");
+                    //lvPages.model = 0;
                     thubnailDecoratorContainer.setInvalidConnection(true);
                     return;
                 }
@@ -124,6 +125,7 @@ Rectangle {
                         menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
 
+                        //menuPanel.activePageIndex = 0;
                         pageIndexTimer.pageIndex = 0;
                         pageIndexTimer.start();
                     }

@@ -74,6 +74,8 @@ Item {
         parameters["resultItem"] = accountCollectionContainer;
         parameters["itemHeight"] = 25;
         parameters["itemWidth"] = 150;
+
+        //parameters["dialogId"] = "PopupMenu";
         parameters["x"] = point.x;
         parameters["y"] = point.y;
         thubnailDecoratorContainer.openDialog(source, parameters);
@@ -236,9 +238,8 @@ Item {
         }
 
         onSelectedIndexChanged: {
+            accountCollectionContainer.commandsChanged("Accounts");
             if (accountCollectionView.selectedIndex > -1){
-                accountCollectionContainer.commandsChanged("Accounts");
-
                 var index = -1;
                 for (var i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
                     var curId = accountsMetaInfoModels.GetData("Id", i);
