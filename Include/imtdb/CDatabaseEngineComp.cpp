@@ -398,6 +398,11 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 				return CreateDatabase();
 			}
 		}
+		else{
+			SendErrorMessage(0, "Database server could not be connected", "Database Engine");
+
+			return false;
+		}
 	}
 	else {
 		if (*m_autoCreateDatabaseAttrPtr == 2){
