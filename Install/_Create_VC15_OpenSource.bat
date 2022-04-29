@@ -7,7 +7,7 @@ set ACF_CONFIG_FILE=$(IMTCOREDIR)/Config/ImtCore.awc
 
 cd %~dp0\..
 
-set COMPILER_EXT=VC15_64
+set COMPILER_EXT=Qt5_VC15_x64
 call %ACFDIR%\Install\InternalParts\CreateTempDirs.bat
 
 call %ACFDIR%\Install\InternalParts\CreateScripts.bat
