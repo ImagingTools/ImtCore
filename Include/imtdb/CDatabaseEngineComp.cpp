@@ -300,6 +300,8 @@ bool CDatabaseEngineComp::CreateTables() const
 					<< "\n\t| Unable to open file"
 					<< "\n\t| File: " << scriptFile.fileName();
 
+		SendErrorMessage(0, QString("Table creation script file '%1' could not be opened").arg(scriptFile.fileName()), "Database Engine");
+
 		return false;
 	}
 
@@ -316,6 +318,8 @@ bool CDatabaseEngineComp::CreateTables() const
 			<< "\n\t| Maintainance SQL error occured"
 			<< "\n\t| Error: " << sqlError
 			<< "\n\t| Query: " << queryString;
+
+		SendErrorMessage(0, QString("Table creation failed: '%1' '%2'").arg(sqlError.text()).arg(queryString), "Database Engine");
 	}
 
 	return sqlError.type() == QSqlError::ErrorType::NoError;
@@ -406,12 +410,8 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 
 
 QString CDatabaseEngineComp::GetConnectionName() const
-{	
+{
 	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
-	QString suffix;
-	if (m_suffixAttrPtr.IsValid()){
-		//suffix = *m_suffixAttrPtr;
-	}
 
 	return GetDatabaseName() + QString(" - %1").arg(threadId);
 }
