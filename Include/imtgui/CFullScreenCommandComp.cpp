@@ -68,17 +68,25 @@ bool CFullScreenCommandComp::CheckIsFullScreen()
 }
 
 
+// reimpemented (iqtgui::TDesignSchemaHandlerWrap)
+
+void CFullScreenCommandComp::OnDesignSchemaChanged()
+{
+	bool isFullScreen = CheckIsFullScreen();
+	if (isFullScreen){
+		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, GetIcon(*m_actionIconScreenOffAttrPtr));
+	}
+	else {
+		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, GetIcon(*m_actionIconScreenOnAttrPtr));
+	}
+}
+
+
 // reimpemented (ibase::TLocalizableWrap)
 
 void CFullScreenCommandComp::OnLanguageChanged()
 {
-	bool isFullScreen = CheckIsFullScreen();
-	if (isFullScreen){
-		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
-	}
-	else{
-		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, QIcon(*m_actionIconScreenOnAttrPtr));
-	}
+	OnDesignSchemaChanged();
 }
 
 

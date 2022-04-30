@@ -10,6 +10,8 @@
 #include <ibase/ICommandsProvider.h>
 #include <ifile/IFileNameParam.h>
 #include <iqtgui/IIconProvider.h>
+#include <iqtgui/TMakeIconProviderCompWrap.h>
+#include <iqtgui/TDesignSchemaHandlerWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <ibase/TLocalizableWrap.h>
 #include <iqtgui/IGuiObject.h>
@@ -24,12 +26,12 @@ namespace imtgui
 */
 class CFullScreenCommandComp:
 			public QObject,
-			public ibase::TLocalizableWrap<icomp::CComponentBase>,
+			public iqtgui::TMakeIconProviderCompWrap<iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<icomp::CComponentBase>>>,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
-	typedef ibase::TLocalizableWrap<icomp::CComponentBase> BaseClass;
+	typedef iqtgui::TMakeIconProviderCompWrap<iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<icomp::CComponentBase>>> BaseClass;
 	
 	I_BEGIN_COMPONENT(CFullScreenCommandComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -52,6 +54,9 @@ public:
 
 protected:
 	virtual bool CheckIsFullScreen();
+
+	// reimpemented (iqtgui::TDesignSchemaHandlerWrap)
+	virtual void OnDesignSchemaChanged() override;
 
 	// reimpemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;

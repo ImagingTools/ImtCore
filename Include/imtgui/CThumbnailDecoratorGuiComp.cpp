@@ -763,7 +763,7 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 
 		LoginMode loginMode = GetLoginMode();
 		if (loginMode != LM_STRONG){
-			LoginControlButton->setIcon(isLogged ? QIcon(":/Icons/Lock") : QIcon(":/Icons/Unlock"));
+			LoginControlButton->setIcon(isLogged ? GetIcon(":/Icons/Lock") : GetIcon(":/Icons/Unlock"));
 		}
 
 		if (!isLogged){
@@ -1274,7 +1274,9 @@ void CThumbnailDecoratorGuiComp::UpdateCommands()
 			if (commandsPtr != nullptr){
 				iqtgui::CCommandTools::SetupToolbar(*commandsPtr, *m_mainToolBar);
 				int group = ibase::ICommand::GI_NONE;
+
 				SetupCommandsMenu(*commandsPtr, m_commandsMenu, group);
+
 				CommandsMenuButton->setVisible(!m_commandsMenu.isEmpty());
 			}
 			else{

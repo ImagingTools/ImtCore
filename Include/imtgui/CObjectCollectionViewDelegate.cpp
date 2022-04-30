@@ -661,19 +661,25 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 {
 	SetupSummaryInformation();
 
-	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), QIcon(":/Icons/Add"));
-	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), QIcon(":/Icons/Duplicate"));
-	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), QIcon(":/Icons/Delete"));
-	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), QIcon(":/Icons/Import"));
-	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), QIcon(":/Icons/Export"));
-	m_restoreCommand.SetVisuals(tr("Restore revision..."), tr("Restore"), tr("Restore data from backup"), QIcon(":/Icons/Undo"));
+	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), GetIcon(":/Icons/Add"));
+	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), GetIcon(":/Icons/Duplicate"));
+	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), GetIcon(":/Icons/Delete"));
+	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), GetIcon(":/Icons/Import"));
+	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), GetIcon(":/Icons/Export"));
+	m_restoreCommand.SetVisuals(tr("Restore revision..."), tr("Restore"), tr("Restore data from backup"), GetIcon(":/Icons/Undo"));
 }
 
 
-// reimplemented (imtbase::TPolishableWrap)
+// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 
 void CObjectCollectionViewDelegate::OnDesignSchemaChanged()
 {
+	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), GetIcon(":/Icons/Add"));
+	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), GetIcon(":/Icons/Duplicate"));
+	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), GetIcon(":/Icons/Delete"));
+	m_importCommand.SetVisuals(tr("Import from File..."), tr("Import"), tr("Import existing file into the collection"), GetIcon(":/Icons/Import"));
+	m_exportCommand.SetVisuals(tr("Export to File..."), tr("Export"), tr("Export data from the collection to a file"), GetIcon(":/Icons/Export"));
+	m_restoreCommand.SetVisuals(tr("Restore revision..."), tr("Restore"), tr("Restore data from backup"), GetIcon(":/Icons/Undo"));
 }
 
 

@@ -13,6 +13,8 @@
 #include <ibase/ICommandsProvider.h>
 #include <ifile/IFilePersistence.h>
 #include <idoc/IDocumentMetaInfo.h>
+#include <iqtgui/TMakeIconProviderCompWrap.h>
+#include <iqtgui/TDesignSchemaHandlerWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/CCommandTools.h>
 #include <iwidgets/iwidgets.h>
@@ -71,6 +73,7 @@ public:
 				const DecoratorConfiguration& configuration);
 
 	virtual void UpdateSaveButtonsStatus();
+	void UpdateAppearance();
 
 	// reimplemeneted (IDocumentViewDecorator)
 	virtual QWidget* GetDecoratorWidget() override;
@@ -109,6 +112,26 @@ protected:
 	iqtgui::CHierarchicalCommand m_undoCommand;
 	iqtgui::CHierarchicalCommand m_redoCommand;
 	iqtgui::CHierarchicalCommand m_closeCommand;
+
+	class UiResourcesManager: public iqtgui::TMakeIconProviderCompWrap<iqtgui::TDesignSchemaHandlerWrap<QObject>>
+	{
+	public:
+		UiResourcesManager(TStandardDocumentViewDecorator& parent)
+			:m_parent(parent)
+		{
+		}
+
+	protected:
+		virtual void OnDesignSchemaChanged() override
+		{
+			m_parent.UpdateAppearance();
+		}
+
+		TStandardDocumentViewDecorator& m_parent;
+	};
+
+
+	UiResourcesManager m_uiResourcesManager;
 };
 
 
@@ -132,8 +155,11 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	m_saveAsCommand("SaveAs", 100, ibase::ICommand::CF_GLOBAL_MENU, 20000),
 	m_undoCommand("Undo", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
 	m_redoCommand("Redo", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20000),
-	m_closeCommand("Close", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20001)
+	m_closeCommand("Close", 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, 20001),
+	m_uiResourcesManager(*this)
 {
+	m_uiResourcesManager.EnableDesignHandler();
+
 	Q_ASSERT(parentPtr != nullptr);
 	Q_ASSERT(viewPtr != nullptr);
 
@@ -204,15 +230,9 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	connect(&m_saveCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnSaveDocument);
 	connect(&m_saveAsCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnSaveDocumentAs);
 
-	m_newCommand.SetVisuals(QObject::tr("&New"), QObject::tr("New"), QObject::tr("Create new document"), QIcon(":/Icons/New"));
-	m_openCommand.SetVisuals(QObject::tr("&Open..."), QObject::tr("Open..."), QObject::tr("Open an existing document"), QIcon(":/Icons/Open"));
-	m_undoCommand.SetVisuals(QObject::tr("&Undo"), QObject::tr("Undo"), QObject::tr("Undo last document changes"), QIcon(":/Icons/Undo"));
-	m_redoCommand.SetVisuals(QObject::tr("&Redo"), QObject::tr("Redo"), QObject::tr("Redo last document changes"), QIcon(":/Icons/Redo"));
-	m_closeCommand.SetVisuals(QObject::tr("&Close"), QObject::tr("Close"), QObject::tr("Close the document"), QIcon(":/Icons/Close"));
-	m_saveCommand.SetVisuals(QObject::tr("&Save"), QObject::tr("Save"), QObject::tr("Save the document changes"), QIcon(":/Icons/Save"));
-	m_saveAsCommand.SetVisuals(QObject::tr("Save As"), QObject::tr("Save As"), QObject::tr("Save the document as..."), QIcon());
-
 	UpdateSaveButtonsStatus();
+
+	UpdateAppearance();
 
 	m_isInitialized = true;
 
@@ -278,6 +298,19 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateSaveButtonsStatus(
 		UI::SaveButton->setVisible(isSaveEnabled);
 		m_saveCommand.setVisible(isSaveEnabled);
 	}
+}
+
+
+template<class WorkspaceImpl, class UI>
+inline void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateAppearance()
+{
+	m_newCommand.SetVisuals(QObject::tr("&New"), QObject::tr("New"), QObject::tr("Create new document"), m_uiResourcesManager.GetIcon(":/Icons/New"));
+	m_openCommand.SetVisuals(QObject::tr("&Open..."), QObject::tr("Open..."), QObject::tr("Open an existing document"), m_uiResourcesManager.GetIcon(":/Icons/Open"));
+	m_undoCommand.SetVisuals(QObject::tr("&Undo"), QObject::tr("Undo"), QObject::tr("Undo last document changes"), m_uiResourcesManager.GetIcon(":/Icons/Undo"));
+	m_redoCommand.SetVisuals(QObject::tr("&Redo"), QObject::tr("Redo"), QObject::tr("Redo last document changes"), m_uiResourcesManager.GetIcon(":/Icons/Redo"));
+	m_closeCommand.SetVisuals(QObject::tr("&Close"), QObject::tr("Close"), QObject::tr("Close the document"), m_uiResourcesManager.GetIcon(":/Icons/Close"));
+	m_saveCommand.SetVisuals(QObject::tr("&Save"), QObject::tr("Save"), QObject::tr("Save the document changes"), m_uiResourcesManager.GetIcon(":/Icons/Save"));
+	m_saveAsCommand.SetVisuals(QObject::tr("Save As"), QObject::tr("Save As"), QObject::tr("Save the document as..."), QIcon());
 }
 
 

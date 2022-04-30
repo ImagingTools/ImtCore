@@ -11,6 +11,7 @@
 #include <ifile/IFileTypeInfo.h>
 #include <iqtgui/IGuiObject.h>
 #include <iqtgui/TDesignSchemaHandlerWrap.h>
+#include <iqtgui/TMakeIconProviderCompWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
@@ -28,11 +29,15 @@ namespace imtgui
 */
 class CObjectCollectionViewDelegate:
 			public QObject,
-			public iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<ICollectionViewDelegate>>
+			public iqtgui::TMakeIconProviderCompWrap<
+						iqtgui::TDesignSchemaHandlerWrap<
+										ibase::TLocalizableWrap<ICollectionViewDelegate>>>
 {
 	Q_OBJECT
 public:
-	typedef iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<ICollectionViewDelegate>> BaseClass;
+	typedef iqtgui::TMakeIconProviderCompWrap<
+				iqtgui::TDesignSchemaHandlerWrap<
+							ibase::TLocalizableWrap<ICollectionViewDelegate>>> BaseClass;
 
 	enum CommandGroup
 	{

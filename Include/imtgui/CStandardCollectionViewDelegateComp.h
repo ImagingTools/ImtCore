@@ -50,6 +50,9 @@ protected:
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
 
+	// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
+	virtual void OnDesignSchemaChanged() override;
+
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
 

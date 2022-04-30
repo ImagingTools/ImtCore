@@ -418,7 +418,15 @@ void CDocumentCollectionViewDelegateComp::OnLanguageChanged()
 {
 	BaseClass2::OnLanguageChanged();
 
-	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), QIcon(":/Icons/Edit"));
+	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), GetIcon(":/Icons/Edit"));
+}
+
+
+// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
+
+void CDocumentCollectionViewDelegateComp::OnDesignSchemaChanged()
+{
+	OnLanguageChanged();
 }
 
 

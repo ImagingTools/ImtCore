@@ -80,6 +80,7 @@ void CStandardCollectionViewDelegateComp::OnComponentCreated()
 	SetupSummaryInformation();
 }
 
+
 // reimplemented (CObjectCollectionViewDelegate)
 
 void CStandardCollectionViewDelegateComp::SetupCommands()
@@ -96,13 +97,23 @@ void CStandardCollectionViewDelegateComp::SetupCommands()
 }
 
 
+// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
+
+void CStandardCollectionViewDelegateComp::OnDesignSchemaChanged()
+{
+	BaseClass2::OnDesignSchemaChanged();
+
+	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), GetIcon(":/Icons/Edit"));
+}
+
+
 // reimplemented (ibase::TLocalizableWrap)
 
 void CStandardCollectionViewDelegateComp::OnLanguageChanged()
 {
 	BaseClass2::OnLanguageChanged();
 
-	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), QIcon(":/Icons/Edit"));
+	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), GetIcon(":/Icons/Edit"));
 }
 
 
