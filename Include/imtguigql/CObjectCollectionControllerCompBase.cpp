@@ -35,6 +35,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 	}
 
 	const QList<imtgql::CGqlObject>* inputParamsPtr = gqlRequest.GetParams();
+	const QList<imtgql::CGqlObject>* inputFieldsPtr = gqlRequest.GetFields();
 	imtgql::CGqlObject gqlObject;
 
 	int operationType = OT_UNKNOWN;
@@ -316,6 +317,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
+	imtbase::CTreeItemModel* notificationModel = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -328,8 +330,22 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 	else{
 		dataModel = new imtbase::CTreeItemModel();
 		itemsModel = new imtbase::CTreeItemModel();
+		notificationModel = new imtbase::CTreeItemModel();
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+		QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+
+		const imtgql::CGqlObject* viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+
+		int offset = 0, count = -1;
+		if (viewParamsGql != nullptr){
+			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
+			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
+
+			int pagesCount = qCeil(m_objectCollectionCompPtr->GetElementsCount() / (double)count);
+			notificationModel->SetData("PagesCount", pagesCount);
+		}
+
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count);
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
 		for (const QByteArray& collectionId : collectionIds){
@@ -340,12 +356,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 				}
 			}
 		}
-
 		itemsModel->SetIsArray(true);
-
 		dataModel->SetExternTreeModel("items", itemsModel);
+		dataModel->SetExternTreeModel("notification", notificationModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
@@ -389,12 +403,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		notificationModel->SetData("Id", objectId);
 		dataModel->SetExternTreeModel("removedNotification", notificationModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
-
-	return nullptr;
 }
 
 
@@ -423,30 +434,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 		rootModel->SetExternTreeModel("data", dataModel);
 	}
 
-//	if (!m_viewDelegateCompPtr.IsValid()){
-//		errorMessage = QObject::tr("Internal error").toUtf8();
-//	}
-
-//	if (!errorMessage.isEmpty()){
-//		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-//		errorsItemModel->SetData("message", errorMessage);
-//	}
-//	else{
-//		dataModel = new imtbase::CTreeItemModel();
-//		itemsModel = new imtbase::CTreeItemModel();
-//		const imtbase::ICollectionInfo& fieldCollection = m_viewDelegateCompPtr->GetSummaryInformationTypes();
-//		QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
-
-//		for (QByteArray fieldId : fieldIds){
-//			QString headerName = fieldCollection.GetElementInfo(fieldId, imtbase::ICollectionInfo::EIT_NAME).toString();
-//			int index = itemsModel->InsertNewItem();
-//			itemsModel->SetData("Name", headerName,index);
-//			itemsModel->SetData("Id", QString(fieldId),index);
-//		}
-//		itemsModel->SetIsArray(true);
-
-//		dataModel->SetExternTreeModel("headers", itemsModel);
-//	}
 	return rootModel;
 }
 

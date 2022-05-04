@@ -5,7 +5,7 @@ Rectangle {
     id: tableDelegateContainer;
 
     width: 1000;
-    height: 35;
+//    height: 35;
 
     color: "transparent";
 

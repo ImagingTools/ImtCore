@@ -8,6 +8,7 @@ Item {
 
     property int selectedIndex: -1;
     property int count: 3; //headersArray.length;
+    property int itemHeight: 35;
 
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
 
@@ -142,6 +143,7 @@ Item {
         delegate: TableDelegate {
             id: tableDelegate;
 
+            height: tableContainer.itemHeight;
             width: elementsList.width;
 
             selected: tableContainer.selectedIndex === model.index;

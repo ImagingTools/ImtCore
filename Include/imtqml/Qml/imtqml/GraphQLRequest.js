@@ -63,9 +63,9 @@ var GqlObject = function(objectId){
         },
     
         InsertFieldObject: function(objectPtr){
-            fieldId = objectPtr.m_objectId
+            var fieldId = objectPtr.m_objectId
             if (!this.m_fieldsMap.hasOwnProperty(fieldId)){
-                var newField
+                var newField = {}
                 newField.id = fieldId
                 newField.objectPtr = objectPtr
     

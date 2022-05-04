@@ -230,7 +230,11 @@ Rectangle {
     AuxTable {
         id: tableInternal;
 
-        anchors.fill: parent;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: pagination.top;
+        anchors.bottomMargin: 5;
 
         onSelectItem: {
             console.log("CollectionView AuxTable onSelectItem", idSelected, name);
@@ -256,13 +260,18 @@ Rectangle {
         }
     }
 
-//    Pagination {
-//        id: pagination;
-//        anchors.bottom: tableInternal.bottom;
-//        anchors.bottomMargin: 10;
-//        anchors.horizontalCenter: parent.horizontalCenter;
-//        pagesSize: 100;
-//    }
+    Pagination {
+        id: pagination;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        pagesSize: 1;
+
+        onCurrentValueChanged: {
+            console.log("Pagination onCurrentValueChanged", pagination.currentValue);
+            modelItems.updateModel();
+        }
+    }
 
     GqlModel {
         id: headerInfoModel;
@@ -336,22 +345,44 @@ Rectangle {
 
         function updateModel() {
             console.log( "collectionViewContainer updateModel", collectionViewContainer.gqlModelItems, collectionViewContainer.itemId);
+
+            console.log("ВЫСОТА КОЛЛЕКЦИИ: ", collectionViewContainer.height);
+            console.log("ВЫСОТА ЭЛЕМЕНТА: ", tableInternal.itemHeight);
+            let height = collectionViewContainer.height - pagination.height - tableInternal.itemHeight; //Убрать высоту от заголовка и меню пагинации
+
+            let count = Math.floor(height / tableInternal.itemHeight);
+            console.log("КОЛ-ВО ЭЛЕМЕНТОВ НА СТРАНИЦЕ: ", count);
+            let offset = (pagination.currentValue - 1) * count;
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelItems);
+            var viewParams = Gql.GqlObject("viewParams");
+            viewParams.InsertField("Offset");
+            viewParams.InsertFieldArgument("Offset", offset);
+            viewParams.InsertField("Count");
+            viewParams.InsertFieldArgument("Count", count);
+
+            //query.AddParam(viewParams);
+            var inputParams = Gql.GqlObject("input");
+            //inputParams.InsertField("ViewParams");
+            inputParams.InsertFieldObject(viewParams);
 
             if(collectionViewContainer.itemId != ""){
-                var inputParams = Gql.GqlObject("input");
+//                var inputParams = Gql.GqlObject("input");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
-                query.AddParam(inputParams);
+//                query.AddParam(inputParams);
             }
+            query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
-
             queryFields.InsertField("Id");
             for(var i = 0; i < tableInternal.headers.GetItemsCount(); i++){
                 queryFields.InsertField(tableInternal.headers.GetData("Id",i));
             }
             query.AddField(queryFields);
+
+            var notifyFields = Gql.GqlObject("Notification");
+            notifyFields.InsertField("PagesCount");
+            query.AddField(notifyFields);
 
             var gqlData = query.GetQuery();
             console.log("collectionViewContainer query ", gqlData);
@@ -361,16 +392,11 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, modelItems);
             if (this.state === "Ready"){
-
                 var dataModelLocal;
-
                 if (modelItems.ContainsKey("errors")){
                     dataModelLocal = modelItems.GetData("errors");
-
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
-
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
-
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
                             collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
@@ -382,14 +408,22 @@ Rectangle {
 
                 if (modelItems.ContainsKey("data")){
                     dataModelLocal = modelItems.GetData("data");
-
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
-
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
-
                         if (dataModelLocal.ContainsKey("items")){
                             tableInternal.elements = dataModelLocal.GetData("items");
                             collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
+                        }
+
+                        if (dataModelLocal.ContainsKey("notification")){
+                            dataModelLocal = dataModelLocal.GetData("notification");
+
+                            if (dataModelLocal.ContainsKey("PagesCount")){
+                                var pagesCount = dataModelLocal.GetData("PagesCount");
+                                if (pagesCount != pagination.pagesSize){
+                                    pagination.pagesSize = pagesCount;
+                                }
+                            }
                         }
                     }
                 }

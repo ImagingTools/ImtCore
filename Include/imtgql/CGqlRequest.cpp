@@ -577,7 +577,7 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 	}
 	else if (m_startParams){
 		CGqlObject gqlObject(commandId);
-		if (m_activeGqlObjectPtr == nullptr || m_activeGqlObjectPtr->GetParentObject() == nullptr){
+		if (m_activeGqlObjectPtr == nullptr){
 			m_params.append(gqlObject);
 			m_activeGqlObjectPtr = &m_params[m_params.count() - 1];
 		}

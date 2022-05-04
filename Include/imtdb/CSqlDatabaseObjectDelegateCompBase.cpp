@@ -27,7 +27,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	QString paginationString;
-	if (offset > 0 && count > 0){
+	if (offset >= 0 && count > 0){
 		paginationString = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count);
 	}
 
