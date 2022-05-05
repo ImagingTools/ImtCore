@@ -13,24 +13,16 @@
 #include <istd/TDelPtr.h>
 
 
+#include <ObjectCollectionTest/CObjectCollectionPartituraTestBase.h>
+
+
 class CObjectCollectionTest: public QObject
 {
 	Q_OBJECT
 
 private slots:
-	void initTestCase();
-	void InsertNewObjectWithRequiredParamsTest_data();
-	void InsertNewObjectWithRequiredParamsTest();
 	void InsertNewObjectWithDataTest();
-	void InsertNewObjectWithNonExistElementTest();
-	void InsertNewObjectWithExistElementTest();
-	void RemoveExistObjectTest();
-	void RemoveNonExistObjectTest();
 	void CheckSerializeTest();
-	void ResetCollectionWithFixedObjectTest();
-	void ResetCollectionWithoutFixedObjectsTest();
-	void cleanupTestCase();
-
 
 private:
 	QString m_imtCorePath;
