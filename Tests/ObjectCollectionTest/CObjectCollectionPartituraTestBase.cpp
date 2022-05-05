@@ -211,6 +211,58 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 	}
 }
 
+void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
+{
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (compositePtr.IsValid()){
+
+		// get component object collection
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		if (objectCollectionPtr != nullptr){
+
+			// reset data from object collection
+			objectCollectionPtr->ResetData();
+
+			// input params of meta
+			imtauth::CAccountInfoMetaInfo inputMetaInfo;
+			QString inputName = "AccountName";
+			QString inputDescription = "AccountDescription";
+
+			// set input params of meta
+			inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE, QObject::tr("Private"));
+			inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME, inputName);
+			inputMetaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION, inputDescription);
+
+			// insert new object with meta
+			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), QByteArray(), &inputMetaInfo);
+
+			//
+			if (!idNewObject.isEmpty()){
+				imtbase::IObjectCollection::MetaInfoPtr referenceMetaInfoPtr;
+				if (objectCollectionPtr->GetDataMetaInfo(idNewObject, referenceMetaInfoPtr)){
+					QString referenceName = referenceMetaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
+					QString referenceDescription = referenceMetaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
+					QVERIFY2(((inputName == referenceName) && (inputDescription == referenceDescription)), "Insert new object with meta data is failed");
+				}
+				else{
+					QFAIL("Meta info not received");
+				}
+			}
+			else{
+				QFAIL("Object is not insert in collection");
+			}
+		}
+		else{
+			QFAIL("Object collection is nullptr");
+		}
+	}
+	else{
+		QFAIL("Component is not initialized");
+	}
+}
+
 
 void CObjectCollectionPartituraTestBase::RemoveExistObjectTest()
 {

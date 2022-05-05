@@ -29,6 +29,7 @@ private slots:
     void InsertNewObjectWithNonExistElementTest();
     void InsertNewObjectWithExistElementTest();
 	void InsertNewObjectWithDataTest();
+	void InsertNewObjectWithMetaObjectTest();
     void RemoveExistObjectTest();
     void RemoveNonExistObjectTest();
 	void ResetCollectionWithFixedObjectTest();
