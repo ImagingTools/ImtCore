@@ -20,7 +20,7 @@ class CObjectCollectionPartituraTestBase: public QObject
     Q_OBJECT
 
 protected:
-    virtual void initTestCase() = 0;
+	virtual void initTestCase() = 0;
 
 private slots:
 
@@ -41,6 +41,7 @@ protected:
     QString m_imtCorePath;
     QString m_registryFile;
     QString m_configFile;
+	QString m_nameAccessor;
     QByteArray m_typeIdObjectCollection;
 };
 
@@ -51,9 +52,9 @@ protected:
     virtual void initTestCase(){
         // paths to test component accessor and config for him
         m_imtCorePath = qEnvironmentVariable("IMTCOREDIR");
-		m_registryFile = m_imtCorePath + QString("/Tests/Partitura/ObjectCollectionTest/%1.acc").arg(partituraPath);
+		m_registryFile = m_imtCorePath + QString("/Tests/ObjectCollectionTest/Partitura/%1.acc").arg(partituraPath);
         m_configFile = m_imtCorePath + "/Config/ImtCoreTest.awc";
-
+		m_nameAccessor = partituraPath;
         // set type id for tests
         m_typeIdObjectCollection = "AccountInfo";
     };

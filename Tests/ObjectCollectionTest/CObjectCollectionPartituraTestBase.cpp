@@ -13,6 +13,7 @@
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest_data()
 {
     initTestCase();
+	QWARN(qPrintable(QString("Start tests for %1 accessor").arg(m_nameAccessor)));
     // variable decloration
     QTest::addColumn<QByteArray>("typeId");
     QTest::addColumn<QString>("name");
@@ -470,4 +471,6 @@ void CObjectCollectionPartituraTestBase::cleanupTestCase()
     m_imtCorePath.clear();
     m_registryFile.clear();
     m_configFile.clear();
+	QWARN(qPrintable(QString("End tests for %1 accessor").arg(m_nameAccessor)));
+	m_nameAccessor.clear();
 }
