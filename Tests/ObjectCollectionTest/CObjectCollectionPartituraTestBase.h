@@ -23,14 +23,17 @@ protected:
     virtual void initTestCase() = 0;
 
 private slots:
+
     void InsertNewObjectWithRequiredParamsTest_data();
     void InsertNewObjectWithRequiredParamsTest();
     void InsertNewObjectWithNonExistElementTest();
     void InsertNewObjectWithExistElementTest();
+	void InsertNewObjectWithDataTest();
     void RemoveExistObjectTest();
     void RemoveNonExistObjectTest();
-//    void ResetCollectionWithFixedObjectTest();
+	void ResetCollectionWithFixedObjectTest();
     void ResetCollectionWithoutFixedObjectsTest();
+	void CheckSerializeTest();
     void cleanupTestCase();
 
 protected:
@@ -47,7 +50,7 @@ protected:
     virtual void initTestCase(){
         // paths to test component accessor and config for him
         m_imtCorePath = qEnvironmentVariable("IMTCOREDIR");
-        m_registryFile = m_imtCorePath + QString("/Tests/Partitura/ImtTestVoce.arp/%1.acc").arg(partituraPath);
+		m_registryFile = m_imtCorePath + QString("/Tests/Partitura/ObjectCollectionTest/%1.acc").arg(partituraPath);
         m_configFile = m_imtCorePath + "/Config/ImtCoreTest.awc";
 
         // set type id for tests

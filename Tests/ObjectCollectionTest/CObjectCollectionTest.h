@@ -21,13 +21,11 @@ class CObjectCollectionTest: public QObject
 	Q_OBJECT
 
 private slots:
-	void InsertNewObjectWithDataTest();
-	void CheckSerializeTest();
+
 
 private:
 	QString m_imtCorePath;
-	QString m_registryFileWithoutFixedTypeIds;
-	QString m_registryFileWithFixedTypeIds;
+	QString m_registryFile;
 	QString m_configFile;
 	QByteArray m_typeIdObjectCollection;
 };
