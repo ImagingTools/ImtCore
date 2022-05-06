@@ -35,6 +35,11 @@ private slots:
 	void ResetCollectionWithFixedObjectTest();
     void ResetCollectionWithoutFixedObjectsTest();
 	void CheckSerializeTest();
+	void SetObjectNameTest();
+	void SetObjectDescriptionTest();
+	void GetObjectTypeIdTest();
+	void GetOperationFlagsFixedObjectTest();
+	void GetOperationFlagsInsertedObjectTest();
     void cleanupTestCase();
 
 protected:

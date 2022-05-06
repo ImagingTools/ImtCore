@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4984" Description="ACF"/>
-            <Version Id="1" Number="2164" Description="ACF-Solutions"/>
+            <Version Id="0" Number="4995" Description="ACF"/>
+            <Version Id="1" Number="2173" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -27,14 +27,12 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DefaultAccount</Value>
-                                <Value>DefaultAccount</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="FixedObjectNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Defalut account</Value>
                                 <Value>Defalut account</Value>
                             </Values>
                         </Data>
@@ -56,7 +54,6 @@
                     <AttributeInfo Id="FixedObjects" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>DefaultAccount1</Value>
                                 <Value>DefaultAccount1</Value>
                             </Values>
                         </Data>
