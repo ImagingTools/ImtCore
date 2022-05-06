@@ -18,7 +18,7 @@ function(imtcore_generate_tests)
 		PRE_BUILD
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tests/ObjectCollectionTest/CGenerateObjectCollectionTest.py ${PARTITURA_DIR}
 		COMMENT
-		"Generate tests for ImtCore"
+		"Generate tests for ObjectCollection ImtCore"
 	        )
 
 	add_custom_target(
@@ -27,3 +27,27 @@ function(imtcore_generate_tests)
 	        )
 
 endfunction(imtcore_generate_tests)
+
+function(imtcore_generate_file_collection_tests)
+        set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
+	set(GENERATE_H_TESTS_FILE ${IMTCOREDIR}/Tests/FileCollectionTest/CGenerateFileCollectionTest.h)
+	set(PARTITURA_DIR ${IMTCOREDIR}/Tests/FileCollectionTest/Partitura)
+
+	if (NOT WIN32)
+	        set(PYTHONEXE python3)
+	endif()
+
+	add_custom_command(
+	        OUTPUT ${GENERATE_H_TESTS_FILE}
+		PRE_BUILD
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tests/FileCollectionTest/CGenerateFileCollectionTest.py ${PARTITURA_DIR}
+		COMMENT
+		"Generate tests for FileCollection ImtCore"
+	        )
+
+	add_custom_target(
+	        GenereteTestHandler${PROJECT_NAME} ALL
+		DEPENDS ${GENERATE_H_TESTS_FILE}
+	        )
+
+endfunction(imtcore_generate_file_collection_tests)
