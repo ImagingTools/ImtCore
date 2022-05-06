@@ -179,3 +179,4 @@ endif()
 #-------- Tests --------
 
 add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
+add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
