@@ -22,8 +22,8 @@ public:
 	virtual void SetTextFilter(const QString &filter) override;
 	virtual SortingOrder GetSortingOrder() const override;
 	virtual void SetSortingOrder(SortingOrder sortingOrder) override;
-	virtual QByteArrayList GetSortingInfoId() const override;
-	virtual void SetSortingInfoId(const QByteArrayList &sortingInfoId) override;
+	virtual QByteArrayList GetSortingInfoIds() const override;
+	virtual void SetSortingInfoIds(const QByteArrayList &sortingInfoIds) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -38,7 +38,7 @@ public:
 private:
 	QString m_filter;
 	SortingOrder m_sortingOrder;
-	QByteArrayList m_sortingInfoId;
+	QByteArrayList m_sortingInfoIds;
 };
 
 

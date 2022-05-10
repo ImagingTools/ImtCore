@@ -5,6 +5,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtbase/ICollectionFilter.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>
 
@@ -46,6 +47,9 @@ protected:
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
 	virtual idoc::IDocumentMetaInfo* CreateObjectMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
+	virtual bool CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const;
+	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const;
+	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);

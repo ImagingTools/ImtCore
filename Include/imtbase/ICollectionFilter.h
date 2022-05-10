@@ -34,12 +34,12 @@ public:
 	/**
 		Get ID of the meta-information used for sorting the elements in the collection.
 	*/
-	virtual QByteArrayList GetSortingInfoId() const = 0;
+	virtual QByteArrayList GetSortingInfoIds() const = 0;
 
 	/**
 		Set ID of the meta-information used for sorting the elements in the collection.
 	*/
-	virtual void SetSortingInfoId(const QByteArrayList& sortingInfoId) = 0;
+	virtual void SetSortingInfoIds(const QByteArrayList& sortingInfoIds) = 0;
 };
 
 

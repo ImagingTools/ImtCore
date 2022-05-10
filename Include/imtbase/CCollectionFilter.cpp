@@ -15,7 +15,7 @@ namespace imtbase
 CCollectionFilter::CCollectionFilter()
 	:m_filter(QString()),
 	m_sortingOrder(SO_NO_ORDER),
-	m_sortingInfoId(QByteArrayList())
+	m_sortingInfoIds(QByteArrayList())
 {
 }
 
@@ -29,9 +29,9 @@ QString CCollectionFilter::GetTextFilter() const
 void CCollectionFilter::SetTextFilter(const QString &filter)
 {
 	if(m_filter != filter){
-		istd::CChangeNotifier changeNotifier(this);
-		m_filter = filter;
-	}
+	istd::CChangeNotifier changeNotifier(this);
+	m_filter = filter;
+}
 }
 
 
@@ -44,9 +44,9 @@ ICollectionFilter::SortingOrder CCollectionFilter::GetSortingOrder() const
 void CCollectionFilter::SetSortingOrder(SortingOrder sortingOrder)
 {
 	if (m_sortingOrder == sortingOrder){
-		istd::CChangeNotifier changeNotifier(this);
-		m_sortingOrder = sortingOrder;
-	}
+	istd::CChangeNotifier changeNotifier(this);
+	m_sortingOrder = sortingOrder;
+}
 }
 
 
@@ -59,7 +59,7 @@ QByteArrayList CCollectionFilter::GetSortingInfoId() const
 void CCollectionFilter::SetSortingInfoId(const QByteArrayList &sortingInfoId)
 {
 	if(m_sortingInfoId == sortingInfoId){
-		istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this);
 		m_sortingInfoId = sortingInfoId;
 	}
 }
@@ -81,7 +81,7 @@ bool CCollectionFilter::Serialize(iser::IArchive &archive)
 	retVal = retVal && I_SERIALIZE_ENUM(SortingOrder, archive, m_sortingOrder);
 	retVal = retVal && archive.EndTag(sortingOrderTag);
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_sortingInfoId, "SortingInfoIds", "SortingInfoId");
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_sortingInfoIds, "SortingInfoIds", "SortingInfoId");
 
 	return retVal;
 }
@@ -101,7 +101,7 @@ bool CCollectionFilter::CopyFrom(const IChangeable &object, CompatibilityMode mo
 
 		m_filter = implPtr->m_filter;
 		m_sortingOrder = implPtr->m_sortingOrder;
-		m_sortingInfoId = implPtr->m_sortingInfoId;
+		m_sortingInfoIds = implPtr->m_sortingInfoIds;
 
 		return true;
 	}
@@ -117,7 +117,7 @@ bool CCollectionFilter::IsEqual(const IChangeable &object) const
 		return
 					(m_filter == implPtr->m_filter) &&
 					(m_sortingOrder == implPtr->m_sortingOrder) &&
-					(m_sortingInfoId == implPtr->m_sortingInfoId);
+					(m_sortingInfoIds == implPtr->m_sortingInfoIds);
 	}
 
 	return false;
@@ -141,7 +141,7 @@ bool CCollectionFilter::ResetData(CompatibilityMode mode)
 
 	m_filter.clear();
 	m_sortingOrder = SO_NO_ORDER;
-	m_sortingInfoId.clear();
+	m_sortingInfoIds.clear();
 
 	return true;
 }

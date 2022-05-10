@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
+#include <iprm/TParamsPtr.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 
@@ -26,20 +27,20 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			int count,
 			const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	QString paginationString;
-	if (offset >= 0 && count > 0){
-		paginationString = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count);
+	QByteArray paginationString;
+	if (!CreatePaginationQuery(offset, count, paginationString)){
+		return QByteArray();
 	}
 
 	if (objectId.isEmpty()){
-		return QString("SELECT * from %1 %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(paginationString).toLocal8Bit();
+		return QString("SELECT * from %1 %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(paginationString)).toLocal8Bit();
 	}
 	else{
 		return QString("SELECT * from %1 WHERE %2 = '%3' %4")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))
-					.arg(paginationString)
+					.arg(qPrintable(paginationString))
 					.toLocal8Bit();
 	}
 }
@@ -129,6 +130,52 @@ idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateObjectMetaInf
 
 bool CSqlDatabaseObjectDelegateCompBase::SetObjectMetaInfoFromRecord(const QSqlRecord& /*record*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
 {
+	return false;
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const
+{
+	paginationQuery.clear();
+
+	if (offset >= 0 && count > 0){
+		paginationQuery = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toLocal8Bit();
+	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const
+{
+	return false;
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
+{
+	QByteArray columnId;
+	QByteArray sortOrder;
+	
+	if (!collectionFilter.GetSortingInfoIds().isEmpty()){
+		columnId = collectionFilter.GetSortingInfoIds().first();
+	}
+
+	switch (collectionFilter.GetSortingOrder()){
+	case imtbase::ICollectionFilter::SO_ASC:
+		sortOrder = "ASC";
+		break;
+	case imtbase::ICollectionFilter::SO_DESC:
+		sortOrder = "DESC";
+		break;
+	}
+
+	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
+		sortQuery = QString("ORDER BY %1 %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+
+		return true;
+	}
+
 	return false;
 }
 
