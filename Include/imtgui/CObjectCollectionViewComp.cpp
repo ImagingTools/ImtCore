@@ -1386,26 +1386,26 @@ CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& par
 
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes)
 {
-	beginResetModel();
+		beginResetModel();
 
-	m_totalRowCount = collection.GetElementsCount();
-	m_fetchedRowCount = 0;
-	m_ids.clear();
+		m_totalRowCount = collection.GetElementsCount();
+		m_fetchedRowCount = 0;
+		m_ids.clear();
 
-	m_metaInfo.clear();
-	m_metaInfoMap.clear();
+		m_metaInfo.clear();
+		m_metaInfoMap.clear();
 
-	if (m_totalRowCount > 0) {
-		imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1);
-		if (!elementIds.isEmpty()) {
-			QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
+		if (m_totalRowCount > 0){
+			imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1);
+			if (!elementIds.isEmpty()){
+				QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
 
-			m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
+				m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
+			}
 		}
+		 
+		endResetModel();
 	}
-
-	endResetModel();
-}
 
 
 void CObjectCollectionViewComp::TableModel::AddItem(const imtbase::IObjectCollectionInfo::Id& objectId)
@@ -1609,9 +1609,12 @@ void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 
 	beginInsertRows(QModelIndex(), start, start + itemsToFetch - 1);
 
-	m_fetchedRowCount += itemsToFetch;
+	imtbase::ICollectionInfo::Ids fetchedIds = collectionPtr->GetElementIds(start, itemsToFetch);
+	if (!fetchedIds.isEmpty()){
+		m_fetchedRowCount += fetchedIds.count();
 
-	m_ids += collectionPtr->GetElementIds(start, itemsToFetch);
+		m_ids += fetchedIds;
+	}
 
 	Q_ASSERT(m_ids.count() == m_fetchedRowCount);
 
