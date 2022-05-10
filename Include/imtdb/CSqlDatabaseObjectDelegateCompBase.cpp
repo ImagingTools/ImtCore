@@ -15,9 +15,16 @@ namespace imtdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParamsSet* /*paramsPtr*/) const
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
-	return QString("SELECT COUNT(*) FROM %1").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
+	QString filterQuery;
+	if (paramsPtr != nullptr){
+		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+			return QByteArray();
+		}
+	}
+
+	return QString("SELECT COUNT(*) FROM %1 %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
 }
 
 
@@ -25,24 +32,45 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const QByteArray& objectId,
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*paramsPtr*/) const
+			const iprm::IParamsSet* paramsPtr) const
 {
-	QByteArray paginationString;
-	if (!CreatePaginationQuery(offset, count, paginationString)){
-		return QByteArray();
-	}
-
-	if (objectId.isEmpty()){
-		return QString("SELECT * from %1 %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(paginationString)).toLocal8Bit();
-	}
-	else{
-		return QString("SELECT * from %1 WHERE %2 = '%3' %4")
+	if (!objectId.isEmpty()){
+		return QString("SELECT * from %1 WHERE %2 = '%3'")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))
-					.arg(qPrintable(paginationString))
 					.toLocal8Bit();
 	}
+	else{
+		QString sortQuery;
+		QString filterQuery;
+		if (paramsPtr != nullptr){
+			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+				return QByteArray();
+			}
+
+			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
+			if (collectionFilterParamPtr.IsValid()){
+				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
+					return QByteArray();
+				}
+			}
+		}
+
+		QByteArray paginationQuery;
+		if (!CreatePaginationQuery(offset, count, paginationQuery)){
+			return QByteArray();
+		}
+
+		return QString("SELECT * FROM %1 %2 %3 %4")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(filterQuery)
+					.arg(sortQuery)
+					.arg(qPrintable(paginationQuery))
+					.toLocal8Bit();
+	}
+
+	return QByteArray();
 }
 
 
@@ -145,10 +173,61 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 	return true;
 }
 
+bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+{
+	QString objectFilterQuery;
+	bool retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
+	if (!retVal){
+		return false;
+	}
+
+	QString textFilterQuery;
+	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+	if (collectionFilterParamPtr.IsValid()){
+		retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+		if (!retVal){
+			return false;
+		}
+	}
+
+	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()){
+		filterQuery = " WHERE ";
+	}
+
+	filterQuery += objectFilterQuery;
+
+	if (!textFilterQuery.isEmpty()){
+		filterQuery += " AND " + textFilterQuery;
+	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(const iprm::IParamsSet& /*filterParams*/, QString& /*filterQuery*/) const
+{
+	return true;
+}
+
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const
 {
-	return false;
+	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
+	if (filteringColumnIds.isEmpty()){
+		return true;
+	}
+
+	QString textFilter = collectionFilter.GetTextFilter();
+
+	textFilterQuery = QString("%1 LIKE %%2%").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+
+	for (int i = 1; i < filteringColumnIds.count(); ++i){
+		textFilterQuery += " AND ";
+
+		textFilterQuery = QString("%1 LIKE %%2%").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+	}
+
+	return true;
 }
 
 

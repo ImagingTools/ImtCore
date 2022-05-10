@@ -68,6 +68,22 @@ void CCollectionFilter::SetSortingInfoIds(const QByteArrayList& sortingInfoIds)
 }
 
 
+QByteArrayList CCollectionFilter::GetFilteringInfoIds() const
+{
+	return m_filteringInfoIds;
+}
+
+
+void CCollectionFilter::SetFilteringInfoIds(const QByteArrayList& filteringInfoIds)
+{
+	if (m_filteringInfoIds != filteringInfoIds){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_filteringInfoIds = filteringInfoIds;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CCollectionFilter::Serialize(iser::IArchive &archive)
@@ -87,6 +103,7 @@ bool CCollectionFilter::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.EndTag(sortingOrderTag);
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_sortingInfoIds, "SortingInfoIds", "SortingInfoId");
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_filteringInfoIds, "FilteringInfoIds", "FilteringInfoId");
 
 	return retVal;
 }
@@ -100,7 +117,7 @@ int CCollectionFilter::GetSupportedOperations() const
 }
 
 
-bool CCollectionFilter::CopyFrom(const IChangeable &object, CompatibilityMode mode)
+bool CCollectionFilter::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 {
 	const CCollectionFilter* implPtr = dynamic_cast<const CCollectionFilter*>(&object);
 	if (implPtr != nullptr){
@@ -109,6 +126,7 @@ bool CCollectionFilter::CopyFrom(const IChangeable &object, CompatibilityMode mo
 		m_filter = implPtr->m_filter;
 		m_sortingOrder = implPtr->m_sortingOrder;
 		m_sortingInfoIds = implPtr->m_sortingInfoIds;
+		m_filteringInfoIds = implPtr->m_filteringInfoIds;
 
 		return true;
 	}
@@ -124,6 +142,7 @@ bool CCollectionFilter::IsEqual(const IChangeable &object) const
 		return
 					(m_filter == implPtr->m_filter) &&
 					(m_sortingOrder == implPtr->m_sortingOrder) &&
+					(m_filteringInfoIds == implPtr->m_filteringInfoIds) &&
 					(m_sortingInfoIds == implPtr->m_sortingInfoIds);
 	}
 
@@ -142,13 +161,14 @@ istd::IChangeable* CCollectionFilter::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CCollectionFilter::ResetData(CompatibilityMode mode)
+bool CCollectionFilter::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_filter.clear();
 	m_sortingOrder = SO_NO_ORDER;
 	m_sortingInfoIds.clear();
+	m_filteringInfoIds.clear();
 
 	return true;
 }

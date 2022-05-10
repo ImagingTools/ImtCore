@@ -19,11 +19,13 @@ public:
 
 	// reimplemented (imtbase::ICollectionFilter)
 	virtual QString GetTextFilter() const override;
-	virtual void SetTextFilter(const QString &filter) override;
+	virtual void SetTextFilter(const QString& filter) override;
 	virtual SortingOrder GetSortingOrder() const override;
 	virtual void SetSortingOrder(SortingOrder sortingOrder) override;
 	virtual QByteArrayList GetSortingInfoIds() const override;
-	virtual void SetSortingInfoIds(const QByteArrayList &sortingInfoIds) override;
+	virtual void SetSortingInfoIds(const QByteArrayList& sortingInfoIds) override;
+	virtual QByteArrayList GetFilteringInfoIds() const override;
+	virtual void SetFilteringInfoIds(const QByteArrayList& filteringInfoIds) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -39,6 +41,7 @@ private:
 	QString m_filter;
 	SortingOrder m_sortingOrder;
 	QByteArrayList m_sortingInfoIds;
+	QByteArrayList m_filteringInfoIds;
 };
 
 
