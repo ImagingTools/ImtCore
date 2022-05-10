@@ -29,9 +29,10 @@ QString CCollectionFilter::GetTextFilter() const
 void CCollectionFilter::SetTextFilter(const QString &filter)
 {
 	if(m_filter != filter){
-	istd::CChangeNotifier changeNotifier(this);
-	m_filter = filter;
-}
+		istd::CChangeNotifier changeNotifier(this);
+	
+		m_filter = filter;
+	}
 }
 
 
@@ -43,27 +44,31 @@ ICollectionFilter::SortingOrder CCollectionFilter::GetSortingOrder() const
 
 void CCollectionFilter::SetSortingOrder(SortingOrder sortingOrder)
 {
-	if (m_sortingOrder == sortingOrder){
-	istd::CChangeNotifier changeNotifier(this);
-	m_sortingOrder = sortingOrder;
-}
-}
+	if (m_sortingOrder != sortingOrder){
+		istd::CChangeNotifier changeNotifier(this);
 
-
-QByteArrayList CCollectionFilter::GetSortingInfoId() const
-{
-	return m_sortingInfoId;
-}
-
-
-void CCollectionFilter::SetSortingInfoId(const QByteArrayList &sortingInfoId)
-{
-	if(m_sortingInfoId == sortingInfoId){
-	istd::CChangeNotifier changeNotifier(this);
-		m_sortingInfoId = sortingInfoId;
+		m_sortingOrder = sortingOrder;
 	}
 }
 
+
+QByteArrayList CCollectionFilter::GetSortingInfoIds() const
+{
+	return m_sortingInfoIds;
+}
+
+
+void CCollectionFilter::SetSortingInfoIds(const QByteArrayList& sortingInfoIds)
+{
+	if (m_sortingInfoIds != sortingInfoIds){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_sortingInfoIds = sortingInfoIds;
+	}
+}
+
+
+// reimplemented (iser::ISerializable)
 
 bool CCollectionFilter::Serialize(iser::IArchive &archive)
 {
@@ -86,6 +91,8 @@ bool CCollectionFilter::Serialize(iser::IArchive &archive)
 	return retVal;
 }
 
+
+// reimplemented (istd::IChangeable)
 
 int CCollectionFilter::GetSupportedOperations() const
 {
@@ -124,7 +131,7 @@ bool CCollectionFilter::IsEqual(const IChangeable &object) const
 }
 
 
-istd::IChangeable *CCollectionFilter::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CCollectionFilter::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CCollectionFilter> clonePtr(new CCollectionFilter);
 	if (clonePtr->CopyFrom(*this, mode)){
