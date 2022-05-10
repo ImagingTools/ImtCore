@@ -45,6 +45,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp
 		}
 	}
 
+	result.infoId = informationId;
+
 	return result;
 }
 
@@ -69,19 +71,19 @@ void CContactInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("EMail", tr("E-Mail"), "");
-	m_summaryInformationHeaders["EMail"] = HeaderInfo(true);
+	m_summaryInformationHeaders["EMail"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Birthday"), tr("Birthday"), "");
 	m_summaryInformationHeaders["Birthday"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("FirstName"), tr("First Name"), "");
-	m_summaryInformationHeaders["FirstName"] = HeaderInfo(false);
+	m_summaryInformationHeaders["FirstName"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("LastName"), tr("Last Name"), "");
-	m_summaryInformationHeaders["LastName"] = HeaderInfo(false);
+	m_summaryInformationHeaders["LastName"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Nickname"), tr("Nickname"), "");
-	m_summaryInformationHeaders["Nickname"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Nickname"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 }
 
 

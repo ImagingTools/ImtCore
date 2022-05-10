@@ -62,11 +62,11 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			return QByteArray();
 		}
 
-		return QString("SELECT * FROM %1 %2 %3 %4")
+		return QString("(SELECT * FROM %1 %2 %3) %4")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(filterQuery)
-					.arg(sortQuery)
 					.arg(qPrintable(paginationQuery))
+					.arg(sortQuery)
 					.toLocal8Bit();
 	}
 
@@ -195,9 +195,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	}
 
 	filterQuery += objectFilterQuery;
+	if (!objectFilterQuery.isEmpty() && !textFilterQuery.isEmpty()){
+		filterQuery += " AND ";
+	}
 
 	if (!textFilterQuery.isEmpty()){
-		filterQuery += " AND " + textFilterQuery;
+		filterQuery += textFilterQuery;
 	}
 
 	return true;
@@ -219,12 +222,12 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 
 	QString textFilter = collectionFilter.GetTextFilter();
 
-	textFilterQuery = QString("%1 LIKE %%2%").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+	textFilterQuery = QString("%1 LIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
 
 	for (int i = 1; i < filteringColumnIds.count(); ++i){
-		textFilterQuery += " AND ";
+		textFilterQuery += " OR ";
 
-		textFilterQuery = QString("%1 LIKE %%2%").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+		textFilterQuery += QString("%1 LIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
 	}
 
 	return true;
@@ -251,11 +254,9 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(const imtbase::ICollect
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		sortQuery = QString("ORDER BY %1 %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
-
-		return true;
 	}
 
-	return false;
+	return true;
 }
 
 

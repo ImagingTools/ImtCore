@@ -177,6 +177,8 @@ ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp
 		}
 	}
 
+	result.infoId = informationId;
+
 	return result;
 }
 
@@ -228,7 +230,7 @@ void CPluginStatusMonitorViewDelegateComp::SetupSummaryInformation()
 
 	if (*m_enabledNameAttrPtr){
 		m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
-		m_summaryInformationHeaders["Name"] = HeaderInfo(false);
+		m_summaryInformationHeaders["Name"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 	}
 
 	if (*m_enabledPathAttrPtr){

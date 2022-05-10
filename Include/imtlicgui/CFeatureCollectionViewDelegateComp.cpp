@@ -39,6 +39,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CFeatureCollectionViewDelega
 		}
 	}
 
+	retVal.infoId = informationId;
+
 	return retVal;
 }
 
@@ -63,13 +65,13 @@ void CFeatureCollectionViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", tr("Feature Name"), "");//изменил FeatureId на Id
-	m_summaryInformationHeaders["Name"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Name"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Id", tr("Feature-ID"), "");//изменил FeatureId на Id
-	m_summaryInformationHeaders["Id"] = HeaderInfo(true);
+	m_summaryInformationHeaders["Id"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");
-	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Description"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 }
 
 

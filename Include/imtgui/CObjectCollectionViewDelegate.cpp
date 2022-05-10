@@ -349,6 +349,8 @@ ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSu
 		}
 	}
 
+	result.infoId = informationId;
+
 	return result;
 }
 
@@ -430,13 +432,13 @@ void CObjectCollectionViewDelegate::SetupSummaryInformation()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", tr("Name"), "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("TypeId"), tr("Type"), "");
 	m_summaryInformationHeaders["TypeId"] = HeaderInfo(false);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Description"), tr("Description"), "");
-	m_summaryInformationHeaders["Description"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Description"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Added"), tr("Added"), "");
 	m_summaryInformationHeaders["Added"] = HeaderInfo(false);

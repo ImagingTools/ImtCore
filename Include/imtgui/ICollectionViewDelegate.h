@@ -71,13 +71,22 @@ public:
 
 	struct HeaderInfo
 	{
-		HeaderInfo(bool setIsFixed = false, quint16 setMinWidth = 0, quint16 setMaxWidth = 0xFFFF)
+		enum InformationFlags
+		{
+			IF_NONE = 0,
+			IF_FILTERABLE = 1,
+			IF_SORTABLE = 2
+		};
+
+		HeaderInfo(bool setIsFixed = false, int headerFlags = IF_SORTABLE, quint16 setMinWidth = 0, quint16 setMaxWidth = 0xFFFF)
 			: isFixed(setIsFixed),
+			flags(headerFlags),
 			minWidth(setMinWidth),
 			maxWidth(setMaxWidth)
 		{
 		}
 
+		int flags;
 		bool isFixed;
 		quint16 minWidth;
 		quint16 maxWidth;
@@ -85,6 +94,7 @@ public:
 	
 	struct SummaryInformation
 	{
+		QByteArray infoId;
 		QString text;
 		QIcon icon;
 		QVariant sortValue;

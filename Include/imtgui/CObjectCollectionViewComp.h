@@ -27,6 +27,7 @@
 
 // ImtCore includes
 #include <imtbase/ISelection.h>
+#include <imtbase/CCollectionFilter.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
 #include <GeneratedFiles/imtgui/ui_CObjectCollectionViewComp.h>
@@ -178,7 +179,6 @@ private:
 	void UpdateTypeStatus();
 
 	void ReadCollection(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr);
-	void StartCollectionRead();
 	Q_INVOKABLE void OnUpdateProgress(int progress);
 	Q_INVOKABLE void OnCollectionReadFinished();
 
@@ -190,6 +190,7 @@ private Q_SLOTS:
 	void OnCustomContextMenuRequested(const QPoint& point);
 	void OnSectionResized(int logicalIndex, int oldSize, int newSize);
 	void OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+	void OnSortingChanged(int logicalIndex, Qt::SortOrder order);
 	void OnTypeChanged();
 
 	void OnContextMenuRename(bool checked);
@@ -247,6 +248,8 @@ private:
 		void AddItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 		void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 		void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
+		void SetFilter(const QString& textFilter);
+		void SetSorting(int logicalIndex, Qt::SortOrder order);
 
 		// reimplemented (QAbstractTableModel)
 		virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -269,6 +272,7 @@ private:
 
 		CObjectCollectionViewComp& m_parent;
 		mutable QMap<QByteArray, ObjectMetaInfo> m_metaInfoMap;
+		imtbase::CCollectionFilter m_filter;
 	};
 
 	QStandardItemModel m_typeModel;

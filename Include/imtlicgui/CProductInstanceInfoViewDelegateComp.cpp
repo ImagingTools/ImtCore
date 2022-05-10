@@ -51,6 +51,7 @@ imtgui::ICollectionViewDelegate::SummaryInformation CProductInstanceInfoViewDele
 
 				retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME).toString());
 				retVal.sortValue = retVal.text;
+				retVal.infoId = informationId;
 
 				return retVal;
 			}
@@ -80,10 +81,10 @@ void CProductInstanceInfoViewDelegateComp::SetupSummaryInformation()
 	BaseClass::SetupSummaryInformation();
 
 	m_summaryInformationTypes.InsertItem("InstanceId", tr("Instance-ID"), "", 1);
-	m_summaryInformationHeaders["InstanceId"] = HeaderInfo(false);
+	m_summaryInformationHeaders["InstanceId"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Customer", tr("Customer"), "", 2);
-	m_summaryInformationHeaders["Customer"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Customer"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.RemoveItem("TypeId");
 }

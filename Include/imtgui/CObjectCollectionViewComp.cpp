@@ -18,6 +18,7 @@
 
 // ACF includes
 #include <imod/IModel.h>
+#include <iprm/CParamsSet.h>
 #include <idoc/IDocumentMetaInfo.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
@@ -329,12 +330,6 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	ItemList->setProperty("ItemView", true);
 	ItemList->setAlternatingRowColors(true);
 
-	//m_proxyModelPtr = new ItemProxyModel(this);
-	//m_proxyModelPtr->setSourceModel(&m_tableModel);
-	//m_proxyModelPtr->setFilterKeyColumn(0);
-	//m_proxyModelPtr->setFilterRole(DR_TYPE_ID);
-	//m_proxyModelPtr->setSortRole(DR_SORT_VALUE);
-
 	ItemList->setModel(&m_tableModel);
 
 	m_searchShortCutPtr = new QShortcut(GetQtWidget());
@@ -371,6 +366,7 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(ItemList, &QTreeView::customContextMenuRequested, this, &CObjectCollectionViewComp::OnCustomContextMenuRequested);
 	connect(ItemList->header(), &QHeaderView::sectionResized, this, &CObjectCollectionViewComp::OnSectionResized);
 	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
+	connect(ItemList->header(), &QHeaderView::sortIndicatorChanged, this, &CObjectCollectionViewComp::OnSortingChanged);
 
 	BaseClass::OnGuiCreated();
 
@@ -481,7 +477,9 @@ void CObjectCollectionViewComp::UpdateCommands()
 QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray& typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
+
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
+
 	return fieldCollection.GetElementIds();
 }
 
@@ -699,7 +697,7 @@ void CObjectCollectionViewComp::SaveItemsSelection()
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); i++){
-			QModelIndex mappedIndex = selectedIndexes[i]; //m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QModelIndex mappedIndex = selectedIndexes[i];
 			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
 			
 			m_itemsSelection[m_currentTypeId].append(itemId);
@@ -712,18 +710,10 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 {
 	QItemSelection selection;
 
-	//for (int i = 0; i < m_proxyModelPtr->rowCount(); i++){
-	//	QModelIndex mappedIndex = m_proxyModelPtr->mapToSource(m_proxyModelPtr->index(i, 0));
-	//	QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-	//	if (m_itemsSelection[m_currentTypeId].contains(itemId)){
-	//		selection.append(QItemSelectionRange(m_proxyModelPtr->index(i, 0)));
-	//	}
-	//}
-
-	for (int i = 0; i < m_tableModel.rowCount(); i++) {
+	for (int i = 0; i < m_tableModel.rowCount(); i++){
 		QModelIndex mappedIndex = m_tableModel.index(i, 0);
 		QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-		if (m_itemsSelection[m_currentTypeId].contains(itemId)) {
+		if (m_itemsSelection[m_currentTypeId].contains(itemId)){
 			selection.append(QItemSelectionRange(m_tableModel.index(i, 0)));
 		}
 	}
@@ -777,11 +767,6 @@ void CObjectCollectionViewComp::ReadCollection(QStandardItemModel* typeModelPtr,
 			}
 		}
 	}
-}
-
-
-void CObjectCollectionViewComp::StartCollectionRead()
-{
 }
 
 
@@ -1033,6 +1018,12 @@ void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int /*oldVisual
 }
 
 
+void CObjectCollectionViewComp::OnSortingChanged(int logicalIndex, Qt::SortOrder order)
+{
+	m_tableModel.SetSorting(logicalIndex, order);
+}
+
+
 void CObjectCollectionViewComp::OnTypeChanged()
 {
 	SignalSemaphore semaphore(m_semaphoreCounter);
@@ -1190,11 +1181,9 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 }
 
 
-void CObjectCollectionViewComp::OnFilterChanged(const QString &text)
+void CObjectCollectionViewComp::OnFilterChanged(const QString& text)
 {
-	//m_proxyModelPtr->SetTextFilter(text);
-
-//	m_tableModel.dataChanged(m_tableModel.index(0, 0), m_tableModel.index(m_tableModel.rowCount() - 1, m_tableModel.columnCount() - 1));
+	m_tableModel.SetFilter(text);
 }
 
 
@@ -1321,6 +1310,8 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 		}
 	}
 
+	m_tableModel.SetSorting(ItemList->header()->sortIndicatorSection(), ItemList->header()->sortIndicatorOrder());
+
 	m_tableModel.UpdateFromData(*collectionPtr, changeSet);
 }
 
@@ -1386,26 +1377,29 @@ CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& par
 
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes)
 {
-		beginResetModel();
+	beginResetModel();
 
-		m_totalRowCount = collection.GetElementsCount();
-		m_fetchedRowCount = 0;
-		m_ids.clear();
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("Filter", &m_filter);
 
-		m_metaInfo.clear();
-		m_metaInfoMap.clear();
+	m_totalRowCount = collection.GetElementsCount(&filterParams);
+	m_fetchedRowCount = 0;
+	m_ids.clear();
 
-		if (m_totalRowCount > 0){
-			imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1);
-			if (!elementIds.isEmpty()){
-				QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
+	m_metaInfo.clear();
+	m_metaInfoMap.clear();
 
-				m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
-			}
+	if (m_totalRowCount > 0){
+		imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1, &filterParams);
+		if (!elementIds.isEmpty()){
+			QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
+
+			m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
 		}
-		 
-		endResetModel();
 	}
+
+	endResetModel();
+}
 
 
 void CObjectCollectionViewComp::TableModel::AddItem(const imtbase::IObjectCollectionInfo::Id& objectId)
@@ -1466,6 +1460,46 @@ void CObjectCollectionViewComp::TableModel::RemoveItem(const imtbase::IObjectCol
 }
 
 
+void CObjectCollectionViewComp::TableModel::SetSorting(int logicalIndex, Qt::SortOrder order)
+{
+	imtbase::IObjectCollection* objectCollectionPtr = m_parent.GetObservedObject();
+	Q_ASSERT(objectCollectionPtr != nullptr);
+
+	m_filter.SetSortingOrder(order == Qt::AscendingOrder ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
+
+	imtbase::ICollectionInfo::Ids informationIds = m_parent.GetMetaInfoIds(m_parent.m_currentTypeId);
+
+	Q_ASSERT(logicalIndex < informationIds.count());
+	Q_ASSERT(!informationIds[logicalIndex].isEmpty());
+
+	m_filter.SetSortingInfoIds(QByteArrayList() << informationIds[logicalIndex]);
+
+	UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
+}
+
+
+void CObjectCollectionViewComp::TableModel::SetFilter(const QString& textFilter)
+{
+	imtbase::IObjectCollection* objectCollectionPtr = m_parent.GetObservedObject();
+	Q_ASSERT(objectCollectionPtr != nullptr);
+
+	imtbase::ICollectionInfo::Ids informationIds = m_parent.GetMetaInfoIds(m_parent.m_currentTypeId);
+	QByteArrayList filterableInfoIds;
+	for (const QByteArray& infoId : informationIds){
+		ICollectionViewDelegate::HeaderInfo headerInfo = m_parent.GetViewDelegate(m_parent.m_currentTypeId).GetSummaryInformationHeaderInfo(infoId);
+		if (headerInfo.flags & ICollectionViewDelegate::HeaderInfo::IF_FILTERABLE){
+			filterableInfoIds.push_back(infoId);
+		}
+	}
+
+	m_filter.SetFilteringInfoIds(filterableInfoIds);
+
+	m_filter.SetTextFilter(textFilter);
+
+	UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
+}
+
+
 // reimplemented (QAbstractTableModel)
 
 int CObjectCollectionViewComp::TableModel::rowCount(const QModelIndex& parent) const
@@ -1480,7 +1514,7 @@ int CObjectCollectionViewComp::TableModel::rowCount(const QModelIndex& parent) c
 
 int CObjectCollectionViewComp::TableModel::columnCount(const QModelIndex& parent) const
 {
-	if (parent.isValid()) {
+	if (parent.isValid()){
 		return 0;
 	}
 
@@ -1609,7 +1643,10 @@ void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 
 	beginInsertRows(QModelIndex(), start, start + itemsToFetch - 1);
 
-	imtbase::ICollectionInfo::Ids fetchedIds = collectionPtr->GetElementIds(start, itemsToFetch);
+	iprm::CParamsSet filterParams;
+	filterParams.SetEditableParameter("Filter", &m_filter);
+
+	imtbase::ICollectionInfo::Ids fetchedIds = collectionPtr->GetElementIds(start, itemsToFetch, &filterParams);
 	if (!fetchedIds.isEmpty()){
 		m_fetchedRowCount += fetchedIds.count();
 

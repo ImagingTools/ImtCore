@@ -97,6 +97,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateC
 		}
 	}
 
+	result.infoId = informationId;
+
 	return result;
 }
 
@@ -137,13 +139,13 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem("Name", tr("License Name"), "");
-	m_summaryInformationHeaders["Name"] = HeaderInfo(true);
+	m_summaryInformationHeaders["Name"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Id", tr("License-ID"), "");//Изменил LicenseId на Id
-	m_summaryInformationHeaders["Id"] = HeaderInfo(true);
+	m_summaryInformationHeaders["Id"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");
-	m_summaryInformationHeaders["Description"] = HeaderInfo(true);
+	m_summaryInformationHeaders["Description"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 }
 
 

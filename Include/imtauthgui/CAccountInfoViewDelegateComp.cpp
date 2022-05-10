@@ -39,6 +39,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CAccountInfoViewDelegateComp
 		}
 	}
 
+	result.infoId = informationId;
+
 	return result;
 }
 
@@ -63,16 +65,16 @@ void CAccountInfoViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationHeaders.clear();
 
 	m_summaryInformationTypes.InsertItem(QByteArray("AccountName"), tr("Account Name"), "");
-	m_summaryInformationHeaders["AccountName"] = HeaderInfo(false);
+	m_summaryInformationHeaders["AccountName"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("Email"), tr("E-Mail"), "");
-	m_summaryInformationHeaders["Email"] = HeaderInfo(false);
+	m_summaryInformationHeaders["Email"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("AccountType"), tr("Account Type"), "");
-	m_summaryInformationHeaders["AccountType"] = HeaderInfo(false);
+	m_summaryInformationHeaders["AccountType"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem(QByteArray("AccountDescription"), tr("Account Description"), "");
-	m_summaryInformationHeaders["AccountDescription"] = HeaderInfo(false);
+	m_summaryInformationHeaders["AccountDescription"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 }
 
 
