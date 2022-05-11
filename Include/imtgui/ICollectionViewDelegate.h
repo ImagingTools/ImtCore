@@ -75,12 +75,14 @@ public:
 		{
 			IF_NONE = 0,
 			IF_FILTERABLE = 1,
-			IF_SORTABLE = 2
+			IF_SORTABLE = 2,
+			IF_SORT_BY_DEFAULT = 4
 		};
 
-		HeaderInfo(bool setIsFixed = false, int headerFlags = IF_SORTABLE, quint16 setMinWidth = 0, quint16 setMaxWidth = 0xFFFF)
+		HeaderInfo(bool setIsFixed = false, int headerFlags = IF_SORTABLE, Qt::SortOrder setDefaultSortOrder = Qt::AscendingOrder, quint16 setMinWidth = 0, quint16 setMaxWidth = 0xFFFF)
 			: isFixed(setIsFixed),
 			flags(headerFlags),
+			defaultSortOrder(setDefaultSortOrder),
 			minWidth(setMinWidth),
 			maxWidth(setMaxWidth)
 		{
@@ -88,6 +90,7 @@ public:
 
 		int flags;
 		bool isFixed;
+		Qt::SortOrder defaultSortOrder;
 		quint16 minWidth;
 		quint16 maxWidth;
 	};

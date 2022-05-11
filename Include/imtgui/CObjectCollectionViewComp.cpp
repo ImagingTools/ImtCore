@@ -131,7 +131,7 @@ bool CObjectCollectionViewComp::Serialize(iser::IArchive& /*archive*/)
 
 // protected methods
 
-ICollectionViewDelegate & CObjectCollectionViewComp::GetViewDelegateRef(const QByteArray& typeId)
+ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegateRef(const QByteArray& typeId)
 {
 	if (m_viewDelegateMap.contains(typeId)){
 		return *m_viewDelegateMap[typeId];
@@ -1036,8 +1036,6 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	if (!selectedItems.isEmpty()){
 		m_currentTypeId = selectedItems[0]->data(0, DR_TYPE_ID).toByteArray();
 	}
-
-//	m_proxyModelPtr->setFilterFixedString(m_currentTypeId);
 	
 	QStringList headerLabels;
 	headerLabels.append(GetMetaInfoHeaders(m_currentTypeId));
@@ -1052,6 +1050,16 @@ void CObjectCollectionViewComp::OnTypeChanged()
 		}
 		else {
 			ItemList->hideColumn(i);
+		}
+	}
+
+	ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(m_currentTypeId);
+
+	imtbase::ICollectionInfo::Ids informationIds = viewDelegate.GetSummaryInformationTypes().GetElementIds();
+	for (int i = 0; i < informationIds.count(); ++i){
+		ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(informationIds[i]);
+		if (headerInfo.flags & ICollectionViewDelegate::HeaderInfo::IF_SORT_BY_DEFAULT){
+			ItemList->header()->setSortIndicator(i, headerInfo.defaultSortOrder);
 		}
 	}
 
