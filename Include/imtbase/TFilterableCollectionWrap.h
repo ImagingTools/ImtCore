@@ -151,6 +151,7 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 	return true;
 }
 
+
 } // namespace imtbase
 
 
