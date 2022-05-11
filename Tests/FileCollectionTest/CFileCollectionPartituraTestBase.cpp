@@ -22,10 +22,10 @@ void CFileCollectionPartituraTestBase::InsertFileTest_data()
 	QTest::newRow("all param is empty") << "" << QByteArray("") << "" << "" << QByteArray("") << true;
 	QTest::newRow("filePath is empty") << "" << m_typeIdObjectCollection << "TestFileName" << "TestFileDescription" << QByteArray("testIdObject") << true;
 	QTest::newRow("objectTypeId is empty") << pathToFile << QByteArray("") << "TestFileName" << "TestFileDescription" << QByteArray("testIdObject") << false;
-	QTest::newRow("objectName is empty") << pathToFile << m_typeIdObjectCollection << "" << "TestFileDescription" << QByteArray("testIdObject") << true;
-	QTest::newRow("objectDescription is empty") << pathToFile << m_typeIdObjectCollection << "TestFileName" << "" << QByteArray("testIdObject") << true;
-	QTest::newRow("proposedObjectId is empty") << pathToFile << m_typeIdObjectCollection << "TestFileName" << "TestFileDescription" << QByteArray("") << true;
-	QTest::newRow("all param setted") << pathToFile << m_typeIdObjectCollection << "TestFileName" << "TestFileDescription" << QByteArray("testIdObject") << true;
+	QTest::newRow("objectName is empty") << pathToFile << m_typeIdObjectCollection << "" << "TestFileDescription" << QByteArray("testIdObject") << false;
+	QTest::newRow("objectDescription is empty") << pathToFile << m_typeIdObjectCollection << "TestFileName" << "" << QByteArray("testIdObject") << false;
+	QTest::newRow("proposedObjectId is empty") << pathToFile << m_typeIdObjectCollection << "TestFileName" << "TestFileDescription" << QByteArray("") << false;
+	QTest::newRow("all param setted") << pathToFile << m_typeIdObjectCollection << "TestFileName" << "TestFileDescription" << QByteArray("testIdObject") << false;
 	QTest::newRow("incorect path to file") << incorrectPathToFile << m_typeIdObjectCollection << "TestFileName" << "TestFileDescription" << QByteArray("testIdObject") << true;
 }
 
@@ -184,6 +184,7 @@ void CFileCollectionPartituraTestBase::InsertFileTest()
 //	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
 //	if (compositePtr.IsValid()){
 //		imtrepo::IFileObjectCollection* fileCollectionPtr = compositePtr->GetComponentInterface<imtrepo::IFileObjectCollection>();
+//		ifile::IFilePersistence* filePersistance = compositePtr->GetComponentInterface<ifile::IFilePersistence>();
 //		if (fileCollectionPtr != nullptr){
 //			fileCollectionPtr->ResetData();
 //			imtbase::IObjectCollection::DataPtr inputDataPtr = new imtauth::CAccountInfo();
@@ -191,16 +192,18 @@ void CFileCollectionPartituraTestBase::InsertFileTest()
 //			// declaration values for object data in type AccountInfo
 //			QString nameAccount = "AccountName";
 //			QString descriptionAccount = "AccountDescription";
-//			QString setNameAccount;
-//			QString setDescriptionAccount;
 
 //			// set values in input data
 //			imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
 //			inputImplPtr->SetAccountName(nameAccount);
 //			inputImplPtr->SetAccountDescription(descriptionAccount);
 //			QString pathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/FileCollectionTest/TestData/FileForTestInsert.xml";
+//			filePersistance->SaveToFile(*inputDataPtr.GetPtr(), pathToFile);
 //			QByteArray idNewObject = fileCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestName", "TestDescription", inputDataPtr);
 //			fileCollectionPtr->GetFile(idNewObject, pathToFile);
+//			fileCollectionPtr->UpdateFile(pathToFile2, idNewObject);
+//			fileCollectionPtr->GetFile(idNewObject, pathToFile2);
+
 //		}
 //		else{
 //			QFAIL("File collection is nullptr");

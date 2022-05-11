@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4902" Description="ACF"/>
-            <Version Id="1" Number="2135" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331010" Description="Qt Framework"/>
+            <Version Id="0" Number="4995" Description="ACF"/>
+            <Version Id="1" Number="2173" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Acula's data repository containing all resources need for the execution of the production workflow</Description>
@@ -106,6 +106,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>account</Value>
+                                <Value>xml</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
