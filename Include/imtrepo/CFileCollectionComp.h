@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/IRevisionController.h>
+#include <imtbase/TFilterableCollectionWrap.h>
 #include <imtrepo/IRepositoryFileTransformationStepsProvider.h>
 #include <imtrepo/IRepositoryTransformationController.h>
 #include <imtrepo/CFileCollectionCompBase.h>
@@ -22,12 +23,12 @@ namespace imtrepo
 */
 
 class CFileCollectionComp:
-			public CFileCollectionCompBase,
+			public imtbase::TFilterableCollectionWrap<CFileCollectionCompBase>,
 			virtual protected imtbase::IRevisionController
 {
 	Q_OBJECT
 public:
-	typedef CFileCollectionCompBase BaseClass;
+	typedef imtbase::TFilterableCollectionWrap <CFileCollectionCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CFileCollectionComp)
 		I_ASSIGN(m_isEnableRevisionHistoryAttrPtr, "IsEnableRevisionHistory", "Allow saving item revisions", true, false);
