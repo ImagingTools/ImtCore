@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos/>
+    </AcfHeader>
+    <AccountType>1</AccountType>
+    <AccountName>SettedName</AccountName>
+    <AccountDescription>SettedDescription</AccountDescription>
+    <AccountPicture>
+        <BitmapHeader>
+            <Size X="0" Y="0"/>
+            <PixelFormat>0</PixelFormat>
+        </BitmapHeader>
+        <BitmapData/>
+    </AccountPicture>
+    <Contact EMail="" GenderType="diverse" Birthday="" FirstName="" LastName="" NickName="">
+        <Addresses>
+            <Addresses>
+                <ObjectsList>
+                    <Object ID="{c38d7741-e0bc-43da-a1fb-2bb103921234}" Description="" TypeId="Address" Name="">
+                        <Data Country="" City="Omsk" PostalCode="0" Street=""/>
+                    </Object>
+                </ObjectsList>
+            </Addresses>
+        </Addresses>
+    </Contact>
+</Acf>

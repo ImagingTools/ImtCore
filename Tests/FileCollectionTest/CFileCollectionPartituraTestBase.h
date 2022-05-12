@@ -25,11 +25,10 @@ protected:
 private slots:
 	void InsertFileTest_data();
 	void InsertFileTest();
-//	void GetFileTest();
-//	void SetFileTest();
+	void GetFileTest();
+	void UpdateFileTest();
 //	void GetFileInfoTest();
 //	void GetFileConstraitsTest();
-//	void UpdateFileTest();
 //	void GetCollectionFileLayoutTest();
 //	void Test();
 
