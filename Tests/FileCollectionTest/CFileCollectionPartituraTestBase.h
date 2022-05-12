@@ -25,12 +25,13 @@ protected:
 private slots:
 	void InsertFileTest_data();
 	void InsertFileTest();
-	void GetFileTest();
-	void UpdateFileTest();
-//	void GetFileInfoTest();
-//	void GetFileConstraitsTest();
-//	void GetCollectionFileLayoutTest();
-//	void Test();
+	void GetFileWithCorrectParamsTest();
+	void GetFileWithIncorrectParamsTest_data();
+	void GetFileWithIncorrectParamsTest();
+	void UpdateFileWithCorrectParamsTest();
+	void UpdateFileWithIncorrectParamsTest_data();
+	void UpdateFileWithIncorrectParamsTest();
+	void GetFileInfoTest();
 
 protected:
     QString m_imtCorePath;
