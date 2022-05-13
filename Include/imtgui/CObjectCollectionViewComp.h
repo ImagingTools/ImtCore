@@ -115,6 +115,8 @@ protected:
 	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
 	const ICollectionViewDelegate& GetViewDelegate(const QByteArray& typeId) const;
 
+	virtual void OnPageSelectionUpdated();
+
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	virtual void OnRestoreSettings(const QSettings& settings) override;
 	virtual void OnSaveSettings(QSettings& settings) const override;
@@ -144,6 +146,8 @@ protected:
 	public:
 		PageSelection();
 
+		void SetParent(CObjectCollectionViewComp* parentPtr);
+
 		void SetPageCount(int pageCount);
 
 		// reimplemented (iprm::ISelectionParam)
@@ -164,6 +168,8 @@ protected:
 		virtual bool Serialize(iser::IArchive& archive) override;
 
 	private:
+		CObjectCollectionViewComp* m_parentPtr;
+
 		int m_pageCount;
 		int m_pageSelection;
 	};

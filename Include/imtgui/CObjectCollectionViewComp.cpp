@@ -40,6 +40,7 @@ CObjectCollectionViewComp::CObjectCollectionViewComp()
 	m_eventBasedUpdateEnabled(false),
 	m_tableModel(*this)
 {
+	m_pageSelection.SetParent(this);
 	m_commands.SetParent(this);
 
 	qRegisterMetaType<istd::IChangeable::ChangeSet>("istd::IChangeable::ChangeSet");
@@ -144,6 +145,12 @@ ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegateRef(const QBy
 const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const QByteArray& typeId) const
 {
 	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef(typeId);
+}
+
+
+void CObjectCollectionViewComp::OnPageSelectionUpdated()
+{
+
 }
 
 
@@ -1329,9 +1336,16 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 // public methods of the embedded class PageSelection
 
 CObjectCollectionViewComp::PageSelection::PageSelection()
-	:m_pageCount(0),
+	:m_parentPtr(nullptr),
+	m_pageCount(0),
 	m_pageSelection(-1)
 {
+}
+
+
+void CObjectCollectionViewComp::PageSelection::SetParent(CObjectCollectionViewComp* parentPtr)
+{
+	m_parentPtr = parentPtr;
 }
 
 
@@ -1345,10 +1359,7 @@ void CObjectCollectionViewComp::PageSelection::SetPageCount(int pageCount)
 			m_pageCount = pageCount;
 
 			if (m_pageSelection >= m_pageCount){
-				istd::IChangeable::ChangeSet selectionChangeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
-				istd::CChangeNotifier notifier(this, &selectionChangeSet);
-
-				m_pageSelection = m_pageCount - 1;
+				SetSelectedOptionIndex(m_pageCount - 1);
 			}
 		}
 	}
@@ -1377,6 +1388,10 @@ bool CObjectCollectionViewComp::PageSelection::SetSelectedOptionIndex(int index)
 			istd::CChangeNotifier notifier(this, &selectionChangeSet);
 
 			m_pageSelection = index;
+
+			if (m_parentPtr != nullptr){
+				m_parentPtr->OnPageSelectionUpdated();
+			}
 		}
 
 		return true;
