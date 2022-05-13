@@ -151,7 +151,6 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 void CObjectCollectionViewComp::OnPageSelectionUpdated()
 {
 	int index = m_pageSelection.GetSelectedOptionIndex();
-
 }
 
 
@@ -376,6 +375,14 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(ItemList->header(), &QHeaderView::sectionMoved, this, &CObjectCollectionViewComp::OnSectionMoved);
 	connect(ItemList->header(), &QHeaderView::sortIndicatorChanged, this, &CObjectCollectionViewComp::OnSortingChanged);
 
+	PaginationFrame->setVisible(m_paginationGuiCompPtr.IsValid());
+	m_pageSelection.SetPageCount(20);
+	m_pageSelection.SetSelectedOptionIndex(-1);
+
+	if (m_paginationGuiCompPtr.IsValid()){
+		m_paginationGuiCompPtr->CreateGui(PaginationFrame);
+	}
+
 	BaseClass::OnGuiCreated();
 
 	if (m_currentInformationViewPtr == nullptr){
@@ -388,6 +395,10 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 void CObjectCollectionViewComp::OnGuiDestroyed()
 {
+	if (m_paginationGuiCompPtr.IsValid() && m_paginationGuiCompPtr->IsGuiCreated()){
+		m_paginationGuiCompPtr->DestroyGui();
+	}
+
 	if (m_filterParamsGuiCompPtr.IsValid() && m_filterParamsGuiCompPtr->IsGuiCreated()){
 		m_filterParamsGuiCompPtr->DestroyGui();
 	}

@@ -45,11 +45,13 @@ void CPaginationGuiComp::OnGuiCreated()
 	if (widgetPtr != nullptr){
 		QHBoxLayout* layoutPtr = new QHBoxLayout();
 
-		layoutPtr->setContentsMargins(QMargins(0, 0, 0, 0));
-		layoutPtr->setSpacing(6);
+		layoutPtr->setContentsMargins(QMargins(10, 10, 10, 10));
+		layoutPtr->setSpacing(10);
 
 		widgetPtr->setLayout(layoutPtr);
 	}
+
+	RefreshWidget();
 }
 
 
@@ -94,19 +96,50 @@ void CPaginationGuiComp::RefreshWidget()
 	if (IsGuiCreated()){
 		QWidget* widgetPtr = GetQtWidget();
 		if (widgetPtr != nullptr){
-			QVBoxLayout* layoutPtr = dynamic_cast<QVBoxLayout*>(widgetPtr->layout());
+			QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(widgetPtr->layout());
 			if (layoutPtr != nullptr){
+				iwidgets::ClearLayout(layoutPtr);
+
 				iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
 				if (pageSelectionPtr != nullptr){
 					const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
 					if (pageListPtr != nullptr){
-						// TODO: Refresh code
+						layoutPtr->addStretch();
+
+						PaginationGuiItem* itemPtr = new PaginationGuiItem("<<", widgetPtr);
+						layoutPtr->addWidget(itemPtr);
+						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnFirstClicked, Qt::QueuedConnection);
+
+						itemPtr = new PaginationGuiItem("<", widgetPtr);
+						layoutPtr->addWidget(itemPtr);
+						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnPrevClicked, Qt::QueuedConnection);
+
+						int pageCount = pageListPtr->GetOptionsCount();
+						for (int i = 0; i < pageCount; i++){
+							QString text = QString::number(i + 1);
+							if (i == pageSelectionPtr->GetSelectedOptionIndex()){
+								text.prepend("*");
+								text.append("*");
+							}
+
+							itemPtr = new PaginationGuiItem(text, widgetPtr);
+							layoutPtr->addWidget(itemPtr);
+							connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnPageClicked, Qt::QueuedConnection);
+						}
+
+						itemPtr = new PaginationGuiItem(">", widgetPtr);
+						layoutPtr->addWidget(itemPtr);
+						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnNextClicked, Qt::QueuedConnection);
+
+						itemPtr = new PaginationGuiItem(">>", widgetPtr);
+						layoutPtr->addWidget(itemPtr);
+						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnLastClicked, Qt::QueuedConnection);
+
+						layoutPtr->addStretch();
 
 						return;
 					}
 				}
-
-				iwidgets::ClearLayout(layoutPtr);
 			}
 		}
 	}
@@ -146,7 +179,7 @@ void CPaginationGuiComp::OnPageClicked()
 			bool isOk;
 			int page = text.toInt(&isOk);
 			if (isOk){
-				selectionPtr->SetSelectedOptionIndex(page);
+				selectionPtr->SetSelectedOptionIndex(page - 1);
 			}
 		}
 	}
