@@ -51,3 +51,27 @@ function(imtcore_generate_file_collection_tests)
 	        )
 
 endfunction(imtcore_generate_file_collection_tests)
+
+function(imtcore_generate_revision_controller_tests)
+        set(PYTHONEXE ${IMTCOREDIR}/3rdParty/Python/3.8/python.exe)
+	set(GENERATE_H_TESTS_FILE ${IMTCOREDIR}/Tests/RevisionControllerTest/CGenerateRevisionControllerTest.h)
+	set(PARTITURA_DIR ${IMTCOREDIR}/Tests/RevisionControllerTest/Partitura)
+
+	if (NOT WIN32)
+	        set(PYTHONEXE python3)
+	endif()
+
+	add_custom_command(
+	        OUTPUT ${GENERATE_H_TESTS_FILE}
+		PRE_BUILD
+		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/Tests/RevisionControllerTest/CGenerateRevisionControllerTest.py ${PARTITURA_DIR}
+		COMMENT
+		"Generate tests for RevisionController ImtCore"
+	        )
+
+	add_custom_target(
+	        GenereteTestHandler${PROJECT_NAME} ALL
+		DEPENDS ${GENERATE_H_TESTS_FILE}
+	        )
+
+endfunction(imtcore_generate_revision_controller_tests)
