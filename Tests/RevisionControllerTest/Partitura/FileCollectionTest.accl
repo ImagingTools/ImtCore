@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="4995" Description="ACF"/>
+            <Version Id="1" Number="2173" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="AccountInfo" X="125" Y="400" Note=""/>
+        <Element ComponentName="AccountInfoMetaInfoCreator" X="275" Y="575" Note=""/>
+        <Element ComponentName="FileCollection" X="575" Y="400" Note=""/>
+        <Element ComponentName="FileCompressor" X="575" Y="150" Note=""/>
+        <Element ComponentName="OptionsListAdapter" X="575" Y="575" Note=""/>
+        <Element ComponentName="Persistence" X="900" Y="575" Note=""/>
+        <Element ComponentName="RepositoryFolder" X="900" Y="150" Note=""/>
+        <Element ComponentName="ResourceTypes" X="275" Y="150" Note=""/>
+        <Element ComponentName="SystemLocation" X="892" Y="50" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
