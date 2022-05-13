@@ -19,6 +19,8 @@
 #include <imod/CMultiModelDispatcherBase.h>
 #include <ibase/ICommandsProvider.h>
 #include <ibase/IProgressManager.h>
+#include <iprm/IOptionsList.h>
+#include <iprm/ISelectionParam.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <iqtgui/CHierarchicalCommand.h>
@@ -55,6 +57,10 @@ public:
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
 		I_REGISTER_INTERFACE(ibase::IProgressManager);
 		I_REGISTER_INTERFACE(imtbase::ISelection);
+		I_REGISTER_SUBELEMENT(PageSelection);
+		I_REGISTER_SUBELEMENT_INTERFACE(PageSelection, iprm::ISelectionParam, ExtractPageSelection);
+		I_REGISTER_SUBELEMENT_INTERFACE(PageSelection, imod::IModel, ExtractPageSelection);
+		I_REGISTER_SUBELEMENT_INTERFACE(PageSelection, istd::IChangeable, ExtractPageSelection);
 		I_REGISTER_SUBELEMENT(Commands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, ibase::ICommandsProvider, ExtractCommands);
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, istd::IChangeable, ExtractCommands);
@@ -133,6 +139,42 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 protected:
+	class PageSelection: virtual public iprm::ISelectionParam, virtual public iprm::IOptionsList
+	{
+	public:
+		PageSelection();
+
+		void SetPageCount(int pageCount);
+
+		// reimplemented (iprm::ISelectionParam)
+		virtual const IOptionsList* GetSelectionConstraints() const override;
+		virtual int GetSelectedOptionIndex() const override;
+		virtual bool SetSelectedOptionIndex(int index) override;
+		virtual ISelectionParam* GetSubselection(int index) const override;
+
+		// reimplemented (iprm::IOptionsList)
+		virtual int GetOptionsFlags() const override;
+		virtual int GetOptionsCount() const override;
+		virtual QString GetOptionName(int index) const override;
+		virtual QString GetOptionDescription(int index) const override;
+		virtual QByteArray GetOptionId(int index) const override;
+		virtual bool IsOptionEnabled(int index) const override;
+
+		// reimplemented (iser::ISerializable)
+		virtual bool Serialize(iser::IArchive& archive) override;
+
+	private:
+		int m_pageCount;
+		int m_pageSelection;
+	};
+
+	template <typename InterfaceType>
+	static InterfaceType* ExtractPageSelection(CObjectCollectionViewComp& component)
+	{
+		return &component.m_pageSelection;
+	}
+
+
 	class Commands: virtual public ibase::ICommandsProvider
 	{
 	public:
@@ -284,6 +326,7 @@ private:
 	ViewDelegateMap m_viewDelegateMap;
 
 	QByteArray m_currentTypeId;
+	imod::TModelWrap<PageSelection> m_pageSelection;
 	imod::TModelWrap<Commands> m_commands;
 
 	typedef QMap<QString, QVariant> ColumnSettings;

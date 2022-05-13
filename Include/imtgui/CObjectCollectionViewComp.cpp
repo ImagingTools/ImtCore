@@ -1326,6 +1326,130 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 }
 
 
+// public methods of the embedded class PageSelection
+
+CObjectCollectionViewComp::PageSelection::PageSelection()
+	:m_pageCount(0),
+	m_pageSelection(-1)
+{
+}
+
+
+void CObjectCollectionViewComp::PageSelection::SetPageCount(int pageCount)
+{
+	if (pageCount >= 0){
+		if (m_pageCount != pageCount){
+			istd::IChangeable::ChangeSet optionsChangeSet(iprm::IOptionsList::CF_OPTIONS_CHANGED);
+			istd::CChangeNotifier notifier(this, &optionsChangeSet);
+
+			m_pageCount = pageCount;
+
+			if (m_pageSelection >= m_pageCount){
+				istd::IChangeable::ChangeSet selectionChangeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
+				istd::CChangeNotifier notifier(this, &selectionChangeSet);
+
+				m_pageSelection = m_pageCount - 1;
+			}
+		}
+	}
+}
+
+
+// reimplemented (iprm::ISelectionParam)
+
+const iprm::IOptionsList* CObjectCollectionViewComp::PageSelection::GetSelectionConstraints() const
+{
+	return this;
+}
+
+
+int CObjectCollectionViewComp::PageSelection::GetSelectedOptionIndex() const
+{
+	return m_pageSelection;
+}
+
+
+bool CObjectCollectionViewComp::PageSelection::SetSelectedOptionIndex(int index)
+{
+	if (index >= -1 && index < m_pageCount){
+		if (index != m_pageSelection){
+			istd::IChangeable::ChangeSet selectionChangeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
+			istd::CChangeNotifier notifier(this, &selectionChangeSet);
+
+			m_pageSelection = index;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
+iprm::ISelectionParam* CObjectCollectionViewComp::PageSelection::GetSubselection(int index) const
+{
+	return nullptr;
+}
+
+
+// reimplemented (iprm::IOptionsList)
+
+int CObjectCollectionViewComp::PageSelection::GetOptionsFlags() const
+{
+	return SCF_SUPPORT_UNIQUE_ID;
+}
+
+
+int CObjectCollectionViewComp::PageSelection::GetOptionsCount() const
+{
+	return m_pageCount;
+}
+
+
+QString CObjectCollectionViewComp::PageSelection::GetOptionName(int index) const
+{
+	QString retVal;
+
+	if (index >= 0 && index < m_pageCount){
+		retVal = QString::number(index);
+	}
+
+	return retVal;
+}
+
+
+QString CObjectCollectionViewComp::PageSelection::GetOptionDescription(int index) const
+{
+	return QString();
+}
+
+
+QByteArray CObjectCollectionViewComp::PageSelection::GetOptionId(int index) const
+{
+	QByteArray retVal;
+
+	if (index >= 0 && index < m_pageCount){
+		retVal = QString::number(index).toUtf8();
+	}
+
+	return retVal;
+}
+
+
+bool CObjectCollectionViewComp::PageSelection::IsOptionEnabled(int index) const
+{
+	return true;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CObjectCollectionViewComp::PageSelection::Serialize(iser::IArchive& archive)
+{
+	return false;
+}
+
+
 // public methods of the embedded class Commands
 
 CObjectCollectionViewComp::Commands::Commands()

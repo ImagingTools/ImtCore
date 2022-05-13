@@ -148,14 +148,19 @@ I_EXPORT_COMPONENT(
 			"Object Collection Delegate View Document MDI");
 
 I_EXPORT_COMPONENT(
-		MenuBasedCommandsProvider,
-		"Menu-Based commands provider",
-		"MenuBased Commands Provider");
+			MenuBasedCommandsProvider,
+			"Menu-Based commands provider",
+			"MenuBased Commands Provider");
 
 I_EXPORT_COMPONENT(
-	TimeFilterParamEditor,
-	"Edit for the time-range filter parameter",
-	"Time Date Filter Range Parameter");
+			TimeFilterParamEditor,
+			"Edit for the time-range filter parameter",
+			"Time Date Filter Range Parameter");
+
+I_EXPORT_COMPONENT(
+			PaginationGui,
+			"Pagination gui",
+			"Pagination Page Selection");
 
 
 } // namespace ImtGuiPck

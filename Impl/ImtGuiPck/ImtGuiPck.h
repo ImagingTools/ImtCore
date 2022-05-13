@@ -34,6 +34,7 @@
 #include <imtgui/CDocumentCollectionViewDelegateComp.h>
 #include <imtgui/CMenuBasedCommandsProviderComp.h>
 #include <imtgui/CTimeFilterParamEditorComp.h>
+#include <imtgui/CPaginationGuiComp.h>
 
 
 /**
@@ -71,6 +72,7 @@ typedef imtgui::CSingleDocumentWorkspaceGuiComp SingleDocumentWorkspace;
 typedef imtgui::CDocumentCollectionViewDelegateComp DocumentCollectionViewDelegate;
 typedef icomp::TModelCompWrap<imtgui::CMenuBasedCommandsProviderComp> MenuBasedCommandsProvider;
 typedef imtgui::CTimeFilterParamEditorComp TimeFilterParamEditor;
+typedef ibase::TModelObserverCompWrap<imtgui::CPaginationGuiComp> PaginationGui;
 
 
 } // namespace ImtGuiPck
