@@ -24,7 +24,7 @@ QByteArray CDatabaseSettingsDataProviderComp::GetModelId() const
 
 
 imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
-			const QList<imtgql::CGqlObject>& /*params*/,
+			const QList<imtgql::CGqlObject>& params,
 			const QByteArrayList& /*fields*/)
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
@@ -37,22 +37,38 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
 	}
 
+	const QTranslator* translatorPtr = nullptr;
+	if (m_translationManagerCompPtr.IsValid()){
+		QByteArray languageId = GetLanguageIdFromInputParams(params);
+		int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+
+		if (languageId != "" && currentIndex >= 0){
+			translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+		}
+	}
+
 	if (m_paramNameAttrPtr.IsValid()){
 		paramName = *m_paramNameAttrPtr;
-		rootModelPtr->SetData("Name", paramName);
+		if (translatorPtr != nullptr){
+			rootModelPtr->SetData("Name", translatorPtr->translate("", paramName.toUtf8()));
+		}
+		else{
+			rootModelPtr->SetData("Name", paramName);
+		}
 	}
 
 	rootModelPtr->SetData("ComponentType", "DatabaseSettingsInput");
 
 	if (m_databaseSettingsCompPtr.IsValid()){
-
 		imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
 
 		int index = parametersPtr->InsertNewItem();
 
 		QString dbName = m_databaseSettingsCompPtr->GetDatabaseName();
 		parametersPtr->SetData("Id", "DBName", index);
-		parametersPtr->SetData("Name", "DB Name", index);
+		if (translatorPtr != nullptr){
+			parametersPtr->SetData("Name", translatorPtr->translate("", "DB Name"), index);
+		}
 		parametersPtr->SetData("Value", dbName, index);
 		parametersPtr->SetData("ComponentType", "TextInput", index);
 
@@ -60,7 +76,9 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 
 		QString hostName = m_databaseSettingsCompPtr->GetHost();
 		parametersPtr->SetData("Id", "Host", index);
-		parametersPtr->SetData("Name", "Host", index);
+		if (translatorPtr != nullptr){
+			parametersPtr->SetData("Name", translatorPtr->translate("", "Host"), index);
+		}
 		parametersPtr->SetData("Value", hostName, index);
 		parametersPtr->SetData("ComponentType", "TextInput", index);
 
@@ -68,7 +86,9 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 
 		QString password = m_databaseSettingsCompPtr->GetPassword();
 		parametersPtr->SetData("Id", "Password", index);
-		parametersPtr->SetData("Name", "Password", index);
+		if (translatorPtr != nullptr){
+			parametersPtr->SetData("Name", translatorPtr->translate("", "Password"), index);
+		}
 		parametersPtr->SetData("Value", password, index);
 		parametersPtr->SetData("ComponentType", "TextInput", index);
 
@@ -76,7 +96,9 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 
 		int port = m_databaseSettingsCompPtr->GetPort();
 		parametersPtr->SetData("Id", "Port", index);
-		parametersPtr->SetData("Name", "Port", index);
+		if (translatorPtr != nullptr){
+			parametersPtr->SetData("Name", translatorPtr->translate("", "Port"), index);
+		}
 		parametersPtr->SetData("Value", port, index);
 		parametersPtr->SetData("ComponentType", "IntegerInput", index);
 
@@ -84,7 +106,9 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 
 		QString userName = m_databaseSettingsCompPtr->GetUserName();
 		parametersPtr->SetData("Id", "Username", index);
-		parametersPtr->SetData("Name", "User name", index);
+		if (translatorPtr != nullptr){
+			parametersPtr->SetData("Name", translatorPtr->translate("", "User name"), index);
+		}
 		parametersPtr->SetData("Value", userName, index);
 		parametersPtr->SetData("ComponentType", "TextInput", index);
 

@@ -10,6 +10,7 @@ Item {
     visible: false;
 
     property Item rootItem;
+    property string title;
     property alias firstElementImageSource: installationsMultiDocView.firstElementImageSource;
 //    property alias model: installationsMultiDocView.model;
 
@@ -34,7 +35,8 @@ Item {
     onVisibleChanged: {
         if (installationsMultiDocViewContainer.visible && installationsMultiDocView.pagesCount === 0) {
             console.log("InstallationsMultiDocView first page loaded !");
-            installationsMultiDocView.addToHeadersArray("", "Installations", "../../imtlicgui/InstallationCollectionView.qml", "Installations", "Open")
+//            let title = qsTr("Installations")
+            installationsMultiDocView.addToHeadersArray("", installationsMultiDocViewContainer.title, "../../imtlicgui/InstallationCollectionView.qml", "Installations", "Open")
         }
     }
 

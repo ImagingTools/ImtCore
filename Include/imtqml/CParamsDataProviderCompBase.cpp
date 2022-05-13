@@ -33,9 +33,21 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QLi
 		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
 	}
 
+	const QTranslator* translatorPtr = nullptr;
+	if (m_translationManagerCompPtr.IsValid()){
+		QByteArray languageId = GetLanguageIdFromInputParams(params);
+		int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+		translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+	}
+
 	if (m_paramNameAttrPtr.IsValid()){
 		paramName = *m_paramNameAttrPtr;
-		rootModelPtr->SetData("Name", paramName);
+		if (translatorPtr != nullptr){
+			rootModelPtr->SetData("Name", translatorPtr->translate("", paramName.toUtf8()));
+		}
+		else{
+			rootModelPtr->SetData("Name", paramName);
+		}
 	}
 
 	int type = 0;;
@@ -76,14 +88,12 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QLi
 	else{
 		if (type == CT_COMBOBOX){
 			iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
-
 			if (selectionParam != nullptr){
 				const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
 				int defaultIndex = selectionParam->GetSelectedOptionIndex();
 				rootModelPtr->SetData("Value", defaultIndex);
 				imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
 				parametersPtr->SetIsArray(true);
-
 				for (int i = 0; i < optionList->GetOptionsCount(); i++){
 					QByteArray id = optionList->GetOptionId(i);
 					QString name = optionList->GetOptionName(i);
@@ -91,7 +101,13 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QLi
 					int index = parametersPtr->InsertNewItem();
 
 					parametersPtr->SetData("Id", id, index);
-					parametersPtr->SetData("Name", name, index);
+
+					if (translatorPtr != nullptr){
+						parametersPtr->SetData("Name", translatorPtr->translate("", name.toUtf8()), index);
+					}
+					else{
+						parametersPtr->SetData("Name", name, index);
+					}
 				}
 			}
 		}

@@ -258,6 +258,16 @@ Rectangle {
             console.log("CollectionView AuxTable onSetActiveFocusFromTable");
             collectionViewContainer.setActiveFocusFromCollectionView();
         }
+
+        onHeaderOnClicked: {
+            console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
+            headersSortModel.SetData(headerId, sortOrder);
+            modelItems.updateModel();
+        }
+    }
+
+    TreeItemModel {
+        id: headersSortModel;
     }
 
     Pagination {
@@ -279,7 +289,14 @@ Rectangle {
         function updateModel() {
             console.log( "headerInfoModel update", collectionViewContainer.gqlModelInfo);
 
+
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelInfo);
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("LanguageId");
+            inputParams.InsertFieldArgument("LanguageId", Style.language);
+            query.AddParam(inputParams);
+
             var queryFields = Gql.GqlObject("headers");
             queryFields.InsertField("Id");
             queryFields.InsertField("Name");
@@ -322,7 +339,12 @@ Rectangle {
 
                         if(dataModelLocal.ContainsKey("headers")){
                             tableInternal.headers = dataModelLocal.GetData("headers")
-                            collectionViewContainer.collectionViewModel.SetExternTreeModel('headers',tableInternal.headers)
+                            collectionViewContainer.collectionViewModel.SetExternTreeModel('headers', tableInternal.headers)
+
+                            for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
+                                headersSortModel.SetData(tableInternal.headers.GetData("Id", i), "NO_SORT");
+                            }
+
                             modelItems.updateModel();
                         }
                     }
@@ -345,13 +367,8 @@ Rectangle {
 
         function updateModel() {
             console.log( "collectionViewContainer updateModel", collectionViewContainer.gqlModelItems, collectionViewContainer.itemId);
-
-            console.log("ВЫСОТА КОЛЛЕКЦИИ: ", collectionViewContainer.height);
-            console.log("ВЫСОТА ЭЛЕМЕНТА: ", tableInternal.itemHeight);
             let height = collectionViewContainer.height - pagination.height - tableInternal.itemHeight; //Убрать высоту от заголовка и меню пагинации
-
             let count = Math.floor(height / tableInternal.itemHeight);
-            console.log("КОЛ-ВО ЭЛЕМЕНТОВ НА СТРАНИЦЕ: ", count);
             let offset = (pagination.currentValue - 1) * count;
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelItems);
             var viewParams = Gql.GqlObject("viewParams");
@@ -359,6 +376,11 @@ Rectangle {
             viewParams.InsertFieldArgument("Offset", offset);
             viewParams.InsertField("Count");
             viewParams.InsertFieldArgument("Count", count);
+            viewParams.InsertField("Sort");
+            var jsonString = headersSortModel.toJSON();
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            console.log('headersSortModel', jsonString);
+            viewParams.InsertFieldArgument("Sort", jsonString);
 
             //query.AddParam(viewParams);
             var inputParams = Gql.GqlObject("input");

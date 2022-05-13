@@ -22,19 +22,15 @@ Item {
     signal selectItem(string idSelected, string name);
     signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromTable();
+    signal headerOnClicked(string headerId, string sortOrder);
 
     function getSelectedId(){
-//        console.log("AuxTable getSelectedId", tableContainer.selectedIndex);
-//        let id = elements.GetData("Id", tableContainer.selectedIndex);
-//       // console.log("id", id);
-//        return id;
         if (tableContainer.selectedIndex > -1){
              return tableContainer.elements.GetData("Id", tableContainer.selectedIndex);
         }
         else{
             return null;
         }
-        //return elementsList.selectedId;
     }
 
     function getSelectedName(){
@@ -85,9 +81,12 @@ Item {
                 id: deleg;
 
                 width: headersList.width/headersList.count;
-                height: headersList.height;
+                height: headersList.height * deleg.scale;
 
                 color: Style.baseColor;
+
+              //  property double scale: 1.0;
+                property string sortOrder: "ASC";
 
                 Text {
                     id: name;
@@ -96,11 +95,55 @@ Item {
                     anchors.left: parent.left;
                     anchors.leftMargin: 8;
 
-                    font.pixelSize: Style.fontSize_common;
+                    font.pixelSize: Style.fontSize_common * deleg.scale;
                     font.family: Style.fontFamilyBold;
                     font.bold: true;
                     color: Style.textColor;
                     text: model.Name;
+                }
+
+                Image {
+                    id: iconSort;
+
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 8;
+
+                    height: 10;
+                    width: 10;
+
+                    visible: headersList.currentIndex == model.index;
+                    source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                    sourceSize.width: width;
+                    sourceSize.height: height;
+                }
+
+                MouseArea {
+                    id: headerMa;
+
+                    anchors.fill: parent;
+
+                    onReleased: {
+                        console.log("onReleased");
+                        deleg.scale = 1;
+                    }
+
+                    onPressed: {
+                        deleg.scale = 0.985;
+                    }
+
+                    onClicked: {
+                        headersList.currentIndex = model.index;
+                        if (deleg.sortOrder == 'ASC'){
+                            deleg.sortOrder = 'DESC'
+                            iconSort.source = "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
+                        }
+                        else if (deleg.sortOrder == 'DESC'){
+                            deleg.sortOrder = 'ASC'
+                            iconSort.source = "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                        }
+                        tableContainer.headerOnClicked(model.Id, deleg.sortOrder);
+                    }
                 }
             }
         }

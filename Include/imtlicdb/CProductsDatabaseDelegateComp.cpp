@@ -91,12 +91,10 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 
 			QByteArray featureId, packageId;
 			if (licenseFeatureRecord.contains("FeatureId")){
-//				featureInfo.id = licenseFeatureRecord.value("FeatureId").toByteArray();
 				featureId = licenseFeatureRecord.value("FeatureId").toByteArray();
 			}
 
 			if (licenseFeatureRecord.contains("PackageId")){
-//				featureInfo.id = licenseFeatureRecord.value("PackageId").toByteArray();
 				packageId = licenseFeatureRecord.value("PackageId").toByteArray();
 			}
 

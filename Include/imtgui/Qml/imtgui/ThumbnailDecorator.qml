@@ -184,6 +184,7 @@ Rectangle
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
                     if (pagesLoader.item){
                         pagesLoader.item.rootItem = pagesDeleg;
+                         pagesLoader.item.title = menuPanel.model.GetData(PageEnum.NAME, model.index);
 //                        pagesLoader.item.forceActiveFocus();
                         console.log("ThumbnailDecorator pagesLoader.item.rootItem", pagesLoader.item.rootItem)
                         pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
@@ -266,6 +267,14 @@ Rectangle
 //            console.log("Quit application");
 //            listViewDialogs.destroy();
 //        }
+//    }
+
+//    Text {
+//        id: test;
+//        anchors.centerIn: parent;
+
+//        text: qsTr("Close");
+//        font.pixelSize: Style.fontSize_title;
 //    }
 
     Repeater {

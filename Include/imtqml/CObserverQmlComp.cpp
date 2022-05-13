@@ -51,10 +51,13 @@ void CObserverQmlComp::OnComponentCreated()
 
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
-		//QMetaObject::invokeMethod(quickItem, "updateModels");
 
 		if (m_pagesDataProviderCompPtr.IsValid()){
 			QList<imtgql::CGqlObject> params;
+			imtgql::CGqlObject *inputParams = new imtgql::CGqlObject("input");
+			inputParams->InsertField("LanguageId");
+			inputParams->InsertFieldArgument("LanguageId", "ru_RU");
+			params.append(*inputParams);
 			QByteArrayList fields;
 			fields.append("NetworkSettings");
 			m_settingsModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);

@@ -9,6 +9,7 @@ Item {
     visible: false;
 
     property Item rootItem;
+    property string title;
     property alias firstElementImageSource: productsMultiDocView.firstElementImageSource;
 //    property alias model: productsMultiDocView.model;
 
@@ -33,7 +34,8 @@ Item {
     onVisibleChanged: {
         if (productsMultiDocViewContainer.visible && productsMultiDocView.pagesCount === 0) {
             console.log("ProductsMultiDocView first page loaded !");
-            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
+//            let title = qsTr("Products");
+            productsMultiDocView.addToHeadersArray("", productsMultiDocViewContainer.title, "../../imtlicgui/ProductCollectionView.qml", "Products")
         }
 
         if (productsMultiDocViewContainer.visible){

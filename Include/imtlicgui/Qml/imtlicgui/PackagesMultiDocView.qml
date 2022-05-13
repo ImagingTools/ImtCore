@@ -11,6 +11,7 @@ Item {
     visible: false;
 
     property Item rootItem;
+    property string title;
     property alias firstElementImageSource: packagesMultiDocView.firstElementImageSource;
 
     function menuActivated(menuId) {
@@ -33,7 +34,7 @@ Item {
 
     onVisibleChanged: {
         if (packagesMultiDocViewContainer.visible && packagesMultiDocView.pagesCount === 0) {
-            packagesMultiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
+            packagesMultiDocView.addToHeadersArray("", packagesMultiDocViewContainer.title, "../../imtlicgui/PackageCollectionView.qml", "Packages")
         }
     }
 

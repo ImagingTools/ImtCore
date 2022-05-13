@@ -1,5 +1,7 @@
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
 
+// ACF includes
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtqml/CCommandDataEnumProviderComp.h>
@@ -344,6 +346,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			int pagesCount = qCeil(m_objectCollectionCompPtr->GetElementsCount() / (double)count);
 			notificationModel->SetData("PagesCount", pagesCount);
 		}
+
+		iprm::CParamsSet headersParamsSet;
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count);
 		imtbase::IObjectCollection::DataPtr dataPtr;

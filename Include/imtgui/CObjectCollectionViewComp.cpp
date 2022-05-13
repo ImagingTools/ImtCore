@@ -150,6 +150,7 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnPageSelectionUpdated()
 {
+	int index = m_pageSelection.GetSelectedOptionIndex();
 
 }
 

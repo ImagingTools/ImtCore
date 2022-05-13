@@ -59,11 +59,11 @@ Item {
         id: contextMenuModel;
 
         Component.onCompleted: {
-            contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
-            contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Edit", "name": qsTr("Edit"), "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Remove", "name": qsTr("Remove"), "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
             contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
-            contextMenuModel.append({"id": "SetDescription", "name": "Set Description", "imageSource": "", "mode": "Normal"});
-            contextMenuModel.append({"id": "Rename", "name": "Rename", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": qsTr("Set Description"), "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "Rename", "name": qsTr("Rename"), "imageSource": "", "mode": "Normal"});
         }
     }
 
@@ -125,7 +125,7 @@ Item {
 
             if (parameters["status"] === "Set Description"){
 
-                prmtrs["message"] = "Please enter the description of the package: ";
+                prmtrs["message"] = qsTr("Please enter the description of the package: ");
                 prmtrs["nameDialog"] = "Set description";
                 prmtrs["typeOperation"] = "SetDescription";
 
@@ -136,7 +136,7 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, prmtrs);
             }
             else if (parameters["status"] === "Rename"){
-                prmtrs["message"] = "Please enter the name of the package: ";
+                prmtrs["message"] = qsTr("Please enter the name of the package: ");
                 prmtrs["nameDialog"] = "Rename Dialog";
                 prmtrs["typeOperation"] = "Rename";
 

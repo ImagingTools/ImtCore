@@ -85,14 +85,18 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		}
 
 		int index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Last Name", index);
+
+		QString test1 = QObject::tr("TEST");
+		QString test2 = QT_TR_NOOP("TEST2");
+
+		metaInfoModel->SetData("Name", QObject::tr("Last Name"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
 		childs->SetData("Value", lastName);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "First Name", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("First Name"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
@@ -106,7 +110,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", mail);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Description", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Description"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString description = accountInfoPtr->GetAccountDescription();
@@ -114,7 +118,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", description);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Account Name", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Account Name"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString name = accountInfoPtr->GetAccountName();
@@ -122,7 +126,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", name);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Account Type", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Account Type"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		imtauth::IAccountInfo::AccountType type = accountInfoPtr->GetAccountType();

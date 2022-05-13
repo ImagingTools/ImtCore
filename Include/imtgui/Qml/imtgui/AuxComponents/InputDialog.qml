@@ -191,7 +191,7 @@ Rectangle {
             hasText: true;
             hasIcon: false;
 
-            textButton: "OK";
+            textButton: qsTr("OK");
             borderColor: okButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 
@@ -229,7 +229,7 @@ Rectangle {
             hasText: true;
             hasIcon: false;
 
-            textButton: "Cancel";
+            textButton: qsTr("Cancel");
             borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 

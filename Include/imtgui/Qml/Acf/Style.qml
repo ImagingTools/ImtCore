@@ -6,6 +6,8 @@ import imtqml 1.0
 Item {
     id: styleContainer;
 
+    property string language: "ru_RU";
+
     property string mainText: "STYLE!!!";
 
     property alias mainFontSource: mainFont.source;

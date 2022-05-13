@@ -90,10 +90,10 @@ Item {
         id: contextMenuModel;
 
         Component.onCompleted: {
-            contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
-            contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Edit", "name": qsTr("Edit"), "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Remove", "name": qsTr("Remove"), "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
             contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
-            contextMenuModel.append({"id": "SetDescription", "name": "Set Description", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": qsTr("Set Description"), "imageSource": "", "mode": "Normal"});
         }
     }
 
@@ -424,14 +424,14 @@ Item {
 
             var emptyId = featureCollectionViewContainer.alreadyExistIdHasEmpty();
             if (emptyId !== "") {
-                featureCollectionView.openMessageDialog("Error Dialog", emptyId + " has an empty id !", "ErrorDialog");
+                featureCollectionView.openMessageDialog("Error Dialog", emptyId + qsTr(" has an empty id !"), "ErrorDialog");
                 return;
             }
 
             if (featureCollectionViewContainer.itemId == "") {
                 var source = "AuxComponents/InputDialog.qml";
                 var parameters = {};
-                parameters["message"] = "Please enter the name of the document: ";
+                parameters["message"] = qsTr("Please enter the name of the document: ");
                 parameters["nameDialog"] = "Document Name";
                 parameters["typeOperation"] = "Save";
                 parameters["resultItem"] = featureCollectionViewContainer;
@@ -574,7 +574,6 @@ Item {
                 }
                 else{
                     if (featureCollectionViewContainer.operation != "New"){
-                        console.log("NOT NEW");
                         treeView.visible = true;
                     }
                 }
@@ -584,10 +583,8 @@ Item {
             let rootFeatureId = featureCollectionView.table.getSelectedId();
             let rootkey = rootPackageId + '.' + rootFeatureId;
 
-           // packageMetaInfo.clearTreeView();
             featuresTreeView.clearTreeView();
             featuresTreeView.hideCurrentFeatureTreeView(rootPackageId, rootFeatureId);
-//            featureCollectionViewContainer.hideCurrentFeatureTreeView();
             if (featuresTreeView.modelDepends){
                 let strValues = featuresTreeView.modelDepends.GetData(rootkey);
                 if (strValues){
@@ -772,7 +769,7 @@ Item {
                 anchors.left: headerTreeView.left;
                 anchors.leftMargin: 10;
 
-                text: "Features";
+                text: qsTr("Features");
                 color: Style.textColor;
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;

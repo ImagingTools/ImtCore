@@ -9,6 +9,7 @@ Item {
 
     visible: false;
     property Item rootItem;
+    property string title;
     property alias firstElementImageSource: accountsMultiDocView.firstElementImageSource;
 
     function menuActivated(menuId) {
@@ -32,7 +33,8 @@ Item {
     onVisibleChanged: {
         if (accountsMultiDocViewContainer.visible && accountsMultiDocView.pagesCount === 0) {
             console.log("AccountsMultiDocView first page loaded !");
-            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtauthgui/AccountCollectionView.qml", "Accounts", "Open")
+//            let title = qsTr("Accounts");
+            accountsMultiDocView.addToHeadersArray("", accountsMultiDocViewContainer.title, "../../imtauthgui/AccountCollectionView.qml", "Accounts", "Open")
         }
     }
 

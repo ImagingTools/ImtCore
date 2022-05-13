@@ -247,6 +247,9 @@ Rectangle {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField(PageEnum.ID);
             inputParams.InsertFieldArgument(PageEnum.ID, topPanel.activeCommandsModelId);
+
+            inputParams.InsertField("LanguageId");
+            inputParams.InsertFieldArgument("LanguageId", Style.language)
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");

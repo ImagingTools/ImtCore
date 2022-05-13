@@ -16,7 +16,7 @@ Rectangle {
     property string nameDialog;
     property string dialogId;
 
-    property string textOkButton: "Yes";
+    property string textOkButton: qsTr("Yes");
 
     property bool okButtonVisible: true;
     property bool noButtonVisible: true;
@@ -191,7 +191,7 @@ Rectangle {
                 hasText: true;
                 hasIcon: false;
 
-                textButton: "No";
+                textButton: qsTr("No");
                 borderColor: noButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
                 backgroundColor: Style.imagingToolsGradient1;
 

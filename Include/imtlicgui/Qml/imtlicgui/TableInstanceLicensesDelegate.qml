@@ -140,7 +140,7 @@ Rectangle {
             anchors.left: checkBoxExpiration.right;
             anchors.leftMargin: 5;
 
-            text: "Unlimited";
+            text: qsTr("Unlimited");
             visible: checkBoxExpiration.checkState === 0;
 
             font.family: Style.fontFamily;

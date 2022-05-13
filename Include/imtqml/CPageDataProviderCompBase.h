@@ -4,11 +4,13 @@
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <icomp/CComponentBase.h>
+#include <iqt/ITranslationManager.h>
 
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
+#include <imtqml/CUserOptionsProviderCompBase.h>
 
 
 namespace imtqml
@@ -19,11 +21,11 @@ namespace imtqml
 	Basic implementation for the controller of the application page representation data model.
 */
 class CPageDataProviderCompBase:
-			public icomp::CComponentBase,
+			public imtqml::CUserOptionsProviderCompBase,
 			public imtbase::IItemBasedRepresentationDataProvider
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
 	typedef imtqml::CPageDataEnumProviderComp PageEnum;
 
 	I_BEGIN_COMPONENT(CPageDataProviderCompBase);
@@ -35,6 +37,7 @@ public:
 		I_ASSIGN(m_pageOffSelectedStatusIconAttrPtr, "PageOffSelectedStatusIcon", "Path of status icon used off selected", false, "");
 		I_ASSIGN(m_pageSourceItemAttrPtr, "PageSourceItem", "Path of source item", false, "");
 		I_ASSIGN(m_representationCommandProviderCompPtr, "RepresentationCommandProvider", "List of page commands", false,"");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
@@ -49,6 +52,7 @@ private:
 	I_ATTR(QString, m_pageOffSelectedStatusIconAttrPtr);
 	I_ATTR(QString, m_pageSourceItemAttrPtr);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_representationCommandProviderCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

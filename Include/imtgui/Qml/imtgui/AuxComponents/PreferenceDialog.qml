@@ -178,6 +178,11 @@ Rectangle {
             if (itemId === "Mode"){
                 preferenceContainer.currentModeId = selectedId;
             }
+
+            if (itemId == "Language"){
+                //context.language = "default";
+                context.language = selectedId;
+            }
         }
         modelSettingsBody.SetData("Parameters", modelElements, index);
         globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
@@ -201,16 +206,6 @@ Rectangle {
             preferenceContainer.currentSettingsBodyId = globalSettings.GetData("Id", mainPanelRepeater.selectedIndex);
             dependentPanelRepeater.model = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex)
         }
-
-//        if (preferenceContainer.serverSettings.ContainsKey("items")){
-//            var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
-
-//            if (dataModelLocal.ContainsKey("Elements", mainPanelRepeater.selectedIndex)){
-//                preferenceContainer.currentSettingsBodyId = dataModelLocal.GetData("Id", mainPanelRepeater.selectedIndex);
-//                dataModelLocal = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
-//                dependentPanelRepeater.model = dataModelLocal;
-//            }
-//        }
     }
 
     Rectangle {
@@ -244,7 +239,7 @@ Rectangle {
             anchors.leftMargin: 10;
             anchors.verticalCenter: topPan.verticalCenter;
 
-            text: "Preferences";
+            text: qsTr("Preferences");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_subtitle;
@@ -500,7 +495,7 @@ Rectangle {
        hasText: true;
        hasIcon: false;
 
-       textButton: "Apply";
+       textButton: qsTr("Apply");
        borderColor: (preferenceSaveButton.highlighted || preferenceSaveButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
        backgroundColor: Style.imagingToolsGradient1;
 
@@ -575,7 +570,7 @@ Rectangle {
        hasText: true;
        hasIcon: false;
 
-       textButton: "Close";
+       textButton: qsTr("Close");
        borderColor: (preferenceCloseButton.highlighted || preferenceCloseButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
        backgroundColor: Style.imagingToolsGradient1;
 
@@ -605,8 +600,12 @@ Rectangle {
        function getSettings() {
            var query = Gql.GqlRequest("query", "GetSettings");
 
-           var queryFields = Gql.GqlObject("items");
+           var inputParams = Gql.GqlObject("input");
+           inputParams.InsertField("LanguageId");
+           inputParams.InsertFieldArgument ("LanguageId", Style.language);
+           query.AddParam(inputParams);
 
+           var queryFields = Gql.GqlObject("items");
            queryFields.InsertField("Mode");
            queryFields.InsertField("Language");
            queryFields.InsertField("DBSettings");

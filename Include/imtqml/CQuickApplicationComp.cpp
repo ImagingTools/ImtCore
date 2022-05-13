@@ -24,6 +24,9 @@
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
+// ImtCore includes
+#include <imtqml/CContext.h>
+
 
 #if defined(Q_OS_MACX) && (QT_VERSION >= 0x040000) && (QT_VERSION < 0x050000)
 void qt_mac_set_menubar_icons(bool enable);
@@ -92,6 +95,10 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 		QQmlApplicationEngine *engine = new QQmlApplicationEngine(this);
 		engine->addImportPath("qrc:/");
 		engine->addImportPath("qrc:/qml");
+
+		QQmlContext *ctxt = engine->rootContext();
+		imtqml::CContext context;
+		ctxt->setContextProperty("context", &context);
 		engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
 		if (m_allowApplicationCloseModelCompPtr.IsValid()){

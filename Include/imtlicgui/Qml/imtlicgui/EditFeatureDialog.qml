@@ -146,7 +146,7 @@ Rectangle {
             anchors.verticalCenter: editFeatureDialogTopPanel.verticalCenter;
             anchors.horizontalCenter: editFeatureDialogTopPanel.horizontalCenter;
 
-            text: "Edit feature";
+            text: qsTr("Edit feature");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_subtitle;
@@ -335,7 +335,7 @@ Rectangle {
             hasText: true;
             hasIcon: false;
 
-            textButton: "OK";
+            textButton: qsTr("OK");
             borderColor: okButton.highlighted ? Style.iconColorOnSelected :
                                               okButton.enabled ? Style.buttonColor :
                                                                  Style.imagingToolsGradient2;
@@ -387,7 +387,7 @@ Rectangle {
             hasText: true;
             hasIcon: false;
 
-            textButton: "Cancel";
+            textButton: qsTr("Cancel");
             borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 
@@ -431,7 +431,7 @@ Rectangle {
 
             color: Style.errorTextColor;
 
-            text: "Id can't be empty!";
+            text: qsTr("Id can't be empty!");
         }
 
         Text {

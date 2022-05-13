@@ -145,7 +145,7 @@ Rectangle {
             anchors.verticalCenter: editLicenseDialogTopPanel.verticalCenter;
             anchors.horizontalCenter: editLicenseDialogTopPanel.horizontalCenter;
 
-            text: "Edit License";
+            text: qsTr("Edit License");
             color: Style.textColor;
 
             font.family: Style.fontFamily;
@@ -322,7 +322,7 @@ Rectangle {
             hasText: true;
             hasIcon: false;
 
-            textButton: "OK";
+            textButton: qsTr("OK");
             borderColor: okButton.highlighted ? Style.iconColorOnSelected :
                                               okButton.enabled ? Style.buttonColor :
                                                                  Style.imagingToolsGradient2;
@@ -370,7 +370,7 @@ Rectangle {
             hasText: true;
             hasIcon: false;
 
-            textButton: "Cancel";
+            textButton: qsTr("Cancel");
             borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.imagingToolsGradient1;
 
@@ -413,7 +413,7 @@ Rectangle {
 
             color: Style.errorTextColor;
 
-            text: "Id can't be empty!";
+            text: qsTr("Id can't be empty!");
         }
 
         Text {

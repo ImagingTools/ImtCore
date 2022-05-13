@@ -23,24 +23,24 @@ Row {
         id: listModel;
     }
 
-    function refreshBtn() {
-            listModel.clear();
-            if (paginationContainer.pagesSize < 10){
-                for (var i = 0; i < paginationContainer.pagesSize; i++){
-                    listModel.append({number: i+1, selected: paginationContainer.currentValue === i + 1});
-                }
+    function refreshBtn(){
+        listModel.clear();
+        if (paginationContainer.pagesSize < 10){
+            for (var i = 0; i < paginationContainer.pagesSize; i++){
+                listModel.append({number: i+1, selected: paginationContainer.currentValue === i + 1});
             }
-            else {
-                [1, 2].map(v => listModel.append({number: v, selected: paginationContainer.currentValue === v}));
-                listModel.append({number: paginationContainer.currentValue - 2 > 1 + 3 ? -1 : 1 + 2, selected: paginationContainer.currentValue === 3});
-                for (var k = Math.max(1 + 3, paginationContainer.currentValue - 2); k <= Math.min(paginationContainer.pagesSize - 3, paginationContainer.currentValue + 2); k++) {
-                    listModel.append({number: k, selected: paginationContainer.currentValue === k});
-                }
-                listModel.append({number: paginationContainer.currentValue + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentValue === paginationContainer.pagesSize - 2});
-                [paginationContainer.pagesSize - 1, paginationContainer.pagesSize].map(v => listModel.append({number: v, selected: paginationContainer.currentValue === v}));
-            }
-            repeaterPagination.model = listModel
         }
+        else {
+            [1, 2].map(v => listModel.append({number: v, selected: paginationContainer.currentValue === v}));
+            listModel.append({number: paginationContainer.currentValue - 2 > 1 + 3 ? -1 : 1 + 2, selected: paginationContainer.currentValue === 3});
+            for (var k = Math.max(1 + 3, paginationContainer.currentValue - 2); k <= Math.min(paginationContainer.pagesSize - 3, paginationContainer.currentValue + 2); k++){
+                listModel.append({number: k, selected: paginationContainer.currentValue === k});
+            }
+            listModel.append({number: paginationContainer.currentValue + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentValue === paginationContainer.pagesSize - 2});
+            [paginationContainer.pagesSize - 1, paginationContainer.pagesSize].map(v => listModel.append({number: v, selected: paginationContainer.currentValue === v}));
+        }
+        repeaterPagination.model = listModel
+    }
 
     AuxButton {
         id: buttonDecr;
@@ -55,14 +55,15 @@ Row {
 
         onClicked: {
             if (paginationContainer.currentValue - 1 >= 1){
-                paginationContainer.currentValue--;;
-                paginationContainer.refreshBtn();;
+                paginationContainer.currentValue--;
+                paginationContainer.refreshBtn();
             }
         }
     }
 
     Repeater {
         id: repeaterPagination;
+
         delegate: AuxButton {
             id: buttonDelegate;
 
@@ -76,8 +77,8 @@ Row {
             textButton: model.number === -1 ? "..." : model.number;
             onClicked: {
                 paginationContainer.currentIndex = model.index;
-                paginationContainer.currentValue = model.number
-                paginationContainer.refreshBtn()
+                paginationContainer.currentValue = model.number;
+                paginationContainer.refreshBtn();
             }
 
             Rectangle {

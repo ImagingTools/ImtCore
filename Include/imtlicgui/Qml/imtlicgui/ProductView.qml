@@ -75,10 +75,10 @@ Item {
         id: contextMenuModel;
 
         Component.onCompleted: {
-            contextMenuModel.append({"id": "Edit", "name": "Edit", "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
-            contextMenuModel.append({"id": "Remove", "name": "Remove", "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Edit", "name": qsTr("Edit"), "imageSource": "../../../Icons/Light/Edit_On_Normal.svg", "mode": "Normal"});
+            contextMenuModel.append({"id": "Remove", "name": qsTr("Remove"), "imageSource": "../../../Icons/Light/Remove_On_Normal.svg", "mode": "Normal"});
             contextMenuModel.append({"id": "", "name": "", "imageSource": "", "mode": "Normal"});
-            contextMenuModel.append({"id": "SetDescription", "name": "Set Description", "imageSource": "", "mode": "Normal"});
+            contextMenuModel.append({"id": "SetDescription", "name": qsTr("Set Description"), "imageSource": "", "mode": "Normal"});
         }
     }
 
@@ -288,7 +288,7 @@ Item {
 //            }
 
             if (tfcProductId.text === ""){
-                productsCollectionView.openMessageDialog("Error dialog", "Id can't be empty!", "ErrorDialog");
+                productsCollectionView.openMessageDialog("Error dialog", qsTr("Id can't be empty!"), "ErrorDialog");
             }
             else{
                 let name = productsCollectionViewContainer.checkLicenses();
@@ -296,7 +296,7 @@ Item {
                     productViewSaveQuery.updateModel();
                 }
                 else{
-                    let message = name + " has an invalid id!";
+                    let message = name + qsTr(" has an invalid id!");
                     productsCollectionView.openMessageDialog("Error dialog", message, "ErrorDialog");
                 }
             }
@@ -638,7 +638,7 @@ Item {
                font.pixelSize: Style.fontSize_common;
                font.family: Style.fontFamily;
 
-               text: "Product-Id";
+               text: qsTr("Product-Id");
             }
         }
 
@@ -685,7 +685,7 @@ Item {
                font.pixelSize: Style.fontSize_common;
                font.family: Style.fontFamily;
 
-               text: "Product Name";
+               text: qsTr("Product Name");
             }
         }
 
@@ -722,7 +722,7 @@ Item {
                 anchors.left: headerTreeView.left;
                 anchors.leftMargin: 10;
 
-                text: "Features";
+                text: qsTr("Features");
                 color: Style.textColor;
 
                 font.pixelSize: Style.fontSize_common;

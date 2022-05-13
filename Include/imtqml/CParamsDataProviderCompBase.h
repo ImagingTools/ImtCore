@@ -3,12 +3,13 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
-#include <icomp/CComponentBase.h>
+#include <iqt/ITranslationManager.h>
 
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtgql/IGqlMutationDataControllerDelegate.h>
+#include <imtqml/CUserOptionsProviderCompBase.h>
 
 
 namespace imtqml
@@ -19,12 +20,12 @@ namespace imtqml
 	Basic implementation for the controller of the application page representation data model.
 */
 class CParamsDataProviderCompBase:
-			public icomp::CComponentBase,
+			public imtqml::CUserOptionsProviderCompBase,
 			public imtbase::IItemBasedRepresentationDataProvider,
 			public imtgql::IGqlMutationDataControllerDelegate
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
 
 	enum ComponentType
 	{
@@ -58,6 +59,7 @@ public:
 		I_ASSIGN_MULTI_0(m_paramSubElementsCompPtr, "ParamSubElements", "Subelements of the param", false);
 		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false);
 		I_ASSIGN(m_parameterCompPtr, "Parameter", "Parameter of params data", false, "");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
@@ -76,6 +78,7 @@ private:
 	I_MULTIREF(imtbase::IItemBasedRepresentationDataProvider, m_paramSubElementsCompPtr);
 	I_MULTIREF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
 	I_REF(iser::ISerializable, m_parameterCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

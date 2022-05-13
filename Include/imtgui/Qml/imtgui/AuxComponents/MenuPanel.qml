@@ -85,6 +85,11 @@ Rectangle {
         function updateModel(){
             var query = Gql.GqlRequest("query", "PagesData") ;
 
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("LanguageId");
+            inputParams.InsertFieldArgument("LanguageId", Style.language);
+            query.AddParam(inputParams);
+
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField(PageEnum.ID);
             queryFields.InsertField(PageEnum.NAME);
