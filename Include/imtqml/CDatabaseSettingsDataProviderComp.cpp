@@ -1,6 +1,9 @@
 #include <imtqml/CDatabaseSettingsDataProviderComp.h>
 
 
+// Qt includes
+#include <QtCore/QTranslator>
+
 // ACF includes
 #include <istd/CChangeGroup.h>
 #include <imod/TModelWrap.h>

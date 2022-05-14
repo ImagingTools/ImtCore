@@ -1,17 +1,15 @@
 #include <imtqml/CCommandDataProviderCompBase.h>
 
 
+// Qt includes
+#include <QtCore/QTranslator>
+
+
 namespace imtqml
 {
 
 
 // public methods
-
-CCommandDataProviderCompBase::CCommandDataProviderCompBase() :
-	CUserOptionsProviderCompBase()
-{
-}
-
 
 // reimplemented (imtbase::IItemBasedRepresentationProvider)
 

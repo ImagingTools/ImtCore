@@ -1,5 +1,9 @@
 #include <imtqml/CParamsDataProviderCompBase.h>
 
+
+// Qt includes
+#include <QtCore/QTranslator>
+
 // ACF includes
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
@@ -20,8 +24,9 @@ QByteArray CParamsDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,
-																	   const QByteArrayList& fields)
+imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
+			const QList<imtgql::CGqlObject>& params,
+			const QByteArrayList& fields)
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 

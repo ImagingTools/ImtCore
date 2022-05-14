@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+
 // ACF includes
 #include <iqt/ITranslationManager.h>
 
@@ -13,17 +14,12 @@ namespace imtqml
 {
 
 
-/**
-	Command.
-	\ingroup LicenseManagement
-*/
 class CCommandDataProviderCompBase:
 		public imtqml::CUserOptionsProviderCompBase,
 		public imtbase::IItemBasedRepresentationDataProvider
 {
 public:
 	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
-	typedef imtbase::IItemBasedRepresentationDataProvider BaseClass2;
 	typedef imtqml::CCommandDataEnumProviderComp CommandEnum;
 
 	I_BEGIN_COMPONENT(CCommandDataProviderCompBase);
@@ -34,8 +30,6 @@ public:
 		I_ASSIGN_MULTI_0(m_commandDefaultStatusIcon, "CommandDefaultStatusIcon", "Path of status icon used by default", false);
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
-
-	CCommandDataProviderCompBase();
 
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;

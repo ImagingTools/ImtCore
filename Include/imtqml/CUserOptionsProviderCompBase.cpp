@@ -5,13 +5,7 @@ namespace imtqml
 {
 
 
-// public methods
-
-CUserOptionsProviderCompBase::CUserOptionsProviderCompBase() :
-	CComponentBase()
-{
-}
-
+// protected methods
 
 QByteArray CUserOptionsProviderCompBase::GetLanguageIdFromInputParams(const QList<imtgql::CGqlObject>& inputParams) const
 {

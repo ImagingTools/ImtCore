@@ -15,7 +15,7 @@ namespace imtqml
 
 
 /**
-	Returns headers for a collection of objects
+	Returns headers for a collection of objects.
 */
 class CHeadersDataProviderComp:
 		public imtqml::CUserOptionsProviderCompBase,
@@ -23,7 +23,6 @@ class CHeadersDataProviderComp:
 {
 public:
 	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
-	typedef imtbase::IItemBasedRepresentationDataProvider BaseClass2;
 
 	I_BEGIN_COMPONENT(CHeadersDataProviderComp);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
@@ -32,8 +31,6 @@ public:
 		I_ASSIGN_MULTI_0(m_headersNamesAttrPtr, "HeadersNames", "Headers names", true);
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
-
-	CHeadersDataProviderComp();
 
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;

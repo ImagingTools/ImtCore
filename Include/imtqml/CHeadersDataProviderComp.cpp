@@ -1,17 +1,15 @@
 #include <imtqml/CHeadersDataProviderComp.h>
 
 
+// Qt includes
+#include <QtCore/QTranslator>
+
+
 namespace imtqml
 {
 
 
 // public methods
-
-CHeadersDataProviderComp::CHeadersDataProviderComp() :
-	CUserOptionsProviderCompBase()
-{
-}
-
 
 // reimplemented (imtbase::IItemBasedRepresentationProvider)
 

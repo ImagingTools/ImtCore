@@ -1,6 +1,10 @@
 #include <imtqml/CPageDataProviderCompBase.h>
 
 
+// Qt includes
+#include <QtCore/QTranslator>
+
+
 namespace imtqml
 {
 
@@ -28,7 +32,7 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 			if (m_translationManagerCompPtr.IsValid()){
 				QByteArray languageId = GetLanguageIdFromInputParams(params);
 				int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-				if (languageId != "" && currentIndex >= 0){
+				if (!languageId.isEmpty() && currentIndex >= 0){
 					const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
 					if (translatorPtr != nullptr && m_pageNameAttrPtr.IsValid()){
 						rootModelPtr->SetData(PageEnum::NAME, translatorPtr->translate("", (*m_pageNameAttrPtr).toUtf8()));
@@ -43,16 +47,16 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 			rootModelPtr->SetData(PageEnum::ICON, *m_pageDefaultStatusIconAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::ICON_ON_SELECTED){
-			rootModelPtr->SetData(PageEnum::ICON_ON_SELECTED,*m_pageOnSelectedStatusIconAttrPtr);
+			rootModelPtr->SetData(PageEnum::ICON_ON_SELECTED, *m_pageOnSelectedStatusIconAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::ICON_OFF_SELECTED){
-			rootModelPtr->SetData(PageEnum::ICON_OFF_SELECTED,*m_pageOffSelectedStatusIconAttrPtr);
+			rootModelPtr->SetData(PageEnum::ICON_OFF_SELECTED, *m_pageOffSelectedStatusIconAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::SOURCE){
-			rootModelPtr->SetData(PageEnum::SOURCE,*m_pageSourceItemAttrPtr);
+			rootModelPtr->SetData(PageEnum::SOURCE, *m_pageSourceItemAttrPtr);
 		}
 		if (fields[indexField] == PageEnum::ENABLED){
-			rootModelPtr->SetData(PageEnum::ENABLED,"true");
+			rootModelPtr->SetData(PageEnum::ENABLED, "true");
 		}
 	}
 
