@@ -40,9 +40,8 @@ namespace imtgui
 
 
 class CObjectCollectionViewComp:
-		public iqtgui::TRestorableGuiWrap<
-		iqtgui::TDesignerGuiObserverCompBase<
-		Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
+			public iqtgui::TRestorableGuiWrap<
+						iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
 		public imod::CMultiModelDispatcherBase,
 		virtual public ibase::IProgressManager,
 		virtual public imtbase::ISelection
@@ -50,8 +49,7 @@ class CObjectCollectionViewComp:
 	Q_OBJECT
 public:
 	typedef iqtgui::TRestorableGuiWrap<
-	iqtgui::TDesignerGuiObserverCompBase<
-	Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
+				iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
@@ -172,7 +170,7 @@ protected:
 		CObjectCollectionViewComp* m_parentPtr;
 
 		int m_pageCount;
-		int m_pageSelection;
+		int m_selectedPageIndex;
 	};
 
 	template <typename InterfaceType>
@@ -318,6 +316,7 @@ private:
 		mutable imtbase::ICollectionInfo::Ids m_ids;
 		int m_totalRowCount;
 		ObjectMetaInfo m_metaInfo;
+		bool m_isPageMode;
 
 		CObjectCollectionViewComp& m_parent;
 		mutable QMap<QByteArray, ObjectMetaInfo> m_metaInfoMap;

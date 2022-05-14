@@ -17,6 +17,7 @@
 #include <QtGui/QResizeEvent>
 
 // ACF includes
+#include <istd/CChangeGroup.h>
 #include <imod/IModel.h>
 #include <iprm/CParamsSet.h>
 #include <idoc/IDocumentMetaInfo.h>
@@ -150,7 +151,10 @@ const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const 
 
 void CObjectCollectionViewComp::OnPageSelectionUpdated()
 {
-	int index = m_pageSelection.GetSelectedOptionIndex();
+	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	if (collectionPtr != nullptr){
+		m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
+	}
 }
 
 
@@ -376,9 +380,6 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	connect(ItemList->header(), &QHeaderView::sortIndicatorChanged, this, &CObjectCollectionViewComp::OnSortingChanged);
 
 	PaginationFrame->setVisible(m_paginationGuiCompPtr.IsValid());
-	m_pageSelection.SetPageCount(20);
-	m_pageSelection.SetSelectedOptionIndex(-1);
-
 	if (m_paginationGuiCompPtr.IsValid()){
 		m_paginationGuiCompPtr->CreateGui(PaginationFrame);
 	}
@@ -1134,7 +1135,7 @@ void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
 
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i]; //m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QModelIndex mappedIndex = selectedIndexes[i];
 			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
 			if (!itemId.isEmpty()){
 				delegate.RenameObject(itemId, "");
@@ -1154,7 +1155,7 @@ void CObjectCollectionViewComp::OnContextMenuEditDescription(bool /*checked*/)
 
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i]; // m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QModelIndex mappedIndex = selectedIndexes[i];
 			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
 			if (!itemId.isEmpty()){
 				imtbase::IObjectCollection* objectPtr = GetObservedObject();
@@ -1178,7 +1179,7 @@ void CObjectCollectionViewComp::OnContextMenuEditDocument(bool /*checked*/)
 
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i]; //m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QModelIndex mappedIndex = selectedIndexes[i];
 			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
 			if (!itemId.isEmpty()){
 				delegate.OpenDocumentEditor(itemId);
@@ -1196,7 +1197,7 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 	QVector<QByteArray> itemIds;
 	if (!selectedIndexes.isEmpty()){
 		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i]; // m_proxyModelPtr->mapToSource(selectedIndexes[i]);
+			QModelIndex mappedIndex = selectedIndexes[i];
 			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
 			if (!itemId.isEmpty()){
 				itemIds.append(itemId);
@@ -1350,7 +1351,7 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 CObjectCollectionViewComp::PageSelection::PageSelection()
 	:m_parentPtr(nullptr),
 	m_pageCount(0),
-	m_pageSelection(-1)
+	m_selectedPageIndex(-1)
 {
 }
 
@@ -1370,7 +1371,7 @@ void CObjectCollectionViewComp::PageSelection::SetPageCount(int pageCount)
 
 			m_pageCount = pageCount;
 
-			if (m_pageSelection >= m_pageCount){
+			if (m_selectedPageIndex >= m_pageCount){
 				SetSelectedOptionIndex(m_pageCount - 1);
 			}
 		}
@@ -1388,18 +1389,18 @@ const iprm::IOptionsList* CObjectCollectionViewComp::PageSelection::GetSelection
 
 int CObjectCollectionViewComp::PageSelection::GetSelectedOptionIndex() const
 {
-	return m_pageSelection;
+	return m_selectedPageIndex;
 }
 
 
 bool CObjectCollectionViewComp::PageSelection::SetSelectedOptionIndex(int index)
 {
 	if (index >= -1 && index < m_pageCount){
-		if (index != m_pageSelection){
+		if (index != m_selectedPageIndex){
 			istd::IChangeable::ChangeSet selectionChangeSet(iprm::ISelectionParam::CF_SELECTION_CHANGED);
 			istd::CChangeNotifier notifier(this, &selectionChangeSet);
 
-			m_pageSelection = index;
+			m_selectedPageIndex = index;
 
 			if (m_parentPtr != nullptr){
 				m_parentPtr->OnPageSelectionUpdated();
@@ -1530,9 +1531,10 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& parent)
 	:m_fetchedRowCount(0),
 	m_totalRowCount(0),
-	m_batchSize(50),
 	m_parent(parent)
 {
+	m_isPageMode = m_parent.m_paginationGuiCompPtr.IsValid();
+	m_batchSize = m_isPageMode ? 25 : 50;
 }
 
 
@@ -1556,6 +1558,40 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 			QByteArray itemTypeId = collection.GetObjectTypeId(elementIds.front());
 
 			m_metaInfo = m_parent.GetMetaInfo(elementIds.front(), itemTypeId);
+		}
+	}
+
+	if (m_isPageMode){
+		int lastSelectedPageIndex = m_parent.m_pageSelection.GetSelectedOptionIndex();
+
+		istd::CChangeGroup changeGroup(&m_parent.m_pageSelection);
+
+		int pageCount = m_totalRowCount / m_batchSize + (((m_totalRowCount % m_batchSize) != 0) ? 1 : 0);
+
+		m_parent.m_pageSelection.SetPageCount(pageCount);
+
+		if (lastSelectedPageIndex < 0){
+			m_parent.m_pageSelection.SetSelectedOptionIndex(pageCount > 0 ? 0 : -1);
+		}
+		else{
+			m_parent.m_pageSelection.SetSelectedOptionIndex(pageCount > lastSelectedPageIndex ? lastSelectedPageIndex : -1);
+		}
+
+		if (m_totalRowCount > 0){
+			int pageIndex = m_parent.m_pageSelection.GetSelectedOptionIndex();
+
+			beginInsertRows(QModelIndex(), 0, m_batchSize - 1);
+
+			imtbase::ICollectionInfo::Ids fetchedIds = collection.GetElementIds(pageIndex * m_batchSize, m_batchSize, &filterParams);
+			if (!fetchedIds.isEmpty()){
+				m_fetchedRowCount = fetchedIds.count();
+
+				m_ids = fetchedIds;
+			}
+
+			Q_ASSERT(m_ids.count() == m_fetchedRowCount);
+
+			endInsertRows();
 		}
 	}
 
@@ -1779,6 +1815,10 @@ bool CObjectCollectionViewComp::TableModel::canFetchMore(const QModelIndex& pare
 		return false;
 	}
 
+	if (m_isPageMode){
+		return false;
+	}
+
 	return (m_fetchedRowCount < m_totalRowCount);
 }
 
@@ -1786,6 +1826,10 @@ bool CObjectCollectionViewComp::TableModel::canFetchMore(const QModelIndex& pare
 void CObjectCollectionViewComp::TableModel::fetchMore(const QModelIndex& parent)
 {
 	if (parent.isValid()){
+		return;
+	}
+
+	if (m_isPageMode){
 		return;
 	}
 
