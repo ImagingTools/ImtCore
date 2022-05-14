@@ -45,10 +45,6 @@ protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
-
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 

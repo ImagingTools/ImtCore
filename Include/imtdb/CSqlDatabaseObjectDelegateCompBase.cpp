@@ -200,7 +200,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	}
 
 	if (!textFilterQuery.isEmpty()){
-		filterQuery += textFilterQuery;
+		filterQuery += "(" + textFilterQuery + ")";
 	}
 
 	return true;
@@ -221,13 +221,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 	}
 
 	QString textFilter = collectionFilter.GetTextFilter();
+	if (!textFilter.isEmpty()){
+		textFilterQuery = QString("%1 LIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
 
-	textFilterQuery = QString("%1 LIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		for (int i = 1; i < filteringColumnIds.count(); ++i){
+			textFilterQuery += " OR ";
 
-	for (int i = 1; i < filteringColumnIds.count(); ++i){
-		textFilterQuery += " OR ";
-
-		textFilterQuery += QString("%1 LIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QString("%1 LIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+		}
 	}
 
 	return true;

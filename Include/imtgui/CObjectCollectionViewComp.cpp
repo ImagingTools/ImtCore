@@ -1041,6 +1041,8 @@ void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int /*oldVisual
 void CObjectCollectionViewComp::OnSortingChanged(int logicalIndex, Qt::SortOrder order)
 {
 	m_tableModel.SetSorting(logicalIndex, order);
+
+	RestoreColumnsSettings();
 }
 
 
@@ -1212,6 +1214,8 @@ void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
 void CObjectCollectionViewComp::OnFilterChanged(const QString& text)
 {
 	m_tableModel.SetFilter(text);
+
+	RestoreColumnsSettings();
 }
 
 
@@ -1343,6 +1347,8 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 	m_tableModel.SetSorting(ItemList->header()->sortIndicatorSection(), ItemList->header()->sortIndicatorOrder());
 
 	m_tableModel.UpdateFromData(*collectionPtr, changeSet);
+
+	RestoreColumnsSettings();
 }
 
 

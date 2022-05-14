@@ -55,20 +55,6 @@ void CPaginationGuiComp::OnGuiCreated()
 }
 
 
-// reimplemented (icomp::CComponentBase)
-
-void CPaginationGuiComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
-
-void CPaginationGuiComp::OnComponentDestroyed()
-{
-	BaseClass::OnComponentDestroyed();
-}
-
-
 // reimplemented (imod::CSingleModelObserverBase)
 
 void CPaginationGuiComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
@@ -117,12 +103,12 @@ void CPaginationGuiComp::RefreshWidget()
 						int pageCount = pageListPtr->GetOptionsCount();
 						for (int i = 0; i < pageCount; i++){
 							QString text = QString::number(i + 1);
+							itemPtr = new PaginationGuiItem(text, widgetPtr);
+
 							if (i == pageSelectionPtr->GetSelectedOptionIndex()){
-								text.prepend("*");
-								text.append("*");
+								itemPtr->setStyleSheet("font-weight: bold;");
 							}
 
-							itemPtr = new PaginationGuiItem(text, widgetPtr);
 							layoutPtr->addWidget(itemPtr);
 							connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnPageClicked, Qt::QueuedConnection);
 						}
