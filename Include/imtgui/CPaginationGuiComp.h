@@ -35,8 +35,13 @@ protected:
 	// reimplemented (imod::IObserver)
 	virtual void OnGuiModelDetached() override;
 
+	// reimplemented (ibase::TDesignSchemaHandlerWrap)
+	virtual void OnDesignSchemaChanged();
+
 protected:
-	void UpdateWidget();
+	void UpdateIcons();
+	void UpdateNavigationButtons();
+	void UpdatePageButtons();
 
 private Q_SLOTS:
 	void OnFirstClicked();

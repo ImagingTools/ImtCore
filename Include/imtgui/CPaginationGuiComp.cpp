@@ -29,7 +29,8 @@ void CPaginationGuiComp::OnGuiCreated()
 	connect(Next, &QToolButton::clicked, this, &CPaginationGuiComp::OnNext10Clicked);
 	connect(Last, &QToolButton::clicked, this, &CPaginationGuiComp::OnLastClicked);
 
-	UpdateWidget();
+	First->setText("");
+	Last->setText("");
 }
 
 
@@ -47,7 +48,8 @@ void CPaginationGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet
 		}
 	}
 
-	UpdateWidget();
+	UpdateNavigationButtons();
+	UpdatePageButtons();
 }
 
 
@@ -57,13 +59,50 @@ void CPaginationGuiComp::OnGuiModelDetached()
 {
 	BaseClass::OnGuiModelDetached();
 
-	UpdateWidget();
+	UpdateNavigationButtons();
+	UpdatePageButtons();
+}
+
+
+// reimplemented (ibase::TDesignSchemaHandlerWrap)
+
+void CPaginationGuiComp::OnDesignSchemaChanged()
+{
+	UpdateIcons();
 }
 
 
 // protected methods
 
-void CPaginationGuiComp::UpdateWidget()
+void CPaginationGuiComp::UpdateIcons()
+{
+	First->setIcon(QIcon(":/Icons/MoveFirst"));
+	Last->setIcon(QIcon(":/Icons/MoveLast"));
+}
+
+
+void CPaginationGuiComp::UpdateNavigationButtons()
+{
+	if (IsGuiCreated()){
+		iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+		if (pageSelectionPtr != nullptr){
+			const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
+			if (pageListPtr != nullptr){
+				int pageCount = pageListPtr->GetOptionsCount();
+
+				First->setEnabled(m_firstVisiblePageIndex >= 10);
+				Prev->setEnabled(m_firstVisiblePageIndex >= 10);
+				Next->setEnabled(m_firstVisiblePageIndex + 10 < pageCount);
+				Last->setEnabled(m_firstVisiblePageIndex + 10 < pageCount);
+
+				return;
+			}
+		}
+	}
+}
+
+
+void CPaginationGuiComp::UpdatePageButtons()
 {
 	if (IsGuiCreated()){
 		QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(PageButtonsFrame->layout());
@@ -110,11 +149,16 @@ void CPaginationGuiComp::OnFirstClicked()
 	if (!IsUpdateBlocked()){
 		iprm::ISelectionParam* selectionPtr = GetObservedObject();
 		if (selectionPtr != nullptr){
-			UpdateBlocker blocker(this);
+			const iprm::IOptionsList* pageListPtr = selectionPtr->GetSelectionConstraints();
+			if (pageListPtr != nullptr){
+				UpdateBlocker blocker(this);
 
-			m_firstVisiblePageIndex = 0;
+				m_firstVisiblePageIndex = 0;
+				pageListPtr->GetOptionsCount() > 0 ? selectionPtr->SetSelectedOptionIndex(0) : selectionPtr->SetSelectedOptionIndex(-1);
 
-			UpdateWidget();
+				UpdateNavigationButtons();
+				UpdatePageButtons();
+			}
 		}
 	}
 }
@@ -125,13 +169,19 @@ void CPaginationGuiComp::OnPrev10Clicked()
 	if (!IsUpdateBlocked()){
 		iprm::ISelectionParam* selectionPtr = GetObservedObject();
 		if (selectionPtr != nullptr){
-			UpdateBlocker blocker(this);
+			const iprm::IOptionsList* pageListPtr = selectionPtr->GetSelectionConstraints();
+			if (pageListPtr != nullptr){
+				UpdateBlocker blocker(this);
 
-			if (m_firstVisiblePageIndex >= 10){
-				m_firstVisiblePageIndex -= 10;
+				if (m_firstVisiblePageIndex >= 10){
+					m_firstVisiblePageIndex -= 10;
+				}
+
+				selectionPtr->SetSelectedOptionIndex(selectionPtr->GetSelectedOptionIndex() - 10);
+
+				UpdateNavigationButtons();
+				UpdatePageButtons();
 			}
-
-			UpdateWidget();
 		}
 	}
 }
@@ -152,7 +202,7 @@ void CPaginationGuiComp::OnPageClicked()
 
 					selectionPtr->SetSelectedOptionIndex(page - 1);
 
-					UpdateWidget();
+					UpdatePageButtons();
 				}
 			}
 		}
@@ -165,15 +215,24 @@ void CPaginationGuiComp::OnNext10Clicked()
 	if (!IsUpdateBlocked()){
 		iprm::ISelectionParam* selectionPtr = GetObservedObject();
 		if (selectionPtr != nullptr){
-			const iprm::IOptionsList* optionsPtr = selectionPtr->GetSelectionConstraints();
-			if (optionsPtr != nullptr){
+			const iprm::IOptionsList* pageListPtr = selectionPtr->GetSelectionConstraints();
+			if (pageListPtr != nullptr){
 				UpdateBlocker blocker(this);
 
-				if (m_firstVisiblePageIndex + 10 < optionsPtr->GetOptionsCount()){
+				if (m_firstVisiblePageIndex + 10 < pageListPtr->GetOptionsCount()){
 					m_firstVisiblePageIndex += 10;
 				}
 
-				UpdateWidget();
+				int pageCount = pageListPtr->GetOptionsCount();
+				int newSelectedPageIndex = selectionPtr->GetSelectedOptionIndex() + 10;
+				if (newSelectedPageIndex >= pageCount){
+					newSelectedPageIndex = pageCount - 1;
+				}
+
+				selectionPtr->SetSelectedOptionIndex(newSelectedPageIndex);
+
+				UpdateNavigationButtons();
+				UpdatePageButtons();
 			}
 		}
 	}
@@ -185,13 +244,17 @@ void CPaginationGuiComp::OnLastClicked()
 	if (!IsUpdateBlocked()){
 		iprm::ISelectionParam* selectionPtr = GetObservedObject();
 		if (selectionPtr != nullptr){
-			const iprm::IOptionsList* optionsPtr = selectionPtr->GetSelectionConstraints();
-			if (optionsPtr != nullptr){
+			const iprm::IOptionsList* pageListPtr = selectionPtr->GetSelectionConstraints();
+			if (pageListPtr != nullptr){
 				UpdateBlocker blocker(this);
 
-				m_firstVisiblePageIndex = optionsPtr->GetOptionsCount() / 10 * 10;
+				m_firstVisiblePageIndex = pageListPtr->GetOptionsCount() / 10 * 10;
 
-				UpdateWidget();
+				int pageCount = pageListPtr->GetOptionsCount();
+				pageCount > 0 ? selectionPtr->SetSelectedOptionIndex(pageCount - 1) : selectionPtr->SetSelectedOptionIndex(-1);
+
+				UpdateNavigationButtons();
+				UpdatePageButtons();
 			}
 		}
 	}
