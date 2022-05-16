@@ -381,7 +381,11 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 	PaginationFrame->setVisible(m_paginationGuiCompPtr.IsValid());
 	if (m_paginationGuiCompPtr.IsValid()){
-		m_paginationGuiCompPtr->CreateGui(PaginationFrame);
+		if (m_paginationGuiCompPtr->CreateGui(PaginationFrame)){
+			if (m_paginationGuiObserverCompPtr.IsValid()){
+				m_pageSelection.AttachObserver(m_paginationGuiObserverCompPtr.GetPtr());
+			}
+		}
 	}
 
 	BaseClass::OnGuiCreated();
@@ -396,6 +400,10 @@ void CObjectCollectionViewComp::OnGuiCreated()
 
 void CObjectCollectionViewComp::OnGuiDestroyed()
 {
+	if (m_paginationGuiObserverCompPtr.IsValid() && m_paginationGuiObserverCompPtr->IsModelAttached(&m_pageSelection)){
+		m_pageSelection.DetachObserver(m_paginationGuiObserverCompPtr.GetPtr());
+	}
+
 	if (m_paginationGuiCompPtr.IsValid() && m_paginationGuiCompPtr->IsGuiCreated()){
 		m_paginationGuiCompPtr->DestroyGui();
 	}
