@@ -1537,15 +1537,17 @@ istd::IFactoryInfo::KeyList CObjectCollectionViewComp::FocusDecorationFactory::G
 CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& parent)
 	:m_fetchedRowCount(0),
 	m_totalRowCount(0),
-	m_parent(parent)
+	m_parent(parent),
+	m_batchSize(50)
 {
-	m_isPageMode = m_parent.m_paginationGuiCompPtr.IsValid();
-	m_batchSize = m_isPageMode ? 25 : 50;
 }
 
 
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes)
 {
+	m_isPageMode = m_parent.m_paginationGuiCompPtr.IsValid();
+	m_batchSize = m_isPageMode ? 25 : 50;
+
 	beginResetModel();
 
 	iprm::CParamsSet filterParams;
