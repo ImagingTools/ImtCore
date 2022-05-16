@@ -10,6 +10,12 @@ namespace imtgui
 {
 
 
+CPaginationGuiComp::CPaginationGuiComp()
+	:m_firstVisiblePageIndex(0)
+{
+}
+
+
 // protected methods
 
 // reimplemented (iqtgui::CGuiComponentBase)
@@ -19,8 +25,8 @@ void CPaginationGuiComp::OnGuiCreated()
 	BaseClass::OnGuiCreated();
 
 	connect(First, &QToolButton::clicked, this, &CPaginationGuiComp::OnFirstClicked);
-	connect(Prev, &QToolButton::clicked, this, &CPaginationGuiComp::OnPrevClicked);
-	connect(Next, &QToolButton::clicked, this, &CPaginationGuiComp::OnNextClicked);
+	connect(Prev, &QToolButton::clicked, this, &CPaginationGuiComp::OnPrev10Clicked);
+	connect(Next, &QToolButton::clicked, this, &CPaginationGuiComp::OnNext10Clicked);
 	connect(Last, &QToolButton::clicked, this, &CPaginationGuiComp::OnLastClicked);
 
 	UpdateWidget();
@@ -31,6 +37,16 @@ void CPaginationGuiComp::OnGuiCreated()
 
 void CPaginationGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
+	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+	if (pageSelectionPtr != nullptr){
+		const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
+		if (pageListPtr != nullptr){
+			if (m_firstVisiblePageIndex >= pageListPtr->GetOptionsCount()){
+				m_firstVisiblePageIndex = pageListPtr->GetOptionsCount() / 10;
+			}
+		}
+	}
+
 	UpdateWidget();
 }
 
@@ -60,14 +76,16 @@ void CPaginationGuiComp::UpdateWidget()
 			const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
 			if (pageListPtr != nullptr){
 				int pageCount = pageListPtr->GetOptionsCount();
-				for (int i = 0; i < pageCount; i++){
-					QString text = QString::number(i + 1);
+				
+				for (int i = 0; m_firstVisiblePageIndex + i < pageCount && i < 10; i++){
+					int pageIndex = m_firstVisiblePageIndex + i;
+
 					QToolButton* itemPtr = new QToolButton(PageButtonsFrame);
-					itemPtr->setText(QString::number(i + 1));
+					itemPtr->setText(QString::number(pageIndex + 1));
 					itemPtr->setAutoRaise(true);
 					connect(itemPtr, &QToolButton::clicked, this, &CPaginationGuiComp::OnPageClicked, Qt::QueuedConnection);
 
-					if (i == pageSelectionPtr->GetSelectedOptionIndex()){
+					if (pageIndex == pageSelectionPtr->GetSelectedOptionIndex()){
 						itemPtr->setStyleSheet("font-weight: bold;");
 					}
 
@@ -94,23 +112,26 @@ void CPaginationGuiComp::OnFirstClicked()
 		if (selectionPtr != nullptr){
 			UpdateBlocker blocker(this);
 
-			selectionPtr->SetSelectedOptionIndex(0);
+			m_firstVisiblePageIndex = 0;
+
+			UpdateWidget();
 		}
 	}
 }
 
 
-void CPaginationGuiComp::OnPrevClicked()
+void CPaginationGuiComp::OnPrev10Clicked()
 {
 	if (!IsUpdateBlocked()){
 		iprm::ISelectionParam* selectionPtr = GetObservedObject();
 		if (selectionPtr != nullptr){
-			int currentSelection = selectionPtr->GetSelectedOptionIndex();
-			if (currentSelection > 0){
-				UpdateBlocker blocker(this);
+			UpdateBlocker blocker(this);
 
-				selectionPtr->SetSelectedOptionIndex(currentSelection - 1);
+			if (m_firstVisiblePageIndex >= 10){
+				m_firstVisiblePageIndex -= 10;
 			}
+
+			UpdateWidget();
 		}
 	}
 }
@@ -130,6 +151,8 @@ void CPaginationGuiComp::OnPageClicked()
 					UpdateBlocker blocker(this);
 
 					selectionPtr->SetSelectedOptionIndex(page - 1);
+
+					UpdateWidget();
 				}
 			}
 		}
@@ -137,15 +160,21 @@ void CPaginationGuiComp::OnPageClicked()
 }
 
 
-void CPaginationGuiComp::OnNextClicked()
+void CPaginationGuiComp::OnNext10Clicked()
 {
 	if (!IsUpdateBlocked()){
 		iprm::ISelectionParam* selectionPtr = GetObservedObject();
 		if (selectionPtr != nullptr){
-			UpdateBlocker blocker(this);
+			const iprm::IOptionsList* optionsPtr = selectionPtr->GetSelectionConstraints();
+			if (optionsPtr != nullptr){
+				UpdateBlocker blocker(this);
 
-			int currentSelection = selectionPtr->GetSelectedOptionIndex();
-			selectionPtr->SetSelectedOptionIndex(currentSelection + 1);
+				if (m_firstVisiblePageIndex + 10 < optionsPtr->GetOptionsCount()){
+					m_firstVisiblePageIndex += 10;
+				}
+
+				UpdateWidget();
+			}
 		}
 	}
 }
@@ -160,7 +189,9 @@ void CPaginationGuiComp::OnLastClicked()
 			if (optionsPtr != nullptr){
 				UpdateBlocker blocker(this);
 
-				selectionPtr->SetSelectedOptionIndex(optionsPtr->GetOptionsCount() - 1);
+				m_firstVisiblePageIndex = optionsPtr->GetOptionsCount() / 10 * 10;
+
+				UpdateWidget();
 			}
 		}
 	}

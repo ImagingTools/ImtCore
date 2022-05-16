@@ -23,6 +23,8 @@ public:
 	I_BEGIN_COMPONENT(CPaginationGuiComp);
 	I_END_COMPONENT;
 
+	CPaginationGuiComp();
+
 protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
@@ -38,10 +40,13 @@ protected:
 
 private Q_SLOTS:
 	void OnFirstClicked();
-	void OnPrevClicked();
+	void OnPrev10Clicked();
 	void OnPageClicked();
-	void OnNextClicked();
+	void OnNext10Clicked();
 	void OnLastClicked();
+
+private:
+	int m_firstVisiblePageIndex;
 };
 
 
