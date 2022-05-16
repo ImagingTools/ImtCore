@@ -72,7 +72,7 @@ typedef imtgui::CSingleDocumentWorkspaceGuiComp SingleDocumentWorkspace;
 typedef imtgui::CDocumentCollectionViewDelegateComp DocumentCollectionViewDelegate;
 typedef icomp::TModelCompWrap<imtgui::CMenuBasedCommandsProviderComp> MenuBasedCommandsProvider;
 typedef imtgui::CTimeFilterParamEditorComp TimeFilterParamEditor;
-typedef ibase::TModelObserverCompWrap<imtgui::CPaginationGuiComp> PaginationGui;
+typedef imtgui::CPaginationGuiComp PaginationGui;
 
 
 } // namespace ImtGuiPck

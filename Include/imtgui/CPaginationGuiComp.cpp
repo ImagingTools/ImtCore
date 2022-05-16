@@ -1,9 +1,6 @@
 #include <imtgui/CPaginationGuiComp.h>
 
 
-// Qt includes
-#include <QtWidgets/QLayout>
-
 // ACF includes
 #include <iprm/IOptionsList.h>
 #include <iwidgets/iwidgets.h>
@@ -11,26 +8,6 @@
 
 namespace imtgui
 {
-
-
-PaginationGuiItem::PaginationGuiItem(QWidget* parent)
-	:QLabel(parent)
-{
-}
-
-
-PaginationGuiItem::PaginationGuiItem(const QString& text, QWidget* parent)
-	:QLabel(text, parent)
-{
-}
-
-
-// reimplemented (QWidget)
-
-void PaginationGuiItem::mousePressEvent(QMouseEvent* ev)
-{
-	Q_EMIT Clicked();
-}
 
 
 // protected methods
@@ -41,15 +18,10 @@ void CPaginationGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	QWidget* widgetPtr = GetQtWidget();
-	if (widgetPtr != nullptr){
-		QHBoxLayout* layoutPtr = new QHBoxLayout();
-
-		layoutPtr->setContentsMargins(QMargins(10, 10, 10, 10));
-		layoutPtr->setSpacing(10);
-
-		widgetPtr->setLayout(layoutPtr);
-	}
+	connect(First, &QToolButton::clicked, this, &CPaginationGuiComp::OnFirstClicked, Qt::QueuedConnection);
+	connect(Prev, &QToolButton::clicked, this, &CPaginationGuiComp::OnPrevClicked, Qt::QueuedConnection);
+	connect(Next, &QToolButton::clicked, this, &CPaginationGuiComp::OnNextClicked, Qt::QueuedConnection);
+	connect(Last, &QToolButton::clicked, this, &CPaginationGuiComp::OnLastClicked, Qt::QueuedConnection);
 
 	RefreshWidget();
 }
@@ -57,7 +29,7 @@ void CPaginationGuiComp::OnGuiCreated()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CPaginationGuiComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CPaginationGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
 	RefreshWidget();
 }
@@ -67,7 +39,7 @@ void CPaginationGuiComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 
 bool CPaginationGuiComp::OnModelDetached(imod::IModel* modelPtr)
 {
-	bool retVal = BaseClass2::OnModelDetached(modelPtr);
+	bool retVal = BaseClass::OnModelDetached(modelPtr);
 
 	RefreshWidget();
 
@@ -80,54 +52,37 @@ bool CPaginationGuiComp::OnModelDetached(imod::IModel* modelPtr)
 void CPaginationGuiComp::RefreshWidget()
 {
 	if (IsGuiCreated()){
-		QWidget* widgetPtr = GetQtWidget();
-		if (widgetPtr != nullptr){
-			QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(widgetPtr->layout());
-			if (layoutPtr != nullptr){
-				iwidgets::ClearLayout(layoutPtr);
+		QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(PageButtonsFrame->layout());
+		Q_ASSERT(layoutPtr != nullptr);
 
-				iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
-				if (pageSelectionPtr != nullptr){
-					const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
-					if (pageListPtr != nullptr){
-						layoutPtr->addStretch();
+		iwidgets::ClearLayout(layoutPtr);
 
-						PaginationGuiItem* itemPtr = new PaginationGuiItem("<<", widgetPtr);
-						layoutPtr->addWidget(itemPtr);
-						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnFirstClicked, Qt::QueuedConnection);
+		iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+		if (pageSelectionPtr != nullptr){
+			const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
+			if (pageListPtr != nullptr){
+				int pageCount = pageListPtr->GetOptionsCount();
+				for (int i = 0; i < pageCount; i++){
+					QString text = QString::number(i + 1);
+					QToolButton* itemPtr = new QToolButton(PageButtonsFrame);
+					itemPtr->setText(QString::number(i + 1));
+					itemPtr->setAutoRaise(true);
+					connect(itemPtr, &QToolButton::clicked, this, &CPaginationGuiComp::OnPageClicked, Qt::QueuedConnection);
 
-						itemPtr = new PaginationGuiItem("<", widgetPtr);
-						layoutPtr->addWidget(itemPtr);
-						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnPrevClicked, Qt::QueuedConnection);
-
-						int pageCount = pageListPtr->GetOptionsCount();
-						for (int i = 0; i < pageCount; i++){
-							QString text = QString::number(i + 1);
-							itemPtr = new PaginationGuiItem(text, widgetPtr);
-
-							if (i == pageSelectionPtr->GetSelectedOptionIndex()){
-								itemPtr->setStyleSheet("font-weight: bold;");
-							}
-
-							layoutPtr->addWidget(itemPtr);
-							connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnPageClicked, Qt::QueuedConnection);
-						}
-
-						itemPtr = new PaginationGuiItem(">", widgetPtr);
-						layoutPtr->addWidget(itemPtr);
-						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnNextClicked, Qt::QueuedConnection);
-
-						itemPtr = new PaginationGuiItem(">>", widgetPtr);
-						layoutPtr->addWidget(itemPtr);
-						connect(itemPtr, &PaginationGuiItem::Clicked, this, &CPaginationGuiComp::OnLastClicked, Qt::QueuedConnection);
-
-						layoutPtr->addStretch();
-
-						return;
+					if (i == pageSelectionPtr->GetSelectedOptionIndex()){
+						itemPtr->setStyleSheet("font-weight: bold;");
 					}
+
+					layoutPtr->addWidget(itemPtr);
 				}
+
+				ControlsFrame->setVisible(pageCount > 0);
+
+				return;
 			}
 		}
+
+		ControlsFrame->setVisible(false);
 	}
 }
 
@@ -159,7 +114,7 @@ void CPaginationGuiComp::OnPageClicked()
 {
 	iprm::ISelectionParam* selectionPtr = GetObservedObject();
 	if (selectionPtr != nullptr){
-		PaginationGuiItem* itemPtr = dynamic_cast<PaginationGuiItem*>(sender());
+		QToolButton* itemPtr = dynamic_cast<QToolButton*>(sender());
 		if (itemPtr != nullptr){
 			QString text = itemPtr->text();
 			bool isOk;
