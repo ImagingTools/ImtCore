@@ -459,6 +459,11 @@ Item {
 		this.wheel.modifiers = 0;
 		this.wheel.x = 0;
 		this.wheel.y = 0;
+
+		this.tempMouse = {
+			x: 0,
+			y: 0,
+		}
 	}
 
 	onCompleted: {
@@ -528,6 +533,9 @@ Item {
 				this.mousePressed()
 			}
 
+			this.tempMouse.x = this.mouse.x
+			this.tempMouse.y = this.mouse.y
+
 			if(!this.hoverEnabled){
 				this.containsMouse = true
 				this.hover = true
@@ -567,12 +575,28 @@ Item {
 				this.hover = false
 			}
 			if(this._timerPressAndHold) clearTimeout(this._timerPressAndHold)
+
+			// console.log('CONSOLE::', this)
 		}
 	}
 	function _mousemove(e, state) {
 		if(this.enabled && (this.pressed || this.hoverEnabled)){
 			this._fillMouse(e)
-			this.positionChanged()
+			
+			if(this.pressed && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10)){
+				// console.log('CONSOLE::', this)
+				this.pressed = false
+				this.containsMouse = false
+				this.hover = false
+				this.exited()
+				state.release()
+				state.view._mousedown(e, state)
+				
+			} else {
+				this.positionChanged()
+			}
+
+			// console.log('CONSOLE::', state)
 		}
 		
 	}
@@ -586,7 +610,7 @@ Item {
 
 	}
 	function _mouseenter(e, state){
-		if(this.hoverEnabled && this.enabled){
+		if(this.hoverEnabled && this.enabled && (this._context.eventState.target === null || this._context.eventState.target === this)){
 			this._fillMouse(e)
 			this.containsMouse = true
 			this.hover = true
@@ -594,7 +618,7 @@ Item {
 		}
 	}
 	function _mouseleave(e, state){
-		if(this.hoverEnabled && this.enabled){
+		if(this.hoverEnabled && this.enabled && (this._context.eventState.target === null || this._context.eventState.target === this)){
 			//this._fillMouse(e)
 			this.containsMouse = false
 			this.hover = false
@@ -652,7 +676,19 @@ Item {
 	function _touchmove(e, state) {
 		if(this.enabled && (this.pressed || this.hoverEnabled)){
 			this._fillMouse(e)
-			this.positionChanged()
+
+			if(this.pressed && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10)){
+				// console.log('CONSOLE::', this)
+				this.pressed = false
+				this.containsMouse = false
+				this.hover = false
+				this.exited()
+				state.release()
+				state.view._mousedown(e, state)
+				
+			} else {
+				this.positionChanged()
+			}
 		}
 	}
 }

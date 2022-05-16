@@ -657,6 +657,8 @@ BaseLayout {
 
 	}
 	function _scroll(deltaX, deltaY){
+		
+
 		if(this.orientation === ListView.Horizontal){
 			if(deltaX > 0)
 			if(this.contentX + deltaX <= this.element.dom.scrollWidth - this.width){
@@ -686,6 +688,9 @@ BaseLayout {
 				this.contentY = 0
 			}
 		}
+
+		
+
 	}
 	function _fillMouse(e){
 		let rrr = this.element.dom.getBoundingClientRect()
@@ -703,6 +708,7 @@ BaseLayout {
 			state.blocked(this)
 			this._fillMouse(e)
 			this._pressed = true
+			
 		}
 	}
 	function _mouseup(e, state) {
@@ -720,7 +726,27 @@ BaseLayout {
 			deltaX -= this._mouseX
 			deltaY -= this._mouseY
 
+			let tempContentX = this.contentX
+			let tempContentY = this.contentY
+
 			this._scroll(deltaX, deltaY)
+
+			if(tempContentX === this.contentX && tempContentY === this.contentY){
+				let parent = this.parent
+				let find = false
+				while(parent && !find){
+					if(parent && parent.webScroll !== undefined){
+						find = true
+						// console.log('CONSOLE::', this)
+						//this._mouseup(e, state)
+						this._pressed = false
+						parent._mousedown(e, state)
+					} else {
+						parent = parent.parent
+					}
+				}
+			}
+			// console.log('CONSOLE::', state)
 		}
 		
 	}
@@ -750,7 +776,25 @@ BaseLayout {
 			deltaY -= this._mouseY
 
 			
+			let tempContentX = this.contentX
+			let tempContentY = this.contentY
+
 			this._scroll(deltaX, deltaY)
+
+			if(tempContentX === this.contentX && tempContentY === this.contentY){
+				let parent = this.parent
+				let find = false
+				while(parent && !find){
+					if(parent && parent.webScroll !== undefined){
+						find = true
+						// this.pressed = false
+						this._pressed = false
+						parent._touchstart(e, state)
+					} else {
+						parent = parent.parent
+					}
+				}
+			}
 		}
 	}
 

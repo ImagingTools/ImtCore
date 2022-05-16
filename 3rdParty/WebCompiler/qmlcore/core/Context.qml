@@ -41,7 +41,8 @@ Item {
 			},
 			release: function(){
 				this.target = null
-			}
+			},
+			view: null,
 		}
 		
 		this.Qt = {
@@ -80,6 +81,16 @@ Item {
 				while(parent){
 					path.push(parent)
 					parent = parent.parentNode
+				}
+				let find = false
+				this.eventState.view = null
+				for(let p of path){
+					let obj = this.listId[p.id]
+					if(obj && obj.webScroll !== undefined && !find){
+						find = true
+						this.eventState.view = obj
+					}
+					
 				}
 				if(this.eventState.target && this.eventState.target[`_${e.type}`]){
 					this.eventState.target[`_${e.type}`](e, this.eventState)
