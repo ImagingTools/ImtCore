@@ -23,10 +23,16 @@ protected:
 	virtual void initTestCase() = 0;
 
 private slots:
-	void BackupObjectTestWithCorrectParams();
-	void BackupObjectTestWithIncorrectParams_data();
-	void BackupObjectTestWithIncorrectParams();
-//	void RestoreObjectTestWithCorrectParams();
+	void BackupObjectWithCorrectParamsTest();
+	void BackupObjectWithIncorrectParamsTest_data();
+	void BackupObjectWithIncorrectParamsTest();
+	void RestoreObjectWithCorrectParamsTest();
+	void RestoreObjectWithIncorrectParamsTest_data();
+	void RestoreObjectWithIncorrectParamsTest();
+	void ExportObjectWithCorrectParamsTest();
+	void ExportObjectWithIncorrectParamsTest_data();
+	void ExportObjectWithIncorrectParamsTest();
+	void cleanupTestCase();
 
 protected:
     QString m_imtCorePath;

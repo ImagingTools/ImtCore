@@ -18,7 +18,7 @@ void CFileCollectionPartituraTestBase::InsertFileTest_data()
 
 	// set values and description of test
 	QString pathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/FileCollectionTest/TestData/FileForTestInsert.xml";
-	QString incorrectPathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/FileCollectionTest/TestData/FileForTestInsert.txt";
+	QString incorrectPathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/FileCollectionTest/|\?'eTestData/FileForTestInsert.txt";
 	QTest::newRow("all param is empty") << "" << QByteArray("") << "" << "" << QByteArray("") << true;
 	QTest::newRow("filePath is empty") << "" << m_typeIdObjectCollection << "TestFileName" << "TestFileDescription" << QByteArray("testIdObject") << true;
 	QTest::newRow("objectTypeId is empty") << pathToFile << QByteArray("") << "TestFileName" << "TestFileDescription" << QByteArray("testIdObject") << false;
@@ -454,6 +454,40 @@ void CFileCollectionPartituraTestBase::GetFileInfoTest()
 			}
 			else{
 				QFAIL("Insert file is failed");
+			}
+		}
+		else{
+			QFAIL("File collection is nullptr");
+		}
+	}
+	else{
+		QFAIL("Component is not initialized");
+	}
+}
+
+void CFileCollectionPartituraTestBase::cleanupTestCase()
+{
+	// get component object collection
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (compositePtr.IsValid()){
+
+		// get file collection
+		imtrepo::IFileObjectCollection* fileCollectionPtr = compositePtr->GetComponentInterface<imtrepo::IFileObjectCollection>();
+		if (fileCollectionPtr != nullptr){
+			QString folderPath = fileCollectionPtr->GetCollectionRootFolder();
+			QDir folder(folderPath);
+			QStringList filter;
+			filter.append("*TestFileName*");
+			filter.append("*TestName*");
+			filter.append(" *");
+			folder.setNameFilters(filter);
+			QStringList foldersForRemove = folder.entryList();
+			for (int i = 0; i < foldersForRemove.size(); i++){
+				QDir currentDir(folderPath + "/" + foldersForRemove[i]);
+				currentDir.removeRecursively();
+				folder.rmdir(foldersForRemove[i]);
 			}
 		}
 		else{

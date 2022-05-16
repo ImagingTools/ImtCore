@@ -32,6 +32,7 @@ private slots:
 	void UpdateFileWithIncorrectParamsTest_data();
 	void UpdateFileWithIncorrectParamsTest();
 	void GetFileInfoTest();
+	void cleanupTestCase();
 
 protected:
     QString m_imtCorePath;
