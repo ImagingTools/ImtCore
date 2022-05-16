@@ -109,7 +109,7 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 		}
 
 		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
-		if (GetDataMetaInfo(objectId, metaInfoPtr)){
+		if (BaseClass::GetDataMetaInfo(objectId, metaInfoPtr)){
 			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
 
 			for (int type : metaInfoTypes){
@@ -124,7 +124,7 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 		}
 
 		idoc::CStandardDocumentMetaInfo collectionItemMetaInfo;
-		if (GetCollectionItemMetaInfo(objectId, collectionItemMetaInfo)){
+		if (BaseClass::GetCollectionItemMetaInfo(objectId, collectionItemMetaInfo)){
 			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfo.GetMetaInfoTypes();
 
 			for (int type : metaInfoTypes){
@@ -139,7 +139,7 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 		}
 
 		if (relatedIds.contains("Name")){
-			QString metaInfoValue = GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			QString metaInfoValue = BaseClass::GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
 				return true;
 			}
