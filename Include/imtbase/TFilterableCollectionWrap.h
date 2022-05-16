@@ -58,7 +58,7 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 	Q_ASSERT(offset >= 0);
 
 	if (selectionParamPtr != nullptr){
-		Ids filteredIds = GetFilteredElementIds(*selectionParamPtr);
+		imtbase::ICollectionInfo::Ids filteredIds = GetFilteredElementIds(*selectionParamPtr);
 		int objectsCount = count >= 0 ? qMin(count, filteredIds.count()) : filteredIds.count();
 
 		for (int i = offset; i < objectsCount; i++){
@@ -79,9 +79,9 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 template <class Base>
 imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetFilteredElementIds(const iprm::IParamsSet& filterParams) const
 {
-	Ids retVal;
+	imtbase::ICollectionInfo::Ids retVal;
 
-	Ids elementIds = GetElementIds();
+	imtbase::ICollectionInfo::Ids elementIds = GetElementIds();
 
 	for (const QByteArray& id : elementIds){
 		if (IsAcceptedByFilter(id, filterParams)){
