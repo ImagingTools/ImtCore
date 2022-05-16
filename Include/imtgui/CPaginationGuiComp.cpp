@@ -18,10 +18,10 @@ void CPaginationGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	connect(First, &QToolButton::clicked, this, &CPaginationGuiComp::OnFirstClicked, Qt::QueuedConnection);
-	connect(Prev, &QToolButton::clicked, this, &CPaginationGuiComp::OnPrevClicked, Qt::QueuedConnection);
-	connect(Next, &QToolButton::clicked, this, &CPaginationGuiComp::OnNextClicked, Qt::QueuedConnection);
-	connect(Last, &QToolButton::clicked, this, &CPaginationGuiComp::OnLastClicked, Qt::QueuedConnection);
+	connect(First, &QToolButton::clicked, this, &CPaginationGuiComp::OnFirstClicked);
+	connect(Prev, &QToolButton::clicked, this, &CPaginationGuiComp::OnPrevClicked);
+	connect(Next, &QToolButton::clicked, this, &CPaginationGuiComp::OnNextClicked);
+	connect(Last, &QToolButton::clicked, this, &CPaginationGuiComp::OnLastClicked);
 
 	RefreshWidget();
 }
@@ -93,6 +93,8 @@ void CPaginationGuiComp::OnFirstClicked()
 {
 	iprm::ISelectionParam* selectionPtr = GetObservedObject();
 	if (selectionPtr != nullptr){
+		UpdateBlocker blocker(this);
+
 		selectionPtr->SetSelectedOptionIndex(0);
 	}
 }
@@ -104,6 +106,8 @@ void CPaginationGuiComp::OnPrevClicked()
 	if (selectionPtr != nullptr){
 		int currentSelection = selectionPtr->GetSelectedOptionIndex();
 		if (currentSelection > 0){
+			UpdateBlocker blocker(this);
+
 			selectionPtr->SetSelectedOptionIndex(currentSelection - 1);
 		}
 	}
@@ -120,6 +124,8 @@ void CPaginationGuiComp::OnPageClicked()
 			bool isOk;
 			int page = text.toInt(&isOk);
 			if (isOk){
+				UpdateBlocker blocker(this);
+
 				selectionPtr->SetSelectedOptionIndex(page - 1);
 			}
 		}
@@ -131,6 +137,8 @@ void CPaginationGuiComp::OnNextClicked()
 {
 	iprm::ISelectionParam* selectionPtr = GetObservedObject();
 	if (selectionPtr != nullptr){
+		UpdateBlocker blocker(this);
+
 		int currentSelection = selectionPtr->GetSelectedOptionIndex();
 		selectionPtr->SetSelectedOptionIndex(currentSelection + 1);
 	}
@@ -143,6 +151,8 @@ void CPaginationGuiComp::OnLastClicked()
 	if (selectionPtr != nullptr){
 		const iprm::IOptionsList* optionsPtr = selectionPtr->GetSelectionConstraints();
 		if (optionsPtr != nullptr){
+			UpdateBlocker blocker(this);
+
 			selectionPtr->SetSelectedOptionIndex(optionsPtr->GetOptionsCount() - 1);
 		}
 	}
