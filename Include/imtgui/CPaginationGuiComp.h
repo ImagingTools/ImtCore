@@ -31,15 +31,10 @@ protected:
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (imod::IObserver)
-	virtual bool OnModelAttached(imod::IModel* modelPtr, istd::IChangeable::ChangeSet& changeMask)
-	{
-		return BaseClass::OnModelAttached(modelPtr, changeMask);
-	}
-
-	virtual bool OnModelDetached(imod::IModel* modelPtr) override;
+	virtual void OnGuiModelDetached() override;
 
 protected:
-	void RefreshWidget();
+	void UpdateWidget();
 
 private Q_SLOTS:
 	void OnFirstClicked();

@@ -23,7 +23,7 @@ void CPaginationGuiComp::OnGuiCreated()
 	connect(Next, &QToolButton::clicked, this, &CPaginationGuiComp::OnNextClicked);
 	connect(Last, &QToolButton::clicked, this, &CPaginationGuiComp::OnLastClicked);
 
-	RefreshWidget();
+	UpdateWidget();
 }
 
 
@@ -31,25 +31,23 @@ void CPaginationGuiComp::OnGuiCreated()
 
 void CPaginationGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
-	RefreshWidget();
+	UpdateWidget();
 }
 
 
 // reimplemented (imod::IObserver)
 
-bool CPaginationGuiComp::OnModelDetached(imod::IModel* modelPtr)
+void CPaginationGuiComp::OnGuiModelDetached()
 {
-	bool retVal = BaseClass::OnModelDetached(modelPtr);
+	BaseClass::OnGuiModelDetached();
 
-	RefreshWidget();
-
-	return retVal;
+	UpdateWidget();
 }
 
 
 // protected methods
 
-void CPaginationGuiComp::RefreshWidget()
+void CPaginationGuiComp::UpdateWidget()
 {
 	if (IsGuiCreated()){
 		QHBoxLayout* layoutPtr = dynamic_cast<QHBoxLayout*>(PageButtonsFrame->layout());
@@ -91,24 +89,28 @@ void CPaginationGuiComp::RefreshWidget()
 
 void CPaginationGuiComp::OnFirstClicked()
 {
-	iprm::ISelectionParam* selectionPtr = GetObservedObject();
-	if (selectionPtr != nullptr){
-		UpdateBlocker blocker(this);
+	if (!IsUpdateBlocked()){
+		iprm::ISelectionParam* selectionPtr = GetObservedObject();
+		if (selectionPtr != nullptr){
+			UpdateBlocker blocker(this);
 
-		selectionPtr->SetSelectedOptionIndex(0);
+			selectionPtr->SetSelectedOptionIndex(0);
+		}
 	}
 }
 
 
 void CPaginationGuiComp::OnPrevClicked()
 {
-	iprm::ISelectionParam* selectionPtr = GetObservedObject();
-	if (selectionPtr != nullptr){
-		int currentSelection = selectionPtr->GetSelectedOptionIndex();
-		if (currentSelection > 0){
-			UpdateBlocker blocker(this);
+	if (!IsUpdateBlocked()){
+		iprm::ISelectionParam* selectionPtr = GetObservedObject();
+		if (selectionPtr != nullptr){
+			int currentSelection = selectionPtr->GetSelectedOptionIndex();
+			if (currentSelection > 0){
+				UpdateBlocker blocker(this);
 
-			selectionPtr->SetSelectedOptionIndex(currentSelection - 1);
+				selectionPtr->SetSelectedOptionIndex(currentSelection - 1);
+			}
 		}
 	}
 }
@@ -116,17 +118,19 @@ void CPaginationGuiComp::OnPrevClicked()
 
 void CPaginationGuiComp::OnPageClicked()
 {
-	iprm::ISelectionParam* selectionPtr = GetObservedObject();
-	if (selectionPtr != nullptr){
-		QToolButton* itemPtr = dynamic_cast<QToolButton*>(sender());
-		if (itemPtr != nullptr){
-			QString text = itemPtr->text();
-			bool isOk;
-			int page = text.toInt(&isOk);
-			if (isOk){
-				UpdateBlocker blocker(this);
+	if (!IsUpdateBlocked()){
+		iprm::ISelectionParam* selectionPtr = GetObservedObject();
+		if (selectionPtr != nullptr){
+			QToolButton* itemPtr = dynamic_cast<QToolButton*>(sender());
+			if (itemPtr != nullptr){
+				QString text = itemPtr->text();
+				bool isOk;
+				int page = text.toInt(&isOk);
+				if (isOk){
+					UpdateBlocker blocker(this);
 
-				selectionPtr->SetSelectedOptionIndex(page - 1);
+					selectionPtr->SetSelectedOptionIndex(page - 1);
+				}
 			}
 		}
 	}
@@ -135,25 +139,29 @@ void CPaginationGuiComp::OnPageClicked()
 
 void CPaginationGuiComp::OnNextClicked()
 {
-	iprm::ISelectionParam* selectionPtr = GetObservedObject();
-	if (selectionPtr != nullptr){
-		UpdateBlocker blocker(this);
+	if (!IsUpdateBlocked()){
+		iprm::ISelectionParam* selectionPtr = GetObservedObject();
+		if (selectionPtr != nullptr){
+			UpdateBlocker blocker(this);
 
-		int currentSelection = selectionPtr->GetSelectedOptionIndex();
-		selectionPtr->SetSelectedOptionIndex(currentSelection + 1);
+			int currentSelection = selectionPtr->GetSelectedOptionIndex();
+			selectionPtr->SetSelectedOptionIndex(currentSelection + 1);
+		}
 	}
 }
 
 
 void CPaginationGuiComp::OnLastClicked()
 {
-	iprm::ISelectionParam* selectionPtr = GetObservedObject();
-	if (selectionPtr != nullptr){
-		const iprm::IOptionsList* optionsPtr = selectionPtr->GetSelectionConstraints();
-		if (optionsPtr != nullptr){
-			UpdateBlocker blocker(this);
+	if (!IsUpdateBlocked()){
+		iprm::ISelectionParam* selectionPtr = GetObservedObject();
+		if (selectionPtr != nullptr){
+			const iprm::IOptionsList* optionsPtr = selectionPtr->GetSelectionConstraints();
+			if (optionsPtr != nullptr){
+				UpdateBlocker blocker(this);
 
-			selectionPtr->SetSelectedOptionIndex(optionsPtr->GetOptionsCount() - 1);
+				selectionPtr->SetSelectedOptionIndex(optionsPtr->GetOptionsCount() - 1);
+			}
 		}
 	}
 }
