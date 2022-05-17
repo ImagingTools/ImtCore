@@ -10,15 +10,19 @@ namespace imtqml
 
 //QTranslator m_translatorTest;
 
-CContext::CContext(QObject *parent) : QObject(parent)
+CContext::CContext(QQmlEngine* engine, QObject *parent) : QObject(parent), m_engine(engine)
 {
 }
 
 
 void CContext::SetLanguage(QString translation)
 {
-	if (m_translator.load(translation + ".qm", "c:/Sybnavigation/ITDevelopment/Lisa/Include/lisaqml/Resources/qml/Translations/")){
+	if (m_translator.load("Lisa_" + translation + ".qm", "C:/Sybnavigation/ITDevelopment/ImtCore/Include/imtgui/CMake/")){
 		qApp->installTranslator(&m_translator);
+		if (m_engine != nullptr){
+			m_engine->retranslate();
+		}
+		m_language = translation;
 		emit LanguageChanged();
 	}
 }
@@ -26,7 +30,7 @@ void CContext::SetLanguage(QString translation)
 
 QString CContext::GetLanguage() const
 {
-	return m_translator.language();
+	return m_language;
 }
 
 
