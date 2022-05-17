@@ -97,7 +97,7 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 		engine->addImportPath("qrc:/qml");
 
 		QQmlContext *ctxt = engine->rootContext();
-		imtqml::CContext context;
+		imtqml::CContext context(engine);
 		ctxt->setContextProperty("context", &context);
 		engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
