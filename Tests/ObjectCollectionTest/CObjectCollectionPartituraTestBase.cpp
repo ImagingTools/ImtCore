@@ -361,6 +361,10 @@ void CObjectCollectionPartituraTestBase::ResetCollectionWithFixedObjectTest()
 		// get component object collection
 		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
 		if (objectCollectionPtr != nullptr){
+
+			// Reset collection
+			objectCollectionPtr->ResetData();
+
 			imtbase::IObjectCollection::Ids idsInObjectBeforeReset = objectCollectionPtr->GetElementIds();
 			if (idsInObjectBeforeReset.count() > 0){
 				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
@@ -421,49 +425,6 @@ void CObjectCollectionPartituraTestBase::ResetCollectionWithoutFixedObjectsTest(
     }
     else{
         QFAIL("Component is not initialized");
-	}
-}
-
-void CObjectCollectionPartituraTestBase::CheckSerializeTest()
-{
-	initTestCase();
-	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
-	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
-	if (compositePtr.IsValid()){
-
-		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
-		if (objectCollectionPtr != nullptr){
-
-			// Reset collection
-			objectCollectionPtr->ResetData();
-
-			// declaration dataPtr for collection
-			iser::ISerializable* dataPtr = compositePtr->GetComponentInterface<iser::ISerializable>();
-
-			// set path to file with test data and serialize in dataPtr
-			QString pathToFile = qEnvironmentVariable("IMTCOREDIR")+"/Tests/ObjectCollectionTest/TestData/testData.xml";
-			ifile::CCompactXmlFileReadArchive readArchive(pathToFile);
-			dataPtr->Serialize(readArchive);
-
-			// get data from object and compare with input data
-			imtbase::IObjectCollection::DataPtr inputDataPtr;
-			if (objectCollectionPtr->GetObjectData("{98c7bd83-2541-427a-a9d2-2427e1d32618}", inputDataPtr)){
-				imtauth::CAccountInfo* inputImplPtr = dynamic_cast<imtauth::CAccountInfo*>(inputDataPtr.GetPtr());
-				QString nameAccount = inputImplPtr->GetAccountName();
-				QString descriptionAccount = inputImplPtr->GetAccountDescription();
-				QVERIFY2(((nameAccount == "AccountName") && (descriptionAccount == "AccountDescription")), "Serialize data from file in ibject collection is failed");
-			}
-			else{
-				QFAIL("Data from file is not readed");
-			}
-		}
-		else{
-			QFAIL("Object collection is nullptr");
-		}
-	}
-	else{
-		QFAIL("Component is not initialized");
 	}
 }
 
@@ -627,6 +588,70 @@ void CObjectCollectionPartituraTestBase::GetOperationFlagsInsertedObjectTest()
 			else{
 				QFAIL("Object don't insert");
 			}
+		}
+		else{
+			QFAIL("Object collection is nullptr");
+		}
+	}
+	else{
+		QFAIL("Component is not initialized");
+	}
+}
+
+void CObjectCollectionPartituraTestBase::PaginationTest_data()
+{
+	initTestCase();
+
+	// variable decloration
+	QTest::addColumn<bool>("isNullObjectCollection");
+	QTest::addColumn<int>("offset");
+	QTest::addColumn<int>("count");
+	QTest::addColumn<bool>("result");
+
+	// set values and description of test
+	QTest::newRow("all param is empty") << true << NULL << NULL << true;
+	QTest::newRow("object collection is nullptr") << true << 1 << 5 << true;
+	QTest::newRow("offset is NULL") << false << NULL << 5 << false;
+	QTest::newRow("offset out of size") << false << 100 << 5 << true;
+	QTest::newRow("count is NULL") << false << 1 << NULL << true;
+	QTest::newRow("count out of size") << false << 1 << 100 << false;
+	QTest::newRow("all params correct") << false << 1 << 100 << false;
+	QTest::newRow("count is negative") << false << 1 << -5 << true;
+//	QTest::newRow("offset is negative") << false << -5 << 5 << true;
+}
+
+
+void CObjectCollectionPartituraTestBase::PaginationTest()
+{
+	// get values from rows
+	QFETCH(bool, isNullObjectCollection);
+	QFETCH(int, offset);
+	QFETCH(int, count);
+	QFETCH(bool, result);
+
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (compositePtr.IsValid()){
+
+		// get component object collection
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		if (objectCollectionPtr != nullptr){
+
+			// Reset collection
+			objectCollectionPtr->ResetData();
+			if (isNullObjectCollection){
+				imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(offset, count);
+				QVERIFY2(collectionIds.isEmpty() == result, "Pagination object collection is failed");
+			}
+			else{
+				for (int i = 0; i < 10; i++){
+					objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestName %1").arg(i), QString("TestDescription %1").arg(i));
+				}
+				imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(offset, count);
+				QVERIFY2(collectionIds.isEmpty() == result, "Pagination object collection is failed");
+			}
+
 		}
 		else{
 			QFAIL("Object collection is nullptr");

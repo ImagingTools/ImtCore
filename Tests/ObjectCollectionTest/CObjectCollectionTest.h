@@ -21,7 +21,9 @@ class CObjectCollectionTest: public QObject
 	Q_OBJECT
 
 private slots:
-
+	void initTestCase();
+	void CheckSerializeTest();
+	void cleanupTestCase();
 
 private:
 	QString m_imtCorePath;

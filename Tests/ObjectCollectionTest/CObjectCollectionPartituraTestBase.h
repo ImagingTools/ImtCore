@@ -34,12 +34,13 @@ private slots:
     void RemoveNonExistObjectTest();
 	void ResetCollectionWithFixedObjectTest();
     void ResetCollectionWithoutFixedObjectsTest();
-	void CheckSerializeTest();
 	void SetObjectNameTest();
 	void SetObjectDescriptionTest();
 	void GetObjectTypeIdTest();
 	void GetOperationFlagsFixedObjectTest();
 	void GetOperationFlagsInsertedObjectTest();
+	void PaginationTest_data();
+	void PaginationTest();
     void cleanupTestCase();
 
 protected:

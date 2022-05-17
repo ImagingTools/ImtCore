@@ -32,6 +32,8 @@ private slots:
 	void UpdateFileWithIncorrectParamsTest_data();
 	void UpdateFileWithIncorrectParamsTest();
 	void GetFileInfoTest();
+
+//	void PartituraTest();
 	void cleanupTestCase();
 
 protected:
