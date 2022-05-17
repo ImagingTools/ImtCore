@@ -7,4 +7,4 @@
 #include <imtauth/CAccountInfo.h>
 #include <imtauth/CAccountInfoMetaInfo.h>
 #include <imtauth/IAccountInfo.h>
-#include <GeneratedFiles/ObjectCollectionTest/CGenerateObjectCollectionTest.h>
+#include <GeneratedFiles/ObjectCollectionTest/CGenerateTest.h>

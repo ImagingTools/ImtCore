@@ -1,2 +1,2 @@
 #include "CFileCollectionTest.h"
-#include <GeneratedFiles/FileCollectionTest/CGenerateFileCollectionTest.h>
+#include <GeneratedFiles/FileCollectionTest/CGenerateTest.h>

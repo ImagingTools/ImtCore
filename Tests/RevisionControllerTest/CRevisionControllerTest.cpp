@@ -1,2 +1,2 @@
 #include "CRevisionControllerTest.h"
-#include <GeneratedFiles/RevisionControllerTest/CGenerateRevisionControllerTest.h>
+#include <GeneratedFiles/RevisionControllerTest/CGenerateTest.h>
