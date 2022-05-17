@@ -72,7 +72,7 @@ public:
 		I_ASSIGN(m_useSearchWidgetAttrPtr, "UseSearchWidget", "Use internal search widget", true, true);
 		I_ASSIGN(m_viewProgressAttrPtr, "ViewProgress", "View progress bar on upload", true, true);
 		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
-		I_ASSIGN(m_viewFilterAttrPtr, "ViewFilter", "View filter for default", true, true);
+		I_ASSIGN(m_viewFilterAttrPtr, "ViewFilter", "View filter for default", true, false);
 	I_END_COMPONENT;
 
 	enum DataRole
