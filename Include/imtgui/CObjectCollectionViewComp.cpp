@@ -355,7 +355,12 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	m_focusDecoratorPtr = new iwidgets::CFocusDecorator(this);
 	m_focusDecoratorPtr->RegisterWidget(FilterEdit, &m_graphicsEffectFactory);
 
-	FilterPanel->setMaximumHeight(0);
+	if(*m_viewFilterAttrPtr){
+		FilterPanel->setMaximumHeight(FilterPanel->sizeHint().height());
+	}
+	else{
+		FilterPanel->setMaximumHeight(0);
+	}
 	m_filterPanelAnimationPtr = new QPropertyAnimation(FilterPanel, "maximumHeight", this);
 
 	connect(FilterEdit, &QLineEdit::textChanged, this, &CObjectCollectionViewComp::OnFilterChanged);
