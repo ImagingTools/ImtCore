@@ -7,7 +7,7 @@
 #include <imtauth/CAccountInfo.h>
 #include <imtauth/CAccountInfoMetaInfo.h>
 #include <imtauth/IAccountInfo.h>
-#include <GeneratedFiles/ObjectCollectionTest/CGenerateTest.h>
+//#include <GeneratedFiles/ObjectCollectionTest/CGenerateTest.h>
 
 
 void CObjectCollectionTest::initTestCase()
