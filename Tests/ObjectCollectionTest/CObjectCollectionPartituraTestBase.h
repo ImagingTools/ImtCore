@@ -32,13 +32,13 @@ private slots:
 	void InsertNewObjectWithMetaObjectTest();
     void RemoveExistObjectTest();
     void RemoveNonExistObjectTest();
-	void ResetCollectionWithFixedObjectTest();
     void ResetCollectionWithoutFixedObjectsTest();
 	void SetObjectNameTest();
 	void SetObjectDescriptionTest();
 	void GetObjectTypeIdTest();
-	void GetOperationFlagsFixedObjectTest();
-	void GetOperationFlagsInsertedObjectTest();
+//	void GetOperationFlagsInsertedObjectTest();
+	void GetElementsCountTest_data();
+	void GetElementsCountTest();
 	void PaginationTest_data();
 	void PaginationTest();
 	void FilterTest_data();

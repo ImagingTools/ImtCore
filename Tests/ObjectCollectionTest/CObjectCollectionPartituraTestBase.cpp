@@ -352,54 +352,6 @@ void CObjectCollectionPartituraTestBase::RemoveNonExistObjectTest()
 }
 
 
-void CObjectCollectionPartituraTestBase::ResetCollectionWithFixedObjectTest()
-{
-	initTestCase();
-	// declaration component accessor
-	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
-	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
-	if (compositePtr.IsValid()){
-
-		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
-		if (objectCollectionPtr != nullptr){
-
-			// Reset collection
-			objectCollectionPtr->ResetData();
-
-			imtbase::IObjectCollection::Ids idsInObjectBeforeReset = objectCollectionPtr->GetElementIds();
-			if (idsInObjectBeforeReset.count() > 0){
-				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::IObjectCollection::DataPtr(), "testId");
-
-				// Reset collection
-				objectCollectionPtr->ResetData();
-
-				//Check exist fixed object and remove inserted object from collection
-				imtbase::IObjectCollection::Ids idsInObjectAfterReset = objectCollectionPtr->GetElementIds();
-				if (!idsInObjectAfterReset.isEmpty()){
-					bool checkExistFixedObject = idsInObjectAfterReset.contains(idsInObjectBeforeReset[0]);
-					bool checkDeleteAddedObject = !idsInObjectAfterReset.contains("testId");
-					QVERIFY2((checkExistFixedObject && checkDeleteAddedObject), "Reset objects from collection with fixed object is failed");
-				}
-				else{
-					QFAIL("Reset collection with fixed object is failed: collection is empty");
-				}
-			}
-			else{
-				QSKIP("Object collection don't have fixed objects");
-			}
-
-		}
-		else{
-			QFAIL("Object collection is nullptr");
-		}
-	}
-	else{
-		QFAIL("Component is not initialized");
-	}
-}
-
-
 void CObjectCollectionPartituraTestBase::ResetCollectionWithoutFixedObjectsTest()
 {
     initTestCase();
@@ -535,8 +487,62 @@ void CObjectCollectionPartituraTestBase::GetObjectTypeIdTest()
 	}
 }
 
-void CObjectCollectionPartituraTestBase::GetOperationFlagsFixedObjectTest()
+
+//void CObjectCollectionPartituraTestBase::GetOperationFlagsInsertedObjectTest()
+//{
+//	initTestCase();
+//	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+//	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+//	if (compositePtr.IsValid()){
+
+//		// get component object collection
+//		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+//		if (objectCollectionPtr != nullptr){
+
+//			// Reset collection
+//			objectCollectionPtr->ResetData();
+
+//			// insert new object and check flags him
+//			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription");
+//			if (!idNewObject.isEmpty()){
+//				int flagsInsertedObject = objectCollectionPtr->GetOperationFlags(idNewObject);
+//				QVERIFY2((flagsInsertedObject == (imtbase::IObjectCollection::OF_ALL & ~imtbase::IObjectCollection::OF_SUPPORT_PAGINATION)), "Operation flags of inserted object is incorrect");
+//			}
+//			else{
+//				QFAIL("Object don't insert");
+//			}
+//		}
+//		else{
+//			QFAIL("Object collection is nullptr");
+//		}
+//	}
+//	else{
+//		QFAIL("Component is not initialized");
+//	}
+//}
+
+
+void CObjectCollectionPartituraTestBase::GetElementsCountTest_data()
 {
+	initTestCase();
+
+	// variable decloration
+	QTest::addColumn<QString>("textFilter");
+	QTest::addColumn<bool>("result");
+
+	// set values and description of test
+	QTest::newRow("textFilter is empty") << "" << false;
+	QTest::newRow("textFilter is non-exist") << "AnotherName" << true;
+	QTest::newRow("textFilter exist") << "TestFilterName1" << false;
+}
+
+
+void CObjectCollectionPartituraTestBase::GetElementsCountTest()
+{
+	// get values from rows
+	QFETCH(QString, textFilter);
+	QFETCH(bool, result);
+
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -549,13 +555,40 @@ void CObjectCollectionPartituraTestBase::GetOperationFlagsFixedObjectTest()
 			// Reset collection
 			objectCollectionPtr->ResetData();
 
-			// check exist fixed object and check flags him
-			if (objectCollectionPtr->GetElementsCount() > 0){
-				int flagsFixedObject = objectCollectionPtr->GetOperationFlags("DefaultAccount");
-				QVERIFY2((flagsFixedObject == (imtbase::IObjectCollection::OF_ALL & ~imtbase::IObjectCollection::OF_SUPPORT_DELETE & ~imtbase::IObjectCollection::OF_SUPPORT_PAGINATION)), "Operation flags of fixed object is incorrect");
+			// Set text filter
+			imtbase::CCollectionFilter filter;
+			filter.SetTextFilter(textFilter);
+			iprm::CParamsSet filterParams;
+			filterParams.SetEditableParameter("Filter", &filter);
+
+			// Insert 20 objects in collection
+			for (int i = 0; i < 20; i++){
+				if (i%2 == 0){
+					objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestFilterName1 %1").arg(i), QString("TestDescription %1").arg(i));
+				}
+				else{
+					objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestFilterName2 %1").arg(i), QString("TestDescription %1").arg(i));
+				}
+			}
+			int count = objectCollectionPtr->GetElementsCount(&filterParams);
+			if (count >= 0){
+				if (count == 0){
+					QVERIFY2(result, "Incorrect count of objects");
+				}
+				else{
+					if (textFilter == ""){
+						QVERIFY2((count == 20) , "Incorrect count of objects");
+					}
+					else if(textFilter == "TestFilterName1"){
+						QVERIFY2((count == 10) , "Incorrect count of objects");
+					}
+					else{
+						QFAIL("Incorrect count of objects");
+					}
+				}
 			}
 			else{
-				QSKIP("Object collection don't have fixed objects");
+				QFAIL("Incorrect count of objects");
 			}
 		}
 		else{
@@ -567,38 +600,6 @@ void CObjectCollectionPartituraTestBase::GetOperationFlagsFixedObjectTest()
 	}
 }
 
-void CObjectCollectionPartituraTestBase::GetOperationFlagsInsertedObjectTest()
-{
-	initTestCase();
-	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
-	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
-	if (compositePtr.IsValid()){
-
-		// get component object collection
-		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
-		if (objectCollectionPtr != nullptr){
-
-			// Reset collection
-			objectCollectionPtr->ResetData();
-
-			// insert new object and check flags him
-			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription");
-			if (!idNewObject.isEmpty()){
-				int flagsInsertedObject = objectCollectionPtr->GetOperationFlags(idNewObject);
-				QVERIFY2((flagsInsertedObject == (imtbase::IObjectCollection::OF_ALL & ~imtbase::IObjectCollection::OF_SUPPORT_PAGINATION)), "Operation flags of inserted object is incorrect");
-			}
-			else{
-				QFAIL("Object don't insert");
-			}
-		}
-		else{
-			QFAIL("Object collection is nullptr");
-		}
-	}
-	else{
-		QFAIL("Component is not initialized");
-	}
-}
 
 void CObjectCollectionPartituraTestBase::PaginationTest_data()
 {
@@ -698,7 +699,7 @@ void CObjectCollectionPartituraTestBase::FilterTest_data()
 	// set values and description of test
 	QTest::newRow("filter is empty") << "" << false;
 	QTest::newRow("filter with non-exist name") << "AnotherTestFilterName" << true;
-	QTest::newRow("filter with correct name") << "TestFilterName" << false;
+	QTest::newRow("filter with correct name") << "TestFilterName1" << false;
 }
 
 
@@ -726,19 +727,41 @@ void CObjectCollectionPartituraTestBase::FilterTest()
 			iprm::CParamsSet filterParams;
 			filterParams.SetEditableParameter("Filter", &filter);
 
-			// Insert 10 objects in collection
-			for (int i = 0; i < 10; i++){
-				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestFilterName %1").arg(i), QString("TestDescription %1").arg(i));
+			// Insert 20 objects in collection
+			for (int i = 0; i < 20; i++){
+				if (i%2 == 0){
+					objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestFilterName1 %1").arg(i), QString("TestDescription %1").arg(i));
+				}
+				else{
+					objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestFilterName2 %1").arg(i), QString("TestDescription %1").arg(i));
+				}
 			}
-			imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(0, 5, &filterParams);
+			imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(0, 15, &filterParams);
 			if (collectionIds.isEmpty()){
 				QVERIFY2(result, "Text filter for object collection is failed");
 			}
 			else{
-				for(int index = 0; index < collectionIds.size(); index++){
-					QString objectName = objectCollectionPtr->GetElementInfo(collectionIds[index], imtbase::IObjectCollection::EIT_NAME).toString();
-					QVERIFY2(objectName.contains(textFilter), "Text filter for object collection is failed");
+				if (collectionIds.count() == 10 && textFilter == "TestFilterName1"){
+					for(int index = 0; index < collectionIds.size(); index++){
+						QString objectName = objectCollectionPtr->GetElementInfo(collectionIds[index], imtbase::IObjectCollection::EIT_NAME).toString();
+						QVERIFY2(objectName.contains(QString(textFilter+" %1").arg(index*2)), "Text filter for object collection is failed");
+					}
 				}
+				else if (collectionIds.count() == 15 && textFilter == ""){
+					for (int index = 0; index < collectionIds.count(); index++){
+						QString objectName = objectCollectionPtr->GetElementInfo(collectionIds[index], imtbase::IObjectCollection::EIT_NAME).toString();
+						if (index%2 == 0){
+							QVERIFY2(objectName.contains(QString("TestFilterName1 %1").arg(index)), "Text filter for object collection is failed");
+						}
+						else{
+							QVERIFY2(objectName.contains(QString("TestFilterName2 %1").arg(index)), "Text filter for object collection is failed");
+						}
+					}
+				}
+				else{
+					QFAIL("Count of objects collection is incorrect");
+				}
+
 			}
 		}
 		else{

@@ -22,6 +22,8 @@ class CObjectCollectionTest: public QObject
 
 private slots:
 	void initTestCase();
+	void ResetCollectionWithFixedObjectTest();
+	void GetOperationFlagsFixedObjectTest();
 	void CheckSerializeTest();
 	void cleanupTestCase();
 
