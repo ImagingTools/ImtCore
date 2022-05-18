@@ -1,4 +1,6 @@
 #include "CObjectCollectionPartituraTestBase.h"
+#include "imtbase/CCollectionFilter.h"
+#include <iprm/CParamsSet.h>
 
 
 // ImtCore includes
@@ -603,28 +605,24 @@ void CObjectCollectionPartituraTestBase::PaginationTest_data()
 	initTestCase();
 
 	// variable decloration
-	QTest::addColumn<bool>("isNullObjectCollection");
 	QTest::addColumn<int>("offset");
 	QTest::addColumn<int>("count");
 	QTest::addColumn<bool>("result");
 
 	// set values and description of test
-	QTest::newRow("all param is empty") << true << NULL << NULL << true;
-	QTest::newRow("object collection is nullptr") << true << 1 << 5 << true;
-	QTest::newRow("offset is NULL") << false << NULL << 5 << false;
-	QTest::newRow("offset out of size") << false << 100 << 5 << true;
-	QTest::newRow("count is NULL") << false << 1 << NULL << true;
-	QTest::newRow("count out of size") << false << 1 << 100 << false;
-	QTest::newRow("all params correct") << false << 1 << 100 << false;
-	QTest::newRow("count is negative") << false << 1 << -5 << true;
-//	QTest::newRow("offset is negative") << false << -5 << 5 << true;
+	QTest::newRow("offset is NULL") << NULL << 5 << false;
+	QTest::newRow("offset out of size") << 100 << 5 << true;
+	QTest::newRow("count is NULL")<< 1 << NULL << true;
+	QTest::newRow("count out of size") << 1 << 100 << false;
+	QTest::newRow("all params correct") << 1 << 100 << false;
+	QTest::newRow("count is negative") << 1 << -5 << true;
+//	QTest::newRow("offset is negative") << -5 << 5 << true;
 }
 
 
 void CObjectCollectionPartituraTestBase::PaginationTest()
 {
 	// get values from rows
-	QFETCH(bool, isNullObjectCollection);
 	QFETCH(int, offset);
 	QFETCH(int, count);
 	QFETCH(bool, result);
@@ -640,18 +638,108 @@ void CObjectCollectionPartituraTestBase::PaginationTest()
 
 			// Reset collection
 			objectCollectionPtr->ResetData();
-			if (isNullObjectCollection){
-				imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(offset, count);
-				QVERIFY2(collectionIds.isEmpty() == result, "Pagination object collection is failed");
-			}
-			else{
-				for (int i = 0; i < 10; i++){
-					objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestName %1").arg(i), QString("TestDescription %1").arg(i));
-				}
-				imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(offset, count);
-				QVERIFY2(collectionIds.isEmpty() == result, "Pagination object collection is failed");
+
+			// Insert 10 objects in collection
+			for (int i = 0; i < 10; i++){
+				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestName %1").arg(i), QString("TestDescription %1").arg(i));
 			}
 
+			// check pagination
+			imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(offset, count);
+			if (collectionIds.isEmpty()){
+				QVERIFY2(result, "Pagination object collection is failed");
+			}
+			else{
+
+				// check correct offset
+				bool isCorrectOffset = false;
+				imtbase::ICollectionInfo::Ids allCollectionIds = objectCollectionPtr->GetElementIds();
+				if(allCollectionIds[offset] == collectionIds[0]){
+					isCorrectOffset = true;
+				}
+				else{
+					QFAIL("Offset in pagination is incorrect");
+				}
+
+				// check correct count
+				bool isCorrectCount = false;
+				if((count < 0) && (collectionIds.count() > 0)){
+					QFAIL("Count objects is not null with set negative param 'count'");
+				}
+				else{
+					if (collectionIds.count() <= count){
+						isCorrectCount = true;
+					}
+					else{
+						QFAIL("Count in pagination is incorrect");
+					}
+					QVERIFY2((isCorrectOffset && isCorrectCount), "Pagination object collection is failed");
+				}
+			}
+		}
+		else{
+			QFAIL("Object collection is nullptr");
+		}
+	}
+	else{
+		QFAIL("Component is not initialized");
+	}
+}
+
+
+void CObjectCollectionPartituraTestBase::FilterTest_data()
+{
+	initTestCase();
+
+	// variable decloration
+	QTest::addColumn<QString>("textFilter");
+	QTest::addColumn<bool>("result");
+
+	// set values and description of test
+	QTest::newRow("filter is empty") << "" << false;
+	QTest::newRow("filter with non-exist name") << "AnotherTestFilterName" << true;
+	QTest::newRow("filter with correct name") << "TestFilterName" << false;
+}
+
+
+void CObjectCollectionPartituraTestBase::FilterTest()
+{
+	// get values from rows
+	QFETCH(QString, textFilter);
+	QFETCH(bool, result);
+
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (compositePtr.IsValid()){
+
+		// get component object collection
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		if (objectCollectionPtr != nullptr){
+
+			// Reset collection
+			objectCollectionPtr->ResetData();
+
+			// Set text filter
+			imtbase::CCollectionFilter filter;
+			filter.SetTextFilter(textFilter);
+			iprm::CParamsSet filterParams;
+			filterParams.SetEditableParameter("Filter", &filter);
+
+			// Insert 10 objects in collection
+			for (int i = 0; i < 10; i++){
+				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, QString("TestFilterName %1").arg(i), QString("TestDescription %1").arg(i));
+			}
+			imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(0, 5, &filterParams);
+			if (collectionIds.isEmpty()){
+				QVERIFY2(result, "Text filter for object collection is failed");
+			}
+			else{
+				for(int index = 0; index < collectionIds.size(); index++){
+					QString objectName = objectCollectionPtr->GetElementInfo(collectionIds[index], imtbase::IObjectCollection::EIT_NAME).toString();
+					QVERIFY2(objectName.contains(textFilter), "Text filter for object collection is failed");
+				}
+			}
 		}
 		else{
 			QFAIL("Object collection is nullptr");

@@ -41,6 +41,8 @@ private slots:
 	void GetOperationFlagsInsertedObjectTest();
 	void PaginationTest_data();
 	void PaginationTest();
+	void FilterTest_data();
+	void FilterTest();
     void cleanupTestCase();
 
 protected:
