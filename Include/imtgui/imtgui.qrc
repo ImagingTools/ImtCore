@@ -32,6 +32,7 @@
         <file alias="imtgui/AuxComponents/Calendar.qml">Qml/imtgui/AuxComponents/Calendar.qml</file>
         <file alias="imtgui/AuxComponents/TreeItemDelegateTest.qml">Qml/imtgui/AuxComponents/TreeItemDelegateTest.qml</file>
         <file alias="imtgui/AuxComponents/Pagination.qml">Qml/imtgui/AuxComponents/Pagination.qml</file>
+        <file alias="imtgui/AuxComponents/FilterMenu.qml">Qml/imtgui/AuxComponents/FilterMenu.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

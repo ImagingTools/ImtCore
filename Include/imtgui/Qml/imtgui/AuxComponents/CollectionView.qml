@@ -259,15 +259,51 @@ Rectangle {
             collectionViewContainer.setActiveFocusFromCollectionView();
         }
 
+        onFilterChanged: {
+            if (filterModel.ContainsKey("Filter")){
+                let filter = filterModel.GetData("Filter");
+                filter.SetData("Text", text, index);
+                filter.SetData("Id", id, index);
+//                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
+//                    let index = filter.InsertNewItem()
+//                    filter.SetData("Id", tableInternal.headers.GetData("Id", i), index);
+//                    filter.SetData("Text", "", index);
+//                }
+                modelItems.updateModel();
+            }
+        }
+
         onHeaderOnClicked: {
             console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
-            headersSortModel.SetData(headerId, sortOrder);
+
+            let filter = filterModel.GetData("Sort");
+            filter.SetData("HeaderId", headerId);
+            filter.SetData("SortOrder", sortOrder);
+//            headersSortModel.SetData("HeaderId", headerId);
+//            headersSortModel.SetData("SortOrder", sortOrder);
+
             modelItems.updateModel();
         }
     }
 
     TreeItemModel {
         id: headersSortModel;
+    }
+
+    TreeItemModel {
+        id: filterModel;
+
+        Component.onCompleted: {
+            filterModel.AddTreeModel("Filter");
+            filterModel.AddTreeModel("Sort");
+
+            let filter = filterModel.GetData("Filter");
+            for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
+                let index = filter.InsertNewItem()
+                filter.SetData("Id", tableInternal.headers.GetData("Id", i), index);
+                filter.SetData("Text", "", index);
+            }
+        }
     }
 
     Pagination {
@@ -376,11 +412,11 @@ Rectangle {
             viewParams.InsertFieldArgument("Offset", offset);
             viewParams.InsertField("Count");
             viewParams.InsertFieldArgument("Count", count);
-            viewParams.InsertField("Sort");
-            var jsonString = headersSortModel.toJSON();
+            viewParams.InsertField("FilterModel");
+            var jsonString = filterModel.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            console.log('headersSortModel', jsonString);
-            viewParams.InsertFieldArgument("Sort", jsonString);
+            console.log("filterModel jsonString", jsonString);
+            viewParams.InsertFieldArgument("FilterModel", jsonString);
 
             //query.AddParam(viewParams);
             var inputParams = Gql.GqlObject("input");

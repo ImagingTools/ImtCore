@@ -20,6 +20,8 @@
 #include <imtqml/CJoinDataProviderComp.h>
 #include <imtqml/CHeadersDataProviderComp.h>
 #include <imtqml/CObserverQmlComp.h>
+#include <imtqml/CContextComp.h>
+
 
 /**
 	ImtQmlPck package
@@ -42,6 +44,7 @@ typedef imtqml::CMenuDataEnumProviderComp MenuDataEnumProvider;
 typedef imtqml::CJoinDataProviderComp JoinDataProvider;
 typedef imtqml::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtqml::CObserverQmlComp ObserverQml;
+typedef imtqml::CContextComp Context;
 
 
 } // namespace ImtQmlPck

@@ -21,12 +21,13 @@ namespace imtqml
 	Basic implementation for the controller of the application page representation data model.
 */
 class CPageDataProviderCompBase:
+			public icomp::CComponentBase,
 			public imtqml::CUserOptionsProviderCompBase,
 			public imtbase::IItemBasedRepresentationDataProvider
 {
 public:
-	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
 	typedef imtqml::CPageDataEnumProviderComp PageEnum;
+	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPageDataProviderCompBase);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);

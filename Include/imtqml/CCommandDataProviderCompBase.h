@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <iqt/ITranslationManager.h>
+#include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
@@ -15,11 +16,12 @@ namespace imtqml
 
 
 class CCommandDataProviderCompBase:
+		public icomp::CComponentBase,
 		public imtqml::CUserOptionsProviderCompBase,
 		public imtbase::IItemBasedRepresentationDataProvider
 {
 public:
-	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 	typedef imtqml::CCommandDataEnumProviderComp CommandEnum;
 
 	I_BEGIN_COMPONENT(CCommandDataProviderCompBase);

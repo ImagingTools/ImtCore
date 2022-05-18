@@ -45,7 +45,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 			const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
 
 			if (accountInfoPtr == nullptr){
-				errorMessage = "Unable to get an account info";
+				errorMessage = QT_TR_NOOP("Unable to get an account info");
 				return nullptr;
 			}
 

@@ -28,20 +28,24 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 	for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); i++){
 		treeModel->InsertNewItem();
 		treeModel->SetData("Id", m_headersIdsAttrPtr[i], i);
+		treeModel->SetData("Name", m_headersNamesAttrPtr[i], i);
+		QString headerName = m_headersNamesAttrPtr[i];
+//		if (m_translationManagerCompPtr.IsValid()){
+//			QByteArray languageId = GetLanguageIdFromInputParams(params);
+//			int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+//			if (languageId != "" && currentIndex >= 0){
+//				const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+//				if (translatorPtr != nullptr){
 
-		if (m_translationManagerCompPtr.IsValid()){
-			QByteArray languageId = GetLanguageIdFromInputParams(params);
-			int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-			if (languageId != "" && currentIndex >= 0){
-				const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
-				if (translatorPtr != nullptr){
-					treeModel->SetData("Name", translatorPtr->translate("", m_headersNamesAttrPtr[i].toUtf8()), i);
-				}
-			}
-		}
-		else{
-			treeModel->SetData("Name", m_headersNamesAttrPtr[i], i);
-		}
+//					QString text1 = translatorPtr->translate("", m_headersNamesAttrPtr[i].toUtf8());
+//					QString text2 = translatorPtr->translate("Attribute", m_headersNamesAttrPtr[i].toUtf8());
+//					treeModel->SetData("Name", translatorPtr->translate("", m_headersNamesAttrPtr[i].toUtf8()), i);
+//				}
+//			}
+//		}
+//		else{
+//			treeModel->SetData("Name", m_headersNamesAttrPtr[i], i);
+//		}
 	}
 
 	return treeModel;

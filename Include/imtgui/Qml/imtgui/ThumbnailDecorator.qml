@@ -269,6 +269,11 @@ Rectangle
 //        }
 //    }
 
+    function refreshText(){
+//        test.text = qsTr("Close");
+//        thubnailDecoratorContainer.update();
+    }
+
 //    Text {
 //        id: test;
 //        anchors.centerIn: parent;

@@ -106,13 +106,13 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 					int index = parametersPtr->InsertNewItem();
 
 					parametersPtr->SetData("Id", id, index);
-
-					if (translatorPtr != nullptr){
-						parametersPtr->SetData("Name", translatorPtr->translate("", name.toUtf8()), index);
-					}
-					else{
-						parametersPtr->SetData("Name", name, index);
-					}
+					parametersPtr->SetData("Name", name, index);
+//					if (translatorPtr != nullptr){
+//						parametersPtr->SetData("Name", translatorPtr->translate("", name.toUtf8()), index);
+//					}
+//					else{
+//						parametersPtr->SetData("Name", name, index);
+//					}
 				}
 			}
 		}

@@ -4,6 +4,7 @@
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <iqt/ITranslationManager.h>
+#include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
@@ -20,12 +21,13 @@ namespace imtqml
 	Basic implementation for the controller of the application page representation data model.
 */
 class CParamsDataProviderCompBase:
+			public icomp::CComponentBase,
 			public imtqml::CUserOptionsProviderCompBase,
 			public imtbase::IItemBasedRepresentationDataProvider,
 			public imtgql::IGqlMutationDataControllerDelegate
 {
 public:
-	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 
 	enum ComponentType
 	{

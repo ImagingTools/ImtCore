@@ -82,7 +82,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
 
 		if (featurePackagePtr == nullptr){
-			errorMessage = "Unable to get an feature package";
+			errorMessage = QT_TR_NOOP("Unable to get an feature package");
 			return nullptr;
 		}
 
@@ -164,8 +164,6 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 		dependenciesModel = new imtbase::CTreeItemModel();
 		dependenciesModel->SetIsArray(true);
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-		int rootIndex;
-
 		for (const QByteArray& collectionId : collectionIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (!m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
@@ -211,7 +209,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
-	else {
+	else{
 		dataModel = new imtbase::CTreeItemModel();
 		treeItemModel = new imtbase::CTreeItemModel();
 		treeItemModel->SetIsArray(true);
@@ -266,7 +264,6 @@ bool CPackageControllerComp::GetOperationFromRequest(
 			QString& errorMessage,
 			int& operationType) const
 {
-
 	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
 	if(fieldList == nullptr){
 		return false;
@@ -279,7 +276,6 @@ bool CPackageControllerComp::GetOperationFromRequest(
 			operationType = OT_USER_OPERATION + 1;
 			return true;
 		}
-
 		if (fieldList->at(i).GetId() == "dependencies"){
 			gqlObject = fieldList->at(i);
 			operationType = OT_USER_OPERATION + 2;

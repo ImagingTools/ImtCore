@@ -76,19 +76,19 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		}
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Instance-ID", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Instance-ID"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 		childs->SetData("Value", productInstanceId);
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_objectCollectionCompPtr->GetObjectData(productInstanceId, dataPtr)){
-			errorMessage = "Unable to get an installation object data";
+			errorMessage = QT_TR_NOOP("Unable to get an installation object data");
 			return nullptr;
 		}
 
 		const imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<const imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 		if (productInstancePtr == nullptr){
-			errorMessage = "Unable to get an installation info";
+			errorMessage = QT_TR_NOOP("Unable to get an installation info");
 			return nullptr;
 		}
 
@@ -97,7 +97,7 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		imtbase::ICollectionInfo::Ids licenseIds = licenseList.GetElementIds();
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Licenses", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Licenses"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		int childIndex;
@@ -108,7 +108,7 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 			if (licensePtr != nullptr){
 				childIndex = childs->InsertNewItem();
 				QString licenseName = licensePtr->GetLicenseName();
-				QString value = licenseName + " (Valid until: ";
+				QString value = licenseName + " (" + QT_TR_NOOP("Valid until") + ": ";
 				if (date.isValid()){
 					value += date.toString("dd.MM.yyyy") + ")";
 				}

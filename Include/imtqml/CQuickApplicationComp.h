@@ -9,6 +9,7 @@
 #include <iprm/IEnableableParam.h>
 #include <ilog/IMessageConsumer.h>
 #include <ibase/ICommandsProvider.h>
+#include <icomp/IComponent.h>
 
 // ImtCore includes
 #include <imtqml/CQuickApplicationCompBase.h>
@@ -43,6 +44,7 @@ public:
 		I_ASSIGN(m_useMenuIconsOnMacAttrPtr, "UseMenuIconsOnMac", "If enabled, the menu icons will be used in the application's menu bar on Mac OS", true, false);
 		I_ASSIGN(m_useTrayIconAttrPtr, "UseTrayIcon", "If enabled, the tray icon for the application will be used", true, false);
 		I_ASSIGN(m_useFullScreenBorderOnWindowsAttrPtr, "UseFullScreenBorderOnWindows", "If enabled, 1-pixel border will be created by Windows in full screen mode", true, false);
+		I_ASSIGN(m_contextCompPtr, "Context", "Context", false, "Context");
 	I_END_COMPONENT;
 
 	CQuickApplicationComp();
@@ -98,6 +100,7 @@ protected:
 	I_REF(iprm::IEnableableParam, m_allowApplicationCloseCompPtr);
 	I_REF(imod::IModel, m_allowApplicationCloseModelCompPtr);
 	I_REF(ibase::ICommandsProvider, m_trayIconCommandsCompPtr);
+	I_REF(icomp::IComponent, m_contextCompPtr);
 	I_ATTR(int, m_frameSpaceSizeAttrPtr);
 	I_ATTR(int, m_uiStartModeAttrPtr);
 	I_ATTR(bool, m_useMenuIconsOnMacAttrPtr);

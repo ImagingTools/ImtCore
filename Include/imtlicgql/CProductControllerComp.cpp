@@ -33,7 +33,7 @@ imtbase::CTreeItemModel* CProductControllerComp::ListObjects(
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QT_TR_NOOP("Internal error");
 	}
 
 	if (!errorMessage.isEmpty()){
@@ -185,7 +185,7 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
-	else {
+	else{
 		dataModel = new imtbase::CTreeItemModel();
 		dependenciesModel = new imtbase::CTreeItemModel();
 

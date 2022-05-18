@@ -26,6 +26,7 @@ Rectangle {
 
     property string currentSettingsBodyId;
     property string currentModeId;
+    property string selectedLanguage: "";
     property string networkUrl;
 
     property int countMainItems: -1;
@@ -180,8 +181,8 @@ Rectangle {
             }
 
             if (itemId == "Language"){
-                //context.language = "default";
-                context.language = selectedId;
+//                context.language = selectedId;
+                preferenceContainer.selectedLanguage = selectedId;
             }
         }
         modelSettingsBody.SetData("Parameters", modelElements, index);
@@ -528,20 +529,6 @@ Rectangle {
                if (newValue != preferenceContainer.networkUrl){
                    thubnailDecoratorContainer.localSettings.SetData("Elements", elements);
                    preferenceContainer.networkUrl = newValue;
-                   //settingsQuery.getSettings();
-//                   //globalSettings.Clear();
-//                   preferenceContainer.serverSettings.Clear();
-//                   settingsQuery.getSettings();
-////                   for (let i = 0; i < globalSettings.GetItemsCount(); i++){
-////                       var id = globalSettings.GetData("Id", i);
-////                       if (id !== "NetworkSettings"){
-////                            globalSettings.RemoveItem(i);
-////                       }
-////                   }
-//                   mainPanelRepeater.model = 0;
-//                   mainPanelRepeater.model = globalSettings;
-////                   preferenceContainer.localSettings = thubnailDecoratorContainer.localSettings;
-////                   settingsQuery.getSettings();
                }
            }
            if (thubnailDecoratorContainer.serverIsConnection){
@@ -552,6 +539,12 @@ Rectangle {
                    Style.changeSchemeDesign(preferenceContainer.currentModeId);
                }
                preferenceSaveQuery.save();
+           }
+
+           if (preferenceContainer.selectedLanguage != "" && preferenceContainer.selectedLanguage != Style.language){
+               Style.language = preferenceContainer.selectedLanguage;
+               context.language = preferenceContainer.selectedLanguage;
+               thubnailDecoratorContainer.updateModels();
            }
        }
    }

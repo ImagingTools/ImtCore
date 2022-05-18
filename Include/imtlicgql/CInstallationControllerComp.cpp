@@ -39,7 +39,7 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 		if (m_objectCollectionCompPtr->GetObjectData(instanceId, dataPtr)){
 			imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 			if (productInstancePtr == nullptr){
-				errorMessage = "Unable to get an product instance";
+				errorMessage = QT_TR_NOOP("Unable to get an product instance");
 				return nullptr;
 			}
 
@@ -132,7 +132,7 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 		}
 
 		if (accountId.isEmpty()){
-			errorMessage = "Account cannot be empty!";
+			errorMessage = QT_TR_NOOP("Account cannot be empty!");
 			return nullptr;
 		}
 
@@ -142,7 +142,7 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 		}
 
 		if (productId.isEmpty()){
-			errorMessage = "Product cannot be empty!";
+			errorMessage = QT_TR_NOOP("Product cannot be empty!");
 			return nullptr;
 		}
 

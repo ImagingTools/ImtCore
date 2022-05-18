@@ -8,6 +8,7 @@
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtgui/ICollectionViewDelegate.h>
+#include <imtqml/CUserOptionsProviderCompBase.h>
 
 
 namespace imtguigql
@@ -15,7 +16,8 @@ namespace imtguigql
 
 
 class CObjectCollectionControllerCompBase:
-		public imtgql::CGqlRepresentationDataControllerCompBase
+		public imtgql::CGqlRepresentationDataControllerCompBase,
+		public imtqml::CUserOptionsProviderCompBase
 {
 public:
 	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
@@ -24,6 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", true, "HeadersProvider");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -88,9 +91,9 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
-	//I_REF(imtgui::ICollectionViewDelegate, m_viewDelegateCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_headersProviderCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

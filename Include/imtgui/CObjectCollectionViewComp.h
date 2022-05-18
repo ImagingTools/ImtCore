@@ -335,6 +335,7 @@ private:
 
 	QByteArray m_currentTypeId;
 	imod::TModelWrap<PageSelection> m_pageSelection;
+	int m_pageRowCount;
 	imod::TModelWrap<Commands> m_commands;
 
 	typedef QMap<QString, QVariant> ColumnSettings;

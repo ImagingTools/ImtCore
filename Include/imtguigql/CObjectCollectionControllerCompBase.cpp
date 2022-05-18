@@ -8,6 +8,7 @@
 #include <iqtgui/CHierarchicalCommand.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imtgui/CObjectCollectionViewDelegate.h>
+#include <imtbase/CCollectionFilter.h>
 
 
 namespace imtguigql
@@ -182,7 +183,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
-			newObjectId = m_objectCollectionCompPtr->InsertNewObject("",name,description, newObject, objectId);
+			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
 		}
 
 		if (errorMessage.isEmpty() && newObjectId.isEmpty()){
@@ -338,18 +339,47 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 		const imtgql::CGqlObject* viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
 
+		imtbase::CCollectionFilter m_filter;
 		int offset = 0, count = -1;
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
 			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
 
-			int pagesCount = qCeil(m_objectCollectionCompPtr->GetElementsCount() / (double)count);
-			notificationModel->SetData("PagesCount", pagesCount);
+			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
+			if (!filterBA.isEmpty()){
+				imtbase::CTreeItemModel generalModel;
+				generalModel.Parse(filterBA);
+
+				imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("Filter");
+				if (filterModel != nullptr){
+					for (int i = 0; i < filterModel->GetItemsCount(); i++){
+						QByteArray headerId = filterModel->GetData("Id").toByteArray();
+						QString filterText = filterModel->GetData("Text").toString();
+						if (!headerId.isEmpty() && !filterText.isEmpty()){
+							m_filter.SetFilteringInfoIds(QByteArrayList() << headerId);
+							m_filter.SetTextFilter(filterText);
+						}
+					}
+				}
+
+				imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
+				if (sortModel != nullptr){
+					QByteArray headerId = sortModel->GetData("HeaderId").toByteArray();
+					QByteArray sortOrder = sortModel->GetData("SortOrder").toByteArray();
+					if (!headerId.isEmpty() && !sortOrder.isEmpty()){
+						m_filter.SetSortingOrder(sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
+						m_filter.SetSortingInfoIds(QByteArrayList() << headerId);
+					}
+				}
+			}
 		}
+		iprm::CParamsSet filterParams;
+		filterParams.SetEditableParameter("Filter", &m_filter);
 
-		iprm::CParamsSet headersParamsSet;
+		int pagesCount = qCeil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
+		notificationModel->SetData("PagesCount", pagesCount);
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count);
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
 		for (const QByteArray& collectionId : collectionIds){

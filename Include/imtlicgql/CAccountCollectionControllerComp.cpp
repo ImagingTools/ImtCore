@@ -47,7 +47,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* childs = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QT_TR_NOOP("Internal error");
 	}
 
 	if (!errorMessage.isEmpty()){
@@ -65,31 +65,43 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
+//		const QTranslator* translatorPtr = nullptr;
+//		if (m_translationManagerCompPtr.IsValid()){
+//			QByteArray languageId = GetLanguageIdFromInputParams(inputParams);
+//			int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+//			if (languageId != "" && currentIndex >= 0){
+//				translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+//			}
+//		}
+
 		if (!m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
-			errorMessage = "Unable to load an object data";
+			errorMessage = QT_TR_NOOP("Unable to load an object data");
 			return nullptr;
 		}
 
 		const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
 
 		if (accountInfoPtr == nullptr){
-			errorMessage = "Unable to get an account info";
+//			if (translatorPtr != nullptr){
+//				errorMessage = translatorPtr->translate("", QT_TR_NOOP("Unable to get an account info"));
+//			}
+//			else{
+//				errorMessage = QT_TR_NOOP("Unable to get an account info");
+//			}
+			errorMessage = QT_TR_NOOP("Unable to get an account info");
+
 			return nullptr;
 		}
 
 		const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
 
 		if (ownerPtr == nullptr){
-			errorMessage = "Unable to get an account owner";
+			errorMessage = QT_TR_NOOP("Unable to get an account owner");
 			return nullptr;
 		}
 
 		int index = metaInfoModel->InsertNewItem();
-
-		QString test1 = QObject::tr("TEST");
-		QString test2 = QT_TR_NOOP("TEST2");
-
-		metaInfoModel->SetData("Name", QObject::tr("Last Name"), index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Last Name"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
@@ -103,7 +115,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", firstName);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Email", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Email"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString mail = ownerPtr->GetMail();

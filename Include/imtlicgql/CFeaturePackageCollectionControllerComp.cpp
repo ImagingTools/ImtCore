@@ -60,7 +60,7 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		QByteArray packageId = GetObjectIdFromInputParams(inputParams);
 
 		int index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Modification Time", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Modification Time"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(packageId, metaInfo)){
@@ -71,21 +71,21 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
 		if (!m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
-			errorMessage = "Unable to load an object data";
+			errorMessage = QT_TR_NOOP("Unable to load an object data");
 			return nullptr;
 		}
 
 		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
 
 		if (packagePtr == nullptr){
-			errorMessage = "Unable to get an package info provider";
+			errorMessage = QT_TR_NOOP("Unable to get an package info provider");
 			return nullptr;
 		}
 
 		imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Features", index);
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Features"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 		int childIndex;
 

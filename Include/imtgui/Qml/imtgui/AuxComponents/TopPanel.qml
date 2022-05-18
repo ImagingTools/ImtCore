@@ -118,6 +118,8 @@ Rectangle {
             var parameters = {};
             parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
             thubnailDecoratorContainer.openDialog(source, parameters);
+
+            thubnailDecoratorContainer.refreshText();
         }
     }
 

@@ -6,7 +6,7 @@ import imtqml 1.0
 Item {
     id: styleContainer;
 
-    property string language: "ru_RU";
+    property string language: "en_US";
 
     property string mainText: "STYLE!!!";
 

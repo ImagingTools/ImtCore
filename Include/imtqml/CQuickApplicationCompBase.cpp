@@ -10,6 +10,8 @@
 #include <QtGui/QIcon>
 #include <QtGui/QGuiApplication>
 
+#include <QTranslator>
+
 
 namespace imtqml
 {
@@ -17,6 +19,7 @@ namespace imtqml
 
 static int s_argc = 0;
 
+QTranslator m_translatorTest;
 
 CQuickApplicationCompBase::CQuickApplicationCompBase()
 :	m_useSplashScreen(false)

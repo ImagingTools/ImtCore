@@ -45,7 +45,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* childs = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QT_TR_NOOP("Internal error");
 	}
 
 	if (!errorMessage.isEmpty()){
@@ -72,7 +72,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
 		if (!m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
-			errorMessage = "Unable to get an product object data";
+			errorMessage = QT_TR_NOOP("Unable to get an product object data");
 			return nullptr;
 		}
 

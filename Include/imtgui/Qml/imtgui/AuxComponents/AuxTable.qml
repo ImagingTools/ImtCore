@@ -1,5 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
+import imtauthgui 1.0
 //import '../UxAdvancedComponents' as AUX
 
 
@@ -23,6 +25,7 @@ Item {
     signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromTable();
     signal headerOnClicked(string headerId, string sortOrder);
+    signal filterChanged(string id, int index, string text);
 
     function getSelectedId(){
         if (tableContainer.selectedIndex > -1){
@@ -80,12 +83,11 @@ Item {
             delegate: Rectangle{
                 id: deleg;
 
-                width: headersList.width/headersList.count;
-                height: headersList.height * deleg.scale;
+                width: (headersList.width - iconFilter.width)/headersList.count;
+                height: headersList.height;
 
                 color: Style.baseColor;
 
-              //  property double scale: 1.0;
                 property string sortOrder: "ASC";
 
                 Text {
@@ -163,9 +165,54 @@ Item {
     }//headers
 
     Rectangle {
+        id: iconFilter;
+
+        anchors.right: parent.right;
+        anchors.top: parent.top;
+
+        width: 20;
+        height: tableContainer.itemHeight;
+
+        color: "blue";
+
+        MouseArea {
+            anchors.fill: parent;
+
+            onClicked: {
+                console.log("iconFilter onClicked");
+
+                filterMenu.visible = !filterMenu.visible;
+            }
+        }
+    }
+
+    Rectangle {
         anchors.fill: elementsList;
         color: Style.baseColor;
 //        color: "transparent";
+    }
+
+    FilterMenu {
+        id: filterMenu;
+
+        anchors.top: headersPanel.bottom;
+
+        width: headersList.width;
+
+        visible: false;
+        countFilters: headersList.count;
+
+        onTextFilterChanged: {
+//            timer.start(1000);
+            tableContainer.filterChanged(tableContainer.headers.GetData("Id", index), index, text);
+        }
+    }
+
+    Timer {
+        id: timer;
+        onTriggered: {
+//            tableContainer.filterChanged(index, text);
+        }
     }
 
     ListView {
@@ -173,7 +220,7 @@ Item {
 
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.top: headersPanel.bottom;
+        anchors.top: filterMenu.visible ? filterMenu.bottom : headersPanel.bottom;
         anchors.bottom: parent.bottom;
 
         clip: true;
@@ -222,6 +269,30 @@ Item {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
                 tableContainer.selectItem(model["Id"], model[tableContainer.headers.GetData("Id", 0)]);
             }
+        }
+    }
+
+    Rectangle {
+        id: filter;
+        y : tableContainer.itemHeight;
+
+        visible: false;
+
+        width: headersList.width / headersList.count;
+        height: tableContainer.itemHeight;
+
+        onVisibleChanged: {
+
+            console.log("onVisibleChanged");
+        }
+
+        function open(columnIndex){
+            filter.x = columnIndex * filter.width;
+        }
+
+        TextFieldCustom {
+            width: filter.width;
+            height: filter.height;
         }
     }
 

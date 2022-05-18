@@ -87,7 +87,10 @@ I_EXPORT_COMPONENT(
 			"Observer QuickObject",
 			"Observer qml quickobject");
 
-
+I_EXPORT_COMPONENT(
+			Context,
+			"Context",
+			"Context");
 } // namespace ImtQmlPck
 
 

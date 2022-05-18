@@ -4,6 +4,7 @@
 // ACF includes
 #include <imod/TSingleModelObserverBase.h>
 #include <iqt/ITranslationManager.h>
+#include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
@@ -18,11 +19,12 @@ namespace imtqml
 	Returns headers for a collection of objects.
 */
 class CHeadersDataProviderComp:
+		public icomp::CComponentBase,
 		public imtqml::CUserOptionsProviderCompBase,
 		public imtbase::IItemBasedRepresentationDataProvider
 {
 public:
-	typedef imtqml::CUserOptionsProviderCompBase BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHeadersDataProviderComp);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
