@@ -19,6 +19,9 @@ class CObjectCollectionPartituraTestBase: public QObject
 {
     Q_OBJECT
 
+public:
+	QString GetRandomString();
+
 protected:
 	virtual void initTestCase() = 0;
 
@@ -43,6 +46,10 @@ private slots:
 	void PaginationTest();
 	void FilterTest_data();
 	void FilterTest();
+	void SortingTest_data();
+	void SortingTest();
+	void GetElementIdsTest_data();
+	void GetElementIdsTest();
     void cleanupTestCase();
 
 protected:

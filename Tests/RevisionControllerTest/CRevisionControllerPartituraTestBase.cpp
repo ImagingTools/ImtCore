@@ -531,7 +531,8 @@ void CRevisionControllerPartituraTestBase::cleanupTestCase()
 			QString folderPath = fileCollectionPtr->GetCollectionRootFolder();
 			QDir folder(folderPath);
 			QStringList filter;
-			filter.append("*TestName*");
+			filter.append("*Test*");
+			filter.append(" - *");
 			folder.setNameFilters(filter);
 			QStringList foldersForRemove = folder.entryList();
 			for (int i = 0; i < foldersForRemove.size(); i++){
