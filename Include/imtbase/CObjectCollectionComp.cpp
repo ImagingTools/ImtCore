@@ -32,7 +32,7 @@ const ifile::IFilePersistence* CObjectCollectionComp::GetPersistenceForObjectTyp
 }
 
 
-bool CObjectCollectionComp::ResetData(CompatibilityMode mode)
+bool CObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 {
 	if (m_fixedObjectIdsAttrPtr.GetCount() == 0){
 		RemoveAllObjects();
@@ -45,6 +45,7 @@ bool CObjectCollectionComp::ResetData(CompatibilityMode mode)
 			}
 		}
 	}
+
 	return true;
 }
 

@@ -20,7 +20,7 @@ QByteArray CUserOptionsProviderCompBase::GetLanguageIdFromInputParams(const QLis
 }
 
 
-QByteArray CUserOptionsProviderCompBase::GetDesignSchemeIdFromInputParams(const QList<imtgql::CGqlObject>& inputParams) const
+QByteArray CUserOptionsProviderCompBase::GetDesignSchemeIdFromInputParams(const QList<imtgql::CGqlObject>& /*inputParams*/) const
 {
 	return QByteArray();
 }

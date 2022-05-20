@@ -664,9 +664,9 @@ bool CDesignTokenStyleUtils::CreateCssFont(QByteArray& output, const QFont& font
 	}
 	else if(fontFamilies.count()){
 		QStringList tempFonts = fontFamilies;
-		for(QStringList::iterator font = tempFonts.begin(); font != tempFonts.end(); ++font){
-			font->append('"');
-			font->prepend('"');
+		for(QStringList::iterator fontIter = tempFonts.begin(); fontIter != tempFonts.end(); ++fontIter){
+			fontIter->append('"');
+			fontIter->prepend('"');
 		}
 	
 		fontFamilyString.append(tempFonts.join(", ").toUtf8());
