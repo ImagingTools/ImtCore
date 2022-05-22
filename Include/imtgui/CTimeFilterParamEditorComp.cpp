@@ -14,23 +14,89 @@ CTimeFilterParamEditorComp::CTimeFilterParamEditorComp()
 
 // protected methods
 
+// reimplemented (iqtgui::TGuiObserverWrap)
+
+void CTimeFilterParamEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	const imtbase::ITimeFilterParam* objectPtr = GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
+
+	int multiplier = objectPtr->GetUnitMultiplier();
+
+	CustomRangeFrame->setVisible(false);
+
+	imtbase::ITimeFilterParam::TimeUnit timeUnit = objectPtr->GetTimeUnit();
+	switch (timeUnit){
+	case imtbase::ITimeFilterParam::TU_HOUR:
+		switch (multiplier){
+		case 1:
+			TimeCombo->setCurrentIndex(1);
+			break;
+		case 4:
+			TimeCombo->setCurrentIndex(2);
+			break;
+		case 8:
+			TimeCombo->setCurrentIndex(3);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_DAY:
+		switch (multiplier) {
+		case 1:
+			TimeCombo->setCurrentIndex(4);
+			break;
+		case 7:
+			TimeCombo->setCurrentIndex(5);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_MONTH:
+		switch (multiplier){
+		case 1:
+			TimeCombo->setCurrentIndex(6);
+			break;
+		case 3:
+			TimeCombo->setCurrentIndex(7);
+			break;
+		}
+		break;
+	case imtbase::ITimeFilterParam::TU_YEAR:
+		TimeCombo->setCurrentIndex(8);
+		break;
+	case imtbase::ITimeFilterParam::TU_CUSTOM:
+		if (objectPtr->GetTimeRange().IsNull()){
+			TimeCombo->setCurrentIndex(0);
+		}
+		else{
+			CustomRangeFrame->setVisible(true);
+			CustomBeginDate->setDateTime(objectPtr->GetTimeRange().GetBeginTime());
+			CustomEndDate->setDateTime(objectPtr->GetTimeRange().GetEndTime());
+			TimeCombo->setCurrentIndex(9);
+		}
+		break;
+	}
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CTimeFilterParamEditorComp::OnGuiCreated()
 {
-	QBoxLayout *layout = nullptr;
+	QBoxLayout* layoutPtr = nullptr;
 	if(*m_horizontalOrientationFlag){
-		layout = new QHBoxLayout();
+		layoutPtr = new QHBoxLayout();
 	}
 	else{
-		layout = new QVBoxLayout();
+		layoutPtr = new QVBoxLayout();
 	}
 
-	layout->setContentsMargins(0, 0, 0, 0);
-	GetWidget()->setLayout(layout);
-	layout->addWidget(TimeCombo);
+	layoutPtr->setContentsMargins(0, 0, 0, 0);
 
-	layout->addWidget(CustomRangeFrame);
+	GetWidget()->setLayout(layoutPtr);
+
+	layoutPtr->addWidget(TimeCombo);
+
+	layoutPtr->addWidget(CustomRangeFrame);
 	CustomRangeFrame->setVisible(false);
 	CustomBeginDate->setDateTime(QDateTime::currentDateTime().addMonths(-6));
 	CustomEndDate->setDateTime(QDateTime::currentDateTime());
@@ -42,6 +108,8 @@ void CTimeFilterParamEditorComp::OnGuiCreated()
 void CTimeFilterParamEditorComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
+
+	UpdateGui(istd::IChangeable::GetAllChanges());
 }
 
 

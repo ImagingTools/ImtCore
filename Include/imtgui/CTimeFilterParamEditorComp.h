@@ -30,6 +30,9 @@ public:
 	CTimeFilterParamEditorComp();
 
 protected:
+	// reimplemented (iqtgui::TGuiObserverWrap)
+	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
 	void OnGuiCreated() override;
 	void OnGuiRetranslate() override;
