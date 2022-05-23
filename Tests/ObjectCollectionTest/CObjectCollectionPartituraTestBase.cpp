@@ -712,12 +712,16 @@ void CObjectCollectionPartituraTestBase::FilterTest_data()
 
 	// variable decloration
 	QTest::addColumn<QString>("textFilter");
+	QTest::addColumn<QByteArray>("column");
 	QTest::addColumn<bool>("result");
 
 	// set values and description of test
-	QTest::newRow("filter is empty") << "" << false;
-	QTest::newRow("filter with non-exist name") << "AnotherTestFilterName" << true;
-	QTest::newRow("filter with correct name") << "TestFilterName1" << false;
+	QTest::newRow("all param is empty") << "" << QByteArray("") << false;
+	QTest::newRow("filter is empty") << "" << QByteArray("Name") << false;
+	QTest::newRow("filter with non-exist name") << "AnotherTestFilterName" << QByteArray("Name") << true;
+	QTest::newRow("column is empty") << "TestFilterName1" << QByteArray("") << true;
+	QTest::newRow("column with non-exist name") << "TestFilterName1" << QByteArray("AnotherTestColumn") << true;
+	QTest::newRow("all params is correct") << "TestFilterName1" << QByteArray("Name") << false;
 }
 
 
@@ -725,6 +729,7 @@ void CObjectCollectionPartituraTestBase::FilterTest()
 {
 	// get values from rows
 	QFETCH(QString, textFilter);
+	QFETCH(QByteArray, column);
 	QFETCH(bool, result);
 
 	initTestCase();
@@ -741,7 +746,10 @@ void CObjectCollectionPartituraTestBase::FilterTest()
 
 			// Set text filter
 			imtbase::CCollectionFilter filter;
+			QByteArrayList columns;
+			columns.append(column);
 			filter.SetTextFilter(textFilter);
+			filter.SetFilteringInfoIds(columns);
 			iprm::CParamsSet filterParams;
 			filterParams.SetEditableParameter("Filter", &filter);
 
@@ -799,11 +807,14 @@ void CObjectCollectionPartituraTestBase::SortingTest_data()
 
 	// variable decloration
 	QTest::addColumn<QString>("sortOrder");
+	QTest::addColumn<QByteArray>("column");
 
 	// set values and description of test
-	QTest::newRow("sortOrder is no-order") << "NO ORDER";
-	QTest::newRow("sortOrder is ASC") << "ASC";
-	QTest::newRow("sortOrder is DESC") << "DESC";
+	QTest::newRow("all params is null") << "NO ORDER" << QByteArray("");
+	QTest::newRow("sortOrder is no-order") << "NO ORDER" << QByteArray("Name");
+	QTest::newRow("sortOrder is ASC") << "ASC" << QByteArray("Name");
+	QTest::newRow("sortOrder is DESC") << "DESC" << QByteArray("Name");
+	QTest::newRow("sortOrder is ASC with non-exist column") << "ASC" << QByteArray("AnotherName");
 }
 
 
@@ -811,6 +822,7 @@ void CObjectCollectionPartituraTestBase::SortingTest()
 {
 	// get values from rows
 	QFETCH(QString, sortOrder);
+	QFETCH(QByteArray, column);
 
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
@@ -826,7 +838,10 @@ void CObjectCollectionPartituraTestBase::SortingTest()
 
 			// Set sorting
 			imtbase::CCollectionFilter filter;
+			QByteArrayList columns;
+			columns.append(column);
 			filter.SetSortingOrder(sortOrder == "NO ORDER" ? imtbase::ICollectionFilter::SO_NO_ORDER : sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
+			filter.SetSortingInfoIds(columns);
 			iprm::CParamsSet filterParams;
 			filterParams.SetEditableParameter("Filter", &filter);
 
@@ -878,21 +893,22 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest_data()
 	QTest::addColumn<int>("count");
 	QTest::addColumn<QString>("textFilter");
 	QTest::addColumn<QString>("sortOrder");
+	QTest::addColumn<QByteArray>("sortColumn");
 	QTest::addColumn<bool>("result");
 
 	// set values and description of test
-	QTest::newRow("all params is empty") << NULL << NULL << "" << "NO ORDER" << true;
-	QTest::newRow("offset is empty") << NULL << 15 << "TestFilterName" << "ASC" << false;
-	QTest::newRow("offset is out of size") << 100 << 15 << "TestFilterName" << "ASC" << true;
-//	QTest::newRow("offset is negative") << -10 << 15 << "TestFilterName" << "ASC" << true;
-	QTest::newRow("count is empty") << 3 << NULL << "TestFilterName" << "ASC" << true;
-	QTest::newRow("count is out of size") << 3 << 100 << "TestFilterName" << "ASC" << false;
-	QTest::newRow("count is negative") << 3 << -10 << "TestFilterName" << "ASC" << false;
-	QTest::newRow("testFilter is empty") << 3 << 15 << "" << "ASC" << false;
-	QTest::newRow("testFilter is non-exist") << 3 << 15 << "AnotherTestFilter" << "ASC" << true;
-	QTest::newRow("sortOrder is NO ORDER") << 3 << 15 << "TestFilterName" << "NO ORDER" << false;
-	QTest::newRow("sortOrder is ASC") << 3 << 15 << "TestFilterName" << "ASC" << false;
-	QTest::newRow("sortOrder is DESC") << 3 << 15 << "TestFilterName" << "DESC" << false;
+	QTest::newRow("all params is empty") << NULL << NULL << "" << "NO ORDER" << QByteArray("Name") << true;
+	QTest::newRow("offset is empty") << NULL << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << false;
+	QTest::newRow("offset is out of size") << 100 << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << true;
+//	QTest::newRow("offset is negative") << -10 << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << true;
+	QTest::newRow("count is empty") << 3 << NULL << "TestFilterName" << "ASC" << QByteArray("Name") << true;
+	QTest::newRow("count is out of size") << 3 << 100 << "TestFilterName" << "ASC" << QByteArray("Name") << false;
+	QTest::newRow("count is negative") << 3 << -10 << "TestFilterName" << "ASC" << QByteArray("Name") << false;
+	QTest::newRow("testFilter is empty") << 3 << 15 << "" << "ASC" << QByteArray("Name") << false;
+	QTest::newRow("testFilter is non-exist") << 3 << 15 << "AnotherTestFilter" << "ASC" << QByteArray("Name") << true;
+	QTest::newRow("sortOrder is NO ORDER") << 3 << 15 << "TestFilterName" << "NO ORDER" << QByteArray("Name") << false;
+	QTest::newRow("sortOrder is ASC") << 3 << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << false;
+	QTest::newRow("sortOrder is DESC") << 3 << 15 << "TestFilterName" << "DESC" << QByteArray("Name") << false;
 }
 
 
@@ -903,6 +919,7 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 	QFETCH(int, count);
 	QFETCH(QString, textFilter);
 	QFETCH(QString, sortOrder);
+	QFETCH(QByteArray, sortColumn);
 	QFETCH(bool, result);
 
 	initTestCase();
@@ -919,8 +936,12 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 
 			// Set sorting and text filter
 			imtbase::CCollectionFilter filter;
+			QByteArrayList columns;
+			columns.append(sortColumn);
 			filter.SetTextFilter(textFilter);
 			filter.SetSortingOrder(sortOrder == "NO ORDER" ? imtbase::ICollectionFilter::SO_NO_ORDER : sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
+			filter.SetSortingInfoIds(columns);
+			filter.SetFilteringInfoIds(columns);
 			iprm::CParamsSet filterParams;
 			filterParams.SetEditableParameter("Filter", &filter);
 
