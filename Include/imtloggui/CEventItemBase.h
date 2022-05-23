@@ -37,6 +37,7 @@ public:
 	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;
 	virtual QVariant GetMetaInfo(int metaInfoType) const override;
 	virtual bool SetMetaInfo(int metaInfoType, const QVariant& metaInfo) override;
+	virtual QByteArray GetMetaInfoId(int metaInfoType) const override;
 	virtual QString GetMetaInfoName(int metaInfoType) const override;
 	virtual QString GetMetaInfoDescription(int metaInfoType) const override;
 	virtual bool IsMetaInfoWritable(int metaInfoType) const override;

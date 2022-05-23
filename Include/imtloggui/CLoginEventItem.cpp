@@ -61,6 +61,19 @@ QVariant CLoginEventItem::GetMetaInfo(int metaInfoType) const
 }
 
 
+QByteArray CLoginEventItem::GetMetaInfoId(int metaInfoType) const
+{
+	switch (metaInfoType) {
+	case MIT_ACTION:
+		return ("Action");
+	case MIT_USER_NAME:
+		return ("UserName");
+	default:
+		return BaseClass::GetMetaInfoId(metaInfoType);
+	}
+}
+
+
 QString CLoginEventItem::GetMetaInfoName(int metaInfoType) const
 {
 	switch (metaInfoType){

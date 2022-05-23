@@ -34,6 +34,7 @@ public:
 	// reimplemented (idoc::IDocumentMetaInfo)
 	virtual MetaInfoTypes GetMetaInfoTypes(bool allowReadOnly = true) const override;
 	virtual QVariant GetMetaInfo(int metaInfoType) const override;
+	virtual QByteArray GetMetaInfoId(int metaInfoType) const override;
 	virtual QString GetMetaInfoName(int metaInfoType) const override;
 
 	// reimplemented (QGraphicsItem)

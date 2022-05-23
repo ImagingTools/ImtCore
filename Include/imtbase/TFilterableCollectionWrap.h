@@ -115,8 +115,8 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
 
 			for (int type : metaInfoTypes){
-				QString metaInfoName = metaInfoPtr->GetMetaInfoName(type);
-				if (relatedIds.contains(metaInfoName.toUtf8())){
+				QByteArray metaInfoId = metaInfoPtr->GetMetaInfoId(type);
+				if (relatedIds.contains(metaInfoId)){
 					QString metaInfoValue = metaInfoPtr->GetMetaInfo(type).toString();
 					if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
 						return true;
@@ -130,8 +130,8 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfo.GetMetaInfoTypes();
 
 			for (int type : metaInfoTypes){
-				QString metaInfoName = collectionItemMetaInfo.GetMetaInfoName(type);
-				if (relatedIds.contains(metaInfoName.toUtf8())){
+				QByteArray metaInfoId = collectionItemMetaInfo.GetMetaInfoId(type);
+				if (relatedIds.contains(metaInfoId)){
 					QString metaInfoValue = collectionItemMetaInfo.GetMetaInfo(type).toString();
 					if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
 						return true;
@@ -178,8 +178,8 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 					else if (BaseClass::GetDataMetaInfo(filteredIds[i], metaInfoPtr)){
 						idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
 						for (int type : metaInfoTypes){
-							QString metaInfoName = metaInfoPtr->GetMetaInfoName(type);
-							if (relatedIds[0] == metaInfoName.toUtf8()){
+							QByteArray metaInfoId = metaInfoPtr->GetMetaInfoId(type);
+							if (relatedIds[0] == metaInfoId){
 								QString objectName = metaInfoPtr->GetMetaInfo(type).toString();
 								QPair<QString, QByteArray> objectPair = {objectName, filteredIds[i]};
 								listObjects.append(objectPair);
@@ -193,8 +193,8 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 							idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfo.GetMetaInfoTypes();
 
 							for (int type : metaInfoTypes){
-								QString metaInfoName = collectionItemMetaInfo.GetMetaInfoName(type);
-								if (relatedIds[0] == metaInfoName.toUtf8()){
+								QByteArray metaInfoId = collectionItemMetaInfo.GetMetaInfoId(type);
+								if (relatedIds[0] == metaInfoId){
 									QString objectName = collectionItemMetaInfo.GetMetaInfo(type).toString();
 									QPair<QString, QByteArray> objectPair = {objectName, filteredIds[i]};
 									listObjects.append(objectPair);

@@ -85,6 +85,12 @@ bool CEventItemBase::SetMetaInfo(int /*metaInfoType*/, const QVariant& /*metaInf
 }
 
 
+QByteArray CEventItemBase::GetMetaInfoId(int metaInfoType) const
+{
+	return QByteArray();
+}
+
+
 QString CEventItemBase::GetMetaInfoName(int metaInfoType) const
 {
 	switch (metaInfoType){
