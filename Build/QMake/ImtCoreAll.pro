@@ -39,6 +39,9 @@ imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
 SUBDIRS += imtcom
 imtcom.file = ../../Include/imtcom/QMake/imtcom.pro
 
+SUBDIRS += imtprm
+imtprm.file = ../../Include/imtprm/QMake/imtprm.pro
+
 SUBDIRS += imtrest
 imtrest.file = ../../Include/imtrest/QMake/imtrest.pro
 
@@ -151,6 +154,10 @@ ImtCryptPck.depends = imtbase imtcrypt
 SUBDIRS += ImtComPck
 ImtComPck.file = ../../Impl/ImtComPck/QMake/ImtComPck.pro
 ImtComPck.depends = imtbase imtcom
+
+SUBDIRS += ImtPrmPck
+ImtPrmPck.file = ../../Impl/ImtPrmPck/QMake/ImtPrmPck.pro
+ImtPrmPck.depends = imtbase imtprm
 
 SUBDIRS += ImtRestPck
 ImtRestPck.file = ../../Impl/ImtRestPck/QMake/ImtRestPck.pro

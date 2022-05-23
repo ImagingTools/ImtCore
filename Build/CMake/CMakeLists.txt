@@ -11,8 +11,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
 set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
-set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/GeneratedFiles")
-set(ENABLE_TESTS_IMTCORE TRUE)
+set (AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/GeneratedFiles")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
 
@@ -52,6 +51,7 @@ add_subdirectory("${INCLUDE_DIR}/imtlicgql/CMake" "${AUX_INCLUDE_DIR}/imtlicgql"
 add_dependencies(imtlicgql imtgql)
 add_subdirectory("${INCLUDE_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicgui")
 add_subdirectory("${INCLUDE_DIR}/imtcom/CMake" "${AUX_INCLUDE_DIR}/imtcom")
+add_subdirectory("${INCLUDE_DIR}/imtprm/CMake" "${AUX_INCLUDE_DIR}/imtprm")
 
 if(NOT DEFINED USE_QT3D OR USE_QT3D)
 	add_subdirectory("${INCLUDE_DIR}/imt3d/CMake" "${AUX_INCLUDE_DIR}/imt3d")
@@ -132,6 +132,9 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtComPck/CMake" "${AUX_INCLUDE_DIR}/ImtComPck")
 	add_dependencies(ImtComPck imtcom)
 
+	add_subdirectory("${IMPL_DIR}/ImtPrmPck/CMake" "${AUX_INCLUDE_DIR}/ImtPrmPck")
+	add_dependencies(ImtPrmPck imtprm)
+
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
 		add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
 		add_dependencies(ImtDatabasePck imtbase imtdb)
@@ -177,7 +180,7 @@ endif()
 
 
 #-------- Tests --------
-if (${ENABLE_TESTS_IMTCORE})
+if (DEFINED BUILD_TESTING AND BUILD_TESTING)
     add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
     add_subdirectory("${TESTS_DIR}/ObjectCollectionTest/CMake" "${AUX_INCLUDE_DIR}/ObjectCollectionTest")
     add_subdirectory("${TESTS_DIR}/FileCollectionTest/CMake" "${AUX_INCLUDE_DIR}/FileCollectionTest")
