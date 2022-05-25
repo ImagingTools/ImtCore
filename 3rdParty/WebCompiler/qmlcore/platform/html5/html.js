@@ -775,6 +775,18 @@ exports.layoutText = function(text) {
 
 	var isHtml = text.textFormat === text.Html || text.text.search(/[\<\&]/) >= 0 //dubious check
 
+	let setRelative = (el, tags = [], isRoot)=>{
+		if(!isRoot && tags.indexOf(el.tagName)>=0){
+			el.style.position = 'relative'
+		}
+		for (let child of el.childNodes) {
+			setRelative(child, tags, false)
+		}
+	}
+	if(isHtml){
+		setRelative(text.element.dom, ['IMG'], true)
+	}
+
 	if (!wrap && textCanvasContext !== null && !isHtml) {
 		var font = text.font
 		var fontSize
