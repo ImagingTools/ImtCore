@@ -637,9 +637,15 @@ BaseLayout {
 
 	function _mousewheel(e, state) {
 		if(this.interactive && this.enabled){
+			let tempX = this.contentX
+			let tempY = this.contentY
 			this._scroll(e.deltaX, e.deltaY)
 
-			//this._context.backend.tick(this._context)
+			if(tempX !== this.contentX || tempY !== this.contentY){
+				state.blocked(this)
+			} else {
+				state.release()
+			}
 		}
 
 		//console.log(e.deltaX, e.deltaY, this.element.dom.scrollHeight, this. height)
@@ -653,7 +659,16 @@ BaseLayout {
 		//this._feelWheel(e)
 	}
 	function _wheel(e, state) {
+		
+		let tempX = this.contentX
+		let tempY = this.contentY
 		this._mousewheel(e, state)
+
+		if(tempX !== this.contentX || tempY !== this.contentY){
+			state.blocked(this)
+		} else {
+			state.release()
+		}
 
 	}
 	function _scroll(deltaX, deltaY){

@@ -102,7 +102,10 @@ Item {
 						}
 					}
 				}
-				
+
+				if(e.type === 'mousewheel' || e.type === 'wheel'){
+					this.eventState.release()
+				}
                 setTimeout(()=>{
                     //this.backend.tick(this)
                     this._processActions()
