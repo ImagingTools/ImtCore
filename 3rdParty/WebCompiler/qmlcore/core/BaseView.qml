@@ -98,6 +98,8 @@ BaseLayout {
 
 		this.nativeScrolling = true
 		this._flickTimer = null
+
+		
 	}
 
 	/// returns index of item by x,y coordinates
@@ -637,15 +639,28 @@ BaseLayout {
 
 	function _mousewheel(e, state) {
 		if(this.interactive && this.enabled){
+			
 			let tempX = this.contentX
 			let tempY = this.contentY
 			this._scroll(e.deltaX, e.deltaY)
+
+
+			// if(this.scrollStopPropagation){
+			// 	state.blocked(this)
+			// } else {
+			// 	if(tempX !== this.contentX || tempY !== this.contentY){
+			// 		state.blocked(this)
+			// 	} else {
+			// 		state.release()
+			// 	}
+			// }
 
 			if(tempX !== this.contentX || tempY !== this.contentY){
 				state.blocked(this)
 			} else {
 				state.release()
 			}
+			
 		}
 
 		//console.log(e.deltaX, e.deltaY, this.element.dom.scrollHeight, this. height)
@@ -660,21 +675,38 @@ BaseLayout {
 	}
 	function _wheel(e, state) {
 		
-		let tempX = this.contentX
-		let tempY = this.contentY
-		this._mousewheel(e, state)
+		
+		if(this.interactive && this.enabled){
+			
+			let tempX = this.contentX
+			let tempY = this.contentY
+			this._mousewheel(e, state)
 
-		if(tempX !== this.contentX || tempY !== this.contentY){
-			state.blocked(this)
-		} else {
-			state.release()
+
+			// if(this.scrollStopPropagation){
+			// 	state.blocked(this)
+			// } else {
+			// 	if(tempX !== this.contentX || tempY !== this.contentY){
+			// 		state.blocked(this)
+			// 	} else {
+			// 		state.release()
+			// 	}
+			// }
+
+			if(tempX !== this.contentX || tempY !== this.contentY){
+				state.blocked(this)
+			} else {
+				state.release()
+			}
 		}
+
+		
 
 	}
 	function _scroll(deltaX, deltaY){
 		
 
-		if(this.orientation === ListView.Horizontal){
+		if(this.orientation === ListView.Horizontal || this.flickableDirection !== Flickable.VerticalFlick){
 			if(deltaX > 0)
 			if(this.contentX + deltaX <= this.element.dom.scrollWidth - this.width){
 				this.contentX += deltaX
@@ -689,7 +721,7 @@ BaseLayout {
 			}
 		}
 		
-		if(this.orientation === ListView.Vertical){
+		if(this.orientation === ListView.Vertical || this.flickableDirection !== Flickable.HorizontalFlick){
 			if(deltaY > 0)
 			if(this.contentY + deltaY <= this.element.dom.scrollHeight - this.height){
 				this.contentY += deltaY
