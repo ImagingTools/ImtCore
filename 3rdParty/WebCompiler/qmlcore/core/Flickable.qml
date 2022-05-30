@@ -1,6 +1,6 @@
 ///single direction (vertical or horizontal) oriented view
 BaseView {
-	property enum flickableDirection { AutoFlickDirection, AutoFlickIfNeeded, VerticalFlick, HorizontalFlick, HorizontalAndVerticalFlick };	
+	//property enum flickableDirection { AutoFlickDirection, AutoFlickIfNeeded, VerticalFlick, HorizontalFlick, HorizontalAndVerticalFlick };	
 	
 	constructor: {
 		//this._sizes = []
@@ -334,32 +334,9 @@ BaseView {
 	// }
 
 	///@private
-	function _updateOverflow() {
-		var style = {}
-		if (this.flickableDirection === this.AutoFlickDirection) {
-			style['overflow-x'] = 'auto'
-			style['overflow-y'] = 'auto'
-		} else if(this.flickableDirection === this.AutoFlickIfNeeded) {
-			style['overflow-x'] = 'auto'
-			style['overflow-y'] = 'auto'
-		} else if(this.flickableDirection === this.HorizontalFlick) {
-			style['overflow-x'] = 'auto'
-			style['overflow-y'] = 'hidden'
-		} else if(this.flickableDirection === this.VerticalFlick) {
-			style['overflow-x'] = 'hidden'
-			style['overflow-y'] = 'auto'
-		} else if(this.flickableDirection === this.HorizontalAndVerticalFlick) {
-			style['overflow-x'] = 'scroll'
-			style['overflow-y'] = 'scroll'
-		}
-		this.style(style)
-	}
+	
 
-	onFlickableDirectionChanged: {
-		this._updateOverflow()
-		//this._scheduleLayout()
-		//this._sizes = []
-	}
+	
 
 	onNativeScrollingChanged: {
 		this._updateOverflow()

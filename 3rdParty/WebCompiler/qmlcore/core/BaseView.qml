@@ -637,6 +637,32 @@ BaseLayout {
 
 	}
 
+	function _updateOverflow() {
+		var style = {}
+		if (this.flickableDirection === this.AutoFlickDirection) {
+			style['overflow-x'] = 'auto'
+			style['overflow-y'] = 'auto'
+		} else if(this.flickableDirection === this.AutoFlickIfNeeded) {
+			style['overflow-x'] = 'auto'
+			style['overflow-y'] = 'auto'
+		} else if(this.flickableDirection === this.HorizontalFlick) {
+			style['overflow-x'] = 'auto'
+			style['overflow-y'] = 'hidden'
+		} else if(this.flickableDirection === this.VerticalFlick) {
+			style['overflow-x'] = 'hidden'
+			style['overflow-y'] = 'auto'
+		} else if(this.flickableDirection === this.HorizontalAndVerticalFlick) {
+			style['overflow-x'] = 'scroll'
+			style['overflow-y'] = 'scroll'
+		}
+		this.style(style)
+	}
+	onFlickableDirectionChanged: {
+		this._updateOverflow()
+		//this._scheduleLayout()
+		//this._sizes = []
+	}
+
 	function _mousewheel(e, state) {
 		if(this.interactive && this.enabled){
 			
@@ -706,7 +732,7 @@ BaseLayout {
 	function _scroll(deltaX, deltaY){
 		
 
-		if(this.orientation === ListView.Horizontal || this.flickableDirection !== Flickable.VerticalFlick){
+		if(this.flickableDirection !== Flickable.VerticalFlick){
 			if(deltaX > 0)
 			if(this.contentX + deltaX <= this.element.dom.scrollWidth - this.width){
 				this.contentX += deltaX
@@ -721,7 +747,7 @@ BaseLayout {
 			}
 		}
 		
-		if(this.orientation === ListView.Vertical || this.flickableDirection !== Flickable.HorizontalFlick){
+		if(this.flickableDirection !== Flickable.HorizontalFlick){
 			if(deltaY > 0)
 			if(this.contentY + deltaY <= this.element.dom.scrollHeight - this.height){
 				this.contentY += deltaY
