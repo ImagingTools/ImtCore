@@ -335,9 +335,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		itemsModel = new imtbase::CTreeItemModel();
 		notificationModel = new imtbase::CTreeItemModel();
 
-		QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
-
-		const imtgql::CGqlObject* viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+		const imtgql::CGqlObject* viewParamsGql = nullptr;
+		if (inputParams.size() > 0){
+			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+		}
 
 		imtbase::CCollectionFilter m_filter;
 		int offset = 0, count = -1;
@@ -350,16 +351,19 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 				imtbase::CTreeItemModel generalModel;
 				generalModel.Parse(filterBA);
 
-				imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("Filter");
+				imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("FilterIds");
 				if (filterModel != nullptr){
 					for (int i = 0; i < filterModel->GetItemsCount(); i++){
 						QByteArray headerId = filterModel->GetData("Id").toByteArray();
-						QString filterText = filterModel->GetData("Text").toString();
-						if (!headerId.isEmpty() && !filterText.isEmpty()){
+						if (!headerId.isEmpty()){
 							m_filter.SetFilteringInfoIds(QByteArrayList() << headerId);
-							m_filter.SetTextFilter(filterText);
 						}
 					}
+				}
+
+				QString filterText = generalModel.GetData("TextFilter").toString();
+				if (!filterText.isEmpty()){
+					m_filter.SetTextFilter(filterText);
 				}
 
 				imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
@@ -377,6 +381,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		filterParams.SetEditableParameter("Filter", &m_filter);
 
 		int pagesCount = qCeil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
+		if (pagesCount < 0){
+			pagesCount = 1;
+		}
+
 		notificationModel->SetData("PagesCount", pagesCount);
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);

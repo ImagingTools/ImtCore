@@ -23,7 +23,6 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	bool isSetResponce = false;
 	QByteArrayList fields;
-
 	for (int i = 0; i < count; i++){
 		if (fieldList->at(i).GetId() == "items"){
 			fields = fieldList->at(i).GetFieldIds();
@@ -38,14 +37,12 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 			}
 
 			QByteArray itemData = paramList->at(0).GetFieldArgumentValue("Item").toByteArray();
-
 			if (itemData.isEmpty()){
 				errorMessage = QObject::tr("Mutation is empty").toUtf8();
 			}
 			else{
 				imtbase::CTreeItemModel itemModel;
 				itemModel.Parse(itemData);
-//				itemsModel = m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(*paramList, &itemModel);
 				if (itemModel.ContainsKey("items")){
 					imtbase::CTreeItemModel* items = itemModel.GetTreeItemModel("items");
 					itemsModel = m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(*paramList, items);
@@ -63,11 +60,16 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 	}
 	else if(gqlRequest.GetRequestType() == imtgql::IGqlRequest::RT_QUERY){
 		if(m_pagesDataProviderCompPtr.IsValid() && isSetResponce){
-
 			itemsModel = m_pagesDataProviderCompPtr->GetTreeItemModel(*paramList, fields);
-
 			if (itemsModel == nullptr){
 				errorMessage = QObject::tr("Pages is empty").toUtf8();
+			}
+			else{
+				if (m_decoratorSourceAttrPtr.IsValid()){
+					for (int i = 0; i < itemsModel->GetItemsCount(); i++){
+						itemsModel->SetData("DecoratorSource", *m_decoratorSourceAttrPtr, i);
+					}
+				}
 			}
 		}
 		else{
@@ -82,10 +84,8 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 	}
 	else{
 		dataModel = new imtbase::CTreeItemModel();
-
 		dataModel->SetExternTreeModel("items", itemsModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

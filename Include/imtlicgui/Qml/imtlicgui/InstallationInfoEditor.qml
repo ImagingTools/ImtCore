@@ -516,6 +516,8 @@ Rectangle {
 
                      headers: headersModelLicenses;
 
+                     hasFilter: false;
+
                      delegate: TableInstanceLicensesDelegate {
                          id: delegate;
 
@@ -701,16 +703,25 @@ Rectangle {
             var dataModelLocal;
 
             if (containerInstallation.gqlModelCollectionInfo == "ProductList") {
+                console.log("products.toJSON()", products.toJSON());
                 dataModelLocal = products.GetData("headers");
             }
             else if (containerInstallation.gqlModelCollectionInfo == "AccountList") {
                 dataModelLocal = accounts.GetData("headers");
             }
 
+            if (dataModelLocal.ContainsKey("Headers")){
+                dataModelLocal = dataModelLocal.GetData("Headers");
+            }
+
             for(var i = 0; i < dataModelLocal.GetItemsCount(); i++){
                 queryFields.InsertField(dataModelLocal.GetData("Id",i));
             }
+
+
             query.AddField(queryFields);
+
+            console.log("query", query);
 
             var gqlData = query.GetQuery();
             console.log("InstallationInfoEditor items query  ", gqlData);
@@ -775,6 +786,10 @@ Rectangle {
 
             queryFields.InsertField("Id");
             var dataModelLocal = products.GetData("headers");
+
+            if (dataModelLocal.ContainsKey("Headers")){
+                dataModelLocal = dataModelLocal.GetData("Headers");
+            }
 
             for(var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
                 queryFields.InsertField(dataModelLocal.GetData("Id",i));

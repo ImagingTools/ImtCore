@@ -3,41 +3,38 @@ import Acf 1.0
 import imtqml 1.0
 import imtauthgui 1.0
 
-Rectangle {
-    id: filterContainer;
+Item {
+    id: filterPanelDecorator;
 
-    width: 500;
-    height: 30;
+    anchors.fill: parent;
 
-    color: Style.backgroundColor;
-
-    property int countFilters: 4;
-
-    property int itemWidth: filterContainer.width / filterContainer.countFilters;
+    property int itemWidth: 150;
     property int itemHeight: 30;
 
-    signal textFilterChanged(int index, string text);
-    property string decoratorSource;
+//    signal textFilterChanged(int index, string text);
 
-    onDecoratorSourceChanged: {
-        console.log("loaderDecorator.source", filterContainer.decoratorSource);
-        loaderDecorator.source = filterContainer.decoratorSource;
+    TextFieldCustom {
+        id: searchTextField;
+
+        anchors.left: parent.left;
+        anchors.leftMargin: 5;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        radius: 5;
+        width: 200;
+        height: 30;
+
+        onTextChanged: {
+//            filterPanelDecorator.textFilterChanged(model.index, tfc.text);
+            loaderDecorator.textChanged(model.index, searchTextField.text);
+        }
     }
 
-    Loader {
-        id: loaderDecorator;
 
-        anchors.fill: parent;
 
-        function textChanged(index, text){
-            filterContainer.textFilterChanged(index, text);
-        }
 
-        onItemChanged: {
-            console.log("onItemChanged");
-        }
 
-    }
+//LISA DECORATOR
 //    TextFieldCustom {
 //        id: tfc;
 
@@ -46,10 +43,11 @@ Rectangle {
 //        anchors.verticalCenter: parent.verticalCenter;
 
 //        width: 200;
-//        height: filterContainer.height - 5;
+//        height: filterPanelDecorator.height - 5;
 
 //        onTextChanged: {
-//            filterContainer.textFilterChanged(model.index, tfc.text);
+////            filterPanelDecorator.textFilterChanged(model.index, tfc.text);
+//            loaderDecorator.textChanged(model.index, tfc.text);
 //        }
 
 //        Image {
@@ -77,3 +75,4 @@ Rectangle {
 //        }
 //    }
 }
+

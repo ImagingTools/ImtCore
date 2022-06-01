@@ -17,72 +17,86 @@ Rectangle{
     property string firstElementText: "text";
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
 
+    property string decoratorSource;
     signal clicked;
     signal closeSignal;
 
-    Rectangle{
-        id: selection;
-
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-
-        height: 2;
-
-        color: Style.tabSelectedColor;
-        visible: selected;
+    onDecoratorSourceChanged: {
+        loaderDecorator.source = tabDelegate.decoratorSource;
     }
 
-    Item {
-        id: imagetabDelegate;
+    Loader {
+        id: loaderDecorator;
 
-        height: parent.height;
-        width: visible ? height : 1;
-
-        visible: tabDelegate.firstElement;
-
-        Image {
-            id: firsElementImage;
-
-            anchors.centerIn: parent;
-
-            width: parent.width * 0.6;
-            height: parent.height * 0.6;
-
-            sourceSize.width: width;
-            sourceSize.height: height;
-
-            fillMode: Image.PreserveAspectFit;
-            source:  "../../../" + "Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
+        onItemChanged: {
+            loaderDecorator.item.width = tabDelegate.width;
+            loaderDecorator.item.height = tabDelegate.height;
         }
     }
 
-    Item {
-        id: texttabDelegate;
+//    Rectangle{
+//        id: selection;
 
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        anchors.left: imagetabDelegate.right;
+//        anchors.bottom: parent.bottom;
+//        anchors.left: parent.left;
+//        anchors.right: parent.right;
 
-        width: text.width + tabDelegate.height;
+//        height: 2;
 
-        onWidthChanged: {
-            if (tabDelegate.autoWidth){
-                tabDelegate.width = texttabDelegate.width + tabDelegate.height
-            }
-        }
+//        color: Style.tabSelectedColor;
+//        visible: selected;
+//    }
 
-        Text {
-            id: text;
+//    Item {
+//        id: imagetabDelegate;
 
-            anchors.centerIn: parent;
+//        height: parent.height;
+//        width: visible ? height : 1;
 
-            text: tabDelegate.text;
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-        }
-    }
+//        visible: tabDelegate.firstElement;
+
+//        Image {
+//            id: firsElementImage;
+
+//            anchors.centerIn: parent;
+
+//            width: parent.width * 0.6;
+//            height: parent.height * 0.6;
+
+//            sourceSize.width: width;
+//            sourceSize.height: height;
+
+//            fillMode: Image.PreserveAspectFit;
+//            source:  "../../../" + "Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
+//        }
+//    }
+
+//    Item {
+//        id: texttabDelegate;
+
+//        anchors.top: parent.top;
+//        anchors.bottom: parent.bottom;
+//        anchors.left: imagetabDelegate.right;
+
+//        width: text.width + tabDelegate.height;
+
+//        onWidthChanged: {
+//            if (tabDelegate.autoWidth){
+//                tabDelegate.width = texttabDelegate.width + tabDelegate.height
+//            }
+//        }
+
+//        Text {
+//            id: text;
+
+//            anchors.centerIn: parent;
+
+//            text: tabDelegate.text;
+//            color: Style.textColor;
+//            font.family: Style.fontFamily;
+//            font.pixelSize: Style.fontSize_common;
+//        }
+//    }
 
     MouseArea{
         id: ma;

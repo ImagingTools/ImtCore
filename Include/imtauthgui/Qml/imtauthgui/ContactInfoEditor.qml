@@ -1256,7 +1256,7 @@ Rectangle {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            if(containerContactInfo.operation === "Open"){
+            if(containerContactInfo.operation == "Open"){
 
                 containerContactInfo.gqlModelQueryType = "AccountUpdate";
                 containerContactInfo.gqlModelQueryTypeNotification = "updatedNotification";
@@ -1335,6 +1335,11 @@ Rectangle {
                                 containerContactInfo.itemName = accName;
                             }
 
+                            if(containerContactInfo.operation == "New"){
+                                containerContactInfo.operation = "Open";
+                            }
+
+                            console.log("containerContactInfo.operation", containerContactInfo.operation);
 //                            if (oldId !== containerContactInfo.itemId){
 //                                var accName = containerContactInfo.contactInfoModel.GetData("AccountName");
 //                                containerContactInfo.rootItem.updateTitleTab(containerContactInfo.itemId, accName);

@@ -158,7 +158,7 @@ Item {
     function refresh() {
         accountCollectionView.refresh();
 
-        metaInfo.getMetaInfo();
+//        metaInfo.getMetaInfo();
     }
 
     function commandsChanged(commandsId) {

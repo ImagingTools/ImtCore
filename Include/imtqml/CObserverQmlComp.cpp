@@ -47,7 +47,7 @@ void CObserverQmlComp::ApplyUrl(const imtbase::CTreeItemModel *settingsModelPtr)
 void CObserverQmlComp::OnComponentCreated()
 {
 	ilog::CLoggerComponentBase::OnComponentCreated();
-    if (m_quickObjectComp.IsValid()){
+	if (m_quickObjectComp.IsValid()){
 
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));

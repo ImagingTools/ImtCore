@@ -415,7 +415,7 @@ Item {
             dataModelLocal.SetData("Id", "", index);
             dataModelLocal.SetData("Description", "", index);
 
-            model.SetData("data", dataModelLocal);
+            //model.SetData("data", dataModelLocal);
             //model.Refresh();
             featureCollectionView.refresh();
         }

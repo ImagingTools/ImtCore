@@ -16,6 +16,10 @@ Rectangle {
     signal menuActivatedSignal(string idMenu);
     signal commandsChangedSignal(string commandsId);
 
+    function updateModels(){
+        commandsModel.updateModel();
+    }
+
     function setModeMenuButton(commandId, mode) {
         console.log("TopPanel setModeMenuButton!", commandId, mode, topPanel.activeCommandsModelId);
 
@@ -119,7 +123,7 @@ Rectangle {
             parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
             thubnailDecoratorContainer.openDialog(source, parameters);
 
-            thubnailDecoratorContainer.refreshText();
+//            thubnailDecoratorContainer.refreshText();
         }
     }
 

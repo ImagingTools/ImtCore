@@ -69,6 +69,8 @@ Rectangle {
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
 
+            decoratorSource: Style.tabPanelDecoratorPath;
+
             onClicked: {
                 console.log("TabDelegate onClicked")
                 tabPanelContainer.selectedIndex = model.index;

@@ -32,16 +32,25 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QL
 			if (fields[indexField] == CommandEnum::NAME && m_commandNameAttrPtr.GetCount() > i){
 				if (m_translationManagerCompPtr.IsValid()){
 					QByteArray languageId = GetLanguageIdFromInputParams(params);
-					int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-					if (languageId != "" && currentIndex >= 0){
+
+					int currentIndex = -1;
+					if (languageId.isEmpty()){
+						currentIndex = 0;
+						languageId = "en_US";
+					}
+					else{
+						currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+					}
+
+					if (currentIndex >= 0){
 						const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
 						if (translatorPtr != nullptr){
-							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("", m_commandNameAttrPtr[i].toUtf8()), i);
+							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandNameAttrPtr[i].toUtf8()), i);
 						}
 					}
 				}
 				else{
-					treeModel->SetData(CommandEnum::NAME, m_commandNameAttrPtr[i], i);
+					treeModel->SetData(CommandEnum::NAME, m_commandNameAttrPtr[i].toUtf8(), i);
 				}
 			}
 			if (fields[indexField] == CommandEnum::ICON && m_commandDefaultStatusIcon.GetCount() > i){

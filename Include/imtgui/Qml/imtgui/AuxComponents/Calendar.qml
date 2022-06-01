@@ -35,12 +35,14 @@ Rectangle {
         var i;
 
         for (i = curYear; i < curYear + 5; i++){
+//            modelYear.append({"id": i});
             modelYear.append({"name": i});
         }
 
         for (i = 0; i < 12; i++){
            // modelMonth.append({"name": Qt.locale().standaloneMonthName(i, Locale.LongFormat)})
 
+//            modelMonth.append({"id": calendarContainer.monthsNames[i]})
             modelMonth.append({"name": calendarContainer.monthsNames[i]})
         }
 
@@ -49,6 +51,7 @@ Rectangle {
         dayCB.currentText = 1;
 
         for (i = 1; i <= 31; i++){
+//            modelDay.append({"id": i})
             modelDay.append({"name": i})
         }
     }
@@ -146,6 +149,7 @@ Rectangle {
                         modelDay.remove(28);
                     }
                     else if (countDay === 29 && curCountDay === 28){
+//                        modelDay.append({"id": 29})
                         modelDay.append({"name": 29})
                     }
                 }
@@ -199,6 +203,7 @@ Rectangle {
 
                 modelDay.clear();
                 for (var i = 1; i <= newCountDay; i++){
+//                    modelDay.append({"id": i})
                     modelDay.append({"name": i})
                 }
 

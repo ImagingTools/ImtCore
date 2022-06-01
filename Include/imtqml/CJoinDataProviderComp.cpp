@@ -30,7 +30,7 @@ imtbase::CTreeItemModel* CJoinDataProviderComp::GetTreeItemModel(const QList<imt
 		for (int index = 0; index < m_representationDataProviderCompPtr.GetCount(); index++){
 			imtbase::CTreeItemModel* externModel = m_representationDataProviderCompPtr[index]->GetTreeItemModel(params, fields);
 			rootModel->InsertNewItem();
-			rootModel->CopyItemDataFromModel(index,externModel);
+			rootModel->CopyItemDataFromModel(index, externModel);
 		}
 	}
 

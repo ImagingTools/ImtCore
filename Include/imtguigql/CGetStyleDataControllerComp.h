@@ -17,6 +17,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGetStyleDataControllerComp);
 		I_ASSIGN(m_parameterCompPtr, "Parameter", "Parameter of params data", false, "");
+		I_ASSIGN(m_prefixFileNameAttrPtr, "Prefix", "Prefix of the files", false, "");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
@@ -24,6 +25,7 @@ public:
 
 private:
 	I_REF(iser::ISerializable, m_parameterCompPtr);
+	I_TEXTATTR(m_prefixFileNameAttrPtr);
 };
 
 

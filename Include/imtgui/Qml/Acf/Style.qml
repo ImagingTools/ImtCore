@@ -6,7 +6,13 @@ import imtqml 1.0
 Item {
     id: styleContainer;
 
-    property string language: "en_US";
+    property int size_indicatorHeight: 50;
+    property int size_leftPanelWidth: 250;
+    property string color_text_titles: "#7700FF";
+    property string color_text_notActive: "#C2CEDB";
+
+
+    property string language;
 
     property string mainText: "STYLE!!!";
 
@@ -73,7 +79,7 @@ Item {
 
     Component.onCompleted: {
         console.log("Style onCompleted");
-        styleContainer.changeSchemeDesign("");
+       //styleContainer.changeSchemeDesign("");
     }
 
     function getImageSource (name, styleTheme, buttonState, buttonMode)
@@ -102,35 +108,57 @@ Item {
         return themeType.GetData("ColorPalette").GetData(colorPalette);
     }
 
+    property string menuButtonDecoratorPath: "MenuPanelButtonDecorator.qml";
+    property string tabPanelDecoratorPath: "TabPanelDecorator.qml";
+    property string filterPanelDecoratorPath: "FilterPanelDecorator.qml";
+
+    function getDecorator(decorators, section, type){
+        let dataModelLocal = decorators.GetData("Decorators");
+        if (dataModelLocal.ContainsKey(section)){
+            dataModelLocal = dataModelLocal.GetData(section);
+            if (dataModelLocal.ContainsKey(type)){
+                return dataModelLocal.GetData(type);
+            }
+        }
+    }
+
     function parseStyleTheme(themeType){
-        console.log("PreferenceDialog parseStyleTheme");
+        let dataSource = themeType.GetData("source");
+        Style.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
+        Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
+        Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
+        Style.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource);
+        Style.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
+        Style.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
+        Style.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
+        Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "HeaderBorder", dataSource);
+        Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
 
-        Style.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", themeType);
-        Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", themeType);
-        Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", themeType);
-        Style.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", themeType);
-        Style.textColor = styleContainer.getThemeColor("ActiveColors", "Text", themeType);
-        Style.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", themeType);
-        Style.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", themeType);
-        Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "HeaderBorder", themeType);
-        Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", themeType);
+        Style.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
 
-        Style.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", themeType);
+        Style.hover = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
 
-        Style.hover = styleContainer.getThemeColor("ActiveColors", "Hover", themeType);
+        Style.imagingToolsGradient0 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient0");
+        Style.imagingToolsGradient1 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient1");
+        Style.imagingToolsGradient2 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient2");
+        Style.imagingToolsGradient3 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient3");
+        Style.imagingToolsGradient4 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient4");
+        Style.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
 
-        Style.imagingToolsGradient0 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient0");
-        Style.imagingToolsGradient1 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient1");
-        Style.imagingToolsGradient2 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient2");
-        Style.imagingToolsGradient3 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient3");
-        Style.imagingToolsGradient4 = themeType.GetData("ColorPalette").GetData("ImagingToolsGradient4");
-        Style.greenColor = themeType.GetData("ColorPalette").GetData("Green");
+        Style.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", dataSource);
+        Style.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
+        Style.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
-        Style.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", themeType);
-        Style.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", themeType);
-        Style.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", themeType);
+        Style.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
 
-        Style.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", themeType);
+        let dataDecorators = themeType.GetData("decorators");
+//        Style.menuButtonDecoratorPath = styleContainer.getDecorator("MenuButton", dataDecorators);
+//        Style.tabPanelDecoratorPath = styleContainer.getDecorator("TabPanel", dataDecorators);
+//        Style.filterPanelDecoratorPath = styleContainer.getDecorator("FilterPanel", dataDecorators);
+
+        Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "Button");
+        Style.tabPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TabPanel", "Base");
+        Style.filterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators,"FilterPanel", "Base");
     }
 
     GqlModel {
@@ -149,18 +177,15 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("Preference GqlModel getStyle query ", gqlData);
+            console.log("styleQuery gqlData", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
             console.log("State:", this.state, styleQuery);
             if (this.state === "Ready") {
-                var dataModelLocal;
 
-                if (styleQuery === ""){
-                    thumbnailDecorator.setNoConnection(true);
-                }
+                var dataModelLocal;
 
                 if (styleQuery.ContainsKey("errors")){
                     return;
@@ -178,9 +203,15 @@ Item {
                     }
 
                     if(dataModelLocal.ContainsKey("source")){
-                        dataModelLocal = dataModelLocal.GetData("source");
+                        console.log("Style GetStyle", dataModelLocal.toJSON());
+                        //dataModelLocal = dataModelLocal.GetData("source");
                         styleContainer.parseStyleTheme(dataModelLocal);
                     }
+
+//                    if(dataModelLocal.ContainsKey("decorators")){
+//                        dataModelLocal = dataModelLocal.GetData("decorators");
+//                        styleContainer.parseStyleTheme(dataModelLocal);
+//                    }
                 }
             }
         }

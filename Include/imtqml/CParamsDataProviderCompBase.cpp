@@ -39,16 +39,31 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 	}
 
 	const QTranslator* translatorPtr = nullptr;
+	int currentIndex = -1;
 	if (m_translationManagerCompPtr.IsValid()){
 		QByteArray languageId = GetLanguageIdFromInputParams(params);
-		int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-		translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+
+		if (languageId.isEmpty()){
+			currentIndex = 2;
+			languageId = "ru_RU";
+		}
+		else{
+			currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+		}
+
+		if (currentIndex >= 0){
+			translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+		}
 	}
 
 	if (m_paramNameAttrPtr.IsValid()){
 		paramName = *m_paramNameAttrPtr;
 		if (translatorPtr != nullptr){
-			rootModelPtr->SetData("Name", translatorPtr->translate("", paramName.toUtf8()));
+			if (m_translationManagerCompPtr->GetSlaveTranslationManager() != nullptr && currentIndex >= 0){
+				const QTranslator* slaveTranslatorPtr = m_translationManagerCompPtr->GetSlaveTranslationManager()->GetLanguageTranslator(currentIndex);
+				QString text1 = slaveTranslatorPtr->translate("Attribute", paramName.toUtf8());
+				rootModelPtr->SetData("Name", slaveTranslatorPtr->translate("Attribute", paramName.toUtf8()));
+			}
 		}
 		else{
 			rootModelPtr->SetData("Name", paramName);
@@ -107,12 +122,6 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 
 					parametersPtr->SetData("Id", id, index);
 					parametersPtr->SetData("Name", name, index);
-//					if (translatorPtr != nullptr){
-//						parametersPtr->SetData("Name", translatorPtr->translate("", name.toUtf8()), index);
-//					}
-//					else{
-//						parametersPtr->SetData("Name", name, index);
-//					}
 				}
 			}
 		}
@@ -147,7 +156,6 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromReprese
 	}
 
 	if (!m_parameterCompPtr.IsValid()){
-
 		if (m_mutationDataDelegateCompPtr.IsValid()){
 			imtbase::CTreeItemModel* elementsModel = baseModel->GetTreeItemModel("Elements");
 

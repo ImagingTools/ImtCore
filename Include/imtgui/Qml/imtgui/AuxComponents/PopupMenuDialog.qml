@@ -141,6 +141,7 @@ Item {
                 color: "transparent";
 
                 function click(){
+                    console.log("popup click", model.index, model.name);
                     popupMenuContainer.exit(model.index, model.name);
                     loaderDialog.closeItem();
                 }

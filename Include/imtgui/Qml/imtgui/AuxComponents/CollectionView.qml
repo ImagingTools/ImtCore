@@ -163,8 +163,8 @@ Rectangle {
     function refresh(){
         var isHeaderUpdated = false;
         console.log("CollectionView refresh", collectionViewContainer.gqlModelInfo)
-        if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("headers")){
-            var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("headers");
+        if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("Headers")){
+            var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("Headers");
             tableInternal.headers = dataModelLocal;
         }
         else{
@@ -174,7 +174,6 @@ Rectangle {
 
         if (collectionViewContainer.collectionViewModel && collectionViewContainer.collectionViewModel.ContainsKey("data")){
             let dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
-
             tableInternal.elements = 0;
             tableInternal.elements = dataModelLocal;
 
@@ -259,50 +258,45 @@ Rectangle {
             collectionViewContainer.setActiveFocusFromCollectionView();
         }
 
-        onFilterChanged: {
-            if (filterModel.ContainsKey("Filter")){
-                let filter = filterModel.GetData("Filter");
-                filter.SetData("Text", text, index);
-                filter.SetData("Id", id, index);
-//                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
-//                    let index = filter.InsertNewItem()
-//                    filter.SetData("Id", tableInternal.headers.GetData("Id", i), index);
-//                    filter.SetData("Text", "", index);
-//                }
-                modelItems.updateModel();
-            }
+        onTextFilterChanged: {
+            modelFilter.SetData("TextFilter", text);
+            modelItems.updateModel();
         }
+
+//        onFilterChanged: {
+//            modelFilter.SetData("TextFilter", text);
+//            modelItems.updateModel();
+////            if (modelFilter.ContainsKey("filterLocal")){
+
+////                let filterLocal = modelFilter.GetData("filterLocal");
+////                filterLocal.SetData("Text", text, index);
+////                filterLocal.SetData("Id", id, index);
+//////                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
+//////                    let index = filterLocal.InsertNewItem()
+//////                    filterLocal.SetData("Id", tableInternal.headers.GetData("Id", i), index);
+//////                    filterLocal.SetData("Text", "", index);
+//////                }
+////                modelItems.updateModel();
+////            }
+//        }
 
         onHeaderOnClicked: {
             console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
 
-            let filter = filterModel.GetData("Sort");
-            filter.SetData("HeaderId", headerId);
-            filter.SetData("SortOrder", sortOrder);
-//            headersSortModel.SetData("HeaderId", headerId);
-//            headersSortModel.SetData("SortOrder", sortOrder);
+            var filterLocal = modelFilter.GetData("Sort");
+            filterLocal.SetData("HeaderId", headerId);
+            filterLocal.SetData("SortOrder", sortOrder);
 
             modelItems.updateModel();
         }
     }
 
     TreeItemModel {
-        id: headersSortModel;
-    }
-
-    TreeItemModel {
-        id: filterModel;
+        id: modelFilter;
 
         Component.onCompleted: {
-            filterModel.AddTreeModel("Filter");
-            filterModel.AddTreeModel("Sort");
-
-            let filter = filterModel.GetData("Filter");
-            for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
-                let index = filter.InsertNewItem()
-                filter.SetData("Id", tableInternal.headers.GetData("Id", i), index);
-                filter.SetData("Text", "", index);
-            }
+            modelFilter.AddTreeModel("FilterIds");
+            modelFilter.AddTreeModel("Sort");
         }
     }
 
@@ -315,6 +309,7 @@ Rectangle {
 
         onCurrentValueChanged: {
             console.log("Pagination onCurrentValueChanged", pagination.currentValue);
+            tableInternal.selectedIndex = -1;
             modelItems.updateModel();
         }
     }
@@ -374,11 +369,23 @@ Rectangle {
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo);
 
                         if(dataModelLocal.ContainsKey("headers")){
-                            tableInternal.headers = dataModelLocal.GetData("headers")
-                            collectionViewContainer.collectionViewModel.SetExternTreeModel('headers', tableInternal.headers)
+                            dataModelLocal = dataModelLocal.GetData("headers");
 
-                            for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
-                                headersSortModel.SetData(tableInternal.headers.GetData("Id", i), "NO_SORT");
+                            if (dataModelLocal.ContainsKey("Headers")){
+                                tableInternal.headers = dataModelLocal.GetData("Headers")
+                                collectionViewContainer.collectionViewModel.SetExternTreeModel('Headers', tableInternal.headers)
+                            }
+
+                            if (dataModelLocal.ContainsKey("FilterSearch")){
+                                let filterSearchModel = dataModelLocal.GetData("FilterSearch")
+                                modelFilter.SetData("FilterIds", filterSearchModel);
+                            }
+
+                            if (dataModelLocal.ContainsKey("LanguageId")){
+                                let langId = dataModelLocal.GetData("LanguageId");
+                                if (Style.language != langId){
+                                    Style.language = langId;
+                                }
                             }
 
                             modelItems.updateModel();
@@ -413,9 +420,9 @@ Rectangle {
             viewParams.InsertField("Count");
             viewParams.InsertFieldArgument("Count", count);
             viewParams.InsertField("FilterModel");
-            var jsonString = filterModel.toJSON();
+            var jsonString = modelFilter.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            console.log("filterModel jsonString", jsonString);
+            console.log("modelFilter jsonString", jsonString);
             viewParams.InsertFieldArgument("FilterModel", jsonString);
 
             //query.AddParam(viewParams);
@@ -471,6 +478,7 @@ Rectangle {
                         if (dataModelLocal.ContainsKey("items")){
                             tableInternal.elements = dataModelLocal.GetData("items");
                             collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
+//                            collectionViewContainer.collectionViewModel = dataModelLocal.GetData("items");
                         }
 
                         if (dataModelLocal.ContainsKey("notification")){

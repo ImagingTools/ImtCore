@@ -11,6 +11,7 @@ Item {
     property int selectedIndex: -1;
     property int count: 3; //headersArray.length;
     property int itemHeight: 35;
+    property bool hasFilter: true;
 
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
 
@@ -25,7 +26,8 @@ Item {
     signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromTable();
     signal headerOnClicked(string headerId, string sortOrder);
-    signal filterChanged(string id, int index, string text);
+    signal textFilterChanged(string id, int index, string text);
+//    signal filterChanged(string id, int index, string text);
 
     function getSelectedId(){
         if (tableContainer.selectedIndex > -1){
@@ -58,12 +60,31 @@ Item {
         }
     }
 
+    FilterMenu {
+        id: filterMenu;
+
+        anchors.top: tableContainer.top;
+//        anchors.right: parent.right;
+
+        width: parent.width;
+        decoratorSource: Style.filterPanelDecoratorPath;
+
+        visible: false;
+        countFilters: 1;
+
+        onTextFilterChanged: {
+//            timer.start(1000);
+//            tableContainer.filterChanged(tableContainer.headers.GetData("Id", index), index, text);
+            tableContainer.textFilterChanged(tableContainer.headers.GetData("Id", index), index, text);
+        }
+    }
+
     Rectangle {
         id: headersPanel;
 
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.top: parent.top;
+        anchors.top: filterMenu.visible ? filterMenu.bottom : parent.top;
 
         height: 35;
 
@@ -164,25 +185,21 @@ Item {
 
     }//headers
 
-    Rectangle {
+    AuxButton {
         id: iconFilter;
 
-        anchors.right: parent.right;
-        anchors.top: parent.top;
+        anchors.right: headersPanel.right;
+        anchors.top: headersPanel.top;
+        visible: tableContainer.hasFilter;
 
-        width: 20;
-        height: tableContainer.itemHeight;
 
-        color: "blue";
+        width: 30;
+        height: width;
 
-        MouseArea {
-            anchors.fill: parent;
+        iconSource: "../../../" + "Icons/" + Style.theme + "/Parameters_On_Normal.svg";
 
-            onClicked: {
-                console.log("iconFilter onClicked");
-
-                filterMenu.visible = !filterMenu.visible;
-            }
+        onClicked: {
+            filterMenu.visible = !filterMenu.visible;
         }
     }
 
@@ -190,22 +207,6 @@ Item {
         anchors.fill: elementsList;
         color: Style.baseColor;
 //        color: "transparent";
-    }
-
-    FilterMenu {
-        id: filterMenu;
-
-        anchors.top: headersPanel.bottom;
-
-        width: headersList.width;
-
-        visible: false;
-        countFilters: headersList.count;
-
-        onTextFilterChanged: {
-//            timer.start(1000);
-            tableContainer.filterChanged(tableContainer.headers.GetData("Id", index), index, text);
-        }
     }
 
     Timer {
@@ -220,7 +221,7 @@ Item {
 
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.top: filterMenu.visible ? filterMenu.bottom : headersPanel.bottom;
+        anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
 
         clip: true;
@@ -248,6 +249,8 @@ Item {
                 elementsList.selectedId = model["Id"];
                 elementsList.selectedName = model[tableContainer.headers.GetData("Id",0)];
                 tableContainer.selectedIndex = model.index;
+
+                console.log("AuxTable ", model.index, model["Id"]);
                 tableContainer.setActiveFocusFromTable();
             }
 
@@ -271,29 +274,4 @@ Item {
             }
         }
     }
-
-    Rectangle {
-        id: filter;
-        y : tableContainer.itemHeight;
-
-        visible: false;
-
-        width: headersList.width / headersList.count;
-        height: tableContainer.itemHeight;
-
-        onVisibleChanged: {
-
-            console.log("onVisibleChanged");
-        }
-
-        function open(columnIndex){
-            filter.x = columnIndex * filter.width;
-        }
-
-        TextFieldCustom {
-            width: filter.width;
-            height: filter.height;
-        }
-    }
-
 }

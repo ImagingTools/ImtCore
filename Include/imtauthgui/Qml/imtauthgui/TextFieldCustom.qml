@@ -20,6 +20,7 @@ Item {
 
     property color borderColor: Style.iconColorOnSelected;
 
+    property int radius: 0;
     property int textSize: 15;
     property int echoMode: TextInput.Normal;
 
@@ -52,6 +53,7 @@ Item {
         anchors.fill: parent;
 
         color: Style.baseColor;
+        radius: containerTextField.radius;
 
         border.color: textField.focus ? containerTextField.borderColor : Style.hover;
         border.width: 1;

@@ -31,11 +31,21 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 		if (fields[indexField] == PageEnum::NAME){
 			if (m_translationManagerCompPtr.IsValid()){
 				QByteArray languageId = GetLanguageIdFromInputParams(params);
-				int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-				if (!languageId.isEmpty() && currentIndex >= 0){
+				int currentIndex = -1;
+
+				if (languageId.isEmpty()){
+					currentIndex = 0;
+					languageId = "en_US";
+				}
+				else{
+					currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+				}
+
+				if (currentIndex >= 0){
 					const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
-					if (translatorPtr != nullptr && m_pageNameAttrPtr.IsValid()){
-						rootModelPtr->SetData(PageEnum::NAME, translatorPtr->translate("", (*m_pageNameAttrPtr).toUtf8()));
+					if (translatorPtr != nullptr){
+						QString tr = translatorPtr->translate("Attribute", (*m_pageNameAttrPtr).toUtf8());
+						rootModelPtr->SetData(PageEnum::NAME, translatorPtr->translate("Attribute", (*m_pageNameAttrPtr).toUtf8()));
 					}
 				}
 			}
@@ -59,6 +69,12 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 			rootModelPtr->SetData(PageEnum::ENABLED, "true");
 		}
 	}
+
+	if (m_subPagesDataProviderCompPtr.IsValid()){
+		imtbase::CTreeItemModel* subPagesModel =  m_subPagesDataProviderCompPtr->GetTreeItemModel(params, fields);
+		rootModelPtr->SetExternTreeModel("SubPages", subPagesModel);
+	}
+	rootModelPtr->SetData("isOpened", false);
 
 	return rootModelPtr;
 }

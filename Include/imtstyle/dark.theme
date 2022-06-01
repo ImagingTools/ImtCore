@@ -1,4 +1,9 @@
 {
+	"Decorators": {
+		"MenuButton": "MenuPanelButtonDecorator.qml",
+		"TabPanel": "TabDecorator.qml",
+		"FilterPanel": "FilterDecorator.qml"
+	},
 	"ColorPalette": {
 		"LightGray": "#c0c0c0",
 		"DeepGray": "#2b2d2d",

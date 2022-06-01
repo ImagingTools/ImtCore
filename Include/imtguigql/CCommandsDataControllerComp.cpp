@@ -16,7 +16,6 @@ namespace imtguigql
 
 imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-
 	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
 		return nullptr;
 	}

@@ -31,7 +31,7 @@ bool CGqlModel::SetGqlQuery(QString query)
 	QQmlEngine* engine = qmlEngine(this);
 	if (engine != nullptr){
 		SetState("Loading");
-		QNetworkAccessManager* accessManager = engine->networkAccessManager();		
+		QNetworkAccessManager* accessManager = engine->networkAccessManager();
 
 		QUrl requestUrl = engine->baseUrl();
 

@@ -21,6 +21,10 @@ Rectangle
     property TreeItemModel localSettings;
     property bool serverIsConnection: false;
 
+    Component.onCompleted: {
+//        Style.changeSchemeDesign("");
+    }
+
     onLocalSettingsChanged: {
         console.log("ThumbnailDecorator onLocalSettingsChanged");
         //console.log("localSettings", thubnailDecoratorContainer.localSettings.toJSON());
@@ -33,6 +37,7 @@ Rectangle
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
         menuPanel.updateModels();
+        topPanel.updateModels();
     }
 
     function openDialog(source, parameters) {
@@ -69,6 +74,7 @@ Rectangle
     function setInvalidConnection(state){
         console.log("ThumbnailDecorator setInvalidConnection", state);
         thubnailDecoratorContainer.serverIsConnection = !state;
+        refreshButton.enabled = true;
 //        textNoConnection.visible = state;
         errorBackground.visible = state;
     }
@@ -177,7 +183,9 @@ Rectangle
 
                 Component.onCompleted: {
                     var source = menuPanel.model.GetData(PageEnum.SOURCE, model.index);
+                    console.log("PagesLoader ", source);
                     pagesLoader.source = source;
+                    console.log("PagesLoader ", pagesLoader.source);
                 }
 
                 onItemChanged: {
@@ -203,6 +211,10 @@ Rectangle
 
         visible: false;
 
+        MouseArea {
+            anchors.fill: parent;
+        }
+
         Rectangle {
             anchors.verticalCenter: errorBackground.verticalCenter;
             anchors.left: errorBackground.left;
@@ -225,11 +237,28 @@ Rectangle
                 font.pixelSize: Style.fontSize_title;
                 font.family: Style.fontFamily;
             }
+
+            AuxButton {
+                id: refreshButton;
+
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 50;
+
+                width: 70;
+                height: 25;
+                backgroundColor: Style.imagingToolsGradient1;
+
+                hasText: true;
+                textButton: qsTr("Refresh");
+
+                onClicked: {
+                    refreshButton.enabled = false;
+                    thubnailDecoratorContainer.updateModels();
+                }
+            }
         }
 
-        MouseArea {
-            anchors.fill: parent;
-        }
     }
 
     TopPanel {
@@ -267,19 +296,6 @@ Rectangle
 //            console.log("Quit application");
 //            listViewDialogs.destroy();
 //        }
-//    }
-
-    function refreshText(){
-//        test.text = qsTr("Close");
-//        thubnailDecoratorContainer.update();
-    }
-
-//    Text {
-//        id: test;
-//        anchors.centerIn: parent;
-
-//        text: qsTr("Close");
-//        font.pixelSize: Style.fontSize_title;
 //    }
 
     Repeater {

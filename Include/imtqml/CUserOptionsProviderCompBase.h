@@ -14,12 +14,10 @@ namespace imtqml
 class CUserOptionsProviderCompBase
 {
 
-protected:
+public:
 	QByteArray GetLanguageIdFromInputParams(const QList<imtgql::CGqlObject>& inputParams) const;
 	QByteArray GetDesignSchemeIdFromInputParams(const QList<imtgql::CGqlObject>& inputParams) const;
 };
 
 
 } // namespace imtqml
-
-

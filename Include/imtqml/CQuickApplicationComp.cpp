@@ -25,7 +25,7 @@
 #include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
-#include <imtqml/CContextComp.h>
+#include <imtqml/CClientUserContextComp.h>
 
 
 #if defined(Q_OS_MACX) && (QT_VERSION >= 0x040000) && (QT_VERSION < 0x050000)
@@ -99,14 +99,13 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 		QQmlContext *ctxt = engine->rootContext();
 
 		if (m_contextCompPtr.IsValid()){
-//			imtqml::CContextComp* context = dynamic_cast<imtqml::CContextComp* >(m_contextCompPtr.GetPtr());
-//			context->SetQmlEngine(engine);
-//			if (context != nullptr){
-//				ctxt->setContextProperty("context", context);
-//			}
+			imtqml::CClientUserContextComp* context = dynamic_cast<imtqml::CClientUserContextComp* >(m_contextCompPtr.GetPtr());
+			context->SetQmlEngine(engine);
+			if (context != nullptr){
+				ctxt->setContextProperty("context", context);
+			}
 		}
-//		imtqml::CContextComp context(engine);
-//		ctxt->setContextProperty("context", &context);
+
 		engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
 		if (m_allowApplicationCloseModelCompPtr.IsValid()){

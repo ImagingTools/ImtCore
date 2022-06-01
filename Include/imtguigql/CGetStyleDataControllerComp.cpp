@@ -58,11 +58,9 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 	else{
 		dataModelPtr = new imtbase::CTreeItemModel();
 		QString pathToTheme;
-
 		if (theme == ""){
 			if (m_parameterCompPtr.IsValid()){
 				iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
-
 				if (selectionParam != nullptr){
 					const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
 
@@ -78,11 +76,15 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 		}
 
 		dataModelPtr->SetData("theme", theme);
+		QString prefix;
+		if (m_prefixFileNameAttrPtr.IsValid() && !(*m_prefixFileNameAttrPtr).isEmpty()){
+			prefix = *m_prefixFileNameAttrPtr + '_';
+		}
 		if (theme == "Dark"){
-			pathToTheme = ":/dark.theme";
+			pathToTheme = ":/Style/" + prefix + "dark.theme";
 		}
 		else if (theme == "Light"){
-			pathToTheme = ":/light.theme";
+			pathToTheme = ":/Style/" + prefix + "light.theme";
 		}
 
 		QFile resource(pathToTheme);
@@ -91,6 +93,14 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 			sourceModelPtr = new imtbase::CTreeItemModel();
 			sourceModelPtr->Parse(resources);
 			dataModelPtr->SetExternTreeModel("source", sourceModelPtr);
+		}
+
+		QFile decorators(":/Decorators/" + prefix + "decorators.theme");
+		if (decorators.open(QIODevice::ReadOnly)){
+			imtbase::CTreeItemModel* decoratorsModelPtr = new imtbase::CTreeItemModel();
+			if (decoratorsModelPtr->Parse(decorators.readAll())){
+				dataModelPtr->SetExternTreeModel("decorators", decoratorsModelPtr);
+			}
 		}
 	}
 

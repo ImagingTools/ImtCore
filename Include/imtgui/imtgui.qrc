@@ -33,10 +33,12 @@
         <file alias="imtgui/AuxComponents/TreeItemDelegateTest.qml">Qml/imtgui/AuxComponents/TreeItemDelegateTest.qml</file>
         <file alias="imtgui/AuxComponents/Pagination.qml">Qml/imtgui/AuxComponents/Pagination.qml</file>
         <file alias="imtgui/AuxComponents/FilterMenu.qml">Qml/imtgui/AuxComponents/FilterMenu.qml</file>
+        <file alias="imtgui/AuxComponents/MenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/MenuPanelButtonDecorator.qml</file>
+	<file alias="imtgui/AuxComponents/TabPanelDecorator.qml">Qml/imtgui/AuxComponents/TabPanelDecorator.qml</file>
+	<file alias="imtgui/AuxComponents/FilterPanelDecorator.qml">Qml/imtgui/AuxComponents/FilterPanelDecorator.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
         <file alias="Ubuntu-Bold.ttf">Qml/Fonts/Ubuntu-Bold.ttf</file>
     </qresource>
-    <qresource prefix="/"/>
 </RCC>

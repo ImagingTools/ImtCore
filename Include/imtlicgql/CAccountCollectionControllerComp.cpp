@@ -55,7 +55,6 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-
 		dataModel = new imtbase::CTreeItemModel();
 		metaInfoModel = new imtbase::CTreeItemModel();
 
@@ -65,14 +64,18 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
-//		const QTranslator* translatorPtr = nullptr;
-//		if (m_translationManagerCompPtr.IsValid()){
+		const QTranslator* translatorPtr = nullptr;
+		if (m_translationManagerCompPtr.IsValid()){
 //			QByteArray languageId = GetLanguageIdFromInputParams(inputParams);
-//			int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-//			if (languageId != "" && currentIndex >= 0){
-//				translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
-//			}
-//		}
+			QByteArray languageId;
+			languageId = "en_US";
+			if (languageId.isEmpty()){
+				int currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
+				if (currentIndex >= 0){
+					translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+				}
+			}
+		}
 
 		if (!m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
 			errorMessage = QT_TR_NOOP("Unable to load an object data");
@@ -80,15 +83,13 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		}
 
 		const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
-
 		if (accountInfoPtr == nullptr){
-//			if (translatorPtr != nullptr){
-//				errorMessage = translatorPtr->translate("", QT_TR_NOOP("Unable to get an account info"));
-//			}
-//			else{
-//				errorMessage = QT_TR_NOOP("Unable to get an account info");
-//			}
-			errorMessage = QT_TR_NOOP("Unable to get an account info");
+			if (translatorPtr != nullptr){
+				errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Unable to get an account info");
+			}
+			else{
+				errorMessage = QT_TR_NOOP("Unable to get an account info");
+			}
 
 			return nullptr;
 		}
@@ -96,33 +97,58 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
 
 		if (ownerPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get an account owner");
+			if (translatorPtr != nullptr){
+				errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Unable to get an account owner");
+			}
+			else{
+				errorMessage = QT_TR_NOOP("Unable to get an account owner");
+			}
+
 			return nullptr;
 		}
 
 		int index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", QT_TR_NOOP("Last Name"), index);
+		if (translatorPtr != nullptr){
+			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Last Name");
+		}
+		else{
+			metaInfoModel->SetData("Name", QT_TR_NOOP("Last Name"), index);
+		}
 		childs = metaInfoModel->AddTreeModel("Childs", index);
-
 		QString lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
 		childs->SetData("Value", lastName);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", QT_TR_NOOP("First Name"), index);
+		if (translatorPtr != nullptr){
+			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "First Name");
+		}
+		else{
+			metaInfoModel->SetData("Name", QT_TR_NOOP("First Name"), index);
+		}
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
 		childs->SetData("Value", firstName);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", QT_TR_NOOP("Email"), index);
+		if (translatorPtr != nullptr){
+			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Email");
+		}
+		else{
+			metaInfoModel->SetData("Name", QT_TR_NOOP("Email"), index);
+		}
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString mail = ownerPtr->GetMail();
 		childs->SetData("Value", mail);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", QT_TR_NOOP("Description"), index);
+		if (translatorPtr != nullptr){
+			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Description");
+		}
+		else{
+			metaInfoModel->SetData("Name", QT_TR_NOOP("Description"), index);
+		}
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString description = accountInfoPtr->GetAccountDescription();
@@ -130,7 +156,12 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", description);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", QT_TR_NOOP("Account Name"), index);
+		if (translatorPtr != nullptr){
+			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Account Name");
+		}
+		else{
+			metaInfoModel->SetData("Name", QT_TR_NOOP("Account Name"), index);
+		}
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		QString name = accountInfoPtr->GetAccountName();
@@ -138,7 +169,12 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		childs->SetData("Value", name);
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", QT_TR_NOOP("Account Type"), index);
+		if (translatorPtr != nullptr){
+			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Account Type");
+		}
+		else{
+			metaInfoModel->SetData("Name", QT_TR_NOOP("Account Type"), index);
+		}
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
 		imtauth::IAccountInfo::AccountType type = accountInfoPtr->GetAccountType();

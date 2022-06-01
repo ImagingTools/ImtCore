@@ -51,7 +51,10 @@ Row {
         hasIcon: true;
         hasText: false;
 
-        iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
+        enabled: listModel.count > 1;
+
+        iconSource: buttonDecr.enabled ? "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg":
+                                         "../../../" + "Icons/" + Style.theme + "/Left_Off_Disabled.svg";
 
         onClicked: {
             if (paginationContainer.currentValue - 1 >= 1){
@@ -101,7 +104,10 @@ Row {
         hasIcon: true;
         hasText: false;
 
-        iconSource: "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg";
+        enabled: listModel.count > 1;
+
+        iconSource: buttonIncr.enabled ? "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg":
+                                         "../../../" + "Icons/" + Style.theme + "/Right_Off_Disabled.svg";
 
         onClicked: {
             if (paginationContainer.currentValue + 1 <= paginationContainer.pagesSize){
