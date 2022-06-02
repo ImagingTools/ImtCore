@@ -26,7 +26,6 @@ protected:
 	virtual void initTestCase() = 0;
 
 private slots:
-
     void InsertNewObjectWithRequiredParamsTest_data();
     void InsertNewObjectWithRequiredParamsTest();
     void InsertNewObjectWithNonExistElementTest();
@@ -71,6 +70,11 @@ protected:
         m_configFile = m_imtCorePath + "/Config/ImtCoreTest.awc";
 		m_nameAccessor = partituraPath;
         // set type id for tests
-        m_typeIdObjectCollection = "AccountInfo";
+		if (m_nameAccessor == "DatabaseTest"){
+			m_typeIdObjectCollection = "TestInfo";
+		}
+		else{
+			m_typeIdObjectCollection = "AccountInfo";
+		}
     };
 };

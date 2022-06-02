@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5003" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="DatabaseAccessSettings" X="975" Y="300" Note=""/>
+        <Element ComponentName="OptionsListAdapter" X="625" Y="725" Note=""/>
+        <Element ComponentName="Persistence" X="1000" Y="600" Note=""/>
+        <Element ComponentName="PgSqlDatabaseEngine" X="600" Y="225" Note=""/>
+        <Element ComponentName="Repository" X="600" Y="475" Note=""/>
+        <Element ComponentName="TestDatabaseDelegate" X="175" Y="325" Note=""/>
+        <Element ComponentName="TestInfo" X="400" Y="150" Note=""/>
+        <Element ComponentName="TestMetaInfoCreator" X="150" Y="675" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

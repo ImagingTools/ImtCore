@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/Database">
+        <file alias="CreateDatabase">Resources/Database/CreateDatabase.sql</file>
+        <file alias="CreateTables">Resources/Database/CreateTables.sql</file>
+        <file alias="ListAccounts">Resources/Database/ListAccounts.sql</file>
+        <file alias="ListFeatures">Resources/Database/ListFeatures.sql</file>
+        <file alias="ListProductInstances">Resources/Database/ListProductInstances.sql</file>
+        <file alias="ListProducts">Resources/Database/ListProducts.sql</file>
+        <file alias="ListTests">Resources/Database/ListTests.sql</file>
+    </qresource>
+</RCC>
