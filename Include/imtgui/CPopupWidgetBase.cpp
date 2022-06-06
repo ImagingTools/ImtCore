@@ -8,7 +8,7 @@ namespace imtgui
 // public methods
 
 CPopupWidgetBase::CPopupWidgetBase()
-	:m_is—losingOnMouseClickAllowed(true)
+	:m_isClosingOnMouseClickAllowed(true)
 {
 	setAttribute(Qt::WA_TranslucentBackground);
 	setAttribute(Qt::WA_ShowWithoutActivating);
@@ -26,9 +26,9 @@ const ilog::IMessageConsumer::MessagePtr& CPopupWidgetBase::GetMessagePtr() cons
 }
 
 
-void CPopupWidgetBase::Allow—losingOnMouseClick(bool isAllowed)
+void CPopupWidgetBase::AllowClosingOnMouseClick(bool isAllowed)
 {
-	m_is—losingOnMouseClickAllowed = isAllowed;
+	m_isClosingOnMouseClickAllowed = isAllowed;
 }
 
 
@@ -54,7 +54,7 @@ void CPopupWidgetBase::leaveEvent(QEvent* event)
 
 void CPopupWidgetBase::mousePressEvent(QMouseEvent* event)
 {
-	if (m_is—losingOnMouseClickAllowed){
+	if (m_isClosingOnMouseClickAllowed){
 		Q_EMIT EmitCloseRequest();
 	}
 }

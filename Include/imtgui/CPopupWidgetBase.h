@@ -22,7 +22,7 @@ public:
 
 	// reimplemented (IPopupWidget)
 	virtual const ilog::IMessageConsumer::MessagePtr& GetMessagePtr() const override;
-	virtual void Allow—losingOnMouseClick(bool isAllowed = true) override;
+	virtual void AllowClosingOnMouseClick(bool isAllowed = true) override;
 
 Q_SIGNALS:
 	void EmitHoverEnter(QEvent* event);
@@ -37,7 +37,7 @@ protected:
 
 protected:
 	ilog::IMessageConsumer::MessagePtr m_messagePtr;
-	bool m_is—losingOnMouseClickAllowed;
+	bool m_isClosingOnMouseClickAllowed;
 };
 
 

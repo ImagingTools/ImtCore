@@ -225,7 +225,7 @@ QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, i
 
 	CPopupWidgetBase* widgetPtr = dynamic_cast<CPopupWidgetBase*>(popupWidgetPtr.GetPtr());
 	if (widgetPtr != nullptr){
-		widgetPtr->AllowÑlosingOnMouseClick(isÑlosingOnMouseClickAllowed);
+		widgetPtr->AllowClosingOnMouseClick(isÑlosingOnMouseClickAllowed);
 		popupWidgetPtr->SetContent(messagePtr, contentWidgetPtr);
 		popupWidgetPtr.PopPtr();
 
