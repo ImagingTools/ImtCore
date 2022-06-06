@@ -1,8 +1,6 @@
 #pragma once
 
 
-// Qt includes
-
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iqtgui/TDesignerGuiCompBase.h>
@@ -68,7 +66,7 @@ private:
 	istd::IInformationProvider::InformationCategory GetCategory();
 	int GetTimeout();
 
-	static QRect CPopupTestGuiComp::Normalize(const QRect& rect);
+	static QRect Normalize(const QRect& rect);
 
 private:
 	class ClientAreaProvider: virtual public IClientAreaProvider
