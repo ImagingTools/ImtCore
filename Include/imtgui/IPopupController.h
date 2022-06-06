@@ -19,7 +19,7 @@ public:
 		\param	timeout			timeout value in msecs, a negative value requires user action to close the popup.
 		\return					assigned popup ID.
 	*/
-	virtual QByteArray AddPopup(const MessagePtr& messagePtr, int timeout = -1, bool is—losingOnMouseClickAllowed = true, QWidget* contentWidgetPtr = nullptr) = 0;
+	virtual QByteArray AddPopup(const MessagePtr& messagePtr, int timeout = -1, bool isClosingOnMouseClickAllowed = true, QWidget* contentWidgetPtr = nullptr) = 0;
 	virtual bool ClosePopup(const QByteArray& popupId) = 0;
 };
 

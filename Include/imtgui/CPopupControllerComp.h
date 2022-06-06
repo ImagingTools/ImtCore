@@ -38,7 +38,7 @@ public:
 		I_REGISTER_INTERFACE(ilog::IMessageConsumer);
 		I_ASSIGN(m_clientAreaProviderCompPtr, "ClientArea", "Desktop area for organizing popups", false, "ClientAreaProvider");
 		I_ASSIGN(m_popupWidgetFactoryCompPtr, "PopupWidgetFactory", "Widget factory for popup messages and content widgets", false, "StandardPopupWidgetFactory");
-		I_ASSIGN_MULTI_0(m_popupEventHandlerCompPtr, "PopupEventHandler", "Popup event handlers", false, "PopupEventHandler");
+		I_ASSIGN_MULTI_0(m_popupEventHandlerCompPtr, "PopupEventHandler", "Popup event handlers", false);
 		I_ASSIGN(m_anchorAttrPtr, "AnchorCorner", "0 - TopLeft\n1 - TopRight\n2 - BottomLeft\n3 - BottomRight", true, 3);
 		I_ASSIGN(m_xRatioAttrPtr, "HorizontalRatio", "Horizontal ratio", true, 0.25);
 		I_ASSIGN(m_yRatioAttrPtr, "VerticalRatio", "Vertical ratio", true, 1);
@@ -49,7 +49,7 @@ public:
 	CPopupControllerComp();
 
 	// reimplemented (IPopupController)
-	virtual QByteArray AddPopup(const MessagePtr& messagePtr, int timeout = -1, bool is—losingOnMouseClickAllowed = true, QWidget* contentWidgetPtr = nullptr) override;
+	virtual QByteArray AddPopup(const MessagePtr& messagePtr, int timeout = -1, bool isClosingOnMouseClickAllowed = true, QWidget* contentWidgetPtr = nullptr) override;
 	virtual bool ClosePopup(const QByteArray& popupId) override;
 
 	// reimplemented (ilog::IMessageConsumer)
@@ -78,7 +78,7 @@ private:
 	struct PopupItem;
 
 	void CalculatePopupAreaFromScreen();
-	QByteArray CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool is—losingOnMouseClickAllowed, QWidget* contentWidgetPtr);
+	QByteArray CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr);
 	void RemovePopupItem(int index);
 	int GetVisibleItemIndex(const QByteArray& id);
 	int GetVisibleItemIndex(const QObject* memberPtr);
