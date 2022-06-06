@@ -35,6 +35,9 @@
 #include <imtgui/CMenuBasedCommandsProviderComp.h>
 #include <imtgui/CTimeFilterParamEditorComp.h>
 #include <imtgui/CPaginationGuiComp.h>
+#include <imtgui/CPopupControllerComp.h>
+#include <imtgui/CStandardPopupWidgetFactoryComp.h>
+#include <imtgui/CPopupTestGuiComp.h>
 
 
 /**
@@ -73,6 +76,9 @@ typedef imtgui::CDocumentCollectionViewDelegateComp DocumentCollectionViewDelega
 typedef icomp::TModelCompWrap<imtgui::CMenuBasedCommandsProviderComp> MenuBasedCommandsProvider;
 typedef imtgui::CTimeFilterParamEditorComp TimeFilterParamEditor;
 typedef imtgui::CPaginationGuiComp PaginationGui;
+typedef imtgui::CPopupControllerComp PopupController;
+typedef imtgui::CStandardPopupWidgetFactoryComp StandardPopupWidgetFactory;
+typedef imtgui::CPopupTestGuiComp PopupTestGui;
 
 
 } // namespace ImtGuiPck

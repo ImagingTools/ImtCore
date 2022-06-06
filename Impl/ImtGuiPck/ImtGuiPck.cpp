@@ -162,6 +162,21 @@ I_EXPORT_COMPONENT(
 			"Pagination gui",
 			"Pagination Page Selection");
 
+I_EXPORT_COMPONENT(
+			PopupController,
+			"Popup controller",
+			"Popup Controller");
+
+I_EXPORT_COMPONENT(
+			StandardPopupWidgetFactory,
+			"Standard popup widget factory",
+			"Popup Widget Factory");
+
+I_EXPORT_COMPONENT(
+			PopupTestGui,
+			"Popup test gui",
+			"Popup Gui");
+
 
 } // namespace ImtGuiPck
 
