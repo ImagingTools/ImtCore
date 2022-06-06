@@ -28,9 +28,9 @@ CPopupControllerComp::CPopupControllerComp()
 
 // reimplemented (IPopupController)
 
-QByteArray CPopupControllerComp::AddPopup(const MessagePtr& messagePtr, int timeout, bool is—losingOnMouseClickAllowed, QWidget* contentWidgetPtr)
+QByteArray CPopupControllerComp::AddPopup(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr)
 {
-	return CreatePopupItem(messagePtr, timeout, is—losingOnMouseClickAllowed, contentWidgetPtr);
+	return CreatePopupItem(messagePtr, timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
 }
 
 
@@ -212,7 +212,7 @@ void CPopupControllerComp::CalculatePopupAreaFromScreen()
 }
 
 
-QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool is—losingOnMouseClickAllowed, QWidget* contentWidgetPtr)
+QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr)
 {
 	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
 	if (m_popupWidgetFactoryCompPtr.IsValid()){
@@ -225,7 +225,7 @@ QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, i
 
 	CPopupWidgetBase* widgetPtr = dynamic_cast<CPopupWidgetBase*>(popupWidgetPtr.GetPtr());
 	if (widgetPtr != nullptr){
-		widgetPtr->AllowClosingOnMouseClick(is—losingOnMouseClickAllowed);
+		widgetPtr->AllowClosingOnMouseClick(isClosingOnMouseClickAllowed);
 		popupWidgetPtr->SetContent(messagePtr, contentWidgetPtr);
 		popupWidgetPtr.PopPtr();
 
