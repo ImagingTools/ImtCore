@@ -19,13 +19,11 @@ class CObjectCollectionPartituraTestBase: public QObject
 {
     Q_OBJECT
 
-public:
-	QString GetRandomString();
-
 protected:
 	virtual void initTestCase() = 0;
 
 private slots:
+	void cleanup();
     void InsertNewObjectWithRequiredParamsTest_data();
     void InsertNewObjectWithRequiredParamsTest();
     void InsertNewObjectWithNonExistElementTest();

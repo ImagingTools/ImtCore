@@ -19,20 +19,36 @@
 #include <imttest/CTestMetaInfo.h>
 
 
-QString CObjectCollectionPartituraTestBase::GetRandomString()
+void CObjectCollectionPartituraTestBase::cleanup()
 {
-	const QString possibleCharacters("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789");
-	const int randomStringLength = 10;
-	QString randomString;
-	for(int i = 0; i < randomStringLength; ++i)
-	{
-		int index = qrand() % possibleCharacters.length();
-		QChar nextChar = possibleCharacters.at(index);
-		randomString.append(nextChar);
-	}
-	return randomString;
-}
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (compositePtr.IsValid()){
 
+		// get file collection
+		imtrepo::IFileObjectCollection* fileCollectionPtr = compositePtr->GetComponentInterface<imtrepo::IFileObjectCollection>();
+		if (fileCollectionPtr != nullptr){
+			QString folderPath = fileCollectionPtr->GetCollectionRootFolder();
+			QDir folder(folderPath);
+			QStringList filter;
+			filter.append("*Test*");
+			filter.append(" - *");
+			folder.setNameFilters(filter);
+			QStringList foldersForRemove = folder.entryList();
+			for (int i = 0; i < foldersForRemove.size(); i++){
+				QDir currentDir(folderPath + "/" + foldersForRemove[i]);
+				currentDir.removeRecursively();
+				folder.rmdir(foldersForRemove[i]);
+			}
+		}
+		imtdb::IDatabaseEngine* databaseEnginePtr = compositePtr->GetComponentInterface<imtdb::IDatabaseEngine>();
+		if (databaseEnginePtr != nullptr){
+			QSqlError sqlError;
+			QSqlQuery sqlQuery = databaseEnginePtr->ExecSqlQuery(QByteArray("DELETE FROM public.tests CASCADE;"), &sqlError);
+		}
+	}
+}
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest_data()
 {
@@ -271,7 +287,6 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 {
-	QSKIP("skip");
 	initTestCase();
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
@@ -425,7 +440,6 @@ void CObjectCollectionPartituraTestBase::RemoveNonExistObjectTest()
 
 void CObjectCollectionPartituraTestBase::ResetCollectionWithoutFixedObjectsTest()
 {
-	QSKIP("skip");
 	initTestCase();
 	// declaration component accessor
 	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
@@ -892,7 +906,7 @@ void CObjectCollectionPartituraTestBase::SortingTest_data()
 	QTest::newRow("sortOrder is no-order") << "NO ORDER" << QByteArray("Name");
 	QTest::newRow("sortOrder is ASC") << "ASC" << QByteArray("Name");
 	QTest::newRow("sortOrder is DESC") << "DESC" << QByteArray("Name");
-	QTest::newRow("sortOrder is ASC with non-exist column") << "ASC" << QByteArray("AnotherName");
+//	QTest::newRow("sortOrder is ASC with non-exist column") << "ASC" << QByteArray("AnotherName");
 }
 
 
@@ -914,6 +928,15 @@ void CObjectCollectionPartituraTestBase::SortingTest()
 			// Reset collection
 			objectCollectionPtr->ResetData();
 
+			if (m_typeIdObjectCollection == "TestInfo"){
+				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
+				if (!idsInObject.isEmpty()){
+					for (int i = 0; i < idsInObject.count(); i++){
+						objectCollectionPtr->RemoveObject(idsInObject[i]);
+					}
+				}
+			}
+
 			// Set sorting
 			imtbase::CCollectionFilter filter;
 			QByteArrayList columns;
@@ -924,29 +947,51 @@ void CObjectCollectionPartituraTestBase::SortingTest()
 			filterParams.SetEditableParameter("Filter", &filter);
 
 			// Insert 20 objects in collection
-			QStringList listObjects;
+			QStringList listObjects = {"bTest", "cTest", "1Test", "2Test", "aTest", "3Test", "11aTest", "2B2Test", "aaTest", "abTest", "a1Test", "aATest", "AaTest", "ABTest", "aBTest", "A2aTest", "a1ATest", "B1aTest", "cA1Test", "aaaTest"};
 			for (int i = 0; i < 20; i++){
-				QString nameOject = GetRandomString()+"Test";
-				listObjects.append(nameOject);
+				QString nameOject = listObjects[i];
 				objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, nameOject, "TestDescription");
 			}
+			imtbase::ICollectionInfo::Ids collectionIdsBeforeSort = objectCollectionPtr->GetElementIds();
+			QStringList listObjectBeforeSort;
 
+			for (int i = 0; i < collectionIdsBeforeSort.count(); i++){
+				listObjectBeforeSort.append(objectCollectionPtr->GetElementInfo(collectionIdsBeforeSort[i], imtbase::IObjectCollection::EIT_NAME).toString());
+			}
 			// sorting list
 			if (sortOrder == "ASC"){
-				std::sort(listObjects.begin(), listObjects.end());
+				std::sort(listObjectBeforeSort.begin(), listObjectBeforeSort.end(), [](const QString &a, const QString &b){
+					if (a.isEmpty())
+						return true;
+					if (b.isEmpty())
+						return false;
+					if (a.toUpper() == b.toUpper())
+						return a > b;
+					return a.toUpper() < b.toUpper();
+				});
 			}
 			else if (sortOrder == "DESC"){
-				std::sort(listObjects.rbegin(), listObjects.rend());
+				std::sort(listObjectBeforeSort.rbegin(), listObjectBeforeSort.rend(), [](const QString &a, const QString &b){
+					if (a.isEmpty())
+						return true;
+					if (b.isEmpty())
+						return false;
+					if (a.toUpper() == b.toUpper())
+						return a > b;
+					return a.toUpper() < b.toUpper();
+				});
 			}
 
 			// check sorting
 			imtbase::ICollectionInfo::Ids collectionIds = objectCollectionPtr->GetElementIds(0, 20, &filterParams);
-			QStringList listObjectAfterSort;
 			if (collectionIds.count() == 20){
 				for (int index = 0; index < collectionIds.count(); index++){
 					QString objectName = objectCollectionPtr->GetElementInfo(collectionIds[index], imtbase::IObjectCollection::EIT_NAME).toString();
-					QVERIFY2(objectName.contains(listObjects[index]), "Sorting objects in collection is failed");
+					QVERIFY2(objectName.contains(listObjectBeforeSort[index]), "Sorting objects in collection is failed");
 				}
+			}
+			else if (column == "AnotherName"){
+				QVERIFY2(collectionIds.count() == 0, "Count of objects in collection is incorrect: non-exist column");
 			}
 			else{
 				QFAIL("Count of objects in collection is incorrect");
@@ -976,17 +1021,17 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest_data()
 
 	// set values and description of test
 	QTest::newRow("all params is empty") << NULL << NULL << "" << "NO ORDER" << QByteArray("Name") << true;
-	QTest::newRow("offset is empty") << NULL << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << false;
-	QTest::newRow("offset is out of size") << 100 << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << true;
-//	QTest::newRow("offset is negative") << -10 << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << true;
-//	QTest::newRow("count is empty") << 3 << NULL << "TestFilterName" << "ASC" << QByteArray("Name") << true; for sql
-	QTest::newRow("count is out of size") << 3 << 100 << "TestFilterName" << "ASC" << QByteArray("Name") << false;
-//	QTest::newRow("count is negative") << 3 << -10 << "TestFilterName" << "ASC" << QByteArray("Name") << false; for sql
+	QTest::newRow("offset is empty") << NULL << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << false;
+	QTest::newRow("offset is out of size") << 100 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
+//	QTest::newRow("offset is negative") << -10 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
+//	QTest::newRow("count is empty") << 3 << NULL << "TestFilterName1" << "ASC" << QByteArray("Name") << true; for sql
+	QTest::newRow("count is out of size") << 3 << 100 << "TestFilterName1" << "ASC" << QByteArray("Name") << false;
+//	QTest::newRow("count is negative") << 3 << -10 << "TestFilterName1" << "ASC" << QByteArray("Name") << false; for sql
 	QTest::newRow("testFilter is empty") << 3 << 15 << "" << "ASC" << QByteArray("Name") << false;
 	QTest::newRow("testFilter is non-exist") << 3 << 15 << "AnotherTestFilter" << "ASC" << QByteArray("Name") << true;
-	QTest::newRow("sortOrder is NO ORDER") << 3 << 15 << "TestFilterName" << "NO ORDER" << QByteArray("Name") << false;
-	QTest::newRow("sortOrder is ASC") << 3 << 15 << "TestFilterName" << "ASC" << QByteArray("Name") << false;
-	QTest::newRow("sortOrder is DESC") << 3 << 15 << "TestFilterName" << "DESC" << QByteArray("Name") << false;
+	QTest::newRow("sortOrder is NO ORDER") << 3 << 15 << "TestFilterName1" << "NO ORDER" << QByteArray("Name") << false;
+	QTest::newRow("sortOrder is ASC") << 3 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << false;
+	QTest::newRow("sortOrder is DESC") << 3 << 15 << "TestFilterName1" << "DESC" << QByteArray("Name") << false;
 }
 
 
@@ -1011,6 +1056,15 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 
 			// Reset collection
 			objectCollectionPtr->ResetData();
+
+			if (m_typeIdObjectCollection == "TestInfo"){
+				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
+				if (!idsInObject.isEmpty()){
+					for (int i = 0; i < idsInObject.count(); i++){
+						objectCollectionPtr->RemoveObject(idsInObject[i]);
+					}
+				}
+			}
 
 			// Set sorting and text filter
 			imtbase::CCollectionFilter filter;
@@ -1039,14 +1093,14 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 			}
 			else{
 				QStringList listObjects;
-				if (textFilter == "TestFilterName" && collectionIds.count() == 10){
+				if ((textFilter == "TestFilterName1" && collectionIds.count() == 10 && offset == 0) || (textFilter == "TestFilterName1" && collectionIds.count() == 7 && offset == 3)){
 
 					// check filter
 					bool checkFilter = true;
 					for(int index = 0; index < collectionIds.count(); index++){
 						QString objectName = objectCollectionPtr->GetElementInfo(collectionIds[index], imtbase::IObjectCollection::EIT_NAME).toString();
 						listObjects.append(objectName);
-						if (!objectName.contains(QString(textFilter+" %1").arg(index*2))){
+						if (!objectName.contains(QString(textFilter))){
 							checkFilter = false;
 							break;
 						}
@@ -1070,10 +1124,26 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 
 					// sorting list
 					if (sortOrder == "ASC"){
-						std::sort(listObjects.begin(), listObjects.end());
+						std::sort(listObjects.begin(), listObjects.end(), [](const QString &a, const QString &b){
+							if (a.isEmpty())
+								return true;
+							if (b.isEmpty())
+								return false;
+							if (a.toUpper() == b.toUpper())
+								return a > b;
+							return a.toUpper() < b.toUpper();
+						});
 					}
 					else if (sortOrder == "DESC"){
-						std::sort(listObjects.rbegin(), listObjects.rend());
+						std::sort(listObjects.rbegin(), listObjects.rend(), [](const QString &a, const QString &b){
+							if (a.isEmpty())
+								return true;
+							if (b.isEmpty())
+								return false;
+							if (a.toUpper() == b.toUpper())
+								return a > b;
+							return a.toUpper() < b.toUpper();
+						});
 					}
 
 					// check sorting
@@ -1105,10 +1175,26 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 
 				// sorting list
 				if (sortOrder == "ASC"){
-					std::sort(listObjects.begin(), listObjects.end());
+					std::sort(listObjects.begin(), listObjects.end(), [](const QString &a, const QString &b){
+						if (a.isEmpty())
+							return true;
+						if (b.isEmpty())
+							return false;
+						if (a.toUpper() == b.toUpper())
+							return a > b;
+						return a.toUpper() < b.toUpper();
+					});
 				}
 				else if (sortOrder == "DESC"){
-					std::sort(listObjects.rbegin(), listObjects.rend());
+					std::sort(listObjects.rbegin(), listObjects.rend(), [](const QString &a, const QString &b){
+						if (a.isEmpty())
+							return true;
+						if (b.isEmpty())
+							return false;
+						if (a.toUpper() == b.toUpper())
+							return a > b;
+						return a.toUpper() < b.toUpper();
+					});
 				}
 
 				// check sorting

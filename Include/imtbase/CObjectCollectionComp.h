@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
+#include <imtbase/TFilterableCollectionWrap.h>
 
 
 namespace imtbase
@@ -20,11 +21,13 @@ namespace imtbase
 */
 class CObjectCollectionComp:
 			public icomp::CComponentBase,
-			public CObjectCollectionBase
+//			public CObjectCollectionBase,
+			public imtbase::TFilterableCollectionWrap<CObjectCollectionBase>
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef CObjectCollectionBase BaseClass2;
+//	typedef CObjectCollectionBase BaseClass2;
+	typedef imtbase::TFilterableCollectionWrap <CObjectCollectionBase> BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectCollectionComp);
 		I_REGISTER_INTERFACE(IObjectCollection);

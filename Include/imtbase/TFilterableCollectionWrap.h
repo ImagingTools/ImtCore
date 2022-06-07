@@ -62,9 +62,16 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 		imtbase::ICollectionInfo::Ids filteredIds = GetFilteredElementIds(*selectionParamPtr);
 		imtbase::ICollectionInfo::Ids sortedIds = GetSortedElementIds(filteredIds, *selectionParamPtr);
 		int objectsCount = count >= 0 ? qMin(count, sortedIds.count()) : sortedIds.count();
-
-		for (int i = offset; i < objectsCount; i++){
-			retVal.push_back(sortedIds[i]);
+		if ((sortedIds.count() - offset - objectsCount) < 0){
+			for (int i = offset; i < sortedIds.count(); i++){
+				retVal.push_back(sortedIds[i]);
+			}
+		}
+		else{
+			int countIds = offset + objectsCount;
+			for (int i = offset; i < countIds; i++){
+				retVal.push_back(sortedIds[i]);
+			}
 		}
 	}
 	else {
@@ -205,10 +212,26 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 				}
 				if (!listObjects.isEmpty()){
 					if (sortingOrder == imtbase::ICollectionFilter::SO_ASC){
-						std::sort(listObjects.begin(), listObjects.end());
+						std::sort(listObjects.begin(), listObjects.end(), [](const QPair<QString, QByteArray> &a, const QPair<QString, QByteArray> &b){
+							if(a.first.isEmpty())
+								return true;
+							if (b.first.isEmpty())
+								return false;
+							if (a.first.toUpper() == b.first.toUpper())
+								return a.first > b.first;
+							return a.first.toUpper() < b.first.toUpper();
+						});
 					}
 					else{
-						std::sort(listObjects.rbegin(), listObjects.rend());
+						std::sort(listObjects.rbegin(), listObjects.rend(), [](const QPair<QString, QByteArray> &a, const QPair<QString, QByteArray> &b){
+							if(a.first.isEmpty())
+								return true;
+							if (b.first.isEmpty())
+								return false;
+							if (a.first.toUpper() == b.first.toUpper())
+								return a.first > b.first;
+							return a.first.toUpper() < b.first.toUpper();
+						});
 					}
 					for(int index = 0; index < listObjects.count(); index++){
 						retVal.append(listObjects[index].second);

@@ -44,6 +44,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 	else{
 		QString sortQuery;
 		QString filterQuery;
+		if (count == 0){
+			return QByteArray();
+		}
 		if (paramsPtr != nullptr){
 			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
 				return QByteArray();
