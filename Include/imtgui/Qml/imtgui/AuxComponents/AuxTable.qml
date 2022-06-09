@@ -22,6 +22,8 @@ Item {
     property alias delegate: elementsList.delegate;
     property alias elements: elementsList.model;
 
+    property int radius: 7;
+
     signal selectItem(string idSelected, string name);
     signal rightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromTable();
@@ -64,6 +66,9 @@ Item {
         id: filterMenu;
 
         anchors.top: tableContainer.top;
+        //anchors.topMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.left: parent.left;
+//        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
 //        anchors.right: parent.right;
 
         width: parent.width;
@@ -87,6 +92,8 @@ Item {
         anchors.top: filterMenu.visible ? filterMenu.bottom : parent.top;
 
         height: 35;
+
+        clip: true;
 
         color: "transparent";
 
@@ -238,6 +245,7 @@ Item {
             width: elementsList.width;
 
             selected: tableContainer.selectedIndex === model.index;
+            radius: tableContainer.radius;
 
             Component.onCompleted: {
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){

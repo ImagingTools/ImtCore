@@ -33,7 +33,6 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModelPtr = nullptr;
 	imtbase::CTreeItemModel* sourceModelPtr = nullptr;
-	bool isSetResponce = false;
 	QByteArrayList fields;
 	QByteArray theme;
 
@@ -44,8 +43,6 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 			if (paramList != nullptr && !paramList->isEmpty()){
 				theme = paramList->at(0).GetFieldArgumentValue("theme").toByteArray();
 			}
-
-			isSetResponce = true;
 		}
 	}
 

@@ -79,7 +79,7 @@ Item {
 
     Component.onCompleted: {
         console.log("Style onCompleted");
-       //styleContainer.changeSchemeDesign("");
+//       styleContainer.changeSchemeDesign("");
     }
 
     function getImageSource (name, styleTheme, buttonState, buttonMode)
@@ -108,9 +108,18 @@ Item {
         return themeType.GetData("ColorPalette").GetData(colorPalette);
     }
 
-    property string menuButtonDecoratorPath: "MenuPanelButtonDecorator.qml";
+//    property string menuButtonDecoratorPath: "MenuPanelButtonDecorator.qml";
+//    property string subMenuButtonDecoratorPath: "SubMenuPanelButtonDecorator.qml";
+    property string menuButtonDecoratorPath;
+    property string subMenuButtonDecoratorPath;
     property string tabPanelDecoratorPath: "TabPanelDecorator.qml";
+    property string topPanelDecoratorPath: "TopPanelDecorator.qml";
     property string filterPanelDecoratorPath: "FilterPanelDecorator.qml";
+
+    property string topLeftPanelDecoratorPath;
+    property string topCenterPanelDecoratorPath;
+    property string topRightPanelDecoratorPath;
+    property string customPanelDecoratorPath;
 
     function getDecorator(decorators, section, type){
         let dataModelLocal = decorators.GetData("Decorators");
@@ -156,9 +165,16 @@ Item {
 //        Style.tabPanelDecoratorPath = styleContainer.getDecorator("TabPanel", dataDecorators);
 //        Style.filterPanelDecoratorPath = styleContainer.getDecorator("FilterPanel", dataDecorators);
 
-        Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "Button");
+        Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "MainButton");
+        Style.subMenuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "SubButton");
         Style.tabPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TabPanel", "Base");
+        Style.topPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "Base");
         Style.filterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators,"FilterPanel", "Base");
+        Style.topCenterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "CenterPanel");
+        Style.topRightPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "RightPanel");
+        Style.customPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "CustomPanel", "Base");
+        Style.topLeftPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "LeftPanel");
+
     }
 
     GqlModel {

@@ -4,9 +4,14 @@
         <file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
         <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
         <file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
+	<file alias="imtgui/ThumbnailPanel.qml">Qml/imtgui/ThumbnailPanel.qml</file>
         <file alias="imtgui/AuxComponents/AuxButton.qml">Qml/imtgui/AuxComponents/AuxButton.qml</file>
+	<file alias="imtgui/AuxComponents/TextButton.qml">Qml/imtgui/AuxComponents/TextButton.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanel.qml">Qml/imtgui/AuxComponents/MenuPanel.qml</file>
         <file alias="imtgui/AuxComponents/TopPanel.qml">Qml/imtgui/AuxComponents/TopPanel.qml</file>
+	<file alias="imtgui/AuxComponents/TopRightPanel.qml">Qml/imtgui/AuxComponents/TopRightPanel.qml</file>
+	<file alias="imtgui/AuxComponents/TopLeftPanel.qml">Qml/imtgui/AuxComponents/TopLeftPanel.qml</file>
+	<file alias="imtgui/AuxComponents/TopCenterPanel.qml">Qml/imtgui/AuxComponents/TopCenterPanel.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanelButton.qml">Qml/imtgui/AuxComponents/MenuPanelButton.qml</file>
         <file alias="imtgui/AuxComponents/TopButton.qml">Qml/imtgui/AuxComponents/TopButton.qml</file>
         <file alias="imtgui/AuxComponents/AuxTable.qml">Qml/imtgui/AuxComponents/AuxTable.qml</file>
@@ -36,6 +41,10 @@
         <file alias="imtgui/AuxComponents/MenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/MenuPanelButtonDecorator.qml</file>
 	<file alias="imtgui/AuxComponents/TabPanelDecorator.qml">Qml/imtgui/AuxComponents/TabPanelDecorator.qml</file>
 	<file alias="imtgui/AuxComponents/FilterPanelDecorator.qml">Qml/imtgui/AuxComponents/FilterPanelDecorator.qml</file>
+	<file alias="imtgui/AuxComponents/PreferenceButton.qml">Qml/imtgui/AuxComponents/PreferenceButton.qml</file>
+	<file alias="imtgui/AuxComponents/TopPanelDecorator.qml">Qml/imtgui/AuxComponents/TopPanelDecorator.qml</file>
+	<file alias="imtgui/AuxComponents/TopRightPanelDecorator.qml">Qml/imtgui/AuxComponents/TopRightPanelDecorator.qml</file>
+	<file alias="imtgui/AuxComponents/TopCenterPanelDecorator.qml">Qml/imtgui/AuxComponents/TopCenterPanelDecorator.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

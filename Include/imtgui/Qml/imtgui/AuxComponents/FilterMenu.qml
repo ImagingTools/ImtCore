@@ -6,8 +6,8 @@ import imtauthgui 1.0
 Rectangle {
     id: filterContainer;
 
-    width: 500;
-    height: 30;
+//    width: 500;
+//    height: 30;
 
     color: Style.backgroundColor;
 
@@ -35,6 +35,9 @@ Rectangle {
 
         onItemChanged: {
             console.log("onItemChanged");
+            if (loaderDecorator.item){
+                filterContainer.height = loaderDecorator.item.height;
+            }
         }
 
     }

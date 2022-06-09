@@ -12,17 +12,18 @@ Rectangle
 
     anchors.fill: parent;
 
-    width: 300;
-    height: 200;
+    height: 480;
+    width: 740;
 
-    color: Style.baseColor;
+    color: Style.backgroundColor;
 
     property Item activeItem;
     property TreeItemModel localSettings;
     property bool serverIsConnection: false;
 
+    property int mainMargin: 10;
+
     Component.onCompleted: {
-//        Style.changeSchemeDesign("");
     }
 
     onLocalSettingsChanged: {
@@ -36,6 +37,7 @@ Rectangle
 
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
+        Style.changeSchemeDesign("");
         menuPanel.updateModels();
         topPanel.updateModels();
     }
@@ -82,8 +84,13 @@ Rectangle
     MenuPanel {
         id: menuPanel;
 
+        anchors.left: parent.left;
+        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
         anchors.top: topPanel.bottom;
-        anchors.bottom: parent.bottom;
+        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
+//        anchors.bottom: customPanel.visible ? customPanel.top : parent.bottom;
+        anchors.bottom: customPanel.top;
+        anchors.bottomMargin: customPanel.visible ? 0 : thubnailDecoratorContainer.mainMargin;
 
         //visible: thubnailDecoratorContainer.serverIsConnection;
         focus: true;
@@ -127,6 +134,40 @@ Rectangle
         }
         onActivePageIndexChanged: {
             console.log("ThumbnailDecorator MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
+        }
+    }
+
+    Item {
+        id: customPanel;
+
+//        anchors.top: menuPanel.bottom;
+//        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.left: parent.left;
+        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
+
+        Rectangle {
+            anchors.fill: parent;
+            color: "red";
+        }
+
+        //visible: false;
+
+        Loader {
+            id: loaderCustomPanel;
+
+            source: Style.customPanelDecoratorPath;
+
+            onItemChanged: {
+                if (loaderCustomPanel.item){
+                    console.log("loaderCustomPanel ", Style.customPanelDecoratorPath);
+                    customPanel.height = loaderCustomPanel.item.height;
+                    customPanel.width = loaderCustomPanel.item.width;
+                    customPanel.visible = true;
+                    console.log("loaderCustomPanel.item.height ", loaderCustomPanel.item.height);
+                }
+            }
         }
     }
 
@@ -263,6 +304,12 @@ Rectangle
 
     TopPanel {
         id: topPanel;
+//        anchors.left: parent.left;
+//        anchors.right: parent.right;
+        anchors.top: parent.top;
+        width: parent.width;
+        height: 55;
+//        width: parent.width;
 
         title: menuPanel.activePageName;
         onMenuActivatedSignal: {

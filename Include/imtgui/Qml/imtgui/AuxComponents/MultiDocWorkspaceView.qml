@@ -23,6 +23,8 @@ Rectangle {
 
     property string operation;
 
+    property int mainMargin: 0;
+
     onFocusChanged: {
         console.log("MultidocWorkspaceView onFocusChanged", multiDocView.focus);
 
@@ -131,7 +133,9 @@ Rectangle {
         id: tabPanelInternal;
 
         anchors.left: parent.left;
+        anchors.leftMargin: multiDocView.mainMargin;
         anchors.right: parent.right;
+        anchors.rightMargin: multiDocView.mainMargin;
 
         visible: true;
         model: pagesData;
@@ -223,7 +227,7 @@ Rectangle {
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    dataLoader.source = model.Source
+                    dataLoader.source = model.Source;
                 }
 
                 onItemChanged: {

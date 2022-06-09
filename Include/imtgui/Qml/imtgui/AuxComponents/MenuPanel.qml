@@ -5,10 +5,9 @@ import imtqml 1.0
 Rectangle {
     id: menuPanel;
 
-    width: 75;
-//    width: 75;
+    color: Style.baseColor;
 
-    color: Style.backgroundColor;
+    radius: 7;
 
     property string textColor: Style.textColor;
     property string fontName: "Helvetica";
@@ -35,42 +34,78 @@ Rectangle {
         lvPages.currentIndex = menuPanel.activePageIndex;
     }
 
-    ListView {
-        id: lvPages;
+    Column {
+        id: columnPages;
 
-        anchors.fill: parent;
+        anchors.top: parent.top;
+        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
 
-        boundsBehavior: Flickable.StopAtBounds;
+        width: parent.width;
 
-        delegate:  MenuPanelButton{
-            width: menuPanel.width;
-//            height: width * 0.88;
-//            height: 50;
+        Repeater {
+            id: lvPages;
+            property int currentIndex: 0;
+            delegate:  MenuPanelButton{
+                text:  model[PageEnum.NAME];
+                textColor: Style.textColor;
+                fontName: menuPanel.fontName;
+                imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
+                                                         "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
 
-            text:  model[PageEnum.NAME];
-            textColor: Style.textColor;
-            fontName: menuPanel.fontName;
-            imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
-                                                     "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
+                selected: lvPages.currentIndex === model.index ? true : false;
 
-            selected: lvPages.currentIndex === model.index ? true : false;
+                decoratorSource : Style.menuButtonDecoratorPath;
 
-            decoratorSource : Style.menuButtonDecoratorPath;
-//            decoratorSource: model['DecoratorSource'];
+                onClicked: {
+                    lvPages.currentIndex = model.index;
+                    menuPanel.activePageName = model[PageEnum.NAME];
+                    menuPanel.activeIcon = model[PageEnum.ICON];
+                    menuPanel.activePageIndex = model.index;
+                    menuPanel.activePageId = model[PageEnum.ID];
 
-            onClicked: {
-                lvPages.currentIndex = model.index;
-                menuPanel.activePageName = model[PageEnum.NAME];
-                menuPanel.activeIcon = model[PageEnum.ICON];
-                menuPanel.activePageIndex = model.index;
-                menuPanel.activePageId = model[PageEnum.ID];
-
-                if (!menuPanel.focus){
-                    menuPanel.forceActiveFocus();
+                    if (!menuPanel.focus){
+                        menuPanel.forceActiveFocus();
+                    }
                 }
             }
         }
     }
+
+//    ListView {
+//        id: lvPages;
+
+////        width: parent.width;
+//        anchors.fill: parent;
+
+//        boundsBehavior: Flickable.StopAtBounds;
+
+//        delegate:  MenuPanelButton{
+//            text:  model[PageEnum.NAME];
+//            textColor: Style.textColor;
+//            fontName: menuPanel.fontName;
+//            imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
+//                                                     "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
+
+//            selected: lvPages.currentIndex === model.index ? true : false;
+
+//            decoratorSource : Style.menuButtonDecoratorPath;
+////            decoratorSource: model['DecoratorSource'];
+
+//            onClicked: {
+//                lvPages.currentIndex = model.index;
+//                menuPanel.activePageName = model[PageEnum.NAME];
+//                menuPanel.activeIcon = model[PageEnum.ICON];
+//                menuPanel.activePageIndex = model.index;
+//                menuPanel.activePageId = model[PageEnum.ID];
+
+//                if (!menuPanel.focus){
+//                    menuPanel.forceActiveFocus();
+//                }
+//            }
+//        }
+//    }
 
     Timer {
         id: pageIndexTimer;
@@ -134,6 +169,7 @@ Rectangle {
                 }
 
                 thubnailDecoratorContainer.setInvalidConnection(false);
+//                Style.changeSchemeDesign("");
                 if(dataModelLocal.ContainsKey("PagesData")){
                     dataModelLocal = dataModelLocal.GetData("PagesData")
                     console.log("dataModelLocal", dataModelLocal);
@@ -146,7 +182,7 @@ Rectangle {
                         menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
 
                         //menuPanel.activePageIndex = 0;
-                        Style.changeSchemeDesign("");
+//                        Style.changeSchemeDesign("");
                         pageIndexTimer.pageIndex = 0;
                         pageIndexTimer.start();
                     }

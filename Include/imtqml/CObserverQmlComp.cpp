@@ -72,7 +72,7 @@ void CObserverQmlComp::OnComponentCreated()
 
 void CObserverQmlComp::OnComponentDestroyed()
 {
-    ilog::CLoggerComponentBase::OnComponentDestroyed();
+	ilog::CLoggerComponentBase::OnComponentDestroyed();
 	m_settingsObserver.UnregisterAllObjects();
 	if (m_settingsModelPtr != nullptr){
 		delete m_settingsModelPtr;
@@ -83,9 +83,9 @@ void CObserverQmlComp::OnComponentDestroyed()
 
 void CObserverQmlComp::OnChangeSourceItem(QString src)
 {
-    if (m_quickObjectComp.IsValid()){
-        QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
-        quickItem->setProperty("sourceItem", "qrc:///qml/"+ src);
+	if (m_quickObjectComp.IsValid()){
+		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
+		quickItem->setProperty("sourceItem", "qrc:///qml/"+ src);
 	}
 }
 

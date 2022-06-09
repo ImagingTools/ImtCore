@@ -7,8 +7,15 @@ ComboBox 1.0 ./AuxComponents/ComboBox.qml
 CheckBox 1.0 ./AuxComponents/CheckBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
+PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
+TextButton 1.0 ./AuxComponents/TextButton.qml
 MessageDialog 1.0 ./AuxComponents/MessageDialog.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
 Splitter 1.0 ./AuxComponents/Splitter.qml
 Calendar 1.0 ./AuxComponents/Calendar.qml
 Pagination 1.0 ./AuxComponents/Pagination.qml
+MenuPanel 1.0 ./AuxComponents/MenuPanel.qml
+TopPanel 1.0 ./AuxComponents/TopPanel.qml
+TopCenterPanel 1.0 ./AuxComponents/TopCenterPanel.qml
+TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
+TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml

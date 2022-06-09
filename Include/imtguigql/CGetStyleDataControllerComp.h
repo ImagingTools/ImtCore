@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
-//#include <imtbase/IItemBasedRepresentationDataProvider.h>
 
 
 namespace imtguigql

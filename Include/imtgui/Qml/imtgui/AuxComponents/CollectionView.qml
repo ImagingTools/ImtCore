@@ -28,6 +28,7 @@ Rectangle {
     property string itemName;
 
     property bool autoRefresh: false;
+    property bool hasPagination: true;
 
     signal itemSelect(string idSelect, string name);
     signal removedItem(string itemId);
@@ -43,6 +44,11 @@ Rectangle {
     onCollectionViewModelChanged: {
         console.log("CollectionView onModelChanged", collectionViewContainer.itemId, collectionViewContainer.itemName);
         collectionViewContainer.refresh();
+    }
+
+    onGqlModelItemsChanged: {
+        console.log("CollectionView onGqlModelItemsChanged");
+        modelItems.updateModel();
     }
 
     function openMessageDialog(nameDialog, message, type) {
@@ -226,70 +232,85 @@ Rectangle {
         removeModel.updateModel();
     }
 
-    AuxTable {
-        id: tableInternal;
+    Rectangle {
+        id: backgroundTable;
 
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.bottom: pagination.top;
-        anchors.bottomMargin: 5;
+        anchors.fill: parent;
+        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.rightMargin: thubnailDecoratorContainer.mainMargin;
 
-        onSelectItem: {
-            console.log("CollectionView AuxTable onSelectItem", idSelected, name);
-            collectionViewContainer.itemSelect(idSelected, name);
-        }
+        color: Style.baseColor;
 
-        onRightButtonMouseClicked: {
-            console.log("CollectionView AuxTable onRightButtonMouseClicked");
-            collectionViewContainer.collectionViewRightButtonMouseClicked(item, mouseX, mouseY);
-        }
+        radius: 7;
 
-        onSelectedIndexChanged: {
-            console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
-            collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
-            collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
+        AuxTable {
+            id: tableInternal;
 
-            //tableInternal.elementsList.selectedId = elements.GetData("Id", tableInternal.selectedIndex);
-        }
+            anchors.fill: parent;
+            anchors.topMargin: thubnailDecoratorContainer.mainMargin;
+            anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
+            anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
 
-        onSetActiveFocusFromTable: {
-            console.log("CollectionView AuxTable onSetActiveFocusFromTable");
-            collectionViewContainer.setActiveFocusFromCollectionView();
-        }
+            onSelectItem: {
+                console.log("CollectionView AuxTable onSelectItem", idSelected, name);
+                collectionViewContainer.itemSelect(idSelected, name);
+            }
 
-        onTextFilterChanged: {
-            modelFilter.SetData("TextFilter", text);
-            modelItems.updateModel();
-        }
+            onRightButtonMouseClicked: {
+                console.log("CollectionView AuxTable onRightButtonMouseClicked");
+                collectionViewContainer.collectionViewRightButtonMouseClicked(item, mouseX, mouseY);
+            }
 
-//        onFilterChanged: {
-//            modelFilter.SetData("TextFilter", text);
-//            modelItems.updateModel();
-////            if (modelFilter.ContainsKey("filterLocal")){
+            onSelectedIndexChanged: {
+                console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
+                collectionViewContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
+                collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
 
-////                let filterLocal = modelFilter.GetData("filterLocal");
-////                filterLocal.SetData("Text", text, index);
-////                filterLocal.SetData("Id", id, index);
-//////                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
-//////                    let index = filterLocal.InsertNewItem()
-//////                    filterLocal.SetData("Id", tableInternal.headers.GetData("Id", i), index);
-//////                    filterLocal.SetData("Text", "", index);
-//////                }
-////                modelItems.updateModel();
-////            }
-//        }
+                //tableInternal.elementsList.selectedId = elements.GetData("Id", tableInternal.selectedIndex);
+            }
 
-        onHeaderOnClicked: {
-            console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
+            onSetActiveFocusFromTable: {
+                console.log("CollectionView AuxTable onSetActiveFocusFromTable");
+                collectionViewContainer.setActiveFocusFromCollectionView();
+            }
 
-            var filterLocal = modelFilter.GetData("Sort");
-            filterLocal.SetData("HeaderId", headerId);
-            filterLocal.SetData("SortOrder", sortOrder);
+            onTextFilterChanged: {
+                modelFilter.SetData("TextFilter", text);
+                modelItems.updateModel();
+            }
 
-            modelItems.updateModel();
+    //        onFilterChanged: {
+    //            modelFilter.SetData("TextFilter", text);
+    //            modelItems.updateModel();
+    ////            if (modelFilter.ContainsKey("filterLocal")){
+
+    ////                let filterLocal = modelFilter.GetData("filterLocal");
+    ////                filterLocal.SetData("Text", text, index);
+    ////                filterLocal.SetData("Id", id, index);
+    //////                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
+    //////                    let index = filterLocal.InsertNewItem()
+    //////                    filterLocal.SetData("Id", tableInternal.headers.GetData("Id", i), index);
+    //////                    filterLocal.SetData("Text", "", index);
+    //////                }
+    ////                modelItems.updateModel();
+    ////            }
+    //        }
+
+            onHeaderOnClicked: {
+                console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
+
+                var filterLocal = modelFilter.GetData("Sort");
+                filterLocal.SetData("HeaderId", headerId);
+                filterLocal.SetData("SortOrder", sortOrder);
+
+                modelItems.updateModel();
+            }
         }
     }
+
+
 
     TreeItemModel {
         id: modelFilter;
@@ -302,10 +323,14 @@ Rectangle {
 
     Pagination {
         id: pagination;
+
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
         anchors.horizontalCenter: parent.horizontalCenter;
+
         pagesSize: 1;
+
+        visible: collectionViewContainer.hasPagination;
 
         onCurrentValueChanged: {
             console.log("Pagination onCurrentValueChanged", pagination.currentValue);
@@ -373,7 +398,10 @@ Rectangle {
 
                             if (dataModelLocal.ContainsKey("Headers")){
                                 tableInternal.headers = dataModelLocal.GetData("Headers")
-                                collectionViewContainer.collectionViewModel.SetExternTreeModel('Headers', tableInternal.headers)
+                                console.log("collectionViewContainer.collectionViewModel");
+                                if (collectionViewContainer.collectionViewModel){
+                                    collectionViewContainer.collectionViewModel.SetExternTreeModel('Headers', tableInternal.headers)
+                                }
                             }
 
                             if (dataModelLocal.ContainsKey("FilterSearch")){
@@ -422,26 +450,21 @@ Rectangle {
             viewParams.InsertField("FilterModel");
             var jsonString = modelFilter.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            console.log("modelFilter jsonString", jsonString);
             viewParams.InsertFieldArgument("FilterModel", jsonString);
 
-            //query.AddParam(viewParams);
             var inputParams = Gql.GqlObject("input");
-            //inputParams.InsertField("ViewParams");
             inputParams.InsertFieldObject(viewParams);
 
             if(collectionViewContainer.itemId != ""){
-//                var inputParams = Gql.GqlObject("input");
                 inputParams.InsertField("Id");
                 inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
-//                query.AddParam(inputParams);
             }
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField("Id");
             for(var i = 0; i < tableInternal.headers.GetItemsCount(); i++){
-                queryFields.InsertField(tableInternal.headers.GetData("Id",i));
+                queryFields.InsertField(tableInternal.headers.GetData("Id", i));
             }
             query.AddField(queryFields);
 
@@ -478,7 +501,7 @@ Rectangle {
                         if (dataModelLocal.ContainsKey("items")){
                             tableInternal.elements = dataModelLocal.GetData("items");
                             collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
-//                            collectionViewContainer.collectionViewModel = dataModelLocal.GetData("items");
+                            //collectionViewContainer.collectionViewModel = dataModelLocal.GetData("items");
                         }
 
                         if (dataModelLocal.ContainsKey("notification")){

@@ -4,11 +4,9 @@ import Acf 1.0
 Item {
     id: container;
 
-    width: 64;
-    height: 64;
-//    height: 50 + subPagesColumn.height;
+    width: container.contentWidth;
 //    height: subPagesColumn.visible ? 50 + subPagesColumn.height : 50;
-//    height: 200;
+    height: subPagesColumn.visible ? container.contentHeight + subPagesColumn.height : container.contentHeight;
 
     property string text: "Test";
     property string imageSource: "../Icons/FeaturePackage.svg";
@@ -23,14 +21,21 @@ Item {
     property real imageSelectedCoeff: 0.73;
     property real fontSize: 11;
 
+    property int contentWidth;
+    property int contentHeight;
+
 
     property string decoratorSource;
     signal clicked;
 
     onDecoratorSourceChanged: {
-        console.log("container.decoratorSource", container.decoratorSource);
-//        loaderDecorator.item = container.decoratorItem;
         loaderDecorator.source = container.decoratorSource;
+    }
+
+    onContentWidthChanged: {
+        if (menuPanel.width != container.contentWidth){
+            menuPanel.width = container.contentWidth;
+        }
     }
 
     onSelectedChanged: {
@@ -39,7 +44,6 @@ Item {
 
     Component.onCompleted: {
         if (model.SubPages){
-            console.log("model.SubPages", model.SubPages, model.Name);
             subPagesRepeater.model = model.SubPages;
         }
     }
@@ -49,8 +53,8 @@ Item {
 
         anchors.top: container.top;
 
-        width: container.width;
-        height: 50;
+        width: container.contentWidth;
+        height: container.contentHeight;
 
         color: "transparent";
 
@@ -58,12 +62,15 @@ Item {
             id: loaderDecorator;
 
             onItemChanged: {
-                loaderDecorator.item.width = container.width;
-                loaderDecorator.item.height = container.height;
-                loaderDecorator.item.imageSource = container.imageSource;
-                loaderDecorator.item.highlighted = container.highlighted;
-                loaderDecorator.item.selected = container.selected;
-                loaderDecorator.item.title = container.text;
+                if (loaderDecorator.item){
+                    loaderDecorator.item.imageSource = container.imageSource;
+                    loaderDecorator.item.highlighted = container.highlighted;
+                    loaderDecorator.item.selected = container.selected;
+                    loaderDecorator.item.title = container.text;
+
+                    container.contentWidth = loaderDecorator.item.width;
+                    container.contentHeight = loaderDecorator.item.height;
+                }
             }
         }
 
@@ -105,7 +112,8 @@ Item {
                 property bool selected: subPagesColumn.currentIndex == model.index;
 
                 Component.onCompleted: {
-                    subPagesDecorator.source = container.decoratorSource;
+                    subPagesDecorator.source = Style.subMenuButtonDecoratorPath;
+                    console.log("subPagesDecorator.source", subPagesDecorator.source);
                 }
 
                 onSelectedChanged: {
@@ -115,15 +123,12 @@ Item {
                 Loader {
                     id: subPagesDecorator;
                     onItemChanged: {
-                        console.log("model.Icon", model.Icon);
-                        console.log("model.Name", model[PageEnum.NAME]);
-                        subPagesDecorator.item.width = container.width;
-                        subPagesDecorator.item.height = container.height;
-
-//                        subPagesDecorator.item.imageSource = "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg"
-//                        subPagesDecorator.item.imageSource = model.Icon;
-                        subPagesDecorator.item.selected = subPageDelegate.selected;
-                        subPagesDecorator.item.title = model[PageEnum.NAME];
+                        if (subPagesDecorator.item){
+                            subPagesDecorator.item.width = container.width;
+                            subPagesDecorator.item.height = container.height;
+                            subPagesDecorator.item.selected = subPageDelegate.selected;
+                            subPagesDecorator.item.title = model[PageEnum.NAME];
+                        }
                     }
                 }
 
