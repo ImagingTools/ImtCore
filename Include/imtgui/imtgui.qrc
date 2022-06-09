@@ -4,7 +4,6 @@
         <file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
         <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
         <file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
-	<file alias="imtgui/ThumbnailPanel.qml">Qml/imtgui/ThumbnailPanel.qml</file>
         <file alias="imtgui/AuxComponents/AuxButton.qml">Qml/imtgui/AuxComponents/AuxButton.qml</file>
 	<file alias="imtgui/AuxComponents/TextButton.qml">Qml/imtgui/AuxComponents/TextButton.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanel.qml">Qml/imtgui/AuxComponents/MenuPanel.qml</file>
