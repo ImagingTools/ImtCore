@@ -34,8 +34,8 @@ public:
 		I_ASSIGN_MULTI_0(m_objectTypeAttrPtr, "ObjectTypeId", "ID of objects on the container", true);
 		I_ASSIGN_MULTI_0(m_objectViewFactoryListCompPtr, "ObjectView", "View for showing object", true);
 		I_ASSIGN_TO(m_objectObserverFactoryListCompPtr, m_objectViewFactoryListCompPtr, true);
-		I_ASSIGN_MULTI_0(m_objectsToExtendAttrPtr, "ObjectsToExtend", "Objects which view will be extended", false);
-		I_ASSIGN_MULTI_0(m_objectsFromExtendAttrPtr, "ObjectsFromExtend", "Objects to extend view", false);
+		I_ASSIGN_MULTI_0(m_objectsToExtendAttrPtr, "ObjectsToExtend", "Object-IDs which view will be extended", false);
+		I_ASSIGN_MULTI_0(m_objectsFromExtendAttrPtr, "ObjectsFromExtend", "Object-IDs to extend view", false);
 		I_ASSIGN_MULTI_0(m_viewExtendersCompPtr, "ViewExtenders", "View extenders", false);
 	I_END_COMPONENT;
 
@@ -62,8 +62,8 @@ private:
 	I_MULTIFACT(iqtgui::IGuiObject, m_objectViewFactoryListCompPtr);
 	I_MULTIFACT(imod::IObserver, m_objectObserverFactoryListCompPtr);
 
-	I_MULTIATTR(QString, m_objectsToExtendAttrPtr);
-	I_MULTIATTR(QString, m_objectsFromExtendAttrPtr);
+	I_MULTIATTR(QByteArray, m_objectsToExtendAttrPtr);
+	I_MULTIATTR(QByteArray, m_objectsFromExtendAttrPtr);
 	I_MULTIFACT(imtgui::IViewExtender, m_viewExtendersCompPtr);
 
 	QList<QByteArray> m_objectIds;

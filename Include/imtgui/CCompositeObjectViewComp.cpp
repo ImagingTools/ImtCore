@@ -89,7 +89,6 @@ void CCompositeObjectViewComp::CreateView()
 		}
 
 		QByteArray objectTypeId = objectProviderPtr->GetObjectTypeId(objectId);
-		QString objectName = objectProviderPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
 		int factoryCount = qMin(m_objectViewFactoryListCompPtr.GetCount(), m_objectTypeAttrPtr.GetCount());
 		for (int factoryCounter = 0; factoryCounter < factoryCount; factoryCounter++){
@@ -117,43 +116,29 @@ void CCompositeObjectViewComp::CreateView()
 				
 				modelPtr->AttachObserver(viewObserverPtr);
 
-				if (!m_objectsToExtendAttrPtr.IsValid() || !m_objectsFromExtendAttrPtr.IsValid() || !m_viewExtendersCompPtr.IsValid()){
-					break;
-				}
-
 				int extendersCount = qMin(m_objectsToExtendAttrPtr.GetCount(), m_objectsFromExtendAttrPtr.GetCount());
 				extendersCount = qMin(extendersCount, m_viewExtendersCompPtr.GetCount());
 				
 				for (int extenderCounter = 0; extenderCounter < extendersCount; extenderCounter++){
-					if (m_objectsToExtendAttrPtr[extenderCounter] == objectName){
-						QString objectFromExtendName = m_objectsFromExtendAttrPtr[extenderCounter];
+					if (m_objectsToExtendAttrPtr[extenderCounter] == objectId){
+						QByteArray objectFromExtendId = m_objectsFromExtendAttrPtr[extenderCounter];
 						const istd::IChangeable* objectFromExtendPtr = nullptr;
 
-						for (QByteArray objectFromExtendId : objectIds){
-							QString currentObjectName = objectProviderPtr->GetElementInfo(objectFromExtendId, imtbase::ICollectionInfo::EIT_NAME).toString();
-
-							if (currentObjectName == objectFromExtendName){
+						for (QByteArray currentObjectId : objectIds){
+							if (objectFromExtendId == currentObjectId){
 								objectFromExtendPtr = objectProviderPtr->GetObjectPtr(objectFromExtendId);
-								break;
+								if (objectFromExtendPtr != nullptr) {
+									icomp::IComponent* viewExtenderComponentPtr = m_viewExtendersCompPtr.CreateComponent(extenderCounter);
+									imtgui::IViewExtender* viewExtenderPtr = dynamic_cast<imtgui::IViewExtender*>(viewExtenderComponentPtr);
+									Q_ASSERT(viewExtenderPtr != nullptr);
+
+									viewExtenderPtr->AddItems(viewObserverPtr, objectFromExtendPtr);
+									m_viewExtenders.append(viewExtenderComponentPtr);
+								}
 							}
 						}
-
-						if (objectFromExtendPtr == nullptr){
-							break;
-						}
-
-						icomp::IComponent* viewExtenderComponentPtr = m_viewExtendersCompPtr.CreateComponent(extenderCounter);
-						imtgui::IViewExtender* viewExtenderPtr = dynamic_cast<imtgui::IViewExtender*>(viewExtenderComponentPtr);
-						Q_ASSERT(viewExtenderPtr != nullptr);
-
-						viewExtenderPtr->AddItems(viewObserverPtr, objectFromExtendPtr);
-						m_viewExtenders.append(viewExtenderComponentPtr);
-
-						break;
 					}
 				}
-
-				break;
 			}
 		}
 	}
