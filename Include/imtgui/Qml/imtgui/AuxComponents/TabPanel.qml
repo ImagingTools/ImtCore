@@ -53,13 +53,12 @@ Rectangle {
         clip: true;
         orientation: ListView.Horizontal;
 
-        spacing: 0;
+        spacing: thubnailDecoratorContainer.mainMargin;
         model: 4;
 
         boundsBehavior: Flickable.StopAtBounds;
 
         delegate: TabDelegate{
-
             height: list.height;
             width: 200;
 

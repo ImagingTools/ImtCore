@@ -5,7 +5,8 @@ import imtqml 1.0
 Rectangle {
     id: topPanel;
 
-    color: Style.baseColor;
+    color: Style.backgroundColor;
+//        color: "red";
     property string fontName: "";
     property string activeCommandsModelId;
     property string title;
@@ -79,12 +80,13 @@ Rectangle {
         if (topPanel.activeCommandsModelId == "") {
             return;
         }
+        commandsModel.updateModel();
 
-        if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
-            commandsModel.updateModel();
-        } else {
-            updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-        }
+//        if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
+//            commandsModel.updateModel();
+//        } else {
+//            updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
+//        }
         topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
     }
 

@@ -90,7 +90,7 @@ Rectangle
         anchors.topMargin: thubnailDecoratorContainer.mainMargin;
 //        anchors.bottom: customPanel.visible ? customPanel.top : parent.bottom;
         anchors.bottom: customPanel.top;
-        anchors.bottomMargin: customPanel.visible ? 0 : thubnailDecoratorContainer.mainMargin;
+        anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
 
         //visible: thubnailDecoratorContainer.serverIsConnection;
         focus: true;
@@ -147,13 +147,6 @@ Rectangle
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
 
-        Rectangle {
-            anchors.fill: parent;
-            color: "red";
-        }
-
-        //visible: false;
-
         Loader {
             id: loaderCustomPanel;
 
@@ -164,7 +157,6 @@ Rectangle
                     console.log("loaderCustomPanel ", Style.customPanelDecoratorPath);
                     customPanel.height = loaderCustomPanel.item.height;
                     customPanel.width = loaderCustomPanel.item.width;
-                    customPanel.visible = true;
                     console.log("loaderCustomPanel.item.height ", loaderCustomPanel.item.height);
                 }
             }
@@ -308,7 +300,7 @@ Rectangle
 //        anchors.right: parent.right;
         anchors.top: parent.top;
         width: parent.width;
-        height: 55;
+        height: 70;
 //        width: parent.width;
 
         title: menuPanel.activePageName;

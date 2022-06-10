@@ -7,6 +7,7 @@ Rectangle {
 
     height: 55;
     width: 100;
+    clip: true;
 
     property Item topPanel;
 

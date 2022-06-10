@@ -1,13 +1,13 @@
 import QtQuick 2.12
 import Acf 1.0
 
-Rectangle{
+Item{
     id: tabDelegate;
 
     height: 40;
     width: 160;
 
-    color: selected ? Style.baseColor : "transparent";
+//    color: selected ? Style.baseColor : "transparent";
 
     property bool selected: false;
     property bool firstElement: false;

@@ -9,6 +9,8 @@ Rectangle {
 
     radius: 7;
 
+    clip: true;
+
     property string textColor: Style.textColor;
     property string fontName: "Helvetica";
     property string activePageId;
@@ -34,43 +36,57 @@ Rectangle {
         lvPages.currentIndex = menuPanel.activePageIndex;
     }
 
-    Column {
-        id: columnPages;
 
-        anchors.top: parent.top;
+    Flickable {
+        anchors.fill: parent;
         anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-        anchors.bottom: parent.bottom;
         anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
 
-        width: parent.width;
+        contentWidth: columnPages.width;
+        contentHeight: columnPages.height + 50;
+        boundsBehavior: Flickable.StopAtBounds;
 
-        Repeater {
-            id: lvPages;
-            property int currentIndex: 0;
-            delegate:  MenuPanelButton{
-                text:  model[PageEnum.NAME];
-                textColor: Style.textColor;
-                fontName: menuPanel.fontName;
-                imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
-                                                         "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
+        clip: true;
 
-                selected: lvPages.currentIndex === model.index ? true : false;
+        Column {
+            id: columnPages;
 
-                decoratorSource : Style.menuButtonDecoratorPath;
+//            anchors.top: parent.top;
+//            anchors.topMargin: thubnailDecoratorContainer.mainMargin;
+//            anchors.bottom: parent.bottom;
+//            anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
 
-                onClicked: {
-                    lvPages.currentIndex = model.index;
-                    menuPanel.activePageName = model[PageEnum.NAME];
-                    menuPanel.activeIcon = model[PageEnum.ICON];
-                    menuPanel.activePageIndex = model.index;
-                    menuPanel.activePageId = model[PageEnum.ID];
+            width: parent.width;
 
-                    if (!menuPanel.focus){
-                        menuPanel.forceActiveFocus();
+            Repeater {
+                id: lvPages;
+                property int currentIndex: 0;
+                delegate:  MenuPanelButton{
+                    text:  model[PageEnum.NAME];
+                    textColor: Style.textColor;
+                    fontName: menuPanel.fontName;
+                    imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
+                                                             "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
+
+                    selected: lvPages.currentIndex === model.index ? true : false;
+
+                    decoratorSource : Style.menuButtonDecoratorPath;
+
+                    onClicked: {
+                        lvPages.currentIndex = model.index;
+                        menuPanel.activePageName = model[PageEnum.NAME];
+                        menuPanel.activeIcon = model[PageEnum.ICON];
+                        menuPanel.activePageIndex = model.index;
+                        menuPanel.activePageId = model[PageEnum.ID];
+
+                        if (!menuPanel.focus){
+                            menuPanel.forceActiveFocus();
+                        }
                     }
                 }
             }
         }
+
     }
 
 //    ListView {
