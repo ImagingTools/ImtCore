@@ -30,6 +30,11 @@ I_EXPORT_COMPONENT(
 			"Settings for database access",
 			"Database User Access Login Settings Parameters");
 
+I_EXPORT_COMPONENT(
+			SqlDatabaseDocumentDelegate,
+			"Delegate for the document-oriented tables",
+			"Database Document");
+
 
 } // namespace ImtDatabasePck
 

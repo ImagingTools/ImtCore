@@ -9,6 +9,8 @@
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 #include <imtdb/CDatabaseAccessSettingsComp.h>
+#include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
+
 
 /**
 	ImtDatabasePck package
@@ -20,6 +22,7 @@ namespace ImtDatabasePck
 typedef imtdb::CDatabaseEngineComp SqlDatabaseEngine;
 typedef icomp::TModelCompWrap<imtdb::CSqlDatabaseObjectCollectionComp> SqlDatabaseCollection;
 typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccessSettings;
+typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;
 
 
 } // namespace ImtDatabasePck
