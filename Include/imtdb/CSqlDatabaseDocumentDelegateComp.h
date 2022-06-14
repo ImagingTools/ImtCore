@@ -5,6 +5,7 @@
 #include <ifile/IFilePersistence.h>
 
 // ImtCore includes
+#include <imtdb/ISqlDatabaseTableDelegate.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
@@ -20,7 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
 		I_ASSIGN(m_documentFactCompPtr, "DocumentFactory", "Factory used for creation of the new document instance", true, "DocumentFactory");
 		I_ASSIGN(m_documentPersistenceCompPtr, "DocumentPersistence", "Persistence for the document", true, "DocumentPersistence");
-		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Creator of the document meta infos", false, "MetaInfoCreator");
+		I_ASSIGN(m_tableDelegateCompPtr, "TableDelegate", "Delegate for the SQl-table", false, "TableDelegate");
 		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumntContentColumnId", "ID of the column in the table containing document content", true, "Document");
 	I_END_COMPONENT
 
@@ -50,8 +51,8 @@ public:
 				const QByteArray& objectId,
 				const QString& description) const override;
 protected:
-	bool WriteDataToMemory(const istd::IChangeable& object, QByteArray& data) const;
-	bool ReadDataFromMemory(const QByteArray& data, istd::IChangeable& object) const;
+	virtual bool WriteDataToMemory(const istd::IChangeable& object, QByteArray& data) const;
+	virtual bool ReadDataFromMemory(const QByteArray& data, istd::IChangeable& object) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual idoc::IDocumentMetaInfo* CreateObjectMetaInfo(const QByteArray& typeId) const override;
@@ -60,7 +61,7 @@ protected:
 private:
 	I_FACT(istd::IChangeable, m_documentFactCompPtr);
 	I_REF(ifile::IFilePersistence, m_documentPersistenceCompPtr);
-	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
+	I_REF(ISqlDatabaseTableDelegate, m_tableDelegateCompPtr);
 	I_ATTR(QByteArray, m_documentContentColumnIdAttrPtr);
 };
 

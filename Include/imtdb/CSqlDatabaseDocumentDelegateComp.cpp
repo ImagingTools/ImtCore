@@ -74,7 +74,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
+			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
 	QByteArray retVal = QString("DELETE FROM %1 WHERE Id = '%2';").arg(qPrintable(objectId)).toLocal8Bit();
@@ -232,13 +232,34 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 
 idoc::IDocumentMetaInfo* CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
+	if (m_tableDelegateCompPtr.IsValid()){
+		return m_tableDelegateCompPtr->CreateItemItemInfo();
+	}
+
 	return nullptr;
 }
 
 
 bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	return true;
+	if (m_tableDelegateCompPtr.IsValid()){
+		QByteArrayList columnIds = m_tableDelegateCompPtr->GetColumnIds();
+		for (const QByteArray& columnId : columnIds){
+			int metaInfoType = m_tableDelegateCompPtr->GetMetaInfoType(columnId);
+			if (metaInfoType >= 0){
+				if (record.contains(columnId)){
+					QVariant data = record.value(qPrintable(columnId));
+					if (data.isValid()){
+						metaInfo.SetMetaInfo(metaInfoType, data);
+					}
+				}
+			}
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 
