@@ -388,7 +388,9 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	if (m_paginationGuiCompPtr.IsValid()){
 		if (m_paginationGuiCompPtr->CreateGui(PaginationFrame)){
 			if (m_paginationGuiObserverCompPtr.IsValid()){
-				m_pageSelection.AttachObserver(m_paginationGuiObserverCompPtr.GetPtr());
+				if (!m_pageSelection.IsAttached(m_paginationGuiObserverCompPtr.GetPtr())){
+					m_pageSelection.AttachObserver(m_paginationGuiObserverCompPtr.GetPtr());
+				}
 			}
 		}
 	}
@@ -1251,6 +1253,10 @@ void CObjectCollectionViewComp::OnSearchShortCut()
 	m_filterPanelAnimationPtr->setDuration(300);
 	m_filterPanelAnimationPtr->start();
 	FilterEdit->setFocus();
+
+	if (m_filterSelectionCompPtr.IsValid()){
+		m_filterSelectionCompPtr->SetSelectedOptionIndex(0);
+	}
 }
 
 
@@ -1274,6 +1280,10 @@ void CObjectCollectionViewComp::OnEscShortCut()
 	FilterEdit->clear();
 
 	OnFilterChanged(QString());
+
+	if (m_filterSelectionCompPtr.IsValid()){
+		m_filterSelectionCompPtr->SetSelectedOptionIndex(-1);
+	}
 }
 
 

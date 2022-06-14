@@ -39,17 +39,41 @@ namespace imtgui
 {
 
 
+class CObjectCollectionViewAttr: public iqtgui::TRestorableGuiWrap<
+			iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>
+{
+public:
+	typedef iqtgui::TRestorableGuiWrap<
+				iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
+
+	I_BEGIN_BASE_COMPONENT(CObjectCollectionViewAttr);
+		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
+		I_ASSIGN(m_useAsyncReadAttrPtr, "UseAsyncRead", "Useasync collectionRead", true, false);
+		I_ASSIGN(m_useSearchWidgetAttrPtr, "UseSearchWidget", "Use internal search widget", true, true);
+		I_ASSIGN(m_viewProgressAttrPtr, "ViewProgress", "View progress bar on upload", true, true);
+		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
+		I_ASSIGN(m_viewFilterAttrPtr, "ViewFilter", "View filter for default", true, false);
+	I_END_COMPONENT;
+
+protected:
+	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
+	I_ATTR(bool, m_useAsyncReadAttrPtr);
+	I_ATTR(bool, m_useSearchWidgetAttrPtr);
+	I_ATTR(bool, m_viewProgressAttrPtr);
+	I_ATTR(bool, m_viewRightPanelAttrPtr);
+	I_ATTR(bool, m_viewFilterAttrPtr);
+};
+
+
 class CObjectCollectionViewComp:
-			public iqtgui::TRestorableGuiWrap<
-						iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>>,
+		public CObjectCollectionViewAttr,
 		public imod::CMultiModelDispatcherBase,
 		virtual public ibase::IProgressManager,
 		virtual public imtbase::ISelection
 {
 	Q_OBJECT
 public:
-	typedef iqtgui::TRestorableGuiWrap<
-				iqtgui::TDesignerGuiObserverCompBase<Ui::CObjectCollectionViewComp, imtbase::IObjectCollection>> BaseClass;
+	typedef CObjectCollectionViewAttr BaseClass;
 	typedef imod::CMultiModelDispatcherBase BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectCollectionViewComp);
@@ -65,14 +89,9 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(Commands, imod::IModel, ExtractCommands);
 		I_ASSIGN_MULTI_0(m_viewDelegatesCompPtr, "ViewDelegates", "List of view delegates (corresponding with the object type) used for the collection", false);
 		I_ASSIGN(m_filterParamsGuiCompPtr, "FilterParamsGui", "UI for the additional filtering parameters for the collection", false, "FilterParamsGui");
+		I_ASSIGN(m_filterSelectionCompPtr, "FilterSelection", "Filter selection", false, "FilterSelection");
 		I_ASSIGN(m_paginationGuiCompPtr, "PaginationGui", "Pagination gui", false, "PaginationGui");
 		I_ASSIGN_TO(m_paginationGuiObserverCompPtr, m_paginationGuiCompPtr, false);
-		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
-		I_ASSIGN(m_useAsyncReadAttrPtr, "UseAsyncRead", "Useasync collectionRead", true, false);
-		I_ASSIGN(m_useSearchWidgetAttrPtr, "UseSearchWidget", "Use internal search widget", true, true);
-		I_ASSIGN(m_viewProgressAttrPtr, "ViewProgress", "View progress bar on upload", true, true);
-		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
-		I_ASSIGN(m_viewFilterAttrPtr, "ViewFilter", "View filter for default", true, false);
 	I_END_COMPONENT;
 
 	enum DataRole
@@ -353,14 +372,9 @@ private:
 	*/
 	I_MULTIREF(ICollectionViewDelegate, m_viewDelegatesCompPtr);
 	I_REF(iqtgui::IGuiObject, m_filterParamsGuiCompPtr);
+	I_REF(iprm::ISelectionParam, m_filterSelectionCompPtr);
 	I_REF(iqtgui::IGuiObject, m_paginationGuiCompPtr);
 	I_REF(imod::IObserver, m_paginationGuiObserverCompPtr);
-	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
-	I_ATTR(bool, m_useAsyncReadAttrPtr);
-	I_ATTR(bool, m_useSearchWidgetAttrPtr);
-	I_ATTR(bool, m_viewProgressAttrPtr);
-	I_ATTR(bool, m_viewRightPanelAttrPtr);
-	I_ATTR(bool, m_viewFilterAttrPtr);
 
 	bool m_eventBasedUpdateEnabled;
 };
