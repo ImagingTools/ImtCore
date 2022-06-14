@@ -20,6 +20,7 @@ Rectangle {
 
     property string gqlModelInfo;
     property string gqlModelItems;
+    property string gqlModelItem;
     property string gqlModelRemove;
     property string gqlModelRename;
     property string gqlModelSetDescription;
@@ -44,6 +45,11 @@ Rectangle {
     onCollectionViewModelChanged: {
         console.log("CollectionView onModelChanged", collectionViewContainer.itemId, collectionViewContainer.itemName);
         collectionViewContainer.refresh();
+    }
+
+    onGqlModelInfoChanged: {
+        console.log("CollectionView onGqlModelInfoChanged");
+        headerInfoModel.updateModel();
     }
 
     onGqlModelItemsChanged: {

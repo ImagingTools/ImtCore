@@ -7,8 +7,7 @@
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtgui/ICollectionViewDelegate.h>
-#include <imtqml/CUserOptionsProviderCompBase.h>
+#include <imtqml/CUserOptionsProviderBase.h>
 
 
 namespace imtguigql
@@ -17,13 +16,12 @@ namespace imtguigql
 
 class CObjectCollectionControllerCompBase:
 		public imtgql::CGqlRepresentationDataControllerCompBase,
-		public imtqml::CUserOptionsProviderCompBase
+		public imtqml::CUserOptionsProviderBase
 {
 public:
 	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", true, "HeadersProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");

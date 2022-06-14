@@ -11,7 +11,7 @@
 #include <imtbase/IItemBasedRepresentationDataController.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 #include <imtgql/IGqlMutationDataControllerDelegate.h>
-#include <imtqml/CUserOptionsProviderCompBase.h>
+#include <imtqml/CUserOptionsProviderBase.h>
 
 
 namespace imtqml
@@ -23,7 +23,7 @@ namespace imtqml
 */
 class CDatabaseSettingsDataProviderComp:
 			public icomp::CComponentBase,
-			public imtqml::CUserOptionsProviderCompBase,
+			public imtqml::CUserOptionsProviderBase,
 			public imtbase::IItemBasedRepresentationDataProvider,
 			public imtgql::IGqlMutationDataControllerDelegate
 {

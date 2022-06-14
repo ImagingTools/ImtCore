@@ -21,7 +21,7 @@ Rectangle
     property TreeItemModel localSettings;
     property bool serverIsConnection: false;
 
-    property int mainMargin: 10;
+    property int mainMargin: 0;
 
     Component.onCompleted: {
     }

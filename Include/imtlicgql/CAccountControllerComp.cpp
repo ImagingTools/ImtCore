@@ -103,10 +103,8 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 				itemModel->SetExternTreeModel("Addresses", addressesModel);
 			}
 		}
-
 		dataModel->SetExternTreeModel("item", itemModel);
 	}
-
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
