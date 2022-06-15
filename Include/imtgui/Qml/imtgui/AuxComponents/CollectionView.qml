@@ -217,7 +217,10 @@ Rectangle {
             collectionViewContainer.itemSelect("", "")
         }
         else if (menuId  === "Edit"){
-            collectionViewContainer.itemSelect(itemId, name);
+            if (tableInternal.selectedIndex >= 0){
+                let curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
+                collectionViewContainer.itemSelect(itemId, curName);
+            }
         }
         else if (menuId  === "Remove"){
             if (itemId !== ""){
@@ -250,7 +253,7 @@ Rectangle {
 
         color: Style.baseColor;
 
-        radius: 7;
+        radius: thubnailDecoratorContainer.mainRadius;
 
         AuxTable {
             id: tableInternal;

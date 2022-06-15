@@ -5,13 +5,14 @@ import imtqml 1.0
 Rectangle {
     id: topCenterPanel;
 
-    height: 55;
+    height: 75;
     width: 100;
+
     clip: true;
 
     property Item topPanel;
 
-    property alias lvButtons: lvButtons;
+    property alias lvButtons: topCenterLvButtons;
 
     property string mode: "Buttons";
     property string customComponent: "Buttons";
@@ -32,14 +33,19 @@ Rectangle {
         }
     }
 
+    function setModelButtons(modelLocal){
+        console.log("topCenterPanel setModelButtons", modelLocal);
+        topCenterLvButtons.model = modelLocal;
+    }
+
     function showCustomLoader(){
         customLoader.visible = true;
-        lvButtons.visible = false;
+        topCenterLvButtons.visible = false;
     }
 
     function showButtons(){
         customLoader.visible = false;
-        lvButtons.visible = true;
+        topCenterLvButtons.visible = true;
     }
 
     Item {
@@ -65,7 +71,7 @@ Rectangle {
         }
 
         ListView {
-            id: lvButtons;
+            id: topCenterLvButtons;
 
             anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -78,6 +84,11 @@ Rectangle {
 
             visible: topCenterPanel.mode == "Buttons";
 
+            Component.onCompleted: {
+                console.log("topCenterLvButtons onCompleted")
+                console.log("topCenterPanel.mode", topCenterPanel.mode)
+            }
+
             delegate: TopButton {
                 id: topButtonDelegate;
 
@@ -86,11 +97,15 @@ Rectangle {
                 imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "Off" + "_" + model["Mode"] + ".svg";
                 fontName: Style.fontFamily;
                 checkable: model["Mode"] === "Normal";
-                visible: x + width <= lvButtons.width;
+                visible: x + width <= topCenterLvButtons.width;
+
+                Component.onCompleted: {
+                    console.log("topButtonDelegate onCompleted")
+                }
 
                 onVisibleChanged: {
                     console.log("TopPanel onVisibleChanged",topButtonDelegate.text, topButtonDelegate.visible);
-//                    if (!topButtonDelegate.visible && lvButtons.width !== 0) {
+//                    if (!topButtonDelegate.visible && topCenterLvButtons.width !== 0) {
 //                        for (var i = 0; i < modelButtons.count; i++) {
 //                            if (modelButtons.get(i).id !== "" && modelButtons.get(i).id === model[CommandEnum.ID]) {
 //                               return;
@@ -98,7 +113,7 @@ Rectangle {
 //                        }
 //                        modelButtons.append({"id": model[CommandEnum.ID], "imageSource": topButtonDelegate.imageSource, "name": topButtonDelegate.text, "mode": model["Mode"]});
 //                    }
-//                    else if (topButtonDelegate.visible && lvButtons.width !== 0) {
+//                    else if (topButtonDelegate.visible && topCenterLvButtons.width !== 0) {
 //                        var j;
 //                        for (var i = 0; i < modelButtons.count; i++) {
 //                            if (modelButtons.get(i).id === model[CommandEnum.ID]) {

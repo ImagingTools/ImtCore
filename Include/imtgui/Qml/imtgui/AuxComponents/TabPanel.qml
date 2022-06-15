@@ -60,11 +60,11 @@ Rectangle {
 
         delegate: TabDelegate{
             height: list.height;
-            width: 200;
+           // width: 200;
 
             selected: model.index === tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
-            firstElementText: tabPanelContainer.firstElementName;
+//            firstElementText: tabPanelContainer.firstElementName;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
 

@@ -13,6 +13,8 @@ Rectangle {
     property string decoratorSource;
     onDecoratorSourceChanged: {
         console.log("topRightPanel onDecoratorSourceChanged")
+        console.log("height", parent.height)
+        console.log("width", parent.width)
         if (topRightPanel.decoratorSource){
             decoratorLoader.source = topRightPanel.decoratorSource;
         }

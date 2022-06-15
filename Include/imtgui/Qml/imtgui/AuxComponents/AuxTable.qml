@@ -66,20 +66,16 @@ Item {
         id: filterMenu;
 
         anchors.top: tableContainer.top;
-        //anchors.topMargin: thubnailDecoratorContainer.mainMargin;
         anchors.left: parent.left;
-//        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
-//        anchors.right: parent.right;
 
         width: parent.width;
+
         decoratorSource: Style.filterPanelDecoratorPath;
 
         visible: false;
         countFilters: 1;
 
         onTextFilterChanged: {
-//            timer.start(1000);
-//            tableContainer.filterChanged(tableContainer.headers.GetData("Id", index), index, text);
             tableContainer.textFilterChanged(tableContainer.headers.GetData("Id", index), index, text);
         }
     }

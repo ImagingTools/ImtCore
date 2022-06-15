@@ -5,6 +5,8 @@ import imtqml 1.0
 Item {
     id: tabPanelDecorator;
 
+    width: text.width + imagetabDelegate.width + closeButton.width + 30;
+
     Rectangle {
         anchors.fill: parent;
         color:  tabDelegate.selected ? Style.baseColor: "transparent";
@@ -53,8 +55,9 @@ Item {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: imagetabDelegate.right;
+        anchors.leftMargin: 10;
 
-        width: text.width + tabDelegate.height;
+        width: text.width;
 
         onWidthChanged: {
             if (tabDelegate.autoWidth){
@@ -71,6 +74,48 @@ Item {
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+        }
+    }
+
+    Item {
+        id: closeButton;
+
+        anchors.right: parent.right;
+        anchors.rightMargin: 8;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        height: parent.height * 0.4;
+        width: height;
+
+        visible: !tabDelegate.firstElement;
+
+        Image {
+            id: closeImage;
+
+            anchors.centerIn: parent;
+
+            width: parent.width;
+            height: parent.height;
+
+            sourceSize.width: width;
+            sourceSize.height: height;
+
+            fillMode: Image.PreserveAspectFit;
+            source: "../../../" + "Icons/" + Style.theme + "/" + "DeleteStylized" + "_On_Normal.svg";
+        }
+
+        MouseArea{
+            id: closeMA;
+
+            anchors.fill: parent;
+
+            enabled: tabDelegate.visible;
+            hoverEnabled: enabled;
+            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+            onClicked: {
+                tabDelegate.closeSignal();
+            }
         }
     }
 }

@@ -380,7 +380,6 @@ Item {
             queryFields.InsertField("ModificationTime");
             queryFields.InsertField("InstanceId");
             queryFields.InsertField("Licenses");
-            queryFields.InsertField("Checksum");
 
             query.AddField(queryFields);
 
@@ -398,31 +397,33 @@ Item {
                     return;
                 }
 
-                dataModelLocal = metaInfo.GetData("data");
+                if (metaInfo.ContainsKey("data")){
+                    dataModelLocal = metaInfo.GetData("data");
 
-                if (dataModelLocal.ContainsKey("InstallationMetaInfo")) {
-                    dataModelLocal = dataModelLocal.GetData("InstallationMetaInfo");
+                    if (dataModelLocal.ContainsKey("InstallationMetaInfo")) {
+                        dataModelLocal = dataModelLocal.GetData("InstallationMetaInfo");
 
-                    if (dataModelLocal.ContainsKey("metaInfo")) {
-                        dataModelLocal = dataModelLocal.GetData("metaInfo");
+                        if (dataModelLocal.ContainsKey("metaInfo")) {
+                            dataModelLocal = dataModelLocal.GetData("metaInfo");
 
-                        installCollectionMetaInfo.modelData = dataModelLocal;
+                            installCollectionMetaInfo.modelData = dataModelLocal;
 
-                        var index = -1;
-                        for (var i = 0; i < installMetaInfoModels.GetItemsCount(); i++){
+                            var index = -1;
+                            for (var i = 0; i < installMetaInfoModels.GetItemsCount(); i++){
 
-                            if (installMetaInfoModels.GetData("Id", i) === installationCollectionView.table.getSelectedId()){
-                                index = i;
-                                break;
+                                if (installMetaInfoModels.GetData("Id", i) === installationCollectionView.table.getSelectedId()){
+                                    index = i;
+                                    break;
+                                }
                             }
-                        }
 
-                        if (index === -1){
-                            index = installMetaInfoModels.InsertNewItem();
-                        }
+                            if (index === -1){
+                                index = installMetaInfoModels.InsertNewItem();
+                            }
 
-                        installMetaInfoModels.SetData("Id", installationCollectionView.table.getSelectedId(), index);
-                        installMetaInfoModels.SetData("ModelData", dataModelLocal, index);
+                            installMetaInfoModels.SetData("Id", installationCollectionView.table.getSelectedId(), index);
+                            installMetaInfoModels.SetData("ModelData", dataModelLocal, index);
+                        }
                     }
                 }
             }

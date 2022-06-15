@@ -194,6 +194,8 @@ Rectangle {
     Flickable {
         anchors.fill: parent;
 
+        anchors.leftMargin: 20;
+
         contentWidth: contactInfoColumn.width;
         contentHeight: contactInfoColumn.height + 50;
         boundsBehavior: Flickable.StopAtBounds;
@@ -250,30 +252,30 @@ Rectangle {
 //                }
 //            }
 
-            Rectangle {
-                id: avatarRect;
+//            Rectangle {
+//                id: avatarRect;
 
-                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
+//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
 
-                width: 150;
-                height: 150;
+//                width: 150;
+//                height: 150;
 
-                color: "transparent";
+//                color: "transparent";
 
-                Image {
-                    id: avatarIcon;
+//                Image {
+//                    id: avatarIcon;
 
-                    height: 150;
-                    width: 150;
+//                    height: 150;
+//                    width: 150;
 
-                    source: "../../Icons/Light/Account_On_Normal.svg";
+//                    source: "../../Icons/Light/Account_On_Normal.svg";
 
-                    sourceSize.width: width;
-                    sourceSize.height: height;
+//                    sourceSize.width: width;
+//                    sourceSize.height: height;
 
-                    fillMode: Image.PreserveAspectFit;
-                }
-            }
+//                    fillMode: Image.PreserveAspectFit;
+//                }
+//            }
 
             Text {
                 id: titleAccountType;
@@ -1344,7 +1346,7 @@ Rectangle {
 //                                var accName = containerContactInfo.contactInfoModel.GetData("AccountName");
 //                                containerContactInfo.rootItem.updateTitleTab(containerContactInfo.itemId, accName);
 //                            }
-                            //containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                            containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                         }
                     }
                 }

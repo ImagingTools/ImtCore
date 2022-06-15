@@ -5,7 +5,7 @@ Item{
     id: tabDelegate;
 
     height: 40;
-    width: 160;
+//    width: 160;
 
 //    color: selected ? Style.baseColor : "transparent";
 
@@ -14,7 +14,6 @@ Item{
     property bool autoWidth: true;
 
     property string text: "no name";
-    property string firstElementText: "text";
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
 
     property string decoratorSource;
@@ -25,12 +24,26 @@ Item{
         loaderDecorator.source = tabDelegate.decoratorSource;
     }
 
+    MouseArea{
+        id: ma;
+
+        anchors.fill: tabDelegate;
+
+        onClicked: {
+            console.log("tabDelegate clicked ");
+            tabDelegate.clicked();
+        }
+    }
+
     Loader {
         id: loaderDecorator;
 
         onItemChanged: {
-            loaderDecorator.item.width = tabDelegate.width;
+//            loaderDecorator.item.width = tabDelegate.width;
             loaderDecorator.item.height = tabDelegate.height;
+            tabDelegate.width = loaderDecorator.item.width;
+            ma.width = loaderDecorator.item.width;
+            ma.height = loaderDecorator.item.height;
         }
     }
 
@@ -98,55 +111,45 @@ Item{
 //        }
 //    }
 
-    MouseArea{
-        id: ma;
+//    Item {
+//        id: closeButton;
 
-        anchors.fill: parent;
+//        anchors.right: parent.right;
+//        anchors.rightMargin: 8;
+//        anchors.verticalCenter: parent.verticalCenter;
 
-        onClicked: {
-            tabDelegate.clicked();
-        }
-    }
+//        height: parent.height * 0.4;
+//        width: height;
 
-    Item {
-        id: closeButton;
+//        visible: !firstElement;
 
-        anchors.right: parent.right;
-        anchors.rightMargin: 8;
-        anchors.verticalCenter: parent.verticalCenter;
+//        Image {
+//            id: closeImage;
 
-        height: parent.height * 0.4;
-        width: height;
+//            anchors.centerIn: parent;
 
-        visible: !firstElement;
+//            width: parent.width;
+//            height: parent.height;
 
-        Image {
-            id: closeImage;
+//            sourceSize.width: width;
+//            sourceSize.height: height;
 
-            anchors.centerIn: parent;
+//            fillMode: Image.PreserveAspectFit;
+//            source: "../../../" + "Icons/" + Style.theme + "/" + "DeleteStylized" + "_On_Normal.svg";
+//        }
 
-            width: parent.width;
-            height: parent.height;
+//        MouseArea{
+//            id: closeMA;
 
-            sourceSize.width: width;
-            sourceSize.height: height;
+//            anchors.fill: parent;
 
-            fillMode: Image.PreserveAspectFit;
-            source: "../../../" + "Icons/" + Style.theme + "/" + "DeleteStylized" + "_On_Normal.svg";
-        }
+//            enabled: tabDelegate.visible;
+//            hoverEnabled: enabled;
+//            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-        MouseArea{
-            id: closeMA;
-
-            anchors.fill: parent;
-
-            enabled: tabDelegate.visible;
-            hoverEnabled: enabled;
-            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
-            onClicked: {
-                tabDelegate.closeSignal();
-            }
-        }
-    }
+//            onClicked: {
+//                tabDelegate.closeSignal();
+//            }
+//        }
+//    }
 }

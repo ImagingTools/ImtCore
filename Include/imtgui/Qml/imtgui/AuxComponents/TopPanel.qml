@@ -25,13 +25,18 @@ Rectangle {
             var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
             var itemsCount = buttonsModelLocal.GetItemsCount();
 
-            for (var i = 0; i < itemsCount; i++) {
+            for (var i = 0; i < itemsCount; i++){
                 var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
 
-                if (id === commandId) {
+                if (id === commandId){
+//                    console.log("topPanelDecoratorLoader.item", topPanelDecoratorLoader.item)
+//                    console.log("topPanelDecoratorLoader.item.centerPanel", topPanelDecoratorLoader.item.centerPanel)
                     buttonsModelLocal.SetData("Mode", mode, i);
-                    decoratorLoader.item.centerPanel.lvButtons.model = 0
-                    decoratorLoader.item.centerPanel.lvButtons.model =  buttonsModelLocal
+
+                    topPanelDecoratorLoader.item.centerPanel.setModelButtons(0)
+                    topPanelDecoratorLoader.item.centerPanel.setModelButtons(buttonsModelLocal)
+//                    topPanelDecoratorLoader.item.centerPanel.lvButtons.model = 0
+//                    topPanelDecoratorLoader.item.centerPanel.lvButtons.model =  buttonsModelLocal
                     console.log("Command", commandId, " change mode", mode);
                     topPanel.updateModeModelMenuButtons(id, mode);
                     break;
@@ -64,8 +69,8 @@ Rectangle {
     }
 
     onWidthChanged: {
-         if (decoratorLoader.item){
-             decoratorLoader.item.width = topPanel.width;
+         if (topPanelDecoratorLoader.item){
+             topPanelDecoratorLoader.item.width = topPanel.width;
          }
     }
 
@@ -95,16 +100,16 @@ Rectangle {
     }
 
     Loader {
-        id: decoratorLoader;
+        id: topPanelDecoratorLoader;
 
         source: Style.topPanelDecoratorPath;
 
         onItemChanged: {
-            if (decoratorLoader.item){
-                console.log("decoratorLoader", topPanel.width, topPanel.height);
-                decoratorLoader.item.width = topPanel.width;
-                decoratorLoader.item.height = topPanel.height;
-                decoratorLoader.item.topPanel = topPanel;
+            if (topPanelDecoratorLoader.item){
+                console.log("topPanelDecoratorLoader", topPanel.width, topPanel.height);
+                topPanelDecoratorLoader.item.width = topPanel.width;
+                topPanelDecoratorLoader.item.height = topPanel.height;
+                topPanelDecoratorLoader.item.topPanel = topPanel;
             }
         }
     }
@@ -298,7 +303,7 @@ Rectangle {
         }
 
         onTriggered: {
-           decoratorLoader.item.centerPanel.lvButtons.model = updateTimer.model;
+           topPanelDecoratorLoader.item.centerPanel.lvButtons.model = updateTimer.model;
         }
     }
 
@@ -341,7 +346,7 @@ Rectangle {
                 var dataModelLocal;
 
                 if (modelCommands.ContainsKey("errors")){
-                    decoratorLoader.item.centerPanel.showCustomLoader();
+                    topPanelDecoratorLoader.item.centerPanel.showCustomLoader();
                     return;
                 }
 
@@ -355,8 +360,13 @@ Rectangle {
                             var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
                             dataModelLocal = dataModelLocal.GetData("items");
                             buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
-                            decoratorLoader.item.centerPanel.lvButtons.model = dataModelLocal;
-                            decoratorLoader.item.centerPanel.showButtons();
+
+//                            console.log("topPanelDecoratorLoader.item", topPanelDecoratorLoader.item)
+//                            console.log("topPanelDecoratorLoader.item.centerPanel", topPanelDecoratorLoader.item.centerPanel)
+
+                            topPanelDecoratorLoader.item.centerPanel.setModelButtons(dataModelLocal)
+//                            topPanelDecoratorLoader.item.centerPanel.lvButtons.model = dataModelLocal;
+                            topPanelDecoratorLoader.item.centerPanel.showButtons();
                             modelCommands.isFirst = !modelCommands.isFirst
                             topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
                         }

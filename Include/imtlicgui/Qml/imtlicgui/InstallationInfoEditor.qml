@@ -242,6 +242,8 @@ Rectangle {
     Flickable {
         anchors.fill: parent;
 
+        anchors.leftMargin: 20;
+
         contentWidth: containerColumn.width;
         contentHeight: containerColumn.height + 50;
         boundsBehavior: Flickable.StopAtBounds;
@@ -939,14 +941,16 @@ Rectangle {
                     }
                     containerInstallation.rootItem.updateTitleTab(containerInstallation.itemId, containerInstallation.itemName);
 
+                    if(containerInstallation.operation == "New"){
+                        containerInstallation.operation = "Open";
+                    }
+
                     if (containerInstallation.multiDocViewItem.activeCollectionItem){
-                        //containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                        containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                     }
 
 
 //                    containerInstallation.multiDocViewItem.activeCollectionItem.refresh();
-
-                    containerInstallation.wasChanged = false;
                 }
             }
         }

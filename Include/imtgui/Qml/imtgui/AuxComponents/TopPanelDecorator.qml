@@ -5,20 +5,21 @@ import imtqml 1.0
 Item {
     id: topPanelDecorator;
 
-    property alias centerPanel: centerPanel;
+    height: 60;
+
+    property Item centerPanel: topCenterPanel;
     property Item topPanel;
 
     Component.onCompleted: {
         console.log("topPanelDecorator onCompleted")
-        console.log("Style.topRightPanelDecoratorPath", Style.topRightPanelDecoratorPath)
     }
 
     TopCenterPanel {
-        id: centerPanel;
+        id: topCenterPanel;
 
         anchors.left: parent.left;
 
-        width: 0.9 * topPanelDecorator.width;
+        width: 0.95 * topPanelDecorator.width;
         height: topPanelDecorator.height;
 
         topPanel: topPanelDecorator.topPanel;
@@ -38,12 +39,21 @@ Item {
 
         anchors.right: parent.right;
 
-        width: 0.1 * topPanelDecorator.width;
+        width: topPanelDecorator.width - topCenterPanel.width;
         height: topPanelDecorator.height;
 
         decoratorSource: Style.topRightPanelDecoratorPath;
 
-        gradient: centerPanel.gradient;
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+        }
+
+        Component.onCompleted: {
+            rightPanel.decoratorSource = "TopRightPanelDecorator.qml";
+        }
 
         onDecoratorSourceChanged: {
             console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath)

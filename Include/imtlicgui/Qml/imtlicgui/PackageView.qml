@@ -711,7 +711,8 @@ Item {
                         }
 
                         featureCollectionViewContainer.wasChanged = false;
-                        //featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+
+                        featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                     }
                 }
             }
@@ -794,8 +795,7 @@ Item {
             anchors.top: headerBottomBorder.bottom;
             anchors.topMargin: 10;
             anchors.horizontalCenter: parent.horizontalCenter;
-//            anchors.left: parent.left;
-//            anchors.leftMargin: 10;
+
             text: qsTr("Please save the package first!");
             visible: featureCollectionViewContainer.operation == "New";
 
@@ -810,13 +810,10 @@ Item {
 
             anchors.top: headerBottomBorder.bottom;
 
-            width: 200;
             height: parent.height;
+            width: parent.width;
 
             visible: false;
-//            visible: featureCollectionViewContainer.operation != "New" &&
-//                     featureCollectionView.selectedIndex > -1          &&
-//                     featureCollectionView.table.getSelectedId() != "";
 
             clip: true;
 
@@ -832,7 +829,6 @@ Item {
                 let value = packageId + '.' + featureId;
 
                 if (state == 0){
-//                    packageMetaInfo.deselectFeature(value);
                     featuresTreeView.deselectFeature(value);
                 }
 

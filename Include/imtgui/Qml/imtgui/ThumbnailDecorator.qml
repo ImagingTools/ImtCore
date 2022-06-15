@@ -22,6 +22,7 @@ Rectangle
     property bool serverIsConnection: false;
 
     property int mainMargin: 0;
+    property int mainRadius: 0;
 
     Component.onCompleted: {
     }
@@ -300,7 +301,7 @@ Rectangle
 //        anchors.right: parent.right;
         anchors.top: parent.top;
         width: parent.width;
-        height: 70;
+        height: 60;
 //        width: parent.width;
 
         title: menuPanel.activePageName;
