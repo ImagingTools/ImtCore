@@ -13,6 +13,10 @@ Rectangle {
 
     radius: 7;
 
+    Component.onCompleted: {
+        console.log("TopRightPanelDecorator onCompleted")
+    }
+
     Row {
         anchors.leftMargin: 10;
         anchors.horizontalCenter: parent.horizontalCenter;

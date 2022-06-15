@@ -769,7 +769,7 @@ Item {
                 anchors.left: headerTreeView.left;
                 anchors.leftMargin: 10;
 
-                text: qsTr("Features");
+                text: qsTr("Dependencies");
                 color: Style.textColor;
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;

@@ -15,7 +15,7 @@ Rectangle {
     signal commandsChangedSignal(string commandsId);
 
     function updateModels(){
-        commandsModel.updateModel();
+        modelCommands.updateModel();
     }
 
     function setModeMenuButton(commandId, mode) {
@@ -41,13 +41,13 @@ Rectangle {
     }
 
     function updateModeModelMenuButtons(id, mode) {
-        for (var i = 0; i < modelButtons.count; i++) {
-            if (modelButtons.get(i).id === id) {
-                modelButtons.get(i).mode = mode;
-                modelButtons.get(i).imageSource = "../../../Icons/" + Style.theme + "/" + modelButtons.get(i).name + "_Off" + "_" + mode + ".svg";
-                break;
-            }
-        }
+//        for (var i = 0; i < modelButtons.count; i++) {
+//            if (modelButtons.get(i).id === id) {
+//                modelButtons.get(i).mode = mode;
+//                modelButtons.get(i).imageSource = "../../../Icons/" + Style.theme + "/" + modelButtons.get(i).name + "_Off" + "_" + mode + ".svg";
+//                break;
+//            }
+//        }
     }
 
     function dialogResult(parameters) {
@@ -80,10 +80,10 @@ Rectangle {
         if (topPanel.activeCommandsModelId == "") {
             return;
         }
-        commandsModel.updateModel();
+        modelCommands.updateModel();
 
 //        if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
-//            commandsModel.updateModel();
+//            modelCommands.updateModel();
 //        } else {
 //            updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
 //        }
@@ -293,7 +293,7 @@ Rectangle {
         property TreeItemModel model;
 
         onModelChanged: {
-            modelButtons.clear();
+            //modelButtons.clear();
             updateTimer.start();
         }
 
@@ -303,13 +303,13 @@ Rectangle {
     }
 
     GqlModel {
-        id: commandsModel;
+        id: modelCommands;
 
         property bool isFirst: true;
 
         function updateModel() {
 
-            console.log("commandsModel topPanel.activeCommandsModelId", topPanel.activeCommandsModelId);
+            console.log("modelCommands topPanel.activeCommandsModelId", topPanel.activeCommandsModelId);
             var query = Gql.GqlRequest("query", "CommandsData");
 
             var inputParams = Gql.GqlObject("input");
@@ -331,22 +331,22 @@ Rectangle {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("commandsModel updateModel", gqlData);
+            console.log("modelCommands updateModel", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
-            console.log("State:", this.state, commandsModel);
+            console.log("State:", this.state, modelCommands);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (commandsModel.ContainsKey("errors")){
+                if (modelCommands.ContainsKey("errors")){
                     decoratorLoader.item.centerPanel.showCustomLoader();
                     return;
                 }
 
-                if (commandsModel.ContainsKey("data")){
-                    dataModelLocal = commandsModel.GetData("data")
+                if (modelCommands.ContainsKey("data")){
+                    dataModelLocal = modelCommands.GetData("data")
 
                     if(dataModelLocal.ContainsKey("CommandsData")){
                         dataModelLocal = dataModelLocal.GetData("CommandsData");
@@ -357,7 +357,7 @@ Rectangle {
                             buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
                             decoratorLoader.item.centerPanel.lvButtons.model = dataModelLocal;
                             decoratorLoader.item.centerPanel.showButtons();
-                            commandsModel.isFirst = !commandsModel.isFirst
+                            modelCommands.isFirst = !modelCommands.isFirst
                             topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
                         }
                     }

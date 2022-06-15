@@ -12,6 +12,7 @@ Rectangle {
 
     property string decoratorSource;
     onDecoratorSourceChanged: {
+        console.log("topRightPanel onDecoratorSourceChanged")
         if (topRightPanel.decoratorSource){
             decoratorLoader.source = topRightPanel.decoratorSource;
         }

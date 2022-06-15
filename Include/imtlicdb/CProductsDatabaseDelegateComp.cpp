@@ -267,6 +267,23 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 								.arg(licenseName)
 								.arg(licenseDescription)
 								.arg(qPrintable(newProductId)).toLocal8Bit();
+
+			const imtlic::ILicenseInfo* licenseInfoPtr = newProductPtr->GetLicenseInfo(licenseId);
+			imtlic::ILicenseInfo::FeatureInfos currentFeatures = licenseInfoPtr->GetFeatureInfos();
+
+			for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : currentFeatures){
+				QByteArrayList data = featureInfo.id.split('.');
+				QByteArray featureId = data[1];
+				QByteArray packageId = data[0];
+
+				retVal += "\n" +
+							QString("INSERT INTO ProductLicenseFeatures(ProductId, LicenseId, PackageId, FeatureId) VALUES('%1', '%2', '%3', '%4');")
+							.arg(qPrintable(newProductId))
+							.arg(qPrintable(licenseId))
+							.arg(qPrintable(packageId))
+							.arg(qPrintable(featureId))
+							.toLocal8Bit();
+			}
 		}
 	}
 

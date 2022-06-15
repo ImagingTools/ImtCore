@@ -112,6 +112,11 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			featuresModelPtr = itemModel.GetTreeItemModel("features");
 		}
 
+		imtbase::CTreeItemModel* dependenciesModelPtr = nullptr;
+		if (itemModel.ContainsKey("dependencies")){
+			dependenciesModelPtr = itemModel.GetTreeItemModel("dependencies");
+		}
+
 		if (featuresModelPtr != nullptr){
 			for (int i = 0; i < featuresModelPtr->GetItemsCount(); i++){
 				QByteArray featureId = featuresModelPtr->GetData("Id", i).toByteArray();
@@ -123,19 +128,17 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				featureInfoPtr->SetFeatureName(featureName);
 
 				featurePackagePtr->InsertNewObject("FeatureInfo", featureName, featureDescription, featureInfoPtr.GetPtr());
-			}
-		}
 
-		imtbase::CTreeItemModel* dependenciesModelPtr = nullptr;
-		if (itemModel.ContainsKey("dependencies")){
-			dependenciesModelPtr = itemModel.GetTreeItemModel("dependencies");
-		}
-
-		if (dependenciesModelPtr != nullptr){
-			QStringList featureDependenciesKeys = dependenciesModelPtr->GetKeys();
-			for (const QString& key : featureDependenciesKeys){
-				QByteArrayList values = dependenciesModelPtr->GetData(key.toUtf8()).toByteArray().split(';');
-				featurePackagePtr->SetFeatureDependencies(key.toUtf8(), values);
+				if (dependenciesModelPtr != nullptr){
+					QStringList featureDependenciesKeys = dependenciesModelPtr->GetKeys();
+					for (const QString& key : featureDependenciesKeys){
+						QByteArray depFeatureId = key.split('.')[1].toUtf8();
+						if (featureId == depFeatureId){
+							QByteArrayList values = dependenciesModelPtr->GetData(key.toUtf8()).toByteArray().split(';');
+							featurePackagePtr->SetFeatureDependencies(key.toUtf8(), values);
+						}
+					}
+				}
 			}
 		}
 

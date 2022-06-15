@@ -8,12 +8,17 @@ Item {
     property alias centerPanel: centerPanel;
     property Item topPanel;
 
+    Component.onCompleted: {
+        console.log("topPanelDecorator onCompleted")
+        console.log("Style.topRightPanelDecoratorPath", Style.topRightPanelDecoratorPath)
+    }
+
     TopCenterPanel {
         id: centerPanel;
 
         anchors.left: parent.left;
 
-        width: 0.8 * topPanelDecorator.width;
+        width: 0.9 * topPanelDecorator.width;
         height: topPanelDecorator.height;
 
         topPanel: topPanelDecorator.topPanel;
@@ -33,12 +38,16 @@ Item {
 
         anchors.right: parent.right;
 
-        width: 0.2 * topPanelDecorator.width;
+        width: 0.1 * topPanelDecorator.width;
         height: topPanelDecorator.height;
 
         decoratorSource: Style.topRightPanelDecoratorPath;
 
         gradient: centerPanel.gradient;
+
+        onDecoratorSourceChanged: {
+            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath)
+        }
     }
 }
 

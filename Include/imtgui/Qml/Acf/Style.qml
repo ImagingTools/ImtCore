@@ -114,6 +114,7 @@ Item {
     property string subMenuButtonDecoratorPath;
     property string tabPanelDecoratorPath: "TabPanelDecorator.qml";
     property string topPanelDecoratorPath: "TopPanelDecorator.qml";
+
     property string filterPanelDecoratorPath: "FilterPanelDecorator.qml";
 
     property string topLeftPanelDecoratorPath;
@@ -174,7 +175,6 @@ Item {
         Style.topRightPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "RightPanel");
         Style.customPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "CustomPanel", "Base");
         Style.topLeftPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "LeftPanel");
-
     }
 
     GqlModel {

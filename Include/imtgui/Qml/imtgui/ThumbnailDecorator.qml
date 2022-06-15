@@ -320,7 +320,7 @@ Rectangle
 
             anchors.horizontalCenter: topPanel.horizontalCenter;
 
-            width: topPanel.width - 100;
+            width: topPanel.width - 200;
             height: topPanel.height;
 
             visible: errorBackground.visible;

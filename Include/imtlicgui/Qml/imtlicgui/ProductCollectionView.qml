@@ -289,6 +289,14 @@ Item {
         onSetDescriptionItem: {
             metaInfo.getMetaInfo();
         }
+
+        onHeaderClicked: {
+            if (headerId == "ModificationTime"){
+                headerId = "lastmodified";
+            }
+
+            productCollectionView.setHeaderSort(headerId, sortOrder);
+        }
     }
 
     TreeItemModel {

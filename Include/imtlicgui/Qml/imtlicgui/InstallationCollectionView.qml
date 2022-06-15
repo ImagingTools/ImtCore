@@ -288,6 +288,17 @@ Item {
         onSetDescriptionItem: {
             metaInfo.getMetaInfo();
         }
+
+        onHeaderClicked: {
+            if (headerId == "Id"){
+                headerId = "instanceid";
+            }
+            else if (headerId == "Customer"){
+                headerId = "accountid";
+            }
+
+            installationCollectionView.setHeaderSort(headerId, sortOrder);
+        }
     }
 
     TreeItemModel {

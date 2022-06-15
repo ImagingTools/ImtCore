@@ -5,6 +5,10 @@ import imtqml 1.0
 Item {
     id: tabPanelDecorator;
 
+    Rectangle {
+        anchors.fill: parent;
+        color:  tabDelegate.selected ? Style.baseColor: "transparent";
+    }
 
     Rectangle{
         id: selection;

@@ -5,7 +5,8 @@ import imtqml 1.0
 Rectangle {
     id: menuPanel;
 
-    color: Style.baseColor;
+//    color: Style.baseColor;
+    color: Style.backgroundColor;
 
     radius: 7;
 
@@ -35,7 +36,6 @@ Rectangle {
         console.log("MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
         lvPages.currentIndex = menuPanel.activePageIndex;
     }
-
 
     Flickable {
         anchors.fill: parent;

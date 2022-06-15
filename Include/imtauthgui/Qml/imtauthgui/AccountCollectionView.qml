@@ -274,6 +274,20 @@ Item {
                 accountCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
             }
         }
+
+        onHeaderClicked: {
+            if (headerId == "AccountName"){
+                headerId = "name";
+            }
+            else if (headerId == "Email"){
+                headerId = "ownermail";
+            }
+            else if (headerId == "AccountType"){
+                headerId = "type";
+            }
+
+            accountCollectionView.setHeaderSort(headerId, sortOrder);
+        }
     }
 
     TreeItemModel {

@@ -32,6 +32,7 @@ Rectangle {
     property bool hasPagination: true;
 
     signal itemSelect(string idSelect, string name);
+    signal headerClicked(string headerId, string sortOrder);
     signal removedItem(string itemId);
     signal renamedItem(string oldId, string newId);
     signal setDescriptionItem(string newDescription);
@@ -306,17 +307,22 @@ Rectangle {
 
             onHeaderOnClicked: {
                 console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
+                collectionViewContainer.headerClicked(headerId, sortOrder);
 
-                var filterLocal = modelFilter.GetData("Sort");
-                filterLocal.SetData("HeaderId", headerId);
-                filterLocal.SetData("SortOrder", sortOrder);
+//                var filterLocal = modelFilter.GetData("Sort");
+//                filterLocal.SetData("HeaderId", headerId);
+//                filterLocal.SetData("SortOrder", sortOrder);
 
                 modelItems.updateModel();
             }
         }
     }
 
-
+    function setHeaderSort(headerId, sortOrder){
+        var filterLocal = modelFilter.GetData("Sort");
+        filterLocal.SetData("HeaderId", headerId);
+        filterLocal.SetData("SortOrder", sortOrder);
+    }
 
     TreeItemModel {
         id: modelFilter;

@@ -310,6 +310,14 @@ Item {
         onSetDescriptionItem: {
             metaInfo.getMetaInfo();
         }
+
+        onHeaderClicked: {
+            if (headerId == "ModificationTime"){
+                headerId = "lastmodified";
+            }
+
+            packageCollectionView.setHeaderSort(headerId, sortOrder);
+        }
     }
 
     MetaInfo {

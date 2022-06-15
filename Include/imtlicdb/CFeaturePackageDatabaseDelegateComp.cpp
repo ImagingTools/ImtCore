@@ -244,13 +244,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	// Delete removed features to the package:
 	for (const QByteArray& removedFeatureId : removedFeatures){
-//		retVal += "\n" +
-//					QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2' OR dependencyid = '%3' AND dependencypackageid = '%4';")
-//									.arg(qPrintable(removedFeatureId))
-//									.arg(qPrintable(newPackageId))
-//									.arg(qPrintable(removedFeatureId))
-//									.arg(qPrintable(newPackageId))
-//									.toLocal8Bit();
+		retVal += "\n" +
+					QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2' OR dependencyid = '%3' AND dependencypackageid = '%4';")
+									.arg(qPrintable(removedFeatureId))
+									.arg(qPrintable(newPackageId))
+									.arg(qPrintable(removedFeatureId))
+									.arg(qPrintable(newPackageId))
+									.toLocal8Bit();
 		retVal += "\n" +
 					QString("DELETE FROM Features WHERE Id = '%1' AND PackageId = '%2';")
 								.arg(qPrintable(removedFeatureId))
@@ -280,47 +280,74 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	// Add new dependencies for the features:
-	imtbase::ICollectionInfo::Ids packageIds = collection.GetElementIds();
-	for (const QByteArray& packageId : packageIds){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		collection.GetObjectData(packageId, dataPtr);
+	imtbase::ICollectionInfo::Ids featureCollectionIds = newObjectPtr->GetFeatureList().GetElementIds();
+	for (const QByteArray& featureCollectionId : featureCollectionIds){
+		const imtlic::IFeatureInfo* featureInfoPtr = newObjectPtr->GetFeatureInfo(featureCollectionId);
+		if (featureInfoPtr != nullptr){
+			QByteArray featureId = featureInfoPtr->GetFeatureId();
+			QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(newPackageId + "." + featureId);
 
-		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
-		if (packagePtr != nullptr){
-			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
-			if (dependenciesProvider != nullptr){
-				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureCollectionId : featureCollectionIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
-					if (featureInfoPtr != nullptr){
-						QByteArray featureId = featureInfoPtr->GetFeatureId();
-						QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(packageId + "." + featureId);
+			retVal += "\n" +
+					QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2';")
+					.arg(qPrintable(featureId))
+					.arg(qPrintable(newPackageId))
+					.toLocal8Bit();
 
-
-						retVal += "\n" +
-									QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2';")
-													.arg(qPrintable(featureId))
-													.arg(qPrintable(packageId))
-													.toLocal8Bit();
-
-
-						for (const QByteArray& dependFeatureId : dependsIds){
-							QByteArrayList data = dependFeatureId.split('.');
-							if (data.size() == 2){
-								retVal += "\n" +
-											QString("INSERT INTO FeatureDependencies(featureid, featurepackageid, dependencyid, dependencypackageid) VALUES('%1', '%2', '%3', '%4');")
-														.arg(qPrintable(featureId))
-														.arg(qPrintable(packageId))
-														.arg(qPrintable(data[1]))
-														.arg(qPrintable(data[0]))
-														.toLocal8Bit();
-							}
-						}
-					}
+			for (const QByteArray& dependFeatureId : dependsIds){
+				QByteArrayList data = dependFeatureId.split('.');
+				if (data.size() == 2){
+					retVal += "\n" +
+							QString("INSERT INTO FeatureDependencies(featureid, featurepackageid, dependencyid, dependencypackageid) VALUES('%1', '%2', '%3', '%4');")
+							.arg(qPrintable(featureId))
+							.arg(qPrintable(newPackageId))
+							.arg(qPrintable(data[1]))
+							.arg(qPrintable(data[0]))
+							.toLocal8Bit();
 				}
 			}
 		}
 	}
+//	imtbase::ICollectionInfo::Ids packageIds = collection.GetElementIds();
+//	for (const QByteArray& packageId : packageIds){
+//		imtbase::IObjectCollection::DataPtr dataPtr;
+//		collection.GetObjectData(packageId, dataPtr);
+
+//		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
+//		if (packagePtr != nullptr){
+//			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
+//			if (dependenciesProvider != nullptr){
+//				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
+//				for (const QByteArray& featureCollectionId : featureCollectionIds){
+//					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+//					if (featureInfoPtr != nullptr){
+//						QByteArray featureId = featureInfoPtr->GetFeatureId();
+//						QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(packageId + "." + featureId);
+
+
+////						retVal += "\n" +
+////									QString("DELETE FROM FeatureDependencies WHERE featureid = '%1' AND featurepackageid = '%2';")
+////													.arg(qPrintable(featureId))
+////													.arg(qPrintable(packageId))
+////													.toLocal8Bit();
+
+
+//						for (const QByteArray& dependFeatureId : dependsIds){
+//							QByteArrayList data = dependFeatureId.split('.');
+//							if (data.size() == 2){
+//								retVal += "\n" +
+//											QString("INSERT INTO FeatureDependencies(featureid, featurepackageid, dependencyid, dependencypackageid) VALUES('%1', '%2', '%3', '%4');")
+//														.arg(qPrintable(featureId))
+//														.arg(qPrintable(packageId))
+//														.arg(qPrintable(data[1]))
+//														.arg(qPrintable(data[0]))
+//														.toLocal8Bit();
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	return retVal;
 }
