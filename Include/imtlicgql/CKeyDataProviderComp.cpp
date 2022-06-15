@@ -36,15 +36,24 @@ bool CKeyDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId) c
 		if (m_licensePersistenceCompPtr.IsValid()){
 			QTemporaryDir tempDir;
 			QString filePathTmp = tempDir.path() + "/"  + QUuid::createUuid().toString() + ".xml";
-			m_licensePersistenceCompPtr->SaveToFile(*productInstancePtr, filePathTmp);
+			
+			int state = m_licensePersistenceCompPtr->SaveToFile(*productInstancePtr, filePathTmp);
+			if (state != ifile::IFilePersistence::OS_OK){
+				SendErrorMessage(0, "License file could not be saved", "Server data provider");
+
+				return false;
+			}
 
 			QFile file(filePathTmp);
 
 			if (!file.open(QIODevice::ReadOnly )){
+				SendErrorMessage(0, "License file could not be opened", "Server data provider");
+
 				return false;
 			}
 
 			data = file.readAll();
+
 			file.close();
 		}
 	}
