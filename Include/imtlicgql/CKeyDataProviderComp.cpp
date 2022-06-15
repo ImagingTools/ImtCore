@@ -4,8 +4,10 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QUuid>
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QFileInfo>
+
 
 namespace imtlicgql
 {
@@ -33,7 +35,7 @@ bool CKeyDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId) c
 
 		if (m_licensePersistenceCompPtr.IsValid()){
 			QTemporaryDir tempDir;
-			QString filePathTmp = tempDir.path() + "/" + dataId + ".xml";
+			QString filePathTmp = tempDir.path() + "/"  + QUuid::createUuid().toString() + ".xml";
 			m_licensePersistenceCompPtr->SaveToFile(*productInstancePtr, filePathTmp);
 
 			QFile file(filePathTmp);
