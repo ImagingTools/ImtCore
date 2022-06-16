@@ -351,9 +351,7 @@ bool CDatabaseEngineComp::Migration() const
 				}
 			}
 			QVariantMap valuesRevision;
-			QMap<QString, QVariant> insertValue;
-			insertValue[":Revision"] = index;
-			valuesRevision.insert(insertValue);
+			valuesRevision.insert(":Revision",index);
 			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql").toLocal8Bit(), valuesRevision, &sqlError);
 			if (sqlError.type() != QSqlError::NoError){
 				return false;
