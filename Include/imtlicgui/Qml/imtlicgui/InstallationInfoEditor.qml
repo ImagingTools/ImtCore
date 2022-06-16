@@ -945,10 +945,10 @@ Rectangle {
                         containerInstallation.operation = "Open";
                     }
 
-                    if (containerInstallation.multiDocViewItem.activeCollectionItem){
-                        containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
-                    }
-
+//                    if (containerInstallation.multiDocViewItem.activeCollectionItem){
+//                        containerInstallation.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+//                    }
+//                    console.log("metainfo updated")
 
 //                    containerInstallation.multiDocViewItem.activeCollectionItem.refresh();
                 }

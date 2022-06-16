@@ -709,10 +709,9 @@ Item {
                                 treeView.visible = true;
                             }
                         }
+//                        featureCollectionViewContainer.wasChanged = false;
 
-                        featureCollectionViewContainer.wasChanged = false;
-
-                        featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+//                        featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                     }
                 }
             }

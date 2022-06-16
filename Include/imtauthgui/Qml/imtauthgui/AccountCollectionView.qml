@@ -265,6 +265,7 @@ Item {
             if (index !== -1){
                 accountCollectionContainer.multiDocViewItem.closeTab(index);
             }
+            accountCollectionContainer.removeMetaInfoById(itemId);
         }
 
         onRenamedItem: {
@@ -292,6 +293,16 @@ Item {
 
     TreeItemModel {
         id: accountsMetaInfoModels;
+    }
+
+    function removeMetaInfoById(objectId){
+        for (let i = 0; i < accountsMetaInfoModels.GetItemsCount(); i++){
+            let curId = accountsMetaInfoModels.GetData("Id", i);
+            if (curId == objectId){
+                accountsMetaInfoModels.RemoveItem(i);
+                return;
+            }
+        }
     }
 
     MetaInfo {

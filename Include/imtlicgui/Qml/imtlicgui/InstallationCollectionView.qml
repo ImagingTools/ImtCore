@@ -274,6 +274,7 @@ Item {
             if (index !== -1){
                 installationCollectionContainer.multiDocViewItem.closeTab(index);
             }
+            installationCollectionContainer.removeMetaInfoById(itemId);
         }
 
         onRenamedItem: {
@@ -303,6 +304,16 @@ Item {
 
     TreeItemModel {
         id: installMetaInfoModels;
+    }
+
+    function removeMetaInfoById(objectId){
+        for (let i = 0; i < installMetaInfoModels.GetItemsCount(); i++){
+            let curId = installMetaInfoModels.GetData("Id", i);
+            if (curId == objectId){
+                installMetaInfoModels.RemoveItem(i);
+                return;
+            }
+        }
     }
 
     MetaInfo {

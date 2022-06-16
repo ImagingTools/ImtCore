@@ -71,6 +71,16 @@ Item {
         id: metaInfoModels;
     }
 
+    function removeMetaInfoById(objectId){
+        for (let i = 0; i < metaInfoModels.GetItemsCount(); i++){
+            let curId = metaInfoModels.GetData("Id", i);
+            if (curId == objectId){
+                metaInfoModels.RemoveItem(i);
+                return;
+            }
+        }
+    }
+
     function commandsChanged(commandsId) {
         console.log("PackageCollectionView commandsChanged!", commandsId, packageCollectionContainer.rootItem);
         if (commandsId !== "Packages"){
@@ -293,6 +303,7 @@ Item {
             if (index !== -1){
                 packageCollectionContainer.multiDocViewItem.closeTab(index);
             }
+            packageCollectionContainer.removeMetaInfoById(itemId);
         }
 
         onRenamedItem: {

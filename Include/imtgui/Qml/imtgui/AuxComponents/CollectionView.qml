@@ -218,7 +218,15 @@ Rectangle {
         }
         else if (menuId  === "Edit"){
             if (tableInternal.selectedIndex >= 0){
-                let curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
+
+                //FIX
+                let curName;
+                if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
+                    curName = tableInternal.elements.GetData("AccountName", tableInternal.selectedIndex);
+                }
+                else{
+                    curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
+                }
                 collectionViewContainer.itemSelect(itemId, curName);
             }
         }
@@ -448,6 +456,21 @@ Rectangle {
         }
     }
 
+    function checkExistSelectedId(idSelect, modelNew){
+        if (!idSelect || !modelNew){
+            return false;
+        }
+
+        for (let i = 0; i < modelNew.GetItemsCount(); i++){
+            let curId = modelNew.GetData("Id", i);
+            if (curId == idSelect){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     GqlModel {
         id: modelItems;
 
@@ -514,8 +537,24 @@ Rectangle {
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelItems)){
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
                         if (dataModelLocal.ContainsKey("items")){
+                            let oldSelectedIndex = tableInternal.selectedIndex;
+
                             tableInternal.elements = dataModelLocal.GetData("items");
                             collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
+
+                            tableInternal.selectedIndex = -1;
+                            if (oldSelectedIndex > -1 && tableInternal.elements.GetItemsCount() > oldSelectedIndex){
+                                tableInternal.selectedIndex = oldSelectedIndex;
+                            }
+
+                            console.log("tableInternal.selectedIndex", tableInternal.selectedIndex)
+                            console.log("oldSelectedIndex", oldSelectedIndex)
+//                            tableInternal.selectedIndex = -1;
+
+//                            if (!collectionViewContainer.checkExistSelectedId(tableInternal.getSelectedId(), tableInternal.elements)){
+//                                tableInternal.selectedIndex = oldSelectedIndex;
+//                            }
+
                             //collectionViewContainer.collectionViewModel = dataModelLocal.GetData("items");
                         }
 

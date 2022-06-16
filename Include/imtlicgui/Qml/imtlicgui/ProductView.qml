@@ -575,13 +575,11 @@ Item {
                                     tfcProductName.text);
                     }
 
-//                    productsCollectionViewContainer.wasChanged = false;
-
                     if (productsCollectionViewContainer.operation == "New"){
                         productsCollectionViewContainer.operation = "Open";
                     }
-                    console.log("productsCollectionViewContainer.operation", productsCollectionViewContainer.operation);
-                    productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+//                    console.log("productsCollectionViewContainer.operation", productsCollectionViewContainer.operation);
+//                    productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                 }
             }
         }
