@@ -24,6 +24,7 @@ protected:
 
 private slots:
 	void cleanup();
+	void Test();
     void InsertNewObjectWithRequiredParamsTest_data();
     void InsertNewObjectWithRequiredParamsTest();
     void InsertNewObjectWithNonExistElementTest();

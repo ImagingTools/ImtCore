@@ -216,6 +216,11 @@ QByteArray CTestDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
+QByteArray CTestDatabaseDelegateComp::CreateResetQuery(const imtbase::IObjectCollection &collection) const
+{
+	return QByteArray();
+}
+
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
 idoc::IDocumentMetaInfo* CTestDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
@@ -246,6 +251,8 @@ bool CTestDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& re
 
 	return true;
 }
+
+
 
 
 } // namespace imttest

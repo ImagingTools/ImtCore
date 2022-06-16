@@ -50,7 +50,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 
 	retVal.setForwardOnly(isForwardOnly);
 
-	bool success = retVal.prepare(queryString);
+	bool success = retVal.exec(queryString);
 	if (!success){
 		if (sqlErrorPtr != nullptr){
 			*sqlErrorPtr = retVal.lastError();
@@ -59,8 +59,6 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, QSqlE
 		return QSqlQuery();
 	}
 	
-	success = retVal.exec();
-
 	if (sqlErrorPtr != nullptr){
 		*sqlErrorPtr = databaseConnection.lastError().type() != QSqlError::NoError ? databaseConnection.lastError() : retVal.lastError();
 	}
@@ -289,8 +287,14 @@ bool CDatabaseEngineComp::CreateDatabase() const
 	}
 
 	if (retVal){
-		if (*m_autoCreateTablesAttrPtr > 0 && m_tablesCreationScriptPathAttrPtr.IsValid()){
-			retVal = CreateTables();
+		QSqlError sqlError;
+		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		ExecSqlQueryFromFile(folder.filePath("CreateRevision.sql").toLocal8Bit(), &sqlError);
+		if (sqlError.type() != QSqlError::NoError){
+			return false;
+		}
+		if (*m_autoCreateTablesAttrPtr > 0 && m_migrationFolderPathAttrPtr.IsValid()){
+			retVal = Migration();
 		}
 	}
 
@@ -298,40 +302,66 @@ bool CDatabaseEngineComp::CreateDatabase() const
 }
 
 
-bool CDatabaseEngineComp::CreateTables() const
+bool CDatabaseEngineComp::Migration() const
 {
-	QSqlError sqlError;
-	QString queryString;
-	QFile scriptFile(*m_tablesCreationScriptPathAttrPtr);
+	if (m_migrationFolderPathAttrPtr.IsValid()){
+		int lastMigration = GetLastMigration();
+		int databaseVersion =  GetDatabaseVersion();
+		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		QStringList nameFilter = {"migration_*.sql"};
+		folder.setNameFilters(nameFilter);
+		QStringList files = folder.entryList();
+		for (int index = databaseVersion + 1; index <= lastMigration; index++){
+			QSqlError sqlError;
+			if (index == 0){
+				ExecSqlQueryFromFile(folder.filePath("GetRevision.sql").toLocal8Bit(), &sqlError);
+				if (sqlError.type() != QSqlError::NoError){
+					qCritical() << __FILE__ << __LINE__
+								<< "\n\t| Unable to migration database"
+								<< "\n\t| Error: " << sqlError.text();
 
-	if (!scriptFile.open(QFile::ReadOnly)){
-		qCritical() << __FILE__ << __LINE__
-					<< "\n\t| Unable to open file"
-					<< "\n\t| File: " << scriptFile.fileName();
+					SendErrorMessage(0, QString("Migration is failed: %1").arg(sqlError.text()), "Database engine");
+					return false;
+				}
+				ExecSqlQueryFromFile(folder.filePath("migration_"+QString::number(index)+".sql").toLocal8Bit(), &sqlError);
+				if (sqlError.type() != QSqlError::NoError){
+					qCritical() << __FILE__ << __LINE__
+								<< "\n\t| Unable to migration database"
+								<< "\n\t| Error: " << sqlError.text();
 
-		SendErrorMessage(0, QString("Table creation script file '%1' could not be opened").arg(scriptFile.fileName()), "Database Engine");
+					SendErrorMessage(0, QString("Migration is failed: %1").arg(sqlError.text()), "Database engine");
+					return false;
+				}
+				if (QFile::exists(folder.filePath("InitData.sql"))){
+					ExecSqlQueryFromFile(folder.filePath("InitData.sql").toLocal8Bit(), &sqlError);
+					if (sqlError.type() != QSqlError::NoError){
+						qCritical() << __FILE__ << __LINE__
+									<< "\n\t| Unable to initialization data of database"
+									<< "\n\t| Error: " << sqlError.text();
 
-		return false;
+						SendErrorMessage(0, QString("Initialization data is failed: %1").arg(sqlError.text()), "Database engine");
+						return false;
+					}
+				}
+			}
+			else{
+				ExecSqlQueryFromFile(folder.filePath("migration_"+QString::number(index)+".sql").toLocal8Bit(), &sqlError);
+				if (sqlError.type() != QSqlError::NoError){
+					return false;
+				}
+			}
+			QVariantMap valuesRevision;
+			QMap<QString, QVariant> insertValue;
+			insertValue[":Revision"] = index;
+			valuesRevision.insert(insertValue);
+			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql").toLocal8Bit(), valuesRevision, &sqlError);
+			if (sqlError.type() != QSqlError::NoError){
+				return false;
+			}
+		}
+		return true;
 	}
-
-	queryString = scriptFile.readAll();
-	scriptFile.close();
-
-	QSqlDatabase databaseConnection = QSqlDatabase::database(GetConnectionName());
-
-	databaseConnection.exec(queryString);
-
-	sqlError = databaseConnection.lastError();
-	if (sqlError.type() != QSqlError::ErrorType::NoError){
-		qCritical() << __FILE__ << __LINE__
-			<< "\n\t| Maintainance SQL error occured"
-			<< "\n\t| Error: " << sqlError
-			<< "\n\t| Query: " << queryString;
-
-		SendErrorMessage(0, QString("Table creation failed: '%1' '%2'").arg(sqlError.text()).arg(queryString), "Database Engine");
-	}
-
-	return sqlError.type() == QSqlError::ErrorType::NoError;
+	return false;
 }
 
 
@@ -417,6 +447,7 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 		if (*m_autoCreateDatabaseAttrPtr == 2){
 			return CreateDatabase();
 		}
+		Migration();
 	}
 
 	return true;
@@ -498,6 +529,78 @@ QString CDatabaseEngineComp::GetPassword() const
 }
 
 
+int CDatabaseEngineComp::GetLastMigration() const
+{
+	if (m_migrationFolderPathAttrPtr.IsValid()){
+		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		if (folder.exists()){
+			QStringList nameFilter = {"migration_*.sql"};
+			folder.setNameFilters(nameFilter);
+			int avaliableMigration = -1;
+			if (!folder.entryList().isEmpty()){
+				QStringList files = folder.entryList();
+				for (int index = 0; index < files.size(); index++){
+					QString nameFile = files[index];
+					nameFile.remove("migration_").remove(".sql");
+					QRegExp re("\\d*");
+					if (re.exactMatch(nameFile)){
+						if (avaliableMigration < nameFile.toInt()){
+							avaliableMigration = nameFile.toInt();
+						}
+					}
+				}
+			}
+			return avaliableMigration;
+		}
+		else{
+			SendErrorMessage(0, "Directory of migration is not exist", "Migration");
+			return -1;
+		}
+	}
+	return -1;
+}
+
+
+int CDatabaseEngineComp::GetDatabaseVersion() const
+{
+	if (m_migrationFolderPathAttrPtr.IsValid()){
+		QSqlError sqlError;
+		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		QSqlQuery queryGetRevision = ExecSqlQueryFromFile(folder.filePath("GetRevision.sql").toLocal8Bit(), &sqlError);
+		if (sqlError.type() != QSqlError::NoError){
+			return -1;
+		}
+		else{
+			if (queryGetRevision.next()){
+				return queryGetRevision.value(0).toInt();
+			}
+			return -1;
+		}
+	}
+	return -1;
+}
+
+
+bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
+{
+	QStringList queryList = QString(qPrintable(sqlQuery)).split(";");
+
+	BeginTransaction();
+
+	for (const QString& singleQuery: queryList){
+		if (!singleQuery.isEmpty()){
+			QSqlError error;
+			ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
+			if (error.type() != QSqlError::NoError){
+				SendErrorMessage(0, error.text(), "Database collection");
+				CancelTransaction();
+				return false;
+			}
+		}
+	}
+
+	FinishTransaction();
+
+	return true;
+}
 } // namespace imtdb
-
-

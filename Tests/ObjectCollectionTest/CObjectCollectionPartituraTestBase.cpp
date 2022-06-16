@@ -26,7 +26,6 @@ void CObjectCollectionPartituraTestBase::cleanup()
 	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
 	if (compositePtr.IsValid()){
 
-		// get file collection
 		imtrepo::IFileObjectCollection* fileCollectionPtr = compositePtr->GetComponentInterface<imtrepo::IFileObjectCollection>();
 		if (fileCollectionPtr != nullptr){
 			QString folderPath = fileCollectionPtr->GetCollectionRootFolder();
@@ -50,10 +49,31 @@ void CObjectCollectionPartituraTestBase::cleanup()
 	}
 }
 
+void CObjectCollectionPartituraTestBase::Test()
+{
+	initTestCase();
+	istd::TDelPtr<ipackage::CComponentAccessor> compositePtr;
+	compositePtr.SetPtr(new ipackage::CComponentAccessor(m_registryFile, m_configFile));
+	if (compositePtr.IsValid()){
+
+		// get component object collection
+		imtbase::IObjectCollection* objectCollectionPtr = compositePtr->GetComponentInterface<imtbase::IObjectCollection>();
+		if (objectCollectionPtr != nullptr){
+
+			// reset data from object collection
+			objectCollectionPtr->ResetData();
+			QByteArray idNewObject = objectCollectionPtr->InsertNewObject("TestInfo", "TestName", "TestDescription");
+			QByteArray idNewObject2 = objectCollectionPtr->InsertNewObject("TestInfo", "TestName2", "TestDescription2");
+		}
+	}
+}
+
+
 void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest_data()
 {
 	initTestCase();
 	QWARN(qPrintable(QString("Start tests for %1 accessor").arg(m_nameAccessor)));
+
 	// variable decloration
 	QTest::addColumn<QByteArray>("typeId");
 	QTest::addColumn<QString>("name");
@@ -91,8 +111,6 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithRequiredParamsTest()
 
 			// reset data from object collection
 			objectCollectionPtr->ResetData();
-
-
 
 			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(typeId, name, description);
 
@@ -161,26 +179,37 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithExistElementTest()
 			objectCollectionPtr->ResetData();
 
 			// insert first object in collection
-			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), "testId");
+			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription", imtbase::CObjectCollection::DataPtr(), "testId");
 
-			// check contains first object in collection
-			imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
-			bool checkInsertFirstObject = idsInObject.contains("testId");
+			if (idNewObject == "testId"){
 
-			if(checkInsertFirstObject){
+				// check contains first object in collection
+				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
+				bool checkInsertFirstObject = idsInObject.contains("testId");
 
-				// insert second object with exist id in collection
-				QByteArray idSecondNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::CObjectCollection::DataPtr(), "testId");
+				if(checkInsertFirstObject){
 
-				// check contains insert objects
-				idsInObject = objectCollectionPtr->GetElementIds();
-				checkInsertFirstObject = idsInObject.contains("testId");
-				bool checkInsertSecondObject = idsInObject.contains(idSecondNewObject);
+					// insert second object with exist id in collection
+					QByteArray idSecondNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::CObjectCollection::DataPtr(), "testId");
 
-				// if one of conditions is false - test will be failed
-				QVERIFY2((checkInsertFirstObject && checkInsertSecondObject), "Insert new object with set exist id is failed");
+					if (!idSecondNewObject.isEmpty()){
+
+						// check contains insert objects
+						idsInObject = objectCollectionPtr->GetElementIds();
+						checkInsertFirstObject = idsInObject.contains("testId");
+						bool checkInsertSecondObject = idsInObject.contains(idSecondNewObject);
+
+						// if one of conditions is false - test will be failed
+						QVERIFY2((checkInsertFirstObject && checkInsertSecondObject), "Insert new object with set exist id is failed");
+					}
+					else{
+						QFAIL("Insert second object in collection is failed");
+					}
+				}
+				else{
+					QFAIL("Insert first object in collection is failed");
+				}
 			}
-
 			else{
 				QFAIL("Insert first object in collection is failed");
 			}
@@ -254,14 +283,13 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithDataTest()
 						setDescriptionAccount = referenceImplPtr->GetAccountDescription();
 					}
 
-
-
 					else{
 						imttest::CTestInfo* referenceImplPtr = dynamic_cast<imttest::CTestInfo*>(referenceDataPtr.GetPtr());
 						// get values from reference data
 						setNameAccount = referenceImplPtr->GetTestName();
 						setDescriptionAccount = referenceImplPtr->GetTestDescription();
 					}
+
 					// compare input & reference data
 					QVERIFY2(((nameAccount == setNameAccount) && (descriptionAccount == setDescriptionAccount)), "Insert new object with data is failed");
 
@@ -714,11 +742,11 @@ void CObjectCollectionPartituraTestBase::PaginationTest_data()
 	// set values and description of test
 	QTest::newRow("offset is NULL") << NULL << 5 << false;
 	QTest::newRow("offset out of size") << 100 << 5 << true;
-//	QTest::newRow("count is NULL")<< 1 << NULL << true; for sql
+	QTest::newRow("count is NULL")<< 1 << NULL << true;
 	QTest::newRow("count out of size") << 1 << 100 << false;
 	QTest::newRow("all params correct") << 1 << 100 << false;
 //	QTest::newRow("count is negative") << 1 << -5 << true; for sql
-	//	QTest::newRow("offset is negative") << -5 << 5 << true;
+//	QTest::newRow("offset is negative") << -5 << 5 << true;
 }
 
 
@@ -906,7 +934,6 @@ void CObjectCollectionPartituraTestBase::SortingTest_data()
 	QTest::newRow("sortOrder is no-order") << "NO ORDER" << QByteArray("Name");
 	QTest::newRow("sortOrder is ASC") << "ASC" << QByteArray("Name");
 	QTest::newRow("sortOrder is DESC") << "DESC" << QByteArray("Name");
-//	QTest::newRow("sortOrder is ASC with non-exist column") << "ASC" << QByteArray("AnotherName");
 }
 
 
@@ -1024,7 +1051,7 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest_data()
 	QTest::newRow("offset is empty") << NULL << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << false;
 	QTest::newRow("offset is out of size") << 100 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
 //	QTest::newRow("offset is negative") << -10 << 15 << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
-//	QTest::newRow("count is empty") << 3 << NULL << "TestFilterName1" << "ASC" << QByteArray("Name") << true; for sql
+	QTest::newRow("count is empty") << 3 << NULL << "TestFilterName1" << "ASC" << QByteArray("Name") << true;
 	QTest::newRow("count is out of size") << 3 << 100 << "TestFilterName1" << "ASC" << QByteArray("Name") << false;
 //	QTest::newRow("count is negative") << 3 << -10 << "TestFilterName1" << "ASC" << QByteArray("Name") << false; for sql
 	QTest::newRow("testFilter is empty") << 3 << 15 << "" << "ASC" << QByteArray("Name") << false;

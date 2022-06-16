@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5003" Description="ACF"/>
+            <Version Id="0" Number="5004" Description="ACF"/>
             <Version Id="1" Number="2174" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -10,17 +10,17 @@
     <Description>Acula's data repository containing all resources need for the execution of the production workflow</Description>
     <Keywords>Inspection Application Product Workflow</Keywords>
     <ElementsList>
-        <Element Id="DatabaseAccessSettings" PackageId="ImtDatabasePck" ComponentId="DatabaseAccessSettings">
+        <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="tests"/>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ImtCoreObjectCollectionTest"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="HostName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="127.0.0.1"/>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ImagingTools GmbH"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Pasword" Type="Id" ExportId="Pasword">
-                        <Data IsEnabled="true" Value="postgres"/>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -67,10 +67,10 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseAccessSettings"/>
+                        <Data IsEnabled="true" Value="PreferencesDatabase/DatabaseAccessSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DbName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="test"/>
+                        <Data IsEnabled="true" Value="tests"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DbType" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="QPSQL"/>
@@ -81,14 +81,47 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RelativeFileNameParam"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Pasword" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="PgPort">
                         <Data IsEnabled="true" Value="5432"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TablesCreationScriptPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value=":/Database/CreateTables"/>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PreferencesDatabase" PackageId="ImtCoreVoce" ComponentId="PreferencesDatabase">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="tests"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="PreferencesTest.xml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RelativeFileNameParam" PackageId="FilePck" ComponentId="RelativeFileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Migrations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="2"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SystemLocation"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -129,6 +162,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SystemLocation" PackageId="FilePck" ComponentId="SystemLocation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="101"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TestDatabaseDelegate" PackageId="ImtTestPck" ComponentId="TestDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -161,6 +206,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="VersionInfo" PackageId="LisaVoce" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -169,7 +219,6 @@
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
         <Interface InterfaceId="imtdb::IDatabaseEngine" ComponentId="PgSqlDatabaseEngine"/>
-        <Interface InterfaceId="imtdb::IDatabaseLoginSettings" ComponentId="DatabaseAccessSettings"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="TestDatabaseDelegate"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>

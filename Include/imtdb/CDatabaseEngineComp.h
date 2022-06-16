@@ -7,6 +7,7 @@
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <ifile/IFileNameParam.h>
 
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
@@ -47,7 +48,8 @@ public:
 		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "localhost");
 		I_ASSIGN(m_maintenanceDatabaseNameAttrPtr, "MaintainanceDatabase", "Name of Maintenance database. It's necessary for creating database if it not exists", true, "postgres");
 		I_ASSIGN(m_databaseCreationScriptPathAttrPtr, "DatabaseCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation database", false, "");
-		I_ASSIGN(m_tablesCreationScriptPathAttrPtr, "TablesCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation tables", false, "");
+//		I_ASSIGN(m_tablesCreationScriptPathAttrPtr, "TablesCreationScriptPath", "The property holds the name of the file that will be opened to receive the SQL-query for creation tables", false, "");
+		I_ASSIGN(m_migrationFolderPathAttrPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", true, "MigrationFolderPath");
 		I_ASSIGN(m_autoCreateDatabaseAttrPtr, "AutoCreateDatabase", "The property holds behavior to create database on startup.\n Possible values:\n0 - will not create new database;\n1 - will create database once;\n2 - will create database at each startup", true, 1);
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
@@ -73,7 +75,8 @@ public:
 protected:
 	virtual bool OpenDatabase() const;
 	virtual bool CreateDatabase() const;
-	virtual bool CreateTables() const;
+	virtual bool Migration() const;
+	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
 
 	// reimplemented (icomp::CComponentBase)
@@ -100,6 +103,8 @@ private:
 	int GetPort() const;
 	QString GetUserName() const;
 	QString GetPassword() const;
+	int GetLastMigration() const;
+	int GetDatabaseVersion() const;
 
 	template <typename Interface>
 	static Interface* ExtractDatabaseAccessSettings(CDatabaseEngineComp& component)
@@ -116,7 +121,7 @@ private:
 	I_ATTR(QByteArray, m_hostNameAttrPtr);
 	I_ATTR(QByteArray, m_maintenanceDatabaseNameAttrPtr);
 	I_ATTR(QByteArray, m_databaseCreationScriptPathAttrPtr);
-	I_ATTR(QByteArray, m_tablesCreationScriptPathAttrPtr);
+	I_REF(ifile::IFileNameParam, m_migrationFolderPathAttrPtr);
 	I_ATTR(int, m_autoCreateDatabaseAttrPtr);
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_portAttrPtr);
