@@ -24,4 +24,6 @@ function(imtcore_generate_tests pathToClassTest)
 		DEPENDS ${GENERATE_H_TESTS_FILE}
 	        )
 
+	target_sources(${PROJECT_NAME} PRIVATE ${GENERATE_H_TESTS_FILE})
+
 endfunction(imtcore_generate_tests)
