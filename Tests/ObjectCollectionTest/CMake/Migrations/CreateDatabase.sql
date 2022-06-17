@@ -1,4 +1,4 @@
-CREATE DATABASE lisa
+CREATE DATABASE tests
     WITH 
     OWNER = postgres
     ENCODING = 'UTF8'

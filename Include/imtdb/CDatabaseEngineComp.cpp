@@ -233,9 +233,10 @@ bool CDatabaseEngineComp::CreateDatabase() const
 	retVal = maintainanceDb.open();
 	if (retVal){
 		QString queryString;
+		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
 
-		if (m_databaseCreationScriptPathAttrPtr.IsValid()){
-			QFile scriptFile(*m_databaseCreationScriptPathAttrPtr);
+		if (QFile(folder.filePath("CreateDatabase.sql")).exists()){
+			QFile scriptFile(folder.filePath("CreateDatabase.sql"));
 
 			scriptFile.open(QFile::ReadOnly);
 
