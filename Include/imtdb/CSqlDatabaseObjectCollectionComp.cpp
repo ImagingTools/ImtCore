@@ -373,6 +373,24 @@ void CSqlDatabaseObjectCollectionComp::SetObjectEnabled(const QByteArray& /*obje
 }
 
 
+bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
+{
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+	QByteArray resetQuery = m_objectDelegateCompPtr->CreateResetQuery(*this);
+	if (resetQuery.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+		return false;
+	}
+	if (ExecuteTransaction(resetQuery)){
+		istd::CChangeNotifier changeNotifier(this);
+		return true;
+	}
+	return false;
+}
+
+
 // protected methods
 
 bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const

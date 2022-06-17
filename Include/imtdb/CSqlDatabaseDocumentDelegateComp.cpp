@@ -115,7 +115,6 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 	return retVal;
 }
 
-
 // protected methods
 
 bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable& object, QByteArray& data) const

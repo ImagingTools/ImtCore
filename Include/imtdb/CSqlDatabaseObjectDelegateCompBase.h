@@ -41,6 +41,8 @@ public:
 				const QSqlRecord& record,
 				imtbase::IMetaInfoCreator::MetaInfoPtr& objectMetaInfoPtr,
 				imtbase::IMetaInfoCreator::MetaInfoPtr& collectionItemMetaInfoPtr) const override;
+	virtual QByteArray CreateResetQuery(
+				const imtbase::IObjectCollection& collection) const override;
 
 protected:
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;

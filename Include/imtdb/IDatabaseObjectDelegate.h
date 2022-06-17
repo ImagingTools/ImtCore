@@ -91,6 +91,12 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const = 0;
+
+	/**
+	*	Create query for the reset collection.
+	*/
+	virtual QByteArray CreateResetQuery(
+				const imtbase::IObjectCollection& collection) const = 0;
 };
 
 

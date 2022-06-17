@@ -83,6 +83,9 @@ public:
 	virtual const istd::IChangeable * GetObjectPtr(const QByteArray & objectId) const override;
 	virtual bool GetObjectData(const QByteArray & objectId, DataPtr & dataPtr) const override;
 	virtual void SetObjectEnabled(const QByteArray & objectId, bool isEnabled = true) override;
+
+	// reimplemented (istd::IChangeable)
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	
 protected:
 	struct ObjectInfo

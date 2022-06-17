@@ -333,17 +333,6 @@ bool CDatabaseEngineComp::Migration() const
 					SendErrorMessage(0, QString("Migration is failed: %1").arg(sqlError.text()), "Database engine");
 					return false;
 				}
-				if (QFile::exists(folder.filePath("InitData.sql"))){
-					ExecSqlQueryFromFile(folder.filePath("InitData.sql").toLocal8Bit(), &sqlError);
-					if (sqlError.type() != QSqlError::NoError){
-						qCritical() << __FILE__ << __LINE__
-									<< "\n\t| Unable to initialization data of database"
-									<< "\n\t| Error: " << sqlError.text();
-
-						SendErrorMessage(0, QString("Initialization data is failed: %1").arg(sqlError.text()), "Database engine");
-						return false;
-					}
-				}
 			}
 			else{
 				ExecSqlQueryFromFile(folder.filePath("migration_"+QString::number(index)+".sql").toLocal8Bit(), &sqlError);

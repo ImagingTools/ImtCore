@@ -117,6 +117,15 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
 }
 
 
+QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(
+			const imtbase::IObjectCollection& collection) const
+{
+	QByteArray retVal = QString("DELETE FROM %1;").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
+
+	return retVal;
+}
+
+
 // protected methods
 
 idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfo(const QByteArray& /*typeId*/) const

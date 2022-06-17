@@ -44,8 +44,6 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
-	virtual QByteArray CreateResetQuery(
-				const imtbase::IObjectCollection& collection) const;
 protected:
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
