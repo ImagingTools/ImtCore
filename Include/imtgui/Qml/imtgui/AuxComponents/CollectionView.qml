@@ -163,6 +163,13 @@ Rectangle {
     function dialogResult(parameters) {
         console.log("CollectionView dialogResult", parameters["status"]);
 
+
+//        if (parameters["dialog"] === "ErrorDialog"){
+//            if (parameters["status"] == "exit"){
+
+//            }
+//        }
+
         if (parameters["status"] === "yes") {
 
             if (collectionViewContainer.gqlModelRemove !== "") {

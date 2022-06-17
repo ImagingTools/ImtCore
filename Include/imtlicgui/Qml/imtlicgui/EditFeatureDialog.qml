@@ -65,9 +65,9 @@ Rectangle {
 
         var dataModelLocal = containerFeatureEdit.collectionViewFeatures.collectionViewModel.GetData("data");
 
-        if (id[0] !== "#") {
-            id = "#" + id;
-        }
+//        if (id[0] !== "#") {
+//            id = "#" + id;
+//        }
 
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
 
@@ -90,7 +90,7 @@ Rectangle {
     function generateKey() {
         console.log("EditFeatureDialog generateKey...");
         if (tfcFeatureIdText.text === "" && tfcFeatureNameText.text !== "") {
-            var key = "#" + tfcFeatureNameText.text;
+            var key = tfcFeatureNameText.text;
             key = key.replace(/\s+/g, '');
             tfcFeatureIdText.text = key;
         }
@@ -346,9 +346,9 @@ Rectangle {
             KeyNavigation.tab: cancelButton;
 
             onClicked: {
-                if (tfcFeatureIdText.text[0] !== "#") {
-                    tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
-                }
+//                if (tfcFeatureIdText.text[0] !== "#") {
+//                    tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
+//                }
 
                 containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
                 containerFeatureEdit.exit("ok");

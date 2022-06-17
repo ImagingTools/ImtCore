@@ -44,6 +44,7 @@
 	<file alias="imtgui/AuxComponents/TopPanelDecorator.qml">Qml/imtgui/AuxComponents/TopPanelDecorator.qml</file>
 	<file alias="imtgui/AuxComponents/TopRightPanelDecorator.qml">Qml/imtgui/AuxComponents/TopRightPanelDecorator.qml</file>
 	<file alias="imtgui/AuxComponents/TopCenterPanelDecorator.qml">Qml/imtgui/AuxComponents/TopCenterPanelDecorator.qml</file>
+	<file alias="imtgui/AuxComponents/SettingsButton.qml">Qml/imtgui/AuxComponents/SettingsButton.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

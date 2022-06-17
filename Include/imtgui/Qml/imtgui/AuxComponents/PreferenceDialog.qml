@@ -460,6 +460,13 @@ Rectangle {
                            dependentPanelLoader.item.itemId = itemId;
                            dependentPanelLoader.item.value = model.Value;
                        }
+                       else if (componentType === "Button"){
+                           dependentPanelLoader.source = "SettingsButton.qml";
+                           dependentPanelLoader.item.width = dependentPanelColumn.width / 3;
+                           dependentPanelLoader.item.itemId = itemId;
+//                           dependentPanelLoader.item.textButton = model.Value;
+                           dependentPanelLoader.item.value = model.Value;
+                       }
 
                        dependentPanelLoader.item.itemId = itemId;
                        dependentPanelLoader.item.rootItem = preferenceContainer;

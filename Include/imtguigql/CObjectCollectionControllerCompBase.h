@@ -23,7 +23,7 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
-		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", true, "HeadersProvider");
+		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 

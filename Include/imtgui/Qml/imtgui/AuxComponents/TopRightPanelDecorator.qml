@@ -6,10 +6,7 @@ import imtgui 1.0
 Rectangle {
     id: topRightPanelDecorator;
 
-    width: parent.width;
-    height: parent.height;
-
-    color: "transparent";
+   // color: "transparent";
 
     radius: 7;
 
@@ -18,9 +15,9 @@ Rectangle {
     }
 
     Row {
+        id: container;
         anchors.leftMargin: 10;
         anchors.horizontalCenter: parent.horizontalCenter;
-//        anchors.verticalCenter: parent.verticalCenter;
 
         height: parent.height;
         spacing: 5;

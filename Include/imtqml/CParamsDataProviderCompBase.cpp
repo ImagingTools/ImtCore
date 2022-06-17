@@ -89,6 +89,9 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 		case CT_COMBOBOX:
 			componentType = "ComboBox";
 		break;
+		case CT_BUTTON:
+			componentType = "Button";
+		break;
 	}
 
 	rootModelPtr->SetData("ComponentType", componentType);
@@ -127,7 +130,13 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 		}
 		else if (type == CT_TEXT_INPUT){
 			iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
-
+			if (sourcePtr != nullptr){
+				QString value = sourcePtr->GetText();
+				rootModelPtr->SetData("Value", value);
+			}
+		}
+		else if (type == CT_BUTTON){
+			iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
 			if (sourcePtr != nullptr){
 				QString value = sourcePtr->GetText();
 				rootModelPtr->SetData("Value", value);

@@ -168,23 +168,23 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 		childs->SetData("Value", name);
 
-		index = metaInfoModel->InsertNewItem();
-		if (translatorPtr != nullptr){
-			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Account Type");
-		}
-		else{
-			metaInfoModel->SetData("Name", QT_TR_NOOP("Account Type"), index);
-		}
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+//		index = metaInfoModel->InsertNewItem();
+//		if (translatorPtr != nullptr){
+//			errorMessage = translatorPtr->translate("imtlicgql::CAccountCollectionControllerComp", "Account Type");
+//		}
+//		else{
+//			metaInfoModel->SetData("Name", QT_TR_NOOP("Account Type"), index);
+//		}
+//		childs = metaInfoModel->AddTreeModel("Childs", index);
 
-		imtauth::IAccountInfo::AccountType type = accountInfoPtr->GetAccountType();
+//		imtauth::IAccountInfo::AccountType type = accountInfoPtr->GetAccountType();
 
-		if (type == imtauth::IAccountInfo::AT_COMPANY){
-			childs->SetData("Value", "Company");
-		}
-		else{
-			childs->SetData("Value", "Private");
-		}
+//		if (type == imtauth::IAccountInfo::AT_COMPANY){
+//			childs->SetData("Value", "Company");
+//		}
+//		else{
+//			childs->SetData("Value", "Private");
+//		}
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}

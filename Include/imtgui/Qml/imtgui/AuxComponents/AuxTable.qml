@@ -119,6 +119,8 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: parent.left;
+                    anchors.right: iconSort.left;
+//                    anchors.rightMargin: 5;
                     anchors.leftMargin: 8;
 
                     font.pixelSize: Style.fontSize_common * deleg.scale;
@@ -126,6 +128,7 @@ Item {
                     font.bold: true;
                     color: Style.textColor;
                     text: model.Name;
+                    elide: Text.ElideRight;
                 }
 
                 Image {

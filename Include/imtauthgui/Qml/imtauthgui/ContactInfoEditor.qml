@@ -54,8 +54,8 @@ Rectangle {
         }
         else {
             if(containerContactInfo.operation === "New"){
-                cbTypeAccount.currentIndex = 0;
-                containerContactInfo.accountType = "private";
+                //cbTypeAccount.currentIndex = 0;
+                containerContactInfo.accountType = "company";
 
                 containerContactInfo.contactInfoModel = model.AddTreeModel("data");
                 containerContactInfo.contactInfoModel.SetData("Email","")
@@ -64,7 +64,7 @@ Rectangle {
                 containerContactInfo.contactInfoModel.SetData("NickName","")
                 containerContactInfo.contactInfoModel.SetData("AccountName","")
                 containerContactInfo.contactInfoModel.SetData("AccountDescription","")
-                containerContactInfo.contactInfoModel.SetData("AccountType", "private")
+                containerContactInfo.contactInfoModel.SetData("AccountType", "company")
 
                 containerContactInfo.contactInfoModel.SetData("AccountTypeComboBoxIndex", cbTypeAccount.currentIndex)
 
@@ -103,9 +103,9 @@ Rectangle {
         tfcAccountName.text = containerContactInfo.contactInfoModel.GetData("AccountName");
         tfcAccountDescription.text = containerContactInfo.contactInfoModel.GetData("AccountDescription");
 
-        cbTypeAccount.currentIndex = containerContactInfo.contactInfoModel.GetData("AccountTypeComboBoxIndex");
-        var accountType = containerContactInfo.contactInfoModel.GetData("AccountType");
-        containerContactInfo.accountType = accountType;
+        //cbTypeAccount.currentIndex = containerContactInfo.contactInfoModel.GetData("AccountTypeComboBoxIndex");
+//        var accountType = containerContactInfo.contactInfoModel.GetData("AccountType");
+//        containerContactInfo.accountType = accountType;
     }
 
     function menuActivated(menuId) {
@@ -277,69 +277,76 @@ Rectangle {
 //                }
 //            }
 
-            Text {
-                id: titleAccountType;
+//            Text {
+//                id: titleAccountType;
 
-                text: qsTr("Account type");
-                color: Style.textColor;
+//                text: qsTr("Account type");
+//                color: Style.textColor;
 
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+//                font.family: Style.fontFamily;
+//                font.pixelSize: Style.fontSize_common;
+//            }
+
+            Item {
+                id: cbTypeAccount;
+
+                property string currentText: "Company";
+                property int currentIndex: 1;
             }
 
-            ComboBox {
-                id: cbTypeAccount;
-                z: 10;
+//            ComboBox {
+//                id: cbTypeAccount;
+//                z: 10;
 
-                width: parent.width;
-                height: 23;
+//                width: parent.width;
+//                height: 23;
 
-                radius: 3;
-                model: typeAccountModel;
-                currentText: cbTypeAccount.currentIndex === 0 ? "Private" : "Company";
-                textCentered: false;
+//                radius: 3;
+//                model: typeAccountModel;
+//                currentText: cbTypeAccount.currentIndex === 0 ? "Private" : "Company";
+//                textCentered: false;
 
-                //borderColor: Style.alternateBaseColor;
+//                //borderColor: Style.alternateBaseColor;
 
-                property bool wasFocus: false;
+//                property bool wasFocus: false;
 
-                onCurrentIndexChanged: {
-                    console.log("cbTypeAccount onCurrentIndexChanged", cbTypeAccount.currentIndex);
+//                onCurrentIndexChanged: {
+//                    console.log("cbTypeAccount onCurrentIndexChanged", cbTypeAccount.currentIndex);
 
-                    var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).name.toLowerCase();
-                    console.log("accountType", accountType);
-                    containerContactInfo.accountType = accountType;
+//                    var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).name.toLowerCase();
+//                    console.log("accountType", accountType);
+//                    containerContactInfo.accountType = accountType;
 
-                    if (!containerContactInfo.contactInfoModel){
-                        return;
-                    }
-
-                    containerContactInfo.contactInfoModel.SetData("AccountType", accountType);
-                    containerContactInfo.contactInfoModel.SetData("AccountTypeComboBoxIndex", cbTypeAccount.currentIndex)
-//                    if (containerContactInfo.operation !== "New" && !cbTypeAccount.wasFocus){
-//                        cbTypeAccount.wasFocus = true;
+//                    if (!containerContactInfo.contactInfoModel){
 //                        return;
 //                    }
-//                    containerContactInfo.wasChanged = true;
-                }
 
-                onClicked: {
-                    cbTypeAccount.focus = true;
-                    cbTypeAccount.openContextMenu();
-                }
+//                    containerContactInfo.contactInfoModel.SetData("AccountType", accountType);
+//                    containerContactInfo.contactInfoModel.SetData("AccountTypeComboBoxIndex", cbTypeAccount.currentIndex)
+////                    if (containerContactInfo.operation !== "New" && !cbTypeAccount.wasFocus){
+////                        cbTypeAccount.wasFocus = true;
+////                        return;
+////                    }
+////                    containerContactInfo.wasChanged = true;
+//                }
 
-                onDialogResultChanged: {
-                    cbTypeAccount.focus = true;
-                }
+//                onClicked: {
+//                    cbTypeAccount.focus = true;
+//                    cbTypeAccount.openContextMenu();
+//                }
 
-                Keys.onPressed: {
-                    if (event.key === Qt.Key_Space){
-                        cbTypeAccount.clicked();
-                    }
-                }
+//                onDialogResultChanged: {
+//                    cbTypeAccount.focus = true;
+//                }
 
-                KeyNavigation.tab: rectTfcAccountName;
-            }
+//                Keys.onPressed: {
+//                    if (event.key === Qt.Key_Space){
+//                        cbTypeAccount.clicked();
+//                    }
+//                }
+
+//                KeyNavigation.tab: rectTfcAccountName;
+//            }
 
             Text {
                 id: titleAccountName;
@@ -1225,13 +1232,13 @@ Rectangle {
 
                         dataModelLocal = dataModelLocal.GetData("item");
 
-                        var type = dataModelLocal.GetData("AccountType");
+//                        var type = dataModelLocal.GetData("AccountType");
 
-                        if (type === "private"){
-                            dataModelLocal.SetData("AccountTypeComboBoxIndex", 0);
-                        } else {
-                            dataModelLocal.SetData("AccountTypeComboBoxIndex", 1);
-                        }
+//                        if (type === "private"){
+//                            dataModelLocal.SetData("AccountTypeComboBoxIndex", 0);
+//                        } else {
+//                            dataModelLocal.SetData("AccountTypeComboBoxIndex", 1);
+//                        }
 
                         containerContactInfo.contactInfoModel = dataModelLocal;
                         containerContactInfo.model.SetExternTreeModel('data', containerContactInfo.contactInfoModel)
@@ -1346,7 +1353,7 @@ Rectangle {
 //                                var accName = containerContactInfo.contactInfoModel.GetData("AccountName");
 //                                containerContactInfo.rootItem.updateTitleTab(containerContactInfo.itemId, accName);
 //                            }
-                            //containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                            containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                         }
                     }
                 }

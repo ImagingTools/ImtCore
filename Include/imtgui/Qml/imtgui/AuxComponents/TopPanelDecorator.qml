@@ -52,6 +52,9 @@ Item {
         }
 
         Component.onCompleted: {
+            console.log("rightPanel");
+            console.log("rightPanel.width", rightPanel.width);
+            console.log("rightPanel.height", rightPanel.height);
             rightPanel.decoratorSource = "TopRightPanelDecorator.qml";
         }
 

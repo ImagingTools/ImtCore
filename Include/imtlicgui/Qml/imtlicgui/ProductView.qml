@@ -218,17 +218,6 @@ Item {
         }
     }
 
-//    function openMessageDialog(nameDialog, message) {
-//        var source = "AuxComponents/MessageDialog.qml";
-//        var parameters = {};
-//        parameters["resultItem"] = productsCollectionViewContainer;
-//        parameters["noButtonVisible"] = false;
-//        parameters["textOkButton"] = "Ok";
-//        parameters["message"] = message;
-//        parameters["nameDialog"] = nameDialog;
-//        thubnailDecoratorContainer.openDialog(source, parameters);
-//    }
-
     function makeCommandActive(commandId){
         productsCollectionViewContainer.rootItem.setModeMenuButton(commandId, "Normal");
     }
@@ -288,7 +277,7 @@ Item {
 //            }
 
             if (tfcProductId.text === ""){
-                productsCollectionView.openMessageDialog("Error dialog", qsTr("Id can't be empty!"), "ErrorDialog");
+                productsCollectionView.openMessageDialog(qsTr("Error dialog"), qsTr("Id can't be empty!"), "ErrorDialog");
             }
             else{
                 let name = productsCollectionViewContainer.checkLicenses();
@@ -297,7 +286,7 @@ Item {
                 }
                 else{
                     let message = name + qsTr(" has an invalid id!");
-                    productsCollectionView.openMessageDialog("Error dialog", message, "ErrorDialog");
+                    productsCollectionView.openMessageDialog(qsTr("Error dialog"), message, "ErrorDialog");
                 }
             }
         }
@@ -579,7 +568,7 @@ Item {
                         productsCollectionViewContainer.operation = "Open";
                     }
 //                    console.log("productsCollectionViewContainer.operation", productsCollectionViewContainer.operation);
-//                    productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                    productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                 }
             }
         }

@@ -5,8 +5,6 @@ import imtqml 1.0
 Rectangle {
     id: topRightPanel;
 
-    height: 55;
-    width: 100;
 
     property Item topPanel;
 
@@ -25,8 +23,14 @@ Rectangle {
 
         onItemChanged: {
             if (decoratorLoader.item){
-                decoratorLoader.item.width = parent.width;
-                decoratorLoader.item.height = parent.height;
+                console.log("topRightPanel");
+                console.log("topRightPanel.width", topRightPanel.width);
+                console.log("topRightPanel.height", topRightPanel.height);
+                decoratorLoader.item.width = topRightPanel.width;
+                decoratorLoader.item.height = topRightPanel.height;
+
+                console.log("decoratorLoader.item.width", decoratorLoader.item.width);
+                console.log("decoratorLoader.item.height", decoratorLoader.item.height);
             }
         }
     }

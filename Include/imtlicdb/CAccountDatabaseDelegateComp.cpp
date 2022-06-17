@@ -29,6 +29,11 @@ istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(const QB
 		return nullptr;
 	}
 
+	QByteArray accountId;
+	if (record.contains("Id")){
+		accountId = record.value("Id").toByteArray();
+	}
+
 	if (record.contains("Name")){
 		QString accountName = record.value("Name").toString();
 
@@ -41,18 +46,55 @@ istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(const QB
 		accountInfoPtr->SetAccountDescription(accountDescription);
 	}
 
+	imtauth::CContactInfo contactInfo;
 	if (record.contains("Type")){
 		QString type = record.value("Type").toString();
 
+		QByteArray accountInfo;
 		if (type == "private"){
 			accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_PERSON);
+
+			accountInfo = QString("SELECT * from PrivateAccounts WHERE AccountId = '%1'").arg(qPrintable(accountId)).toUtf8();
 		}
-		else {
+		else{
 			accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_COMPANY);
+
+			accountInfo = QString("SELECT * from CompanyAccounts WHERE AccountId = '%1'").arg(qPrintable(accountId)).toUtf8();
 		}
+
+//		QSqlError error;
+//		QSqlQuery accountInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(accountInfo, &error, true);
+
+//		if (error.type() != QSqlError::NoError){
+//			return nullptr;
+//		}
+
+//		QSqlRecord accountInfoRecord = accountInfoQuery.record();
+
+//		if (accountInfoRecord.contains("GenderType")){
+//			QString genderType = accountInfoRecord.value("GenderType").toString();
+//			if (genderType == "male"){
+//				contactInfo.SetGenderType(imtauth::IContactInfo::GT_MALE);
+//			}
+//			else if (genderType == "female"){
+//				contactInfo.SetGenderType(imtauth::IContactInfo::GT_FEMALE);
+//			}
+//			else if (genderType == "diverse"){
+//				contactInfo.SetGenderType(imtauth::IContactInfo::GT_DIVERSE);
+//			}
+//		}
+//		else if (accountInfoRecord.contains("Nickname")){
+//			QString nickname = accountInfoRecord.value("GenderType").toString();
+//			contactInfo.SetNameField(imtauth::IContactInfo::NFT_NICKNAME, nickname);
+//		}
+//		else if (accountInfoRecord.contains("BirthDay")){
+//			QDate birthDay = accountInfoRecord.value("BirthDay").toDate();
+//			contactInfo.SetBirthday(birthDay);
+//		}
+//		else if (accountInfoRecord.contains("Country")){
+//			QString country = accountInfoRecord.value("Country").toString();
+//		}
 	}
-	
-	imtauth::CContactInfo contactInfo;
 
 	if (record.contains("OwnerMail")){
 		contactInfo.SetEmail(record.value("OwnerMail").toString());
@@ -109,12 +151,27 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAccountDatabaseDelegateComp::Cre
 	QString mail;
 	QString lastName;
 	QString firstName;
+	QByteArray gender;
+	QDate birthDay;
 
 	const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
 	if (ownerPtr != nullptr){
 		mail = ownerPtr->GetMail();
 		lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
 		firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
+
+		imtauth::IContactInfo::GenderType genderType = ownerPtr->GetGenderType();
+		if (genderType == imtauth::IContactInfo::GenderType::GT_MALE){
+			gender = "male";
+		}
+		else if (genderType == imtauth::IContactInfo::GenderType::GT_FEMALE){
+			gender = "female";
+		}
+		else if (genderType == imtauth::IContactInfo::GenderType::GT_DIVERSE){
+			gender = "diverse";
+		}
+
+		birthDay = ownerPtr->GetBirthday();
 	}
 
 	NewObjectQuery retVal;
@@ -128,6 +185,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAccountDatabaseDelegateComp::Cre
 							.arg(lastName)
 							.arg(firstName)
 							.toLocal8Bit();
+
+//	retVal.query += QString("INSERT INTO PrivateAccounts(AccountId, GenderType, Nickname, BirthDay) VALUES('%1', '%2', '%3', '%4');")
+//							.arg(qPrintable(accountId))
+//							.arg(qPrintable(gender))
+//							.arg(accountDescription)
+//							.arg(birthDay.toString(Qt::ISODate))
+//							.toLocal8Bit();
 
 	retVal.objectName = accountName;
 

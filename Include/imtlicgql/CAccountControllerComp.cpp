@@ -152,7 +152,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			if (accountType == "company"){
 				accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_COMPANY);
 			}
-			else if (accountType == "private")  {
+			else if (accountType == "private"){
 				accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_PERSON);
 			}
 		}

@@ -711,7 +711,7 @@ Item {
                         }
 //                        featureCollectionViewContainer.wasChanged = false;
 
-//                        featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
+                        featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                     }
                 }
             }
