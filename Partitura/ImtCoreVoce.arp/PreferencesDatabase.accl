@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5004" Description="ACF"/>
+            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="AutoPersistence" X="725" Y="250" Note=""/>
+        <Element ComponentName="CompactXmlFileSerializer" X="1025" Y="250" Note=""/>
+        <Element ComponentName="Database" X="975" Y="450" Note=""/>
+        <Element ComponentName="DatabaseAccessSettings" X="1000" Y="575" Note=""/>
+        <Element ComponentName="Preferences" X="725" Y="350" Note=""/>
+        <Element ComponentName="PreferencesFilePath" X="725" Y="150" Note=""/>
+        <Element ComponentName="SystemLocation" X="725" Y="50" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
