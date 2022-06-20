@@ -152,8 +152,8 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			const QString& description,
 			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
-			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
-			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return nullptr;
@@ -177,6 +177,19 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (ExecuteTransaction(objectQuery.query)){
+		if (dataMetaInfoPtr != nullptr){
+			QByteArray metaQuery = m_objectDelegateCompPtr->CreateDataMetaInfoQuery(*this, objectId, dataMetaInfoPtr);
+			if(!metaQuery.isEmpty()){
+				ExecuteTransaction(metaQuery);
+			}
+		}
+		if (collectionItemMetaInfoPtr != nullptr){
+			QByteArray collectionItemMetaQuery = m_objectDelegateCompPtr->CreateCollectionItemMetaInfoQuery(*this, objectId, collectionItemMetaInfoPtr);
+			if(!collectionItemMetaQuery.isEmpty()){
+				ExecuteTransaction(collectionItemMetaQuery);
+			}
+		}
+
 		return objectId;
 	}
 	else {

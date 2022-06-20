@@ -42,7 +42,15 @@ public:
 				imtbase::IMetaInfoCreator::MetaInfoPtr& objectMetaInfoPtr,
 				imtbase::IMetaInfoCreator::MetaInfoPtr& collectionItemMetaInfoPtr) const override;
 	virtual QByteArray CreateResetQuery(
-				const imtbase::IObjectCollection& collection) const override;
+				const imtbase::IObjectCollection& collection) const override;	
+	virtual QByteArray CreateDataMetaInfoQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr) const override;
+	virtual QByteArray CreateCollectionItemMetaInfoQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const override;
 
 protected:
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;

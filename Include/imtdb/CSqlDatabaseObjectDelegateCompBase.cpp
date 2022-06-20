@@ -126,6 +126,28 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(
 }
 
 
+QByteArray CSqlDatabaseObjectDelegateCompBase::CreateDataMetaInfoQuery(
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId,
+		const idoc::IDocumentMetaInfo* dataMetaInfoPtr) const
+{
+	QByteArray retVal;
+
+	return retVal;
+}
+
+
+QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery(
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId,
+		const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const
+{
+	QByteArray retVal;
+
+	return retVal;
+}
+
+
 // protected methods
 
 idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfo(const QByteArray& /*typeId*/) const

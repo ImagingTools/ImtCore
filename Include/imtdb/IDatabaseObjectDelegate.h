@@ -97,6 +97,22 @@ public:
 	*/
 	virtual QByteArray CreateResetQuery(
 				const imtbase::IObjectCollection& collection) const = 0;
+
+	/**
+	*	Create query for the set meta-information for the data content sql collection.
+	*/
+	virtual QByteArray CreateDataMetaInfoQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr) const = 0;
+
+	/**
+	*	Create query for the set meta-information for the sql collection item.
+	*/
+	virtual QByteArray CreateCollectionItemMetaInfoQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const = 0;
 };
 
 
