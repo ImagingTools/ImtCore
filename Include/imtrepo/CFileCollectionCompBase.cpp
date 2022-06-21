@@ -163,12 +163,8 @@ QByteArray CFileCollectionCompBase::InsertFile(
 
 	QWriteLocker locker(&m_filesLock);
 
-	if (IsObjectIdUsed(proposedObjectId)){
-		return emptyId;
-	}
-
 	// Generate unique file-ID accroding to \c proposedObjectId variable provided by caller:
-	QByteArray fileId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
+	QByteArray fileId = (IsObjectIdUsed(proposedObjectId) || proposedObjectId.isEmpty()) ? QUuid::createUuid().toByteArray() : proposedObjectId;
 
 	// Generate teraget absolute file path for the data file:
 	QString targetFilePath = CalculateTargetFilePath(localFilePath, objectName, typeId);
