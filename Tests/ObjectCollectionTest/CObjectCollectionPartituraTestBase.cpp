@@ -1287,6 +1287,8 @@ void CObjectCollectionPartituraTestBase::cleanupTestCase()
 		if (databaseEnginePtr != nullptr){
 			QSqlError sqlError;
 			QSqlQuery sqlQuery = databaseEnginePtr->ExecSqlQuery(QByteArray("DELETE FROM public.tests CASCADE;"), &sqlError);
+			QSqlQuery sqlQuery2 = databaseEnginePtr->ExecSqlQuery(QByteArray("DROP DATABASE tests;"), &sqlError);
+
 		}
 	}
 	m_typeIdObjectCollection.clear();

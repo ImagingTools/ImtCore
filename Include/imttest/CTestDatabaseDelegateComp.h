@@ -44,6 +44,14 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
+	virtual QByteArray CreateDataMetaInfoQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr) const override;
+	virtual QByteArray CreateCollectionItemMetaInfoQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const override;
 protected:
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)

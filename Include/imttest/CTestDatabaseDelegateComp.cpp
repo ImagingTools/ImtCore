@@ -247,6 +247,48 @@ bool CTestDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& re
 	return true;
 }
 
+QByteArray CTestDatabaseDelegateComp::CreateDataMetaInfoQuery(const imtbase::IObjectCollection &collection, const QByteArray &objectId, const idoc::IDocumentMetaInfo *dataMetaInfoPtr) const
+{
+	if(dataMetaInfoPtr != nullptr && !objectId.isEmpty()){
+		QString name = dataMetaInfoPtr->GetMetaInfo(imttest::ITestInfo::MIT_TEST_NAME).toString();
+		QString description = dataMetaInfoPtr->GetMetaInfo(imttest::ITestInfo::MIT_TEST_DESCRIPTION).toString();
+		QDateTime added = dataMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME).toDateTime();
+		QString str_Added = added.isValid() ? added.toString("yyyy-MM-dd hh:mm:ss") : "null";
+		QDateTime lastModificationTime = dataMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime();
+		QString str_lastModificationTime = lastModificationTime.isValid() ? lastModificationTime.toString("yyyy-MM-dd hh:mm:ss") : "null";
+		QByteArray retVal = QString("UPDATE Tests SET Name = '%1', Description = '%2', Added = %3, LastModified = %4 WHERE Id ='%5';")
+								.arg(name)
+								.arg(description)
+								.arg(str_Added)
+								.arg(str_lastModificationTime)
+								.arg(qPrintable(objectId)).toLocal8Bit();
+
+		return retVal;
+	}
+	return QByteArray();
+}
+
+QByteArray CTestDatabaseDelegateComp::CreateCollectionItemMetaInfoQuery(const imtbase::IObjectCollection &collection, const QByteArray &objectId, const idoc::IDocumentMetaInfo *collectionItemMetaInfoPtr) const
+{
+	if(collectionItemMetaInfoPtr != nullptr && !objectId.isEmpty()){
+		QString name = collectionItemMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString();
+		QString description = collectionItemMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+		QDateTime added = collectionItemMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME).toDateTime();
+		QString str_Added = added.isValid() ? added.toString("yyyy-MM-dd hh:mm:ss") : "null";
+		QDateTime lastModificationTime = collectionItemMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime();
+		QString str_lastModificationTime = lastModificationTime.isValid() ? lastModificationTime.toString("yyyy-MM-dd hh:mm:ss") : "null";
+		QByteArray retVal = QString("UPDATE Tests SET Name = '%1', Description = '%2', Added = %3, LastModified = %4 WHERE Id ='%5';")
+								.arg(name)
+								.arg(description)
+								.arg(str_Added)
+								.arg(str_lastModificationTime)
+								.arg(qPrintable(objectId)).toLocal8Bit();
+
+		return retVal;
+	}
+	return QByteArray();
+}
+
 
 
 
