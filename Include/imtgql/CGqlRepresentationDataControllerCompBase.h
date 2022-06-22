@@ -13,7 +13,9 @@ namespace imtgql
 {
 
 
-class CGqlRepresentationDataControllerCompBase: public ilog::CLoggerComponentBase, public imtgql::IGqlRepresentationDataController
+class CGqlRepresentationDataControllerCompBase:
+			public ilog::CLoggerComponentBase,
+			virtual public imtgql::IGqlRepresentationDataController
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -21,7 +23,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(CGqlRepresentationDataControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRepresentationDataController);
 		I_ASSIGN_MULTI_0(m_modelIdsCompPtr, "ModelIds", "List of model-IDs for GraphQL-response", true);
-		I_ASSIGN(m_databaseEngineCompPtr, "Database", "Database for working", false, "IDataBaseEngine");
+        I_ASSIGN(m_databaseEngineCompPtr, "Database", "Database for working", false, "IDatabaseEngine");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)

@@ -55,8 +55,7 @@ void CObserverQmlComp::OnComponentCreated()
 		if (m_pagesDataProviderCompPtr.IsValid()){
 			QList<imtgql::CGqlObject> params;
 			imtgql::CGqlObject *inputParams = new imtgql::CGqlObject("input");
-			inputParams->InsertField("LanguageId");
-			inputParams->InsertFieldArgument("LanguageId", "ru_RU");
+			inputParams->InsertField("LanguageId", "ru_RU");
 			params.append(*inputParams);
 			QByteArrayList fields;
 			fields.append("NetworkSettings");

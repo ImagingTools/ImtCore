@@ -557,7 +557,7 @@ void CGqlRequest::ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject 
 		}
 		else{
 			gqlObject.InsertField(key.toUtf8());
-			gqlObject.InsertFieldArgument(key.toUtf8(), object.value(key).toString().toUtf8());
+			gqlObject.InsertField(key.toUtf8(), object.value(key).toString());
 		}
 	}
 }
@@ -577,7 +577,7 @@ void CGqlRequest::SetParseObject(const QByteArray &commandId)
 	}
 	else if (m_startParams){
 		CGqlObject gqlObject(commandId);
-		if (m_activeGqlObjectPtr == nullptr){
+		if (m_activeGqlObjectPtr == nullptr || m_activeGqlObjectPtr->GetParentObject() == nullptr){
 			m_params.append(gqlObject);
 			m_activeGqlObjectPtr = &m_params[m_params.count() - 1];
 		}
@@ -599,7 +599,7 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 		m_currentField = text;
 	}
 	else{
-		m_activeGqlObjectPtr->InsertFieldArgument(m_currentField, text);
+		m_activeGqlObjectPtr->InsertField(m_currentField, QVariant(text));
 	}
 
 }

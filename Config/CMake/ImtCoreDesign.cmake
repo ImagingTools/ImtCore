@@ -1,59 +1,3 @@
-macro(get_target_name target_name)
-	set(COMPILER_NAME "Clang")
-    if(${MSVC})
-        if(${MSVC_TOOLSET_VERSION} STREQUAL 100)
-            set(COMPILER_NAME "VC10")
-        endif()
-        if(${MSVC_TOOLSET_VERSION} STREQUAL 110)
-            set(COMPILER_NAME "VC11")
-        endif()
-
-        if(${MSVC_TOOLSET_VERSION} STREQUAL 120)
-            set(COMPILER_NAME}"VC12")
-        endif()
-
-        if(${MSVC_TOOLSET_VERSION} STREQUAL 140)
-            set(COMPILER_NAME "VC14")
-        endif()
-        if(${MSVC_TOOLSET_VERSION} STREQUAL 141)
-            set(COMPILER_NAME "VC15")
-        endif()
-        if(${MSVC_TOOLSET_VERSION} STREQUAL 142)
-            set(COMPILER_NAME "VC16")
-        endif()
-
-		if(${CMAKE_CL_64} STREQUAL 1)
-			set(COMPILER_NAME "${COMPILER_NAME}_64")
-		endif()
-
-	elseif(${APPLE})
-
-		if("${CMAKE_OSX_ARCHITECTURES}" STREQUAL "arm64")
-			set(COMPILER_NAME "${COMPILER_NAME}OSX_arm64")
-			add_compile_definitions(COMPILER_NAME=ClangOSX)
-			add_compile_definitions(PLATFORM_CODE=arm64)
-		else()
-			set(COMPILER_NAME "${COMPILER_NAME}OSX_64")
-			add_compile_definitions(COMPILER_NAME=ClangOSX)
-			add_compile_definitions(PLATFORM_CODE=x64)
-		endif()
-
-	elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-
-		if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-			set(COMPILER_NAME "GCCLinux_64")
-		else()
-			set(COMPILER_NAME "${COMPILER_NAME}_64")
-		endif()
-	endif()
-
-	message("CMAKE_SYSTEM_NAME" "${CMAKE_SYSTEM_NAME}")
-	message("CMAKE_CXX_COMPILER_ARCHITECTURE_ID " "${CMAKE_CL_64}")
-
-
-	set(${target_name} "${COMPILER_NAME}")
-endmacro()
-
 function(imt_core_get_root_dir identifier_to_use)
     set(${identifier_to_use} "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../.." PARENT_SCOPE)
 endfunction()
@@ -64,7 +8,9 @@ function(GenerateDesignTokenExt DESIGN_TOKEN_CREATOR_COMMAND_PARAM_IMAGES_INPUT_
 #----------------------------------------------------------- The DESIGN TOKEN CREATOR config
 # Setting the executable file name for specific OS
 get_target_name(TARGETNAME)
-set(COMPILER_DIR ${CMAKE_BUILD_TYPE}${TARGETNAME})
+message("GenerateDesignTokenExt ${PROJECT_NAME} TARGETNAME ${TARGETNAME}")
+
+set(COMPILER_DIR ${CMAKE_BUILD_TYPE}_${TARGETNAME})
 if (WIN32)
 	set(DESIGN_TOKEN_CREATOR_EXE "DesignTokenCreator.exe")
 else()
@@ -139,7 +85,7 @@ foreach(_file ${DESIGN_TOKEN_CREATOR_INPUT_THEME_FILES})
 	add_custom_command(
 		OUTPUT ${QRC_CPP_CURRENT_FILE}
 		COMMAND
-			${Qt5Core_RCC_EXECUTABLE}
+			Qt${QT_VERSION_MAJOR}::rcc
 		ARGS
 			-name ${LOWER_PROJECT_NAME}${CURRENT_FILE_NAME} ${QRC_QRC_CURRENT_FILE} -o ${QRC_CPP_CURRENT_FILE}
 		DEPENDS

@@ -23,7 +23,6 @@ QByteArrayList CGqlObject::GetFieldIds() const
 {
 	QByteArrayList retVal = m_emptyFields;
 	retVal += m_simpleFields.keys();
-	retVal += m_enumFields.keys();
 	retVal += m_objectFields.keys();
 	retVal += m_objectFieldsArray.keys();
 
@@ -36,9 +35,6 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 	QVariant retVal;
 	if (m_simpleFields.contains(fieldId)){
 		retVal = m_simpleFields[fieldId];
-	}
-	if (m_enumFields.contains(fieldId)){
-		retVal = m_enumFields[fieldId];
 	}
 
 	return retVal;
@@ -53,7 +49,7 @@ CGqlObject *CGqlObject::CreateFieldObject(const QByteArray& fieldId)
 	}
 
 	CGqlObject gqlObject(fieldId);
-	InsertFieldObject(gqlObject);
+	InsertField(fieldId, gqlObject);
 
 	return m_objectFields[fieldId].GetPtr();
 }
@@ -94,26 +90,35 @@ void CGqlObject::InsertField(const QByteArray &fieldId)
 	}
 }
 
-
-void CGqlObject::InsertFieldArgument(const QByteArray &fieldId, const QVariant &value)
+void CGqlObject::InsertField(const QByteArray &fieldId, const QVariant &value)
 {
 	RemoveField(fieldId);
 	m_simpleFields.insert(fieldId, value);
 }
 
 
-bool CGqlObject::InsertFieldObject(const CGqlObject& object)
+void CGqlObject::InsertField(const QByteArray &fieldId, const CGqlEnum &value)
+{
+	RemoveField(fieldId);
+	m_simpleFields.insert(fieldId, value);
+}
+
+
+void CGqlObject::InsertField(const QByteArray &fieldId, const CGqlObject& object)
 {
 	istd::TSmartPtr<CGqlObject> objectPtr(new CGqlObject());
 	*objectPtr = object;
 	objectPtr->m_parentPtr = this;
-	RemoveField(objectPtr->GetId());
-	m_objectFields.insert(objectPtr->GetId(),objectPtr);
-
-	return true;
+	QByteArray fieldIdLocal = fieldId;
+	if (fieldId.isEmpty()){
+		fieldIdLocal = objectPtr->GetId();
+	}
+	RemoveField(fieldIdLocal);
+	m_objectFields.insert(fieldIdLocal, objectPtr);
 }
 
-bool CGqlObject::InsertFieldObjectList(const QByteArray &fieldId, const QList<CGqlObject> objectList)
+
+void CGqlObject::InsertField(const QByteArray &fieldId, const QList<CGqlObject> objectList)
 {
 	QList<istd::TSmartPtr<CGqlObject>> objectPtrList;
 	for (int i = 0; i < objectList.count(); i++){
@@ -124,8 +129,6 @@ bool CGqlObject::InsertFieldObjectList(const QByteArray &fieldId, const QList<CG
 	}
 	RemoveField(fieldId);
 	m_objectFieldsArray.insert(fieldId,objectPtrList);
-
-	return true;
 }
 
 
