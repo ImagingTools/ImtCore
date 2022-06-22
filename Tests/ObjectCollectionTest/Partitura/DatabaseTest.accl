@@ -3,7 +3,7 @@
     <AcfHeader>
         <VersionInfos>
             <Version Id="0" Number="5004" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1" Number="2176" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -12,7 +12,7 @@
         <Element ComponentName="OptionsListAdapter" X="625" Y="725" Note=""/>
         <Element ComponentName="Persistence" X="1000" Y="600" Note=""/>
         <Element ComponentName="PgSqlDatabaseEngine" X="600" Y="225" Note=""/>
-        <Element ComponentName="PreferencesDatabase" X="925" Y="325" Note=""/>
+        <Element ComponentName="PreferencesDatabase" X="850" Y="325" Note=""/>
         <Element ComponentName="RelativeFileNameParam" X="625" Y="125" Note=""/>
         <Element ComponentName="Repository" X="600" Y="475" Note=""/>
         <Element ComponentName="SystemLocation" X="900" Y="125" Note=""/>

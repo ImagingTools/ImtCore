@@ -3,7 +3,7 @@
     <AcfHeader>
         <VersionInfos>
             <Version Id="0" Number="5004" Description="ACF"/>
-            <Version Id="1" Number="2174" Description="ACF-Solutions"/>
+            <Version Id="1" Number="2176" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -94,7 +94,7 @@
             </Data>
         </Element>
         <Element Id="PreferencesDatabase" PackageId="ImtCoreVoce" ComponentId="PreferencesDatabase">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfo"/>
