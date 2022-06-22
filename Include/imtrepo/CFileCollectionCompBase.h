@@ -128,7 +128,9 @@ public:
 				const QByteArray& objectTypeId = QByteArray(),
 				const QString& objectName = QString(),
 				const QString& objectDescription = QString(),
-				const QByteArray& proposedObjectId = QByteArray()) override;
+				const QByteArray& proposedObjectId = QByteArray(),
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
 	virtual bool UpdateFile(const QString& filePath, const QByteArray& objectId) override;
 
 	// reimplemented (ICollectionDataController)

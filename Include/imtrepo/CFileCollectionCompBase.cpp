@@ -17,6 +17,7 @@
 #include <ifile/CCompactXmlFileReadArchive.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtcore/Version.h>
@@ -153,7 +154,9 @@ QByteArray CFileCollectionCompBase::InsertFile(
 			const QByteArray& typeId,
 			const QString& objectName,
 			const QString& objectDescription,
-			const QByteArray& proposedObjectId)
+			const QByteArray& proposedObjectId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
 {
 	static QByteArray emptyId;
 
@@ -216,11 +219,29 @@ QByteArray CFileCollectionCompBase::InsertFile(
 			collectionItem.filePathInRepository = targetFilePath;
 			collectionItem.sourceFilePath = localFilePath;
 
-			collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
-			collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
-			collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
+			if (collectionItemMetaInfoPtr != nullptr){
+				idoc::CStandardDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfoPtr->GetMetaInfoTypes();
+				QList<int> metaInfoTypesList = metaInfoTypes.toList();
+				for (int i = 0; i < metaInfoTypesList.size(); i++){
+					QVariant valueMeta = collectionItemMetaInfoPtr->GetMetaInfo(metaInfoTypesList[i]);
+					collectionItem.metaInfo.SetMetaInfo(metaInfoTypesList[i], valueMeta);
+				}
+			}
+			else{
+				collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+				collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
+				collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
+			}
 
 			MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(workingFilePath, typeId);
+			if (dataMetaInfoPtr != nullptr){
+				idoc::CStandardDocumentMetaInfo::MetaInfoTypes dataMetaInfoTypes = dataMetaInfoPtr->GetMetaInfoTypes();
+				QList<int> dataMetaInfoTypesList = dataMetaInfoTypes.toList();
+				for (int i = 0; i < dataMetaInfoTypesList.size(); i++){
+					QVariant dataValueMeta = dataMetaInfoPtr->GetMetaInfo(dataMetaInfoTypesList[i]);
+					metaInfoPtr->SetMetaInfo(dataMetaInfoTypesList[i], dataValueMeta);
+				}
+			}
 			bool metaInfoCreated = SaveMetaInfo(*metaInfoPtr, metaInfoFilePath);
 
 			if (metaInfoCreated){
@@ -421,8 +442,8 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 			const QString& description,
 			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
-			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
-			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
 {
 	DataPtr newObjectPtr;
 
@@ -454,8 +475,8 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 			tempFilePath += workingExt.isEmpty() ? "" : "." + workingExt;
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
-				QByteArray retval = InsertFile(tempFilePath, typeId, name, description, proposedObjectId);
 
+				QByteArray retval = InsertFile(tempFilePath, typeId, name, description, proposedObjectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
 				return retval;
 			}
 			else{

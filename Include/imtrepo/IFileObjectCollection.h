@@ -81,7 +81,10 @@ public:
 				const QByteArray& objectTypeId = QByteArray(),
 				const QString& objectName = QString(),
 				const QString& objectDescription = QString(),
-				const QByteArray& proposedObjectId = QByteArray()) = 0;
+				const QByteArray& proposedObjectId = QByteArray(),
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr
+			) = 0;
 
 	/**
 		Update file in the collection.
