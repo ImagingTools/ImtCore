@@ -5,7 +5,11 @@ import imtqml 1.0
 
 Item {
     id: eventsContainer;
-    property var events: {}
+    property var events;
+
+    Component.onCompleted: {
+        eventsContainer.events = {};
+    }
 
     function sendEvent(key){
         if(key in this.events){
