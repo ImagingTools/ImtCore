@@ -21,12 +21,10 @@ namespace imtbase
 */
 class CObjectCollectionComp:
 			public icomp::CComponentBase,
-//			public CObjectCollectionBase,
 			public imtbase::TFilterableCollectionWrap<CObjectCollectionBase>
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-//	typedef CObjectCollectionBase BaseClass2;
 	typedef imtbase::TFilterableCollectionWrap <CObjectCollectionBase> BaseClass2;
 
 	I_BEGIN_COMPONENT(CObjectCollectionComp);
