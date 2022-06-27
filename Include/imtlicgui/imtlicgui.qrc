@@ -20,5 +20,6 @@
         <file alias="imtlicgui/UserView.qml">Qml/imtlicgui/UserView.qml</file>
         <file alias="imtlicgui/AdminPanelMultiDocView.qml">Qml/imtlicgui/AdminPanelMultiDocView.qml</file>
         <file alias="imtlicgui/UsersCollectionView.qml">Qml/imtlicgui/UsersCollectionView.qml</file>
+	<file alias="imtlicgui/LoadingPage.qml">Qml/imtlicgui/LoadingPage.qml</file>
     </qresource>
 </RCC>

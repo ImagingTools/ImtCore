@@ -71,14 +71,13 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		imtbase::IObjectCollection::DataPtr dataPtr;
 
 		if (!m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
-			errorMessage = QT_TR_NOOP("Unable to load an object data");
+			errorMessage = QT_TR_NOOP("Unable to load an object data!");
 			return nullptr;
 		}
 
 		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
-
 		if (packagePtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get an package info provider");
+			errorMessage = QT_TR_NOOP("Unable to get an package info provider!");
 			return nullptr;
 		}
 

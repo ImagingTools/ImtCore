@@ -375,7 +375,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 	QByteArray oldPackageId = currentPackagePtr->GetPackageId();
 	QByteArray newPackageId = newObjectName.toLocal8Bit();
 
-	QByteArray retVal = QString("UPDATE Packages SET Id ='%1', Name = '%1', LastModified = '%2' WHERE Id ='%3';")
+	QByteArray retVal = QString("UPDATE Packages SET Id = '%1', Name = '%1', LastModified = '%2' WHERE Id ='%3';")
 			.arg(newObjectName)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(oldPackageId)).toLocal8Bit();

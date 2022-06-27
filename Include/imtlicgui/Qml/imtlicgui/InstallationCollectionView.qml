@@ -18,33 +18,6 @@ Item {
 
     property string operation;
 
-    Keys.onPressed: {
-        console.log("InstallationCollectionView keys pressed")
-        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-            if (installationCollectionContainer.multiDocViewItem.tabPanel.count > 1){
-                installationCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
-                installationCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-            }
-            else{
-                thubnailDecoratorContainer.setFocusOnMenuPanel();
-            }
-        }
-        else if (event.key === Qt.Key_Up){
-            console.log('Key up was pressed');
-            installationCollectionContainer.selectedIndexDecr();
-        }
-        else if (event.key === Qt.Key_Down){
-            console.log('Key down was pressed');
-             installationCollectionContainer.selectedIndexIncr();
-        }
-        else if (event.key === Qt.Key_Return){
-            console.log('Key down was pressed');
-            installationCollectionContainer.selectItem();
-            installationCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-        }
-    }
-
     ListModel {
         id: contextMenuModel;
 
@@ -137,7 +110,7 @@ Item {
             else if (parameters["status"] === "Rename") {
 
                 prmtrs["message"] = "Please enter the name of the product: ";
-                prmtrs["nameDialog"] = "Rename Dialog";
+                prmtrs["nameDialog"] = "Rename";
                 prmtrs["typeOperation"] = "Rename";
 
                 prmtrs["startingValue"] = installationCollectionView.getNameBySelectedItem();
@@ -220,6 +193,8 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.right: installCollectionMetaInfo.left;
 
+        rootItem: installationCollectionContainer;
+
         autoRefresh: true;
 
         Component.onCompleted: {
@@ -244,7 +219,6 @@ Item {
             console.log("InstallationCollectionView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
             installationCollectionContainer.openContextMenu(item, mouseX, mouseY);
         }
-
 
         onSelectedIndexChanged: {
             installationCollectionContainer.commandsChanged("Installations")

@@ -24,7 +24,12 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	imtgql::CGqlRequest gqlRequest;
 	int errorPosition = -1;
 
-	gqlRequest.ParseQuery(request.GetBody(), errorPosition);
+	if (!gqlRequest.ParseQuery(request.GetBody(), errorPosition)){
+		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
+												.arg(qPrintable(request.GetBody()))
+												.arg(errorPosition);
+	}
+
 	QByteArray representationData;
 	bool gqlError = false;
 

@@ -28,8 +28,8 @@ Rectangle {
     property bool clickBackgroundClose: false;
     property bool centered: true;
 
-    signal okClicked(string newId, string newName);
-    signal cancelClicked();
+//    signal okClicked(string newId, string newName);
+//    signal cancelClicked();
 
     Component.onCompleted: {
         console.log("EditFeatureDialog onCompleted");
@@ -54,9 +54,9 @@ Rectangle {
         }
     }
 
-    function validateId(id) {
+    function validateId(id){
         if (id === "") {
-            return "Id can't be empty!";
+            return qsTr("Id can't be empty!");
         }
 
         if (!containerFeatureEdit.collectionViewFeatures){
@@ -64,25 +64,20 @@ Rectangle {
         }
 
         var dataModelLocal = containerFeatureEdit.collectionViewFeatures.collectionViewModel.GetData("data");
-
-//        if (id[0] !== "#") {
-//            id = "#" + id;
-//        }
-
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
 
             if (dataModelLocal.GetData("Id", i ) === id &&
                     containerFeatureEdit.collectionViewFeatures.selectedIndex !== i) {
-                return "Id already exist!";
+                return qsTr("Id already exist!");
             }
         }
 
         return "";
     }
 
-    function validateName(name) {
+    function validateName(name){
         if (name === "") {
-            return "Name can't be empty!";
+            return qsTr("Name can't be empty!");
         }
         return "";
     }
@@ -98,14 +93,14 @@ Rectangle {
 
     function exit(status) {
         var parameters  = {};
-        if (status === "ok") {
+        if (status === "ok"){
+
             parameters["newFeatureId"] = tfcFeatureIdText.text;
             parameters["newFeatureName"] = tfcFeatureNameText.text;
             parameters["loaderDialog"] = containerFeatureEdit.loaderDialog;
         }
         parameters["dialog"] = "EditFeature";
         parameters["status"] = status;
-        containerFeatureEdit.resultItem.forceActiveFocus();
         containerFeatureEdit.resultItem.dialogResult(parameters);
     }
 
@@ -237,6 +232,7 @@ Rectangle {
                 }
 
                 KeyNavigation.tab: tfcFeatureId;
+                KeyNavigation.backtab: cancelButton;
             }
         }
 
@@ -344,26 +340,21 @@ Rectangle {
             enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
 
             KeyNavigation.tab: cancelButton;
+            KeyNavigation.backtab: tfcFeatureId;
 
             onClicked: {
 //                if (tfcFeatureIdText.text[0] !== "#") {
 //                    tfcFeatureIdText.text = "#" + tfcFeatureIdText.text;
 //                }
 
-                containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
+//                containerFeatureEdit.okClicked(tfcFeatureIdText.text, tfcFeatureNameText.text);
                 containerFeatureEdit.exit("ok");
                 loaderDialog.closeItem();
             }
 
             onFocusChanged: {
                 console.log("EditFeatureDialog okButton onFocusChanged");
-
-                if (okButton.focus){
-                    okButton.highlighted = true;
-                }
-                else{
-                    okButton.highlighted = false;
-                }
+                okButton.highlighted = okButton.focus;
             }
 
             Keys.onPressed: {
@@ -392,6 +383,7 @@ Rectangle {
             backgroundColor: Style.imagingToolsGradient1;
 
             KeyNavigation.tab: containerFeatureEdit;
+            KeyNavigation.backtab: okButton;
 
             onClicked: {
                 containerFeatureEdit.exit("cancel");
@@ -402,12 +394,7 @@ Rectangle {
             onFocusChanged: {
                 console.log("EditFeatureDialog cancelButton onFocusChanged");
 
-                if (cancelButton.focus){
-                    cancelButton.highlighted = true;
-                }
-                else{
-                    cancelButton.highlighted = false;
-                }
+                cancelButton.highlighted = cancelButton.focus;
             }
 
             Keys.onPressed: {

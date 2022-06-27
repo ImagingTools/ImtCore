@@ -33,6 +33,17 @@ Rectangle {
     signal okButtonClicked();
     signal noButtonClicked();
 
+    Component.onCompleted: {
+//        yesButton.forceActiveFocus();
+    }
+
+    onFocusChanged: {
+        console.log("MessageDialog onFocusChanged", messageDialogContainer.focus);
+        if (messageDialogContainer.focus){
+            yesButton.forceActiveFocus();
+        }
+    }
+
     Keys.onPressed: {
         console.log("MessageDialog keys pressed")
         if (event.key === Qt.Key_Escape){
@@ -177,9 +188,12 @@ Rectangle {
                 onClicked: {
                     var result = messageDialogContainer.textOkButton.toLowerCase();
                     messageDialogContainer.exit(result);
-                    messageDialogContainer.okButtonClicked();
+//                    messageDialogContainer.okButtonClicked();
                     loaderDialog.closeItem();
                 }
+
+                KeyNavigation.tab: noButton;
+                KeyNavigation.backtab: noButton;
             }
 
             AuxButton {
@@ -199,9 +213,12 @@ Rectangle {
 
                 onClicked: {
                     messageDialogContainer.exit("no");
-                    messageDialogContainer.noButtonClicked();
+                    //messageDialogContainer.noButtonClicked();
                     loaderDialog.closeItem();
                 }
+
+                KeyNavigation.tab: yesButton;
+                KeyNavigation.backtab: yesButton;
             }
         }
     }

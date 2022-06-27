@@ -119,17 +119,15 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			QString& errorMessage) const
 {
 	if (!m_accountInfoFactCompPtr.IsValid()){
+		errorMessage = QObject::tr("Can not create account: %1").arg(QString(objectId));
 		return nullptr;
 	}
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
-//	objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
-
 	if (!itemData.isEmpty()){
 		imtauth::CAccountInfo *accountInfoPtr = new imtauth::CAccountInfo();
-
 		if (accountInfoPtr == nullptr){
-			errorMessage = "Unable to get an account info";
+			errorMessage = QT_TR_NOOP("Unable to get an account info!");
 			return nullptr;
 		}
 
@@ -140,6 +138,11 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			name = itemModel.GetData("AccountName").toString();
 			accountInfoPtr->SetAccountName(name);
 			objectId = name.toUtf8();
+
+			if (objectId.isEmpty()){
+				errorMessage = QT_TR_NOOP("Account name can't be empty!");
+				return nullptr;
+			}
 		}
 
 		if (itemModel.ContainsKey("AccountDescription")){
@@ -197,6 +200,8 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		return accountInfoPtr;
 	}
+
+	errorMessage = QObject::tr("Can not create account: %1").arg(QString(objectId));
 
 	return nullptr;
 }

@@ -51,7 +51,8 @@ Rectangle {
         console.log("InputDialog onFocusChanged", inputDialogContainer.focus);
 
         if (inputDialogContainer.focus){
-            tfcInputDialog.setFocus(true);
+//            tfcInputDialog.setFocus(true);
+            rectTfcInputDialog.forceActiveFocus();
         }
     }
 
@@ -162,8 +163,8 @@ Rectangle {
             }
         }
 
-        TextFieldCustom {
-            id: tfcInputDialog;
+        Rectangle {
+            id: rectTfcInputDialog;
 
             anchors.top: rectText.bottom;
             anchors.topMargin: 5;
@@ -172,9 +173,22 @@ Rectangle {
             width: dialogBody.width - 20;
             height: 30;
 
-            text: inputDialogContainer.startingValue;
+            TextFieldCustom {
+                id: tfcInputDialog;
+
+                anchors.fill: parent;
+
+                text: inputDialogContainer.startingValue;
+            }
+
+            onFocusChanged: {
+                if (rectTfcInputDialog.focus){
+                    tfcInputDialog.setFocus(true);
+                }
+            }
 
             KeyNavigation.tab: okButton;
+            KeyNavigation.backtab: cancelButton;
         }
 
         AuxButton {
@@ -204,15 +218,7 @@ Rectangle {
             }
 
             KeyNavigation.tab: cancelButton;
-
-            onFocusChanged: {
-                if (okButton.focus){
-                    okButton.highlighted = true;
-                }
-                else{
-                    okButton.highlighted = false;
-                }
-            }
+            KeyNavigation.backtab: rectTfcInputDialog;
         }
 
         AuxButton {
@@ -238,17 +244,8 @@ Rectangle {
                 inputDialogContainer.cancelButtonClicked();
                 loaderDialog.closeItem();
             }
-
-            onFocusChanged: {
-                if (cancelButton.focus){
-                    cancelButton.highlighted = true;
-                }
-                else{
-                    cancelButton.highlighted = false;
-                }
-            }
-
-            KeyNavigation.tab: tfcInputDialog;
+            KeyNavigation.tab: rectTfcInputDialog;
+            KeyNavigation.backtab: okButton;
         }
     }
 }

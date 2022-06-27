@@ -25,5 +25,9 @@ Item {
         textButton: settingsButtonContainer.value;
         borderColor: (button.highlighted || button.focus) ? Style.iconColorOnSelected : Style.buttonColor;
         backgroundColor: Style.imagingToolsGradient1;
+
+        onClicked: {
+            settingsButtonContainer.rootItem.openFileDialog();
+        }
     }
 }

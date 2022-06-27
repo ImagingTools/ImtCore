@@ -8,46 +8,345 @@ Item {
     property TreeItemModel modelTreeItems;
     property TreeItemModel modelDepends;
     property TreeItemModel productLicenseFeatures;
-    property var featuresDependencies;
+
+    property var items: [];
+//    property var featuresDependencies;
 
     Component.onCompleted: {
-        console.log( "FeaturesTreeView Component.onCompleted");
-//        featuresTreeViewContainer.loadFeaturesModel();
-//        featuresTreeViewContainer.loadDependModel();
-//        featuresTreeViewContainer.loadLicenseDependModel();
+        console.log( "FeaturesTreeView onCompleted");
     }
 
-    function hideCurrentFeatureTreeView(packageId, featureId){
-        console.log("PackageView hideCurrentFeatureTreeView");
-        //var modelItems = treeView.modelItems;
-        //let dataModelLocal = featuresTreeViewContainer.modelTreeItems;
+    onModelTreeItemsChanged: {
+        console.log( "featuresTreeViewContainer onModelTreeItemsChanged");
+//        Events.sendEvent("FeaturesTreeUpdate");
+    }
+
+    function subscribe(item){
+        console.log("FeaturesTreeView subscribe", item);
+        if (!featuresTreeViewContainer.items.includes(item)){
+            featuresTreeViewContainer.items.push(item);
+        }
+    }
+
+    function unsubscribe(item){
+        console.log("FeaturesTreeView unsubscribe", item);
+        if (featuresTreeViewContainer.items.includes(item)){
+            console.log(featuresTreeViewContainer.items);
+            const index = featuresTreeViewContainer.items.indexOf(item);
+            if (index > -1) {
+                featuresTreeViewContainer.items.splice(index, 1);
+            }
+            console.log(featuresTreeViewContainer.items);
+        }
+    }
+
+    function sendSignal(){
+        console.log("FeaturesTreeView sendSignal");
+        for (let i = 0; i < items.length; i++){
+            if (items[i] != undefined){
+                featuresTreeViewContainer.items[i].update();
+            }
+        }
+    }
+
+    function updateFeaturesDependenciesAfterPackageEditing(oldPackageId, newPackageId){
+        console.log("updateFeaturesDependenciesAfterPackageEditing", oldPackageId, newPackageId);
+
+        if (!featuresTreeViewContainer.modelDepends){
+            return;
+        }
+        console.log("1", featuresTreeViewContainer.modelDepends.toJSON());
+        let keys = featuresTreeViewContainer.modelDepends.GetKeys();
+        for (let i = 0; i < keys.length; i++){
+            let value = featuresTreeViewContainer.modelDepends.GetData(keys[i]);
+
+            let data = keys[i].split('.');
+
+            let curPackageId = data[0];
+            let curFeatureId = data[1];
+
+            if (curPackageId == oldPackageId){
+                let newKey = newPackageId + "." + curFeatureId;
+                featuresTreeViewContainer.modelDepends.SetData(newKey, value);
+                featuresTreeViewContainer.modelDepends.SetData(keys[i], "");
+                continue;
+            }
+
+            let valuesData = value.split(';');
+
+            for (let j = 0; j < valuesData.length; j++){
+                let valueData = valuesData[j].split('.');
+
+                let curDependPackageId = valueData[0];
+                let curDependFeatureId = valueData[1];
+
+                if (curDependPackageId == oldPackageId){
+                    let removeValue = curDependPackageId + '.' + curDependFeatureId;
+
+                    if (j != valuesData.length - 1){
+                        removeValue += ';';
+                    }
+                    let newValue = value.replace(removeValue, '');
+                    newValue += ';' + newPackageId + "." + curDependFeatureId;
+                    featuresTreeViewContainer.modelDepends.SetData(keys[i], newValue);
+                }
+            }
+        }
+
+        console.log("2", featuresTreeViewContainer.modelDepends.toJSON());
+    }
+
+    function updateTreeViewAfterFeatureEditing(packageId, featureOldId, featureNewId, featureNewName){
+        console.log("updateTreeViewAfterFeatureEditing", packageId, featureOldId, featureNewId, featureNewName);
         if (!featuresTreeViewContainer.modelTreeItems){
             return;
         }
 
-        for (var i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++) {
-            if (featuresTreeViewContainer.modelTreeItems.GetData("Name", i) == packageId) {
+        console.log("1", featuresTreeViewContainer.modelTreeItems.toJSON());
+        for (let i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            let curId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
+            if (curId == packageId){
+                var childModelItems = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+                if (childModelItems){
+                    for (let j = 0; j < childModelItems.GetItemsCount(); j++){
+                        let curFeatureId = childModelItems.GetData("Id", j);
+                        if (curFeatureId == featureOldId){
+                            childModelItems.SetData("Id", featureNewId, j);
+                            childModelItems.SetData("Name", featureNewName, j);
+
+                             break;
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+
+
+        console.log("2", featuresTreeViewContainer.modelTreeItems.toJSON());
+    }
+
+    function updateLicensesDependenciesAfterProductEditing(oldProductId, newProductId){
+        console.log("updateLicensesDependenciesAfterProductEditing", oldProductId, newProductId);
+        if (!featuresTreeViewContainer.productLicenseFeatures){
+            return;
+        }
+        console.log("1", featuresTreeViewContainer.productLicenseFeatures.toJSON());
+        let keys = featuresTreeViewContainer.productLicenseFeatures.GetKeys();
+        for (let i = 0; i < keys.length; i++){
+            let value = featuresTreeViewContainer.productLicenseFeatures.GetData(keys[i]);
+            let data = keys[i].split('.');
+
+            let curProductId = data[0];
+            let curLicenseId = data[1];
+
+            if (curProductId == oldProductId){
+                let newKey = newProductId + "." + curLicenseId;
+                featuresTreeViewContainer.productLicenseFeatures.SetData(newKey, value);
+                featuresTreeViewContainer.productLicenseFeatures.SetData(keys[i], "");
+                break;
+            }
+        }
+        console.log("2", featuresTreeViewContainer.productLicenseFeatures.toJSON());
+    }
+
+    function updateLicensesDependenciesAfterLicenseEditing(productId, licenseOldId, licenseNewId, licenseNewName){
+        console.log("updateLicensesDependenciesAfterLicenseEditing", productId, licenseOldId, licenseNewId, licenseNewName);
+
+        if (!featuresTreeViewContainer.productLicenseFeatures){
+            return;
+        }
+
+        console.log("1", featuresTreeViewContainer.productLicenseFeatures.toJSON());
+        let keys = featuresTreeViewContainer.productLicenseFeatures.GetKeys();
+        for (let i = 0; i < keys.length; i++){
+            let value = featuresTreeViewContainer.productLicenseFeatures.GetData(keys[i]);
+
+            let data = keys[i].split('.');
+
+            let curProductId = data[0];
+            let curLicenseId = data[1];
+
+            if (curProductId == productId && curLicenseId == licenseOldId){
+                let newKey = curProductId + "." + licenseNewId;
+                featuresTreeViewContainer.productLicenseFeatures.SetData(newKey, value);
+                break;
+            }
+
+//            let valuesData = value.split(';');
+
+//            for (let j = 0; j < valuesData.length; j++){
+//                let valueData = valuesData[j].split('.');
+
+//                let curDependProductId = valueData[0];
+//                let curDependLicenseId = valueData[1];
+
+//                if (curDependProductId == productId && curDependLicenseId == licenseOldId){
+//                    let removeValue = curDependProductId + '.' + curDependLicenseId;
+
+//                    if (j != valuesData.length - 1){
+//                        removeValue += ';';
+//                    }
+//                    let newValue = value.replace(removeValue, '');
+//                    newValue += ';' + curProductId + "." + licenseNewId;
+//                    featuresTreeViewContainer.productLicenseFeatures.SetData(keys[i], newValue);
+//                }
+//            }
+        }
+
+        console.log("2", featuresTreeViewContainer.productLicenseFeatures.toJSON());
+    }
+
+    function updateFeaturesDependenciesAfterFeatureEditing(packageId, featureOldId, featureNewId, featureNewName){
+        console.log("updateFeaturesDependenciesAfterFeatureEditing", packageId, featureOldId, featureNewId, featureNewName);
+
+        if (!featuresTreeViewContainer.modelDepends){
+            return;
+        }
+        console.log("1", featuresTreeViewContainer.modelDepends.toJSON());
+        let keys = featuresTreeViewContainer.modelDepends.GetKeys();
+        for (let i = 0; i < keys.length; i++){
+            let value = featuresTreeViewContainer.modelDepends.GetData(keys[i]);
+
+            let data = keys[i].split('.');
+
+            let curPackageId = data[0];
+            let curFeatureId = data[1];
+
+            if (curPackageId == packageId && curFeatureId == featureOldId){
+                let newKey = curPackageId + "." + featureNewId;
+                featuresTreeViewContainer.modelDepends.SetData(newKey, value);
+                featuresTreeViewContainer.modelDepends.SetData(keys[i], "");
+                break;
+            }
+
+            let valuesData = value.split(';');
+
+            for (let j = 0; j < valuesData.length; j++){
+                let valueData = valuesData[j].split('.');
+
+                let curDependPackageId = valueData[0];
+                let curDependFeatureId = valueData[1];
+
+                if (curDependPackageId == packageId && curDependFeatureId == featureOldId){
+                    let removeValue = curDependPackageId + '.' + curDependFeatureId;
+
+                    if (j != valuesData.length - 1){
+                        removeValue += ';';
+                    }
+                    let newValue = value.replace(removeValue, '');
+                    newValue += ';' + curPackageId + "." + featureNewId;
+                    featuresTreeViewContainer.modelDepends.SetData(keys[i], newValue);
+                }
+            }
+        }
+
+        console.log("2", featuresTreeViewContainer.modelDepends.toJSON());
+    }
+
+    function removeFeatureInTreeViewModel(packageId, featureId){
+        console.log("FeaturesTreeView removeFeatureInTreeViewModel", packageId, featureId);
+
+        if (!featuresTreeViewContainer.modelTreeItems){
+            return;
+        }
+
+        for (var i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            var modelChildren = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
+            var currentPackageId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
+            if (!modelChildren){
+                continue;
+            }
+
+            for (var j = 0; j < modelChildren.GetItemsCount(); j++){
+                var currentFeatureId = modelChildren.GetData("Id", j);
+
+                if (currentPackageId === packageId && currentFeatureId === featureId){
+                    console.log("FeaturesTreeView removeFeatureInTreeViewModel Removed", packageId, featureId);
+                    modelChildren.RemoveItem(j);
+
+                    featuresTreeViewContainer.removeDependsFeature(packageId, featureId);
+                    break;
+                }
+            }
+
+           featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", modelChildren, i);
+        }
+    }
+
+    function removeDependsFeature(packageId, featureId){
+        console.log("FeaturesTreeView removeDependsFeature", packageId, featureId);
+        if (!featuresTreeViewContainer.modelDepends){
+            return;
+        }
+
+        let keys = featuresTreeViewContainer.modelDepends.GetKeys();
+
+        for (let i = 0; i < keys.length; i++){
+            let value = featuresTreeViewContainer.modelDepends.GetData(keys[i]);
+            let data = keys[i].split('.');
+
+            let curPackageId = data[0];
+            let curFeatureId = data[1];
+
+            if (curPackageId == packageId && curFeatureId == featureId){
+                featuresTreeViewContainer.modelDepends.SetData(keys[i], '');
+                continue;
+            }
+
+            let valuesData = value.split(';');
+
+            for (let j = 0; j < valuesData.length; j++){
+                let valueData = valuesData[j].split('.');
+
+                let curDependPackageId = valueData[0];
+                let curDependFeatureId = valueData[1];
+
+                if (curDependPackageId == packageId && curDependFeatureId == featureId){
+                    let removeValue = curDependPackageId + '.' + curDependFeatureId;
+
+                    if (j != valuesData.length - 1){
+                        removeValue += ';';
+                    }
+                    let newValue = value.replace(removeValue, '');
+                    featuresTreeViewContainer.modelDepends.SetData(keys[i], newValue);
+                }
+            }
+        }
+    }
+
+    function hideCurrentFeatureTreeView(packageId, featureId){
+        console.log("FeatureTreeView hideCurrentFeatureTreeView", packageId, featureId);
+        if (!featuresTreeViewContainer.modelTreeItems){
+            return;
+        }
+        console.log("1 featuresTreeViewContainer.modelTreeItems", featuresTreeViewContainer.modelTreeItems.toJSON());
+        for (var i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
+            let curPackageId = featuresTreeViewContainer.modelTreeItems.GetData("Name", i);
+            console.log("curPackageId", curPackageId);
+            if (curPackageId == packageId) {
                 var childModelItems = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
                 if (!childModelItems){
                     continue;
                 }
 
                 for (var j = 0; j < childModelItems.GetItemsCount(); j++) {
-                    if (childModelItems.GetData("visible", j) === 0) {
+                    if (childModelItems.GetData("visible", j) === 0){
                         childModelItems.SetData("visible", 1, j);
                     }
 
                     if (childModelItems.GetData("Id", j) === featureId){
+                        console.log("featureId visible false");
                         childModelItems.SetData("visible", 0, j);
                     }
                 }
-                featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", childModelItems, i);
+                //featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", childModelItems, i);
                 break;
             }
         }
 
-        //featuresTreeViewContainer.modelTreeItems = dataModelLocal;
-//        featuresTreeViewContainer.modelTreeItems.Refresh();
+        console.log("2 featuresTreeViewContainer.modelTreeItems", featuresTreeViewContainer.modelTreeItems.toJSON());
     }
 
     function selectFeature(feature){
@@ -248,7 +547,7 @@ Item {
 
     function featureIsNew(packageId, featureId){
         if (!featuresTreeViewContainer.modelTreeItems){
-            return false;
+            return true;
         }
 
         if (featureId == ""){
@@ -260,13 +559,13 @@ Item {
             if (curId === packageId){
                 let modelChild = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
                 if (!modelChild){
-                    return false;
+                    return true;
                 }
 
                 for (let j = 0; j < modelChild.GetItemsCount(); j++){
                     let fId = modelChild.GetData("Id", j);
                     if (fId == featureId){
-                        return true;
+                        return false;
                     }
                 }
 
@@ -274,7 +573,7 @@ Item {
             }
         }
 
-        return false;
+        return true;
     }
 
     function addFeatureInTreeViewModel(packageId, featureId, featureName){
@@ -326,92 +625,10 @@ Item {
                 modelChildren.SetData("isActive", isActive, childIndex);
                 modelChildren.SetData("packageId", packageId, childIndex);
 
-                featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", modelChildren, i);
+                //featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", modelChildren, i);
                 break;
             }
         }
-    }
-
-    function removeFeatureInTreeViewModel(packageId, featureId){
-        console.log("FeaturesTreeView removeFeatureInTreeViewModel", packageId, featureId);
-
-        if (!featuresTreeViewContainer.modelTreeItems){
-            return;
-        }
-
-        for (var i = 0; i < featuresTreeViewContainer.modelTreeItems.GetItemsCount(); i++){
-            var modelChildren = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", i);
-            var currentPackageId = featuresTreeViewContainer.modelTreeItems.GetData("Id", i);
-            if (!modelChildren){
-                continue;
-            }
-
-            for (var j = 0; j < modelChildren.GetItemsCount(); j++){
-                var currentFeatureId = modelChildren.GetData("Id", j);
-
-                if (currentPackageId === packageId && currentFeatureId === featureId){
-                    console.log("FeaturesTreeView removeFeatureInTreeViewModel Removed", packageId, featureId);
-                    modelChildren.RemoveItem(j);
-
-                    featuresTreeViewContainer.removeDependsFeature(packageId, featureId);
-                    break;
-                }
-            }
-
-           featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", modelChildren, i);
-        }
-    }
-
-    function removeDependsFeature(packageId, featureId){
-        console.log("FeaturesTreeView removeDependsFeature", packageId, featureId);
-        if (!featuresTreeViewContainer.modelDepends ||!featuresTreeViewContainer.modelDepends.GetItemsCount() === 0){
-            return;
-        }
-
-        for (var i = 0; i < featuresTreeViewContainer.modelDepends.GetItemsCount(); i++){
-            var rootFeatureId = featuresTreeViewContainer.modelDepends.GetData("RootFeatureId", i);
-            var rootPackageId = featuresTreeViewContainer.modelDepends.GetData("RootPackageId", i);
-
-            if (packageId === rootPackageId && rootFeatureId === featureId){
-                console.log("FeaturesTreeView removeDependsFeature Removed", packageId, featureId);
-                featuresTreeViewContainer.modelDepends.RemoveItem(i);
-                break;
-            }
-
-            var modelPackages = featuresTreeViewContainer.modelDepends.GetData("Packages", i);
-
-            for (var j = 0; j < modelPackages.GetItemsCount(); j++){
-                var currentPackageId = modelPackages.GetData("Id", j);
-
-                var currentChildModel = modelPackages.GetData("childItemModel", j);
-
-                if (!currentChildModel || currentChildModel.GetItemsCount() === 0){
-                    continue;
-                }
-
-                for (var k = 0; k < currentChildModel.GetItemsCount(); k++){
-                    var currentFeatureId = currentChildModel.GetData("Id", k);
-
-                    if (currentPackageId === packageId && currentFeatureId === featureId){
-                        console.log("FeaturesTreeView removeDependsFeature Removed", packageId, featureId);
-                        currentChildModel.RemoveItem(k);
-                    }
-                }
-
-                modelPackages.SetData("childItemModel", currentChildModel, j)
-
-                if (currentChildModel.GetItemsCount() === 0){
-                    modelPackages.RemoveItem(j);
-                }
-            }
-
-            featuresTreeViewContainer.modelDepends.SetData("Packages", modelPackages, i);
-
-            if (modelPackages.GetItemsCount() === 0){
-                featuresTreeViewContainer.modelDepends.RemoveItem(i);
-            }
-        }
-
     }
 
     function loadFeaturesModel() {
@@ -442,30 +659,20 @@ Item {
             console.log("State:", this.state, featuresModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
-                if (dataModelLocal.ContainsKey("FeaturesTree")) {
+                if (dataModelLocal.ContainsKey("FeaturesTree")){
                     dataModelLocal = dataModelLocal.GetData("FeaturesTree");
                     if (dataModelLocal.ContainsKey("TreeModel")) {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
-
-//                        var index = featuresTreeViewContainer.getIndexFromTreeViewByPackageId(featuresTreeViewContainer.packageItem.itemId);
-//                        var modelChildren;
-
-//                        if (index !== -1){
-//                            modelChildren = featuresTreeViewContainer.modelTreeItems.GetData("childItemModel", index);
-//                        }
 
                         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
                             var modelChildren = dataModelLocal.GetData("childItemModel", i);
                             dataModelLocal.SetData("childItemModel", modelChildren, i);
                         }
 
-                        console.log( "FeaturesTreeView GqlModel assign a new modelTreeItems");
                         featuresTreeViewContainer.modelTreeItems = dataModelLocal;
-                        console.log();
 
-//                        if (index !== -1){
-//                            featuresTreeViewContainer.modelTreeItems.SetData("childItemModel", modelChildren, index);
-//                        }
+                        featuresTreeViewContainer.sendSignal();
+//                        Events.sendEvent("FeaturesTreeUpdate");
                     }
                 }
 

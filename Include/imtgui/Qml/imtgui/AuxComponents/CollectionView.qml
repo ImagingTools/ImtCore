@@ -14,6 +14,8 @@ Rectangle {
 
     property TreeItemModel collectionViewModel;
 
+    property Item rootItem; //PackageCollectionView, packageView, productView ...
+
     property var table: tableInternal;
 
     property int selectedIndex: -1;
@@ -38,9 +40,15 @@ Rectangle {
     signal setDescriptionItem(string newDescription);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromCollectionView();
+    signal dataLoaded();
 
     Component.onCompleted: {
         console.log("CollectionView onCompleted");
+        //collectionViewContainer.forceActiveFocus();
+    }
+
+    onFocusChanged: {
+        console.log("CollectionView onFocusChanged", collectionViewContainer.focus);
     }
 
     onCollectionViewModelChanged: {
@@ -56,6 +64,66 @@ Rectangle {
     onGqlModelItemsChanged: {
         console.log("CollectionView onGqlModelItemsChanged");
         modelItems.updateModel();
+    }
+
+    onItemIdChanged: {
+        console.log("CollectionView onItemIdChanged", collectionViewContainer.itemId);
+    }
+
+    Keys.onPressed: {
+        console.log("CollectionView keys pressed")
+
+/*        if (event.key === Qt.Key_Tab){
+            console.log('Key tab was pressed');
+
+            if (packageCollectionContainer.multiDocViewItem.tabPanel.count > 1){
+                packageCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
+                packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+            }
+            else{
+                thubnailDecoratorContainer.setFocusOnMenuPanel();
+            }
+        }
+        else */
+        if (event.key === Qt.Key_Up){
+            console.log('Key up was pressed');
+            collectionViewContainer.selectedIndexDecr();
+        }
+        else if (event.key === Qt.Key_Down){
+            console.log('Key down was pressed');
+             collectionViewContainer.selectedIndexIncr();
+        }
+        else if (event.key === Qt.Key_Return){
+            console.log('Key down was pressed');
+            var itemId = tableInternal.getSelectedId();
+            var name = tableInternal.getSelectedName();
+            collectionViewContainer.itemSelect(itemId, name);
+        }
+        else if (event.key === Qt.Key_Delete){
+            console.log('Key delete was pressed');
+            rootItem.menuActivated("Remove");
+        }
+    }
+
+    function selectedIndexIncr(){
+        console.log("CollectionView selectedIndexIncr", tableInternal.selectedIndex);
+        if (tableInternal.selectedIndex == collectionViewContainer.getCountItems() - 1){
+            tableInternal.selectedIndex = 0;
+        }
+        else
+            tableInternal.selectedIndex++;
+
+        tableInternal.changeDataByIndex(tableInternal.selectedIndex);
+    }
+
+    function selectedIndexDecr(){
+        console.log("CollectionView selectedIndexDecr");
+        if (tableInternal.selectedIndex == 0){
+            tableInternal.selectedIndex = collectionViewContainer.getCountItems() - 1;
+        }
+        else
+            tableInternal.selectedIndex--;
+        tableInternal.changeDataByIndex(tableInternal.selectedIndex);
     }
 
     function openMessageDialog(nameDialog, message, type) {
@@ -77,18 +145,6 @@ Rectangle {
         var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
         var description = "";
-//        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
-
-//            console.log("collectionViewContainer.gqlModelInfo", collectionViewContainer.gqlModelInfo);
-//            console.log("dataModelLocal", dataModelLocal.toJSON());
-//            console.log("tableInternal.selectedIndex", tableInternal.selectedIndex);
-
-//            description = dataModelLocal.GetData("AccountDescription", tableInternal.selectedIndex);
-//        }
-//        else{
-//            description = dataModelLocal.GetData("Description", tableInternal.selectedIndex);
-//        }
-
         description = dataModelLocal.GetData("Description", tableInternal.selectedIndex);
 
         console.log("description", description);
@@ -241,8 +297,8 @@ Rectangle {
             if (itemId !== ""){
                 var source = "AuxComponents/MessageDialog.qml";
                 var parameters = {};
-                parameters["message"] = "Remove selected file from the collection ?";
-                parameters["nameDialog"] = "Remove dialog";
+                parameters["message"] = "Remove selected item from the collection ?";
+                parameters["nameDialog"] = "Remove";
                 parameters["dialogId"] = "RemoveDialog";
                 parameters["resultItem"] = collectionViewContainer;
 
@@ -298,7 +354,8 @@ Rectangle {
 
             onSetActiveFocusFromTable: {
                 console.log("CollectionView AuxTable onSetActiveFocusFromTable");
-                collectionViewContainer.setActiveFocusFromCollectionView();
+                //collectionViewContainer.setActiveFocusFromCollectionView();
+                collectionViewContainer.forceActiveFocus();
             }
 
             onTextFilterChanged: {
@@ -396,20 +453,23 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, headerInfoModel);
             if (this.state === "Ready"){
+                let keys = headerInfoModel.GetKeys();
+                if (!keys || keys.length == 0){
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
 
                 var dataModelLocal;
 
                 if (headerInfoModel.ContainsKey("errors")){
-
                     dataModelLocal = headerInfoModel.GetData("errors");
-
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelInfo)){
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelInfo);
 
                         if (dataModelLocal.ContainsKey("message")){
 
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
+                            collectionViewContainer.openMessageDialog("Error", message, "ErrorDialog");
                         }
 
                     }
@@ -487,18 +547,19 @@ Rectangle {
             let count = Math.floor(height / tableInternal.itemHeight);
             let offset = (pagination.currentValue - 1) * count;
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelItems);
+
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset");
             viewParams.InsertFieldArgument("Offset", offset);
             viewParams.InsertField("Count");
             viewParams.InsertFieldArgument("Count", count);
-            viewParams.InsertField("FilterModel");
-            var jsonString = modelFilter.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            viewParams.InsertFieldArgument("FilterModel", jsonString);
+//            viewParams.InsertField("FilterModel");
+//            var jsonString = modelFilter.toJSON();
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+//            viewParams.InsertFieldArgument("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertFieldObject(viewParams);
+//            inputParams.InsertFieldObject(viewParams);
 
             if(collectionViewContainer.itemId != ""){
                 inputParams.InsertField("Id");
@@ -525,6 +586,14 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, modelItems);
             if (this.state === "Ready"){
+                let keys = modelItems.GetKeys();
+                if (!keys || keys.length == 0){
+                    collectionViewContainer.dataLoaded();
+                    console.log("modelItems");
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
+
                 var dataModelLocal;
                 if (modelItems.ContainsKey("errors")){
                     dataModelLocal = modelItems.GetData("errors");
@@ -532,7 +601,7 @@ Rectangle {
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelItems);
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
+                            collectionViewContainer.openMessageDialog("Error", message, "ErrorDialog");
                         }
                     }
 
@@ -576,6 +645,7 @@ Rectangle {
                             }
                         }
                     }
+                    collectionViewContainer.dataLoaded();
                 }
             }
         }
@@ -612,12 +682,15 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, removeModel);
             if (this.state === "Ready"){
+                let keys = removeModel.GetKeys();
+                if (!keys || keys.length == 0){
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
 
                 var dataModelLocal;
-
                 if (removeModel.ContainsKey("errors")){
                     dataModelLocal = removeModel.GetData("errors");
-
                     if (dataModelLocal.ContainsKey(collectionViewContainer.gqlModelRemove)){
                         dataModelLocal = dataModelLocal.GetData(collectionViewContainer.gqlModelRemove);
                     }
@@ -678,6 +751,11 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, renameQuery);
             if (this.state === "Ready"){
+                let keys = renameQuery.GetKeys();
+                if (!keys || keys.length == 0){
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
 
                 var dataModelLocal;
 
@@ -689,7 +767,7 @@ Rectangle {
 
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
+                            collectionViewContainer.openMessageDialog("Error", message, "ErrorDialog");
                         }
                     }
 
@@ -706,13 +784,12 @@ Rectangle {
                             dataModelLocal = dataModelLocal.GetData("item");
 
                             var newId = dataModelLocal.GetData("NewId");
-
-//                            if (collectionViewContainer.gqlModelInfo === "ProductCollectionInfo"){
-//                                newId = tableInternal.getSelectedId();
-//                            }
-
                             var newName = dataModelLocal.GetData("NewName");
+
                             collectionViewContainer.renamedItem(tableInternal.getSelectedId(), newId);
+
+                            featuresTreeView.loadFeaturesModel();
+                            featuresTreeView.loadDependModel();
                         }
                     }
                 }
@@ -752,6 +829,11 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, setDescriptionQuery);
             if (this.state === "Ready"){
+                let keys = setDescriptionQuery.GetKeys();
+                if (!keys || keys.length == 0){
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
 
                 var dataModelLocal;
 
@@ -763,7 +845,7 @@ Rectangle {
 
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewContainer.openMessageDialog("Error dialog", message, "ErrorDialog");
+                            collectionViewContainer.openMessageDialog("Error", message, "ErrorDialog");
                         }
                     }
 

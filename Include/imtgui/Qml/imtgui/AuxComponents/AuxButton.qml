@@ -32,6 +32,17 @@ Rectangle {
 
     signal clicked;
 
+    onFocusChanged: {
+        auxButtonContainer.highlighted  = auxButtonContainer.focus;
+    }
+
+    Keys.onPressed: {
+        console.log("AuxButton Key pressed!")
+        if (event.key === Qt.Key_Return){
+            auxButtonContainer.clicked();
+        }
+     }
+
     Image {
         id: image;
 

@@ -6,7 +6,7 @@ import imtgui 1.0
 Rectangle {
     id: topRightPanelDecorator;
 
-   // color: "transparent";
+    color: "transparent";
 
     radius: 7;
 

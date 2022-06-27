@@ -25,35 +25,39 @@ Item {
         packageCollectionView.menuActivated(menuId)
     }
 
-    Keys.onPressed: {
-        console.log("PackageCollectionView keys pressed")
-
-        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-
-            if (packageCollectionContainer.multiDocViewItem.tabPanel.count > 1){
-                packageCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
-                packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-            }
-            else{
-                thubnailDecoratorContainer.setFocusOnMenuPanel();
-            }
-        }
-        else if (event.key === Qt.Key_Up){
-            console.log('Key up was pressed');
-            packageCollectionContainer.selectedIndexDecr();
-        }
-        else if (event.key === Qt.Key_Down){
-            console.log('Key down was pressed');
-             packageCollectionContainer.selectedIndexIncr();
-        }
-        else if (event.key === Qt.Key_Return){
-            console.log('Key down was pressed');
-            packageCollectionContainer.selectItem();
-
-            packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-        }
+    Component.onCompleted: {
+//        packageCollectionContainer.forceActiveFocus();
     }
+
+//    Keys.onPressed: {
+//        console.log("PackageCollectionView keys pressed")
+
+//        if (event.key === Qt.Key_Tab){
+//            console.log('Key tab was pressed');
+
+//            if (packageCollectionContainer.multiDocViewItem.tabPanel.count > 1){
+//                packageCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
+//                packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+//            }
+//            else{
+//                thubnailDecoratorContainer.setFocusOnMenuPanel();
+//            }
+//        }
+//        else if (event.key === Qt.Key_Up){
+//            console.log('Key up was pressed');
+//            packageCollectionContainer.selectedIndexDecr();
+//        }
+//        else if (event.key === Qt.Key_Down){
+//            console.log('Key down was pressed');
+//             packageCollectionContainer.selectedIndexIncr();
+//        }
+//        else if (event.key === Qt.Key_Return){
+//            console.log('Key down was pressed');
+//            packageCollectionContainer.selectItem();
+
+//            packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
+//        }
+//    }
 
     ListModel {
         id: contextMenuModel;
@@ -126,8 +130,9 @@ Item {
         packageCollectionView.collectionViewModel.SetData("data", dataModelLocal);
     }
 
-    function dialogResult(parameters) {
+    function dialogResult(parameters){
         console.log("PackageCollectionView dialogResult", parameters["status"]);
+        packageCollectionContainer.forceActiveFocus();
         if (parameters["dialog"] === "PopupMenu"){
 
             var source = "AuxComponents/InputDialog.qml";
@@ -147,7 +152,7 @@ Item {
             }
             else if (parameters["status"] === "Rename"){
                 prmtrs["message"] = qsTr("Please enter the name of the package: ");
-                prmtrs["nameDialog"] = "Rename Dialog";
+                prmtrs["nameDialog"] = "Rename";
                 prmtrs["typeOperation"] = "Rename";
 
                 prmtrs["startingValue"] = packageCollectionView.getNameBySelectedItem();
@@ -156,7 +161,11 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, prmtrs);
             }
             else if (parameters["status"] === "Edit"){
-                packageCollectionContainer.menuActivated("Edit");
+//                packageCollectionContainer.menuActivated("Edit");
+
+                var itemId = packageCollectionView.table.getSelectedId();
+                var name = packageCollectionView.table.getSelectedName();
+                packageCollectionView.itemSelect(itemId, name);
             }
             else if (parameters["status"] === "Remove"){
                 packageCollectionContainer.menuActivated("Remove");
@@ -250,6 +259,8 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.right: packageCollectionMetaInfo.left;
 
+        rootItem: packageCollectionContainer;
+
         autoRefresh: true;
 
         Component.onCompleted: {
@@ -292,7 +303,7 @@ Item {
 
         onSetActiveFocusFromCollectionView: {
             console.log("PackageCollection CollectionView onSetActiveFocusFromCollectionView");
-            packageCollectionContainer.forceActiveFocus();
+//            packageCollectionContainer.forceActiveFocus();
         }
 
         onRemovedItem: {
@@ -315,6 +326,8 @@ Item {
                 packageCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
             }
 
+            featuresTreeView.updateFeaturesDependenciesAfterPackageEditing(oldId, newId);
+//            packageCollectionContainer.multiDocViewItem.updateIdAfterEdit(oldId, newId);
             metaInfo.getMetaInfo();
         }
 

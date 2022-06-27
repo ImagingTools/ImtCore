@@ -23,14 +23,8 @@ Rectangle {
 
         onItemChanged: {
             if (decoratorLoader.item){
-                console.log("topRightPanel");
-                console.log("topRightPanel.width", topRightPanel.width);
-                console.log("topRightPanel.height", topRightPanel.height);
                 decoratorLoader.item.width = topRightPanel.width;
                 decoratorLoader.item.height = topRightPanel.height;
-
-                console.log("decoratorLoader.item.width", decoratorLoader.item.width);
-                console.log("decoratorLoader.item.height", decoratorLoader.item.height);
             }
         }
     }

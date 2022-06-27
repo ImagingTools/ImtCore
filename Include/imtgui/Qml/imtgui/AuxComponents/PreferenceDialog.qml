@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
 import imtqml 1.0
+import QtQuick.Dialogs 1.3
 
 Rectangle {
     id: preferenceContainer;
@@ -43,7 +44,7 @@ Rectangle {
 
     onFocusChanged: {
         if (preferenceContainer.focus){
-           // mainPanelColumn.forceActiveFocus();
+            mainPanelColumn.forceActiveFocus();
         }
     }
 
@@ -345,7 +346,7 @@ Rectangle {
                         mainPanelRepeater.selectedIndex = model.index;
 
                         if (!mainPanelColumn.focus){
-                            //mainPanelColumn.forceActiveFocus();
+                            mainPanelColumn.forceActiveFocus();
                         }
                     }
                 }
@@ -684,6 +685,93 @@ Rectangle {
            console.log("State:", this.state, preferenceSaveQuery);
            if (this.state === "Ready") {
                var dataModelLocal = this.GetData("data");
+           }
+       }
+   }
+
+   function openFileDialog(){
+       fileDialogSave.open();
+//       fileQuery.getFile("LisaServerLog.txt");
+   }
+
+   RemoteFileController {
+       id: remoteFileController;
+
+       onFileDownloaded: {
+           console.log('onFileDownloaded', filePath);
+          // console.log('onopening file', remoteFileController.OpenFile(filePath));
+       }
+   }
+
+   FileDialog {
+       id: fileDialogSave;
+
+       title: qsTr("Save file");
+       selectExisting: false;
+       folder: shortcuts.home;
+
+       nameFilters: ["Text files (*.txt)", "All files (*)"];
+
+       onAccepted: {
+           console.log("You chose: " + fileDialogSave.fileUrl);
+           console.log("You chose folder: " + fileDialogSave.folder);
+
+           var pathDir = fileDialogSave.folder.toString();
+           remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
+           var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
+
+           console.log("You chose file name: ", fileName);
+           var id = "";
+
+           if (fileName == ""){
+               fileName = {};
+               fileName["name"] = "LisaServerLog.txt";
+           }
+
+           console.log("id ",id);
+           console.log("fileName ",fileName);
+           remoteFileController.GetFile(id, fileName);
+       }
+   }
+
+   GqlModel {
+       id: fileQuery;
+
+       function getFile(name){
+           var query = Gql.GqlRequest("query", "GetFile");
+           var inputParams = Gql.GqlObject("input");
+           inputParams.InsertField("name");
+           inputParams.InsertFieldArgument("name", name);
+           query.AddParam(inputParams);
+
+           var queryFields = Gql.GqlObject("file");
+           queryFields.InsertField("name");
+           queryFields.InsertField("data");
+           query.AddField(queryFields);
+
+           var gqlData = query.GetQuery();
+           console.log("fileQuery gqlData", gqlData);
+           this.SetGqlQuery(gqlData);
+       }
+
+       onStateChanged: {
+           console.log("State:", this.state, fileQuery);
+           if (this.state === "Ready") {
+
+               var dataModelLocal;
+
+               if (fileQuery.ContainsKey("errors")){
+                   return;
+               }
+
+               if (fileQuery.ContainsKey("data")){
+                   dataModelLocal = styleQuery.GetData("data");
+
+                   if(dataModelLocal.ContainsKey("FileData")) {
+                       let fileData = dataModelLocal.GetData("FileData");
+                       fileDialogSave.open();
+                   }
+               }
            }
        }
    }

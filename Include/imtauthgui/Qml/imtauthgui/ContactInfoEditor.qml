@@ -1,8 +1,8 @@
 import QtQuick 2.0
-//import '../../../imtgui/Qml/imtgui/AuxComponents'
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
+import imtlicgui 1.0
 
 Rectangle {
     id: containerContactInfo;
@@ -116,11 +116,11 @@ Rectangle {
         else if (menuId  === "Save") {
 
             var name = containerContactInfo.contactInfoModel.GetData("AccountName");
-            if (name == ""){
-                var message = "Account name can't be empty!";
-                containerContactInfo.openMessageDialog("Error Dialog", message, "ErrorDialog");
-                return;
-            }
+//            if (name == ""){
+//                var message = "Account name can't be empty!";
+//                containerContactInfo.openMessageDialog("Error", message, "ErrorDialog");
+//                return;
+//            }
 
             contactInfoSaveQuery.updateModel();
         }
@@ -442,7 +442,7 @@ Rectangle {
                 }
 
                 KeyNavigation.backtab: rectTfcAccountName;
-                KeyNavigation.tab: containerContactInfo.accountType === "company" ? countryBlock : emailBlock;
+                KeyNavigation.tab: countryBlock;
             }
 
 //            TextFieldCustom {
@@ -781,8 +781,10 @@ Rectangle {
                         }
                     }
 
-                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? firstNameBlock : bdBlock;
-                    KeyNavigation.backtab: containerContactInfo.accountType === "company" ? streetBlock : rectTfcAccountDescription;
+//                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? firstNameBlock : bdBlock;
+                    KeyNavigation.tab: firstNameBlock;
+//                    KeyNavigation.backtab: containerContactInfo.accountType === "company" ? streetBlock : rectTfcAccountDescription;
+                    KeyNavigation.backtab: streetBlock;
                 }
 
                 Text {
@@ -969,7 +971,8 @@ Rectangle {
                     }
 
                     KeyNavigation.tab: lastNameBlock;
-                    KeyNavigation.backtab: containerContactInfo.accountType === "company" ? emailBlock : genderCB;
+//                    KeyNavigation.backtab: containerContactInfo.accountType === "company" ? emailBlock : genderCB;
+                    KeyNavigation.backtab: emailBlock;
                 }
 
                 Text {
@@ -1022,7 +1025,8 @@ Rectangle {
                         }
                     }
 
-                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? lastNameBlock : nickNameBlock;
+//                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? lastNameBlock : nickNameBlock;
+                    KeyNavigation.tab: lastNameBlock;
                     KeyNavigation.backtab: firstNameBlock;
                 }
 
@@ -1186,12 +1190,21 @@ Rectangle {
         }
     }
 
+    LoadingPage {
+        id: loadingPage;
+
+        anchors.fill: parent;
+
+        visible: false;
+    }
+
     GqlModel {
         id: accountItemModel;
 
         function updateModel() {
             console.log( "updateModel AccountItem");
 
+            loadingPage.visible = true;
             var query = Gql.GqlRequest("query", "AccountItem");
 
             if(containerContactInfo.itemId != ""){
@@ -1223,6 +1236,12 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, accountItemModel);
             if (this.state === "Ready"){
+                let keys = accountItemModel.GetKeys();
+                if (!keys || keys.length == 0){
+                    loadingPage.visible = false;
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
 
                 var dataModelLocal = accountItemModel.GetData("data");
                 if(dataModelLocal.ContainsKey("AccountItem")){
@@ -1251,6 +1270,9 @@ Rectangle {
                         }
                     }
                 }
+
+                console.log("loadingPage.visible = false");
+                loadingPage.visible = false;
             }
         }
     }
@@ -1308,6 +1330,11 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, contactInfoSaveQuery);
             if (this.state === "Ready"){
+                let keys = contactInfoSaveQuery.GetKeys();
+                if (!keys || keys.length == 0){
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
 
                 var dataModelLocal;
 
@@ -1317,7 +1344,7 @@ Rectangle {
                     if (dataModelLocal.ContainsKey(containerContactInfo.gqlModelQueryType)){
                         dataModelLocal = dataModelLocal.GetData(containerContactInfo.gqlModelQueryType);
                         var messageError = dataModelLocal.GetData("message");
-                        containerContactInfo.openMessageDialog("Error dialog", messageError, "ErrorDialog");
+                        containerContactInfo.openMessageDialog("Error", messageError, "ErrorDialog");
                     }
 
                     return;

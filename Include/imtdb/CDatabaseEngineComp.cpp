@@ -222,7 +222,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 bool CDatabaseEngineComp::CreateDatabase() const
 {
 	bool retVal = false;
-
+	SendWarningMessage(0, QString("Create database %1").arg(qPrintable(*m_maintenanceDatabaseNameAttrPtr)));
 	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
 	maintainanceDb.setHostName(GetHostName());
 	maintainanceDb.setUserName(GetUserName());
@@ -268,6 +268,11 @@ bool CDatabaseEngineComp::CreateDatabase() const
 						<< "\n\t| Maintainance SQL error occured"
 						<< "\n\t| Error: " << sqlError
 						<< "\n\t| Query: " << queryString;
+			SendErrorMessage(0, QString("\n\t| Maintainance SQL error occured"
+										"\n\t| Error: %1"
+										"\n\t| Query: %2")
+								.arg(sqlError.text())
+								.arg(queryString));
 		}
 		else{
 			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);

@@ -92,9 +92,9 @@ Rectangle {
             delegate: TopButton {
                 id: topButtonDelegate;
 
-                text: model[CommandEnum.NAME];
-                isEmpty: model[CommandEnum.NAME] === "";
-                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "Off" + "_" + model["Mode"] + ".svg";
+                text: model["Name"];
+                isEmpty: model["Name"] === "";
+                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_" + "Off" + "_" + model["Mode"] + ".svg";
                 fontName: Style.fontFamily;
                 checkable: model["Mode"] === "Normal";
                 visible: x + width <= topCenterLvButtons.width;

@@ -185,10 +185,10 @@ Rectangle {
         }
         else if (menuId  === "Save") {
 
-            if (instanceIdText.text == ""){
-                containerInstallation.openMessageDialog("Error Dialog", "Id can't be empty!", "ErrorDialog");
-                return;
-            }
+//            if (instanceIdText.text == ""){
+//                containerInstallation.openMessageDialog("Error", qsTr("Installation-ID can't be empty!"), "ErrorDialog");
+//                return;
+//            }
 
             if (containerInstallation.operation === "New") {
                 var source = "AuxComponents/InputDialog.qml";
@@ -583,6 +583,14 @@ Rectangle {
         }
     }
 
+    LoadingPage {
+        id: loadingPage;
+
+        anchors.fill: parent;
+
+        visible: true;
+    }
+
     GqlModel {
         id: installItemModel;
 
@@ -615,6 +623,12 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, installItemModel);
             if (this.state === "Ready"){
+                let keys = installItemModel.GetKeys();
+                if (!keys || keys.length == 0){
+                    loadingPage.visible = false;
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
                 var dataModelLocal;
 
                 if (installItemModel.ContainsKey("errors")){
@@ -635,6 +649,7 @@ Rectangle {
                     }
                     containerInstallation.model.SetExternTreeModel('data', containerInstallation.installationInfoModel)
                 }
+                loadingPage.visible = false;
             }
         }
     }
@@ -907,6 +922,12 @@ Rectangle {
         onStateChanged: {
             console.log("State:", this.state, installationSaveQuery);
             if (this.state === "Ready"){
+                let keys = installationSaveQuery.GetKeys();
+                if (!keys || keys.length == 0){
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
+
                 var dataModelLocal;
 
                 if (installationSaveQuery.ContainsKey("errors")){
@@ -918,7 +939,7 @@ Rectangle {
                     if (dataModelLocal){
                         console.log("Message errors");
                         var messageError = dataModelLocal.GetData("message");
-                        containerInstallation.openMessageDialog("Error Dialog", messageError, "ErrorDialog");
+                        containerInstallation.openMessageDialog("Error", messageError, "ErrorDialog");
                     }
 
                     return;

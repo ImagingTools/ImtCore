@@ -86,16 +86,19 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		if (!m_productFactCompPtr.IsValid()){
+			errorMessage = QObject::tr("Can not create product: %1").arg(QString(objectId));
 			return nullptr;
 		}
 
 		istd::TDelPtr<imtlic::IProductLicensingInfo> productPtr = m_productFactCompPtr.CreateInstance();
 		if (!productPtr.IsValid()){
+			errorMessage = QT_TR_NOOP("Unable to get an product pointer");
 			return nullptr;
 		}
 
 		imtbase::IObjectCollection* licenseCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(productPtr.GetPtr());
 		if (licenseCollectionPtr == nullptr){
+			errorMessage = QT_TR_NOOP("Unable to get an license collection");
 			return nullptr;
 		}
 
@@ -104,6 +107,12 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Id")){
 			objectId = itemModel.GetData("Id").toByteArray();
+
+			if (objectId.isEmpty()){
+				errorMessage = QT_TR_NOOP("Product-ID can not be empty!");
+				return nullptr;
+			}
+
 			productPtr->SetProductId(objectId);
 		}
 
@@ -166,6 +175,8 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 
 		return productPtr.PopPtr();
 	}
+
+	errorMessage = QObject::tr("Can not create product: %1").arg(QString(objectId));
 
 	return nullptr;
 }

@@ -24,7 +24,6 @@ Item {
     property int contentWidth;
     property int contentHeight;
 
-
     property string decoratorSource;
     signal clicked;
 
@@ -127,7 +126,7 @@ Item {
                             subPagesDecorator.item.width = container.width;
                             subPagesDecorator.item.height = container.height;
                             subPagesDecorator.item.selected = subPageDelegate.selected;
-                            subPagesDecorator.item.title = model[PageEnum.NAME];
+                            subPagesDecorator.item.title = model["Name"];
                         }
                     }
                 }

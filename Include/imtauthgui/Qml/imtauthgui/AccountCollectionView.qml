@@ -18,34 +18,8 @@ Item {
 
     property string operation;
 
-    Keys.onPressed: {
-        console.log("accountCollectionContainer keys pressed")
-
-        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-
-            if (accountCollectionContainer.multiDocViewItem.tabPanel.count > 1){
-                accountCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
-                accountCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-            }
-            else{
-                thubnailDecoratorContainer.setFocusOnMenuPanel();
-            }
-        }
-        else if (event.key === Qt.Key_Up){
-            console.log('Key up was pressed');
-            accountCollectionContainer.selectedIndexDecr();
-        }
-        else if (event.key === Qt.Key_Down){
-            console.log('Key down was pressed');
-             accountCollectionContainer.selectedIndexIncr();
-        }
-        else if (event.key === Qt.Key_Return){
-            console.log('Key down was pressed');
-            accountCollectionContainer.selectItem();
-
-            accountCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-        }
+    Component.onCompleted: {
+//        accountCollectionContainer.forceActiveFocus();
     }
 
     ListModel {
@@ -103,7 +77,7 @@ Item {
             else if (parameters["status"] === "Rename") {
 
                 prmtrs["message"] = qsTr("Please enter the name of the account: ");
-                prmtrs["nameDialog"] = "Rename Dialog";
+                prmtrs["nameDialog"] = "Rename";
                 prmtrs["typeOperation"] = "Rename";
 
                 prmtrs["startingValue"] = accountCollectionView.getNameBySelectedItem();
@@ -212,6 +186,8 @@ Item {
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
         anchors.right: accountCollectionMetaInfo.left;
+
+        rootItem: accountCollectionContainer;
 
         autoRefresh: true;
 

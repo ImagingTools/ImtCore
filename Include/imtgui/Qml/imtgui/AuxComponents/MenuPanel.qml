@@ -62,22 +62,22 @@ Rectangle {
                 id: lvPages;
                 property int currentIndex: 0;
                 delegate:  MenuPanelButton{
-                    text:  model[PageEnum.NAME];
+                    text:  model["Name"];
                     textColor: Style.textColor;
                     fontName: menuPanel.fontName;
-                    imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
-                                                             "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
+                    imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_" + "On" + "_" + "Selected" + ".svg":
+                                                             "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_" + "On" + "_" + "Normal" + ".svg";
 
-                    selected: lvPages.currentIndex === model.index ? true : false;
+                    selected: lvPages.currentIndex === model.index;
 
                     decoratorSource : Style.menuButtonDecoratorPath;
 
                     onClicked: {
                         lvPages.currentIndex = model.index;
-                        menuPanel.activePageName = model[PageEnum.NAME];
-                        menuPanel.activeIcon = model[PageEnum.ICON];
+                        menuPanel.activePageName = model["Name"];
+                        menuPanel.activeIcon = model["Icon"];
                         menuPanel.activePageIndex = model.index;
-                        menuPanel.activePageId = model[PageEnum.ID];
+                        menuPanel.activePageId = model["PageId"];
 
                         if (!menuPanel.focus){
                             menuPanel.forceActiveFocus();
@@ -160,10 +160,10 @@ Rectangle {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField(PageEnum.ID);
-            queryFields.InsertField(PageEnum.NAME);
-            queryFields.InsertField(PageEnum.ICON);
-            queryFields.InsertField(PageEnum.SOURCE);
+            queryFields.InsertField("PageId");
+            queryFields.InsertField("Name");
+            queryFields.InsertField("Icon");
+            queryFields.InsertField("Source");
             query.AddField(queryFields);
             var gqlData = query.GetQuery();
 
@@ -174,10 +174,7 @@ Rectangle {
         onStateChanged: {
             console.log("State:",this.state, pagesModel)
             if (this.state == "Ready"){
-               // console.log("pagesModel toJSON", pagesModel.toJSON());
                 var dataModelLocal = this.GetData("data");
-
-                //refreshButton.enabled = true;
 
                 if (!dataModelLocal){
                     thubnailDecoratorContainer.setInvalidConnection(true);
@@ -193,9 +190,9 @@ Rectangle {
                         dataModelLocal = dataModelLocal.GetData("items")
                         lvPages.model = dataModelLocal
 
-                        menuPanel.activePageId = dataModelLocal.GetData(PageEnum.ID);
-                        menuPanel.activePageName = dataModelLocal.GetData(PageEnum.NAME);
-                        menuPanel.activeIcon = dataModelLocal.GetData(PageEnum.ICON);
+                        menuPanel.activePageId = dataModelLocal.GetData("PageId");
+                        menuPanel.activePageName = dataModelLocal.GetData("Name");
+                        menuPanel.activeIcon = dataModelLocal.GetData("Icon");
 
                         //menuPanel.activePageIndex = 0;
 //                        Style.changeSchemeDesign("");

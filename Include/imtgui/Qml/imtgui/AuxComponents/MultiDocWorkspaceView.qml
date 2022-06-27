@@ -96,6 +96,12 @@ Rectangle {
     function closeTab(index) {
         console.log("MultiDocWorkspaceView closeTab", index);
 
+        let delegateItem = docsData.itemAtIndex(index);
+        let itemLink = delegateItem.getItem();
+        console.log(itemLink);
+
+        //featuresTreeView.unsubscribe(itemLink);
+
         pagesData.RemoveItem(index)
         if (tabPanelInternal.selectedIndex >= index){
             tabPanelInternal.selectedIndex--;
@@ -106,7 +112,26 @@ Rectangle {
         console.log("MultidocWorkspaceView updateTitleTab()", index, title);
         pagesData.SetData("Title", title, index);
         pagesData.SetData("ItemId", itemId, index);
+
+        let delegateItem = docsData.itemAtIndex(index);
+        delegateItem.setItemId(itemId);
+        delegateItem.setItemName(title);
     }
+
+//    function updateIdAfterEdit(oldId, newId){
+//        console.log("updateIdAfterEdit", oldId, newId);
+//        for (let i = 0; i < pagesData.GetItemsCount(); i++){
+//            let pageId = pagesData.GetData("ItemId", i);
+//            console.log("ItemId", pageId);
+//            if (pageId == newId){
+//                pagesData.SetData("ItemId", i);
+
+//                let delegate = docsData.itemAtIndex(i);
+//                delegate.setItemId(newId);
+//                break;
+//            }
+//        }
+//    }
 
     function getTabIndexById(tabId){
         console.log("MultidocWorkspaceView getTabIndexById", tabId);
@@ -221,6 +246,20 @@ Rectangle {
                 multiDocView.closeTab(tabPanelInternal.selectedIndex);
             }
 
+            function setItemId(itemId){
+                console.log("setItemId", dataLoader.item.itemId, '->', itemId);
+                dataLoader.item.itemId = itemId;
+            }
+
+            function setItemName(itemName){
+                console.log("setItemName", dataLoader.item.itemName, '->', itemName);
+                dataLoader.item.itemId = itemName;
+            }
+
+            function getItem(){
+                return dataLoader.item;
+            }
+
             Loader {
                 id: dataLoader;
 
@@ -257,6 +296,8 @@ Rectangle {
                             multiDocView.activeItem = dataLoader.item;
                             multiDocView.updateCommandId();
                         }
+
+//                        multiDocView.activeItem.forceActiveFocus();
                     }
                 }
 

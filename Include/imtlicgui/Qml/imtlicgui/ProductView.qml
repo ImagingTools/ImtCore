@@ -40,35 +40,13 @@ Item {
         if (!featuresTreeView.productLicenseFeatures){
             featuresTreeView.loadLicenseDependModel();
         }
+
+//        rectTfcProductId.forceActiveFocus();
+        //productsCollectionViewContainer.forceActiveFocus();
     }
 
     onWasChangedChanged: {
         productsCollectionViewContainer.commandsChanged("ProductEdit");
-    }
-
-    Keys.onPressed: {
-        console.log("ProductView keys pressed")
-        if (treeView.focus){
-            return;
-        }
-
-        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-            treeView.forceActiveFocus();
-        }
-        else if (event.key === Qt.Key_Up){
-            console.log('Key up was pressed');
-            productsCollectionViewContainer.selectedIndexDecr();
-        }
-        else if (event.key === Qt.Key_Down){
-            console.log('Key down was pressed');
-             productsCollectionViewContainer.selectedIndexIncr();
-        }
-        else if (event.key === Qt.Key_Return){
-            console.log('Key down was pressed');
-
-            productsCollectionViewContainer.selectItem();
-        }
     }
 
     ListModel {
@@ -102,7 +80,7 @@ Item {
 
     function dialogResult(parameters) {
          console.log("ProductView dialogResult", parameters["dialog"], parameters["status"]);
-
+        productsCollectionView.forceActiveFocus();
         if (parameters["dialog"] === "EditLicense"){
 
             if (parameters["status"] === "ok") {
@@ -118,15 +96,16 @@ Item {
                 if (oldId !== parameters["newLicenseId"] || oldName !== parameters["newLicenseName"]){
                     dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);
                     dataModelLocal.SetData("Name", parameters["newLicenseName"], productsCollectionView.selectedIndex);
-                    productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+                    //productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+//                    productsCollectionView.refresh();
+
+                    featuresTreeView.updateLicensesDependenciesAfterLicenseEditing(productsCollectionViewContainer.itemId, oldId,
+                                                                       parameters["newLicenseId"],
+                                                                       parameters["newLicenseName"]);
                     productsCollectionView.refresh();
+//                    productsCollectionViewContainer.updateFeatureLicenseModelAfterLicenseEdit(productsCollectionViewContainer.itemId, oldId, parameters["newLicenseId"]);
 
-                    console.log("productsCollectionView.collectionViewModel", productsCollectionView.collectionViewModel.toJSON());
-
-                    console.log("getSelectedId", productsCollectionView.table.getSelectedId());
-                    productsCollectionViewContainer.updateFeatureLicenseModelAfterLicenseEdit(productsCollectionViewContainer.itemId, oldId, parameters["newLicenseId"]);
-
-                    treeView.visible = true;
+                    //treeView.visible = true;
 //                    productsCollectionViewContainer.wasChanged = true;
                 }
             }
@@ -163,6 +142,10 @@ Item {
                     productsCollectionView.refresh();
 
                     productsCollectionView.table.selectedIndex = -1;
+
+                    if (dataModelLocal.GetItemsCount() == 0){
+                        treeView.visible = false;
+                    }
                 }
             }
         }
@@ -185,37 +168,7 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
         }
-    }
-
-    function updateFeatureLicenseModelAfterProductEdit(oldProductId, newProductId){
-        console.log("updateFeatureLicenseModelAfterProductEdit", oldProductId, newProductId);
-        if (!featuresTreeView.productLicenseFeatures || oldProductId == newProductId || oldProductId == "", newProductId == ""){
-            return;
-        }
-
-        for (let i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
-            let rootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
-
-            if (rootProductId == oldProductId){
-                featuresTreeView.productLicenseFeatures.SetData("RootProductId", newProductId, i);
-            }
-        }
-    }
-
-    function updateFeatureLicenseModelAfterLicenseEdit(productId, oldLicId, newLicId){
-        console.log("updateFeatureLicenseModelAfterLicenseEdit", productId, oldLicId, newLicId);
-        if (!featuresTreeView.productLicenseFeatures || oldLicId == newLicId || oldLicId == "" || newLicId == "" || productId == ""){
-            return;
-        }
-
-        for (let i = 0; i < featuresTreeView.productLicenseFeatures.GetItemsCount(); i++){
-            let rootLicId = featuresTreeView.productLicenseFeatures.GetData("RootLicenseId", i);
-            let rootProductId = featuresTreeView.productLicenseFeatures.GetData("RootProductId", i);
-
-            if (rootLicId == oldLicId && rootProductId == productId){
-                featuresTreeView.productLicenseFeatures.SetData("RootLicenseId", newLicId, i);
-            }
-        }
+        productsCollectionView.forceActiveFocus();
     }
 
     function makeCommandActive(commandId){
@@ -254,41 +207,19 @@ Item {
             productsCollectionViewContainer.createLicense("", "License Name", "");
         }
         else if (menuId  === "Save") {
-
-//            if (productsCollectionViewContainer.operation === "New"){
-//                var source = "AuxComponents/InputDialog.qml";
-//                var parameters = {};
-//                parameters["message"] = "Please enter the name of the document: ";
-//                parameters["nameDialog"] = "Document Name";
-//                parameters["resultItem"] = productsCollectionViewContainer;
-//                thubnailDecoratorContainer.openDialog(source, parameters);
+//            if (tfcProductId.text === ""){
+//                productsCollectionView.openMessageDialog(qsTr("Error"), qsTr("Product-ID can't be empty!"), "ErrorDialog");
 //            }
-
-//            if (productsCollectionView.itemId === "") {
-//                var source = "AuxComponents/InputDialog.qml";
-//                var parameters = {};
-//                parameters["message"] = "Please enter the name of the document: ";
-//                parameters["nameDialog"] = "Document Name";
-//                parameters["resultItem"] = productsCollectionViewContainer;
-//                thubnailDecoratorContainer.openDialog(source, parameters);
-//            }
-//            else {
-//                productViewSaveQuery.updateModel()
-//            }
-
-            if (tfcProductId.text === ""){
-                productsCollectionView.openMessageDialog(qsTr("Error dialog"), qsTr("Id can't be empty!"), "ErrorDialog");
-            }
-            else{
+//            else{
                 let name = productsCollectionViewContainer.checkLicenses();
                 if (name == ""){
                     productViewSaveQuery.updateModel();
                 }
                 else{
-                    let message = name + qsTr(" has an invalid id!");
-                    productsCollectionView.openMessageDialog(qsTr("Error dialog"), message, "ErrorDialog");
+                    let message = name + " " + qsTr("has an invalid id!");
+                    productsCollectionView.openMessageDialog(qsTr("Error"), message, "ErrorDialog");
                 }
-            }
+//            }
         }
         else if (menuId  === "Remove") {
             var source = "AuxComponents/MessageDialog.qml";
@@ -391,6 +322,8 @@ Item {
         anchors.left: parent.left;
         anchors.right: productSplitter.left;
 
+        rootItem: productsCollectionViewContainer;
+
         height: parent.height;
 
         Component.onCompleted: {
@@ -432,15 +365,13 @@ Item {
             if (productsCollectionView.selectedIndex > -1){
                 productsCollectionViewContainer.commandsChanged("ProductEdit")
 
-                let curIdIsEmpty = productsCollectionView.table.getSelectedId() == "";
-                if (!curIdIsEmpty){
-                    treeView.visible = true;
-                }
-                else{
-                    treeView.visible = false;
+                if (productsCollectionViewContainer.operation != "New"){
+                    let curIdIsEmpty = productsCollectionView.table.getSelectedId() == "";
+                    treeView.visible = !curIdIsEmpty;
                 }
 
-                let rootProductId = productsCollectionViewContainer.itemId;
+//                let rootProductId = productsCollectionViewContainer.itemId;
+                let rootProductId = tfcProductId.text;
                 let rootLicenseId = productsCollectionView.table.getSelectedId();
                 let rootKey = rootProductId + '.' + rootLicenseId;
 
@@ -466,6 +397,10 @@ Item {
             else {
                 treeView.visible = false;
             }
+        }
+
+        onDataLoaded: {
+            loadingPage.visible = false;
         }
     }
 
@@ -524,6 +459,12 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, productViewSaveQuery);
             if (this.state === "Ready"){
+                let keys = productViewSaveQuery.GetKeys();
+                if (!keys || keys.length == 0){
+                    thubnailDecoratorContainer.setInvalidConnection(true);
+                    return;
+                }
+
                 var dataModelLocal;
                 if (productViewSaveQuery.ContainsKey("errors")){
                     dataModelLocal = productViewSaveQuery.GetData("errors");
@@ -531,7 +472,7 @@ Item {
                     dataModelLocal = dataModelLocal.GetData(productsCollectionViewContainer.gqlModelQueryType);
                     if (dataModelLocal){
                         var messageError = dataModelLocal.GetData("message");
-                        productsCollectionView.openMessageDialog("Error Dialog", messageError, "ErrorDialog");
+                        productsCollectionView.openMessageDialog("Error", messageError, "ErrorDialog");
                     }
 
                     return;
@@ -566,6 +507,11 @@ Item {
 
                     if (productsCollectionViewContainer.operation == "New"){
                         productsCollectionViewContainer.operation = "Open";
+
+                        let dataModelLocal = productsCollectionView.collectionViewModel.GetData("data");
+                        if (dataModelLocal && dataModelLocal.GetItemsCount() > 0){
+                            treeView.visible = true;
+                        }
                     }
 //                    console.log("productsCollectionViewContainer.operation", productsCollectionViewContainer.operation);
                     productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
@@ -627,37 +573,58 @@ Item {
                font.pixelSize: Style.fontSize_common;
                font.family: Style.fontFamily;
 
-               text: qsTr("Product-Id");
+               text: qsTr("Product-ID");
             }
         }
 
-        TextFieldCustom {
-            id: tfcProductId;
+        Rectangle {
+            id: rectTfcProductId;
 
             anchors.top: productIdTextRect.bottom;
-
             width: parent.width - 3;
             height: 30;
 
-            text: productsCollectionViewContainer.itemId;
+            TextFieldCustom {
+                id: tfcProductId;
 
-            onInputTextChanged: {
-//                productsCollectionViewContainer.wasChanged = true;
-                if (tfcProductId.text != ""){
+                anchors.fill: parent;
+                text: productsCollectionViewContainer.itemId;
 
-                    productsCollectionViewContainer.updateFeatureLicenseModelAfterProductEdit(
-                                productsCollectionViewContainer.itemId,
-                                tfcProductId.text);
+                property string lastValue: tfcProductId.text;
 
-                    //productsCollectionViewContainer.itemId = tfcProductId.text;
+//                Component.onCompleted: {
+//                    tfcProductId.lastValue = productsCollectionViewContainer.itemId;
+//                }
+
+                onInputTextChanged: {
+                    if (tfcProductId.text != ""){
+
+//                        productsCollectionViewContainer.updateFeatureLicenseModelAfterProductEdit(
+//                                    productsCollectionViewContainer.itemId,
+//                                    tfcProductId.text);
+
+                        featuresTreeView.updateLicensesDependenciesAfterProductEditing(tfcProductId.lastValue, tfcProductId.text);
+
+                        tfcProductId.lastValue = tfcProductId.text;
+                        //productsCollectionViewContainer.itemId = tfcProductId.text;
+                    }
                 }
             }
 
+            onFocusChanged: {
+                if (rectTfcProductId.focus){
+                    tfcProductId.setFocus(true);
+                }
+            }
+
+            KeyNavigation.tab: rectTfcProductName;
+            KeyNavigation.backtab: rectTfcProductName;
         }
 
         Rectangle {
             id: productNameTextRect;
-            anchors.top: tfcProductId.bottom;
+            anchors.top: rectTfcProductId.bottom;
+            anchors.topMargin: 8;
 
             width: parent.width;
             height: 20;
@@ -678,26 +645,42 @@ Item {
             }
         }
 
-        TextFieldCustom {
-            id: tfcProductName;
+        Rectangle {
+            id: rectTfcProductName;
 
             anchors.top: productNameTextRect.bottom;
 
             width: parent.width - 3;
             height: 30;
 
-            text: productsCollectionViewContainer.itemName;
+            TextFieldCustom {
+                id: tfcProductName;
 
-            onInputTextChanged: {
-//                productsCollectionViewContainer.wasChanged = true;
+                anchors.fill: parent;
+
+                text: productsCollectionViewContainer.itemName;
+
+                onInputTextChanged: {
+    //                productsCollectionViewContainer.wasChanged = true;
+                }
+
             }
+
+            onFocusChanged: {
+                if (rectTfcProductName.focus){
+                    tfcProductName.setFocus(true);
+                }
+            }
+
+            KeyNavigation.tab: rectTfcProductId;
+            KeyNavigation.backtab: rectTfcProductId;
         }
 
         Rectangle {
             id: headerTreeView;
 
-            anchors.top: tfcProductName.bottom;
-            anchors.topMargin: 5;
+            anchors.top: rectTfcProductName.bottom;
+            anchors.topMargin: productNameText.height + productNameTextRect.anchors.topMargin;
 
             width: parent.width - 5;
             height: 35;
@@ -711,7 +694,7 @@ Item {
                 anchors.left: headerTreeView.left;
                 anchors.leftMargin: 10;
 
-                text: qsTr("Dependencies");
+                text: qsTr("Features");
                 color: Style.textColor;
 
                 font.pixelSize: Style.fontSize_common;
@@ -731,6 +714,22 @@ Item {
             color: "lightgray";
         }
 
+        Text {
+            id: valueText;
+
+            anchors.top: headerBottomBorder.bottom;
+            anchors.topMargin: 10;
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            text: qsTr("Please save the product first!");
+            visible: productsCollectionViewContainer.operation == "New";
+
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+
+            color: Style.textColor;
+        }
+
         TreeView {
             id: treeView;
 
@@ -743,6 +742,7 @@ Item {
             clip: true;
 
             visible: false;
+            //visible: productsCollectionViewContainer.operation !== "New";
 
             modelItems: featuresTreeView.modelTreeItems;
 
@@ -754,7 +754,9 @@ Item {
                             featureId,
                             state);
                // productsCollectionViewContainer.wasChanged = true;
-                let rootLProductd = productsCollectionViewContainer.itemId;
+//                let rootLProductd = productsCollectionViewContainer.itemId;
+                let rootLProductd = tfcProductId.text;
+
                 let rootLicenseId = productsCollectionView.table.getSelectedId();
                 let rootKey = rootLProductd + '.' + rootLicenseId;
                 let value = packageId + '.' + featureId;
@@ -799,18 +801,13 @@ Item {
                 }
             }
         }
+    }
 
-//        FeaturesTreeView {
-//            id: featuresTreeView;
+    LoadingPage {
+        id: loadingPage;
 
-//            onModelTreeItemsChanged: {
-//                console.log("PackageView FeaturesTreeView onModelTreeViewChanged");
-//                //treeView.modelItems = featuresTreeView.modelTreeItems;
-//            }
+        anchors.fill: parent;
 
-//            onProductLicenseFeaturesChanged: {
-//                console.log("PackageView FeaturesTreeView onProductLicenseFeaturesChanged");
-//            }
-//        }
+        visible: true;
     }
 }

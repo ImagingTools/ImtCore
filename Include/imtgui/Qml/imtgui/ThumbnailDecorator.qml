@@ -216,7 +216,7 @@ Rectangle
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    var source = menuPanel.model.GetData(PageEnum.SOURCE, model.index);
+                    var source = menuPanel.model.GetData("Source", model.index);
                     console.log("PagesLoader ", source);
                     pagesLoader.source = source;
                     console.log("PagesLoader ", pagesLoader.source);
@@ -226,10 +226,10 @@ Rectangle
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
                     if (pagesLoader.item){
                         pagesLoader.item.rootItem = pagesDeleg;
-                         pagesLoader.item.title = menuPanel.model.GetData(PageEnum.NAME, model.index);
+                         pagesLoader.item.title = menuPanel.model.GetData("Name", model.index);
 //                        pagesLoader.item.forceActiveFocus();
                         console.log("ThumbnailDecorator pagesLoader.item.rootItem", pagesLoader.item.rootItem)
-                        pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData(PageEnum.ICON, model.index);
+                        pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData("Icon", model.index);
                     }
                 }
             }
@@ -406,10 +406,9 @@ Rectangle
 
                   function closeItem() {
                       console.log("ThumbnailDecorator close dialog", model.index);
+//                      thubnailDecoratorContainer.activeItem.forceActiveFocus();
+                      loaderDialog.item.focus = false;
                       modelLayers.remove(model.index);
-//                      if (modelLayers.count === 0){
-//                          listViewDialogs.visible = false;
-//                      }
                   }
 
 

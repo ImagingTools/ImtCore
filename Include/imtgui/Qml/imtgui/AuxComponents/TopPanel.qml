@@ -26,7 +26,7 @@ Rectangle {
             var itemsCount = buttonsModelLocal.GetItemsCount();
 
             for (var i = 0; i < itemsCount; i++){
-                var id = buttonsModelLocal.GetData(CommandEnum.ID, i);
+                var id = buttonsModelLocal.GetData("Id", i);
 
                 if (id === commandId){
 //                    console.log("topPanelDecoratorLoader.item", topPanelDecoratorLoader.item)
@@ -318,18 +318,18 @@ Rectangle {
             var query = Gql.GqlRequest("query", "CommandsData");
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField(PageEnum.ID);
-            inputParams.InsertFieldArgument(PageEnum.ID, topPanel.activeCommandsModelId);
+            inputParams.InsertField("PageId");
+            inputParams.InsertFieldArgument("PageId", topPanel.activeCommandsModelId);
 
             inputParams.InsertField("LanguageId");
             inputParams.InsertFieldArgument("LanguageId", Style.language)
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField(CommandEnum.ID);
-            queryFields.InsertField(CommandEnum.NAME);
-            queryFields.InsertField(CommandEnum.ICON);
-            queryFields.InsertField(CommandEnum.MODE);
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Name");
+            queryFields.InsertField("Icon");
+            queryFields.InsertField("Mode");
             query.AddField(queryFields);
             queryFields = Gql.GqlObject("information");
             queryFields.InsertField("CommandsModelId");

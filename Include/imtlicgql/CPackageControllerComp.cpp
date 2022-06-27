@@ -74,6 +74,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			QString& errorMessage) const
 {
 	if (inputParams.isEmpty()){
+		errorMessage = QObject::tr("Can not create package: %1").arg(QString(objectId));
 		return nullptr;
 	}
 
@@ -91,6 +92,11 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Id")){
 			objectId = itemModel.GetData("Id").toByteArray();
+		}
+
+		if (objectId.isEmpty()){
+			errorMessage = QT_TR_NOOP("Package-ID can not be empty!");
+			return nullptr;
 		}
 
 		if (itemModel.ContainsKey("Name")){
@@ -144,6 +150,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 		return featurePackagePtr.PopPtr();
 	}
+	errorMessage = QObject::tr("Can not create package: %1").arg(QString(objectId));
 
 	return nullptr;
 }

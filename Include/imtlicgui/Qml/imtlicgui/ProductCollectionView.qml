@@ -17,34 +17,10 @@ Item {
 
     property string operation;
 
-    Keys.onPressed: {
-        console.log("ProductollectionView keys pressed")
-
-        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-
-            if (productCollectionContainer.multiDocViewItem.tabPanel.count > 1){
-                productCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
-                productCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-            }
-            else{
-                thubnailDecoratorContainer.setFocusOnMenuPanel();
-            }
-        }
-        else if (event.key === Qt.Key_Up){
-            console.log('Key up was pressed');
-            productCollectionContainer.selectedIndexDecr();
-        }
-        else if (event.key === Qt.Key_Down){
-            console.log('Key down was pressed');
-             productCollectionContainer.selectedIndexIncr();
-        }
-        else if (event.key === Qt.Key_Return){
-            console.log('Key down was pressed');
-            productCollectionContainer.selectItem();
-
-            productCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-        }
+    Component.onCompleted: {
+        console.log("productCollectionContainer");
+       // productCollectionContainer.forceActiveFocus();
+        console.log("focus", productCollectionContainer.focus);
     }
 
     ListModel {
@@ -100,7 +76,7 @@ Item {
             else if (parameters["status"] === "Rename") {
 
                 prmtrs["message"] = qsTr("Please enter the name of the product: ");
-                prmtrs["nameDialog"] = "Rename Dialog";
+                prmtrs["nameDialog"] = "Rename";
                 prmtrs["typeOperation"] = "Rename";
 
                 prmtrs["startingValue"] = productCollectionView.getNameBySelectedItem();
@@ -223,6 +199,8 @@ Item {
         anchors.right: productCollectionMetaInfo.left;
 
         autoRefresh: true;
+
+        rootItem: productCollectionContainer;
 
         Component.onCompleted: {
             productCollectionView.gqlModelInfo = "ProductCollectionInfo"

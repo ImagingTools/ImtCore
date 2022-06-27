@@ -14,7 +14,12 @@ namespace imtbase
 bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId) const
 {
 	QByteArray workingFileName = dataId;
-	QString homeDirPath = *m_homeDirPathAttrPtr;
+//	QString homeDirPath = *m_homeDirPathAttrPtr;
+	QString homeDirPath;
+
+	if (m_homeDirPathAttrPtr.IsValid()){
+		homeDirPath = m_homeDirPathAttrPtr->GetPath();
+	}
 
 	if (m_fileTemplatePathCompPtr.IsValid() && m_fileTemplatePathCompPtr->GetPath().length()){
 		homeDirPath = m_fileTemplatePathCompPtr->GetPath();

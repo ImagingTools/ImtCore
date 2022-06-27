@@ -63,6 +63,7 @@ Rectangle {
                     font.bold: true;
 
                     color: Style.lightBlueColor;
+                    elide: Text.ElideRight;
                 }
 
                 Column {
@@ -98,6 +99,7 @@ Rectangle {
                                 font.pixelSize: Style.fontSize_small;
 
                                 color: Style.textColor;
+                                elide: Text.ElideRight;
                             }
                         }
                     }

@@ -54,6 +54,7 @@ Rectangle {
         height: parent.height;
 
         color: "transparent";
+        clip: true;
 
         CheckBox {
             id: checkBoxLicense;
@@ -91,6 +92,7 @@ Rectangle {
             font.pixelSize: Style.fontSize_common;
             color: Style.textColor;
             wrapMode: Text.WordWrap;
+            elide: Text.ElideRight;
         }
     }
 
@@ -147,6 +149,7 @@ Rectangle {
             font.pixelSize: Style.fontSize_common;
             color: Style.textColor;
             wrapMode: Text.WordWrap;
+            elide: Text.ElideRight;
         }
 
         Calendar {
@@ -191,31 +194,5 @@ Rectangle {
                 licensesTableDelegate.expirationTextChanged(model.index, dateStr);
             }
         }
-
-//        TextFieldCustom {
-//            id: tfcDate;
-
-//            anchors.verticalCenter: parent.verticalCenter;
-//            anchors.left: checkBoxExpiration.right;
-//            anchors.leftMargin: 5;
-
-//            height: 20;
-//            width: 100;
-
-////            text: licensesTableDelegate.expirationText;
-//            text: model.ExpirationState === 2 ? model.Expiration : "Unlimited";
-////            text: model.Expiration;
-//            textSize: 12;
-
-//            visible: checkBoxExpiration.checkState === 2;
-
-////            onTextChanged: {
-////                licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);
-////            }
-
-//            onInputTextChanged: {
-//                licensesTableDelegate.expirationTextChanged(model.index, tfcDate.text);
-//            }
-//        }
     }
 }
