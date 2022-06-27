@@ -9,7 +9,7 @@ Item {
     property TreeItemModel modelDepends;
     property TreeItemModel productLicenseFeatures;
 
-    property var items: [];
+//    property var items: [];
 //    property var featuresDependencies;
 
     Component.onCompleted: {
@@ -18,36 +18,35 @@ Item {
 
     onModelTreeItemsChanged: {
         console.log( "featuresTreeViewContainer onModelTreeItemsChanged");
-//        Events.sendEvent("FeaturesTreeUpdate");
     }
 
-    function subscribe(item){
-        console.log("FeaturesTreeView subscribe", item);
-        if (!featuresTreeViewContainer.items.includes(item)){
-            featuresTreeViewContainer.items.push(item);
-        }
-    }
+//    function subscribe(item){
+//        console.log("FeaturesTreeView subscribe", item);
+//        if (!featuresTreeViewContainer.items.includes(item)){
+//            featuresTreeViewContainer.items.push(item);
+//        }
+//    }
 
-    function unsubscribe(item){
-        console.log("FeaturesTreeView unsubscribe", item);
-        if (featuresTreeViewContainer.items.includes(item)){
-            console.log(featuresTreeViewContainer.items);
-            const index = featuresTreeViewContainer.items.indexOf(item);
-            if (index > -1) {
-                featuresTreeViewContainer.items.splice(index, 1);
-            }
-            console.log(featuresTreeViewContainer.items);
-        }
-    }
+//    function unsubscribe(item){
+//        console.log("FeaturesTreeView unsubscribe", item);
+//        if (featuresTreeViewContainer.items.includes(item)){
+//            console.log(featuresTreeViewContainer.items);
+//            const index = featuresTreeViewContainer.items.indexOf(item);
+//            if (index > -1) {
+//                featuresTreeViewContainer.items.splice(index, 1);
+//            }
+//            console.log(featuresTreeViewContainer.items);
+//        }
+//    }
 
-    function sendSignal(){
-        console.log("FeaturesTreeView sendSignal");
-        for (let i = 0; i < items.length; i++){
-            if (items[i] != undefined){
-                featuresTreeViewContainer.items[i].update();
-            }
-        }
-    }
+//    function sendSignal(){
+//        console.log("FeaturesTreeView sendSignal");
+//        for (let i = 0; i < items.length; i++){
+//            if (items[i] != undefined){
+//                featuresTreeViewContainer.items[i].update();
+//            }
+//        }
+//    }
 
     function updateFeaturesDependenciesAfterPackageEditing(oldPackageId, newPackageId){
         console.log("updateFeaturesDependenciesAfterPackageEditing", oldPackageId, newPackageId);
@@ -670,9 +669,7 @@ Item {
                         }
 
                         featuresTreeViewContainer.modelTreeItems = dataModelLocal;
-
-                        featuresTreeViewContainer.sendSignal();
-//                        Events.sendEvent("FeaturesTreeUpdate");
+                        Events.sendEvent("FeaturesTreeUpdate");
                     }
                 }
 

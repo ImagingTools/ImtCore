@@ -81,18 +81,6 @@ I_EXPORT_COMPONENT(
 			"Key data provider");
 
 
-I_EXPORT_COMPONENT(
-			FileDataController,
-			"FileDataController",
-			"File data controller");
-
-
-I_EXPORT_COMPONENT(
-			FileDataProvider,
-			"FileDataProvider",
-			"File data provider");
-
-
 } // namespace ImtLicenseGqlPck
 
 

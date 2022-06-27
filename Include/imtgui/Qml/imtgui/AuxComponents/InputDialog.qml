@@ -36,6 +36,11 @@ Rectangle {
     signal okButtonClicked();
     signal cancelButtonClicked();
 
+    Component.onCompleted: {
+        console.log("InputDialog onCompleted");
+        inputDialogContainer.forceActiveFocus();
+    }
+
     Keys.onPressed: {
         console.log("InputDialog keys pressed")
         if (event.key === Qt.Key_Escape){

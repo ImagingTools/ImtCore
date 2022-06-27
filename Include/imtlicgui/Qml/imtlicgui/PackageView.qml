@@ -40,22 +40,16 @@ Item {
             featuresTreeView.loadDependModel();
         }
 
-        featuresTreeView.subscribe(featureCollectionViewContainer);
-//        Events.subscribeEvent("FeaturesTreeUpdate", featureCollectionView.refresh());
+        Events.subscribeEvent("FeaturesTreeUpdate", featureCollectionView.refresh);
     }
 
-    Component.onDestruction: {
-        console.log("PackageView onDestruction");
-        featuresTreeView.unsubscribe(featureCollectionViewContainer);
-    }
+//    Component.onDestruction: {
+//        console.log("PackageView onDestruction");
+//        Events.unSubscribeEvent("FeaturesTreeUpdate", featureCollectionView.refresh)
+//    }
 
     onWasChangedChanged: {
         featureCollectionViewContainer.commandsChanged("PackageEdit");
-    }
-
-    function update(){
-        console.log("PackageView update");
-        featureCollectionView.refresh();
     }
 
     function refresh() {
@@ -114,7 +108,7 @@ Item {
 
     function dialogResult(parameters){
          console.log("PackageView dialogResult", parameters["status"]);
-        featureCollectionView.forceActiveFocus();
+        //featureCollectionView.forceActiveFocus();
         if (parameters["status"] === "ok"){
             if (parameters["dialog"] === "EditFeature"){
                 var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");

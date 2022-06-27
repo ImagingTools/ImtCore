@@ -15,8 +15,6 @@
 #include <imtlicgql/CProductControllerComp.h>
 #include <imtlicgql/CAccountControllerComp.h>
 #include <imtlicgql/CKeyDataProviderComp.h>
-#include <imtlicgql/CFileDataControllerComp.h>
-#include <imtlicgql/CFileDataProviderComp.h>
 #include <imtlicgql/CUserCollectionControllerComp.h>
 #include <imtlicgql/CUserControllerComp.h>
 
@@ -37,8 +35,6 @@ typedef imtlicgql::CAccountControllerComp AccountController;
 typedef imtlicgql::CInstallationCollectionControllerComp InstallationCollectionController;
 typedef imtlicgql::CInstallationControllerComp InstallationController;
 typedef imtlicgql::CKeyDataProviderComp KeyDataProvider;
-typedef imtlicgql::CFileDataControllerComp FileDataController;
-typedef imtlicgql::CFileDataProviderComp FileDataProvider;
 typedef imtlicgql::CUserCollectionControllerComp UserCollectionController;
 typedef imtlicgql::CUserControllerComp UserController;
 
