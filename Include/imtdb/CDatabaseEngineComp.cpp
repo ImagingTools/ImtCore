@@ -233,7 +233,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 	retVal = maintainanceDb.open();
 	if (retVal){
 		QString queryString;
-		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		QDir folder(m_migrationFolderPathCompPtr->GetPath());
 
 		if (QFile(folder.filePath("CreateDatabase.sql")).exists()){
 			QFile scriptFile(folder.filePath("CreateDatabase.sql"));
@@ -294,12 +294,12 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 	if (retVal){
 		QSqlError sqlError;
-		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		QDir folder(m_migrationFolderPathCompPtr->GetPath());
 		ExecSqlQueryFromFile(folder.filePath("CreateRevision.sql").toLocal8Bit(), &sqlError);
 		if (sqlError.type() != QSqlError::NoError){
 			return false;
 		}
-		if (*m_autoCreateTablesAttrPtr > 0 && m_migrationFolderPathAttrPtr.IsValid()){
+		if (*m_autoCreateTablesAttrPtr > 0 && m_migrationFolderPathCompPtr.IsValid()){
 			retVal = Migration();
 		}
 	}
@@ -310,10 +310,10 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 bool CDatabaseEngineComp::Migration() const
 {
-	if (m_migrationFolderPathAttrPtr.IsValid()){
+	if (m_migrationFolderPathCompPtr.IsValid()){
 		int lastMigration = GetLastMigration();
 		int databaseVersion =  GetDatabaseVersion();
-		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		QDir folder(m_migrationFolderPathCompPtr->GetPath());
 		QStringList nameFilter = {"migration_*.sql"};
 		folder.setNameFilters(nameFilter);
 		QStringList files = folder.entryList();
@@ -524,8 +524,8 @@ QString CDatabaseEngineComp::GetPassword() const
 
 int CDatabaseEngineComp::GetLastMigration() const
 {
-	if (m_migrationFolderPathAttrPtr.IsValid()){
-		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+	if (m_migrationFolderPathCompPtr.IsValid()){
+		QDir folder(m_migrationFolderPathCompPtr->GetPath());
 		if (folder.exists()){
 			QStringList nameFilter = {"migration_*.sql"};
 			folder.setNameFilters(nameFilter);
@@ -556,9 +556,9 @@ int CDatabaseEngineComp::GetLastMigration() const
 
 int CDatabaseEngineComp::GetDatabaseVersion() const
 {
-	if (m_migrationFolderPathAttrPtr.IsValid()){
+	if (m_migrationFolderPathCompPtr.IsValid()){
 		QSqlError sqlError;
-		QDir folder(m_migrationFolderPathAttrPtr->GetPath());
+		QDir folder(m_migrationFolderPathCompPtr->GetPath());
 		QSqlQuery queryGetRevision = ExecSqlQueryFromFile(folder.filePath("GetRevision.sql").toLocal8Bit(), &sqlError);
 		if (sqlError.type() != QSqlError::NoError){
 			return -1;

@@ -10,7 +10,7 @@
 #include <imtauth/IContactInfo.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
-#include <imtqml/CUserOptionsProviderBase.h>
+#include <imtgql/CUserOptionsProviderBase.h>
 
 
 namespace imtqml
@@ -22,7 +22,7 @@ namespace imtqml
 */
 class CPageDataProviderCompBase:
 			public icomp::CComponentBase,
-			public imtqml::CUserOptionsProviderBase,
+			public imtgql::CUserOptionsProviderBase,
 			public imtbase::IItemBasedRepresentationDataProvider
 {
 public:

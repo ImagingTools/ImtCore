@@ -47,7 +47,7 @@ public:
 		I_ASSIGN(m_paswordAttrPtr, "Pasword", "The property holds connection's password.", true, "12345");
 		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "localhost");
 		I_ASSIGN(m_maintenanceDatabaseNameAttrPtr, "MaintainanceDatabase", "Name of Maintenance database. It's necessary for creating database if it not exists", true, "postgres");
-        I_ASSIGN(m_migrationFolderPathAttrPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");
+		I_ASSIGN(m_migrationFolderPathCompPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");
 		I_ASSIGN(m_autoCreateDatabaseAttrPtr, "AutoCreateDatabase", "The property holds behavior to create database on startup.\n Possible values:\n0 - will not create new database;\n1 - will create database once;\n2 - will create database at each startup", true, 1);
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
@@ -119,7 +119,7 @@ private:
 	I_ATTR(QByteArray, m_hostNameAttrPtr);
 	I_ATTR(QByteArray, m_maintenanceDatabaseNameAttrPtr);
 	I_ATTR(QByteArray, m_databaseCreationScriptPathAttrPtr);
-	I_REF(ifile::IFileNameParam, m_migrationFolderPathAttrPtr);
+	I_REF(ifile::IFileNameParam, m_migrationFolderPathCompPtr);
 	I_ATTR(int, m_autoCreateDatabaseAttrPtr);
 	I_ATTR(int, m_autoCreateTablesAttrPtr);
 	I_ATTR(int, m_portAttrPtr);

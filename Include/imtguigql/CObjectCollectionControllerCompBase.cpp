@@ -5,9 +5,7 @@
 
 // ImtCore includes
 #include <imtqml/CCommandDataEnumProviderComp.h>
-#include <iqtgui/CHierarchicalCommand.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
-#include <imtgui/CObjectCollectionViewDelegate.h>
 #include <imtbase/CCollectionFilter.h>
 
 
@@ -533,11 +531,11 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			else if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(collectionId, metaInfo)){
 				if (informationId == QByteArray("Added")){
 					elementInformation = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
-							.toDateTime().toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
+							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
 				else if (informationId == QByteArray("ModificationTime")){
 					elementInformation = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
-							.toDateTime().toString(imtgui::CObjectCollectionViewDelegate::s_dateTimeFormat);
+							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
 			}
 

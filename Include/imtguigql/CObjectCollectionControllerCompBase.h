@@ -4,11 +4,12 @@
 #include <iqt/ITranslationManager.h>
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtqml/CUserOptionsProviderBase.h>
+#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
+#include <imtgql/CUserOptionsProviderBase.h>
 
+#undef GetObject
 
 namespace imtguigql
 {
@@ -16,7 +17,7 @@ namespace imtguigql
 
 class CObjectCollectionControllerCompBase:
 		public imtgql::CGqlRepresentationDataControllerCompBase,
-		public imtqml::CUserOptionsProviderBase
+		public imtgql::CUserOptionsProviderBase
 {
 public:
 	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
