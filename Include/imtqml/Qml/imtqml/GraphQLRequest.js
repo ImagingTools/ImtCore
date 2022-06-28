@@ -50,18 +50,15 @@ var GqlObject = function(objectId){
             return retVal;
         },
     
-        InsertField: function(fieldId){
+        InsertField: function(fieldId, value){
             if (!this.m_fieldsMap.hasOwnProperty(fieldId)) {
                   this.m_fieldsMap[fieldId] = fieldId
             }
-        },
-    
-        InsertFieldArgument: function(fieldId, value){
-            if (this.m_fieldsMap.hasOwnProperty(fieldId)){
+            if(value !== undefined){
                 this.m_fieldsMap[fieldId] = value;
             }
         },
-    
+
         InsertFieldObject: function(objectPtr){
             var fieldId = objectPtr.m_objectId
             if (!this.m_fieldsMap.hasOwnProperty(fieldId)){
