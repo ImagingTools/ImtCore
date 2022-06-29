@@ -43,10 +43,10 @@ Item {
         Events.subscribeEvent("FeaturesTreeUpdate", featureCollectionView.refresh);
     }
 
-//    Component.onDestruction: {
-//        console.log("PackageView onDestruction");
-//        Events.unSubscribeEvent("FeaturesTreeUpdate", featureCollectionView.refresh)
-//    }
+    Component.onDestruction: {
+        console.log("PackageView onDestruction");
+        Events.unSubscribeEvent("FeaturesTreeUpdate", featureCollectionView.refresh)
+    }
 
     onWasChangedChanged: {
         featureCollectionViewContainer.commandsChanged("PackageEdit");
@@ -244,8 +244,8 @@ Item {
         else if (menuId  === "Remove") {
             let source = "AuxComponents/MessageDialog.qml";
             let parameters = {};
-            parameters["message"] = "Remove selected file from the database ?";
-            parameters["nameDialog"] = "RemoveDialog";
+            parameters["message"] = "Remove selected file from the collection?";
+            parameters["nameDialog"] = "Remove";
             parameters["resultItem"] = featureCollectionViewContainer;
 
             thubnailDecoratorContainer.openDialog(source, parameters);
@@ -527,8 +527,6 @@ Item {
                             }
                         }
 
-//                        featuresTreeView.subscribe(featureCollectionViewContainer);
-//                        featureCollectionView.refresh();
                         featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                     }
                 }

@@ -96,10 +96,6 @@ Rectangle {
     function closeTab(index) {
         console.log("MultiDocWorkspaceView closeTab", index);
 
-        let delegateItem = docsData.itemAtIndex(index);
-        let itemLink = delegateItem.getItem();
-        console.log(itemLink);
-
         //featuresTreeView.unsubscribe(itemLink);
 
         pagesData.RemoveItem(index)
@@ -116,6 +112,12 @@ Rectangle {
         let delegateItem = docsData.itemAtIndex(index);
         delegateItem.setItemId(itemId);
         delegateItem.setItemName(title);
+    }
+
+    function reloadModelInOpenTab(index){
+        let delegateItem = docsData.itemAtIndex(index);
+        let itemLink = delegateItem.getItem();
+        itemLink.reloadModel();
     }
 
 //    function updateIdAfterEdit(oldId, newId){
@@ -141,7 +143,6 @@ Rectangle {
 
         for (var i = 1; i < pagesData.GetItemsCount(); i++){
             var id = pagesData.GetData("ItemId", i);
-            console.log("TabId", id);
             if (id === tabId){
                 return i;
             }

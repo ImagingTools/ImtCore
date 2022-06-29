@@ -37,7 +37,7 @@ Rectangle {
     signal headerClicked(string headerId, string sortOrder);
     signal removedItem(string itemId);
     signal renamedItem(string oldId, string newId);
-    signal setDescriptionItem(string newDescription);
+    signal setDescriptionItem(string id, string newDescription);
     signal collectionViewRightButtonMouseClicked(Item item, int mouseX, int mouseY);
     signal setActiveFocusFromCollectionView();
     signal dataLoaded();
@@ -95,9 +95,12 @@ Rectangle {
         }
         else if (event.key === Qt.Key_Return){
             console.log('Key down was pressed');
-            var itemId = tableInternal.getSelectedId();
-            var name = tableInternal.getSelectedName();
-            collectionViewContainer.itemSelect(itemId, name);
+//            var itemId = tableInternal.getSelectedId();
+//            var name = tableInternal.getSelectedName();
+
+            let curId = tableInternal.elements.GetData("Id", tableInternal.selectedIndex);
+            let curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
+            collectionViewContainer.itemSelect(curId, curName);
         }
         else if (event.key === Qt.Key_Delete){
             console.log('Key delete was pressed');
@@ -862,10 +865,11 @@ Rectangle {
                         if (dataModelLocal.ContainsKey("item")) {
                             dataModelLocal = dataModelLocal.GetData("item");
 
+                            var id = dataModelLocal.GetData("Id");
                             var description = dataModelLocal.GetData("Description");
 
                             collectionViewContainer.updateItemAfterSetDescription(description);
-                            collectionViewContainer.setDescriptionItem(description);
+                            collectionViewContainer.setDescriptionItem(id, description);
                         }
                     }
                 }

@@ -321,7 +321,6 @@ Item {
             console.log("PackageCollection CollectionView onRenamedItem");
 
             var index = packageCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
-
             if (index !== -1){
                 packageCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
             }

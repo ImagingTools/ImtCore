@@ -116,12 +116,6 @@ Rectangle {
         else if (menuId  === "Save") {
 
             var name = containerContactInfo.contactInfoModel.GetData("AccountName");
-//            if (name == ""){
-//                var message = "Account name can't be empty!";
-//                containerContactInfo.openMessageDialog("Error", message, "ErrorDialog");
-//                return;
-//            }
-
             contactInfoSaveQuery.updateModel();
         }
         else if (menuId === "Close") {
@@ -1196,6 +1190,10 @@ Rectangle {
         anchors.fill: parent;
 
         visible: false;
+    }
+
+    function reloadModel(){
+        accountItemModel.updateModel();
     }
 
     GqlModel {

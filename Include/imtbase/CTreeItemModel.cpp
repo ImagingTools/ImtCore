@@ -370,8 +370,22 @@ bool CTreeItemModel::Parse(const QByteArray &data)
 		qCritical()  << "Error for parsing json document:" << error.errorString();
 		return false;
 	}
-	InsertNewItem();
-	bool retVal = ParseRecursive(document.object(), 0);
+
+	bool retVal = true;
+	if (document.isArray()){
+		QJsonArray jsonArray = document.array();
+		int index;
+		for (auto v : jsonArray){
+			index = InsertNewItem();
+			QJsonObject element = v.toObject();
+			retVal &= ParseRecursive(element, index);
+		}
+	}
+	else{
+		InsertNewItem();
+		retVal = ParseRecursive(document.object(), 0);
+	}
+
 	return retVal;
 }
 

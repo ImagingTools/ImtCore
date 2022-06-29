@@ -12,12 +12,12 @@ Item {
     property Item rootItem;
     property Item repeaterItem;
 
-    onFocusChanged: {
-        console.log("SettingsTextInput onFocusChanged", settingsTextInputContainer.focus);
-        if (settingsTextInputContainer.focus){
-            tfcTextInput.setFocus(true);
-        }
-    }
+//    onFocusChanged: {
+//        console.log("SettingsTextInput onFocusChanged", settingsTextInputContainer.focus);
+//        if (settingsTextInputContainer.focus){
+//            tfcTextInput.setFocus(settingsTextInputContainer.focus);
+//        }
+//    }
 
     onItemIdChanged: {
         if (settingsTextInputContainer.itemId === "Password"){
@@ -38,6 +38,7 @@ Item {
     function dataChanged(id, value){
         console.log("SettingsTextInput dataChanged", id, value);
 
+        //FIX
         if (id === "ServerUrl"){
             settingsTextInputContainer.rootItem.dataChanged(0, null , value);
         }

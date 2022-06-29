@@ -95,6 +95,7 @@ def parse_qml_file(cache, com, path):
 				data = data.replace('pragma Singleton', '') # by Artur
 				data = data.replace('property bool webScroll', 'webScroll') # by Artur
 				data = data.replace('Component.onCompleted', 'onCompleted') # by Artur, for compatibility completed signal
+				data = data.replace('Component.onDestruction', 'onDestruction')
 				data = data.replace('onPressed:', 'onMousePressed:').replace('onReleased:', 'onMouseReleased:') # by Artur, for compatibility MouseArea signal
 				#data = data.replace('.scale', '.transform.scale') # by Artur, for compatibility scale
 

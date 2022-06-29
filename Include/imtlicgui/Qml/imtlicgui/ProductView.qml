@@ -224,8 +224,8 @@ Item {
         else if (menuId  === "Remove") {
             var source = "AuxComponents/MessageDialog.qml";
             var parameters = {};
-            parameters["message"] = "Remove selected file from the database ?";
-            parameters["nameDialog"] = "Remove Dialog";
+            parameters["message"] = "Remove selected file from the collection ?";
+            parameters["nameDialog"] = "Remove";
             parameters["resultItem"] = productsCollectionViewContainer;
             parameters["dialogId"] = "RemoveDialog";
             thubnailDecoratorContainer.openDialog(source, parameters);

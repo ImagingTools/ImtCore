@@ -38,7 +38,7 @@ Rectangle {
 
     Component.onCompleted: {
         console.log("InputDialog onCompleted");
-        inputDialogContainer.forceActiveFocus();
+        //inputDialogContainer.forceActiveFocus();
     }
 
     Keys.onPressed: {

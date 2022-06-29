@@ -148,6 +148,34 @@ JSONListModel {
         return retModel;
     }
 
+    function Parse(json){
+        console.log("Parse", json);
+        console.log("start container", container.toJSON());
+        this.json = json;
+        this.updateJSONModel()
+        this.updateTreeItemJSONModel();
+//        container.clear();
+//        var obj = JSON.parse(json);
+//        for (let i = 0; i < obj.length; i++){
+//            let emptyObj = this.createComponent("imtqml/TreeItemModel.qml", this);
+//            //emptyObj.InsertNewItem();
+//            let keys = Object.keys(obj[i]);
+//            for (let j = 0; j < keys.length; j++){
+//                console.log("emptyObj.SetData", keys[j], obj[i][keys[j]]);
+//                if (typeof obj[i][keys[j]] == 'object'){
+//                    let child = emptyObj.AddTreeModel(keys[j], 0);
+//                    child.Parse(JSON.stringify(obj[i][keys[j]]));
+//                }
+//                else{
+//                    emptyObj.SetData(keys[j], obj[i][keys[j]]);
+//                }
+//            }
+//            container.append(emptyObj)
+//        }
+
+        console.log("finish container", container.toJSON());
+    }
+
     function toJSON(){
         var retVal = ""
         if (this.isArray || this.count > 1)

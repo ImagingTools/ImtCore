@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtQuick 2.15
 import Acf 1.0
 import imtqml 1.0
 import QtQuick.Dialogs 1.3
@@ -52,12 +53,13 @@ Rectangle {
         console.log("PreferenceDialog modelSettingsChanged");
 
         preferenceContainer.countMainItems = globalSettings.GetItemsCount();
+        mainPanelRepeater.model = 0;
         mainPanelRepeater.model = globalSettings;
         preferenceContainer.settingsBodyChanged();
     }
 
     onLocalSettingsChanged: {
-        console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.toJSON());
+        //console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.toJSON());
         if (preferenceContainer.localSettings){
             for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
                 var index = globalSettings.InsertNewItem();
@@ -93,6 +95,7 @@ Rectangle {
             }
         }
         preferenceContainer.modelSettingsChange();
+        undoRedo.addModel(globalSettings);
     }
 
     Keys.onPressed: {
@@ -107,14 +110,57 @@ Rectangle {
         }
     }
 
+//    Shortcut {
+//        sequence: "Ctrl+S";
+//        onActivated: {
+//            console.log("Ctrl+S pressed");
+//            preferenceSaveButton.clicked();
+//        }
+//    }
+
+//    Shortcut {
+//        sequence: "Ctrl+Z";
+//        onActivated: {
+//            console.log("Ctrl+Z pressed");
+//            var result = undoRedo.undo();
+//            if (result != null){
+//                result = result.replace(/\\/g, '');
+//                result = result.slice(1, result.length - 1);
+//                globalSettings.Parse(result);
+//                preferenceContainer.modelSettingsChange();
+//                preferenceContainer.settingsBodyChanged();
+//                mainPanelRepeater.model = globalSettings;
+//            }
+//        }
+//    }
+
+//    Shortcut {
+//        sequence: "Ctrl+Shift+Z";
+//        onActivated: {
+//            console.log("Ctrl+Shift+Z pressed");
+//            if (!undoRedo.redoStackIsEmpty()){
+//                var result = undoRedo.redo();
+//                result = result.replace(/\\/g, '');
+//                result = result.slice(1, result.length - 1);
+//                globalSettings.Parse(result);
+//                preferenceContainer.modelSettingsChange();
+//                preferenceContainer.settingsBodyChanged();
+//                mainPanelRepeater.model = globalSettings;
+//            }
+//        }
+//    }
+
+    Timer {
+        id: saveTimer;
+
+        onTriggered: {
+            console.log("saveTimer onTriggered");
+            undoRedo.addModel(globalSettings);
+        }
+    }
+
     function dataChanged(index, modelElements, activeValue){
         console.log("PreferenceDialog dataChanged", index, modelElements, activeValue);
-
-//        var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
-
-//        if (!dataModelLocal){
-//            return;
-//        }
 
         var curBodyId = globalSettings.GetData("Id", mainPanelRepeater.selectedIndex);
         if (curBodyId === "General"){
@@ -126,6 +172,8 @@ Rectangle {
         else{
             preferenceContainer.settingsLocalChanged(index, activeValue);
         }
+
+        saveTimer.start(3000);
     }
 
     function settingsLocalChanged(index, activeValue){
@@ -136,36 +184,12 @@ Rectangle {
         globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
 
         console.log(thubnailDecoratorContainer.localSettings.toJSON());
-//        var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
-
-//        if (!dataModelLocal){
-//            return;
-//        }
-
-//        var modelSettingsBody = dataModelLocal.GetData("Elements", mainPanelRepeater.selectedIndex);
-
-//        modelSettingsBody.SetData("Value", activeValue, index);
-//        dataModelLocal.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
-
-//        preferenceContainer.serverSettings.SetData("items", dataModelLocal);
-
-     //   console.log("preferenceContainer.globalSettings", globalSettings.toJSON());
     }
 
     function generalSettingsChanged(index, modelElements, activeValue){
         console.log("PreferenceDialog generalSettingsChanged", index, modelElements, activeValue);
-//        var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
-
-//        if (!dataModelLocal){
-//            return;
-//        }
 
         var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
-
-//        if (!modelSettingsBody){
-//            return;
-//        }
-
         var curId = modelSettingsBody.GetData("Id", index);
 
         if (!curId){
@@ -188,7 +212,6 @@ Rectangle {
         }
         modelSettingsBody.SetData("Parameters", modelElements, index);
         globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
-      //  console.log("preferenceContainer.globalSettings", globalSettings.toJSON());
     }
 
     function databaseDataChanged(index, modelElements){
@@ -490,6 +513,66 @@ Rectangle {
        preferenceSaveButton.forceActiveFocus();
    }
 
+   Row {
+       anchors.bottom: preferenceSaveButton.top;
+       anchors.bottomMargin: 10;
+       anchors.right: parent.right;
+
+       spacing: 10;
+       width: 100;
+
+       AuxButton {
+           id: undoButton;
+
+           width: 25;
+           height: 25;
+
+           hasText: true;
+           hasIcon: false;
+
+           textButton: qsTr("Undo");
+
+           onClicked: {
+               console.log("undoRedo.undo");
+               var result = undoRedo.undo();
+               if (result != null){
+                   result = result.replace(/\\/g, '');
+                   result = result.slice(1, result.length - 1);
+                   globalSettings.Parse(result);
+                   preferenceContainer.modelSettingsChange();
+                   preferenceContainer.settingsBodyChanged();
+                   mainPanelRepeater.model = globalSettings;
+               }
+
+               //preferenceSaveButton.enabled = !undoRedo.undoStackIsEmpty();
+           }
+       }
+
+       AuxButton {
+           id: redoButton;
+
+           width: 25;
+           height: 25;
+
+           hasText: true;
+           hasIcon: false;
+
+           textButton: qsTr("Redo");
+
+           onClicked: {
+               if (!undoRedo.redoStackIsEmpty()){
+                   var result = undoRedo.redo();
+                   result = result.replace(/\\/g, '');
+                   result = result.slice(1, result.length - 1);
+                   globalSettings.Parse(result);
+                   preferenceContainer.modelSettingsChange();
+                   preferenceContainer.settingsBodyChanged();
+                   mainPanelRepeater.model = globalSettings;
+               }
+           }
+       }
+   }
+
    AuxButton {
        id: preferenceSaveButton;
 
@@ -503,6 +586,8 @@ Rectangle {
 
        hasText: true;
        hasIcon: false;
+
+       enabled: undoRedo.undoStackCountObjects > 1;
 
        textButton: qsTr("Apply");
        borderColor: (preferenceSaveButton.highlighted || preferenceSaveButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
@@ -554,6 +639,8 @@ Rectangle {
                context.language = preferenceContainer.selectedLanguage;
                thubnailDecoratorContainer.updateModels();
            }
+
+//           preferenceSaveButton.enabled = false;
        }
    }
 
@@ -593,6 +680,10 @@ Rectangle {
            preferenceContainer.thumbnailItem.setFocusOnMenuPanel();
            preferenceContainer.loaderDialog.closeItem();
        }
+   }
+
+   UndoRedo {
+       id: undoRedo;
    }
 
    GqlModel {

@@ -249,6 +249,14 @@ Item {
             var index = accountCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
             if (index !== -1){
                 accountCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
+                accountCollectionContainer.multiDocViewItem.reloadModelInOpenTab(index);
+            }
+        }
+
+        onSetDescriptionItem: {
+            var index = accountCollectionContainer.multiDocViewItem.getTabIndexById(id);
+            if (index !== -1){
+                accountCollectionContainer.multiDocViewItem.reloadModelInOpenTab(index);
             }
         }
 
