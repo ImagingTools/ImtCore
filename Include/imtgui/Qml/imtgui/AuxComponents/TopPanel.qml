@@ -318,11 +318,9 @@ Rectangle {
             var query = Gql.GqlRequest("query", "CommandsData");
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("PageId");
-            inputParams.InsertFieldArgument("PageId", topPanel.activeCommandsModelId);
+            inputParams.InsertField("PageId", topPanel.activeCommandsModelId);
 
-            inputParams.InsertField("LanguageId");
-            inputParams.InsertFieldArgument("LanguageId", Style.language)
+            inputParams.InsertField("LanguageId", Style.language)
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");

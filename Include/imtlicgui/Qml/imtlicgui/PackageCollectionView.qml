@@ -369,8 +369,7 @@ Item {
             var query = Gql.GqlRequest("query", "FeaturePackageMetaInfo");;
             var inputParams = Gql.GqlObject("input");
 
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", packageCollectionView.table.getSelectedId());
+            inputParams.InsertField("Id", packageCollectionView.table.getSelectedId());
 
             var queryFields = Gql.GqlObject("metaInfo");
             query.AddParam(inputParams);

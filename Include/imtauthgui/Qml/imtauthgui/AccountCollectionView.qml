@@ -315,8 +315,7 @@ Item {
             var query = Gql.GqlRequest("query", "AccountMetaInfo");;
             var inputParams = Gql.GqlObject("input");
 
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", accountCollectionView.table.getSelectedId());
+            inputParams.InsertField("Id", accountCollectionView.table.getSelectedId());
 
             var queryFields = Gql.GqlObject("metaInfo");
             query.AddParam(inputParams);

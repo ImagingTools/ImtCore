@@ -439,8 +439,7 @@ Rectangle {
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelInfo);
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("LanguageId");
-            inputParams.InsertFieldArgument("LanguageId", Style.language);
+            inputParams.InsertField("LanguageId", Style.language);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("headers");
@@ -552,21 +551,18 @@ Rectangle {
             var query = Gql.GqlRequest("query", collectionViewContainer.gqlModelItems);
 
             var viewParams = Gql.GqlObject("viewParams");
-            viewParams.InsertField("Offset");
-            viewParams.InsertFieldArgument("Offset", offset);
-            viewParams.InsertField("Count");
-            viewParams.InsertFieldArgument("Count", count);
+            viewParams.InsertField("Offset", offset);
+            viewParams.InsertField("Count", count);
 //            viewParams.InsertField("FilterModel");
 //            var jsonString = modelFilter.toJSON();
 //            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-//            viewParams.InsertFieldArgument("FilterModel", jsonString);
+//            viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
 //            inputParams.InsertFieldObject(viewParams);
 
             if(collectionViewContainer.itemId != ""){
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", collectionViewContainer.itemId);
+                inputParams.InsertField("Id", collectionViewContainer.itemId);
             }
             query.AddParam(inputParams);
 
@@ -666,8 +662,7 @@ Rectangle {
 
             if(collectionViewContainer.itemId != ""){
                 query = Gql.GqlRequest("query", collectionViewContainer.gqlModelRemove);
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", tableInternal.getSelectedId());
+                inputParams.InsertField("Id", tableInternal.getSelectedId());
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
 
@@ -732,11 +727,9 @@ Rectangle {
             var inputParams = Gql.GqlObject("input");
 
             query = Gql.GqlRequest("query", collectionViewContainer.gqlModelRename);
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", tableInternal.getSelectedId());
+            inputParams.InsertField("Id", tableInternal.getSelectedId());
 
-            inputParams.InsertField("NewName");
-            inputParams.InsertFieldArgument("NewName", newName);
+            inputParams.InsertField("NewName", newName);
 
             query.AddParam(inputParams);
 
@@ -811,11 +804,9 @@ Rectangle {
             var inputParams = Gql.GqlObject("input");
 
             query = Gql.GqlRequest("query", collectionViewContainer.gqlModelSetDescription);
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", tableInternal.getSelectedId());
+            inputParams.InsertField("Id", tableInternal.getSelectedId());
 
-            inputParams.InsertField("Description");
-            inputParams.InsertFieldArgument("Description", description);
+            inputParams.InsertField("Description", description);
 
             query.AddParam(inputParams);
 

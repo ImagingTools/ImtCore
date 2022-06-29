@@ -1207,8 +1207,7 @@ Rectangle {
 
             if(containerContactInfo.itemId != ""){
                 var inputParams = Gql.GqlObject("input");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", containerContactInfo.itemId);
+                inputParams.InsertField("Id", containerContactInfo.itemId);
                 query.AddParam(inputParams);
             }
 
@@ -1291,8 +1290,7 @@ Rectangle {
                 containerContactInfo.gqlModelQueryTypeNotification = "updatedNotification";
 
                 query = Gql.GqlRequest("query", "AccountUpdate");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", containerContactInfo.itemId);
+                inputParams.InsertField("Id", containerContactInfo.itemId);
                 queryFields = Gql.GqlObject("updatedNotification");
             }
             else{
@@ -1300,8 +1298,7 @@ Rectangle {
                 containerContactInfo.gqlModelQueryTypeNotification = "addedNotification";
 
                 query = Gql.GqlRequest("query", "AccountAdd");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", containerContactInfo.contactInfoModel.GetData("AccountName"));
+                inputParams.InsertField("Id", containerContactInfo.contactInfoModel.GetData("AccountName"));
                 queryFields = Gql.GqlObject("addedNotification");
             }
             query.AddParam(inputParams);
@@ -1312,8 +1309,7 @@ Rectangle {
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 //            console.log("jsonString", jsonString)
 
-            inputParams.InsertField("Item");
-            inputParams.InsertFieldArgument ("Item", jsonString);
+            inputParams.InsertField ("Item", jsonString);
 
             queryFields.InsertField("Id");
             queryFields.InsertField("Successed");

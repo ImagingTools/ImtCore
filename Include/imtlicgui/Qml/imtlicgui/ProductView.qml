@@ -419,8 +419,7 @@ Item {
                 productsCollectionViewContainer.gqlModelQueryTypeNotification = "updatedNotification";
 
                 query = Gql.GqlRequest("query", "ProductUpdate");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", productsCollectionViewContainer.itemId);
+                inputParams.InsertField("Id", productsCollectionViewContainer.itemId);
                 queryFields = Gql.GqlObject("updatedNotification");
             }
             else {
@@ -443,8 +442,7 @@ Item {
             var jsonString = modelProducts.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
-            inputParams.InsertField("Item");
-            inputParams.InsertFieldArgument ("Item", jsonString);
+            inputParams.InsertField ("Item", jsonString);
 
             queryFields.InsertField("Id");
             queryFields.InsertField("Successed");

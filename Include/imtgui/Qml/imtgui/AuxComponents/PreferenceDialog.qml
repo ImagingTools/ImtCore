@@ -693,8 +693,7 @@ Rectangle {
            var query = Gql.GqlRequest("query", "GetSettings");
 
            var inputParams = Gql.GqlObject("input");
-           inputParams.InsertField("LanguageId");
-           inputParams.InsertFieldArgument ("LanguageId", Style.language);
+           inputParams.InsertField ("LanguageId", Style.language);
            query.AddParam(inputParams);
 
            var queryFields = Gql.GqlObject("items");
@@ -754,8 +753,7 @@ Rectangle {
            var jsonString = preferenceContainer.serverSettings.toJSON();
            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
-           inputParams.InsertField("Item");
-           inputParams.InsertFieldArgument ("Item", jsonString);
+           inputParams.InsertField ("Item", jsonString);
            query.AddParam(inputParams);
 
            var queryFields = Gql.GqlObject("items");
@@ -831,8 +829,7 @@ Rectangle {
        function getFile(name){
            var query = Gql.GqlRequest("query", "GetFile");
            var inputParams = Gql.GqlObject("input");
-           inputParams.InsertField("name");
-           inputParams.InsertFieldArgument("name", name);
+           inputParams.InsertField("name", name);
            query.AddParam(inputParams);
 
            var queryFields = Gql.GqlObject("file");

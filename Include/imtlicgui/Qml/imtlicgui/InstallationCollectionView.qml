@@ -356,8 +356,7 @@ Item {
             var query = Gql.GqlRequest("query", "InstallationMetaInfo");;
             var inputParams = Gql.GqlObject("input");
 
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", installationCollectionView.table.getSelectedId());
+            inputParams.InsertField("Id", installationCollectionView.table.getSelectedId());
 
             var queryFields = Gql.GqlObject("metaInfo");
             query.AddParam(inputParams);
@@ -424,8 +423,7 @@ Item {
             var query = Gql.GqlRequest("query", "CreateLicenseFile");;
             var inputParams = Gql.GqlObject("input");
 
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", installationCollectionView.table.getSelectedId());
+            inputParams.InsertField("Id", installationCollectionView.table.getSelectedId());
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("createLicenseFile");

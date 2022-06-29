@@ -184,8 +184,7 @@ Item {
         function getStyle(theme){
             var query = Gql.GqlRequest("query", "GetStyle");
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("theme");
-            inputParams.InsertFieldArgument("theme", theme);
+            inputParams.InsertField("theme", theme);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("style");

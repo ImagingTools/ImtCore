@@ -601,8 +601,7 @@ Rectangle {
 
             if (containerInstallation.operation !== "New"){
                 var inputParams = Gql.GqlObject("input");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", containerInstallation.itemId);
+                inputParams.InsertField("Id", containerInstallation.itemId);
                 query.AddParam(inputParams);
             }
 
@@ -709,8 +708,7 @@ Rectangle {
 
             if(containerInstallation.itemId !== ""){
                 var inputParams = Gql.GqlObject("input");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", containerInstallation.itemId);
+                inputParams.InsertField("Id", containerInstallation.itemId);
                 query.AddParam(inputParams);
             }
 
@@ -795,8 +793,7 @@ Rectangle {
             var query = Gql.GqlRequest("query", "LicenseList");
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id");
-            inputParams.InsertFieldArgument("Id", productId);
+            inputParams.InsertField("Id", productId);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
@@ -876,8 +873,7 @@ Rectangle {
                 containerInstallation.gqlModelQueryType = "InstallationUpdate";
                 containerInstallation.gqlModelQueryTypeNotification = "updatedNotification";
                 query = Gql.GqlRequest("query", "InstallationUpdate");
-                inputParams.InsertField("Id");
-                inputParams.InsertFieldArgument("Id", containerInstallation.itemId);
+                inputParams.InsertField("Id", containerInstallation.itemId);
                 queryFields = Gql.GqlObject("updatedNotification");
             }
             else{
@@ -906,8 +902,7 @@ Rectangle {
             var jsonString = modelInstallations.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
-            inputParams.InsertField("Item");
-            inputParams.InsertFieldArgument ("Item", jsonString);
+            inputParams.InsertField ("Item", jsonString);
 
             queryFields.InsertField("Id");
             queryFields.InsertField("Successed");
