@@ -5,6 +5,7 @@
 #include <QtCore/QFile>
 
 // ACF includes
+#include <istd/TOptDelPtr.h>
 #include <istd/CSystem.h>
 
 
@@ -52,12 +53,22 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 {
 	NewObjectQuery retVal;
 
+	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
 	if (valuePtr != nullptr){
+		workingDocumentPtr.SetPtr(valuePtr, false);
+	}
+	else{
+		if (m_documentFactCompPtr.IsValid()){
+			workingDocumentPtr.SetPtr(m_documentFactCompPtr.CreateInstance());
+		}
+	}
+
+	if (workingDocumentPtr.IsValid()){
 		QByteArray documentContent;
-		if (WriteDataToMemory(*valuePtr, documentContent)){
+		if (WriteDataToMemory(*workingDocumentPtr, documentContent)){
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 
-			retVal.query = QString("INSERT INTO %1(Id, %2, Name, Description) VALUES('%3', '%4', '%5');")
+			retVal.query = QString("INSERT INTO %1(Id, %2, Name, Description ) VALUES('%3', '%4', '%5');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
 						.arg(qPrintable (*m_documentContentColumnIdAttrPtr))
 						.arg(qPrintable(objectId))

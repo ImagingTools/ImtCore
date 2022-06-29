@@ -138,9 +138,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateDataMetaInfoQuery(
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const
 {
 	QByteArray retVal;
 
@@ -206,6 +206,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 
 	return true;
 }
+
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {

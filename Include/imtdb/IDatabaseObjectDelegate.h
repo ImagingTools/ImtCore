@@ -69,7 +69,7 @@ public:
 				const QByteArray& objectId) const = 0;
 
 	/**
-	*	Create query for the update of the object.
+	*	Create query for the update an existing object in the collection.
 	*/
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
@@ -93,10 +93,9 @@ public:
 				const QString& description) const = 0;
 
 	/**
-	*	Create query for the reset collection.
+	*	Create query for the reseting the collection.
 	*/
-	virtual QByteArray CreateResetQuery(
-				const imtbase::IObjectCollection& collection) const = 0;
+	virtual QByteArray CreateResetQuery(const imtbase::IObjectCollection& collection) const = 0;
 
 	/**
 	*	Create query for the set meta-information for the data content sql collection.
