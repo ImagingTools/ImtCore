@@ -148,31 +148,35 @@ JSONListModel {
         return retModel;
     }
 
+    //Parse from the extern json to the intern model
     function Parse(json){
         console.log("Parse", json);
-        console.log("start container", container.toJSON());
+        console.log("start container", container);
+        container.clear();
         this.json = json;
+
         this.updateJSONModel()
-        this.updateTreeItemJSONModel();
-//        container.clear();
+        this.updateTreeItemJSONModel()
+
 //        var obj = JSON.parse(json);
 //        for (let i = 0; i < obj.length; i++){
-//            let emptyObj = this.createComponent("imtqml/TreeItemModel.qml", this);
-//            //emptyObj.InsertNewItem();
-//            let keys = Object.keys(obj[i]);
-//            for (let j = 0; j < keys.length; j++){
-//                console.log("emptyObj.SetData", keys[j], obj[i][keys[j]]);
-//                if (typeof obj[i][keys[j]] == 'object'){
-//                    let child = emptyObj.AddTreeModel(keys[j], 0);
-//                    child.Parse(JSON.stringify(obj[i][keys[j]]));
-//                }
-//                else{
-//                    emptyObj.SetData(keys[j], obj[i][keys[j]]);
-//                }
-//            }
-//            container.append(emptyObj)
+//            var child = this.createComponent("imtqml/TreeItemModel.qml", this);
+//            child.append(obj[i])
+//            child.updateTreeItemJSONModel();
+////            let keysObj = Object.keys(obj[i]);
+////            for (let j = 0; j < keysObj.length; j++){
+////                if (typeof obj[i][keysObj[j]] == 'object'){
+////                    var child = this.createComponent("imtqml/TreeItemModel.qml", this);
+////                    child.append(obj[i][keysObj[j]])
+////                    child.Parse(JSON.stringify(child))
+////                }
+////            }
+////            container.append(child)
+//            container.append(obj[i])
+//            //this.updateTreeItemJSONModel();
 //        }
 
+//        this.updateTreeItemJSONModel();
         console.log("finish container", container.toJSON());
     }
 
@@ -221,6 +225,7 @@ JSONListModel {
     }
 
     function updateTreeItemJSONModel(){
+        console.log("updateTreeItemJSONModel")
         for(var row = 0; row < this.GetItemsCount(); row++){
             var modelObject = this.get(row)
             var keys = Object.keys(modelObject)

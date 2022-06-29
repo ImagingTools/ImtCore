@@ -47,6 +47,8 @@ Item {
 
     function addModel(obj){
         undoRedo.undoStackCountObjects++;
-        undoRedo.undoStack.push(JSON.stringify(obj));
+
+        undoRedo.undoStack.push(obj.toJSON());
+//        undoRedo.undoStack.push(JSON.stringify(obj));
     }
 }

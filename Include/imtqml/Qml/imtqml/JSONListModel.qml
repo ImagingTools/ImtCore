@@ -49,12 +49,12 @@ ListModel {
         this.clear();
 		var d1 = new Date()
         var objectArray = this.parseJSONString(this.json, this.inquiry);
-		var dict = {};
-		for ( var key in objectArray ) {
+        var dict = {};
+        for ( var key in objectArray ) {
 			var jo = objectArray[key];
-			dict[key] = jo
+            dict[key] = jo
 		}
-			this.append(dict);
+        this.append(dict);
 		var d2 = new Date()
 		console.log(d2.getMilliseconds() - d1.getMilliseconds())
     }

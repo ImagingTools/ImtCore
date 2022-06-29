@@ -542,6 +542,7 @@ Rectangle {
                    preferenceContainer.modelSettingsChange();
                    preferenceContainer.settingsBodyChanged();
                    mainPanelRepeater.model = globalSettings;
+                   globalSettings.Refresh();
                }
 
                //preferenceSaveButton.enabled = !undoRedo.undoStackIsEmpty();
@@ -568,6 +569,7 @@ Rectangle {
                    preferenceContainer.modelSettingsChange();
                    preferenceContainer.settingsBodyChanged();
                    mainPanelRepeater.model = globalSettings;
+                   globalSettings.Refresh();
                }
            }
        }
