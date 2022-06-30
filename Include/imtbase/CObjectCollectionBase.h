@@ -86,7 +86,8 @@ protected:
 	{
 		ObjectInfo()
 			:isEnabled(true),
-			flags(OF_ALL)
+			flags(OF_ALL),
+			copyMode(istd::IChangeable::CM_WITHOUT_REFS)
 		{
 			id = QUuid::createUuid().toByteArray();
 		}
@@ -94,6 +95,7 @@ protected:
 		ObjectInfo(const ObjectInfo& object)
 		{
 			this->objectPtr = object.objectPtr;
+			this->copyMode = object.copyMode;
 
 			this->id = object.id;
 			this->typeId = object.typeId;
@@ -112,6 +114,7 @@ protected:
 		QByteArray id;
 		QByteArray typeId;
 		int flags;
+		istd::IChangeable::CompatibilityMode copyMode;
 		idoc::CStandardDocumentMetaInfo metaInfo;
 
 		/**

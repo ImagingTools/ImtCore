@@ -218,7 +218,7 @@ bool CObjectCollectionBase::GetObjectData(const QByteArray& objectId, DataPtr& d
 			if (!dataPtr.IsValid()){
 				DataPtr newInstancePtr = CreateObjectInstance(objectInfo.typeId);
 				if (newInstancePtr.IsValid()){
-					if (newInstancePtr->CopyFrom(*objectInfo.objectPtr)){
+					if (newInstancePtr->CopyFrom(*objectInfo.objectPtr, objectInfo.copyMode)){
 						dataPtr = newInstancePtr;
 
 						return true;
@@ -226,7 +226,7 @@ bool CObjectCollectionBase::GetObjectData(const QByteArray& objectId, DataPtr& d
 				}
 			}
 			else{
-				return dataPtr->CopyFrom(*objectInfo.objectPtr);
+				return dataPtr->CopyFrom(*objectInfo.objectPtr, objectInfo.copyMode);
 			}
 		}
 	}
@@ -242,6 +242,8 @@ bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd
 			istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
 			changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+			objectInfo.copyMode = mode;
 
 			return objectInfo.objectPtr->CopyFrom(object, mode);
 		}
@@ -512,7 +514,10 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 			else{
 				const istd::IChangeable* dataPtr = sourcePtr->GetObjectPtr(sourceObjectInfo.id);
 				if (dataPtr != nullptr){
-					if (!targetObjectInfoPtr->objectPtr->CopyFrom(*dataPtr, mode)){
+					if (targetObjectInfoPtr->objectPtr->CopyFrom(*dataPtr, sourceObjectInfo.copyMode)){
+						targetObjectInfoPtr->copyMode = sourceObjectInfo.copyMode;
+					}
+					else{
 						return false;
 					}
 				}
