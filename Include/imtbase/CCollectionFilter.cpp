@@ -20,6 +20,24 @@ CCollectionFilter::CCollectionFilter()
 }
 
 
+// reimplemented (imtbase::ICollectionFilter)
+
+QByteArray CCollectionFilter::GetObjectTypeId() const
+{
+	return m_objectTypeId;
+}
+
+
+void CCollectionFilter::SetObjectTypeId(const QByteArray& typeId)
+{
+	if (m_objectTypeId != typeId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_objectTypeId = typeId;
+	}
+}
+
+
 QString CCollectionFilter::GetTextFilter() const
 {
 	return m_filter;
@@ -92,6 +110,11 @@ bool CCollectionFilter::Serialize(iser::IArchive &archive)
 
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
+	static iser::CArchiveTag objectTypeIdTag("TypeId", "Type-ID of the object to be passed", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(objectTypeIdTag);
+	retVal = retVal && archive.Process(m_objectTypeId);
+	retVal = retVal && archive.EndTag(objectTypeIdTag);
+
 	static iser::CArchiveTag filterTag("Filter", "Text filter", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(filterTag);
 	retVal = retVal && archive.Process(m_filter);
@@ -123,6 +146,7 @@ bool CCollectionFilter::CopyFrom(const IChangeable &object, CompatibilityMode /*
 	if (implPtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
+		m_objectTypeId = implPtr->m_objectTypeId;
 		m_filter = implPtr->m_filter;
 		m_sortingOrder = implPtr->m_sortingOrder;
 		m_sortingInfoIds = implPtr->m_sortingInfoIds;
@@ -140,6 +164,7 @@ bool CCollectionFilter::IsEqual(const IChangeable &object) const
 	const CCollectionFilter* implPtr = dynamic_cast<const CCollectionFilter*>(&object);
 	if (implPtr != nullptr){
 		return
+					(m_objectTypeId == implPtr->m_objectTypeId) &&
 					(m_filter == implPtr->m_filter) &&
 					(m_sortingOrder == implPtr->m_sortingOrder) &&
 					(m_filteringInfoIds == implPtr->m_filteringInfoIds) &&
@@ -166,6 +191,7 @@ bool CCollectionFilter::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_filter.clear();
+	m_objectTypeId.clear();
 	m_sortingOrder = SO_NO_ORDER;
 	m_sortingInfoIds.clear();
 	m_filteringInfoIds.clear();

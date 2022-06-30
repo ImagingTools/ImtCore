@@ -246,10 +246,6 @@ private:
 
 	void UpdateTypeStatus();
 
-	void ReadCollection(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr);
-	Q_INVOKABLE void OnUpdateProgress(int progress);
-	Q_INVOKABLE void OnCollectionReadFinished();
-
 	bool eventFilter(QObject* object, QEvent* event);
 
 private Q_SLOTS:
@@ -318,6 +314,7 @@ private:
 		void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 		void SetFilter(const QString& textFilter);
 		void SetSorting(int logicalIndex, Qt::SortOrder order);
+		void SetCurrentTypeId(const QByteArray& typeId);
 
 		// reimplemented (QAbstractTableModel)
 		virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -354,7 +351,6 @@ private:
 
 	QByteArray m_currentTypeId;
 	imod::TModelWrap<PageSelection> m_pageSelection;
-	int m_pageRowCount;
 	imod::TModelWrap<Commands> m_commands;
 
 	typedef QMap<QString, QVariant> ColumnSettings;

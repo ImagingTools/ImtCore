@@ -70,9 +70,9 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 		else{
 			int countIds = offset + objectsCount;
 			for (int i = offset; i < countIds; i++){
-				retVal.push_back(sortedIds[i]);
-			}
+			retVal.push_back(sortedIds[i]);
 		}
+	}
 	}
 	else {
 		retVal = BaseClass::GetElementIds(offset, count, selectionParamPtr);
@@ -107,6 +107,14 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 {
 	iprm::TParamsPtr<imtbase::ICollectionFilter> filterParamPtr(&filterParams, "Filter");
 	if (filterParamPtr.IsValid()){
+		QByteArray allowedTypeId = filterParamPtr->GetObjectTypeId();
+		if (!allowedTypeId.isEmpty()){
+			QByteArray typeId = BaseClass::GetObjectTypeId(objectId);
+			if (typeId != allowedTypeId){
+				return false;
+			}
+		}
+
 		QString textFilter = filterParamPtr->GetTextFilter();
 		if (textFilter.isEmpty()){
 			return true;

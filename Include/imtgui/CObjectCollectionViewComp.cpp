@@ -389,10 +389,10 @@ void CObjectCollectionViewComp::OnGuiCreated()
 		if (m_paginationGuiCompPtr->CreateGui(PaginationFrame)){
 			if (m_paginationGuiObserverCompPtr.IsValid()){
 				if (!m_pageSelection.IsAttached(m_paginationGuiObserverCompPtr.GetPtr())){
-					m_pageSelection.AttachObserver(m_paginationGuiObserverCompPtr.GetPtr());
-				}
+				m_pageSelection.AttachObserver(m_paginationGuiObserverCompPtr.GetPtr());
 			}
 		}
+	}
 	}
 
 	BaseClass::OnGuiCreated();
@@ -756,127 +756,6 @@ void CObjectCollectionViewComp::RestoreItemsSelection()
 }
 
 
-void CObjectCollectionViewComp::ReadCollection(QStandardItemModel* typeModelPtr, QStandardItemModel* itemModelPtr)
-{
-	imtbase::IObjectCollection* objectCollectionPtr = GetObservedObject();
-	if (objectCollectionPtr != nullptr){
-		Q_ASSERT(typeModelPtr != nullptr);
-		Q_ASSERT(itemModelPtr != nullptr);
-
-		typeModelPtr->clear();
-		itemModelPtr->clear();
-		itemModelPtr->setColumnCount(0);
-
-		const iprm::IOptionsList* objectTypeInfoPtr = objectCollectionPtr->GetObjectTypesInfo();
-		if (objectTypeInfoPtr != nullptr){
-			int typesCount = objectTypeInfoPtr->GetOptionsCount();
-			imtbase::IObjectCollectionInfo::Ids collectionItemIds = objectCollectionPtr->GetElementIds();
-
-			for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
-				if (objectTypeInfoPtr->IsOptionEnabled(typeIndex)){
-					QByteArray typeId = objectTypeInfoPtr->GetOptionId(typeIndex);
-					QString typeName = objectTypeInfoPtr->GetOptionName(typeIndex);
-
-					QStandardItem* typeItemPtr = new QStandardItem();
-					typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-					typeItemPtr->setData(typeName, Qt::DisplayRole);
-					typeItemPtr->setData(typeName, Qt::EditRole);
-					typeItemPtr->setData(typeId, DR_TYPE_ID);
-					typeModelPtr->appendRow(typeItemPtr);
-				}
-			}
-
-			int progress = 0;
-			int count = collectionItemIds.count();
-
-			for (int i = 0; i < count; i++){
-				m_tableModel.UpdateItem(collectionItemIds[i]);
-
-				if (*m_useAsyncReadAttrPtr && *m_viewProgressAttrPtr){
-					int currentProgress = i * 100 / count;
-					if (progress != currentProgress){
-						progress = currentProgress;
-						QMetaObject::invokeMethod(this, "OnUpdateProgress", Qt::QueuedConnection, Q_ARG(int, progress));
-					}
-				}
-			}
-		}
-	}
-}
-
-
-void CObjectCollectionViewComp::OnUpdateProgress(int progress)
-{
-	Message->setText(tr("Update..."));
-	Progress->setValue(progress);
-	Message->show();
-	Progress->show();
-}
-
-
-void CObjectCollectionViewComp::OnCollectionReadFinished()
-{
-	Progress->setValue(0);
-	Message->hide();
-	Progress->hide();
-
-	{
-		SignalSemaphore semaphore(m_semaphoreCounter);
-
-		if (m_typeModel.rowCount() > 1){
-			TypeList->show();
-		}
-		else {
-			TypeList->hide();
-		}
-
-		QByteArray lastTypeId = m_currentTypeId;
-
-		TypeList->clear();
-		QTreeWidgetItem* activeTypeItemPtr = nullptr;
-
-		for (int i = 0; i < m_typeModel.rowCount(); i++){
-			QStandardItem* itemPtr = m_typeModel.item(i, 0);
-
-			QTreeWidgetItem* typeItemPtr = new QTreeWidgetItem(TypeList);
-			typeItemPtr->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-			typeItemPtr->setData(0, Qt::DisplayRole, itemPtr->data(Qt::DisplayRole));
-			typeItemPtr->setData(0, Qt::EditRole, itemPtr->data(Qt::EditRole));
-			typeItemPtr->setData(0, DR_TYPE_ID, itemPtr->data(DR_TYPE_ID));
-			TypeList->addTopLevelItem(typeItemPtr);
-
-			if (lastTypeId == itemPtr->data(DR_TYPE_ID)){
-				activeTypeItemPtr = typeItemPtr;
-			}
-
-			if (lastTypeId.isEmpty() && (i == 0)){
-				activeTypeItemPtr = typeItemPtr;
-			}
-		}
-
-		if (activeTypeItemPtr != nullptr){
-			activeTypeItemPtr->setSelected(true);
-			const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
-			const imtbase::ICollectionInfo &collectionInfo = delegate.GetSummaryInformationTypes();
-
-			imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
-			for (int i = 0; i < ids.count(); ++i){
-				QByteArray id = ids[i];
-				ItemList->itemDelegateForColumn(i)->deleteLater();
-				QAbstractItemDelegate *itemDelegate = delegate.GetColumnItemDelegate(id);
-				ItemList->setItemDelegateForColumn(i, itemDelegate);
-			}
-		}
-	}
-
-	UpdateCommands();
-
-	RestoreItemsSelection();
-
-	UpdateTypeStatus();
-}
-
-
 void CObjectCollectionViewComp::UpdateTypeStatus()
 {
 	for (int delegateIndex = 0; delegateIndex < m_viewDelegatesCompPtr.GetCount(); ++delegateIndex){
@@ -1136,6 +1015,13 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
 		connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
 	}
+
+	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+
+	m_tableModel.SetCurrentTypeId(m_currentTypeId);
+
+	m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
 
 	UpdateCommands();
 }
@@ -1443,7 +1329,7 @@ bool CObjectCollectionViewComp::PageSelection::SetSelectedOptionIndex(int index)
 }
 
 
-iprm::ISelectionParam* CObjectCollectionViewComp::PageSelection::GetSubselection(int index) const
+iprm::ISelectionParam* CObjectCollectionViewComp::PageSelection::GetSubselection(int /*index*/) const
 {
 	return nullptr;
 }
@@ -1475,7 +1361,7 @@ QString CObjectCollectionViewComp::PageSelection::GetOptionName(int index) const
 }
 
 
-QString CObjectCollectionViewComp::PageSelection::GetOptionDescription(int index) const
+QString CObjectCollectionViewComp::PageSelection::GetOptionDescription(int /*index*/) const
 {
 	return QString();
 }
@@ -1493,7 +1379,7 @@ QByteArray CObjectCollectionViewComp::PageSelection::GetOptionId(int index) cons
 }
 
 
-bool CObjectCollectionViewComp::PageSelection::IsOptionEnabled(int index) const
+bool CObjectCollectionViewComp::PageSelection::IsOptionEnabled(int /*index*/) const
 {
 	return true;
 }
@@ -1501,7 +1387,7 @@ bool CObjectCollectionViewComp::PageSelection::IsOptionEnabled(int index) const
 
 // reimplemented (iser::ISerializable)
 
-bool CObjectCollectionViewComp::PageSelection::Serialize(iser::IArchive& archive)
+bool CObjectCollectionViewComp::PageSelection::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -1566,7 +1452,7 @@ CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& par
 }
 
 
-void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& changes)
+void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& /*changes*/)
 {
 	m_isPageMode = m_parent.m_paginationGuiCompPtr.IsValid();
 	m_batchSize = m_isPageMode ? 25 : 50;
@@ -1703,6 +1589,12 @@ void CObjectCollectionViewComp::TableModel::SetSorting(int logicalIndex, Qt::Sor
 	m_filter.SetSortingInfoIds(QByteArrayList() << informationIds[logicalIndex]);
 
 	UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
+}
+
+
+void CObjectCollectionViewComp::TableModel::SetCurrentTypeId(const QByteArray & typeId)
+{
+	m_filter.SetObjectTypeId(typeId);
 }
 
 

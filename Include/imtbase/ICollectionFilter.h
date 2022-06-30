@@ -25,6 +25,9 @@ public:
 
 	I_DECLARE_ENUM(SortingOrder, SO_NO_ORDER, SO_DESC, SO_ASC);
 
+	virtual QByteArray GetObjectTypeId() const = 0;
+	virtual void SetObjectTypeId(const QByteArray& typeId) = 0;
+
 	virtual QString GetTextFilter() const = 0;
 	virtual void SetTextFilter(const QString& filter) = 0;
 

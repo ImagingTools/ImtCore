@@ -18,6 +18,8 @@ public:
 	CCollectionFilter();
 
 	// reimplemented (imtbase::ICollectionFilter)
+	virtual QByteArray GetObjectTypeId() const override;
+	virtual void SetObjectTypeId(const QByteArray& typeId) override;
 	virtual QString GetTextFilter() const override;
 	virtual void SetTextFilter(const QString& filter) override;
 	virtual SortingOrder GetSortingOrder() const override;
@@ -38,6 +40,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode) override;
 
 private:
+	QByteArray m_objectTypeId;
 	QString m_filter;
 	SortingOrder m_sortingOrder;
 	QByteArrayList m_sortingInfoIds;
