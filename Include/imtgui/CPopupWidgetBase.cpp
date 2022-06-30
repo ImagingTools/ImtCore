@@ -1,5 +1,8 @@
 #include <imtgui/CPopupWidgetBase.h>
 
+// Qt includes
+#include <QtGui/QEnterEvent>
+
 
 namespace imtgui
 {
@@ -36,6 +39,8 @@ void CPopupWidgetBase::AllowClosingOnMouseClick(bool isAllowed)
 
 // reimplemented (QWidget)
 
+#if QT_VERSION < 0x060000
+
 void CPopupWidgetBase::enterEvent(QEvent* event)
 {
 	BaseClass::enterEvent(event);
@@ -43,10 +48,20 @@ void CPopupWidgetBase::enterEvent(QEvent* event)
 	Q_EMIT EmitHoverEnter(event);
 }
 
+#else
+
+void CPopupWidgetBase::enterEvent(QEnterEvent *event)
+{
+	BaseClass::enterEvent(event);
+
+	Q_EMIT EmitHoverEnter(event);
+}
+#endif
+
 
 void CPopupWidgetBase::leaveEvent(QEvent* event)
 {
-	BaseClass::enterEvent(event);
+	BaseClass::leaveEvent(event);
 
 	Q_EMIT EmitHoverLeave(event);
 }

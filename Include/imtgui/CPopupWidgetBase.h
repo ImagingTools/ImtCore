@@ -31,7 +31,11 @@ Q_SIGNALS:
 
 protected:
 	// reimplemented (QWidget)
+#if QT_VERSION < 0x060000
 	virtual void enterEvent(QEvent* event) override;
+#else
+	virtual void enterEvent(QEnterEvent* event) override;
+#endif
 	virtual void leaveEvent(QEvent* event) override;
 	virtual void mousePressEvent(QMouseEvent* event) override;
 

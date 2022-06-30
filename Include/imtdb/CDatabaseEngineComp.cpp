@@ -535,8 +535,8 @@ int CDatabaseEngineComp::GetLastMigration() const
 				for (int index = 0; index < files.size(); index++){
 					QString nameFile = files[index];
 					nameFile.remove("migration_").remove(".sql");
-					QRegExp re("\\d*");
-					if (re.exactMatch(nameFile)){
+					QRegularExpression re("\\d*");
+					if (re.match(nameFile).hasMatch()){
 						if (avaliableMigration < nameFile.toInt()){
 							avaliableMigration = nameFile.toInt();
 						}
