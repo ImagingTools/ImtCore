@@ -155,6 +155,8 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 	tempPath.cd(uuid);
 
+	Q_ASSERT(QFile::exists(tempPath.path()));
+
 	QString contentsFileName = tempPath.path() + QDir::separator() + "Contents.xml";
 	ifile::CCompactXmlFileWriteArchive xmlArchive(contentsFileName);
 
@@ -173,8 +175,6 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		}
 
 		QByteArray typeId = documentPtr->GetObjectTypeId(objectId);
-		QString name = documentPtr->GetElementInfo(objectId, imtbase::IObjectCollection::EIT_NAME).toByteArray();
-
 		const ifile::IFilePersistence* persistencePtr = GetFilePersistenceForTypeId(typeId);
 		if (persistencePtr == nullptr){
 			SendErrorMessage(0, QString("No persistence was registered for type-ID: '%1'").arg(qPrintable(typeId)));
@@ -187,12 +187,12 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 		QStringList extensions;
 		persistencePtr->GetFileExtensions(extensions);
 
-		QString objectFileName(name + "_" + objectId);
+		QString objectFileName(objectId);
 		if (extensions.count() > 0){
 			objectFileName.append(QString(".%1").arg(extensions[0]));
 		}
 		
-		QString objectFilePath = tempPath.path() + QDir::separator() + objectFileName;
+		QString objectFilePath = QDir::toNativeSeparators(tempPath.path() + QDir::separator() + objectFileName);
 
 		if (persistencePtr->SaveToFile(*objectPtr, objectFilePath) != OS_OK){
 			SendErrorMessage(0, QString("Object could not be saved to: '%1'").arg(objectFilePath));
@@ -217,7 +217,7 @@ int CCompositeObjectPersistenceComp::SaveToFile(
 
 	xmlArchive.Flush();
 
-	bundleInfoWritten &= SaveAdditionalData(data, tempPath.path());
+	bundleInfoWritten = SaveAdditionalData(data, tempPath.path()) && bundleInfoWritten;
 
 	if (bundleInfoWritten){
 		if (m_fileCompressionCompPtr.IsValid()){
