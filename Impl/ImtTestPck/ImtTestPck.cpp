@@ -20,11 +20,6 @@ I_EXPORT_COMPONENT(
             "Test Information");
 
 I_EXPORT_COMPONENT(
-            TestCollection,
-            "Definition of all tests",
-            "Tests collection");
-
-I_EXPORT_COMPONENT(
             TestMetaInfoCreator,
             "Test metainfo creator",
             "Test Metainfo Creator");

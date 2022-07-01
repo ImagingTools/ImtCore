@@ -6,8 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imttest/CTestInfoComp.h>
-#include <imttest/CTestCollection.h>
+#include <imttest/CTestInfo.h>
 #include <imttest/CTestMetaInfoCreatorComp.h>
 #include <imttest/CTestDatabaseDelegateComp.h>
 
@@ -18,13 +17,13 @@
 namespace ImtTestPck
 {
 
-typedef icomp::TModelCompWrap<imttest::CTestInfoComp> TestInfo;
 typedef icomp::TModelCompWrap<
-            icomp::TMakeComponentWrap<
-                        imttest::CTestCollection,
-                        imttest::ITestInfoProvider,
-                        imttest::ITestInfo,
-                        iser::ISerializable>> TestCollection;
+			icomp::TMakeComponentWrap <
+						imttest::CTestInfo,
+						imttest::ITestInfo,
+						iser::IObject,
+						iser::ISerializable,
+						istd::IChangeable>> TestInfo;
 typedef imttest::CTestMetaInfoCreatorComp TestMetaInfoCreator;
 typedef imttest::CTestDatabaseDelegateComp TestDatabaseDelegate;
 
