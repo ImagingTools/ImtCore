@@ -90,7 +90,7 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 
 		idoc::CStandardDocumentMetaInfo metaInfo;
 		collection.GetCollectionItemMetaInfo(objectId, metaInfo);
-		QVariant currentRevision = metaInfo.GetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION);
+		QVariant currentRevision = metaInfo.GetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION);
 		if (currentRevision.isValid()){
 			int revision = currentRevision.toInt();
 			if (revision >= newRevision){
@@ -144,8 +144,8 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 
 						readLocker.unlock();
 
-						collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, newRevision);
-						collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+						collectionItem.metaInfo.SetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION, newRevision);
+						collectionItem.metaInfo.SetMetaInfo(imtbase::IObjectCollectionInfo::MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
 
 						QWriteLocker writeLocker(&m_filesLock);
 
@@ -232,8 +232,8 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const QByte
 
 									CollectionItem& collectionItem = m_files[fileIndex];
 
-									collectionItem.metaInfo.SetMetaInfo(imtrepo::IFileObjectCollection::MIT_REVISION, revision);
-									collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+									collectionItem.metaInfo.SetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION, revision);
+									collectionItem.metaInfo.SetMetaInfo(imtbase::IObjectCollectionInfo::MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
 
 									writeLocker.unlock();
 

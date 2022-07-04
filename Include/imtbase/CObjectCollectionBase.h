@@ -14,6 +14,7 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/ICollectionDataController.h>
+#include <imtbase/CObjectCollectionMetaInfo.h>
 
 
 namespace imtbase
@@ -103,7 +104,7 @@ protected:
 			this->isEnabled = object.isEnabled;
 			this->flags = object.flags;
 			this->description = object.description;
-			this->metaInfo.CopyFrom(object.metaInfo);
+			this->collectionItemMetaInfo.CopyFrom(object.collectionItemMetaInfo);
 			this->contentsMetaInfoPtr = object.contentsMetaInfoPtr;
 		}
 
@@ -115,7 +116,7 @@ protected:
 		QByteArray typeId;
 		int flags;
 		istd::IChangeable::CompatibilityMode copyMode;
-		idoc::CStandardDocumentMetaInfo metaInfo;
+		imtbase::CObjectCollectionMetaInfo collectionItemMetaInfo;
 
 		/**
 			Meta-informations for the data object.

@@ -9,7 +9,7 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/ICollectionFilter.h>
-
+#include <imtbase/CObjectCollectionMetaInfo.h>
 
 
 namespace imtbase
@@ -183,35 +183,38 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 			QByteArrayList relatedIds = filterParamPtr->GetSortingInfoIds();
 			if (!relatedIds.isEmpty()){
 				QList<QPair<QString, QByteArray>> listObjects;
-				for(int i = 0; i < filteredIds.count(); i++){
+				for (int i = 0; i < filteredIds.count(); i++){
+					QByteArray objectId = filteredIds[i];
+
 					imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
 					if (relatedIds.contains("Name")){
-						QString metaInfoValue = BaseClass::GetElementInfo(filteredIds[i], imtbase::ICollectionInfo::EIT_NAME).toString();
-						QPair<QString, QByteArray> objectPair = {metaInfoValue, filteredIds[i]};
+						QString metaInfoValue = BaseClass::GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+						QPair<QString, QByteArray> objectPair = {metaInfoValue, objectId};
 						listObjects.append(objectPair);
 					}
-					else if (BaseClass::GetDataMetaInfo(filteredIds[i], metaInfoPtr)){
-						idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
-						for (int type : metaInfoTypes){
-							QByteArray metaInfoId = metaInfoPtr->GetMetaInfoId(type);
-							if (relatedIds[0] == metaInfoId){
-								QString objectName = metaInfoPtr->GetMetaInfo(type).toString();
-								QPair<QString, QByteArray> objectPair = {objectName, filteredIds[i]};
-								listObjects.append(objectPair);
-								break;
+					else{
+						if (BaseClass::GetDataMetaInfo(objectId, metaInfoPtr)){
+							idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
+							for (int type : metaInfoTypes){
+								QByteArray metaInfoId = metaInfoPtr->GetMetaInfoId(type);
+								if (relatedIds[0] == metaInfoId){
+									QString objectName = metaInfoPtr->GetMetaInfo(type).toString();
+									QPair<QString, QByteArray> objectPair = {objectName, objectId};
+									listObjects.append(objectPair);
+									break;
+								}
 							}
 						}
-					}
-					else{
-						idoc::CStandardDocumentMetaInfo collectionItemMetaInfo;
-						if (BaseClass::GetCollectionItemMetaInfo(filteredIds[i], collectionItemMetaInfo)){
+
+						imtbase::CObjectCollectionMetaInfo collectionItemMetaInfo;
+						if (BaseClass::GetCollectionItemMetaInfo(objectId, collectionItemMetaInfo)){
 							idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfo.GetMetaInfoTypes();
 
 							for (int type : metaInfoTypes){
 								QByteArray metaInfoId = collectionItemMetaInfo.GetMetaInfoId(type);
 								if (relatedIds[0] == metaInfoId){
 									QString objectName = collectionItemMetaInfo.GetMetaInfo(type).toString();
-									QPair<QString, QByteArray> objectPair = {objectName, filteredIds[i]};
+									QPair<QString, QByteArray> objectPair = { objectName, objectId };
 									listObjects.append(objectPair);
 								}
 							}

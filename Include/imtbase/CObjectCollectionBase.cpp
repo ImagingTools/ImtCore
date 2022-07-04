@@ -156,7 +156,7 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 		info.flags = GetItemDefaultFlags();
 
 		if (collectionItemMetaInfoPtr != nullptr){
-			info.metaInfo.CopyFrom(*collectionItemMetaInfoPtr);
+			info.collectionItemMetaInfo.CopyFrom(*collectionItemMetaInfoPtr);
 		}
 
 		if (dataMetaInfoPtr != nullptr){
@@ -307,7 +307,7 @@ bool CObjectCollectionBase::GetCollectionItemMetaInfo(const QByteArray& objectId
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
-			return metaInfo.CopyFrom(objectInfo.metaInfo);
+			return metaInfo.CopyFrom(objectInfo.collectionItemMetaInfo);
 		}
 	}
 	
@@ -439,7 +439,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		if (imtCoreVersionExists && imtCoreVersion >= 3401){
 			static iser::CArchiveTag collectionMetaInfoTag("CollectionItemMeta", "Collection item meta information", iser::CArchiveTag::TT_GROUP, &objectTag);
 			retVal = retVal && archive.BeginTag(collectionMetaInfoTag);
-			retVal = retVal && elementInfo.metaInfo.Serialize(archive);
+			retVal = retVal && elementInfo.collectionItemMetaInfo.Serialize(archive);
 			retVal = retVal && archive.EndTag(collectionMetaInfoTag);
 		}
 
@@ -484,7 +484,7 @@ int CObjectCollectionBase::GetSupportedOperations() const
 }
 
 
-bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CObjectCollectionBase* sourcePtr = dynamic_cast<const CObjectCollectionBase*>(&object);
 	if (sourcePtr != nullptr){

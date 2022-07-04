@@ -27,6 +27,7 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IRevisionController.h>
 #include <imtbase/ICollectionDataController.h>
+#include <imtbase/CObjectCollectionMetaInfo.h>
 #include <imtfile/IFileCompression.h>
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
@@ -298,7 +299,7 @@ protected:
 		/**
 			Meta-informations for the file item in the collection.
 		*/
-		idoc::CStandardDocumentMetaInfo metaInfo;
+		imtbase::CObjectCollectionMetaInfo metaInfo;
 
 		/**
 			Meta-informations for the file contents.

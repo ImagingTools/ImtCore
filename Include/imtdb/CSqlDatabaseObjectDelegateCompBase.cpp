@@ -65,12 +65,14 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			return QByteArray();
 		}
 
-		return QString("(SELECT * FROM %1 %2 %3) %4")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(filterQuery)
-					.arg(qPrintable(paginationQuery))
-					.arg(sortQuery)
-					.toLocal8Bit();
+		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+		QString retVal = "(SELECT * FROM";
+		retVal += QString(" ") + qPrintable(*m_tableNameAttrPtr);
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + sortQuery;
+
+		return retVal.toLocal8Bit();
 	}
 
 	return QByteArray();
