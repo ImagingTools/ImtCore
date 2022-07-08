@@ -25,7 +25,6 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgq
 
 	int count = fieldList->count();
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	bool isSetResponce = false;
@@ -49,12 +48,18 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgq
 			}
 		}
 		if (itemsModel == nullptr){
-			errorMessage = QObject::tr("CommandsId incorrected " + commandsId).toUtf8();
+			isSetResponce = false;
 		}
 	}
 	else{
 		errorMessage = QObject::tr("Incorrect qyery").toUtf8();
 	}
+
+	if (!isSetResponce){
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");

@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"GraphQLServlet",
 			"GraphQL Receiver");
 
+I_EXPORT_COMPONENT(
+			GraphQLDemultiplexer,
+			"GraphQLDemultiplexer",
+			"GraphQL Demultiplexer");
+
 
 } // namespace ImtGqlPck
 

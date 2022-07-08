@@ -22,6 +22,11 @@ public:
 	virtual QByteArrayList GetModelIds() const = 0;
 
 	/**
+		Get context IDs of the supported data model.
+	*/
+	virtual QByteArrayList GetContextIds() const = 0;
+
+	/**
 		Create representation data for a given GraphQL request.
 	*/
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;

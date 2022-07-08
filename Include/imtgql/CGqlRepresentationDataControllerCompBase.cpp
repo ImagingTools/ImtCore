@@ -21,6 +21,20 @@ QByteArrayList CGqlRepresentationDataControllerCompBase::GetModelIds() const
 }
 
 
+QByteArrayList CGqlRepresentationDataControllerCompBase::GetContextIds() const
+{
+	QByteArrayList retVal;
+
+	if (m_contextIdsCompPtr.IsValid()){
+		for (int i = 0; i < m_contextIdsCompPtr.GetCount(); i++){
+			retVal << m_contextIdsCompPtr[i];
+		}
+	}
+
+	return retVal;
+}
+
+
 } // namespace imtgql
 
 
