@@ -48,6 +48,7 @@
         <file alias="imtgui/AuxComponents/SettingsButton.qml">Qml/imtgui/AuxComponents/SettingsButton.qml</file>
         <file alias="imtgui/AuxComponents/UndoRedo.qml">Qml/imtgui/AuxComponents/UndoRedo.qml</file>
         <file alias="imtgui/AuxComponents/LoginDialog.qml">LoginDialog.qml</file>
+        <file alias="imtgui/AuxComponents//LoginButton.qml">LoginButton.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

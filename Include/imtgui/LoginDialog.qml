@@ -67,7 +67,7 @@ Rectangle {
         anchors.top: headerRec.bottom
         anchors.topMargin: 50
         anchors.leftMargin: 75
-        width: preferenceContainer.width - 150;
+        width: loginContainer.width - 150;
         height: 30;
 
         onInputTextChanged: {
@@ -80,7 +80,7 @@ Rectangle {
         anchors.top: loginTextInput.bottom
         anchors.topMargin: 30
         anchors.leftMargin: 75
-        width: preferenceContainer.width - 150;
+        width: loginContainer.width - 150;
         height: 30;
         echoMode: TextInput.Password
         onInputTextChanged: {
@@ -149,7 +149,7 @@ Rectangle {
         textButton: "Login"
         color: Style.buttonColor
         onClicked: {
-            console.log("LofinDialog loginButton onClicked");
+            console.log("LoginDialog loginButton onClicked");
             loginContainer.loaderDialog.closeItem();
         }
     }

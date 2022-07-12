@@ -32,6 +32,7 @@ public:
 		I_ASSIGN(m_pagesDataProviderCompPtr, "PagesDataProviderCompPtr", "List of pages providers for join", false, "");
 		I_ASSIGN(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false, "");
 		I_ASSIGN(m_quickObjectComp, "QuickObject", "Main QML Component", true, "QuickObject");
+		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/Lisa");
 	I_END_COMPONENT;
 
 	CObserverQmlComp();
@@ -51,6 +52,7 @@ private:
     I_REF(imtqml::IQuickObject, m_quickObjectComp);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);
 	I_REF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
+	I_ATTR(QByteArray, m_prefixServer);
 
 	imtbase::CTreeItemModel* m_settingsModelPtr;
 	imtbase::TModelUpdateBinder<imtbase::CTreeItemModel, CObserverQmlComp> m_settingsObserver;

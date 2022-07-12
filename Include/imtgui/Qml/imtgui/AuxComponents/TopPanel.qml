@@ -10,12 +10,14 @@ Rectangle {
     property string fontName: "";
     property string activeCommandsModelId;
     property string title;
+    property bool loginDialog: false;
 
     signal menuActivatedSignal(string idMenu);
     signal commandsChangedSignal(string commandsId);
 
     function updateModels(){
         modelCommands.updateModel();
+        modelUserMode.getUserMode();
     }
 
     function setModeMenuButton(commandId, mode) {
@@ -338,6 +340,7 @@ Rectangle {
             this.SetGqlQuery(gqlData);
         }
 
+
         onStateChanged: {
             console.log("State:", this.state, modelCommands);
             if (this.state === "Ready"){
@@ -350,7 +353,6 @@ Rectangle {
 
                 if (modelCommands.ContainsKey("data")){
                     dataModelLocal = modelCommands.GetData("data")
-
                     if(dataModelLocal.ContainsKey("CommandsData")){
                         dataModelLocal = dataModelLocal.GetData("CommandsData");
 
@@ -367,6 +369,56 @@ Rectangle {
                             topPanelDecoratorLoader.item.centerPanel.showButtons();
                             modelCommands.isFirst = !modelCommands.isFirst
                             topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    GqlModel{
+        id: modelUserMode;
+        function getUserMode() {
+            var query = Gql.GqlRequest("query", "GetUserMode");
+
+            var queryFields = Gql.GqlObject("items");
+            queryFields.InsertField("UserMode");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("TopPanel GqlModel getUserMode query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, modelUserMode);
+            if (this.state === "Ready"){
+                var dataModelLocal;
+
+                if (modelUserMode.ContainsKey("errors")){
+                    return;
+                }
+
+                if (modelUserMode.ContainsKey("data")){
+                    dataModelLocal = modelUserMode.GetData("data")
+                    if (dataModelLocal.ContainsKey("GetUserMode")){
+                        dataModelLocal = dataModelLocal.GetData("GetUserMode");
+                        if(dataModelLocal.ContainsKey("items")){
+                            dataModelLocal = dataModelLocal.GetData("items");
+                            if(dataModelLocal.ContainsKey("Value")){
+                                dataModelLocal = dataModelLocal.GetData("Value");
+                                if (dataModelLocal == 0){
+                                    loginDialog = false
+                                }
+                                else{
+                                    loginDialog = true
+                                }
+                                if (dataModelLocal == 2){
+                                    var source = "AuxComponents/LoginDialog.qml";
+                                    var parameters = {};
+                                    parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
+                                    thubnailDecoratorContainer.openDialog(source, parameters);
+                                }
+                            }
                         }
                     }
                 }

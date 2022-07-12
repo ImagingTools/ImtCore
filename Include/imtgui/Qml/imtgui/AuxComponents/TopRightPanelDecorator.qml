@@ -5,7 +5,6 @@ import imtgui 1.0
 
 Rectangle {
     id: topRightPanelDecorator;
-
     color: "transparent";
 
     radius: 7;
@@ -30,6 +29,15 @@ Rectangle {
 
             anchors.verticalCenter: parent.verticalCenter;
 
+        }
+        LoginButton {
+            id: loginButton;
+
+            width: 24;
+            height: 24;
+            visible: loginDialog;
+
+            anchors.verticalCenter: parent.verticalCenter;
         }
     }
 }

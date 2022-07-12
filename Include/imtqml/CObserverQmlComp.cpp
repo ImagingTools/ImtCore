@@ -37,7 +37,7 @@ void CObserverQmlComp::ApplyUrl(const imtbase::CTreeItemModel *settingsModelPtr)
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		QQmlEngine* engine = qmlEngine(quickItem);
 		qDebug() << "ApplyUrl" << serverUrl;
-		engine->setBaseUrl(serverUrl + "/Lisa");
+		engine->setBaseUrl(serverUrl + *m_prefixServer);
 		QMetaObject::invokeMethod(quickItem, "updateModels");
 	}
 }
