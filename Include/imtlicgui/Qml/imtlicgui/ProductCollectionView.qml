@@ -158,6 +158,10 @@ Item {
             productCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             productCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
         }
+
+        productCollectionContainer.rootItem.setModeMenuButton("New", "Normal");
+        productCollectionContainer.rootItem.setModeMenuButton("Undo", "Disabled");
+        productCollectionContainer.rootItem.setModeMenuButton("Redo", "Disabled");
     }
 
     function selectedIndexIncr(){

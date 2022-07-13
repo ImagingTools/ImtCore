@@ -9,44 +9,20 @@ Item {
     property TreeItemModel modelDepends;
     property TreeItemModel productLicenseFeatures;
 
-//    property var items: [];
-//    property var featuresDependencies;
-
     Component.onCompleted: {
         console.log( "FeaturesTreeView onCompleted");
     }
 
     onModelTreeItemsChanged: {
         console.log( "featuresTreeViewContainer onModelTreeItemsChanged");
+        Events.sendEvent("FeaturesTreeItemsUpdated");
     }
 
-//    function subscribe(item){
-//        console.log("FeaturesTreeView subscribe", item);
-//        if (!featuresTreeViewContainer.items.includes(item)){
-//            featuresTreeViewContainer.items.push(item);
-//        }
-//    }
+    onModelDependsChanged: {
+        console.log("featuresTreeViewContainer onModelDependsChanged");
+        Events.sendEvent("FeatureDependenciesUpdated");
+    }
 
-//    function unsubscribe(item){
-//        console.log("FeaturesTreeView unsubscribe", item);
-//        if (featuresTreeViewContainer.items.includes(item)){
-//            console.log(featuresTreeViewContainer.items);
-//            const index = featuresTreeViewContainer.items.indexOf(item);
-//            if (index > -1) {
-//                featuresTreeViewContainer.items.splice(index, 1);
-//            }
-//            console.log(featuresTreeViewContainer.items);
-//        }
-//    }
-
-//    function sendSignal(){
-//        console.log("FeaturesTreeView sendSignal");
-//        for (let i = 0; i < items.length; i++){
-//            if (items[i] != undefined){
-//                featuresTreeViewContainer.items[i].update();
-//            }
-//        }
-//    }
 
     function updateFeaturesDependenciesAfterPackageEditing(oldPackageId, newPackageId){
         console.log("updateFeaturesDependenciesAfterPackageEditing", oldPackageId, newPackageId);
@@ -135,19 +111,19 @@ Item {
         let keys = featuresTreeViewContainer.productLicenseFeatures.GetKeys();
         for (let i = 0; i < keys.length; i++){
             let value = featuresTreeViewContainer.productLicenseFeatures.GetData(keys[i]);
-            let data = keys[i].split('.');
+            let data = keys[i].split(';');
 
             let curProductId = data[0];
             let curLicenseId = data[1];
 
             if (curProductId == oldProductId){
-                let newKey = newProductId + "." + curLicenseId;
+                let newKey = newProductId + ";" + curLicenseId;
                 featuresTreeViewContainer.productLicenseFeatures.SetData(newKey, value);
                 featuresTreeViewContainer.productLicenseFeatures.SetData(keys[i], "");
                 break;
             }
         }
-        console.log("2", featuresTreeViewContainer.productLicenseFeatures.toJSON());
+//        console.log("2", featuresTreeViewContainer.productLicenseFeatures.toJSON());
     }
 
     function updateLicensesDependenciesAfterLicenseEditing(productId, licenseOldId, licenseNewId, licenseNewName){
@@ -162,39 +138,17 @@ Item {
         for (let i = 0; i < keys.length; i++){
             let value = featuresTreeViewContainer.productLicenseFeatures.GetData(keys[i]);
 
-            let data = keys[i].split('.');
+            let data = keys[i].split(';');
 
             let curProductId = data[0];
             let curLicenseId = data[1];
 
             if (curProductId == productId && curLicenseId == licenseOldId){
-                let newKey = curProductId + "." + licenseNewId;
+                let newKey = curProductId + ";" + licenseNewId;
                 featuresTreeViewContainer.productLicenseFeatures.SetData(newKey, value);
                 break;
             }
-
-//            let valuesData = value.split(';');
-
-//            for (let j = 0; j < valuesData.length; j++){
-//                let valueData = valuesData[j].split('.');
-
-//                let curDependProductId = valueData[0];
-//                let curDependLicenseId = valueData[1];
-
-//                if (curDependProductId == productId && curDependLicenseId == licenseOldId){
-//                    let removeValue = curDependProductId + '.' + curDependLicenseId;
-
-//                    if (j != valuesData.length - 1){
-//                        removeValue += ';';
-//                    }
-//                    let newValue = value.replace(removeValue, '');
-//                    newValue += ';' + curProductId + "." + licenseNewId;
-//                    featuresTreeViewContainer.productLicenseFeatures.SetData(keys[i], newValue);
-//                }
-//            }
         }
-
-        console.log("2", featuresTreeViewContainer.productLicenseFeatures.toJSON());
     }
 
     function updateFeaturesDependenciesAfterFeatureEditing(packageId, featureOldId, featureNewId, featureNewName){

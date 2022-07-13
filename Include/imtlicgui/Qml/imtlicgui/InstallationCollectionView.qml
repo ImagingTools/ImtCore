@@ -75,17 +75,21 @@ Item {
         if (commandsId !== "Installations"){
             return;
         }
-        if (installationCollectionView.selectedIndex > -1) {
+
+        if (installationCollectionView.selectedIndex > -1){
             installationCollectionContainer.rootItem.setModeMenuButton("Remove", "Normal");
             installationCollectionContainer.rootItem.setModeMenuButton("Edit", "Normal");
             installationCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
             installationCollectionContainer.rootItem.setModeMenuButton("CreateLicense", "Normal");
-        } else {
+        }
+        else{
             installationCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             installationCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             installationCollectionContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
             installationCollectionContainer.rootItem.setModeMenuButton("CreateLicense", "Disabled");
         }
+
+        installationCollectionContainer.rootItem.setModeMenuButton("New", "Normal");
     }
 
     function dialogResult(parameters) {
@@ -331,13 +335,15 @@ Item {
             var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
 
             console.log("You chose file name: ", fileName);
-            var id = installationCollectionView.table.getSelectedId();
+            let id = installationCollectionView.table.getSelectedId();
 
             if (fileName == ""){
                 fileName = {};
                 fileName["name"] = id + ".lic";
             }
 
+//            let splitData = id.split("%IMTCORESEPARATOR%");
+//            id = splitData[0];
             console.log("id ",id);
             console.log("fileName ",fileName);
             remoteFileController.GetFile(id, fileName);
@@ -415,43 +421,43 @@ Item {
     }
 
 
-    GqlModel {
-        id: licenseFile;
+//    GqlModel {
+//        id: licenseFile;
 
-        function createLicenseFile() {
-            console.log( "InstallationCollectionView licenseFile createLicenseFile");
-            var query = Gql.GqlRequest("query", "CreateLicenseFile");;
-            var inputParams = Gql.GqlObject("input");
+//        function createLicenseFile() {
+//            console.log( "InstallationCollectionView licenseFile createLicenseFile");
+//            var query = Gql.GqlRequest("query", "CreateLicenseFile");;
+//            var inputParams = Gql.GqlObject("input");
 
-            inputParams.InsertField("Id", installationCollectionView.table.getSelectedId());
-            query.AddParam(inputParams);
+//            inputParams.InsertField("Id", installationCollectionView.table.getSelectedId());
+//            query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("createLicenseFile");
-            queryFields.InsertField("Status");
-            query.AddField(queryFields);
+//            var queryFields = Gql.GqlObject("createLicenseFile");
+//            queryFields.InsertField("Status");
+//            query.AddField(queryFields);
 
-            var gqlData = query.GetQuery();
-            console.log("InstallationCollectionView licenseFile query ", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
+//            var gqlData = query.GetQuery();
+//            console.log("InstallationCollectionView licenseFile query ", gqlData);
+//            this.SetGqlQuery(gqlData);
+//        }
 
-        onStateChanged: {
-            console.log("State:", this.state, licenseFile);
-            if (this.state === "Ready"){
-                var dataModelLocal;
+//        onStateChanged: {
+//            console.log("State:", this.state, licenseFile);
+//            if (this.state === "Ready"){
+//                var dataModelLocal;
 
-                if (licenseFile.ContainsKey("errors")){
-                    return;
-                }
-
-                dataModelLocal = licenseFile.GetData("data");
-
-//                if (dataModelLocal.ContainsKey("InstallationMetaInfo")) {
-
+//                if (licenseFile.ContainsKey("errors")){
+//                    return;
 //                }
 
-            }
-        }
-    }
+//                dataModelLocal = licenseFile.GetData("data");
+
+////                if (dataModelLocal.ContainsKey("InstallationMetaInfo")) {
+
+////                }
+
+//            }
+//        }
+//    }
 
 }

@@ -54,7 +54,6 @@ Rectangle {
         }
         else {
             if(containerContactInfo.operation === "New"){
-                //cbTypeAccount.currentIndex = 0;
                 containerContactInfo.accountType = "company";
 
                 containerContactInfo.contactInfoModel = model.AddTreeModel("data");
@@ -80,7 +79,35 @@ Rectangle {
         }
     }
 
-    function dialogResult(parameters){}
+    Timer {
+        id: saveTimer;
+
+        interval: 500;
+
+        onTriggered: {
+            console.log("saveTimer onTriggered");
+            undoRedo.addModel(containerContactInfo.contactInfoModel);
+        }
+    }
+
+    UndoRedo {
+        id: undoRedo;
+
+        rootItem: containerContactInfo.rootItem;
+        multiDocViewItem: containerContactInfo.multiDocViewItem;
+    }
+
+    function dialogResult(parameters){
+        if (parameters["dialog"] == "SaveDialog"){
+
+            if (parameters["status"] == "yes"){
+                containerContactInfo.menuActivated("Save")
+            }
+            else if (parameters["status"] == "no"){
+                containerContactInfo.rootItem.closeTab();
+            }
+        }
+    }
 
     function openMessageDialog(nameDialog, message, type) {
         var source = "AuxComponents/MessageDialog.qml";
@@ -102,31 +129,62 @@ Rectangle {
         tfcNickName.text = containerContactInfo.contactInfoModel.GetData("NickName");
         tfcAccountName.text = containerContactInfo.contactInfoModel.GetData("AccountName");
         tfcAccountDescription.text = containerContactInfo.contactInfoModel.GetData("AccountDescription");
-
-        //cbTypeAccount.currentIndex = containerContactInfo.contactInfoModel.GetData("AccountTypeComboBoxIndex");
-//        var accountType = containerContactInfo.contactInfoModel.GetData("AccountType");
-//        containerContactInfo.accountType = accountType;
     }
 
     function menuActivated(menuId) {
         console.log("ContactInfoEditor menuActivated", menuId);
-        if (menuId  === "New"){
-//            collectionViewContainer.selectItem("", "")
-        }
-        else if (menuId  === "Save") {
+
+        if (menuId  === "Save") {
 
             var name = containerContactInfo.contactInfoModel.GetData("AccountName");
             contactInfoSaveQuery.updateModel();
         }
-        else if (menuId === "Close") {
-            containerContactInfo.rootItem.closeTab();
-        }
-    }
+        else if (menuId === "Close"){
+            if (containerContactInfo.wasChanged){
+//                let message = qsTr("Save all changes ?")
+//                containerContactInfo.openMessageDialog("Save", message, "SaveDialog");
 
-    function activateSaveButton(){
-        console.log("ContactInfoEditor activateSaveButton");
-        if (containerContactInfo.wasChanged) {
-            containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
+                let source = "AuxComponents/MessageDialog.qml";
+                let parameters = {};
+                parameters["message"] = qsTr("Save all changes ?");
+                parameters["nameDialog"] = "Save";
+                parameters["dialogId"] = "SaveDialog";
+                parameters["cancelButtonVisible"] = true;
+                parameters["resultItem"] = containerContactInfo;
+
+                thubnailDecoratorContainer.openDialog(source, parameters);
+
+            }
+            else{
+                containerContactInfo.rootItem.closeTab();
+            }
+        }
+        else if (menuId  === "Undo"){
+            var result = undoRedo.undo();
+            if (result != null){
+                result = result.replace(/\\/g, '');
+                result = result.slice(1, result.length - 1);
+
+                console.log("Result 1", result);
+
+                console.log("containerContactInfo.contactInfoModel", JSON.stringify(containerContactInfo.contactInfoModel));
+                containerContactInfo.contactInfoModel.Parse(result);
+
+                console.log("Result 2", containerContactInfo.contactInfoModel.toJSON());
+
+                containerContactInfo.updateData();
+//                containerContactInfo.contactInfoModel.Refresh();
+            }
+        }
+        else if (menuId  === "Redo"){
+            if (!undoRedo.redoStackIsEmpty()){
+                var result = undoRedo.redo();
+                result = result.replace(/\\/g, '');
+                result = result.slice(1, result.length - 1);
+
+                containerContactInfo.contactInfoModel.Parse(result);
+                containerContactInfo.updateData();
+            }
         }
     }
 
@@ -148,13 +206,12 @@ Rectangle {
         containerContactInfo.rootItem.setModeMenuButton("New", "Normal");
         containerContactInfo.rootItem.setModeMenuButton("Close", "Normal");
 
-        containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
-//        if (containerContactInfo.wasChanged){
-//            containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
-//        }
-//        else {
-//            containerContactInfo.rootItem.setModeMenuButton("Save", "Disabled");
-//        }
+//        containerContactInfo.checkStacksUndoRedo();
+        undoRedo.updateStatesCommands();
+
+        if (containerContactInfo.wasChanged){
+            containerContactInfo.rootItem.setModeMenuButton("Save", "Normal");
+        }
     }
 
     ListModel {
@@ -203,144 +260,12 @@ Rectangle {
 
             spacing: 7;
 
-//            Rectangle {
-//                id: buttonsAvatar;
-
-//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
-
-//                width: 125;
-//                height: 30;
-
-//                color: "transparent";
-
-//                AuxButton {
-//                    id: loadAvatarButton;
-
-//                    anchors.left: buttonsAvatar.left;
-//                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
-
-//                    width: 50;
-//                    height:  20;
-
-//                    fontPixelSize: 12;
-
-//                    hasText: true;
-//                    textButton: "Load";
-//                }
-
-//                AuxButton {
-//                    id: removeAvatarButton;
-
-//                    anchors.left: loadAvatarButton.right;
-//                    anchors.leftMargin: 5;
-//                    anchors.verticalCenter: buttonsAvatar.verticalCenter;
-
-//                    width: 50;
-//                    height:  20;
-
-//                    fontPixelSize: 12;
-
-//                    hasText: true;
-
-//                    textButton: "Remove";
-//                }
-//            }
-
-//            Rectangle {
-//                id: avatarRect;
-
-//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
-
-//                width: 150;
-//                height: 150;
-
-//                color: "transparent";
-
-//                Image {
-//                    id: avatarIcon;
-
-//                    height: 150;
-//                    width: 150;
-
-//                    source: "../../Icons/Light/Account_On_Normal.svg";
-
-//                    sourceSize.width: width;
-//                    sourceSize.height: height;
-
-//                    fillMode: Image.PreserveAspectFit;
-//                }
-//            }
-
-//            Text {
-//                id: titleAccountType;
-
-//                text: qsTr("Account type");
-//                color: Style.textColor;
-
-//                font.family: Style.fontFamily;
-//                font.pixelSize: Style.fontSize_common;
-//            }
-
             Item {
                 id: cbTypeAccount;
 
                 property string currentText: "Company";
                 property int currentIndex: 1;
             }
-
-//            ComboBox {
-//                id: cbTypeAccount;
-//                z: 10;
-
-//                width: parent.width;
-//                height: 23;
-
-//                radius: 3;
-//                model: typeAccountModel;
-//                currentText: cbTypeAccount.currentIndex === 0 ? "Private" : "Company";
-//                textCentered: false;
-
-//                //borderColor: Style.alternateBaseColor;
-
-//                property bool wasFocus: false;
-
-//                onCurrentIndexChanged: {
-//                    console.log("cbTypeAccount onCurrentIndexChanged", cbTypeAccount.currentIndex);
-
-//                    var accountType = typeAccountModel.get(cbTypeAccount.currentIndex).name.toLowerCase();
-//                    console.log("accountType", accountType);
-//                    containerContactInfo.accountType = accountType;
-
-//                    if (!containerContactInfo.contactInfoModel){
-//                        return;
-//                    }
-
-//                    containerContactInfo.contactInfoModel.SetData("AccountType", accountType);
-//                    containerContactInfo.contactInfoModel.SetData("AccountTypeComboBoxIndex", cbTypeAccount.currentIndex)
-////                    if (containerContactInfo.operation !== "New" && !cbTypeAccount.wasFocus){
-////                        cbTypeAccount.wasFocus = true;
-////                        return;
-////                    }
-////                    containerContactInfo.wasChanged = true;
-//                }
-
-//                onClicked: {
-//                    cbTypeAccount.focus = true;
-//                    cbTypeAccount.openContextMenu();
-//                }
-
-//                onDialogResultChanged: {
-//                    cbTypeAccount.focus = true;
-//                }
-
-//                Keys.onPressed: {
-//                    if (event.key === Qt.Key_Space){
-//                        cbTypeAccount.clicked();
-//                    }
-//                }
-
-//                KeyNavigation.tab: rectTfcAccountName;
-//            }
 
             Text {
                 id: titleAccountName;
@@ -367,8 +292,12 @@ Rectangle {
 
                     onInputTextChanged: {
                         console.log("ContactInfoEditor TextFieldCustom AccountName onInputTextChanged");
-                        containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
-                        containerContactInfo.wasChanged = true;
+
+                        let curName = containerContactInfo.contactInfoModel.GetData("AccountName");
+                        if (tfcAccountName.text != curName){
+                            saveTimer.restart();
+                            containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
+                        }
                     }
                 }
 
@@ -381,23 +310,6 @@ Rectangle {
                 KeyNavigation.tab: rectTfcAccountDescription;
                 KeyNavigation.backtab: cbTypeAccount;
             }
-
-//            TextFieldCustom {
-//                id: tfcAccountName;
-
-//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
-
-//                width: contactInfoColumn.width;
-//                height: 30;
-
-//                onInputTextChanged: {
-//                    console.log("ContactInfoEditor TextFieldCustom AccountName onInputTextChanged");
-//                    containerContactInfo.contactInfoModel.SetData("AccountName", tfcAccountName.text);
-//                    containerContactInfo.wasChanged = true;
-//                }
-
-//                KeyNavigation.tab: tfcAccountDescription;
-//            }
 
             Text {
                 id: titleAccountDescription;
@@ -424,8 +336,11 @@ Rectangle {
 
                     onInputTextChanged: {
                         console.log("ContactInfoEditor TextFieldCustom AccountDescription onInputTextChanged");
-                        containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
-                        containerContactInfo.wasChanged = true;
+                        let curDescription = containerContactInfo.contactInfoModel.GetData("AccountDescription");
+                        if (tfcAccountDescription.text != curDescription){
+                            saveTimer.restart();
+                            containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
+                        }
                     }
                 }
 
@@ -438,24 +353,6 @@ Rectangle {
                 KeyNavigation.backtab: rectTfcAccountName;
                 KeyNavigation.tab: countryBlock;
             }
-
-//            TextFieldCustom {
-//                id: tfcAccountDescription;
-
-//                anchors.horizontalCenter: contactInfoColumn.horizontalCenter;
-
-//                width: contactInfoColumn.width;
-//                height: 30;
-
-//                onInputTextChanged: {
-//                    console.log("ContactInfoEditor TextFieldCustom AccountDescription onInputTextChanged");
-//                    containerContactInfo.contactInfoModel.SetData("AccountDescription", tfcAccountDescription.text);
-//                    containerContactInfo.wasChanged = true;
-//                }
-
-//                KeyNavigation.tab: tfcAccountDescription;
-//                KeyNavigation.backtab: tfcAccountName;
-//            }
 
             Text {
                 id: companyAddressBlockTitle;
@@ -521,8 +418,14 @@ Rectangle {
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom Country onInputTextChanged");
-                            containerContactInfo.contactInfoModel.SetData("Country", tfcCountryText.text);
-                            containerContactInfo.wasChanged = true;
+
+                            let curCountry = containerContactInfo.contactInfoModel.GetData("Country");
+                            if (tfcCountryText.text != curCountry){
+                                saveTimer.restart();
+                                containerContactInfo.contactInfoModel.SetData("Country", tfcCountryText.text);
+                            }
+
+//                            containerContactInfo.contactInfoModel.SetData("Country", tfcCountryText.text);
                         }
                     }
 
@@ -576,8 +479,13 @@ Rectangle {
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom City onInputTextChanged");
-                            containerContactInfo.contactInfoModel.SetData("City", tfcCity.text);
-                            containerContactInfo.wasChanged = true;
+//                            containerContactInfo.contactInfoModel.SetData("City", tfcCity.text);
+
+                            let curCity = containerContactInfo.contactInfoModel.GetData("City");
+                            if (tfcCity.text != curCity){
+                                saveTimer.restart();
+                                containerContactInfo.contactInfoModel.SetData("City", tfcCity.text);
+                            }
                         }
                     }
 
@@ -629,12 +537,17 @@ Rectangle {
                         width: postalCodeBlock.width - 22;
                         height: 30;
 
-                        text: "5";
+//                        text: "5";
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom PostalCode onInputTextChanged");
-                            containerContactInfo.contactInfoModel.SetData("PostalCode", postalCode.text);
-                            containerContactInfo.wasChanged = true;
+//                            containerContactInfo.contactInfoModel.SetData("PostalCode", postalCode.text);
+
+                            let curCode = containerContactInfo.contactInfoModel.GetData("PostalCode");
+                            if (postalCode.text != curCode){
+                                saveTimer.restart();
+                                containerContactInfo.contactInfoModel.SetData("PostalCode", postalCode.text);
+                            }
                         }
                     }
 
@@ -687,8 +600,13 @@ Rectangle {
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom Street onInputTextChanged");
-                            containerContactInfo.contactInfoModel.SetData("Street", tfcStreet.text);
-                            containerContactInfo.wasChanged = true;
+//                            containerContactInfo.contactInfoModel.SetData("Street", tfcStreet.text);
+
+                            let curStreet = containerContactInfo.contactInfoModel.GetData("Street");
+                            if (tfcStreet.text != curStreet){
+                                saveTimer.restart();
+                                containerContactInfo.contactInfoModel.SetData("Street", tfcStreet.text);
+                            }
                         }
                     }
 
@@ -763,9 +681,13 @@ Rectangle {
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom Email onInputTextChanged");
-                            containerContactInfo.contactInfoModel.SetData("Email", tfcEmail.text);
-                            containerContactInfo.wasChanged = true;
-//                            containerContactInfo.activateSaveButton();
+//                            containerContactInfo.contactInfoModel.SetData("Email", tfcEmail.text);
+
+                            let curEmail = containerContactInfo.contactInfoModel.GetData("Email");
+                            if (tfcEmail.text != curEmail){
+                                saveTimer.restart();
+                                containerContactInfo.contactInfoModel.SetData("Email", tfcEmail.text);
+                            }
                         }
                     }
 
@@ -775,9 +697,7 @@ Rectangle {
                         }
                     }
 
-//                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? firstNameBlock : bdBlock;
                     KeyNavigation.tab: firstNameBlock;
-//                    KeyNavigation.backtab: containerContactInfo.accountType === "company" ? streetBlock : rectTfcAccountDescription;
                     KeyNavigation.backtab: streetBlock;
                 }
 
@@ -825,7 +745,12 @@ Rectangle {
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom BirthDay onInputTextChanged");
                             containerContactInfo.contactInfoModel.SetData("BirthDay", tfcBD.text);
-                            containerContactInfo.wasChanged = true;
+
+//                            let curEmail = containerContactInfo.contactInfoModel.GetData("Email");
+//                            if (tfcEmail.text != curEmail){
+//                                saveTimer.restart();
+//                                containerContactInfo.contactInfoModel.SetData("Email", tfcEmail.text);
+//                            }
                         }
                     }
 
@@ -891,7 +816,6 @@ Rectangle {
                             console.log("ContactInfoEditor TextFieldCustom Gender onInputTextChanged");
                             var gender = genderModel.get(genderCB.currentIndex).name.toLowerCase();
                             containerContactInfo.contactInfoModel.SetData("Gender", gender);
-                            containerContactInfo.wasChanged = true;
                         }
 
                         onClicked: {
@@ -953,8 +877,13 @@ Rectangle {
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom FirstName onInputTextChanged");
-                            containerContactInfo.contactInfoModel.SetData("FirstName", tfcFirstNameText.text);
-                            containerContactInfo.wasChanged = true;
+//                            containerContactInfo.contactInfoModel.SetData("FirstName", tfcFirstNameText.text);
+
+                            let curName = containerContactInfo.contactInfoModel.GetData("FirstName");
+                            if (tfcFirstNameText.text != curName){
+                                saveTimer.restart();
+                                containerContactInfo.contactInfoModel.SetData("FirstName", tfcFirstNameText.text);
+                            }
                         }
                     }
 
@@ -1008,8 +937,13 @@ Rectangle {
 
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom LastName onInputTextChanged");
-                            containerContactInfo.contactInfoModel.SetData("LastName", tfcLastName.text);
-                            containerContactInfo.wasChanged = true;
+//                            containerContactInfo.contactInfoModel.SetData("LastName", tfcLastName.text);
+
+                            let curName = containerContactInfo.contactInfoModel.GetData("LastName");
+                            if (tfcLastName.text != curName){
+                                saveTimer.restart();
+                                containerContactInfo.contactInfoModel.SetData("LastName", tfcLastName.text);
+                            }
                         }
                     }
 
@@ -1019,7 +953,6 @@ Rectangle {
                         }
                     }
 
-//                    KeyNavigation.tab: containerContactInfo.accountType === "company" ? lastNameBlock : nickNameBlock;
                     KeyNavigation.tab: lastNameBlock;
                     KeyNavigation.backtab: firstNameBlock;
                 }
@@ -1067,7 +1000,6 @@ Rectangle {
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom NickName onInputTextChanged");
                             containerContactInfo.contactInfoModel.SetData("NickName", tfcNickName.text);
-                            containerContactInfo.wasChanged = true;
                         }
                     }
 
@@ -1257,6 +1189,9 @@ Rectangle {
 //                        }
 
                         containerContactInfo.contactInfoModel = dataModelLocal;
+
+                        undoRedo.addModel(containerContactInfo.contactInfoModel);
+
                         containerContactInfo.model.SetExternTreeModel('data', containerContactInfo.contactInfoModel)
                         //dataModelLocal.RemoveData("item");
                     }
@@ -1369,11 +1304,10 @@ Rectangle {
                                 containerContactInfo.operation = "Open";
                             }
 
+//                            containerContactInfo.disableChanges();
+                            containerContactInfo.multiDocViewItem.disableChanges();
+
                             console.log("containerContactInfo.operation", containerContactInfo.operation);
-//                            if (oldId !== containerContactInfo.itemId){
-//                                var accName = containerContactInfo.contactInfoModel.GetData("AccountName");
-//                                containerContactInfo.rootItem.updateTitleTab(containerContactInfo.itemId, accName);
-//                            }
                             containerContactInfo.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                         }
                     }

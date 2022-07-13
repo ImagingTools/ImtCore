@@ -24,6 +24,9 @@ QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByte
 		if (informationId == QByteArray("InstanceId")){
 			return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID);
 		}
+		else if (informationId == QByteArray("ProductId")){
+			return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_NAME);
+		}
 		else if (informationId == QByteArray("Customer")){
 			return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME);
 		}
@@ -63,25 +66,23 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 
 		imtbase::IObjectCollection::MetaInfoPtr metaInfo;
 
-		QByteArray productInstanceId = GetObjectIdFromInputParams(inputParams);
+		QByteArray objectId = GetObjectIdFromInputParams(inputParams);
+		QByteArray productInstanceId = objectId;
 
-		int index;
-		//index = metaInfoModel->InsertNewItem();
-		//metaInfoModel->SetData("Name", "Modification Time", index);
-		//childs = metaInfoModel->AddTreeModel("Childs", index);
+		if (m_separatorObjectIdAttrPtr.IsValid()){
+			QString productInstanceIdStr = productInstanceId;
 
-		if (m_objectCollectionCompPtr->GetDataMetaInfo(productInstanceId, metaInfo)){
-			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			//childs->SetData("Value", date);
+			QStringList splitData = productInstanceIdStr.split(*m_separatorObjectIdAttrPtr);
+			productInstanceId = splitData[0].toUtf8();
 		}
 
-		index = metaInfoModel->InsertNewItem();
+		int index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Instance-ID"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 		childs->SetData("Value", productInstanceId);
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (!m_objectCollectionCompPtr->GetObjectData(productInstanceId, dataPtr)){
+		if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			errorMessage = QT_TR_NOOP("Unable to get an installation object data");
 			return nullptr;
 		}
@@ -91,6 +92,20 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 			errorMessage = QT_TR_NOOP("Unable to get an installation info");
 			return nullptr;
 		}
+
+		QByteArray productId = productInstancePtr->GetProductId();
+
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Product-ID"), index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+		childs->SetData("Value", productId);
+
+		QByteArray accountId = productInstancePtr->GetCustomerId();
+
+		index = metaInfoModel->InsertNewItem();
+		metaInfoModel->SetData("Name", QT_TR_NOOP("Account-ID"), index);
+		childs = metaInfoModel->AddTreeModel("Childs", index);
+		childs->SetData("Value", accountId);
 
 		const imtbase::ICollectionInfo& licenseList = productInstancePtr->GetLicenseInstances();
 

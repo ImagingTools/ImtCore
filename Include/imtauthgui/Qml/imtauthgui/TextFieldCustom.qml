@@ -75,6 +75,11 @@ Item {
         selectByMouse: true;
         clip: true;
 
+//        inputMask: "00:00:00:00";
+//        validator: RegExpValidator {
+//                regExp: /([0-9A-F]{2}/;
+//            }
+
         onFocusChanged: {
             console.log("TextInput onFocusChanged", textField.focus);
             containerTextField.wasFocus = true;
@@ -85,12 +90,11 @@ Item {
         }
 
         onTextChanged: {
-            console.log("TextFieldCustom onTextChanged");
-            if (containerTextField.wasFocus) {
-                containerTextField.inputTextChanged();
-            }
-
-//            containerTextField.customTextChanged();
+            console.log("TextFieldCustom onTextChanged", textField.text);
+//            if (containerTextField.wasFocus) {
+//                containerTextField.inputTextChanged();
+//            }
+            containerTextField.inputTextChanged();
             containerTextField.isTextChanged = true;
         }
 

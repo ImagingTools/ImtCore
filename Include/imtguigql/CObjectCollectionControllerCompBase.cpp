@@ -179,13 +179,21 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		QString name, description;
 		QByteArray objectId;
 
+		QString splitObjectId;
+		if (m_separatorObjectIdAttrPtr.IsValid()){
+			splitObjectId = objectId;
+
+			QStringList splitData = splitObjectId.split(*m_separatorObjectIdAttrPtr);
+			splitObjectId = splitData[0].toUtf8();
+		}
+
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
 			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
 		}
 
 		if (errorMessage.isEmpty() && newObjectId.isEmpty()){
-			errorMessage = QObject::tr("Can not insert object: %1").arg(QString(objectId));
+			errorMessage = QObject::tr("Can not insert object: %1").arg(splitObjectId);
 		}
 	}
 
@@ -218,6 +226,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	QByteArray oldObjectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QByteArray newObjectId;
 	QString name, description;
+
+	QString splitObjectId;
+	if (m_separatorObjectIdAttrPtr.IsValid()){
+		splitObjectId = oldObjectId;
+
+		QStringList splitData = splitObjectId.split(*m_separatorObjectIdAttrPtr);
+		splitObjectId = splitData[0].toUtf8();
+	}
+
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
@@ -225,11 +242,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
 		if (savedObject != nullptr){
 			if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
-				errorMessage = QObject::tr("Can not update object: %1").arg(QString(oldObjectId));
+				errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
 			}
 		}
 		else {
-			errorMessage = QObject::tr("Can not create object for update: %1").arg(QString(oldObjectId));
+			if (errorMessage.isEmpty()){
+				errorMessage = QObject::tr("Can not create object for update: %1").arg(splitObjectId);
+			}
 		}
 	}
 

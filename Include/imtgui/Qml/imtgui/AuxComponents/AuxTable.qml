@@ -11,7 +11,7 @@ Item {
     property int selectedIndex: -1;
     property int count: 3; //headersArray.length;
     property int itemHeight: 35;
-    property bool hasFilter: true;
+    property bool hasFilter: false;
 
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
 
@@ -199,7 +199,7 @@ Item {
         visible: tableContainer.hasFilter;
 
 
-        width: 30;
+        width: 0;
         height: width;
 
         iconSource: "../../../" + "Icons/" + Style.theme + "/Parameters_On_Normal.svg";

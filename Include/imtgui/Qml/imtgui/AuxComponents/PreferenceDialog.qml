@@ -513,67 +513,67 @@ Rectangle {
        preferenceSaveButton.forceActiveFocus();
    }
 
-   Row {
-       anchors.bottom: preferenceSaveButton.top;
-       anchors.bottomMargin: 10;
-       anchors.right: parent.right;
+//   Row {
+//       anchors.bottom: preferenceSaveButton.top;
+//       anchors.bottomMargin: 10;
+//       anchors.right: parent.right;
 
-       spacing: 10;
-       width: 100;
+//       spacing: 10;
+//       width: 100;
 
-       AuxButton {
-           id: undoButton;
+//       AuxButton {
+//           id: undoButton;
 
-           width: 25;
-           height: 25;
+//           width: 25;
+//           height: 25;
 
-           hasText: true;
-           hasIcon: false;
+//           hasText: true;
+//           hasIcon: false;
 
-           textButton: qsTr("Undo");
+//           textButton: qsTr("Undo");
 
-           onClicked: {
-               console.log("undoRedo.undo");
-               var result = undoRedo.undo();
-               if (result != null){
-                   result = result.replace(/\\/g, '');
-                   result = result.slice(1, result.length - 1);
-                   globalSettings.Parse(result);
-                   preferenceContainer.modelSettingsChange();
-                   preferenceContainer.settingsBodyChanged();
-                   mainPanelRepeater.model = globalSettings;
-                   globalSettings.Refresh();
-               }
+//           onClicked: {
+//               console.log("undoRedo.undo");
+//               var result = undoRedo.undo();
+//               if (result != null){
+//                   result = result.replace(/\\/g, '');
+//                   result = result.slice(1, result.length - 1);
+//                   globalSettings.Parse(result);
+//                   preferenceContainer.modelSettingsChange();
+//                   preferenceContainer.settingsBodyChanged();
+//                   mainPanelRepeater.model = globalSettings;
+//                   globalSettings.Refresh();
+//               }
 
-               //preferenceSaveButton.enabled = !undoRedo.undoStackIsEmpty();
-           }
-       }
+//               //preferenceSaveButton.enabled = !undoRedo.undoStackIsEmpty();
+//           }
+//       }
 
-       AuxButton {
-           id: redoButton;
+//       AuxButton {
+//           id: redoButton;
 
-           width: 25;
-           height: 25;
+//           width: 25;
+//           height: 25;
 
-           hasText: true;
-           hasIcon: false;
+//           hasText: true;
+//           hasIcon: false;
 
-           textButton: qsTr("Redo");
+//           textButton: qsTr("Redo");
 
-           onClicked: {
-               if (!undoRedo.redoStackIsEmpty()){
-                   var result = undoRedo.redo();
-                   result = result.replace(/\\/g, '');
-                   result = result.slice(1, result.length - 1);
-                   globalSettings.Parse(result);
-                   preferenceContainer.modelSettingsChange();
-                   preferenceContainer.settingsBodyChanged();
-                   mainPanelRepeater.model = globalSettings;
-                   globalSettings.Refresh();
-               }
-           }
-       }
-   }
+//           onClicked: {
+//               if (!undoRedo.redoStackIsEmpty()){
+//                   var result = undoRedo.redo();
+//                   result = result.replace(/\\/g, '');
+//                   result = result.slice(1, result.length - 1);
+//                   globalSettings.Parse(result);
+//                   preferenceContainer.modelSettingsChange();
+//                   preferenceContainer.settingsBodyChanged();
+//                   mainPanelRepeater.model = globalSettings;
+//                   globalSettings.Refresh();
+//               }
+//           }
+//       }
+//   }
 
    AuxButton {
        id: preferenceSaveButton;
@@ -589,7 +589,7 @@ Rectangle {
        hasText: true;
        hasIcon: false;
 
-       enabled: undoRedo.undoStackCountObjects > 1;
+//       enabled: undoRedo.undoStackCountObjects > 1;
 
        textButton: qsTr("Apply");
        borderColor: (preferenceSaveButton.highlighted || preferenceSaveButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;

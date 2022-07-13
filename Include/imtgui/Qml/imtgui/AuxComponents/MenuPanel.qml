@@ -51,11 +51,6 @@ Rectangle {
         Column {
             id: columnPages;
 
-//            anchors.top: parent.top;
-//            anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-//            anchors.bottom: parent.bottom;
-//            anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
-
             width: parent.width;
 
             Repeater {
@@ -89,40 +84,6 @@ Rectangle {
 
     }
 
-//    ListView {
-//        id: lvPages;
-
-////        width: parent.width;
-//        anchors.fill: parent;
-
-//        boundsBehavior: Flickable.StopAtBounds;
-
-//        delegate:  MenuPanelButton{
-//            text:  model[PageEnum.NAME];
-//            textColor: Style.textColor;
-//            fontName: menuPanel.fontName;
-//            imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Selected" + ".svg":
-//                                                     "../../../" + "Icons/" + Style.theme + "/" + model[PageEnum.ICON] + "_" + "On" + "_" + "Normal" + ".svg";
-
-//            selected: lvPages.currentIndex === model.index ? true : false;
-
-//            decoratorSource : Style.menuButtonDecoratorPath;
-////            decoratorSource: model['DecoratorSource'];
-
-//            onClicked: {
-//                lvPages.currentIndex = model.index;
-//                menuPanel.activePageName = model[PageEnum.NAME];
-//                menuPanel.activeIcon = model[PageEnum.ICON];
-//                menuPanel.activePageIndex = model.index;
-//                menuPanel.activePageId = model[PageEnum.ID];
-
-//                if (!menuPanel.focus){
-//                    menuPanel.forceActiveFocus();
-//                }
-//            }
-//        }
-//    }
-
     Timer {
         id: pageIndexTimer;
 
@@ -132,19 +93,6 @@ Rectangle {
 
         onTriggered: {
             menuPanel.activePageIndex  = pageIndexTimer.pageIndex;
-        }
-    }
-
-    function transformModel(modelInput){
-        if (!modelInput){
-            return;
-        }
-
-        for (let i = 0; i < modelInput.GetItemsCount(); i++){
-            let subPages = modelInput.GetData("SubPages", i);
-            if (subPages){
-
-            }
         }
     }
 

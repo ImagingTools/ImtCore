@@ -14,6 +14,9 @@
         <file alias="imtlicgui/EditLicenseDialog.qml">Qml/imtlicgui/EditLicenseDialog.qml</file>
         <file alias="imtlicgui/InstallationInfoEditor.qml">Qml/imtlicgui/InstallationInfoEditor.qml</file>
         <file alias="imtlicgui/FeaturesTreeView.qml">Qml/imtlicgui/FeaturesTreeView.qml</file>
+	<file alias="imtlicgui/TreeViewModel.qml">Qml/imtlicgui/TreeViewModel.qml</file>
+	<file alias="imtlicgui/FeatureDependenciesModel.qml">Qml/imtlicgui/FeatureDependenciesModel.qml</file>
+	<file alias="imtlicgui/LicenseFeaturesModel.qml">Qml/imtlicgui/LicenseFeaturesModel.qml</file>
         <file alias="imtlicgui/TableInstanceLicensesDelegate.qml">Qml/imtlicgui/TableInstanceLicensesDelegate.qml</file>
         <file alias="imtlicgui/MetaInfo.qml">Qml/imtlicgui/MetaInfo.qml</file>
         <file alias="imtlicgui/TestMultiDocView.qml">Qml/imtlicgui/TestMultiDocView.qml</file>

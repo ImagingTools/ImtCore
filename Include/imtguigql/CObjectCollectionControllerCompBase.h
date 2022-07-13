@@ -2,6 +2,7 @@
 
 // ACF includes
 #include <iqt/ITranslationManager.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
@@ -26,6 +27,7 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
+		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -93,6 +95,9 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_headersProviderCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
+//	I_REF(iser::ISerializable, m_separatorObjectIdAttrPtr);
+	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
+
 };
 
 

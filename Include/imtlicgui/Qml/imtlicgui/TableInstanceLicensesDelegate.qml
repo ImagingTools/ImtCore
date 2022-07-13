@@ -15,9 +15,9 @@ Rectangle {
 
     signal clicked;
     signal doubleClicked;
-    signal checkBoxLicenseClicked(int modelIndex, int state);
-    signal checkBoxExpirationClicked(int modelIndex, int state);
-    signal expirationTextChanged(int modelIndex, string value);
+    signal checkBoxLicenseClicked(string itemId, int modelIndex, int state);
+    signal checkBoxExpirationClicked(string itemId, int modelIndex, int state);
+    signal expirationTextChanged(string itemId, int modelIndex, string value);
 
     Rectangle{
         id: selectionBackGround;
@@ -70,9 +70,9 @@ Rectangle {
 
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-                    checkBoxLicense.checkState === 2 ? checkBoxLicense.checkState = 0 : checkBoxLicense.checkState = 2;
+//                    checkBoxLicense.checkState === 2 ? checkBoxLicense.checkState = 0 : checkBoxLicense.checkState = 2;
 
-                    licensesTableDelegate.checkBoxLicenseClicked(model.index, checkBoxLicense.checkState);
+                    licensesTableDelegate.checkBoxLicenseClicked(model.Id, model.index, 2 - checkBoxLicense.checkState);
                 }
             }
 
@@ -123,14 +123,14 @@ Rectangle {
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
 
-                    if (checkBoxExpiration.checkState === 2){
-                        checkBoxExpiration.checkState = 0;
-                    }
-                    else{
-                        checkBoxExpiration.checkState = 2;
-                    }
+//                    if (checkBoxExpiration.checkState === 2){
+//                        checkBoxExpiration.checkState = 0;
+//                    }
+//                    else{
+//                        checkBoxExpiration.checkState = 2;
+//                    }
 
-                    licensesTableDelegate.checkBoxExpirationClicked(model.index, checkBoxExpiration.checkState);
+                    licensesTableDelegate.checkBoxExpirationClicked(model.Id, model.index, 2 - checkBoxExpiration.checkState);
                 }
             }
         }
@@ -165,10 +165,13 @@ Rectangle {
 
             Component.onCompleted: {
                 console.log("TableInstanceLicensesDelegate Calendar onCompleted");
+                let data = model.Expiration.split(".")
 
-                //expirationDate.selectedDate = model.Expiration;
+                let day = Number(data[0]);
+                let monthIndex = Number(data[1]) - 1;
+                let year = Number(data[2]);
 
-                var date = new Date(model.Expiration);
+                var date = new Date(year, monthIndex, day);
 
                 if (date){
                     expirationDate.setDate(date);
@@ -191,7 +194,7 @@ Rectangle {
                // var dateStr = expirationDate.selectedDate.format('dd.mm.yyyy');
 
                 var dateStr = expirationDate.formatDate();
-                licensesTableDelegate.expirationTextChanged(model.index, dateStr);
+                licensesTableDelegate.expirationTextChanged(model.Id, model.index, dateStr);
             }
         }
     }

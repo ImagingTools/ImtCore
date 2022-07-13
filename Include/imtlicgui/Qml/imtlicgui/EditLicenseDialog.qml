@@ -58,9 +58,6 @@ Rectangle {
     function exit(status) {
         var parameters  = {};
         if (status === "ok") {
-//            tfcFeatureIdText.text = tfcFeatureIdText.text.replace('.', '');
-            tfcLicenseIdText.text = tfcLicenseIdText.text.replace(/[\s.,%]/g, '')
-//            tfcLicenseIdText.text = tfcLicenseIdText.text.replace('.', '');
             parameters["newLicenseId"] = tfcLicenseIdText.text;
             parameters["newLicenseName"] = tfcLicenseNameText.text;
         }
@@ -71,7 +68,7 @@ Rectangle {
 
     function validateId(id) {
         if (id === "") {
-            return qsTr("Id can't be empty!");
+            return qsTr("License-ID can't be empty!");
         }
 
         if (!editLicenseContainer.collectionViewLicenses){
@@ -84,7 +81,7 @@ Rectangle {
 
             if (dataModelLocal.GetData("Id", i ) === id &&
                     editLicenseContainer.collectionViewLicenses.selectedIndex !== i) {
-                return qsTr("Id already exist!");
+                return qsTr("License-ID already exists!");
             }
         }
 
@@ -93,7 +90,7 @@ Rectangle {
 
     function validateName(name) {
         if (name === "") {
-            return qsTr("Name can't be empty!");
+            return qsTr("License Name can't be empty!");
         }
 
         return "";
@@ -102,8 +99,8 @@ Rectangle {
     function generateKey() {
         console.log("EditLicenseDialog generateKey...");
         if (tfcLicenseIdText.text === "") {
-            var key = "000000";
-            key = key.replace(/\s+/g, '');
+            var key = "00.0000";
+            //key = key.replace(/\s+/g, '');
             tfcLicenseIdText.text = key;
         }
     }
@@ -333,8 +330,6 @@ Rectangle {
             enabled: errorIdMessage.text === "" && errorNameMessage.text === "";
 
             onClicked: {
-
-//                editLicenseContainer.okClicked(tfcLicenseIdText.text, tfcLicenseNameText.text);
                 editLicenseContainer.exit("ok");
                 editLicenseContainer.loaderDialog.closeItem();
             }
@@ -407,7 +402,7 @@ Rectangle {
 
             color: Style.errorTextColor;
 
-            text: qsTr("Id can't be empty!");
+            text: qsTr("License-ID can't be empty!");
         }
 
         Text {

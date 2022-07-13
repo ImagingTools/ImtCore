@@ -138,8 +138,8 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				if (dependenciesModelPtr != nullptr){
 					QStringList featureDependenciesKeys = dependenciesModelPtr->GetKeys();
 					for (const QString& key : featureDependenciesKeys){
-						QByteArray depFeatureId = key.split('.')[1].toUtf8();
-						if (featureId == depFeatureId){
+						//QByteArray depFeatureId = key.split('.')[1].toUtf8();
+						if (featureId == key){
 							QByteArrayList values = dependenciesModelPtr->GetData(key.toUtf8()).toByteArray().split(';');
 							featurePackagePtr->SetFeatureDependencies(key.toUtf8(), values);
 						}
@@ -188,9 +188,11 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 					if (featureInfoPtr != nullptr){
 						QByteArray featureId = featureInfoPtr->GetFeatureId();
-						QByteArrayList dependsIds = dependenciesProvider->GetFeatureDependencies(collectionId + "." + featureId);
+//						QByteArrayList dependsIds = dependenciesProvider->GetFeatureDependencies(collectionId + "." + featureId);
+						QByteArrayList dependsIds = dependenciesProvider->GetFeatureDependencies(featureId);
 						if (dependsIds.size() > 0){
-							QByteArray key = collectionId + "." + featureId;
+//							QByteArray key = collectionId + "." + featureId;
+							QByteArray key = featureId;
 							QString value = dependsIds.join(';');
 							dependenciesModel->SetData(key, value);
 						}

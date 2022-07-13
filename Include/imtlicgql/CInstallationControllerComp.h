@@ -20,6 +20,7 @@ public:
 		I_ASSIGN(m_productInstanceFactCompPtr, "InstallationFactory", "Factory used for creation of the new product instance", true, "InstallationFactory");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta information creator for the product instance", true, "MetaInfoCreator");
 	I_END_COMPONENT
+
 protected:
 	virtual imtbase::CTreeItemModel* GetObject(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;

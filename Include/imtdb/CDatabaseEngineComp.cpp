@@ -206,15 +206,6 @@ bool CDatabaseEngineComp::OpenDatabase() const
 	databaseConnection.setDatabaseName(databaseName);
 	retVal = databaseConnection.open();
 
-//	QString queryString;
-//	for (int i = 100; i < 10000; i++){
-//		queryString += QString("INSERT INTO Packages(Id, Name, Description) VALUES('%1', '%2', '%3');")
-//				.arg(QString(QString::number(i) + "_test"))
-//				.arg(QString(QString::number(i) + "_test"))
-//				.arg(QString(QString::number(i) + "_test"));
-//	}
-//	databaseConnection.exec(queryString);
-
 	return retVal;
 }
 

@@ -8,7 +8,6 @@ Item {
     width: texttabDelegate.width + imagetabDelegate.width + 30;
 
 
-
     Rectangle {
         anchors.fill: parent;
         color:  tabDelegate.selected ? Style.baseColor: "transparent";

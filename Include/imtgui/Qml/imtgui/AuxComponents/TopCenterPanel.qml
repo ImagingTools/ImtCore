@@ -48,6 +48,20 @@ Rectangle {
         topCenterLvButtons.visible = true;
     }
 
+    function getCommandModeById(commandId){
+        console.log("topCenterPanel getCommandModeById", commandId);
+
+        for (let i = 0; i < topCenterLvButtons.model.GetItemsCount(); i++){
+            let m_commandId = topCenterLvButtons.model.GetData("Id", i);
+            if (m_commandId == commandId){
+                let m_mode = topCenterLvButtons.model.GetData("Mode", i);
+                return m_mode;
+            }
+        }
+
+        return null;
+    }
+
     Item {
         id: mainItem;
 
@@ -96,36 +110,25 @@ Rectangle {
                 isEmpty: model["Name"] === "";
                 imageSource: "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_" + "Off" + "_" + model["Mode"] + ".svg";
                 fontName: Style.fontFamily;
-                checkable: model["Mode"] === "Normal";
+                checkable: model["Mode"] == "Normal";
                 visible: x + width <= topCenterLvButtons.width;
 
                 Component.onCompleted: {
                     console.log("topButtonDelegate onCompleted")
                 }
 
+                onCheckableChanged: {
+                    console.log("TopButton onCheckableChanged", checkable);
+                    let parameters = {};
+                    parameters["Id"] = model.Id;
+                    parameters["Mode"] = model.Mode;
+                    parameters["Checkable"] = checkable;
+
+                    Events.sendEvent("CommandUpdated", parameters);
+                }
+
                 onVisibleChanged: {
                     console.log("TopPanel onVisibleChanged",topButtonDelegate.text, topButtonDelegate.visible);
-//                    if (!topButtonDelegate.visible && topCenterLvButtons.width !== 0) {
-//                        for (var i = 0; i < modelButtons.count; i++) {
-//                            if (modelButtons.get(i).id !== "" && modelButtons.get(i).id === model[CommandEnum.ID]) {
-//                               return;
-//                            }
-//                        }
-//                        modelButtons.append({"id": model[CommandEnum.ID], "imageSource": topButtonDelegate.imageSource, "name": topButtonDelegate.text, "mode": model["Mode"]});
-//                    }
-//                    else if (topButtonDelegate.visible && topCenterLvButtons.width !== 0) {
-//                        var j;
-//                        for (var i = 0; i < modelButtons.count; i++) {
-//                            if (modelButtons.get(i).id === model[CommandEnum.ID]) {
-//                                modelButtons.remove(i)
-//                                j = i;
-//                                break;
-//                            }
-//                        }
-//                        for (var i = j; i < modelButtons.count; i++) {
-//                            modelButtons.remove(i)
-//                        }
-//                    }
                 }
 
                 onClicked: {

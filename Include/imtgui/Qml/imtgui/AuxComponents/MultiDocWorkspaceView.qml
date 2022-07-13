@@ -58,7 +58,10 @@ Rectangle {
 
     function commandsChanged(commandsId){
         console.log("MultidocWorkspaceView commandsChanged")
-        multiDocView.activeItem.commandsChanged(commandsId);
+
+        if (multiDocView.activeItem){
+            multiDocView.activeItem.commandsChanged(commandsId);
+        }
     }
 
     function tabIsOpened(itemId) {
@@ -82,6 +85,7 @@ Rectangle {
             findPage = true;
         }
 
+        console.log("findPage", findPage);
         if (!findPage) {
             var index = pagesData.InsertNewItem();
             pagesData.SetData("ItemId", itemId, index);
@@ -95,23 +99,22 @@ Rectangle {
 
     function closeTab(index) {
         console.log("MultiDocWorkspaceView closeTab", index);
-
-        //featuresTreeView.unsubscribe(itemLink);
-
         pagesData.RemoveItem(index)
         if (tabPanelInternal.selectedIndex >= index){
             tabPanelInternal.selectedIndex--;
         }
+
+//        pagesData.Refresh();
     }
 
     function updateTitleTab(itemId, title, index) {
-        console.log("MultidocWorkspaceView updateTitleTab()", index, title);
+        console.log("MultidocWorkspaceView updateTitleTab()", itemId, title, index);
         pagesData.SetData("Title", title, index);
         pagesData.SetData("ItemId", itemId, index);
 
-        let delegateItem = docsData.itemAtIndex(index);
-        delegateItem.setItemId(itemId);
-        delegateItem.setItemName(title);
+//        let delegateItem = docsData.itemAtIndex(index);
+//        delegateItem.setItemId(itemId);
+//        delegateItem.setItemName(title);
     }
 
     function reloadModelInOpenTab(index){
@@ -119,21 +122,6 @@ Rectangle {
         let itemLink = delegateItem.getItem();
         itemLink.reloadModel();
     }
-
-//    function updateIdAfterEdit(oldId, newId){
-//        console.log("updateIdAfterEdit", oldId, newId);
-//        for (let i = 0; i < pagesData.GetItemsCount(); i++){
-//            let pageId = pagesData.GetData("ItemId", i);
-//            console.log("ItemId", pageId);
-//            if (pageId == newId){
-//                pagesData.SetData("ItemId", i);
-
-//                let delegate = docsData.itemAtIndex(i);
-//                delegate.setItemId(newId);
-//                break;
-//            }
-//        }
-//    }
 
     function getTabIndexById(tabId){
         console.log("MultidocWorkspaceView getTabIndexById", tabId);
@@ -149,6 +137,30 @@ Rectangle {
         }
 
         return -1;
+    }
+
+    function enableChanges(){
+        console.log("MultidocWorkspaceView enableChanges");
+
+        let delegateItem = docsData.itemAtIndex(tabPanelInternal.selectedIndex);
+        let itemLink = delegateItem.getItem();
+        delegateItem.updateTitleTab(itemLink.itemName, itemLink.itemName + "*");
+//        delegateItem.updateTitleTab(itemLink.itemId, itemLink.itemId + "*");
+        itemLink.wasChanged = true;
+
+        multiDocView.rootItem.setModeMenuButton("Save", "Normal");
+    }
+
+    function disableChanges(){
+        console.log("MultidocWorkspaceView disableChanges");
+
+        let delegateItem = docsData.itemAtIndex(tabPanelInternal.selectedIndex);
+        let itemLink = delegateItem.getItem();
+//        delegateItem.updateTitleTab(itemLink.itemId, itemLink.itemId);
+        delegateItem.updateTitleTab(itemLink.itemName, itemLink.itemName);
+        itemLink.wasChanged = false;
+
+        multiDocView.rootItem.setModeMenuButton("Save", "Disabled");
     }
 
     TreeItemModel {
@@ -168,7 +180,11 @@ Rectangle {
 
         onCloseItem: {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
-            multiDocView.closeTab(index);
+//            multiDocView.closeTab(index);
+            tabPanelInternal.selectedIndex = index;
+            let delegateItem = docsData.itemAtIndex(index);
+            let itemLink = delegateItem.getItem();
+            itemLink.menuActivated("Close");
         }
 
         onSelectedIndexChanged: {
@@ -283,10 +299,10 @@ Rectangle {
 
                         var dataModelLocal
                         if (pagesData.ContainsKey("DocsData",model.index)){
-                            dataModelLocal = pagesData.GetData("DocsData",model.index);
+                            dataModelLocal = pagesData.GetData("DocsData", model.index);
                         }
                         else {
-                            dataModelLocal = pagesData.AddTreeModel("DocsData",model.index)
+                            dataModelLocal = pagesData.AddTreeModel("DocsData", model.index)
                         }
 
                         dataLoader.item.multiDocViewItem = multiDocView;

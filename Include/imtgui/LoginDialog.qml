@@ -34,39 +34,39 @@ Rectangle {
     }
 
     Rectangle{
-        id: headerRec
-        width: parent.width
-        height: 100
-        color: Style.backgroundColor
+        id: headerRec;
+        width: parent.width;
+        height: 100;
+        color: Style.backgroundColor;
         Text{
-            id: welcomeText
-            anchors.top: parent.top
-            anchors.topMargin: 30
-            anchors.left: parent.left
-            anchors.leftMargin: (parent.width-welcomeText.width)/2
+            id: welcomeText;
+            anchors.top: parent.top;
+            anchors.topMargin: 30;
+            anchors.left: parent.left;
+            anchors.leftMargin: (parent.width-welcomeText.width)/2;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_title
-            text: "Welcome to Lisa"
+            font.pixelSize: Style.fontSize_title;
+            text: qsTr("Welcome to Lisa");
         }
         Text{
-            id: loginText
-            anchors.top: welcomeText.bottom
-            anchors.topMargin: 20
-            anchors.left: parent.left
-            anchors.leftMargin: (parent.width-loginText.width)/2
+            id: loginText;
+            anchors.top: welcomeText.bottom;
+            anchors.topMargin: 20;
+            anchors.left: parent.left;
+            anchors.leftMargin: (parent.width-loginText.width)/2;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common
-            text: "Please login"
+            font.pixelSize: Style.fontSize_common;
+            text: qsTr("Please login");
         }
     }
     TextFieldCustom {
         id: loginTextInput;
-        anchors.left: parent.left
-        anchors.top: headerRec.bottom
-        anchors.topMargin: 50
-        anchors.leftMargin: 75
+        anchors.left: parent.left;
+        anchors.top: headerRec.bottom;
+        anchors.topMargin: 50;
+        anchors.leftMargin: 75;
         width: loginContainer.width - 150;
         height: 30;
 
@@ -76,10 +76,10 @@ Rectangle {
     }
     TextFieldCustom {
         id: passwordTextInput;
-        anchors.left: parent.left
-        anchors.top: loginTextInput.bottom
-        anchors.topMargin: 30
-        anchors.leftMargin: 75
+        anchors.left: parent.left;
+        anchors.top: loginTextInput.bottom;
+        anchors.topMargin: 30;
+        anchors.leftMargin: 75;
         width: loginContainer.width - 150;
         height: 30;
         echoMode: TextInput.Password
@@ -88,21 +88,21 @@ Rectangle {
         }
     }
     Rectangle{
-        id: footerRec
-        width: passwordTextInput
-        anchors.left: parent.left
-        anchors.top: passwordTextInput.bottom
-        anchors.topMargin: 10
-        anchors.leftMargin: 75
+        id: footerRec;
+        width: passwordTextInput;
+        anchors.left: parent.left;
+        anchors.top: passwordTextInput.bottom;
+        anchors.topMargin: 10;
+        anchors.leftMargin: 75;
         CheckBox{
-            id: checkRemember
-            anchors.left: parent.left
-            anchors.top: parent.top
-            anchors.topMargin: 10
-            anchors.leftMargin: 10
-            checkState: 1
+            id: checkRemember;
+            anchors.left: parent.left;
+            anchors.top: parent.top;
+            anchors.topMargin: 10;
+            anchors.leftMargin: 10;
+            checkState: 1;
             MouseArea {
-                anchors.fill: parent
+                anchors.fill: parent;
                 onClicked: {
                     if (checkRemember.checkState == 1){
                         checkRemember.checkState = 2
@@ -114,40 +114,42 @@ Rectangle {
             }
         }
         Text{
-            id: rememberText
-            anchors.top: parent.top
-            anchors.topMargin: 7
-            anchors.left: checkRemember.right
-            anchors.leftMargin: 7
+            id: rememberText;
+            anchors.top: parent.top;
+            anchors.topMargin: 7;
+            anchors.left: checkRemember.right;
+            anchors.leftMargin: 7;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_small
-            text: "Remember me"
+            font.pixelSize: Style.fontSize_small;
+            text: qsTr("Remember me");
         }
         Text{
-            id: forgotText
-            anchors.top: parent.top
-            anchors.topMargin: 7
-            anchors.left: rememberText.right
-            anchors.leftMargin: 120
+            id: forgotText;
+            anchors.top: parent.top;
+            anchors.topMargin: 7;
+            anchors.left: rememberText.right;
+            anchors.leftMargin: 120;
             color: Style.textColor;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_small
+            font.pixelSize: Style.fontSize_small;
             text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
-            onLinkActivated: Qt.openUrlExternally(link)
+            onLinkActivated: {
+                Qt.openUrlExternally(link)
+            }
         }
     }
     AuxButton{
-        id: loginButton
-        anchors.top: footerRec.bottom
-        anchors.left: parent.left
-        anchors.topMargin: 50
-        anchors.leftMargin: (parent.width - width)/2
-        width: 100
-        height: 30
-        hasText: true
-        textButton: "Login"
-        color: Style.buttonColor
+        id: loginButton;
+        anchors.top: footerRec.bottom;
+        anchors.left: parent.left;
+        anchors.topMargin: 50;
+        anchors.leftMargin: (parent.width - width)/2;
+        width: 100;
+        height: 30;
+        hasText: true;
+        textButton: qsTr("Login");
+        color: Style.buttonColor;
         onClicked: {
             console.log("LoginDialog loginButton onClicked");
             loginContainer.loaderDialog.closeItem();

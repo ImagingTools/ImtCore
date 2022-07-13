@@ -47,6 +47,11 @@ Rectangle {
         }
     }
 
+    function getCommandModeById(commandId){
+        console.log("topPanel getCommandModeById", commandId);
+        return topPanelDecoratorLoader.item.centerPanel.getCommandModeById(commandId);
+    }
+
     function updateModeModelMenuButtons(id, mode) {
 //        for (var i = 0; i < modelButtons.count; i++) {
 //            if (modelButtons.get(i).id === id) {

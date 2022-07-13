@@ -15,21 +15,24 @@ Rectangle {
 
     Row {
         id: container;
-        anchors.leftMargin: 10;
-        anchors.horizontalCenter: parent.horizontalCenter;
+
+        anchors.fill: parent;
 
         height: parent.height;
-        spacing: 5;
+        spacing: 10;
 
         PreferenceButton {
             id: preferenceButton;
+
+            anchors.right: parent.right;
+            anchors.rightMargin: 20;
 
             width: 24;
             height: 24;
 
             anchors.verticalCenter: parent.verticalCenter;
-
         }
+
         LoginButton {
             id: loginButton;
 

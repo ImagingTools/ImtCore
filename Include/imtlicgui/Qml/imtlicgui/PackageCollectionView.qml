@@ -99,6 +99,10 @@ Item {
             packageCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             packageCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
         }
+
+        packageCollectionContainer.rootItem.setModeMenuButton("New", "Normal");
+        packageCollectionContainer.rootItem.setModeMenuButton("Undo", "Disabled");
+        packageCollectionContainer.rootItem.setModeMenuButton("Redo", "Disabled");
     }
 
     function getDescriptionBySelectedItem(){
@@ -251,6 +255,10 @@ Item {
         packageCollectionView.itemSelect(itemId, name);
     }
 
+    UndoRedo {
+        id: undoRedo;
+    }
+
     CollectionView {
         id: packageCollectionView;
 
@@ -291,9 +299,27 @@ Item {
             console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.table.selectedIndex);
             packageCollectionContainer.commandsChanged("Packages");
             if (packageCollectionView.table.selectedIndex > -1){
-                if (metaInfoModels.GetItemsCount() >= packageCollectionView.table.selectedIndex + 1){
-                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData",
-                                                                                 packageCollectionView.table.selectedIndex);
+//                if (metaInfoModels.GetItemsCount() >= packageCollectionView.table.selectedIndex + 1){
+//                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData",
+//                                                                                 packageCollectionView.table.selectedIndex);
+//                }
+//                else{
+//                    metaInfo.getMetaInfo();
+//                }
+
+
+                var index = -1;
+                for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
+                    var curId = metaInfoModels.GetData("Id", i);
+
+                    if (curId === packageCollectionView.table.getSelectedId()){
+                        index = i;
+                        break;
+                    }
+                }
+
+                if (index !== -1){
+                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData", index);
                 }
                 else{
                     metaInfo.getMetaInfo();
@@ -303,7 +329,6 @@ Item {
 
         onSetActiveFocusFromCollectionView: {
             console.log("PackageCollection CollectionView onSetActiveFocusFromCollectionView");
-//            packageCollectionContainer.forceActiveFocus();
         }
 
         onRemovedItem: {
@@ -325,8 +350,8 @@ Item {
                 packageCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
             }
 
-            featuresTreeView.updateFeaturesDependenciesAfterPackageEditing(oldId, newId);
-//            packageCollectionContainer.multiDocViewItem.updateIdAfterEdit(oldId, newId);
+//            featuresTreeView.updateFeaturesDependenciesAfterPackageEditing(oldId, newId);
+            featureDependenciesModel.updateFeaturesDependenciesAfterPackageEditing(oldId, newId);
             metaInfo.getMetaInfo();
         }
 

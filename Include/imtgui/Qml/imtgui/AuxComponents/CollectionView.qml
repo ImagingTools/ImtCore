@@ -258,10 +258,11 @@ Rectangle {
 
             var selectedIndexLocal = collectionViewContainer.collectionViewModel.GetData("selectedIndex");
             console.log("selectedIndexLocal", selectedIndexLocal);
-            if (selectedIndexLocal != undefined) {
-                tableInternal.selectedIndex = -1;
+            console.log("tableInternal.elements", tableInternal.elements.GetItemsCount());
+            tableInternal.selectedIndex = -1;
+            if (selectedIndexLocal < tableInternal.elements.GetItemsCount()){
+//                tableInternal.selectedIndex = -1;
                 tableInternal.selectedIndex = selectedIndexLocal;
-                console.log("tableInternal.selectedIndex", tableInternal.selectedIndex);
             }
 
             if (collectionViewContainer.autoRefresh){
@@ -617,20 +618,12 @@ Rectangle {
                             tableInternal.elements = dataModelLocal.GetData("items");
                             collectionViewContainer.collectionViewModel.SetExternTreeModel('data', tableInternal.elements);
 
+                            console.log("tableInternal.elements", tableInternal.elements.toJSON());
+
                             tableInternal.selectedIndex = -1;
                             if (oldSelectedIndex > -1 && tableInternal.elements.GetItemsCount() > oldSelectedIndex){
                                 tableInternal.selectedIndex = oldSelectedIndex;
                             }
-
-                            console.log("tableInternal.selectedIndex", tableInternal.selectedIndex)
-                            console.log("oldSelectedIndex", oldSelectedIndex)
-//                            tableInternal.selectedIndex = -1;
-
-//                            if (!collectionViewContainer.checkExistSelectedId(tableInternal.getSelectedId(), tableInternal.elements)){
-//                                tableInternal.selectedIndex = oldSelectedIndex;
-//                            }
-
-                            //collectionViewContainer.collectionViewModel = dataModelLocal.GetData("items");
                         }
 
                         if (dataModelLocal.ContainsKey("notification")){
@@ -784,8 +777,10 @@ Rectangle {
 
                             collectionViewContainer.renamedItem(tableInternal.getSelectedId(), newId);
 
-                            featuresTreeView.loadFeaturesModel();
-                            featuresTreeView.loadDependModel();
+//                            featuresTreeView.loadFeaturesModel();
+//                            featuresTreeView.loadDependModel();
+                            treeViewModel.reloadModel();
+                            featureDependenciesModel.reloadModel();
                         }
                     }
                 }

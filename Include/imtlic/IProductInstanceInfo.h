@@ -44,7 +44,12 @@ public:
 		/**
 			Customer name.
 		*/
-		MIT_CUSTOMER_NAME
+		MIT_CUSTOMER_NAME,
+
+		/**
+			Product name.
+		*/
+		MIT_PRODUCT_NAME
 	};
 
 

@@ -27,8 +27,15 @@ Item{
     Loader {
         id: loaderDecorator;
 
+        width: loaderDecorator.item.width;
+        height: loaderDecorator.item.height;
+
         onItemChanged: {
             loaderDecorator.item.height = tabDelegate.height;
+            tabDelegate.width = loaderDecorator.item.width;
+        }
+
+        onWidthChanged: {
             tabDelegate.width = loaderDecorator.item.width;
         }
     }

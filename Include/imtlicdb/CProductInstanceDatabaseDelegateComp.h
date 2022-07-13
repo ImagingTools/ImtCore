@@ -45,6 +45,14 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
+	virtual QByteArray GetObjectIdFromRecord(
+				const QByteArray& typeId,
+				const QSqlRecord& record) const override;
+	virtual QByteArray GetSelectionQuery(
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 protected:
 	void GenerateDifferencesLicenses(const imtlic::IProductInstanceInfo* currentProductInstancePtr,
 				const imtlic::IProductInstanceInfo* newProductInstancePtr,

@@ -28,9 +28,6 @@ Rectangle {
     property bool clickBackgroundClose: false;
     property bool centered: true;
 
-//    signal okClicked(string newId, string newName);
-//    signal cancelClicked();
-
     Component.onCompleted: {
         console.log("EditFeatureDialog onCompleted");
     }
@@ -56,7 +53,7 @@ Rectangle {
 
     function validateId(id){
         if (id === "") {
-            return qsTr("Id can't be empty!");
+            return qsTr("Feature-ID can't be empty!");
         }
 
         if (!containerFeatureEdit.collectionViewFeatures){
@@ -68,7 +65,7 @@ Rectangle {
 
             if (dataModelLocal.GetData("Id", i ) === id &&
                     containerFeatureEdit.collectionViewFeatures.selectedIndex !== i) {
-                return qsTr("Id already exist!");
+                return qsTr("Feature-ID already exists!");
             }
         }
 
@@ -77,7 +74,7 @@ Rectangle {
 
     function validateName(name){
         if (name === "") {
-            return qsTr("Name can't be empty!");
+            return qsTr("Feature Name can't be empty!");
         }
         return "";
     }
@@ -242,7 +239,7 @@ Rectangle {
             anchors.top: tfcFeatureName.bottom;
             anchors.topMargin: 25;
 
-            text: qsTr("Feature - ID");
+            text: qsTr("Feature-ID");
 
             color: Style.textColor;
             font.family: Style.fontFamily;
@@ -292,25 +289,6 @@ Rectangle {
                 onTextInputFocusChanged: {
                     containerFeatureEdit.generateKey();
                 }
-
-//                onInputTextChanged: {
-//                    console.log("TextFieldCustom onTextChanged");
-//                    errorIdMessage.text = "";
-//                    var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
-
-//                    if (idMessage !== "") {
-//                       errorIdMessage.text = idMessage;
-//                    }
-//                }
-
-//                onCustomTextChanged: {
-//                    errorIdMessage.text = "";
-//                    var idMessage = containerFeatureEdit.validateId(tfcFeatureIdText.text);
-
-//                    if (idMessage !== "") {
-//                       errorIdMessage.text = idMessage;
-//                    }
-//                }
 
                 KeyNavigation.tab: okButton;
                 KeyNavigation.backtab: tfcFeatureName;
@@ -418,7 +396,7 @@ Rectangle {
 
             color: Style.errorTextColor;
 
-            text: qsTr("Id can't be empty!");
+            text: qsTr("Feature-ID can't be empty!");
         }
 
         Text {

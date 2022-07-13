@@ -18,6 +18,23 @@ Rectangle {
         }
     }
 
+    onWidthChanged: {
+        if (decoratorLoader.item){
+            decoratorLoader.item.width = topRightPanel.width;
+        }
+    }
+
+    onHeightChanged: {
+        if (decoratorLoader.item){
+            decoratorLoader.item.height = topRightPanel.height;
+        }
+    }
+
+//    Rectangle {
+//        anchors.fill: parent;
+//        color: "red";
+//    }
+
     Loader {
         id: decoratorLoader;
 

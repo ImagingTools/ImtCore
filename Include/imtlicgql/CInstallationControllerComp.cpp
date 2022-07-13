@@ -33,14 +33,22 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 		dataModel = new imtbase::CTreeItemModel();
 		itemModel = new imtbase::CTreeItemModel();
 
-		QByteArray instanceId = GetObjectIdFromInputParams(inputParams);
+		QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(instanceId, dataPtr)){
+		if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 			if (productInstancePtr == nullptr){
 				errorMessage = QT_TR_NOOP("Unable to get an product instance");
 				return nullptr;
+			}
+
+			QByteArray instanceId = objectId;
+
+			if (m_separatorObjectIdAttrPtr.IsValid()){
+				QString objectIdStr = objectId;
+				QStringList splitData = objectIdStr.split(*m_separatorObjectIdAttrPtr);
+				instanceId = splitData[0].toUtf8();
 			}
 
 			QByteArray accountId = productInstancePtr->GetCustomerId();
@@ -49,14 +57,13 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 			if (instanceId != ""){
 				itemModel->SetData("Id", instanceId);
 			}
-
-			if (accountId != ""){
-				itemModel->SetData("AccountId", accountId);
+			else{
+				accountId = "";
+				productId = "";
 			}
 
-			if (productId != ""){
-				itemModel->SetData("ProductId", productId);
-			}
+			itemModel->SetData("AccountId", accountId);
+			itemModel->SetData("ProductId", productId);
 
 			imtbase::CTreeItemModel* activeLicenses = itemModel->AddTreeModel("ActiveLicenses");
 			const imtbase::ICollectionInfo& licenseInstances = productInstancePtr->GetLicenseInstances();
@@ -73,6 +80,7 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 					index = activeLicenses->InsertNewItem();
 					activeLicenses->SetData("Id", licenseCollectionId, index);
 					activeLicenses->SetData("Name", name, index);
+					activeLicenses->SetData("ProductId", productId, index);
 
 					if (date.isValid()){
 						QLocale locale;
@@ -104,11 +112,6 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	if (!m_productInstanceFactCompPtr.IsValid()) {
-		errorMessage = QObject::tr("Can not create installation: %1").arg(QString(objectId));
-		return nullptr;
-	}
-
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::IProductInstanceInfo> productInstancePtr = m_productInstanceFactCompPtr.CreateInstance();
@@ -119,11 +122,13 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
+		QByteArray instanceId;
+
 		if (itemModel.ContainsKey("Id")){
-			objectId = itemModel.GetData("Id").toByteArray();
+			instanceId = itemModel.GetData("Id").toByteArray();
 		}
 
-		if (objectId.isEmpty()){
+		if (instanceId.isEmpty()){
 			errorMessage = QT_TR_NOOP("Installation-ID can not be empty!");
 			return nullptr;
 		}
@@ -152,31 +157,33 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 			return nullptr;
 		}
 
-		productInstancePtr->SetupProductInstance(productId, objectId, accountId);
+		objectId = instanceId;
+
+		if (m_separatorObjectIdAttrPtr.IsValid()){
+			objectId += *m_separatorObjectIdAttrPtr + productId;
+		}
+
+		productInstancePtr->SetupProductInstance(productId, instanceId, accountId);
 		imtbase::CTreeItemModel* activeLicenses = itemModel.GetTreeItemModel("ActiveLicenses");
 		if (activeLicenses != nullptr){
-			int licenseState, expirationState = 0;
-
 			for (int i = 0; i < activeLicenses->GetItemsCount(); i++){
-				QByteArray licenseId;
-				if (activeLicenses->ContainsKey("Id")) {
-					licenseId = activeLicenses->GetData("Id", i).toByteArray();
+				QByteArray productLicenseId;
+				if (activeLicenses->ContainsKey("ProductId")) {
+					productLicenseId = activeLicenses->GetData("ProductId", i).toByteArray();
 				}
 
-				if (activeLicenses->ContainsKey("LicenseState")){
-					licenseState = activeLicenses->GetData("LicenseState", i).toInt();
-				}
-
-				QDateTime expirationDate;
-				if (licenseState == 2){
-					if (activeLicenses->ContainsKey("ExpirationState")){
-						expirationState = activeLicenses->GetData("ExpirationState", i).toInt();
+				if (productLicenseId == productId){
+					QByteArray licenseId;
+					if (activeLicenses->ContainsKey("Id")) {
+						licenseId = activeLicenses->GetData("Id", i).toByteArray();
 					}
 
-					if (expirationState == 2 && activeLicenses->ContainsKey("Expiration")){
+					QDateTime expirationDate;
+					if (activeLicenses->ContainsKey("Expiration")) {
 						QString dateExpirationStr = activeLicenses->GetData("Expiration", i).toString();
 						expirationDate = QDateTime::fromString(dateExpirationStr, "dd.MM.yyyy");
 					}
+
 					productInstancePtr->AddLicense(licenseId, expirationDate);
 				}
 			}
@@ -184,8 +191,6 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 
 		return productInstancePtr.PopPtr();
 	}
-
-	errorMessage = QObject::tr("Can not create installation: %1").arg(QString(objectId));
 
 	return nullptr;
 }

@@ -27,8 +27,11 @@ Rectangle {
     signal dateChanged();
 
     Component.onCompleted: {
-        console.log("Calendar onCompleted");
+        console.log("Calendar onCompleted", calendarContainer.selectedDate);
+
         calendarContainer.selectedDate = new Date("2023-01-01");
+
+        console.log("calendarContainer.selectedDate", calendarContainer.selectedDate);
 
         var currentDate = new Date();
         var curYear = currentDate.getFullYear();

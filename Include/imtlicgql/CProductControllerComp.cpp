@@ -158,7 +158,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 
 				imtlic::ILicenseInfo::FeatureInfos featureInfos;
 				if (dependencies != nullptr){
-					QByteArray key = objectId + '.' + licenseId;
+					QByteArray key = licenseId;
 					if (dependencies->ContainsKey(key)){
 						QStringList valuesList = dependencies->GetData(key).toString().split(';');
 						imtlic::ILicenseInfo::FeatureInfo featureInfo;
@@ -216,7 +216,8 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 
 					imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
 					if (featureInfos.size() > 0){
-						QByteArray key = productPtr->GetProductId() + "." + licenseId;
+//						QByteArray key = productPtr->GetProductId() + ";" + licenseId;
+						QByteArray key = licenseId;
 						QString value;
 						for (int i = 0; i < featureInfos.size(); i++){
 							if (i != 0){

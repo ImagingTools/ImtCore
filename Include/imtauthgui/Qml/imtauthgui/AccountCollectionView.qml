@@ -147,6 +147,8 @@ Item {
             accountCollectionContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             accountCollectionContainer.rootItem.setModeMenuButton("Edit", "Disabled");
         }
+
+        accountCollectionContainer.rootItem.setModeMenuButton("New", "Normal");
     }
 
     function selectedIndexIncr(){

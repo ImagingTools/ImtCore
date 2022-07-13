@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionFilter.h>
@@ -26,6 +27,7 @@ public:
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for SQL queries", true, "DatabaseEngine");
 		I_ASSIGN(m_tableNameAttrPtr, "TableName", "Name of the object table", true, "");
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Name of the column containing ID of the object", true, "Id");
+		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "SeparatorObjectId");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -64,6 +66,8 @@ protected:
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
+//	I_REF(iser::ISerializable, m_separatorObjectIdAttrPtr);
+	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
 };
 

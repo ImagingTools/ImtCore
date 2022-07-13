@@ -77,7 +77,6 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 		}
 
 		imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
-
 		if (licensePtr != nullptr){
 			QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
 			index = metaInfoModel->InsertNewItem();

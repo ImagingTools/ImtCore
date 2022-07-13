@@ -168,6 +168,18 @@ Rectangle
         id: featuresTreeView;
     }
 
+    TreeViewModel {
+        id: treeViewModel;
+    }
+
+    FeatureDependenciesModel {
+        id: featureDependenciesModel;
+    }
+
+    LicenseFeaturesModel {
+        id: licenseFeaturesModel;
+    }
+
     Repeater {
         id: pagesData;
 
@@ -292,7 +304,11 @@ Rectangle
                 }
             }
         }
+    }
 
+    function getCommandModeById(commandId){
+        console.log("thubnailDecoratorContainer getCommandModeById", commandId);
+        return topPanel.getCommandModeById(commandId);
     }
 
     TopPanel {

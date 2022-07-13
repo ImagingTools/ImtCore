@@ -29,20 +29,26 @@ Item {
     }
 
     Component.onCompleted: {
-        if (!featuresTreeView.modelTreeItems){
-            featuresTreeView.loadFeaturesModel();
+        if (!treeViewModel.modelTreeView){
+            Events.subscribeEvent("FeaturesTreeItemsUpdated", productsCollectionViewContainer.treeItemsUpdated);
+            treeViewModel.reloadModel();
+        }
+        else{
+            productsCollectionViewContainer.treeItemsUpdated();
         }
 
-        if (!featuresTreeView.modelDepends){
-            featuresTreeView.loadDependModel();
+        if (!featureDependenciesModel.modelFeatureDependencies){
+//            Events.subscribeEvent("LicenseFeaturesModelUpdated", productsCollectionViewContainer.licenseFeaturesUpdated);
+            featureDependenciesModel.reloadModel();
         }
 
-        if (!featuresTreeView.productLicenseFeatures){
-            featuresTreeView.loadLicenseDependModel();
+        if (!licenseFeaturesModel.modelLicenseFeatures){
+            Events.subscribeEvent("LicenseFeaturesModelUpdated", productsCollectionViewContainer.licenseFeaturesUpdated);
+            licenseFeaturesModel.reloadModel();
         }
-
-//        rectTfcProductId.forceActiveFocus();
-        //productsCollectionViewContainer.forceActiveFocus();
+        else{
+            productsCollectionViewContainer.licenseFeaturesUpdated();
+        }
     }
 
     onWasChangedChanged: {
@@ -90,23 +96,18 @@ Item {
                 var oldId =  dataModelLocal.GetData("Id", productsCollectionView.selectedIndex);
                 var oldName =  dataModelLocal.GetData("Name", productsCollectionView.selectedIndex);
 
-                console.log("oldId", oldId);
-                console.log("newLicenseId", parameters["newLicenseId"]);
-
                 if (oldId !== parameters["newLicenseId"] || oldName !== parameters["newLicenseName"]){
                     dataModelLocal.SetData("Id", parameters["newLicenseId"] , productsCollectionView.selectedIndex);
                     dataModelLocal.SetData("Name", parameters["newLicenseName"], productsCollectionView.selectedIndex);
-                    //productsCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-//                    productsCollectionView.refresh();
 
-                    featuresTreeView.updateLicensesDependenciesAfterLicenseEditing(productsCollectionViewContainer.itemId, oldId,
+                    licenseFeaturesModel.updateLicensesDependenciesAfterLicenseEditing(productsCollectionViewContainer.itemId, oldId,
                                                                        parameters["newLicenseId"],
                                                                        parameters["newLicenseName"]);
-                    productsCollectionView.refresh();
-//                    productsCollectionViewContainer.updateFeatureLicenseModelAfterLicenseEdit(productsCollectionViewContainer.itemId, oldId, parameters["newLicenseId"]);
 
-                    //treeView.visible = true;
-//                    productsCollectionViewContainer.wasChanged = true;
+                    general.SetData("Licenses", productsCollectionView.table.elements)
+                    undoRedo.addModel(general);
+
+                    productsCollectionView.refresh();
                 }
             }
         }
@@ -130,6 +131,9 @@ Item {
 //                    productsCollectionViewContainer.wasChanged = true;
                 }
             }
+
+            general.SetData("Licenses", productsCollectionView.table.elements)
+            undoRedo.addModel(general);
         }
         else if (parameters["dialog"] === "RemoveDialog"){
             if (parameters["status"] === "yes") {
@@ -146,6 +150,9 @@ Item {
                     if (dataModelLocal.GetItemsCount() == 0){
                         treeView.visible = false;
                     }
+
+                    general.SetData("Licenses", productsCollectionView.table.elements)
+                    undoRedo.addModel(general);
                 }
             }
         }
@@ -168,6 +175,17 @@ Item {
                 thubnailDecoratorContainer.openDialog(source, parameters);
             }
         }
+        else if (parameters["dialog"] === "SaveDialog"){
+
+            if (parameters["status"] === "yes"){
+                productsCollectionViewContainer.menuActivated("Save");
+            }
+            else if (parameters["status"] === "no"){
+                productsCollectionViewContainer.rootItem.closeTab();
+            }
+
+        }
+
         productsCollectionView.forceActiveFocus();
     }
 
@@ -205,6 +223,11 @@ Item {
         console.log("ProductView menuActivated", menuId);
         if (menuId  === "New"){
             productsCollectionViewContainer.createLicense("", "License Name", "");
+
+            general.SetData("Licenses", productsCollectionView.table.elements)
+            undoRedo.addModel(general);
+
+            productsCollectionView.refresh();
         }
         else if (menuId  === "Save") {
 //            if (tfcProductId.text === ""){
@@ -224,14 +247,28 @@ Item {
         else if (menuId  === "Remove") {
             var source = "AuxComponents/MessageDialog.qml";
             var parameters = {};
-            parameters["message"] = "Remove selected file from the collection ?";
+            parameters["message"] = "Remove the selected license from the collection ?";
             parameters["nameDialog"] = "Remove";
             parameters["resultItem"] = productsCollectionViewContainer;
             parameters["dialogId"] = "RemoveDialog";
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
         else if (menuId  === "Close") {
-            productsCollectionViewContainer.rootItem.closeTab();
+
+            if (productsCollectionViewContainer.wasChanged){
+                let source = "AuxComponents/MessageDialog.qml";
+                let parameters = {};
+                parameters["message"] = qsTr("Save all changes ?");
+                parameters["nameDialog"] = "Save";
+                parameters["dialogId"] = "SaveDialog";
+                parameters["cancelButtonVisible"] = true;
+                parameters["resultItem"] = productsCollectionViewContainer;
+
+                thubnailDecoratorContainer.openDialog(source, parameters);
+            }
+            else{
+                productsCollectionViewContainer.rootItem.closeTab();
+            }
         }
         else if (menuId  === "Duplicate") {
             var dataModelLocal = model.GetData("data");
@@ -241,18 +278,76 @@ Item {
             productsCollectionViewContainer.createLicense(duplicateId, duplicateName, duplicateDescription);
 //            productsCollectionViewContainer.wasChanged = true;
         }
+        else if (menuId  === "Undo"){
+            var result = undoRedo.undo();
+            if (result != null){
+
+                productsCollectionViewContainer.parseData(result);
+            }
+        }
+        else if (menuId  === "Redo"){
+            if (!undoRedo.redoStackIsEmpty()){
+                var result = undoRedo.redo();
+                productsCollectionViewContainer.parseData(result);
+            }
+        }
         else {
             productsCollectionView.menuActivated(menuId)
         }
     }
 
+    TreeItemModel {
+        id: general;
+    }
+
+    function treeItemsUpdated(){
+        console.log("ProductView TreeView treeItemsUpdated");
+        general.SetData("TreeView", treeViewModel.modelTreeView)
+    }
+
+    function licenseFeaturesUpdated(){
+        console.log("ProductView LicenseFeatures licenseFeaturesUpdated");
+        general.SetData("LicenseFeatures", licenseFeaturesModel.modelLicenseFeatures)
+    }
+
+    function parseData(json){
+        json = json.replace(/\\/g, '');
+        json = json.slice(1, json.length - 1);
+
+        console.log("json", json)
+
+        general.Parse(json);
+        console.log("general", general.toJSON())
+
+        let elementsJson = general.GetData("Licenses").toJSON();
+        let treeViewJson = general.GetData("TreeView").toJSON();
+        let licenseFeaturesJson = general.GetData("LicenseFeatures").toJSON();
+
+        productsCollectionView.table.elements.Parse(elementsJson);
+        treeViewModel.modelTreeView.Parse(treeViewJson);
+        licenseFeaturesModel.modelLicenseFeatures.Parse(licenseFeaturesJson);
+
+        let productId = general.GetData("Id");
+//        let productName = general.GetData("Name");
+
+//        productIdText.text = productId;
+        tfcProductId.text = productId;
+//        productNameText.text = productName;
+
+        treeViewModel.modelTreeView.Refresh();
+        licenseFeaturesModel.modelLicenseFeatures.Refresh();
+        productsCollectionView.refresh();
+    }
+
     function refresh() {
         console.log("ProductView refresh");
-        productsCollectionView.refresh();
+//        productsCollectionView.refresh();
 
-        featuresTreeView.loadFeaturesModel();
-        featuresTreeView.loadDependModel();
-        featuresTreeView.loadLicenseDependModel();
+//        treeViewModel.reloadModel();
+//        featureDependenciesModel.reloadModel();
+//        licenseFeaturesModel.reloadModel();
+
+        productsCollectionView.refresh();
     }
 
     function commandsChanged(commandsId){
@@ -266,21 +361,21 @@ Item {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
-//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");//
-            productsCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
         } else {
             productsCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Duplicate", "Disabled");
             productsCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
-//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");//
         }
-        productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
-//        if (productsCollectionViewContainer.wasChanged){
-//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
-//        } else {
-//            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
-//        }
+
+        productsCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
+        productsCollectionViewContainer.rootItem.setModeMenuButton("New", "Normal");
+
+        undoRedo.updateStatesCommands();
+
+        if (productsCollectionViewContainer.wasChanged){
+            productsCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+        }
     }
 
     TreeItemModel {
@@ -314,6 +409,25 @@ Item {
         var itemId = productsCollectionView.table.getSelectedId();
         var name = productsCollectionView.table.getSelectedName();
         productsCollectionView.itemSelect(itemId, name);
+    }
+
+    Timer {
+        id: saveTimer;
+
+        interval: 500;
+
+        onTriggered: {
+            console.log("saveTimer onTriggered");
+            console.log("general", general.toJSON());
+            undoRedo.addModel(general);
+        }
+    }
+
+    UndoRedo {
+        id: undoRedo;
+
+        rootItem: productsCollectionViewContainer.rootItem;
+        multiDocViewItem: productsCollectionViewContainer.multiDocViewItem;
     }
 
     CollectionView {
@@ -370,27 +484,25 @@ Item {
                     treeView.visible = !curIdIsEmpty;
                 }
 
-//                let rootProductId = productsCollectionViewContainer.itemId;
-                let rootProductId = tfcProductId.text;
                 let rootLicenseId = productsCollectionView.table.getSelectedId();
-                let rootKey = rootProductId + '.' + rootLicenseId;
+                let rootKey = rootLicenseId;
 
-                featuresTreeView.clearTreeView();
+                treeViewModel.clearTreeView();
 
-                if (featuresTreeView.modelDepends){
-                    let strValues = featuresTreeView.productLicenseFeatures.GetData(rootKey);
+                if (featureDependenciesModel.modelFeatureDependencies){
+                    let strValues = licenseFeaturesModel.modelLicenseFeatures.GetData(rootKey);
                     if (strValues){
                         let values = strValues.split(';');
                         for (let value of values){
-                            featuresTreeView.selectFeature(value);
+                            treeViewModel.selectFeature(value);
                         }
                     }
 
                     let upFeatures = [];
-                    featuresTreeView.getFeaturesDependsByFeatureUp(rootKey, upFeatures);
+                    featureDependenciesModel.getFeaturesDependsByFeatureUp(rootKey, upFeatures);
 
                     if (upFeatures.length > 0){
-                        featuresTreeView.updateDataFeatureList(upFeatures, 0, 0);
+                        treeViewModel.updateDataFeatureList(upFeatures, 0, 0);
                     }
                 }
             }
@@ -400,6 +512,8 @@ Item {
         }
 
         onDataLoaded: {
+            general.SetData("Licenses", productsCollectionView.table.elements)
+            undoRedo.addModel(general);
             loadingPage.visible = false;
         }
     }
@@ -437,7 +551,7 @@ Item {
 //            modelProducts.SetData("Id", productsCollectionViewContainer.itemId)
 //            modelProducts.SetData("Name", productsCollectionViewContainer.itemName)
             modelProducts.SetExternTreeModel("licenses", productsCollectionView.collectionViewModel.GetData("data"));
-            modelProducts.SetExternTreeModel("dependencies", featuresTreeView.productLicenseFeatures);
+            modelProducts.SetExternTreeModel("dependencies", licenseFeaturesModel.modelLicenseFeatures);
 
             var jsonString = modelProducts.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
@@ -497,12 +611,6 @@ Item {
                         productsCollectionView.itemId = newId;
                     }
 
-                    if (productsCollectionView.itemName !== tfcProductName.text){
-                        productsCollectionViewContainer.rootItem.updateTitleTab(
-                                    newId,
-                                    tfcProductName.text);
-                    }
-
                     if (productsCollectionViewContainer.operation == "New"){
                         productsCollectionViewContainer.operation = "Open";
 
@@ -511,7 +619,12 @@ Item {
                             treeView.visible = true;
                         }
                     }
-//                    console.log("productsCollectionViewContainer.operation", productsCollectionViewContainer.operation);
+                    productsCollectionViewContainer.multiDocViewItem.disableChanges();
+
+                    if (productsCollectionView.itemName !== tfcProductName.text){
+                        productsCollectionViewContainer.rootItem.updateTitleTab(newId, tfcProductName.text);
+                    }
+
                     productsCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                 }
             }
@@ -588,23 +701,12 @@ Item {
                 anchors.fill: parent;
                 text: productsCollectionViewContainer.itemId;
 
-                property string lastValue: tfcProductId.text;
-
-//                Component.onCompleted: {
-//                    tfcProductId.lastValue = productsCollectionViewContainer.itemId;
-//                }
-
                 onInputTextChanged: {
-                    if (tfcProductId.text != ""){
 
-//                        productsCollectionViewContainer.updateFeatureLicenseModelAfterProductEdit(
-//                                    productsCollectionViewContainer.itemId,
-//                                    tfcProductId.text);
+                    general.SetData("Id", tfcProductId.text);
 
-                        featuresTreeView.updateLicensesDependenciesAfterProductEditing(tfcProductId.lastValue, tfcProductId.text);
-
-                        tfcProductId.lastValue = tfcProductId.text;
-                        //productsCollectionViewContainer.itemId = tfcProductId.text;
+                    if (tfcProductId.text != productsCollectionViewContainer.itemId){
+                        saveTimer.restart();
                     }
                 }
             }
@@ -659,7 +761,13 @@ Item {
                 text: productsCollectionViewContainer.itemName;
 
                 onInputTextChanged: {
-    //                productsCollectionViewContainer.wasChanged = true;
+
+                    general.SetData("Name", tfcProductName.text);
+
+                    if (tfcProductName.text != productsCollectionViewContainer.itemName){
+                        //general.SetData("Name", tfcProductName.text);
+                        saveTimer.restart();
+                    }
                 }
 
             }
@@ -742,7 +850,7 @@ Item {
             visible: false;
             //visible: productsCollectionViewContainer.operation !== "New";
 
-            modelItems: featuresTreeView.modelTreeItems;
+            modelItems: treeViewModel.modelTreeView;
 
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("ProductView TreeView onItemTreeViewCheckBoxStateChanged",
@@ -751,20 +859,17 @@ Item {
                             packageId,
                             featureId,
                             state);
-               // productsCollectionViewContainer.wasChanged = true;
-//                let rootLProductd = productsCollectionViewContainer.itemId;
-                let rootLProductd = tfcProductId.text;
 
                 let rootLicenseId = productsCollectionView.table.getSelectedId();
-                let rootKey = rootLProductd + '.' + rootLicenseId;
-                let value = packageId + '.' + featureId;
+                let rootKey = rootLicenseId;
+                let value = featureId;
 
                 if (state == 0){
-                    featuresTreeView.deselectFeature(value);
+                    treeViewModel.deselectFeature(value);
                 }
 
-                if (featuresTreeView.productLicenseFeatures.ContainsKey(rootKey)){
-                    let str = featuresTreeView.productLicenseFeatures.GetData(rootKey);
+                if (licenseFeaturesModel.modelLicenseFeatures.ContainsKey(rootKey)){
+                    let str = licenseFeaturesModel.modelLicenseFeatures.GetData(rootKey);
                     let arr = str.split(";");
                     if (state == 0){
                         if (arr){
@@ -774,11 +879,11 @@ Item {
                             }
 
                             if (arr.length == 0){
-                                featuresTreeView.productLicenseFeatures.RemoveData(rootKey);
+                                licenseFeaturesModel.modelLicenseFeatures.RemoveData(rootKey);
                             }
                             else{
                                 let resStr = arr.join(';');
-                                featuresTreeView.productLicenseFeatures.SetData(rootKey, resStr);
+                                licenseFeaturesModel.modelLicenseFeatures.SetData(rootKey, resStr);
                             }
                         }
                     }
@@ -786,17 +891,23 @@ Item {
                         if (arr.indexOf(value) == -1){
                             arr.push(value);
                             let resStr = arr.join(';');
-                            featuresTreeView.productLicenseFeatures.SetData(rootKey, resStr);
+                            licenseFeaturesModel.modelLicenseFeatures.SetData(rootKey, resStr);
                         }
                     }
                 }
                 else{
-                    featuresTreeView.productLicenseFeatures.SetData(rootKey, value);
+                    licenseFeaturesModel.modelLicenseFeatures.SetData(rootKey, value);
                 }
 
                 if (state == 2){
-                    featuresTreeView.selectFeature(value);
+                    treeViewModel.selectFeature(value);
                 }
+
+                productsCollectionViewContainer.licenseFeaturesUpdated();
+                productsCollectionViewContainer.treeItemsUpdated();
+
+                undoRedo.addModel(general);
+//                console.log(" featuresTreeView.productLicenseFeatures",  featuresTreeView.productLicenseFeatures.toJSON());
             }
         }
     }

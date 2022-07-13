@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
-//import imtlicgui 1.0
+import imtlicgui 1.0
 
 Item {
     id: featureCollectionViewContainer;
@@ -35,9 +35,17 @@ Item {
 
     Component.onCompleted: {
         console.log("PackageView onCompleted", featureCollectionView.selectedIndex);
-        if (!featuresTreeView.modelDepends || !featuresTreeView.modelTreeItems){
-            featuresTreeView.loadFeaturesModel();
-            featuresTreeView.loadDependModel();
+
+        if (!featureDependenciesModel.modelFeatureDependencies || !treeViewModel.modelTreeView){
+            Events.subscribeEvent("FeatureDependenciesUpdated", featureCollectionViewContainer.dependenciesUpdated);
+            Events.subscribeEvent("FeaturesTreeItemsUpdated", featureCollectionViewContainer.treeItemsUpdated);
+
+            treeViewModel.reloadModel();
+            featureDependenciesModel.reloadModel();
+        }
+        else{
+            featureCollectionViewContainer.dependenciesUpdated();
+            featureCollectionViewContainer.treeItemsUpdated();
         }
 
         Events.subscribeEvent("FeaturesTreeUpdate", featureCollectionView.refresh);
@@ -50,6 +58,16 @@ Item {
 
     onWasChangedChanged: {
         featureCollectionViewContainer.commandsChanged("PackageEdit");
+    }
+
+    function dependenciesUpdated(){
+        console.log("PackageView dependenciesUpdated");
+        general.SetData("Dependencies", featureDependenciesModel.modelFeatureDependencies )
+    }
+
+    function treeItemsUpdated(){
+        console.log("PackageView treeItemsUpdated");
+        general.SetData("TreeView", treeViewModel.modelTreeView)
     }
 
     function refresh() {
@@ -69,7 +87,7 @@ Item {
     }
 
     function getDescriptionBySelectedItem(){
-        var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
+        var dataModelLocal = featureCollectionView.table.elements;
         var description = dataModelLocal.GetData("Description", featureCollectionView.table.selectedIndex);
         return description;
     }
@@ -93,7 +111,8 @@ Item {
     }
 
     function alreadyExistIdHasEmpty() {
-        var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data")
+//        var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data")
+        var dataModelLocal = featureCollectionView.table.elements;
         for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
             if (dataModelLocal.GetData("Id", i) === "#" || dataModelLocal.GetData("Id", i) === "") {
                 return dataModelLocal.GetData("Name", i);
@@ -102,16 +121,12 @@ Item {
         return "";
     }
 
-    UndoRedo {
-        id: undoRedo;
-    }
-
     function dialogResult(parameters){
          console.log("PackageView dialogResult", parameters["status"]);
-        //featureCollectionView.forceActiveFocus();
         if (parameters["status"] === "ok"){
             if (parameters["dialog"] === "EditFeature"){
-                var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
+
+                var dataModelLocal = featureCollectionView.table.elements;
                 console.log("PackageView EditFeature dialogResult", dataModelLocal.GetItemsCount())
 
                 var oldId = dataModelLocal.GetData("Id", featureCollectionView.selectedIndex);
@@ -122,19 +137,23 @@ Item {
                     dataModelLocal.SetData("Id", parameters["newFeatureId"] , featureCollectionView.selectedIndex);
                     dataModelLocal.SetData("Name", parameters["newFeatureName"], featureCollectionView.selectedIndex);
 
-                    if (featuresTreeView.featureIsNew(featureCollectionViewContainer.itemId, oldId)){
-                        featuresTreeView.addFeatureInTreeViewModel(featureCollectionViewContainer.itemId,
+                    if (treeViewModel.featureIsNew(featureCollectionViewContainer.itemId, oldId)){
+                        treeViewModel.addFeatureInTreeViewModel(featureCollectionViewContainer.itemId,
                                                                                    parameters["newFeatureId"],
                                                                                    parameters["newFeatureName"]);
                     }
                     else{
-                        featuresTreeView.updateTreeViewAfterFeatureEditing(featureCollectionViewContainer.itemId, oldId,
+                        treeViewModel.updateTreeViewAfterFeatureEditing(featureCollectionViewContainer.itemId, oldId,
                                                                            parameters["newFeatureId"],
                                                                            parameters["newFeatureName"]);
-                        featuresTreeView.updateFeaturesDependenciesAfterFeatureEditing(featureCollectionViewContainer.itemId, oldId,
+                        featureDependenciesModel.updateFeaturesDependenciesAfterFeatureEditing(featureCollectionViewContainer.itemId, oldId,
                                                                            parameters["newFeatureId"],
                                                                            parameters["newFeatureName"]);
                     }
+
+                    general.SetData("Features", featureCollectionView.table.elements)
+                    undoRedo.addModel(general);
+
                     featureCollectionView.refresh();
                 }
             }
@@ -143,31 +162,33 @@ Item {
                     var value = parameters["value"];
                     console.log("featureCollectionViewContainer dialogResult", value);
                     packageViewSaveQuery.updateModel(value);
-                    //featureCollectionView.refresh();
                 }
                 else if (parameters["typeOperation"] === "SetDescription") {
                     var value = parameters["value"];
-                    var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
-
+                    var dataModelLocal = featureCollectionView.table.elements;
                     var oldDescription =  dataModelLocal.GetData("Description", featureCollectionView.table.selectedIndex);
 
                     if (oldDescription !== value){
                         dataModelLocal.SetData("Description", value, featureCollectionView.table.selectedIndex);
-                        featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
+//                        featureCollectionView.table.elements.SetData("data", dataModelLocal)
+                        general.SetData("Features", featureCollectionView.table.elements)
+                        undoRedo.addModel(general);
                         featureCollectionView.refresh();
-                        featureCollectionViewContainer.wasChanged = true;
                     }
                 }
             }
         }
         else if (parameters["status"] === "yes"){
 
-            if (featureCollectionView.collectionViewModel.ContainsKey("data")) {
-                featuresTreeView.removeFeatureInTreeViewModel(featureCollectionViewContainer.itemId, featureCollectionView.table.getSelectedId());
-                let dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
+            if (parameters["dialog"] === "RemoveDialog"){
+
+                treeViewModel.removeFeatureInTreeViewModel(featureCollectionViewContainer.itemId, featureCollectionView.table.getSelectedId());
+
+                let dataModelLocal = featureCollectionView.table.elements;
                 dataModelLocal.RemoveItem(featureCollectionView.table.selectedIndex);
-                //featureCollectionView.collectionViewModel.SetData("data", dataModelLocal);
-                //featureCollectionView.collectionViewModel.Refresh();
+
+                general.SetData("Features", featureCollectionView.table.elements)
+                undoRedo.addModel(general);
                 featureCollectionView.refresh();
 
                 featureCollectionView.table.selectedIndex = -1;
@@ -176,10 +197,14 @@ Item {
                 if (dataModelLocal.GetItemsCount() == 0){
                     treeView.visible = false;
                 }
-
-                //featureCollectionViewContainer.makeCommandActive("Save");
-
-
+            }
+            else if (parameters["dialog"] === "SaveDialog"){
+                featureCollectionViewContainer.menuActivated("Save")
+            }
+        }
+        else if (parameters["status"] === "no"){
+            if (parameters["dialog"] === "SaveDialog"){
+                featureCollectionViewContainer.rootItem.closeTab();
             }
         }
         else if (parameters["status"] === "Edit") {
@@ -199,24 +224,22 @@ Item {
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
 
-//        console.log("featureCollectionView.forceActiveFocus()");
         featureCollectionView.forceActiveFocus();
     }
 
     function menuActivated(menuId) {
         console.log("PackageView menuActivated", menuId);
         if (menuId  === "New"){
-            //var countItems = model.GetData("data").GetItemsCount();
-
-            var dataModelLocal = model.GetData("data");
+            var dataModelLocal = featureCollectionView.table.elements;
             var index = dataModelLocal.InsertNewItem();
 
             dataModelLocal.SetData("Name", "Feature Name", index);
             dataModelLocal.SetData("Id", "", index);
             dataModelLocal.SetData("Description", "", index);
 
-            //model.SetData("data", dataModelLocal);
-            //model.Refresh();
+            general.SetData("Features", featureCollectionView.table.elements)
+            undoRedo.addModel(general);
+
             featureCollectionView.refresh();
         }
         else if (menuId  === "Save") {
@@ -241,25 +264,68 @@ Item {
                 packageViewSaveQuery.updateModel()
             }
         }
-        else if (menuId  === "Remove") {
+        else if (menuId  === "Remove"){
             let source = "AuxComponents/MessageDialog.qml";
             let parameters = {};
-            parameters["message"] = "Remove selected file from the collection?";
+            parameters["message"] = "Remove the selected feature from the collection?";
             parameters["nameDialog"] = "Remove";
+            parameters["dialogId"] = "RemoveDialog";
             parameters["resultItem"] = featureCollectionViewContainer;
 
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
-        else if (menuId  === "Close") {
-            featureCollectionViewContainer.rootItem.closeTab();
+        else if (menuId  === "Close"){
+            let saveMode = thubnailDecoratorContainer.getCommandModeById("Save");
+            if (saveMode == "Disabled"){
+                featureCollectionViewContainer.rootItem.closeTab();
+            }
+            else if (saveMode == "Normal"){
+                let source = "AuxComponents/MessageDialog.qml";
+                let parameters = {};
+                parameters["message"] = qsTr("Save all changes ?");
+                parameters["nameDialog"] = "Save";
+                parameters["dialogId"] = "SaveDialog";
+                parameters["cancelButtonVisible"] = true;
+                parameters["resultItem"] = featureCollectionViewContainer;
+
+                thubnailDecoratorContainer.openDialog(source, parameters);
+            }
+        }
+        else if (menuId  === "Undo"){
+            var result = undoRedo.undo();
+            if (result != null){
+
+                featureCollectionViewContainer.parseData(result);
+            }
+        }
+        else if (menuId  === "Redo"){
+            if (!undoRedo.redoStackIsEmpty()){
+                var result = undoRedo.redo();
+                featureCollectionViewContainer.parseData(result);
+            }
         }
         else {
            featureCollectionView.menuActivated(menuId)
         }
     }
 
-    function makeCommandActive(commandId){
-        featureCollectionViewContainer.rootItem.setModeMenuButton(commandId, "Normal");
+    function parseData(json){
+        json = json.replace(/\\/g, '');
+        json = json.slice(1, json.length - 1);
+
+        general.Parse(json);
+
+        let elementsJson = general.GetData("Features").toJSON();
+        let treeViewJson = general.GetData("TreeView").toJSON();
+        let dependenciesJson = general.GetData("Dependencies").toJSON();
+
+        featureCollectionView.table.elements.Parse(elementsJson);
+        treeViewModel.modelTreeView.Parse(treeViewJson);
+        featureDependenciesModel.modelFeatureDependencies.Parse(dependenciesJson);
+
+        treeViewModel.modelTreeView.Refresh();
+        featureDependenciesModel.modelFeatureDependencies.Refresh();
+        featureCollectionView.refresh();
     }
 
     function commandsChanged(commandsId){
@@ -273,23 +339,23 @@ Item {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Import", "Normal");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Normal");
-            featureCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
-            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+
         }
         else {
             featureCollectionViewContainer.rootItem.setModeMenuButton("Remove", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Edit", "Disabled");
             featureCollectionViewContainer.rootItem.setModeMenuButton("Export", "Disabled");
-//            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
-            //featureCollectionViewContainer.rootItem.setModeMenuButton("New", "Disabled");
         }
 
-//        featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
-//        if (featureCollectionViewContainer.wasChanged){
-//            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
-//        } else {
-//            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Disabled");
-//        }
+        featureCollectionViewContainer.rootItem.setModeMenuButton("Close", "Normal");
+        featureCollectionViewContainer.rootItem.setModeMenuButton("New", "Normal");
+
+        undoRedo.updateStatesCommands();
+
+        if (featureCollectionViewContainer.wasChanged){
+            featureCollectionViewContainer.rootItem.setModeMenuButton("Save", "Normal");
+        }
+
     }
 
     TreeItemModel {
@@ -323,6 +389,13 @@ Item {
         var itemId = featureCollectionView.table.getSelectedId();
         var name = featureCollectionView.table.getSelectedName();
         featureCollectionView.itemSelect(itemId, name);
+    }
+
+    UndoRedo {
+        id: undoRedo;
+
+        rootItem: featureCollectionViewContainer.rootItem;
+        multiDocViewItem: featureCollectionViewContainer.multiDocViewItem;
     }
 
     CollectionView {
@@ -371,8 +444,8 @@ Item {
             console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
             if (featureCollectionView.selectedIndex > -1){
                 featureCollectionViewContainer.commandsChanged("PackageEdit")
-                //valueText.visible = false;
-                var dataModelLocal = featureCollectionView.collectionViewModel.GetData("data");
+                var dataModelLocal =featureCollectionView.table.elements
+
 
                 let curFeatureId = featureCollectionView.table.getSelectedId();
                 if (curFeatureId == ""){
@@ -392,34 +465,39 @@ Item {
 
             let rootPackageId = featureCollectionViewContainer.itemId;
             let rootFeatureId = featureCollectionView.table.getSelectedId();
-            let rootkey = rootPackageId + '.' + rootFeatureId;
+            let rootkey = rootFeatureId;;
 
-            featuresTreeView.clearTreeView();
+            treeViewModel.clearTreeView();
             console.log("packageview hideCurrentFeatureTreeView", rootPackageId, rootFeatureId)
-            featuresTreeView.hideCurrentFeatureTreeView(rootPackageId, rootFeatureId);
-            if (featuresTreeView.modelDepends){
-                let strValues = featuresTreeView.modelDepends.GetData(rootkey);
+            treeViewModel.hideCurrentFeatureTreeView(rootPackageId, rootFeatureId);
+            if (featureDependenciesModel.modelFeatureDependencies){
+                let strValues = featureDependenciesModel.modelFeatureDependencies.GetData(rootkey);
                 if (strValues){
                     let values = strValues.split(';');
                     for (let value of values){
-                        featuresTreeView.selectFeature(value);
+                        treeViewModel.selectFeature(value);
                     }
                 }
 
                 let upFeatures = [];
-                featuresTreeView.getFeaturesDependsByFeatureUp(rootkey, upFeatures);
+                featureDependenciesModel.getFeaturesDependsByFeatureUp(rootkey, upFeatures);
 
                 if (upFeatures.length > 0){
-                    featuresTreeView.updateDataFeatureList(upFeatures, 0, 0);
+                    treeViewModel.updateDataFeatureList(upFeatures, 0, 0);
                 }
             }
         }
 
         onDataLoaded: {
+            general.SetData("Features", featureCollectionView.table.elements)
+            undoRedo.addModel(general);
+
             loadingPage.visible = false;
-            featureCollectionViewContainer.makeCommandActive("Save");
-           // featureCollectionViewContainer.makeCommandActive("New");
         }
+    }
+
+    TreeItemModel {
+        id: general;
     }
 
     GqlModel {
@@ -456,8 +534,8 @@ Item {
                 modelPackages.SetData("Name", featureCollectionViewContainer.itemName);
             }
 
-            modelPackages.SetExternTreeModel("features", featureCollectionView.collectionViewModel.GetData("data"));
-            modelPackages.SetExternTreeModel("dependencies", featuresTreeView.modelDepends);
+            modelPackages.SetExternTreeModel("features", featureCollectionView.table.elements);
+            modelPackages.SetExternTreeModel("dependencies", featureDependenciesModel.modelFeatureDependencies);
 
             var jsonString = modelPackages.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
@@ -512,11 +590,13 @@ Item {
                             featureCollectionViewContainer.rootItem.updateTitleTab(featureCollectionViewContainer.itemId, newId);
                         }
 
-                        let modelLocal = featureCollectionView.collectionViewModel.GetData("data");
+                        let modelLocal = featureCollectionView.table.elements;
+
                         if (featureCollectionViewContainer.operation == "New"){
 
-                            featuresTreeView.loadFeaturesModel();
-                            featuresTreeView.loadDependModel();
+
+                            treeViewModel.reloadModel();
+                            featureDependenciesModel.reloadModel();
 
                             featureCollectionViewContainer.operation = "Open";
 
@@ -524,7 +604,7 @@ Item {
                                 treeView.visible = true;
                             }
                         }
-
+                        featureCollectionViewContainer.multiDocViewItem.disableChanges();
                         featureCollectionViewContainer.multiDocViewItem.activeCollectionItem.callMetaInfoQuery();
                     }
                 }
@@ -557,7 +637,6 @@ Item {
     Rectangle {
         id: packageMetaInfo;
 
-        //anchors.right: parent.right;
         anchors.left: packageSplitter.right;
 
         width: featureCollectionViewContainer.width > 0 ? featureCollectionViewContainer.width - featureCollectionView.width : 250;
@@ -630,23 +709,26 @@ Item {
 
             clip: true;
 
-            modelItems: featuresTreeView.modelTreeItems;
+            modelItems: treeViewModel.modelTreeView;
+
+            onModelItemsChanged: {
+                console.log("general", general.toJSON());
+            }
 
             onItemTreeViewCheckBoxStateChanged: {
                 console.log("PackageView TreeView onItemTreeViewCheckBoxStateChanged", state, packageId, featureId);
                 featureCollectionViewContainer.wasChanged = true;
 
-                let rootPackageId = featureCollectionViewContainer.itemId;
                 let rootFeatureId = featureCollectionView.table.getSelectedId();
-                let rootkey = rootPackageId + '.' + rootFeatureId;
-                let value = packageId + '.' + featureId;
+                let rootkey = rootFeatureId;
+                let value = featureId;
 
                 if (state == 0){
-                    featuresTreeView.deselectFeature(value);
+                    treeViewModel.deselectFeature(value);
                 }
 
-                if (featuresTreeView.modelDepends.ContainsKey(rootkey)){
-                    let str = featuresTreeView.modelDepends.GetData(rootkey);
+                if (featureDependenciesModel.modelFeatureDependencies.ContainsKey(rootkey)){
+                    let str = featureDependenciesModel.modelFeatureDependencies.GetData(rootkey);
                     let arr = str.split(";");
                     if (state == 0){
                         if (arr){
@@ -656,11 +738,11 @@ Item {
                             }
 
                             if (arr.length == 0){
-                                featuresTreeView.modelDepends.RemoveData(rootkey);
+                                featureDependenciesModel.modelFeatureDependencies.RemoveData(rootkey);
                             }
                             else{
                                 let resStr = arr.join(';');
-                                featuresTreeView.modelDepends.SetData(rootkey, resStr);
+                                featureDependenciesModel.modelFeatureDependencies.SetData(rootkey, resStr);
                             }
                         }
                     }
@@ -668,17 +750,22 @@ Item {
                         if (arr.indexOf(value) == -1){
                             arr.push(value);
                             let resStr = arr.join(';');
-                            featuresTreeView.modelDepends.SetData(rootkey, resStr);
+                            featureDependenciesModel.modelFeatureDependencies.SetData(rootkey, resStr);
                         }
                     }
                 }
                 else{
-                    featuresTreeView.modelDepends.SetData(rootkey, value);
+                    featureDependenciesModel.modelFeatureDependencies.SetData(rootkey, value);
                 }
 
                 if (state == 2){
-                    featuresTreeView.selectFeature(value);
+                    treeViewModel.selectFeature(value);
                 }
+
+                featureCollectionViewContainer.dependenciesUpdated();
+                featureCollectionViewContainer.treeItemsUpdated();
+
+                undoRedo.addModel(general);
             }
         }
     }

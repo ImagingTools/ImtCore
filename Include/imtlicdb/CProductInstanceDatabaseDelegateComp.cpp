@@ -3,6 +3,8 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
+#include <iprm/TParamsPtr.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtlic/ILicenseInstance.h>
@@ -53,7 +55,10 @@ istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
 	productInstancePtr->SetupProductInstance(productId, productInstanceId, accountId);
 
 	// Query for getting licenses inside of the product instance:
-	QByteArray productLicenses = QString("SELECT * from ProductInstanceLicenses WHERE InstanceId = '%1'").arg(qPrintable(productInstanceId)).toUtf8();
+	QByteArray productLicenses = QString("SELECT * from ProductInstanceLicenses WHERE InstanceId = '%1' AND ProductId = '%2'")
+			.arg(qPrintable(productInstanceId))
+			.arg(qPrintable(productId))
+			.toUtf8();
 
 	QSqlError error;
 	QSqlQuery productLicensesQuery = m_databaseEngineCompPtr->ExecSqlQuery(productLicenses, &error, true);
@@ -177,7 +182,15 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray retVal = QString("DELETE FROM ProductInstances WHERE InstanceId = '%1';").arg(qPrintable(productInstanceId)).toLocal8Bit();
+		QByteArray productId = productInstancePtr->GetProductId();
+		if (productId.isEmpty()){
+			return QByteArray();
+		}
+
+		QByteArray retVal = QString("DELETE FROM ProductInstances WHERE InstanceId = '%1' AND ProductId = '%2';")
+				.arg(qPrintable(productInstanceId))
+				.arg(qPrintable(productId))
+				.toLocal8Bit();
 
 		return retVal;
 	}
@@ -216,6 +229,11 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
+	QByteArray oldProductId = oldProductInstancePtr->GetProductId();
+	if (oldProductId.isEmpty()){
+		return QByteArray();
+	}
+
 	QByteArray productId = productInstancePtr->GetProductId();
 	if (productId.isEmpty()){
 		return QByteArray();
@@ -226,12 +244,12 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	QString objectName = collection.GetElementInfo(oldProductInstanceId,imtbase::ICollectionInfo::EIT_NAME).toString();
-	QString objectDescription = collection.GetElementInfo(oldProductInstanceId,imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+	QString objectName = collection.GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	QString objectDescription = collection.GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 	QString timestamp = QDateTime::currentDateTime().toString(Qt::ISODate);
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET InstanceId = '%1', ProductId = '%2', AccountId = '%3', Name = '%4', Description = '%5', LastModified = '%6' WHERE InstanceId = '%7';")
+	QByteArray retVal = QString("UPDATE ProductInstances SET InstanceId = '%1', ProductId = '%2', AccountId = '%3', Name = '%4', Description = '%5', LastModified = '%6' WHERE InstanceId = '%7' AND ProductId = '%8';")
 							.arg(qPrintable(newProductInstanceId))
 							.arg(qPrintable(productId))
 							.arg(qPrintable(accountId))
@@ -239,6 +257,7 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 							.arg(objectDescription)
 							.arg(timestamp)
 							.arg(qPrintable(oldProductInstanceId))
+							.arg(qPrintable(oldProductId))
 							.toLocal8Bit();
 
 	QByteArrayList addedLicenses;
@@ -278,10 +297,9 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateUpdateObjectQuery(
 		if (licensePtr != nullptr){
 			QByteArray licenseId = licensePtr->GetLicenseId();
 			retVal += "\n" +
-					QString("DELETE FROM ProductInstanceLicenses WHERE InstanceId = '%1' AND LicenseId = '%2' AND ProductId = '%3' ;")
+					QString("DELETE FROM ProductInstanceLicenses WHERE InstanceId = '%1' AND LicenseId = '%2';")
 							.arg(qPrintable(oldProductInstanceId))
 							.arg(qPrintable(licenseId))
-							.arg(qPrintable(productId))
 							.toLocal8Bit();
 		}
 	}
@@ -330,10 +348,17 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET Name = '%1', LastModified = '%2' WHERE InstanceId ='%3';")
+	QByteArray productId = productInstancePtr->GetProductId();
+	if (productId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray retVal = QString("UPDATE ProductInstances SET Name = '%1', LastModified = '%2' WHERE InstanceId ='%3' AND ProductId ='%4';")
 			.arg(newObjectName)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(productInstanceId)).toLocal8Bit();
+			.arg(qPrintable(productInstanceId))
+			.arg(qPrintable(productId))
+			.toLocal8Bit();
 
 	return retVal;
 }
@@ -359,12 +384,101 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE ProductInstances SET Description = '%1', LastModified = '%2' WHERE InstanceId ='%3';")
+	QByteArray productId = productInstancePtr->GetProductId();
+	if (productId.isEmpty()){
+		return QByteArray();
+	}
+
+	QByteArray retVal = QString("UPDATE ProductInstances SET Description = '%1', LastModified = '%2' WHERE InstanceId ='%3' AND ProductId ='%4';")
 			.arg(description)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(productInstanceId)).toLocal8Bit();
+			.arg(qPrintable(productInstanceId))
+			.arg(qPrintable(productId))
+			.toLocal8Bit();
 
 	return retVal;
+}
+
+
+QByteArray CProductInstanceDatabaseDelegateComp::GetObjectIdFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+{
+	QByteArray objectId;
+
+	if (record.contains("InstanceId")){
+		objectId = record.value("InstanceId").toByteArray();
+	}
+
+	if (m_separatorObjectIdAttrPtr.IsValid()){
+		objectId += *m_separatorObjectIdAttrPtr;
+	}
+
+	if (record.contains("ProductId")){
+		objectId += record.value("ProductId").toByteArray();
+	}
+
+	return objectId;
+}
+
+
+QByteArray CProductInstanceDatabaseDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	if (!objectId.isEmpty()){
+		QString objectIdStr = objectId;
+
+		QByteArray instanceId, productId;
+
+		if (m_separatorObjectIdAttrPtr.IsValid()){
+			QStringList splitData = objectIdStr.split(*m_separatorObjectIdAttrPtr);
+
+			instanceId = splitData[0].toUtf8();
+			productId = splitData[1].toUtf8();
+		}
+
+		return QString("SELECT * FROM %1 WHERE InstanceId = '%2' AND ProductId = '%3'")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(instanceId))
+					.arg(qPrintable(productId))
+					.toLocal8Bit();
+	}
+	else{
+		QString sortQuery;
+		QString filterQuery;
+		if (count == 0){
+			return QByteArray();
+		}
+		if (paramsPtr != nullptr){
+			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+				return QByteArray();
+			}
+
+			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
+			if (collectionFilterParamPtr.IsValid()){
+				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
+					return QByteArray();
+				}
+			}
+		}
+
+		QByteArray paginationQuery;
+		if (!CreatePaginationQuery(offset, count, paginationQuery)){
+			return QByteArray();
+		}
+
+		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
+		QString retVal = "(SELECT * FROM";
+		retVal += QString(" ") + qPrintable(*m_tableNameAttrPtr);
+		retVal += QString(" ") + filterQuery;
+		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
+		retVal += QString(" ") + sortQuery;
+
+		return retVal.toLocal8Bit();
+	}
+
+	return QByteArray();
 }
 
 
@@ -433,7 +547,6 @@ idoc::IDocumentMetaInfo* CProductInstanceDatabaseDelegateComp::CreateObjectMetaI
 
 bool CProductInstanceDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-//	QSqlRecord record = query.record();
 	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
 		imtbase::IMetaInfoCreator::MetaInfoPtr retVal;

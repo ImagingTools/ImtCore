@@ -20,6 +20,8 @@ Rectangle {
 
     property bool okButtonVisible: true;
     property bool noButtonVisible: true;
+    property bool cancelButtonVisible: false;
+
     property bool backgroundExist: true;
     property bool clickBackgroundClose: false;
 
@@ -48,7 +50,7 @@ Rectangle {
         console.log("MessageDialog keys pressed")
         if (event.key === Qt.Key_Escape){
             console.log('Key tab was pressed');
-            noButton.clicked();
+            cancelButton.clicked();
         }
         else if (event.key === Qt.Key_Return){
             yesButton.clicked();
@@ -193,7 +195,7 @@ Rectangle {
                 }
 
                 KeyNavigation.tab: noButton;
-                KeyNavigation.backtab: noButton;
+                KeyNavigation.backtab: cancelButton;
             }
 
             AuxButton {
@@ -217,8 +219,33 @@ Rectangle {
                     loaderDialog.closeItem();
                 }
 
-                KeyNavigation.tab: yesButton;
+                KeyNavigation.tab: cancelButton;
                 KeyNavigation.backtab: yesButton;
+            }
+
+            AuxButton {
+                id: cancelButton;
+
+                width: 70;
+                height: 25;
+
+                hasText: true;
+                hasIcon: false;
+
+                textButton: qsTr("Cancel");
+                borderColor: cancelButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+                backgroundColor: Style.imagingToolsGradient1;
+
+                visible: messageDialogContainer.cancelButtonVisible;
+
+                onClicked: {
+                    messageDialogContainer.exit("cancel");
+                    //messageDialogContainer.noButtonClicked();
+                    loaderDialog.closeItem();
+                }
+
+                KeyNavigation.tab: yesButton;
+                KeyNavigation.backtab: noButton;
             }
         }
     }
