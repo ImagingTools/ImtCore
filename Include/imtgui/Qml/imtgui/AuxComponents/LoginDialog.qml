@@ -82,7 +82,7 @@ Rectangle {
         anchors.leftMargin: 75;
         width: loginContainer.width - 150;
         height: 30;
-        echoMode: TextInput.Password
+//        echoMode: TextInput.Password
         onInputTextChanged: {
             console.log("PasswordTextInput onInputTextChanged");
         }
@@ -133,7 +133,7 @@ Rectangle {
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_small;
-            text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
+//            text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
             onLinkActivated: {
                 Qt.openUrlExternally(link)
             }
