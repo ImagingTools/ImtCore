@@ -29,6 +29,9 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_animationDelay(0),
 	m_animationDuration(0),
 	m_animationEnabled(true),
+	m_guiCreated(false),
+	m_animationWidth(this),
+	m_animationIndent(this),
 	m_mainWidgetPtr(nullptr),
 	m_leftFramePtr(parent),
 	m_parentWidgetPtr(nullptr),
@@ -104,6 +107,7 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	pushBottom->setAutoRepeat(true);
 
 	SetMinimumPanelWidth(0);
+	m_guiCreated = true;
 }
 
 
@@ -1001,6 +1005,10 @@ void CMenuPanel::StartAnimation()
 {
 	StopTimer();
 	StopAnimation();
+
+	if (!m_guiCreated){
+		return;
+	}
 
 	if (m_animationAction == AA_EXPAND && this->width() != m_maxWidth){
 		if (m_mainWidgetPtr != nullptr){

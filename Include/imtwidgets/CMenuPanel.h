@@ -136,6 +136,7 @@ private:
 	int m_animationDelay;
 	int m_animationDuration;
 	bool m_animationEnabled;
+	bool m_guiCreated;
 
 	QStandardItemModel m_model;
 	QStandardItemModel m_bottomModel;
