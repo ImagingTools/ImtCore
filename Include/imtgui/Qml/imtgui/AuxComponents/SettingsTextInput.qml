@@ -12,6 +12,8 @@ Item {
     property Item rootItem;
     property Item repeaterItem;
 
+    property int index: 0; // index element in the data model, default - 0
+
 //    onFocusChanged: {
 //        console.log("SettingsTextInput onFocusChanged", settingsTextInputContainer.focus);
 //        if (settingsTextInputContainer.focus){
@@ -35,18 +37,6 @@ Item {
         }
     }
 
-    function dataChanged(id, value){
-        console.log("SettingsTextInput dataChanged", id, value);
-
-        //FIX
-        if (id === "ServerUrl"){
-            settingsTextInputContainer.rootItem.dataChanged(0, null , value);
-        }
-        else{
-            settingsTextInputContainer.rootItem.dataChanged(id, value);
-        }
-    }
-
     Component.onCompleted: {
         console.log("SettingsTextInput onCompleted", settingsTextInputContainer.itemId);
     }
@@ -61,9 +51,9 @@ Item {
 
         onInputTextChanged: {
             console.log("SettingsTextInput onInputTextChanged");
-
-            settingsTextInputContainer.dataChanged(settingsTextInputContainer.itemId,
-                                                   tfcTextInput.text);
+            if (settingsTextInputContainer.rootItem){
+                settingsTextInputContainer.rootItem.dataChanged(settingsTextInputContainer.index, tfcTextInput.text);
+            }
         }
     }
 }

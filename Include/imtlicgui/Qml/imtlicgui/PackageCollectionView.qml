@@ -299,15 +299,6 @@ Item {
             console.log("packageCollectionView onSelectedIndexChanged", packageCollectionView.table.selectedIndex);
             packageCollectionContainer.commandsChanged("Packages");
             if (packageCollectionView.table.selectedIndex > -1){
-//                if (metaInfoModels.GetItemsCount() >= packageCollectionView.table.selectedIndex + 1){
-//                    packageCollectionMetaInfo.modelData = metaInfoModels.GetData("ModelData",
-//                                                                                 packageCollectionView.table.selectedIndex);
-//                }
-//                else{
-//                    metaInfo.getMetaInfo();
-//                }
-
-
                 var index = -1;
                 for (var i = 0; i < metaInfoModels.GetItemsCount(); i++){
                     var curId = metaInfoModels.GetData("Id", i);

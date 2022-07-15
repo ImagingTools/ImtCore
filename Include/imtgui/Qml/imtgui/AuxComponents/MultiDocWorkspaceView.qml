@@ -103,18 +103,12 @@ Rectangle {
         if (tabPanelInternal.selectedIndex >= index){
             tabPanelInternal.selectedIndex--;
         }
-
-//        pagesData.Refresh();
     }
 
     function updateTitleTab(itemId, title, index) {
         console.log("MultidocWorkspaceView updateTitleTab()", itemId, title, index);
         pagesData.SetData("Title", title, index);
         pagesData.SetData("ItemId", itemId, index);
-
-//        let delegateItem = docsData.itemAtIndex(index);
-//        delegateItem.setItemId(itemId);
-//        delegateItem.setItemName(title);
     }
 
     function reloadModelInOpenTab(index){
@@ -263,16 +257,6 @@ Rectangle {
                 multiDocView.closeTab(tabPanelInternal.selectedIndex);
             }
 
-            function setItemId(itemId){
-                console.log("setItemId", dataLoader.item.itemId, '->', itemId);
-                dataLoader.item.itemId = itemId;
-            }
-
-            function setItemName(itemName){
-                console.log("setItemName", dataLoader.item.itemName, '->', itemName);
-                dataLoader.item.itemId = itemName;
-            }
-
             function getItem(){
                 return dataLoader.item;
             }
@@ -290,8 +274,12 @@ Rectangle {
                     console.log("MultidocWorkspaceView dataLoader onItemChanged", dataLoader.source, docsDataDeleg)
                     if (dataLoader.item && dataLoader.source != ""){
 
+                        console.log("docsDataDeleg", docsDataDeleg);
                         dataLoader.item.rootItem = docsDataDeleg;
+                        console.log("dataLoader.item.rootItem", dataLoader.item.rootItem);
+
                         dataLoader.item.itemId = model.ItemId
+                        console.log("dataLoader.item.itemId", dataLoader.item.itemId);
                         dataLoader.item.itemName = model.Title
                         dataLoader.item.operation = multiDocView.operation
 
@@ -307,7 +295,7 @@ Rectangle {
 
                         dataLoader.item.multiDocViewItem = multiDocView;
                         dataLoader.item.model = dataModelLocal
-                        dataLoader.item.rootItem = docsDataDeleg;
+//                        dataLoader.item.rootItem = docsDataDeleg;
 
                         if (tabPanelInternal.selectedIndex === model.index) {
                             multiDocView.activeItem = dataLoader.item;

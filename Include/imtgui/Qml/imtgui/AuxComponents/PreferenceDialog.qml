@@ -21,32 +21,38 @@ Rectangle {
     property bool centered: true;
 
     property Item loaderDialog;
-    property Item thumbnailItem;
 
     property TreeItemModel localSettings;
     property TreeItemModel serverSettings;
 
     property string currentSettingsBodyId;
-    property string currentModeId;
+    property string currentModeId: "";
     property string selectedLanguage: "";
     property string networkUrl;
 
     property int countMainItems: -1;
 
-
     TreeItemModel {
         id: globalSettings;
     }
 
+    onCurrentModeIdChanged: {
+        console.log("PreferenceDialog onCurrentModeIdChanged", preferenceContainer.currentModeId);
+    }
+
     Component.onCompleted: {
         console.log("PreferenceDialog onCompleted");
-        settingsQuery.getSettings();
+        //settingsQuery.getSettings();
     }
 
     onFocusChanged: {
         if (preferenceContainer.focus){
             mainPanelColumn.forceActiveFocus();
         }
+    }
+
+    function loadSettings(){
+        settingsQuery.getSettings();
     }
 
     function modelSettingsChange(){
@@ -95,7 +101,6 @@ Rectangle {
             }
         }
         preferenceContainer.modelSettingsChange();
-        undoRedo.addModel(globalSettings);
     }
 
     Keys.onPressed: {
@@ -118,110 +123,18 @@ Rectangle {
 //        }
 //    }
 
-//    Shortcut {
-//        sequence: "Ctrl+Z";
-//        onActivated: {
-//            console.log("Ctrl+Z pressed");
-//            var result = undoRedo.undo();
-//            if (result != null){
-//                result = result.replace(/\\/g, '');
-//                result = result.slice(1, result.length - 1);
-//                globalSettings.Parse(result);
-//                preferenceContainer.modelSettingsChange();
-//                preferenceContainer.settingsBodyChanged();
-//                mainPanelRepeater.model = globalSettings;
-//            }
-//        }
-//    }
-
-//    Shortcut {
-//        sequence: "Ctrl+Shift+Z";
-//        onActivated: {
-//            console.log("Ctrl+Shift+Z pressed");
-//            if (!undoRedo.redoStackIsEmpty()){
-//                var result = undoRedo.redo();
-//                result = result.replace(/\\/g, '');
-//                result = result.slice(1, result.length - 1);
-//                globalSettings.Parse(result);
-//                preferenceContainer.modelSettingsChange();
-//                preferenceContainer.settingsBodyChanged();
-//                mainPanelRepeater.model = globalSettings;
-//            }
-//        }
-//    }
-
-    Timer {
-        id: saveTimer;
-
-        onTriggered: {
-            console.log("saveTimer onTriggered");
-            undoRedo.addModel(globalSettings);
-        }
-    }
-
-    function dataChanged(index, modelElements, activeValue){
-        console.log("PreferenceDialog dataChanged", index, modelElements, activeValue);
-
-        var curBodyId = globalSettings.GetData("Id", mainPanelRepeater.selectedIndex);
-        if (curBodyId === "General"){
-            preferenceContainer.generalSettingsChanged(index, modelElements, activeValue);
-        }
-        else if (curBodyId === "DBSettings"){
-            preferenceContainer.databaseDataChanged(index, modelElements, activeValue);
-        }
-        else{
-            preferenceContainer.settingsLocalChanged(index, activeValue);
-        }
-
-        saveTimer.start(3000);
-    }
-
-    function settingsLocalChanged(index, activeValue){
-        console.log("PreferenceDialog settingsLocalChanged", index, activeValue);
-
+    function dataChanged(index, value){
+        console.log("PreferenceDialog dataChanged", index, value);
         var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
-        modelSettingsBody.SetData("Value", activeValue, index);
-        globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex);
+        modelSettingsBody.SetData("Value", value, index);
 
-        console.log(thubnailDecoratorContainer.localSettings.toJSON());
-    }
+        let elementId = modelSettingsBody.GetData("Id", index);
+        if (elementId == "Mode"){
+            let parameters = modelSettingsBody.GetData("Parameters", index);
+            let parameterId = parameters.GetData("Id", value);
 
-    function generalSettingsChanged(index, modelElements, activeValue){
-        console.log("PreferenceDialog generalSettingsChanged", index, modelElements, activeValue);
-
-        var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
-        var curId = modelSettingsBody.GetData("Id", index);
-
-        if (!curId){
-            return;
+            preferenceContainer.currentModeId = parameterId;
         }
-
-        if (activeValue !== undefined){
-            var itemId = modelSettingsBody.GetData("Id", index);
-            modelSettingsBody.SetData("Value", activeValue, index);
-            var selectedId = modelElements.GetData("Id", activeValue);
-
-            if (itemId === "Mode"){
-                preferenceContainer.currentModeId = selectedId;
-            }
-
-            if (itemId == "Language"){
-//                context.language = selectedId;
-                preferenceContainer.selectedLanguage = selectedId;
-            }
-        }
-        modelSettingsBody.SetData("Parameters", modelElements, index);
-        globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
-    }
-
-    function databaseDataChanged(index, modelElements){
-        console.log("PreferenceDialog databaseDataChanged", index, modelElements);
-       // var dataModelLocal = preferenceContainer.serverSettings.GetData("items");
-        var modelSettingsBody = globalSettings.GetData("Elements", mainPanelRepeater.selectedIndex);
-        modelSettingsBody.SetData("Parameters", modelElements, index);
-        globalSettings.SetData("Elements", modelSettingsBody, mainPanelRepeater.selectedIndex)
-       // preferenceContainer.serverSettings.SetData("items", dataModelLocal);
-        console.log("preferenceContainer.globalSettings", globalSettings.toJSON());
     }
 
     function settingsBodyChanged(){
@@ -283,7 +196,8 @@ Rectangle {
             iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 
             onClicked: {
-                preferenceContainer.loaderDialog.closeItem();
+//                preferenceContainer.loaderDialog.closeItem();
+                thubnailDecoratorContainer.setPreferencesVisible(false);
             }
         }
     }
@@ -499,10 +413,7 @@ Rectangle {
                            dependentPanelLoader.item.delegateItem = dependentPanelRepeater;
                        }
 
-                       if (dependentPanelLoader.item.currentItemIndex){
-                           dependentPanelLoader.item.currentItemIndex = model.index;
-                       }
-
+                       dependentPanelLoader.item.index = model.index;
                    }
                }
            }
@@ -513,67 +424,36 @@ Rectangle {
        preferenceSaveButton.forceActiveFocus();
    }
 
-//   Row {
-//       anchors.bottom: preferenceSaveButton.top;
-//       anchors.bottomMargin: 10;
-//       anchors.right: parent.right;
+   function getPageIndexByPageId(pageId){
+       for (let i = 0; i < globalSettings.GetItemsCount(); i++){
+           let id = globalSettings.GetData("Id", i);
+           if (id == pageId){
+               return i;
+           }
+       }
 
-//       spacing: 10;
-//       width: 100;
+       return -1;
+   }
 
-//       AuxButton {
-//           id: undoButton;
+   function getInstanceMask(){
+       console.log("Preferences getInstanceMask");
+       let generalPageIndex = preferenceContainer.getPageIndexByPageId("General");
 
-//           width: 25;
-//           height: 25;
+       if (generalPageIndex >= 0){
+           var elements = globalSettings.GetData("Elements", generalPageIndex);
 
-//           hasText: true;
-//           hasIcon: false;
+           for (let i = 0; i < elements.GetItemsCount(); i++){
+               let elementId = elements.GetData("Id", i);
+               if (elementId == "InstanceMask"){
+                   let elementValue = elements.GetData("Value", i);
 
-//           textButton: qsTr("Undo");
+                   return elementValue;
+               }
+           }
+       }
 
-//           onClicked: {
-//               console.log("undoRedo.undo");
-//               var result = undoRedo.undo();
-//               if (result != null){
-//                   result = result.replace(/\\/g, '');
-//                   result = result.slice(1, result.length - 1);
-//                   globalSettings.Parse(result);
-//                   preferenceContainer.modelSettingsChange();
-//                   preferenceContainer.settingsBodyChanged();
-//                   mainPanelRepeater.model = globalSettings;
-//                   globalSettings.Refresh();
-//               }
-
-//               //preferenceSaveButton.enabled = !undoRedo.undoStackIsEmpty();
-//           }
-//       }
-
-//       AuxButton {
-//           id: redoButton;
-
-//           width: 25;
-//           height: 25;
-
-//           hasText: true;
-//           hasIcon: false;
-
-//           textButton: qsTr("Redo");
-
-//           onClicked: {
-//               if (!undoRedo.redoStackIsEmpty()){
-//                   var result = undoRedo.redo();
-//                   result = result.replace(/\\/g, '');
-//                   result = result.slice(1, result.length - 1);
-//                   globalSettings.Parse(result);
-//                   preferenceContainer.modelSettingsChange();
-//                   preferenceContainer.settingsBodyChanged();
-//                   mainPanelRepeater.model = globalSettings;
-//                   globalSettings.Refresh();
-//               }
-//           }
-//       }
-//   }
+       return null;
+   }
 
    AuxButton {
        id: preferenceSaveButton;
@@ -588,8 +468,6 @@ Rectangle {
 
        hasText: true;
        hasIcon: false;
-
-//       enabled: undoRedo.undoStackCountObjects > 1;
 
        textButton: qsTr("Apply");
        borderColor: (preferenceSaveButton.highlighted || preferenceSaveButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
@@ -609,38 +487,41 @@ Rectangle {
 
        onClicked: {
            console.log("PreferenceDialog saveButton onClicked", preferenceContainer.currentModeId, Style.theme);
-           var indexLocalSettings = -1;
-           for (var i = 0; i < globalSettings.GetItemsCount(); i++){
-               var id = globalSettings.GetData("Id", i);
-               if (id == "NetworkSettings"){
-                   indexLocalSettings = i;
-                   break;
-               }
-           }
-           if (indexLocalSettings !== -1){
-               var elements = globalSettings.GetData("Elements", indexLocalSettings);
-               var newValue = elements.GetData("Value");
 
-               if (newValue != preferenceContainer.networkUrl){
-                   thubnailDecoratorContainer.localSettings.SetData("Elements", elements);
-                   preferenceContainer.networkUrl = newValue;
-               }
-           }
+
+
            if (thubnailDecoratorContainer.serverIsConnection){
                if ((preferenceContainer.currentModeId == "Light" ||
                        preferenceContainer.currentModeId == "Dark") &&
                        preferenceContainer.currentModeId !== Style.theme){
+
+                   console.log("preferenceContainer.currentModeId", preferenceContainer.currentModeId);
                    Style.theme = preferenceContainer.currentModeId;
                    Style.changeSchemeDesign(preferenceContainer.currentModeId);
                }
+
+               console.log("preferenceContainer.serverSettings", preferenceContainer.serverSettings.toJSON());
+
                preferenceSaveQuery.save();
            }
 
-           if (preferenceContainer.selectedLanguage != "" && preferenceContainer.selectedLanguage != Style.language){
-               Style.language = preferenceContainer.selectedLanguage;
-               context.language = preferenceContainer.selectedLanguage;
-               thubnailDecoratorContainer.updateModels();
+           let localPageIndex = preferenceContainer.getPageIndexByPageId("NetworkSettings");
+           if (localPageIndex >= 0){
+               var elements = globalSettings.GetData("Elements", localPageIndex);
+
+               let newNetworkUrl = elements.GetData("Value");
+
+               if (newNetworkUrl != preferenceContainer.networkUrl){
+                   preferenceContainer.networkUrl = newNetworkUrl
+                   thubnailDecoratorContainer.localSettings.SetData("Elements", elements);
+               }
            }
+
+//           if (preferenceContainer.selectedLanguage != "" && preferenceContainer.selectedLanguage != Style.language){
+//               Style.language = preferenceContainer.selectedLanguage;
+//               context.language = preferenceContainer.selectedLanguage;
+//               thubnailDecoratorContainer.updateModels();
+//           }
 
 //           preferenceSaveButton.enabled = false;
        }
@@ -679,13 +560,10 @@ Rectangle {
 
        onClicked: {
            console.log("PreferenceDialog closeButton onClicked");
-           preferenceContainer.thumbnailItem.setFocusOnMenuPanel();
-           preferenceContainer.loaderDialog.closeItem();
+           thubnailDecoratorContainer.setPreferencesVisible(false);
+//           preferenceContainer.thumbnailItem.setFocusOnMenuPanel();
+//           preferenceContainer.loaderDialog.closeItem();
        }
-   }
-
-   UndoRedo {
-       id: undoRedo;
    }
 
    GqlModel {
@@ -735,10 +613,6 @@ Rectangle {
        }
    }
 
-   TreeItemModel {
-       id: emptyModel;
-   }
-
    GqlModel {
        id: preferenceSaveQuery;
 
@@ -750,8 +624,6 @@ Rectangle {
 //           console.log("preferenceContainer.serverSettings", preferenceContainer.serverSettings.toJSON())
 
            var inputParams = Gql.GqlObject("input");
-//           emptyModel.InsertNewItem();
-//           emptyModel.SetExternTreeModel("items", globalSettings);
            var jsonString = preferenceContainer.serverSettings.toJSON();
            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
@@ -768,7 +640,6 @@ Rectangle {
 
            var gqlData = query.GetQuery();
            console.log("Preference GqlModel SaveSettings query ", gqlData);
-           emptyModel.Clear();
            this.SetGqlQuery(gqlData);
        }
 

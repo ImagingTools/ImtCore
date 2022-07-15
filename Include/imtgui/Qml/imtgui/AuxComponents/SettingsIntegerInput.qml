@@ -12,6 +12,8 @@ Item {
     property Item rootItem;
     property Item repeaterItem;
 
+    property int index: 0; // index element in the data model, default - 0
+
     onFocusChanged: {
         if (settingsIntegerInputContainer.focus){
 //            tfcIntegerInput.setFocus(true);
@@ -26,11 +28,6 @@ Item {
 //            tfcIntegerInput.setFocus(false);
 //            settingsIntegerInputContainer.repeaterItem.focusOnNextItem();
         }
-    }
-
-    function dataChanged(id, value){
-        console.log("SettingsIntegerInput dataChanged", id, value);
-        settingsIntegerInputContainer.rootItem.dataChanged(id, value);
     }
 
     Component.onCompleted: {
@@ -48,9 +45,9 @@ Item {
 
         onInputTextChanged: {
             console.log("SettingsIntegerInput onInputTextChanged");
-
-            settingsIntegerInputContainer.dataChanged(settingsIntegerInputContainer.itemId,
-                                                   tfcIntegerInput.text);
+            if (settingsIntegerInputContainer.rootItem){
+                settingsIntegerInputContainer.rootItem.dataChanged(settingsIntegerInputContainer.index, tfcIntegerInput.text);
+            }
         }
     }
 }

@@ -66,9 +66,12 @@ Item {
         id: filterMenu;
 
         anchors.top: tableContainer.top;
-        anchors.left: parent.left;
+//        width: 500;
+//        height: 30;
+//        anchors.left: parent.left;
 
         width: parent.width;
+        height: 30;
 
         decoratorSource: Style.filterPanelDecoratorPath;
 
@@ -198,13 +201,15 @@ Item {
         anchors.top: headersPanel.top;
         visible: tableContainer.hasFilter;
 
-
-        width: 0;
+        width: tableContainer.hasFilter ? 30 : 0;
         height: width;
+
+        highlighted: filterMenu.visible;
 
         iconSource: "../../../" + "Icons/" + Style.theme + "/Parameters_On_Normal.svg";
 
         onClicked: {
+            console.log("AuxButton iconFilter onClicked");
             filterMenu.visible = !filterMenu.visible;
         }
     }
@@ -212,7 +217,6 @@ Item {
     Rectangle {
         anchors.fill: elementsList;
         color: Style.baseColor;
-//        color: "transparent";
     }
 
     Timer {

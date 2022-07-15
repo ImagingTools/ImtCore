@@ -169,9 +169,9 @@ bool CRemoteFileController::GetFile(const QString& fileId, const QString& fileNa
 		urlQuery.addQueryItem("FileId", fileId);
 		requestUrl.setQuery(urlQuery);
 
-		QNetworkReply* reply = accessManager->get(QNetworkRequest(requestUrl));        
-        connect(reply, &QNetworkReply::downloadProgress, this, &CRemoteFileController::OnProgressChanged);
-        connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDownloaded);
+		QNetworkReply* reply = accessManager->get(QNetworkRequest(requestUrl));
+		connect(reply, &QNetworkReply::downloadProgress, this, &CRemoteFileController::OnProgressChanged);
+		connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDownloaded);
 		return true;
 	}
 	return false;

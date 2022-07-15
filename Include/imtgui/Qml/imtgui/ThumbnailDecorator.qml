@@ -29,6 +29,7 @@ Rectangle
 
     onLocalSettingsChanged: {
         console.log("ThumbnailDecorator onLocalSettingsChanged");
+        preferenceDialog.localSettings = thubnailDecoratorContainer.localSettings;
         //console.log("localSettings", thubnailDecoratorContainer.localSettings.toJSON());
     }
 
@@ -41,6 +42,8 @@ Rectangle
         Style.changeSchemeDesign("");
         menuPanel.updateModels();
         topPanel.updateModels();
+
+        preferenceDialog.loadSettings();
     }
 
     function openDialog(source, parameters) {
@@ -78,7 +81,6 @@ Rectangle
         console.log("ThumbnailDecorator setInvalidConnection", state);
         thubnailDecoratorContainer.serverIsConnection = !state;
         refreshButton.enabled = true;
-//        textNoConnection.visible = state;
         errorBackground.visible = state;
     }
 
@@ -130,7 +132,7 @@ Rectangle
         onActivePageIdChanged: {
             console.log("ThumbnailDecorator MenuPanel onActivePageIdChanged");
             if (thubnailDecoratorContainer.activeItem){
-                thubnailDecoratorContainer.activeItem.updateCommandId();
+                //thubnailDecoratorContainer.activeItem.updateCommandId();
             }
         }
         onActivePageIndexChanged: {
@@ -141,8 +143,6 @@ Rectangle
     Item {
         id: customPanel;
 
-//        anchors.top: menuPanel.bottom;
-//        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
         anchors.left: parent.left;
         anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
         anchors.bottom: parent.bottom;
@@ -229,9 +229,7 @@ Rectangle
 
                 Component.onCompleted: {
                     var source = menuPanel.model.GetData("Source", model.index);
-                    console.log("PagesLoader ", source);
                     pagesLoader.source = source;
-                    console.log("PagesLoader ", pagesLoader.source);
                 }
 
                 onItemChanged: {
@@ -239,8 +237,6 @@ Rectangle
                     if (pagesLoader.item){
                         pagesLoader.item.rootItem = pagesDeleg;
                          pagesLoader.item.title = menuPanel.model.GetData("Name", model.index);
-//                        pagesLoader.item.forceActiveFocus();
-                        console.log("ThumbnailDecorator pagesLoader.item.rootItem", pagesLoader.item.rootItem)
                         pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData("Icon", model.index);
                     }
                 }
@@ -278,7 +274,6 @@ Rectangle
                 anchors.verticalCenter: parent.verticalCenter;
 
                 text: qsTr("There is no connection to the server!");
-                //visible: false;
                 color: "red";
                 font.pixelSize: Style.fontSize_title;
                 font.family: Style.fontFamily;
@@ -313,17 +308,13 @@ Rectangle
 
     TopPanel {
         id: topPanel;
-//        anchors.left: parent.left;
-//        anchors.right: parent.right;
         anchors.top: parent.top;
+
         width: parent.width;
         height: 60;
-//        width: parent.width;
 
         title: menuPanel.activePageName;
         onMenuActivatedSignal: {
-            console.log("ThumbnailDecorator TopPanel onMenuActivatedSignal");
-            console.log("menuId", idMenu);
             thubnailDecoratorContainer.activeItem.menuActivated(idMenu);
         }
 
@@ -354,6 +345,18 @@ Rectangle
 //        }
 //    }
 
+    function setPreferencesVisible(visible){
+        preferenceDialog.visible = visible;
+    }
+
+    PreferenceDialog {
+        id: preferenceDialog;
+
+        anchors.centerIn: parent;
+
+        visible: false;
+    }
+
     Repeater {
         id: listViewDialogs;
         z: 10;
@@ -375,27 +378,12 @@ Rectangle
 
             color: "transparent";
 
-//            Timer {
-//                id: timepBackground;
-
-//                Component.onCompleted: {
-//                    timepBackground.start(100);
-
-//                }
-
-//                onTriggered: {
-//                    darkBackground.visible = true;
-//                }
-//            }
-
-
             Rectangle {
                 id: darkBackground;
 
                 anchors.fill: parent;
 
                 color: "gray";
-//                visible: false;
 
                 MouseArea {
                     anchors.fill: parent;
@@ -412,17 +400,11 @@ Rectangle
                 }
             }
 
-            function setLoaderItem(mySource){
-               // loaderDialog.source = mySource;
-                loaderDialog.destroy();
-            }
-
             Loader {
                   id: loaderDialog;
 
                   function closeItem() {
                       console.log("ThumbnailDecorator close dialog", model.index);
-//                      thubnailDecoratorContainer.activeItem.forceActiveFocus();
                       loaderDialog.item.focus = false;
                       modelLayers.remove(model.index);
                   }

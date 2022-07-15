@@ -537,8 +537,6 @@ Rectangle {
                         width: postalCodeBlock.width - 22;
                         height: 30;
 
-//                        text: "5";
-
                         onInputTextChanged: {
                             console.log("ContactInfoEditor TextFieldCustom PostalCode onInputTextChanged");
 //                            containerContactInfo.contactInfoModel.SetData("PostalCode", postalCode.text);

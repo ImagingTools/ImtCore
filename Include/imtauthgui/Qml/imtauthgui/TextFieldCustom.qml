@@ -24,6 +24,8 @@ Item {
     property int textSize: 15;
     property int echoMode: TextInput.Normal;
 
+//    property string regexMask: "/([0-9A-F]{2}[:-]){5}([0-9A-F]{2})/";
+
     signal inputTextChanged();
 
     signal textInputFocusChanged();
@@ -43,6 +45,10 @@ Item {
            textField.selectAll();
         }
         textField.focus = state;
+    }
+
+    function setMask(mask){
+        textField.inputMask = mask;
     }
 
     Rectangle {
@@ -75,11 +81,6 @@ Item {
         selectByMouse: true;
         clip: true;
 
-//        inputMask: "00:00:00:00";
-//        validator: RegExpValidator {
-//                regExp: /([0-9A-F]{2}/;
-//            }
-
         onFocusChanged: {
             console.log("TextInput onFocusChanged", textField.focus);
             containerTextField.wasFocus = true;
@@ -91,9 +92,6 @@ Item {
 
         onTextChanged: {
             console.log("TextFieldCustom onTextChanged", textField.text);
-//            if (containerTextField.wasFocus) {
-//                containerTextField.inputTextChanged();
-//            }
             containerTextField.inputTextChanged();
             containerTextField.isTextChanged = true;
         }

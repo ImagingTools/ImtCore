@@ -15,7 +15,7 @@ Item {
     property string itemId;
 //    property string selectedItemId;
 
-    property int currentItemIndex: -1;
+    property int index: 0;
     property int currentValue: 0;
 
     property Item rootItem;
@@ -61,9 +61,10 @@ Item {
         }
 
         for (var i = 0; i < settingsComboBoxContainer.modelElements.GetItemsCount(); i++){
+            var id = settingsComboBoxContainer.modelElements.GetData("Id", i);
             var name = settingsComboBoxContainer.modelElements.GetData("Name", i);
-            //settingsComboBoxContainer.modelElements.SetData("name", name, i);
-            settingsComboBoxModelList.append({'name': name})
+
+            settingsComboBoxModelList.append({'name': name, 'id': id})
 
             if (i == settingsComboBoxContainer.currentValue){
                 settingsComboBox.currentText = name;
@@ -71,27 +72,6 @@ Item {
         }
 
         settingsComboBox.currentIndex = settingsComboBoxContainer.currentValue;
-    }
-
-    function dataChanged(){
-        console.log("SettingsComboBox dataChanged");
-
-        if (!settingsComboBoxContainer.modelElements || !settingsComboBoxContainer.rootItem){
-            return;
-        }
-
-//        for (var i = 0; i < settingsComboBoxContainer.modelElements.GetItemsCount(); i++){
-//            if (settingsComboBoxContainer.modelElements.GetData("Value", i) === 1){
-//                settingsComboBoxContainer.modelElements.SetData("Value", 0, i);
-//                break;
-//            }
-//        }
-
-//        settingsComboBoxContainer.modelElements.SetData("Value", 1, settingsComboBox.currentIndex);
-        settingsComboBoxContainer.currentValue = settingsComboBox.currentIndex;
-        settingsComboBoxContainer.rootItem.dataChanged(settingsComboBoxContainer.currentItemIndex,
-                                                       settingsComboBoxContainer.modelElements,
-                                                       settingsComboBoxContainer.currentValue);
     }
 
     ListModel {
@@ -116,10 +96,9 @@ Item {
         textCentered: false;
 
         onCurrentIndexChanged: {
-            if (settingsComboBox.currentIndex < 0){
-                return;
+            if (settingsComboBoxContainer.rootItem){
+                settingsComboBoxContainer.rootItem.dataChanged(settingsComboBoxContainer.index, settingsComboBox.currentIndex);
             }
-            settingsComboBoxContainer.dataChanged();
         }
 
         onClicked: {

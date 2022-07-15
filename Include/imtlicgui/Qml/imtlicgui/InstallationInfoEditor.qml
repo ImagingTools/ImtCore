@@ -137,11 +137,6 @@ Rectangle {
                 }
             }
         }
-
-//        licensesTable.elements = containerInstallation.activeLicenses;
-//        containerInstallation.activeLicenses.Refresh();
-        console.log("containerInstallation.activeLicenses 2", containerInstallation.activeLicenses.toJSON());
-        console.log("licensesTable.elements", licensesTable.elements.toJSON());
     }
 
     function clearActiveLicenses(){
@@ -171,8 +166,7 @@ Rectangle {
                 accountIndex = i;
             }
         }
-        console.log("accountId", accountId);
-        console.log("Account index = ", accountIndex);
+
         if (accountIndex !== -1){
             customerCB.currentIndex = accountIndex;
         }
@@ -394,6 +388,13 @@ Rectangle {
 
                      width: tfcInstance.width - 22;
                      height: 30;
+
+                     Component.onCompleted: {
+                         let mask = preferenceDialog.getInstanceMask();
+                         if (mask){
+                             instanceIdText.setMask(mask);
+                         }
+                     }
 
                      onInputTextChanged: {
                          containerInstallation.installationInfoModel.SetData("Id", instanceIdText.text);
@@ -746,6 +747,9 @@ Rectangle {
 //                    if (containerInstallation.operation === "New"){
 //                        containerInstallation.installationInfoModel = dataModelLocal;
 //                    }
+                    if (!dataModelLocal.ContainsKey("item")){
+                        dataModelLocal.AddTreeModel("item");
+                    }
 
                     if(dataModelLocal.ContainsKey("item")){
                         dataModelLocal = dataModelLocal.GetData("item");
@@ -885,7 +889,7 @@ Rectangle {
                             accounts.SetExternTreeModel('data', dataModelLocal);
 
                             for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-                                listModelAccounts.append({"id": dataModelLocal.GetData("Id", i), "name": dataModelLocal.GetData("AccountName", i)});
+                                listModelAccounts.append({"id": dataModelLocal.GetData("Id", i), "name": dataModelLocal.GetData("Name", i)});
                             }
 
                             installItemModel.updateModel();

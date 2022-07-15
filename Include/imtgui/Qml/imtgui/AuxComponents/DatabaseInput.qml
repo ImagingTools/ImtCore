@@ -33,24 +33,30 @@ Item {
         settingsDatabaseInputRepeater.model = settingsDatabaseInputContainer.modelDatabase;
     }
 
-    function dataChanged(id, value){
-        console.log("DatabaseSettingsInput dataChanged", id, value);
+    function dataChanged(index, value){
+        console.log("DatabaseSettingsInput dataChanged", index, value);
 
-        if (!settingsDatabaseInputContainer.modelDatabase){
-            return;
-        }
-
-        for (var i = 0; i < settingsDatabaseInputContainer.modelDatabase.GetItemsCount(); i++){
-            var curId = settingsDatabaseInputContainer.modelDatabase.GetData("Id", i);
-
-            if (curId === id){
-                settingsDatabaseInputContainer.modelDatabase.SetData("Value", value, i);
-            }
-        }
-
-        settingsDatabaseInputContainer.rootItem.dataChanged(settingsDatabaseInputContainer.currentItemIndex,
-                                                                    settingsDatabaseInputContainer.modelDatabase);
+        settingsDatabaseInputContainer.modelDatabase.SetData("Value", value, index);
     }
+
+//    function dataChanged(id, value){
+//        console.log("DatabaseSettingsInput dataChanged", id, value);
+
+//        if (!settingsDatabaseInputContainer.modelDatabase){
+//            return;
+//        }
+
+//        for (var i = 0; i < settingsDatabaseInputContainer.modelDatabase.GetItemsCount(); i++){
+//            var curId = settingsDatabaseInputContainer.modelDatabase.GetData("Id", i);
+
+//            if (curId === id){
+//                settingsDatabaseInputContainer.modelDatabase.SetData("Value", value, i);
+//            }
+//        }
+
+//        settingsDatabaseInputContainer.rootItem.dataChanged(settingsDatabaseInputContainer.currentItemIndex,
+//                                                                    settingsDatabaseInputContainer.modelDatabase);
+//    }
 
     Column {
         id: databaseInputColumn;
@@ -119,6 +125,7 @@ Item {
                             settingsDatabaseInputLoader.source = "SettingsIntegerInput.qml";
                         }
 
+                        settingsDatabaseInputLoader.item.index = model.index;
                         settingsDatabaseInputLoader.item.itemId = itemId;
                         settingsDatabaseInputLoader.item.width = databaseInputDelegate.width;
                         settingsDatabaseInputLoader.item.value = value;

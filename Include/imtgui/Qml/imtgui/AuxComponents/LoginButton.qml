@@ -14,11 +14,11 @@ Item {
         iconSource: "../../../Icons/" + Style.theme + "/Account.svg";
 
         onClicked: {
-            console.log("Login button clicked !", thubnailDecoratorContainer.localSettings);
-            console.log(loginButton.iconSource)
-            var source = "AuxComponents/LoginDialog.qml";
+//            console.log("Login button clicked !", thubnailDecoratorContainer.localSettings);
+//            console.log(loginButton.iconSource)
+            var source = "AuxComponents/InputDialog.qml";
             var parameters = {};
-            parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
+//            parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
             thubnailDecoratorContainer.openDialog(source, parameters);
         }
     }

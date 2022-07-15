@@ -38,7 +38,6 @@ Rectangle {
 
             width: 24;
             height: 24;
-//            visible: loginDialog;
 
             anchors.verticalCenter: parent.verticalCenter;
         }

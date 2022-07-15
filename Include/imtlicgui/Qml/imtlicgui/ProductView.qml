@@ -656,7 +656,6 @@ Item {
     Rectangle {
         id: productMetaInfo;
 
-        //anchors.right: parent.right;
         anchors.left: productSplitter.right;
 
         height: parent.height;

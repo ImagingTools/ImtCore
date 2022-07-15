@@ -11,30 +11,20 @@ Item {
     property int itemWidth: 150;
     property int itemHeight: 30;
 
-//    signal textFilterChanged(int index, string text);
+    Text {
+        id: filterTitle;
 
-//    TextFieldCustom {
-//        id: searchTextField;
+        anchors.right: tfc.left;
+        anchors.rightMargin: 10;
+        anchors.verticalCenter: parent.verticalCenter;
 
-//        anchors.left: parent.left;
-//        anchors.leftMargin: 5;
-//        anchors.verticalCenter: parent.verticalCenter;
+        color: Style.textColor;
+        font.pixelSize: Style.fontSize_common;
+        font.family: Style.fontFamily;
 
-//        radius: 5;
-//        width: 200;
-//        height: 30;
+        text: qsTr("Filter");
+    }
 
-//        onTextChanged: {
-////            filterPanelDecorator.textFilterChanged(model.index, tfc.text);
-//            loaderDecorator.textChanged(model.index, searchTextField.text);
-//        }
-//    }
-
-
-
-
-
-//LISA DECORATOR
     TextFieldCustom {
         id: tfc;
 
@@ -46,7 +36,6 @@ Item {
         height: filterPanelDecorator.height - 5;
 
         onTextChanged: {
-//            filterPanelDecorator.textFilterChanged(model.index, tfc.text);
             loaderDecorator.textChanged(model.index, tfc.text);
         }
 

@@ -12,6 +12,7 @@ Item {
     property string value;
 
     property Item rootItem;
+    property int index: 0;
 
     AuxButton {
         id: button;

@@ -15,10 +15,11 @@ Item {
 
         onClicked: {
             console.log("Preference button clicked !", thubnailDecoratorContainer.localSettings);
-            var source = "AuxComponents/PreferenceDialog.qml";
-            var parameters = {};
-            parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
-            thubnailDecoratorContainer.openDialog(source, parameters);
+//            var source = "AuxComponents/PreferenceDialog.qml";
+//            var parameters = {};
+//            parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
+//            thubnailDecoratorContainer.openDialog(source, parameters);
+            thubnailDecoratorContainer.setPreferencesVisible(true);
         }
     }
 }

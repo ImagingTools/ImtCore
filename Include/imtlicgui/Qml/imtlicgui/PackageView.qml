@@ -438,7 +438,17 @@ Item {
             parameters["collectionViewFeatures"] = featureCollectionView;
             parameters["resultItem"] = featureCollectionViewContainer;
             thubnailDecoratorContainer.openDialog(source, parameters);
+
+//            dialog.open();
         }
+
+//        InputDialog {
+//            id: dialog;
+
+//            onFinished: {
+
+//            }
+//        }
 
         onSelectedIndexChanged: {
             console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);

@@ -158,13 +158,13 @@ Rectangle {
         console.log("CollectionView getNameBySelectedItem");
         var dataModelLocal = collectionViewContainer.collectionViewModel.GetData("data");
 
-        var name;
-        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
-            name = dataModelLocal.GetData("AccountName", tableInternal.selectedIndex);
-        }
-        else{
-            name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
-        }
+        var name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
+//        if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
+//            name = dataModelLocal.GetData("AccountName", tableInternal.selectedIndex);
+//        }
+//        else{
+//            name = dataModelLocal.GetData("Name", tableInternal.selectedIndex);
+//        }
         return name;
     }
 
@@ -337,6 +337,7 @@ Rectangle {
             anchors.topMargin: thubnailDecoratorContainer.mainMargin;
             anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
             anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
+            hasFilter: true;
 
             onSelectItem: {
                 console.log("CollectionView AuxTable onSelectItem", idSelected, name);
@@ -367,22 +368,6 @@ Rectangle {
                 modelItems.updateModel();
             }
 
-    //        onFilterChanged: {
-    //            modelFilter.SetData("TextFilter", text);
-    //            modelItems.updateModel();
-    ////            if (modelFilter.ContainsKey("filterLocal")){
-
-    ////                let filterLocal = modelFilter.GetData("filterLocal");
-    ////                filterLocal.SetData("Text", text, index);
-    ////                filterLocal.SetData("Id", id, index);
-    //////                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
-    //////                    let index = filterLocal.InsertNewItem()
-    //////                    filterLocal.SetData("Id", tableInternal.headers.GetData("Id", i), index);
-    //////                    filterLocal.SetData("Text", "", index);
-    //////                }
-    ////                modelItems.updateModel();
-    ////            }
-    //        }
 
             onHeaderOnClicked: {
                 console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
@@ -554,13 +539,13 @@ Rectangle {
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset", offset);
             viewParams.InsertField("Count", count);
-//            viewParams.InsertField("FilterModel");
-//            var jsonString = modelFilter.toJSON();
-//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-//            viewParams.InsertField("FilterModel", jsonString);
+            viewParams.InsertField("FilterModel");
+            var jsonString = modelFilter.toJSON();
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
-//            inputParams.InsertFieldObject(viewParams);
+            inputParams.InsertFieldObject(viewParams);
 
             if(collectionViewContainer.itemId != ""){
                 inputParams.InsertField("Id", collectionViewContainer.itemId);

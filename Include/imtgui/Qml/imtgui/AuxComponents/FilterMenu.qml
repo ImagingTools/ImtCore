@@ -36,7 +36,13 @@ Rectangle {
         onItemChanged: {
             console.log("onItemChanged");
             if (loaderDecorator.item){
-                filterContainer.height = loaderDecorator.item.height;
+                loaderDecorator.item.height = filterContainer.height;
+                loaderDecorator.item.width = filterContainer.width;
+                console.log("FilterMenu");
+                console.log("filterContainer.heightt", filterContainer.height);
+                console.log("filterContainer.width", filterContainer.width);
+                console.log("loaderDecorator.item.height", loaderDecorator.item.height);
+                console.log("loaderDecorator.item.width", loaderDecorator.item.width);
             }
         }
 

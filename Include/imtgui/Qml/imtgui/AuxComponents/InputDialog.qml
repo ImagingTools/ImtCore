@@ -3,6 +3,18 @@ import Acf 1.0
 import imtqml 1.0
 import imtauthgui 1.0
 
+//Dialog {
+//    id: inputDialogContainer;
+
+//    Component.onCompleted: {
+//        inputDialogContainer.setTitle(qsTr("Input"));
+
+//        inputDialogContainer.addButton({"Id":"Ok", "Name":"OK"});
+//        inputDialogContainer.addButton({"Id":"Cancel", "Name":"Cancel"});
+
+//        inputDialogContainer.bodySource = "InputDialogBody.qml";
+//    }
+//}
 
 Rectangle {
     id: inputDialogContainer;

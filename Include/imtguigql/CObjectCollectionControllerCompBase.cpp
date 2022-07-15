@@ -369,12 +369,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 				imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("FilterIds");
 				if (filterModel != nullptr){
+					QByteArrayList filteringInfoIds;
 					for (int i = 0; i < filterModel->GetItemsCount(); i++){
-						QByteArray headerId = filterModel->GetData("Id").toByteArray();
+						QByteArray headerId = filterModel->GetData("Id", i).toByteArray();
 						if (!headerId.isEmpty()){
-							m_filter.SetFilteringInfoIds(QByteArrayList() << headerId);
+							filteringInfoIds << headerId;
 						}
 					}
+					m_filter.SetFilteringInfoIds(filteringInfoIds);
 				}
 
 				QString filterText = generalModel.GetData("TextFilter").toString();
