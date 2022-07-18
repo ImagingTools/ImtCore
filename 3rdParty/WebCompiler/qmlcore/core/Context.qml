@@ -75,44 +75,64 @@ Item {
 		
 		for(let event of events){
 			this.element.on(event, (e)=>{
-	
-				let path = [e. target]
-				let parent = e.target.parentNode
-				while(parent){
-					path.push(parent)
-					parent = parent.parentNode
-				}
-				let find = false
-				this.eventState.view = null
-				for(let p of path){
-					let obj = this.listId[p.id]
-					if(obj && obj.webScroll !== undefined && !find){
-						find = true
-						this.eventState.view = obj
-					}
+				if(this.$readyEvents){
+
 					
-				}
-				if(this.eventState.target && this.eventState.target[`_${e.type}`]){
-					this.eventState.target[`_${e.type}`](e, this.eventState)
-				} else {
+					let path = [e. target]
+					let parent = e.target.parentNode
+					while(parent){
+						path.push(parent)
+						parent = parent.parentNode
+					}
+					let find = false
+					this.eventState.view = null
 					for(let p of path){
 						let obj = this.listId[p.id]
-						if(!this.eventState.target && obj && obj[`_${e.type}`]){
-							obj[`_${e.type}`](e, this.eventState)
+						if(obj && obj.webScroll !== undefined && !find){
+							find = true
+							this.eventState.view = obj
+						}
+						
+					}
+					if(this.eventState.target && this.eventState.target[`_${e.type}`]){
+						this.eventState.target[`_${e.type}`](e, this.eventState)
+					} else {
+						for(let p of path){
+							let obj = this.listId[p.id]
+							if(!this.eventState.target && obj && obj[`_${e.type}`]){
+								obj[`_${e.type}`](e, this.eventState)
+							}
 						}
 					}
-				}
 
-				if(e.type === 'mousewheel' || e.type === 'wheel'){
-					this.eventState.release()
+					if(e.type === 'mousewheel' || e.type === 'wheel'){
+						this.eventState.release()
+					}
+					setTimeout(()=>{
+						//this.backend.tick(this)
+						this._processActions()
+					}, 50)
 				}
-                setTimeout(()=>{
-                    //this.backend.tick(this)
-                    this._processActions()
-                }, 50)
-				
 			})
 		}
+
+		this.$readyEvents = true
+		let timerFocus = null
+		setInterval(()=>{
+			if(document.hasFocus()){
+				if(!timerFocus && !this.$readyEvents){
+					timerFocus = setTimeout(()=>{
+						this.$readyEvents = true
+					}, 200)
+				}
+			} else {
+				this.$readyEvents = false
+				if(timerFocus){
+					clearTimeout(timerFocus)
+					timerFocus = null
+				}
+			}
+		}, 100)
 
 		this.backend.document.body.addEventListener('keydown', (e)=>{
 			if(e.keyCode === 9 ) {
