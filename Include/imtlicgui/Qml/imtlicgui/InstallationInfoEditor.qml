@@ -380,6 +380,20 @@ Rectangle {
                  border.width: 1;
                  border.color: Style.borderColor;
 
+                 RegExpValidator {
+                     id: regexValid;
+
+                     Component.onCompleted: {
+                         console.log("RegExpValidator onCompleted");
+                         let regex = preferenceDialog.getInstanceMask();
+
+                         let re = new RegExp(regex)
+                         if (re){
+                             regexValid.regExp = re;
+                         }
+                     }
+                 }
+
                  TextFieldCustom {
                      id: instanceIdText;
 
@@ -389,11 +403,11 @@ Rectangle {
                      width: tfcInstance.width - 22;
                      height: 30;
 
+                     placeHolderText: qsTr("Enter the instance ID");
+
                      Component.onCompleted: {
-                         let mask = preferenceDialog.getInstanceMask();
-                         if (mask){
-                             instanceIdText.setMask(mask);
-                         }
+                         console.log("instanceIdText onCompleted", regexValid);
+                         instanceIdText.setValidator(regexValid);
                      }
 
                      onInputTextChanged: {
