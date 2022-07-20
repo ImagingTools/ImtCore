@@ -28,6 +28,7 @@ private slots:
     void InsertNewObjectWithRequiredParamsTest_data();
     void InsertNewObjectWithRequiredParamsTest();
     void InsertNewObjectWithNonExistElementTest();
+    void InsertNewObjectWithEmptyIdTest();//in writing
     void InsertNewObjectWithExistElementTest();
 	void InsertNewObjectWithDataTest();
 	void InsertNewObjectWithMetaObjectTest();
