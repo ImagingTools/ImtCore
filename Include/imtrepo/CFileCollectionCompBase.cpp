@@ -221,7 +221,11 @@ QByteArray CFileCollectionCompBase::InsertFile(
 
 			if (collectionItemMetaInfoPtr != nullptr){
 				idoc::CStandardDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfoPtr->GetMetaInfoTypes();
+#if QT_VERSION < 0x051500
+				QList<int> metaInfoTypesList = metaInfoTypes.toList();
+#else
 				QList<int> metaInfoTypesList(metaInfoTypes.begin(), metaInfoTypes.end());
+#endif
 				for (int i = 0; i < metaInfoTypesList.size(); i++){
 					QVariant valueMeta = collectionItemMetaInfoPtr->GetMetaInfo(metaInfoTypesList[i]);
 					collectionItem.metaInfo.SetMetaInfo(metaInfoTypesList[i], valueMeta);
@@ -236,7 +240,11 @@ QByteArray CFileCollectionCompBase::InsertFile(
 			MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(workingFilePath, typeId);
 			if (dataMetaInfoPtr != nullptr){
 				idoc::CStandardDocumentMetaInfo::MetaInfoTypes dataMetaInfoTypes = dataMetaInfoPtr->GetMetaInfoTypes();
+#if QT_VERSION < 0x051500
+				QList<int> dataMetaInfoTypesList = dataMetaInfoTypes.toList();
+#else
 				QList<int> dataMetaInfoTypesList(dataMetaInfoTypes.begin(), dataMetaInfoTypes.end());
+#endif
 				for (int i = 0; i < dataMetaInfoTypesList.size(); i++){
 					QVariant dataValueMeta = dataMetaInfoPtr->GetMetaInfo(dataMetaInfoTypesList[i]);
 					metaInfoPtr->SetMetaInfo(dataMetaInfoTypesList[i], dataValueMeta);
