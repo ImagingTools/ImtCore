@@ -1,27 +1,29 @@
 import QtQuick 2.12
 import Acf 1.0
 
-Rectangle {
+Item {
     id: multiDocView;
 
-    height: 100;
-    width: 100;
+    anchors.fill: parent;
 
-    color: "transparent";
+//    color: "transparent";
 
     property TabPanel tabPanel: tabPanelInternal;
 
     property Item activeItem;
-    property Item activeCollectionItem;
     property Item rootItem;
 
-    property var pagesSources: [];
-    property var pagesItems: [];
+//    property var pagesSources: [];
+//    property var pagesItems: [];
 
     property alias pagesCount: docsData.count;
     property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
 
     property string operation;
+
+    property string startSourcePage;
+
+    property var startPageObj;
 
     property int mainMargin: 0;
 
@@ -36,6 +38,12 @@ Rectangle {
     Component.onCompleted: {
         console.log("MultidocWorkspaceView onCompleted", tabPanelInternal.selectedIndex)
         docsData.anchors.topMargin = tabPanelInternal.height;
+
+//        multiDocView.addToHeadersArray("", "Packages", "../../imtlicgui/PackageCollectionView.qml", "Packages")
+    }
+
+    onStartPageObjChanged: {
+        multiDocView.addToHeadersArray(startPageObj);
     }
 
     function setFocus(){
@@ -52,6 +60,9 @@ Rectangle {
         if (tabPanelInternal.selectedIndex > -1 && multiDocView.rootItem){
             var commandsId = pagesData.GetData("CommandsId", tabPanelInternal.selectedIndex);
             var itemId = pagesData.GetData("ItemId", tabPanelInternal.selectedIndex);
+
+            console.log("commandsId", commandsId);
+            console.log("itemId", itemId);
             multiDocView.rootItem.changeCommandsId(commandsId);
         }
     }
@@ -75,27 +86,49 @@ Rectangle {
         return false;
     }
 
-    function addToHeadersArray(itemId, title, source, commandsId, operation){
-        console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId, operation)
-        if (operation) {
-            multiDocView.operation = operation;
-        }
-        var findPage = false;
-        if (itemId !== "" && multiDocView.tabIsOpened(itemId)) {
-            findPage = true;
-        }
+    function addToHeadersArray(page){
+        console.log("MultidocWorkspaceView addToHeadersArray", page)
 
-        console.log("findPage", findPage);
-        if (!findPage) {
+        let itemId = page["Id"];
+        let itemName = page["Name"];
+        let source = page["Source"];
+        let commandsId = page["CommandsId"];
+
+        console.log(itemId, itemName, source, commandsId);
+
+        var findPage = multiDocView.tabIsOpened(itemId);
+        if (!findPage){
             var index = pagesData.InsertNewItem();
             pagesData.SetData("ItemId", itemId, index);
-            pagesData.SetData("Title", title, index);
+            pagesData.SetData("Title", itemName, index);
             pagesData.SetData("Source", source, index);
             pagesData.SetData("CommandsId", commandsId, index);
 
             tabPanelInternal.selectedIndex = pagesData.GetItemsCount() - 1;
         }
     }
+
+//    function addToHeadersArray(itemId, title, source, commandsId, operation){
+//        console.log("MultidocWorkspaceView addToHeadersArray", title, source, itemId, commandsId, operation)
+//        if (operation) {
+//            multiDocView.operation = operation;
+//        }
+//        var findPage = false;
+//        if (itemId !== "" && multiDocView.tabIsOpened(itemId)) {
+//            findPage = true;
+//        }
+
+//        console.log("findPage", findPage);
+//        if (!findPage) {
+//            var index = pagesData.InsertNewItem();
+//            pagesData.SetData("ItemId", itemId, index);
+//            pagesData.SetData("Title", title, index);
+//            pagesData.SetData("Source", source, index);
+//            pagesData.SetData("CommandsId", commandsId, index);
+
+//            tabPanelInternal.selectedIndex = pagesData.GetItemsCount() - 1;
+//        }
+//    }
 
     function closeTab(index) {
         console.log("MultiDocWorkspaceView closeTab", index);
@@ -183,6 +216,8 @@ Rectangle {
 
         onSelectedIndexChanged: {
             console.log("MultiDocWorkspaceView TabPanel onSelectedIndexChanged", tabPanelInternal.selectedIndex);
+
+            multiDocView.updateCommandId();
         }
 
         onRightClicked: {
@@ -235,7 +270,7 @@ Rectangle {
                 if(this.visible){
                     multiDocView.activeItem = dataLoader.item;
                     multiDocView.activeItem.refresh();
-                    multiDocView.updateCommandId();
+//                    multiDocView.updateCommandId();
                 }
             }
 

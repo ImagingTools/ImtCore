@@ -91,6 +91,13 @@ I_EXPORT_COMPONENT(
 			Context,
 			"Context",
 			"Context");
+
+I_EXPORT_COMPONENT(
+			ApplicationInfoDataProvider,
+			"Application info data provider",
+			"Application info data provider");
+
+
 } // namespace ImtQmlPck
 
 

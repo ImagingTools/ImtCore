@@ -355,6 +355,10 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
+	if (objectId.isEmpty()){
+		return false;
+	}
+
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId, -1, -1, nullptr);
 	if (objectSelectionQuery.isEmpty()){
 		return false;

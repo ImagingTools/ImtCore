@@ -6,13 +6,37 @@ import imtauthgui 1.0
 //Dialog {
 //    id: inputDialogContainer;
 
+//    property string source: "AuxComponents/InputDialog.qml";
+
+//    function setInputValue(value){
+//        let item = inputDialogContainer.getLoaderBodyItem();
+//        item.inputValue = value;
+//    }
+
+//    function setMessage(message){
+//        let item = inputDialogContainer.getLoaderBodyItem();
+//        item.message = message;
+//    }
+
+////    function open(){
+////        console.log("inputDialogContainer.data", inputDialogContainer.data);
+////        let data = inputDialogContainer.data;
+
+////        console.log("data.toString()", data.toString());
+
+////        thubnailDecoratorContainer.open(inputDialogContainer);
+////    }
+
 //    Component.onCompleted: {
-//        inputDialogContainer.setTitle(qsTr("Input"));
+////        inputDialogContainer.setTitle(qsTr("Input"));
+//        console.log("InputDialog onCompleted", inputDialogContainer);
 
 //        inputDialogContainer.addButton({"Id":"Ok", "Name":"OK"});
 //        inputDialogContainer.addButton({"Id":"Cancel", "Name":"Cancel"});
 
 //        inputDialogContainer.bodySource = "InputDialogBody.qml";
+
+//        inputDialogContainer.setMessage("Test mes seeee eeeeeee eeee eee eeeeeee eeeeeeeeee eeeeeeeeee eeeeeee eeeeee eeeeeeeeeeeeee eeee eeeee eeeeage");
 //    }
 //}
 

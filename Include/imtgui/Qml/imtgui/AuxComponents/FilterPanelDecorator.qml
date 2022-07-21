@@ -6,60 +6,79 @@ import imtauthgui 1.0
 Item {
     id: filterPanelDecorator;
 
-    anchors.fill: parent;
+    height: 30;
 
-    property int itemWidth: 150;
-    property int itemHeight: 30;
+    onVisibleChanged: {
+        console.log("filterPanelDecorator", filterPanelDecorator.visible);
 
-    Text {
-        id: filterTitle;
-
-        anchors.right: tfc.left;
-        anchors.rightMargin: 10;
-        anchors.verticalCenter: parent.verticalCenter;
-
-        color: Style.textColor;
-        font.pixelSize: Style.fontSize_common;
-        font.family: Style.fontFamily;
-
-        text: qsTr("Filter");
+        animRect.start();
     }
 
-    TextFieldCustom {
-        id: tfc;
+    NumberAnimation {
+        id: animRect;
+        target: filterPanelDecorator;
+        property: "height";
+        from: 0;
+        to: filterPanelDecorator.height;
+        duration: 500;
+    }
+
+    Row {
+        id: rowFilter;
 
         anchors.right: parent.right;
-        anchors.rightMargin: 5;
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: 200;
-        height: filterPanelDecorator.height - 5;
+        height: 25;
 
-        onTextChanged: {
-            loaderDecorator.textChanged(model.index, tfc.text);
-        }
+        spacing: 5;
 
-        Image {
-            id: iconClear;
-
-            anchors.right: parent.right;
-            anchors.rightMargin: 5;
+        TextFieldCustom {
+            id: tfc;
             anchors.verticalCenter: parent.verticalCenter;
 
-            height: 10;
-            width: 10;
+            width: 400;
+            height: 25;
 
-            sourceSize.height: height;
-            sourceSize.width: width;
+            placeHolderText: qsTr("Enter some text to filter the item list");
 
-            source: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+            onTextChanged: {
+                loaderDecorator.textChanged(model.index, tfc.text);
+            }
 
-            MouseArea {
-                anchors.fill: parent;
+            AuxButton {
+                id: iconClear;
+
+                anchors.right: parent.right;
+                anchors.rightMargin: 5;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                height: 15;
+                width: height;
+
+                visible: tfc.text != "";
+
+                iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
 
                 onClicked: {
                     tfc.text = "";
                 }
+            }
+        }
+
+        AuxButton {
+            id: closeButton;
+
+            anchors.verticalCenter: parent.verticalCenter;
+
+            height: 20;
+            width: height;
+
+            iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+
+            onClicked: {
+                tfc.text = "";
+                loaderDecorator.onClosed();
             }
         }
     }

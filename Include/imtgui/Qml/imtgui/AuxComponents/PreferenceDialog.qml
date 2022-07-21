@@ -52,6 +52,7 @@ Rectangle {
     }
 
     function loadSettings(){
+      //  preferenceContainer.serverSettings = 0;
         settingsQuery.getSettings();
     }
 
@@ -65,7 +66,7 @@ Rectangle {
     }
 
     onLocalSettingsChanged: {
-        //console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.toJSON());
+        console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.toJSON());
         if (preferenceContainer.localSettings){
             for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
                 var index = globalSettings.InsertNewItem();
@@ -87,13 +88,18 @@ Rectangle {
     onServerSettingsChanged: {
         console.log("PreferenceDialog onModelSettingsChanged");
 
-        var index, i;
         if (preferenceContainer.serverSettings){
             if (preferenceContainer.serverSettings.ContainsKey("items")){
                 var serverItems = preferenceContainer.serverSettings.GetData("items");
-                for (i = 0; i < serverItems.GetItemsCount(); i++){
-                    index = globalSettings.InsertNewItem();
-                    globalSettings.SetData("Id", serverItems.GetData("Id", i), index);
+                for (let i = 0; i < serverItems.GetItemsCount(); i++){
+                    let id = serverItems.GetData("Id", i);
+                    let index = preferenceContainer.getPageIndexByPageId(id);
+
+                    if (index < 0){
+                        index = globalSettings.InsertNewItem();
+                    }
+
+                    globalSettings.SetData("Id", id, index);
                     globalSettings.SetData("Name", serverItems.GetData("Name", i), index);
                     globalSettings.SetData("ComponentType", serverItems.GetData("ComponentType", i), index);
                     globalSettings.SetData("Elements", serverItems.GetData("Elements", i), index);
@@ -402,7 +408,12 @@ Rectangle {
                            dependentPanelLoader.source = "SettingsButton.qml";
                            dependentPanelLoader.item.width = dependentPanelColumn.width / 3;
                            dependentPanelLoader.item.itemId = itemId;
-//                           dependentPanelLoader.item.textButton = model.Value;
+                           dependentPanelLoader.item.value = model.Value;
+                       }
+                       else if (componentType === "TextLabel"){
+                           dependentPanelLoader.source = "SettingsTextLabel.qml";
+                           dependentPanelLoader.item.width = dependentPanelColumn.width / 3;
+                           dependentPanelLoader.item.itemId = itemId;
                            dependentPanelLoader.item.value = model.Value;
                        }
 
@@ -487,8 +498,6 @@ Rectangle {
 
        onClicked: {
            console.log("PreferenceDialog saveButton onClicked", preferenceContainer.currentModeId, Style.theme);
-
-
 
            if (thubnailDecoratorContainer.serverIsConnection){
                if ((preferenceContainer.currentModeId == "Light" ||

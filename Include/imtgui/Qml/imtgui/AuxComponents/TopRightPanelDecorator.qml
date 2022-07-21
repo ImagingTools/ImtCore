@@ -24,8 +24,8 @@ Rectangle {
         PreferenceButton {
             id: preferenceButton;
 
-            anchors.right: parent.right;
-            anchors.rightMargin: 20;
+//            anchors.right: parent.right;
+//            anchors.rightMargin: 20;
 
             width: 24;
             height: 24;
@@ -33,14 +33,14 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter;
         }
 
-        LoginButton {
-            id: loginButton;
+//        LoginButton {
+//            id: loginButton;
 
-            width: 24;
-            height: 24;
+//            width: 24;
+//            height: 24;
 
-            anchors.verticalCenter: parent.verticalCenter;
-        }
+//            anchors.verticalCenter: parent.verticalCenter;
+//        }
     }
 }
 

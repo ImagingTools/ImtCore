@@ -63,6 +63,16 @@ Rectangle {
        return 32 - new Date(iYear, iMonth, 32).getDate();
     }
 
+    function setDefault(){
+        yearCB.currentIndex = 1;
+        monthCB.currentIndex = 0;
+        dayCB.currentIndex = 0;
+
+        yearCB.currentText = "2023";
+        monthCB.currentText = calendarContainer.monthsNames[0];
+        dayCB.currentText = 1;
+    }
+
     function formatDate() {
 
       var dd = calendarContainer.selectedDate.getDate();
@@ -128,6 +138,8 @@ Rectangle {
 //            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
             borderColor: Style.alternateBaseColor;
 
+            property bool flag: true;
+
             onCurrentIndexChanged: {
                 console.log("YearCB onCurrentIndexChanged");
 
@@ -158,6 +170,11 @@ Rectangle {
                 }
                 calendarContainer.selectedDate.setFullYear(year);
 
+                if (yearCB.flag){
+                    yearCB.flag = false;
+                    return;
+                }
+
                 calendarContainer.dateChanged();
             }
 
@@ -179,6 +196,8 @@ Rectangle {
             model: ListModel {
                 id: modelMonth;
             }
+
+            property bool flag: true;
 
 //            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
             borderColor: Style.alternateBaseColor;
@@ -210,6 +229,11 @@ Rectangle {
                     modelDay.append({"name": i})
                 }
 
+                if (monthCB.flag){
+                    monthCB.flag = false;
+                    return;
+                }
+
                 calendarContainer.dateChanged();
             }
 
@@ -233,12 +257,19 @@ Rectangle {
                 id: modelDay;
             }
 
+            property bool flag: true;
+
 //            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
             borderColor: Style.alternateBaseColor;
 
             onCurrentIndexChanged: {
                 console.log("dayCB onCurrentIndexChanged");
                 calendarContainer.selectedDate.setDate(dayCB.currentIndex + 1);
+
+                if (dayCB.flag){
+                    dayCB.flag = false;
+                    return;
+                }
 
                 calendarContainer.dateChanged();
             }

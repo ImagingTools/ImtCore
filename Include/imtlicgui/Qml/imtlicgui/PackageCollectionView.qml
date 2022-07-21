@@ -286,8 +286,15 @@ Item {
                 typeOperation = "New";
             }
 
-            packageCollectionContainer.multiDocViewItem.activeCollectionItem = packageCollectionContainer;
-            packageCollectionContainer.multiDocViewItem.addToHeadersArray(idSelect, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
+            let page = {};
+            page["Id"] = idSelect;
+            page["Name"] = name;
+            page["Source"] = "../../imtlicgui/PackageView.qml";
+            page["CommandsId"] = "PackageEdit";
+
+            multiDocView.addToHeadersArray(page);
+//            packageCollectionContainer.multiDocViewItem.activeCollectionItem = packageCollectionContainer;
+//            packageCollectionContainer.multiDocViewItem.addToHeadersArray(idSelect, name,  "../../imtlicgui/PackageView.qml", "PackageEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {

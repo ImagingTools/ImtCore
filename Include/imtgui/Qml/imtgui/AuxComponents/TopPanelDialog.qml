@@ -14,7 +14,7 @@ Rectangle {
 
     property string title;
 
-    signal closeButtonClicked();
+    signal closeButtonClicked(string buttonId);
 
     Image {
         id: iconDialog;
@@ -58,7 +58,7 @@ Rectangle {
         iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
 
         onClicked: {
-            topPanelDialogContainer.closeButtonClicked();
+            topPanelDialogContainer.closeButtonClicked("Exit");
         }
     }
 }

@@ -4,10 +4,34 @@ import imtqml 1.0
 import imtauthgui 1.0
 
 
-Item {
+Rectangle {
     id: dialogContainer;
 
+    z: 10;
+//    anchors.centerIn: dialogContainer.root;
+    anchors.centerIn: background;
+
     width: 300;
+    height: dialogColumn.height;
+
+    color: Style.backgroundColor;
+
+    visible: false;
+
+    property Item root;
+    property Item backgroundItem: background;
+
+    signal finished(string buttonId);
+
+    Component.onCompleted: {
+        console.log("Dialog onCompleted", dialogContainer);
+        console.log("background", background);
+        console.log("thubnailDecoratorContainer", thubnailDecoratorContainer);
+    }
+
+    onHeightChanged: {
+        console.log("dialogContainer onHeightChanged", dialogContainer.height);
+    }
 
     property string bodySource: "MessageDialogBody.qml";
 
@@ -19,32 +43,58 @@ Item {
         buttonsDialog.addButton(buttonObj);
     }
 
+    function getLoaderBodyItem(){
+        return loaderBodyDialog.item;
+    }
+
+    function open(){
+        dialogContainer.visible = true;
+        dialogContainer.backgroundItem.z = 9;
+        dialogContainer.backgroundItem.visible = dialogContainer.visible;
+    }
+
     onBodySourceChanged: {
         loaderBodyDialog.source = dialogContainer.bodySource;
     }
 
-    TopPanelDialog {
-        id: topPanelDialog;
+    Column {
+        id: dialogColumn;
 
         width: dialogContainer.width;
-        height: 40;
-    }
 
-    Loader {
-        id: loaderBodyDialog;
+        TopPanelDialog {
+            id: topPanelDialog;
 
-        anchors.top: topPanelDialog.bottom;
+            width: dialogContainer.width;
+            height: 40;
 
-        onItemChanged: {
-            if (loaderBodyDialog.item){
-                loaderBodyDialog.item.width = dialogContainer.width;
+            onCloseButtonClicked: {
+                dialogContainer.finished(buttonId);
+                dialogContainer.visible = false;
             }
         }
-    }
 
-    ButtonsDialog {
-        id: buttonsDialog;
+        Loader {
+            id: loaderBodyDialog;
 
-        anchors.bottom: dialogContainer.bottom;
+            onItemChanged: {
+                if (loaderBodyDialog.item){
+                    loaderBodyDialog.item.width = dialogContainer.width;
+                }
+            }
+        }
+
+        ButtonsDialog {
+            id: buttonsDialog;
+
+            anchors.right: parent.right;
+            anchors.rightMargin: 10;
+
+            onButtonClicked: {
+                console.log("ButtonsDialog onButtonClicked", buttonId);
+                dialogContainer.finished(buttonId);
+                dialogContainer.visible = false;
+            }
+        }
     }
 }

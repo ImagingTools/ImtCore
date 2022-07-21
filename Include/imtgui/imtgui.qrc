@@ -54,6 +54,8 @@
 	<file alias="imtgui/AuxComponents/TopPanelDialog.qml">Qml/imtgui/AuxComponents/TopPanelDialog.qml</file>
 	
 	<file alias="imtgui/AuxComponents/InputDialogBody.qml">Qml/imtgui/AuxComponents/InputDialogBody.qml</file>
+	<file alias="imtgui/AuxComponents/SettingsTextLabel.qml">Qml/imtgui/AuxComponents/SettingsTextLabel.qml</file>
+	<file alias="imtgui/AuxComponents/MultiDocWorkspacePageView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspacePageView.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

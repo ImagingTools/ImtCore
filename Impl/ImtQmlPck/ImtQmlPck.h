@@ -21,6 +21,7 @@
 #include <imtqml/CHeadersDataProviderComp.h>
 #include <imtqml/CObserverQmlComp.h>
 #include <imtqml/CClientUserContextComp.h>
+#include <imtqml/CApplicationInfoDataProviderComp.h>
 
 
 /**
@@ -45,6 +46,7 @@ typedef imtqml::CJoinDataProviderComp JoinDataProvider;
 typedef imtqml::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp Context;
+typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 
 
 } // namespace ImtQmlPck

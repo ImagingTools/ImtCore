@@ -25,6 +25,7 @@ Rectangle
     property int mainRadius: 0;
 
     Component.onCompleted: {
+
     }
 
     onLocalSettingsChanged: {
@@ -40,6 +41,7 @@ Rectangle
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
         Style.changeSchemeDesign("");
+
         menuPanel.updateModels();
         topPanel.updateModels();
 
@@ -228,16 +230,24 @@ Rectangle
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    var source = menuPanel.model.GetData("Source", model.index);
-                    pagesLoader.source = source;
+//                    var source = menuPanel.model.GetData("Source", model.index);
+                    pagesLoader.source = "AuxComponents/MultiDocWorkspaceView.qml";
                 }
 
                 onItemChanged: {
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
                     if (pagesLoader.item){
                         pagesLoader.item.rootItem = pagesDeleg;
-                         pagesLoader.item.title = menuPanel.model.GetData("Name", model.index);
-                        pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData("Icon", model.index);
+
+                        let startPage = {};
+                        startPage["Id"] = menuPanel.model.GetData("PageId", model.index);
+                        startPage["Name"] = menuPanel.model.GetData("Name", model.index);
+                        startPage["Source"] = menuPanel.model.GetData("Source", model.index);
+                        startPage["CommandsId"] = menuPanel.model.GetData("PageId", model.index);
+
+                        pagesLoader.item.startPageObj = startPage;
+//                        pagesLoader.item.title = menuPanel.model.GetData("Name", model.index);
+//                        pagesLoader.item.firstElementImageSource =  menuPanel.model.GetData("Icon", model.index);
                     }
                 }
             }
@@ -349,17 +359,33 @@ Rectangle
         preferenceDialog.visible = visible;
     }
 
+    Rectangle {
+        id: background;
+
+        anchors.fill: parent;
+        color: "gray";
+        visible: false;
+        opacity: 0.4;
+        MouseArea {
+            anchors.fill: parent;
+            onWheel: {}
+        }
+    }
+
     PreferenceDialog {
         id: preferenceDialog;
 
         anchors.centerIn: parent;
 
         visible: false;
+
+        onVisibleChanged: {
+            background.visible = preferenceDialog.visible;
+        }
     }
 
     Repeater {
         id: listViewDialogs;
-        z: 10;
 
         width: parent.width;
         height: parent.height;
@@ -372,6 +398,8 @@ Rectangle
 
         delegate: Rectangle {
             id: delegateListViewDialogs;
+
+            z: 5;
 
             width: thubnailDecoratorContainer.width;
             height: thubnailDecoratorContainer.height;
@@ -409,13 +437,13 @@ Rectangle
                       modelLayers.remove(model.index);
                   }
 
-
                   Component.onCompleted: {
                       console.log("model.source", model.source);
                       if (!model.source){
                           return;
                       }
                       loaderDialog.source = model.source;
+//                      loaderDialog.item = model.source
                   }
 
                   onItemChanged: {
@@ -437,4 +465,5 @@ Rectangle
              }
         }
     }
+
 }

@@ -25,7 +25,7 @@ Rectangle {
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
-    property TreeItemModel installationInfoModel;
+//    property TreeItemModel installationInfoModel;
     property TreeItemModel model;
     property TreeItemModel activeLicenses;
 
@@ -41,6 +41,10 @@ Rectangle {
     }
 
     TreeItemModel {
+        id: installationInfoModel;
+    }
+
+    TreeItemModel {
         id: products;
     }
 
@@ -53,33 +57,26 @@ Rectangle {
     }
 
     Component.onCompleted: {
+        containerInstallation.setDefaultGui();
         containerInstallation.gqlModelInfo = "ProductInfo";
         containerInstallation.gqlModelCollectionInfo = "ProductList"
         headerInfoModel.updateModel();
     }
 
-    onModelChanged: {
-        console.log("InstallationInfoEditor onModelChanged", containerInstallation.operation);
-//        if (containerInstallation.model.ContainsKey("data")){
-//            containerInstallation.contactInfoModel = containerContactInfo.model.GetData('data');
-//            containerInstallation.updateData();
-//        }
-    }
-
     onActiveLicensesChanged: {
         console.log("InstallationInfoEditor onActiveLicensesChanged");
-        if (!containerInstallation.installationInfoModel){
+        if (!installationInfoModel || !containerInstallation.activeLicenses){
             return;
         }
         containerInstallation.updateActiveLicenses();
     }
 
-    onInstallationInfoModelChanged: {
-        console.log("InstallationInfoEditor onInstallationInfoModelChanged");
-        if (containerInstallation.operation !== "New"){
-            containerInstallation.updateData();
-        }
-    }
+//    onInstallationInfoModelChanged: {
+//        console.log("InstallationInfoEditor onInstallationInfoModelChanged");
+//        if (containerInstallation.operation !== "New"){
+//            containerInstallation.updateGui();
+//        }
+//    }
 
     Timer {
         id: saveTimer;
@@ -88,7 +85,7 @@ Rectangle {
 
         onTriggered: {
             console.log("saveTimer onTriggered");
-            undoRedo.addModel(containerInstallation.installationInfoModel);
+            undoRedo.addModel(installationInfoModel);
         }
     }
 
@@ -108,13 +105,14 @@ Rectangle {
     }
 
     function updateActiveLicenses(){
-        console.log("containerContactInfo updateActiveLicenses");
-        containerInstallation.clearActiveLicenses();
 
-//        licensesTable.Refresh();
-        console.log("containerInstallation.activeLicenses 1", containerInstallation.activeLicenses.toJSON());
-        var licenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
-        console.log("licenses", licenses.toJSON());
+        if (!containerInstallation.activeLicenses){
+            return;
+        }
+
+        containerInstallation.setDefaultActiveLicensesGui();
+
+        var licenses = installationInfoModel.GetData("ActiveLicenses");
 
         if (licenses && licenses.GetItemsCount() > 0){
             var index;
@@ -139,7 +137,11 @@ Rectangle {
         }
     }
 
-    function clearActiveLicenses(){
+    function setDefaultActiveLicensesGui(){
+
+        if (!containerInstallation.activeLicenses){
+            return;
+        }
 
         for (let i = 0; i < containerInstallation.activeLicenses.GetItemsCount(); i++){
             containerInstallation.activeLicenses.SetData("LicenseState", 0, i);
@@ -148,13 +150,21 @@ Rectangle {
         }
     }
 
-    function updateData() {
-        console.log("containerContactInfo updateData");
+    function setDefaultGui(){
+        installationInfoModel.SetData("Id", "");
+        installationInfoModel.SetData("Name", "");
+        installationInfoModel.SetData("ProductId", "");
+        installationInfoModel.SetData("AccountId", "");
+        let activeLicenses = installationInfoModel.AddTreeModel("ActiveLicenses");
+    }
 
-        instanceIdText.text = containerInstallation.installationInfoModel.GetData("Id");
+    function updateGui() {
+        console.log("containerContactInfo updateGui");
 
-        var accountId = containerInstallation.installationInfoModel.GetData("AccountId");
-        var producId = containerInstallation.installationInfoModel.GetData("ProductId");
+        instanceIdText.text = installationInfoModel.GetData("Id");
+
+        var accountId = installationInfoModel.GetData("AccountId");
+        var producId = installationInfoModel.GetData("ProductId");
 
         var accountIndex = -1;
         var accountsData = accounts.GetData("data");
@@ -196,6 +206,7 @@ Rectangle {
             if (parameters["status"] === "ok"){
                 var value = parameters["value"];
                 console.log("featureCollectionViewContainer dialogResult", value);
+                installationInfoModel.SetData("Name", value);
                 installationSaveQuery.updateModel(value);
             }
         }
@@ -264,8 +275,8 @@ Rectangle {
         json = json.replace(/\\/g, '');
         json = json.slice(1, json.length - 1);
 
-        containerInstallation.installationInfoModel.Parse(json);
-        containerInstallation.updateData();
+        installationInfoModel.Parse(json);
+        containerInstallation.updateGui();
     }
 
     function openMessageDialog(nameDialog, message, type) {
@@ -296,18 +307,18 @@ Rectangle {
     }
 
     function addLicenseToActiveLicenses(itemId){
-        let modelLicenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
-        let curProductId = containerInstallation.installationInfoModel.GetData("ProductId");
+        let modelLicenses = installationInfoModel.GetData("ActiveLicenses");
+        let curProductId = installationInfoModel.GetData("ProductId");
         let index = modelLicenses.InsertNewItem();
         modelLicenses.SetData("Id", itemId, index);
         modelLicenses.SetData("Expiration", "Unlimited", index);
 //        modelLicenses.SetData("ProductId", containerInstallation.productId, index);
         modelLicenses.SetData("ProductId", curProductId, index);
-        containerInstallation.updateData();
+        containerInstallation.updateGui();
     }
 
     function removeLicenseToActiveLicenses(itemId){
-        let modelLicenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
+        let modelLicenses = installationInfoModel.GetData("ActiveLicenses");
 
         for (let i = 0; i < modelLicenses.GetItemsCount(); i++){
             let curItemId = modelLicenses.GetData("Id", i);
@@ -317,24 +328,28 @@ Rectangle {
             }
         }
 
-        containerInstallation.updateData();
+        containerInstallation.updateGui();
     }
 
     function setDataToActiveLicenses(itemId, fieldId, value){
         console.log("containerInstallation setDataToActiveLicenses", itemId, fieldId, value);
-        let modelLicenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
+        let modelLicenses = installationInfoModel.GetData("ActiveLicenses");
 
         let itemFind = false;
         for (let i = 0; i < modelLicenses.GetItemsCount(); i++){
             let curItemId = modelLicenses.GetData("Id", i);
             if (curItemId == itemId){
                 itemFind = true;
+
+                console.log("SetData fieldId value i", fieldId, value, i);
                 modelLicenses.SetData(fieldId, value, i);
                 break;
             }
         }
 
-        containerInstallation.updateData();
+//        installationInfoModel.Refresh();
+
+        containerInstallation.updateGui();
     }
 
     Flickable {
@@ -386,10 +401,11 @@ Rectangle {
                      Component.onCompleted: {
                          console.log("RegExpValidator onCompleted");
                          let regex = preferenceDialog.getInstanceMask();
-
-                         let re = new RegExp(regex)
-                         if (re){
-                             regexValid.regExp = re;
+                         if (regex != ""){
+                             let re = new RegExp(regex);
+                             if (re){
+                                 regexValid.regExp = re;
+                             }
                          }
                      }
                  }
@@ -411,7 +427,7 @@ Rectangle {
                      }
 
                      onInputTextChanged: {
-                         containerInstallation.installationInfoModel.SetData("Id", instanceIdText.text);
+                         installationInfoModel.SetData("Id", instanceIdText.text);
 
                          let splitData = containerInstallation.itemId.split("$IMTCORESEPARATOR$");
                          let value = splitData[0];
@@ -492,11 +508,11 @@ Rectangle {
                      onCurrentIndexChanged: {
                          console.log("InstallationInfoEditor customerCB onCurrentIndexChanged");
 
-                         let curAccountId = containerInstallation.installationInfoModel.GetData("AccountId");
+                         let curAccountId = installationInfoModel.GetData("AccountId");
                          let selectedAccountId = listModelAccounts.get(customerCB.currentIndex).id;
-                         containerInstallation.installationInfoModel.SetData("AccountId", selectedAccountId);
+                         installationInfoModel.SetData("AccountId", selectedAccountId);
                          if (curAccountId != selectedAccountId){
-                             undoRedo.addModel(containerInstallation.installationInfoModel);
+                             undoRedo.addModel(installationInfoModel);
                          }
 
                          containerInstallation.accountId = selectedAccountId;
@@ -577,13 +593,13 @@ Rectangle {
 
                          let selectedProductId = listModelProducts.get(productCB.currentIndex).id;
 
-                         let curProductId = containerInstallation.installationInfoModel.GetData("ProductId");
-                         containerInstallation.installationInfoModel.SetData("ProductId", selectedProductId);
+                         let curProductId = installationInfoModel.GetData("ProductId");
+                         installationInfoModel.SetData("ProductId", selectedProductId);
 
                          if (containerInstallation.operation != "New"){
 
                              if (curProductId != selectedProductId){
-                                 undoRedo.addModel(containerInstallation.installationInfoModel);
+                                 undoRedo.addModel(installationInfoModel);
                              }
                          }
                          licensesModel.updateModel(selectedProductId);
@@ -651,6 +667,8 @@ Rectangle {
 
                          selected: licensesTable.selectedIndex === model.index;
 
+                         property bool flag: true;
+
                          onClicked: {
                              licensesTable.selectedIndex = model.index;
                          }
@@ -665,7 +683,7 @@ Rectangle {
                                  containerInstallation.removeLicenseToActiveLicenses(itemId);
                              }
 
-                             undoRedo.addModel(containerInstallation.installationInfoModel);
+                             undoRedo.addModel(installationInfoModel);
                          }
 
                          onCheckBoxExpirationClicked: {
@@ -678,11 +696,17 @@ Rectangle {
                                  containerInstallation.setDataToActiveLicenses(itemId, "Expiration", "01.01.2023");
                              }
 
-                             undoRedo.addModel(containerInstallation.installationInfoModel);
+                             undoRedo.addModel(installationInfoModel);
                          }
 
                          onExpirationTextChanged: {
                              console.log("InstallationInfoEditor AuxTable onExpirationTextChanged", modelIndex, value);
+                             let modelLicenses = installationInfoModel.GetData("ActiveLicenses");
+                             let state = modelLicenses.GetData("Expiration", modelIndex);
+
+                             if (state && state != value){
+                                containerInstallation.rootItem.setModeMenuButton("Save", "Normal");
+                             }
 
                              containerInstallation.setDataToActiveLicenses(itemId, "Expiration", value);
                          }
@@ -708,7 +732,7 @@ Rectangle {
 
         anchors.fill: parent;
 
-        visible: containerInstallation.operation != "New";
+        visible: false;
     }
 
     GqlModel {
@@ -734,6 +758,7 @@ Rectangle {
 
             query.AddField(queryFields);
 
+            loadingPage.visible = true;
             var gqlData = query.GetQuery();
             console.log("InstallationItem query ", gqlData);
             this.SetGqlQuery(gqlData);
@@ -758,9 +783,6 @@ Rectangle {
                 if(dataModelLocal.ContainsKey("InstallationItem")){
                     dataModelLocal = dataModelLocal.GetData("InstallationItem");
 
-//                    if (containerInstallation.operation === "New"){
-//                        containerInstallation.installationInfoModel = dataModelLocal;
-//                    }
                     if (!dataModelLocal.ContainsKey("item")){
                         dataModelLocal.AddTreeModel("item");
                     }
@@ -772,16 +794,27 @@ Rectangle {
                             dataModelLocal.AddTreeModel("ActiveLicenses");
                         }
 
+                        installationInfoModel.SetData("ActiveLicenses", dataModelLocal.GetData("ActiveLicenses"));
+
                         if (dataModelLocal.ContainsKey("ProductId")){
                             containerInstallation.productId = dataModelLocal.GetData("ProductId");
+                            installationInfoModel.SetData("ProductId", dataModelLocal.GetData("ProductId"));
                         }
 
-                        containerInstallation.installationInfoModel = dataModelLocal;
+                        if (dataModelLocal.ContainsKey("AccountId")){
+                            installationInfoModel.SetData("AccountId", dataModelLocal.GetData("AccountId"));
+                        }
+
+                        if (dataModelLocal.ContainsKey("Id")){
+                            installationInfoModel.SetData("Id", dataModelLocal.GetData("Id"));
+                        }
+
+                        containerInstallation.updateGui();
                     }
 
-                    undoRedo.addModel(containerInstallation.installationInfoModel);
+                    undoRedo.addModel(installationInfoModel);
 
-//                    containerInstallation.model.SetExternTreeModel('data', containerInstallation.installationInfoModel)
+//                    containerInstallation.model.SetExternTreeModel('data', installationInfoModel)
                 }
                 loadingPage.visible = false;
             }
@@ -906,10 +939,10 @@ Rectangle {
                                 listModelAccounts.append({"id": dataModelLocal.GetData("Id", i), "name": dataModelLocal.GetData("Name", i)});
                             }
 
-                            installItemModel.updateModel();
-//                            if (containerInstallation.operation != "New"){
-//                                installItemModel.updateModel();
-//                            }
+//                            installItemModel.updateModel();
+                            if (containerInstallation.operation != "New"){
+                                installItemModel.updateModel();
+                            }
                         }
                     }
                     else if(itemsModel.ContainsKey("errors")){
@@ -1035,20 +1068,18 @@ Rectangle {
 
             query.AddParam(inputParams);
 
-            let curProductId = containerInstallation.installationInfoModel.GetData("ProductId");
+//            let curProductId = installationInfoModel.GetData("ProductId");
 
-            modelInstallations.SetData("Id", instanceIdText.text)
-            modelInstallations.SetData("Name", containerInstallation.itemName)
-            modelInstallations.SetData("AccountId", containerInstallation.accountId);
-//            modelInstallations.SetData("ProductId", containerInstallation.productId);
-            modelInstallations.SetData("ProductId", curProductId);
+//            modelInstallations.SetData("Id", instanceIdText.text)
+//            modelInstallations.SetData("Name", containerInstallation.itemName)
+//            modelInstallations.SetData("AccountId", containerInstallation.accountId);
+////            modelInstallations.SetData("ProductId", containerInstallation.productId);
+//            modelInstallations.SetData("ProductId", curProductId);
 
-            let licenses = containerInstallation.installationInfoModel.GetData("ActiveLicenses");
+//            let licenses = installationInfoModel.GetData("ActiveLicenses");
+//            modelInstallations.SetExternTreeModel("ActiveLicenses", licenses);
 
-//            modelInstallations.SetExternTreeModel("ActiveLicenses", containerInstallation.activeLicenses);
-            modelInstallations.SetExternTreeModel("ActiveLicenses", licenses);
-
-            var jsonString = modelInstallations.toJSON();
+            var jsonString = installationInfoModel.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);

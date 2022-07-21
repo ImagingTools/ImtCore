@@ -22,3 +22,4 @@ TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml
 UndoRedo 1.0 ./AuxComponents/UndoRedo.qml
 LoginDialog 1.0 ./AuxComponents/LoginDialog.qml
 LoginButton 1.0 ./AuxComponents/LoginButton.qml
+InputDialog 1.0 ./AuxComponents/InputDialog.qml

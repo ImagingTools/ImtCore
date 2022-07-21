@@ -222,6 +222,12 @@ Item {
             parameters["startingValue"] = featureCollectionViewContainer.getDescriptionBySelectedItem();
             parameters["resultItem"] = featureCollectionViewContainer;
             thubnailDecoratorContainer.openDialog(source, parameters);
+
+//            inputDialog.setTitle("Set description");
+//            inputDialog.setMessage(qsTr("Please enter the description of the feature:"));
+//            inputDialog.setInputValue(featureCollectionViewContainer.getDescriptionBySelectedItem());
+
+//            inputDialog.open();
         }
 
         featureCollectionView.forceActiveFocus();
@@ -406,6 +412,8 @@ Item {
 
         rootItem: featureCollectionViewContainer;
 
+        hasPagination: false;
+
         height: parent.height;
 
         Component.onCompleted: {
@@ -413,6 +421,9 @@ Item {
             featureCollectionView.gqlModelInfo = "PackageInfo"
             featureCollectionView.gqlModelItems = "FeatureList"
             featureCollectionView.gqlModelRemove = "";
+
+            featureCollectionView.table.hasFilter = false;
+            featureCollectionView.table.hasSort = false;
         }
 
         onItemIdChanged: {
@@ -441,14 +452,6 @@ Item {
 
 //            dialog.open();
         }
-
-//        InputDialog {
-//            id: dialog;
-
-//            onFinished: {
-
-//            }
-//        }
 
         onSelectedIndexChanged: {
             console.log("PackageView CollectionView onSelectedIndexChanged", featureCollectionView.selectedIndex);
@@ -787,4 +790,15 @@ Item {
 
         visible: false;
     }
+
+
+//    InputDialog {
+//        id: inputDialog;
+
+//        root: featureCollectionViewContainer.multiDocViewItem;
+
+//        onFinished: {
+//            console.log("PackageView InputDialog onFinished", buttonId);
+//        }
+//    }
 }

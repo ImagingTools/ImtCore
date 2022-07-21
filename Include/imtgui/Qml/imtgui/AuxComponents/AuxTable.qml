@@ -12,6 +12,7 @@ Item {
     property int count: 3; //headersArray.length;
     property int itemHeight: 35;
     property bool hasFilter: false;
+    property bool hasSort: false;
 
     property real delegateWidth: tableContainer.count == 0 ? 0 : headersList.width/headersList.count;
 
@@ -66,20 +67,20 @@ Item {
         id: filterMenu;
 
         anchors.top: tableContainer.top;
-//        width: 500;
-//        height: 30;
-//        anchors.left: parent.left;
 
         width: parent.width;
-        height: 30;
+//        height: 30;
 
         decoratorSource: Style.filterPanelDecoratorPath;
 
         visible: false;
-        countFilters: 1;
 
         onTextFilterChanged: {
             tableContainer.textFilterChanged(tableContainer.headers.GetData("Id", index), index, text);
+        }
+
+        onClosed: {
+            filterMenu.visible = false;
         }
     }
 
@@ -197,16 +198,18 @@ Item {
     AuxButton {
         id: iconFilter;
 
+        anchors.verticalCenter: headersPanel.verticalCenter;
         anchors.right: headersPanel.right;
-        anchors.top: headersPanel.top;
+        anchors.rightMargin: 5;
+
         visible: tableContainer.hasFilter;
 
-        width: tableContainer.hasFilter ? 30 : 0;
+        width: tableContainer.hasFilter ? 20 : 0;
         height: width;
 
         highlighted: filterMenu.visible;
 
-        iconSource: "../../../" + "Icons/" + Style.theme + "/Parameters_On_Normal.svg";
+        iconSource: "../../../" + "Icons/" + Style.theme + "/Filter_On_Normal.svg";
 
         onClicked: {
             console.log("AuxButton iconFilter onClicked");

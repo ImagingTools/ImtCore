@@ -123,12 +123,10 @@ Rectangle {
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
 
-//                    if (checkBoxExpiration.checkState === 2){
-//                        checkBoxExpiration.checkState = 0;
-//                    }
-//                    else{
-//                        checkBoxExpiration.checkState = 2;
-//                    }
+                    let state = 2 - checkBoxExpiration.checkState;
+                    if (state == 0){
+                        expirationDate.setDefault();
+                    }
 
                     licensesTableDelegate.checkBoxExpirationClicked(model.Id, model.index, 2 - checkBoxExpiration.checkState);
                 }

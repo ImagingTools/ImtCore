@@ -32,17 +32,17 @@ public:
 	enum ComponentType
 	{
 		/**
-			Component type is unknown.
+			Component type is Unknown.
 		*/
 		CT_UNKNOWN,
 
 		/**
-			Component type is text.
+			Component type is Text.
 		*/
 		CT_TEXT_INPUT,
 
 		/**
-			Component type is integer.
+			Component type is Integer.
 		*/
 		CT_INTEGER_INPUT,
 
@@ -54,7 +54,12 @@ public:
 		/**
 			Component type is Button.
 		*/
-		CT_BUTTON
+		CT_BUTTON,
+
+		/**
+			Component type is Text Label.
+		*/
+		CT_TEXT_LABEL
 	};
 
 	I_BEGIN_COMPONENT(CParamsDataProviderCompBase);
@@ -62,7 +67,7 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlMutationDataControllerDelegate);
 		I_ASSIGN(m_paramIdAttrPtr, "ParamId", "ID of the param", true, "");
 		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the param", false, "");
-		I_ASSIGN(m_paramComponentTypeAttrPtr, "ComponentType", "Type of component\n0 - UNKNOWN\n1 - TEXT\n2 - INTEGER\n3 - COMBOBOX\n4 - BUTTON", false, 0);
+		I_ASSIGN(m_paramComponentTypeAttrPtr, "ComponentType", "Type of component\n0 - UNKNOWN\n1 - TEXT\n2 - INTEGER\n3 - COMBOBOX\n4 - BUTTON\n5 - TEXT LABEL", false, 0);
 		I_ASSIGN_MULTI_0(m_paramSubElementsCompPtr, "ParamSubElements", "Subelements of the param", false);
 		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false);
 		I_ASSIGN(m_parameterCompPtr, "Parameter", "Parameter of params data", false, "");

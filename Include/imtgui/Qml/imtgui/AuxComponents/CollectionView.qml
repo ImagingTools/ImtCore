@@ -73,18 +73,10 @@ Rectangle {
     Keys.onPressed: {
         console.log("CollectionView keys pressed")
 
-/*        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-
-            if (packageCollectionContainer.multiDocViewItem.tabPanel.count > 1){
-                packageCollectionContainer.multiDocViewItem.tabPanel.rightClicked();
-                packageCollectionContainer.multiDocViewItem.activeItem.forceActiveFocus();
-            }
-            else{
-                thubnailDecoratorContainer.setFocusOnMenuPanel();
-            }
+        if (!collectionViewContainer.focus){
+            return;
         }
-        else */
+
         if (event.key === Qt.Key_Up){
             console.log('Key up was pressed');
             collectionViewContainer.selectedIndexDecr();
@@ -95,12 +87,9 @@ Rectangle {
         }
         else if (event.key === Qt.Key_Return){
             console.log('Key down was pressed');
-//            var itemId = tableInternal.getSelectedId();
-//            var name = tableInternal.getSelectedName();
-
-            let curId = tableInternal.elements.GetData("Id", tableInternal.selectedIndex);
-            let curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
-            collectionViewContainer.itemSelect(curId, curName);
+//            let curId = tableInternal.elements.GetData("Id", tableInternal.selectedIndex);
+//            let curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
+//            collectionViewContainer.itemSelect(curId, curName);
         }
         else if (event.key === Qt.Key_Delete){
             console.log('Key delete was pressed');
@@ -286,14 +275,7 @@ Rectangle {
         else if (menuId  === "Edit"){
             if (tableInternal.selectedIndex >= 0){
 
-                //FIX
-                let curName;
-                if (collectionViewContainer.gqlModelInfo === "AccountInfo"){
-                    curName = tableInternal.elements.GetData("AccountName", tableInternal.selectedIndex);
-                }
-                else{
-                    curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
-                }
+                let curName = tableInternal.elements.GetData("Name", tableInternal.selectedIndex);
                 collectionViewContainer.itemSelect(itemId, curName);
             }
         }
@@ -337,7 +319,9 @@ Rectangle {
             anchors.topMargin: thubnailDecoratorContainer.mainMargin;
             anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
             anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
+
             hasFilter: true;
+            hasSort: true;
 
             onSelectItem: {
                 console.log("CollectionView AuxTable onSelectItem", idSelected, name);

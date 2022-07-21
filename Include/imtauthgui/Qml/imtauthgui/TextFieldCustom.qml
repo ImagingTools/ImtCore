@@ -8,7 +8,7 @@ Item {
 
     property alias text: textField.text;
 
-    property string placeHolderText: "Наименование";
+    property string placeHolderText;
     property string focusColor: Style.textSelected;
 
     property bool canReduce: false;
@@ -34,9 +34,6 @@ Item {
 
     onFocusChanged: {
         console.log('TextFieldCustom onFocusChanged', containerTextField.focus);
-//        if (containerTextField.focus){
-//            containerTextField.setFocus(containerTextField.focus);
-//        }
         containerTextField.setFocus(containerTextField.focus);
     }
 
@@ -49,6 +46,10 @@ Item {
 
     function setMask(mask){
         textField.inputMask = mask;
+    }
+
+    function setValidator(validator){
+        textField.validator = validator;
     }
 
     Rectangle {
@@ -100,12 +101,21 @@ Item {
             console.log("TextFieldCustom onAccepted");
             containerTextField.isTextChanged = false;
         }
-    }
 
-    Text {
-        id: placeHolder;
-        anchors.left: parent.left;
-        anchors.leftMargin: 5;
-        anchors.bottom: parent.bottom;
+        Text {
+            id: placeHolder;
+
+            anchors.left: parent.left;
+            anchors.verticalCenter: parent.verticalCenter;
+
+            text: containerTextField.placeHolderText;
+
+            font.pixelSize: Style.fontSize_common;
+            font.family: Style.fontFamily;
+
+            color: "gray";
+
+            visible: textField.text == "";
+        }
     }
 }

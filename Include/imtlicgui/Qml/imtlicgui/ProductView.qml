@@ -437,6 +437,7 @@ Item {
         anchors.right: productSplitter.left;
 
         rootItem: productsCollectionViewContainer;
+        hasPagination: false;
 
         height: parent.height;
 
@@ -445,6 +446,9 @@ Item {
             productsCollectionView.gqlModelInfo = "ProductInfo"
             productsCollectionView.gqlModelItems = "LicenseList"
             productsCollectionView.gqlModelRemove = "";
+
+            productsCollectionView.table.hasFilter = false;
+            productsCollectionView.table.hasSort = false;
         }
 
         onItemIdChanged: {
@@ -699,6 +703,7 @@ Item {
 
                 anchors.fill: parent;
                 text: productsCollectionViewContainer.itemId;
+                placeHolderText: qsTr("Enter the product ID");
 
                 onInputTextChanged: {
 
@@ -758,6 +763,7 @@ Item {
                 anchors.fill: parent;
 
                 text: productsCollectionViewContainer.itemName;
+                placeHolderText: qsTr("Enter the product name");
 
                 onInputTextChanged: {
 

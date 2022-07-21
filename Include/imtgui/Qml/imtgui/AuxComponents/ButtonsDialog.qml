@@ -7,23 +7,24 @@ import imtauthgui 1.0
 Item {
     id: buttonsDialogContainer;
 
+    height: 30;
+    width: rowButtons.width;
+
     signal buttonClicked(string buttonId);
 
     function addButton(buttonObj){
-        let buttonId = buttonObj["Id"];
-        let buttonText = buttonObj["Text"];
-
-        let index = buttonsModel.InsertNewItem();
-        buttonsModel.SetData("Id", buttonId, index);
-        buttonsModel.SetData("Name", buttonText, index);
+        console.log("buttonsDialogContainer addButton");
+        buttonsModel.append(buttonObj)
     }
 
-    TreeItemModel {
+    ListModel {
         id: buttonsModel;
     }
 
     Row {
         id: rowButtons;
+
+        height: buttonsDialogContainer.height;
 
         spacing: 10;
 
@@ -33,6 +34,11 @@ Item {
             model: buttonsModel;
 
             delegate: AuxButton {
+                id: delegateButton;
+
+                Component.onCompleted: {
+//                    console.log("AuxButton onCompleted", model.Id, model.Name. model.index);
+                }
 
                 width: 70;
                 height: 25;
@@ -41,8 +47,11 @@ Item {
                 hasIcon: false;
 
                 textButton: model.Name;
+                borderColor: delegateButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
+                backgroundColor: Style.imagingToolsGradient1;
 
                 onClicked: {
+                    console.log("AuxButton onClicked", model.Id);
                     buttonsDialogContainer.buttonClicked(model.Id);
                 }
             }
