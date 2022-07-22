@@ -29,16 +29,10 @@ public:
 	I_END_COMPONENT;
 
 public:
-	CCollectionDataControllerComp();
-
 	// reimplemented (ICollectionDataController)
 	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
 	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
 	virtual imtbase::ICollectionInfo::Id ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString(), const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const override;
-
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-	virtual void OnComponentDestroyed() override;
 
 protected:
 	/**
@@ -55,7 +49,6 @@ protected:
 		List of file type infos related to registered resource types.
 	*/
 	I_MULTIREF(ifile::IFileTypeInfo, m_resourceFileTypesCompPtr);
-
 };
 
 

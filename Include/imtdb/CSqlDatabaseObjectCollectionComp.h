@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/ICollectionDataController.h>
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
@@ -46,6 +47,7 @@ public:
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
+		I_ASSIGN(m_collectionDataControllerCompPtr, "CollectionDataController", "Data export/import controller for the collection", false, "DataController");
 	I_END_COMPONENT;
 
 	CSqlDatabaseObjectCollectionComp();
@@ -134,6 +136,7 @@ private:
 	I_TEXTATTR(m_typeNameAttrPtr);
 	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
+	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
 
 	iprm::COptionsManager m_typesInfo;
 

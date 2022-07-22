@@ -1,15 +1,12 @@
 #include <imtbase/CCollectionDataControllerComp.h>
 
 
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
+
+
 namespace imtbase
 {
-
-
-// public methods of the class CCollectionDataControllerComp
-
-CCollectionDataControllerComp::CCollectionDataControllerComp()
-{
-}
 
 
 // reimplemented (ICollectionDataController)
@@ -35,13 +32,30 @@ const ifile::IFilePersistence* CCollectionDataControllerComp::GetPersistenceForO
 }
 
 
-bool CCollectionDataControllerComp::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
+bool CCollectionDataControllerComp::ExportFile(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const QString& targetFilePath) const
 {
+	QByteArray typeId = collection.GetObjectTypeId(objectId);
+
+	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
+	if (persistencePtr != nullptr){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (collection.GetObjectData(objectId, dataPtr)){
+			return persistencePtr->SaveToFile(*dataPtr, targetFilePath) == ifile::IFilePersistence::OS_OK;
+		}
+	}
+
 	return false;
 }
 
 
-QByteArray CCollectionDataControllerComp::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/, const ICollectionInfo::Id& /*parentId*/) const
+QByteArray CCollectionDataControllerComp::ImportFile(
+			imtbase::IObjectCollection& collection,
+			const QByteArray& typeId,
+			const QString& sourceFilePath,
+			const ICollectionInfo::Id& /*parentId*/) const
 {
 	return QByteArray();
 }

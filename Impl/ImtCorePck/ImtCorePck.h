@@ -28,6 +28,7 @@
 #include <imtbase/CParameterLinkControllerComp.h>
 #include <imtbase/CObjectCollectionBasedPersistenceComp.h>
 #include <imtbase/CTimeFilterParam.h>
+#include <imtbase/CCollectionDataControllerComp.h>
 
 
 /**
@@ -69,6 +70,7 @@ typedef icomp::TModelCompWrap<
 						imtbase::CTimeFilterParam,
 						imtbase::ITimeFilterParam,
 						iser::ISerializable>> TimeFilterParam;
+typedef imtbase::CCollectionDataControllerComp CollectionDataController;
 
 
 } // namespace ImtCorePck

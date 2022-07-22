@@ -37,7 +37,10 @@ public:
 		\param targetPath	Path to the exported file.
 		\return \c true if the file object was successfully exported or \c false otherwise.
 	*/
-	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const ICollectionInfo::Id& objectId, const QString& targetFilePath = QString()) const = 0;
+	virtual bool ExportFile(
+				const imtbase::IObjectCollection& collection,
+				const ICollectionInfo::Id& objectId,
+				const QString& targetFilePath = QString()) const = 0;
 
 	/**
 		Import an object in the collection from a file.
@@ -46,7 +49,11 @@ public:
 		\param sourcePath	Path to the imported file.
 		\return \c true if the file object was successfully imported or \c false otherwise.
 	*/
-	virtual ICollectionInfo::Id ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString(), const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const = 0;
+	virtual ICollectionInfo::Id ImportFile(
+				imtbase::IObjectCollection& collection,
+				const QByteArray& typeId,
+				const QString& sourceFilePath = QString(),
+				const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const = 0;
 };
 
 

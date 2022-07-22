@@ -119,6 +119,11 @@ I_EXPORT_COMPONENT(
 			"Time-based filter parameter",
 			"Time Filter Parameter");
 
+I_EXPORT_COMPONENT(
+			CollectionDataController,
+			"Controller for export and import of data in a collection",
+			"Controller Export Import Collection");
+
 
 } // namespace ImtCorePck
 

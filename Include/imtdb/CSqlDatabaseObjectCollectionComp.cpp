@@ -38,7 +38,7 @@ const imtbase::IRevisionController* CSqlDatabaseObjectCollectionComp::GetRevisio
 
 const imtbase::ICollectionDataController* CSqlDatabaseObjectCollectionComp::GetDataController() const
 {
-	return nullptr;
+	return m_collectionDataControllerCompPtr.GetPtr();
 }
 
 
