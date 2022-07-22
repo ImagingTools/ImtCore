@@ -18,7 +18,6 @@ class IMetaInfoCreator: virtual public istd::IPolymorphic
 {
 public:
 	typedef QList<QByteArray> TypeIds;
-	typedef istd::TSmartPtr<idoc::IDocumentMetaInfo> MetaInfoPtr;
 
 	/**
 		Get list of supported type-IDs for the meta-information creation.
@@ -29,7 +28,7 @@ public:
 		Create meta informations for the data object of the given type.
 		\note if the dataPtr is \c null, an empty meta-info object will be created.
 	*/
-	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const = 0;
+	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const = 0;
 };
 
 

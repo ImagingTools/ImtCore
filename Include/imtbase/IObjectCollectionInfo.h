@@ -38,7 +38,7 @@ public:
 		\param objectId			ID of the object in the collection.
 		\return \c true if the operation was successful, and \c false if no information could be provided.
 	*/
-	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const = 0;
+	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const = 0;
 };
 
 

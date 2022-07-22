@@ -77,7 +77,7 @@ public:
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
-	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
+	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
@@ -94,7 +94,7 @@ public:
 	virtual Ids GetElementPath(const Id& elementId) const override;
 	virtual bool IsBranch(const Id& elementId) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
 	virtual bool SetElementName(const Id& objectId, const QString& name) override;
 	virtual bool SetElementDescription(const Id& objectId, const QString& description) override;
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
@@ -106,8 +106,8 @@ protected:
 	struct ObjectInfo
 	{
 		QByteArray typeId;
-		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
-		imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+		idoc::MetaInfoPtr metaInfoPtr;
+		idoc::MetaInfoPtr collectionMetaInfoPtr;
 	};
 
 	typedef QMap<QByteArray, ObjectInfo> ObjectInfoMap;

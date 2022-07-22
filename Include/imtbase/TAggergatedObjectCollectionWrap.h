@@ -68,7 +68,7 @@ public:
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
-	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
+	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
@@ -85,7 +85,7 @@ public:
 	virtual Ids GetElementPath(const Id& elementId) const override;
 	virtual bool IsBranch(const Id& elementId) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
 	virtual bool SetElementName(const QByteArray& objectId, const QString& objectName) override;
 	virtual bool SetElementDescription(const QByteArray& objectId, const QString& objectDescription) override;
 	virtual bool SetElementEnabled(const QByteArray& objectId, bool isEnabled = true) override;
@@ -249,7 +249,7 @@ inline imtbase::ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterfac
 }
 
 template<class BaseInterface, class ObjectImpl>
-inline IObjectCollectionInfo::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetDataMetaInfo(const Id& objectId) const
+inline idoc::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetDataMetaInfo(const Id& objectId) const
 {
 	return m_collection.GetDataMetaInfo(objectId);
 }
@@ -308,7 +308,7 @@ inline QVariant TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetE
 
 
 template<class BaseInterface, class ObjectImpl>
-inline ICollectionInfo::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementMetaInfo(const Id& elementId) const
+inline idoc::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementMetaInfo(const Id& elementId) const
 {
 	return m_collection.GetElementMetaInfo(elementId);
 }

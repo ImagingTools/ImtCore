@@ -162,7 +162,7 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 				int revision = -1;
 
 				QByteArray objectId = selectedItems[0];
-				imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
+				idoc::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
 				if (metaInfo.IsValid()){
 					QVariant variant = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
 					if (variant.isValid()){
@@ -336,7 +336,7 @@ ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSu
 			result.sortValue = result.text;
 		}
 
-		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
+		idoc::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
 		if (metaInfo.IsValid()){
 			if (informationId == QByteArray("Added")){
 				result.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
@@ -815,7 +815,7 @@ void CObjectCollectionViewDelegate::OnRestore()
 
 		QByteArray objectId = m_selectedItemIds[0];
 
-		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
+		idoc::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
 
 		if (metaInfo.IsValid()){
 			QVariant revision = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);

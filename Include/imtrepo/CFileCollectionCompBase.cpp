@@ -237,7 +237,7 @@ QByteArray CFileCollectionCompBase::InsertFile(
 				collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
 			}
 
-			MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(workingFilePath, typeId);
+			idoc::MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(workingFilePath, typeId);
 			if (dataMetaInfoPtr != nullptr){
 				idoc::CStandardDocumentMetaInfo::MetaInfoTypes dataMetaInfoTypes = dataMetaInfoPtr->GetMetaInfoTypes();
 #if QT_VERSION < 0x051500
@@ -621,9 +621,9 @@ imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase::GetObjectTypeId(cons
 }
 
 
-imtbase::ICollectionInfo::MetaInfoPtr CFileCollectionCompBase::GetDataMetaInfo(const Id& objectId) const
+idoc::MetaInfoPtr CFileCollectionCompBase::GetDataMetaInfo(const Id& objectId) const
 {
-	MetaInfoPtr metaInfoPtr;
+	idoc::MetaInfoPtr metaInfoPtr;
 
 	QReadLocker lockCollection(&m_filesLock);
 
@@ -725,9 +725,9 @@ QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 }
 
 
-imtbase::ICollectionInfo::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementId) const
 {
-	MetaInfoPtr metaInfoPtr;
+	idoc::MetaInfoPtr metaInfoPtr;
 
 	QReadLocker lockCollection(&m_filesLock);
 
@@ -1053,9 +1053,9 @@ int CFileCollectionCompBase::GetFileIndexByName(const QString& fileName) const
 }
 
 
-imtbase::IObjectCollection::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const
+idoc::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const
 {
-	IFileObjectCollection::MetaInfoPtr retVal;
+	idoc::MetaInfoPtr retVal;
 
 	QFileInfo fileInfo(dataObjectFilePath);
 	if (fileInfo.exists()){
@@ -1089,7 +1089,7 @@ imtbase::IObjectCollection::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaI
 
 bool CFileCollectionCompBase::CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const
 {
-	IFileObjectCollection::MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(dataObjectFilePath, typeId);
+	idoc::MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(dataObjectFilePath, typeId);
 	if (metaInfoPtr.IsValid()){
 		if (SaveMetaInfo(*metaInfoPtr, metaInfoFilePath)){
 			return true;
@@ -1148,7 +1148,7 @@ void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFileP
 	QFileInfo repositoryFileInfo(fileItem.filePathInRepository);
 	if (repositoryFileInfo.exists()){
 		if (!fileItem.contentsMetaInfoPtr.IsValid()){
-			imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
+			idoc::MetaInfoPtr retVal;
 
 			if (m_metaInfoCreatorMap.contains(fileItem.typeId)){
 				m_metaInfoCreatorMap[fileItem.typeId]->CreateMetaInfo(nullptr, fileItem.typeId, retVal);

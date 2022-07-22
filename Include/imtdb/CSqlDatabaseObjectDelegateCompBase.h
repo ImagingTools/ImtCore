@@ -41,8 +41,8 @@ public:
 	virtual bool CreateObjectInfoFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record,
-				imtbase::IMetaInfoCreator::MetaInfoPtr& objectMetaInfoPtr,
-				imtbase::IMetaInfoCreator::MetaInfoPtr& collectionItemMetaInfoPtr) const override;
+				idoc::MetaInfoPtr& objectMetaInfoPtr,
+				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const override;
 	virtual QByteArray CreateResetQuery(const imtbase::IObjectCollection& collection) const override;
 	virtual QByteArray CreateDataMetaInfoQuery(
 				const imtbase::IObjectCollection& collection,

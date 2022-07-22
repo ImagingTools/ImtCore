@@ -88,7 +88,7 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 			}
 		}
 
-		MetaInfoPtr metaInfoPtr = GetElementMetaInfo(objectId);
+		idoc::MetaInfoPtr metaInfoPtr = GetElementMetaInfo(objectId);
 		Q_ASSERT(metaInfoPtr.IsValid());
 		QVariant currentRevision = metaInfoPtr->GetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION);
 		if (currentRevision.isValid()){
@@ -599,7 +599,7 @@ QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collect
 							QFile(dataFile).rename(newDataFile);
 							QFile(itemFile).rename(newItemFile);
 
-							MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(newDataFile, typeId);
+							idoc::MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(newDataFile, typeId);
 							if (!metaInfoPtr.IsValid()){
 								workingDir.removeRecursively();
 								return QByteArray();
@@ -1011,9 +1011,9 @@ QVariant CFileCollectionComp::RepositoryItemInfoProvider::GetElementInfo(const Q
 }
 
 
-imtbase::ICollectionInfo::MetaInfoPtr CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementMetaInfo(const Id& /*elementId*/) const
+idoc::MetaInfoPtr CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementMetaInfo(const Id& /*elementId*/) const
 {
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
 

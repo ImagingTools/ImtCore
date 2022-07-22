@@ -20,7 +20,7 @@ namespace imtauth
 bool CContactInfoMetaInfoCreatorComp::CreateMetaInfo(
 			const istd::IChangeable* dataPtr,
 			const QByteArray& typeId,
-			MetaInfoPtr& metaInfoPtr) const
+			idoc::MetaInfoPtr& metaInfoPtr) const
 {
 	if (typeId != *m_objectTypeIdAttrPtr){
 		return false;

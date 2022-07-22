@@ -34,7 +34,7 @@ int CObjectMetaInfoUniquenessValidatorComp::IsUniqueValue(const imtbase::IObject
 		for (int objectIndex = 0; objectIndex < objectCount && isUnique; objectIndex++){
 			QByteArray currentObjectId = objectIds[objectIndex];
 
-			imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
+			idoc::MetaInfoPtr metaInfoPtr;
 			QSet<int> metaInfoTypes;
 			if (metaInfoType == -1){
 				metaInfoTypes.insert(-1);

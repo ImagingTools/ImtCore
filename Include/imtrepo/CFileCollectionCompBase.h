@@ -166,7 +166,7 @@ public:
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
-	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
+	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
@@ -183,7 +183,7 @@ public:
 	virtual Ids GetElementPath(const Id& elementId) const override;
 	virtual bool IsBranch(const Id& elementId) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
 	virtual bool SetElementName(const Id& elementId, const QString& name) override;
 	virtual bool SetElementDescription(const Id& elementId, const QString& description) override;
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
@@ -255,7 +255,7 @@ protected:
 		virtual Ids GetElementPath(const Id& elementId) const override;
 		virtual bool IsBranch(const Id& elementId) const override;
 		virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-		virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+		virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
 		virtual bool SetElementName(const Id& elementId, const QString& name) override;
 		virtual bool SetElementDescription(const Id& elementId, const QString& description) override;
 		virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
@@ -331,7 +331,7 @@ protected:
 		/**
 			Meta-informations for the file contents.
 		*/
-		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
+		idoc::MetaInfoPtr contentsMetaInfoPtr;
 
 	private:
 		/**
@@ -434,7 +434,7 @@ protected:
 	Create meta-info object for a given file in the file collection.
 	\return The instance of the meta-information object, or \c NULL of no meta-info was created for the given file.
 */
-	virtual IFileObjectCollection::MetaInfoPtr CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const;
+	virtual idoc::MetaInfoPtr CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const;
 
 	/**
 		Create the meta information file.

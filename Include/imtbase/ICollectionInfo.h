@@ -26,7 +26,6 @@ class ICollectionInfo: virtual public istd::IChangeable
 public:
 	typedef QByteArray Id;
 	typedef QVector<Id> Ids;
-	typedef istd::TSmartPtr<idoc::IDocumentMetaInfo> MetaInfoPtr;
 
 	struct NotifierInfo
 	{
@@ -182,7 +181,7 @@ public:
 		\param metaInfo			Meta-info to be filled by this method.
 		\return \c true if the operation was successful, and \c false if no information could be provided.
 	*/
-	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const = 0;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const = 0;
 
 	/**
 		Set name of the element with the given ID.

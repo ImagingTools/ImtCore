@@ -25,7 +25,7 @@ protected:
 	virtual bool CreateMetaInfo(
 				const istd::IChangeable* dataPtr,
 				const QByteArray& typeId,
-				MetaInfoPtr& metaInfoPtr) const override;
+				idoc::MetaInfoPtr& metaInfoPtr) const override;
 };
 
 

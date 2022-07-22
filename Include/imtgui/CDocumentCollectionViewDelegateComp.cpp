@@ -608,7 +608,7 @@ void CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::CreateBackup(c
 
 	const imtbase::IRevisionController* revisionControllerPtr = m_parent.m_collectionPtr->GetRevisionController();
 	if (revisionControllerPtr != nullptr){
-		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_parent.m_collectionPtr->GetElementMetaInfo(objectId);
+		idoc::MetaInfoPtr metaInfo = m_parent.m_collectionPtr->GetElementMetaInfo(objectId);
 		Q_ASSERT(metaInfo.IsValid());
 		QVariant variant = metaInfo->GetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION);
 		

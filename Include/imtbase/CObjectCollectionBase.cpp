@@ -269,9 +269,9 @@ ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const Id& objectId) c
 }
 
 
-ICollectionInfo::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) const
+idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) const
 {
-	MetaInfoPtr metaInfoPtr;
+	idoc::MetaInfoPtr metaInfoPtr;
 
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -361,9 +361,9 @@ QVariant CObjectCollectionBase::GetElementInfo(const Id& elementId, int infoType
 }
 
 
-ICollectionInfo::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId) const
 {
-	MetaInfoPtr metaInfoPtr;
+	idoc::MetaInfoPtr metaInfoPtr;
 
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){

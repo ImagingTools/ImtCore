@@ -20,7 +20,7 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(
 		const QByteArray &informationId,
 		const QByteArray &objectId) const
 {
-	imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
 	if (metaInfo.IsValid()){
 		if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
@@ -62,7 +62,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 		metaInfoModel->SetData("Name", "Modification Time", index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
-		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(productId);
+		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(productId);
 		if (metaInfo.IsValid()){
 			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 			childs->SetData("Value", date);

@@ -359,7 +359,7 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 			}
 
 			if (!idNewObject.isEmpty()){
-				imtbase::IObjectCollection::MetaInfoPtr referenceMetaInfoPtr = objectCollectionPtr->GetDataMetaInfo(idNewObject);
+				idoc::MetaInfoPtr referenceMetaInfoPtr = objectCollectionPtr->GetDataMetaInfo(idNewObject);
 				QString referenceName;
 				QString referenceDescription;
 				if (referenceMetaInfoPtr.IsValid()){

@@ -549,7 +549,7 @@ bool CProductInstanceDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSq
 {
 	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
-		imtbase::IMetaInfoCreator::MetaInfoPtr retVal;
+		idoc::MetaInfoPtr retVal;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductInstanceInfo", retVal)){
 			Q_ASSERT(retVal.IsValid());
 

@@ -171,9 +171,9 @@ QVariant CCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoTy
 	return QVariant();
 }
 
-ICollectionInfo::MetaInfoPtr CCollectionInfo::GetElementMetaInfo(const Id& /*elementId*/) const
+idoc::MetaInfoPtr CCollectionInfo::GetElementMetaInfo(const Id& /*elementId*/) const
 {
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
 

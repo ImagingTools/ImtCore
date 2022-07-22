@@ -536,7 +536,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	QByteArrayList informationIds = GetInformationIds(gqlObject);
 
 	if (!informationIds.isEmpty()){
-		imtbase::ICollectionInfo::MetaInfoPtr metaInfo;
+		idoc::MetaInfoPtr metaInfo;
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
 

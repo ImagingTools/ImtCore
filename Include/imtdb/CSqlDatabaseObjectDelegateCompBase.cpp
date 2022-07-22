@@ -94,8 +94,8 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QByte
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
 			const QByteArray& typeId,
 			const QSqlRecord& record,
-			imtbase::IMetaInfoCreator::MetaInfoPtr& objectMetaInfoPtr,
-			imtbase::IMetaInfoCreator::MetaInfoPtr& collectionItemMetaInfoPtr) const
+			idoc::MetaInfoPtr& objectMetaInfoPtr,
+			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
 {
 	objectMetaInfoPtr.SetPtr(CreateObjectMetaInfo(typeId));
 	if (objectMetaInfoPtr.IsValid()){

@@ -66,7 +66,7 @@ public:
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual QByteArray GetObjectTypeId(const Id& objectId) const override;
-	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
+	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
@@ -83,7 +83,7 @@ public:
 	virtual Ids GetElementPath(const Id& elementId) const override;
 	virtual bool IsBranch(const Id& elementId) const override;
 	virtual QVariant GetElementInfo(const Id& elementId, int infoType) const override;
-	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
 	virtual bool SetElementName(const Id& elementId, const QString& name) override;
 	virtual bool SetElementDescription(const Id& elementId, const QString& description) override;
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
@@ -135,7 +135,7 @@ protected:
 		/**
 			Meta-informations for the data object.
 		*/
-		imtbase::IMetaInfoCreator::MetaInfoPtr contentsMetaInfoPtr;
+		idoc::MetaInfoPtr contentsMetaInfoPtr;
 	};
 
 	typedef QVector<ObjectInfo> Objects;

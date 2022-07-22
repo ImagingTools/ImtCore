@@ -93,9 +93,9 @@ imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetObjectTypeId(const Q
 	return Id();
 }
 
-imtbase::ICollectionInfo::MetaInfoPtr CSimpleReferenceCollection::GetDataMetaInfo(const Id& /*objectId*/) const
+idoc::MetaInfoPtr CSimpleReferenceCollection::GetDataMetaInfo(const Id& /*objectId*/) const
 {
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
 
@@ -165,9 +165,9 @@ QVariant CSimpleReferenceCollection::GetElementInfo(const QByteArray& elementId,
 }
 
 
-imtbase::ICollectionInfo::MetaInfoPtr CSimpleReferenceCollection::GetElementMetaInfo(const Id& /*elementId*/) const
+idoc::MetaInfoPtr CSimpleReferenceCollection::GetElementMetaInfo(const Id& /*elementId*/) const
 {
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
 

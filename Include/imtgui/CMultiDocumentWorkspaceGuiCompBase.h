@@ -137,8 +137,8 @@ private:
 		virtual bool IsOptionEnabled(int index) const;
 
 		// reimplemented (imtbase::IObjectCollectionInfo)
-		virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
-		virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
+		virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+		virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 		virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 		virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 

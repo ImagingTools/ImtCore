@@ -29,7 +29,7 @@ imtgui::ICollectionViewDelegate::SummaryInformation CProductInstanceInfoViewDele
 			const QByteArray& informationId) const
 {
 	if (m_collectionPtr != nullptr){
-		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
+		idoc::MetaInfoPtr metaInfoPtr;
 		
 		if (informationId == QByteArray("InstanceId")){
 			metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);

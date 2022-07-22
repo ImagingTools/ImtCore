@@ -30,8 +30,8 @@ public:
 	virtual bool CreateObjectInfoFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record,
-				imtbase::IMetaInfoCreator::MetaInfoPtr& objectMetaInfoPtr,
-				imtbase::IMetaInfoCreator::MetaInfoPtr& collectionItemMetaInfoPtr) const = 0;
+				idoc::MetaInfoPtr& objectMetaInfoPtr,
+				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const = 0;
 
 	/**
 		Create a data object for the given SQL record.

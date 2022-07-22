@@ -18,7 +18,7 @@ imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp
 	SummaryInformation result;
 
 	if (m_collectionPtr != nullptr){
-		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+		idoc::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
 		if (metaInfoPtr.IsValid()){
 			if (informationId == QByteArray("EMail")){
 				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();

@@ -682,14 +682,14 @@ bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*ind
 
 // reimplemented (imtbase::IObjectCollectionInfo)
 
-imtbase::ICollectionInfo::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementMetaInfo(const Id& /*objectId*/) const
+idoc::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementMetaInfo(const Id& /*objectId*/) const
 {
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
-imtbase::ICollectionInfo::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetDataMetaInfo(const Id& /*objectId*/) const
+idoc::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetDataMetaInfo(const Id& /*objectId*/) const
 {
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
 

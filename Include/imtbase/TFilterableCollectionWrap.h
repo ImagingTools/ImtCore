@@ -133,7 +133,7 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 				for (int i = 0; i < filteredIds.count(); i++){
 					QByteArray objectId = filteredIds[i];
 
-					imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
+					idoc::MetaInfoPtr metaInfoPtr;
 					if (relatedIds.contains("Name")){
 						QString metaInfoValue = BaseClass::GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
 						QPair<QString, QByteArray> objectPair = {metaInfoValue, objectId};
@@ -154,7 +154,7 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 							}
 						}
 
-						MetaInfoPtr collectionItemMetaInfoPtr = BaseClass::GetElementMetaInfo(objectId);
+						idoc::MetaInfoPtr collectionItemMetaInfoPtr = BaseClass::GetElementMetaInfo(objectId);
 						if (collectionItemMetaInfoPtr.IsValid()){
 							idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfoPtr->GetMetaInfoTypes();
 
@@ -233,7 +233,7 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 			return true;
 		}
 
-		MetaInfoPtr dataMetaInfoPtr = BaseClass::GetDataMetaInfo(objectId);
+		idoc::MetaInfoPtr dataMetaInfoPtr = BaseClass::GetDataMetaInfo(objectId);
 		if (dataMetaInfoPtr.IsValid()){
 			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = dataMetaInfoPtr->GetMetaInfoTypes();
 
@@ -248,7 +248,7 @@ bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objec
 			}
 		}
 
-		MetaInfoPtr elementMetaInfoPtr = BaseClass::GetElementMetaInfo(objectId);
+		idoc::MetaInfoPtr elementMetaInfoPtr = BaseClass::GetElementMetaInfo(objectId);
 		if (elementMetaInfoPtr.IsValid()){
 			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = elementMetaInfoPtr->GetMetaInfoTypes();
 

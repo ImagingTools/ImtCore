@@ -22,7 +22,7 @@ public:
 
 protected:
 	// reimplemented (imtbase::IMetaInfoCreator)
-	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, MetaInfoPtr& metaInfoPtr) const override;
+	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const override;
 };
 
 

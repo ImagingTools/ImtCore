@@ -226,13 +226,13 @@ imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(c
 }
 
 
-imtbase::ICollectionInfo::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
+idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
 		QSqlRecord record = GetObjectRecord(objectId);
 		if (!record.isEmpty()){
-			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+			idoc::MetaInfoPtr objectMetaInfoPtr;
+			idoc::MetaInfoPtr collectionMetaInfoPtr;
 
 			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
 
@@ -240,7 +240,7 @@ imtbase::ICollectionInfo::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataM
 		}
 	}
 
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
 
@@ -332,8 +332,8 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 	if (m_objectDelegateCompPtr.IsValid()){
 		QSqlRecord record = GetObjectRecord(elementId);
 		if (!record.isEmpty()){
-			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+			idoc::MetaInfoPtr objectMetaInfoPtr;
+			idoc::MetaInfoPtr collectionMetaInfoPtr;
 			bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
 			if (isOk){
 				switch (infoType){
@@ -351,13 +351,13 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 }
 
 
-imtbase::ICollectionInfo::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id& elementId) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
 		QSqlRecord record = GetObjectRecord(elementId);
 		if (!record.isEmpty()){
-			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+			idoc::MetaInfoPtr objectMetaInfoPtr;
+			idoc::MetaInfoPtr collectionMetaInfoPtr;
 
 			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
 
@@ -365,7 +365,7 @@ imtbase::ICollectionInfo::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetEleme
 		}
 	}
 
-	return MetaInfoPtr();
+	return idoc::MetaInfoPtr();
 }
 
 
