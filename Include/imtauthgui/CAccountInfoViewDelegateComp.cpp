@@ -18,8 +18,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CAccountInfoViewDelegateComp
 	SummaryInformation result;
 
 	if (m_collectionPtr != nullptr){
-		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
-		if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+		if (metaInfoPtr.IsValid()){
 			if (informationId == QByteArray("AccountName")){
 				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
 				result.sortValue = result.text;

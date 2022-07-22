@@ -333,7 +333,7 @@ bool CFileCollectionCompBase::UpdateFile(
 		locker.relock();
 
 		static ChangeSet changes(CF_UPDATED);
-		changes.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+		changes.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
 		istd::CChangeNotifier changeNotifier(this, &changes);
 
 		m_files[fileIndex].CopyFrom(collectionItem);
@@ -393,7 +393,7 @@ bool CFileCollectionCompBase::ExportFile(const imtbase::IObjectCollection& /*col
 }
 
 
-QByteArray CFileCollectionCompBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/) const
+QByteArray CFileCollectionCompBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/, const ICollectionInfo::Id& /*parentId*/) const
 {
 	return QByteArray();
 }
@@ -419,28 +419,14 @@ int CFileCollectionCompBase::GetOperationFlags(const QByteArray& /*objectId*/) c
 }
 
 
-bool CFileCollectionCompBase::GetDataMetaInfo(const QByteArray& objectId, ifile::IFileMetaInfoProvider::MetaInfoPtr& metaInfoPtr) const
+imtbase::ICollectionInfo::Id CFileCollectionCompBase::InsertNewBranch(
+			const Id& /*parentId*/,
+			const QString& /*name*/,
+			const QString& /*description*/,
+			const Id& /*proposedElementId*/,
+			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
 {
-	QReadLocker lockCollection(&m_filesLock);
-
-	// Looking for file item:
-	int fileIndex = GetFileIndexById(objectId);
-	if (fileIndex < 0){
-		SendVerboseMessage(QObject::tr("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
-
-		return false;
-	}
-
-	// Get meta-information from cache:
-	CollectionItem& item = m_files[fileIndex];
-
-	if (item.contentsMetaInfoPtr.IsValid()){
-		metaInfoPtr.SetCastedOrRemove(item.contentsMetaInfoPtr->CloneMe());
-
-		return metaInfoPtr.IsValid();
-	}
-
-	return false;
+	return Id();
 }
 
 
@@ -451,7 +437,8 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
+			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
+			const Id& /*parentId*/)
 {
 	DataPtr newObjectPtr;
 
@@ -484,7 +471,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 
 			if (persistencePtr->SaveToFile(*newObjectPtr, tempFilePath) == ifile::IFilePersistence::OS_OK){
 
-				QByteArray retval = InsertFile(tempFilePath, typeId, name, description, proposedObjectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
+				QByteArray retval = InsertFile(tempFilePath, typeId, name, description, proposedObjectId, dataMetaInfoPtr, elementMetaInfoPtr);
 				return retval;
 			}
 			else{
@@ -497,7 +484,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 }
 
 
-bool CFileCollectionCompBase::RemoveObject(const QByteArray& /*objectId*/)
+bool CFileCollectionCompBase::RemoveElement(const Id& /*elementId*/)
 {
 	return false;
 }
@@ -609,60 +596,7 @@ bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const is
 }
 
 
-void CFileCollectionCompBase::SetObjectName(const QByteArray& /*objectId*/, const QString& /*objectName*/)
-{
-}
-
-
-void CFileCollectionCompBase::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
-{
-	QWriteLocker locker(&m_filesLock);
-
-	int fileIndex = GetFileIndexById(objectId);
-	if (fileIndex >= 0){
-		CollectionItem& item = m_files[fileIndex];
-
-		QString oldDescription = item.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
-
-		if (oldDescription != objectDescription){
-			static ChangeSet changes(CF_UPDATED);
-			changes.SetChangeInfo(CN_OBJECT_ADDED, objectId);
-			istd::CChangeNotifier changeNotifier(this, &changes);
-
-			item.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
-
-			SaveCollectionItem(item);
-
-			locker.unlock();
-		}
-	}
-}
-
-
-void CFileCollectionCompBase::SetObjectEnabled(const QByteArray& /*objectId*/, bool /*isEnabled*/)
-{
-}
-
 // reimplemented (IObjectCollectionInfo)
-
-bool CFileCollectionCompBase::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
-{
-	QReadLocker lockCollection(&m_filesLock);
-
-	// Looking for file item:
-	int fileIndex = GetFileIndexById(objectId);
-	if (fileIndex < 0){
-		SendVerboseMessage(QObject::tr("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
-
-		return false;
-	}
-
-	// Get meta-information from cache:
-	CollectionItem& item = m_files[fileIndex];
-
-	return metaInfo.CopyFrom(item.metaInfo);
-}
-
 
 const iprm::IOptionsList* CFileCollectionCompBase::GetObjectTypesInfo() const
 {
@@ -687,9 +621,37 @@ imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase::GetObjectTypeId(cons
 }
 
 
+imtbase::ICollectionInfo::MetaInfoPtr CFileCollectionCompBase::GetDataMetaInfo(const Id& objectId) const
+{
+	MetaInfoPtr metaInfoPtr;
+
+	QReadLocker lockCollection(&m_filesLock);
+
+	// Looking for file item:
+	int fileIndex = GetFileIndexById(objectId);
+	if (fileIndex < 0){
+		SendVerboseMessage(QObject::tr("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(objectId.constData()), "File Collection");
+
+		return metaInfoPtr;
+	}
+
+	// Get meta-information from cache:
+	CollectionItem& item = m_files[fileIndex];
+
+	if (item.contentsMetaInfoPtr.IsValid()){
+		metaInfoPtr.SetCastedOrRemove(item.contentsMetaInfoPtr->CloneMe());
+	}
+
+	return metaInfoPtr;
+}
+
+
 // reimplemented (ICollectionInfo)
 
-int CFileCollectionCompBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CFileCollectionCompBase::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	m_filesLock.lockForRead();
 
@@ -704,7 +666,9 @@ int CFileCollectionCompBase::GetElementsCount(const iprm::IParamsSet* /*selectio
 imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	Ids retVal;
 
@@ -719,6 +683,24 @@ imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
 	m_filesLock.unlock();
 
 	return retVal;
+}
+
+
+imtbase::ICollectionInfo::Id CFileCollectionCompBase::GetParentId(const Id& /*elementId*/) const
+{
+	return Id();
+}
+
+
+imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementPath(const Id& /*elementId*/) const
+{
+	return Ids();
+}
+
+
+bool CFileCollectionCompBase::IsBranch(const Id& /*elementId*/) const
+{
+	return false;
 }
 
 
@@ -740,6 +722,70 @@ QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 	}
 
 	return QString();
+}
+
+
+imtbase::ICollectionInfo::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementId) const
+{
+	MetaInfoPtr metaInfoPtr;
+
+	QReadLocker lockCollection(&m_filesLock);
+
+	// Looking for file item:
+	int fileIndex = GetFileIndexById(elementId);
+	if (fileIndex < 0){
+		SendVerboseMessage(QObject::tr("Collection item doesn't exist for the given object-ID (%1). Meta-information could not be provided").arg(elementId.constData()), "File Collection");
+
+		return metaInfoPtr;
+	}
+
+	// Get meta-information from cache:
+	CollectionItem& item = m_files[fileIndex];
+
+	metaInfoPtr.SetCastedOrRemove(item.metaInfo.CloneMe());
+
+	return metaInfoPtr;
+}
+
+
+bool CFileCollectionCompBase::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+{
+	return false;
+}
+
+
+bool CFileCollectionCompBase::SetElementDescription(const Id& elementId, const QString& description)
+{
+	QWriteLocker locker(&m_filesLock);
+
+	int fileIndex = GetFileIndexById(elementId);
+	if (fileIndex >= 0){
+		CollectionItem& item = m_files[fileIndex];
+
+		QString oldDescription = item.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+
+		if (oldDescription != description){
+			static ChangeSet changes(CF_UPDATED);
+			changes.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+			istd::CChangeNotifier changeNotifier(this, &changes);
+
+			item.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, description);
+
+			SaveCollectionItem(item);
+
+			locker.unlock();
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CFileCollectionCompBase::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+{
+	return false;
 }
 
 
@@ -1230,7 +1276,8 @@ bool CFileCollectionCompBase::FinishInsertFileTransaction(
 		if (result){
 			{
 				static ChangeSet changes(CF_ADDED);
-				changes.SetChangeInfo(CN_OBJECT_ADDED, fileId);
+				ElementInsertInfo info;
+				changes.SetChangeInfo(CN_ELEMENT_INSERTED, fileId);
 				istd::CChangeNotifier changeNotifier(this, &changes);
 
 				QWriteLocker locker(&m_filesLock);

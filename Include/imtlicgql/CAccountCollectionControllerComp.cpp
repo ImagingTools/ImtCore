@@ -15,9 +15,9 @@ namespace imtlicgql
 
 QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
-	imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
+	imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 
-	if (m_objectCollectionCompPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+	if (metaInfoPtr.IsValid()){
 		if (informationId == QByteArray("AccountName")){
 			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME);
 		}

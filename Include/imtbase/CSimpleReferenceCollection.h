@@ -37,17 +37,29 @@ public:
 	virtual bool RemoveAllReferences() override;
 
 	// reimplemented (IObjectCollectionInfo)
-	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual const iprm::IOptionsList * GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
+	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (imtbase::ICollectionInfo)
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual Id GetParentId(const Id& elementId) const override;
+	virtual Ids GetElementPath(const Id& elementId) const override;
+	virtual bool IsBranch(const Id& elementId) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+	virtual bool SetElementName(const Id& elementId, const QString& name) override;
+	virtual bool SetElementDescription(const Id& elementId, const QString& description) override;
+	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

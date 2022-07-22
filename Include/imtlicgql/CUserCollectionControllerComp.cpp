@@ -20,13 +20,13 @@ QVariant CUserCollectionControllerComp::GetObjectInformation(
 		const QByteArray &informationId,
 		const QByteArray &objectId) const
 {
-	idoc::CStandardDocumentMetaInfo metaInfo;
-	if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
+	imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+	if (metaInfo.IsValid()){
 		if (informationId == QByteArray("Added")){
-			return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
+			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
 		else if (informationId == QByteArray("ModificationTime")){
-			return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
 		}
 	}
 

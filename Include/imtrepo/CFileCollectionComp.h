@@ -41,21 +41,23 @@ public:
 
 	// reimplemented (imtbase::IRevisionController)
 	virtual RevisionInfoList GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const override;
-	virtual int BackupObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment = QString()) const override;
-	virtual bool RestoreObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision) const override;
-	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const override;
+	virtual int BackupObject(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment = QString()) const override;
+	virtual bool RestoreObject(imtbase::IObjectCollection& collection, const Id& objectId, int revision) const override;
+	virtual bool ExportObject(const imtbase::IObjectCollection& collection, const Id& objectId, int revision, const QString& filePath) const override;
 
 	// reimplemented (IFileCollectionInfo)
 	virtual FileCollectionLayout GetCollectionFileLayout() const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
-	virtual bool RemoveObject(const QByteArray& objectId) override;
-	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
+	virtual bool RemoveElement(const Id& elementId) override;
+
+	// reimplemented (ICollectionInfo)
+	virtual bool SetElementName(const Id& elementId, const QString& name) override;
 
 	// reimplemented (ICollectionDataController)
-	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
-	virtual QByteArray ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString()) const override;
+	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& targetFilePath = QString()) const override;
+	virtual QByteArray ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString(), const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

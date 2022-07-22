@@ -287,7 +287,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 		itemsModel->SetData("NewId", newName);
 		itemsModel->SetData("NewName", newName);
 
-		m_objectCollectionCompPtr->SetObjectName(objectId, newName);
+		m_objectCollectionCompPtr->SetElementName(objectId, newName);
 		dataModel->SetExternTreeModel("item", itemsModel);
 	}
 
@@ -319,7 +319,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 
 		dataModel->SetExternTreeModel("item", itemsModel);
 
-		m_objectCollectionCompPtr->SetObjectDescription(objectId, description);
+		m_objectCollectionCompPtr->SetElementDescription(objectId, description);
 	}
 
 	rootModel->SetExternTreeModel("data", dataModel);
@@ -444,7 +444,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		return nullptr;
 	}
 
-	bool retVal = m_objectCollectionCompPtr->RemoveObject(objectId);
+	bool retVal = m_objectCollectionCompPtr->RemoveElement(objectId);
 	if (!retVal){
 		errorMessage = QObject::tr("Can not remove object: %1").arg(QString(objectId));
 	}
@@ -536,7 +536,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	QByteArrayList informationIds = GetInformationIds(gqlObject);
 
 	if (!informationIds.isEmpty()){
-		idoc::CStandardDocumentMetaInfo metaInfo;
+		imtbase::ICollectionInfo::MetaInfoPtr metaInfo;
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
 
@@ -549,14 +549,17 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			else if(informationId == "Description"){
 				elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 			}
-			else if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(collectionId, metaInfo)){
-				if (informationId == QByteArray("Added")){
-					elementInformation = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+			else{
+				metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
+				if (metaInfo.IsValid()){
+					if (informationId == QByteArray("Added")){
+						elementInformation = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-				}
-				else if (informationId == QByteArray("ModificationTime")){
-					elementInformation = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
+					}
+					else if (informationId == QByteArray("ModificationTime")){
+						elementInformation = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+					}
 				}
 			}
 

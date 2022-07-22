@@ -77,12 +77,6 @@ bool CSimpleReferenceCollection::RemoveAllReferences()
 
 // reimplemented (IObjectCollectionInfo)
 
-bool CSimpleReferenceCollection::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
-{
-	return false;
-}
-
-
 const iprm::IOptionsList* CSimpleReferenceCollection::GetObjectTypesInfo() const
 {
 	return nullptr;
@@ -99,10 +93,18 @@ imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetObjectTypeId(const Q
 	return Id();
 }
 
+imtbase::ICollectionInfo::MetaInfoPtr CSimpleReferenceCollection::GetDataMetaInfo(const Id& /*objectId*/) const
+{
+	return MetaInfoPtr();
+}
+
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CSimpleReferenceCollection::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CSimpleReferenceCollection::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return m_references.count();
 }
@@ -111,7 +113,9 @@ int CSimpleReferenceCollection::GetElementsCount(const iprm::IParamsSet* /*selec
 imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	Ids retVal;
 
@@ -124,6 +128,23 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 	}
 
 	return retVal;
+}
+
+imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetParentId(const Id& /*elementId*/) const
+{
+	return Id();
+}
+
+
+imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementPath(const Id& /*elementId*/) const
+{
+	return Ids();
+}
+
+
+bool CSimpleReferenceCollection::IsBranch(const Id& /*elementId*/) const
+{
+	return false;
 }
 
 
@@ -141,6 +162,30 @@ QVariant CSimpleReferenceCollection::GetElementInfo(const QByteArray& elementId,
 	}
 
 	return QVariant();
+}
+
+
+imtbase::ICollectionInfo::MetaInfoPtr CSimpleReferenceCollection::GetElementMetaInfo(const Id& /*elementId*/) const
+{
+	return MetaInfoPtr();
+}
+
+
+bool CSimpleReferenceCollection::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+{
+	return false;
+}
+
+
+bool CSimpleReferenceCollection::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+{
+	return false;
+}
+
+
+bool CSimpleReferenceCollection::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+{
+	return false;
 }
 
 

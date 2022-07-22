@@ -68,9 +68,9 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 }
 
 
-int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& userComment) const
+int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment) const
 {
-	IFileObjectCollection* collectionPtr = dynamic_cast<IFileObjectCollection*>(&collection);
+	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
 	if (collectionPtr == nullptr || !m_compressorCompPtr.IsValid()){
 		return -1;
 	}
@@ -88,9 +88,9 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 			}
 		}
 
-		idoc::CStandardDocumentMetaInfo metaInfo;
-		collection.GetCollectionItemMetaInfo(objectId, metaInfo);
-		QVariant currentRevision = metaInfo.GetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION);
+		MetaInfoPtr metaInfoPtr = GetElementMetaInfo(objectId);
+		Q_ASSERT(metaInfoPtr.IsValid());
+		QVariant currentRevision = metaInfoPtr->GetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION);
 		if (currentRevision.isValid()){
 			int revision = currentRevision.toInt();
 			if (revision >= newRevision){
@@ -154,7 +154,7 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 						writeLocker.unlock();
 
 						static ChangeSet changes(CF_UPDATED);
-						changes.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+						changes.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
 						istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 						tempDir.removeRecursively();
@@ -182,7 +182,7 @@ int CFileCollectionComp::BackupObject(imtbase::IObjectCollection& collection, co
 }
 
 
-bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const QByteArray& objectId, int revision) const
+bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const Id& objectId, int revision) const
 {
 	if (!m_compressorCompPtr.IsValid())
 		return false;
@@ -238,7 +238,7 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const QByte
 									writeLocker.unlock();
 
 									static ChangeSet changes(CF_UPDATED);
-									changes.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+									changes.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
 									istd::CChangeNotifier changeNotifier(const_cast<CFileCollectionComp*>(this), &changes);
 
 									bool result = const_cast<CFileCollectionComp*>(this)->UpdateFile(newObjectDataFilePath, objectId);
@@ -265,7 +265,7 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const QByte
 }
 
 
-bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& collection, const QByteArray& objectId, int revision, const QString& filePath) const
+bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& collection, const Id& objectId, int revision, const QString& filePath) const
 {
 	if (!m_compressorCompPtr.IsValid()){
 		return false;
@@ -340,9 +340,9 @@ const imtbase::IRevisionController* CFileCollectionComp::GetRevisionController()
 }
 
 
-bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
+bool CFileCollectionComp::RemoveElement(const Id& elementId)
 {
-	if (objectId.isEmpty()){
+	if (elementId.isEmpty()){
 		SendErrorMessage(0, "Object-ID is empty. Unknown resource could not be removed");
 
 		return false;
@@ -351,14 +351,14 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 	{
 		QWriteLocker cacheLocker(&m_objectCacheLock);
 
-		if (m_objectCache.contains(objectId)){
-			m_objectCache.remove(objectId);
+		if (m_objectCache.contains(elementId)){
+			m_objectCache.remove(elementId);
 		}
 	}
 
 	QWriteLocker repositoryDataLocker(&m_filesLock);
 
-	int fileIndex = GetFileIndexById(objectId);
+	int fileIndex = GetFileIndexById(elementId);
 	if (fileIndex >= 0){
 		// If the file was copied into the repository, remove also the file from repository folder:
 		const CollectionItem& itemToRemove = m_files[fileIndex];
@@ -393,7 +393,7 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 
 		{
 			static ChangeSet changes(CF_REMOVED);
-			changes.SetChangeInfo(CN_OBJECT_REMOVED, objectId);
+			changes.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			// Remove the repository item with the corresponding object-ID:
@@ -405,34 +405,36 @@ bool CFileCollectionComp::RemoveObject(const QByteArray& objectId)
 		return true;
 	}
 	else{
-		SendInfoMessage(0, QObject::tr("Resource '%1' doesn't exist").arg(qPrintable(objectId)));
+		SendInfoMessage(0, QObject::tr("Resource '%1' doesn't exist").arg(qPrintable(elementId)));
 	}
 
 	return true;
 }
 
 
-void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QString& objectName)
+// reimplemented (ICollectionInfo)
+
+bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& name)
 {
 	QWriteLocker locker(&m_filesLock);
 
-	int fileIndex = GetFileIndexById(objectId);
+	int fileIndex = GetFileIndexById(elementId);
 	if (fileIndex >= 0){
 		CollectionItem& item = m_files[fileIndex];
 
-		if (item.objectName != objectName){
-			int foundIndex = GetFileIndexByName(objectName);
+		if (item.objectName != name){
+			int foundIndex = GetFileIndexByName(name);
 			if (foundIndex >= 0){
 				bool isSameResourceType = (m_files[fileIndex].typeId == m_files[foundIndex].typeId);
 
 				if (isSameResourceType){
-					SendErrorMessage(0, QObject::tr("Resource with the name '%1' already exists").arg(objectName));
+					SendErrorMessage(0, QObject::tr("Resource with the name '%1' already exists").arg(name));
 
-					return;
+					return false;
 				}
 			}
 			static ChangeSet changes(CF_UPDATED);
-			changes.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+			changes.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
 			QFileInfo fileInfo(item.filePathInRepository);
@@ -443,9 +445,9 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 
 			QString fileName = fileInfo.fileName();
 
-			QString newPhysicalName = objectName;
+			QString newPhysicalName = name;
 		#if _WIN32
-			QString newFullName = objectName + "." + fileInfo.suffix();
+			QString newFullName = name + "." + fileInfo.suffix();
 			newPhysicalName = CalculateShortFileName(newFullName, QFileInfo(newFullName), "");
 			newPhysicalName = QFileInfo(newPhysicalName).completeBaseName();
 		#endif
@@ -483,36 +485,38 @@ void CFileCollectionComp::SetObjectName(const QByteArray& objectId, const QStrin
 			targetFolderPath += "/" + newPhysicalName;
 
 			if (!resourceDir.rename(resouceDirPath, targetFolderPath)){
-				SendErrorMessage(0, QObject::tr("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(objectName));
+				SendErrorMessage(0, QObject::tr("Resource path could not be renamed from '%1' into '%2'. Resource could not be renamed to '%3'").arg(resouceDirPath).arg(targetFolderPath).arg(name));
 
 				locker.unlock();
 
-				return;
+				return false;
 			}
 
 			QString newFileRepositoryPath = targetFolderPath + "/" + newFileName;
 			QFile::rename(targetFolderPath + "/" + fileName, newFileRepositoryPath);
 
-			item.objectName = objectName;
+			item.objectName = name;
 			item.filePathInRepository = newFileRepositoryPath;
 
 			SaveCollectionItem(item);
 
 			locker.unlock();
 
-			return;
+			return true;
 		}
 
-		return;
+		return true;
 	}
 
-	SendErrorMessage(0, QObject::tr("Resource with the ID '%1' doesn't exist").arg(objectId.constData()));
+	SendErrorMessage(0, QObject::tr("Resource with the ID '%1' doesn't exist").arg(elementId.constData()));
+
+	return false;
 }
 
 
 // reimplemented (ICollectionDataController)
 
-bool CFileCollectionComp::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
+bool CFileCollectionComp::ExportFile(const imtbase::IObjectCollection& /*collection*/, const Id& objectId, const QString& targetFilePath) const
 {
 	if (targetFilePath.isEmpty()){
 		return false;
@@ -533,7 +537,7 @@ bool CFileCollectionComp::ExportFile(const imtbase::IObjectCollection& /*collect
 }
 
 
-QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
+QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath, const ICollectionInfo::Id& /*parentId*/) const
 {
 	int repositoryRevision = *m_revisionAttrPtr;
 
@@ -949,7 +953,10 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -960,7 +967,9 @@ int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(const 
 imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -978,9 +987,51 @@ imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::G
 }
 
 
+imtbase::ICollectionInfo::Id CFileCollectionCompBase::RepositoryItemInfoProvider::GetParentId(const Id& /*elementId*/) const
+{
+	return Id();
+}
+
+
+imtbase::ICollectionInfo::Ids CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementPath(const Id& /*elementId*/) const
+{
+	return Ids();
+}
+
+
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::IsBranch(const Id& /*elementId*/) const
+{
+	return false;
+}
+
+
 QVariant CFileCollectionComp::RepositoryItemInfoProvider::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
 {
 	return QVariant();
+}
+
+
+imtbase::ICollectionInfo::MetaInfoPtr CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementMetaInfo(const Id& /*elementId*/) const
+{
+	return MetaInfoPtr();
+}
+
+
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+{
+	return false;
+}
+
+
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+{
+	return false;
+}
+
+
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+{
+	return false;
 }
 
 

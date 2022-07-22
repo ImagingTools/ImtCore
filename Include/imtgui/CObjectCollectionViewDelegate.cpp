@@ -8,6 +8,7 @@
 #include <QtWidgets/QInputDialog>
 
 // ACF includes
+#include <iprm/IOptionsList.h>
 #include <istd/CChangeGroup.h>
 #include <istd/CChangeNotifier.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -159,12 +160,11 @@ void CObjectCollectionViewDelegate::UpdateItemSelection(
 		if (revisionControllerPtr != nullptr){
 			if (selectedItems.count() == 1){
 				int revision = -1;
-				idoc::CStandardDocumentMetaInfo metaInfo;
 
 				QByteArray objectId = selectedItems[0];
-
-				if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-					QVariant variant = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
+				imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
+				if (metaInfo.IsValid()){
+					QVariant variant = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
 					if (variant.isValid()){
 						revision = variant.toInt();
 					}
@@ -263,7 +263,7 @@ void CObjectCollectionViewDelegate::RemoveObjects(const imtbase::ICollectionInfo
 		istd::CChangeGroup changeGroup(m_collectionPtr);
 
 		for (const QByteArray& id : objectIds){
-			m_collectionPtr->RemoveObject(id);
+			m_collectionPtr->RemoveElement(id);
 		}
 	}
 }
@@ -301,7 +301,7 @@ bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, con
 		int pos;
 		name = name.trimmed();
 		if (inputValidator.validate(name, pos) == QValidator::Acceptable){
-			m_collectionPtr->SetObjectName(objectId, name);
+			m_collectionPtr->SetElementName(objectId, name);
 			return true;
 		}
 
@@ -336,14 +336,14 @@ ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSu
 			result.sortValue = result.text;
 		}
 
-		idoc::CStandardDocumentMetaInfo metaInfo;
-		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
+		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
+		if (metaInfo.IsValid()){
 			if (informationId == QByteArray("Added")){
-				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
+				result.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
 				result.text = result.sortValue.toDateTime().toString(s_dateTimeFormat);
 			}
 			else if (informationId == QByteArray("ModificationTime")){
-				result.sortValue = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
+				result.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
 				result.text = result.sortValue.toDateTime().toString(s_dateTimeFormat);
 			}
 		}
@@ -811,13 +811,14 @@ void CObjectCollectionViewDelegate::OnRestore()
 
 	const imtbase::IRevisionController* revisionControllerPtr = m_collectionPtr->GetRevisionController();
 	if (revisionControllerPtr != nullptr){
-		idoc::CStandardDocumentMetaInfo metaInfo;
 		int currentRevision = -1;
 
 		QByteArray objectId = m_selectedItemIds[0];
 
-		if (m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-			QVariant revision = metaInfo.GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
+		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
+
+		if (metaInfo.IsValid()){
+			QVariant revision = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
 			if (revision.isValid()){
 				currentRevision = revision.toInt();
 			}

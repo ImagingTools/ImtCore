@@ -3,8 +3,6 @@
 
 // ACF includes
 #include <istd/TIFactory.h>
-#include <istd/TSmartPtr.h>
-#include <icomp/IComponent.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
@@ -25,71 +23,6 @@ class ICollectionDataController;
 class IObjectCollection: virtual public IObjectCollectionInfo
 {
 public:
-	// Change info ids
-	static const QByteArray CN_OBJECT_REMOVED;
-	static const QByteArray CN_OBJECT_ADDED;
-	static const QByteArray CN_OBJECT_UPDATED;
-
-	class DataPtr
-	{
-	public:
-		typedef std::shared_ptr<istd::IPolymorphic> RootObjectPtr;
-		typedef std::function<istd::IChangeable*()> ExtractInterfaceFunc;
-
-		DataPtr() : m_objectPtr(nullptr) {}
-
-		DataPtr(const istd::IChangeable* ptr) : m_objectPtr(ptr) {}// pure pointer
-
-		DataPtr(const RootObjectPtr& rootObjPtr, const ExtractInterfaceFunc& extractInterface)
-			: m_rootPtr(rootObjPtr),
-			m_objectPtr(extractInterface())
-		{
-		}
-
-		bool IsValid() const { return m_objectPtr != nullptr; }
-		const istd::IChangeable* GetPtr() const { return m_objectPtr; }
-		const istd::IChangeable* operator->() const { return m_objectPtr; }
-		const istd::IChangeable& operator*() const { return *m_objectPtr; }
-
-		istd::IChangeable* GetPtr() { return const_cast<istd::IChangeable*>(m_objectPtr); }
-		istd::IChangeable& operator*() { return *const_cast<istd::IChangeable*>(m_objectPtr); }
-		istd::IChangeable* operator->() { return const_cast<istd::IChangeable*>(m_objectPtr); }
-
-	private:
-		RootObjectPtr m_rootPtr;
-		const istd::IChangeable* m_objectPtr;
-	};
-
-	class IDataFactory
-	{
-	public:
-		virtual DataPtr CreateInstance(const QByteArray& keyId = "") const = 0;
-		virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const = 0;
-	};
-
-	typedef istd::TSmartPtr<idoc::IDocumentMetaInfo> MetaInfoPtr;
-
-	/**
-		Change notification flags.
-	*/
-	enum ChangeFlags
-	{
-		/**
-			Item was added.
-		*/
-		CF_ADDED = 10000,
-
-		/**
-			Item was removed.
-		*/
-		CF_REMOVED,
-
-		/**
-			Data object was changed.
-		*/
-		CF_UPDATED
-	};
-
 	/**
 		Flags for describing operational constraints on the collection items or the collection itself.
 	*/
@@ -133,6 +66,42 @@ public:
 
 	I_DECLARE_FLAGS(OperationalFlags, OF_SUPPORT_RENAME, OF_SUPPORT_INSERT, OF_SUPPORT_DELETE, OF_SUPPORT_EDIT, OF_SUPPORT_USING, OF_SUPPORT_PAGINATION, OF_ALL);
 
+	class DataPtr
+	{
+	public:
+		typedef std::shared_ptr<istd::IPolymorphic> RootObjectPtr;
+		typedef std::function<istd::IChangeable*()> ExtractInterfaceFunc;
+
+		DataPtr() : m_objectPtr(nullptr) {}
+
+		DataPtr(const istd::IChangeable* ptr) : m_objectPtr(ptr) {}// pure pointer
+
+		DataPtr(const RootObjectPtr& rootObjPtr, const ExtractInterfaceFunc& extractInterface)
+			: m_rootPtr(rootObjPtr),
+			m_objectPtr(extractInterface())
+		{
+		}
+
+		bool IsValid() const { return m_objectPtr != nullptr; }
+		const istd::IChangeable* GetPtr() const { return m_objectPtr; }
+		const istd::IChangeable* operator->() const { return m_objectPtr; }
+		const istd::IChangeable& operator*() const { return *m_objectPtr; }
+
+		istd::IChangeable* GetPtr() { return const_cast<istd::IChangeable*>(m_objectPtr); }
+		istd::IChangeable& operator*() { return *const_cast<istd::IChangeable*>(m_objectPtr); }
+		istd::IChangeable* operator->() { return const_cast<istd::IChangeable*>(m_objectPtr); }
+
+	private:
+		RootObjectPtr m_rootPtr;
+		const istd::IChangeable* m_objectPtr;
+	};
+
+	class IDataFactory
+	{
+	public:
+		virtual DataPtr CreateInstance(const QByteArray& keyId = QByteArray()) const = 0;
+		virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const = 0;
+	};
 
 	/**
 		Get access to the revision controller of the collection, if available.
@@ -148,16 +117,23 @@ public:
 		Get binary flags describing the possible operations on the single object or on the whole collection.
 		\param objectId	ID of the object for quering flags. If this parameter is empty, the flags for entire collection will be returned.
 	*/
-	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const = 0;
+	virtual int GetOperationFlags(const Id& elementId = Id()) const = 0;
 
 	/**
-		Get meta-information of the data object.
-		In difference to GetCollectionItemMetaInfo, this method get the meta-informations related to the data itself.
-		\param objectId			ID of the object in the collection.
-		\param metaInfoPtr		Meta-info pointer to be created and filled by this method.
-		\return \c true if the operation was successful, and \c false if no information could be provided.
+		Create a new object in the container.
+		\param name								Name of the object in the collection.
+		\param description						Descrpition of the object.
+		\param defaultValuePtr					Optional instance used for the object data initialization.
+		\param proposedElementId				Optional-defined ID of the object in the collection. If the value is non-empty inserted object become specified ID if possible.
+		\param elementMetaInfoPtr				Optional-defined meta-information for the collection element.
+		\return If the operation was successful the method will return ID of the created data object in the collection or an empty ID otherwise.
 	*/
-	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const = 0;
+	virtual Id InsertNewBranch(
+				const Id& parentId,
+				const QString& name,
+				const QString& description,
+				const Id& proposedElementId = Id(),
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr) = 0;
 
 	/**
 		Create a new object in the container.
@@ -165,56 +141,41 @@ public:
 		\param name								Name of the object in the collection.
 		\param description						Descrpition of the object.
 		\param defaultValuePtr					Optional instance used for the object data initialization.
-		\param proposedObjectId					Optional-defined ID of the object in the collection. If the value is non-empty inserted object become specified ID if possible.
+		\param proposedElementId				Optional-defined ID of the object in the collection. If the value is non-empty inserted object become specified ID if possible.
 		\param dataMetaInfoPtr					Optional-defined meta-information for the data content.
-		\param collectionItemMetaInfoPtr		Optional-defined meta-information for the collection item.
+		\param elementMetaInfoPtr				Optional-defined meta-information for the collection element.
 		\return If the operation was successful the method will return ID of the created data object in the collection or an empty ID otherwise.
 	*/
-	virtual QByteArray InsertNewObject(
+	virtual Id InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
 				DataPtr defaultValuePtr = DataPtr(),
-				const QByteArray& proposedObjectId = QByteArray(),
+				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) = 0;
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
+				const Id& parentId = Id()) = 0;
 
 	/**
 		Remove element with the given ID.
 	*/
-	virtual bool RemoveObject(const QByteArray& objectId) = 0;
+	virtual bool RemoveElement(const Id& elementId) = 0;
 
 	/**
 		Get access to the object instance inside of collecton.
 		\note This method should return a valid instance for an object only for objects that are permanent in the collection (fixed).
 	*/
-	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const = 0;
+	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const = 0;
 
 	/**
 		Get object data instance for the entry with the given ID.
 	*/
-	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const = 0;
+	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const = 0;
 
 	/**
 		Set data for the entry with the given ID.
 	*/
-	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) = 0;
-
-	/**
-		Set name of the element with the given ID.
-	*/
-	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) = 0;
-
-	/**
-		Set description of the element with the given ID.
-	*/
-	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) = 0;
-
-	/**
-		Enable/Disable element with the given ID.
-	*/
-	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) = 0;
-
+	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) = 0;
 };
 
 

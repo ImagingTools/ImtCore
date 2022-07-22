@@ -8,6 +8,7 @@
 #include <QtWidgets/QInputDialog>
 
 // ACF includes
+#include <iprm/IOptionsList.h>
 #include <istd/CChangeGroup.h>
 #include <istd/CSystem.h>
 #include <idoc/CStandardDocumentMetaInfo.h>

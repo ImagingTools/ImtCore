@@ -41,7 +41,7 @@ bool CObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 		for (int i = 0; i < m_objects.count(); ++i){
 			int checkIsFixed = m_fixedObjectIdsAttrPtr.FindValue(m_objects[i].id);
 			if (checkIsFixed < 0){
-				RemoveObject(m_objects[i].id);
+				RemoveElement(m_objects[i].id);
 			}
 		}
 	}

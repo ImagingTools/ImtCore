@@ -54,7 +54,7 @@ public:
 	virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const override;
 
 	// reimplemented (IObjectCollection)
-	virtual bool RemoveObject(const QByteArray& objectId) override;
+	virtual bool RemoveElement(const Id& elementId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

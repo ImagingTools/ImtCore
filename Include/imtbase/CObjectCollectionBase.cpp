@@ -42,7 +42,7 @@ const ifile::IFilePersistence* CObjectCollectionBase::GetPersistenceForObjectTyp
 }
 
 
-bool CObjectCollectionBase::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
+bool CObjectCollectionBase::ExportFile(const imtbase::IObjectCollection& /*collection*/, const Id& objectId, const QString& targetFilePath) const
 {
 	QByteArray objectTypeId = GetObjectTypeId(objectId);
 	if (!objectTypeId.isEmpty()){
@@ -59,7 +59,7 @@ bool CObjectCollectionBase::ExportFile(const imtbase::IObjectCollection& /*colle
 }
 
 
-QByteArray CObjectCollectionBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
+ICollectionInfo::Id CObjectCollectionBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath, const ICollectionInfo::Id& /*parentId*/) const
 {
 	if (!typeId.isEmpty()){
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
@@ -95,7 +95,7 @@ const imtbase::ICollectionDataController* CObjectCollectionBase::GetDataControll
 }
 
 
-int CObjectCollectionBase::GetOperationFlags(const QByteArray& objectId) const
+int CObjectCollectionBase::GetOperationFlags(const Id& objectId) const
 {
 	if (!objectId.isEmpty()){
 		for (const ObjectInfo& objectInfo : m_objects){
@@ -109,36 +109,32 @@ int CObjectCollectionBase::GetOperationFlags(const QByteArray& objectId) const
 }
 
 
-bool CObjectCollectionBase::GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const
+ICollectionInfo::Id CObjectCollectionBase::InsertNewBranch(
+			const Id& /*parentId*/,
+			const QString& /*name*/,
+			const QString& /*description*/,
+			const Id& /*proposedElementId*/,
+			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
 {
-	for (const ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			if (objectInfo.contentsMetaInfoPtr.IsValid()){
-				metaInfoPtr.SetCastedOrRemove(objectInfo.contentsMetaInfoPtr->CloneMe());
-
-				return metaInfoPtr.IsValid();
-			}
-		}
-	}
-
-	return false;
+	return Id();
 }
 
 
-QByteArray CObjectCollectionBase::InsertNewObject(
+ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
 			const QString& description,
 			DataPtr defaultValuePtr,
-			const QByteArray& proposedObjectId,
+			const Id& proposedElementId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
+			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
+			const Id& /*parentId*/)
 {
 	ObjectInfo info;
 
-	if (!proposedObjectId.isEmpty()){
-		if (GetObjectInfo(proposedObjectId) == nullptr){
-			info.id = proposedObjectId;
+	if (!proposedElementId.isEmpty()){
+		if (GetObjectInfo(proposedElementId) == nullptr){
+			info.id = proposedElementId;
 		}
 	}
 
@@ -155,8 +151,8 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 		info.typeId = typeId;
 		info.flags = GetItemDefaultFlags();
 
-		if (collectionItemMetaInfoPtr != nullptr){
-			info.collectionItemMetaInfo.CopyFrom(*collectionItemMetaInfoPtr);
+		if (elementMetaInfoPtr != nullptr){
+			info.collectionItemMetaInfo.CopyFrom(*elementMetaInfoPtr);
 		}
 
 		if (dataMetaInfoPtr != nullptr){
@@ -165,7 +161,7 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 
 		if (InsertObjectIntoCollection(info)){
 			istd::IChangeable::ChangeSet changeSet(CF_ADDED);
-			changeSet.SetChangeInfo(CN_OBJECT_ADDED, info.id);
+			changeSet.SetChangeInfo(CN_ELEMENT_INSERTED, info.id);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			return info.id;
@@ -176,12 +172,12 @@ QByteArray CObjectCollectionBase::InsertNewObject(
 }
 
 
-bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
+bool CObjectCollectionBase::RemoveElement(const Id& elementId)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
-		if ((*iter).id == objectId){
+		if ((*iter).id == elementId){
 			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-			changeSet.SetChangeInfo(CN_OBJECT_REMOVED, objectId);
+			changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>((*iter).objectPtr.GetPtr());
@@ -199,7 +195,7 @@ bool CObjectCollectionBase::RemoveObject(const QByteArray& objectId)
 }
 
 
-const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const QByteArray& objectId) const
+const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const Id& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -211,7 +207,7 @@ const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const QByteArray& o
 }
 
 
-bool CObjectCollectionBase::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
+bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
@@ -235,12 +231,12 @@ bool CObjectCollectionBase::GetObjectData(const QByteArray& objectId, DataPtr& d
 }
 
 
-bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
+bool CObjectCollectionBase::SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode)
 {
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
 			istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-			changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
+			changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			objectInfo.copyMode = mode;
@@ -253,67 +249,7 @@ bool CObjectCollectionBase::SetObjectData(const QByteArray& objectId, const istd
 }
 
 
-void CObjectCollectionBase::SetObjectName(const QByteArray& objectId, const QString& objectName)
-{
-	for (ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			if (objectInfo.name != objectName){
-				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
-				istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-				objectInfo.name = objectName;
-			}
-		}
-	}
-}
-
-
-void CObjectCollectionBase::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
-{
-	for (ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			if (objectInfo.description!= objectDescription) {
-				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
-				istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-				objectInfo.description = objectDescription;
-			}
-		}
-	}
-}
-
-
-void CObjectCollectionBase::SetObjectEnabled(const QByteArray& objectId, bool isEnabled)
-{
-	for (ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			if (objectInfo.isEnabled != isEnabled) {
-				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-				changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
-				istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-				objectInfo.isEnabled = isEnabled;
-			}
-		}
-	}
-}
-
-
 // reimplemented (IObjectCollectionInfo)
-
-bool CObjectCollectionBase::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
-{
-	for (const ObjectInfo& objectInfo : m_objects){
-		if (objectInfo.id == objectId){
-			return metaInfo.CopyFrom(objectInfo.collectionItemMetaInfo);
-		}
-	}
-	
-	return false;
-}
-
 
 const iprm::IOptionsList* CObjectCollectionBase::GetObjectTypesInfo() const
 {
@@ -321,7 +257,7 @@ const iprm::IOptionsList* CObjectCollectionBase::GetObjectTypesInfo() const
 }
 
 
-ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const QByteArray& objectId) const
+ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const Id& objectId) const
 {
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -333,9 +269,28 @@ ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const QByteArray& obj
 }
 
 
+ICollectionInfo::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) const
+{
+	MetaInfoPtr metaInfoPtr;
+
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == objectId){
+			if (objectInfo.contentsMetaInfoPtr.IsValid()){
+				metaInfoPtr.SetCastedOrRemove(objectInfo.contentsMetaInfoPtr->CloneMe());
+			}
+		}
+	}
+
+	return metaInfoPtr;
+}
+
+
 // reimplemented (ICollectionInfo)
 
-int CObjectCollectionBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CObjectCollectionBase::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return m_objects.count();
 }
@@ -344,7 +299,9 @@ int CObjectCollectionBase::GetElementsCount(const iprm::IParamsSet* /*selectionP
 ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	Ids retVal;
 
@@ -359,8 +316,25 @@ ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 	return retVal;
 }
 
+ICollectionInfo::Id CObjectCollectionBase::GetParentId(const Id& /*elementId*/) const
+{
+	return Id();
+}
 
-QVariant CObjectCollectionBase::GetElementInfo(const QByteArray& elementId, int infoType) const
+
+ICollectionInfo::Ids CObjectCollectionBase::GetElementPath(const Id& /*elementId*/) const
+{
+	return Ids();
+}
+
+
+bool CObjectCollectionBase::IsBranch(const Id& /*elementId*/) const
+{
+	return false;
+}
+
+
+QVariant CObjectCollectionBase::GetElementInfo(const Id& elementId, int infoType) const
 {
 	int objectIndex = -1;
 	for (int i = 0; i < m_objects.count(); ++i){
@@ -386,6 +360,82 @@ QVariant CObjectCollectionBase::GetElementInfo(const QByteArray& elementId, int 
 	return QVariant();
 }
 
+
+ICollectionInfo::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId) const
+{
+	MetaInfoPtr metaInfoPtr;
+
+	for (const ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == elementId){
+			metaInfoPtr.SetCastedOrRemove(objectInfo.collectionItemMetaInfo.CloneMe());
+		}
+	}
+
+	return metaInfoPtr;
+}
+
+
+bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& objectName)
+{
+	for (ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == elementId){
+			if (objectInfo.name != objectName){
+				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+				istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+				objectInfo.name = objectName;
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QString& objectDescription)
+{
+	for (ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == elementId){
+			if (objectInfo.description != objectDescription){
+				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+				istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+				objectInfo.description = objectDescription;
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnabled)
+{
+	for (ObjectInfo& objectInfo : m_objects){
+		if (objectInfo.id == elementId){
+			if (objectInfo.isEnabled != isEnabled){
+				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+				istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+				objectInfo.isEnabled = isEnabled;
+			}
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+// (reimplemented from ISerializable)
 
 bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 {

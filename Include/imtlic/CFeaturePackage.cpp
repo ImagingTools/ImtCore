@@ -197,9 +197,9 @@ const IFeatureInfoProvider* CFeaturePackage::GetParentFeatureInfoProvider(const 
 
 // reimplemented (IObjectCollection)
 
-bool CFeaturePackage::RemoveObject(const QByteArray& objectId)
+bool CFeaturePackage::RemoveElement(const Id& elementId)
 {
-	bool retVal = BaseClass::RemoveObject(objectId);
+	bool retVal = BaseClass::RemoveElement(elementId);
 
 	if (retVal){
 		istd::CChangeNotifier changeNotifier(this);

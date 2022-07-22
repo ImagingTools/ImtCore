@@ -68,7 +68,8 @@ QByteArray CStaticObjectCollection::InsertNewObject(
 			DataPtr /*defaultValuePtr*/,
 			const QByteArray& /*proposedObjectId*/,
 			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
-			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
+			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/,
+			const Id& /*parentId*/)
 {
 	return QByteArray();
 }

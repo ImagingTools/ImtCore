@@ -1,11 +1,16 @@
 #pragma once
 
 
-// ACF includes
-#include <iprm/IParamsSet.h>
+// Qt includes
+#include <QtCore/QByteArray>
+#include <QtCore/QVector>
+#include <QtCore/QVariant>
 
 // ACF includes
-#include <imtbase/ICollectionInfoProvider.h>
+#include <idoc/IDocumentMetaInfo.h>
+#include <iprm/IParamsSet.h>
+#include <istd/IChangeable.h>
+#include <istd/TSmartPtr.h>
 
 
 namespace imtbase
@@ -16,29 +21,130 @@ namespace imtbase
 	Interface for non-iterable colllection info.
 	\ingroup Collection
 */
-class ICollectionInfo: virtual public ICollectionInfoProvider
+class ICollectionInfo: virtual public istd::IChangeable
 {
 public:
-	static const QByteArray s_cidAllChanged;
-	static const QByteArray s_cidElementInserted;
-	struct ElementInsertInfo
+	typedef QByteArray Id;
+	typedef QVector<Id> Ids;
+	typedef istd::TSmartPtr<idoc::IDocumentMetaInfo> MetaInfoPtr;
+
+	struct NotifierInfo
 	{
 		QByteArray elementId;
 	};
 
-	static const QByteArray s_cidElementRemoved;
-	typedef ElementInsertInfo ElementRemoveInfo;
+	static const QByteArray CN_ALL_CHANGED;
 
-	static const QByteArray s_cidElementUpdated;
-	typedef ElementInsertInfo ElementUpdateInfo;
+	static const QByteArray CN_ELEMENT_INSERTED;
+	typedef NotifierInfo ElementInsertInfo;
+
+	static const QByteArray CN_ELEMENT_UPDATED;
+	typedef NotifierInfo ElementUpdateInfo;
+
+	static const QByteArray CN_ELEMENT_REMOVED;
+	typedef NotifierInfo ElementRemoveInfo;
+
+	/**
+		Change notification flags.
+	*/
+	enum ChangeFlags
+	{
+		/**
+			Element was added.
+		*/
+		CF_ADDED = 10000,
+
+		/**
+			Element was changed.
+		*/
+		CF_UPDATED,
+
+		/**
+			Element was removed.
+		*/
+		CF_REMOVED
+	};
+
+	/**
+		Type of the element information.
+	*/
+	enum ElementInfoType
+	{
+		/**
+			Name of the element given as a QString.
+		*/
+		EIT_NAME,
+
+		/**
+			Human-readable description of the element given as a QString.
+		*/
+		EIT_DESCRIPTION,
+
+		/**
+			Enabled/Disabled status of the element as a boolean.
+		*/
+		EIT_ENABLED,
+
+		/**
+			Start value for user-defined info types.
+		*/
+		EIT_USER = 1000
+	};
+
+	/**
+		Type of the meta-informations supported by the collection.
+	*/
+	enum MetaInfoType
+	{
+		/**
+			Name of the user who has added the element.
+		*/
+		MIT_INSERTION_USER = idoc::IDocumentMetaInfo::MIT_USER + 10000,
+
+		/**
+			Timestamp of the element inserting into the collection.
+		*/
+		MIT_INSERTION_TIME,
+
+		/**
+			Name of the user who has modified the element.
+		*/
+		MIT_LAST_OPERATION_USER,
+
+		/**
+			Timestamp of the last operation on the element in the collection.
+		*/
+		MIT_LAST_OPERATION_TIME,
+
+		/**
+			Tumbnail for the item preview.
+		*/
+		MIT_PREVIEW_THUMBNAIL,
+
+		/**
+			Current element revision.
+		*/
+		MIT_REVISION = idoc::IDocumentMetaInfo::MIT_USER + 20000
+	};
+
+	enum IterationFlags
+	{
+		IF_RECURSIVE = 1,
+		IF_BRANCH_ONLY = 2,
+		IF_LEAF_ONLY = 4
+	};
 
 	/**
 		Get number of elements in the collection
 	*/
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const = 0;
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
 
 	/**
-		Get IDs of the elements inside the collection.
+		Get IDs of the elements inside the collection for parent.
+		\param parentId	Parent element ID
 		\param offset	Index offset of the first element
 		\param count	If positive, the number of elements should be returned.
 		\param selectionParamsPtr	 [optional] Additional parameters for filtering/ordering elements.
@@ -46,13 +152,58 @@ public:
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
+
+	/**
+		Get parent of the element with the given ID.
+	*/
+	virtual Id GetParentId(const Id& elementId) const = 0;
+
+	/**
+		Get path of the element with the given ID.
+	*/
+	virtual Ids GetElementPath(const Id& elementId) const = 0;
+
+	/**
+		Checking if the element with the given ID is a branch.
+	*/
+	virtual bool IsBranch(const Id& elementId) const = 0;
+
+	/**
+		Get information about a given element.
+	*/
+	virtual QVariant GetElementInfo(const Id& elementId, int infoType) const = 0;
+
+	/**
+		Get meta-information of the element in the collection.
+		\param elementId		ID of the element in the collection.
+		\param metaInfo			Meta-info to be filled by this method.
+		\return \c true if the operation was successful, and \c false if no information could be provided.
+	*/
+	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const = 0;
+
+	/**
+		Set name of the element with the given ID.
+	*/
+	virtual bool SetElementName(const Id& elementId, const QString& name) = 0;
+
+	/**
+		Set description of the element with the given ID.
+	*/
+	virtual bool SetElementDescription(const Id& elementId, const QString& description) = 0;
+
+	/**
+		Enable/Disable element with the given ID.
+	*/
+	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) = 0;
 };
 
 
 } // namespace imtbase
 
 
-Q_DECLARE_METATYPE(imtbase::ICollectionInfo::ElementInsertInfo);
+Q_DECLARE_METATYPE(imtbase::ICollectionInfo::NotifierInfo);
 
 

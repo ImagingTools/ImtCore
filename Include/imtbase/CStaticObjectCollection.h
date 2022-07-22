@@ -43,7 +43,8 @@ public:
 				DataPtr defaultValuePtr = DataPtr(),
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
+				const Id& parentId = Id()) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

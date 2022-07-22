@@ -109,7 +109,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		}
 
 		featurePackagePtr->SetPackageId(objectId);
-		featurePackagePtr->SetObjectDescription(objectId, description);
+		featurePackagePtr->SetElementDescription(objectId, description);
 
 
 		imtbase::CTreeItemModel* featuresModelPtr = nullptr;

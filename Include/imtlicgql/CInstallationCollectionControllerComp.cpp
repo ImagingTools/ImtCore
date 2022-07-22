@@ -18,9 +18,9 @@ namespace imtlicgql
 
 QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
-	imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
+	imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 
-	if (m_objectCollectionCompPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+	if (metaInfoPtr.IsValid()){
 		if (informationId == QByteArray("InstanceId")){
 			return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID);
 		}

@@ -18,8 +18,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp
 	SummaryInformation result;
 
 	if (m_collectionPtr != nullptr){
-		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
-		if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+		if (metaInfoPtr.IsValid()){
 			if (informationId == QByteArray("EMail")){
 				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
 				result.sortValue = result.text;

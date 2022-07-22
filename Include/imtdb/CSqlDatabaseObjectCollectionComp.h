@@ -50,20 +50,16 @@ public:
 
 	CSqlDatabaseObjectCollectionComp();
 
-	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
-	virtual Ids GetElementIds(
-				int offset = 0,
-				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-
-	// reimplemented (IObjectCollectionInfo)
-	virtual bool GetCollectionItemMetaInfo(const QByteArray & objectId, idoc::IDocumentMetaInfo & metaInfo) const override;
-	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
-	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
-
 	// reimplemented (imtbase::IObjectCollection)
+	virtual const imtbase::IRevisionController* GetRevisionController() const override;
+	virtual const imtbase::ICollectionDataController* GetDataController() const override;
+	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
+	virtual Id InsertNewBranch(
+				const Id& parentId,
+				const QString& name,
+				const QString& description,
+				const Id& proposedElementId = Id(),
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr) override;
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
@@ -71,18 +67,37 @@ public:
 				DataPtr defaultValuePtr = DataPtr(),
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
-	virtual bool RemoveObject(const QByteArray& objectId) override;
-	virtual bool SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
-	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
-	virtual const imtbase::IRevisionController * GetRevisionController() const override;
-	virtual const imtbase::ICollectionDataController * GetDataController() const override;
-	virtual int GetOperationFlags(const QByteArray & objectId = QByteArray()) const override;
-	virtual bool GetDataMetaInfo(const QByteArray & objectId, MetaInfoPtr & metaInfoPtr) const override;
-	virtual const istd::IChangeable * GetObjectPtr(const QByteArray & objectId) const override;
-	virtual bool GetObjectData(const QByteArray & objectId, DataPtr & dataPtr) const override;
-	virtual void SetObjectEnabled(const QByteArray & objectId, bool isEnabled = true) override;
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
+				const Id& parentId = Id()) override;
+	virtual bool RemoveElement(const Id& elementId) override;
+	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
+	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
+	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+
+	// reimplemented (IObjectCollectionInfo)
+	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
+	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
+	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
+
+	// reimplemented (ICollectionInfo)
+	virtual int GetElementsCount(
+		const iprm::IParamsSet* selectionParamPtr = nullptr,
+		const Id& parentId = Id(),
+		int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual Ids GetElementIds(
+		int offset = 0,
+		int count = -1,
+		const iprm::IParamsSet* selectionParamsPtr = nullptr,
+		const Id& parentId = Id(),
+		int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual Id GetParentId(const Id& elementId) const override;
+	virtual Ids GetElementPath(const Id& elementId) const override;
+	virtual bool IsBranch(const Id& elementId) const override;
+	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+	virtual bool SetElementName(const Id& objectId, const QString& name) override;
+	virtual bool SetElementDescription(const Id& objectId, const QString& description) override;
+	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;

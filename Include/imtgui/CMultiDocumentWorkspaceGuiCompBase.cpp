@@ -682,9 +682,14 @@ bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*ind
 
 // reimplemented (imtbase::IObjectCollectionInfo)
 
-bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetCollectionItemMetaInfo(const QByteArray& /*objectId*/, idoc::IDocumentMetaInfo& /*metaInfo*/) const
+imtbase::ICollectionInfo::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementMetaInfo(const Id& /*objectId*/) const
 {
-	return false;
+	return MetaInfoPtr();
+}
+
+imtbase::ICollectionInfo::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetDataMetaInfo(const Id& /*objectId*/) const
+{
+	return MetaInfoPtr();
 }
 
 
@@ -704,7 +709,10 @@ imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::G
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return 0;
 }
@@ -713,15 +721,53 @@ int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(const ipr
 imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds(
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return Ids();
+}
+
+
+imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetParentId(const Id& /*elementId*/) const
+{
+	return Id();
+}
+
+
+imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementPath(const Id& /*elementId*/) const
+{
+	return Ids();
+}
+
+
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::IsBranch(const Id& /*elementId*/) const
+{
+	return false;
 }
 
 
 QVariant CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
 {
 	return QVariant();
+}
+
+
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+{
+	return false;
+}
+
+
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+{
+	return false;
+}
+
+
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+{
+	return false;
 }
 
 

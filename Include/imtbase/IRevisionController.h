@@ -7,6 +7,9 @@
 // ACF includes
 #include <istd/IPolymorphic.h>
 
+// ImtCore includes
+#include <imtbase/ICollectionInfo.h>
+
 
 namespace imtbase
 {
@@ -43,32 +46,32 @@ public:
 		Get list of revisions available for restore for a given data object in the collection.
 	*/
 	virtual RevisionInfoList GetRevisionInfoList(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId) const = 0;
+				const IObjectCollection& collection,
+				const ICollectionInfo::Id& objectId) const = 0;
 
 	/**
-	Create backup of the given object in the collection.
-	\return Revision of the saved object if the operation was successfull, or a negative value otherwise.
-*/
+		Create backup of the given object in the collection.
+		\return Revision of the saved object if the operation was successfull, or a negative value otherwise.
+	*/
 	virtual int BackupObject(
-				imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
+				const IObjectCollection& collection,
+				const ICollectionInfo::Id& objectId,
 				const QString& userComment = QString()) const = 0;
 
 	/**
 		Restore the data of an object in the collection from a given revision.
 	*/
 	virtual bool RestoreObject(
-				imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
+				IObjectCollection& collection,
+				const ICollectionInfo::Id& objectId,
 				int revision) const = 0;
 
 	/**
 		Exporting object data of a given revision from a collection to a file
 	*/
 	virtual bool ExportObject(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
+				const IObjectCollection& collection,
+				const ICollectionInfo::Id& objectId,
 				int revision,
 				const QString& filePath) const = 0;
 };

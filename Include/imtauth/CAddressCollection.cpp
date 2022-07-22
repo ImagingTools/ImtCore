@@ -23,7 +23,7 @@ QByteArray CAddressCollection::AddAddress(IAddress* addressPtr)
 
 bool CAddressCollection::RemoveAddress(const QByteArray& addressId)
 {
-	return m_collection.RemoveObject(addressId);
+	return m_collection.RemoveElement(addressId);
 }
 
 

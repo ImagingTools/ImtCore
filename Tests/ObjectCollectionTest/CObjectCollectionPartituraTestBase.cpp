@@ -359,10 +359,10 @@ void CObjectCollectionPartituraTestBase::InsertNewObjectWithMetaObjectTest()
 			}
 
 			if (!idNewObject.isEmpty()){
-				imtbase::IObjectCollection::MetaInfoPtr referenceMetaInfoPtr;
+				imtbase::IObjectCollection::MetaInfoPtr referenceMetaInfoPtr = objectCollectionPtr->GetDataMetaInfo(idNewObject);
 				QString referenceName;
 				QString referenceDescription;
-				if (objectCollectionPtr->GetDataMetaInfo(idNewObject, referenceMetaInfoPtr)){
+				if (referenceMetaInfoPtr.IsValid()){
 					if (m_typeIdObjectCollection == "AccountInfo"){
 						referenceName = referenceMetaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
 						referenceDescription = referenceMetaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
@@ -411,7 +411,7 @@ void CObjectCollectionPartituraTestBase::RemoveExistObjectTest()
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::CObjectCollection::DataPtr(), "testId2");
 
 			// Remove object with the ID 'testId':
-			objectCollectionPtr->RemoveObject("testId");
+			objectCollectionPtr->RemoveElement("testId");
 
 			// Get IDs in the collection after removing of the 'testId':
 			imtbase::IObjectCollection::Ids idsInObjectAfterRemove = objectCollectionPtr->GetElementIds();
@@ -453,7 +453,7 @@ void CObjectCollectionPartituraTestBase::RemoveNonExistObjectTest()
 			objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject2", "TestDescription2", imtbase::CObjectCollection::DataPtr(), "testId2");
 
 			// Remove object with non-exist id
-			objectCollectionPtr->RemoveObject("testId3");
+			objectCollectionPtr->RemoveElement("testId3");
 
 			// Check contains removed object and another objects
 			imtbase::IObjectCollection::Ids idsInObjectAfterRemove = objectCollectionPtr->GetElementIds();
@@ -524,8 +524,8 @@ void CObjectCollectionPartituraTestBase::SetObjectNameTest()
 			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription");
 			if (!idNewObject.isEmpty()){
 				QString changedName = "ChangedTestNameObject";
-				objectCollectionPtr->SetObjectName(idNewObject, changedName);
-				QString objectName = objectCollectionPtr->GetElementInfo(idNewObject, imtbase::ICollectionInfoProvider::EIT_NAME).toString();
+				objectCollectionPtr->SetElementName(idNewObject, changedName);
+				QString objectName = objectCollectionPtr->GetElementInfo(idNewObject, imtbase::ICollectionInfo::EIT_NAME).toString();
 				QVERIFY2(((changedName == objectName) && (objectName != "TestObject")), "Name object don't changed");
 			}
 			else{
@@ -559,8 +559,8 @@ void CObjectCollectionPartituraTestBase::SetObjectDescriptionTest()
 			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription");
 			if (!idNewObject.isEmpty()){
 				QString changedDescription = "ChangedDescriptionObject";
-				objectCollectionPtr->SetObjectDescription(idNewObject, changedDescription);
-				QString objectDescription = objectCollectionPtr->GetElementInfo(idNewObject, imtbase::ICollectionInfoProvider::EIT_DESCRIPTION).toString();
+				objectCollectionPtr->SetElementDescription(idNewObject, changedDescription);
+				QString objectDescription = objectCollectionPtr->GetElementInfo(idNewObject, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 				QVERIFY2(((changedDescription == objectDescription) && (objectDescription != "TestDescription")), "Description object don't changed");
 			}
 			else{
@@ -593,7 +593,7 @@ void CObjectCollectionPartituraTestBase::GetObjectTypeIdTest()
 			// insert new object and check type id
 			QByteArray idNewObject = objectCollectionPtr->InsertNewObject(m_typeIdObjectCollection, "TestObject", "TestDescription");
 			if (!idNewObject.isEmpty()){
-				imtbase::ICollectionInfoProvider::Id gettedObjectTypeId = objectCollectionPtr->GetObjectTypeId(idNewObject);
+				imtbase::ICollectionInfo::Id gettedObjectTypeId = objectCollectionPtr->GetObjectTypeId(idNewObject);
 				QVERIFY2((gettedObjectTypeId == m_typeIdObjectCollection), "Type id of object is incorrect");
 
 			}
@@ -682,7 +682,7 @@ void CObjectCollectionPartituraTestBase::GetElementsCountTest()
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
 				if (!idsInObject.isEmpty()){
 					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveObject(idsInObject[i]);
+						objectCollectionPtr->RemoveElement(idsInObject[i]);
 					}
 				}
 			}
@@ -867,7 +867,7 @@ void CObjectCollectionPartituraTestBase::FilterTest()
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
 				if (!idsInObject.isEmpty()){
 					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveObject(idsInObject[i]);
+						objectCollectionPtr->RemoveElement(idsInObject[i]);
 					}
 				}
 			}
@@ -967,7 +967,7 @@ void CObjectCollectionPartituraTestBase::SortingTest()
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
 				if (!idsInObject.isEmpty()){
 					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveObject(idsInObject[i]);
+						objectCollectionPtr->RemoveElement(idsInObject[i]);
 					}
 				}
 			}
@@ -1096,7 +1096,7 @@ void CObjectCollectionPartituraTestBase::GetElementIdsTest()
 				imtbase::IObjectCollection::Ids idsInObject = objectCollectionPtr->GetElementIds();
 				if (!idsInObject.isEmpty()){
 					for (int i = 0; i < idsInObject.count(); i++){
-						objectCollectionPtr->RemoveObject(idsInObject[i]);
+						objectCollectionPtr->RemoveElement(idsInObject[i]);
 					}
 				}
 			}

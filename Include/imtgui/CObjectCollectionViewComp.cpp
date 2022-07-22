@@ -1067,7 +1067,7 @@ void CObjectCollectionViewComp::OnContextMenuEditDescription(bool /*checked*/)
 				bool ok;
 				QString newDescription = QInputDialog::getText(ItemList, tr("Enter object description"), tr("Description"), QLineEdit::Normal, description, &ok);
 				if (ok){
-					objectPtr->SetObjectDescription(itemId, newDescription);
+					objectPtr->SetElementDescription(itemId, newDescription);
 				}
 			}
 		}

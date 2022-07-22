@@ -49,7 +49,8 @@ int CObjectMetaInfoUniquenessValidatorComp::IsUniqueValue(const imtbase::IObject
 			else{
 				metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
 
-				if (!currentCollectionPtr->GetDataMetaInfo(currentObjectId, metaInfoPtr)){
+				metaInfoPtr = currentCollectionPtr->GetDataMetaInfo(currentObjectId);
+				if (!metaInfoPtr.IsValid()){
 					retVal |= RF_MISSING_METAINFO;
 					continue;
 				}

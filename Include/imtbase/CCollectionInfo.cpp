@@ -39,8 +39,8 @@ QByteArray CCollectionInfo::InsertItem(const QByteArray& id, const QString & nam
 
 	ElementInsertInfo info;
 	info.elementId = newItem.id;
-	istd::IChangeable::ChangeSet changeSet(CF_ANY);
-	changeSet.SetChangeInfo(s_cidElementInserted, QVariant::fromValue<ElementInsertInfo>(info));
+	istd::IChangeable::ChangeSet changeSet(CF_ADDED);
+	changeSet.SetChangeInfo(CN_ELEMENT_INSERTED, QVariant::fromValue<ElementInsertInfo>(info));
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	if (position < 0 || (position > m_items.count() - 1)){
@@ -60,8 +60,8 @@ void CCollectionInfo::RemoveItem(const QByteArray& id)
 		if (item.id == id){
 			ElementRemoveInfo info;
 			info.elementId = id;
-			istd::IChangeable::ChangeSet changeSet(CF_ANY);
-			changeSet.SetChangeInfo(s_cidElementRemoved, QVariant::fromValue<ElementRemoveInfo>(info));
+			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
+			changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, QVariant::fromValue<ElementRemoveInfo>(info));
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 			m_items.removeOne(item);
@@ -79,8 +79,8 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 			if (item.name != name || item.description != description){
 				ElementUpdateInfo info;
 				info.elementId = id;
-				istd::IChangeable::ChangeSet changeSet(CF_ANY);
-				changeSet.SetChangeInfo(s_cidElementUpdated, QVariant::fromValue<ElementUpdateInfo>(info));
+				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, QVariant::fromValue<ElementUpdateInfo>(info));
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				item.name = name;
@@ -95,7 +95,10 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 
 // reimplemented (ICollectionInfo)
 
-int CCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CCollectionInfo::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return m_items.size();
 }
@@ -104,7 +107,9 @@ int CCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPt
 ICollectionInfo::Ids CCollectionInfo::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	Ids retVal;
 
@@ -117,6 +122,24 @@ ICollectionInfo::Ids CCollectionInfo::GetElementIds(
 	}
 
 	return retVal;
+}
+
+
+ICollectionInfo::Id CCollectionInfo::GetParentId(const Id& /*elementId*/) const
+{
+	return Id();
+}
+
+
+ICollectionInfo::Ids CCollectionInfo::GetElementPath(const Id& /*elementId*/) const
+{
+	return Ids();
+}
+
+
+bool CCollectionInfo::IsBranch(const Id& /*elementId*/) const
+{
+	return false;
 }
 
 
@@ -148,6 +171,29 @@ QVariant CCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoTy
 	return QVariant();
 }
 
+ICollectionInfo::MetaInfoPtr CCollectionInfo::GetElementMetaInfo(const Id& /*elementId*/) const
+{
+	return MetaInfoPtr();
+}
+
+
+bool CCollectionInfo::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+{
+	return false;
+}
+
+
+bool CCollectionInfo::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+{
+	return false;
+}
+
+
+bool CCollectionInfo::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+{
+	return false;
+}
+
 
 // reimplemented (istd::IChangeable)
 
@@ -162,7 +208,7 @@ bool CCollectionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 	const CCollectionInfo* sourcePtr = dynamic_cast<const CCollectionInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::IChangeable::ChangeSet changeSet(CF_ANY);
-		changeSet.SetChangeInfo(s_cidAllChanged, QVariant());
+		changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant());
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 		m_items = sourcePtr->m_items;
@@ -198,7 +244,7 @@ istd::IChangeable* CCollectionInfo::CloneMe(CompatibilityMode mode) const
 bool CCollectionInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::IChangeable::ChangeSet changeSet(CF_ANY);
-	changeSet.SetChangeInfo(s_cidAllChanged, QVariant());
+	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant());
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 	m_items.clear();
@@ -212,7 +258,7 @@ bool CCollectionInfo::ResetData(CompatibilityMode /*mode*/)
 bool CCollectionInfo::Serialize(iser::IArchive& archive)
 {
 	istd::IChangeable::ChangeSet changeSet(CF_ANY);
-	changeSet.SetChangeInfo(s_cidAllChanged, QVariant());
+	changeSet.SetChangeInfo(CN_ALL_CHANGED, QVariant());
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this, &changeSet);
 
 	int itemCount = m_items.count();

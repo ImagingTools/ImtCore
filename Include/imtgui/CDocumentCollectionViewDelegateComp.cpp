@@ -8,6 +8,7 @@
 #include <QtWidgets/QInputDialog>
 
 // ACF includes
+#include <iprm/IOptionsList.h>
 #include <istd/CChangeGroup.h>
 #include <istd/CSystem.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -184,7 +185,7 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 			}
 
 			if (isRemoveAccepted){
-				m_collectionPtr->RemoveObject(id);
+				m_collectionPtr->RemoveElement(id);
 			}
 		}
 	}
@@ -242,7 +243,9 @@ void CDocumentCollectionViewDelegateComp::UpdateItemSelection(
 		imod::IObserver* observerPtr = dynamic_cast<imod::IObserver*>(m_informationViewCompPtr.GetPtr());
 		if (observerPtr != nullptr){
 			imtbase::IObjectCollection* collectionPtr = dynamic_cast<imtbase::IObjectCollection*>(m_collectionPtr);
-			if (collectionPtr->GetDataMetaInfo(selectedItems[0], m_selectedMetaInfoPtr)){
+
+			m_selectedMetaInfoPtr = collectionPtr->GetDataMetaInfo(selectedItems[0]);
+			if (m_selectedMetaInfoPtr.IsValid()){
 				imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_selectedMetaInfoPtr.GetPtr());
 				if (modelPtr != nullptr){
 					modelPtr->AttachObserver(observerPtr);
@@ -605,9 +608,9 @@ void CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::CreateBackup(c
 
 	const imtbase::IRevisionController* revisionControllerPtr = m_parent.m_collectionPtr->GetRevisionController();
 	if (revisionControllerPtr != nullptr){
-		idoc::CStandardDocumentMetaInfo metaInfo;
-		m_parent.m_collectionPtr->GetCollectionItemMetaInfo(objectId, metaInfo);
-		QVariant variant = metaInfo.GetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION);
+		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_parent.m_collectionPtr->GetElementMetaInfo(objectId);
+		Q_ASSERT(metaInfo.IsValid());
+		QVariant variant = metaInfo->GetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION);
 		
 		int revision = -1;
 		if (variant.isValid()){

@@ -17,15 +17,15 @@ namespace imtlicgql
 QVariant CFeaturePackageCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
 	if (informationId == QByteArray("Added")){
-		idoc::CStandardDocumentMetaInfo metaInfo;
-		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-			return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
+		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);;
+		if (metaInfo.IsValid()){
+			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
 	}
 	else if (informationId == QByteArray("ModificationTime")){
-		idoc::CStandardDocumentMetaInfo metaInfo;
-		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(objectId, metaInfo)){
-			return metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
+		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+		if (metaInfo.IsValid()){
+			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
 		}
 	}
 
@@ -55,16 +55,15 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		dataModel = new imtbase::CTreeItemModel();
 		metaInfoModel = new imtbase::CTreeItemModel();
 
-		idoc::CStandardDocumentMetaInfo metaInfo;
-
 		QByteArray packageId = GetObjectIdFromInputParams(inputParams);
 
 		int index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Modification Time"), index);
 		childs = metaInfoModel->AddTreeModel("Childs", index);
 
-		if (m_objectCollectionCompPtr->GetCollectionItemMetaInfo(packageId, metaInfo)){
-			QString date = metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+		imtbase::ICollectionInfo::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(packageId);
+		if (metaInfo.IsValid()){
+			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 			childs->SetData("Value", date);
 		}
 

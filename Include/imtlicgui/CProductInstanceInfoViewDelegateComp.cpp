@@ -32,7 +32,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CProductInstanceInfoViewDele
 		imtbase::IObjectCollection::MetaInfoPtr metaInfoPtr;
 		
 		if (informationId == QByteArray("InstanceId")){
-			if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+			metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+			if (metaInfoPtr.IsValid()){
 				Q_ASSERT(metaInfoPtr.IsValid());
 
 				imtgui::ICollectionViewDelegate::SummaryInformation retVal;
@@ -44,7 +45,8 @@ imtgui::ICollectionViewDelegate::SummaryInformation CProductInstanceInfoViewDele
 			}
 		}
 		else if (informationId == QByteArray("Customer")){
-			if (m_collectionPtr->GetDataMetaInfo(objectId, metaInfoPtr)){
+			metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+			if (metaInfoPtr.IsValid()){
 				Q_ASSERT(metaInfoPtr.IsValid());
 
 				imtgui::ICollectionViewDelegate::SummaryInformation retVal;

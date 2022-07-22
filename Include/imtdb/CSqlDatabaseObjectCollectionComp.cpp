@@ -28,123 +28,31 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 }
 
 
-// reimplemented (ICollectionInfo)
-
-int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
-{
-	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
-
-	if (m_objectDelegateCompPtr.IsValid()){
-		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(&filterParams);
-		if (!countQuery.isEmpty()){
-			QSqlError sqlError;
-			QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
-
-			if (sqlError.type() == QSqlError::NoError){
-				if (result.first()){
-					return result.value(0).toInt();
-				}
-			}
-			else{
-				SendErrorMessage(0, sqlError.text(), "Database collection");
-			}
-		}
-		else{
-			SendErrorMessage(0, "Database query could not be created", "Database collection");
-		}
-	}
-
-	return 0;
-}
-
-
-imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
-{
-	Ids retVal;
-
-	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
-
-	if (m_objectDelegateCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
-		if (objectSelectionQuery.isEmpty()){
-			return Ids();
-		}
-
-		QSqlError sqlError;
-		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
-
-		while (sqlQuery.next()){
-			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
-			Q_ASSERT(!objectId.isEmpty());
-
-			retVal.push_back(objectId);
-		}
-	}
-
-	return retVal;
-}
-
-
-QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elementId, int infoType) const
-{
-	if (m_objectDelegateCompPtr.IsValid()){
-		QSqlRecord record = GetObjectRecord(elementId);
-		if (!record.isEmpty()){
-			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
-			bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
-			if (isOk){
-				switch (infoType){
-				case EIT_NAME:
-					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString() : QString();
-
-				case EIT_DESCRIPTION:
-					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString() : QString();
-				}
-			}
-		}
-	}
-
-	return QVariant();
-}
-
-
-// reimplemented (IObjectCollectionInfo)
-
-bool CSqlDatabaseObjectCollectionComp::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
-{
-	if (m_objectDelegateCompPtr.IsValid()){
-		QSqlRecord record = GetObjectRecord(objectId);
-		if (!record.isEmpty()){
-			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
-			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
-			if (collectionMetaInfoPtr.IsValid()){
-				return metaInfo.CopyFrom(*collectionMetaInfoPtr);
-			}
-		}
-	}
-
-	return false;
-}
-
-
-const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo() const
-{
-	return &m_typesInfo;
-}
-
-
-imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
-{
-	return *m_typeIdAttrPtr;
-}
-
-
 // reimplemented (imtbase::IObjectCollection)
+
+const imtbase::IRevisionController* CSqlDatabaseObjectCollectionComp::GetRevisionController() const
+{
+	return nullptr;
+}
+
+
+const imtbase::ICollectionDataController* CSqlDatabaseObjectCollectionComp::GetDataController() const
+{
+	return nullptr;
+}
+
+
+int CSqlDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*objectId*/) const
+{
+	return OF_ALL;
+}
+
+
+imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::InsertNewBranch(const Id& /*parentId*/, const QString& /*name*/, const QString& /*description*/, const Id& /*proposedElementId*/, const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
+{
+	return Id();
+}
+
 
 QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
@@ -153,7 +61,8 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
+			const Id& /*parentId*/)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return nullptr;
@@ -172,7 +81,7 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 	}
 
 	istd::IChangeable::ChangeSet changeSet(CF_ADDED);
-	changeSet.SetChangeInfo(CN_OBJECT_ADDED, objectId);
+	changeSet.SetChangeInfo(CN_ELEMENT_INSERTED, objectId);
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
@@ -200,13 +109,13 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
+bool CSqlDatabaseObjectCollectionComp::RemoveElement(const Id& elementId)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectQuery(*this, objectId);
+	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectQuery(*this, elementId);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -214,7 +123,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 	}
 
 	istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
-	changeSet.SetChangeInfo(CN_OBJECT_REMOVED, objectId);
+	changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
@@ -223,120 +132,6 @@ bool CSqlDatabaseObjectCollectionComp::RemoveObject(const QByteArray& objectId)
 	}
 	else {
 		changeNotifier.Abort();
-	}
-
-	return false;
-}
-
-
-bool CSqlDatabaseObjectCollectionComp::SetObjectData(
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
-			CompatibilityMode /*mode*/)
-{
-	if (!m_objectDelegateCompPtr.IsValid()){
-		return false;
-	}
-
-	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object);
-	if (query.isEmpty()){
-		SendErrorMessage(0, "Database query could not be created", "Database collection");
-
-		return false;
-	}
-
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
-
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-	if (ExecuteTransaction(query)){
-		return true;
-	}
-	else{
-		changeNotifier.Abort();
-	}
-
-	return false;
-}
-
-
-void CSqlDatabaseObjectCollectionComp::SetObjectName(const QByteArray& objectId, const QString& objectName)
-{
-	if (!m_objectDelegateCompPtr.IsValid()){
-		return;
-	}
-
-	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, objectId, objectName);
-	if (query.isEmpty()){
-		SendErrorMessage(0, "Database query could not be created", "Database collection");
-
-		return;
-	}
-
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
-
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-	if (!ExecuteTransaction(query)){
-		changeNotifier.Abort();
-	}
-}
-
-
-void CSqlDatabaseObjectCollectionComp::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
-{
-	if (!m_objectDelegateCompPtr.IsValid()){
-		return;
-	}
-
-	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, objectId, objectDescription);
-	if (query.isEmpty()){
-		SendErrorMessage(0, "Database query could not be created", "Database collection");
-
-		return;
-	}
-
-	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-	changeSet.SetChangeInfo(CN_OBJECT_UPDATED, objectId);
-
-	istd::CChangeNotifier changeNotifier(this, &changeSet);
-
-	if (!ExecuteTransaction(query)){
-		changeNotifier.Abort();
-	}
-}
-
-
-const imtbase::IRevisionController * CSqlDatabaseObjectCollectionComp::GetRevisionController() const
-{
-	return nullptr;
-}
-
-
-const imtbase::ICollectionDataController * CSqlDatabaseObjectCollectionComp::GetDataController() const
-{
-	return nullptr;
-}
-
-
-int CSqlDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*objectId*/) const
-{
-	return OF_ALL;
-}
-
-
-bool CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const
-{
-	if (m_objectDelegateCompPtr.IsValid()){
-		QSqlRecord record = GetObjectRecord(objectId);
-		if (!record.isEmpty()){
-			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
-			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
-			
-			return m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, metaInfoPtr, collectionMetaInfoPtr);
-		}
 	}
 
 	return false;
@@ -385,10 +180,267 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 }
 
 
-void CSqlDatabaseObjectCollectionComp::SetObjectEnabled(const QByteArray& /*objectId*/, bool /*isEnabled*/)
+bool CSqlDatabaseObjectCollectionComp::SetObjectData(
+			const Id& objectId,
+			const istd::IChangeable& object,
+			CompatibilityMode /*mode*/)
 {
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return false;
+	}
+
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	if (ExecuteTransaction(query)){
+		return true;
+	}
+	else{
+		changeNotifier.Abort();
+	}
+
+	return false;
 }
 
+
+// reimplemented (IObjectCollectionInfo)
+
+const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo() const
+{
+	return &m_typesInfo;
+}
+
+
+imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
+{
+	return *m_typeIdAttrPtr;
+}
+
+
+imtbase::ICollectionInfo::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
+{
+	if (m_objectDelegateCompPtr.IsValid()){
+		QSqlRecord record = GetObjectRecord(objectId);
+		if (!record.isEmpty()){
+			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+
+			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+
+			return objectMetaInfoPtr;
+		}
+	}
+
+	return MetaInfoPtr();
+}
+
+
+// reimplemented (ICollectionInfo)
+
+int CSqlDatabaseObjectCollectionComp::GetElementsCount(
+			const iprm::IParamsSet* selectionParamPtr,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
+{
+	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
+
+	if (m_objectDelegateCompPtr.IsValid()){
+		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(&filterParams);
+		if (!countQuery.isEmpty()){
+			QSqlError sqlError;
+			QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
+
+			if (sqlError.type() == QSqlError::NoError){
+				if (result.first()){
+					return result.value(0).toInt();
+				}
+			}
+			else{
+				SendErrorMessage(0, sqlError.text(), "Database collection");
+			}
+		}
+		else{
+			SendErrorMessage(0, "Database query could not be created", "Database collection");
+		}
+	}
+
+	return 0;
+}
+
+
+imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
+{
+	Ids retVal;
+
+	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+
+	if (m_objectDelegateCompPtr.IsValid()){
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+		if (objectSelectionQuery.isEmpty()){
+			return Ids();
+		}
+
+		QSqlError sqlError;
+		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+
+		while (sqlQuery.next()){
+			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
+			Q_ASSERT(!objectId.isEmpty());
+
+			retVal.push_back(objectId);
+		}
+	}
+
+	return retVal;
+}
+
+
+imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetParentId(const Id& /*elementId*/) const
+{
+	return Id();
+}
+
+
+imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementPath(const Id& /*elementId*/) const
+{
+	return Ids();
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::IsBranch(const Id& /*elementId*/) const
+{
+	return false;
+}
+
+
+QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elementId, int infoType) const
+{
+	if (m_objectDelegateCompPtr.IsValid()){
+		QSqlRecord record = GetObjectRecord(elementId);
+		if (!record.isEmpty()){
+			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+			bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+			if (isOk){
+				switch (infoType){
+				case EIT_NAME:
+					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString() : QString();
+
+				case EIT_DESCRIPTION:
+					return collectionMetaInfoPtr.IsValid() ? collectionMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString() : QString();
+				}
+			}
+		}
+	}
+
+	return QVariant();
+}
+
+
+imtbase::ICollectionInfo::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id& elementId) const
+{
+	if (m_objectDelegateCompPtr.IsValid()){
+		QSqlRecord record = GetObjectRecord(elementId);
+		if (!record.isEmpty()){
+			imtbase::IMetaInfoCreator::MetaInfoPtr objectMetaInfoPtr;
+			imtbase::IMetaInfoCreator::MetaInfoPtr collectionMetaInfoPtr;
+
+			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+
+			return collectionMetaInfoPtr;
+		}
+	}
+
+	return MetaInfoPtr();
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
+{
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+
+	if (elementId.isEmpty()){
+		return false;
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, name);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return false;
+	}
+
+	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(elementId, -1, -1, nullptr);
+	if (objectSelectionQuery.isEmpty()){
+		return false;
+	}
+
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	if (!ExecuteTransaction(query)){
+		changeNotifier.Abort();
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
+{
+	if (!m_objectDelegateCompPtr.IsValid()){
+		return false;
+	}
+
+	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, description);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
+		return false;
+	}
+
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	if (!ExecuteTransaction(query)){
+		changeNotifier.Abort();
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CSqlDatabaseObjectCollectionComp::SetElementEnabled(const Id& /*objectId*/, bool /*isEnabled*/)
+{
+	return false;
+}
+
+
+// reimplemented (istd::IChangeable)
 
 bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 {

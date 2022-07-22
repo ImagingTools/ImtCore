@@ -45,7 +45,12 @@ public:
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual const imtbase::ICollectionDataController* GetDataController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
-	virtual bool GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const override;
+	virtual Id InsertNewBranch(
+				const Id& parentId,
+				const QString& name,
+				const QString& description,
+				const Id& proposedElementId = Id(),
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr) override;
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
@@ -53,27 +58,37 @@ public:
 				DataPtr defaultValuePtr = DataPtr(),
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr) override;
-	virtual bool RemoveObject(const QByteArray& objectId) override;
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
+				const Id& parentId = Id()) override;
+	virtual bool RemoveElement(const QByteArray& elementId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual void SetObjectName(const QByteArray& objectId, const QString& objectName) override;
-	virtual void SetObjectDescription(const QByteArray& objectId, const QString& objectDescription) override;
-	virtual void SetObjectEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 
 	// reimplemented (IObjectCollectionInfo)
-	virtual bool GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const override;
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
+	virtual MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual Id GetParentId(const Id& elementId) const override;
+	virtual Ids GetElementPath(const Id& elementId) const override;
+	virtual bool IsBranch(const Id& elementId) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
+	virtual MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
+	virtual bool SetElementName(const QByteArray& objectId, const QString& objectName) override;
+	virtual bool SetElementDescription(const QByteArray& objectId, const QString& objectDescription) override;
+	virtual bool SetElementEnabled(const QByteArray& objectId, bool isEnabled = true) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -151,9 +166,19 @@ inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetOperat
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetDataMetaInfo(const QByteArray& objectId, MetaInfoPtr& metaInfoPtr) const
+inline ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::InsertNewBranch(
+			const Id& parentId,
+			const QString& name,
+			const QString& description,
+			const Id& proposedElementId,
+			const idoc::IDocumentMetaInfo* elementMetaInfoPtr)
 {
-	return m_collection.GetDataMetaInfo(objectId, metaInfoPtr);
+	return m_collection.InsertNewBranch(
+				parentId,
+				name,
+				description,
+				proposedElementId,
+				elementMetaInfoPtr);
 }
 
 
@@ -165,16 +190,25 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 			DataPtr defaultValuePtr,
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr)
+			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
+			const Id& parentId)
 {
-	return m_collection.InsertNewObject(typeId, name, description, defaultValuePtr, proposedObjectId, dataMetaInfoPtr, collectionItemMetaInfoPtr);
+	return m_collection.InsertNewObject(
+				typeId,
+				name,
+				description,
+				defaultValuePtr,
+				proposedObjectId,
+				dataMetaInfoPtr,
+				collectionItemMetaInfoPtr,
+				parentId);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RemoveObject(const QByteArray& objectId)
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RemoveElement(const QByteArray& elementId)
 {
-	return m_collection.RemoveObject(objectId);
+	return m_collection.RemoveElement(elementId);
 }
 
 
@@ -199,34 +233,7 @@ inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjec
 }
 
 
-template<class BaseInterface, class ObjectImpl>
-inline void TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjectName(const QByteArray& objectId, const QString& objectName)
-{
-	m_collection.SetObjectName(objectId, objectName);
-}
-
-
-template<class BaseInterface, class ObjectImpl>
-inline void TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjectDescription(const QByteArray& objectId, const QString& objectDescription)
-{
-	m_collection.SetObjectDescription(objectId, objectDescription);
-}
-
-
-template<class BaseInterface, class ObjectImpl>
-inline void TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjectEnabled(const QByteArray& objectId, bool isEnabled)
-{
-	m_collection.SetObjectEnabled(objectId, isEnabled);
-}
-
-
 // reimplemented (IObjectCollectionInfo)
-
-template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetCollectionItemMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& metaInfo) const
-{
-	return m_collection.GetCollectionItemMetaInfo(objectId, metaInfo);
-}
 
 template<class BaseInterface, class ObjectImpl>
 inline const iprm::IOptionsList* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetObjectTypesInfo() const
@@ -241,13 +248,22 @@ inline imtbase::ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterfac
 	return m_types.GetOptionId(0);
 }
 
+template<class BaseInterface, class ObjectImpl>
+inline IObjectCollectionInfo::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetDataMetaInfo(const Id& objectId) const
+{
+	return m_collection.GetDataMetaInfo(objectId);
+}
+
 
 // reimplemented (ICollectionInfo)
 
 template<class BaseInterface, class ObjectImpl>
-inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
+inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount(
+			const iprm::IParamsSet* selectionParamPtr,
+			const Id& parentId,
+			int iterationFlags) const
 {
-	return m_collection.GetElementsCount(selectionParamPtr);
+	return m_collection.GetElementsCount(selectionParamPtr, parentId, iterationFlags);
 }
 
 
@@ -255,9 +271,32 @@ template<class BaseInterface, class ObjectImpl>
 inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& parentId,
+			int iterationFlags) const
 {
-	return m_collection.GetElementIds(offset, count, selectionParamsPtr);
+	return m_collection.GetElementIds(offset, count, selectionParamsPtr, parentId, iterationFlags);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetParentId(const Id& elementId) const
+{
+	return m_collection.GetParentId(elementId);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementPath(const Id& elementId) const
+{
+	return m_collection.GetElementPath(elementId);;
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::IsBranch(const Id& elementId) const
+{
+	return m_collection.IsBranch(elementId);
 }
 
 
@@ -265,6 +304,34 @@ template<class BaseInterface, class ObjectImpl>
 inline QVariant TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
 	return m_collection.GetElementInfo(elementId, infoType);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline ICollectionInfo::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementMetaInfo(const Id& elementId) const
+{
+	return m_collection.GetElementMetaInfo(elementId);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementName(const QByteArray& objectId, const QString& objectName)
+{
+	return m_collection.SetElementName(objectId, objectName);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementDescription(const QByteArray& objectId, const QString& objectDescription)
+{
+	return m_collection.SetElementDescription(objectId, objectDescription);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementEnabled(const QByteArray& objectId, bool isEnabled)
+{
+	return m_collection.SetElementEnabled(objectId, isEnabled);
 }
 
 

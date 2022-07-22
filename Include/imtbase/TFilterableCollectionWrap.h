@@ -23,36 +23,48 @@ public:
 	typedef Base BaseClass;
 
 	// pseudo-reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				const ICollectionInfo::Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	virtual imtbase::ICollectionInfo::Ids GetElementIds(
 			int offset = 0,
 			int count = -1,
-			const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+			const iprm::IParamsSet* selectionParamsPtr = nullptr,
+			const ICollectionInfo::Id& parentId = Id(),
+			int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 protected:
 	virtual imtbase::ICollectionInfo::Ids GetFilteredElementIds(const iprm::IParamsSet& filterParams) const;
+	virtual imtbase::ICollectionInfo::Ids GetSortedElementIds(
+				const imtbase::ICollectionInfo::Ids filteredIds,
+				const iprm::IParamsSet& filterParams) const;
 	virtual bool IsAcceptedByFilter(const QByteArray& objectId, const iprm::IParamsSet& filterParams) const;
-	virtual imtbase::ICollectionInfo::Ids GetSortedElementIds(const imtbase::ICollectionInfo::Ids filteredIds, const iprm::IParamsSet& filterParams) const;
 };
 
 
 // reimplemented (ICollectionInfo)
 
 template <class Base>
-int TFilterableCollectionWrap<Base>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
+int TFilterableCollectionWrap<Base>::GetElementsCount(
+			const iprm::IParamsSet* selectionParamPtr,
+			const ICollectionInfo::Id& parentId,
+			int iterationFlags) const
 {
 	if (selectionParamPtr != nullptr){
 		return GetFilteredElementIds(*selectionParamPtr).count();
 	}
 
-	return BaseClass::GetElementsCount(selectionParamPtr);
+	return BaseClass::GetElementsCount(selectionParamPtr, parentId, iterationFlags);
 }
 
 
 template <class Base>
 imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
-		int offset,
-		int count,
-		const iprm::IParamsSet* selectionParamPtr) const
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamPtr,
+			const ICollectionInfo::Id& parentId,
+			int iterationFlags) const
 {
 	ICollectionInfo::Ids retVal;
 
@@ -75,7 +87,7 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 	}
 	}
 	else {
-		retVal = BaseClass::GetElementIds(offset, count, selectionParamPtr);
+		retVal = BaseClass::GetElementIds(offset, count, selectionParamPtr, parentId, iterationFlags);
 	}
 
 	return retVal;
@@ -103,74 +115,9 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetFilteredElemen
 
 
 template <class Base>
-bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objectId, const iprm::IParamsSet& filterParams) const
-{
-	iprm::TParamsPtr<imtbase::ICollectionFilter> filterParamPtr(&filterParams, "Filter");
-	if (filterParamPtr.IsValid()){
-		QByteArray allowedTypeId = filterParamPtr->GetObjectTypeId();
-		if (!allowedTypeId.isEmpty()){
-			QByteArray typeId = BaseClass::GetObjectTypeId(objectId);
-			if (typeId != allowedTypeId){
-				return false;
-			}
-		}
-
-		QString textFilter = filterParamPtr->GetTextFilter();
-		if (textFilter.isEmpty()){
-			return true;
-		}
-
-		QByteArrayList relatedIds = filterParamPtr->GetFilteringInfoIds();
-		if (relatedIds.isEmpty()){
-			return true;
-		}
-
-		imtbase::IMetaInfoCreator::MetaInfoPtr metaInfoPtr;
-		if (BaseClass::GetDataMetaInfo(objectId, metaInfoPtr)){
-			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
-
-			for (int type : metaInfoTypes){
-				QByteArray metaInfoId = metaInfoPtr->GetMetaInfoId(type);
-				if (relatedIds.contains(metaInfoId)){
-					QString metaInfoValue = metaInfoPtr->GetMetaInfo(type).toString();
-					if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
-						return true;
-					}
-				}
-			}
-		}
-
-		idoc::CStandardDocumentMetaInfo collectionItemMetaInfo;
-		if (BaseClass::GetCollectionItemMetaInfo(objectId, collectionItemMetaInfo)){
-			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfo.GetMetaInfoTypes();
-
-			for (int type : metaInfoTypes){
-				QByteArray metaInfoId = collectionItemMetaInfo.GetMetaInfoId(type);
-				if (relatedIds.contains(metaInfoId)){
-					QString metaInfoValue = collectionItemMetaInfo.GetMetaInfo(type).toString();
-					if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
-						return true;
-					}
-				}
-			}
-		}
-
-		if (relatedIds.contains("Name")){
-			QString metaInfoValue = BaseClass::GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	return true;
-}
-
-
-template <class Base>
-imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementIds(const imtbase::ICollectionInfo::Ids filteredIds, const iprm::IParamsSet& filterParams) const
+imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementIds(
+			const imtbase::ICollectionInfo::Ids filteredIds,
+			const iprm::IParamsSet& filterParams) const
 {
 	imtbase::ICollectionInfo::Ids retVal;
 	iprm::TParamsPtr<imtbase::ICollectionFilter> filterParamPtr(&filterParams, "Filter");
@@ -193,7 +140,8 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 						listObjects.append(objectPair);
 					}
 					else{
-						if (BaseClass::GetDataMetaInfo(objectId, metaInfoPtr)){
+						metaInfoPtr = BaseClass::GetDataMetaInfo(objectId);
+						if (metaInfoPtr.IsValid()){
 							idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = metaInfoPtr->GetMetaInfoTypes();
 							for (int type : metaInfoTypes){
 								QByteArray metaInfoId = metaInfoPtr->GetMetaInfoId(type);
@@ -206,14 +154,14 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 							}
 						}
 
-						imtbase::CObjectCollectionMetaInfo collectionItemMetaInfo;
-						if (BaseClass::GetCollectionItemMetaInfo(objectId, collectionItemMetaInfo)){
-							idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfo.GetMetaInfoTypes();
+						MetaInfoPtr collectionItemMetaInfoPtr = BaseClass::GetElementMetaInfo(objectId);
+						if (collectionItemMetaInfoPtr.IsValid()){
+							idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfoPtr->GetMetaInfoTypes();
 
 							for (int type : metaInfoTypes){
-								QByteArray metaInfoId = collectionItemMetaInfo.GetMetaInfoId(type);
+								QByteArray metaInfoId = collectionItemMetaInfoPtr->GetMetaInfoId(type);
 								if (relatedIds[0] == metaInfoId){
-									QString objectName = collectionItemMetaInfo.GetMetaInfo(type).toString();
+									QString objectName = collectionItemMetaInfoPtr->GetMetaInfo(type).toString();
 									QPair<QString, QByteArray> objectPair = { objectName, objectId };
 									listObjects.append(objectPair);
 								}
@@ -259,6 +207,73 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetSortedElementI
 		return filteredIds;
 	}
 	return filteredIds;
+}
+
+
+template <class Base>
+bool TFilterableCollectionWrap<Base>::IsAcceptedByFilter(const QByteArray& objectId, const iprm::IParamsSet& filterParams) const
+{
+	iprm::TParamsPtr<imtbase::ICollectionFilter> filterParamPtr(&filterParams, "Filter");
+	if (filterParamPtr.IsValid()){
+		QByteArray allowedTypeId = filterParamPtr->GetObjectTypeId();
+		if (!allowedTypeId.isEmpty()){
+			QByteArray typeId = BaseClass::GetObjectTypeId(objectId);
+			if (typeId != allowedTypeId){
+				return false;
+			}
+		}
+
+		QString textFilter = filterParamPtr->GetTextFilter();
+		if (textFilter.isEmpty()){
+			return true;
+		}
+
+		QByteArrayList relatedIds = filterParamPtr->GetFilteringInfoIds();
+		if (relatedIds.isEmpty()){
+			return true;
+		}
+
+		MetaInfoPtr dataMetaInfoPtr = BaseClass::GetDataMetaInfo(objectId);
+		if (dataMetaInfoPtr.IsValid()){
+			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = dataMetaInfoPtr->GetMetaInfoTypes();
+
+			for (int type : metaInfoTypes){
+				QByteArray metaInfoId = dataMetaInfoPtr->GetMetaInfoId(type);
+				if (relatedIds.contains(metaInfoId)){
+					QString metaInfoValue = dataMetaInfoPtr->GetMetaInfo(type).toString();
+					if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
+						return true;
+					}
+				}
+			}
+		}
+
+		MetaInfoPtr elementMetaInfoPtr = BaseClass::GetElementMetaInfo(objectId);
+		if (elementMetaInfoPtr.IsValid()){
+			idoc::IDocumentMetaInfo::MetaInfoTypes metaInfoTypes = elementMetaInfoPtr->GetMetaInfoTypes();
+
+			for (int type : metaInfoTypes){
+				QByteArray metaInfoId = elementMetaInfoPtr->GetMetaInfoId(type);
+				if (relatedIds.contains(metaInfoId)){
+					QString metaInfoValue = elementMetaInfoPtr->GetMetaInfo(type).toString();
+					if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
+						return true;
+					}
+				}
+			}
+		}
+
+		if (relatedIds.contains("Name")){
+			QString metaInfoValue = BaseClass::GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			if (metaInfoValue.contains(textFilter, Qt::CaseInsensitive)){
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	return true;
 }
 
 
