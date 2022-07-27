@@ -1,5 +1,6 @@
 #pragma once
 
+
 // ImtCore includes
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 
@@ -23,10 +24,10 @@ private:
 	bool LoginMatch(const QString& login) const;
 	bool PasswordMatch(const QString& login, const QString& password) const;
 	int GetUserId(const QString& verificationLogin) const;
-	bool ChangePassword(const int& idUser, const QString& oldPassword, const QString& newPassword);
+	bool ChangePassword(const QByteArray& userId, const QString& oldPassword, const QString& newPassword);
 };
 
 
-} // namespace imtguigql
+} // namespace imtauthgql
 
 
