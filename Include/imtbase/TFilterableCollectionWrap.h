@@ -25,14 +25,15 @@ public:
 	// pseudo-reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
 				const iprm::IParamsSet* selectionParamPtr = nullptr,
-				const ICollectionInfo::Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+				const ICollectionInfo::Id& parentId = ICollectionInfo::Id(),
+				int iterationFlags = ICollectionInfo::IF_RECURSIVE | ICollectionInfo::IF_LEAF_ONLY) const override;
 	virtual imtbase::ICollectionInfo::Ids GetElementIds(
 			int offset = 0,
 			int count = -1,
 			const iprm::IParamsSet* selectionParamsPtr = nullptr,
-			const ICollectionInfo::Id& parentId = Id(),
-			int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+			const ICollectionInfo::Id& parentId = ICollectionInfo::Id(),
+			int iterationFlags = ICollectionInfo::IF_RECURSIVE | ICollectionInfo::IF_LEAF_ONLY) const override;
+
 protected:
 	virtual imtbase::ICollectionInfo::Ids GetFilteredElementIds(const iprm::IParamsSet& filterParams) const;
 	virtual imtbase::ICollectionInfo::Ids GetSortedElementIds(
