@@ -3,8 +3,9 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
-#include <imtbase/CTreeItemModel.h>
 
+// ImtCore includes
+#include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlObject.h>
 
 

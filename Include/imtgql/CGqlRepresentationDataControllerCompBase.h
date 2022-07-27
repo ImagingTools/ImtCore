@@ -24,7 +24,6 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlRepresentationDataController);
 		I_ASSIGN_MULTI_0(m_modelIdsCompPtr, "ModelIds", "List of model-IDs for GraphQL-response", true);
 		I_ASSIGN_MULTI_0(m_contextIdsCompPtr, "ContextIds", "List of context-IDs for GraphQL-response", false);
-        I_ASSIGN(m_databaseEngineCompPtr, "Database", "Database for working", false, "IDatabaseEngine");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
@@ -34,7 +33,6 @@ public:
 protected:
 	I_MULTIATTR(QByteArray, m_modelIdsCompPtr);
 	I_MULTIATTR(QByteArray, m_contextIdsCompPtr);
-	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 };
 
 
