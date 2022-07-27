@@ -5,7 +5,6 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtdb/IDatabaseEngine.h>
 #include <imtgql/IGqlRepresentationDataController.h>
 
 
