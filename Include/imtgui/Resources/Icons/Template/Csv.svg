@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   viewBox="0 0 512.00002 512.00002"
+   xml:space="preserve"
+   sodipodi:docname="Csv.svg"
+   width="512"
+   height="512"
+   inkscape:version="1.0.2-2 (e86c870879, 2021-01-15)"><metadata
+   id="metadata73"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs71" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1920"
+   inkscape:window-height="1017"
+   id="namedview69"
+   showgrid="false"
+   inkscape:zoom="0.94447431"
+   inkscape:cx="-8.9850488"
+   inkscape:cy="344.45626"
+   inkscape:window-x="-8"
+   inkscape:window-y="-8"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Layer_1" />
+<g
+   id="g36"
+   transform="matrix(1.5049267,0,0,1.5049267,16.575192,16.575192)"
+   style="fill:#d9d9d9;fill-opacity:1">
+	<g
+   id="g34"
+   style="fill:#d9d9d9;fill-opacity:1">
+		<g
+   id="g32"
+   style="fill:#d9d9d9;fill-opacity:1">
+			<rect
+   x="182.882"
+   y="155.008"
+   width="33.713001"
+   height="15"
+   id="rect2"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="101.592"
+   y="132.689"
+   width="33.713001"
+   height="15"
+   id="rect4"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="182.882"
+   y="132.689"
+   width="33.713001"
+   height="15"
+   id="rect6"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="182.882"
+   y="88.053001"
+   width="33.713001"
+   height="15"
+   id="rect8"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="182.882"
+   y="110.371"
+   width="33.713001"
+   height="15"
+   id="rect10"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="101.592"
+   y="155.008"
+   width="33.713001"
+   height="15"
+   id="rect12"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<polygon
+   points="123.911,91.54 118.33,101.472 112.53,91.54 102.906,91.54 112.925,107.228 102.269,123.663 112.09,123.663 112.09,123.662 118.286,113.621 124.548,123.662 134.588,123.662 123.647,107.909 133.82,91.54 "
+   id="polygon14"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<path
+   d="m 201.02,249.514 c -0.339,1.27 -0.73,3.015 -1.174,5.236 -0.445,2.222 -0.741,4.073 -0.889,5.555 -0.127,-2.053 -0.847,-5.691 -2.158,-10.918 l -6.316,-23.519 h -14.092 l 15.139,46.401 h 14.759 l 15.202,-46.401 h -14.027 z"
+   id="path16"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="142.457"
+   y="110.371"
+   width="33.713001"
+   height="15"
+   id="rect18"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="142.457"
+   y="88.053001"
+   width="33.713001"
+   height="15"
+   id="rect20"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<path
+   d="M 283.149,52.723 232.624,2.197 C 231.218,0.79 229.311,0 227.321,0 H 40.342 c -4.142,0 -7.5,3.358 -7.5,7.5 v 303.188 c 0,4.142 3.358,7.5 7.5,7.5 h 237.504 c 4.142,0 7.5,-3.358 7.5,-7.5 V 58.025 c 0,-1.989 -0.79,-3.896 -2.197,-5.302 z M 234.821,25.606 259.739,50.525 H 234.821 Z M 47.842,15 H 219.821 V 25.263 H 47.842 Z m 0,288.188 V 40.263 h 171.979 v 17.763 c 0,4.143 3.358,7.5 7.5,7.5 h 43.024 v 237.662 z"
+   id="path22"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="142.457"
+   y="132.689"
+   width="33.713001"
+   height="15"
+   id="rect24"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<path
+   d="m 122.372,235.484 c 1.969,0 3.809,0.275 5.523,0.826 1.713,0.55 3.428,1.227 5.141,2.031 l 3.841,-9.871 c -4.57,-2.18 -9.362,-3.27 -14.378,-3.27 -4.591,0 -8.585,0.98 -11.98,2.937 -3.396,1.957 -5.999,4.755 -7.808,8.395 -1.81,3.64 -2.714,7.86 -2.714,12.663 0,7.682 1.867,13.553 5.602,17.615 3.734,4.063 9.104,6.094 16.107,6.094 4.888,0 9.268,-0.857 13.14,-2.57 v -10.602 c -1.947,0.805 -3.883,1.492 -5.808,2.063 -1.926,0.571 -3.915,0.857 -5.967,0.857 -6.793,0 -10.188,-4.464 -10.188,-13.393 0,-4.295 0.836,-7.665 2.507,-10.109 1.672,-2.443 4,-3.666 6.982,-3.666 z"
+   id="path26"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<path
+   d="m 163.57,244.594 c -4.169,-1.904 -6.724,-3.216 -7.665,-3.936 -0.942,-0.719 -1.412,-1.533 -1.412,-2.443 -0.002,-0.847 0.368,-1.556 1.11,-2.127 0.74,-0.571 1.925,-0.857 3.555,-0.857 3.152,0 6.897,0.995 11.234,2.984 l 3.841,-9.681 c -4.994,-2.222 -9.892,-3.333 -14.694,-3.333 -5.439,0 -9.713,1.196 -12.822,3.587 -3.111,2.392 -4.666,5.724 -4.666,9.997 0,2.285 0.365,4.264 1.095,5.936 0.73,1.672 1.851,3.152 3.364,4.443 1.513,1.291 3.782,2.624 6.809,3.999 3.343,1.503 5.4,2.497 6.173,2.983 0.771,0.486 1.333,0.968 1.682,1.444 0.35,0.476 0.524,1.031 0.524,1.666 0,1.016 -0.435,1.847 -1.302,2.491 -0.868,0.647 -2.233,0.969 -4.095,0.969 -2.158,0 -4.527,-0.344 -7.109,-1.032 -2.581,-0.687 -5.067,-1.645 -7.458,-2.872 v 11.172 c 2.264,1.079 4.443,1.836 6.538,2.27 2.095,0.434 4.687,0.65 7.775,0.65 3.703,0 6.93,-0.619 9.681,-1.856 2.75,-1.238 4.856,-2.973 6.315,-5.205 1.461,-2.232 2.191,-4.787 2.191,-7.665 0,-3.131 -0.777,-5.729 -2.333,-7.792 -1.555,-2.063 -4.332,-3.993 -8.331,-5.792 z"
+   id="path28"
+   style="fill:#d9d9d9;fill-opacity:1" />
+			<rect
+   x="142.457"
+   y="155.008"
+   width="33.713001"
+   height="15"
+   id="rect30"
+   style="fill:#d9d9d9;fill-opacity:1" />
+		</g>
+	</g>
+</g>
+<g
+   id="g38">
+</g>
+<g
+   id="g40">
+</g>
+<g
+   id="g42">
+</g>
+<g
+   id="g44">
+</g>
+<g
+   id="g46">
+</g>
+<g
+   id="g48">
+</g>
+<g
+   id="g50">
+</g>
+<g
+   id="g52">
+</g>
+<g
+   id="g54">
+</g>
+<g
+   id="g56">
+</g>
+<g
+   id="g58">
+</g>
+<g
+   id="g60">
+</g>
+<g
+   id="g62">
+</g>
+<g
+   id="g64">
+</g>
+<g
+   id="g66">
+</g>
+</svg>
