@@ -1,6 +1,9 @@
 #include <imtlicgql/CAccountCollectionControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QTranslator>
+
 // ImtCore includes
 #include <imtauth/CAccountInfo.h>
 

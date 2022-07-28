@@ -6,6 +6,7 @@
 
 // Qt includes
 #include <QtCore/QObject>
+#include <QtCore/QFile>
 
 // ImtCore includes
 #include <imtqml/CPageDataEnumProviderComp.h>
