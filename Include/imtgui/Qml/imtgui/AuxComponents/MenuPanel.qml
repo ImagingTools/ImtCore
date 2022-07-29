@@ -111,6 +111,7 @@ Rectangle {
             queryFields.InsertField("Name");
             queryFields.InsertField("Icon");
             queryFields.InsertField("Source");
+            queryFields.InsertField("StartItem");
             query.AddField(queryFields);
             var gqlData = query.GetQuery();
 

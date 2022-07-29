@@ -118,7 +118,7 @@ Item {
     property string filterPanelDecoratorPath: "FilterPanelDecorator.qml";
 
     property string topLeftPanelDecoratorPath;
-    property string topCenterPanelDecoratorPath;
+    property string topCenterPanelDecoratorPath: "TopCenterPanelDecorator.qml";
     property string topRightPanelDecoratorPath;
     property string customPanelDecoratorPath;
 

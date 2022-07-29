@@ -1,17 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
-import imtauthgui 1.0
+import imtgui 1.0
 
 Item {
     id: inputDialogBodyContainer;
 
-//    width: 300;
     height: columnBody.height + 40;
-
-    onHeightChanged: {
-        //loaderBodyDialog.itemHeightChanged();
-    }
 
     property string message;
     property string inputValue: "";
@@ -25,7 +19,7 @@ Item {
         anchors.rightMargin: 10;
         anchors.leftMargin: 10;
 
-        width: inputDialogBodyContainer.width;
+//        width: inputDialogBodyContainer.width;
 
         spacing: 5;
 
@@ -43,7 +37,7 @@ Item {
             wrapMode: Text.WordWrap;
         }
 
-        TextFieldCustom {
+        CustomTextField {
             id: tfcInput;
 
             anchors.horizontalCenter: parent.horizontalCenter;

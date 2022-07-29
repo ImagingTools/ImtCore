@@ -11,11 +11,15 @@ Rectangle {
 
     color: Style.backgroundColor;
 
+    property string gqlModelMetaInfo;
+
     property var modelData;
 
     property int elementHeight: 20;
 
     property bool contentVisible: true;
+
+    property Item tableData;
 
     onModelDataChanged: {
         console.log("MetaInfo onModelDataChanged", collectionMetaInfo.modelData);
@@ -24,25 +28,25 @@ Rectangle {
     Column {
         id: column;
 
-        anchors.top: collectionMetaInfo.top;
+        anchors.fill: parent;
+        anchors.rightMargin: 5;
+        anchors.leftMargin: 5;
         anchors.topMargin: 5;
 
         visible: collectionMetaInfo.contentVisible;
 
-        width: collectionMetaInfo.width;
+//        width: collectionMetaInfo.width;
 
         Repeater {
             id: repeaterColumn;
 
             model: collectionMetaInfo.modelData;
 
-            delegate: Rectangle {
+            delegate: Item {
                 id: repeaterTitle;
 
                 width: collectionMetaInfo.width;
                 height: childColumn.height + nameTitle.height + collectionMetaInfo.elementHeight;
-
-                color: "transparent";
 
                 Component.onCompleted: {
                     console.log("MetaInfo Component.onCompleted", model.Childs);
@@ -51,6 +55,8 @@ Rectangle {
 
                 Text {
                     id: nameTitle;
+
+                    width: column.width;
 
                     anchors.left: parent.left;
                     anchors.leftMargin: 10;
@@ -64,6 +70,7 @@ Rectangle {
 
                     color: Style.lightBlueColor;
                     elide: Text.ElideRight;
+                    wrapMode: Text.WrapAnywhere ;
                 }
 
                 Column {
@@ -107,4 +114,56 @@ Rectangle {
             }
         }
     }
+
+    function getMetaInfo(){
+        metaInfo.getMetaInfo();
+    }
+
+    GqlModel {
+        id: metaInfo;
+
+        function getMetaInfo(){
+            console.log( "CollectionView metaInfo getMetaInfo");
+            var query = Gql.GqlRequest("query", collectionMetaInfo.gqlModelMetaInfo);
+            var inputParams = Gql.GqlObject("input");
+
+            inputParams.InsertField("Id", collectionMetaInfo.tableData.getSelectedId());
+
+            var queryFields = Gql.GqlObject("metaInfo");
+            query.AddParam(inputParams);
+
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Successed");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("PackageCollectionView metaInfo query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, metaInfo);
+            if (this.state === "Ready"){
+                var dataModelLocal;
+
+                if (metaInfo.ContainsKey("errors")){
+                    return;
+                }
+
+                if (metaInfo.ContainsKey("data")){
+                    dataModelLocal = metaInfo.GetData("data");
+
+                    if (dataModelLocal.ContainsKey(collectionMetaInfo.gqlModelMetaInfo)){
+                        dataModelLocal = dataModelLocal.GetData(collectionMetaInfo.gqlModelMetaInfo);
+
+                        if (dataModelLocal.ContainsKey("metaInfo")){
+                            dataModelLocal = dataModelLocal.GetData("metaInfo");
+                            collectionMetaInfo.modelData = dataModelLocal;
+                        }
+                    }
+                }
+            }
+        }
+    }//MetaInfo
 }

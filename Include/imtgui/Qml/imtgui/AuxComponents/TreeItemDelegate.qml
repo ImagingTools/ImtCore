@@ -4,57 +4,22 @@ import Acf 1.0
 Item {
     id: treeItemDelegate;
 
-    width: 100;
-//    height: mainRect.height + childrenColumn.height;
+    width: parent.width;
 
-//    height: childrenColumn.visible ? mainRect.height + childrenColumn.height: mainRect.height;
-    height: childrenColumn.visible ?
-                mainRect.height + (childrenColumn.height ?
-                                       childrenColumn.height : (model.childItemModel ?
-                                                                    model.childItemModel._rows.length * 30 : 0)) :
-                mainRect.height;
+    height: childrenColumn.visible ? childrenColumn.height + treeItemDelegate.itemHeight : treeItemDelegate.itemHeight;
 
-    property bool isOpened: true;
+    property bool isOpened: model.isOpened;
 
-    property TreeItemModel childItemModel;
-
-    property Item listViewItem;
-
-    signal checkBoxState(int state, string packageId, string featureId);
-
-    onCheckBoxState: {
-        console.log("TreeItemDelegate onCheckBoxState", state, packageId, featureId);
-    }
-
-//    onHeightChanged: {
-//        console.log("TreeItemDelegate onHeightChanged", treeItemDelegate.height);
-//    }
+    property int itemHeight: 30;
+    property int index: model.index;
 
     Component.onCompleted: {
-        if (model.childItemModel)
-        {
-           // console.log("Model childCount ", model.childItemModel.GetItemsCount());
-            treeItemRepeater.model = model.childItemModel;
-//            childrenColumn.model = model.childItemModel;
+        console.log("TreeItemDelegate onCompleted");
+
+        if (model.childItemModel){
+            childModelRepeater.model = model.childItemModel;
         }
-
     }
-
-//    onIsOpenedChanged: {
-//        console.log("TreeItemDelegate onIsOpenedChanged");
-//        if (treeItemDelegate.isOpened){
-//            console.log(" = model.childItemModel");
-//            treeItemRepeater.model = model.childItemModel;
-//        } else {
-//            console.log(" = 0");
-//            treeItemRepeater.model = 0;
-//        }
-//    }
-
-//    onCheckBoxStateChanged: {
-//        //treeItemRepeater.model = treeItemDelegate.childItemModel;
-//    }
-
 
     Rectangle {
         id: mainRect;
@@ -62,29 +27,11 @@ Item {
         anchors.top: parent.top;
         anchors.right: parent.right;
 
-        width: parent.width - model.level * 20;
-        height: model.visible ? 30 : 0;
+        width: parent.width;
+        height: model.visible === 1 ? treeItemDelegate.itemHeight : 0;
 
-        color: Style.baseColor;
-
-        visible: model.visible === 1;
-
-//        MouseArea {
-//            anchors.fill: parent;
-
-//            onClicked: {
-//                selectionBackGround.visible = true;
-//            }
-//        }
-
-//        Rectangle {
-//            id: selectionBackGround;
-//            anchors.fill: parent;
-//            color: "#4682B4";
-//            opacity: 0.2;
-//            radius: 2;
-//            visible: false;
-//        }
+        color: mainTreeView.currentParentIndex == model.index &&
+               childModelRepeater.indexChild === -1 ? Style.selectedColor : Style.baseColor;
 
         Image {
             id: iconArrow;
@@ -110,56 +57,13 @@ Item {
 
                 onClicked: {
                     console.log("TreeItemDelegate Image onClicked");
-                    treeItemDelegate.isOpened = !treeItemDelegate.isOpened;
-//                    isOpened = !isOpened;
-                    console.log("treeItemDelegate", treeItemDelegate);
-//                    console.log("TreeItemDelegate onHeightChanged", treeItemDelegate.height);
-//                    console.log("treeItemDelegate.isOpened", treeItemDelegate.isOpened);
-//                    console.log("Model id", model.Id);
-//                    console.log("Model packageId", model.packageId);
+                    treeViewContainer.modelItems.SetData("isOpened", !treeItemDelegate.isOpened, model.index);
                 }
             }
         }
 
-        CheckBox {
-             id: checkBox;
-
-             anchors.rightMargin: 10;
-             anchors.right: titleModel.left;
-             anchors.verticalCenter: parent.verticalCenter;
-
-             checkState: model.stateChecked;
-
-             visible: model.level === 1;
-
-             onCheckStateChanged: {
-                // console.log("TreeItemDelegate CheckBox onCheckStateChanged", checkBox.checkState, model.packageId, model.Id);
-
-//                 treeItemDelegate.checkBoxState(checkBox.checkState, model.packageId, model.Id);
-                // listViewItem.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
-             }
-
-             MouseArea {
-                 anchors.fill: parent;
-
-                 visible: model.isActive === 1;
-
-                 onClicked: {
-                     console.log("TreeItemDelegate CheckBox MouseArea onClicked", checkBox.checkState);
-                     if (checkBox.checkState == 2) {
-                         checkBox.checkState = 0
-                     }
-                     else {
-                         checkBox.checkState = 2
-                     }
-
-                     mainTreeView.changeCheckBoxState(checkBox.checkState, model.packageId, model.Id);
-                 }
-             }
-        }
-
         Text {
-            id: titleModel;
+            id: parentTitle;
 
             anchors.left: iconArrow.right;
             anchors.leftMargin: 10;
@@ -170,36 +74,67 @@ Item {
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamily;
         }
-    }
 
-    Column {
-        id: childrenColumn;
+        Column {
+            id: childrenColumn;
 
-        anchors.top: mainRect.bottom;
+            anchors.top: mainRect.bottom;
+            anchors.right: mainRect.right;
 
-        width: treeItemDelegate.width;
+            width: treeItemDelegate.width - 20;
 
-        visible: treeItemDelegate.isOpened;
+            visible: treeItemDelegate.isOpened;
 
-        Repeater {
-             id: treeItemRepeater;
+            Repeater {
+                id: childModelRepeater;
 
-             delegate: Loader {
-                 id: loader;
+                property int indexChild: mainTreeView.currentChildIndex;
 
-                 source: "TreeItemDelegate.qml";
+                delegate: Rectangle {
+                    id: childRect;
 
-                 onItemChanged: {
-                     if (loader.item) {
-                         console.log("TreeItemDelegate child load");
-                         console.log("treeItemDelegate.listViewItem", treeItemDelegate.listViewItem);
-                         loader.height = loader.item.height;
-                         //childrenColumn.height += item.height;
-                         loader.item.listViewItem = treeItemDelegate.listViewItem;
-                         console.log("loader.item.listViewItem", loader.item.listViewItem);
-                     }
-                 }
-             }
-       }
+                    width: treeItemDelegate.width;
+                    height: childRect.visible ? treeItemDelegate.itemHeight : 0;
+
+                    visible: model.visible === 1;
+
+                    color: treeItemDelegate.index === mainTreeView.currentParentIndex &&
+                           childModelRepeater.indexChild === model.index ? Style.selectedColor : "transparent";
+
+                    CheckBox {
+                        id: checkBox;
+
+                        anchors.left: childRect.left;
+                        anchors.leftMargin: 10;
+                        anchors.verticalCenter: parent.verticalCenter;
+
+                        checkState: model.stateChecked;
+
+                        MouseArea {
+                            anchors.fill: parent;
+
+                            visible: model.isActive === 1;
+
+                            onClicked: {
+                                treeViewContainer.checkBoxStateChanged(2 - checkBox.checkState, model.packageId, model.Id);
+                            }
+                        }
+                    }
+
+                    Text {
+                        id: childTitle;
+
+                        anchors.left: checkBox.right;
+                        anchors.leftMargin: 10;
+                        anchors.verticalCenter: parent.verticalCenter;
+
+                        text: model.Name;
+                        color: model.isActive === 1 ? Style.textColor : Style.disabledInActiveTextColor;
+                        font.pixelSize: Style.fontSize_common;
+                        font.family: Style.fontFamily;
+                    }
+                }
+            }
+        }
     }
 }

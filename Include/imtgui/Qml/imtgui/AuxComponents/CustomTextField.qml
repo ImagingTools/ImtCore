@@ -6,17 +6,11 @@ Item {
 
     height: 40;
 
+//    property string text: textField.text;
     property alias text: textField.text;
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;
-
-    property bool canReduce: false;
-    property bool reduced: false;
-    property bool isTextChanged: false;
-    property bool wasFocus: false;
-    property bool enabled:  true;
-    property bool correctData: true;
 
     property color borderColor: Style.iconColorOnSelected;
 
@@ -25,15 +19,11 @@ Item {
     property int echoMode: TextInput.Normal;
 
 //    property string regexMask: "/([0-9A-F]{2}[:-]){5}([0-9A-F]{2})/";
-
-    signal inputTextChanged();
-
-    signal textInputFocusChanged();
-    signal clicked();
-
+//    signal textChanged();
+    signal accepted();
 
     onFocusChanged: {
-        console.log('TextFieldCustom onFocusChanged', containerTextField.focus);
+        console.log('CustomTextField onFocusChanged', containerTextField.focus);
         containerTextField.setFocus(containerTextField.focus);
     }
 
@@ -75,6 +65,9 @@ Item {
         font.pixelSize: containerTextField.textSize;
         font.family: Style.fontFamily;
 
+//        text: containerTextField.text;
+
+
         echoMode: containerTextField.echoMode;
 
         verticalAlignment: TextInput.AlignVCenter;
@@ -83,23 +76,18 @@ Item {
         clip: true;
 
         onFocusChanged: {
-            console.log("TextInput onFocusChanged", textField.focus);
-            containerTextField.wasFocus = true;
+            console.log("TextInput onFocusChanged", textField.focus)
 
-            if (textField.focus){
-                containerTextField.textInputFocusChanged();
-            }
         }
 
         onTextChanged: {
-            console.log("TextFieldCustom onTextChanged", textField.text);
-            containerTextField.inputTextChanged();
-            containerTextField.isTextChanged = true;
+            console.log("CustomTextField onTextChanged", textField.text);
+//            containerTextField.text = textField.text;
         }
 
         onAccepted: {
-            console.log("TextFieldCustom onAccepted");
-            containerTextField.isTextChanged = false;
+            console.log("CustomTextField onAccepted");
+            containerTextField.accepted();
         }
 
         Text {

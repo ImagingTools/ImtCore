@@ -23,7 +23,6 @@ Item {
         Events.sendEvent("FeatureDependenciesUpdated");
     }
 
-
     function updateFeaturesDependenciesAfterPackageEditing(oldPackageId, newPackageId){
         console.log("updateFeaturesDependenciesAfterPackageEditing", oldPackageId, newPackageId);
 

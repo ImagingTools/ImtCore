@@ -33,7 +33,7 @@ Item {
 
         spacing: 5;
 
-        TextFieldCustom {
+        CustomTextField {
             id: tfc;
             anchors.verticalCenter: parent.verticalCenter;
 

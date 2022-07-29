@@ -97,6 +97,11 @@ I_EXPORT_COMPONENT(
 			"Application info data provider",
 			"Application info data provider");
 
+I_EXPORT_COMPONENT(
+			ObjectViewDataProvider,
+			"Object view data provider",
+			"Object view data provider");
+
 
 } // namespace ImtQmlPck
 

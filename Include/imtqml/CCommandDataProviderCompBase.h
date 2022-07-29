@@ -27,9 +27,10 @@ public:
 	I_BEGIN_COMPONENT(CCommandDataProviderCompBase);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
 		I_ASSIGN(m_commandsModelIdAttrPtr, "CommandsModelId", "Command model-ID", true, "");
-		I_ASSIGN_MULTI_0(m_commandIdAttrPtr, "CommandId", "Command Id", true);
-		I_ASSIGN_MULTI_0(m_commandNameAttrPtr, "CommandName", "Command name", true);
-		I_ASSIGN_MULTI_0(m_commandDefaultStatusIcon, "CommandDefaultStatusIcon", "Path of status icon used by default", false);
+		I_ASSIGN_MULTI_0(m_commandsIdsAttrPtr, "CommandsIds", "Commands Ids", true);
+		I_ASSIGN_MULTI_0(m_commandsNamesAttrPtr, "CommandsNames", "Commands names", true);
+		I_ASSIGN_MULTI_0(m_commandsDefaultModesAttrPtr, "CommandsDefaultModes", "Default commands modes", true);
+		I_ASSIGN_MULTI_0(m_commandsDefaultStatusIconAttrPtr, "CommandsDefaultStatusIcon", "Path of status icon used by default", false);
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
@@ -39,9 +40,10 @@ public:
 
 private:
 	I_ATTR(QByteArray, m_commandsModelIdAttrPtr);
-	I_MULTIATTR(QString, m_commandIdAttrPtr);
-	I_MULTITEXTATTR(m_commandNameAttrPtr);
-	I_MULTIATTR(QString, m_commandDefaultStatusIcon);
+	I_MULTIATTR(QString, m_commandsIdsAttrPtr);
+	I_MULTITEXTATTR(m_commandsNamesAttrPtr);
+	I_MULTIATTR(QString, m_commandsDefaultModesAttrPtr);
+	I_MULTIATTR(QString, m_commandsDefaultStatusIconAttrPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 

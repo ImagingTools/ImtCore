@@ -1,7 +1,5 @@
 pragma Singleton
 import QtQuick 2.0
-import Acf 1.0
-import imtqml 1.0
 
 Item {
     id: eventsContainer;
@@ -12,6 +10,7 @@ Item {
     }
 
     function sendEvent(key, parameters){
+        console.log("EVENTS sendEvent", key, parameters);
         if(key in this.events){
             for(var i = 0; i < this.events[key].length; i++){
                 console.log("key i", key, i, this.events[key][i]);
@@ -26,6 +25,7 @@ Item {
     }
 
     function subscribeEvent(key, slot){
+        console.log("EVENTS subscribeEvent", key, slot);
         if(key in this.events){
             this.events[key].push(slot)
         } else {

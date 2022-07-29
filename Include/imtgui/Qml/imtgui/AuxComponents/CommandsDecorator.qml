@@ -1,0 +1,44 @@
+import QtQuick 2.12
+import Acf 1.0
+
+Item {
+    id: commandsDecoratorContainer;
+
+    height: 30;
+    width: rowCommands.width;
+
+    property string commandsId;
+
+    function setCommandsModel(parameters){
+        let model = parameters["Model"];
+        let commandsId = parameters["CommandsId"];
+        commandsDecoratorContainer.commandsId = commandsId;
+        repeaterCommands.model = model;
+    }
+
+    Row {
+        id: rowCommands;
+
+        height: parent.height;
+
+        spacing: 5;
+
+        Repeater {
+            id: repeaterCommands;
+
+            delegate: TopButton {
+                id: topButtonDelegate;
+
+                text: model.Name;
+                isEmpty: model.Name === "";
+                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
+                fontName: Style.fontFamily;
+                checkable: model.Mode == "Normal";
+
+                onClicked: {
+                    Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                }
+            }
+        }
+    }
+}

@@ -36,9 +36,8 @@ Item {
         if (tableContainer.selectedIndex > -1){
              return tableContainer.elements.GetData("Id", tableContainer.selectedIndex);
         }
-        else{
-            return null;
-        }
+
+        return null;
     }
 
     function getSelectedName(){

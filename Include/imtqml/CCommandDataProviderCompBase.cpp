@@ -23,13 +23,13 @@ QByteArray CCommandDataProviderCompBase::GetModelId() const
 imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields)
 {
 	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
-	for (int i = 0; i < m_commandIdAttrPtr.GetCount(); ++i){
+	for (int i = 0; i < m_commandsIdsAttrPtr.GetCount(); ++i){
 		treeModel->InsertNewItem();
 		for (int indexField = 0; indexField < fields.count(); indexField++){
 			if (fields[indexField] == CommandEnum::ID){
-				treeModel->SetData(CommandEnum::ID, m_commandIdAttrPtr[i], i);
+				treeModel->SetData(CommandEnum::ID, m_commandsIdsAttrPtr[i], i);
 			}
-			if (fields[indexField] == CommandEnum::NAME && m_commandNameAttrPtr.GetCount() > i){
+			if (fields[indexField] == CommandEnum::NAME && m_commandsNamesAttrPtr.GetCount() > i){
 				if (m_translationManagerCompPtr.IsValid()){
 					QByteArray languageId = GetLanguageIdFromInputParams(params);
 
@@ -45,19 +45,19 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QL
 					if (currentIndex >= 0){
 						const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
 						if (translatorPtr != nullptr){
-							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandNameAttrPtr[i].toUtf8()), i);
+							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandsNamesAttrPtr[i].toUtf8()), i);
 						}
 					}
 				}
 				else{
-					treeModel->SetData(CommandEnum::NAME, m_commandNameAttrPtr[i].toUtf8(), i);
+					treeModel->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
 				}
 			}
-			if (fields[indexField] == CommandEnum::ICON && m_commandDefaultStatusIcon.GetCount() > i){
-				treeModel->SetData(CommandEnum::ICON, m_commandDefaultStatusIcon[i], i);
+			if (fields[indexField] == CommandEnum::ICON && m_commandsDefaultStatusIconAttrPtr.GetCount() > i){
+				treeModel->SetData(CommandEnum::ICON, m_commandsDefaultStatusIconAttrPtr[i], i);
 			}
 			if (fields[indexField] == CommandEnum::MODE){
-				treeModel->SetData(CommandEnum::MODE, "Disabled", i);
+				treeModel->SetData(CommandEnum::MODE, m_commandsDefaultModesAttrPtr[i], i);
 			}
 		}
 	}

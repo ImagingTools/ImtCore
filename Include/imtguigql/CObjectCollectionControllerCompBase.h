@@ -26,6 +26,7 @@ public:
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
+		I_ASSIGN(m_objectViewProviderCompPtr, "ObjectViewProvider", "Object view provider", false, "ObjectViewProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
 	I_END_COMPONENT;
@@ -43,6 +44,7 @@ public:
 		OT_HEADERS,
 		OT_COMMANDS,
 		OT_METAINFO,
+		OT_OBJECT_VIEW,
 		OT_USER_OPERATION = 1000
 	};
 
@@ -63,6 +65,8 @@ protected:
 	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetDependencies(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetObjectView(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
 	*/
@@ -94,10 +98,9 @@ protected:
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_headersProviderCompPtr);
+	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_objectViewProviderCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
-//	I_REF(iser::ISerializable, m_separatorObjectIdAttrPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
-
 };
 
 

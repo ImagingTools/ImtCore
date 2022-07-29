@@ -56,17 +56,20 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 		if (fields[indexField] == PageEnum::ICON){
 			rootModelPtr->SetData(PageEnum::ICON, *m_pageDefaultStatusIconAttrPtr);
 		}
-		if (fields[indexField] == PageEnum::ICON_ON_SELECTED){
+		else if (fields[indexField] == PageEnum::ICON_ON_SELECTED){
 			rootModelPtr->SetData(PageEnum::ICON_ON_SELECTED, *m_pageOnSelectedStatusIconAttrPtr);
 		}
-		if (fields[indexField] == PageEnum::ICON_OFF_SELECTED){
+		else if (fields[indexField] == PageEnum::ICON_OFF_SELECTED){
 			rootModelPtr->SetData(PageEnum::ICON_OFF_SELECTED, *m_pageOffSelectedStatusIconAttrPtr);
 		}
-		if (fields[indexField] == PageEnum::SOURCE){
+		else if (fields[indexField] == PageEnum::SOURCE){
 			rootModelPtr->SetData(PageEnum::SOURCE, *m_pageSourceItemAttrPtr);
 		}
-		if (fields[indexField] == PageEnum::ENABLED){
+		else if (fields[indexField] == PageEnum::ENABLED){
 			rootModelPtr->SetData(PageEnum::ENABLED, "true");
+		}
+		else if (fields[indexField] == "StartItem"){
+			rootModelPtr->SetData("StartItem", *m_startSourceItemAttrPtr);
 		}
 	}
 

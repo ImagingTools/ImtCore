@@ -2,19 +2,17 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Rectangle {
-    id: topLeftPanelDecorator;
+Item {
+    id: topCenterPanelDecorator;
 
-    width: parent.width;
-    height: parent.height;
+    CommandsDecorator {
+        id: commandsDecorator;
 
-    color: "transparent";
+        anchors.horizontalCenter: parent.horizontalCenter;
 
-    radius: 7;
-
-    Row {
-        height: parent.height;
-       // spacing: 20;
+        Component.onCompleted: {
+            Events.subscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
+        }
     }
 }
 

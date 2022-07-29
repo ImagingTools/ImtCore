@@ -215,7 +215,7 @@ Rectangle {
                 }
             }
 
-            TextFieldCustom {
+            CustomTextField {
                 id: tfcLicenseNameText;
 
                 anchors.horizontalCenter: tfcLicenseName.horizontalCenter;
@@ -276,7 +276,7 @@ Rectangle {
                 }
             }
 
-            TextFieldCustom {
+            CustomTextField {
                 id: tfcLicenseIdText;
 
                 anchors.horizontalCenter: tfcLicenseId.horizontalCenter;

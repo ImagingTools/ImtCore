@@ -34,7 +34,7 @@ Item {
         if (accountsMultiDocViewContainer.visible && accountsMultiDocView.pagesCount === 0) {
             console.log("AccountsMultiDocView first page loaded !");
 //            let title = qsTr("Accounts");
-            accountsMultiDocView.addToHeadersArray("", accountsMultiDocViewContainer.title, "../../imtauthgui/AccountCollectionView.qml", "Accounts", "Open")
+            accountsMultiDocView.addPage("", accountsMultiDocViewContainer.title, "../../imtauthgui/AccountCollectionView.qml", "Accounts", "Open")
         }
     }
 
@@ -44,7 +44,7 @@ Item {
 
         rootItem: accountsMultiDocViewContainer.rootItem;
 //        Component.onCompleted: {
-//            accountsMultiDocView.addToHeadersArray("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
+//            accountsMultiDocView.addPage("", "Accounts", "../../imtlicgui/AccountCollectionView.qml", "Accounts")
 //        }
     }
 }

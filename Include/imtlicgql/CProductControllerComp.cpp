@@ -122,7 +122,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		}
 
 		imtbase::CTreeItemModel *licenses = nullptr;
-		if (itemModel.ContainsKey("licenses")){
+		if (itemModel.ContainsKey("Items")){
 			licenses = itemModel.GetTreeItemModel("licenses");
 		}
 

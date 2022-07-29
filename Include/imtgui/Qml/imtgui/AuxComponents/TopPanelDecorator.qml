@@ -24,7 +24,7 @@ Item {
 
         topPanel: topPanelDecorator.topPanel;
 
-       // decoratorSource: Style.topCenterPanelDecoratorPath;
+        decoratorSource: Style.topCenterPanelDecoratorPath;
 
         gradient: Gradient {
             GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }

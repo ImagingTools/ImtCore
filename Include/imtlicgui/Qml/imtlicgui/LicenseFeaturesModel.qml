@@ -12,8 +12,8 @@ Item {
         Events.sendEvent("LicenseFeaturesModelUpdated");
     }
 
-    function reloadModel(){
-        licensesDependenciesModel.loadLicenseDependModel();
+    function updateModel(){
+        licensesDependenciesModel.updateModel();
     }
 
     function updateLicensesDependenciesAfterLicenseEditing(productId, licenseOldId, licenseNewId, licenseNewName){
@@ -28,7 +28,7 @@ Item {
         for (let i = 0; i < keys.length; i++){
             let value = licenseFeaturesModelContainer.modelLicenseFeatures.GetData(keys[i]);
 
-            if (keys[i] == licenseOldId){
+            if (keys[i] === licenseOldId){
                 licenseFeaturesModelContainer.modelLicenseFeatures.SetData(licenseNewId, value);
                 licenseFeaturesModelContainer.modelLicenseFeatures.SetData(keys[i], "");
                 break;
@@ -39,7 +39,7 @@ Item {
     GqlModel {
         id: licensesDependenciesModel;
 
-        function loadLicenseDependModel() {
+        function updateModel() {
             console.log( "FeaturesTreeView GqlModel loadLicenseDependModel");
             var query = Gql.GqlRequest("query", "LicensesDependencies");
             var queryFields = Gql.GqlObject("dependencies");

@@ -11,7 +11,6 @@ Item {
     width: isEmpty ? 30 : 73;
 
     property string imageSource: "../Icons/Add.svg";
-    property string imageSourceDisabled: "../Icons/Add_On_Disabled.svg";
     property string text: "New";
     property string textColor: Style.textColor;
     property string hint: "button";
@@ -24,7 +23,6 @@ Item {
 
     property bool isEmpty: false;
     property bool checkable: false;
-    property bool isChecked: false;
     property bool enabled:  true;
     property bool highlighted: false;
 

@@ -1,7 +1,11 @@
 module imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
-MouseTest 1.0 MouseTest.qml
+
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
+CollectionViewBase 1.0 ./AuxComponents/CollectionViewBase.qml
+CollectionViewCommandsDelegateBase 1.0 ./AuxComponents/CollectionViewCommandsDelegateBase.qml
+CommandsProvider 1.0 ./AuxComponents/CommandsProvider.qml
+DocumentWorkspaceCommandsDelegate 1.0 ./AuxComponents/DocumentWorkspaceCommandsDelegate.qml
 MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
 ComboBox 1.0 ./AuxComponents/ComboBox.qml
 CheckBox 1.0 ./AuxComponents/CheckBox.qml
@@ -9,7 +13,7 @@ AuxTable 1.0 ./AuxComponents/AuxTable.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
 PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
 TextButton 1.0 ./AuxComponents/TextButton.qml
-MessageDialog 1.0 ./AuxComponents/MessageDialog.qml
+CustomTextField 1.0 ./AuxComponents/CustomTextField.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
 Splitter 1.0 ./AuxComponents/Splitter.qml
 Calendar 1.0 ./AuxComponents/Calendar.qml
@@ -20,6 +24,10 @@ TopCenterPanel 1.0 ./AuxComponents/TopCenterPanel.qml
 TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
 TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml
 UndoRedo 1.0 ./AuxComponents/UndoRedo.qml
-LoginDialog 1.0 ./AuxComponents/LoginDialog.qml
 LoginButton 1.0 ./AuxComponents/LoginButton.qml
-InputDialog 1.0 ./AuxComponents/InputDialog.qml
+
+LoginDialog 1.0 ./AuxComponents/Dialogs/LoginDialog.qml
+MessageDialog 1.0 ./AuxComponents/Dialogs/MessageDialog.qml
+InputDialog 1.0 ./AuxComponents/Dialogs/InputDialog.qml
+Dialog 1.0 ./AuxComponents/Dialogs/Dialog.qml
+ModalDialogManager 1.0 ./AuxComponents/Dialogs/ModalDialogManager.qml

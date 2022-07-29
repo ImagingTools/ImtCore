@@ -55,7 +55,7 @@ Item {
             var currentId = dataModelLocal.GetData("Id", installationCollectionView.selectedIndex);
             var name = "Copy of " + currentName;
 
-            installationCollectionContainer.multiDocViewItem.addToHeadersArray(currentId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", "Copy")
+            installationCollectionContainer.multiDocViewItem.addPage(currentId, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", "Copy")
 
         }
         else if (menuId === "CreateLicense"){
@@ -215,7 +215,7 @@ Item {
                 typeOperation = "New";
             }
             installationCollectionContainer.multiDocViewItem.activeCollectionItem = installationCollectionContainer;
-            installationCollectionContainer.multiDocViewItem.addToHeadersArray(idSelect, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
+            installationCollectionContainer.multiDocViewItem.addPage(idSelect, name,  "../../imtlicgui/InstallationInfoEditor.qml", "InstallationEdit", typeOperation)
 
         }
 
@@ -419,45 +419,4 @@ Item {
             }
         }
     }
-
-
-//    GqlModel {
-//        id: licenseFile;
-
-//        function createLicenseFile() {
-//            console.log( "InstallationCollectionView licenseFile createLicenseFile");
-//            var query = Gql.GqlRequest("query", "CreateLicenseFile");;
-//            var inputParams = Gql.GqlObject("input");
-
-//            inputParams.InsertField("Id", installationCollectionView.table.getSelectedId());
-//            query.AddParam(inputParams);
-
-//            var queryFields = Gql.GqlObject("createLicenseFile");
-//            queryFields.InsertField("Status");
-//            query.AddField(queryFields);
-
-//            var gqlData = query.GetQuery();
-//            console.log("InstallationCollectionView licenseFile query ", gqlData);
-//            this.SetGqlQuery(gqlData);
-//        }
-
-//        onStateChanged: {
-//            console.log("State:", this.state, licenseFile);
-//            if (this.state === "Ready"){
-//                var dataModelLocal;
-
-//                if (licenseFile.ContainsKey("errors")){
-//                    return;
-//                }
-
-//                dataModelLocal = licenseFile.GetData("data");
-
-////                if (dataModelLocal.ContainsKey("InstallationMetaInfo")) {
-
-////                }
-
-//            }
-//        }
-//    }
-
 }

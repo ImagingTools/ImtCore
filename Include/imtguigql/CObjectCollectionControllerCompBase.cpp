@@ -65,6 +65,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 		return GetHeaders(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_METAINFO:
 		return GetMetaInfo(*inputParamsPtr, gqlObject, errorMessage);
+	case OT_OBJECT_VIEW:
+		return GetObjectView(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_USER_OPERATION + 1:
 		return GetTreeItemModel(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_USER_OPERATION + 2:
@@ -133,6 +135,11 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		if (fieldList->at(i).GetId() == "metaInfo"){
 			gqlObject = fieldList->at(i);
 			operationType = OT_METAINFO;
+			return true;
+		}
+		if (fieldList->at(i).GetId() == "objectView"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_OBJECT_VIEW;
 			return true;
 		}
 	}
@@ -475,7 +482,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 			QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* dataModel = nullptr;
 	QByteArrayList fields;
 
 	if (!m_headersProviderCompPtr.IsValid()){
@@ -484,14 +490,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		dataModel = new imtbase::CTreeItemModel();
-
 		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, fields);
 		if (headersModel != nullptr){
-			headersModel->SetIsArray(true);
-			dataModel->SetExternTreeModel("headers", headersModel);
+			rootModel->SetExternTreeModel("data", headersModel);
 		}
-		rootModel->SetExternTreeModel("data", dataModel);
 	}
 
 	return rootModel;
@@ -522,6 +524,25 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetMetaInfo(
 		QString &errorMessage) const
 {
 	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
+		const QList<imtgql::CGqlObject> &inputParams,
+		const imtgql::CGqlObject &gqlObject,
+		QString &errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	QByteArrayList fields;
+
+	if (m_objectViewProviderCompPtr.IsValid()){
+		imtbase::CTreeItemModel* objectViewModelPtr = m_objectViewProviderCompPtr->GetTreeItemModel(inputParams, fields);
+		if (objectViewModelPtr != nullptr){
+			rootModel->SetExternTreeModel("data", objectViewModelPtr);
+		}
+	}
+
+	return rootModel;
 }
 
 

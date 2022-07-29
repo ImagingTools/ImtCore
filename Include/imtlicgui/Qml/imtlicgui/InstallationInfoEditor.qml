@@ -410,7 +410,7 @@ Rectangle {
                      }
                  }
 
-                 TextFieldCustom {
+                 CustomTextField {
                      id: instanceIdText;
 
                      anchors.horizontalCenter: tfcInstance.horizontalCenter;

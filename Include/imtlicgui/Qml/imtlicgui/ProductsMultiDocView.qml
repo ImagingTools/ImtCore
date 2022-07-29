@@ -35,7 +35,7 @@ Item {
         if (productsMultiDocViewContainer.visible && productsMultiDocView.pagesCount === 0) {
             console.log("ProductsMultiDocView first page loaded !");
 //            let title = qsTr("Products");
-            productsMultiDocView.addToHeadersArray("", productsMultiDocViewContainer.title, "../../imtlicgui/ProductCollectionView.qml", "Products")
+            productsMultiDocView.addPage("", productsMultiDocViewContainer.title, "../../imtlicgui/ProductCollectionView.qml", "Products")
         }
 
         if (productsMultiDocViewContainer.visible){
@@ -52,7 +52,7 @@ Item {
 
 
 //        Component.onCompleted: {
-//            productsMultiDocView.addToHeadersArray("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
+//            productsMultiDocView.addPage("", "Products", "../../imtlicgui/ProductCollectionView.qml", "Products")
 //        }
 
     }

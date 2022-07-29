@@ -37,6 +37,7 @@ public:
 		I_ASSIGN(m_pageOnSelectedStatusIconAttrPtr, "PageOnSelectedStatusIcon", "Path of status icon used on selected", false, "");
 		I_ASSIGN(m_pageOffSelectedStatusIconAttrPtr, "PageOffSelectedStatusIcon", "Path of status icon used off selected", false, "");
 		I_ASSIGN(m_pageSourceItemAttrPtr, "PageSourceItem", "Path of source item", false, "");
+		I_ASSIGN(m_startSourceItemAttrPtr, "StartSourceItem", "Start of source item", false, "");
 		I_ASSIGN(m_subPagesDataProviderCompPtr, "SubPagesDataProvider", "Subpages of page", false,"");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
@@ -52,6 +53,7 @@ private:
 	I_ATTR(QString, m_pageOnSelectedStatusIconAttrPtr);
 	I_ATTR(QString, m_pageOffSelectedStatusIconAttrPtr);
 	I_ATTR(QString, m_pageSourceItemAttrPtr);
+	I_ATTR(QString, m_startSourceItemAttrPtr);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_subPagesDataProviderCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };

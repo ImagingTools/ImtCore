@@ -11,8 +11,8 @@ Item {
         Events.sendEvent("FeaturesTreeItemsUpdated");
     }
 
-    function reloadModel(){
-        featuresModel.loadFeaturesModel();
+    function updateModel(){
+        featuresModel.updateModel();
     }
 
     function updateTreeViewAfterFeatureEditing(packageId, featureOldId, featureNewId, featureNewName){
@@ -333,12 +333,16 @@ Item {
     GqlModel {
         id: featuresModel;
 
-        function loadFeaturesModel() {
+        function updateModel() {
             console.log( "FeaturesTreeView GqlModel loadFeaturesModel");
+
             var query = Gql.GqlRequest("query", "FeaturesTree");
+
             var queryFields = Gql.GqlObject("treeItem");
             queryFields.InsertField("TreeModel");
+            queryFields.InsertField("Successed");
             query.AddField(queryFields);
+
             var gqlData = query.GetQuery();
             console.log("TreeView query ", gqlData);
             this.SetGqlQuery(gqlData);
@@ -353,10 +357,10 @@ Item {
                     if (dataModelLocal.ContainsKey("TreeModel")) {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
 
-                        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
-                            var modelChildren = dataModelLocal.GetData("childItemModel", i);
-                            dataModelLocal.SetData("childItemModel", modelChildren, i);
-                        }
+//                        for (var i = 0; i < dataModelLocal.GetItemsCount(); i++) {
+//                            var modelChildren = dataModelLocal.GetData("childItemModel", i);
+//                            dataModelLocal.SetData("childItemModel", modelChildren, i);
+//                        }
 
                         treeViewModelContainer.modelTreeView = dataModelLocal;
                         Events.sendEvent("FeaturesTreeUpdate");

@@ -61,7 +61,7 @@ Rectangle {
             text: qsTr("Please login");
         }
     }
-    TextFieldCustom {
+    CustomTextField {
         id: loginTextInput;
         anchors.left: parent.left;
         anchors.top: headerRec.bottom;
@@ -74,7 +74,7 @@ Rectangle {
             console.log("LoginTextInput onInputTextChanged");
         }
     }
-    TextFieldCustom {
+    CustomTextField {
         id: passwordTextInput;
         anchors.left: parent.left;
         anchors.top: loginTextInput.bottom;

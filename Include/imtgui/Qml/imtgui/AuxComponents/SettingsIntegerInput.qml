@@ -35,7 +35,7 @@ Item {
         console.log("width", settingsIntegerInputContainer.width);
     }
 
-    TextFieldCustom {
+    CustomTextField {
         id: tfcIntegerInput;
 
         width: settingsIntegerInputContainer.width;

@@ -34,7 +34,7 @@ Rectangle {
         tabPanelContainer.count = 0
     }
 
-    function addToHeadersArray(str){
+    function addPage(str){
         tabPanelContainer.headersArray.push(str);
         tabPanelContainer.count = tabPanelContainer.headersArray.length
         tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1

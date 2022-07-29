@@ -16,7 +16,7 @@ Rectangle {
     signal commandsChangedSignal(string commandsId);
 
     function updateModels(){
-        modelCommands.updateModel();
+//        modelCommands.updateModel();
         modelUserMode.getUserMode();
     }
 
@@ -92,7 +92,7 @@ Rectangle {
         if (topPanel.activeCommandsModelId == "") {
             return;
         }
-        modelCommands.updateModel();
+//        modelCommands.updateModel();
 
 //        if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
 //            modelCommands.updateModel();
@@ -314,72 +314,72 @@ Rectangle {
         }
     }
 
-    GqlModel {
-        id: modelCommands;
+//    GqlModel {
+//        id: modelCommands;
 
-        property bool isFirst: true;
+//        property bool isFirst: true;
 
-        function updateModel() {
+//        function updateModel() {
 
-            console.log("modelCommands topPanel.activeCommandsModelId", topPanel.activeCommandsModelId);
-            var query = Gql.GqlRequest("query", "CommandsData");
+//            console.log("modelCommands topPanel.activeCommandsModelId", topPanel.activeCommandsModelId);
+//            var query = Gql.GqlRequest("query", "CommandsData");
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("PageId", topPanel.activeCommandsModelId);
+//            var inputParams = Gql.GqlObject("input");
+//            inputParams.InsertField("PageId", topPanel.activeCommandsModelId);
 
-            inputParams.InsertField("LanguageId", Style.language)
-            query.AddParam(inputParams);
+//            inputParams.InsertField("LanguageId", Style.language)
+//            query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            queryFields.InsertField("Icon");
-            queryFields.InsertField("Mode");
-            query.AddField(queryFields);
-            queryFields = Gql.GqlObject("information");
-            queryFields.InsertField("CommandsModelId");
-            query.AddField(queryFields);
+//            var queryFields = Gql.GqlObject("items");
+//            queryFields.InsertField("Id");
+//            queryFields.InsertField("Name");
+//            queryFields.InsertField("Icon");
+//            queryFields.InsertField("Mode");
+//            query.AddField(queryFields);
+//            queryFields = Gql.GqlObject("information");
+//            queryFields.InsertField("CommandsModelId");
+//            query.AddField(queryFields);
 
-            var gqlData = query.GetQuery();
-            console.log("modelCommands updateModel", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
+//            var gqlData = query.GetQuery();
+//            console.log("modelCommands updateModel", gqlData);
+////            this.SetGqlQuery(gqlData);
+//        }
 
 
-        onStateChanged: {
-            console.log("State:", this.state, modelCommands);
-            if (this.state === "Ready"){
-                var dataModelLocal;
+//        onStateChanged: {
+//            console.log("State:", this.state, modelCommands);
+//            if (this.state === "Ready"){
+//                var dataModelLocal;
 
-                if (modelCommands.ContainsKey("errors")){
-                    topPanelDecoratorLoader.item.centerPanel.showCustomLoader();
-                    return;
-                }
+//                if (modelCommands.ContainsKey("errors")){
+//                    topPanelDecoratorLoader.item.centerPanel.showCustomLoader();
+//                    return;
+//                }
 
-                if (modelCommands.ContainsKey("data")){
-                    dataModelLocal = modelCommands.GetData("data")
-                    if(dataModelLocal.ContainsKey("CommandsData")){
-                        dataModelLocal = dataModelLocal.GetData("CommandsData");
+//                if (modelCommands.ContainsKey("data")){
+//                    dataModelLocal = modelCommands.GetData("data")
+//                    if(dataModelLocal.ContainsKey("CommandsData")){
+//                        dataModelLocal = dataModelLocal.GetData("CommandsData");
 
-                        if(dataModelLocal.ContainsKey("items")){
-                            var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
-                            dataModelLocal = dataModelLocal.GetData("items");
-                            buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
+//                        if(dataModelLocal.ContainsKey("items")){
+//                            var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
+//                            dataModelLocal = dataModelLocal.GetData("items");
+//                            buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
 
-//                            console.log("topPanelDecoratorLoader.item", topPanelDecoratorLoader.item)
-//                            console.log("topPanelDecoratorLoader.item.centerPanel", topPanelDecoratorLoader.item.centerPanel)
+////                            console.log("topPanelDecoratorLoader.item", topPanelDecoratorLoader.item)
+////                            console.log("topPanelDecoratorLoader.item.centerPanel", topPanelDecoratorLoader.item.centerPanel)
 
-                            topPanelDecoratorLoader.item.centerPanel.setModelButtons(dataModelLocal)
-//                            topPanelDecoratorLoader.item.centerPanel.lvButtons.model = dataModelLocal;
-                            topPanelDecoratorLoader.item.centerPanel.showButtons();
-                            modelCommands.isFirst = !modelCommands.isFirst
-                            topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
-                        }
-                    }
-                }
-            }
-        }
-    }
+//                            topPanelDecoratorLoader.item.centerPanel.setModelButtons(dataModelLocal)
+////                            topPanelDecoratorLoader.item.centerPanel.lvButtons.model = dataModelLocal;
+//                            topPanelDecoratorLoader.item.centerPanel.showButtons();
+//                            modelCommands.isFirst = !modelCommands.isFirst
+//                            topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     GqlModel{
         id: modelUserMode;
         function getUserMode() {

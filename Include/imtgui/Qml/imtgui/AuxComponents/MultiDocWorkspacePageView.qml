@@ -4,6 +4,16 @@ import Acf 1.0
 Item {
     id: multiDocPageView;
 
+    anchors.fill: parent;
+
+    property var startPageObj;
+
+    onStartPageObjChanged: {
+        console.log("multiDocPageView onStartPageObjChanged");
+//        startPageObj["Source"] = "../../imtlicgui//ProductCollectionView.qml";
+        multiDocView.addPage(multiDocPageView.startPageObj)
+    }
+
     MultiDocWorkspaceView {
         id: multiDocView;
         anchors.fill: parent;

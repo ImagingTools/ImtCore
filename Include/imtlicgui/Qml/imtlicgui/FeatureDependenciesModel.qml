@@ -11,55 +11,8 @@ Item {
         Events.sendEvent("FeatureDependenciesUpdated");
     }
 
-    function reloadModel(){
-        dependenciesModel.loadDependModel();
-    }
-
-    function updateFeaturesDependenciesAfterPackageEditing(oldPackageId, newPackageId){
-//        console.log("updateFeaturesDependenciesAfterPackageEditing", oldPackageId, newPackageId);
-
-//        if (!featureDependenciesModelContainer.modelFeatureDependencies){
-//            return;
-//        }
-//        console.log("1", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
-//        let keys = featureDependenciesModelContainer.modelFeatureDependencies.GetKeys();
-//        for (let i = 0; i < keys.length; i++){
-//            let value = featureDependenciesModelContainer.modelFeatureDependencies.GetData(keys[i]);
-
-//            let data = keys[i].split('.');
-
-//            let curPackageId = data[0];
-//            let curFeatureId = data[1];
-
-//            if (curPackageId == oldPackageId){
-//                let newKey = newPackageId + "." + curFeatureId;
-//                featureDependenciesModelContainer.modelFeatureDependencies.SetData(newKey, value);
-//                featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], "");
-//                continue;
-//            }
-
-//            let valuesData = value.split(';');
-
-//            for (let j = 0; j < valuesData.length; j++){
-//                let valueData = valuesData[j].split('.');
-
-//                let curDependPackageId = valueData[0];
-//                let curDependFeatureId = valueData[1];
-
-//                if (curDependPackageId == oldPackageId){
-//                    let removeValue = curDependPackageId + '.' + curDependFeatureId;
-
-//                    if (j != valuesData.length - 1){
-//                        removeValue += ';';
-//                    }
-//                    let newValue = value.replace(removeValue, '');
-//                    newValue += ';' + newPackageId + "." + curDependFeatureId;
-//                    featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
-//                }
-//            }
-//        }
-
-//        console.log("2", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
+    function updateModel(){
+        dependenciesModel.updateModel();
     }
 
     function updateFeaturesDependenciesAfterFeatureEditing(packageId, featureOldId, featureNewId, featureNewName){
@@ -84,22 +37,9 @@ Item {
                 break;
             }
 
-
-//            if (curPackageId == packageId && curFeatureId == featureOldId){
-//                let newKey = curPackageId + "." + featureNewId;
-//                featureDependenciesModelContainer.modelFeatureDependencies.SetData(newKey, value);
-//                featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], "");
-//                break;
-//            }
-
             let valuesData = value.split(';');
 
             for (let j = 0; j < valuesData.length; j++){
-//                let valueData = valuesData[j].split('.');
-
-//                let curDependPackageId = valueData[0];
-//                let curDependFeatureId = valueData[1];
-
                 if (valuesData[j] == featureOldId){
                     let removeValue = valuesData[j];
 
@@ -111,17 +51,6 @@ Item {
                     newValue += ';' + featureNewId;
                     featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
                 }
-
-//                if (curDependPackageId == packageId && curDependFeatureId == featureOldId){
-//                    let removeValue = curDependPackageId + '.' + curDependFeatureId;
-
-//                    if (j != valuesData.length - 1){
-//                        removeValue += ';';
-//                    }
-//                    let newValue = value.replace(removeValue, '');
-//                    newValue += ';' + curPackageId + "." + featureNewId;
-//                    featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
-//                }
             }
         }
         console.log("2", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
@@ -146,12 +75,6 @@ Item {
                 featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], '');
                 continue;
             }
-
-//            if (curPackageId == packageId && curFeatureId == featureId){
-//                featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], '');
-//                continue;
-//            }
-
             let valuesData = value.split(';');
 
             for (let j = 0; j < valuesData.length; j++){
@@ -166,19 +89,6 @@ Item {
                     let newValue = value.replace(removeValue, '');
                     featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
                 }
-
-//                let curDependPackageId = valueData[0];
-//                let curDependFeatureId = valueData[1];
-
-//                if (curDependPackageId == packageId && curDependFeatureId == featureId){
-//                    let removeValue = curDependPackageId + '.' + curDependFeatureId;
-
-//                    if (j != valuesData.length - 1){
-//                        removeValue += ';';
-//                    }
-//                    let newValue = value.replace(removeValue, '');
-//                    featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
-//                }
             }
         }
     }
@@ -224,7 +134,7 @@ Item {
     GqlModel {
         id: dependenciesModel;
 
-        function loadDependModel() {
+        function updateModel() {
             console.log( "FeaturesTreeView GqlModel loadDependModel");
             var query = Gql.GqlRequest("query", "FeaturesDependencies");
             var queryFields = Gql.GqlObject("dependencies");

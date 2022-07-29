@@ -1,56 +1,32 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
-import imtauthgui 1.0
 
 
 Rectangle {
     id: dialogContainer;
-
-    z: 10;
-//    anchors.centerIn: dialogContainer.root;
-    anchors.centerIn: background;
 
     width: 300;
     height: dialogColumn.height;
 
     color: Style.backgroundColor;
 
-    visible: false;
+    property string title;
+    property string bodySource;
 
     property Item root;
-    property Item backgroundItem: background;
+    property Item bodyItem: loaderBodyDialog.item;
+
+    property alias buttons: buttonsDialog;
 
     signal finished(string buttonId);
 
-    Component.onCompleted: {
-        console.log("Dialog onCompleted", dialogContainer);
-        console.log("background", background);
-        console.log("thubnailDecoratorContainer", thubnailDecoratorContainer);
+    onFinished: {
+        root.closeDialog();
     }
 
-    onHeightChanged: {
-        console.log("dialogContainer onHeightChanged", dialogContainer.height);
-    }
-
-    property string bodySource: "MessageDialogBody.qml";
-
-    function setTitle(title){
+    onTitleChanged: {
         topPanelDialog.title = title;
-    }
-
-    function addButton(buttonObj){
-        buttonsDialog.addButton(buttonObj);
-    }
-
-    function getLoaderBodyItem(){
-        return loaderBodyDialog.item;
-    }
-
-    function open(){
-        dialogContainer.visible = true;
-        dialogContainer.backgroundItem.z = 9;
-        dialogContainer.backgroundItem.visible = dialogContainer.visible;
     }
 
     onBodySourceChanged: {
@@ -70,7 +46,6 @@ Rectangle {
 
             onCloseButtonClicked: {
                 dialogContainer.finished(buttonId);
-                dialogContainer.visible = false;
             }
         }
 
@@ -78,6 +53,7 @@ Rectangle {
             id: loaderBodyDialog;
 
             onItemChanged: {
+                console.log("Dialog onItemChanged", loaderBodyDialog.item);
                 if (loaderBodyDialog.item){
                     loaderBodyDialog.item.width = dialogContainer.width;
                 }
@@ -93,7 +69,6 @@ Rectangle {
             onButtonClicked: {
                 console.log("ButtonsDialog onButtonClicked", buttonId);
                 dialogContainer.finished(buttonId);
-                dialogContainer.visible = false;
             }
         }
     }

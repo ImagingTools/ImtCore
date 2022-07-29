@@ -2,10 +2,11 @@
     <qresource prefix="/Icons"/>
     <qresource prefix="/ColorIcons"/>
     <qresource prefix="/qml">
-        <file alias="imtauthgui/ContactInfoEditor.qml">Qml/imtauthgui/ContactInfoEditor.qml</file>
-        <file alias="imtauthgui/TextFieldCustom.qml">Qml/imtauthgui/TextFieldCustom.qml</file>
+        <file alias="imtauthgui/AccountEditor.qml">Qml/imtauthgui/AccountEditor.qml</file>
         <file alias="imtauthgui/qmldir">Qml/imtauthgui/qmldir</file>
         <file alias="imtauthgui/AccountCollectionView.qml">Qml/imtauthgui/AccountCollectionView.qml</file>
         <file alias="imtauthgui/AccountsMultiDocView.qml">Qml/imtauthgui/AccountsMultiDocView.qml</file>
+        <file alias="imtauthgui/AccountEditorCommandsDelegate.qml">Qml/imtauthgui/AccountEditorCommandsDelegate.qml</file>
+	<file alias="imtauthgui/AccountCollectionViewCommandsDelegate.qml">Qml/imtauthgui/AccountCollectionViewCommandsDelegate.qml</file>
     </qresource>
 </RCC>

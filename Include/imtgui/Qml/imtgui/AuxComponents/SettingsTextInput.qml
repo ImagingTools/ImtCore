@@ -41,7 +41,7 @@ Item {
         console.log("SettingsTextInput onCompleted", settingsTextInputContainer.itemId);
     }
 
-    TextFieldCustom {
+    CustomTextField {
         id: tfcTextInput;
 
         width: settingsTextInputContainer.width;
