@@ -1,5 +1,9 @@
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
 
+
+// STL includes
+#include <cmath>
+
 // ACF includes
 #include <iprm/CParamsSet.h>
 
@@ -405,7 +409,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		iprm::CParamsSet filterParams;
 		filterParams.SetEditableParameter("Filter", &m_filter);
 
-		int pagesCount = qCeil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
+		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
 		if (pagesCount < 0){
 			pagesCount = 1;
 		}
