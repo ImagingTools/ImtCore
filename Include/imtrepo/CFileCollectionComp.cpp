@@ -75,6 +75,10 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 		return -1;
 	}
 
+	if (objectId.isEmpty()){
+		return -1;
+	}
+
 	QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
 
 	if (istd::CSystem::EnsurePathExists(revisionsPath)){
