@@ -8,7 +8,7 @@ Rectangle {
 
     property TreeItemModel modelItems;
 
-    signal checkBoxStateChanged(int state, string parentId, string childId);
+    signal checkBoxChanged(int state, string parentId, string childId);
 
     ListView {
         id: mainTreeView;

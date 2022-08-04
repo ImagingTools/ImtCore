@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
 import imtqml 1.0
-import imtauthgui 1.0
+import imtgui 1.0
 
 Item {
     id: settingsTextInputContainer;
@@ -13,13 +13,6 @@ Item {
     property Item repeaterItem;
 
     property int index: 0; // index element in the data model, default - 0
-
-//    onFocusChanged: {
-//        console.log("SettingsTextInput onFocusChanged", settingsTextInputContainer.focus);
-//        if (settingsTextInputContainer.focus){
-//            tfcTextInput.setFocus(settingsTextInputContainer.focus);
-//        }
-//    }
 
     onItemIdChanged: {
         if (settingsTextInputContainer.itemId === "Password"){
@@ -49,7 +42,7 @@ Item {
 
         text: settingsTextInputContainer.value;
 
-        onInputTextChanged: {
+        onTextChanged: {
             console.log("SettingsTextInput onInputTextChanged");
             if (settingsTextInputContainer.rootItem){
                 settingsTextInputContainer.rootItem.dataChanged(settingsTextInputContainer.index, tfcTextInput.text);

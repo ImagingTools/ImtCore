@@ -203,7 +203,7 @@ Rectangle {
 
             onClicked: {
 //                preferenceContainer.loaderDialog.closeItem();
-                thubnailDecoratorContainer.setPreferencesVisible(false);
+                thumbnailDecoratorContainer.setPreferencesVisible(false);
             }
         }
     }
@@ -499,7 +499,7 @@ Rectangle {
        onClicked: {
            console.log("PreferenceDialog saveButton onClicked", preferenceContainer.currentModeId, Style.theme);
 
-           if (thubnailDecoratorContainer.serverIsConnection){
+           if (thumbnailDecoratorContainer.serverIsConnection){
                if ((preferenceContainer.currentModeId == "Light" ||
                        preferenceContainer.currentModeId == "Dark") &&
                        preferenceContainer.currentModeId !== Style.theme){
@@ -522,14 +522,14 @@ Rectangle {
 
                if (newNetworkUrl != preferenceContainer.networkUrl){
                    preferenceContainer.networkUrl = newNetworkUrl
-                   thubnailDecoratorContainer.localSettings.SetData("Elements", elements);
+                   thumbnailDecoratorContainer.localSettings.SetData("Elements", elements);
                }
            }
 
 //           if (preferenceContainer.selectedLanguage != "" && preferenceContainer.selectedLanguage != Style.language){
 //               Style.language = preferenceContainer.selectedLanguage;
 //               context.language = preferenceContainer.selectedLanguage;
-//               thubnailDecoratorContainer.updateModels();
+//               thumbnailDecoratorContainer.updateModels();
 //           }
 
 //           preferenceSaveButton.enabled = false;
@@ -569,7 +569,7 @@ Rectangle {
 
        onClicked: {
            console.log("PreferenceDialog closeButton onClicked");
-           thubnailDecoratorContainer.setPreferencesVisible(false);
+           thumbnailDecoratorContainer.setPreferencesVisible(false);
 //           preferenceContainer.thumbnailItem.setFocusOnMenuPanel();
 //           preferenceContainer.loaderDialog.closeItem();
        }

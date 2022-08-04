@@ -11,7 +11,7 @@ CollectionViewCommandsDelegateBase {
 
     function commandHandle(commandId){
         console.log("AccountCollectionCommands commandActivated", commandId);
-        super.commandHandle(commandId);
+        container.commandHandleBase(commandId);
     }
 }
 

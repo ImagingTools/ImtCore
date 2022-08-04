@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-
 Item {
     id: gqlModelBaseContainer;
 
@@ -74,6 +73,11 @@ Item {
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelHeadersInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelHeadersInfo);
 
+                        if (dataModelLocal.ContainsKey("FilterSearch")){
+                            let filterSearchModel = dataModelLocal.GetData("FilterSearch")
+                            modelFilter.SetData("FilterIds", filterSearchModel);
+                        }
+
                         if(dataModelLocal.ContainsKey("Headers")){
                             dataModelLocal = dataModelLocal.GetData("Headers");
                             gqlModelBaseContainer.headers = dataModelLocal;
@@ -92,11 +96,26 @@ Item {
             console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
 
+            let height = collectionViewBaseContainer.height - pagination.height - table.itemHeight; //Убрать высоту от заголовка и меню пагинации
+            let count = Math.floor(height / table.itemHeight);
+            let offset = (pagination.currentValue - 1) * count;
+
+            var viewParams = Gql.GqlObject("viewParams");
+            viewParams.InsertField("Offset", offset);
+            viewParams.InsertField("Count", count);
+            viewParams.InsertField("FilterModel");
+            var jsonString = modelFilter.toJSON();
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            viewParams.InsertField("FilterModel", jsonString);
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertFieldObject(viewParams);
+
             if (gqlModelBaseContainer.itemId){
-                var inputParams = Gql.GqlObject("input");
                 inputParams.InsertField("Id", gqlModelBaseContainer.itemId);
-                query.AddParam(inputParams);
             }
+
+            query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField("Id");
@@ -126,6 +145,8 @@ Item {
                         if (dataModelLocal.ContainsKey("items")){
                             dataModelLocal = dataModelLocal.GetData("items");
                             gqlModelBaseContainer.items = dataModelLocal;
+
+                            table.selectedIndex = -1;
                         }
                     }
                 }

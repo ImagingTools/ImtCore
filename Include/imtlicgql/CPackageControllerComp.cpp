@@ -2,13 +2,9 @@
 
 
 // ImtCore includes
-#include <imtlic/CFeaturePackageCollectionUtility.h>
 #include <imtlic/CFeatureInfo.h>
 #include <imtlic/IFeaturePackage.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
-#include <imtgui/CObjectCollectionViewDelegate.h>
 #include <imtlic/CFeaturePackage.h>
-
 
 
 namespace imtlicgql
@@ -118,8 +114,8 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		}
 
 		imtbase::CTreeItemModel* dependenciesModelPtr = nullptr;
-		if (itemModel.ContainsKey("Dependencies")){
-			dependenciesModelPtr = itemModel.GetTreeItemModel("Dependencies");
+		if (itemModel.ContainsKey("DependentModel")){
+			dependenciesModelPtr = itemModel.GetTreeItemModel("DependentModel");
 		}
 
 		if (featuresModelPtr != nullptr){
@@ -127,6 +123,12 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				QByteArray featureId = featuresModelPtr->GetData("Id", i).toByteArray();
 				QString featureName = featuresModelPtr->GetData("Name", i).toString();
 				QString featureDescription = featuresModelPtr->GetData("Description", i).toString();
+
+				if (featureId.isEmpty()){
+					errorMessage = QObject::tr("%1 has an empty ID!").arg(featureName);
+
+					return nullptr;
+				}
 
 				istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
 				featureInfoPtr->SetFeatureId(featureId);
@@ -186,10 +188,8 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 					if (featureInfoPtr != nullptr){
 						QByteArray featureId = featureInfoPtr->GetFeatureId();
-//						QByteArrayList dependsIds = dependenciesProvider->GetFeatureDependencies(collectionId + "." + featureId);
 						QByteArrayList dependsIds = dependenciesProvider->GetFeatureDependencies(featureId);
 						if (dependsIds.size() > 0){
-//							QByteArray key = collectionId + "." + featureId;
 							QByteArray key = featureId;
 							QString value = dependsIds.join(';');
 							dependenciesModel->SetData(key, value);
@@ -301,5 +301,3 @@ bool CPackageControllerComp::GetOperationFromRequest(
 
 
 } // namespace imtlicgql
-
-

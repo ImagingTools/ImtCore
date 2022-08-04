@@ -7,40 +7,39 @@ Item {
 
     property TreeItemModel modelFeatureDependencies;
 
-    onModelFeatureDependenciesChanged: {
-        Events.sendEvent("FeatureDependenciesUpdated");
+    Component.onCompleted: {
+        Events.subscribeEvent("FeatureDependenciesUpdate", updateModel);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("FeatureDependenciesUpdate", updateModel);
     }
 
     function updateModel(){
         dependenciesModel.updateModel();
     }
 
-    function updateFeaturesDependenciesAfterFeatureEditing(packageId, featureOldId, featureNewId, featureNewName){
-        console.log("updateFeaturesDependenciesAfterFeatureEditing", packageId, featureOldId, featureNewId, featureNewName);
+    function featureIdChanged(oldId, newId){
+        console.log("featureIdChanged", oldId, newId);
+        console.log("featureDependenciesModelContainer.modelFeatureDependencies 1", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
 
-        if (!featureDependenciesModelContainer.modelFeatureDependencies){
-            return;
-        }
-        console.log("1", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
         let keys = featureDependenciesModelContainer.modelFeatureDependencies.GetKeys();
         for (let i = 0; i < keys.length; i++){
-            let value = featureDependenciesModelContainer.modelFeatureDependencies.GetData(keys[i]);
+            let key = keys[i];
+            let value = featureDependenciesModelContainer.modelFeatureDependencies.GetData(key);
 
-            let data = keys[i].split('.');
-
-            let curPackageId = data[0];
-            let curFeatureId = data[1];
-
-            if (keys[i] == featureOldId){
-                featureDependenciesModelContainer.modelFeatureDependencies.SetData(featureNewId, value);
-                featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], "");
+            if (key == oldId){
+                console.log("Key changed",key, oldId);
+                featureDependenciesModelContainer.modelFeatureDependencies.SetData(newId, value);
+//                featureDependenciesModelContainer.modelFeatureDependencies.SetData(key, "");
+                featureDependenciesModelContainer.modelFeatureDependencies.RemoveData(key);
                 break;
             }
 
             let valuesData = value.split(';');
 
             for (let j = 0; j < valuesData.length; j++){
-                if (valuesData[j] == featureOldId){
+                if (valuesData[j] == oldId){
                     let removeValue = valuesData[j];
 
                     if (j != valuesData.length - 1){
@@ -48,16 +47,19 @@ Item {
                     }
 
                     let newValue = value.replace(removeValue, '');
-                    newValue += ';' + featureNewId;
-                    featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
+                    newValue += ';' + newId;
+                    featureDependenciesModelContainer.modelFeatureDependencies.SetData(key, newValue);
                 }
             }
         }
-        console.log("2", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
+
+        featureDependenciesModelContainer.modelFeatureDependencies.Refresh();
+        console.log("featureDependenciesModelContainer.modelFeatureDependencies 2", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
+
     }
 
-    function removeDependsFeature(packageId, featureId){
-        console.log("FeaturesTreeView removeDependsFeature", packageId, featureId);
+    function removeDependsFeature(featureId){
+        console.log("FeaturesTreeView removeDependsFeature", featureId);
         if (!featureDependenciesModelContainer.modelFeatureDependencies){
             return;
         }

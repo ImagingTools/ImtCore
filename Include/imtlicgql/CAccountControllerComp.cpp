@@ -1,15 +1,7 @@
 #include <imtlicgql/CAccountControllerComp.h>
 
 // ImtCore includes
-#include <imtauth/IContactInfo.h>
-#include <imtauth/IAccountInfo.h>
 #include <imtauth/CAccountInfo.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
-#include <imtgui/CObjectCollectionViewDelegate.h>
-#include <imtauth/IAddressManager.h>
-#include <imtauth/CAddress.h>
-#include <imtauth/CContactInfo.h>
-#include <imtauth/CAccountInfoMetaInfo.h>
 
 
 namespace imtlicgql

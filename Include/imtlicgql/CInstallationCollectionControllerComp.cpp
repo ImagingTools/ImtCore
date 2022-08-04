@@ -3,9 +3,7 @@
 
 // ImtCore includes
 #include <imtlic/IProductInstanceInfo.h>
-#include <imtlic/IProductInfo.h>
 #include <imtlic/ILicenseInstance.h>
-#include <imtlic/CProductInstanceMetaInfo.h>
 
 
 namespace imtlicgql

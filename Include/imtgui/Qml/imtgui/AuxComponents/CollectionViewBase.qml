@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
-
+import imtgui 1.0
 
 Item {
     id: collectionViewBaseContainer;
@@ -10,73 +9,92 @@ Item {
 
     property var table: tableInternal;
     property bool hasPagination: true;
+    property bool hasFilter: true;
+    property bool hasSort: true;
 
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
+    signal elementsChanged();
+
+    onFocusChanged: {
+        console.log("CollectionViewBase onFocusChanged", focus);
+
+        if (focus){
+            keyboardManager.forceActiveFocus();
+        }
+    }
+
+    FilterMenu {
+        id: filterMenu;
+
+        anchors.top: collectionViewBaseContainer.top;
+
+        width: parent.width;
+
+        decoratorSource: Style.filterPanelDecoratorPath;
+
+        visible: false;
+
+        onTextFilterChanged: {
+            modelFilter.SetData("TextFilter", text);
+            baseCommands.updateModels();
+        }
+
+        onClosed: {
+            filterMenu.visible = false;
+        }
+    }
 
     Rectangle {
         id: backgroundTable;
 
-        anchors.fill: parent;
-        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
-        anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
-        anchors.rightMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.top: filterMenu.visible ? filterMenu.bottom: parent.top;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+        anchors.margins: thumbnailDecoratorContainer.mainMargin;
 
         color: Style.baseColor;
 
-        radius: thubnailDecoratorContainer.mainRadius;
+        radius: thumbnailDecoratorContainer.mainRadius;
 
         AuxTable {
             id: tableInternal;
 
             anchors.fill: parent;
-            anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-            anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
+            anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
+            anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
             anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
 
-            hasFilter: true;
-            hasSort: true;
+            hasFilter: collectionViewBaseContainer.hasFilter;
+            hasSort: collectionViewBaseContainer.hasSort;
 
             onSelectItem: {
-                console.log("CollectionView AuxTable onSelectItem", idSelected, name);
-//                collectionViewContainer.itemSelect(idSelected, name);
-
                 collectionViewBaseContainer.selectedItem(idSelected, name);
-            }
-
-            onRightButtonMouseClicked: {
-                console.log("CollectionView AuxTable onRightButtonMouseClicked");
-                collectionViewBaseContainer.collectionViewRightButtonMouseClicked(item, mouseX, mouseY);
             }
 
             onSelectedIndexChanged: {
                 console.log("CollectionView AuxTable onSelectedIndexChanged");
                 collectionViewBaseContainer.selectedIndexChanged(tableInternal.selectedIndex);
-//                console.log(" CollectionView AuxTable onSelectedIndexChanged", collectionViewContainer.selectedIndex, tableInternal.selectedIndex);
-//                collectionViewBaseContainer.collectionViewModel.SetData("selectedIndex", tableInternal.selectedIndex);
-//                collectionViewContainer.selectedIndex = tableInternal.selectedIndex;
-
-                //tableInternal.elementsList.selectedId = elements.GetData("Id", tableInternal.selectedIndex);
-            }
-
-            onSetActiveFocusFromTable: {
-                console.log("CollectionView AuxTable onSetActiveFocusFromTable");
-                //collectionViewContainer.setActiveFocusFromCollectionView();
-//                collectionViewContainer.forceActiveFocus();
             }
 
             onTextFilterChanged: {
                 modelFilter.SetData("TextFilter", text);
-//                modelItems.updateModel();
             }
 
+            onElementsChanged: {
+                collectionViewBaseContainer.elementsChanged();
+            }
 
-            onHeaderOnClicked: {
+            onHeaderClicked: {
                 console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
 //                collectionViewContainer.headerClicked(headerId, sortOrder);
 
 //                modelItems.updateModel();
+            }
+
+            onFilterClicked: {
+                filterMenu.visible = !filterMenu.visible;
             }
         }
     }
@@ -112,6 +130,20 @@ Item {
             tableInternal.selectedIndex = -1;
             modelItems.updateModel();
         }
+    }
+
+    CollectionKeyboardManager{
+        id: keyboardManager;
+        collection: collectionViewBaseContainer;
+
+        onFocusChanged: {
+            console.log("keyboardManager onFocusChanged", focus);
+        }
+
+        Keys.onPressed: {
+            console.log("KeyboardManager onPressed", event.key);
+        }
+
     }
 
     CollectionViewBaseGqlModels {

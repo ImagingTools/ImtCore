@@ -18,6 +18,10 @@ Rectangle {
         loaderDecorator.source = filterContainer.decoratorSource;
     }
 
+    onVisibleChanged: {
+        console.log("filterContainer onVisibleChanged", filterContainer.width, filterContainer.height);
+    }
+
     Loader {
         id: loaderDecorator;
 
@@ -32,11 +36,9 @@ Rectangle {
         }
 
         onItemChanged: {
-            console.log("onItemChanged");
             if (loaderDecorator.item){
                 loaderDecorator.item.width = filterContainer.width;
                 filterContainer.height = loaderDecorator.item.height;
-//                loaderDecorator.item.height = filterContainer.height;
             }
         }
     }

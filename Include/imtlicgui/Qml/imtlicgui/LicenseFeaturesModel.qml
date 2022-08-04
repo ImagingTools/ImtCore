@@ -7,6 +7,14 @@ Item {
 
     property TreeItemModel modelLicenseFeatures;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("LicenseFeaturesUpdate", updateModel);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("LicenseFeaturesUpdate", updateModel);
+    }
+
     onModelLicenseFeaturesChanged: {
         console.log("licenseFeaturesModelContainer onModelLicenseFeaturesChanged");
         Events.sendEvent("LicenseFeaturesModelUpdated");
@@ -16,8 +24,8 @@ Item {
         licensesDependenciesModel.updateModel();
     }
 
-    function updateLicensesDependenciesAfterLicenseEditing(productId, licenseOldId, licenseNewId, licenseNewName){
-        console.log("updateLicensesDependenciesAfterLicenseEditing", productId, licenseOldId, licenseNewId, licenseNewName);
+    function updateLicensesDependenciesAfterLicenseEditing(licenseOldId, licenseNewId){
+        console.log("updateLicensesDependenciesAfterLicenseEditing", licenseOldId, licenseNewId);
 
         if (!licenseFeaturesModelContainer.modelLicenseFeatures){
             return;
@@ -41,10 +49,12 @@ Item {
 
         function updateModel() {
             console.log( "FeaturesTreeView GqlModel loadLicenseDependModel");
-            var query = Gql.GqlRequest("query", "LicensesDependencies");
-            var queryFields = Gql.GqlObject("dependencies");
+            var query = Gql.GqlRequest("query", "LicenseFeatures");
+
+            var queryFields = Gql.GqlObject("Features");
             queryFields.InsertField("TreeModel");
             query.AddField(queryFields);
+
             var gqlData = query.GetQuery();
             console.log("TreeView loadLicenseDependModel query ", gqlData);
             this.SetGqlQuery(gqlData);
@@ -55,14 +65,14 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
 
-                if (dataModelLocal.ContainsKey("LicensesDependencies")){
-                    dataModelLocal = dataModelLocal.GetData("LicensesDependencies");
+                if (dataModelLocal.ContainsKey("LicenseFeatures")){
+                    dataModelLocal = dataModelLocal.GetData("LicenseFeatures");
 
                     if (dataModelLocal.ContainsKey("TreeModel")){
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
-                    }
 
-                    licenseFeaturesModelContainer.modelLicenseFeatures = dataModelLocal;
+                        licenseFeaturesModelContainer.modelLicenseFeatures = dataModelLocal;
+                    }
                 }
             }
         }

@@ -35,7 +35,7 @@ Item {
         if (usersCollectionView.table.height - mouseY <= 100){
             mouseY = mouseY - 100;
         }
-        var point = usersCollectionContainer.mapToItem(thubnailDecoratorContainer, mouseX, mouseY);
+        var point = usersCollectionContainer.mapToItem(thumbnailDecoratorContainer, mouseX, mouseY);
         var source = "AuxComponents/PopupMenuDialog.qml";
         var parameters = {};
         parameters["model"] = contextMenuModel;
@@ -45,7 +45,7 @@ Item {
         parameters["x"] = point.x;
         parameters["y"] = point.y;
 
-        thubnailDecoratorContainer.openDialog(source, parameters);
+        thumbnailDecoratorContainer.openDialog(source, parameters);
     }
 
     function menuActivated(menuId) {

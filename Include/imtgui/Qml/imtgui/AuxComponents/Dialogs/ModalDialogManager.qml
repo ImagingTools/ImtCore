@@ -3,6 +3,8 @@ import QtQuick 2.12
 Item {
     id: container;
 
+    property alias backgroundItem: background;
+
     ListModel {
         id: modalDialogModels;
     }
@@ -14,7 +16,10 @@ Item {
 
     function closeDialog(){
         console.log("DialogsManager closeDialog");
-        modalDialogModels.remove(modalDialogModels.count - 1);
+
+        if (modalDialogModels.count > 0){
+            modalDialogModels.remove(modalDialogModels.count - 1);
+        }
     }
 
     Rectangle {
@@ -26,8 +31,13 @@ Item {
         color: "gray";
         visible: modalDialogs.visible;
 
-        opacity: 0.4;
-        MouseArea { anchors.fill: parent; }
+        property alias backgroundAreaItem: backgroundArea;
+        MouseArea {
+            id: backgroundArea;
+            anchors.fill: parent;
+
+            onWheel: {}
+        }
     }
 
     Repeater {
@@ -47,7 +57,7 @@ Item {
             Loader {
                 id: dialogLoader;
 
-                anchors.centerIn: dialogDelegate;
+//                anchors.centerIn: dialogDelegate;
 
                 sourceComponent: model.Component;
 
@@ -55,7 +65,10 @@ Item {
                     dialogLoader.item["root"] = container;
                     for (let key in model.Parameters) {
                         console.log(key, model.Parameters[key]);
-                        dialogLoader.item[key]  = model.Parameters[key];
+                        dialogLoader.item[key] = model.Parameters[key];
+                    }
+                    if (dialogLoader.item.centered){
+                        dialogLoader.anchors.centerIn = dialogDelegate;
                     }
                 }
             }

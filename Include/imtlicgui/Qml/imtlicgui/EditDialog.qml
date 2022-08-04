@@ -11,10 +11,12 @@ Dialog {
     property string valueId;
     property string valueName;
 
+    property TreeItemModel model;
+
     onFinished: {
         if (buttonId === "Ok"){
-            container.valueId = container.bodyItem.valueId;
-            container.valueName = container.bodyItem.valueName;
+            container.valueId = container.bodyItem.inputId;
+            container.valueName = container.bodyItem.inputName;
         }
     }
 
@@ -29,11 +31,11 @@ Dialog {
     }
 
     onValueIdChanged: {
-        container.bodyItem.valueId = container.valueId;
+        container.bodyItem.inputId = container.valueId;
     }
 
     onValueNameChanged: {
-        container.bodyItem.valueName = container.valueName;
+        container.bodyItem.inputName = container.valueName;
     }
 
     Component.onCompleted: {
@@ -42,5 +44,13 @@ Dialog {
 
         container.bodySource = "../../../imtlicgui/EditDialogBody.qml";
         container.title = qsTr("Edit");
+    }
+
+    function setInputNameValidator(validator){
+//        container.bodyItem.inputName.setValidator(validator);
+    }
+
+    function setInputIdValidator(validator){
+//        container.bodyItem.inputId.setValidator(validator);
     }
 }

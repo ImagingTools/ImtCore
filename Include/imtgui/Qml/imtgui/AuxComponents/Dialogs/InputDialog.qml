@@ -7,14 +7,20 @@ Dialog {
     id: inputDialogContainer;
 
     property string message;
-    property string startValue;
+    property string inputValue;
+
+    onFinished: {
+        if (buttonId === "Ok"){
+            inputDialogContainer.inputValue = inputDialogContainer.bodyItem.inputValue;
+        }
+    }
 
     onMessageChanged: {
         inputDialogContainer.bodyItem.message = message;
     }
 
-    onStartValueChanged: {
-        inputDialogContainer.bodyItem.inputValue = startValue;
+    onInputValueChanged: {
+        inputDialogContainer.bodyItem.inputValue = inputValue;
     }
 
     Component.onCompleted: {

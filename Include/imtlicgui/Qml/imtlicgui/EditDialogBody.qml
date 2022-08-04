@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 import imtgui 1.0
 
-Item {
+FocusScope {
     id: container;
 
     height: bodyColumn.height + 40;
@@ -10,8 +10,11 @@ Item {
     property string titleId;
     property string titleName;
 
-    property string valueId;
-    property string valueName;
+//    property string valueId;
+//    property string valueName;
+
+    property alias inputName: inputName.text;
+    property alias inputId: inputId.text;
 
     Column {
         id: bodyColumn;
@@ -41,7 +44,8 @@ Item {
             width: bodyColumn.width;
             height: 30;
 
-            text: container.valueName;
+//            text: container.valueName;
+            focus: true;
 
             onTextChanged: {
                 container.valueName = inputName.text;
@@ -50,8 +54,6 @@ Item {
 
 
         Text {
-            id: titleFeatureId;
-
             anchors.topMargin: 10;
 
             text: container.titleId;
@@ -67,11 +69,27 @@ Item {
             width: bodyColumn.width;
             height: 30;
 
-            text: container.valueId;
+//            text: container.valueId;
 
             onTextChanged: {
-                container.valueId = inputId.text;
+                if(checkInputId(inputId.text)){
+//                    container.valueId = inputId.text;
+                }
+                else{
+
+                }
             }
         }
+    }
+
+    function checkInputId(inputId){
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let id = model.GetData("Id", i);
+            if (id === inputId){
+                return false;
+            }
+        }
+
+        return true;
     }
 }

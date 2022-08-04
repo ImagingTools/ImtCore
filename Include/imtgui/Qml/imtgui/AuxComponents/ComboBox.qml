@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Acf 1.0
+import imtgui 1.0
 
 Item {
     id: comboBoxContainer;
@@ -9,7 +10,6 @@ Item {
 
     property var model;
 
-//    property color borderColor: Style.textColor;
     property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
 
     property color backgroundColor: Style.baseColor;
@@ -21,11 +21,30 @@ Item {
 
     property int radius: 5;
     property int currentIndex: -1;
-    property int menuWidth: comboBoxContainer.width;
-    property int menuHeight: cbListView.count * comboBoxContainer.height;
 
     signal clicked();
-    signal dialogResultChanged();
+
+    onModelChanged: {
+        if (comboBoxContainer.currentIndex > -1){
+            comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
+        }
+    }
+
+    onCurrentIndexChanged: {
+        console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
+        if (comboBoxContainer.currentIndex > -1){
+            comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
+        }
+    }
+
+    Component {
+        id: popupMenu;
+        PopupMenuDialog {
+            onFinished: {
+                comboBoxContainer.currentIndex = index;
+            }
+        }
+    }
 
     Component.onCompleted: {
         if (comboBoxContainer.textCentered){
@@ -37,36 +56,9 @@ Item {
         }
     }
 
-    function dialogResult(parameters){
-        console.log("ComboBox dialogResult");
-
-        if (parameters){
-            comboBoxContainer.currentText = parameters["status"];
-            comboBoxContainer.currentIndex = parameters["index"];
-        }
-
-        comboBoxContainer.dialogResultChanged();
-    }
-
-    function openContextMenu(){
-        var point = comboBoxContainer.mapToItem(thubnailDecoratorContainer, 0, comboBoxContainer.height);
-
-        console.log("point.x", point.x);
-        console.log("point.y", point.y);
-
-        var source = "AuxComponents/PopupMenuDialog.qml";
-        var parameters = {};
-
-        parameters["model"] = comboBoxContainer.model;
-        parameters["resultItem"] = comboBoxContainer;
-        parameters["hasIcon"] = false;
-
-        parameters["itemHeight"] = comboBoxContainer.height;
-        parameters["itemWidth"] = comboBoxContainer.width;
-
-        parameters["x"] = point.x;
-        parameters["y"] = point.y;
-        thubnailDecoratorContainer.openDialog(source, parameters);
+    function openPopupMenu(){
+        var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
+        modalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": comboBoxContainer.model});
     }
 
     Rectangle {
@@ -124,91 +116,8 @@ Item {
             onClicked: {
                 console.log("ComboBox clicked !");
 
+                openPopupMenu();
                 comboBoxContainer.clicked();
-            }
-        }
-    }
-
-    Rectangle {
-        id: cbMenu;
-        z: 100;
-
-        anchors.top: cbMainRect.bottom;
-
-        width: comboBoxContainer.menuWidth;
-        height: comboBoxContainer.menuHeight;
-
-        color: Style.baseColor;
-
-        border.width: 1;
-        border.color: comboBoxContainer.borderColor;
-
-        radius: comboBoxContainer.radius;
-        visible: comboBoxContainer.menuVisible;
-
-        ListView {
-            id: cbListView;
-
-            anchors.fill: parent;
-
-            model: comboBoxContainer.model;
-            clip: true;
-            currentIndex: 0;
-
-            boundsBehavior: Flickable.StopAtBounds;
-
-            delegate: Item {
-                id: cbListDelegate;
-
-                width: cbListView.width;
-                height: cbMainRect.height;
-
-                Rectangle {
-                    anchors.verticalCenter: cbListDelegate.verticalCenter;
-                    anchors.horizontalCenter: cbListDelegate.horizontalCenter;
-
-                    width: cbListDelegate.width - 2;
-                    height: cbListDelegate.height - 2;
-
-                    visible: comboBoxContainer.currentIndex === model.index;
-                    color: Style.selectedColor;
-                    radius: comboBoxContainer.radius;
-                }
-
-                Text {
-                    id: cbTitleModel;
-
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: cbListDelegate.left;
-                    anchors.leftMargin: 10;
-
-                    text: model.text ? model.text : "";
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-                }
-
-                MouseArea {
-                    anchors.fill: parent;
-
-                    cursorShape: Qt.PointingHandCursor;
-
-                    onClicked: {
-                        comboBoxContainer.currentText = model.text;
-                        comboBoxContainer.currentIndex = model.index;
-                        comboBoxContainer.menuVisible = false;
-                    }
-                }
-
-                Rectangle {
-                    anchors.top: cbListDelegate.bottom;
-
-                    width: cbListDelegate.width;
-                    height: 1;
-
-                    color: Style.textColor;
-                    visible: model.index !== cbListView.count - 1;
-                }
             }
         }
     }

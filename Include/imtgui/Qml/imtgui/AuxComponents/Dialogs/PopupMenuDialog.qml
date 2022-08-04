@@ -1,222 +1,127 @@
 import QtQuick 2.12
 import QtGraphicalEffects 1.12
-//import Qt5Compat.GraphicalEffects
 import Acf 1.0
-import imtqml 1.0
 
-Item {
+Rectangle {
     id: popupMenuContainer;
 
     width: popupMenuContainer.itemWidth;
- //   visible: false;
-
-    property Item resultItem;
-    property Item loaderDialog;
-    property Item thumbnailItem;
+    height: popupMenuListView.height;
 
     property var model;
-    property real backgroundOpacity: 0;
+    property Item root;
 
-    property bool backgroundExist: false;
-    property bool clickBackgroundClose: true;
-    property bool centered: false;
-    property bool hasIcon: true;
-
-    property int itemWidth: 100;
+    property int itemWidth: 200;
     property int itemHeight: 26;
-    property int emptyItemCount: 0;
 
-    function exit(index, name) {
-        var parameters  = {};
-        parameters["index"] = index;
-        parameters["status"] = name;
-        parameters["dialog"] = "PopupMenu";
-        popupMenuContainer.resultItem.dialogResult(parameters);
-    }
+    signal finished(string commandId, int index);
 
-    onFocusChanged: {
-        console.log("PopupMenuDialog onFocusChanged");
-        mainBody.forceActiveFocus();
-    }
-
-    onHeightChanged: {
-        console.log("PopupMenuDialog onHeightChanged", popupMenuContainer.height);
+    onFinished: {
+        root.closeDialog();
     }
 
     onModelChanged: {
-        console.log("PopupMenuDialog ListView onModelChanged", popupMenuContainer.model.count);
-        for (var i = 0; i < popupMenuContainer.model.count; i++) {
-            if (popupMenuContainer.model.get(i).id === "") {
-                popupMenuContainer.emptyItemCount++;
-            }
-        }
+        popupMenuListView.model = model;
     }
 
-    DropShadow {
-       id: dropShadow;
+    onRootChanged: {
+        /**
+            Opacity of the background = 0
+        */
+        root.backgroundItem.opacity = 0;
 
-       anchors.fill: mainBody;
-
-       horizontalOffset: 2;
-       verticalOffset: 2;
-
-       radius: 4;
-//       samples: 10;
-       color: Style.shadowColor;
-       source: mainBody;
+        /**
+            Close the dialog by clicking on the background
+        */
+        root.backgroundItem.backgroundAreaItem.clicked.connect(root.closeDialog);
     }
 
     Rectangle {
-        id: mainBody;
+        id: itemBody;
 
-        width: parent.width;
+        width: popupMenuListView.width;
+        height: popupMenuListView.height;
 
         color: Style.baseColor;
-        radius: 3;
-        clip: true;
 
         border.width: 1;
         border.color: Style.alternateBaseColor;
 
-        Keys.onPressed: {
-            console.log("PopupMenuDialog mainBody keys pressed")
-            if (event.key === Qt.Key_Up){
-                console.log('Key up was pressed');
-
-                if (popupMenuListView.currentIndex == 0){
-                    popupMenuListView.currentIndex = popupMenuListView.count - 1;
-                }
-                else
-                    popupMenuListView.currentIndex--;
-            }
-            else if (event.key === Qt.Key_Down){
-                console.log('Key down was pressed');
-                if (popupMenuListView.currentIndex == popupMenuListView.count){
-                    popupMenuListView.currentIndex = 0;
-                }
-                else
-                    popupMenuListView.currentIndex++;
-            }
-            else if (event.key === Qt.Key_Return){
-                console.log('Key return was pressed');
-                popupMenuListView.itemAtIndex(popupMenuListView.currentIndex).click();
-            }
-            else if (event.key === Qt.Key_Escape){
-                console.log('Key esc was pressed');
-
-                popupMenuContainer.resultItem.dialogResult();
-                loaderDialog.closeItem();
-            }
-        }
-
         ListView {
             id: popupMenuListView;
 
-            width: parent.width;
-            height: parent.height;
-            model: popupMenuContainer.model;
-            currentIndex: -1;
+            width: popupMenuContainer.itemWidth;
+            height: popupMenuListView.count * popupMenuContainer.itemHeight;
 
-            onModelChanged: {
-                console.log("PopupMenuDialog onModelChanged");
-                var height = popupMenuListView.count * popupMenuContainer.itemHeight -
-                        popupMenuContainer.emptyItemCount * popupMenuContainer.itemHeight;
-
-                if (height > 130){
-                    mainBody.height = 130;
-                }
-                else {
-                    mainBody.height = height;
-                }
-
-               // popupMenuContainer.height = mainBody.height;
-            }
-
-            delegate: Rectangle {
-                id: delegateListViewPopup;
-
+            delegate: Item {
                 width: popupMenuContainer.width;
-                height: model.id !== "" ? popupMenuContainer.itemHeight : 0;
-
-                color: "transparent";
-
-                function click(){
-                    console.log("popup click", model.index, model.name);
-                    popupMenuContainer.exit(model.index, model.name);
-                    loaderDialog.closeItem();
-                }
-
-                Rectangle {
-                    id: highlightRect;
-
-                    anchors.horizontalCenter: parent.horizontalCenter;
-                    anchors.verticalCenter: parent.verticalCenter;
-
-                    width: parent.width - 2;
-                    height: parent.height - 2;
-
-                    color: Style.selectedColor;
-
-                    visible: delegateListViewPopupMA.containsMouse && model.id !== "" && model.mode !== "Disabled";
-//                    visible: (model.index === popupMenuListView.currentIndex ||
-//                              delegateListViewPopupMA.containsMouse) && model.id !== "" && model.mode !== "Disabled";
-                }
-
-                Text {
-                    anchors.left: popupMenuContainer.hasIcon ? iconDelegateListViewPopup.right : delegateListViewPopup.left;
-                    anchors.verticalCenter: iconDelegateListViewPopup.verticalCenter;
-                    anchors.leftMargin: 10;
-                    anchors.rightMargin: 10;
-
-                    text: model.name;
-                    color: model.mode === "Disabled" ? Style.disabledInActiveTextColor : Style.textColor;
-                    font.pixelSize: Style.fontSize_common;
-                    font.family: Style.fontFamily;
-                }
-
-                Image {
-                    id: iconDelegateListViewPopup;
-
-                    anchors.left: delegateListViewPopup.left;
-                    anchors.verticalCenter: delegateListViewPopup.verticalCenter;
-                    anchors.leftMargin: 10;
-
-                    width: 18;
-                    height: width;
-
-                    visible: popupMenuContainer.hasIcon && model.name !== "";
-                    source: model.imageSource;
-                    sourceSize.width: width;
-                    sourceSize.height: height;
-                }
-
-                Rectangle {
-                    anchors.horizontalCenter: parent.horizontalCenter;
-                    anchors.bottom: delegateListViewPopup.bottom;
-
-                    width: parent.width - 20;
-                    height: 1;
-
-                    visible: model.id === "";
-
-                    color: Style.hover;
-                }
+                height: popupMenuContainer.itemHeight;
 
                 MouseArea {
-                    id: delegateListViewPopupMA;
+                    id: mouseArea;
 
                     anchors.fill: parent;
 
                     hoverEnabled: true;
                     cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-                    visible: model.mode !== "Disabled";
-
                     onClicked: {
-                        delegateListViewPopup.click();
+                        finished(model.Id, model.index);
                     }
                 }
-            }
-        }
+
+                Rectangle {
+                    anchors.fill: parent;
+                    color: Style.selectedColor;
+                    visible: mouseArea.containsMouse;
+                }
+
+                Item {
+                    id: iconItem;
+
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 5;
+                    anchors.verticalCenter: parent.verticalCenter;
+
+                    width: 18;
+                    height: width;
+
+                    Image {
+                        id: icon;
+
+                        anchors.fill: parent;
+
+                        source: model.IconSource;
+                        sourceSize.width: width;
+                        sourceSize.height: height;
+                    }
+                }
+
+                Text {
+                    anchors.left: iconItem.right;
+                    anchors.leftMargin: 10;
+                    anchors.verticalCenter: parent.verticalCenter;
+
+                    text: model.Name;
+                    color: Style.textColor;
+                    font.pixelSize: Style.fontSize_common;
+                    font.family: Style.fontFamily;
+                }
+            }// Delegate Item
+        }//ListView
+    }//ItemListView
+
+    DropShadow {
+       id: dropShadow;
+
+       anchors.fill: itemBody;
+
+       horizontalOffset: 2;
+       verticalOffset: 2;
+
+       radius: 4;
+       color: Style.shadowColor;
+
+       source: itemBody;
     }
 }

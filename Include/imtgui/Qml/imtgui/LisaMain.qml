@@ -18,24 +18,24 @@ Item {
         thumbnailDecorator.updateModels();
         treeViewModel.updateModel();
         featureDependenciesModel.updateModel();
-        lisenseFeaturesModel.updateModel();
-    }
-
-    ThumbnailDecorator {
-        id: thumbnailDecorator;
-
-        anchors.fill: parent;
+        lisensesFeaturesModel.updateModel();
     }
 
     TreeViewModel {
         id: treeViewModel;
     }
 
+    LicenseFeaturesModel {
+        id: lisensesFeaturesModel;
+    }
+
     FeatureDependenciesModel {
         id: featureDependenciesModel;
     }
 
-    LicenseFeaturesModel {
-        id: lisenseFeaturesModel;
+    ThumbnailDecorator {
+        id: thumbnailDecorator;
+
+        anchors.fill: parent;
     }
 }

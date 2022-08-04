@@ -12,6 +12,7 @@
 #include <iser/CJsonStringWriteArchive.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/TSmartPtr.h>
+#include <imod/CModelUpdateBridge.h>
 
 
 namespace imtbase
@@ -20,13 +21,8 @@ namespace imtbase
 
 CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
-	m_parentUpdateBridge(dynamic_cast<CTreeItemModel*>(parent)),
 	m_isArray(false)
 {
-	CTreeItemModel* parentModel = dynamic_cast<CTreeItemModel*>(parent);
-	if (parentModel != nullptr){
-		this->AttachObserver(&m_parentUpdateBridge);
-	}
 }
 
 CTreeItemModel::~CTreeItemModel()
@@ -132,6 +128,9 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 
 	if (externTreeModel != nullptr){
 		externTreeModel->setParent(this);
+
+//		externTreeModel->m_parentUpdateBridge = imod::CModelUpdateBridge(this);
+//		externTreeModel->AttachObserver(&m_parentUpdateBridge);
 	}
 
 	QVariant v = QVariant::fromValue(externTreeModel);
@@ -480,31 +479,6 @@ QHash<int, QByteArray> CTreeItemModel::roleNames() const
 }
 
 
-// pseudo-reimplemented (istd::IChangeable)
-
-void CTreeItemModel::BeginChanges(const ChangeSet &changeSet)
-{
-	NotifyBeforeChange(changeSet,false);
-}
-
-
-void CTreeItemModel::EndChanges(const ChangeSet &changeSet)
-{
-	NotifyAfterChange(changeSet);
-}
-
-
-void CTreeItemModel::BeginChangeGroup(const ChangeSet &changeSet)
-{
-	NotifyBeforeChange(changeSet,true);
-}
-
-void CTreeItemModel::EndChangeGroup(const ChangeSet &changeSet)
-{
-	NotifyAfterChange(changeSet);
-}
-
-
 // reimplemented (iser::ISerializable)
 
 bool CTreeItemModel::Serialize(iser::IArchive &archive)
@@ -676,18 +650,6 @@ void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &cha
 	else{
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
 	}
-}
-
-
-void CTreeItemModel::OnBeginGlobalChanges()
-{
-	this->OnBeginChanges();
-}
-
-
-void CTreeItemModel::OnEndGlobalChanges(const ChangeSet &changeSet)
-{
-	this->OnEndChanges(changeSet);
 }
 
 

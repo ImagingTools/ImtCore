@@ -14,12 +14,18 @@ Rectangle {
     property string title;
     property string bodySource;
 
+    property bool centered: true;
+
     property Item root;
     property Item bodyItem: loaderBodyDialog.item;
 
     property alias buttons: buttonsDialog;
 
     signal finished(string buttonId);
+
+    onRootChanged: {
+        root.backgroundItem.opacity = 0.4;
+    }
 
     onFinished: {
         root.closeDialog();
@@ -56,6 +62,8 @@ Rectangle {
                 console.log("Dialog onItemChanged", loaderBodyDialog.item);
                 if (loaderBodyDialog.item){
                     loaderBodyDialog.item.width = dialogContainer.width;
+
+                     loaderBodyDialog.item.focus = true;
                 }
             }
         }

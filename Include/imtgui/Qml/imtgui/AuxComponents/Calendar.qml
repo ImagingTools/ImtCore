@@ -128,7 +128,7 @@ Rectangle {
             width: 60;
 
             backgroundColor: Style.baseColor;
-            menuHeight: 100;
+//            menuHeight: 100;
             radius: 0;
 
             model: ListModel {
@@ -190,7 +190,7 @@ Rectangle {
             width: 80;
 
             backgroundColor: Style.baseColor;
-            menuHeight: 100;
+//            menuHeight: 100;
             radius: 0;
 
             model: ListModel {
@@ -248,7 +248,7 @@ Rectangle {
             height: calendarContainer.height;
             width: 40;
 
-            menuHeight: 100;
+//            menuHeight: 100;
             radius: 0;
 
             backgroundColor: Style.baseColor;

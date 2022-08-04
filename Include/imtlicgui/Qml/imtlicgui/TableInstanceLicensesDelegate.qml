@@ -1,7 +1,5 @@
 import QtQuick 2.0
-import imtauthgui 1.0
 import imtgui 1.0
-import imtqml 1.0
 import Acf 1.0
 
 Rectangle {
@@ -11,13 +9,9 @@ Rectangle {
 
     property bool selected: false;
     property string name;
-   // property string expirationText: "01.01.2023";
 
     signal clicked;
     signal doubleClicked;
-    signal checkBoxLicenseClicked(string itemId, int modelIndex, int state);
-    signal checkBoxExpirationClicked(string itemId, int modelIndex, int state);
-    signal expirationTextChanged(string itemId, int modelIndex, string value);
 
     Rectangle{
         id: selectionBackGround;
@@ -44,7 +38,7 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    Item {
         id: leftPart;
 
         anchors.left: parent.left;
@@ -53,7 +47,6 @@ Rectangle {
         width: licensesTableDelegate.width / 2;
         height: parent.height;
 
-        color: "transparent";
         clip: true;
 
         CheckBox {
@@ -70,12 +63,9 @@ Rectangle {
 
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-//                    checkBoxLicense.checkState === 2 ? checkBoxLicense.checkState = 0 : checkBoxLicense.checkState = 2;
-
-                    licensesTableDelegate.checkBoxLicenseClicked(model.Id, model.index, 2 - checkBoxLicense.checkState);
+                    licensesController.checkBoxLicenseClicked(model.Id, model.index, 2 - checkBoxLicense.checkState);
                 }
             }
-
         }
 
         Text {
@@ -85,7 +75,6 @@ Rectangle {
             anchors.left: checkBoxLicense.right;
             anchors.leftMargin: 10;
 
-            //text: licensesTableDelegate.name;
             text: model.Name;
 
             font.family: Style.fontFamily;
@@ -96,7 +85,7 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    Item {
         id: rightPart;
 
         anchors.right: parent.right;
@@ -106,8 +95,6 @@ Rectangle {
         height: parent.height;
 
         visible: checkBoxLicense.checkState === 2;
-
-        color: "transparent";
 
         CheckBox {
             id: checkBoxExpiration;
@@ -122,13 +109,7 @@ Rectangle {
 
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-
-                    let state = 2 - checkBoxExpiration.checkState;
-                    if (state == 0){
-                        expirationDate.setDefault();
-                    }
-
-                    licensesTableDelegate.checkBoxExpirationClicked(model.Id, model.index, 2 - checkBoxExpiration.checkState);
+                    licensesController.checkBoxExpirationClicked(model.Id, model.index, 2 - checkBoxExpiration.checkState);
                 }
             }
         }
@@ -146,53 +127,38 @@ Rectangle {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
             color: Style.textColor;
-            wrapMode: Text.WordWrap;
-            elide: Text.ElideRight;
         }
 
-        Calendar {
-            id: expirationDate;
+        RegExpValidator {
+            id: dateRegex;
+            regExp: /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
+        }
+
+        CustomTextField{
+            id: inputDate;
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: checkBoxExpiration.right;
             anchors.leftMargin: 5;
 
+            height: 20;
+            width: 100;
+
             visible: checkBoxExpiration.checkState === 2;
 
-            //selectedDate: model.Expiration;
+            placeHolderText: "yyyy-MM-dd";
+            text: model.Expiration;
+            textSize: 17;
 
             Component.onCompleted: {
-                console.log("TableInstanceLicensesDelegate Calendar onCompleted");
-                let data = model.Expiration.split(".")
-
-                let day = Number(data[0]);
-                let monthIndex = Number(data[1]) - 1;
-                let year = Number(data[2]);
-
-                var date = new Date(year, monthIndex, day);
-
-                if (date){
-                    expirationDate.setDate(date);
-                }
-
-                //console.log("Date from delegate: ", expirationDate.selectedDate.toLocaleDateString());
+                inputDate.setMask("9999-00-00");
+                inputDate.setValidator(dateRegex);
             }
 
-            onDateChanged: {
-                console.log("TableInstanceLicensesDelegate Calendar onDateChanged");
-
-                var str =  expirationDate.toString();
-                console.log(expirationDate.selectedDate.toLocaleDateString());
-
-                if ((new Date(expirationDate.selectedDate) === "Invalid Date") ||
-                        isNaN(new Date(expirationDate.selectedDate))){
-                    console.log("TableInstanceLicensesDelegate Calendar Invalid Date!");
-                    return;
+            onTextChanged: {
+                if (inputDate.acceptableInput){
+                    licensesController.textExpirationChanged(model.Id, model.index, inputDate.text);
                 }
-               // var dateStr = expirationDate.selectedDate.format('dd.mm.yyyy');
-
-                var dateStr = expirationDate.formatDate();
-                licensesTableDelegate.expirationTextChanged(model.Id, model.index, dateStr);
             }
         }
     }

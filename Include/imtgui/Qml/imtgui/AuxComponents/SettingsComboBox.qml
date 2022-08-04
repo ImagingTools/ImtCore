@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Acf 1.0
-import imtqml 1.0
+import imtgui 1.0
 
 Item {
     id: settingsComboBoxContainer;
@@ -64,11 +64,11 @@ Item {
             var id = settingsComboBoxContainer.modelElements.GetData("Id", i);
             var name = settingsComboBoxContainer.modelElements.GetData("Name", i);
 
-            settingsComboBoxModelList.append({'name': name, 'id': id})
+//            settingsComboBoxModelList.append({'name': name, 'id': id})
 
-            if (i == settingsComboBoxContainer.currentValue){
-                settingsComboBox.currentText = name;
-            }
+//            if (i == settingsComboBoxContainer.currentValue){
+//                settingsComboBox.currentText = name;
+//            }
         }
 
         settingsComboBox.currentIndex = settingsComboBoxContainer.currentValue;
@@ -87,7 +87,7 @@ Item {
         radius: 3;
 
         //model: settingsComboBoxContainer.modelElements;
-        model: settingsComboBoxModelList;
+        model: settingsComboBoxContainer.modelElements;
 
         borderColor: settingsComboBoxContainer.active ? Style.iconColorOnSelected :
                                                         Style.alternateBaseColor;
@@ -99,15 +99,6 @@ Item {
             if (settingsComboBoxContainer.rootItem){
                 settingsComboBoxContainer.rootItem.dataChanged(settingsComboBoxContainer.index, settingsComboBox.currentIndex);
             }
-        }
-
-        onClicked: {
-            settingsComboBox.openContextMenu();
-        }
-
-        onDialogResultChanged: {
-            console.log("SettingsComboBox ComboBox onDialogResultChanged");
-            settingsComboBoxContainer.rootItem.forceActiveFocus();
         }
     }
 }

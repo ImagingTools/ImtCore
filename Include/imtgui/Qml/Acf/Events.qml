@@ -27,13 +27,19 @@ Item {
     function subscribeEvent(key, slot){
         console.log("EVENTS subscribeEvent", key, slot);
         if(key in this.events){
-            this.events[key].push(slot)
-        } else {
+            let slots = this.events[key]
+
+            if (!slots.includes(slot)){
+                this.events[key].push(slot)
+            }
+        }
+        else {
             this.events[key] = [slot]
         }
     }
 
     function unSubscribeEvent(key, slot){
+        console.log("EVENTS unSubscribeEvent", key, slot);
         if(key in this.events){
             var indx = this.events[key].indexOf(slot)
             if(indx >= 0) this.events[key].splice(indx, 1)

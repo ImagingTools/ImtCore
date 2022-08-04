@@ -1,7 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-//import '../UxAdvancedComponents' as AUX
-
 
 Rectangle {
     id: tabPanelContainer;
@@ -24,21 +22,21 @@ Rectangle {
     signal rightClicked();
     signal leftClicked();
 
-    function setFirstElementImageSource(source){
-        tabPanelContainer.firstElementImageSource = source;
-    }
+//    function setFirstElementImageSource(source){
+//        tabPanelContainer.firstElementImageSource = source;
+//    }
 
-    function clearHeadersArray(){
-        while(tabPanelContainer.headersArray.length > 0)
-            tabPanelContainer.headersArray.pop();
-        tabPanelContainer.count = 0
-    }
+//    function clearHeadersArray(){
+//        while(tabPanelContainer.headersArray.length > 0)
+//            tabPanelContainer.headersArray.pop();
+//        tabPanelContainer.count = 0
+//    }
 
-    function addPage(str){
-        tabPanelContainer.headersArray.push(str);
-        tabPanelContainer.count = tabPanelContainer.headersArray.length
-        tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1
-    }
+//    function addPage(str){
+//        tabPanelContainer.headersArray.push(str);
+//        tabPanelContainer.count = tabPanelContainer.headersArray.length
+//        tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1
+//    }
 
     function viewTabInListView(index) {
         list.positionViewAtIndex(index, ListView.Contain);
@@ -53,18 +51,16 @@ Rectangle {
         clip: true;
         orientation: ListView.Horizontal;
 
-        spacing: thubnailDecoratorContainer.mainMargin;
+        spacing: thumbnailDecoratorContainer.mainMargin;
         model: 4;
 
         boundsBehavior: Flickable.StopAtBounds;
 
         delegate: TabDelegate{
             height: list.height;
-           // width: 200;
 
             selected: model.index === tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
-//            firstElementText: tabPanelContainer.firstElementName;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
 
@@ -78,7 +74,6 @@ Rectangle {
             onCloseSignal: {
                 tabPanelContainer.closeItem(model.index);
             }
-
         }
     }
 
@@ -92,10 +87,10 @@ Rectangle {
         rotation: -90;
 
         gradient: Gradient {
-                 GradientStop { position: 0.0; color: "#00ffffff"; }
-                 GradientStop { position: 0.5; color: "#00ffffff"; }
-                 GradientStop { position: 1.0; color: Style.imagingToolsGradient2; }
-             }
+            GradientStop { position: 0.0; color: "#00ffffff"; }
+            GradientStop { position: 0.5; color: "#00ffffff"; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient2; }
+        }
     }
 
     Rectangle {

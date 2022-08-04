@@ -22,7 +22,7 @@ Rectangle {
     property real delegateWidth: count == 0 ? 0 : width/count;
 
     signal clicked();
-    signal tableDelegateRrightButtonMouseClicked(int mX, int mY);
+    signal rightButtonMouseClicked(int mX, int mY);
     signal doubleClicked;
 
     onBodyArrayChanged: {
@@ -140,13 +140,16 @@ Rectangle {
         onClicked: {
             if (mouse.button === Qt.RightButton) {
                 console.log("TableDelegate onRightButtonMouseClicked");
-                thubnailDecoratorContainer.closeDialog();
-                tableDelegateContainer.tableDelegateRrightButtonMouseClicked(this.mouseX, this.mouseY);
+                tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
             }
             tableDelegateContainer.clicked();
         }
 
         onDoubleClicked: {
+            if (mouse.button === Qt.RightButton) {
+                return;
+            }
+
             tableDelegateContainer.doubleClicked();
         }
     }

@@ -21,6 +21,10 @@ Item {
 
     property string commandUpdateGui;
 
+    Component.onCompleted: {
+        collectionViewBase.forceActiveFocus();
+    }
+
     onCommandUpdateGuiChanged: {
         Events.subscribeEvent(collectionViewBaseContainer.commandUpdateGui, collectionViewBaseContainer.updateGui);
     }

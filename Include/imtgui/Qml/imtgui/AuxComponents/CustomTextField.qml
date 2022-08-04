@@ -6,8 +6,9 @@ Item {
 
     height: 40;
 
-//    property string text: textField.text;
     property alias text: textField.text;
+
+    property alias acceptableInput: textField.acceptableInput;
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;
@@ -18,20 +19,14 @@ Item {
     property int textSize: 15;
     property int echoMode: TextInput.Normal;
 
-//    property string regexMask: "/([0-9A-F]{2}[:-]){5}([0-9A-F]{2})/";
-//    signal textChanged();
     signal accepted();
 
     onFocusChanged: {
         console.log('CustomTextField onFocusChanged', containerTextField.focus);
-        containerTextField.setFocus(containerTextField.focus);
-    }
 
-    function setFocus(state){
-        if (state === true){
-           textField.selectAll();
-        }
-        textField.focus = state;
+//        if (focus){
+//            textField.focus = focus;
+//        }
     }
 
     function setMask(mask){
@@ -54,6 +49,11 @@ Item {
         border.width: 1;
     }
 
+    MouseArea {
+        anchors.fill: textField;
+        cursorShape: Qt.IBeamCursor;
+    }
+
     TextInput {
         id: textField;
 
@@ -65,9 +65,6 @@ Item {
         font.pixelSize: containerTextField.textSize;
         font.family: Style.fontFamily;
 
-//        text: containerTextField.text;
-
-
         echoMode: containerTextField.echoMode;
 
         verticalAlignment: TextInput.AlignVCenter;
@@ -75,14 +72,11 @@ Item {
         selectByMouse: true;
         clip: true;
 
+//        focus: true;
+
         onFocusChanged: {
             console.log("TextInput onFocusChanged", textField.focus)
 
-        }
-
-        onTextChanged: {
-            console.log("CustomTextField onTextChanged", textField.text);
-//            containerTextField.text = textField.text;
         }
 
         onAccepted: {
@@ -101,6 +95,7 @@ Item {
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamily;
 
+            //TODO -> Style
             color: "gray";
 
             visible: textField.text == "";

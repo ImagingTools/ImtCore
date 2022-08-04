@@ -2,7 +2,6 @@ import QtQuick 2.0
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
-import imtlicgui 1.0
 
 Rectangle {
     id: accountEditorContainer;
@@ -12,24 +11,39 @@ Rectangle {
     property string itemId;
     property string itemName;
     property string commandsId;
-    property string commandsDelegatePath;
 
     property int textInputHeight: 30;
 
     property Item rootItem;
 
-//    property TreeItemModel accountModel;
-
-//    onAccountModelChanged: {
-//        updateGui();
-//    }
-
     onWidthChanged: {
         console.log("AccountEditor onWidthChanged", accountEditorContainer.width);
     }
 
+    onVisibleChanged: {
+        if (accountEditorContainer.visible){
+            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
+                                                      "CommandsId": commandsProvider.commandsId});
+        }
+    }
+
     TreeItemModel {
         id: accountModel;
+
+        onDataChanged: {
+            console.log("accountModel onDataChanged");
+            undoRedoManager.modelChanged();
+        }
+    }
+
+    UndoRedoManager {
+        id: undoRedoManager;
+
+        commandsId: accountEditorContainer.commandsId;
+
+        onModelParsed: {
+            updateGui();
+        }
     }
 
     CommandsProvider {
@@ -48,11 +62,13 @@ Rectangle {
     }
 
     function updateGui(){
+        console.log("AccountEditor updateGui");
         accountNameInput.text = accountModel.GetData("AccountName");
         accountDescriptionInput.text = accountModel.GetData("AccountDescription");
 
-        for (let i = 0; i < addressModel.count; i++){
+        for (let i = 0; i < accountOwnerModel.count; i++){
             let id = accountOwnerModel.get(i).Id;
+            console.log("Id", id)
             if (id === "Email"){
                 accountOwnerModel.setProperty(i, "Value", accountModel.GetData("Email"))
             }
@@ -233,6 +249,42 @@ Rectangle {
 
                     spacing: 10;
 
+//                    TreeItemModel {
+//                        id: accountOwnerModel;
+
+//                        Component.onCompleted: {
+//                            let index = accountOwnerModel.InsertNewItem();
+
+//                            accountOwnerModel.SetData("Id", "Email", index);
+//                            accountOwnerModel.SetData("Name", "Email", index);
+//                            accountOwnerModel.SetData("Value", "", index);
+
+//                            index = accountOwnerModel.InsertNewItem();
+
+//                            accountOwnerModel.SetData("Id", "BirthDay", index);
+//                            accountOwnerModel.SetData("Name", "Birthday", index);
+//                            accountOwnerModel.SetData("Value", "", index);
+
+//                            index = accountOwnerModel.InsertNewItem();
+
+//                            accountOwnerModel.SetData("Id", "FirstName", index);
+//                            accountOwnerModel.SetData("Name", "First name", index);
+//                            accountOwnerModel.SetData("Value", "", index);
+
+//                            index = accountOwnerModel.InsertNewItem();
+
+//                            accountOwnerModel.SetData("Id", "LastName", index);
+//                            accountOwnerModel.SetData("Name", "Last name", index);
+//                            accountOwnerModel.SetData("Value", "", index);
+
+//                            index = accountOwnerModel.InsertNewItem();
+
+//                            accountOwnerModel.SetData("Id", "Nickname", index);
+//                            accountOwnerModel.SetData("Name", "Nickname", index);
+//                            accountOwnerModel.SetData("Value", "", index);
+//                        }
+//                    }
+
                     ListModel {
                         id: accountOwnerModel;
 
@@ -272,7 +324,7 @@ Rectangle {
                                 height: accountEditorContainer.textInputHeight;
                                 width: accountOwnerBlock.width;
 
-                                text: accountOwnerModel.Value;
+                                text: model.Value;
 
                                 onTextChanged: {
                                     accountModel.SetData(model.Id, fieldInputOwnerBlock.text);

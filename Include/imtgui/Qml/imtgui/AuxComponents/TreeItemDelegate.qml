@@ -116,7 +116,7 @@ Item {
                             visible: model.isActive === 1;
 
                             onClicked: {
-                                treeViewContainer.checkBoxStateChanged(2 - checkBox.checkState, model.packageId, model.Id);
+                                treeViewContainer.checkBoxChanged(2 - checkBox.checkState, model.packageId, model.Id);
                             }
                         }
                     }

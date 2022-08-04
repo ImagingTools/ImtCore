@@ -5,7 +5,6 @@ import imtqml 1.0
 Rectangle {
     id: menuPanel;
 
-//    color: Style.baseColor;
     color: Style.backgroundColor;
 
     radius: 7;
@@ -20,8 +19,6 @@ Rectangle {
     property string firstElementImageSources: [];
 
     property alias model: lvPages.model;
-
-    property var pagesSources: [];
 
     property int activePageIndex: -1;
     property int pagesCount: lvPages.count;
@@ -39,8 +36,8 @@ Rectangle {
 
     Flickable {
         anchors.fill: parent;
-        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-        anchors.bottomMargin: thubnailDecoratorContainer.mainMargin;
+        anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
+        anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
 
         contentWidth: columnPages.width;
         contentHeight: columnPages.height + 50;
@@ -73,10 +70,6 @@ Rectangle {
                         menuPanel.activeIcon = model["Icon"];
                         menuPanel.activePageIndex = model.index;
                         menuPanel.activePageId = model["PageId"];
-
-                        if (!menuPanel.focus){
-                            menuPanel.forceActiveFocus();
-                        }
                     }
                 }
             }
@@ -124,16 +117,8 @@ Rectangle {
             if (this.state == "Ready"){
                 var dataModelLocal = this.GetData("data");
 
-                if (!dataModelLocal){
-                    thubnailDecoratorContainer.setInvalidConnection(true);
-                    return;
-                }
-
-                thubnailDecoratorContainer.setInvalidConnection(false);
-//                Style.changeSchemeDesign("");
                 if(dataModelLocal.ContainsKey("PagesData")){
                     dataModelLocal = dataModelLocal.GetData("PagesData")
-                    console.log("dataModelLocal", dataModelLocal);
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items")
                         lvPages.model = dataModelLocal
@@ -142,8 +127,7 @@ Rectangle {
                         menuPanel.activePageName = dataModelLocal.GetData("Name");
                         menuPanel.activeIcon = dataModelLocal.GetData("Icon");
 
-                        //menuPanel.activePageIndex = 0;
-//                        Style.changeSchemeDesign("");
+
                         pageIndexTimer.pageIndex = 0;
                         pageIndexTimer.start();
                     }

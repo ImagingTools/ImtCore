@@ -41,7 +41,7 @@ Item {
 
         let itemId = page["Id"];
 
-        let pageIndex = multiDocView.getTabIndexById(itemId);
+        let pageIndex = multiDocView.getPageIndexById(itemId);
         if (pageIndex < 0){
             var index = pagesData.InsertNewItem();
             pagesData.SetData("ItemId", itemId, index);
@@ -55,26 +55,52 @@ Item {
         tabPanelInternal.selectedIndex = pageIndex;
     }
 
-    function closeTab(index) {
-        console.log("MultiDocWorkspaceView closeTab", index);
-        pagesData.RemoveItem(index)
-        if (tabPanelInternal.selectedIndex >= index){
-            tabPanelInternal.selectedIndex--;
+     function closePage(itemId){
+         console.log("MultidocWorkspaceView closePage", itemId);
+         let index;
+         if (itemId == ""){
+             console.log("Empty");
+             index = tabPanelInternal.selectedIndex;
+         }
+         else{
+             index = multiDocView.getPageIndexById(itemId);
+         }
+
+         console.log("tabPanelInternal.selectedIndex", tabPanelInternal.selectedIndex);
+         console.log("index", index);
+
+         if (index >= 0){
+             pagesData.RemoveItem(index);
+
+             if (tabPanelInternal.selectedIndex === index && index > 0){
+                 tabPanelInternal.selectedIndex--;
+             }
+         }
+     }
+
+    function updatePageTitle(parameters){
+        let itemId = parameters["ItemId"];
+        let newTitle = parameters["Title"];
+
+        let index;
+        if (itemId === ""){
+            index = tabPanelInternal.selectedIndex;
+        }
+        else{
+            index = multiDocView.getPageIndexById(itemId);
+        }
+
+        if (index >= 0){
+            pagesData.SetData("Title", newTitle, index);
         }
     }
 
-    function updateTitleTab(itemId, title, index) {
-        console.log("MultidocWorkspaceView updateTitleTab()", itemId, title, index);
-        pagesData.SetData("Title", title, index);
-        pagesData.SetData("ItemId", itemId, index);
-    }
-
-    function getTabIndexById(tabId){
-        console.log("MultidocWorkspaceView getTabIndexById", tabId);
+    function getPageIndexById(pageId){
+        console.log("MultidocWorkspaceView getPageIndexById", pageId);
 
         for (var i = 1; i < pagesData.GetItemsCount(); i++){
-            var id = pagesData.GetData("ItemId", i);
-            if (id === tabId){
+            var m_id = pagesData.GetData("ItemId", i);
+            if (m_id === pageId){
                 return i;
             }
         }
@@ -99,7 +125,7 @@ Item {
 
         onCloseItem: {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
-            multiDocView.closeTab(index);
+            multiDocView.closePage(pagesData.GetData("ItemId", index));
         }
 
         onRightClicked: {
@@ -139,16 +165,12 @@ Item {
             width: visible ? docsData.width : 0;
             height: docsData.height;
 
-            visible: tabPanelInternal.selectedIndex == model.index;
+            visible: tabPanelInternal.selectedIndex === model.index;
 
             onVisibleChanged: {
                 if(docsDataDeleg.visible){
                     multiDocView.activeItem = dataLoader.item;
                 }
-            }
-
-            function getItem(){
-                return dataLoader.item;
             }
 
             Loader {

@@ -6,104 +6,17 @@ Rectangle {
     id: topPanel;
 
     color: Style.backgroundColor;
-//        color: "red";
-    property string fontName: "";
-    property string activeCommandsModelId;
-    property string title;
+
     property bool loginDialog: false;
 
-    signal menuActivatedSignal(string idMenu);
-    signal commandsChangedSignal(string commandsId);
-
     function updateModels(){
-//        modelCommands.updateModel();
         modelUserMode.getUserMode();
-    }
-
-    function setModeMenuButton(commandId, mode) {
-        console.log("TopPanel setModeMenuButton!", commandId, mode, topPanel.activeCommandsModelId);
-
-        if (buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
-            var buttonsModelLocal = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-            var itemsCount = buttonsModelLocal.GetItemsCount();
-
-            for (var i = 0; i < itemsCount; i++){
-                var id = buttonsModelLocal.GetData("Id", i);
-
-                if (id === commandId){
-//                    console.log("topPanelDecoratorLoader.item", topPanelDecoratorLoader.item)
-//                    console.log("topPanelDecoratorLoader.item.centerPanel", topPanelDecoratorLoader.item.centerPanel)
-                    buttonsModelLocal.SetData("Mode", mode, i);
-
-                    topPanelDecoratorLoader.item.centerPanel.setModelButtons(0)
-                    topPanelDecoratorLoader.item.centerPanel.setModelButtons(buttonsModelLocal)
-//                    topPanelDecoratorLoader.item.centerPanel.lvButtons.model = 0
-//                    topPanelDecoratorLoader.item.centerPanel.lvButtons.model =  buttonsModelLocal
-                    console.log("Command", commandId, " change mode", mode);
-                    topPanel.updateModeModelMenuButtons(id, mode);
-                    break;
-                }
-            }
-        }
-    }
-
-    function getCommandModeById(commandId){
-        console.log("topPanel getCommandModeById", commandId);
-        return topPanelDecoratorLoader.item.centerPanel.getCommandModeById(commandId);
-    }
-
-    function updateModeModelMenuButtons(id, mode) {
-//        for (var i = 0; i < modelButtons.count; i++) {
-//            if (modelButtons.get(i).id === id) {
-//                modelButtons.get(i).mode = mode;
-//                modelButtons.get(i).imageSource = "../../../Icons/" + Style.theme + "/" + modelButtons.get(i).name + "_Off" + "_" + mode + ".svg";
-//                break;
-//            }
-//        }
-    }
-
-    function dialogResult(parameters) {
-        console.log("TopPanel dialogResult", parameters["status"]);
-        topPanel.menuActivatedSignal(parameters["status"]);
-    }
-
-    function getMenuButtonsX() {
-        return menuButton.x - 100;
-    }
-
-    function getMenuButtonsY() {
-        return menuButton.y + menuButton.width;
     }
 
     onWidthChanged: {
          if (topPanelDecoratorLoader.item){
              topPanelDecoratorLoader.item.width = topPanel.width;
          }
-    }
-
-    onHeightChanged: {
-        if (thubnailDecoratorContainer.dialogIsActive()) {
-            //thubnailDecoratorContainer.closeDialog();
-        }
-    }
-
-    onActiveCommandsModelIdChanged: {
-        console.log("onActiveCommandsModelIdChanged", topPanel.activeCommandsModelId);
-        if (topPanel.activeCommandsModelId == "") {
-            return;
-        }
-//        modelCommands.updateModel();
-
-//        if (!buttonsModelItem.ContainsKey(topPanel.activeCommandsModelId)) {
-//            modelCommands.updateModel();
-//        } else {
-//            updateTimer.model = buttonsModelItem.GetData(topPanel.activeCommandsModelId);
-//        }
-        topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
-    }
-
-    TreeItemModel {
-        id: buttonsModelItem;
     }
 
     Loader {
@@ -113,7 +26,6 @@ Rectangle {
 
         onItemChanged: {
             if (topPanelDecoratorLoader.item){
-                console.log("topPanelDecoratorLoader", topPanel.width, topPanel.height);
                 topPanelDecoratorLoader.item.width = topPanel.width;
                 topPanelDecoratorLoader.item.height = topPanel.height;
                 topPanelDecoratorLoader.item.topPanel = topPanel;
@@ -121,265 +33,6 @@ Rectangle {
         }
     }
 
-//    TopLeftPanel {
-//        id: leftPanel;
-//        anchors.top: parent.top;
-//        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-//        anchors.left: parent.left;
-//        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
-
-//        gradient: parent.gradient;
-
-//        height: parent.height - thubnailDecoratorContainer.mainMargin;
-//        width: 150;
-
-//        decoratorSource: Style.topLeftPanelDecoratorPath;
-
-//        topPanel: topPanel;
-//    }
-
-//    TopCenterPanel {
-//        id: centerPanel;
-
-//        anchors.top: parent.top;
-//        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-//        anchors.left: leftPanel.right;
-//        anchors.leftMargin: thubnailDecoratorContainer.mainMargin;
-//        anchors.right: rightPanel.left;
-//        anchors.rightMargin: thubnailDecoratorContainer.mainMargin;
-
-//        gradient: parent.gradient;
-
-//        height: parent.height - thubnailDecoratorContainer.mainMargin;
-
-//        decoratorSource: Style.topCenterPanelDecoratorPath;
-
-//        topPanel: topPanel;
-//    }
-
-//    TopRightPanel {
-//        id: rightPanel;
-
-//        anchors.top: parent.top;
-//        anchors.topMargin: thubnailDecoratorContainer.mainMargin;
-//        anchors.right: parent.right;
-//        anchors.rightMargin: thubnailDecoratorContainer.mainMargin;
-
-//        gradient: parent.gradient;
-
-//        height: parent.height - thubnailDecoratorContainer.mainMargin;
-//        width: parent.width * 0.1;
-
-//        decoratorSource: Style.topRightPanelDecoratorPath;
-
-//        topPanel: topPanel;
-//    }
-
-
-//    AuxButton {
-//        id: preferenceButton;
-//        z: 100;
-
-//        anchors.top: parent.top;
-//        anchors.right: parent.right;
-//        anchors.rightMargin: 10;
-//        anchors.topMargin: 10;
-
-//        width: 24;
-//        height: 24;
-
-//        iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
-
-//        onClicked: {
-//            console.log("Preference button clicked !", thubnailDecoratorContainer.localSettings);
-//            var source = "AuxComponents/PreferenceDialog.qml";
-//            var parameters = {};
-//            parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
-//            thubnailDecoratorContainer.openDialog(source, parameters);
-
-////            thubnailDecoratorContainer.refreshText();
-//        }
-//    }
-
-//    Item {
-//        anchors.left: parent.left;
-//        anchors.leftMargin: 10;
-//        anchors.right: menuButton.left;
-//        anchors.rightMargin: 10;
-
-//        height: parent.height;
-
-//        ListView {
-//            id: lvButtons;
-
-//            anchors.horizontalCenter: parent.horizontalCenter;
-
-//            height: parent.height;
-//            width: contentWidth > parent.width ? parent.width : contentWidth;
-
-//            clip: true;
-//            orientation: ListView.Horizontal;
-//            boundsBehavior: Flickable.StopAtBounds;
-
-//            delegate: TopButton {
-//                id: topButtonDelegate;
-
-//                text: model[CommandEnum.NAME];
-//                isEmpty: model[CommandEnum.NAME] === "";
-//                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model[CommandEnum.ICON] + "_" + "Off" + "_" + model["Mode"] + ".svg";
-//                fontName: Style.fontFamily;
-//                checkable: model["Mode"] === "Normal";
-//                visible: x + width <= lvButtons.width;
-
-//                onVisibleChanged: {
-//                    console.log("TopPanel onVisibleChanged",topButtonDelegate.text, topButtonDelegate.visible);
-////                    if (!topButtonDelegate.visible && lvButtons.width !== 0) {
-////                        for (var i = 0; i < modelButtons.count; i++) {
-////                            if (modelButtons.get(i).id !== "" && modelButtons.get(i).id === model[CommandEnum.ID]) {
-////                               return;
-////                            }
-////                        }
-////                        modelButtons.append({"id": model[CommandEnum.ID], "imageSource": topButtonDelegate.imageSource, "name": topButtonDelegate.text, "mode": model["Mode"]});
-////                    }
-////                    else if (topButtonDelegate.visible && lvButtons.width !== 0) {
-////                        var j;
-////                        for (var i = 0; i < modelButtons.count; i++) {
-////                            if (modelButtons.get(i).id === model[CommandEnum.ID]) {
-////                                modelButtons.remove(i)
-////                                j = i;
-////                                break;
-////                            }
-////                        }
-////                        for (var i = j; i < modelButtons.count; i++) {
-////                            modelButtons.remove(i)
-////                        }
-////                    }
-//                }
-
-//                onClicked: {
-//                    console.log("TopPanel menuActivited", model.Id)
-//                    topPanel.menuActivatedSignal(model.Id);
-//                }
-//            }
-//        }
-//    }
-
-//    TopButton {
-//        id: menuButton;
-
-//        anchors.right: preferenceButton.left;
-//        anchors.rightMargin: 10;
-//        anchors.verticalCenter: parent.verticalCenter;
-
-//        height: 56;
-//        width: 35;
-
-//        text: "";
-//        checkable: true;
-
-//        visible: modelButtons.count > 0;
-
-//        imageSource: "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg";
-
-//        onClicked: {
-//            console.log("TopPanel TopButton onClicked");
-//            var source = "AuxComponents/PopupMenuDialog.qml";
-//            var parameters = {};
-//            parameters["model"] = modelButtons;
-//            parameters["backgroundOpacity"] = 0;
-//            parameters["resultItem"] = topPanel;
-//            parameters["itemHeight"] = 35;
-//            parameters["itemWidth"] = 150;
-//            parameters["styleColor"] = Style.theme == "Dark" ? "Light" : "Dark";
-//            thubnailDecoratorContainer.openDialog(source, parameters);
-//        }
-//    }
-
-//    ListModel {
-//        id: modelButtons;
-//    }
-
-    Timer {
-        id: updateTimer;
-        interval: 10;
-        property TreeItemModel model;
-
-        onModelChanged: {
-            //modelButtons.clear();
-            updateTimer.start();
-        }
-
-        onTriggered: {
-           topPanelDecoratorLoader.item.centerPanel.lvButtons.model = updateTimer.model;
-        }
-    }
-
-//    GqlModel {
-//        id: modelCommands;
-
-//        property bool isFirst: true;
-
-//        function updateModel() {
-
-//            console.log("modelCommands topPanel.activeCommandsModelId", topPanel.activeCommandsModelId);
-//            var query = Gql.GqlRequest("query", "CommandsData");
-
-//            var inputParams = Gql.GqlObject("input");
-//            inputParams.InsertField("PageId", topPanel.activeCommandsModelId);
-
-//            inputParams.InsertField("LanguageId", Style.language)
-//            query.AddParam(inputParams);
-
-//            var queryFields = Gql.GqlObject("items");
-//            queryFields.InsertField("Id");
-//            queryFields.InsertField("Name");
-//            queryFields.InsertField("Icon");
-//            queryFields.InsertField("Mode");
-//            query.AddField(queryFields);
-//            queryFields = Gql.GqlObject("information");
-//            queryFields.InsertField("CommandsModelId");
-//            query.AddField(queryFields);
-
-//            var gqlData = query.GetQuery();
-//            console.log("modelCommands updateModel", gqlData);
-////            this.SetGqlQuery(gqlData);
-//        }
-
-
-//        onStateChanged: {
-//            console.log("State:", this.state, modelCommands);
-//            if (this.state === "Ready"){
-//                var dataModelLocal;
-
-//                if (modelCommands.ContainsKey("errors")){
-//                    topPanelDecoratorLoader.item.centerPanel.showCustomLoader();
-//                    return;
-//                }
-
-//                if (modelCommands.ContainsKey("data")){
-//                    dataModelLocal = modelCommands.GetData("data")
-//                    if(dataModelLocal.ContainsKey("CommandsData")){
-//                        dataModelLocal = dataModelLocal.GetData("CommandsData");
-
-//                        if(dataModelLocal.ContainsKey("items")){
-//                            var pageId = dataModelLocal.GetData("information").GetData("CommandsModelId");
-//                            dataModelLocal = dataModelLocal.GetData("items");
-//                            buttonsModelItem.SetExternTreeModel(pageId, dataModelLocal);
-
-////                            console.log("topPanelDecoratorLoader.item", topPanelDecoratorLoader.item)
-////                            console.log("topPanelDecoratorLoader.item.centerPanel", topPanelDecoratorLoader.item.centerPanel)
-
-//                            topPanelDecoratorLoader.item.centerPanel.setModelButtons(dataModelLocal)
-////                            topPanelDecoratorLoader.item.centerPanel.lvButtons.model = dataModelLocal;
-//                            topPanelDecoratorLoader.item.centerPanel.showButtons();
-//                            modelCommands.isFirst = !modelCommands.isFirst
-//                            topPanel.commandsChangedSignal(topPanel.activeCommandsModelId);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
     GqlModel{
         id: modelUserMode;
         function getUserMode() {
@@ -420,8 +73,8 @@ Rectangle {
                                 if (dataModelLocal == 2){
                                     var source = "AuxComponents/LoginDialog.qml";
                                     var parameters = {};
-                                    parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
-                                    thubnailDecoratorContainer.openDialog(source, parameters);
+                                    parameters["localSettings"] = thumbnailDecoratorContainer.localSettings;
+                                    thumbnailDecoratorContainer.openDialog(source, parameters);
                                 }
                             }
                         }

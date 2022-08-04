@@ -14,12 +14,12 @@ Item {
         iconSource: "../../../Icons/" + Style.theme + "/Account.svg";
 
         onClicked: {
-//            console.log("Login button clicked !", thubnailDecoratorContainer.localSettings);
+//            console.log("Login button clicked !", thumbnailDecoratorContainer.localSettings);
 //            console.log(loginButton.iconSource)
             var source = "AuxComponents/InputDialog.qml";
             var parameters = {};
-//            parameters["localSettings"] = thubnailDecoratorContainer.localSettings;
-            thubnailDecoratorContainer.openDialog(source, parameters);
+//            parameters["localSettings"] = thumbnailDecoratorContainer.localSettings;
+            thumbnailDecoratorContainer.openDialog(source, parameters);
         }
     }
 }

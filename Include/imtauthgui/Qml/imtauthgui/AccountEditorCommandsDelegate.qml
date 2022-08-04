@@ -13,8 +13,11 @@ Item {
 
     property string itemId: editorItem.itemId;
 
+    property string gqlModelQueryType;
+    property string gqlModelQueryTypeNotify;
+
     onCommandsIdChanged: {
-        console.log("PackageCommands onCommandsIdChanged", container.commandsId);
+        console.log("AccountEditor onCommandsIdChanged", container.commandsId);
         Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
     }
 
@@ -22,18 +25,32 @@ Item {
         accountItemModel.updateModel();
     }
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
+    onVisibleChanged: {
+        if (container.visible){
+            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
+        }
+        else{
+            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
+        }
     }
 
     function commandHandle(commandId){
-        console.log("AccountsCommands commandActivated", commandId);
+        console.log("AccountEditor commandHandle", commandId);
 
         if (commandId === "Save"){
+            if (itemId === ""){
+                gqlModelQueryType = "Add";
+                gqlModelQueryTypeNotify = "addedNotification";
+            }
+            else{
+                gqlModelQueryType = "Update"
+                gqlModelQueryTypeNotify = "updatedNotification";
+            }
+
             saveQuery.updateModel();
         }
         else if (commandId === "Close"){
-            multiDocView.closeTab(tabPanelInternal.selectedIndex);
+            multiDocView.closePage("");
         }
     }
 
@@ -85,8 +102,11 @@ Item {
                             console.log("keys", keys);
 
                             for (let i = 0; i < keys.length; i++){
+                                console.log("keys[i]", keys[i], "->", dataModelLocal.GetData(keys[i]));
                                 accountModel.SetData(keys[i], dataModelLocal.GetData(keys[i]));
                             }
+
+                            undoRedoManager.model = accountModel;
 
                             updateGui();
                         }
@@ -103,13 +123,13 @@ Item {
         function updateModel() {
             console.log( "updateModel saveQuery");
 
-            var query = Gql.GqlRequest("query", "AccountUpdate");
+            var query = Gql.GqlRequest("query", "Account" + gqlModelQueryType);
 
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.itemId);
 
-            var queryFields = Gql.GqlObject("updatedNotification");
+            var queryFields = Gql.GqlObject(gqlModelQueryTypeNotify);
             queryFields.InsertField("Id");
             queryFields.InsertField("Successed");
             query.AddField(queryFields);
@@ -139,6 +159,19 @@ Item {
                 if (saveQuery.ContainsKey("data")){
                     dataModelLocal = saveQuery.GetData("data");
 
+                    if (dataModelLocal.ContainsKey("Account" + gqlModelQueryType)){
+                        dataModelLocal = dataModelLocal.GetData("Account" + gqlModelQueryType);
+
+                        if (dataModelLocal.ContainsKey(gqlModelQueryTypeNotify)){
+                            dataModelLocal = dataModelLocal.GetData(gqlModelQueryTypeNotify);
+                            let itemId = dataModelLocal.GetData("Id");
+                            let itemName = dataModelLocal.GetData("Name");
+
+                            multiDocView.updatePageTitle({"ItemId": "", "Title": itemName});
+                        }
+                    }
+
+                    Events.sendEvent(commandsId + "CollectionUpdateGui");
                 }
             }
         }

@@ -1,7 +1,6 @@
 import QtQuick 2.0
 import Acf 1.0
-import imtqml 1.0
-import imtauthgui 1.0
+import imtgui 1.0
 
 Item {
     id: settingsIntegerInputContainer;
@@ -43,7 +42,7 @@ Item {
 
         text: settingsIntegerInputContainer.value;
 
-        onInputTextChanged: {
+        onTextChanged: {
             console.log("SettingsIntegerInput onInputTextChanged");
             if (settingsIntegerInputContainer.rootItem){
                 settingsIntegerInputContainer.rootItem.dataChanged(settingsIntegerInputContainer.index, tfcIntegerInput.text);

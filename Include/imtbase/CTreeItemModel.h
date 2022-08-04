@@ -10,8 +10,7 @@
 
 // ACF includes
 #include <iser/ISerializable.h>
-#include <imod/CModelUpdateBridge.h>
-#include <imod/CModelBase.h>
+#include <istd/TChangeDelegator.h>
 
 
 namespace imtbase
@@ -21,7 +20,7 @@ namespace imtbase
 /**
 	Universal data controller for UI representations
 */
-class CTreeItemModel: public QAbstractListModel, public imod::CModelBase, virtual public iser::ISerializable
+class CTreeItemModel: public QAbstractListModel, public istd::TChangeDelegator<iser::ISerializable>
 {
 	Q_OBJECT
 	Q_PROPERTY(QString state READ State WRITE SetState NOTIFY stateChanged)
@@ -74,12 +73,6 @@ public Q_SLOTS:
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	virtual QHash<int, QByteArray> roleNames() const override;
 
-	// pseudo-reimplemented (istd::IChangeable)
-	virtual void BeginChanges(const istd::IChangeable::ChangeSet& changeSet);
-	virtual void EndChanges(const istd::IChangeable::ChangeSet& changeSet);
-	virtual void BeginChangeGroup(const istd::IChangeable::ChangeSet& changeSet);
-	virtual void EndChangeGroup(const istd::IChangeable::ChangeSet& changeSet);
-
 Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
@@ -116,7 +109,6 @@ private:
 
 	QList<Item*> m_items;
 	QHash<int, QByteArray> m_roleNames;
-	imod::CModelUpdateBridge m_parentUpdateBridge;
 	QMap<QByteArray,QByteArray> m_queryParams;
 	bool m_isArray;
 
@@ -126,10 +118,6 @@ protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
 	virtual bool ParseRecursive(const QJsonObject &jsonObject, int index = 0);
 	virtual void subModelChanged(const CTreeItemModel* model, istd::IChangeable::ChangeSet& changeSet);
-
-	// reimplemented (imod::CModelBase)
-	virtual void OnBeginGlobalChanges();
-	virtual void OnEndGlobalChanges(const istd::IChangeable::ChangeSet& changeSet);
 };
 
 

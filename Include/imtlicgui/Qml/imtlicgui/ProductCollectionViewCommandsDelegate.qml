@@ -8,7 +8,7 @@ CollectionViewCommandsDelegateBase {
     id: container;
 
     onCommandsIdChanged: {
-        Events.subscribeEvent(container.commandsId + "CommandActivated", container.onСommandActivated);
+        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
     }
 
     onSelectedIndexChanged: {
@@ -18,16 +18,21 @@ CollectionViewCommandsDelegateBase {
         container.commandsProvider.changeCommandMode("Duplicate", mode);
     }
 
-    function onСommandActivated(commandId){
-        console.log("productCollectionViewContainer commandActivated", commandId);
+    function commandHandle(commandId){
+        console.log("ProductCollectionViewCommandscommandActivated", commandId);
 
         if (commandId === "Duplicate"){
             let itemId = container.collectionView.baseCollectionView.table.getSelectedId();
             let itemName = container.collectionView.baseCollectionView.table.getSelectedName();
-            container.collectionView.rootItem.addPage({"Id": itemId, "Name": itemName, "Source": container.collectionView.editorPath, "CommandsId": container.collectionView.editorCommandsId});
+
+            let copyStr = qsTr("Copy of ");
+            container.collectionView.rootItem.addPage({"Id": itemId,
+                                                       "Name": copyStr + itemName,
+                                                       "Source": container.collectionView.baseCollectionView.commands.objectViewEditorPath,
+                                                       "CommandsId": container.collectionView.baseCollectionView.commands.objectViewEditorCommandsId});
         }
         else{
-            super.commandHandle(commandId);
+            container.commandHandleBase(commandId);
         }
     }
 }

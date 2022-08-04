@@ -54,41 +54,49 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 			QByteArray accountId = productInstancePtr->GetCustomerId();
 			QByteArray productId = productInstancePtr->GetProductId();
 
-			if (instanceId != ""){
-				itemModel->SetData("Id", instanceId);
-			}
-			else{
-				accountId = "";
-				productId = "";
-			}
-
+			itemModel->SetData("Id", instanceId);
 			itemModel->SetData("AccountId", accountId);
 			itemModel->SetData("ProductId", productId);
 
 			imtbase::CTreeItemModel* activeLicenses = itemModel->AddTreeModel("ActiveLicenses");
 			const imtbase::ICollectionInfo& licenseInstances = productInstancePtr->GetLicenseInstances();
-			imtbase::ICollectionInfo::Ids licenseIds = licenseInstances.GetElementIds();
+			imtbase::ICollectionInfo::Ids activeLicenseIds = licenseInstances.GetElementIds();
 
-			int index;
-			for (const QByteArray& licenseCollectionId : licenseIds){
-				const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(licenseCollectionId);
-				if (licenseInstancePtr != nullptr){
-					QDate date = licenseInstancePtr->GetExpiration().date();
-					QString name = licenseInstancePtr->GetLicenseName();
-					QString licenseExpirationText;
+			const imtbase::IObjectCollection* productsCollectionPtr = productInstancePtr->GetProductDatabase();
+			imtbase::IObjectCollection::DataPtr dataPtr;
 
-					index = activeLicenses->InsertNewItem();
-					activeLicenses->SetData("Id", licenseCollectionId, index);
-					activeLicenses->SetData("Name", name, index);
-					activeLicenses->SetData("ProductId", productId, index);
+			if (productsCollectionPtr->GetObjectData(productId, dataPtr)){
+				imtbase::IObjectCollection* productPtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
 
-					if (date.isValid()){
-						QLocale locale;
-						licenseExpirationText = locale.toString(date, QLocale::ShortFormat);
-						activeLicenses->SetData("Expiration", licenseExpirationText, index);
-					}
-					else{
+				if (productPtr != nullptr){
+					QByteArrayList licenseIds = productPtr->GetElementIds().toList();
+					for (const QByteArray& licenseId : licenseIds){
+						QString name = productPtr->GetElementInfo(licenseId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+						int index = activeLicenses->InsertNewItem();
+
+						activeLicenses->SetData("Id", licenseId, index);
+						activeLicenses->SetData("Name", name, index);
+						activeLicenses->SetData("ProductId", productId, index);
+
+						activeLicenses->SetData("LicenseState", 0, index);
+						activeLicenses->SetData("ExpirationState", 0, index);
 						activeLicenses->SetData("Expiration", "Unlimited", index);
+
+						for (const QByteArray& activeLicenseId : activeLicenseIds){
+							const imtlic::ILicenseInstance* licenseInstancePtr = productInstancePtr->GetLicenseInstance(activeLicenseId);
+							if (licenseId == activeLicenseId){
+								activeLicenses->SetData("LicenseState", 2, index);
+								QDate date = licenseInstancePtr->GetExpiration().date();
+
+								QString licenseExpirationText;
+								if (date.isValid()){
+									licenseExpirationText = date.toString("yyyy-MM-dd");
+									activeLicenses->SetData("ExpirationState", 2, index);
+									activeLicenses->SetData("Expiration", licenseExpirationText, index);
+								}
+							}
+						}
 					}
 				}
 			}
@@ -167,24 +175,22 @@ istd::IChangeable* CInstallationControllerComp::CreateObject(
 		imtbase::CTreeItemModel* activeLicenses = itemModel.GetTreeItemModel("ActiveLicenses");
 		if (activeLicenses != nullptr){
 			for (int i = 0; i < activeLicenses->GetItemsCount(); i++){
-				QByteArray productLicenseId;
-				if (activeLicenses->ContainsKey("ProductId")) {
-					productLicenseId = activeLicenses->GetData("ProductId", i).toByteArray();
-				}
+				if (activeLicenses->ContainsKey("LicenseState")){
+					int state = activeLicenses->GetData("LicenseState", i).toInt();
+					if (state == 2){
+						QByteArray licenseId;
+						if (activeLicenses->ContainsKey("Id")){
+							licenseId = activeLicenses->GetData("Id", i).toByteArray();
+						}
 
-				if (productLicenseId == productId){
-					QByteArray licenseId;
-					if (activeLicenses->ContainsKey("Id")) {
-						licenseId = activeLicenses->GetData("Id", i).toByteArray();
+						QDateTime expirationDate;
+						if (activeLicenses->ContainsKey("Expiration")){
+							QString dateExpirationStr = activeLicenses->GetData("Expiration", i).toString();
+							expirationDate = QDateTime::fromString(dateExpirationStr, "yyyy-MM-dd");
+						}
+
+						productInstancePtr->AddLicense(licenseId, expirationDate);
 					}
-
-					QDateTime expirationDate;
-					if (activeLicenses->ContainsKey("Expiration")) {
-						QString dateExpirationStr = activeLicenses->GetData("Expiration", i).toString();
-						expirationDate = QDateTime::fromString(dateExpirationStr, "dd.MM.yyyy");
-					}
-
-					productInstancePtr->AddLicense(licenseId, expirationDate);
 				}
 			}
 		}

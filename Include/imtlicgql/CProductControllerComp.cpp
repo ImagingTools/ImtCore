@@ -1,22 +1,9 @@
 #include <imtlicgql/CProductControllerComp.h>
 
 // ImtCore includes
-#include <imtlic/CFeaturePackageCollectionUtility.h>
-//#include <imtlic/CFeatureInfo.h>
-//#include <imtlic/IFeaturePackage.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
-#include <imtgui/CObjectCollectionViewDelegate.h>
-
-#include <imtlic/CLicenseInstance.h>
 #include <imtlic/CLicenseInfo.h>
-
 #include <imtlic/IProductLicensingInfo.h>
-
-#include <imtlic/ILicenseInstance.h>
-#include <imtlic/CFeaturePackage.h>
-
 #include <imtbase/ICollectionInfo.h>
-
 
 
 namespace imtlicgql
@@ -46,7 +33,7 @@ imtbase::CTreeItemModel* CProductControllerComp::ListObjects(
 		QByteArray productId = GetObjectIdFromInputParams(inputParams);
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (productId != "" && m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
+		if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
 			imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
 
 			if (licensePtr != nullptr){
@@ -123,12 +110,12 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel *licenses = nullptr;
 		if (itemModel.ContainsKey("Items")){
-			licenses = itemModel.GetTreeItemModel("licenses");
+			licenses = itemModel.GetTreeItemModel("Items");
 		}
 
 		imtbase::CTreeItemModel *dependencies = nullptr;
-		if (itemModel.ContainsKey("dependencies")){
-			dependencies = itemModel.GetTreeItemModel("dependencies");
+		if (itemModel.ContainsKey("DependentModel")){
+			dependencies = itemModel.GetTreeItemModel("DependentModel");
 		}
 
 		if (licenses != nullptr){
@@ -203,7 +190,7 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 		for (const QByteArray& collectionId : collectionIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (collectionId != "" && m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 				const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 				const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
 				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
@@ -216,7 +203,6 @@ imtbase::CTreeItemModel* CProductControllerComp::GetDependencies(
 
 					imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
 					if (featureInfos.size() > 0){
-//						QByteArray key = productPtr->GetProductId() + ";" + licenseId;
 						QByteArray key = licenseId;
 						QString value;
 						for (int i = 0; i < featureInfos.size(); i++){
@@ -257,7 +243,7 @@ bool CProductControllerComp::GetOperationFromRequest(
 			return true;
 		}
 
-		if (fieldList->at(i).GetId() == "dependencies"){
+		if (fieldList->at(i).GetId() == "Features"){
 			gqlObject = fieldList->at(i);
 			operationType = OT_USER_OPERATION + 2;
 			return true;

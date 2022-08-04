@@ -1,9 +1,10 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 
 Item {
-    id: container;
+    id: containerBase;
 
     /**
         Collection view
@@ -23,9 +24,11 @@ Item {
     /**
         The property for tracking changes to the selected item
     */
-    property int selectedIndex: container.tableData.selectedIndex;
+    property int selectedIndex: containerBase.tableData.selectedIndex;
 
     property string commandsId;
+
+    signal modelChanged();
 
     /**
         Requests ids for GQL models
@@ -36,18 +39,32 @@ Item {
     property string gqlModelItem;
     property string gqlModelMetaInfo;
 
+    onTableDataChanged: {
+        tableData.rightButtonMouseClicked.connect(openPopupMenu);
+    }
 
     //TODO -> onItemSelectionChanged
     onSelectedIndexChanged: {
-        console.log("CollectionViewCommands onSelectedIndexChanged", container.selectedIndex, container);
-        let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
+        console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
+        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
 
-        container.commandsProvider.changeCommandMode("Remove", mode);
-        container.commandsProvider.changeCommandMode("Edit", mode);
+        containerBase.commandsProvider.changeCommandMode("Remove", mode);
+        containerBase.commandsProvider.changeCommandMode("Edit", mode);
+    }
+
+    function openPopupMenu(x, y){
+        modalDialogManager.closeDialog();
+        modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
     }
 
     Component {
-        id: messageDialog;
+        id: errorDialog;
+        MessageDialog {
+        }
+    }
+
+    Component {
+        id: removeDialog;
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
@@ -58,21 +75,74 @@ Item {
         }
     }
 
+    Component {
+        id: renameDialog;
+        InputDialog {
+            onFinished: {
+                if (buttonId == "Ok"){
+                    renameQuery.rename(inputValue);
+                }
+            }
+        }
+    }
+
+    Component {
+        id: setDescriptionDialog;
+        InputDialog {
+            onFinished: {
+                if (buttonId == "Ok"){
+                    setDescriptionQuery.setDescription(inputValue);
+                }
+            }
+        }
+    }
+
+    Component {
+        id: popupMenu;
+
+        PopupMenuDialog {
+            onFinished: {
+                console.log("CollectionView PopupMenuDialog", commandId);
+                commandHandleBase(commandId);
+            }
+        }
+    }
+
+    ListModel {
+        id: contextMenuModel;
+
+        Component.onCompleted: {
+            contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
+            contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
+            contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
+            contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
+        }
+    }
+
     /**
         Basic command click handler
     */
-    function commandHandle(commandId){
+    function commandHandleBase(commandId){
         console.log("CollectionView commandActivated", commandId);
         if (commandId === "New"){
-            container.collectionView.baseCollectionView.selectedItem("", "<new item>");
+            containerBase.collectionView.baseCollectionView.selectedItem("", "<new item>");
         }
         else if (commandId === "Remove"){
-            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the collection ?")});
+            modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
         }
         else if (commandId === "Edit"){
             let itemId = tableData.getSelectedId();
             let itemName = tableData.getSelectedName();
-            container.collectionView.baseCollectionView.selectedItem(itemId, itemName);
+            containerBase.collectionView.baseCollectionView.selectedItem(itemId, itemName);
+        }
+        else if (commandId === "Rename"){
+            let selectedName = tableData.getSelectedName();
+            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+        }
+        else if (commandId === "SetDescription"){
+            let elements = tableData.elements;
+            let selectedDescription = elements.GetData("Description", selectedIndex);
+            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
         }
     }
 
@@ -89,8 +159,8 @@ Item {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            if(itemId != ""){
-                query = Gql.GqlRequest("query", container.gqlModelRemove);
+            if(itemId !== ""){
+                query = Gql.GqlRequest("query", containerBase.gqlModelRemove);
                 inputParams.InsertField("Id", itemId);
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
@@ -113,8 +183,10 @@ Item {
                 var dataModelLocal;
                 if (removeModel.ContainsKey("errors")){
                     dataModelLocal = removeModel.GetData("errors");
-                    if (dataModelLocal.ContainsKey(container.gqlModelRemove)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlModelRemove);
+                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
+                        var message = dataModelLocal.GetData("message");
+                        modalDialogManager.openDialog(errorDialog, {"message": message});
                     }
 
                     return;
@@ -123,16 +195,21 @@ Item {
                 if (removeModel.ContainsKey("data")){
                     dataModelLocal = removeModel.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(container.gqlModelRemove)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlModelRemove);
+                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
 
                         if (dataModelLocal.ContainsKey("removedNotification")){
                             dataModelLocal = dataModelLocal.GetData("removedNotification");
 
+                            tableData.selectedIndex = -1;
+
                             if (dataModelLocal.ContainsKey("Id")){
                                 var itemId = dataModelLocal.GetData("Id");
 
-                                container.collectionView.updateGui();
+                                containerBase.modelChanged();
+                                containerBase.collectionView.updateGui();
+
+                                multiDocView.closePage(itemId);
                             }
                         }
                     }
@@ -144,15 +221,15 @@ Item {
     GqlModel {
         id: renameQuery;
 
-        function rename(itemId, newName) {
+        function rename(newName) {
             console.log( "CollectionView renameQuery rename");
 
             var query;
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("query", collectionViewBaseContainer.gqlModelRename);
-            inputParams.InsertField("Id", itemId);
+            query = Gql.GqlRequest("query", containerBase.gqlModelRename);
+            inputParams.InsertField("Id", tableData.getSelectedId());
 
             inputParams.InsertField("NewName", newName);
 
@@ -177,12 +254,12 @@ Item {
                 if (renameQuery.ContainsKey("errors")){
                     dataModelLocal = renameQuery.GetData("errors");
 
-                    if (dataModelLocal.ContainsKey(collectionViewBaseContainer.gqlModelRename)){
-                        dataModelLocal = dataModelLocal.GetData(collectionViewBaseContainer.gqlModelRename);
+                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRename)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRename);
 
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewBaseContainer.openMessageDialog("Error", message, "ErrorDialog");
+                            modalDialogManager.openDialog(errorDialog, {"message": message});
                         }
                     }
 
@@ -192,21 +269,19 @@ Item {
                 if (renameQuery.ContainsKey("data")){
                     dataModelLocal = renameQuery.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(collectionViewBaseContainer.gqlModelRename)) {
-                        dataModelLocal = dataModelLocal.GetData(collectionViewBaseContainer.gqlModelRename);
+                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRename)) {
+                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRename);
 
                         if (dataModelLocal.ContainsKey("item")) {
                             dataModelLocal = dataModelLocal.GetData("item");
+                            containerBase.collectionView.updateGui();
+                            containerBase.modelChanged();
 
-                            var newId = dataModelLocal.GetData("NewId");
-                            var newName = dataModelLocal.GetData("NewName");
+                            let oldId = dataModelLocal.GetData("OldId");
+                            let newName = dataModelLocal.GetData("NewName");
+                            multiDocView.updatePageTitle({"ItemId": oldId, "Title": newName});
 
-//                            collectionViewBaseContainer.renamedItem(tableInternal.getSelectedId(), newId);
-
-//                            featuresTreeView.loadFeaturesModel();
-//                            featuresTreeView.loadDependModel();
-//                            treeViewModel.reloadModel();
-//                            featureDependenciesModel.reloadModel();
+                            containerBase.modelChanged();
                         }
                     }
                 }
@@ -224,8 +299,8 @@ Item {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("query", collectionViewBaseContainer.gqlModelSetDescription);
-            inputParams.InsertField("Id", tableInternal.getSelectedId());
+            query = Gql.GqlRequest("query", containerBase.gqlModelSetDescription);
+            inputParams.InsertField("Id", tableData.getSelectedId());
 
             inputParams.InsertField("Description", description);
 
@@ -244,23 +319,17 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, setDescriptionQuery);
             if (this.state === "Ready"){
-                let keys = setDescriptionQuery.GetKeys();
-                if (!keys || keys.length == 0){
-                    thubnailDecoratorContainer.setInvalidConnection(true);
-                    return;
-                }
-
                 var dataModelLocal;
 
                 if (setDescriptionQuery.ContainsKey("errors")){
                     dataModelLocal = setDescriptionQuery.GetData("errors");
 
-                    if (dataModelLocal.ContainsKey(collectionViewBaseContainer.gqlModelSetDescription)){
-                        dataModelLocal = dataModelLocal.GetData(collectionViewBaseContainer.gqlModelSetDescription);
+                    if (dataModelLocal.ContainsKey(containerBase.gqlModelSetDescription)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelSetDescription);
 
                         if (dataModelLocal.ContainsKey("message")){
                             var message = dataModelLocal.GetData("message");
-                            collectionViewBaseContainer.openMessageDialog("Error", message, "ErrorDialog");
+                            modalDialogManager.openDialog(errorDialog, {"message": message});
                         }
                     }
 
@@ -270,9 +339,9 @@ Item {
                 if (setDescriptionQuery.ContainsKey("data")){
                     dataModelLocal = setDescriptionQuery.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(collectionViewBaseContainer.gqlModelSetDescription)) {
+                    if (dataModelLocal.ContainsKey(containerBase.gqlModelSetDescription)) {
 
-                        dataModelLocal = dataModelLocal.GetData(collectionViewBaseContainer.gqlModelSetDescription);
+                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelSetDescription);
 
                         if (dataModelLocal.ContainsKey("item")) {
                             dataModelLocal = dataModelLocal.GetData("item");
@@ -280,8 +349,8 @@ Item {
                             var id = dataModelLocal.GetData("Id");
                             var description = dataModelLocal.GetData("Description");
 
-                            collectionViewBaseContainer.updateItemAfterSetDescription(description);
-                            collectionViewBaseContainer.setDescriptionItem(id, description);
+                            containerBase.collectionView.updateGui();
+                            containerBase.modelChanged();
                         }
                     }
                 }

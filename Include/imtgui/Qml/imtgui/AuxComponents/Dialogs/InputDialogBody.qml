@@ -38,7 +38,7 @@ Item {
         }
 
         CustomTextField {
-            id: tfcInput;
+            id: inputField;
 
             anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -46,6 +46,10 @@ Item {
             height: 30;
 
             text: inputDialogBodyContainer.inputValue;
+
+            onTextChanged: {
+                inputDialogBodyContainer.inputValue = inputField.text;
+            }
         }
     }
 }

@@ -16,9 +16,27 @@ Item {
     property Item tableData;
     property Item commandsProvider;
 
+    property TreeItemModel objectModel;
+
     property int selectedIndex: container.tableData.selectedIndex;
 
-    property alias editorDialog: editDialog;
+    signal saved(string id, string name);
+    signal closed();
+    signal edited(string itemId, string itemName);
+    signal removed(string itemId);
+
+    /**
+        Обновляем данные только после получения результата с сервера, удостоверясь
+        что нет никаких ошибок
+    */
+    onSaved: {
+        multiDocView.updatePageTitle({"ItemId": "", "Title": name});
+    }
+
+    onTableDataChanged: {
+        console.log("DocumentView onTableDataChanged");
+        tableData.rightButtonMouseClicked.connect(openPopupMenu);
+    }
 
     onSelectedIndexChanged: {
         console.log("CollectionViewCommands onSelectedIndexChanged", container.selectedIndex, container);
@@ -28,14 +46,34 @@ Item {
         container.commandsProvider.changeCommandMode("Edit", mode);
     }
 
+    function openPopupMenu(x, y){
+        modalDialogManager.closeDialog();
+        modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
+    }
+
+    Component {
+        id: errorDialog;
+        MessageDialog {
+        }
+    }
+
     Component {
         id: messageDialog;
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
-                    let elements = container.tableData.elements;
+                    let elementsModel = objectModel.GetData("Items");
+
                     let selectedIndex = container.tableData.selectedIndex;
-                    elements.RemoveItem(selectedIndex);
+                    let removedId = elementsModel.GetData("Id", selectedIndex);
+
+                    elementsModel.RemoveItem(selectedIndex);
+
+                    if (selectedIndex === elementsModel.GetItemsCount()){
+                        container.tableData.selectedIndex = -1;
+                    }
+
+                    removed(removedId);
                 }
             }
         }
@@ -46,9 +84,17 @@ Item {
         EditDialog {
             onFinished: {
                 if (buttonId == "Ok"){
-                    let elementsModel = container.tableData.elements;
+                    let elementsModel = objectModel.GetData("Items");
+
+                    let oldId = elementsModel.GetData("Id", selectedIndex);
+                    let oldName = elementsModel.GetData("Name", selectedIndex);
+
                     elementsModel.SetData("Id", valueId, container.selectedIndex);
                     elementsModel.SetData("Name", valueName, container.selectedIndex);
+
+                    undoRedoManager.modelChanged();
+
+                    edited(oldId, oldName);
 
                     objectView.updateGui();
                 }
@@ -56,15 +102,72 @@ Item {
         }
     }
 
-    function commandHandle(commandId){
-        console.log("PackageCommands commandActivated", commandId);
+    Component {
+        id: inputDialog;
+        InputDialog {
+            onFinished: {
+                console.log("InputDialog result", buttonId, inputValue);
+                if (buttonId == "Ok"){
+                    container.gqlModelQueryType = "Add";
+                    container.gqlModelQueryTypeNotify = "addedNotification";
 
+                    container.objectView.itemId = inputValue;
+                    container.objectView.itemName = inputValue;
+
+                    saveQuery.updateModel();
+                }
+            }
+        }
+    }
+
+    Component {
+        id: setDescriptionDialog;
+        InputDialog {
+            onFinished: {
+                if (buttonId == "Ok"){
+                    let elements = container.tableData.elements;
+                    elements.SetData("Description", inputValue, selectedIndex);
+
+                    objectView.updateGui();
+
+                    undoRedoManager.modelChanged();
+                }
+            }
+        }
+    }
+
+    Component {
+        id: popupMenu;
+
+        PopupMenuDialog {
+            onFinished: {
+                console.log("DocumentView PopupMenuDialog", commandId);
+                commandHandleBase(commandId);
+            }
+        }
+    }
+
+    ListModel {
+        id: contextMenuModel;
+
+        Component.onCompleted: {
+            contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
+            contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
+            contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
+        }
+    }
+
+    function commandHandleBase(commandId){
         if (commandId === "New"){
             let elements = container.tableData.elements;
             let index = elements.InsertNewItem();
             elements.SetData("Name", "Item Name", index);
             elements.SetData("Id", "", index);
             elements.SetData("Description", "", index);
+
+            objectView.updateGui();
+
+            undoRedoManager.modelChanged();
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
@@ -72,31 +175,38 @@ Item {
         else if (commandId === "Edit"){
             let id = container.tableData.getSelectedId();
             let name = container.tableData.getSelectedName();
-            modalDialogManager.openDialog(editorDialog, {"titleId": qsTr("Item-ID"),
-                                                         "titleName": qsTr("Item Name"),
-                                                         "valueId": id,
-                                                         "valueName": name});
+            modalDialogManager.openDialog(editDialog, {"titleId":   qsTr("Item-ID"),
+                                                       "titleName": qsTr("Item Name"),
+                                                       "valueId":   id,
+                                                       "valueName": name,
+                                                       "model":     tableData.elements});
         }
         else if (commandId === "Save"){
             let itemId = container.objectView.itemId;
             if (itemId === ""){
-                container.gqlModelQueryType = "Add";
-                container.gqlModelQueryTypeNotify = "addedNotification";
+                modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
             }
             else{
                 container.gqlModelQueryType = "Update";
                 container.gqlModelQueryTypeNotify = "updatedNotification";
-            }
 
-            saveQuery.updateModel();
+                saveQuery.updateModel();
+            }
         }
         else if (commandId === "Close"){
-            multiDocView.closeTab(tabPanelInternal.selectedIndex);
+            container.closed();
+            multiDocView.closePage("");
+        }
+        else if (commandId === "SetDescription"){
+            let elements = tableData.elements;
+            let selectedDescription = elements.GetData("Description", selectedIndex);
+            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the item:"),
+                                                                 "inputValue": selectedDescription});
         }
     }
 
-    TreeItemModel {
-        id: model;
+    function saveModel(){
+        saveQuery.updateModel();
     }
 
     GqlModel {
@@ -108,19 +218,12 @@ Item {
             var queryFields = Gql.GqlObject(container.gqlModelQueryTypeNotify);
 
             let itemId = container.objectView.itemId;
-            let itemName = container.objectView.itemName;
-
-            console.log("itemId", itemId);
-            console.log("itemName", itemName);
+            let itemName = itemId;
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", itemId);
 
-            model.SetData("Id", itemId);
-            model.SetData("Name", itemName);
-            model.SetData("Items", container.tableData.elements);
-
-            var jsonString = model.toJSON();
+            var jsonString = objectModel.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);
@@ -142,21 +245,34 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (saveQuery.ContainsKey("errors")){
+                    dataModelLocal = saveQuery.GetData("errors");
+                    dataModelLocal = dataModelLocal.GetData(container.commandsId + container.gqlModelQueryType);
+                    if (gqlModelQueryType == "Add"){
+                        container.objectView.itemId = "";
+                    }
+
+                    if (dataModelLocal.ContainsKey("message")){
+                        let message = dataModelLocal.GetData("message");
+                        modalDialogManager.openDialog(errorDialog, {"message": message});
+                    }
+
                     return;
                 }
 
                 if (saveQuery.ContainsKey("data")){
                     dataModelLocal = saveQuery.GetData("data");
 
-                    dataModelLocal = dataModelLocal.GetData(container.commandsId + "Add");
+                    dataModelLocal = dataModelLocal.GetData(container.commandsId + container.gqlModelQueryType);
 
-                    if (dataModelLocal.ContainsKey("addedNotification")){
-                        dataModelLocal = dataModelLocal.GetData("addedNotification");
+                    if (dataModelLocal.ContainsKey(gqlModelQueryTypeNotify)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelQueryTypeNotify);
 
+                        let itemId = dataModelLocal.GetData("Id");
+                        let itemName = dataModelLocal.GetData("Name");
+
+                        container.saved(itemId, itemName);
                     }
                 }
-
-                Events.sendEvent("PackageCollectionUpdateGui");
             }
         }
     }

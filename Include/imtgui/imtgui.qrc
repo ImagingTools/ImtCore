@@ -64,6 +64,10 @@
         <file alias="imtgui/AuxComponents/Dialogs/InputDialogBody.qml">Qml/imtgui/AuxComponents/Dialogs/InputDialogBody.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/ModalDialogManager.qml">Qml/imtgui/AuxComponents/Dialogs/ModalDialogManager.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/MessageDialogBody.qml">Qml/imtgui/AuxComponents/Dialogs/MessageDialogBody.qml</file>
+        <file alias="imtgui/AuxComponents/UndoRedoManager.qml">Qml/imtgui/AuxComponents/UndoRedoManager.qml</file>
+        <file alias="imtgui/AuxComponents/ServerConnectionManager.qml">Qml/imtgui/AuxComponents/ServerConnectionManager.qml</file>
+        <file alias="imtgui/AuxComponents/PagesManager.qml">Qml/imtgui/AuxComponents/PagesManager.qml</file>
+        <file alias="imtgui/AuxComponents/CollectionKeyboardManager.qml">Qml/imtgui/AuxComponents/CollectionKeyboardManager.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

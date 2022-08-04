@@ -10,7 +10,6 @@ Item {
 
     onStartPageObjChanged: {
         console.log("multiDocPageView onStartPageObjChanged");
-//        startPageObj["Source"] = "../../imtlicgui//ProductCollectionView.qml";
         multiDocView.addPage(multiDocPageView.startPageObj)
     }
 

@@ -5,7 +5,6 @@ Item {
     id: container;
 
     width: container.contentWidth;
-//    height: subPagesColumn.visible ? 50 + subPagesColumn.height : 50;
     height: subPagesColumn.visible ? container.contentHeight + subPagesColumn.height : container.contentHeight;
 
     property string text: "Test";
@@ -83,7 +82,6 @@ Item {
 
             onClicked: {
                 container.clicked();
-//                subPagesColumn.visible = !subPagesColumn.visible;
             }
         }
     }
@@ -112,7 +110,6 @@ Item {
 
                 Component.onCompleted: {
                     subPagesDecorator.source = Style.subMenuButtonDecoratorPath;
-                    console.log("subPagesDecorator.source", subPagesDecorator.source);
                 }
 
                 onSelectedChanged: {
@@ -144,44 +141,4 @@ Item {
             }
         }
     }
-
-//    Image {
-//        id: image;
-
-//        anchors.horizontalCenter: parent.horizontalCenter;
-//        anchors.top: parent.top;
-//        anchors.topMargin: 5;
-
-//        width: container.highlighted || container.selected ? parent.width * imageSelectedCoeff : parent.width * imageDecrease;
-//        height:  container.highlighted || container.selected ? parent.height * imageSelectedCoeff : parent.height * imageDecrease;
-
-//        fillMode: Image.PreserveAspectFit;
-
-//        source: container.imageSource;
-//        sourceSize.height: height;
-//        sourceSize.width: width;
-//    }
-
-//    Rectangle {
-//        anchors.top: parent.top;
-//        anchors.bottom: parent.bottom;
-//        anchors.left: parent.left;
-
-//        width: 5;
-
-//        color: Style.iconColorOnSelected;
-//        visible: container.selected;
-//    }
-
-//    Text {
-//        id: description;
-
-//        anchors.bottom: parent.bottom;
-//        anchors.horizontalCenter: container.horizontalCenter;
-
-//        text: container.text;
-//        color: container.selected ? Style.iconColorOnSelected: Style.textColor;
-//        font.pixelSize: container.fontSize;
-//        font.family: Style.fontFamily;
-//    }
 }
