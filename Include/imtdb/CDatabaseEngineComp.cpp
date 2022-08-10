@@ -233,6 +233,8 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 			queryString = scriptFile.readAll();
 
+			queryString.replace(":DatabaseName", GetDatabaseName());
+
 			scriptFile.close();
 		}
 		else{
