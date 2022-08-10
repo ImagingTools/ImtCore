@@ -66,7 +66,6 @@ protected:
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
-//	I_REF(iser::ISerializable, m_separatorObjectIdAttrPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
 };

@@ -21,7 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
 		I_ASSIGN(m_documentFactCompPtr, "DocumentFactory", "Factory used for creation of the new document instance", true, "DocumentFactory");
 		I_ASSIGN(m_documentPersistenceCompPtr, "DocumentPersistence", "Persistence for the document", true, "DocumentPersistence");
-		I_ASSIGN(m_tableDelegateCompPtr, "TableDelegate", "Delegate for the SQl-table", false, "TableDelegate");
+		I_ASSIGN(m_metaInfoTableDelegateCompPtr, "MetaInfoTableDelegate", "Delegate for the table containing meta-informations for the document type", false, "MetaInfoTableDelegate");
 		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumntContentColumnId", "ID of the column in the table containing document content", true, "Document");
 	I_END_COMPONENT
 
@@ -61,7 +61,7 @@ protected:
 private:
 	I_FACT(istd::IChangeable, m_documentFactCompPtr);
 	I_REF(ifile::IFilePersistence, m_documentPersistenceCompPtr);
-	I_REF(ISqlDatabaseTableDelegate, m_tableDelegateCompPtr);
+	I_REF(ISqlDatabaseTableDelegate, m_metaInfoTableDelegateCompPtr);
 	I_ATTR(QByteArray, m_documentContentColumnIdAttrPtr);
 };
 

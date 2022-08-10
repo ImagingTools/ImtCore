@@ -62,14 +62,14 @@ public:
 				const istd::IChangeable* valuePtr) const = 0;
 
 	/**
-	*	Create query for the deletion of the object from the database.
+		Create query for the deletion of the object from the database.
 	*/
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId) const = 0;
 
 	/**
-	*	Create query for the update an existing object in the collection.
+		Create query for the update an existing object in the collection.
 	*/
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
@@ -77,7 +77,7 @@ public:
 				const istd::IChangeable& object) const = 0;
 
 	/**
-	*	Create query for the renaming of the object.
+		Create query for the renaming of the object.
 	*/
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,
@@ -93,12 +93,12 @@ public:
 				const QString& description) const = 0;
 
 	/**
-	*	Create query for the reseting the collection.
+		Create query for the reseting the collection.
 	*/
 	virtual QByteArray CreateResetQuery(const imtbase::IObjectCollection& collection) const = 0;
 
 	/**
-	*	Create query for the set meta-information for the data content sql collection.
+		Create query for setting the meta-information for the given object in the database.
 	*/
 	virtual QByteArray CreateDataMetaInfoQuery(
 				const imtbase::IObjectCollection& collection,
@@ -106,7 +106,7 @@ public:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr) const = 0;
 
 	/**
-	*	Create query for the set meta-information for the sql collection item.
+		Create query for setting the collection-related meta-information for the given object in the database.
 	*/
 	virtual QByteArray CreateCollectionItemMetaInfoQuery(
 				const imtbase::IObjectCollection& collection,

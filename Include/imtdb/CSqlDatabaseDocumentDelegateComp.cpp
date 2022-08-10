@@ -68,12 +68,10 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		if (WriteDataToMemory(*workingDocumentPtr, documentContent)){
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 
-			retVal.query = QString("INSERT INTO %1(Id, %2, Name, Description ) VALUES('%3', '%4', '%5');")
+			retVal.query = QString("INSERT INTO %1(Id, %2) VALUES('%3');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
 						.arg(qPrintable (*m_documentContentColumnIdAttrPtr))
 						.arg(qPrintable(objectId))
-						.arg(objectName)
-						.arg(objectDescription)
 						.toLocal8Bit();
 
 			retVal.objectName = objectName;
@@ -242,8 +240,8 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 
 idoc::IDocumentMetaInfo* CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
-	if (m_tableDelegateCompPtr.IsValid()){
-		return m_tableDelegateCompPtr->CreateItemItemInfo();
+	if (m_metaInfoTableDelegateCompPtr.IsValid()){
+		return m_metaInfoTableDelegateCompPtr->CreateItemItemInfo();
 	}
 
 	return nullptr;
@@ -252,10 +250,10 @@ idoc::IDocumentMetaInfo* CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(
 
 bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (m_tableDelegateCompPtr.IsValid()){
-		QByteArrayList columnIds = m_tableDelegateCompPtr->GetColumnIds();
+	if (m_metaInfoTableDelegateCompPtr.IsValid()){
+		QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
 		for (const QByteArray& columnId : columnIds){
-			int metaInfoType = m_tableDelegateCompPtr->GetMetaInfoType(columnId);
+			int metaInfoType = m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId);
 			if (metaInfoType >= 0){
 				if (record.contains(columnId)){
 					QVariant data = record.value(qPrintable(columnId));
