@@ -22,7 +22,7 @@ QVariant CFeaturePackageCollectionControllerComp::GetObjectInformation(const QBy
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
 	}
-	else if (informationId == QByteArray("ModificationTime")){
+	else if (informationId == QByteArray("LastModified")){
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
 		if (metaInfo.IsValid()){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);

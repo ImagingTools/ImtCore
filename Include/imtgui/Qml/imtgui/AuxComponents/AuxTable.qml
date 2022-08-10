@@ -1,9 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
-import imtauthgui 1.0
-//import '../UxAdvancedComponents' as AUX
-
 
 Item {
     id: tableContainer;
@@ -24,20 +20,28 @@ Item {
     signal selectItem(string idSelected, string name);
     signal rightButtonMouseClicked(int mouseX, int mouseY);
     signal setActiveFocusFromTable();
-    signal headerClicked(string headerId, string sortOrder);
+    signal headerClicked(string headerId);
     signal textFilterChanged(string id, int index, string text);
     signal filterClicked();
 
     function getSelectedId(){
         if (tableContainer.selectedIndex > -1){
-             return tableContainer.elements.GetData("Id", tableContainer.selectedIndex);
+            if (tableContainer.elements.ContainsKey("Id", tableContainer.selectedIndex)){
+                return tableContainer.elements.GetData("Id", tableContainer.selectedIndex);
+            }
         }
 
-        return null;
+        return "";
     }
 
     function getSelectedName(){
-        return elementsList.selectedName;
+        if (tableContainer.selectedIndex > -1){
+            if (tableContainer.elements.ContainsKey("Name", tableContainer.selectedIndex)){
+                return tableContainer.elements.GetData("Name", tableContainer.selectedIndex);
+            }
+        }
+
+        return "";
     }
 
     MouseArea {
@@ -81,8 +85,6 @@ Item {
 
                 color: Style.baseColor;
 
-                property string sortOrder: "ASC";
-
                 Text {
                     id: name;
 
@@ -124,7 +126,6 @@ Item {
                     visible: tableContainer.hasSort;
 
                     onReleased: {
-                        console.log("onReleased");
                         deleg.scale = 1;
                     }
 
@@ -134,15 +135,7 @@ Item {
 
                     onClicked: {
                         headersList.currentIndex = model.index;
-                        if (deleg.sortOrder == 'ASC'){
-                            deleg.sortOrder = 'DESC'
-                            iconSort.source = "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
-                        }
-                        else if (deleg.sortOrder == 'DESC'){
-                            deleg.sortOrder = 'ASC'
-                            iconSort.source = "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
-                        }
-                        tableContainer.headerClicked(model.Id, deleg.sortOrder);
+                        tableContainer.headerClicked(model.Id);
                     }
                 }
             }
@@ -174,8 +167,6 @@ Item {
         width: tableContainer.hasFilter ? 20 : 0;
         height: width;
 
-//        highlighted: filterMenu.visible;
-
         iconSource: "../../../" + "Icons/" + Style.theme + "/Filter_On_Normal.svg";
 
         onClicked: {
@@ -201,9 +192,6 @@ Item {
         spacing: 0;
         boundsBehavior: Flickable.StopAtBounds;
 
-        property string selectedId;
-        property string selectedName;
-
         delegate: TableDelegate {
             id: tableDelegate;
 
@@ -215,13 +203,11 @@ Item {
 
             Component.onCompleted: {
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id",i)]);
+                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
                 }
             }
 
             onClicked: {
-                elementsList.selectedId = model.Id;
-                elementsList.selectedName = model.Name;
                 tableContainer.selectedIndex = model.index;
             }
 

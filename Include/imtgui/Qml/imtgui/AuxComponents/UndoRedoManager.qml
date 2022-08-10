@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import Acf 1.0;
 
 Item {
@@ -6,14 +6,19 @@ Item {
 
     property string commandsId;
     property TreeItemModel model;
+    property Item editorItem;
 
     signal modelParsed();
 
     onModelChanged: {
+        console.log("undoRedoManager onModelChanged");
         undoRedo.addModel(model);
+
+        model.modelChanged.connect(modelUpdated);
     }
 
     Component.onDestruction: {
+        model.modelChanged.disconnect(modelUpdated);
         Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
     }
 
@@ -28,6 +33,25 @@ Item {
         }
         else{
             Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle)
+        }
+    }
+
+    function modelUpdated(){
+        console.log("undoRedoManager modelUpdated");
+        undoRedo.addModel(model);
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Z";
+        onActivated: {
+            commandHandle("Undo");
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+Z";
+        onActivated: {
+            commandHandle("Redo");
         }
     }
 
@@ -50,14 +74,6 @@ Item {
     function checkCommandMode(){
         let state = undoRedo.undoStack.length > 1 ? "Normal" : "Disabled";
         commandsProvider.changeCommandMode("Undo", state);
-        commandsProvider.changeCommandMode("Save", state);
-
-        let suffix = "";
-        if (state === "Normal"){
-            suffix = "*";
-        }
-
-        multiDocView.updatePageTitle({"ItemId": "", "Title": model.GetData("Name") + suffix});
 
         state = undoRedo.redoStack.length > 0 ? "Normal" : "Disabled";
         commandsProvider.changeCommandMode("Redo", state);
@@ -73,19 +89,15 @@ Item {
         else if (commandId === "Redo"){
             result = undoRedo.redo();
         }
-//        else if (commandId === "Save"){
-//            if (itemId != ""){
-//                undoRedo.undoStack = []
-//                undoRedo.addModel(model);
-//            }
-//        }
 
         if (result !== null){
+
             parseModel(result);
         }
     }
 
     function parseModel(json){
+        model.modelChanged.disconnect(modelUpdated);
         console.log("UndoRedo parseModel", json);
         json = json.replace(/\\/g, '');
         json = json.slice(1, json.length - 1);
@@ -93,5 +105,7 @@ Item {
         model.Parse(json);
 
         modelParsed();
+
+        model.modelChanged.connect(modelUpdated);
     }
 }

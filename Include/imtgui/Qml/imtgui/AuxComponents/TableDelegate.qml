@@ -5,7 +5,6 @@ Rectangle {
     id: tableDelegateContainer;
 
     width: 1000;
-//    height: 35;
 
     color: "transparent";
 
@@ -101,13 +100,11 @@ Rectangle {
         spacing: 0;
         model: tableDelegateContainer.count;
 
-        delegate: Rectangle {
+        delegate: Item {
             id: deleg;
 
             width: tableDelegateContainer.delegateWidth;
             height: tableDelegateContainer.height;
-
-            color: "transparent";
 
             Text {
                 id: name;

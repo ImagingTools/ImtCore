@@ -6,10 +6,13 @@ CollectionViewBase 1.0 ./AuxComponents/CollectionViewBase.qml
 CollectionViewCommandsDelegateBase 1.0 ./AuxComponents/CollectionViewCommandsDelegateBase.qml
 CommandsProvider 1.0 ./AuxComponents/CommandsProvider.qml
 DocumentWorkspaceCommandsDelegate 1.0 ./AuxComponents/DocumentWorkspaceCommandsDelegate.qml
+DocumentWorkspaceCommandsDelegateBase 1.0 ./AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml
+SaveCommandDelegate 1.0 ./AuxComponents/SaveCommandDelegate.qml
 MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
 ComboBox 1.0 ./AuxComponents/ComboBox.qml
 CheckBox 1.0 ./AuxComponents/CheckBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
+DatePicker 1.0 ./AuxComponents/DatePicker.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
 PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
 TextButton 1.0 ./AuxComponents/TextButton.qml

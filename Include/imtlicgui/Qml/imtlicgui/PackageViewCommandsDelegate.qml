@@ -5,20 +5,6 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegate {
     id: container;
 
-    onCommandsIdChanged: {
-        console.log("PackageCommands onCommandsIdChanged", container.commandsId);
-        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-    }
-
-    onVisibleChanged: {
-        if (container.visible){
-            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-        }
-        else{
-            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
-        }
-    }
-
     Component.onCompleted: {
         Events.subscribeEvent("TreeViewModelUpdated", objectView.updateGui);
     }
@@ -27,7 +13,13 @@ DocumentWorkspaceCommandsDelegate {
         Events.unSubscribeEvent("TreeViewModelUpdated", objectView.updateGui);
     }
 
+    onEntered: {
+        objectModel.SetData("Id", value);
+        objectModel.SetData("Name", value);
+    }
+
     onSaved: {
+        console.log("PackageView onSaved");
         Events.sendEvent("TreeViewModelUpdate");
         Events.sendEvent(commandsId + "CollectionUpdateGui");
     }
@@ -55,12 +47,6 @@ DocumentWorkspaceCommandsDelegate {
         else{
             treeViewModel.updateTreeViewAfterFeatureEditing(objectView.itemId, oldId, newId, newName);
         }
-    }
-
-    function commandHandle(commandId){
-        console.log("PackageCommands commandActivated", commandId);
-
-        container.commandHandleBase(commandId);
     }
 }
 

@@ -24,6 +24,13 @@ Item {
         }
     }
 
+    Shortcut {
+        sequence: "Ctrl+F";
+        onActivated: {
+            filterMenu.visible = !filterMenu.visible;
+        }
+    }
+
     FilterMenu {
         id: filterMenu;
 
@@ -86,16 +93,17 @@ Item {
                 collectionViewBaseContainer.elementsChanged();
             }
 
-            onHeaderClicked: {
-                console.log("CollectionView AuxTable onHeaderOnClicked", headerId, sortOrder);
-//                collectionViewContainer.headerClicked(headerId, sortOrder);
-
-//                modelItems.updateModel();
-            }
-
             onFilterClicked: {
                 filterMenu.visible = !filterMenu.visible;
             }
+        }
+    }
+
+    SortController {
+        id: sortController;
+
+        Component.onCompleted: {
+            tableInternal.headerClicked.connect(sortController.headerClicked);
         }
     }
 
@@ -128,7 +136,7 @@ Item {
         onCurrentValueChanged: {
             console.log("Pagination onCurrentValueChanged", pagination.currentValue);
             tableInternal.selectedIndex = -1;
-            modelItems.updateModel();
+            baseCommands.updateModels();
         }
     }
 
@@ -143,7 +151,6 @@ Item {
         Keys.onPressed: {
             console.log("KeyboardManager onPressed", event.key);
         }
-
     }
 
     CollectionViewBaseGqlModels {

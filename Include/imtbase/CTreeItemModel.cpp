@@ -23,6 +23,10 @@ CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
 	m_isArray(false)
 {
+	imtbase::CTreeItemModel* parentModel = dynamic_cast<imtbase::CTreeItemModel*>(parent);
+	if (parentModel != nullptr){
+		SetSlavePtr(parentModel);
+	}
 }
 
 CTreeItemModel::~CTreeItemModel()
@@ -128,9 +132,7 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 
 	if (externTreeModel != nullptr){
 		externTreeModel->setParent(this);
-
-//		externTreeModel->m_parentUpdateBridge = imod::CModelUpdateBridge(this);
-//		externTreeModel->AttachObserver(&m_parentUpdateBridge);
+		externTreeModel->SetSlavePtr(this);
 	}
 
 	QVariant v = QVariant::fromValue(externTreeModel);
@@ -650,6 +652,13 @@ void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &cha
 	else{
 		istd::CChangeNotifier changeNotifier(this, &changeSet);
 	}
+}
+
+
+void CTreeItemModel::OnEndChanges(const ChangeSet& changeSet)
+{
+	BaseClass::OnEndChanges(changeSet);
+	emit modelChanged();
 }
 
 

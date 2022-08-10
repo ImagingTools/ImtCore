@@ -143,10 +143,17 @@ Item {
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
                         if (dataModelLocal.ContainsKey("items")){
-                            dataModelLocal = dataModelLocal.GetData("items");
-                            gqlModelBaseContainer.items = dataModelLocal;
-
+                            gqlModelBaseContainer.items = dataModelLocal.GetData("items");
                             table.selectedIndex = -1;
+                        }
+
+                        if (dataModelLocal.ContainsKey("notification")){
+                            dataModelLocal = dataModelLocal.GetData("notification");
+                            if (dataModelLocal.ContainsKey("PagesCount")){
+                                dataModelLocal = dataModelLocal.GetData("PagesCount");
+
+                                pagination.pagesSize = dataModelLocal;
+                            }
                         }
                     }
                 }

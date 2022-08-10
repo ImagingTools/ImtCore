@@ -13,12 +13,15 @@ Item {
     property string itemName;
     property string commandsId;
 
+    property alias commands: commandsDelegate;
+
     property string rightPanelTitle: qsTr("Dependencies");
 
     signal selectedItem(string id, string name);
 
     Component.onCompleted: {
-        packageModel.SetData("DependentModel", featureDependenciesModel.modelFeatureDependencies);
+        console.log("PackageView onCompleted", featureDependenciesModel.modelFeatureDependencies);
+        packageModel.SetExternTreeModel("DependentModel", featureDependenciesModel.modelFeatureDependencies);
     }
 
     onItemIdChanged: {
@@ -57,16 +60,13 @@ Item {
 
     TreeItemModel {
         id: packageModel;
-
-        onDataChanged: {
-            console.log("packageModel onDataChanged", data);
-        }
     }
 
     UndoRedoManager {
         id: undoRedoManager;
 
         commandsId: packageViewContainer.commandsId;
+        editorItem: packageViewContainer;
 
         onModelParsed: {
 
@@ -100,15 +100,14 @@ Item {
         height: parent.height;
 
         onSelectedItem: {
-            commandsDelegate.commandHandle("Edit");
+            commandsDelegate.commandActivated("Edit");
         }
 
         onElementsChanged: {
-//            packageModel.SetData("Items", collectionView.table.elements);
-
             packageModel.SetExternTreeModel("Items", collectionView.table.elements);
 
             undoRedoManager.model = packageModel;
+            commandsDelegate.objectModel = packageModel;
         }
     }
 
@@ -121,9 +120,8 @@ Item {
 
         tableData: collectionView.table;
         objectView: packageViewContainer;
-        commandsProvider: commandsProvider;
+
         commandsId: packageViewContainer.commandsId;
-        objectModel: packageModel;
     }
 
     Splitter {
@@ -207,8 +205,6 @@ Item {
 
             onCheckBoxChanged: {
                 treeViewController.checkBoxChanged(state, parentId, childId);
-
-                undoRedoManager.modelChanged();
             }
         }
     }

@@ -134,6 +134,12 @@ Rectangle {
             regExp: /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
         }
 
+//        DatePicker {
+//            id: datePicker;
+
+//            height: 200;
+//        }
+
         CustomTextField{
             id: inputDate;
 
@@ -151,8 +157,8 @@ Rectangle {
             textSize: 17;
 
             Component.onCompleted: {
-                inputDate.setMask("9999-00-00");
-                inputDate.setValidator(dateRegex);
+                inputDate.textInputMask = "9999-00-00";
+                inputDate.textInputValidator = dateRegex;
             }
 
             onTextChanged: {

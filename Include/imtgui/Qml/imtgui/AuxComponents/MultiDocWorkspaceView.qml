@@ -66,15 +66,29 @@ Item {
              index = multiDocView.getPageIndexById(itemId);
          }
 
-         console.log("tabPanelInternal.selectedIndex", tabPanelInternal.selectedIndex);
-         console.log("index", index);
-
          if (index >= 0){
              pagesData.RemoveItem(index);
 
-             if (tabPanelInternal.selectedIndex === index && index > 0){
+             if (tabPanelInternal.selectedIndex >= index && index > 0){
                  tabPanelInternal.selectedIndex--;
              }
+         }
+     }
+
+     function updatePageId(parameters){
+         let oldId = parameters["OldId"];
+         let newId = parameters["NewId"];
+
+         let index;
+         if (oldId === ""){
+             index = tabPanelInternal.selectedIndex;
+         }
+         else{
+             index = multiDocView.getPageIndexById(oldId);
+         }
+
+         if (index >= 0){
+             pagesData.SetData("ItemId", newId, index);
          }
      }
 
@@ -125,7 +139,9 @@ Item {
 
         onCloseItem: {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
-            multiDocView.closePage(pagesData.GetData("ItemId", index));
+
+            let item = pagesData.GetData("Item", index);
+            item.commands.commandActivated("Close");
         }
 
         onRightClicked: {
@@ -191,6 +207,7 @@ Item {
                         dataLoader.item.itemName = model.Title
                         dataLoader.item.commandsId = model.CommandsId
 
+                        pagesData.SetData("Item", dataLoader.item, model.index);
                         docsData.currentIndex = model.index;
                     }
                 }

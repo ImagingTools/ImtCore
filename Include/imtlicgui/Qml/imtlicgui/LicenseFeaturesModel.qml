@@ -73,6 +73,10 @@ Item {
 
                         licenseFeaturesModelContainer.modelLicenseFeatures = dataModelLocal;
                     }
+                    else{
+                        let treeModel = dataModelLocal.AddTreeModel("TreeModel");
+                        licenseFeaturesModelContainer.modelLicenseFeatures =treeModel;
+                    }
                 }
             }
         }

@@ -68,6 +68,10 @@
         <file alias="imtgui/AuxComponents/ServerConnectionManager.qml">Qml/imtgui/AuxComponents/ServerConnectionManager.qml</file>
         <file alias="imtgui/AuxComponents/PagesManager.qml">Qml/imtgui/AuxComponents/PagesManager.qml</file>
         <file alias="imtgui/AuxComponents/CollectionKeyboardManager.qml">Qml/imtgui/AuxComponents/CollectionKeyboardManager.qml</file>
+        <file alias="imtgui/AuxComponents/SaveCommandDelegate.qml">Qml/imtgui/AuxComponents/SaveCommandDelegate.qml</file>
+        <file alias="imtgui/AuxComponents/SortController.qml">Qml/imtgui/AuxComponents/SortController.qml</file>
+        <file alias="imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml">Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml</file>
+        <file alias="imtgui/AuxComponents/DatePicker.qml">Qml/imtgui/AuxComponents/DatePicker.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

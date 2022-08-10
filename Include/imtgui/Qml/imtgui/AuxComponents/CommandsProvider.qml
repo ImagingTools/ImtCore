@@ -29,6 +29,21 @@ Item {
         }
     }
 
+    function getCommandMode(commandId){
+        console.log("CommandsController getCommandMode", commandId);
+
+        for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
+            let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let m_mode = commandsProviderContainer.commandsModel.GetData("Mode", i);
+
+            if (m_commandId == commandId){
+                return m_mode;
+            }
+        }
+
+        return null;
+    }
+
     GqlModel {
         id: modelCommands;
 

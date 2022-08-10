@@ -17,7 +17,7 @@ Item {
         anchors.right: parent.right;
         anchors.left: parent.left;
         anchors.rightMargin: 10;
-        anchors.leftMargin: 10;
+        anchors.leftMargin: 20;
 
         width: inputDialogBodyContainer.width;
 

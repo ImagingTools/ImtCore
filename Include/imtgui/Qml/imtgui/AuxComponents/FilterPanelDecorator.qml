@@ -15,11 +15,11 @@ Item {
 
     NumberAnimation {
         id: animRect;
-        target: filterPanelDecorator;
-        property: "height";
+        target: tfc;
+        property: "width";
         from: 0;
-        to: filterPanelDecorator.height;
-        duration: 500;
+        to: tfc.width;
+        duration: 300;
     }
 
     Row {

@@ -16,6 +16,17 @@ Item {
         buttonsModel.append(buttonObj)
     }
 
+    function setButtonState(buttonId, state){
+        for (let i = 0; i < buttonsModel.count; i++){
+            let id = buttonsModel.get(i).Id;
+
+            if (id == buttonId){
+                buttonsModel.setProperty(i, "Enabled", state);
+                break;
+            }
+        }
+    }
+
     ListModel {
         id: buttonsModel;
     }
@@ -35,15 +46,13 @@ Item {
             delegate: AuxButton {
                 id: delegateButton;
 
-                Component.onCompleted: {
-//                    console.log("AuxButton onCompleted", model.Id, model.Name. model.index);
-                }
-
                 width: 70;
                 height: 25;
 
                 hasText: true;
                 hasIcon: false;
+
+                enabled: model.Enabled;
 
                 textButton: model.Name;
                 borderColor: delegateButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;

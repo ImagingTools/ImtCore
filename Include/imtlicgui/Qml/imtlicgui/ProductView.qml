@@ -18,10 +18,14 @@ Item {
 
     property string rightPanelTitle: qsTr("Features");
 
+    property alias commands: commandsDelegate;
+
     signal selectedItem(string id, string name);
 
     Component.onCompleted: {
-        productModel.SetData("DependentModel", lisensesFeaturesModel.modelLicenseFeatures);
+        productModel.SetData("Id", "");
+        productModel.SetData("Name", "");
+        productModel.SetExternTreeModel("DependentModel", lisensesFeaturesModel.modelLicenseFeatures);
     }
 
     onItemIdChanged: {
@@ -60,13 +64,27 @@ Item {
         id: productModel;
     }
 
+    UndoRedoManager {
+        id: undoRedoManager;
+
+        commandsId: container.commandsId;
+        editorItem: container;
+
+        onModelParsed: {
+            lisensesFeaturesModel.modelLicenseFeatures = productModel.GetData("DependentModel");
+            collectionView.table.elements = productModel.GetData("Items");
+
+            updateGui();
+        }
+    }
+
     function updateGui(){
         let index = collectionView.table.selectedIndex;
         collectionView.table.selectedIndex = -1;
         collectionView.table.selectedIndex = index;
 
-//        inputId.text = productModel.GetData("Id");
-//        inputName.text = productModel.GetData("Name");
+        inputId.text = productModel.GetData("Id");
+        inputName.text = productModel.GetData("Name");
 
         collectionView.table.elements.Refresh();
     }
@@ -78,15 +96,20 @@ Item {
         anchors.right: splitter.left;
 
         hasPagination: false;
+        hasFilter: false;
+        hasSort: false;
 
         height: parent.height;
 
         onSelectedItem: {
-            commandsDelegate.commandHandle("Edit");
+            commandsDelegate.commandActivated("Edit");
         }
 
         onElementsChanged: {
-            productModel.SetData("Items", collectionView.table.elements);
+            productModel.SetExternTreeModel("Items", collectionView.table.elements);
+
+            undoRedoManager.model = productModel;
+            commandsDelegate.objectModel = productModel;
         }
     }
 
@@ -96,12 +119,12 @@ Item {
 
     ProductViewCommandsDelegate {
         id: commandsDelegate;
+
         tableData: collectionView.table;
         objectView: container;
-        commandsProvider: commandsProvider;
+        showInputIdDialog: false;
 
         commandsId: container.commandsId;
-        objectModel: productModel;
     }
 
     Splitter {
@@ -126,7 +149,7 @@ Item {
         }
     }
 
-    Column {
+    Item {
         id: rightPanel;
 
         anchors.left: splitter.right;
@@ -134,103 +157,108 @@ Item {
         width: container.width > 0 ? container.width - collectionView.width : 250;
         height: parent.height;
 
-        spacing: 5;
+        Column {
+            id: content;
 
-        Text {
-            id: titleId;
+            anchors.fill: parent;
+            anchors.rightMargin: 10;
 
-            anchors.left: headerTreeView.left;
-            anchors.leftMargin: 10;
-
-            text: qsTr("Product-ID");
-            color: Style.textColor;
-            font.pixelSize: Style.fontSize_common;
-            font.family: Style.fontFamily;
-        }
-
-        CustomTextField {
-            id: inputId;
-
-            width: parent.width;
-            height: 30;
-
-            placeHolderText: qsTr("Enter the Product-ID");
-
-            text: itemId;
-
-            onTextChanged: {
-                productModel.SetData("Id", inputId.text);
-            }
-        }
-
-        Text {
-            id: titleName;
-
-            anchors.left: headerTreeView.left;
-            anchors.leftMargin: 10;
-
-            text: qsTr("Product Name");
-            color: Style.textColor;
-            font.pixelSize: Style.fontSize_common;
-            font.family: Style.fontFamily;
-        }
-
-        CustomTextField {
-            id: inputName;
-
-            width: parent.width;
-            height: 30;
-
-            text: itemName;
-
-            placeHolderText: qsTr("Enter the Product Name");
-
-            onTextChanged: {
-                productModel.SetData("Name", inputName.text);
-            }
-        }
-
-        Rectangle {
-            id: headerTreeView;
-
-            width: parent.width;
-            height: 35;
-
-            color: Style.baseColor;
+            spacing: 5;
 
             Text {
-                id: titleHeader;
-
-                anchors.verticalCenter: headerTreeView.verticalCenter;
+                id: titleId;
 
                 anchors.left: headerTreeView.left;
-                anchors.leftMargin: 10;
 
-                text: container.rightPanelTitle;
+                text: qsTr("Product-ID");
                 color: Style.textColor;
                 font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamilyBold;
-                font.bold: true;
+                font.family: Style.fontFamily;
             }
-        }
 
-        ProductTreeViewController {
-            id: treeViewController;
-        }
+            CustomTextField {
+                id: inputId;
 
-        TreeView {
-            id: treeView;
+                width: parent.width;
+                height: 30;
 
-            height: container.height;
-            width: parent.width;
+                placeHolderText: qsTr("Enter the Product-ID");
 
-            clip: true;
+                text: itemId;
 
-            modelItems: treeViewModel.modelTreeView;
-            visible: itemId !== "" && collectionView.table.selectedIndex > -1;
+                onTextChanged: {
+                    productModel.SetData("Id", inputId.text);
+                }
+            }
 
-            onCheckBoxChanged: {
-                treeViewController.checkBoxChanged(state, parentId, childId);
+            Text {
+                id: titleName;
+
+                anchors.left: headerTreeView.left;
+
+                text: qsTr("Product Name");
+                color: Style.textColor;
+                font.pixelSize: Style.fontSize_common;
+                font.family: Style.fontFamily;
+            }
+
+            CustomTextField {
+                id: inputName;
+
+                width: parent.width;
+                height: 30;
+
+                text: itemName;
+
+                placeHolderText: qsTr("Enter the Product Name");
+
+                onTextChanged: {
+                    productModel.SetData("Name", inputName.text);
+                }
+            }
+
+            Rectangle {
+                id: headerTreeView;
+
+                width: parent.width;
+                height: 35;
+
+                color: Style.baseColor;
+
+                Text {
+                    id: titleHeader;
+
+                    anchors.verticalCenter: headerTreeView.verticalCenter;
+
+                    anchors.left: headerTreeView.left;
+                    anchors.leftMargin: 10;
+
+                    text: container.rightPanelTitle;
+                    color: Style.textColor;
+                    font.pixelSize: Style.fontSize_common;
+                    font.family: Style.fontFamilyBold;
+                    font.bold: true;
+                }
+            }
+
+            ProductTreeViewController {
+                id: treeViewController;
+            }
+
+            TreeView {
+                id: treeView;
+
+                height: container.height;
+                width: parent.width;
+
+                clip: true;
+
+                modelItems: treeViewModel.modelTreeView;
+                visible: itemId !== "" && collectionView.table.selectedIndex > -1;
+
+                onCheckBoxChanged: {
+                    treeViewController.checkBoxChanged(state, parentId, childId);
+                }
             }
         }
     }

@@ -17,6 +17,8 @@ Rectangle {
     property string accountId;
     property string productId;
 
+    property alias commands: commandsDelegate;
+
     onVisibleChanged: {
         if (installationEditorContainer.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
@@ -34,10 +36,18 @@ Rectangle {
 
     TreeItemModel {
         id: installationModel;
+    }
 
-//        Component.onCompleted: {
-//            installationModel.AddTreeModel("ActiveLicenses");
-//        }
+    UndoRedoManager {
+        id: undoRedoManager;
+
+        commandsId: installationEditorContainer.commandsId;
+        editorItem: installationEditorContainer;
+
+        onModelParsed: {
+            licensesTable.elements = installationModel.GetData("ActiveLicenses");
+            updateGui();
+        }
     }
 
     CommandsProvider {
@@ -49,10 +59,9 @@ Rectangle {
     InstallationEditorCommandsDelegate {
         id: commandsDelegate;
 
-        commandsProvider: commandsProvider;
         commandsId: installationEditorContainer.commandsId;
 
-        editorItem: installationEditorContainer;
+        objectView: installationEditorContainer;
     }
 
     function updateGui(){

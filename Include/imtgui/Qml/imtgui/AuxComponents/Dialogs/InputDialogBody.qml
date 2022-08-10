@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-Item {
+FocusScope {
     id: inputDialogBodyContainer;
 
     height: columnBody.height + 40;
@@ -46,6 +46,8 @@ Item {
             height: 30;
 
             text: inputDialogBodyContainer.inputValue;
+
+            focus: true;
 
             onTextChanged: {
                 inputDialogBodyContainer.inputValue = inputField.text;

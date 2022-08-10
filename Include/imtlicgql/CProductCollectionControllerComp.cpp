@@ -25,7 +25,7 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(
 		if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
-		else if (informationId == QByteArray("ModificationTime")){
+		else if (informationId == QByteArray("LastModified")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
 		}
 	}

@@ -3,14 +3,10 @@ import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
 
-Item {
+DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
-    property Item editorItem: null;
-    property Item commandsProvider: null;
-
-    property string itemId: editorItem.itemId;
-    property string commandsId;
+    property string itemId: objectView.itemId;
 
     property string itemsInfoModel;
 
@@ -21,18 +17,14 @@ Item {
     property string gqlModelQueryTypeNotify;
 
     signal modelItemsLoaded();
+    signal itemLoaded();
 
     Component.onCompleted: {
         itemsModel.updateModel("AccountsList");
     }
 
-    onVisibleChanged: {
-        if (container.visible){
-            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-        }
-        else{
-            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
-        }
+    onItemLoaded: {
+        undoRedoManager.model = installationModel;
     }
 
     onModelItemsLoaded: {
@@ -77,17 +69,12 @@ Item {
         licensesModel.updateModel(productId);
     }
 
-    onCommandsIdChanged: {
-        console.log("InstallationCommands onCommandsIdChanged", container.commandsId);
-        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-    }
-
     Component {
         id: inputDialog;
         InputDialog {
             onFinished: {
                 if (buttonId == "Ok"){
-                    editorItem.itemName = inputValue;
+                    objectView.itemName = inputValue;
                     saveQuery.updateModel();
                 }
             }
@@ -102,26 +89,26 @@ Item {
         }
     }
 
-    function commandHandle(commandId){
-        console.log("InstallationCommands commandActivated", commandId);
+//    function commandHandle(commandId){
+//        console.log("InstallationCommands commandActivated", commandId);
 
-        if (commandId === "Save"){
-            if (itemId === ""){
-                gqlModelQueryType = "InstallationAdd";
-                gqlModelQueryTypeNotify = "addedNotification";
+//        if (commandId === "Save"){
+//            if (itemId === ""){
+//                gqlModelQueryType = "InstallationAdd";
+//                gqlModelQueryTypeNotify = "addedNotification";
 
-                modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the installation:")});
-            }
-            else{
-                gqlModelQueryType = "InstallationUpdate";
-                gqlModelQueryTypeNotify = "updatedNotification";
-                saveQuery.updateModel();
-            }
-        }
-        else if (commandId === "Close"){
-            multiDocView.closePage("");
-        }
-    }
+//                modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the installation:")});
+//            }
+//            else{
+//                gqlModelQueryType = "InstallationUpdate";
+//                gqlModelQueryTypeNotify = "updatedNotification";
+//                saveQuery.updateModel();
+//            }
+//        }
+//        else if (commandId === "Close"){
+//            multiDocView.closePage("");
+//        }
+//    }
 
     GqlModel {
         id: itemModel;
@@ -173,83 +160,84 @@ Item {
                         licensesTable.elements = dataModelLocal.GetData("ActiveLicenses");
 
                         updateGui();
+                        itemLoaded();
                     }
                 }
             }
         }
     }//GqlModel itemModel
 
-    GqlModel {
-        id: saveQuery;
+//    GqlModel {
+//        id: saveQuery;
 
-        function updateModel() {
-            console.log( "InstallationInfoEditor saveQuery updateModel");
+//        function updateModel() {
+//            console.log( "InstallationInfoEditor saveQuery updateModel");
 
-            var query = Gql.GqlRequest("query", gqlModelQueryType);
+//            var query = Gql.GqlRequest("query", gqlModelQueryType);
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.itemId);
-            inputParams.InsertField("Name", editorItem.itemName);
-            query.AddParam(inputParams);
+//            var inputParams = Gql.GqlObject("input");
+//            inputParams.InsertField("Id", container.itemId);
+//            inputParams.InsertField("Name", objectView.itemName);
+//            query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject(gqlModelQueryTypeNotify);
+//            var queryFields = Gql.GqlObject(gqlModelQueryTypeNotify);
 
-            var jsonString = installationModel.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-            inputParams.InsertField ("Item", jsonString);
+//            var jsonString = installationModel.toJSON();
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+//            inputParams.InsertField ("Item", jsonString);
 
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Successed");
+//            queryFields.InsertField("Id");
+//            queryFields.InsertField("Successed");
 
-            query.AddField(queryFields);
+//            query.AddField(queryFields);
 
-            var gqlData = query.GetQuery();
-            console.log("InstallationInfoEditot save model query ", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
+//            var gqlData = query.GetQuery();
+//            console.log("InstallationInfoEditot save model query ", gqlData);
+//            this.SetGqlQuery(gqlData);
+//        }
 
-        onStateChanged: {
-            console.log("State:", this.state, saveQuery);
-            if (this.state === "Ready"){
-                var dataModelLocal;
+//        onStateChanged: {
+//            console.log("State:", this.state, saveQuery);
+//            if (this.state === "Ready"){
+//                var dataModelLocal;
 
-                if (saveQuery.ContainsKey("errors")){
+//                if (saveQuery.ContainsKey("errors")){
 
-                    dataModelLocal = saveQuery.GetData("errors");
+//                    dataModelLocal = saveQuery.GetData("errors");
 
-                    dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryType);
+//                    dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryType);
 
-                    if (dataModelLocal){
-                        var messageError = dataModelLocal.GetData("message");
+//                    if (dataModelLocal){
+//                        var messageError = dataModelLocal.GetData("message");
 
-                        modalDialogManager.openDialog(inputDialog, {"message": messageError});
-                    }
+//                        modalDialogManager.openDialog(inputDialog, {"message": messageError});
+//                    }
 
-                    return;
-                }
-                if (saveQuery.ContainsKey("data")){
-                    dataModelLocal = saveQuery.GetData("data");
-                    if (dataModelLocal.ContainsKey(container.gqlModelQueryType)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryType);
+//                    return;
+//                }
+//                if (saveQuery.ContainsKey("data")){
+//                    dataModelLocal = saveQuery.GetData("data");
+//                    if (dataModelLocal.ContainsKey(container.gqlModelQueryType)){
+//                        dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryType);
 
-                        if (dataModelLocal.ContainsKey(container.gqlModelQueryTypeNotify)){
-                            dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryTypeNotify);
+//                        if (dataModelLocal.ContainsKey(container.gqlModelQueryTypeNotify)){
+//                            dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryTypeNotify);
 
-                            if (dataModelLocal.ContainsKey("Id")){
-                                container.itemId = dataModelLocal.GetData("Id");
-                            }
+//                            if (dataModelLocal.ContainsKey("Id")){
+//                                container.itemId = dataModelLocal.GetData("Id");
+//                            }
 
-                            if (dataModelLocal.ContainsKey("Name")){
-                                let name = dataModelLocal.GetData("Name");
-                                multiDocView.updatePageTitle({"ItemId": "", "Title": name});
-                            }
-                            Events.sendEvent(commandsId + "CollectionUpdateGui");
-                        }
-                    }
-                }
-            }
-        }
-    }//GqlModel saveQuery
+//                            if (dataModelLocal.ContainsKey("Name")){
+//                                let name = dataModelLocal.GetData("Name");
+//                                multiDocView.updatePageTitle({"ItemId": "", "Title": name});
+//                            }
+//                            Events.sendEvent(commandsId + "CollectionUpdateGui");
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }//GqlModel saveQuery
 
     GqlModel {
         id: itemsModel;
@@ -351,7 +339,7 @@ Item {
                             }
 
                             licensesTable.elements = dataModelLocal;
-                            installationModel.SetData("ActiveLicenses", dataModelLocal);
+                            installationModel.SetExternTreeModel("ActiveLicenses", dataModelLocal);
                         }
                     }
                 }

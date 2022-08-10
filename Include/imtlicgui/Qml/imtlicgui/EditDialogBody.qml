@@ -10,11 +10,13 @@ FocusScope {
     property string titleId;
     property string titleName;
 
-//    property string valueId;
-//    property string valueName;
-
     property alias inputName: inputName.text;
     property alias inputId: inputId.text;
+
+    property alias inputNameField: inputName;
+    property alias inputIdField: inputId;
+
+    property bool autoGenerate: false;
 
     Column {
         id: bodyColumn;
@@ -44,14 +46,8 @@ FocusScope {
             width: bodyColumn.width;
             height: 30;
 
-//            text: container.valueName;
-            focus: true;
-
-            onTextChanged: {
-                container.valueName = inputName.text;
-            }
+            textInputFocus: true;
         }
-
 
         Text {
             anchors.topMargin: 10;
@@ -69,20 +65,25 @@ FocusScope {
             width: bodyColumn.width;
             height: 30;
 
-//            text: container.valueId;
+            onTextInputFocusChanged: {
+                if (textInputFocus && autoGenerate && inputId.text == ""){
+                    generateKey();
+                }
+            }
 
             onTextChanged: {
-                if(checkInputId(inputId.text)){
-//                    container.valueId = inputId.text;
-                }
-                else{
-
-                }
+                let state = checkValidId(inputId.text);
+                buttonsDialog.setButtonState("Ok", state);
             }
         }
     }
 
-    function checkInputId(inputId){
+    function checkValidId(inputId){
+
+        if (inputId == ""){
+            return false
+        }
+
         for (let i = 0; i < model.GetItemsCount(); i++){
             let id = model.GetData("Id", i);
             if (id === inputId){
@@ -91,5 +92,14 @@ FocusScope {
         }
 
         return true;
+    }
+
+    function generateKey(){
+        console.log("EditDialog generateKey...");
+        if (inputName.text !== "") {
+            var key = inputName.text;
+            key = key.replace(/\s+/g, '');
+            inputId.text = key;
+        }
     }
 }

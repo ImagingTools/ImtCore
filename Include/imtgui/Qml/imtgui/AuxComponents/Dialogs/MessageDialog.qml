@@ -13,8 +13,8 @@ Dialog {
     }
 
     Component.onCompleted: {
-        messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes"});
-        messageDialog.buttons.addButton({"Id":"No", "Name":"No"});
+        messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes", "Enabled": true});
+        messageDialog.buttons.addButton({"Id":"No", "Name":"No", "Enabled": true});
         messageDialog.bodySource = "MessageDialogBody.qml";
         messageDialog.title = qsTr("Message");
     }

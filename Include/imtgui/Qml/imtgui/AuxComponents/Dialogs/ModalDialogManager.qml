@@ -5,6 +5,10 @@ Item {
 
     property alias backgroundItem: background;
 
+    Component.onDestruction: {
+        modalDialogModels.clear();
+    }
+
     ListModel {
         id: modalDialogModels;
     }
@@ -57,8 +61,6 @@ Item {
             Loader {
                 id: dialogLoader;
 
-//                anchors.centerIn: dialogDelegate;
-
                 sourceComponent: model.Component;
 
                 onLoaded: {
@@ -70,6 +72,8 @@ Item {
                     if (dialogLoader.item.centered){
                         dialogLoader.anchors.centerIn = dialogDelegate;
                     }
+
+                    dialogLoader.item.forceActiveFocus();
                 }
             }
         }

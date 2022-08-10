@@ -11,6 +11,8 @@ Dialog {
     property string valueId;
     property string valueName;
 
+    property bool autoGenerate: false;
+
     property TreeItemModel model;
 
     onFinished: {
@@ -38,9 +40,13 @@ Dialog {
         container.bodyItem.inputName = container.valueName;
     }
 
+    onAutoGenerateChanged: {
+        container.bodyItem.autoGenerate = container.autoGenerate;
+    }
+
     Component.onCompleted: {
-        container.buttons.addButton({"Id":"Ok", "Name":"OK"});
-        container.buttons.addButton({"Id":"Cancel", "Name":"Cancel"});
+        container.buttons.addButton({"Id": "Ok", "Name": "OK", "Enabled": true});
+        container.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
 
         container.bodySource = "../../../imtlicgui/EditDialogBody.qml";
         container.title = qsTr("Edit");

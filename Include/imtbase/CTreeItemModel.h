@@ -20,12 +20,14 @@ namespace imtbase
 /**
 	Universal data controller for UI representations
 */
-class CTreeItemModel: public QAbstractListModel, public istd::TChangeDelegator<iser::ISerializable>
+class CTreeItemModel: public QAbstractListModel, public istd::CChangeDelegator, public iser::ISerializable
 {
 	Q_OBJECT
 	Q_PROPERTY(QString state READ State WRITE SetState NOTIFY stateChanged)
 
 public:
+	typedef istd::CChangeDelegator BaseClass;
+
 	explicit CTreeItemModel(QObject* parent = nullptr);
 	~CTreeItemModel();
 
@@ -73,9 +75,12 @@ public Q_SLOTS:
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	virtual QHash<int, QByteArray> roleNames() const override;
 
+	virtual void OnEndChanges(const ChangeSet& changeSet) override;
+
 Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
+	void modelChanged();
 
 private:
 	class Item

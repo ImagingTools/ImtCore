@@ -8,10 +8,7 @@ JSONListModel {
     property var queryParams: [];
     property bool isArray: false;
 
-//    function get(row){
-//        return container.get(row)
-//    }
-
+    signal modelChanged();
 
     function GetItemsCount(){
         return this.count

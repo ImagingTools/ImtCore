@@ -41,10 +41,10 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 				return nullptr;
 			}
 
-			QString accountName = accountInfoPtr->GetAccountName();
-			QString accountDescription = accountInfoPtr->GetAccountDescription();
+			QString Name = accountInfoPtr->GetAccountName();
+			QString Description = accountInfoPtr->GetAccountDescription();
 
-			QByteArray accountId = accountName.toUtf8();
+			QByteArray accountId = Name.toUtf8();
 
 			QByteArray accountTypeId;
 			imtauth::IAccountInfo::AccountType accountType = accountInfoPtr->GetAccountType();
@@ -69,8 +69,8 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 			}
 
 			itemModel->SetData("Id", accountId);
-			itemModel->SetData("AccountName", accountName);
-			itemModel->SetData("AccountDescription", accountDescription);
+			itemModel->SetData("Name", Name);
+			itemModel->SetData("Description", Description);
 			itemModel->SetData("AccountType", accountTypeId);
 			itemModel->SetData("FirstName", firstName);
 			itemModel->SetData("LastName", lastName);
@@ -126,8 +126,8 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
-		if (itemModel.ContainsKey("AccountName")){
-			name = itemModel.GetData("AccountName").toString();
+		if (itemModel.ContainsKey("Name")){
+			name = itemModel.GetData("Name").toString();
 			accountInfoPtr->SetAccountName(name);
 			objectId = name.toUtf8();
 
@@ -137,8 +137,8 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			}
 		}
 
-		if (itemModel.ContainsKey("AccountDescription")){
-			description = itemModel.GetData("AccountDescription").toString();
+		if (itemModel.ContainsKey("Description")){
+			description = itemModel.GetData("Description").toString();
 			accountInfoPtr->SetAccountDescription(description);
 		}
 

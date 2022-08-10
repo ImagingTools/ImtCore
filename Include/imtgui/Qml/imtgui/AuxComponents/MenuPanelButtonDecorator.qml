@@ -5,8 +5,8 @@ import imtqml 1.0
 Item {
     id: leftPanelElement;
 
-    width: 75;
-    height: 75;
+    width: 80;
+    height: 80;
 
     property string title: "";
     property string imageSource: "";

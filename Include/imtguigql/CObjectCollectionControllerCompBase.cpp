@@ -182,12 +182,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 	QByteArray newObjectId;
+	QString name, description;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 	}
 	else{
-		QString name, description;
 		QByteArray objectId;
 
 		QString splitObjectId;
@@ -216,6 +216,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		dataModel = new imtbase::CTreeItemModel();
 		notificationModel = new imtbase::CTreeItemModel();
 		notificationModel->SetData("Id", newObjectId);
+		notificationModel->SetData("Name", name);
 		dataModel->SetExternTreeModel("addedNotification", notificationModel);
 	}
 
@@ -581,7 +582,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 						elementInformation = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					}
-					else if (informationId == QByteArray("ModificationTime")){
+					else if (informationId == QByteArray("LastModified")){
 						elementInformation = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
 							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					}

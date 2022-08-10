@@ -16,6 +16,8 @@ Rectangle {
 
     property Item rootItem;
 
+    property alias commands: commandsDelegate;
+
     onWidthChanged: {
         console.log("AccountEditor onWidthChanged", accountEditorContainer.width);
     }
@@ -29,17 +31,13 @@ Rectangle {
 
     TreeItemModel {
         id: accountModel;
-
-        onDataChanged: {
-            console.log("accountModel onDataChanged");
-            undoRedoManager.modelChanged();
-        }
     }
 
     UndoRedoManager {
         id: undoRedoManager;
 
         commandsId: accountEditorContainer.commandsId;
+        editorItem: accountEditorContainer;
 
         onModelParsed: {
             updateGui();
@@ -54,17 +52,16 @@ Rectangle {
 
     AccountEditorCommandsDelegate {
         id: commandsDelegate;
-
-        commandsProvider: commandsProvider;
         commandsId: accountEditorContainer.commandsId;
 
-        editorItem: accountEditorContainer;
+        objectView: accountEditorContainer;
+        objectModel: accountModel;
     }
 
     function updateGui(){
         console.log("AccountEditor updateGui");
-        accountNameInput.text = accountModel.GetData("AccountName");
-        accountDescriptionInput.text = accountModel.GetData("AccountDescription");
+        accountNameInput.text = accountModel.GetData("Name");
+        accountDescriptionInput.text = accountModel.GetData("Description");
 
         for (let i = 0; i < accountOwnerModel.count; i++){
             let id = accountOwnerModel.get(i).Id;
@@ -121,7 +118,8 @@ Rectangle {
 
                 onTextChanged: {
                     console.log("AccountEditor onTextChanged");
-                    accountModel.SetData("AccountName", accountNameInput.text);
+                    accountModel.SetData("Id", accountNameInput.text);
+                    accountModel.SetData("Name", accountNameInput.text);
                 }
             }
 
@@ -140,7 +138,7 @@ Rectangle {
                 width: bodyColumn.width;
 
                 onTextChanged: {
-                    accountModel.SetData("AccountDescription", accountDescriptionInput.text);
+                    accountModel.SetData("Description", accountDescriptionInput.text);
                 }
             }
 
@@ -218,7 +216,6 @@ Rectangle {
                     }
                 }// Company address block
             }//Company address block borders
-
 
             Text {
                 text: qsTr("Account Owner");

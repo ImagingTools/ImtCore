@@ -7,8 +7,10 @@ Item {
     height: 40;
 
     property alias text: textField.text;
-
     property alias acceptableInput: textField.acceptableInput;
+    property alias textInputFocus: textField.focus;
+    property alias textInputMask: textField.inputMask;
+    property alias textInputValidator: textField.validator;
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;
@@ -22,19 +24,7 @@ Item {
     signal accepted();
 
     onFocusChanged: {
-        console.log('CustomTextField onFocusChanged', containerTextField.focus);
-
-//        if (focus){
-//            textField.focus = focus;
-//        }
-    }
-
-    function setMask(mask){
-        textField.inputMask = mask;
-    }
-
-    function setValidator(validator){
-        textField.validator = validator;
+        console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus)
     }
 
     Rectangle {
@@ -72,11 +62,8 @@ Item {
         selectByMouse: true;
         clip: true;
 
-//        focus: true;
-
         onFocusChanged: {
-            console.log("TextInput onFocusChanged", textField.focus)
-
+            console.log("CustomTextField onFocusChanged", textField.text, textField.focus)
         }
 
         onAccepted: {

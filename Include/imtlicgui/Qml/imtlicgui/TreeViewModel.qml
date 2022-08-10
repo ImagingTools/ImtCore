@@ -170,11 +170,12 @@ Item {
     function resetProperties(){
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
             let childrenItems = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
-
-            for (let j = 0; j < childrenItems.GetItemsCount(); j++){
-                childrenItems.SetData("stateChecked", 0, j);
-                childrenItems.SetData("isActive", 1, j);
-                childrenItems.SetData("visible", 1, j);
+            if (childrenItems){
+                for (let j = 0; j < childrenItems.GetItemsCount(); j++){
+                    childrenItems.SetData("stateChecked", 0, j);
+                    childrenItems.SetData("isActive", 1, j);
+                    childrenItems.SetData("visible", 1, j);
+                }
             }
         }
     }
@@ -191,38 +192,15 @@ Item {
                 if (modelChildren){
                     let childIndex = modelChildren.InsertNewItem();
 
-
+                    modelChildren.SetData("Id", featureId, childIndex);
+                    modelChildren.SetData("Name", featureName, childIndex);
+                    modelChildren.SetData("stateChecked", 0, childIndex);
+                    modelChildren.SetData("level", 1, childIndex);
+                    modelChildren.SetData("visible", 0, childIndex);
+                    modelChildren.SetData("isActive", 1, childIndex);
+                    modelChildren.SetData("packageId", packageId, childIndex);
+                    break;
                 }
-                var childIndex = -1;
-                var stateChecked = 0;
-                var level = 1;
-                var visible = 0;
-                var isActive = 1;
-
-                for (var j = 0; j < modelChildren.GetItemsCount(); j++){
-                    var currentFeatureId = modelChildren.GetData("Id", j);
-                    if (currentFeatureId == featureId){
-                        childIndex = j;
-                        stateChecked = modelChildren.GetData("stateChecked", j);
-                        level = modelChildren.GetData("level", j);
-                        visible = modelChildren.GetData("visible", j);
-                        isActive = modelChildren.GetData("isActive", j);
-                        break;
-                    }
-                }
-
-                if (childIndex === -1){
-                    childIndex = modelChildren.InsertNewItem();
-                }
-
-                modelChildren.SetData("Id", featureId, childIndex);
-                modelChildren.SetData("Name", featureName, childIndex);
-                modelChildren.SetData("stateChecked", stateChecked, childIndex);
-                modelChildren.SetData("level", level, childIndex);
-                modelChildren.SetData("visible", visible, childIndex);
-                modelChildren.SetData("isActive", isActive, childIndex);
-                modelChildren.SetData("packageId", packageId, childIndex);
-                break;
             }
         }
     }

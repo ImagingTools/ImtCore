@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-
 Rectangle {
     id: dialogContainer;
 
@@ -23,6 +22,14 @@ Rectangle {
 
     signal finished(string buttonId);
 
+    onFocusChanged: {
+        console.log("Dialog onFocusChanged", focus);
+
+        if (focus){
+            loaderBodyDialog.item.focus = true;
+        }
+    }
+
     onRootChanged: {
         root.backgroundItem.opacity = 0.4;
     }
@@ -37,6 +44,11 @@ Rectangle {
 
     onBodySourceChanged: {
         loaderBodyDialog.source = dialogContainer.bodySource;
+    }
+
+    MouseArea {
+        anchors.fill: parent;
+        onClicked: {}
     }
 
     Column {
@@ -62,8 +74,6 @@ Rectangle {
                 console.log("Dialog onItemChanged", loaderBodyDialog.item);
                 if (loaderBodyDialog.item){
                     loaderBodyDialog.item.width = dialogContainer.width;
-
-                     loaderBodyDialog.item.focus = true;
                 }
             }
         }
