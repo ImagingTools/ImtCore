@@ -10,7 +10,7 @@ Item {
 
     onStartPageObjChanged: {
         console.log("multiDocPageView onStartPageObjChanged");
-        multiDocView.addPage(multiDocPageView.startPageObj)
+        multiDocView.addDocument(multiDocPageView.startPageObj)
     }
 
     MultiDocWorkspaceView {

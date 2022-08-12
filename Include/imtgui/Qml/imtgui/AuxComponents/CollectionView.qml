@@ -4,11 +4,9 @@ import imtgui 1.0
 import imtlicgui 1.0
 
 Item {
-    id: collectionViewBaseContainer;
+    id: collectionViewContainer;
 
     anchors.fill: parent;
-
-    property Item rootItem; //MultiDoc
 
     property alias baseCollectionView: collectionViewBase;
 
@@ -16,39 +14,46 @@ Item {
     property string itemName;
 
     property string commandsId;
-
-    property string commandsDelegatePath;
-
+    property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
     property string commandUpdateGui;
+    property alias commands: commandsLoader.item;
+
+    /**
+        Если true -> данные будут запрошены с сервера,
+        иначе нужно будет подставлять данные вручную
+      */
+    property bool loadData: true;
 
     Component.onCompleted: {
         collectionViewBase.forceActiveFocus();
     }
 
     onCommandUpdateGuiChanged: {
-        Events.subscribeEvent(collectionViewBaseContainer.commandUpdateGui, collectionViewBaseContainer.updateGui);
+        Events.subscribeEvent(commandUpdateGui, updateGui);
     }
 
     onVisibleChanged: {
-        if (collectionViewBaseContainer.visible){
+        if (visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                                       "CommandsId": commandsProvider.commandsId});
         }
     }
 
     onCommandsIdChanged: {
-        console.log("collectionViewBaseContainer onItemIdChanged", collectionViewBaseContainer.itemId);
+        console.log("this onItemIdChanged", itemId);
 
-        commandsProvider.commandsId = collectionViewBaseContainer.commandsId;
+        commandsProvider.commandsId = commandsId;
 
-        collectionViewBase.commands.gqlModelObjectView = collectionViewBaseContainer.commandsId + "ObjectView";
-        collectionViewBase.commands.gqlModelHeadersInfo = collectionViewBaseContainer.commandsId + "Info";
-        collectionViewBase.commands.gqlModelItemsInfo = collectionViewBaseContainer.commandsId + "List";
+        if (loadData){
+            collectionViewBase.commands.gqlModelObjectView = commandsId + "ObjectView";
+            collectionViewBase.commands.gqlModelHeadersInfo = commandsId + "Info";
+            collectionViewBase.commands.gqlModelItemsInfo = commandsId + "List";
+        }
 
-        collectionMetaInfo.gqlModelMetaInfo = collectionViewBaseContainer.commandsId + "MetaInfo";
+        collectionMetaInfo.gqlModelMetaInfo = commandsId + "MetaInfo";
 
         if (commandsLoader.item){
-            commandsLoader.item.commandsId = collectionViewBaseContainer.commandsId;
+            commandsLoader.item.commandsId = commandsId;
 
             commandsLoader.item.gqlModelItem = commandsLoader.item.commandsId + "Item";
             commandsLoader.item.gqlModelRemove = commandsLoader.item.commandsId + "Remove";
@@ -61,20 +66,26 @@ Item {
         collectionViewBase.commands.updateModels();
     }
 
+    function selectItem(id, name){
+        console.log("CollectionView selectItem", id, name);
+        let editorPath = collectionViewBase.commands.objectViewEditorPath;
+        let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
+
+        multiDocView.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+    }
+
     Loader {
         id: commandsLoader;
 
         Component.onCompleted: {
-            console.log("commandsLoader.source", collectionViewBaseContainer.commandsDelegatePath);
-            commandsLoader.source = collectionViewBaseContainer.commandsDelegatePath;
+            console.log("commandsLoader.source", commandsDelegatePath);
+            commandsLoader.source = commandsDelegatePath;
         }
 
         onItemChanged: {
             console.log("commandsLoader onItemChanged", commandsLoader.item);
             if (commandsLoader.item){
-                commandsLoader.item.collectionView = collectionViewBaseContainer;
                 commandsLoader.item.tableData = collectionViewBase.table;
-                commandsLoader.item.commandsProvider = commandsProvider;
             }
         }
     }
@@ -87,9 +98,9 @@ Item {
         id: collectionViewBase;
 
         anchors.right: collectionMetaInfo.left;
-        anchors.left: collectionViewBaseContainer.left;
-        anchors.top: collectionViewBaseContainer.top;
-        anchors.bottom: collectionViewBaseContainer.bottom;
+        anchors.left: parent.left;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
 
         onSelectedIndexChanged: {
             console.log("CollectionViewBase onSelectedIndexChanged");
@@ -98,11 +109,7 @@ Item {
 
         onSelectedItem: {
             console.log("CollectionViewBase onItemSelected");
-
-            let editorPath = collectionViewBase.commands.objectViewEditorPath;
-            let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
-
-            multiDocView.addPage({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+            selectItem(id, name);
         }
     }
 

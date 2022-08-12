@@ -125,7 +125,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				QString featureDescription = featuresModelPtr->GetData("Description", i).toString();
 
 				if (featureId.isEmpty()){
-					errorMessage = QObject::tr("%1 has an empty ID!").arg(featureName);
+					errorMessage = QT_TR_NOOP(featureName + " has an empty Feature-ID!");
 
 					return nullptr;
 				}

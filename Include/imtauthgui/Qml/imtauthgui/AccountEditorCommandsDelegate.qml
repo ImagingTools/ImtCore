@@ -6,8 +6,15 @@ import imtqml 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
-    onItemIdChanged: {
+    signal itemUpdate();
+
+    Component.onCompleted: {
+        container.itemIdChanged.connect(itemUpdate)
+    }
+
+    onItemUpdate: {
         accountItemModel.updateModel();
+        container.itemIdChanged.disconnect(itemUpdate)
     }
 
     GqlModel {
@@ -22,14 +29,12 @@ DocumentWorkspaceCommandsDelegateBase {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("item");
-
             queryFields.InsertField("Name");
             queryFields.InsertField("Description");
             queryFields.InsertField("FirstName");
             queryFields.InsertField("LastName");
             queryFields.InsertField("NickName");
             queryFields.InsertField("Email");
-
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -65,6 +70,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
 
                             undoRedoManager.model = accountModel;
+                            container.objectModel = accountModel
                         }
                     }
                 }

@@ -7,6 +7,7 @@ CollectionView {
     id: packageCollectionViewContainer;
 
     Component.onCompleted: {
+        console.log("PackageCollection onCompleted", model.index);
         packageCollectionViewContainer.commandUpdateGui = "PackageCollectionUpdateGui";
         packageCollectionViewContainer.commandsDelegatePath = "../../imtlicgui/PackageCollectionViewCommandsDelegate.qml";
     }

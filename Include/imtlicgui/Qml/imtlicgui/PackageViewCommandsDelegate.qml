@@ -21,7 +21,6 @@ DocumentWorkspaceCommandsDelegate {
     onSaved: {
         console.log("PackageView onSaved");
         Events.sendEvent("TreeViewModelUpdate");
-        Events.sendEvent(commandsId + "CollectionUpdateGui");
     }
 
     onClosed: {

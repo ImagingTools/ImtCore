@@ -32,7 +32,7 @@ Rectangle {
 //        tabPanelContainer.count = 0
 //    }
 
-//    function addPage(str){
+//    function addDocument(str){
 //        tabPanelContainer.headersArray.push(str);
 //        tabPanelContainer.count = tabPanelContainer.headersArray.length
 //        tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1

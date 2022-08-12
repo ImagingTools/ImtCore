@@ -9,6 +9,7 @@ Item {
     property Item editorItem;
 
     signal modelParsed();
+    signal commandActivated(string commandId);
 
     onModelChanged: {
         console.log("undoRedoManager onModelChanged");
@@ -28,10 +29,13 @@ Item {
     }
 
     onVisibleChanged: {
+        console.log("UndoRedoManager onVisibleChanged", undoRedoManager.visible);
         if (undoRedoManager.visible){
+            model.modelChanged.connect(modelUpdated);
             Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
         }
         else{
+            model.modelChanged.disconnect(modelUpdated);
             Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle)
         }
     }
@@ -44,14 +48,14 @@ Item {
     Shortcut {
         sequence: "Ctrl+Z";
         onActivated: {
-            commandHandle("Undo");
+            commandActivated("Undo");
         }
     }
 
     Shortcut {
         sequence: "Ctrl+Shift+Z";
         onActivated: {
-            commandHandle("Redo");
+            commandActivated("Redo");
         }
     }
 
@@ -89,6 +93,8 @@ Item {
         else if (commandId === "Redo"){
             result = undoRedo.redo();
         }
+
+        commandActivated(commandId);
 
         if (result !== null){
 

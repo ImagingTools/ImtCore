@@ -31,7 +31,6 @@ Item {
             return;
         }
 
-        console.log("1", licenseFeaturesModelContainer.modelLicenseFeatures.toJSON());
         let keys = licenseFeaturesModelContainer.modelLicenseFeatures.GetKeys();
         for (let i = 0; i < keys.length; i++){
             let value = licenseFeaturesModelContainer.modelLicenseFeatures.GetData(keys[i]);

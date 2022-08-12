@@ -9,6 +9,10 @@ Rectangle {
 
     property bool loginDialog: false;
 
+    Component.onCompleted: {
+        console.log("TopPanel onCompleted");
+    }
+
     function updateModels(){
         modelUserMode.getUserMode();
     }
@@ -23,6 +27,10 @@ Rectangle {
         id: topPanelDecoratorLoader;
 
         source: Style.topPanelDecoratorPath;
+
+        onSourceChanged: {
+            console.log("TopPanel onSourceChanged", source);
+        }
 
         onItemChanged: {
             if (topPanelDecoratorLoader.item){

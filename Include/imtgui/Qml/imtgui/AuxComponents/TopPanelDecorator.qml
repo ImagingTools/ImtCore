@@ -14,6 +14,8 @@ Item {
         console.log("topPanelDecorator onCompleted")
     }
 
+
+
     TopCenterPanel {
         id: topCenterPanel;
 

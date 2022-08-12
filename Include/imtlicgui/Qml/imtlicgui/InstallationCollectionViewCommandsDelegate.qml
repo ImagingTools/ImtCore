@@ -6,10 +6,9 @@ import QtQuick.Dialogs 1.3
 CollectionViewCommandsDelegateBase {
     id: container;
 
-    onCommandsIdChanged: {
-        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-    }
-
+//    onCommandsIdChanged: {
+//        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
+//    }
 
     onSelectedIndexChanged: {
         console.log("InstallationCollectionViewContainer onSelectedIndexChanged");
@@ -19,21 +18,33 @@ CollectionViewCommandsDelegateBase {
         container.commandsProvider.changeCommandMode("CreateLicense", mode);
     }
 
-    function commandHandle(commandId){
+    onCommandActivated: {
         console.log("InstallationCollectionViewContainer commandActivated", commandId);
-
         if (commandId === "Duplicate"){
             let itemId = container.collectionView.baseCollectionView.table.getSelectedId();
             let itemName = container.collectionView.baseCollectionView.table.getSelectedName();
-            container.collectionView.rootItem.addPage({"Id": itemId, "Name": itemName, "Source": container.collectionView.editorPath, "CommandsId": container.collectionView.editorCommandsId});
+            container.collectionView.rootItem.addDocument({"Id": itemId, "Name": itemName, "Source": container.collectionView.editorPath, "CommandsId": container.collectionView.editorCommandsId});
         }
         else if (commandId === "CreateLicense"){
             fileDialogSave.open();
         }
-        else{
-            container.commandHandleBase(commandId);
-        }
     }
+
+//    function commandHandle(commandId){
+//        console.log("InstallationCollectionViewContainer commandActivated", commandId);
+
+//        if (commandId === "Duplicate"){
+//            let itemId = container.collectionView.baseCollectionView.table.getSelectedId();
+//            let itemName = container.collectionView.baseCollectionView.table.getSelectedName();
+//            container.collectionView.rootItem.addDocument({"Id": itemId, "Name": itemName, "Source": container.collectionView.editorPath, "CommandsId": container.collectionView.editorCommandsId});
+//        }
+//        else if (commandId === "CreateLicense"){
+//            fileDialogSave.open();
+//        }
+//        else{
+//            container.commandHandleBase(commandId);
+//        }
+//    }
 
     RemoteFileController {
         id: remoteFileController;

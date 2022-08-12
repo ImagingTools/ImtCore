@@ -36,13 +36,19 @@ Item {
         else {
             this.events[key] = [slot]
         }
+
+        console.log("events[key]", events[key])
     }
 
     function unSubscribeEvent(key, slot){
         console.log("EVENTS unSubscribeEvent", key, slot);
         if(key in this.events){
             var indx = this.events[key].indexOf(slot)
+
+            console.log("indx", indx)
             if(indx >= 0) this.events[key].splice(indx, 1)
         }
+
+        console.log("events[key]", events[key])
     }
 }

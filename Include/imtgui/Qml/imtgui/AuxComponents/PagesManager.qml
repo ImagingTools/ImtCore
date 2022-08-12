@@ -9,10 +9,6 @@ Item {
     property Item activeItem;
     property int activePageIndex: -1;
 
-//    onModelChanged: {
-//        console.log("PagesManager onModelChanged");
-//    }
-
     Repeater {
         id: pagesData;
 

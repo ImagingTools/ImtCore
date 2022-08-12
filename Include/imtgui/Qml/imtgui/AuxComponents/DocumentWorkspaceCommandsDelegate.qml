@@ -28,7 +28,12 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onCommandActivated: {
-        console.log("DocumentCommands onCommandActivated", commandId);
+        console.log("DocumentCommands onCommandActivated", container.itemId, commandId);
+
+        if (!container.visible){
+            return;
+        }
+
         if (commandId === "New"){
             let elements = container.tableData.elements;
             let index = elements.InsertNewItem();

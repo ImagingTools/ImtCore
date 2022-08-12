@@ -5,9 +5,6 @@ import imtqml 1.0
 Rectangle {
     id: topCenterPanel;
 
-//    height: 75;
-//    width: 100;
-
     clip: true;
 
     property Item topPanel;
@@ -26,11 +23,6 @@ Rectangle {
         }
     }
 
-    function setModelButtons(modelLocal){
-        console.log("topCenterPanel setModelButtons", modelLocal);
-        topCenterLvButtons.model = modelLocal;
-    }
-
     Item {
         id: mainItem;
 
@@ -44,12 +36,18 @@ Rectangle {
         Loader {
             id: customLoader;
 
-            onItemChanged: {
-                if (customLoader.item){
-                    customLoader.item.width = topCenterPanel.width;
-                    customLoader.item.height = topCenterPanel.height;
-                }
+            onLoaded: {
+                console.log("customLoader onLoaded");
+                customLoader.item.width = topCenterPanel.width;
+                customLoader.item.height = topCenterPanel.height;
             }
+
+//            onItemChanged: {
+//                if (customLoader.item){
+//                    customLoader.item.width = topCenterPanel.width;
+//                    customLoader.item.height = topCenterPanel.height;
+//                }
+//            }
         }
     }
 }

@@ -33,6 +33,10 @@ Item {
         headerInfoModel.updateModel();
     }
 
+    function updateItemsModel(){
+        itemsInfoModel.updateModel();
+    }
+
     GqlModel {
         id: headerInfoModel;
 
@@ -81,6 +85,7 @@ Item {
                         if(dataModelLocal.ContainsKey("Headers")){
                             dataModelLocal = dataModelLocal.GetData("Headers");
                             gqlModelBaseContainer.headers = dataModelLocal;
+
                             itemsInfoModel.updateModel();
                         }
                     }

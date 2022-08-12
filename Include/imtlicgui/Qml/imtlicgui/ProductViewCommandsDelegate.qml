@@ -15,6 +15,7 @@ DocumentWorkspaceCommandsDelegate {
 
     onCommandActivated: {
         console.log("ProductsCommands onCommandActivated", commandId);
+
         if (commandId === "Duplicate"){
             let elements = container.tableData.elements;
 
@@ -36,11 +37,21 @@ DocumentWorkspaceCommandsDelegate {
 
     onSaved: {
         Events.sendEvent("TreeViewModelUpdate");
-        Events.sendEvent(commandsId + "CollectionUpdateGui");
+//        Events.sendEvent(commandsId + "CollectionUpdateGui");
     }
 
     onClosed: {
         Events.sendEvent("LicenseFeaturesUpdate");
+    }
+
+    onEdited: {
+        let elementsModel = tableData.elements;
+        let oldLicenseId = itemId;
+        let newLicenseId = elementsModel.GetData("Id", selectedIndex);
+
+        if (oldLicenseId != newLicenseId){
+            lisensesFeaturesModel.updateLicensesDependenciesAfterLicenseEditing(oldLicenseId, newLicenseId);
+        }
     }
 
 //    RegExpValidator{

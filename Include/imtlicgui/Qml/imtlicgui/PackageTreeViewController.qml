@@ -39,6 +39,10 @@ Item {
 
     onCheckBoxChanged: {
         console.log("ObjectView TreeView onItemTreeViewCheckBoxStateChanged", state, parentId, childId);
+        console.log("ItemID", itemId);
+        if (!visible){
+            return;
+        }
 
         let rootkey = collectionView.table.getSelectedId();
         let value = childId;

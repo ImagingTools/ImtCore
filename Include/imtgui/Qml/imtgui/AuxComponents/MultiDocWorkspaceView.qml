@@ -24,10 +24,10 @@ Item {
     }
 
     onFocusChanged: {
-        console.log("MultidocWorkspaceView onFocusChanged", multiDocView.focus);
+        console.log("MultidocWorkspaceView onFocusChanged", focus);
 
-        if (multiDocView.focus){
-            multiDocView.activeItem.forceActiveFocus();
+        if (focus){
+            activeItem.forceActiveFocus();
         }
     }
 
@@ -36,18 +36,20 @@ Item {
         multiDocView.forceActiveFocus();
     }
 
-    function addPage(page){
-        console.log("MultidocWorkspaceView addPage", page)
+    function addDocument(document){
+        console.log("MultidocWorkspaceView addDocument", document)
 
-        let itemId = page["Id"];
+        let itemId = document["Id"];
 
-        let pageIndex = multiDocView.getPageIndexById(itemId);
+        let pageIndex = this.getDocumentIndexById(itemId);
         if (pageIndex < 0){
-            var index = pagesData.InsertNewItem();
-            pagesData.SetData("ItemId", itemId, index);
-            pagesData.SetData("Title", page["Name"], index);
-            pagesData.SetData("Source", page["Source"], index);
-            pagesData.SetData("CommandsId", page["CommandsId"], index);
+            var index = documentsData.InsertNewItem();
+
+            //TODO -> Uuid
+            documentsData.SetData("ItemId", itemId, index);
+            documentsData.SetData("Title", document["Name"], index);
+            documentsData.SetData("Source", document["Source"], index);
+            documentsData.SetData("CommandsId", document["CommandsId"], index);
 
             pageIndex = index;
         }
@@ -55,19 +57,11 @@ Item {
         tabPanelInternal.selectedIndex = pageIndex;
     }
 
-     function closePage(itemId){
-         console.log("MultidocWorkspaceView closePage", itemId);
-         let index;
-         if (itemId == ""){
-             console.log("Empty");
-             index = tabPanelInternal.selectedIndex;
-         }
-         else{
-             index = multiDocView.getPageIndexById(itemId);
-         }
-
+    function closeDocument(itemId){
+         console.log("MultidocWorkspaceView closeDocument", itemId);
+         let index = this.getDocumentIndexById(itemId);;
          if (index >= 0){
-             pagesData.RemoveItem(index);
+             documentsData.RemoveItem(index);
 
              if (tabPanelInternal.selectedIndex >= index && index > 0){
                  tabPanelInternal.selectedIndex--;
@@ -75,46 +69,22 @@ Item {
          }
      }
 
-     function updatePageId(parameters){
-         let oldId = parameters["OldId"];
-         let newId = parameters["NewId"];
-
-         let index;
-         if (oldId === ""){
-             index = tabPanelInternal.selectedIndex;
-         }
-         else{
-             index = multiDocView.getPageIndexById(oldId);
-         }
-
-         if (index >= 0){
-             pagesData.SetData("ItemId", newId, index);
-         }
-     }
-
-    function updatePageTitle(parameters){
+    function setDocumentTitle(parameters){
         let itemId = parameters["ItemId"];
         let newTitle = parameters["Title"];
 
-        let index;
-        if (itemId === ""){
-            index = tabPanelInternal.selectedIndex;
-        }
-        else{
-            index = multiDocView.getPageIndexById(itemId);
-        }
-
+        let index = this.getDocumentIndexById(itemId);
         if (index >= 0){
-            pagesData.SetData("Title", newTitle, index);
+            documentsData.SetData("Title", newTitle, index);
         }
     }
 
-    function getPageIndexById(pageId){
-        console.log("MultidocWorkspaceView getPageIndexById", pageId);
+    function getDocumentIndexById(documentId){
+        console.log("MultidocWorkspaceView getPageIndexById", documentId);
 
-        for (var i = 1; i < pagesData.GetItemsCount(); i++){
-            var m_id = pagesData.GetData("ItemId", i);
-            if (m_id === pageId){
+        for (var i = 1; i < documentsData.GetItemsCount(); i++){
+            var m_id = documentsData.GetData("ItemId", i);
+            if (m_id === documentId){
                 return i;
             }
         }
@@ -123,7 +93,7 @@ Item {
     }
 
     TreeItemModel {
-        id: pagesData;
+        id: documentsData;
     }
 
     TabPanel {
@@ -135,17 +105,17 @@ Item {
         anchors.rightMargin: multiDocView.mainMargin;
 
         visible: true;
-        model: pagesData;
+        model: documentsData;
 
         onCloseItem: {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
 
-            let item = pagesData.GetData("Item", index);
-            item.commands.commandActivated("Close");
+            let item = documentsData.GetData("Item", index);
+            item.commands.commandHandler("Close");
         }
 
         onRightClicked: {
-            if (tabPanelInternal.selectedIndex < pagesData.GetItemsCount() - 1) {
+            if (tabPanelInternal.selectedIndex < documentsData.GetItemsCount() - 1) {
                 tabPanelInternal.selectedIndex++;
                 tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
             }
@@ -171,9 +141,7 @@ Item {
         clip: true;
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
-        model: pagesData;
-
-        property int  currentIndex: -1;
+        model: documentsData;
 
         delegate: Item {
             id: docsDataDeleg;
@@ -185,7 +153,7 @@ Item {
 
             onVisibleChanged: {
                 if(docsDataDeleg.visible){
-                    multiDocView.activeItem = dataLoader.item;
+                    activeItem = dataLoader.item;
                 }
             }
 
@@ -199,17 +167,13 @@ Item {
                     dataLoader.source = model.Source;
                 }
 
-                onItemChanged: {
-                    console.log("MultidocWorkspaceView dataLoader onItemChanged", dataLoader.source, docsDataDeleg)
-                    if (dataLoader.item){
-                        dataLoader.item.rootItem = multiDocView;
-                        dataLoader.item.itemId = model.ItemId
-                        dataLoader.item.itemName = model.Title
-                        dataLoader.item.commandsId = model.CommandsId
+                onLoaded: {
+                    dataLoader.item.itemId = model.ItemId
+                    dataLoader.item.itemName = model.Title
 
-                        pagesData.SetData("Item", dataLoader.item, model.index);
-                        docsData.currentIndex = model.index;
-                    }
+                    dataLoader.item.commandsId = model.CommandsId
+
+                    documentsData.SetData("Item", dataLoader.item, model.index);
                 }
             }
         }

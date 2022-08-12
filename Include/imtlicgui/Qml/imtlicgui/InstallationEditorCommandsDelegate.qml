@@ -89,27 +89,6 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }
 
-//    function commandHandle(commandId){
-//        console.log("InstallationCommands commandActivated", commandId);
-
-//        if (commandId === "Save"){
-//            if (itemId === ""){
-//                gqlModelQueryType = "InstallationAdd";
-//                gqlModelQueryTypeNotify = "addedNotification";
-
-//                modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the installation:")});
-//            }
-//            else{
-//                gqlModelQueryType = "InstallationUpdate";
-//                gqlModelQueryTypeNotify = "updatedNotification";
-//                saveQuery.updateModel();
-//            }
-//        }
-//        else if (commandId === "Close"){
-//            multiDocView.closePage("");
-//        }
-//    }
-
     GqlModel {
         id: itemModel;
 
@@ -167,77 +146,6 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }//GqlModel itemModel
 
-//    GqlModel {
-//        id: saveQuery;
-
-//        function updateModel() {
-//            console.log( "InstallationInfoEditor saveQuery updateModel");
-
-//            var query = Gql.GqlRequest("query", gqlModelQueryType);
-
-//            var inputParams = Gql.GqlObject("input");
-//            inputParams.InsertField("Id", container.itemId);
-//            inputParams.InsertField("Name", objectView.itemName);
-//            query.AddParam(inputParams);
-
-//            var queryFields = Gql.GqlObject(gqlModelQueryTypeNotify);
-
-//            var jsonString = installationModel.toJSON();
-//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-//            inputParams.InsertField ("Item", jsonString);
-
-//            queryFields.InsertField("Id");
-//            queryFields.InsertField("Successed");
-
-//            query.AddField(queryFields);
-
-//            var gqlData = query.GetQuery();
-//            console.log("InstallationInfoEditot save model query ", gqlData);
-//            this.SetGqlQuery(gqlData);
-//        }
-
-//        onStateChanged: {
-//            console.log("State:", this.state, saveQuery);
-//            if (this.state === "Ready"){
-//                var dataModelLocal;
-
-//                if (saveQuery.ContainsKey("errors")){
-
-//                    dataModelLocal = saveQuery.GetData("errors");
-
-//                    dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryType);
-
-//                    if (dataModelLocal){
-//                        var messageError = dataModelLocal.GetData("message");
-
-//                        modalDialogManager.openDialog(inputDialog, {"message": messageError});
-//                    }
-
-//                    return;
-//                }
-//                if (saveQuery.ContainsKey("data")){
-//                    dataModelLocal = saveQuery.GetData("data");
-//                    if (dataModelLocal.ContainsKey(container.gqlModelQueryType)){
-//                        dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryType);
-
-//                        if (dataModelLocal.ContainsKey(container.gqlModelQueryTypeNotify)){
-//                            dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryTypeNotify);
-
-//                            if (dataModelLocal.ContainsKey("Id")){
-//                                container.itemId = dataModelLocal.GetData("Id");
-//                            }
-
-//                            if (dataModelLocal.ContainsKey("Name")){
-//                                let name = dataModelLocal.GetData("Name");
-//                                multiDocView.updatePageTitle({"ItemId": "", "Title": name});
-//                            }
-//                            Events.sendEvent(commandsId + "CollectionUpdateGui");
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }//GqlModel saveQuery
 
     GqlModel {
         id: itemsModel;

@@ -26,20 +26,21 @@ Item {
     signal commandActivated(string commandId);
 
     onCommandsIdChanged: {
-        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandActivated);
+        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandler);
     }
 
     onVisibleChanged: {
+        console.log("DocumentCommands onVisibleChanged", itemId, container.visible);
         if (container.visible){
-            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandActivated);
+            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandler);
         }
         else{
-            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandActivated)
+            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandler)
         }
     }
 
-    onCommandActivated: {
-        console.log("DocumentCommandsBase onCommandActivated", commandId);
+    function commandHandler(commandId){
+        console.log("DocumentCommandsBase commandHandler", commandId);
         if (commandId == "Close"){
             let saveMode = commandsProvider.getCommandMode("Save");
             if (saveMode && saveMode == "Normal"){
@@ -52,29 +53,24 @@ Item {
         else if (commandId == "Save"){
             let itemId = container.objectView.itemId;
 
-            if (showInputIdDialog){
-                if (itemId === ""){
+            if (itemId === ""){
+                if (showInputIdDialog){
                     modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
                 }
                 else{
-                    container.gqlModelQueryType = "Update";
-                    container.gqlModelQueryTypeNotify = "updatedNotification";
-
+                    container.gqlModelQueryType = "Add";
+                    container.gqlModelQueryTypeNotify = "addedNotification";
                     saveQuery.updateModel();
                 }
             }
             else{
-                if (itemId === ""){
-                    container.gqlModelQueryType = "Add";
-                    container.gqlModelQueryTypeNotify = "addedNotification";
-                }
-                else{
-                    container.gqlModelQueryType = "Update";
-                    container.gqlModelQueryTypeNotify = "updatedNotification";
-                }
+                container.gqlModelQueryType = "Update";
+                container.gqlModelQueryTypeNotify = "updatedNotification";
                 saveQuery.updateModel();
             }
         }
+
+        commandActivated(commandId);
     }
 
     onObjectModelChanged: {
@@ -82,11 +78,7 @@ Item {
     }
 
     onItemIdChanged: {
-        multiDocView.updatePageId({"OldId": "", "NewId": itemId});
-    }
-
-    onItemNameChanged: {
-//        multiDocView.updatePageTitle({"ItemId": objectView.itemId, "Title": itemName});
+//        multiDocView.updatePageId({"OldId": "", "NewId": itemId});
     }
 
     Component {
@@ -96,7 +88,7 @@ Item {
                 console.log("saveDialog onFinished", buttonId);
                 if (buttonId == "Yes"){
                     closingFlag = true;
-                    commandActivated("Save");
+                    commandHandler("Save");
                 }
                 else if (buttonId == "No"){
                     container.documentClosed();
@@ -147,6 +139,8 @@ Item {
     function documentSaved(itemId, itemName){
         console.log("DocumentsCommands documentSaved", itemId, itemName);
 
+        Events.sendEvent(commandsId + "CollectionUpdateGui");
+
         objectModel.modelChanged.disconnect(modelChanged);
 
         saved(itemId, itemName);
@@ -155,9 +149,10 @@ Item {
         objectView.itemName = itemName;
 
         commandsProvider.changeCommandMode("Save", "Disabled");
-        multiDocView.updatePageTitle({"ItemId": objectView.itemId, "Title": itemName});
+        multiDocView.setDocumentTitle({"ItemId": objectView.itemId, "Title": itemName});
 
         objectModel.modelChanged.connect(modelChanged);
+
         if (closingFlag){
             documentClosed();
         }
@@ -167,7 +162,7 @@ Item {
         console.log("documentClosed", objectView.itemId);
         closed();
 
-        multiDocView.closePage(objectView.itemId);
+        multiDocView.closeDocument(objectView.itemId);
     }
 
     function modelChanged(){
@@ -175,7 +170,7 @@ Item {
         commandsProvider.changeCommandMode("Save", "Normal");
 
         let suffix = "*";
-        multiDocView.updatePageTitle({"ItemId": objectView.itemId, "Title": objectView.itemName + suffix});
+        multiDocView.setDocumentTitle({"ItemId": objectView.itemId, "Title": objectView.itemName + suffix});
     }
 
     GqlModel {

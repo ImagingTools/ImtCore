@@ -7,19 +7,9 @@ Item {
     id: containerBase;
 
     /**
-        Collection view
-    */
-    property Item collectionView;
-
-    /**
         The table inside collection view
     */
     property Item tableData;
-
-    /**
-        The property for providing a command model
-    */
-    property Item commandsProvider;
 
     /**
         The property for tracking changes to the selected item
@@ -28,7 +18,11 @@ Item {
 
     property string commandsId;
 
-    signal modelChanged();
+    signal commandActivated(string commandId);
+
+    signal renamed(string id, string newName);
+    signal descriptionSetted(string id, string description);
+    signal removed(string id);
 
     /**
         Requests ids for GQL models
@@ -48,13 +42,60 @@ Item {
         console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
         let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
 
-        containerBase.commandsProvider.changeCommandMode("Remove", mode);
-        containerBase.commandsProvider.changeCommandMode("Edit", mode);
+        commandsProvider.changeCommandMode("Remove", mode);
+        commandsProvider.changeCommandMode("Edit", mode);
+    }
+
+    onCommandsIdChanged: {
+        console.log("CollectionCommands onCommandsIdChanged", containerBase.commandsId);
+        Events.subscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
     }
 
     function openPopupMenu(x, y){
         modalDialogManager.closeDialog();
         modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
+    }
+
+    function commandHandle(commandId){
+        console.log("CollectionView commandHandle", commandId);
+        if (commandId === "New"){
+            collectionViewBase.selectedItem("", "<new item>");
+        }
+        else if (commandId === "Remove"){
+            modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
+        }
+        else if (commandId === "Edit"){
+            let itemId = tableData.getSelectedId();
+            let itemName = tableData.getSelectedName();
+            collectionViewBase.selectedItem(itemId, itemName);
+        }
+        else if (commandId === "Rename"){
+            let selectedName = tableData.getSelectedName();
+            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+        }
+        else if (commandId === "SetDescription"){
+            let elements = tableData.elements;
+            let selectedDescription = elements.GetData("Description", selectedIndex);
+            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
+        }
+
+        commandActivated(commandId);
+    }
+
+    onRenamed: {
+        multiDocView.setDocumentTitle({"ItemId": id, "Title": newName});
+
+        updateGui();
+    }
+
+    onRemoved: {
+        multiDocView.closeDocument(id);
+
+        updateGui();
+    }
+
+    onDescriptionSetted: {
+        updateGui();
     }
 
     Component {
@@ -103,7 +144,7 @@ Item {
         PopupMenuDialog {
             onFinished: {
                 console.log("CollectionView PopupMenuDialog", commandId);
-                commandHandleBase(commandId);
+                commandHandle(commandId);
             }
         }
     }
@@ -116,33 +157,6 @@ Item {
             contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
             contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
             contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
-        }
-    }
-
-    /**
-        Basic command click handler
-    */
-    function commandHandleBase(commandId){
-        console.log("CollectionView commandActivated", commandId);
-        if (commandId === "New"){
-            containerBase.collectionView.baseCollectionView.selectedItem("", "<new item>");
-        }
-        else if (commandId === "Remove"){
-            modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
-        }
-        else if (commandId === "Edit"){
-            let itemId = tableData.getSelectedId();
-            let itemName = tableData.getSelectedName();
-            containerBase.collectionView.baseCollectionView.selectedItem(itemId, itemName);
-        }
-        else if (commandId === "Rename"){
-            let selectedName = tableData.getSelectedName();
-            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
-        }
-        else if (commandId === "SetDescription"){
-            let elements = tableData.elements;
-            let selectedDescription = elements.GetData("Description", selectedIndex);
-            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
         }
     }
 
@@ -206,10 +220,7 @@ Item {
                             if (dataModelLocal.ContainsKey("Id")){
                                 var itemId = dataModelLocal.GetData("Id");
 
-                                containerBase.modelChanged();
-                                containerBase.collectionView.updateGui();
-
-                                multiDocView.closePage(itemId);
+                                removed(itemId);
                             }
                         }
                     }
@@ -274,14 +285,11 @@ Item {
 
                         if (dataModelLocal.ContainsKey("item")) {
                             dataModelLocal = dataModelLocal.GetData("item");
-                            containerBase.collectionView.updateGui();
-                            containerBase.modelChanged();
 
                             let oldId = dataModelLocal.GetData("OldId");
                             let newName = dataModelLocal.GetData("NewName");
-                            multiDocView.updatePageTitle({"ItemId": oldId, "Title": newName});
 
-                            containerBase.modelChanged();
+                            renamed(oldId, newName);
                         }
                     }
                 }
@@ -349,8 +357,7 @@ Item {
                             var id = dataModelLocal.GetData("Id");
                             var description = dataModelLocal.GetData("Description");
 
-                            containerBase.collectionView.updateGui();
-                            containerBase.modelChanged();
+                            descriptionSetted(id, description);
                         }
                     }
                 }

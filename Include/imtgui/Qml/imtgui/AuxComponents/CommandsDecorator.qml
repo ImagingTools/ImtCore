@@ -10,9 +10,14 @@ Item {
     property string commandsId;
 
     function setCommandsModel(parameters){
+        console.log("CommandsDecorator setCommandsModel", parameters, commandsDecoratorContainer);
         let model = parameters["Model"];
-        let commandsId = parameters["CommandsId"];
-        commandsDecoratorContainer.commandsId = commandsId;
+        let commId = parameters["CommandsId"];
+
+        console.log("model", model);
+        console.log("commandsId", commId);
+
+        commandsDecoratorContainer.commandsId = commId;
         repeaterCommands.model = model;
     }
 

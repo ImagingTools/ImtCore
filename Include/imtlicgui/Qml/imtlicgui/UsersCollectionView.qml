@@ -107,7 +107,7 @@ Item {
                 typeOperation = "New";
             }
             usersCollectionContainer.multiDocViewItem.activeCollectionItem = usersCollectionContainer;
-            usersCollectionContainer.multiDocViewItem.addPage(idSelect, name,  "../../imtlicgui/UserView.qml", "UserEdit", typeOperation)
+            usersCollectionContainer.multiDocViewItem.addDocument(idSelect, name,  "../../imtlicgui/UserView.qml", "UserEdit", typeOperation)
         }
 
         onCollectionViewRightButtonMouseClicked: {

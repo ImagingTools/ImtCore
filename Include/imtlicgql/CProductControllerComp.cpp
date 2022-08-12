@@ -96,7 +96,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 			objectId = itemModel.GetData("Id").toByteArray();
 
 			if (objectId.isEmpty()){
-				errorMessage = QT_TR_NOOP("Product-ID can not be empty!");
+				errorMessage = QT_TR_NOOP("Product-ID cannot be empty!");
 				return nullptr;
 			}
 
@@ -133,6 +133,11 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 
 				if (licenses->ContainsKey("Description")){
 					licenseDescription = licenses->GetData("Description", i).toString();
+				}
+
+				if (licenseId.isEmpty()){
+					errorMessage = QT_TR_NOOP(licenseName + " has an empty License-ID!");
+					return nullptr;
 				}
 
 				istd::TDelPtr<imtlic::CLicenseInfo> licenseInfoPtr = new imtlic::CLicenseInfo;

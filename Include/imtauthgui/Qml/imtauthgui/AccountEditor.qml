@@ -18,13 +18,9 @@ Rectangle {
 
     property alias commands: commandsDelegate;
 
-    onWidthChanged: {
-        console.log("AccountEditor onWidthChanged", accountEditorContainer.width);
-    }
-
     onVisibleChanged: {
         if (accountEditorContainer.visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
+            Events.sendEvent("CommandsModelChanged", {"Model":      commandsProvider.commandsModel,
                                                       "CommandsId": commandsProvider.commandsId});
         }
     }
@@ -55,7 +51,6 @@ Rectangle {
         commandsId: accountEditorContainer.commandsId;
 
         objectView: accountEditorContainer;
-        objectModel: accountModel;
     }
 
     function updateGui(){

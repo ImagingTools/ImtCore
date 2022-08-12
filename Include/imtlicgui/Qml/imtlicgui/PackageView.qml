@@ -7,15 +7,11 @@ Item {
 
     anchors.fill: parent;
 
-    property Item rootItem;
-
     property string itemId;
     property string itemName;
     property string commandsId;
 
     property alias commands: commandsDelegate;
-
-    property string rightPanelTitle: qsTr("Dependencies");
 
     signal selectedItem(string id, string name);
 
@@ -60,6 +56,14 @@ Item {
 
     TreeItemModel {
         id: packageModel;
+
+        onModelChanged: {
+            if (!visible){
+                return;
+            }
+
+            console.log("PackageView onModelChanged", itemId);
+        }
     }
 
     UndoRedoManager {
@@ -170,7 +174,7 @@ Item {
                 anchors.left: headerTreeView.left;
                 anchors.leftMargin: 10;
 
-                text: packageViewContainer.rightPanelTitle;
+                text: qsTr("Dependencies");
                 color: Style.textColor;
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;
@@ -204,6 +208,7 @@ Item {
             visible: itemId !== "" && collectionView.table.selectedIndex > -1;
 
             onCheckBoxChanged: {
+                console.log("PackageView onCheckBoxChanged", state, parentId, childId);
                 treeViewController.checkBoxChanged(state, parentId, childId);
             }
         }
