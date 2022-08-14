@@ -35,6 +35,11 @@ I_EXPORT_COMPONENT(
 			"Delegate for the document-oriented tables",
 			"Database Document");
 
+I_EXPORT_COMPONENT(
+			StandardMetaInfoTableDelegate,
+			"Delegate for the meta-info table",
+			"Database Document Meta");
+
 
 } // namespace ImtDatabasePck
 

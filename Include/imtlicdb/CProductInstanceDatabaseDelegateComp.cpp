@@ -539,9 +539,9 @@ void CProductInstanceDatabaseDelegateComp::GenerateDifferencesLicenses(const imt
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-idoc::IDocumentMetaInfo* CProductInstanceDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+idoc::MetaInfoPtr CProductInstanceDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-	return new imod::TModelWrap<imtlic::CProductInstanceMetaInfo>;
+	return idoc::MetaInfoPtr(new imod::TModelWrap<imtlic::CProductInstanceMetaInfo>);
 }
 
 

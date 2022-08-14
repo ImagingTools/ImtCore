@@ -328,9 +328,9 @@ QByteArray CAccountDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-idoc::IDocumentMetaInfo* CAccountDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+idoc::MetaInfoPtr CAccountDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-	return new imod::TModelWrap<imtauth::CAccountInfoMetaInfo>;
+	return idoc::MetaInfoPtr(new imod::TModelWrap<imtauth::CAccountInfoMetaInfo>);
 }
 
 

@@ -97,7 +97,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
 			idoc::MetaInfoPtr& objectMetaInfoPtr,
 			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
 {
-	objectMetaInfoPtr.SetPtr(CreateObjectMetaInfo(typeId));
+	objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
 	if (objectMetaInfoPtr.IsValid()){
 		if (!SetObjectMetaInfoFromRecord(record, *objectMetaInfoPtr)){
 			objectMetaInfoPtr.Reset();
@@ -186,9 +186,9 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 }
 
 
-idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+idoc::MetaInfoPtr CSqlDatabaseObjectDelegateCompBase::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-	return nullptr;
+	return idoc::MetaInfoPtr();
 }
 
 

@@ -61,7 +61,7 @@ protected:
 				QByteArrayList& updatedLicenseInstances) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
-	virtual idoc::IDocumentMetaInfo* CreateObjectMetaInfo(const QByteArray& typeId) const override;
+	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:

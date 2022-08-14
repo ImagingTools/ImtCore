@@ -423,9 +423,9 @@ void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-idoc::IDocumentMetaInfo* CFeaturePackageDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+idoc::MetaInfoPtr CFeaturePackageDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-	return nullptr;
+	return idoc::MetaInfoPtr();
 }
 
 

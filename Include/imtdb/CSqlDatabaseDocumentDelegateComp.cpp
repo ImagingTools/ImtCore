@@ -7,6 +7,7 @@
 // ACF includes
 #include <istd/TOptDelPtr.h>
 #include <istd/CSystem.h>
+#include <istd/CCrcCalculator.h>
 
 
 namespace imtdb
@@ -45,7 +46,7 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp::CreateNewObjectQuery(
-			const QByteArray& /*typeId*/,
+			const QByteArray& typeId,
 			const QByteArray& proposedObjectId,
 			const QString& objectName,
 			const QString& objectDescription,
@@ -68,11 +69,41 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		if (WriteDataToMemory(*workingDocumentPtr, documentContent)){
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 
-			retVal.query = QString("INSERT INTO %1(Id, %2) VALUES('%3');")
+			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+//			QString checkSumString = QString::number(checksum, 16).rightJustified(8, '0').toUpper();
+
+			retVal.query = QString("INSERT INTO %1(Id, %2, Name, Description, LastModified, Added, Checksum) VALUES('%3', '%4', '%5', '%6', '%7');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
 						.arg(qPrintable (*m_documentContentColumnIdAttrPtr))
 						.arg(qPrintable(objectId))
+						.arg(objectName)
+						.arg(objectDescription)
+						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+						.arg(checksum)
 						.toLocal8Bit();
+			
+			if (m_metaInfoTableDelegateCompPtr.IsValid()){
+				idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(valuePtr, typeId);
+				if (metaInfoPtr.IsValid()){
+					retVal.query += "\n";
+
+					QByteArrayList metaInfoIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
+
+					QStringList metaInfoTableValues;
+					metaInfoTableValues.push_back("'" + objectId + "'");
+
+					for (const QByteArray& metaInfoId : metaInfoIds){
+						metaInfoTableValues.push_back(metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(metaInfoId)).toString());
+					}
+
+					retVal.query += QString("INSERT INTO %1(Id, %2) VALUES(%3);")
+								.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+								.arg(qPrintable(metaInfoIds.join(" ")))
+								.arg(metaInfoTableValues.join(" "))
+								.toLocal8Bit();
+				}
+			}
 
 			retVal.objectName = objectName;
 		}
@@ -123,6 +154,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 
 	return retVal;
 }
+
 
 // protected methods
 
@@ -238,13 +270,13 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-idoc::IDocumentMetaInfo* CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
+idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {
 	if (m_metaInfoTableDelegateCompPtr.IsValid()){
-		return m_metaInfoTableDelegateCompPtr->CreateItemItemInfo();
+		return m_metaInfoTableDelegateCompPtr->CreateMetaInfo(nullptr, typeId);
 	}
 
-	return nullptr;
+	return idoc::MetaInfoPtr();
 }
 
 
