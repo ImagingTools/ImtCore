@@ -5,16 +5,11 @@ namespace imtdb
 {
 
 
-static const QByteArray s_documentIdColumnId = "DocumentId";
-
-
 // reimplemented (imtdb::IMetaInfoTableDelegate)
 
 QByteArrayList CStandardSqlMetaInfoTableDelegateComp::GetColumnIds() const
 {
 	QByteArrayList retVal;
-
-	retVal << s_documentIdColumnId;
 
 	for (const QPair<int, QByteArray>& item : m_metaInfoIds){
 		retVal += item.second;
@@ -26,10 +21,6 @@ QByteArrayList CStandardSqlMetaInfoTableDelegateComp::GetColumnIds() const
 
 imtdb::IMetaInfoTableDelegate::ColumnDataType CStandardSqlMetaInfoTableDelegateComp::GetColumnType(const QByteArray& columnId) const
 {
-	if (columnId == s_documentIdColumnId){
-		return CDI_ID;
-	}
-
 	return CDI_UNKNOWN;
 }
 
@@ -71,7 +62,7 @@ void CStandardSqlMetaInfoTableDelegateComp::OnComponentCreated()
 
 	if (m_objectMetaInfoCreatorCompPtr.IsValid()){
 		idoc::MetaInfoPtr retVal;
-		if (m_objectMetaInfoCreatorCompPtr->CreateMetaInfo(nullptr, "", retVal)){
+		if (m_objectMetaInfoCreatorCompPtr->CreateMetaInfo(nullptr, *m_objectTypeIdAttrPtr, retVal)){
 			idoc::IDocumentMetaInfo::MetaInfoTypes types = retVal->GetMetaInfoTypes();
 			for (int type : types){
 				m_metaInfoIds.push_back(QPair<int, QByteArray>(type, retVal->GetMetaInfoId(type)));

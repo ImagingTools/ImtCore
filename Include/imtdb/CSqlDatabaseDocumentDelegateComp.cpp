@@ -36,6 +36,8 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 	if (record.contains(*m_documentContentColumnIdAttrPtr)){
 		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
 
+		documentContent = QByteArray::fromBase64(documentContent);
+
 		if (ReadDataFromMemory(documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
 		}
@@ -70,12 +72,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-//			QString checkSumString = QString::number(checksum, 16).rightJustified(8, '0').toUpper();
 
-			retVal.query = QString("INSERT INTO %1(Id, %2, Name, Description, LastModified, Added, Checksum) VALUES('%3', '%4', '%5', '%6', '%7');")
+			retVal.query = QString("INSERT INTO %1(Id, %2, Name, Description, LastModified, Added, Checksum) VALUES('%3', '%4', '%5', '%6', '%7', '%8', '%9');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
 						.arg(qPrintable (*m_documentContentColumnIdAttrPtr))
 						.arg(qPrintable(objectId))
+						.arg(qPrintable(documentContent.toBase64()))
 						.arg(objectName)
 						.arg(objectDescription)
 						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
@@ -88,19 +90,21 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 				if (metaInfoPtr.IsValid()){
 					retVal.query += "\n";
 
-					QByteArrayList metaInfoIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
+					QByteArrayList columnIds = {"Id", "DocumentId"};
+					columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
-					QStringList metaInfoTableValues;
-					metaInfoTableValues.push_back("'" + objectId + "'");
+					QStringList tableValues;
+					tableValues.push_back("'" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "'");
+					tableValues.push_back("'" + objectId + "'");
 
-					for (const QByteArray& metaInfoId : metaInfoIds){
-						metaInfoTableValues.push_back(metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(metaInfoId)).toString());
+					for (const QByteArray& metaInfoId : m_metaInfoTableDelegateCompPtr->GetColumnIds()){
+						tableValues.push_back("'" + metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(metaInfoId)).toString() + "'");
 					}
 
-					retVal.query += QString("INSERT INTO %1(Id, %2) VALUES(%3);")
+					retVal.query += QString("INSERT INTO %1(%2) VALUES(%3);")
 								.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
-								.arg(qPrintable(metaInfoIds.join(" ")))
-								.arg(metaInfoTableValues.join(" "))
+								.arg(qPrintable(columnIds.join(", ")))
+								.arg(tableValues.join(", "))
 								.toLocal8Bit();
 				}
 			}
@@ -117,18 +121,53 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
-	QByteArray retVal = QString("DELETE FROM %1 WHERE Id = '%2';").arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM %1 WHERE Id = '%2';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }
 
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object) const
 {
 	QByteArray retVal;
+
+	QByteArray documentContent;
+	if (WriteDataToMemory(object, documentContent)){
+		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+
+		retVal = QString("UPDATE %1 SET %2 = '%3', LastModified = '%4', Checksum = '%5' WHERE Id = '%6';")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
+					.arg(qPrintable(documentContent.toBase64()))
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(checksum)
+					.arg(qPrintable(objectId))
+					.toLocal8Bit();
+
+		if (m_metaInfoTableDelegateCompPtr.IsValid()) {
+			idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(&object, collection.GetObjectTypeId(objectId));
+			if (metaInfoPtr.IsValid()) {
+				retVal += "\n";
+
+				QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
+
+				QStringList valueTuples;
+
+				for (const QByteArray& columnId : columnIds){
+					valueTuples.push_back(columnId + " = " + "'" + metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId)).toString() + "'");
+				}
+
+				retVal += QString("UPDATE %1 SET %2 WHERE DocumentId = '%3';")
+					.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+					.arg(valueTuples.join(", "))
+					.arg(qPrintable(objectId))
+					.toLocal8Bit();
+			}
+		}
+	}
 
 	return retVal;
 }
@@ -164,7 +203,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable
 		return false;
 	}
 
-	QString tempFolder = QDir::tempPath() + "/ImtCore";
+	QString tempFolder = QDir::tempPath() + "/ImtCore/SqlDatabaseDocumentDelegate/" + QUuid::createUuid().toString();
 
 	if (!istd::CSystem::EnsurePathExists(tempFolder)){
 		return false;
@@ -197,7 +236,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable
 	}
 
 	QFile documentFile(filePath);
-	if (!documentFile.open(QFile::WriteOnly)){
+	if (!documentFile.open(QFile::ReadOnly)){
 		istd::CSystem::RemoveDirectory(tempFolder);
 
 		return false;
@@ -219,7 +258,7 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 		return false;
 	}
 
-	QString tempFolder = QDir::tempPath() + "/ImtCore";
+	QString tempFolder = QDir::tempPath() + "/ImtCore/SqlDatabaseDocumentDelegate/" + QUuid::createUuid().toString();
 
 	if (!istd::CSystem::EnsurePathExists(tempFolder)){
 		return false;
@@ -269,6 +308,46 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+
+bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
+			const QByteArray& typeId,
+			const QSqlRecord& record,
+			idoc::MetaInfoPtr& objectMetaInfoPtr,
+			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM  %1 WHERE DocumentId = '%2'").arg(qPrintable(*m_metaInfoTableNameAttrPtr)).arg(record.value("Id").toString()).toLocal8Bit();
+
+	QSqlQuery metaInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(sqlMetaInfoQuery);
+	if (metaInfoQuery.next()){
+		QSqlRecord record = metaInfoQuery.record();
+
+		objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
+		if (objectMetaInfoPtr.IsValid()) {
+			if (!SetObjectMetaInfoFromRecord(record, *objectMetaInfoPtr)) {
+				objectMetaInfoPtr.Reset();
+
+				return false;
+			}
+		}
+	}
+
+	collectionItemMetaInfoPtr.SetPtr(CreateCollectionItemMetaInfo(typeId));
+	if (collectionItemMetaInfoPtr.IsValid()) {
+		if (!SetCollectionItemMetaInfoFromRecord(record, *collectionItemMetaInfoPtr)){
+			collectionItemMetaInfoPtr.Reset();
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 
 idoc::MetaInfoPtr CSqlDatabaseDocumentDelegateComp::CreateObjectMetaInfo(const QByteArray& typeId) const
 {

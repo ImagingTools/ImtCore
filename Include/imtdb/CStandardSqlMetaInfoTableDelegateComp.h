@@ -24,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CStandardSqlMetaInfoTableDelegateComp)
 		I_REGISTER_INTERFACE(imtdb::IMetaInfoTableDelegate);
 		I_ASSIGN(m_objectMetaInfoCreatorCompPtr, "ObjectMetaInfoCreator", "Creator of the meta informations for the data object", false, "ObjectMetaInfoCreator");
+		I_ASSIGN(m_objectTypeIdAttrPtr, "TypeId", "Type-ID of the related object", true, "");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::IMetaInfoTableDelegate)
@@ -38,6 +39,7 @@ protected:
 
 protected:
 	I_REF(imtbase::IMetaInfoCreator, m_objectMetaInfoCreatorCompPtr);
+	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
 
 	QVector<QPair<int, QByteArray>> m_metaInfoIds;
 };
