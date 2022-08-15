@@ -218,9 +218,9 @@ QByteArray CTestDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
-idoc::IDocumentMetaInfo* CTestDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+idoc::MetaInfoPtr CTestDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-	return new imod::TModelWrap<imttest::CTestMetaInfo>;
+	return  idoc::MetaInfoPtr(new imttest::CTestMetaInfo());
 }
 
 

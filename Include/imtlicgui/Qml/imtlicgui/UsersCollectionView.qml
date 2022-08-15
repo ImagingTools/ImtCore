@@ -91,7 +91,7 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
 
-        autoRefresh: true;
+//        autoRefresh: true;
 
         Component.onCompleted: {
             usersCollectionView.gqlModelInfo = "UserInfo"
@@ -99,47 +99,47 @@ Item {
             usersCollectionView.gqlModelRemove = "UserRemove"
         }
 
-        onItemSelect: {
-            console.log("usersCollectionView onSelectItem", idSelect, name);
-            var typeOperation = "Open";
-            if (idSelect === "") {
-                name = "New user";
-                typeOperation = "New";
-            }
-            usersCollectionContainer.multiDocViewItem.activeCollectionItem = usersCollectionContainer;
-            usersCollectionContainer.multiDocViewItem.addDocument(idSelect, name,  "../../imtlicgui/UserView.qml", "UserEdit", typeOperation)
-        }
+//        onItemSelect: {
+//            console.log("usersCollectionView onSelectItem", idSelect, name);
+//            var typeOperation = "Open";
+//            if (idSelect === "") {
+//                name = "New user";
+//                typeOperation = "New";
+//            }
+//            usersCollectionContainer.multiDocViewItem.activeCollectionItem = usersCollectionContainer;
+//            usersCollectionContainer.multiDocViewItem.addDocument(idSelect, name,  "../../imtlicgui/UserView.qml", "UserEdit", typeOperation)
+//        }
 
-        onCollectionViewRightButtonMouseClicked: {
-            console.log("usersCollectionView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
-            usersCollectionContainer.openContextMenu(item, mouseX, mouseY);
-        }
+//        onCollectionViewRightButtonMouseClicked: {
+//            console.log("usersCollectionView CollectionView AuxTable onCollectionViewRightButtonMouseClicked");
+//            usersCollectionContainer.openContextMenu(item, mouseX, mouseY);
+//        }
 
 
-        onSelectedIndexChanged: {
-            if (usersCollectionView.selectedIndex > -1){
-            }
-        }
+//        onSelectedIndexChanged: {
+//            if (usersCollectionView.selectedIndex > -1){
+//            }
+//        }
 
-        onRemovedItem: {
-            console.log("InstallationCollection CollectionView onRemovedItem");
-            var index = usersCollectionContainer.multiDocViewItem.getTabIndexById(itemId);
-            if (index !== -1){
-                usersCollectionContainer.multiDocViewItem.closeTab(index);
-            }
-        }
+//        onRemovedItem: {
+//            console.log("InstallationCollection CollectionView onRemovedItem");
+//            var index = usersCollectionContainer.multiDocViewItem.getTabIndexById(itemId);
+//            if (index !== -1){
+//                usersCollectionContainer.multiDocViewItem.closeTab(index);
+//            }
+//        }
 
-        onRenamedItem: {
-            console.log("InstallationCollection CollectionView onRenamedItem");
-            var index = usersCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
-            if (index !== -1){
-                usersCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
-            }
-//            metaInfo.getMetaInfo();
-        }
+//        onRenamedItem: {
+//            console.log("InstallationCollection CollectionView onRenamedItem");
+//            var index = usersCollectionContainer.multiDocViewItem.getTabIndexById(oldId);
+//            if (index !== -1){
+//                usersCollectionContainer.multiDocViewItem.updateTitleTab(newId, newId, index);
+//            }
+////            metaInfo.getMetaInfo();
+//        }
 
-        onSetDescriptionItem: {
-//            metaInfo.getMetaInfo();
-        }
+//        onSetDescriptionItem: {
+////            metaInfo.getMetaInfo();
+//        }
     }
 }
