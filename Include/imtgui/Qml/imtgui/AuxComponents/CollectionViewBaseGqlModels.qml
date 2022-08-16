@@ -5,7 +5,7 @@ import imtqml 1.0
 Item {
     id: gqlModelBaseContainer;
 
-    property string itemId;
+//    property string itemId;
 
     property string gqlModelHeadersInfo;
     property string gqlModelItemsInfo;
@@ -25,9 +25,9 @@ Item {
         objectViewModel.getObjectView();
     }
 
-    onItemIdChanged: {
-        console.log("gqlModelBaseContainer onItemIdChanged", gqlModelBaseContainer.itemId);
-    }
+//    onItemIdChanged: {
+//        console.log("gqlModelBaseContainer onItemIdChanged", gqlModelBaseContainer.itemId);
+//    }
 
     function updateModels(){
         headerInfoModel.updateModel();
@@ -116,8 +116,8 @@ Item {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
 
-            if (gqlModelBaseContainer.itemId){
-                inputParams.InsertField("Id", gqlModelBaseContainer.itemId);
+            if (itemId){
+                inputParams.InsertField("Id", itemId);
             }
 
             query.AddParam(inputParams);

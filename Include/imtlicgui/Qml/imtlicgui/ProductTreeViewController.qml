@@ -18,7 +18,7 @@ Item {
 
             treeViewModel.resetProperties();
 
-            if (featureDependenciesModel.modelFeatureDependencies){
+            if (featureDependenciesModel.modelFeatureDependencies && lisensesFeaturesModel.modelLicenseFeatures){
                 let strValues = lisensesFeaturesModel.modelLicenseFeatures.GetData(rootKey);
                 if (strValues){
                     let values = strValues.split(';');

@@ -13,13 +13,13 @@ Item {
 
     onModelChanged: {
         console.log("undoRedoManager onModelChanged");
-        undoRedo.addModel(model);
+//        undoRedo.addModel(model);
 
-        model.modelChanged.connect(modelUpdated);
+//        model.modelChanged.connect(modelUpdated);
     }
 
     Component.onDestruction: {
-        model.modelChanged.disconnect(modelUpdated);
+//        model.modelChanged.disconnect(modelUpdated);
         Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
     }
 

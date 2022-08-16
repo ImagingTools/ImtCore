@@ -72,6 +72,7 @@
         <file alias="imtgui/AuxComponents/SortController.qml">Qml/imtgui/AuxComponents/SortController.qml</file>
         <file alias="imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml">Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml</file>
         <file alias="imtgui/AuxComponents/DatePicker.qml">Qml/imtgui/AuxComponents/DatePicker.qml</file>
+        <file alias="imtgui/AuxComponents/DocumentBase.qml">Qml/imtgui/AuxComponents/DocumentBase.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

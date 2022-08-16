@@ -90,6 +90,8 @@ Rectangle {
         preferenceDialog.visible = visible;
     }
 
+
+    //TODO: Fix the preference dialog, extend his by Dialog.qml
     Rectangle {
         id: background;
 

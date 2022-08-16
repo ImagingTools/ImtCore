@@ -3,36 +3,20 @@ import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
 
-Rectangle {
+DocumentBase {
     id: accountEditorContainer;
 
-    color: Style.backgroundColor;
-
-    property string itemId;
-    property string itemName;
-    property string commandsId;
+    commandsDelegatePath: "../../imtauthgui/AccountEditorCommandsDelegate.qml"
 
     property int textInputHeight: 30;
 
-    property Item rootItem;
-
-    property alias commands: commandsDelegate;
-
-    onVisibleChanged: {
-        if (accountEditorContainer.visible){
-            Events.sendEvent("CommandsModelChanged", {"Model":      commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
-        }
-    }
-
-    TreeItemModel {
-        id: accountModel;
+    Component.onCompleted: {
     }
 
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: accountEditorContainer.commandsId;
+//        commandsId: accountEditorContainer.commandsId;
         editorItem: accountEditorContainer;
 
         onModelParsed: {
@@ -40,41 +24,28 @@ Rectangle {
         }
     }
 
-    CommandsProvider {
-        id: commandsProvider;
-
-        commandsId: accountEditorContainer.commandsId;
-    }
-
-    AccountEditorCommandsDelegate {
-        id: commandsDelegate;
-        commandsId: accountEditorContainer.commandsId;
-
-        objectView: accountEditorContainer;
-    }
-
     function updateGui(){
         console.log("AccountEditor updateGui");
-        accountNameInput.text = accountModel.GetData("Name");
-        accountDescriptionInput.text = accountModel.GetData("Description");
+        accountNameInput.text = documentModel.GetData("Name");
+        accountDescriptionInput.text = documentModel.GetData("Description");
 
         for (let i = 0; i < accountOwnerModel.count; i++){
             let id = accountOwnerModel.get(i).Id;
             console.log("Id", id)
             if (id === "Email"){
-                accountOwnerModel.setProperty(i, "Value", accountModel.GetData("Email"))
+                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("Email"))
             }
             else if (id === "FirstName"){
-                accountOwnerModel.setProperty(i, "Value", accountModel.GetData("FirstName"))
+                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("FirstName"))
             }
             else if (id === "LastName"){
-                accountOwnerModel.setProperty(i, "Value", accountModel.GetData("LastName"))
+                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("LastName"))
             }
             else if (id === "NickName"){
-                accountOwnerModel.setProperty(i, "Value", accountModel.GetData("NickName"))
+                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("NickName"))
             }
             else if (id === "BirthDay"){
-                accountOwnerModel.setProperty(i, "Value", accountModel.GetData("BirthDay"))
+                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("BirthDay"))
             }
         }
     }
@@ -113,8 +84,8 @@ Rectangle {
 
                 onTextChanged: {
                     console.log("AccountEditor onTextChanged");
-                    accountModel.SetData("Id", accountNameInput.text);
-                    accountModel.SetData("Name", accountNameInput.text);
+                    documentModel.SetData("Id", accountNameInput.text);
+                    documentModel.SetData("Name", accountNameInput.text);
                 }
             }
 
@@ -133,7 +104,7 @@ Rectangle {
                 width: bodyColumn.width;
 
                 onTextChanged: {
-                    accountModel.SetData("Description", accountDescriptionInput.text);
+                    documentModel.SetData("Description", accountDescriptionInput.text);
                 }
             }
 
@@ -204,7 +175,7 @@ Rectangle {
                                 text: model.Value;
 
                                 onTextChanged: {
-                                    accountModel.SetData(model.Id, fieldInput.text);
+                                    documentModel.SetData(model.Id, fieldInput.text);
                                 }
                             }
                         }
@@ -240,42 +211,6 @@ Rectangle {
                     width: parent.width - 20;
 
                     spacing: 10;
-
-//                    TreeItemModel {
-//                        id: accountOwnerModel;
-
-//                        Component.onCompleted: {
-//                            let index = accountOwnerModel.InsertNewItem();
-
-//                            accountOwnerModel.SetData("Id", "Email", index);
-//                            accountOwnerModel.SetData("Name", "Email", index);
-//                            accountOwnerModel.SetData("Value", "", index);
-
-//                            index = accountOwnerModel.InsertNewItem();
-
-//                            accountOwnerModel.SetData("Id", "BirthDay", index);
-//                            accountOwnerModel.SetData("Name", "Birthday", index);
-//                            accountOwnerModel.SetData("Value", "", index);
-
-//                            index = accountOwnerModel.InsertNewItem();
-
-//                            accountOwnerModel.SetData("Id", "FirstName", index);
-//                            accountOwnerModel.SetData("Name", "First name", index);
-//                            accountOwnerModel.SetData("Value", "", index);
-
-//                            index = accountOwnerModel.InsertNewItem();
-
-//                            accountOwnerModel.SetData("Id", "LastName", index);
-//                            accountOwnerModel.SetData("Name", "Last name", index);
-//                            accountOwnerModel.SetData("Value", "", index);
-
-//                            index = accountOwnerModel.InsertNewItem();
-
-//                            accountOwnerModel.SetData("Id", "Nickname", index);
-//                            accountOwnerModel.SetData("Name", "Nickname", index);
-//                            accountOwnerModel.SetData("Value", "", index);
-//                        }
-//                    }
 
                     ListModel {
                         id: accountOwnerModel;
@@ -319,7 +254,7 @@ Rectangle {
                                 text: model.Value;
 
                                 onTextChanged: {
-                                    accountModel.SetData(model.Id, fieldInputOwnerBlock.text);
+                                    documentModel.SetData(model.Id, fieldInputOwnerBlock.text);
                                 }
                             }
                         }

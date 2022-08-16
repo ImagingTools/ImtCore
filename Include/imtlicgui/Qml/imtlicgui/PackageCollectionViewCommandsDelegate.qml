@@ -6,6 +6,12 @@ CollectionViewCommandsDelegateBase {
     id: container;
 
     Component.onCompleted: {
-        collectionViewBase.commands.onItemsChanged.connect(treeViewModel.updateModel);
+//        collectionViewBase.commands.onItemsChanged.connect(updateTreeView);
+    }
+
+    function updateTreeView(){
+//        Events.sendEvent("TreeViewModelUpdate");
+
+//        updateGui();
     }
 }

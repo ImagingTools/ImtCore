@@ -6,11 +6,11 @@ DocumentWorkspaceCommandsDelegate {
     id: container;
 
     Component.onCompleted: {
-        Events.subscribeEvent("TreeViewModelUpdated", objectView.updateGui);
+        Events.subscribeEvent("TreeViewModelUpdated", updateGui)
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("TreeViewModelUpdated", objectView.updateGui);
+        Events.unSubscribeEvent("TreeViewModelUpdated", updateGui)
     }
 
     onEntered: {
@@ -19,13 +19,15 @@ DocumentWorkspaceCommandsDelegate {
     }
 
     onSaved: {
-        console.log("PackageView onSaved");
-        Events.sendEvent("TreeViewModelUpdate");
+        if (gqlModelQueryType == "Add"){
+            Events.sendEvent("TreeViewModelUpdate");
+        }
+
+        Events.sendEvent("FeatureDependenciesUpdate");
     }
 
     onClosed: {
-        Events.sendEvent("TreeViewModelUpdate");
-        Events.sendEvent("FeatureDependenciesUpdate");
+//        Events.sendEvent("TreeViewModelUpdate");
     }
 
     onRemoved: {
@@ -33,7 +35,6 @@ DocumentWorkspaceCommandsDelegate {
     }
 
     onEdited: {
-        console.log("onEdited");
         let oldId = itemId;
         let elementsModel = tableData.elements;
 

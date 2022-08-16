@@ -9,6 +9,22 @@ Item {
 
     signal checkBoxChanged(int state, string parentId, string childId);
 
+//    Component.onCompleted: {
+//        let itemId = documentsData.GetData("ItemId", model.index);
+
+//        if (itemId != ""){
+//            let value = featureDependenciesModel.modelFeatureDependencies.GetData(itemId);
+
+//            featuresDependenciesModel.SetData(itemId, value);
+//        }
+
+
+//    }
+
+//    TreeItemModel {
+//        id: featuresDependenciesModel;
+//    }
+
     onSelectedIndexChanged: {
         console.log("PackageTreeView onSelectedIndexChanged", container.selectedIndex);
 
@@ -39,10 +55,8 @@ Item {
 
     onCheckBoxChanged: {
         console.log("ObjectView TreeView onItemTreeViewCheckBoxStateChanged", state, parentId, childId);
-        console.log("ItemID", itemId);
-        if (!visible){
-            return;
-        }
+        console.log("featureDependenciesModel.modelFeatureDependencies", featureDependenciesModel.modelFeatureDependencies);
+        console.log("featureDependenciesModel.modelFeatureDependencies 1", featureDependenciesModel.modelFeatureDependencies.toJSON());
 
         let rootkey = collectionView.table.getSelectedId();
         let value = childId;
@@ -92,6 +106,9 @@ Item {
         if (state === 2){
             treeViewModel.selectFeature(value);
         }
+
+        console.log("featureDependenciesModel.modelFeatureDependencies 2", featureDependenciesModel.modelFeatureDependencies.toJSON());
+        documentModel.modelChanged();
     }
 
     function updateVisibleElements(){
@@ -107,13 +124,11 @@ Item {
                 for (let j = 0; j < m_features.GetItemsCount(); j++){
                     let m_visible = m_features.GetData("visible", j)
                     if (!m_visible){
-                        console.log("visible -> 1 index", j);
                         m_features.SetData("visible", 1, j);
                     }
 
                     let m_featureId = m_features.GetData("Id", j);
                     if (m_featureId === featureId){
-                        console.log("visible -> 0 index", j);
                         m_features.SetData("visible", 0, j);
                     }
                 }

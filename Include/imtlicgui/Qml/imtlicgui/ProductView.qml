@@ -2,38 +2,15 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-Item {
+DocumentBase {
     id: container;
 
-    anchors.fill: parent;
+    property string commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml";
 
-    property Item rootItem;
-
-    property string itemId;
-    property string itemName;
-    property string commandsId;
-    property string commandsDelegatePath: "ProductViewCommandsDelegate.qml";
-
-    property string treeViewControllerPath: "ProductViewTreeViewController.qml";
-
-    property string rightPanelTitle: qsTr("Features");
-
-    property alias commands: commandsDelegate;
-
-    signal selectedItem(string id, string name);
+//    signal selectedItem(string id, string name);
 
     Component.onCompleted: {
-        productModel.SetData("Id", "");
-        productModel.SetData("Name", "");
-        productModel.SetExternTreeModel("DependentModel", lisensesFeaturesModel.modelLicenseFeatures);
-    }
-
-    onItemIdChanged: {
-        productModel.SetData("Id", itemId);
-    }
-
-    onItemNameChanged: {
-        productModel.SetData("Name", itemName);
+        documentModel.SetExternTreeModel("DependentModel", lisensesFeaturesModel.modelLicenseFeatures);
     }
 
     onVisibleChanged: {
@@ -53,26 +30,21 @@ Item {
 
     onCommandsIdChanged: {
         console.log("ObjectView onCommandsIdChanged", container.commandsId);
-        commandsProvider.commandsId = container.commandsId;
 
-        collectionView.commands.itemId = container.itemId;
         collectionView.commands.gqlModelHeadersInfo = container.commandsId + "Info";
         collectionView.commands.gqlModelItemsInfo = container.commandsId + "List";
     }
 
-    TreeItemModel {
-        id: productModel;
-    }
 
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: container.commandsId;
+//        commandsId: container.commandsId;
         editorItem: container;
 
         onModelParsed: {
-            lisensesFeaturesModel.modelLicenseFeatures = productModel.GetData("DependentModel");
-            collectionView.table.elements = productModel.GetData("Items");
+            lisensesFeaturesModel.modelLicenseFeatures = documentModel.GetData("DependentModel");
+            collectionView.table.elements = documentModel.GetData("Items");
 
             updateGui();
         }
@@ -83,8 +55,8 @@ Item {
         collectionView.table.selectedIndex = -1;
         collectionView.table.selectedIndex = index;
 
-        inputId.text = productModel.GetData("Id");
-        inputName.text = productModel.GetData("Name");
+        inputId.text = documentModel.GetData("Id");
+        inputName.text = documentModel.GetData("Name");
 
         collectionView.table.elements.Refresh();
     }
@@ -106,15 +78,11 @@ Item {
         }
 
         onElementsChanged: {
-            productModel.SetExternTreeModel("Items", collectionView.table.elements);
+            documentModel.SetExternTreeModel("Items", collectionView.table.elements);
 
-            undoRedoManager.model = productModel;
-            commandsDelegate.objectModel = productModel;
+//            undoRedoManager.model = documentModel;
+            commandsDelegate.objectModel = documentModel;
         }
-    }
-
-    CommandsProvider {
-        id: commandsProvider;
     }
 
     ProductViewCommandsDelegate {
@@ -187,7 +155,7 @@ Item {
                 text: itemId;
 
                 onTextChanged: {
-                    productModel.SetData("Id", inputId.text);
+                    documentModel.SetData("Id", inputId.text);
                 }
             }
 
@@ -213,7 +181,7 @@ Item {
                 placeHolderText: qsTr("Enter the Product Name");
 
                 onTextChanged: {
-                    productModel.SetData("Name", inputName.text);
+                    documentModel.SetData("Name", inputName.text);
                 }
             }
 
@@ -233,7 +201,7 @@ Item {
                     anchors.left: headerTreeView.left;
                     anchors.leftMargin: 10;
 
-                    text: container.rightPanelTitle;
+                    text: qsTr("Features");
                     color: Style.textColor;
                     font.pixelSize: Style.fontSize_common;
                     font.family: Style.fontFamilyBold;

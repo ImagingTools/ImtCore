@@ -9,14 +9,10 @@ Item {
     property TabPanel tabPanel: tabPanelInternal;
 
     property Item activeItem;
-    property Item rootItem;
 
     property alias pagesCount: docsData.count;
-    property alias firstElementImageSource: tabPanelInternal.firstElementImageSource;
 
     property string operation;
-
-    property int mainMargin: 0;
 
     Component.onCompleted: {
         console.log("MultidocWorkspaceView onCompleted", tabPanelInternal.selectedIndex)
@@ -31,9 +27,8 @@ Item {
         }
     }
 
-    function setFocus(){
-        console.log("MultidocWorkspaceView setFocus");
-        multiDocView.forceActiveFocus();
+    TreeItemModel {
+        id: documentsData;
     }
 
     function addDocument(document){
@@ -92,17 +87,11 @@ Item {
         return -1;
     }
 
-    TreeItemModel {
-        id: documentsData;
-    }
-
     TabPanel {
         id: tabPanelInternal;
 
         anchors.left: parent.left;
-        anchors.leftMargin: multiDocView.mainMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: multiDocView.mainMargin;
 
         visible: true;
         model: documentsData;
@@ -111,7 +100,7 @@ Item {
             console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
 
             let item = documentsData.GetData("Item", index);
-            item.commands.commandHandler("Close");
+            item.commandsDelegate.commandHandle("Close");
         }
 
         onRightClicked: {
@@ -168,8 +157,10 @@ Item {
                 }
 
                 onLoaded: {
-                    dataLoader.item.itemId = model.ItemId
-                    dataLoader.item.itemName = model.Title
+//                    dataLoader.item.itemId = model.ItemId
+//                    dataLoader.item.itemName = model.Title
+
+//                    dataLoader.item.model = model;
 
                     dataLoader.item.commandsId = model.CommandsId
 

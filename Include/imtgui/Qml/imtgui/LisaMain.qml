@@ -17,6 +17,7 @@ Item {
     function updateModels() {
         thumbnailDecorator.updateModels();
         treeViewModel.updateModel();
+
         featureDependenciesModel.updateModel();
         lisensesFeaturesModel.updateModel();
     }

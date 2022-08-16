@@ -27,6 +27,7 @@ TopCenterPanel 1.0 ./AuxComponents/TopCenterPanel.qml
 TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
 TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml
 UndoRedo 1.0 ./AuxComponents/UndoRedo.qml
+DocumentBase 1.0 ./AuxComponents/DocumentBase.qml
 UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
 LoginButton 1.0 ./AuxComponents/LoginButton.qml
 

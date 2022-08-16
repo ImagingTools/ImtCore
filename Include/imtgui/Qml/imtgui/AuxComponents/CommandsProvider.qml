@@ -14,9 +14,9 @@ Item {
         modelCommands.updateModel();
     }
 
-    TreeItemModel {
-        id: commandsModelStorage;
-    }
+//    TreeItemModel {
+//        id: commandsModelStorage;
+//    }
 
     function changeCommandMode(commandId, mode){
         console.log("CommandsController changeCommandMode");
@@ -86,7 +86,7 @@ Item {
                             commandsProviderContainer.commandsModel = dataModelLocal;
                             Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
                                                                       "CommandsId": commandsProviderContainer.commandsId});
-                            commandsModelStorage.SetData(commandsProviderContainer.commandsId, commandsProviderContainer.commandsModel);
+//                            commandsModelStorage.SetData(commandsProviderContainer.commandsId, commandsProviderContainer.commandsModel);
                         }
                     }
                 }

@@ -25,7 +25,12 @@ Item {
     property bool loadData: true;
 
     Component.onCompleted: {
-        collectionViewBase.forceActiveFocus();
+//        collectionViewBase.forceActiveFocus();
+        console.log("CollectionView onCompleted");
+        itemId = documentsData.GetData("ItemId", model.index);
+        itemName = documentsData.GetData("Title", model.index);
+        console.log("itemId", itemId);
+        console.log("itemName", itemName);
     }
 
     onCommandUpdateGuiChanged: {
@@ -82,11 +87,8 @@ Item {
             commandsLoader.source = commandsDelegatePath;
         }
 
-        onItemChanged: {
-            console.log("commandsLoader onItemChanged", commandsLoader.item);
-            if (commandsLoader.item){
-                commandsLoader.item.tableData = collectionViewBase.table;
-            }
+        onLoaded: {
+            commandsLoader.item.tableData = collectionViewBase.table;
         }
     }
 

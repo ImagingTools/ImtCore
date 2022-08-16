@@ -205,52 +205,6 @@ Item {
         }
     }
 
-//    function addFeatureInTreeViewModel(packageId, featureId, featureName){
-//        console.log("FeaturesTreeView addFeatureInTreeViewModel", packageId, featureId, featureName);
-
-//        for (var i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
-//            var currentPackageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
-
-//            if (currentPackageId === packageId){
-//                var modelChildren = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
-
-//                if (!modelChildren){
-//                    break;
-//                }
-//                var childIndex = -1;
-//                var stateChecked = 0;
-//                var level = 1;
-//                var visible = 0;
-//                var isActive = 1;
-
-//                for (var j = 0; j < modelChildren.GetItemsCount(); j++){
-//                    var currentFeatureId = modelChildren.GetData("Id", j);
-//                    if (currentFeatureId == featureId){
-//                        childIndex = j;
-//                        stateChecked = modelChildren.GetData("stateChecked", j);
-//                        level = modelChildren.GetData("level", j);
-//                        visible = modelChildren.GetData("visible", j);
-//                        isActive = modelChildren.GetData("isActive", j);
-//                        break;
-//                    }
-//                }
-
-//                if (childIndex === -1){
-//                    childIndex = modelChildren.InsertNewItem();
-//                }
-
-//                modelChildren.SetData("Id", featureId, childIndex);
-//                modelChildren.SetData("Name", featureName, childIndex);
-//                modelChildren.SetData("stateChecked", stateChecked, childIndex);
-//                modelChildren.SetData("level", level, childIndex);
-//                modelChildren.SetData("visible", visible, childIndex);
-//                modelChildren.SetData("isActive", isActive, childIndex);
-//                modelChildren.SetData("packageId", packageId, childIndex);
-//                break;
-//            }
-//        }
-//    }
-
     GqlModel {
         id: featuresModel;
 

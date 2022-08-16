@@ -68,19 +68,15 @@ Item {
 
         for (let i = 0; i < keys.length; i++){
             let value = featureDependenciesModelContainer.modelFeatureDependencies.GetData(keys[i]);
-            let data = keys[i].split('.');
-
-            let curPackageId = data[0];
-            let curFeatureId = data[1];
 
             if (keys[i] == featureId){
-                featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], '');
+                featureDependenciesModelContainer.modelFeatureDependencies.RemoveData(keys[i]);
                 continue;
             }
+
             let valuesData = value.split(';');
 
             for (let j = 0; j < valuesData.length; j++){
-                let valueData = valuesData[j].split('.');
 
                 if (valuesData[j] == featureId){
                     let removeValue = valuesData[j];
@@ -89,7 +85,13 @@ Item {
                         removeValue += ';';
                     }
                     let newValue = value.replace(removeValue, '');
-                    featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
+
+                    if (newValue == ""){
+                        featureDependenciesModelContainer.modelFeatureDependencies.RemoveData(keys[i]);
+                    }
+                    else{
+                        featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
+                    }
                 }
             }
         }
@@ -157,6 +159,8 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
 
                         featureDependenciesModelContainer.modelFeatureDependencies = dataModelLocal;
+                        Events.sendEvent("FeatureDependenciesUpdated");
+                        console.log(" featureDependencies updated", featureDependenciesModelContainer.modelFeatureDependencies);
                     }
                 }
             }

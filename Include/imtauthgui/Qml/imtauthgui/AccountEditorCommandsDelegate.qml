@@ -6,21 +6,21 @@ import imtqml 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
-    signal itemUpdate();
-
     Component.onCompleted: {
-        container.itemIdChanged.connect(itemUpdate)
+        console.log("AccountEditor onCompleted");
+
+        let itemId = documentsData.GetData("ItemId", model.index);
+        console.log("itemId", itemId);
+        if (itemId != ""){
+            accountItemModel.updateModel(itemId);
+        }
     }
 
-    onItemUpdate: {
-        accountItemModel.updateModel();
-        container.itemIdChanged.disconnect(itemUpdate)
-    }
 
     GqlModel {
         id: accountItemModel;
 
-        function updateModel() {
+        function updateModel(itemId) {
             console.log( "updateModel AccountItem");
             var query = Gql.GqlRequest("query", "AccountItem");
 
@@ -64,13 +64,14 @@ DocumentWorkspaceCommandsDelegateBase {
 
                             for (let i = 0; i < keys.length; i++){
                                 console.log("keys[i]", keys[i], "->", dataModelLocal.GetData(keys[i]));
-                                accountModel.SetData(keys[i], dataModelLocal.GetData(keys[i]));
+                                documentModel.SetData(keys[i], dataModelLocal.GetData(keys[i]));
                             }
+
                             updateGui();
 
 
-                            undoRedoManager.model = accountModel;
-                            container.objectModel = accountModel
+//                            undoRedoManager.model = documentModel;
+//                            container.objectModel = documentModel
                         }
                     }
                 }

@@ -6,9 +6,6 @@ import imtgui 1.0
 Item {
     id: container;
 
-    property string itemId: objectView.itemId;
-    property string itemName: objectView.itemName;
-
     property Item objectView;
     property TreeItemModel objectModel;
 
@@ -26,21 +23,22 @@ Item {
     signal commandActivated(string commandId);
 
     onCommandsIdChanged: {
-        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandler);
+        console.log("DocumentCommands onCommandsIdChanged", container.commandsId);
+        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
     }
 
     onVisibleChanged: {
         console.log("DocumentCommands onVisibleChanged", itemId, container.visible);
         if (container.visible){
-            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandler);
+            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
         }
         else{
-            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandler)
+            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
         }
     }
 
-    function commandHandler(commandId){
-        console.log("DocumentCommandsBase commandHandler", commandId);
+    function commandHandle(commandId){
+        console.log("DocumentCommandsBase commandHandle", commandId);
         if (commandId == "Close"){
             let saveMode = commandsProvider.getCommandMode("Save");
             if (saveMode && saveMode == "Normal"){
@@ -74,11 +72,7 @@ Item {
     }
 
     onObjectModelChanged: {
-        objectModel.modelChanged.connect(modelChanged);
-    }
-
-    onItemIdChanged: {
-//        multiDocView.updatePageId({"OldId": "", "NewId": itemId});
+        timer.start(1000);
     }
 
     Component {
@@ -88,7 +82,7 @@ Item {
                 console.log("saveDialog onFinished", buttonId);
                 if (buttonId == "Yes"){
                     closingFlag = true;
-                    commandHandler("Save");
+                    commandHandle("Save");
                 }
                 else if (buttonId == "No"){
                     container.documentClosed();
@@ -125,6 +119,14 @@ Item {
         }
     }
 
+    Timer {
+        id:  timer;
+
+        onTriggered: {
+            objectModel.modelChanged.connect(modelChanged);
+        }
+    }
+
     Shortcut {
         sequence: "Ctrl+S";
         onActivated: {
@@ -150,6 +152,8 @@ Item {
 
         commandsProvider.changeCommandMode("Save", "Disabled");
         multiDocView.setDocumentTitle({"ItemId": objectView.itemId, "Title": itemName});
+
+//        objectView.updateGui();
 
         objectModel.modelChanged.connect(modelChanged);
 

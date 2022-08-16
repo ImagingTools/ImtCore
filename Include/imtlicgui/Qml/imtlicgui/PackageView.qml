@@ -2,40 +2,21 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-Item {
+DocumentBase {
     id: packageViewContainer;
 
-    anchors.fill: parent;
-
-    property string itemId;
-    property string itemName;
-    property string commandsId;
-
-    property alias commands: commandsDelegate;
+    commandsDelegatePath: "../../imtlicgui/PackageViewCommandsDelegate.qml"
 
     signal selectedItem(string id, string name);
 
     Component.onCompleted: {
         console.log("PackageView onCompleted", featureDependenciesModel.modelFeatureDependencies);
-        packageModel.SetExternTreeModel("DependentModel", featureDependenciesModel.modelFeatureDependencies);
+        documentModel.SetData("DependentModel", featureDependenciesModel.modelFeatureDependencies);
+//        Events.subscribeEvent("FeatureDependenciesUpdated", dependenciesUpdated);
     }
 
-    onItemIdChanged: {
-        console.log("packageViewContainer onItemIdChanged", itemId);
-        packageModel.SetData("Id", itemId);
-    }
-
-    onItemNameChanged: {
-        packageModel.SetData("Name", itemName);
-    }
-
-    onVisibleChanged: {
-        if (packageViewContainer.visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
-
-            updateGui();
-        }
+    onCommandsDelegateLoaded: {
+        commandsDelegate.tableData = collectionView.table;
     }
 
     onWidthChanged: {
@@ -47,35 +28,25 @@ Item {
 
     onCommandsIdChanged: {
         console.log("ObjectView onCommandsIdChanged", packageViewContainer.commandsId);
-        commandsProvider.commandsId = packageViewContainer.commandsId;
 
-        collectionView.commands.itemId = packageViewContainer.itemId;
         collectionView.commands.gqlModelHeadersInfo = packageViewContainer.commandsId + "Info";
         collectionView.commands.gqlModelItemsInfo = packageViewContainer.commandsId + "List";
     }
 
-    TreeItemModel {
-        id: packageModel;
-
-        onModelChanged: {
-            if (!visible){
-                return;
-            }
-
-            console.log("PackageView onModelChanged", itemId);
-        }
-    }
+//    function dependenciesUpdated(){
+//        documentModel.SetExternTreeModel("DependentModel", featureDependenciesModel.modelFeatureDependencies);
+//    }
 
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: packageViewContainer.commandsId;
+//        commandsId: packageViewContainer.commandsId;
         editorItem: packageViewContainer;
 
         onModelParsed: {
 
-            featureDependenciesModel.modelFeatureDependencies = packageModel.GetData("DependentModel");
-            collectionView.table.elements = packageModel.GetData("Items");
+            featureDependenciesModel.modelFeatureDependencies = documentModel.GetData("DependentModel");
+            collectionView.table.elements = documentModel.GetData("Items");
 
             updateGui();
         }
@@ -108,24 +79,12 @@ Item {
         }
 
         onElementsChanged: {
-            packageModel.SetExternTreeModel("Items", collectionView.table.elements);
+            documentModel.SetExternTreeModel("Items", collectionView.table.elements);
 
-            undoRedoManager.model = packageModel;
-            commandsDelegate.objectModel = packageModel;
+            updateGui();
+//            undoRedoManager.model = documentModel;
+//            commandsDelegate.objectModel = documentModel;
         }
-    }
-
-    CommandsProvider {
-        id: commandsProvider;
-    }
-
-    PackageViewCommandsDelegate {
-        id: commandsDelegate;
-
-        tableData: collectionView.table;
-        objectView: packageViewContainer;
-
-        commandsId: packageViewContainer.commandsId;
     }
 
     Splitter {
