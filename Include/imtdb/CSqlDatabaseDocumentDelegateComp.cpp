@@ -97,8 +97,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 					tableValues.push_back("'" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "'");
 					tableValues.push_back("'" + objectId + "'");
 
-					for (const QByteArray& metaInfoId : m_metaInfoTableDelegateCompPtr->GetColumnIds()){
-						tableValues.push_back("'" + metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(metaInfoId)).toString() + "'");
+					for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()){
+						QVariant data = metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId));
+
+						QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
+
+						tableValues.push_back("'" + value + "'");
 					}
 
 					retVal.query += QString("INSERT INTO %1(%2) VALUES(%3);")
@@ -155,16 +159,19 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 				QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
 				QStringList valueTuples;
-
 				for (const QByteArray& columnId : columnIds){
-					valueTuples.push_back(columnId + " = " + "'" + metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId)).toString() + "'");
+					QVariant data = metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId));
+
+					QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
+
+					valueTuples.push_back(columnId + " = " + "'" + value + "'");
 				}
 
 				retVal += QString("UPDATE %1 SET %2 WHERE DocumentId = '%3';")
-					.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
-					.arg(valueTuples.join(", "))
-					.arg(qPrintable(objectId))
-					.toLocal8Bit();
+							.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+							.arg(valueTuples.join(", "))
+							.arg(qPrintable(objectId))
+							.toLocal8Bit();
 			}
 		}
 	}
@@ -323,11 +330,11 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 
 	QSqlQuery metaInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(sqlMetaInfoQuery);
 	if (metaInfoQuery.next()){
-		QSqlRecord record = metaInfoQuery.record();
+		QSqlRecord metaInfoRecord = metaInfoQuery.record();
 
 		objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
 		if (objectMetaInfoPtr.IsValid()) {
-			if (!SetObjectMetaInfoFromRecord(record, *objectMetaInfoPtr)) {
+			if (!SetObjectMetaInfoFromRecord(metaInfoRecord, *objectMetaInfoPtr)) {
 				objectMetaInfoPtr.Reset();
 
 				return false;
@@ -367,7 +374,7 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRec
 			int metaInfoType = m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId);
 			if (metaInfoType >= 0){
 				if (record.contains(columnId)){
-					QVariant data = record.value(qPrintable(columnId));
+					QVariant data = m_metaInfoTableDelegateCompPtr->FromTableRepresentation(record.value(qPrintable(columnId)), columnId);
 					if (data.isValid()){
 						metaInfo.SetMetaInfo(metaInfoType, data);
 					}

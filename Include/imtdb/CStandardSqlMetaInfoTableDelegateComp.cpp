@@ -1,6 +1,10 @@
 #include <imtdb/CStandardSqlMetaInfoTableDelegateComp.h>
 
 
+// Qt includes
+#include <QtGui/QImage>
+
+
 namespace imtdb
 {
 
@@ -19,12 +23,6 @@ QByteArrayList CStandardSqlMetaInfoTableDelegateComp::GetColumnIds() const
 }
 
 
-imtdb::IMetaInfoTableDelegate::ColumnDataType CStandardSqlMetaInfoTableDelegateComp::GetColumnType(const QByteArray& columnId) const
-{
-	return CDI_UNKNOWN;
-}
-
-
 int CStandardSqlMetaInfoTableDelegateComp::GetMetaInfoType(const QByteArray& columnId) const
 {
 	for (const QPair<int, QByteArray>& item : m_metaInfoIds){
@@ -34,6 +32,46 @@ int CStandardSqlMetaInfoTableDelegateComp::GetMetaInfoType(const QByteArray& col
 	}
 	
 	return -1;
+}
+
+
+QVariant CStandardSqlMetaInfoTableDelegateComp::ToTableRepresentation(const QVariant& data, const QByteArray& /*columnId*/) const
+{
+	switch (data.type()){
+	case QVariant::Image: {
+		QImage image = data.value<QImage>();
+
+		QByteArray imageBuffer;
+		QDataStream dataStream(&imageBuffer, QIODevice::ReadWrite);
+
+		dataStream << image;
+
+		return imageBuffer.toBase64();
+	}
+	break;
+
+	default:
+		return data;
+	}
+}
+
+
+QVariant CStandardSqlMetaInfoTableDelegateComp::FromTableRepresentation(const QVariant& data, const QByteArray& columnId) const
+{
+	if (columnId == "Preview"){
+		QByteArray imageBuffer = QByteArray::fromBase64(data.toByteArray());
+		
+		QDataStream dataStream(imageBuffer);
+		QImage image;
+
+		dataStream >> image;
+
+		qDebug() << image;
+
+		return image;
+	}
+
+	return data;
 }
 
 

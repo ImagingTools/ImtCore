@@ -29,8 +29,9 @@ public:
 
 	// reimplemented (imtdb::IMetaInfoTableDelegate)
 	virtual QByteArrayList GetColumnIds() const override;
-	virtual ColumnDataType GetColumnType(const QByteArray& columnId) const override;
 	virtual int GetMetaInfoType(const QByteArray& columnId) const override;
+	virtual QVariant ToTableRepresentation(const QVariant& data, const QByteArray& columnId) const override;
+	virtual QVariant FromTableRepresentation(const QVariant& data, const QByteArray& columnId) const override;
 	virtual idoc::MetaInfoPtr CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId) const override;
 
 protected:

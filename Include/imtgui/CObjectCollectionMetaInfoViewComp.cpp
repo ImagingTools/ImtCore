@@ -49,6 +49,20 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 		case QVariant::ByteArray:
 			textValue = value.toByteArray();
 			break;
+		case QVariant::Int:
+			textValue = QString::number(value.toInt());
+			break;
+		case QVariant::UInt:
+			textValue = QString::number(value.toUInt());
+			break;
+		case QVariant::LongLong:
+			textValue = QString::number(value.toLongLong());
+			break;
+		case QVariant::ULongLong:
+			textValue = QString::number(value.toULongLong());
+			break;
+		case QVariant::Double:
+			textValue = QString::number(value.toDouble());
 		}
 
 		switch (type){
