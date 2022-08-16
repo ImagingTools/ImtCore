@@ -37,6 +37,12 @@ public:
     // reimplemented (IFeatureInfoProvider)
     virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
     virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const override;
+	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
+
+	// reimplemented (IFeatureDependenciesProvider)
+	virtual const IFeatureDependenciesProvider* GetDependenciesInfoProvider() const override;
+	virtual const imtbase::ICollectionInfo* GetParentFeatureInfoProviderList() const override;
+	virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const override;
 
     // reimplemented (iser::ISerializable)
     virtual bool Serialize(iser::IArchive& archive) override;

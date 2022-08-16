@@ -90,6 +90,30 @@ const IFeatureInfo* CFeatureContainer::GetFeatureInfo(const QByteArray& featureI
 }
 
 
+const imtbase::IObjectCollection* CFeatureContainer::GetFeaturePackages() const
+{
+	return nullptr;
+}
+
+
+const IFeatureDependenciesProvider* CFeatureContainer::GetDependenciesInfoProvider() const
+{
+	return nullptr;
+}
+
+
+const imtbase::ICollectionInfo* CFeatureContainer::GetParentFeatureInfoProviderList() const
+{
+	return nullptr;
+}
+
+
+const IFeatureInfoProvider* CFeatureContainer::GetParentFeatureInfoProvider(const QByteArray& parentId) const
+{
+	return nullptr;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CFeatureContainer::Serialize(iser::IArchive& archive)
