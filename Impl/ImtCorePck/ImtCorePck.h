@@ -29,6 +29,7 @@
 #include <imtbase/CObjectCollectionBasedPersistenceComp.h>
 #include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CCollectionDataControllerComp.h>
+#include <imtbase/CQtResourceLoaderComp.h>
 
 
 /**
@@ -71,6 +72,7 @@ typedef icomp::TModelCompWrap<
 						imtbase::ITimeFilterParam,
 						iser::ISerializable>> TimeFilterParam;
 typedef imtbase::CCollectionDataControllerComp CollectionDataController;
+typedef imtbase::CQtResourceLoaderComp QtResourceLoaderComp;
 
 
 } // namespace ImtCorePck

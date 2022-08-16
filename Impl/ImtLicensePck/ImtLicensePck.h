@@ -20,6 +20,7 @@
 #include <imtlic/CProductLicensingInfoMetaInfoCreatorComp.h>
 #include <imtlic/CProductInstanceMetaInfoCreatorComp.h>
 #include <imtlic/CLicenseControllerComp.h>
+#include <imtlic/CFeatureContainer.h>
 
 
 /**
@@ -59,6 +60,15 @@ typedef imtlic::CFeaturePackageMetaInfoCreatorComp FeaturePackageMetaInfoCreator
 typedef imtlic::CProductLicensingInfoMetaInfoCreatorComp ProductLicensingInfoMetaInfoCreator;
 typedef imtlic::CProductInstanceMetaInfoCreatorComp ProductInstanceMetaInfoCreator;
 typedef imtlic::CLicenseControllerComp LicenseController;
+//typedef icomp::TModelCompWrap<
+//            icomp::TMakeComponentWrap<
+//                        imtlic::CFeatureContainer,
+//                        imtlic::IFeatureInfoProvider,
+//                        imtlic::IFeaturePackage,
+//                        imtbase::IObjectCollection,
+//                        imtbase::IObjectCollectionInfo,
+//                        imtbase::ICollectionInfo,
+//                        iser::ISerializable>> FeatureContainer;
 
 
 } // namespace ImtLicensePck

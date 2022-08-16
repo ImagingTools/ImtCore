@@ -3,6 +3,7 @@ import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
 import imtlicgui 1.0
+import QtQuick.Dialogs 1.3
 
 CollectionViewCommandsDelegateBase {
     id: container;
@@ -24,6 +25,37 @@ CollectionViewCommandsDelegateBase {
                                       "Name":       copyStr + itemName,
                                       "Source":     container.collectionView.baseCollectionView.commands.objectViewEditorPath,
                                       "CommandsId": container.collectionView.baseCollectionView.commands.objectViewEditorCommandsId});
+        }
+        else if (commandId === "Export"){
+            fileDialogSave.open();
+        }
+    }
+
+    RemoteFileController {
+        id: remoteFileController;
+    }
+
+    FileDialog {
+        id: fileDialogSave;
+
+        title: qsTr("Save file");
+        selectExisting: false;
+        folder: shortcuts.home;
+
+        nameFilters: ["Features files (*.xml)", "All files (*)"];
+
+        onAccepted: {
+            var pathDir = fileDialogSave.folder.toString();
+            remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
+            var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
+
+            let id = tableData.getSelectedId();
+
+            if (fileName == ""){
+                fileName = {};
+                fileName["name"] = id + ".xml";
+            }
+            remoteFileController.GetFile(id, fileName);
         }
     }
 }

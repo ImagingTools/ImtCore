@@ -79,6 +79,11 @@ I_EXPORT_COMPONENT(
 			"Client-side license controller",
 			"License Product Instance Controller");
 
+//I_EXPORT_COMPONENT(
+//            FeatureContainer,
+//            "Feature Container",
+//            "Feature Container Collection Package");
+
 
 } // namespace ImtLicensePck
 

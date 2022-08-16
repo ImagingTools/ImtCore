@@ -80,6 +80,11 @@ I_EXPORT_COMPONENT(
 			"KeyDataProvider",
 			"Key data provider");
 
+I_EXPORT_COMPONENT(
+            FeaturesExportProvider,
+            "FeaturesExportProvider",
+            "Features Export Provider");
+
 
 } // namespace ImtLicenseGqlPck
 

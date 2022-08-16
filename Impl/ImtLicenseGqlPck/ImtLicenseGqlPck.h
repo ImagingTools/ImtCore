@@ -17,6 +17,7 @@
 #include <imtlicgql/CKeyDataProviderComp.h>
 #include <imtlicgql/CUserCollectionControllerComp.h>
 #include <imtlicgql/CUserControllerComp.h>
+#include <imtlicgql/CFeaturesExportProviderComp.h>
 
 
 /**
@@ -37,6 +38,7 @@ typedef imtlicgql::CInstallationControllerComp InstallationController;
 typedef imtlicgql::CKeyDataProviderComp KeyDataProvider;
 typedef imtlicgql::CUserCollectionControllerComp UserCollectionController;
 typedef imtlicgql::CUserControllerComp UserController;
+typedef imtlicgql::CFeaturesExportProviderComp FeaturesExportProvider;
 
 
 } // namespace ImtLicenseGqlPck

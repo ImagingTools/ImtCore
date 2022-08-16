@@ -124,6 +124,11 @@ I_EXPORT_COMPONENT(
 			"Controller for export and import of data in a collection",
 			"Controller Export Import Collection");
 
+I_EXPORT_COMPONENT(
+            QtResourceLoaderComp,
+            "Controller for load data from resource file in a collection",
+            "Controller Resource Loader");
+
 
 } // namespace ImtCorePck
 

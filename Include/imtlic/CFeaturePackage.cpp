@@ -19,8 +19,7 @@ namespace imtlic
 // public methods
 
 CFeaturePackage::CFeaturePackage()
-	:BaseClass("FeatureInfo", "Feature info", "Features"),
-	m_featurePackageCollectionPtr(nullptr)
+    :m_featurePackageCollectionPtr(nullptr)
 {
 }
 
@@ -33,58 +32,6 @@ void CFeaturePackage::SetParents(const QByteArrayList& parentIds)
 
 	for (const QByteArray& parentId : parentIds){
 		m_parents.InsertItem(parentId, "", "");
-	}
-}
-
-
-const IFeatureInfo* CFeaturePackage::FindFeatureById(const QByteArray& featureId) const
-{
-	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
-	for (QByteArray id : featureIds){
-		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
-		Q_ASSERT(featurePtr != nullptr);
-		if (featurePtr != nullptr){
-			if (featurePtr->GetFeatureId() == featureId){
-				return featurePtr;
-			}
-		}
-	}
-	
-	return nullptr;
-}
-
-
-QByteArray CFeaturePackage::GetFeatureCollectionId(const QByteArray& featureId) const
-{
-	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
-	for (QByteArray id : featureIds){
-		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
-		Q_ASSERT(featurePtr != nullptr);
-		if (featurePtr != nullptr){
-			if (featurePtr->GetFeatureId() == featureId){
-				return id;
-			}
-		}
-	}
-
-	return QByteArray();
-}
-
-
-// reimplemented (IFeaturePackage)
-
-QByteArray CFeaturePackage::GetPackageId() const
-{
-	return m_packageId;
-}
-
-
-void CFeaturePackage::SetPackageId(const QByteArray& packageId)
-{
-	if (m_packageId != packageId){
-		istd::CChangeNotifier notifier(this);
-	
-		m_packageId = packageId;
 	}
 }
 
@@ -141,23 +88,142 @@ const IFeatureInfoProvider* CFeaturePackage::GetDependencyContainer(const QByteA
 }
 
 
+// reimplemented (IObjectCollection)
+
+bool CFeaturePackage::RemoveElement(const Id& elementId)
+{
+    bool retVal = BaseClass::RemoveElement(elementId);
+
+    if (retVal){
+        istd::CChangeNotifier changeNotifier(this);
+
+        CleanupDependencies();
+    }
+
+    return retVal;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CFeaturePackage::Serialize(iser::IArchive& archive)
+{
+    istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
+    bool retVal = BaseClass::Serialize(archive);
+
+    QByteArrayList dependencyKeys = m_dependencies.keys();
+    int dependencyCount = dependencyKeys.count();
+
+    if (!archive.IsStoring()){
+        m_dependencies.clear();
+        m_parents.ResetData();
+        dependencyKeys.clear();
+        dependencyCount = 0;
+    }
+
+    static iser::CArchiveTag dependenciesTag("Dependencies", "Feature list", iser::CArchiveTag::TT_MULTIPLE);
+    static iser::CArchiveTag dependencyTag("Dependency", "Dependency", iser::CArchiveTag::TT_GROUP, &dependenciesTag);
+
+    retVal = retVal && archive.BeginMultiTag(dependenciesTag, dependencyTag, dependencyCount);
+
+    for (int dependencyIndex = 0; dependencyIndex < dependencyCount; dependencyIndex++){
+        retVal = retVal && archive.BeginTag(dependencyTag);
+
+        QByteArray key;
+        QByteArrayList value;
+        int valueCount = 0;
+
+        if (archive.IsStoring()){
+            key = dependencyKeys[dependencyIndex];
+            value = m_dependencies[key];
+            valueCount = value.count();
+        }
+
+        static iser::CArchiveTag keyTag("FeatureId", "FeatureId", iser::CArchiveTag::TT_LEAF, &dependencyTag);
+        retVal = retVal && archive.BeginTag(keyTag);
+        retVal = retVal && archive.Process(key);
+        retVal = retVal && archive.EndTag(keyTag);
+
+        retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "BaseFeatures", "BaseFeatureId");
+
+        if (!archive.IsStoring()){
+            m_dependencies[key] = value;
+        }
+
+        retVal = retVal && archive.EndTag(dependencyTag);
+    }
+
+    retVal = retVal && archive.EndTag(dependenciesTag);
+
+    if (!archive.IsStoring()){
+        CleanupDependencies();
+    }
+
+    static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
+    retVal = retVal && archive.BeginTag(parentsTag);
+    retVal = retVal && m_parents.Serialize(archive);
+    retVal = retVal && archive.EndTag(parentsTag);
+
+    return retVal;
+}
+
+
+bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+{
+    istd::CChangeNotifier changeNotifier(this);
+
+    bool retVal = BaseClass::CopyFrom(object, mode);
+    if (!retVal){
+        return false;
+    }
+
+    const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
+    if (sourcePtr != nullptr){
+        m_dependencies = sourcePtr->m_dependencies;
+        m_parents = sourcePtr->m_parents;
+
+        return true;
+    }
+
+    return false;
+}
+
+
+bool CFeaturePackage::IsEqual(const IChangeable& object) const
+{
+    const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
+    if (sourcePtr != nullptr){
+        return
+                    m_dependencies == sourcePtr->m_dependencies &&
+                    m_parents.IsEqual(sourcePtr->m_parents);
+    }
+
+    return false;
+}
+
+
+bool CFeaturePackage::ResetData(CompatibilityMode mode)
+{
+    if (!BaseClass::ResetData(mode)){
+        return false;
+    }
+
+    if (!m_parents.ResetData(mode)){
+        return false;
+    }
+
+    m_dependencies.clear();
+
+    return true;
+}
+
+
 // reimplemented (IFeatureInfoProvider)
 
 const imtbase::IObjectCollection* CFeaturePackage::GetFeaturePackages() const
 {
 	return m_featurePackageCollectionPtr;
-}
-
-
-const imtbase::ICollectionInfo& CFeaturePackage::GetFeatureList() const
-{
-	return m_collection;
-}
-
-
-const IFeatureInfo* CFeaturePackage::GetFeatureInfo(const QByteArray& featureId) const
-{
-	return dynamic_cast<const IFeatureInfo*>(m_collection.GetObjectPtr(featureId));
 }
 
 
@@ -192,154 +258,6 @@ const IFeatureInfoProvider* CFeaturePackage::GetParentFeatureInfoProvider(const 
 	}
 
 	return nullptr;
-}
-
-
-// reimplemented (IObjectCollection)
-
-bool CFeaturePackage::RemoveElement(const Id& elementId)
-{
-	bool retVal = BaseClass::RemoveElement(elementId);
-
-	if (retVal){
-		istd::CChangeNotifier changeNotifier(this);
-
-		CleanupDependencies();
-	}
-
-	return retVal;
-}
-
-
-// reimplemented (iser::ISerializable)
-
-bool CFeaturePackage::Serialize(iser::IArchive& archive)
-{
-	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
-
-	bool retVal = BaseClass::Serialize(archive);
-
-	static iser::CArchiveTag packageIdTag("PackageId", "ID of the feature package", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(packageIdTag);
-	retVal = retVal && archive.Process(m_packageId);
-	retVal = retVal && archive.EndTag(packageIdTag);
-
-	QByteArrayList dependencyKeys = m_dependencies.keys();
-	int dependencyCount = dependencyKeys.count();
-
-	if (!archive.IsStoring()){
-		m_dependencies.clear();
-		m_parents.ResetData();
-		dependencyKeys.clear();
-		dependencyCount = 0;
-	}
-
-	static iser::CArchiveTag dependenciesTag("Dependencies", "Feature list", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag dependencyTag("Dependency", "Dependency", iser::CArchiveTag::TT_GROUP, &dependenciesTag);
-
-	retVal = retVal && archive.BeginMultiTag(dependenciesTag, dependencyTag, dependencyCount);
-
-	for (int dependencyIndex = 0; dependencyIndex < dependencyCount; dependencyIndex++){
-		retVal = retVal && archive.BeginTag(dependencyTag);
-
-		QByteArray key;
-		QByteArrayList value;
-		int valueCount = 0;
-
-		if (archive.IsStoring()){
-			key = dependencyKeys[dependencyIndex];
-			value = m_dependencies[key];
-			valueCount = value.count();
-		}
-
-		static iser::CArchiveTag keyTag("FeatureId", "FeatureId", iser::CArchiveTag::TT_LEAF, &dependencyTag);
-		retVal = retVal && archive.BeginTag(keyTag);
-		retVal = retVal && archive.Process(key);
-		retVal = retVal && archive.EndTag(keyTag);
-
-		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "BaseFeatures", "BaseFeatureId");
-
-		if (!archive.IsStoring()){
-			m_dependencies[key] = value;
-		}
-
-		retVal = retVal && archive.EndTag(dependencyTag);
-	}
-
-	retVal = retVal && archive.EndTag(dependenciesTag);
-
-	if (!archive.IsStoring()){
-		CleanupDependencies();
-	}
-
-	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(parentsTag);
-	retVal = retVal && m_parents.Serialize(archive);
-	retVal = retVal && archive.EndTag(parentsTag);
-
-	return retVal;
-}
-
-
-// reimplemented (istd::IChangeable)
-
-int CFeaturePackage::GetSupportedOperations() const
-{
-	return SO_COPY | SO_COMPARE | SO_RESET;
-}
-
-
-bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode)
-{
-	istd::CChangeNotifier changeNotifier(this);
-
-	bool retVal = BaseClass::CopyFrom(object, mode);
-	if (!retVal){
-		return false;
-	}
-
-	const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
-	if (sourcePtr != nullptr){
-		m_dependencies = sourcePtr->m_dependencies;
-		m_parents = sourcePtr->m_parents;
-		m_packageId = sourcePtr->m_packageId;
-
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CFeaturePackage::IsEqual(const IChangeable& object) const
-{
-	const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
-	if (sourcePtr != nullptr){
-		return
-					m_dependencies == sourcePtr->m_dependencies &&
-					m_parents.IsEqual(sourcePtr->m_parents) &&
-					m_packageId == sourcePtr->m_packageId;
-	}
-	
-	return false;
-}
-
-
-bool CFeaturePackage::ResetData(CompatibilityMode mode)
-{
-	if (!BaseClass::ResetData(mode)){
-		return false;
-	}
-
-	if (!m_parents.ResetData(mode)){
-		return false;
-	}
-
-	m_dependencies.clear();
-
-	m_packageId.clear();
-
-	return true;
 }
 
 
