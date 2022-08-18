@@ -19,7 +19,7 @@ namespace imtlic
 // public methods
 
 CFeaturePackage::CFeaturePackage()
-    :m_featurePackageCollectionPtr(nullptr)
+	:m_featurePackageCollectionPtr(nullptr)
 {
 }
 
@@ -92,15 +92,15 @@ const IFeatureInfoProvider* CFeaturePackage::GetDependencyContainer(const QByteA
 
 bool CFeaturePackage::RemoveElement(const Id& elementId)
 {
-    bool retVal = BaseClass::RemoveElement(elementId);
+	bool retVal = BaseClass::RemoveElement(elementId);
 
-    if (retVal){
-        istd::CChangeNotifier changeNotifier(this);
+	if (retVal){
+		istd::CChangeNotifier changeNotifier(this);
 
-        CleanupDependencies();
-    }
+		CleanupDependencies();
+	}
 
-    return retVal;
+	return retVal;
 }
 
 
@@ -108,114 +108,114 @@ bool CFeaturePackage::RemoveElement(const Id& elementId)
 
 bool CFeaturePackage::Serialize(iser::IArchive& archive)
 {
-    istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
-    bool retVal = BaseClass::Serialize(archive);
+	bool retVal = BaseClass::Serialize(archive);
 
-    QByteArrayList dependencyKeys = m_dependencies.keys();
-    int dependencyCount = dependencyKeys.count();
+	QByteArrayList dependencyKeys = m_dependencies.keys();
+	int dependencyCount = dependencyKeys.count();
 
-    if (!archive.IsStoring()){
-        m_dependencies.clear();
-        m_parents.ResetData();
-        dependencyKeys.clear();
-        dependencyCount = 0;
-    }
+	if (!archive.IsStoring()){
+		m_dependencies.clear();
+		m_parents.ResetData();
+		dependencyKeys.clear();
+		dependencyCount = 0;
+	}
 
-    static iser::CArchiveTag dependenciesTag("Dependencies", "Feature list", iser::CArchiveTag::TT_MULTIPLE);
-    static iser::CArchiveTag dependencyTag("Dependency", "Dependency", iser::CArchiveTag::TT_GROUP, &dependenciesTag);
+	static iser::CArchiveTag dependenciesTag("Dependencies", "Feature list", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag dependencyTag("Dependency", "Dependency", iser::CArchiveTag::TT_GROUP, &dependenciesTag);
 
-    retVal = retVal && archive.BeginMultiTag(dependenciesTag, dependencyTag, dependencyCount);
+	retVal = retVal && archive.BeginMultiTag(dependenciesTag, dependencyTag, dependencyCount);
 
-    for (int dependencyIndex = 0; dependencyIndex < dependencyCount; dependencyIndex++){
-        retVal = retVal && archive.BeginTag(dependencyTag);
+	for (int dependencyIndex = 0; dependencyIndex < dependencyCount; dependencyIndex++){
+		retVal = retVal && archive.BeginTag(dependencyTag);
 
-        QByteArray key;
-        QByteArrayList value;
-        int valueCount = 0;
+		QByteArray key;
+		QByteArrayList value;
+		int valueCount = 0;
 
-        if (archive.IsStoring()){
-            key = dependencyKeys[dependencyIndex];
-            value = m_dependencies[key];
-            valueCount = value.count();
-        }
+		if (archive.IsStoring()){
+			key = dependencyKeys[dependencyIndex];
+			value = m_dependencies[key];
+			valueCount = value.count();
+		}
 
-        static iser::CArchiveTag keyTag("FeatureId", "FeatureId", iser::CArchiveTag::TT_LEAF, &dependencyTag);
-        retVal = retVal && archive.BeginTag(keyTag);
-        retVal = retVal && archive.Process(key);
-        retVal = retVal && archive.EndTag(keyTag);
+		static iser::CArchiveTag keyTag("FeatureId", "FeatureId", iser::CArchiveTag::TT_LEAF, &dependencyTag);
+		retVal = retVal && archive.BeginTag(keyTag);
+		retVal = retVal && archive.Process(key);
+		retVal = retVal && archive.EndTag(keyTag);
 
-        retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "BaseFeatures", "BaseFeatureId");
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "BaseFeatures", "BaseFeatureId");
 
-        if (!archive.IsStoring()){
-            m_dependencies[key] = value;
-        }
+		if (!archive.IsStoring()){
+			m_dependencies[key] = value;
+		}
 
-        retVal = retVal && archive.EndTag(dependencyTag);
-    }
+		retVal = retVal && archive.EndTag(dependencyTag);
+	}
 
-    retVal = retVal && archive.EndTag(dependenciesTag);
+	retVal = retVal && archive.EndTag(dependenciesTag);
 
-    if (!archive.IsStoring()){
-        CleanupDependencies();
-    }
+	if (!archive.IsStoring()){
+		CleanupDependencies();
+	}
 
-    static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
-    retVal = retVal && archive.BeginTag(parentsTag);
-    retVal = retVal && m_parents.Serialize(archive);
-    retVal = retVal && archive.EndTag(parentsTag);
+	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
+	retVal = retVal && archive.BeginTag(parentsTag);
+	retVal = retVal && m_parents.Serialize(archive);
+	retVal = retVal && archive.EndTag(parentsTag);
 
-    return retVal;
+	return retVal;
 }
 
 
 bool CFeaturePackage::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
-    istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this);
 
-    bool retVal = BaseClass::CopyFrom(object, mode);
-    if (!retVal){
-        return false;
-    }
+	bool retVal = BaseClass::CopyFrom(object, mode);
+	if (!retVal){
+		return false;
+	}
 
-    const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
-    if (sourcePtr != nullptr){
-        m_dependencies = sourcePtr->m_dependencies;
-        m_parents = sourcePtr->m_parents;
+	const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
+	if (sourcePtr != nullptr){
+		m_dependencies = sourcePtr->m_dependencies;
+		m_parents = sourcePtr->m_parents;
 
-        return true;
-    }
+		return true;
+	}
 
-    return false;
+	return false;
 }
 
 
 bool CFeaturePackage::IsEqual(const IChangeable& object) const
 {
-    const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
-    if (sourcePtr != nullptr){
-        return
-                    m_dependencies == sourcePtr->m_dependencies &&
-                    m_parents.IsEqual(sourcePtr->m_parents);
-    }
+	const CFeaturePackage* sourcePtr = dynamic_cast<const CFeaturePackage*>(&object);
+	if (sourcePtr != nullptr){
+		return
+			m_dependencies == sourcePtr->m_dependencies &&
+			m_parents.IsEqual(sourcePtr->m_parents);
+	}
 
-    return false;
+	return false;
 }
 
 
 bool CFeaturePackage::ResetData(CompatibilityMode mode)
 {
-    if (!BaseClass::ResetData(mode)){
-        return false;
-    }
+	if (!BaseClass::ResetData(mode)){
+		return false;
+	}
 
-    if (!m_parents.ResetData(mode)){
-        return false;
-    }
+	if (!m_parents.ResetData(mode)){
+		return false;
+	}
 
-    m_dependencies.clear();
+	m_dependencies.clear();
 
-    return true;
+	return true;
 }
 
 

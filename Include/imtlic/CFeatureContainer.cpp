@@ -19,42 +19,42 @@ namespace imtlic
 // public methods
 
 CFeatureContainer::CFeatureContainer()
-    :BaseClass("FeatureInfo", "Feature info", "Features")
+	:BaseClass("FeatureInfo", "Feature info", "Features")
 {
 }
 
 
 const IFeatureInfo* CFeatureContainer::FindFeatureById(const QByteArray& featureId) const
 {
-    imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
-    for (QByteArray id : featureIds){
-        const IFeatureInfo* featurePtr = GetFeatureInfo(id);
-        Q_ASSERT(featurePtr != nullptr);
-        if (featurePtr != nullptr){
-            if (featurePtr->GetFeatureId() == featureId){
-                return featurePtr;
-            }
-        }
-    }
+	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
+	for (QByteArray id : featureIds){
+		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
+		Q_ASSERT(featurePtr != nullptr);
+		if (featurePtr != nullptr){
+			if (featurePtr->GetFeatureId() == featureId){
+				return featurePtr;
+			}
+		}
+	}
 
-    return nullptr;
+	return nullptr;
 }
 
 
 QByteArray CFeatureContainer::GetFeatureCollectionId(const QByteArray& featureId) const
 {
-    imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
-    for (QByteArray id : featureIds){
-        const IFeatureInfo* featurePtr = GetFeatureInfo(id);
-        Q_ASSERT(featurePtr != nullptr);
-        if (featurePtr != nullptr){
-            if (featurePtr->GetFeatureId() == featureId){
-                return id;
-            }
-        }
-    }
+	imtbase::ICollectionInfo::Ids featureIds = GetFeatureList().GetElementIds();
+	for (QByteArray id : featureIds){
+		const IFeatureInfo* featurePtr = GetFeatureInfo(id);
+		Q_ASSERT(featurePtr != nullptr);
+		if (featurePtr != nullptr){
+			if (featurePtr->GetFeatureId() == featureId){
+				return id;
+			}
+		}
+	}
 
-    return QByteArray();
+	return QByteArray();
 }
 
 
@@ -62,17 +62,17 @@ QByteArray CFeatureContainer::GetFeatureCollectionId(const QByteArray& featureId
 
 QByteArray CFeatureContainer::GetPackageId() const
 {
-    return m_packageId;
+	return m_packageId;
 }
 
 
 void CFeatureContainer::SetPackageId(const QByteArray& packageId)
 {
-    if (m_packageId != packageId){
-        istd::CChangeNotifier notifier(this);
+	if (m_packageId != packageId){
+		istd::CChangeNotifier notifier(this);
 
-        m_packageId = packageId;
-    }
+		m_packageId = packageId;
+	}
 }
 
 
@@ -80,13 +80,13 @@ void CFeatureContainer::SetPackageId(const QByteArray& packageId)
 
 const imtbase::ICollectionInfo& CFeatureContainer::GetFeatureList() const
 {
-    return m_collection;
+	return m_collection;
 }
 
 
 const IFeatureInfo* CFeatureContainer::GetFeatureInfo(const QByteArray& featureId) const
 {
-    return dynamic_cast<const IFeatureInfo*>(m_collection.GetObjectPtr(featureId));
+	return dynamic_cast<const IFeatureInfo*>(m_collection.GetObjectPtr(featureId));
 }
 
 
@@ -118,16 +118,16 @@ const IFeatureInfoProvider* CFeatureContainer::GetParentFeatureInfoProvider(cons
 
 bool CFeatureContainer::Serialize(iser::IArchive& archive)
 {
-    istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
-    bool retVal = BaseClass::Serialize(archive);
+	bool retVal = BaseClass::Serialize(archive);
 
-    static iser::CArchiveTag packageIdTag("PackageId", "ID of the feature package", iser::CArchiveTag::TT_LEAF);
-    retVal = retVal && archive.BeginTag(packageIdTag);
-    retVal = retVal && archive.Process(m_packageId);
-    retVal = retVal && archive.EndTag(packageIdTag);
+	static iser::CArchiveTag packageIdTag("PackageId", "ID of the feature package", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(packageIdTag);
+	retVal = retVal && archive.Process(m_packageId);
+	retVal = retVal && archive.EndTag(packageIdTag);
 
-    return retVal;
+	return retVal;
 }
 
 
@@ -135,49 +135,49 @@ bool CFeatureContainer::Serialize(iser::IArchive& archive)
 
 int CFeatureContainer::GetSupportedOperations() const
 {
-    return SO_COPY | SO_COMPARE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_RESET;
 }
 
 
 bool CFeatureContainer::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
-    istd::CChangeNotifier changeNotifier(this);
+	istd::CChangeNotifier changeNotifier(this);
 
-    bool retVal = BaseClass::CopyFrom(object, mode);
-    if (!retVal){
-        return false;
-    }
+	bool retVal = BaseClass::CopyFrom(object, mode);
+	if (!retVal){
+		return false;
+	}
 
-    const CFeatureContainer* sourcePtr = dynamic_cast<const CFeatureContainer*>(&object);
-    if (sourcePtr != nullptr){
-        m_packageId = sourcePtr->m_packageId;
-        return true;
-    }
+	const CFeatureContainer* sourcePtr = dynamic_cast<const CFeatureContainer*>(&object);
+	if (sourcePtr != nullptr){
+		m_packageId = sourcePtr->m_packageId;
+		return true;
+	}
 
-    return false;
+	return false;
 }
 
 
 bool CFeatureContainer::IsEqual(const IChangeable& object) const
 {
-    const CFeatureContainer* sourcePtr = dynamic_cast<const CFeatureContainer*>(&object);
-    if (sourcePtr != nullptr){
-        return m_packageId == sourcePtr->m_packageId;
-    }
+	const CFeatureContainer* sourcePtr = dynamic_cast<const CFeatureContainer*>(&object);
+	if (sourcePtr != nullptr){
+		return m_packageId == sourcePtr->m_packageId;
+	}
 
-    return false;
+	return false;
 }
 
 
 bool CFeatureContainer::ResetData(CompatibilityMode mode)
 {
-    if (!BaseClass::ResetData(mode)){
-        return false;
-    }
+	if (!BaseClass::ResetData(mode)){
+		return false;
+	}
 
-    m_packageId.clear();
+	m_packageId.clear();
 
-    return true;
+	return true;
 }
 
 
