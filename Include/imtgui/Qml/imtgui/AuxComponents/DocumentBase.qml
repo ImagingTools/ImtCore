@@ -25,6 +25,7 @@ Item {
         console.log("documentBase onCompleted");
         itemId = documentsData.GetData("ItemId", model.index);
         itemName = documentsData.GetData("Title", model.index);
+        documentBase.updateGui();
 
     }
 
@@ -38,7 +39,7 @@ Item {
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                                       "CommandsId": commandsProvider.commandsId});
 
-            updateGui();
+            documentBase.updateGui();
         }
     }
 
