@@ -84,6 +84,7 @@ Rectangle {
 
         width: parent.width;
         height: 60;
+
     }
 
     function setPreferencesVisible(visible){
@@ -127,4 +128,6 @@ Rectangle {
         id: serverConnectionManager;
         anchors.fill: parent;
     }
+
+
 }

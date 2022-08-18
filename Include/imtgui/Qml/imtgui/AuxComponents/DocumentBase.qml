@@ -25,6 +25,7 @@ Item {
         console.log("documentBase onCompleted");
         itemId = documentsData.GetData("ItemId", model.index);
         itemName = documentsData.GetData("Title", model.index);
+
     }
 
     onCommandsIdChanged: {

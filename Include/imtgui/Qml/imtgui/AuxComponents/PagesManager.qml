@@ -21,6 +21,7 @@ Item {
             id: pagesDeleg;
 
             anchors.fill: parent;
+            anchors.margins: thumbnailDecoratorContainer.mainMargin;
 
             visible: activePageIndex === model.index;
 

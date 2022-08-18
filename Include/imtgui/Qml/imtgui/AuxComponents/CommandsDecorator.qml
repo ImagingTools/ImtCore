@@ -36,7 +36,7 @@ Item {
 
                 text: model.Name;
                 isEmpty: model.Name === "";
-                imageSource: "../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
+                imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
                 fontName: Style.fontFamily;
                 checkable: model.Mode == "Normal";
 

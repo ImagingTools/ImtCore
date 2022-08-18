@@ -51,7 +51,7 @@ Rectangle {
         clip: true;
         orientation: ListView.Horizontal;
 
-        spacing: thumbnailDecoratorContainer.mainMargin;
+        spacing: 0;
         model: 4;
 
         boundsBehavior: Flickable.StopAtBounds;
@@ -61,6 +61,7 @@ Rectangle {
 
             selected: model.index === tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
+            lastElement: model.index === list.count - 1;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
 

@@ -16,7 +16,6 @@ Item {
 
     Component.onCompleted: {
         console.log("MultidocWorkspaceView onCompleted", tabPanelInternal.selectedIndex)
-        docsData.anchors.topMargin = tabPanelInternal.height;
     }
 
     onFocusChanged: {
@@ -116,6 +115,7 @@ Item {
                 tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
             }
         }
+
     }
 
     ListView {
@@ -123,8 +123,8 @@ Item {
 
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.top: parent.top;
-        anchors.topMargin: tabPanelInternal.height;
+        anchors.top: tabPanelInternal.bottom;
+        anchors.topMargin: 20;//thumbnailDecoratorContainer.mainMargin;
         anchors.bottom: parent.bottom;
 
         clip: true;

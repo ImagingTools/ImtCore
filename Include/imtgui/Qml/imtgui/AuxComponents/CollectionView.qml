@@ -16,7 +16,7 @@ Item {
     property string commandsId;
     property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
     property string commandUpdateGui;
-    property alias commands: commandsLoader.item;
+    property alias commandsDelegate: commandsLoader.item;
 
     /**
         Если true -> данные будут запрошены с сервера,

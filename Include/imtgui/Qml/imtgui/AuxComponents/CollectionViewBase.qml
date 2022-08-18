@@ -59,7 +59,6 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
-        anchors.margins: thumbnailDecoratorContainer.mainMargin;
 
         color: Style.baseColor;
 
@@ -69,9 +68,8 @@ Item {
             id: tableInternal;
 
             anchors.fill: parent;
-            anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
-            anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
             anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
+            anchors.margins: thumbnailDecoratorContainer.mainMargin;
 
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;

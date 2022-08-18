@@ -11,6 +11,7 @@ Item{
 
     property bool selected: false;
     property bool firstElement: false;
+    property bool lastElement: false;
     property bool autoWidth: true;
 
     property string text: "no name";

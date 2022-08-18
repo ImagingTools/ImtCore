@@ -15,6 +15,7 @@ Item {
 
         anchors.horizontalCenter: parent.horizontalCenter;
 
+
         onVisibleChanged: {
             if (!visible){
                 Events.unSubscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
@@ -25,6 +26,7 @@ Item {
             console.log("topCenterPanelDecorator onCompleted");
             Events.subscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
         }
+
     }
 }
 

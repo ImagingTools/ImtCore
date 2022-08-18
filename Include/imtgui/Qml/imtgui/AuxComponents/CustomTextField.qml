@@ -23,6 +23,7 @@ Item {
 
     signal accepted();
 
+
     onFocusChanged: {
         console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus)
     }

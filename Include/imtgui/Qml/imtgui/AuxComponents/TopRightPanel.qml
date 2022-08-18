@@ -30,10 +30,6 @@ Rectangle {
         }
     }
 
-//    Rectangle {
-//        anchors.fill: parent;
-//        color: "red";
-//    }
 
     Loader {
         id: decoratorLoader;
@@ -45,5 +41,7 @@ Rectangle {
             }
         }
     }
+
+
 }
 

@@ -30,6 +30,9 @@ UndoRedo 1.0 ./AuxComponents/UndoRedo.qml
 DocumentBase 1.0 ./AuxComponents/DocumentBase.qml
 UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
 LoginButton 1.0 ./AuxComponents/LoginButton.qml
+PagesManager 1.0 ./AuxComponents/PagesManager.qml
+PreferenceDialog 1.0 ./AuxComponents/PreferenceDialog.qml
+ServerConnectionManager 1.0 ./AuxComponents/ServerConnectionManager.qml
 
 LoginDialog 1.0 ./AuxComponents/Dialogs/LoginDialog.qml
 PopupMenuDialog 1.0 ./AuxComponents/Dialogs/PopupMenuDialog.qml

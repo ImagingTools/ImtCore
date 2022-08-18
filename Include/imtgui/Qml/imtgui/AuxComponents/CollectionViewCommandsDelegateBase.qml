@@ -59,7 +59,7 @@ Item {
     function commandHandle(commandId){
         console.log("CollectionView commandHandle", commandId);
         if (commandId === "New"){
-            collectionViewBase.selectedItem("", "<new item>");
+            baseCollectionView.selectedItem("", "<new item>");
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
@@ -67,7 +67,7 @@ Item {
         else if (commandId === "Edit"){
             let itemId = tableData.getSelectedId();
             let itemName = tableData.getSelectedName();
-            collectionViewBase.selectedItem(itemId, itemName);
+            baseCollectionView.selectedItem(itemId, itemName);
         }
         else if (commandId === "Rename"){
             let selectedName = tableData.getSelectedName();
@@ -77,6 +77,11 @@ Item {
             let elements = tableData.elements;
             let selectedDescription = elements.GetData("Description", selectedIndex);
             modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
+        }
+
+        else if (commandId === "Close"){
+            multiDocView.closeDocument(itemId);
+
         }
 
         commandActivated(commandId);
