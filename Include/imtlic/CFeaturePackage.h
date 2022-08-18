@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureContainer.h>
+#include <imtlic/IFeatureDependenciesManager.h>
 
 
 namespace imtlic
