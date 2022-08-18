@@ -45,12 +45,12 @@ public:
 	virtual void SetSortingInfoIds(const QByteArrayList& sortingInfoIds) = 0;
 
 	/**
-		Get ID of the meta-information used for filtering the elements in the collection.
+		Get IDs of the meta-information used for filtering the elements in the collection.
 	*/
 	virtual QByteArrayList GetFilteringInfoIds() const = 0;
 
 	/**
-		Set ID of the meta-information used for filtering the elements in the collection.
+		Set IDs of the meta-information used for filtering the elements in the collection.
 	*/
 	virtual void SetFilteringInfoIds(const QByteArrayList& filteringInfoIds) = 0;
 };
