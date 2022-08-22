@@ -563,6 +563,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 
 	if (!informationIds.isEmpty()){
 		idoc::MetaInfoPtr metaInfo;
+		metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
 
@@ -576,7 +577,6 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 				elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 			}
 			else{
-				metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 				if (metaInfo.IsValid()){
 					if (informationId == QByteArray("Added")){
 						elementInformation = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
