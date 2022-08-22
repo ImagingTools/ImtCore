@@ -125,6 +125,18 @@ ICollectionInfo::Ids CCollectionInfo::GetElementIds(
 }
 
 
+bool CCollectionInfo::GetSubsetInfo(
+			imtbase::ICollectionInfo& subsetInfo,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& parentId,
+			int iterationFlags) const
+{
+	return false;
+}
+
+
 ICollectionInfo::Id CCollectionInfo::GetParentId(const Id& /*elementId*/) const
 {
 	return Id();

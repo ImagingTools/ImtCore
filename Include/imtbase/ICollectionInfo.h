@@ -143,12 +143,27 @@ public:
 
 	/**
 		Get IDs of the elements inside the collection for parent.
-		\param parentId	Parent element ID
-		\param offset	Index offset of the first element
-		\param count	If positive, the number of elements should be returned.
-		\param selectionParamsPtr	 [optional] Additional parameters for filtering/ordering elements.
+		\param offset				[optional] Index offset of the first element
+		\param count				[optional] If positive, the number of elements should be returned.
+		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
+		\param parentId				[optional] Parent element ID. Entire filtering operation applies to the childs of this element only.
 	*/
 	virtual Ids GetElementIds(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
+	/**
+		Get information about the subset of the whole collection according to the given filtering/sorting parameters.
+		\param subsetInfo		collection information for the data subset.
+		\param offset				[optional] Index offset of the first element
+		\param count				[optional] If positive, the number of elements should be returned.
+		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
+		\param parentId				[optional] Parent element ID. Entire filtering operation applies to the childs of this element only.
+	*/
+	virtual bool GetSubsetInfo(
+				ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,

@@ -728,6 +728,11 @@ imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::
 	return Ids();
 }
 
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetSubsetInfo(imtbase::ICollectionInfo& subsetInfo, int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+{
+	return false;
+}
+
 
 imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetParentId(const Id& /*elementId*/) const
 {

@@ -316,6 +316,19 @@ ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 	return retVal;
 }
 
+
+bool CObjectCollectionBase::GetSubsetInfo(
+			ICollectionInfo& subsetInfo,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& parentId,
+			int iterationFlags) const
+{
+	return false;
+}
+
+
 ICollectionInfo::Id CObjectCollectionBase::GetParentId(const Id& /*elementId*/) const
 {
 	return Id();

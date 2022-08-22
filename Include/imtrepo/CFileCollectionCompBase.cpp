@@ -686,6 +686,12 @@ imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
 }
 
 
+bool CFileCollectionCompBase::GetSubsetInfo(imtbase::ICollectionInfo& subsetInfo, int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+{
+	return false;
+}
+
+
 imtbase::ICollectionInfo::Id CFileCollectionCompBase::GetParentId(const Id& /*elementId*/) const
 {
 	return Id();

@@ -130,6 +130,19 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 	return retVal;
 }
 
+
+bool CSimpleReferenceCollection::GetSubsetInfo(
+			imtbase::ICollectionInfo& subsetInfo,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& parentId,
+			int iterationFlags) const
+{
+	return false;
+}
+
+
 imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetParentId(const Id& /*elementId*/) const
 {
 	return Id();

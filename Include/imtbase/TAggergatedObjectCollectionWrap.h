@@ -81,6 +81,13 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const Id& parentId = Id(),
 				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual bool GetSubsetInfo(
+				imtbase::ICollectionInfo& subsetInfo,
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	virtual Id GetParentId(const Id& elementId) const override;
 	virtual Ids GetElementPath(const Id& elementId) const override;
 	virtual bool IsBranch(const Id& elementId) const override;
@@ -276,6 +283,19 @@ inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterfa
 			int iterationFlags) const
 {
 	return m_collection.GetElementIds(offset, count, selectionParamsPtr, parentId, iterationFlags);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetSubsetInfo(
+			imtbase::ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
+{
+	return false;
 }
 
 
