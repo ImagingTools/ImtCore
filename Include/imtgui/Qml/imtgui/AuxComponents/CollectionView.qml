@@ -33,6 +33,10 @@ Item {
         console.log("itemName", itemName);
     }
 
+    Component.onDestruction: {
+        Events.unSubscribeEvent(commandUpdateGui, updateGui);
+    }
+
     onCommandUpdateGuiChanged: {
         Events.subscribeEvent(commandUpdateGui, updateGui);
     }
