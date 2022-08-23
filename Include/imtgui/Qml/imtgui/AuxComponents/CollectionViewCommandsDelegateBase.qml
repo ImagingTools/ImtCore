@@ -46,6 +46,10 @@ Item {
         commandsProvider.changeCommandMode("Edit", mode);
     }
 
+    Component.onDestruction: {
+        Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
+    }
+
     onCommandsIdChanged: {
         console.log("CollectionCommands onCommandsIdChanged", containerBase.commandsId);
         Events.subscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
