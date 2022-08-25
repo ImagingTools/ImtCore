@@ -160,8 +160,9 @@ bool CFeatureContainer::CopyFrom(const IChangeable& object, CompatibilityMode mo
 
 bool CFeatureContainer::IsEqual(const IChangeable& object) const
 {
+	bool retVal = BaseClass::IsEqual(object);
 	const CFeatureContainer* sourcePtr = dynamic_cast<const CFeatureContainer*>(&object);
-	if (sourcePtr != nullptr){
+	if (sourcePtr != nullptr && retVal){
 		return m_packageId == sourcePtr->m_packageId;
 	}
 

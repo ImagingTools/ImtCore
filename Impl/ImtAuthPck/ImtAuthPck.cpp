@@ -44,6 +44,16 @@ I_EXPORT_COMPONENT(
 			"Account info metainfo creator",
 			"Account Metainfo Creator");
 
+I_EXPORT_COMPONENT(
+			Role,
+			"Role",
+			"Role");
+
+I_EXPORT_COMPONENT(
+			RoleMetaInfoCreator,
+			"Role metainfo creator",
+			"Role Metainfo Creator");
+
 
 } // namespace ImtAuthPck
 

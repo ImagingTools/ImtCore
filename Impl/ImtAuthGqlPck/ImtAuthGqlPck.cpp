@@ -19,6 +19,16 @@ I_EXPORT_COMPONENT(
 			"AuthorizationController",
 			"AuthorizationController");
 
+I_EXPORT_COMPONENT(
+			RoleCollectionController,
+			"RoleCollectionController",
+			"Role Collection Controller");
+
+I_EXPORT_COMPONENT(
+			RoleController,
+			"RoleController",
+			"Role Controller");
+
 
 
 } // namespace ImtAuthGqlPck

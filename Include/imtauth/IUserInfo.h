@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <iser/IObject.h>
+#include <imtauth/IRole.h>
 
 namespace imtauth
 {
@@ -12,7 +13,9 @@ namespace imtauth
     Interface for describing an user.
     \ingroup User
 */
-class IUserInfo: virtual public iser::IObject
+class IUserInfo:
+		virtual public iser::IObject,
+		virtual public imtauth::IRole
 {
 public:
 
@@ -24,7 +27,7 @@ public:
     /**
         Set id of the user.
     */
-    virtual bool SetId(QByteArray id) = 0;
+	virtual void SetId(QByteArray id) = 0;
 
     /**
         Get username of the user.
@@ -34,7 +37,7 @@ public:
     /**
         Set username of the user.
     */
-    virtual bool SetUsername(QString username) = 0;
+	virtual void SetUsername(QString username) = 0;
 
     /**
         Get name of the user.
@@ -44,7 +47,7 @@ public:
     /**
         Set name of the user.
     */
-    virtual bool SetName(QString name) = 0;
+	virtual void SetName(QString name) = 0;
 
     /**
         Get password hash of the user.
@@ -54,7 +57,7 @@ public:
     /**
         Set password hash of the user.
     */
-    virtual bool SetPasswordHash(QByteArray passwordHash) = 0;
+	virtual void SetPasswordHash(QByteArray passwordHash) = 0;
 
     /**
         Get e-mail of the user.
@@ -64,7 +67,8 @@ public:
     /**
         Set e-mail of the user.
     */
-    virtual bool SetMail(QString mail) = 0;
+	virtual void SetMail(QString mail) = 0;
+
 
 };
 
