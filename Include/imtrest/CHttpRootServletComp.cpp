@@ -42,7 +42,10 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 		return responsePtr;
 	}
 	else{
-		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandId)).toUtf8();
+        QByteArray commandIdSafe = commandId.replace("<","<<");
+        commandIdSafe = commandId.replace(">",">>");
+        commandIdSafe = commandId.replace("/","//");
+        QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
