@@ -118,18 +118,6 @@ void CObjectCollectionMetaInfoViewComp::UpdateGui(const istd::IChangeable::Chang
 }
 
 
-// iqtgui::TDesignSchemaHandlerWrap
-
-void CObjectCollectionMetaInfoViewComp::OnDesignSchemaChanged()
-{
-	BaseClass::OnDesignSchemaChanged();
-
-	if (IsGuiCreated()){
-		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
-	}
-}
-
-
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
@@ -170,6 +158,15 @@ void CObjectCollectionMetaInfoViewComp::OnGuiRetranslate()
 		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
 }
+
+
+void CObjectCollectionMetaInfoViewComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
+}
+
 
 
 // reimplemented (iqtgui::TGuiObserverWrap)
