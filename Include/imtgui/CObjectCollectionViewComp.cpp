@@ -313,18 +313,6 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 }
 
 
-// iqtgui::TDesignSchemaHandlerWrap
-
-void CObjectCollectionViewComp::OnDesignSchemaChanged()
-{
-	BaseClass::OnDesignSchemaChanged();
-
-	if (IsGuiCreated()){
-		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
-	}
-}
-
-
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CObjectCollectionViewComp::OnGuiCreated()
@@ -430,6 +418,14 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	UpdateGui(istd::IChangeable::GetAnyChange());
+}
+
+
+void CObjectCollectionViewComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
 }
 
 
