@@ -53,6 +53,7 @@ public:
 				const QByteArray& objectId,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const override;
 protected:
+	virtual QString GetBaseSelectionQuery() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;
 	virtual bool SetCollectionItemMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const;
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const;

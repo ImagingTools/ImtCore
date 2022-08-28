@@ -57,6 +57,7 @@ protected:
 	virtual bool ReadDataFromMemory(const QByteArray& data, istd::IChangeable& object) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+	virtual QString GetBaseSelectionQuery() const override;
 	virtual bool CreateObjectInfoFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record,

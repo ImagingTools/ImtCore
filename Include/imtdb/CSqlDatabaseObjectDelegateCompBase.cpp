@@ -65,9 +65,10 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			return QByteArray();
 		}
 
+		QString baseSelelectionQuery = GetBaseSelectionQuery();
+
 		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
-		QString retVal = "(SELECT * FROM";
-		retVal += QString(" ") + qPrintable(*m_tableNameAttrPtr);
+		QString retVal = "(" + baseSelelectionQuery;
 		retVal += QString(" ") + filterQuery;
 		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
 		retVal += QString(" ") + sortQuery;
@@ -151,6 +152,12 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery
 
 
 // protected methods
+
+QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
+{
+	return QString("SELECT * FROM %1").arg(qPrintable(*m_tableNameAttrPtr));
+}
+
 
 idoc::IDocumentMetaInfo* CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfo(const QByteArray& /*typeId*/) const
 {

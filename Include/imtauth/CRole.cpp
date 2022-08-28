@@ -24,7 +24,7 @@ CRole::CRole()
 }
 
 
-const imtlic::IFeatureInfoProvider *CRole::GetPermissionProvider() const
+const imtlic::IFeatureInfoProvider* CRole::GetPermissionProvider() const
 {
 	return m_permissionProviderPtr;
 }
@@ -36,7 +36,7 @@ QByteArray CRole::GetRoleId() const
 }
 
 
-void CRole::SetRoleId(const QByteArray &id)
+void CRole::SetRoleId(const QByteArray& id)
 {
 	if (m_roleId != id){
 		istd::CChangeNotifier changeNotifier(this);
@@ -45,12 +45,14 @@ void CRole::SetRoleId(const QByteArray &id)
 	}
 }
 
+
 QString CRole::GetRoleName() const
 {
 	return m_roleName;
 }
 
-void CRole::SetRoleName(const QString &name)
+
+void CRole::SetRoleName(const QString& name)
 {
 	if (m_roleName != name){
 		istd::CChangeNotifier changeNotifier(this);
@@ -59,25 +61,31 @@ void CRole::SetRoleName(const QString &name)
 	}
 }
 
+
 IRole::FeatureIds CRole::GetPermissions() const
 {
 	IRole::FeatureIds allPermissions;
 	for (const IRole* rolePtr: m_parents){
 		allPermissions += rolePtr->GetPermissions();
 	}
+
 	allPermissions += m_rolePermissions;
+
 	for (const QByteArray& prohibitionId : m_roleRestrictions){
 		allPermissions.remove(prohibitionId);
 	}
+
 	return allPermissions;
 }
+
 
 IRole::FeatureIds CRole::GetLocalPermissions() const
 {
 	return m_rolePermissions;
 }
 
-void CRole:: SetLocalPermissions(const IRole::FeatureIds &permissions)
+
+void CRole:: SetLocalPermissions(const IRole::FeatureIds& permissions)
 {
 	if (m_rolePermissions != permissions){
 		istd::CChangeNotifier changeNotifier(this);
@@ -86,18 +94,22 @@ void CRole:: SetLocalPermissions(const IRole::FeatureIds &permissions)
 	}
 }
 
+
 IRole::FeatureIds CRole::GetProhibitions() const
 {
 	IRole::FeatureIds allProhibitions;
+
 	for (const IRole* rolePtr: m_parents){
 		allProhibitions += rolePtr->GetPermissions();
 	}
+
 	allProhibitions += m_roleRestrictions;
 
 	return allProhibitions;
 }
 
-void CRole::SetProhibitions(const IRole::FeatureIds &prohibitions)
+
+void CRole::SetProhibitions(const IRole::FeatureIds& prohibitions)
 {
 	if (m_roleRestrictions != prohibitions){
 		istd::CChangeNotifier changeNotifier(this);
@@ -106,12 +118,14 @@ void CRole::SetProhibitions(const IRole::FeatureIds &prohibitions)
 	}
 }
 
-const QList<const IRole *> CRole::GetParents() const
+
+const QList<const IRole*> CRole::GetParents() const
 {
 	return m_parents;
 }
 
-void CRole::SetParents(const QList<const IRole *> parents)
+
+void CRole::SetParents(const QList<const IRole*> parents)
 {
 	if (m_parents != parents){
 		istd::CChangeNotifier changeNotifier(this);
@@ -120,9 +134,13 @@ void CRole::SetParents(const QList<const IRole *> parents)
 	}
 }
 
-bool CRole::Serialize(iser::IArchive &archive)
+
+// reimplemented (iser::ISerializable)
+
+bool CRole::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
 	bool retVal = true;
 
 	static iser::CArchiveTag roleIdTag("RoleId", "ID of the role", iser::CArchiveTag::TT_LEAF);
@@ -138,12 +156,16 @@ bool CRole::Serialize(iser::IArchive &archive)
 	return retVal;
 }
 
+
+// reimplemented (iser::IChangeable)
+
 int CRole::GetSupportedOperations() const
 {
-	return SO_COPY | SO_COMPARE | SO_RESET;
+	return SO_COPY | SO_COMPARE | SO_RESET | SO_CLONE;
 }
 
-bool CRole::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
+
+bool CRole::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -154,6 +176,11 @@ bool CRole::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 		m_rolePermissions = sourcePtr->m_rolePermissions;
 		m_roleRestrictions = sourcePtr->m_roleRestrictions;
 		m_parents = sourcePtr->m_parents;
+
+		if (mode == CM_WITH_REFS){
+			m_permissionProviderPtr = sourcePtr->m_permissionProviderPtr;
+		}
+
 		return true;
 	}
 
@@ -161,14 +188,22 @@ bool CRole::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 }
 
 
-istd::IChangeable *CRole::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CRole::CloneMe(CompatibilityMode mode) const
 {
+	istd::TDelPtr<CRole> clonePtr(new CRole());
+
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
 	return nullptr;
 }
 
-bool CRole::ResetData(CompatibilityMode mode)
+
+bool CRole::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
+
 	m_roleId.clear();
 	m_roleName.clear();
 	m_rolePermissions.clear();
@@ -177,7 +212,6 @@ bool CRole::ResetData(CompatibilityMode mode)
 
 	return true;
 }
-
 
 
 } // namespace imtauth

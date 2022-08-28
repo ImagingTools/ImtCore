@@ -14,6 +14,10 @@ namespace imtdb
 {
 
 
+static const QByteArray s_documentIdColumn = "DocumentId";
+static const QByteArray s_idColumn = "Id";
+
+
 // public methods
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -90,7 +94,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 				if (metaInfoPtr.IsValid()){
 					retVal.query += "\n";
 
-					QByteArrayList columnIds = {"Id", "DocumentId"};
+					QByteArrayList columnIds = {s_idColumn, s_documentIdColumn};
 					columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
 					QStringList tableValues;
@@ -125,7 +129,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
-	QByteArray retVal = QString("DELETE FROM %1 WHERE Id = '%2';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM %1 WHERE %2 = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -142,12 +146,13 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	if (WriteDataToMemory(object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
-		retVal = QString("UPDATE %1 SET %2 = '%3', LastModified = '%4', Checksum = '%5' WHERE Id = '%6';")
+		retVal = QString("UPDATE %1 SET %2 = '%3', LastModified = '%4', Checksum = '%5' WHERE %6 = '%7';")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
 					.arg(qPrintable(documentContent.toBase64()))
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum)
+					.arg(qPrintable(s_idColumn))
 					.arg(qPrintable(objectId))
 					.toLocal8Bit();
 
@@ -167,9 +172,10 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					valueTuples.push_back(columnId + " = " + "'" + value + "'");
 				}
 
-				retVal += QString("UPDATE %1 SET %2 WHERE DocumentId = '%3';")
+				retVal += QString("UPDATE %1 SET %2 WHERE %3 = '%4';")
 							.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 							.arg(valueTuples.join(", "))
+							.arg(qPrintable(s_documentIdColumn))
 							.arg(qPrintable(objectId))
 							.toLocal8Bit();
 			}
@@ -316,6 +322,16 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 
 // reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 
+QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
+{
+	return QString("SELECT * from %1 JOIN %2 ON %1.%3 = %2.%4")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(s_documentIdColumn));
+}
+
+
 bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 			const QByteArray& typeId,
 			const QSqlRecord& record,
@@ -326,7 +342,13 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 		return false;
 	}
 
-	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM  %1 WHERE DocumentId = '%2'").arg(qPrintable(*m_metaInfoTableNameAttrPtr)).arg(record.value("Id").toString()).toLocal8Bit();
+	QByteArray objectId = record.value(qPrintable(s_idColumn)).toByteArray();
+
+	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM  %1 WHERE %3 = '%2'")
+				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(qPrintable(s_documentIdColumn))
+				.toLocal8Bit();
 
 	QSqlQuery metaInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(sqlMetaInfoQuery);
 	if (metaInfoQuery.next()){
