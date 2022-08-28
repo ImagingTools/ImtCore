@@ -13,36 +13,6 @@ CStandardAccountMenuComp::CStandardAccountMenuComp()
 }
 
 
-bool CStandardAccountMenuComp::eventFilter(QObject* watched, QEvent* event)
-{
-	if (event->type() == QEvent::MouseButtonPress){
-		if (watched == LogoutFrame){
-			QWidget* widgetPtr =  GetQtWidget();
-			if (widgetPtr != nullptr){
-				widgetPtr->hide();
-			}
-
-			if (m_loginCompPtr.IsValid()){
-				m_loginCompPtr->Logout();
-			}
-		}
-
-		if (watched == PreferencesFrame){
-			QWidget* widgetPtr = GetQtWidget();
-			if (widgetPtr != nullptr){
-				widgetPtr->hide();
-			}
-			
-			if (m_preferencesDialogCompPtr.IsValid()){
-				m_preferencesDialogCompPtr->ExecuteDialog(this);
-			}
-		}
-	}
-
-	return BaseClass::eventFilter(watched, event);
-}
-
-
 // protected methods
 
 // reimplemented (iqtgui::CGuiComponentBase)
@@ -77,16 +47,46 @@ void CStandardAccountMenuComp::OnGuiDestroyed()
 }
 
 
-// reimplemented (ibase::TDesignSchemaHandlerWrap)
-
-void CStandardAccountMenuComp::OnDesignSchemaChanged()
+void CStandardAccountMenuComp::OnGuiDesignChanged()
 {
-	BaseClass::OnDesignSchemaChanged();
+	BaseClass::OnGuiDesignChanged();
 
 	QIcon accountIcon = GetIcon(*m_accountPreviewAttrPtr);
 	QIcon preferencesIcon = GetIcon(*m_preferencesIconAttrPtr);
 	AccountPreview->setPixmap(accountIcon.pixmap(*m_iconSizeAttrPtr));
 	PreferencesIcon->setPixmap(preferencesIcon.pixmap(*m_iconSizeAttrPtr));
+}
+
+
+// reimplemented (QObject)
+
+bool CStandardAccountMenuComp::eventFilter(QObject* watched, QEvent* event)
+{
+	if (event->type() == QEvent::MouseButtonPress){
+		if (watched == LogoutFrame){
+			QWidget* widgetPtr = GetQtWidget();
+			if (widgetPtr != nullptr){
+				widgetPtr->hide();
+			}
+
+			if (m_loginCompPtr.IsValid()){
+				m_loginCompPtr->Logout();
+			}
+		}
+
+		if (watched == PreferencesFrame){
+			QWidget* widgetPtr = GetQtWidget();
+			if (widgetPtr != nullptr){
+				widgetPtr->hide();
+			}
+
+			if (m_preferencesDialogCompPtr.IsValid()){
+				m_preferencesDialogCompPtr->ExecuteDialog(this);
+			}
+		}
+	}
+
+	return BaseClass::eventFilter(watched, event);
 }
 
 
@@ -100,7 +100,6 @@ void CStandardAccountMenuComp::OnLoginUpdate(const istd::IChangeable::ChangeSet&
 		UserName->setText(userPtr->GetUserName());
 		userName.replace(" ", "");
 
-		//Email->setText(userName + "@yahoo.com");
 		Email->setVisible(false);
 	}
 }

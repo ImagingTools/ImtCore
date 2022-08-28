@@ -153,18 +153,6 @@ void CLayoutManagerGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*chan
 }
 
 
-// iqtgui::TDesignSchemaHandlerWrap
-
-void CLayoutManagerGuiComp::OnDesignSchemaChanged()
-{
-	BaseClass::OnDesignSchemaChanged();
-
-	if (IsGuiCreated()){
-		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
-	}
-}
-
-
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CLayoutManagerGuiComp::OnGuiCreated()
@@ -248,8 +236,6 @@ void CLayoutManagerGuiComp::OnGuiCreated()
 	}
 
 	m_layoutWidgetPtr->SetAdditionalNames(additionalNames);
-
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
 }
 
 
@@ -270,6 +256,14 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/Clear"));
 	m_loadCommand.SetVisuals(tr("Import"), tr("Import"), tr("Import"), QIcon(":/Icons/Import"));
 	m_saveCommand.SetVisuals(tr("Export"), tr("Export"), tr("Export"), QIcon(":/Icons/Export"));
+}
+
+
+void CLayoutManagerGuiComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
 }
 
 

@@ -149,9 +149,7 @@ void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
 	shadowPtr->setColor(QColor("#555555"));
 
 	PreviewFrame->setGraphicsEffect(shadowPtr);
-	
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
-}
+	}
 
 
 void CObjectCollectionMetaInfoViewComp::OnGuiDestroyed()

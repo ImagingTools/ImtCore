@@ -80,14 +80,6 @@ void CStandardLoginGuiComp::OnGuiDestroyed()
 }
 
 
-// reimplemented (ibase::TDesignSchemaHandlerWrap)
-
-void CStandardLoginGuiComp::OnDesignSchemaChanged()
-{
-	BaseClass::OnDesignSchemaChanged();
-}
-
-
 // reimplemented (iqtgui::TRestorableGuiWrap)
 
 void CStandardLoginGuiComp::OnRestoreSettings(const QSettings& settings)
@@ -158,7 +150,7 @@ void CStandardLoginGuiComp::on_PasswordEdit_textEdited(const QString&/*text*/)
 
 // private methods
 
-void CStandardLoginGuiComp::OnLoginUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const iauth::ILogin* objectPtr)
+void CStandardLoginGuiComp::OnLoginUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const iauth::ILogin* /*objectPtr*/)
 {
 	UpdateLoginButtonsState();
 }

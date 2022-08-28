@@ -102,18 +102,6 @@ void CMenuPanelComp::OnGuiModelDetached()
 }
 
 
-// iqtgui::TDesignSchemaHandlerWrap
-
-void CMenuPanelComp::OnDesignSchemaChanged()
-{
-	BaseClass::OnDesignSchemaChanged();
-
-	if (IsGuiCreated()){
-		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
-	}
-}
-
-
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CMenuPanelComp::OnGuiCreated()
@@ -156,8 +144,6 @@ void CMenuPanelComp::OnGuiCreated()
 	if (m_menuPanelVisibilityModelCompPtr.IsValid()){
 		m_menuPanelVisibilityModelCompPtr->AttachObserver(&m_menuPanelVisibilityObserver);
 	}
-
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
 }
 
 
@@ -170,6 +156,14 @@ void CMenuPanelComp::OnGuiRetranslate()
 	
 		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
+}
+
+
+void CMenuPanelComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
 }
 
 

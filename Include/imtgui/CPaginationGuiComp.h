@@ -26,17 +26,13 @@ public:
 	CPaginationGuiComp();
 
 protected:
-	// reimplemented (iqtgui::CGuiComponentBase)
-	virtual void OnGuiCreated() override;
-
-	// reimplemented (imod::CSingleModelObserverBase)
+	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
-
-	// reimplemented (imod::IObserver)
 	virtual void OnGuiModelDetached() override;
 
-	// reimplemented (ibase::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged();
+	// reimplemented (iqtgui::CGuiComponentBase)
+	virtual void OnGuiCreated() override;
+	virtual void OnGuiDesignChanged() override;
 
 protected:
 	void UpdateIcons();

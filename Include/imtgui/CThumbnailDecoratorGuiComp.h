@@ -187,14 +187,12 @@ protected:
 	virtual void OnRestoreSettings(const QSettings& settings) override;
 	virtual void OnSaveSettings(QSettings& settings) const override;
 
-	// reimlpemented (iqtgui::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged() override;
-
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
+	virtual void OnGuiDesignChanged();
 
 private Q_SLOTS:
 	void on_PageList_clicked(const QModelIndex& index);

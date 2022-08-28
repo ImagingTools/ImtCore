@@ -400,8 +400,6 @@ void CObjectCollectionViewComp::OnGuiCreated()
 	if (m_currentInformationViewPtr == nullptr){
 		RightPanel->setVisible(false);
 	}
-
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
 }
 
 

@@ -18,6 +18,35 @@ CPaginationGuiComp::CPaginationGuiComp()
 
 // protected methods
 
+// reimplemented (iqtgui::TGuiObserverWrap)
+
+void CPaginationGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
+	if (pageSelectionPtr != nullptr){
+		const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
+		if (pageListPtr != nullptr){
+			if (m_firstVisiblePageIndex >= pageListPtr->GetOptionsCount()){
+				m_firstVisiblePageIndex = pageListPtr->GetOptionsCount() / 10;
+			}
+		}
+	}
+
+	UpdateNavigationButtons();
+
+	UpdatePageButtons();
+}
+
+
+void CPaginationGuiComp::OnGuiModelDetached()
+{
+	BaseClass::OnGuiModelDetached();
+
+	UpdateNavigationButtons();
+	UpdatePageButtons();
+}
+
+
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CPaginationGuiComp::OnGuiCreated()
@@ -34,40 +63,10 @@ void CPaginationGuiComp::OnGuiCreated()
 }
 
 
-// reimplemented (imod::CSingleModelObserverBase)
-
-void CPaginationGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& changeSet)
+void CPaginationGuiComp::OnGuiDesignChanged()
 {
-	iprm::ISelectionParam* pageSelectionPtr = GetObservedObject();
-	if (pageSelectionPtr != nullptr){
-		const iprm::IOptionsList* pageListPtr = pageSelectionPtr->GetSelectionConstraints();
-		if (pageListPtr != nullptr){
-			if (m_firstVisiblePageIndex >= pageListPtr->GetOptionsCount()){
-				m_firstVisiblePageIndex = pageListPtr->GetOptionsCount() / 10;
-			}
-		}
-	}
+	BaseClass::OnGuiDesignChanged();
 
-	UpdateNavigationButtons();
-	UpdatePageButtons();
-}
-
-
-// reimplemented (imod::IObserver)
-
-void CPaginationGuiComp::OnGuiModelDetached()
-{
-	BaseClass::OnGuiModelDetached();
-
-	UpdateNavigationButtons();
-	UpdatePageButtons();
-}
-
-
-// reimplemented (ibase::TDesignSchemaHandlerWrap)
-
-void CPaginationGuiComp::OnDesignSchemaChanged()
-{
 	UpdateIcons();
 }
 

@@ -192,16 +192,6 @@ void CQuickApplicationCompBase::InitializeComponentApplication()
 
 void CQuickApplicationCompBase::ApplyStyleSheet()
 {
-	// Set up style sheet:
-	if (!m_styleSheetFile.isEmpty()){
-//		if (!iqtgui::SetStyleSheetFromFile(*m_applicationPtr, m_styleSheetFile)){
-//			qDebug("Style sheet file could not be set: %s", m_styleSheetFile.toLocal8Bit().constData());
-//		}
-	}
-	else{
-		// Reset style sheet:
-//		m_applicationPtr->setStyleSheet("");
-	}
 }
 
 

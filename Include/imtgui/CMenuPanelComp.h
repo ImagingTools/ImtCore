@@ -92,12 +92,10 @@ protected:
 	virtual void OnGuiModelAttached() override;
 	virtual void OnGuiModelDetached() override;
 
-	// iqtgui::TDesignSchemaHandlerWrap
-	virtual void OnDesignSchemaChanged() override;
-
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiRetranslate() override;
+	virtual void OnGuiDesignChanged() override;
 
 private:
 	class PageSubselectionObserver: public imod::CMultiModelDispatcherBase

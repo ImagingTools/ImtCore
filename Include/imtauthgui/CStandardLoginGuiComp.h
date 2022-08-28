@@ -44,9 +44,6 @@ protected:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 
-	// reimplemented (ibase::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged() override;
-
 	// reimplemented (iqtgui::TRestorableGuiWrap)
 	virtual void OnRestoreSettings(const QSettings& settings) override;
 	virtual void OnSaveSettings(QSettings& settings) const override;

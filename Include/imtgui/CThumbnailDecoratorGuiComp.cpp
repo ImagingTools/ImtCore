@@ -171,18 +171,6 @@ void CThumbnailDecoratorGuiComp::OnSaveSettings(QSettings& /*settings*/) const
 }
 
 
-// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
-
-void CThumbnailDecoratorGuiComp::OnDesignSchemaChanged()
-{
-	BaseClass::OnDesignSchemaChanged();
-
-	if (IsGuiCreated()){
-		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
-	}
-}
-
-
 // reimplemented (iqtgui::CGuiComponentBase)
 
 void CThumbnailDecoratorGuiComp::OnGuiCreated()
@@ -335,8 +323,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		m_lastPageIndexForLoggedUser = *m_defaultPageIndexAttrPtr;
 	}
 
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
-
 	if (m_accountMenuCompPtr.IsValid()){
 		m_accountMenuCompPtr->CreateGui(GetQtWidget());
 	}
@@ -471,6 +457,16 @@ void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 
 			ExitApplication();
 		}
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	if (IsGuiCreated()) {
+		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
 	}
 }
 

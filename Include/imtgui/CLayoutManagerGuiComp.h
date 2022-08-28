@@ -70,13 +70,11 @@ protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 
-	// iqtgui::TDesignSchemaHandlerWrap
-	virtual void OnDesignSchemaChanged() override;
-
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
+	virtual void OnGuiDesignChanged() override;
 
 protected Q_SLOTS:
 	void OnSplitterMoved(int pos, int index);

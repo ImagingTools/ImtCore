@@ -30,15 +30,15 @@ public:
 	I_END_COMPONENT;
 
 	CStandardAccountMenuComp();
-	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
+	virtual void OnGuiDesignChanged() override;
 
-	// reimplemented (ibase::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged();
+	// reimplemented (QObject)
+	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
