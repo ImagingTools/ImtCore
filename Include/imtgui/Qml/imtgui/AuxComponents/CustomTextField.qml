@@ -19,10 +19,16 @@ Item {
 
     property int radius: 0;
     property int textSize: 15;
+    property int placeHolderTextSize: Style.fontSize_common;
     property int echoMode: TextInput.Normal;
+
+    property alias borderWidth: mainRect.border.width;
 
     signal accepted();
 
+    function setFocus(value) {
+        textField.focus = value
+    }
 
     onFocusChanged: {
         console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus)
@@ -80,7 +86,7 @@ Item {
 
             text: containerTextField.placeHolderText;
 
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: containerTextField.placeHolderTextSize;
             font.family: Style.fontFamily;
 
             //TODO -> Style

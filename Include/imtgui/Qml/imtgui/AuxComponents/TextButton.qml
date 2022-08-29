@@ -9,6 +9,9 @@ Item {
     property bool active: false;
     property string legend;
     property int textWidth: legendText.width;
+    property string fontFamily: Style.fontFamilyBold;
+    property bool fontBold: false;
+    property alias indicatorHeight: activeIndicator.height;
 
     signal clicked();
 
@@ -22,8 +25,8 @@ Item {
         verticalAlignment: Text.AlignTop;
         wrapMode: Text.NoWrap;
         font.pixelSize: Style.fontSize_subtitle;
-        font.bold: false;
-        font.family: Style.fontFamilyBold;
+        font.bold: textButton.fontBold;
+        font.family: textButton.fontFamily;
         color: textButton.active ? Style.color_text_titles : Style.color_text_notActive;
         text: textButton.legend;
     }

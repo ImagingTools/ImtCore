@@ -19,7 +19,7 @@ Rectangle {
 
     onWidthChanged: {
         if (topCenterPanel.decoratorSource){
-            customLoader.item.width = topCenterPanel.width;
+            customLoader.item.width = topCenterPanel.width - topCenterPanel.anchors.leftMargin - topCenterPanel.anchors.rightMargin;
         }
     }
 

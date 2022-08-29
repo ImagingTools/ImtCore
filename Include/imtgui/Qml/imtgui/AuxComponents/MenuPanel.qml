@@ -23,6 +23,8 @@ Rectangle {
     property int activePageIndex: -1;
     property int pagesCount: lvPages.count;
 
+    property int spacing: 0;
+
     signal activePageChanged;
 
     function updateModels(){
@@ -47,7 +49,7 @@ Rectangle {
 
         Column {
             id: columnPages;
-
+            spacing: menuPanel.spacing;
             width: parent.width;
 
             Repeater {
