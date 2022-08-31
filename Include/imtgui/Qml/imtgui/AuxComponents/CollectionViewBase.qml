@@ -7,6 +7,8 @@ Item {
 
     property alias commands: baseCommands;
 
+    property string commandsId;
+
     property var table: tableInternal;
     property bool hasPagination: true;
     property bool hasFilter: true;
@@ -16,11 +18,27 @@ Item {
     signal selectedIndexChanged(int index);
     signal elementsChanged();
 
-    onFocusChanged: {
-        console.log("CollectionViewBase onFocusChanged", focus);
+    /**
+        Если true -> данные будут запрошены с сервера,
+        иначе нужно будет подставлять данные вручную
+      */
+    property bool loadData;
 
-        if (focus){
-            keyboardManager.forceActiveFocus();
+    Component.onCompleted: {
+        console.log("CollectionViewBase onCompleted", loadData);
+
+        keyboardManager.forceActiveFocus();
+    }
+
+    Keys.onPressed: {
+        console.log("CollectionViewBase onPressed", event.key);
+    }
+
+    onCommandsIdChanged: {
+        console.log("CollectionViewBase onCommandsIdChanged", loadData);
+
+        if (loadData){
+            baseCommands.updateModels();
         }
     }
 
@@ -140,15 +158,6 @@ Item {
 
     CollectionKeyboardManager{
         id: keyboardManager;
-        collection: collectionViewBaseContainer;
-
-        onFocusChanged: {
-            console.log("keyboardManager onFocusChanged", focus);
-        }
-
-        Keys.onPressed: {
-            console.log("KeyboardManager onPressed", event.key);
-        }
     }
 
     CollectionViewBaseGqlModels {

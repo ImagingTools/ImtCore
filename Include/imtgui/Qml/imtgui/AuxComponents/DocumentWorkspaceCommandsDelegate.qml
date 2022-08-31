@@ -37,7 +37,7 @@ DocumentWorkspaceCommandsDelegateBase {
             elements.SetData("Id", "", index);
             elements.SetData("Description", "", index);
 
-            objectView.updateGui();
+            documentBase.updateGui();
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
@@ -76,7 +76,7 @@ DocumentWorkspaceCommandsDelegateBase {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
-                    let elementsModel = objectModel.GetData("Items");
+                    let elementsModel = documentModel.GetData("Items");
 
                     let selectedIndex = container.tableData.selectedIndex;
                     let removedId = elementsModel.GetData("Id", selectedIndex);
@@ -98,7 +98,7 @@ DocumentWorkspaceCommandsDelegateBase {
         EditDialog {
             onFinished: {
                 if (buttonId == "Ok"){
-                    let elementsModel = objectModel.GetData("Items");
+                    let elementsModel = documentModel.GetData("Items");
 
                     let oldId = elementsModel.GetData("Id", selectedIndex);
                     let oldName = elementsModel.GetData("Name", selectedIndex);
@@ -108,7 +108,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
                     edited(oldId, oldName);
 
-                    objectView.updateGui();
+                    documentBase.updateGui();
                 }
             }
         }
@@ -121,7 +121,8 @@ DocumentWorkspaceCommandsDelegateBase {
                 if (buttonId == "Ok"){
                     let elements = container.tableData.elements;
                     elements.SetData("Description", inputValue, selectedIndex);
-                    objectView.updateGui();
+
+                    documentBase.updateGui();
                 }
             }
         }

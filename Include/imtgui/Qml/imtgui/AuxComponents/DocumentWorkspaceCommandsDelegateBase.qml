@@ -6,8 +6,7 @@ import imtgui 1.0
 Item {
     id: container;
 
-    property Item objectView;
-    property TreeItemModel objectModel;
+    property TreeItemModel objectModel: documentModel;
 
     property bool closingFlag: false;
     property bool showInputIdDialog: true;
@@ -17,14 +16,30 @@ Item {
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotify;
 
+    property alias updateItemTimer: timer.interval;
+
     signal entered(string value);
     signal saved(string id, string name);
     signal closed();
     signal commandActivated(string commandId);
+    signal itemLoaded();
+
+    Timer {
+        id: timer;
+
+        interval: 0;
+
+        onTriggered: {
+            let itemId = documentsData.GetData("ItemId", model.index);
+            itemModel.updateModel(itemId)
+        }
+    }
 
     onCommandsIdChanged: {
         console.log("DocumentCommands onCommandsIdChanged", container.commandsId);
         Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
+
+        timer.start();
     }
 
     onVisibleChanged: {
@@ -35,6 +50,10 @@ Item {
         else{
             Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
         }
+    }
+
+    onObjectModelChanged: {
+        objectModel.modelChanged.connect(modelChanged);
     }
 
     function commandHandle(commandId){
@@ -49,15 +68,16 @@ Item {
             }
         }
         else if (commandId == "Save"){
-            let itemId = container.objectView.itemId;
+            let itemId = documentBase.itemId;
 
             if (itemId === ""){
+                container.gqlModelQueryType = "Add";
+                container.gqlModelQueryTypeNotify = "addedNotification";
+
                 if (showInputIdDialog){
                     modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
                 }
                 else{
-                    container.gqlModelQueryType = "Add";
-                    container.gqlModelQueryTypeNotify = "addedNotification";
                     saveQuery.updateModel();
                 }
             }
@@ -69,10 +89,6 @@ Item {
         }
 
         commandActivated(commandId);
-    }
-
-    onObjectModelChanged: {
-        timer.start(1000);
     }
 
     Component {
@@ -97,8 +113,6 @@ Item {
             onFinished: {
                 console.log("InputDialog result", buttonId, inputValue);
                 if (buttonId == "Ok"){
-                    container.gqlModelQueryType = "Add";
-                    container.gqlModelQueryTypeNotify = "addedNotification";
                     entered(inputValue);
 
                     saveQuery.updateModel();
@@ -116,14 +130,6 @@ Item {
                     closingFlag = false;
                 }
             }
-        }
-    }
-
-    Timer {
-        id:  timer;
-
-        onTriggered: {
-            objectModel.modelChanged.connect(modelChanged);
         }
     }
 
@@ -147,13 +153,11 @@ Item {
 
         saved(itemId, itemName);
 
-        objectView.itemId = itemId;
-        objectView.itemName = itemName;
+        documentBase.itemId = itemId;
+        documentBase.itemName = itemName;
 
         commandsProvider.changeCommandMode("Save", "Disabled");
-        multiDocView.setDocumentTitle({"ItemId": objectView.itemId, "Title": itemName});
-
-//        objectView.updateGui();
+        multiDocView.setDocumentTitle({"ItemId": itemId, "Title": itemName});
 
         objectModel.modelChanged.connect(modelChanged);
 
@@ -163,10 +167,10 @@ Item {
     }
 
     function documentClosed(){
-        console.log("documentClosed", objectView.itemId);
+        console.log("documentClosed", documentBase.itemId);
         closed();
 
-        multiDocView.closeDocument(objectView.itemId);
+        multiDocView.closeDocument(documentBase.itemId);
     }
 
     function modelChanged(){
@@ -174,7 +178,7 @@ Item {
         commandsProvider.changeCommandMode("Save", "Normal");
 
         let suffix = "*";
-        multiDocView.setDocumentTitle({"ItemId": objectView.itemId, "Title": objectView.itemName + suffix});
+        multiDocView.setDocumentTitle({"ItemId": documentBase.itemId, "Title": documentBase.itemName + suffix});
     }
 
     GqlModel {
@@ -185,13 +189,13 @@ Item {
             var query = Gql.GqlRequest("query", container.commandsId + container.gqlModelQueryType);
             var queryFields = Gql.GqlObject(container.gqlModelQueryTypeNotify);
 
-            let itemId = objectView.itemId;
-            let itemName = objectView.itemName;
+            let itemId = documentBase.itemId;
+            let itemName = documentBase.itemName;
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", itemId);
 
-            var jsonString = objectModel.toJSON();
+            var jsonString = documentModel.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);
@@ -216,7 +220,7 @@ Item {
                     dataModelLocal = saveQuery.GetData("errors");
                     dataModelLocal = dataModelLocal.GetData(container.commandsId + container.gqlModelQueryType);
                     if (gqlModelQueryType == "Add"){
-                        container.objectView.itemId = "";
+                        documentBase.itemId = "";
                     }
 
                     if (dataModelLocal.ContainsKey("message")){
@@ -244,4 +248,49 @@ Item {
             }
         }
     }
+
+    GqlModel {
+        id: itemModel;
+
+        function updateModel(itemId) {
+            console.log( "updateModel InstallationItem");
+
+            var query = Gql.GqlRequest("query", commandsId + "Item");
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("Id", itemId);
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("item");
+
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Name");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log(commandsId + " Item query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:", this.state, itemModel);
+            if (this.state === "Ready"){
+                var dataModelLocal;
+
+                if (itemModel.ContainsKey("errors")){
+//                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the installation:")});
+                    return;
+                }
+
+                dataModelLocal = itemModel.GetData("data");
+                if(dataModelLocal.ContainsKey(commandsId + "Item")){
+                    dataModelLocal = dataModelLocal.GetData(commandsId + "Item");
+
+                    documentModel = dataModelLocal;
+                    itemLoaded();
+                }
+            }
+        }
+    }//GqlModel itemModel
 }

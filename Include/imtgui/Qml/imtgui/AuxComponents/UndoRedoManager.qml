@@ -5,7 +5,7 @@ Item {
     id: undoRedoManager;
 
     property string commandsId;
-    property TreeItemModel model;
+    property TreeItemModel model: documentModel;
     property Item editorItem;
 
     signal modelParsed();
@@ -13,13 +13,12 @@ Item {
 
     onModelChanged: {
         console.log("undoRedoManager onModelChanged");
-//        undoRedo.addModel(model);
+        undoRedo.addModel(model);
 
-//        model.modelChanged.connect(modelUpdated);
+        model.modelChanged.connect(modelUpdated);
     }
 
     Component.onDestruction: {
-//        model.modelChanged.disconnect(modelUpdated);
         Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
     }
 

@@ -201,6 +201,8 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
+	qDebug() << query;
+
 	if (ExecuteTransaction(query)){
 		return true;
 	}
@@ -479,6 +481,7 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
 			if (error.type() != QSqlError::NoError){
 				SendErrorMessage(0, error.text(), "Database collection");
+				qDebug() << error.text();
 
 				m_dbEngineCompPtr->CancelTransaction();
 

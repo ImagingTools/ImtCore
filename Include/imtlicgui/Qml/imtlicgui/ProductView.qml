@@ -5,20 +5,25 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-    property string commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml";
+    commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml";
 
-//    signal selectedItem(string id, string name);
+    onDocumentModelChanged: {
+        let headers = documentModel.GetData("Headers");
+        let items = documentModel.GetData("Items");
+        let dependencies = documentModel.GetData("Features");
 
-    Component.onCompleted: {
-        documentModel.SetExternTreeModel("DependentModel", lisensesFeaturesModel.modelLicenseFeatures);
-    }
-
-    onVisibleChanged: {
-        if (container.visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
-            updateGui();
+        if (!items){
+            items = documentModel.AddTreeModel("Items");
         }
+
+        if (!dependencies){
+            dependencies = documentModel.AddTreeModel("Features");
+        }
+
+        collectionView.table.headers = headers;
+        collectionView.table.elements = items;
+
+        undoRedoManager.model = documentModel;
     }
 
     onWidthChanged: {
@@ -30,22 +35,22 @@ DocumentBase {
 
     onCommandsIdChanged: {
         console.log("ObjectView onCommandsIdChanged", container.commandsId);
-
-        collectionView.commands.gqlModelHeadersInfo = container.commandsId + "Info";
-        collectionView.commands.gqlModelItemsInfo = container.commandsId + "List";
+        collectionView.commandsId = commandsId;
     }
 
+    onCommandsDelegateLoaded: {
+        commandsDelegate.tableData = collectionView.table;
+    }
 
     UndoRedoManager {
         id: undoRedoManager;
 
-//        commandsId: container.commandsId;
+        commandsId: container.commandsId;
         editorItem: container;
 
         onModelParsed: {
-            lisensesFeaturesModel.modelLicenseFeatures = documentModel.GetData("DependentModel");
-            collectionView.table.elements = documentModel.GetData("Items");
 
+            collectionView.table.elements = documentModel.GetData("Items");
             updateGui();
         }
     }
@@ -71,28 +76,13 @@ DocumentBase {
         hasFilter: false;
         hasSort: false;
 
+        loadData: false;
+
         height: parent.height;
 
         onSelectedItem: {
             commandsDelegate.commandActivated("Edit");
         }
-
-        onElementsChanged: {
-            documentModel.SetExternTreeModel("Items", collectionView.table.elements);
-
-//            undoRedoManager.model = documentModel;
-            commandsDelegate.objectModel = documentModel;
-        }
-    }
-
-    ProductViewCommandsDelegate {
-        id: commandsDelegate;
-
-        tableData: collectionView.table;
-        objectView: container;
-        showInputIdDialog: false;
-
-        commandsId: container.commandsId;
     }
 
     Splitter {
@@ -152,8 +142,6 @@ DocumentBase {
 
                 placeHolderText: qsTr("Enter the Product-ID");
 
-                text: itemId;
-
                 onTextChanged: {
                     documentModel.SetData("Id", inputId.text);
                 }
@@ -175,8 +163,6 @@ DocumentBase {
 
                 width: parent.width;
                 height: 30;
-
-                text: itemName;
 
                 placeHolderText: qsTr("Enter the Product Name");
 

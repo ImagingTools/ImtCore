@@ -27,26 +27,8 @@ DocumentWorkspaceCommandsDelegate {
     }
 
     onClosed: {
-//        Events.sendEvent("TreeViewModelUpdate");
-    }
-
-    onRemoved: {
-        treeViewModel.removeFeatureInTreeViewModel(objectView.itemId, itemId);
-    }
-
-    onEdited: {
-        let oldId = itemId;
-        let elementsModel = tableData.elements;
-
-        let newId = elementsModel.GetData("Id", selectedIndex);
-        let newName = elementsModel.GetData("Name", selectedIndex);
-
-        if (oldId == ""){
-            treeViewModel.addFeatureInTreeViewModel(objectView.itemId, newId, newName);
-        }
-        else{
-            treeViewModel.updateTreeViewAfterFeatureEditing(objectView.itemId, oldId, newId, newName);
-        }
+        Events.sendEvent("TreeViewModelUpdate");
+        Events.sendEvent("FeatureDependenciesUpdate");
     }
 }
 

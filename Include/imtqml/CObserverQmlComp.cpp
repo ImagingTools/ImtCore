@@ -9,10 +9,9 @@ namespace imtqml
 
 
 CObserverQmlComp::CObserverQmlComp()
-	: m_settingsModelPtr(nullptr),
-	  m_settingsObserver(*this)
+	:m_settingsModelPtr(nullptr),
+	m_settingsObserver(*this)
 {
-
 }
 
 
@@ -36,7 +35,6 @@ void CObserverQmlComp::ApplyUrl(const imtbase::CTreeItemModel *settingsModelPtr)
 		QString serverUrl = elementsModel->GetData("Value").toString();
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		QQmlEngine* engine = qmlEngine(quickItem);
-		qDebug() << "ApplyUrl" << serverUrl;
 		engine->setBaseUrl(serverUrl + *m_prefixServer);
 		QMetaObject::invokeMethod(quickItem, "updateModels");
 	}
@@ -50,24 +48,33 @@ void CObserverQmlComp::OnComponentCreated()
 	if (m_quickObjectComp.IsValid()){
 
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
-		connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
 
-		if (m_pagesDataProviderCompPtr.IsValid()){
-			QList<imtgql::CGqlObject> params;
-			imtgql::CGqlObject *inputParams = new imtgql::CGqlObject("input");
-			inputParams->InsertField("LanguageId", "ru_RU");
-			params.append(*inputParams);
-			QByteArrayList fields;
-			fields.append("NetworkSettings");
-			m_settingsModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);
-			QVariant data = QVariant::fromValue(m_settingsModelPtr);
-			quickItem->setProperty("localSettings", data);
-			m_settingsObserver.RegisterObject(m_settingsModelPtr, &CObserverQmlComp::OnSettingsUpdated);
+		if (quickItem != nullptr){
+			connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
 
-			ApplyUrl(m_settingsModelPtr);
+			if (m_pagesDataProviderCompPtr.IsValid()){
+				QList<imtgql::CGqlObject> params;
+				imtgql::CGqlObject *inputParams = new imtgql::CGqlObject("input");
+				inputParams->InsertField("LanguageId", "ru_RU");
+				params.append(*inputParams);
+				QByteArrayList fields;
+				fields.append("NetworkSettings");
+				m_settingsModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);
+				QVariant data = QVariant::fromValue(m_settingsModelPtr);
+				quickItem->setProperty("localSettings", data);
+//				m_settingsObserver.RegisterObject(m_settingsModelPtr, &CObserverQmlComp::OnSettingsUpdated);
+//				connect(m_settingsModelPtr, SIGNAL(modelChanged()), this, SLOT(OnModelChanged()));
+
+//				QMetaObject::invokeMethod(quickItem, "updateModels");
+				connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnModelChanged()));
+
+
+				ApplyUrl(m_settingsModelPtr);
+			}
 		}
-    }
+	}
 }
+
 
 void CObserverQmlComp::OnComponentDestroyed()
 {
@@ -86,6 +93,16 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		quickItem->setProperty("sourceItem", "qrc:///qml/"+ src);
 	}
+}
+
+
+void CObserverQmlComp::OnModelChanged()
+{
+	qDebug() << "ObserverQml OnModelChanged";
+	QList<imtgql::CGqlObject> params;
+
+	ApplyUrl(m_settingsModelPtr);
+	m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(params, m_settingsModelPtr);
 }
 
 

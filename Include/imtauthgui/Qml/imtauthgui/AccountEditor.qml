@@ -10,13 +10,10 @@ DocumentBase {
 
     property int textInputHeight: 30;
 
-    Component.onCompleted: {
-    }
-
     UndoRedoManager {
         id: undoRedoManager;
 
-//        commandsId: accountEditorContainer.commandsId;
+        commandsId: accountEditorContainer.commandsId;
         editorItem: accountEditorContainer;
 
         onModelParsed: {

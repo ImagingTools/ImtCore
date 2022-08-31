@@ -26,14 +26,16 @@ Item {
 
     onModelChanged: {
         if (comboBoxContainer.currentIndex > -1){
-            comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
+            comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name");
         }
     }
 
     onCurrentIndexChanged: {
         console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (comboBoxContainer.currentIndex > -1){
-            comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
+            let name = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
+            console.log("name", name);
+            comboBoxContainer.currentText = name;
         }
     }
 

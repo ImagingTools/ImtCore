@@ -5,7 +5,6 @@
         <file alias="Acf/Events.qml">Qml/Acf/Events.qml</file>
         <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
         <file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
-        <file alias="imtgui/LisaMain.qml">Qml/imtgui/LisaMain.qml</file>
         <file alias="imtgui/AuxComponents/AuxButton.qml">Qml/imtgui/AuxComponents/AuxButton.qml</file>
         <file alias="imtgui/AuxComponents/TextButton.qml">Qml/imtgui/AuxComponents/TextButton.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanel.qml">Qml/imtgui/AuxComponents/MenuPanel.qml</file>
@@ -28,7 +27,7 @@
         <file alias="imtgui/AuxComponents/Dialogs/MessageDialog.qml">Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml</file>
         <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/InputDialog.qml">Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml</file>
-        <file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
+        <file alias="imtgui/AuxComponents/PreferencePage.qml">Qml/imtgui/AuxComponents/PreferencePage.qml</file>
         <file alias="imtgui/AuxComponents/Splitter.qml">Qml/imtgui/AuxComponents/Splitter.qml</file>
         <file alias="imtgui/MouseTest.qml">Qml/imtgui/MouseTest.qml</file>
         <file alias="imtgui/AuxComponents/SettingsComboBox.qml">Qml/imtgui/AuxComponents/SettingsComboBox.qml</file>

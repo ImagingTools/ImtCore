@@ -311,13 +311,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray oldPackageId = currentPackagePtr->GetPackageId();
-	QByteArray newPackageId = newObjectName.toLocal8Bit();
+	QByteArray packageId = currentPackagePtr->GetPackageId();
+//	QByteArray newPackageId = newObjectName.toLocal8Bit();
 
-	QByteArray retVal = QString("UPDATE Packages SET Id = '%1', Name = '%1', LastModified = '%2' WHERE Id ='%3';")
+	QByteArray retVal = QString("UPDATE Packages SET Name = '%1', LastModified = '%2' WHERE Id ='%3';")
 			.arg(newObjectName)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(oldPackageId)).toLocal8Bit();
+			.arg(qPrintable(packageId)).toLocal8Bit();
 
 	return retVal;
 }

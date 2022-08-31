@@ -6,45 +6,32 @@ import QtQuick.Dialogs 1.3
 CollectionViewCommandsDelegateBase {
     id: container;
 
-//    onCommandsIdChanged: {
-//        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-//    }
-
     onSelectedIndexChanged: {
         console.log("InstallationCollectionViewContainer onSelectedIndexChanged");
 
         let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
-        container.commandsProvider.changeCommandMode("Duplicate", mode);
-        container.commandsProvider.changeCommandMode("CreateLicense", mode);
+        commandsProvider.changeCommandMode("Duplicate", mode);
+        commandsProvider.changeCommandMode("CreateLicense", mode);
     }
 
     onCommandActivated: {
         console.log("InstallationCollectionViewContainer commandActivated", commandId);
         if (commandId === "Duplicate"){
-            let itemId = container.collectionView.baseCollectionView.table.getSelectedId();
-            let itemName = container.collectionView.baseCollectionView.table.getSelectedName();
-            container.collectionView.rootItem.addDocument({"Id": itemId, "Name": itemName, "Source": container.collectionView.editorPath, "CommandsId": container.collectionView.editorCommandsId});
+            let itemId = baseCollectionView.table.getSelectedId();
+            let itemName = baseCollectionView.table.getSelectedName();
+
+            let copyStr = qsTr("Copy of ");
+
+            multiDocView.addDocument({"Id":         itemId,
+                                      "Name":       copyStr + itemName,
+                                      "Source":     baseCollectionView.commands.objectViewEditorPath,
+                                      "CommandsId": baseCollectionView.commands.objectViewEditorCommandsId});
+
         }
         else if (commandId === "CreateLicense"){
             fileDialogSave.open();
         }
     }
-
-//    function commandHandle(commandId){
-//        console.log("InstallationCollectionViewContainer commandActivated", commandId);
-
-//        if (commandId === "Duplicate"){
-//            let itemId = container.collectionView.baseCollectionView.table.getSelectedId();
-//            let itemName = container.collectionView.baseCollectionView.table.getSelectedName();
-//            container.collectionView.rootItem.addDocument({"Id": itemId, "Name": itemName, "Source": container.collectionView.editorPath, "CommandsId": container.collectionView.editorCommandsId});
-//        }
-//        else if (commandId === "CreateLicense"){
-//            fileDialogSave.open();
-//        }
-//        else{
-//            container.commandHandleBase(commandId);
-//        }
-//    }
 
     RemoteFileController {
         id: remoteFileController;

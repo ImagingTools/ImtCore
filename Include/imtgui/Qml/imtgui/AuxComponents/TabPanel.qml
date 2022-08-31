@@ -22,22 +22,6 @@ Rectangle {
     signal rightClicked();
     signal leftClicked();
 
-//    function setFirstElementImageSource(source){
-//        tabPanelContainer.firstElementImageSource = source;
-//    }
-
-//    function clearHeadersArray(){
-//        while(tabPanelContainer.headersArray.length > 0)
-//            tabPanelContainer.headersArray.pop();
-//        tabPanelContainer.count = 0
-//    }
-
-//    function addDocument(str){
-//        tabPanelContainer.headersArray.push(str);
-//        tabPanelContainer.count = tabPanelContainer.headersArray.length
-//        tabPanelContainer.selectedIndex = tabPanelContainer.headersArray.length - 1
-//    }
-
     function viewTabInListView(index) {
         list.positionViewAtIndex(index, ListView.Contain);
     }

@@ -5,27 +5,29 @@ import imtgui 1.0
 Item {
     id: keyboardManager;
 
-    property Item collection;
+    onFocusChanged: {
+        console.log("KeyboardManager onFocusChanged", focus);
+    }
 
     Keys.onPressed: {
         console.log("KeyboardManager onPressed", event.key);
-        let countElements = collection.table.elements.GetItemsCount();
+        let countElements = table.elements.GetItemsCount();
         if (event.key == Qt.Key_Up){
-            if (collection.table.selectedIndex < countElements - 1){
-                collection.table.selectedIndex++;
+            if (table.selectedIndex < countElements - 1){
+                table.selectedIndex++;
             }
             else{
-                collection.table.selectedIndex = 0;
+                table.selectedIndex = 0;
             }
 
-            collection.table.selectedIndex++;
+            table.selectedIndex++;
         }
         else if (event.key == Qt.Key_Down){
-            if (collection.table.selectedIndex > 0){
-                collection.table.selectedIndex--;
+            if (table.selectedIndex > 0){
+                table.selectedIndex--;
             }
             else{
-                collection.table.selectedIndex = countElements - 1;
+                table.selectedIndex = countElements - 1;
             }
         }
     }

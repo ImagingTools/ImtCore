@@ -14,10 +14,6 @@ Item {
         connection = state;
     }
 
-    onVisibleChanged: {
-        console.log("ConnectionManager onVisibleChanged", visible);
-    }
-
     Rectangle {
         id: background;
 
@@ -57,6 +53,28 @@ Item {
             color: Style.textColor;
             font.pixelSize: Style.fontSize_title;
             font.family: Style.fontFamily;
+        }
+
+        AuxButton {
+            id: refreshButton;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.top: textNoConnection.bottom;
+            anchors.topMargin: 10;
+
+            width: 70;
+            height: 25;
+
+            hasText: true;
+            hasIcon: false;
+
+            textButton: qsTr("Refresh");
+            borderColor: (refreshButton.highlighted || refreshButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
+            backgroundColor: Style.baseColor;
+
+            onClicked: {
+                window.updateModels();
+            }
         }
     }
 }

@@ -69,7 +69,7 @@ Item {
                     console.log("FeaturesTreeView removeFeatureInTreeViewModel Removed", packageId, featureId);
                     modelChildren.RemoveItem(j);
 
-                    featureDependenciesModel.removeDependsFeature(featureId);
+                    featureDependenciesModel.removeDependsFeature(featureDependenciesModel.modelFeatureDependencies, featureId);
                     break;
                 }
             }

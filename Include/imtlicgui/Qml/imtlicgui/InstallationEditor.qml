@@ -3,39 +3,21 @@ import imtgui 1.0
 import imtqml 1.0
 import Acf 1.0
 
-Rectangle {
+DocumentBase {
     id: installationEditorContainer;
 
-    color: Style.backgroundColor;
+    property alias activeLicenses: licensesTable.elements;
 
-    property string itemId;
-    property string itemName;
-    property string commandsId;
+    commandsDelegatePath: "../../imtlicgui/InstallationEditorCommandsDelegate.qml"
 
-    property Item rootItem;
+    onDocumentModelChanged: {
 
-    property string accountId;
-    property string productId;
-
-    property alias commands: commandsDelegate;
-
-    onVisibleChanged: {
-        if (installationEditorContainer.visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
+        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
+        if (!activeLicensesModel){
+            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
         }
-    }
 
-    onItemIdChanged: {
-        installationModel.SetData("Id", itemId);
-    }
-
-    onItemNameChanged: {
-        installationModel.SetData("Name", itemName);
-    }
-
-    TreeItemModel {
-        id: installationModel;
+        licensesTable.elements = activeLicensesModel;
     }
 
     UndoRedoManager {
@@ -45,30 +27,16 @@ Rectangle {
         editorItem: installationEditorContainer;
 
         onModelParsed: {
-            licensesTable.elements = installationModel.GetData("ActiveLicenses");
+            activeLicenses = documentModel.GetData("ActiveLicenses");
             updateGui();
         }
     }
 
-    CommandsProvider {
-        id: commandsProvider;
-
-        commandsId: installationEditorContainer.commandsId;
-    }
-
-    InstallationEditorCommandsDelegate {
-        id: commandsDelegate;
-
-        commandsId: installationEditorContainer.commandsId;
-
-        objectView: installationEditorContainer;
-    }
-
     function updateGui(){
         console.log("Installation updateGui");
-        instanceIdInput.text = installationModel.GetData("Id");
-        let accountId = installationModel.GetData("AccountId");
-        let productId = installationModel.GetData("ProductId");
+        instanceIdInput.text = documentModel.GetData("Id");
+        let accountId = documentModel.GetData("AccountId");
+        let productId = documentModel.GetData("ProductId");
 
         let customerModel = customerCB.model;
         for (let i = 0; i < customerModel.GetItemsCount(); i++){
@@ -113,6 +81,20 @@ Rectangle {
                 font.pixelSize: Style.fontSize_common;
             }
 
+            RegExpValidator {
+                id: regexValid;
+
+                Component.onCompleted: {
+                    console.log("RegExpValidator onCompleted");
+                    let regex = preferenceDialog.getInstanceMask();
+
+                    let re = new RegExp(regex)
+                    if (re){
+                        regexValid.regExp = re;
+                    }
+                }
+            }
+
             CustomTextField {
                 id: instanceIdInput;
 
@@ -121,8 +103,10 @@ Rectangle {
 
                 placeHolderText: qsTr("Enter the instance ID");
 
+                textInputValidator: regexValid;
+
                 onTextChanged: {
-                    installationModel.SetData("Id", instanceIdInput.text);
+                    documentModel.SetData("Id", instanceIdInput.text);
                 }
             }
 
@@ -145,7 +129,7 @@ Rectangle {
 
                 onCurrentIndexChanged: {
                     let selectedAccount = customerCB.model.GetData("Id", customerCB.currentIndex);
-                    installationModel.SetData("AccountId", selectedAccount);
+                    documentModel.SetData("AccountId", selectedAccount);
                 }
             }
 
@@ -169,7 +153,7 @@ Rectangle {
                 onCurrentIndexChanged: {
                     console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex);
                     let selectedProduct = productCB.model.GetData("Id", productCB.currentIndex);
-                    installationModel.SetData("ProductId", selectedProduct);
+                    documentModel.SetData("ProductId", selectedProduct);
                 }
             }
 

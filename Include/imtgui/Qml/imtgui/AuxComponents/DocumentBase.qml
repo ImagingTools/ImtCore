@@ -16,7 +16,7 @@ Item {
 
     signal commandsDelegateLoaded();
 
-    property alias documentModel: objectModel;
+    property TreeItemModel documentModel;
 
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsProvider: commandsProviderBase;
@@ -34,6 +34,12 @@ Item {
         commandsDelegateBase.item.commandsId = documentBase.commandsId;
     }
 
+    onDocumentModelChanged: {
+        console.log("documentBase onDocumentModelChanged");
+
+        updateGui();
+    }
+
     onVisibleChanged: {
         if (visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
@@ -44,23 +50,23 @@ Item {
     }
 
     onItemIdChanged: {
-        objectModel.SetData("Id", itemId);
+//        objectModel.SetData("Id", itemId);
         documentsData.SetData("ItemId", itemId, model.index);
     }
 
     onItemNameChanged: {
-        objectModel.SetData("Name", itemName);
+//        objectModel.SetData("Name", itemName);
         documentsData.SetData("Name", itemName, model.index);
     }
 
-    TreeItemModel {
-        id: objectModel;
+//    TreeItemModel {
+//        id: objectModel;
 
-        onModelChanged: {
-            console.log("objectModel onModelChanged");
-            console.log("DependentModel", objectModel.GetData("DependentModel"));
-        }
-    }
+//        onModelChanged: {
+//            console.log("objectModel onModelChanged");
+//            console.log("DependentModel", objectModel.GetData("DependentModel"));
+//        }
+//    }
 
     Loader {
         id: commandsDelegateBase;
@@ -68,9 +74,6 @@ Item {
         source: commandsDelegatePath;
 
         onLoaded: {
-            commandsDelegateBase.item.objectView = documentBase;
-            commandsDelegateBase.item.objectModel = objectModel;
-
             commandsDelegateLoaded();
         }
     }
@@ -79,5 +82,6 @@ Item {
         id: commandsProviderBase;
     }
 
-    function updateGui(){}
+    function updateGui(){
+    }
 }

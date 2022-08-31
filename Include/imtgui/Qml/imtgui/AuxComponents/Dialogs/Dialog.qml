@@ -35,10 +35,15 @@ Rectangle {
     }
 
     onFinished: {
-        root.closeDialog();
+
+        if (root){
+            root.closeDialog();
+        }
+
     }
 
     onTitleChanged: {
+        console.log("Dialog onTitleChanged", title);
         topPanelDialog.title = title;
     }
 

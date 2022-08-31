@@ -5,13 +5,7 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegate {
     id: container;
 
-    Component.onCompleted: {
-        Events.subscribeEvent("TreeViewModelUpdated", objectView.updateGui);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("TreeViewModelUpdated", objectView.updateGui);
-    }
+    showInputIdDialog: false;
 
     onCommandActivated: {
         console.log("ProductsCommands onCommandActivated", commandId);
@@ -33,11 +27,6 @@ DocumentWorkspaceCommandsDelegate {
     onSelectedIndexChanged: {
         let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
         commandsProvider.changeCommandMode("Duplicate", mode);
-    }
-
-    onSaved: {
-        Events.sendEvent("TreeViewModelUpdate");
-//        Events.sendEvent(commandsId + "CollectionUpdateGui");
     }
 
     onClosed: {

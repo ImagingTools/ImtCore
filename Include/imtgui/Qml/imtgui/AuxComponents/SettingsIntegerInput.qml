@@ -5,33 +5,10 @@ import imtgui 1.0
 Item {
     id: settingsIntegerInputContainer;
 
-    property string value;
-    property string itemId;
+    RegExpValidator {
+        id: intValid;
 
-    property Item rootItem;
-    property Item repeaterItem;
-
-    property int index: 0; // index element in the data model, default - 0
-
-    onFocusChanged: {
-        if (settingsIntegerInputContainer.focus){
-//            tfcIntegerInput.setFocus(true);
-        }
-    }
-
-    Keys.onPressed: {
-        console.log("SettingsIntegerInput keys pressed")
-        if (event.key === Qt.Key_Tab){
-            console.log('Key tab was pressed');
-
-//            tfcIntegerInput.setFocus(false);
-//            settingsIntegerInputContainer.repeaterItem.focusOnNextItem();
-        }
-    }
-
-    Component.onCompleted: {
-        console.log("SettingsIntegerInput onCompleted");
-        console.log("width", settingsIntegerInputContainer.width);
+        regExp: /^[1-9]\d*$/;
     }
 
     CustomTextField {
@@ -40,13 +17,13 @@ Item {
         width: settingsIntegerInputContainer.width;
         height: 30;
 
-        text: settingsIntegerInputContainer.value;
+        textInputValidator: intValid;
+
+        text: model.Value;
 
         onTextChanged: {
             console.log("SettingsIntegerInput onInputTextChanged");
-            if (settingsIntegerInputContainer.rootItem){
-                settingsIntegerInputContainer.rootItem.dataChanged(settingsIntegerInputContainer.index, tfcIntegerInput.text);
-            }
+            model.Value = tfcIntegerInput.text;
         }
     }
 }

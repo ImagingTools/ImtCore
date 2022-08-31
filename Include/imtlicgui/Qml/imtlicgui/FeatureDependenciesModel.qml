@@ -58,19 +58,21 @@ Item {
 
     }
 
-    function removeDependsFeature(featureId){
+    function removeDependsFeature(model, featureId){
         console.log("FeaturesTreeView removeDependsFeature", featureId);
-        if (!featureDependenciesModelContainer.modelFeatureDependencies){
+
+
+        if (!model){
             return;
         }
 
-        let keys = featureDependenciesModelContainer.modelFeatureDependencies.GetKeys();
+        let keys = model.GetKeys();
 
         for (let i = 0; i < keys.length; i++){
-            let value = featureDependenciesModelContainer.modelFeatureDependencies.GetData(keys[i]);
+            let value = model.GetData(keys[i]);
 
             if (keys[i] == featureId){
-                featureDependenciesModelContainer.modelFeatureDependencies.RemoveData(keys[i]);
+                model.RemoveData(keys[i]);
                 continue;
             }
 
@@ -81,16 +83,20 @@ Item {
                 if (valuesData[j] == featureId){
                     let removeValue = valuesData[j];
 
-                    if (j != valuesData.length - 1){
+                    if (j != 0){
+                        removeValue = ';' + removeValue;
+                    }
+                    else{
                         removeValue += ';';
                     }
+
                     let newValue = value.replace(removeValue, '');
 
                     if (newValue == ""){
-                        featureDependenciesModelContainer.modelFeatureDependencies.RemoveData(keys[i]);
+                        model.RemoveData(keys[i]);
                     }
                     else{
-                        featureDependenciesModelContainer.modelFeatureDependencies.SetData(keys[i], newValue);
+                        model.SetData(keys[i], newValue);
                     }
                 }
             }

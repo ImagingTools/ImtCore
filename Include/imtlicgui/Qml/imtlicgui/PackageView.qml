@@ -7,12 +7,25 @@ DocumentBase {
 
     commandsDelegatePath: "../../imtlicgui/PackageViewCommandsDelegate.qml"
 
-    signal selectedItem(string id, string name);
+    onDocumentModelChanged: {
+        console.log("documentBase onDocumentModelChanged");
 
-    Component.onCompleted: {
-        console.log("PackageView onCompleted", featureDependenciesModel.modelFeatureDependencies);
-        documentModel.SetData("DependentModel", featureDependenciesModel.modelFeatureDependencies);
-//        Events.subscribeEvent("FeatureDependenciesUpdated", dependenciesUpdated);
+        let headers = documentModel.GetData("Headers");
+        let items = documentModel.GetData("Items");
+        let dependencies = documentModel.GetData("Dependencies");
+
+        if (!items){
+            items = documentModel.AddTreeModel("Items");
+        }
+
+        if (!dependencies){
+            dependencies = documentModel.AddTreeModel("Dependencies");
+        }
+
+        collectionView.table.headers = headers;
+        collectionView.table.elements = items;
+
+        undoRedoManager.model = documentModel;
     }
 
     onCommandsDelegateLoaded: {
@@ -28,26 +41,18 @@ DocumentBase {
 
     onCommandsIdChanged: {
         console.log("ObjectView onCommandsIdChanged", packageViewContainer.commandsId);
-
-        collectionView.commands.gqlModelHeadersInfo = packageViewContainer.commandsId + "Info";
-        collectionView.commands.gqlModelItemsInfo = packageViewContainer.commandsId + "List";
+        collectionView.commandsId = commandsId;
     }
-
-//    function dependenciesUpdated(){
-//        documentModel.SetExternTreeModel("DependentModel", featureDependenciesModel.modelFeatureDependencies);
-//    }
 
     UndoRedoManager {
         id: undoRedoManager;
 
-//        commandsId: packageViewContainer.commandsId;
+        commandsId: packageViewContainer.commandsId;
         editorItem: packageViewContainer;
 
         onModelParsed: {
 
-            featureDependenciesModel.modelFeatureDependencies = documentModel.GetData("DependentModel");
             collectionView.table.elements = documentModel.GetData("Items");
-
             updateGui();
         }
     }
@@ -58,6 +63,8 @@ DocumentBase {
         let index = collectionView.table.selectedIndex;
         collectionView.table.selectedIndex = -1;
         collectionView.table.selectedIndex = index;
+
+        documentModel.Refresh();
 
         collectionView.table.elements.Refresh();
     }
@@ -72,18 +79,12 @@ DocumentBase {
         hasFilter: false;
         hasSort: false;
 
+        loadData: false;
+
         height: parent.height;
 
         onSelectedItem: {
             commandsDelegate.commandActivated("Edit");
-        }
-
-        onElementsChanged: {
-            documentModel.SetExternTreeModel("Items", collectionView.table.elements);
-
-            updateGui();
-//            undoRedoManager.model = documentModel;
-//            commandsDelegate.objectModel = documentModel;
         }
     }
 

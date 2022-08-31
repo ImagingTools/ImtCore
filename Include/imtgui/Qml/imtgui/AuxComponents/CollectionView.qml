@@ -18,19 +18,9 @@ Item {
     property string commandUpdateGui;
     property alias commandsDelegate: commandsLoader.item;
 
-    /**
-        Если true -> данные будут запрошены с сервера,
-        иначе нужно будет подставлять данные вручную
-      */
-    property bool loadData: true;
-
     Component.onCompleted: {
-//        collectionViewBase.forceActiveFocus();
-        console.log("CollectionView onCompleted");
         itemId = documentsData.GetData("ItemId", model.index);
         itemName = documentsData.GetData("Title", model.index);
-        console.log("itemId", itemId);
-        console.log("itemName", itemName);
     }
 
     Component.onDestruction: {
@@ -53,11 +43,11 @@ Item {
 
         commandsProvider.commandsId = commandsId;
 
-        if (loadData){
-            collectionViewBase.commands.gqlModelObjectView = commandsId + "ObjectView";
-            collectionViewBase.commands.gqlModelHeadersInfo = commandsId + "Info";
-            collectionViewBase.commands.gqlModelItemsInfo = commandsId + "List";
-        }
+        collectionViewBase.commands.gqlModelObjectView = commandsId + "ObjectView";
+        collectionViewBase.commands.gqlModelHeadersInfo = commandsId + "Info";
+        collectionViewBase.commands.gqlModelItemsInfo = commandsId + "List";
+
+        collectionViewBase.commandsId = commandsId;
 
         collectionMetaInfo.gqlModelMetaInfo = commandsId + "MetaInfo";
 
@@ -107,6 +97,9 @@ Item {
         anchors.left: parent.left;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
+
+        commandsId: parent.commandsId;
+        loadData: true;
 
         onSelectedIndexChanged: {
             console.log("CollectionViewBase onSelectedIndexChanged");

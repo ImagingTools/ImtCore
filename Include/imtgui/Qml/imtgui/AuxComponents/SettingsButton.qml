@@ -7,13 +7,6 @@ Item {
 
     height: 25;
 
-    property string textButton;
-    property string itemId;
-    property string value;
-
-    property Item rootItem;
-    property int index: 0;
-
     AuxButton {
         id: button;
 
@@ -23,12 +16,12 @@ Item {
         hasText: true;
         hasIcon: false;
 
-        textButton: settingsButtonContainer.value;
+        textButton: model.Value;
         borderColor: (button.highlighted || button.focus) ? Style.iconColorOnSelected : Style.buttonColor;
         backgroundColor: Style.imagingToolsGradient1;
 
         onClicked: {
-            settingsButtonContainer.rootItem.openFileDialog();
+            openFileDialog();
         }
     }
 }

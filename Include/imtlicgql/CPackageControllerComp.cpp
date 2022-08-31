@@ -114,8 +114,8 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		}
 
 		imtbase::CTreeItemModel* dependenciesModelPtr = nullptr;
-		if (itemModel.ContainsKey("DependentModel")){
-			dependenciesModelPtr = itemModel.GetTreeItemModel("DependentModel");
+		if (itemModel.ContainsKey("Dependencies")){
+			dependenciesModelPtr = itemModel.GetTreeItemModel("Dependencies");
 		}
 
 		if (featuresModelPtr != nullptr){
@@ -153,6 +153,81 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 	errorMessage = QObject::tr("Can not create package: %1").arg(QString(objectId));
 
 	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
+			const QList<imtgql::CGqlObject>& inputParams,
+			const imtgql::CGqlObject& gqlObject,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();;
+
+	QByteArray packageId = GetObjectIdFromInputParams(inputParams);
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+
+	if (m_headersProviderCompPtr.IsValid()){
+		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
+		imtbase::CTreeItemModel* headers = headersModel->GetTreeItemModel("Headers");
+		dataModel->SetExternTreeModel("Headers", headers);
+	}
+
+	imtbase::CTreeItemModel* featuresModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dependenciesModel = dataModel->AddTreeModel("Dependencies");
+
+	if (m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
+		const imtlic::IFeaturePackage* packagePtr  = dynamic_cast<const imtlic::IFeaturePackage*>(dataPtr.GetPtr());
+		if (packagePtr != nullptr){
+			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
+
+			dataModel->SetData("Id", packagePtr->GetPackageId());
+
+			QString name = m_objectCollectionCompPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			dataModel->SetData("Name", name);
+
+			QString description = m_objectCollectionCompPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			dataModel->SetData("Description", description);
+
+			QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
+
+			for (const QByteArray& featureCollectionId : featureCollectionIds){
+
+				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+
+				int index = featuresModel->InsertNewItem();
+
+				QByteArray featureId = featureInfoPtr->GetFeatureId();
+				QString featureName = featureInfoPtr->GetFeatureName();
+				QString featureDescription = packagePtr->GetFeatureList().GetElementInfo(featureCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+				featuresModel->SetData("Id", featureId, index);
+				featuresModel->SetData("Name", featureName, index);
+				featuresModel->SetData("Description", featureDescription, index);
+
+				QByteArrayList featureDependencies = dependenciesProvider->GetFeatureDependencies(featureId);
+
+				if (featureDependencies.size() > 0){
+					QByteArray key = featureId;
+					QByteArray value = featureDependencies.join(";");
+					dependenciesModel->SetData(key, value);
+				}
+			}
+		}
+	}
+
+	dataModel->SetExternTreeModel("Items", featuresModel);
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

@@ -9,21 +9,53 @@ Item {
 
     signal checkBoxChanged(int state, string parentId, string childId);
 
-//    Component.onCompleted: {
-//        let itemId = documentsData.GetData("ItemId", model.index);
+    Component.onCompleted: {
+        commandsDelegate.removed.connect(removed);
+        commandsDelegate.edited.connect(edited);
+    }
 
-//        if (itemId != ""){
-//            let value = featureDependenciesModel.modelFeatureDependencies.GetData(itemId);
+    Component.onDestruction: {
+        commandsDelegate.removed.disconnect(removed);
+        commandsDelegate.edited.disconnect(edited);
+    }
 
-//            featuresDependenciesModel.SetData(itemId, value);
-//        }
+    function synchronise(){
+        let dependenciesModel = documentModel.GetData("Dependencies");
 
+        let keys = dependenciesModel.GetKeys();
 
-//    }
+        for (let key of keys){
+            let value = dependenciesModel.GetData(key);
+            featureDependenciesModel.modelFeatureDependencies.SetData(key, value);
+        }
+    }
 
-//    TreeItemModel {
-//        id: featuresDependenciesModel;
-//    }
+    function removed(itemId){
+        console.log("PackageTreeView removed");
+
+        let dependenciesModel = documentModel.GetData("Dependencies");
+
+        featureDependenciesModel.removeDependsFeature(dependenciesModel, itemId);
+
+        treeViewModel.removeFeatureInTreeViewModel(packageViewContainer.itemId, itemId);
+    }
+
+    function edited(itemId, itemName){
+        console.log("PackageTreeView edited");
+
+        let oldId = itemId;
+        let elementsModel = collectionView.table.elements;
+
+        let newId = elementsModel.GetData("Id", selectedIndex);
+        let newName = elementsModel.GetData("Name", selectedIndex);
+
+        if (oldId == ""){
+            treeViewModel.addFeatureInTreeViewModel(packageViewContainer.itemId, newId, newName);
+        }
+        else{
+            treeViewModel.updateTreeViewAfterFeatureEditing(packageViewContainer.itemId, oldId, newId, newName);
+        }
+    }
 
     onSelectedIndexChanged: {
         console.log("PackageTreeView onSelectedIndexChanged", container.selectedIndex);
@@ -35,8 +67,9 @@ Item {
         treeViewModel.resetProperties();
         container.updateVisibleElements();
 
-        if (featureDependenciesModel.modelFeatureDependencies){
-            let strValues = featureDependenciesModel.modelFeatureDependencies.GetData(rootkey);
+        let dependenciesModel = documentModel.GetData("Dependencies");
+        if (dependenciesModel){
+            let strValues = dependenciesModel.GetData(rootkey);
             if (strValues){
                 let values = strValues.split(';');
                 for (let value of values){
@@ -54,10 +87,6 @@ Item {
     }
 
     onCheckBoxChanged: {
-        console.log("ObjectView TreeView onItemTreeViewCheckBoxStateChanged", state, parentId, childId);
-        console.log("featureDependenciesModel.modelFeatureDependencies", featureDependenciesModel.modelFeatureDependencies);
-        console.log("featureDependenciesModel.modelFeatureDependencies 1", featureDependenciesModel.modelFeatureDependencies.toJSON());
-
         let rootkey = collectionView.table.getSelectedId();
         let value = childId;
 
@@ -72,8 +101,14 @@ Item {
             treeViewModel.deselectFeature(value);
         }
 
-        if (featureDependenciesModel.modelFeatureDependencies.ContainsKey(rootkey)){
-            let str = featureDependenciesModel.modelFeatureDependencies.GetData(rootkey);
+        let dependenciesModel = documentModel.GetData("Dependencies");
+
+        if (!dependenciesModel){
+            dependenciesModel = documentModel.AddTreeModel("Dependencies");
+        }
+
+        if (dependenciesModel.ContainsKey(rootkey)){
+            let str = dependenciesModel.GetData(rootkey);
             let arr = str.split(";");
             if (state === 0){
                 if (arr){
@@ -83,11 +118,11 @@ Item {
                     }
 
                     if (arr.length === 0){
-                        featureDependenciesModel.modelFeatureDependencies.RemoveData(rootkey);
+                        dependenciesModel.RemoveData(rootkey);
                     }
                     else{
                         let resStr = arr.join(';');
-                        featureDependenciesModel.modelFeatureDependencies.SetData(rootkey, resStr);
+                        dependenciesModel.SetData(rootkey, resStr);
                     }
                 }
             }
@@ -95,20 +130,19 @@ Item {
                 if (arr.indexOf(value) === -1){
                     arr.push(value);
                     let resStr = arr.join(';');
-                    featureDependenciesModel.modelFeatureDependencies.SetData(rootkey, resStr);
+                    dependenciesModel.SetData(rootkey, resStr);
                 }
             }
         }
         else{
-            featureDependenciesModel.modelFeatureDependencies.SetData(rootkey, value);
+            dependenciesModel.SetData(rootkey, value);
         }
 
         if (state === 2){
             treeViewModel.selectFeature(value);
         }
 
-        console.log("featureDependenciesModel.modelFeatureDependencies 2", featureDependenciesModel.modelFeatureDependencies.toJSON());
-        documentModel.modelChanged();
+        synchronise();
     }
 
     function updateVisibleElements(){

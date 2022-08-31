@@ -44,12 +44,13 @@ public:
 protected:
 	void OnSettingsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::CTreeItemModel* settingsModelPtr);
 	void ApplyUrl(const imtbase::CTreeItemModel* settingsModelPtr);
-
 private Q_SLOTS:
 	void OnChangeSourceItem(QString src);
+	void OnModelChanged();
 
 private:
-    I_REF(imtqml::IQuickObject, m_quickObjectComp);
+	I_REF(imtqml::IQuickObject, m_quickObjectComp);
+
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);
 	I_REF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
 	I_ATTR(QByteArray, m_prefixServer);

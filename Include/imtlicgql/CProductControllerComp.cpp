@@ -113,9 +113,9 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 			licenses = itemModel.GetTreeItemModel("Items");
 		}
 
-		imtbase::CTreeItemModel *dependencies = nullptr;
-		if (itemModel.ContainsKey("DependentModel")){
-			dependencies = itemModel.GetTreeItemModel("DependentModel");
+		imtbase::CTreeItemModel *featuresModel = nullptr;
+		if (itemModel.ContainsKey("Features")){
+			featuresModel = itemModel.GetTreeItemModel("Features");
 		}
 
 		if (licenses != nullptr){
@@ -149,10 +149,10 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 				licenseInfoPtr->SetLicenseName(licenseName);
 
 				imtlic::ILicenseInfo::FeatureInfos featureInfos;
-				if (dependencies != nullptr){
+				if (featuresModel != nullptr){
 					QByteArray key = licenseId;
-					if (dependencies->ContainsKey(key)){
-						QStringList valuesList = dependencies->GetData(key).toString().split(';');
+					if (featuresModel->ContainsKey(key)){
+						QStringList valuesList = featuresModel->GetData(key).toString().split(';');
 						imtlic::ILicenseInfo::FeatureInfo featureInfo;
 						for (const QString& value : valuesList){
 							featureInfo.id = value.toUtf8();
@@ -171,6 +171,88 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	errorMessage = QObject::tr("Can not create product: %1").arg(QString(objectId));
 
 	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CProductControllerComp::GetObject(
+			const QList<imtgql::CGqlObject>& inputParams,
+			const imtgql::CGqlObject& gqlObject,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();;
+
+	QByteArray productId = GetObjectIdFromInputParams(inputParams);
+
+	dataModel->SetData("Id", productId);
+	dataModel->SetData("Name", "");
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+
+	if (m_headersProviderCompPtr.IsValid()){
+		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
+		imtbase::CTreeItemModel* headers = headersModel->GetTreeItemModel("Headers");
+		dataModel->SetExternTreeModel("Headers", headers);
+	}
+
+	imtbase::CTreeItemModel* licensesModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* featuresModel = dataModel->AddTreeModel("Features");
+
+	if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
+		const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
+		if (productPtr != nullptr){
+
+			QString name = m_objectCollectionCompPtr->GetElementInfo(productId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			dataModel->SetData("Name", name);
+
+			const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
+			const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
+
+			for ( const QByteArray& licenseId : licenseCollectionIds){
+				const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
+				if (licenseInfoPtr == nullptr){
+					continue;
+				}
+
+				int index = licensesModel->InsertNewItem();
+
+				licensesModel->SetData("Id", licenseId, index);
+
+				QString licenseName = licenseInfoPtr->GetLicenseName();
+				licensesModel->SetData("Name", licenseName, index);
+
+				QString description = licenseList.GetElementInfo(licenseId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+				licensesModel->SetData("Description", description, index);
+
+				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
+				if (featureInfos.size() > 0){
+					QByteArray key = licenseId;
+					QString value;
+					for (int i = 0; i < featureInfos.size(); i++){
+						if (i != 0){
+							value += ';';
+						}
+
+						value += featureInfos[i].id;
+					}
+
+					featuresModel->SetData(key, value);
+				}
+			}
+		}
+	}
+
+	dataModel->SetExternTreeModel("Items", licensesModel);
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

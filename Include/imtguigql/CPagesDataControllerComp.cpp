@@ -43,10 +43,8 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 			else{
 				imtbase::CTreeItemModel itemModel;
 				itemModel.Parse(itemData);
-				if (itemModel.ContainsKey("items")){
-					imtbase::CTreeItemModel* items = itemModel.GetTreeItemModel("items");
-					itemsModel = m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(*paramList, items);
-				}
+
+				itemsModel = m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(*paramList, &itemModel);
 			}
 
 			if (itemsModel == nullptr){
@@ -86,6 +84,7 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 		dataModel = new imtbase::CTreeItemModel();
 		dataModel->SetExternTreeModel("items", itemsModel);
 	}
+
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

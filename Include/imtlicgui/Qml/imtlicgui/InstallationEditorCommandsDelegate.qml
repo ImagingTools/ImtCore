@@ -6,43 +6,28 @@ import imtqml 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
-    property string itemId: objectView.itemId;
-
-    property string itemsInfoModel;
-
     property int accountCurrentIndex: customerCB.currentIndex;
     property int productCurrentIndex: productCB.currentIndex;
 
-    property string gqlModelQueryType;
-    property string gqlModelQueryTypeNotify;
-
-    signal modelItemsLoaded();
-    signal itemLoaded();
-
     Component.onCompleted: {
+
+        updateItemTimer = 200;
         itemsModel.updateModel("AccountsList");
+
+        timer.start();
     }
 
-    onItemLoaded: {
-        undoRedoManager.model = installationModel;
+    onEntered: {
+        objectModel.SetData("Name", value);
     }
 
-    onModelItemsLoaded: {
+    Timer {
+        id: timer;
 
-        /**
-            Если создается новая инсталляция, то загружаем лиценции первого продукта,
-            иначе делаем Item запрос
-        */
-        if (itemId === ""){
+        interval: 100;
 
-            productCB.currentIndex = 0;
-            customerCB.currentIndex = 0;
-
-            let productId = productCB.model.GetData("Id");
-            licensesModel.updateModel(productId);
-        }
-        else{
-            itemModel.updateModel();
+        onTriggered: {
+            itemsModel.updateModel("ProductsList");
         }
     }
 
@@ -54,12 +39,8 @@ DocumentWorkspaceCommandsDelegateBase {
         }
 
         let productId = productCB.model.GetData("Id", productCurrentIndex);
-
-        /**
-            Если лицензии текущего продукта уже загружены, то return
-        */
-        if (licensesTable.elements.ContainsKey("ProductId")){
-            let currentProductId = licensesTable.elements.GetData("ProductId");
+        if (documentModel.GetData("ActiveLicenses").ContainsKey("ProductId")){
+            let currentProductId = documentModel.GetData("ActiveLicenses").GetData("ProductId");
 
             if (currentProductId == productId){
                 return;
@@ -74,7 +55,7 @@ DocumentWorkspaceCommandsDelegateBase {
         InputDialog {
             onFinished: {
                 if (buttonId == "Ok"){
-                    objectView.itemName = inputValue;
+                    documentBase.itemName = inputValue;
                     saveQuery.updateModel();
                 }
             }
@@ -88,64 +69,6 @@ DocumentWorkspaceCommandsDelegateBase {
             }
         }
     }
-
-    GqlModel {
-        id: itemModel;
-
-        function updateModel() {
-            console.log( "updateModel InstallationItem");
-
-            var query = Gql.GqlRequest("query", "InstallationItem");
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", installationEditorContainer.itemId);
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("item");
-
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            queryFields.InsertField("AccountId");
-            queryFields.InsertField("ProductId");
-
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-            console.log("InstallationItem query ", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, itemModel);
-            if (this.state === "Ready"){
-                var dataModelLocal;
-
-                if (itemModel.ContainsKey("errors")){
-//                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the installation:")});
-                    return;
-                }
-
-                dataModelLocal = itemModel.GetData("data");
-                if(dataModelLocal.ContainsKey("InstallationItem")){
-                    dataModelLocal = dataModelLocal.GetData("InstallationItem");
-                    if(dataModelLocal.ContainsKey("item")){
-                        dataModelLocal = dataModelLocal.GetData("item");
-
-                        let keys = dataModelLocal.GetKeys();
-                        for (let i = 0; i < keys.length; i++){
-                            installationModel.SetData(keys[i], dataModelLocal.GetData(keys[i]));
-                        }
-
-                        licensesTable.elements = dataModelLocal.GetData("ActiveLicenses");
-
-                        updateGui();
-                        itemLoaded();
-                    }
-                }
-            }
-        }
-    }//GqlModel itemModel
-
 
     GqlModel {
         id: itemsModel;
@@ -165,7 +88,6 @@ DocumentWorkspaceCommandsDelegateBase {
             var gqlData = query.GetQuery();
             console.log("InstallationInfoEditor items query  ", gqlData);
 
-            itemsInfoModel = modelInfo;
             this.SetGqlQuery(gqlData);
         }
 
@@ -181,21 +103,24 @@ DocumentWorkspaceCommandsDelegateBase {
 
                 if (itemsModel.ContainsKey("data")){
                     dataModelLocal = itemsModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(itemsInfoModel)){
-                        dataModelLocal = dataModelLocal.GetData(itemsInfoModel);
-                        if(dataModelLocal.ContainsKey("items")){
-                            dataModelLocal = dataModelLocal.GetData("items");
+                    console.log("itemsModel", itemsModel);
+                    if (dataModelLocal.ContainsKey("AccountsList")){
+                        dataModelLocal = dataModelLocal.GetData("AccountsList");
+                        dataModelLocal = dataModelLocal.GetData("items");
 
-                            if (itemsInfoModel === "AccountsList"){
-                                customerCB.model = dataModelLocal;
-                                itemsModel.updateModel("ProductsList");
-                            }
-                            else if (itemsInfoModel === "ProductsList"){
-                                productCB.model = dataModelLocal;
+                        customerCB.model = dataModelLocal;
 
-                                modelItemsLoaded();
-                            }
-                        }
+                        console.log("customerCB.model", customerCB.model);
+                    }
+                    else if (dataModelLocal.ContainsKey("ProductsList")){
+                        dataModelLocal = dataModelLocal.GetData("ProductsList");
+
+                        dataModelLocal = dataModelLocal.GetData("items");
+
+                        productCB.model = dataModelLocal;
+
+                        console.log("productCB.model", productCB.model);
+
                     }
                 }
             }
@@ -246,8 +171,8 @@ DocumentWorkspaceCommandsDelegateBase {
                                 dataModelLocal.SetData("Expiration", "Unlimited", i);
                             }
 
-                            licensesTable.elements = dataModelLocal;
-                            installationModel.SetExternTreeModel("ActiveLicenses", dataModelLocal);
+                            activeLicenses = dataModelLocal;
+                            documentModel.SetExternTreeModel("ActiveLicenses", dataModelLocal);
                         }
                     }
                 }

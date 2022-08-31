@@ -21,9 +21,9 @@ Item {
     onFocusChanged: {
         console.log("MultidocWorkspaceView onFocusChanged", focus);
 
-        if (focus){
-            activeItem.forceActiveFocus();
-        }
+//        if (focus){
+//            activeItem.forceActiveFocus();
+//        }
     }
 
     TreeItemModel {
@@ -157,11 +157,6 @@ Item {
                 }
 
                 onLoaded: {
-//                    dataLoader.item.itemId = model.ItemId
-//                    dataLoader.item.itemName = model.Title
-
-//                    dataLoader.item.model = model;
-
                     dataLoader.item.commandsId = model.CommandsId
 
                     documentsData.SetData("Item", dataLoader.item, model.index);

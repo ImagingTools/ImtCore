@@ -10,14 +10,14 @@ Item {
 
     onCheckBoxLicenseClicked: {
         console.log("InstallationLicenses onCheckBoxLicenseClicked", itemId, modelIndex, state);
-        let activeLicensesModel = installationModel.GetData("ActiveLicenses");
+        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
         activeLicensesModel.SetData("LicenseState", state, modelIndex);
         activeLicensesModel.SetData("ExpirationState", 0, modelIndex);
         activeLicensesModel.SetData("Expiration", "Unlimited", modelIndex);
     }
 
     onCheckBoxExpirationClicked: {
-        let activeLicensesModel = installationModel.GetData("ActiveLicenses");
+        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
 
         activeLicensesModel.SetData("ExpirationState", state, modelIndex);
 
@@ -31,7 +31,7 @@ Item {
 
     onTextExpirationChanged: {
         console.log("InstallationLicenses onTextExpirationChanged",itemId, date, modelIndex);
-        let activeLicensesModel = installationModel.GetData("ActiveLicenses");
+        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
 
         if (activeLicensesModel){
             activeLicensesModel.SetData("Expiration", date, modelIndex);

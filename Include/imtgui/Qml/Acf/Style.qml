@@ -79,7 +79,7 @@ Item {
 
     Component.onCompleted: {
         console.log("Style onCompleted");
-//       styleContainer.changeSchemeDesign("");
+       styleContainer.changeSchemeDesign("");
     }
 
     function getImageSource (name, styleTheme, buttonState, buttonMode)
@@ -108,8 +108,6 @@ Item {
         return themeType.GetData("ColorPalette").GetData(colorPalette);
     }
 
-//    property string menuButtonDecoratorPath: "MenuPanelButtonDecorator.qml";
-//    property string subMenuButtonDecoratorPath: "SubMenuPanelButtonDecorator.qml";
     property string menuButtonDecoratorPath;
     property string subMenuButtonDecoratorPath;
     property string tabPanelDecoratorPath: "TabPanelDecorator.qml";
@@ -162,9 +160,6 @@ Item {
         Style.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
 
         let dataDecorators = themeType.GetData("decorators");
-//        Style.menuButtonDecoratorPath = styleContainer.getDecorator("MenuButton", dataDecorators);
-//        Style.tabPanelDecoratorPath = styleContainer.getDecorator("TabPanel", dataDecorators);
-//        Style.filterPanelDecoratorPath = styleContainer.getDecorator("FilterPanel", dataDecorators);
 
         Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "MainButton");
         Style.subMenuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "SubButton");
@@ -219,15 +214,8 @@ Item {
                     }
 
                     if(dataModelLocal.ContainsKey("source")){
-                        console.log("Style GetStyle", dataModelLocal.toJSON());
-                        //dataModelLocal = dataModelLocal.GetData("source");
                         styleContainer.parseStyleTheme(dataModelLocal);
                     }
-
-//                    if(dataModelLocal.ContainsKey("decorators")){
-//                        dataModelLocal = dataModelLocal.GetData("decorators");
-//                        styleContainer.parseStyleTheme(dataModelLocal);
-//                    }
                 }
             }
         }

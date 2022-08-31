@@ -9,6 +9,35 @@ Item {
 
     signal checkBoxChanged(int state, string parentId, string childId);
 
+    Component.onCompleted: {
+        commandsDelegate.edited.connect(edited);
+    }
+
+    Component.onDestruction: {
+        commandsDelegate.edited.disconnect(edited);
+    }
+
+    function synchronise(){
+        let featuresModel = documentModel.GetData("Features");
+
+        let keys = featuresModel.GetKeys();
+
+        for (let key of keys){
+            let value = featuresModel.GetData(key);
+            lisensesFeaturesModel.modelLicenseFeatures.SetData(key, value);
+        }
+    }
+
+    function edited(itemId, itemName){
+        let elementsModel = collectionView.table.elements;
+        let oldLicenseId = itemId;
+        let newLicenseId = elementsModel.GetData("Id", selectedIndex);
+
+        if (oldLicenseId != newLicenseId){
+            lisensesFeaturesModel.updateLicensesDependenciesAfterLicenseEditing(oldLicenseId, newLicenseId);
+        }
+    }
+
     onSelectedIndexChanged: {
 
         if (selectedIndex > -1){
@@ -18,8 +47,10 @@ Item {
 
             treeViewModel.resetProperties();
 
-            if (featureDependenciesModel.modelFeatureDependencies && lisensesFeaturesModel.modelLicenseFeatures){
-                let strValues = lisensesFeaturesModel.modelLicenseFeatures.GetData(rootKey);
+            let featuresModel = documentModel.GetData("Features");
+
+            if (featuresModel){
+                let strValues = featuresModel.GetData(rootKey);
                 if (strValues){
                     let values = strValues.split(';');
                     for (let value of values){
@@ -39,10 +70,6 @@ Item {
 
     onCheckBoxChanged: {
 
-        console.log("featureDependenciesModel", featureDependenciesModel);
-        console.log("lisensesFeaturesModel", lisensesFeaturesModel);
-
-
         let rootLicenseId = collectionView.table.getSelectedId();
         let rootKey = rootLicenseId;
         let value = childId;
@@ -51,7 +78,13 @@ Item {
             treeViewModel.deselectFeature(value);
         }
 
-        if (lisensesFeaturesModel.modelLicenseFeatures.ContainsKey(rootKey)){
+        let featuresModel = documentModel.GetData("Features");
+
+        if (!featuresModel){
+            featuresModel = documentModel.AddTreeModel("Features");
+        }
+
+        if (featuresModel.ContainsKey(rootKey)){
             let str = lisensesFeaturesModel.modelLicenseFeatures.GetData(rootKey);
             let arr = str.split(";");
             if (state == 0){
@@ -62,11 +95,11 @@ Item {
                     }
 
                     if (arr.length == 0){
-                        lisensesFeaturesModel.modelLicenseFeatures.RemoveData(rootKey);
+                        featuresModel.RemoveData(rootKey);
                     }
                     else{
                         let resStr = arr.join(';');
-                        lisensesFeaturesModel.modelLicenseFeatures.SetData(rootKey, resStr);
+                        featuresModel.SetData(rootKey, resStr);
                     }
                 }
             }
@@ -74,16 +107,18 @@ Item {
                 if (arr.indexOf(value) == -1){
                     arr.push(value);
                     let resStr = arr.join(';');
-                    lisensesFeaturesModel.modelLicenseFeatures.SetData(rootKey, resStr);
+                    featuresModel.SetData(rootKey, resStr);
                 }
             }
         }
         else{
-            lisensesFeaturesModel.modelLicenseFeatures.SetData(rootKey, value);
+            featuresModel.SetData(rootKey, value);
         }
 
         if (state == 2){
             treeViewModel.selectFeature(value);
         }
+
+        synchronise()
     }
 }

@@ -117,7 +117,16 @@ Rectangle {
         onStateChanged: {
             console.log("State:",this.state, pagesModel)
             if (this.state == "Ready"){
+
                 var dataModelLocal = this.GetData("data");
+
+                if (!dataModelLocal){
+                    serverConnectionManager.connection = false;
+
+                    return;
+                }
+
+                serverConnectionManager.connection = true;
 
                 if(dataModelLocal.ContainsKey("PagesData")){
                     dataModelLocal = dataModelLocal.GetData("PagesData")

@@ -14,10 +14,10 @@ Item {
         console.log("topPanelDecorator onCompleted")
     }
 
-
-
     TopCenterPanel {
         id: topCenterPanel;
+
+        z: 10;
 
         anchors.left: parent.left;
 
@@ -38,6 +38,8 @@ Item {
 
     TopRightPanel {
         id: rightPanel;
+
+        z: 100;
 
         anchors.right: parent.right;
 

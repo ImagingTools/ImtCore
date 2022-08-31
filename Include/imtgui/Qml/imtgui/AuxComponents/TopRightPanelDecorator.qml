@@ -5,13 +5,10 @@ import imtgui 1.0
 
 Rectangle {
     id: topRightPanelDecorator;
+
     color: "transparent";
 
     radius: 7;
-
-    Component.onCompleted: {
-        console.log("TopRightPanelDecorator onCompleted")
-    }
 
     Row {
         id: container;
@@ -23,9 +20,6 @@ Rectangle {
 
         PreferenceButton {
             id: preferenceButton;
-
-//            anchors.right: parent.right;
-//            anchors.rightMargin: 20;
 
             width: 24;
             height: 24;
@@ -43,4 +37,3 @@ Rectangle {
 //        }
     }
 }
-

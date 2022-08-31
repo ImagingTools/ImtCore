@@ -19,8 +19,6 @@ FocusScope {
         anchors.rightMargin: 10;
         anchors.leftMargin: 10;
 
-//        width: inputDialogBodyContainer.width;
-
         spacing: 5;
 
         Text {

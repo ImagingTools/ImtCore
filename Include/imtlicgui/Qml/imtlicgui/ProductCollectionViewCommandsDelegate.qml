@@ -17,14 +17,14 @@ CollectionViewCommandsDelegateBase {
 
     onCommandActivated: {
         if (commandId === "Duplicate"){
-            let itemId = container.collectionView.baseCollectionView.table.getSelectedId();
-            let itemName = container.collectionView.baseCollectionView.table.getSelectedName();
+            let itemId = tableData.getSelectedId();
+            let itemName = tableData.getSelectedName();
 
             let copyStr = qsTr("Copy of ");
             multiDocView.addDocument({"Id":         itemId,
                                       "Name":       copyStr + itemName,
-                                      "Source":     container.collectionView.baseCollectionView.commands.objectViewEditorPath,
-                                      "CommandsId": container.collectionView.baseCollectionView.commands.objectViewEditorCommandsId});
+                                      "Source":     baseCollectionView.commands.objectViewEditorPath,
+                                      "CommandsId": baseCollectionView.commands.objectViewEditorCommandsId});
         }
         else if (commandId === "Export"){
             fileDialogSave.open();

@@ -7,9 +7,9 @@ Item {
 
 //    property string itemId;
 
-    property string gqlModelHeadersInfo;
-    property string gqlModelItemsInfo;
-    property string gqlModelObjectView;
+    property string gqlModelHeadersInfo: commandsId + "Info";
+    property string gqlModelItemsInfo: commandsId + "List";
+    property string gqlModelObjectView: commandsId + "ObjectView";
 
     property string objectViewEditorPath;
     property string objectViewEditorCommandsId;
@@ -17,20 +17,10 @@ Item {
     property TreeItemModel headers;
     property TreeItemModel items;
 
-    onGqlModelHeadersInfoChanged: {
-        headerInfoModel.updateModel();
-    }
-
-    onGqlModelObjectViewChanged: {
-        objectViewModel.getObjectView();
-    }
-
-//    onItemIdChanged: {
-//        console.log("gqlModelBaseContainer onItemIdChanged", gqlModelBaseContainer.itemId);
-//    }
-
     function updateModels(){
         headerInfoModel.updateModel();
+
+        objectViewModel.getObjectView();
     }
 
     function updateItemsModel(){

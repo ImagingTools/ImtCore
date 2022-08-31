@@ -15,19 +15,22 @@ Rectangle {
     property int mainMargin: 0;
     property int mainRadius: 0;
 
+    Component.onCompleted: {
+        console.log("ThumbnailDecorator onCompleted");
+    }
+
     onLocalSettingsChanged: {
         console.log("ThumbnailDecorator onLocalSettingsChanged");
-        preferenceDialog.localSettings = thumbnailDecoratorContainer.localSettings;
+        preferenceDialog.localModel = thumbnailDecoratorContainer.localSettings;
     }
 
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
-        Style.changeSchemeDesign("");
 
         menuPanel.updateModels();
         topPanel.updateModels();
 
-        preferenceDialog.loadSettings();
+        preferenceDialog.updateModel();
     }
 
     MenuPanel {
@@ -56,10 +59,8 @@ Rectangle {
 
             onItemChanged: {
                 if (loaderCustomPanel.item){
-                    console.log("loaderCustomPanel ", Style.customPanelDecoratorPath);
                     customPanel.height = loaderCustomPanel.item.height;
                     customPanel.width = loaderCustomPanel.item.width;
-                    console.log("loaderCustomPanel.item.height ", loaderCustomPanel.item.height);
                 }
             }
         }
@@ -80,54 +81,42 @@ Rectangle {
 
     TopPanel {
         id: topPanel;
+
+        z: 10;
+
         anchors.top: parent.top;
 
         width: parent.width;
         height: 60;
+    }
 
+    ServerConnectionManager {
+        id: serverConnectionManager;
+
+        z: 5;
+
+        anchors.fill: parent;
     }
 
     function setPreferencesVisible(visible){
         preferenceDialog.visible = visible;
     }
 
-
-    //TODO: Fix the preference dialog, extend his by Dialog.qml
-    Rectangle {
-        id: background;
-
-        anchors.fill: parent;
-        color: "gray";
-        visible: false;
-        opacity: 0.4;
-        MouseArea {
-            anchors.fill: parent;
-            onWheel: {}
-        }
-    }
-
-    PreferenceDialog {
+    PreferencePage {
         id: preferenceDialog;
 
-        anchors.centerIn: parent;
+        z: 20;
+
+        anchors.fill: parent;
 
         visible: false;
-
-        onVisibleChanged: {
-            background.visible = preferenceDialog.visible;
-        }
     }
 
     ModalDialogManager {
         id: modalDialogManager;
 
+        z: 30;
+
         anchors.fill: parent;
     }
-
-    ServerConnectionManager{
-        id: serverConnectionManager;
-        anchors.fill: parent;
-    }
-
-
 }

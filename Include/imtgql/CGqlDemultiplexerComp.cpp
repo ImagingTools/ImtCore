@@ -44,10 +44,10 @@ imtbase::CTreeItemModel *CGqlDemultiplexerComp::CreateResponse(const CGqlRequest
 				QByteArrayList modelItemIds = representationControllerPtr->GetModelIds();
 				if (modelItemIds.contains(gqlCommand)){
 					sourceItemModel = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
+
 					if (sourceItemModel != nullptr){
 						return sourceItemModel;
 					}
-
 				}
 			}
 		}
