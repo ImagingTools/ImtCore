@@ -13,7 +13,7 @@ namespace imtauthdb
 class CUserDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
-	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+    typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserDatabaseDelegateComp)
 		I_ASSIGN(m_userInfoFactCompPtr, "UserInfo", "Factory used for creation of the new user", true, "UserInfo");

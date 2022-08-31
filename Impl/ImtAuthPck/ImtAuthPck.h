@@ -14,7 +14,11 @@
 #include <imtauth/CAccountInfoMetaInfoCreatorComp.h>
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
-
+#include <imtauth/CUserInfo.h>
+#include <imtauth/CUserCollection.h>
+#include <imtauth/CRoleCollection.h>
+#include <imtauth/CUserInfoMetaInfoCreatorComp.h>
+#include <imtauth/CUserInfoComp.h>
 
 namespace ImtAuthPck
 {
@@ -41,6 +45,20 @@ typedef imtauth::CAddressMetaInfoCreatorComp AddressMetaInfoCreator;
 typedef imtauth::CAccountInfoMetaInfoCreatorComp AccountInfoMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
+typedef icomp::TModelCompWrap<
+            icomp::TMakeComponentWrap<
+                        imtauth::CRoleCollection,
+                        imtauth::IRoleInfoProvider,
+                        imtauth::IRole,
+                        iser::ISerializable>> RoleCollection;
+typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;
+typedef icomp::TModelCompWrap<
+            icomp::TMakeComponentWrap<
+                        imtauth::CUserCollection,
+                        imtauth::IUserInfoProvider,
+                        imtauth::IUserInfo,
+                        iser::ISerializable>> UserCollection;
+typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 
 
 } // namespace ImtAuthPck

@@ -13,7 +13,7 @@ namespace imtauthgql
 class CUserControllerComp: public imtguigql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+    typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserControllerComp);
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user", true, "UserFactory");

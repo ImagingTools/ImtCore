@@ -41,13 +41,11 @@ protected:
 	const imtlic::IFeatureInfoProvider* m_permissionProviderPtr;
 
 private:
-	QByteArray m_roleId;
-	QString m_roleName;
+    QByteArray m_roleId;
+    QString m_roleName;
 	IRole::FeatureIds m_rolePermissions;
 	IRole::FeatureIds m_roleRestrictions;
 	QList<const IRole*> m_parents;
-
-
 };
 
 

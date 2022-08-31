@@ -4,6 +4,7 @@
 // ACF includes
 #include <iser/IObject.h>
 #include <imtauth/IRole.h>
+#include <imtauth/IRoleInfoProvider.h>
 
 namespace imtauth
 {
@@ -14,10 +15,21 @@ namespace imtauth
     \ingroup User
 */
 class IUserInfo:
-		virtual public iser::IObject,
-		virtual public imtauth::IRole
+        virtual public iser::IObject
 {
 public:
+    typedef QSet<QByteArray> FeatureIds;
+    typedef QSet<QByteArray> RoleIds;
+
+    /**
+        Get list of all availiable permissions for this user.
+    */
+    virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const = 0;
+
+    /**
+        Get list of all availiable roles for this user.
+    */
+    virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const = 0;
 
     /**
         Get id of the user.
@@ -69,7 +81,40 @@ public:
     */
 	virtual void SetMail(QString mail) = 0;
 
+    /**
+        Get permissions of user.
+    */
+    virtual FeatureIds GetPermissions() const = 0;
 
+    /**
+        Get local permissions of user.
+    */
+    virtual FeatureIds GetLocalPermissions() const = 0;
+
+    /**
+        Set local permissions of user.
+    */
+    virtual void SetLocalPermissions(const FeatureIds &permissions) = 0;
+
+    /**
+        Get user restrictions.
+    */
+    virtual FeatureIds GetProhibitions() const = 0;
+
+    /**
+        Set user restrictions.
+    */
+    virtual void SetProhibitions(const FeatureIds &prohibitions) = 0;
+
+    /**
+        Get user roles.
+    */
+    virtual RoleIds GetRoles() const = 0;
+
+    /**
+        Set user roles.
+    */
+    virtual void SetRoles(const RoleIds &roles) = 0;
 };
 
 

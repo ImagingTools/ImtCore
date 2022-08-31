@@ -153,6 +153,24 @@ bool CRole::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_roleName);
 	retVal = retVal && archive.EndTag(roleNameTag);
 
+    QByteArray permissionsTag = "Permissions";
+    QByteArray permissionTag = "Permission";
+    QByteArrayList permissions = m_rolePermissions.toList();
+    retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, permissionsTag, permissionTag);
+
+    if (!archive.IsStoring()){
+        m_rolePermissions.fromList(permissions);
+    }
+
+    QByteArray restrictionsTag = "Restrictions";
+    QByteArray restrictionTag = "Restriction";
+    QByteArrayList restrictions = m_roleRestrictions.toList();
+    retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, restrictionsTag, restrictionTag);
+
+    if (!archive.IsStoring()){
+        m_roleRestrictions.fromList(restrictions);
+    }
+
 	return retVal;
 }
 

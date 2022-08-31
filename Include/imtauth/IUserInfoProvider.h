@@ -46,6 +46,6 @@ public:
 };
 
 
-} // namespace imttest
+} // namespace imtauth
 
 

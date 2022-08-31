@@ -28,14 +28,14 @@ istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QByte
 	}
 
 	QByteArray roleId;
-	if (record.contains("Id")){
-		roleId = record.value("Id").toByteArray();
+    if (record.contains("RoleId")){
+        roleId = record.value("RoleId").toByteArray();
 		rolePtr->SetRoleId(roleId);
 	}
 
 	QString roleName;
-	if (record.contains("Name")){
-		roleName = record.value("Name").toString();
+    if (record.contains("RoleName")){
+        roleName = record.value("RoleName").toString();
 		rolePtr->SetRoleName(roleName);
 	}
 
@@ -50,8 +50,8 @@ istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QByte
 		QSqlRecord permissionRecord = rolePermissionsQuery.record();
 		QByteArray permissionId;
 
-		if (permissionRecord.contains("Id")){
-			permissionId = permissionRecord.value("Id").toByteArray();
+        if (permissionRecord.contains("PermissionId")){
+            permissionId = permissionRecord.value("PermissionId").toByteArray();
 			permissionsIds->insert(permissionId);
 		}
 	}
@@ -67,8 +67,8 @@ istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QByte
 		QSqlRecord prohibitionRecord = roleProhibitionsQuery.record();
 		QByteArray prohibitionId;
 
-		if (prohibitionRecord.contains("Id")){
-			prohibitionId = prohibitionRecord.value("Id").toByteArray();
+        if (prohibitionRecord.contains("ProhibitionId")){
+            prohibitionId = prohibitionRecord.value("ProhibitionId").toByteArray();
 			prohibitionsIds->insert(prohibitionId);
 		}
 	}
@@ -115,14 +115,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 
 	for (const QByteArray& permissionId : permissionsIds){
 		retVal.query += "\n" +
-					QString("INSERT INTO RolePermissions(RoleId, FeatureId) VALUES('%1', '%2');")
+                    QString("INSERT INTO RolePermissions(RoleId, PermissionId) VALUES('%1', '%2');")
 					.arg(qPrintable(roleId))
 					.arg(qPrintable(permissionId)).toLocal8Bit();
 
 	}
 	for (const QByteArray& prohibitionId : prohibitionsIds){
 		retVal.query += "\n" +
-					QString("INSERT INTO RoleProhibitions(RoleId, FeatureId) VALUES('%1', '%2');")
+                    QString("INSERT INTO RoleProhibitions(RoleId, ProhibitionId) VALUES('%1', '%2');")
 					.arg(qPrintable(roleId))
 					.arg(qPrintable(prohibitionId)).toLocal8Bit();
 
@@ -149,6 +149,13 @@ QByteArray CRoleDatabaseDelegateComp::CreateDeleteObjectQuery(
 		}
 
 		QByteArray retVal = QString("DELETE FROM Roles WHERE Id = '%1';").arg(qPrintable(roleId)).toLocal8Bit();
+
+        retVal += "\n" +
+                    QString("DELETE FROM RolePermissions WHERE RoleId = '%1';").arg(qPrintable(roleId)).toLocal8Bit();
+
+        retVal += "\n" +
+                    QString("DELETE FROM RoleProhibitions WHERE RoleId = '%1';").arg(qPrintable(roleId)).toLocal8Bit();
+
 
 		return retVal;
 	}
@@ -196,7 +203,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& permissionId : newPermissionsIds){
 		if (!oldPermissionsIds.contains(permissionId)){
 			retVal += "\n" +
-						QString("INSERT INTO RolePermissions(RoleId, FeatureId) VALUES('%1', '%2');")
+                        QString("INSERT INTO RolePermissions(RoleId, PermissionId) VALUES('%1', '%2');")
 						.arg(qPrintable(newRoleId))
 						.arg(qPrintable(permissionId)).toLocal8Bit();
 		}
@@ -205,7 +212,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& permissionId : oldPermissionsIds){
 		if (!newPermissionsIds.contains(permissionId)){
 			retVal += "\n" +
-						QString("DELETE FROM RolePermissions WHERE RoleId = '%1' AND FeatureId = '%2';")
+                        QString("DELETE FROM RolePermissions WHERE RoleId = '%1' AND PermissionId = '%2';")
 						.arg(qPrintable(newRoleId))
 						.arg(qPrintable(permissionId)).toLocal8Bit();
 		}
@@ -214,7 +221,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& prohibitionId : newProhibitionsIds){
 		if (!oldProhibitionsIds.contains(prohibitionId)){
 			retVal += "\n" +
-						QString("INSERT INTO RoleProhibitions(RoleId, FeatureId) VALUES('%1', '%2');")
+                        QString("INSERT INTO RoleProhibitions(RoleId, ProhibitionId) VALUES('%1', '%2');")
 						.arg(qPrintable(newRoleId))
 						.arg(qPrintable(prohibitionId)).toLocal8Bit();
 		}
@@ -223,7 +230,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& prohibitionId : oldProhibitionsIds){
 		if (!newProhibitionsIds.contains(prohibitionId)){
 			retVal += "\n" +
-						QString("DELETE FROM RoleProhibitions WHERE RoleId = '%1' AND FeatureId = '%2';")
+                        QString("DELETE FROM RoleProhibitions WHERE RoleId = '%1' AND ProhibitionId = '%2';")
 						.arg(qPrintable(newRoleId))
 						.arg(qPrintable(prohibitionId)).toLocal8Bit();
 		}
@@ -268,22 +275,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const QByteArray& objectId,
 			const QString& description) const
 {
-	const imtauth::IRole* rolePtr = nullptr;
-	imtbase::IObjectCollection::DataPtr objectPtr;
-	if (collection.GetObjectData(objectId, objectPtr)){
-		rolePtr = dynamic_cast<const imtauth::IRole*>(objectPtr.GetPtr());
-	}
-
-	if (rolePtr == nullptr){
-		return QByteArray();
-	}
-
-	QByteArray retVal = QString("UPDATE Roles SET Description = '%1', LastModified = '%2' WHERE Id ='%3';")
-			.arg(description)
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(rolePtr->GetRoleId())).toLocal8Bit();
-
-	return retVal;
+    return QByteArray();
 }
 
 

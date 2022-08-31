@@ -9,6 +9,8 @@
 #include <imtauthgql/CAuthorizationControllerComp.h>
 #include <imtauthgql/CRoleCollectionControllerComp.h>
 #include <imtauthgql/CRoleControllerComp.h>
+#include <imtauthgql/CUserCollectionControllerComp.h>
+#include <imtauthgql/CUserControllerComp.h>
 
 
 /**
@@ -21,8 +23,8 @@ namespace ImtAuthGqlPck
 typedef imtauthgql::CAuthorizationControllerComp AuthorizationController;
 typedef imtauthgql::CRoleCollectionControllerComp RoleCollectionController;
 typedef imtauthgql::CRoleControllerComp RoleController;
-
-
+typedef imtauthgql::CUserCollectionControllerComp UserCollectionController;
+typedef imtauthgql::CUserControllerComp UserController;
 
 } // namespace ImtAuthGqlPck
 

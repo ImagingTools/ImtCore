@@ -21,7 +21,7 @@ public:
 
 	// reimplemented (IAccountInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetUserList() const override;
-	virtual const IUserInfo* GetUser(const QByteArray& userId) const override = 0;
+    virtual const IUserInfo* GetUser(const QByteArray& userId) const override;
 };
 
 
