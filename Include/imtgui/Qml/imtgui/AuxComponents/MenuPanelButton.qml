@@ -37,7 +37,12 @@ Item {
     }
 
     onSelectedChanged: {
+        console.log("onSelectedChanged", selected);
         loaderDecorator.item.selected = container.selected;
+    }
+
+    onImageSourceChanged: {
+        loaderDecorator.item.imageSource = container.imageSource;
     }
 
     Component.onCompleted: {
