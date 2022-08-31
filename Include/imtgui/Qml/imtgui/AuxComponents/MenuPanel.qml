@@ -23,6 +23,8 @@ Rectangle {
     property int activePageIndex: -1;
     property int pagesCount: lvPages.count;
 
+//    property Item activeItem: pagesManager.activeItem;
+
     property int spacing: 0;
 
     signal activePageChanged;
@@ -32,7 +34,6 @@ Rectangle {
     }
 
     onActivePageIndexChanged: {
-        console.log("MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
         lvPages.currentIndex = menuPanel.activePageIndex;
     }
 
@@ -49,18 +50,21 @@ Rectangle {
 
         Column {
             id: columnPages;
+
             spacing: menuPanel.spacing;
             width: parent.width;
 
             Repeater {
                 id: lvPages;
+
                 property int currentIndex: 0;
+
                 delegate:  MenuPanelButton{
                     text:  model["Name"];
                     textColor: Style.textColor;
                     fontName: menuPanel.fontName;
-                    imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_" + "On" + "_" + "Selected" + ".svg":
-                                                             "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_" + "On" + "_" + "Normal" + ".svg";
+                    imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Selected.svg":
+                                                             "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
 
                     selected: lvPages.currentIndex === model.index;
 
@@ -76,7 +80,6 @@ Rectangle {
                 }
             }
         }
-
     }
 
     Timer {

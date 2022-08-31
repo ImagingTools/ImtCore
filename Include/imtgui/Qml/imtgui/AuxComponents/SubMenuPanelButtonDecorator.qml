@@ -19,39 +19,26 @@ Item {
     property bool selected: false;
     property string text;
 
-    Image {
-        id: image;
-
-        anchors.horizontalCenter: parent.horizontalCenter;
-        anchors.top: parent.top;
-        anchors.topMargin: 5;
-
-        width: 50;
-        height: 50;
-
-        fillMode: Image.PreserveAspectFit;
-
-        source: imageSource;
-        sourceSize.height: height;
-        sourceSize.width: width;
-    }
-
     Rectangle {
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
+        id: marker;
 
-        width: 5;
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.left: parent.left;
+        anchors.leftMargin: 10;
+
+        width: 8;
+        height: width;
+
+        radius: 8;
 
         color: Style.iconColorOnSelected;
         visible: selected;
     }
 
     Text {
-        id: description;
 
-        anchors.bottom: parent.bottom;
         anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.verticalCenter: parent.verticalCenter;
 
         text: title;
         color: selected ? Style.iconColorOnSelected: Style.textColor;

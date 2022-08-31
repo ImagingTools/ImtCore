@@ -9,6 +9,10 @@ Item {
     property Item activeItem;
     property int activePageIndex: -1;
 
+    onActiveItemChanged: {
+        console.log("onActiveItemChanged", activeItem);
+    }
+
     Repeater {
         id: pagesData;
 
@@ -25,27 +29,20 @@ Item {
 
             visible: activePageIndex === model.index;
 
-            Component.onCompleted: {
-                console.log("pagesData Item onCompleted");
-
-                console.log("width", width);
-                console.log("height", height);
-            }
-
             /**
                 The page will be loaded only by click if it hasn't loaded yet
              */
 
             onVisibleChanged: {
-                console.log("pagesData onVisibleChanged");
                 if(pagesDeleg.visible){
-//                    activeItem = pagesLoader.item;
-                    console.log("pagesDeleg.visible", pagesDeleg.visible);
+
+
                     if (!pagesLoader.item){
                         var source = pageModel.GetData("Source", model.index);
-                        console.log("source", source);
                         pagesLoader.source = source;
                     }
+
+                    activeItem = pagesLoader.item;
                 }
             }
 

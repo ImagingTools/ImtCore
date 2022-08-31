@@ -24,6 +24,7 @@ Item {
     property int contentHeight;
 
     property string decoratorSource;
+
     signal clicked;
 
     onDecoratorSourceChanged: {
@@ -102,6 +103,10 @@ Item {
 
         property int currentIndex: 0;
 
+        onCurrentIndexChanged: {
+
+        }
+
         Repeater {
             id: subPagesRepeater;
 
@@ -113,23 +118,20 @@ Item {
 
                 property bool selected: subPagesColumn.currentIndex == model.index;
 
-                Component.onCompleted: {
-                    subPagesDecorator.source = Style.subMenuButtonDecoratorPath;
-                }
-
                 onSelectedChanged: {
                     subPagesDecorator.item.selected = subPageDelegate.selected;
                 }
 
                 Loader {
                     id: subPagesDecorator;
-                    onItemChanged: {
-                        if (subPagesDecorator.item){
-                            subPagesDecorator.item.width = container.width;
-                            subPagesDecorator.item.height = container.height;
-                            subPagesDecorator.item.selected = subPageDelegate.selected;
-                            subPagesDecorator.item.title = model["Name"];
-                        }
+
+                    source: Style.subMenuButtonDecoratorPath;
+
+                    onLoaded: {
+                        subPagesDecorator.item.width = container.width;
+                        subPagesDecorator.item.height = container.height;
+                        subPagesDecorator.item.selected = subPageDelegate.selected;
+                        subPagesDecorator.item.title = model["Name"];
                     }
                 }
 
@@ -141,6 +143,12 @@ Item {
 
                     onClicked: {
                         subPagesColumn.currentIndex = model.index;
+
+                        console.log("pagesManager.activeItem", pagesManager.activeItem);
+                        pagesManager.activeItem.startPageObj = {"Id": model.PageId,
+                            "Name": model.Name,
+                            "Source": model.StartItem,
+                            "CommandsId": model.PageId};
                     }
                 }
             }
