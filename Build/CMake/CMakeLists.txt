@@ -12,7 +12,7 @@ set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
 set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
 set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/GeneratedFiles")
-set(ENABLE_TESTS_IMTCORE TRUE)
+set(ENABLE_TESTS_IMTCORE True CACHE STRING "Enable tests (True or False), defaults to True")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
 
