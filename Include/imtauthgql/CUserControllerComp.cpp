@@ -81,11 +81,11 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
                 }
                 itemModel->SetExternTreeModel("Prohibitions", prohibitionsModel);
             }
-            const imtauth::IRoleInfoProvider* rolesPtr = userInfoPtr->GetRoleProvider();
+            const imtbase::IObjectCollection*  rolesPtr = userInfoPtr->GetRoleProvider();
             imtauth::IUserInfo::RoleIds roles = userInfoPtr->GetRoles();
             if (rolesPtr != nullptr){
                 for (const QByteArray& id : roles){
-                    const imtauth::IRole* rolePtr = rolesPtr->GetRole(id);
+                    const imtauth::IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(rolesPtr->GetObjectPtr(id));
                     if (rolePtr != nullptr){
                         int index = rolesModel->InsertNewItem();
                         rolesModel->SetData("RoleId", rolePtr->GetRoleId(), index);

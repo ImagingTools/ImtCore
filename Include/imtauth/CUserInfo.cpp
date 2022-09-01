@@ -1,3 +1,4 @@
+#include "imtbase/IObjectCollection.h"
 #include <imtauth/CUserInfo.h>
 
 
@@ -25,7 +26,7 @@ const imtlic::IFeatureInfoProvider *CUserInfo::GetPermissionProvider() const
 }
 
 
-const IRoleInfoProvider *CUserInfo::GetRoleProvider() const
+const imtbase::IObjectCollection* CUserInfo::GetRoleProvider() const
 {
     return m_roleProviderPtr;
 }
@@ -116,14 +117,14 @@ IUserInfo::FeatureIds CUserInfo::GetPermissions() const
     IUserInfo::FeatureIds allPermissions;
 
     for (QByteArray roleId : m_userRoles){
-        const IRole* rolePtr = m_roleProviderPtr->GetRole(roleId);
+        const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
         allPermissions += rolePtr->GetPermissions();
     }
 
     allPermissions += m_userPermissions;
 
     for (QByteArray roleId : m_userRoles){
-        const IRole* rolePtr = m_roleProviderPtr->GetRole(roleId);
+        const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
         IRole::FeatureIds prohibitions = rolePtr->GetProhibitions();
         for (const QByteArray& prohibitionId : prohibitions){
             allPermissions.remove(prohibitionId);

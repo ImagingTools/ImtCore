@@ -8,6 +8,7 @@
 #include <imtauth/CUserInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtbase/IObjectCollection.h>
 
 namespace imtauth
 {
@@ -38,7 +39,7 @@ protected:
 
 private:
     I_REF(imtlic::IFeatureInfoProvider, m_featuresCompPtr);
-    I_REF(imtauth::IRoleInfoProvider, m_rolesCompPtr);
+    I_REF(imtbase::IObjectCollection, m_rolesCompPtr);
     I_TEXTATTR(m_userIdAttrPtr);
     I_TEXTATTR(m_usernameAttrPtr);
     I_TEXTATTR(m_nameAttrPtr);

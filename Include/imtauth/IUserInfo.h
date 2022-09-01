@@ -29,7 +29,7 @@ public:
     /**
         Get list of all availiable roles for this user.
     */
-    virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const = 0;
+    virtual const imtbase::IObjectCollection* GetRoleProvider() const = 0;
 
     /**
         Get id of the user.
