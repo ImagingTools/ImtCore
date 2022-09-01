@@ -4,6 +4,8 @@
 // Qt includes
 #include <QtCore/QFileInfo>
 #include <QtCore/QStringList>
+#include <QtCore/QUrl>
+#include <QtCore/QUrlQuery>
 
 
 namespace imtbase
@@ -39,20 +41,6 @@ int CObjectCollectionBasedPersistenceComp::LoadFromFile(
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	Q_ASSERT(false);
-	// TODO: check load from collection
-
-	if (m_collectionCompPtr.IsValid()){
-		QByteArray documentId;
-		for (const QByteArray& id : m_collectionCompPtr->GetElementIds()){
-			if (m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString() == filePath){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (m_collectionCompPtr->GetObjectData(id, dataPtr)){
-					data.CopyFrom(*dataPtr.GetPtr());
-					return OS_OK;
-				}
-			}
-		}
-	}
 
 	return OS_FAILED;
 }
@@ -64,30 +52,42 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	if (m_collectionCompPtr.IsValid()){
-		QByteArray documentId;
-		for (const QByteArray& id : m_collectionCompPtr->GetElementIds()){
-			if (m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString() == filePath){
-				documentId = id;
-				break;
+		QUrl uri(filePath);
+		if (uri.scheme() == "collection"){
+			QString path = uri.path();
+			QStringList parts = path.split("/");
+			if (parts.count() == 2){
+				QByteArray parentId = parts[0].toUtf8();
+				QByteArray id = parts[1].toUtf8();
+
+				if (uri.hasQuery()){
+					QUrlQuery query(uri.query());
+					if (query.hasQueryItem("name")){
+						QString name = query.queryItemValue("name");
+
+						QByteArray documentId;
+						for (const QByteArray& id : m_collectionCompPtr->GetElementIds(0, -1, nullptr, parentId, imtbase::ICollectionInfo::IF_LEAF_ONLY)){
+							if (m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString() == filePath){
+								documentId = id;
+								break;
+							}
+						}
+
+						bool result = false;
+						if (documentId.isEmpty()){
+							documentId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, name, "", &data, id, nullptr, nullptr, parentId);
+							result = !documentId.isEmpty();
+						}
+						else{
+							result = m_collectionCompPtr->SetObjectData(documentId, data);
+						}
+
+						if (result){
+							return OS_OK;
+						}
+					}
+				}
 			}
-		}
-
-		bool result = false;
-		if (documentId.isEmpty()){
-			documentId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, filePath, "", &data);
-			result = !documentId.isEmpty();
-		}
-		else{
-			result = m_collectionCompPtr->SetObjectData(documentId, data);
-		}
-
-		if (result){
-			idoc::IDocumentMetaInfo* documentMetaInfoPtr = dynamic_cast<idoc::IDocumentMetaInfo*>(const_cast<istd::IChangeable*>(&data));
-			if (documentMetaInfoPtr != nullptr){
-				documentMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, filePath);
-			}
-
-			return OS_OK;
 		}
 	}
 
