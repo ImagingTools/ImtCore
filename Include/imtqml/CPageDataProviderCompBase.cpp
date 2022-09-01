@@ -69,7 +69,12 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 			rootModelPtr->SetData(PageEnum::ENABLED, "true");
 		}
 		else if (fields[indexField] == "StartItem"){
-			rootModelPtr->SetData("StartItem", *m_startSourceItemAttrPtr);
+			if (m_startSourceItemAttrPtr.IsValid()){
+				rootModelPtr->SetData("StartItem", *m_startSourceItemAttrPtr);
+			}
+			else{
+				rootModelPtr->SetData("StartItem", "");
+			}
 		}
 	}
 
