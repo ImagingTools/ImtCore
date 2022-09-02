@@ -187,8 +187,11 @@ endif()
 #-------- Tests --------
 if (${ENABLE_TESTS_IMTCORE})
     add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
-    add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
-    add_dependencies(ImtTestPck imtbase imtdb imttest)
+
+    if(NOT DEFINED USE_QTDB OR USE_QTDB)
+        add_subdirectory("${IMPL_DIR}/ImtTestPck/CMake" "${AUX_INCLUDE_DIR}/ImtTestPck")
+        add_dependencies(ImtTestPck imtbase imtdb imttest)
+    endif()
 
     add_subdirectory("${INCLUDE_DIR}/imtbase/Test/CMake" "${AUX_INCLUDE_DIR}/imtbase/Test")
 
