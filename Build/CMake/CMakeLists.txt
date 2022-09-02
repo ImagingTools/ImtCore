@@ -137,10 +137,10 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
 	add_dependencies(ImtAuthGqlPck imtauthgql)
 
-	add_subdirectory("${IMPL_DIR}/ImtAuthDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthDbPck")
-	add_dependencies(ImtAuthDbPck imtauthdb)
-
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
+		add_subdirectory("${IMPL_DIR}/ImtAuthDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthDbPck")
+		add_dependencies(ImtAuthDbPck imtauthdb imtdb)
+
 		add_subdirectory("${IMPL_DIR}/ImtDatabasePck/CMake" "${AUX_INCLUDE_DIR}/ImtDatabasePck")
 		add_dependencies(ImtDatabasePck imtbase imtdb)
 
