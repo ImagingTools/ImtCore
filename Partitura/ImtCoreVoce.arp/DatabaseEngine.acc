@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5004" Description="ACF"/>
-            <Version Id="1" Number="2176" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5005" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -16,8 +16,8 @@
                     <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DbName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="lisa"/>
+                    <AttributeInfo Id="DbName" Type="Id" ExportId="DbName">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DbType" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="QPSQL"/>
