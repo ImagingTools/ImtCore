@@ -142,4 +142,4 @@ add_custom_command(
 add_custom_target(
         DesignToken${PROJECT_NAME} ALL
         DEPENDS ${DESIGN_TOKEN_CREATOR_COMMAND_PARAM_OUTPUT_DIR}/${PROJECT_NAME}DesignToken.stamp
-	)
+        )
