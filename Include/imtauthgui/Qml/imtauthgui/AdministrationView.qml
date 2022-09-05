@@ -1,13 +1,21 @@
 import QtQuick 2.15
 import Acf 1.0
 import imtgui 1.0
-import imtqml 1.0
-import QtQuick.Dialogs 1.3
 
 Rectangle {
     id: container;
+
+    anchors.fill: parent;
+
+//    property alias commandsId: userCollectionViewContainer.commandsId;
+
+    function addDocument(document){
+        console.log("AdministrationView addDocument");
+    }
+
     Rectangle {
         id: mainPanelBackground;
+
         anchors.top: parent.top;
         anchors.left: parent.left;
 
@@ -25,18 +33,24 @@ Rectangle {
             property int selectedIndex: -1;
 
             spacing: 5;
+
             ListModel{
                 id: leftMenuModel
                 ListElement{
-                    Name: "Users"
+                    Id: "Users";
+                    Name: "Users";
                 }
                 ListElement{
-                    Name: "Roles"
+                    Id: "Roles";
+                    Name: "Roles";
                 }
             }
+
             Repeater {
                 id: mainPanelRepeater;
+
                 model: leftMenuModel
+
                 delegate: AuxButton {
 
                     anchors.left: parent.left;
@@ -66,27 +80,38 @@ Rectangle {
                     onClicked: {
                         if (mainPanel.selectedIndex !== model.index){
                             mainPanel.selectedIndex = model.index;
+
+                            bodyLoader.source = "qrc:/qml/imtgui/AuxComponents/CollectionView.qml";
+
+                            if (bodyLoader.item){
+                                bodyLoader.item.commandsId = model.Id;
+                            }
+
+                            console.log("bodyLoader.item", bodyLoader.item);
                         }
                     }
                 }
             }
         }
     }
+
     Rectangle{
-        id: bodyAdministration
+        id: bodyAdministration;
+
         anchors.left: mainPanelBackground.right;
         anchors.top: parent.top;
-        width: parent.width - mainPanelBackground.width
-        height: parent.height
-        CollectionView {
-            id: userCollectionViewContainer;
 
-            Component.onCompleted: {
-                console.log("UserCollection onCompleted", model.index);
-                userCollectionViewContainer.commandUpdateGui = "UserCollectionUpdateGui";
-                userCollectionViewContainer.commandsDelegatePath = "../../imtauthgui/UserCollectionViewCommandsDelegate.qml";
+        width: parent.width - mainPanelBackground.width;
+        height: parent.height;
+
+        Loader {
+            id: bodyLoader;
+
+            anchors.fill: parent;
+
+            onItemChanged: {
+
             }
         }
     }
-
 }

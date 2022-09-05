@@ -9,15 +9,27 @@ Item {
     property var startPageObj;
 
     onStartPageObjChanged: {
-        documentLoader.source = startPageObj["Source"];
 
-        documentLoader.item.commandsId = startPageObj["CommandsId"];
+        console.log("onStartPageObjChanged");
+        documentLoader.source = startPageObj["Source"];
+        console.log("documentLoader.source", documentLoader.source);
+
+         if (documentLoader.item){
+
+             documentLoader.item.commandsId = startPageObj["CommandsId"];
+         }
+
+         console.log("documentLoader.item", documentLoader.item);
     }
 
     Loader {
         id: documentLoader;
 
         anchors.fill: parent;
+
+        onLoaded: {
+            console.log("onLoaded", source);
+        }
     }
 
     function addDocument(document){
