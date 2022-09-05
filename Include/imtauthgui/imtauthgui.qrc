@@ -7,6 +7,22 @@
         <file alias="imtauthgui/AccountCollectionView.qml">Qml/imtauthgui/AccountCollectionView.qml</file>
         <file alias="imtauthgui/AccountsMultiDocView.qml">Qml/imtauthgui/AccountsMultiDocView.qml</file>
         <file alias="imtauthgui/AccountEditorCommandsDelegate.qml">Qml/imtauthgui/AccountEditorCommandsDelegate.qml</file>
-	<file alias="imtauthgui/AccountCollectionViewCommandsDelegate.qml">Qml/imtauthgui/AccountCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtauthgui/AccountCollectionViewCommandsDelegate.qml">Qml/imtauthgui/AccountCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtauthgui/AdministrationView.qml">Qml/imtauthgui/AdministrationView.qml</file>
+        <file alias="imtauthgui/RoleCollectionView.qml">Qml/imtauthgui/RoleCollectionView.qml</file>
+        <file alias="imtauthgui/RoleEditor.qml">Qml/imtauthgui/RoleEditor.qml</file>
+        <file alias="imtauthgui/RoleView.qml">Qml/imtauthgui/RoleView.qml</file>
+        <file alias="imtauthgui/UserCollectionView.qml">Qml/imtauthgui/UserCollectionView.qml</file>
+        <file alias="imtauthgui/UserCollectionViewCommandsDelegate.qml">Qml/imtauthgui/UserCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtauthgui/UserEditor.qml">Qml/imtauthgui/UserEditor.qml</file>
+        <file alias="imtauthgui/UserEditorCommandsDelegate.qml">Qml/imtauthgui/UserEditorCommandsDelegate.qml</file>
+        <file alias="imtauthgui/UserView.qml">Qml/imtauthgui/UserView.qml</file>
+        <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtauthgui/RoleEditorCommandsDelegate.qml">Qml/imtauthgui/RoleEditorCommandsDelegate.qml</file>
+        <file alias="imtauthgui/AdministrationTreeViewController.qml">Qml/imtauthgui/AdministrationTreeViewController.qml</file>
+        <file alias="imtauthgui/UserViewCommandsDelegate.qml">Qml/imtauthgui/UserViewCommandsDelegate.qml</file>
+        <file alias="imtauthgui/UserTreeViewController.qml">Qml/imtauthgui/UserTreeViewController.qml</file>
+        <file alias="imtauthgui/CollectionViewWithMenu.qml">Qml/imtauthgui/CollectionViewWithMenu.qml</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>
