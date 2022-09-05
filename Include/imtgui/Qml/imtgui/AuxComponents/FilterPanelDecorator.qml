@@ -10,7 +10,11 @@ Item {
     onVisibleChanged: {
         console.log("filterPanelDecorator", filterPanelDecorator.visible);
 
-        animRect.start();
+        if (visible){
+            animRect.start();
+
+            tfc.focus = true;
+        }
     }
 
     NumberAnimation {
@@ -36,7 +40,7 @@ Item {
             id: tfc;
             anchors.verticalCenter: parent.verticalCenter;
 
-            width: 400;
+            width: 435;
             height: 25;
 
             placeHolderText: qsTr("Enter some text to filter the item list");

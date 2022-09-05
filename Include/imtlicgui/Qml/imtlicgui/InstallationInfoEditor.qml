@@ -25,7 +25,6 @@ Rectangle {
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotification;
 
-//    property TreeItemModel installationInfoModel;
     property TreeItemModel model;
     property TreeItemModel activeLicenses;
 

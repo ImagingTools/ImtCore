@@ -18,6 +18,8 @@ DocumentBase {
         }
 
         licensesTable.elements = activeLicensesModel;
+
+        instanceIdInput.focus = true;
     }
 
     UndoRedoManager {

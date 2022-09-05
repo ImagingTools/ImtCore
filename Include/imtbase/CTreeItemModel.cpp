@@ -53,6 +53,13 @@ void CTreeItemModel::SetState(const QString &newState)
 
 // public slots
 
+bool CTreeItemModel::Copy(CTreeItemModel* object)
+{
+	bool result = CopyFrom(*object);
+	return result;
+}
+
+
 int CTreeItemModel::InsertNewItem()
 {
 	m_items.append(new Item());
@@ -494,6 +501,56 @@ bool CTreeItemModel::Serialize(iser::IArchive &archive)
 	}
 
 	return SerializeRecursive(archive,"");
+}
+
+
+// reimplemented (istd::IChangeable)
+
+int CTreeItemModel::GetSupportedOperations() const
+{
+	return SO_COPY | SO_CLONE;
+}
+
+
+bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+{
+	const imtbase::CTreeItemModel* sourcePtr = dynamic_cast<const imtbase::CTreeItemModel*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		Clear();
+
+		for (int i = 0; i < sourcePtr->m_items.count(); i++){
+			Item* item = new Item();
+			Item* sourceItem = sourcePtr->m_items[i];
+
+			QList<QByteArray> keys;
+			sourceItem->GetKeys(keys);
+
+			for (const QByteArray& key : keys){
+				QVariant value = sourceItem->Value(key);
+				item->SetValue(key, value);
+			}
+
+			m_items.append(item);
+		}
+
+		m_roleNames = sourcePtr->m_roleNames;
+		m_queryParams = sourcePtr->m_queryParams;
+		m_isArray = sourcePtr->m_isArray;
+		m_state = sourcePtr->m_state;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+istd::IChangeable* CTreeItemModel::CloneMe(CompatibilityMode mode) const
+{
+
+	return NULL;
 }
 
 

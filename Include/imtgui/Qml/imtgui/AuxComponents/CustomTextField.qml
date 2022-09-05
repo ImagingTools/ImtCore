@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import Acf 1.0;
 
 Item {
@@ -6,11 +6,15 @@ Item {
 
     height: 40;
 
+    focus: textField.activeFocus;
+
     property alias text: textField.text;
     property alias acceptableInput: textField.acceptableInput;
     property alias textInputFocus: textField.focus;
     property alias textInputMask: textField.inputMask;
     property alias textInputValidator: textField.validator;
+    property alias readOnly: textField.readOnly;
+    property alias horizontalAlignment: textField.horizontalAlignment;
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;
@@ -32,6 +36,11 @@ Item {
 
     onFocusChanged: {
         console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus)
+
+        if (focus){
+            textField.selectAll();
+            textField.forceActiveFocus();
+        }
     }
 
     Rectangle {
@@ -42,11 +51,13 @@ Item {
         color: Style.baseColor;
         radius: containerTextField.radius;
 
-        border.color: textField.focus ? containerTextField.borderColor : Style.hover;
+        border.color: textField.activeFocus ? containerTextField.borderColor : Style.hover;
         border.width: 1;
     }
 
     MouseArea {
+        id: mouseArea;
+
         anchors.fill: textField;
         cursorShape: Qt.IBeamCursor;
     }
@@ -69,13 +80,17 @@ Item {
         selectByMouse: true;
         clip: true;
 
-        onFocusChanged: {
-            console.log("CustomTextField onFocusChanged", textField.text, textField.focus)
-        }
-
         onAccepted: {
             console.log("CustomTextField onAccepted");
             containerTextField.accepted();
+        }
+
+        onEditingFinished: {
+            console.log("CustomTextField onEditingFinished");
+        }
+
+        onTextEdited: {
+            console.log("CustomTextField onTextEdited");
         }
 
         Text {

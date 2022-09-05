@@ -18,6 +18,14 @@ FocusScope {
 
     property bool autoGenerate: false;
 
+    onFocusChanged: {
+        console.log("InputBody onFocusChanged", focus);
+
+        if (focus){
+            inputName.focus = focus;
+        }
+    }
+
     Column {
         id: bodyColumn;
 
@@ -46,7 +54,13 @@ FocusScope {
             width: bodyColumn.width;
             height: 30;
 
-            textInputFocus: true;
+            KeyNavigation.tab: inputId;
+
+            onAccepted: {
+                if (checkValidId(inputId.text)){
+                    buttonsDialog.buttonClicked("Ok");
+                }
+            }
         }
 
         Text {
@@ -75,6 +89,14 @@ FocusScope {
                 let state = checkValidId(inputId.text);
                 buttonsDialog.setButtonState("Ok", state);
             }
+
+            onAccepted: {
+                if (checkValidId(inputId.text)){
+                    buttonsDialog.buttonClicked("Ok");
+                }
+            }
+
+            KeyNavigation.tab: inputName;
         }
     }
 

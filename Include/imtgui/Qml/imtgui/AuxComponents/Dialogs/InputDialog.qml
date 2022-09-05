@@ -26,8 +26,8 @@ Dialog {
     Component.onCompleted: {
         console.log("InputDialog onCompleted", inputDialogContainer);
 
-        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": true});
-        inputDialogContainer.buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
+        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": true, "Active": true});
+        inputDialogContainer.buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true, "Active": false});
 
         inputDialogContainer.bodySource = "InputDialogBody.qml";
         inputDialogContainer.title = qsTr("Input");

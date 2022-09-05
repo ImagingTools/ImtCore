@@ -26,7 +26,6 @@ Item {
             console.log("topCenterPanelDecorator onCompleted");
             Events.subscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
         }
-
     }
 }
 

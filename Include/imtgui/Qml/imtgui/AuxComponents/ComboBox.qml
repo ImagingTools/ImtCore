@@ -60,7 +60,11 @@ Item {
 
     function openPopupMenu(){
         var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
-        modalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": comboBoxContainer.model});
+        modalDialogManager.openDialog(popupMenu, { "x":     point.x,
+                                                   "y":     point.y,
+                                                   "model": comboBoxContainer.model,
+                                                   "width": comboBoxContainer.width,
+                                                   "countVisibleItem": 5 });
     }
 
     Rectangle {

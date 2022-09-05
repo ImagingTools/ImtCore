@@ -1,6 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0;
 
+import "../../Acf/core.js" as Lodash
+
 Item {
     id: undoRedoManager;
 
@@ -13,9 +15,31 @@ Item {
 
     onModelChanged: {
         console.log("undoRedoManager onModelChanged");
+
         undoRedo.addModel(model);
 
         model.modelChanged.connect(modelUpdated);
+    }
+
+    Timer {
+        id: timerCheckModel;
+
+        interval: 10;
+
+        onTriggered: {
+            let newModel = JSON.stringify(model)
+
+            let startModel = undoRedo.undoStack[0];
+            if (_.isEqual(newModel, startModel)){
+                commandsDelegate.removeChanges();
+            }
+        }
+    }
+
+    onModelParsed: {
+        if (undoRedo.undoStack.length == 1){
+            commandsDelegate.removeChanges();
+        }
     }
 
     Component.onDestruction: {
@@ -41,7 +65,9 @@ Item {
 
     function modelUpdated(){
         console.log("undoRedoManager modelUpdated");
+
         undoRedo.addModel(model);
+        timerCheckModel.start();
     }
 
     Shortcut {
@@ -80,6 +106,8 @@ Item {
 
         state = undoRedo.redoStack.length > 0 ? "Normal" : "Disabled";
         commandsProvider.changeCommandMode("Redo", state);
+
+        timerCheckModel.start();
     }
 
     function commandHandle(commandId){

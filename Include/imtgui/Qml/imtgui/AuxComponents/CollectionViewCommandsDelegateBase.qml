@@ -84,7 +84,7 @@ Item {
         }
 
         else if (commandId === "Close"){
-            multiDocView.closeDocument(itemId);
+            documentManager.closeDocument(itemId);
 
         }
 
@@ -92,13 +92,13 @@ Item {
     }
 
     onRenamed: {
-        multiDocView.setDocumentTitle({"ItemId": id, "Title": newName});
+        documentManager.setDocumentTitle({"ItemId": id, "Title": newName});
 
         updateGui();
     }
 
     onRemoved: {
-        multiDocView.closeDocument(id);
+        documentManager.closeDocument(id);
 
         updateGui();
     }

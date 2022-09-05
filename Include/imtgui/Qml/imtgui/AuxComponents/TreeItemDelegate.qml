@@ -8,10 +8,7 @@ Item {
 
     height: childrenColumn.visible ? childrenColumn.height + treeItemDelegate.itemHeight : treeItemDelegate.itemHeight;
 
-    property bool isOpened: model.isOpened;
-
     property int itemHeight: 30;
-    property int index: model.index;
 
     Component.onCompleted: {
         console.log("TreeItemDelegate onCompleted");
@@ -30,8 +27,7 @@ Item {
         width: parent.width;
         height: model.visible === 1 ? treeItemDelegate.itemHeight : 0;
 
-        color: mainTreeView.currentParentIndex == model.index &&
-               childModelRepeater.indexChild === -1 ? Style.selectedColor : Style.baseColor;
+        color: Style.baseColor;
 
         Image {
             id: iconArrow;
@@ -44,7 +40,7 @@ Item {
             height: 10;
 
             visible: model.level === 0;
-            source: treeItemDelegate.isOpened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
+            source: model.isOpened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                                 "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
             sourceSize.height: height;
@@ -56,8 +52,7 @@ Item {
                 anchors.fill: parent;
 
                 onClicked: {
-                    console.log("TreeItemDelegate Image onClicked");
-                    treeViewContainer.modelItems.SetData("isOpened", !treeItemDelegate.isOpened, model.index);
+                    model.isOpened = !model.isOpened;
                 }
             }
         }
@@ -83,12 +78,10 @@ Item {
 
             width: treeItemDelegate.width - 20;
 
-            visible: treeItemDelegate.isOpened;
+            visible: model.isOpened;
 
             Repeater {
                 id: childModelRepeater;
-
-                property int indexChild: mainTreeView.currentChildIndex;
 
                 delegate: Rectangle {
                     id: childRect;
@@ -98,8 +91,7 @@ Item {
 
                     visible: model.visible === 1;
 
-                    color: treeItemDelegate.index === mainTreeView.currentParentIndex &&
-                           childModelRepeater.indexChild === model.index ? Style.selectedColor : "transparent";
+                    color: "transparent";
 
                     CheckBox {
                         id: checkBox;
@@ -116,7 +108,7 @@ Item {
                             visible: model.isActive === 1;
 
                             onClicked: {
-                                treeViewContainer.checkBoxChanged(2 - checkBox.checkState, model.packageId, model.Id);
+                                treeViewController.checkBoxChanged(2 - checkBox.checkState, model.packageId, model.Id);
                             }
                         }
                     }

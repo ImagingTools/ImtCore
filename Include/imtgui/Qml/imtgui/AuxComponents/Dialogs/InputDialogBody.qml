@@ -2,13 +2,21 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-FocusScope {
+Item {
     id: inputDialogBodyContainer;
 
     height: columnBody.height + 40;
 
     property string message;
     property string inputValue: "";
+
+    onFocusChanged: {
+        console.log("InputBody onFocusChanged", focus);
+
+        if (focus){
+            inputField.focus = focus;
+        }
+    }
 
     Column {
         id: columnBody;
@@ -45,10 +53,12 @@ FocusScope {
 
             text: inputDialogBodyContainer.inputValue;
 
-            focus: true;
-
             onTextChanged: {
                 inputDialogBodyContainer.inputValue = inputField.text;
+            }
+
+            onAccepted: {
+                buttonsDialog.buttonClicked("Ok");
             }
         }
     }

@@ -14,6 +14,11 @@ Rectangle {
     property int itemWidth: 200;
     property int itemHeight: 26;
 
+    /**
+        Count of the visible item, if value = -1 then count unlimited
+    */
+    property int countVisibleItem: -1;
+
     signal finished(string commandId, int index);
 
     onFinished: {
@@ -39,7 +44,7 @@ Rectangle {
     Rectangle {
         id: itemBody;
 
-        width: popupMenuListView.width;
+        width: popupMenuContainer.width;
         height: popupMenuListView.height;
 
         color: Style.baseColor;
@@ -50,8 +55,13 @@ Rectangle {
         ListView {
             id: popupMenuListView;
 
-            width: popupMenuContainer.itemWidth;
-            height: popupMenuListView.count * popupMenuContainer.itemHeight;
+            width: popupMenuContainer.width;
+            height: (countVisibleItem == -1 || countVisibleItem > popupMenuListView.count) ?
+                        popupMenuListView.count * popupMenuContainer.itemHeight :
+                        countVisibleItem * popupMenuContainer.itemHeight;
+
+            boundsBehavior: Flickable.StopAtBounds;
+            clip: true;
 
             delegate: Item {
                 width: popupMenuContainer.width;
@@ -83,7 +93,7 @@ Rectangle {
                     anchors.leftMargin: 5;
                     anchors.verticalCenter: parent.verticalCenter;
 
-                    width: 18;
+                    width: icon.source != "" ? 18 : 0;
                     height: width;
 
                     Image {

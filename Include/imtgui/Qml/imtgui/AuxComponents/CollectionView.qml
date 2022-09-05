@@ -70,7 +70,7 @@ Item {
         let editorPath = collectionViewBase.commands.objectViewEditorPath;
         let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
 
-        multiDocView.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+        documentManager.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
     }
 
     Loader {

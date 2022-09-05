@@ -10,6 +10,10 @@ DocumentBase {
 
     property int textInputHeight: 30;
 
+    onDocumentModelChanged: {
+        accountNameInput.focus = true;
+    }
+
     UndoRedoManager {
         id: undoRedoManager;
 
@@ -84,6 +88,8 @@ DocumentBase {
                     documentModel.SetData("Id", accountNameInput.text);
                     documentModel.SetData("Name", accountNameInput.text);
                 }
+
+                KeyNavigation.tab: accountDescriptionInput;
             }
 
             Text {
@@ -103,6 +109,8 @@ DocumentBase {
                 onTextChanged: {
                     documentModel.SetData("Description", accountDescriptionInput.text);
                 }
+
+                KeyNavigation.tab: repeater;
             }
 
             Text {
@@ -148,7 +156,16 @@ DocumentBase {
 
                         model: addressModel;
 
+                        onFocusChanged: {
+                            if (focus){
+                                let item  = repeater.itemAt(0)
+                                item.focus = true;
+                            }
+                        }
+
                         delegate: Item {
+                            id: delegateItem;
+
                             width: parent.width;
                             height: fieldInput.height + title.height;
 
@@ -159,6 +176,12 @@ DocumentBase {
                                 color: Style.textColor;
                                 font.family: Style.fontFamily;
                                 font.pixelSize: Style.fontSize_common;
+                            }
+
+                            onFocusChanged: {
+                                if (focus){
+                                    fieldInput.focus = true;
+                                }
                             }
 
                             CustomTextField {
@@ -173,6 +196,26 @@ DocumentBase {
 
                                 onTextChanged: {
                                     documentModel.SetData(model.Id, fieldInput.text);
+                                }
+
+                                Keys.onBacktabPressed: {
+                                    if (model.index > 0){
+                                        let item  = repeater.itemAt(model.index - 1)
+                                        item.focus = true;
+                                    }
+                                    else{
+                                        accountDescriptionInput.focus = true;
+                                    }
+                                }
+
+                                Keys.onTabPressed: {
+                                    if (model.index < repeater.count - 1){
+                                        let item  = repeater.itemAt(model.index + 1)
+                                        item.focus = true;
+                                    }
+                                    else{
+                                        repeaterOwnerBlock.focus = true;
+                                    }
                                 }
                             }
                         }
@@ -226,9 +269,22 @@ DocumentBase {
 
                         model: accountOwnerModel;
 
+                        onFocusChanged: {
+                            if (focus){
+                                let item  = repeaterOwnerBlock.itemAt(0)
+                                item.focus = true;
+                            }
+                        }
+
                         delegate: Item {
                             width: parent.width;
                             height: fieldInputOwnerBlock.height + titleOwnerBlock.height;
+
+                            onFocusChanged: {
+                                if (focus){
+                                    fieldInputOwnerBlock.focus = true;
+                                }
+                            }
 
                             Text {
                                 id: titleOwnerBlock;
@@ -252,6 +308,26 @@ DocumentBase {
 
                                 onTextChanged: {
                                     documentModel.SetData(model.Id, fieldInputOwnerBlock.text);
+                                }
+
+                                Keys.onBacktabPressed: {
+                                    let item ;
+                                    if (model.index > 0){
+                                        item  = repeaterOwnerBlock.itemAt(model.index - 1)
+                                    }
+                                    else{
+                                        item = repeater.itemAt(repeater.count - 1);
+
+                                    }
+
+                                    item.focus = true;
+                                }
+
+                                Keys.onTabPressed: {
+                                    if (model.index < repeaterOwnerBlock.count - 1){
+                                        let item  = repeaterOwnerBlock.itemAt(model.index + 1)
+                                        item.focus = true;
+                                    }
                                 }
                             }
                         }

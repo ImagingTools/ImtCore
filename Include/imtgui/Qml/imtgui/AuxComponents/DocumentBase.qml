@@ -25,8 +25,6 @@ Item {
         console.log("documentBase onCompleted");
         itemId = documentsData.GetData("ItemId", model.index);
         itemName = documentsData.GetData("Title", model.index);
-        documentBase.updateGui();
-
     }
 
     onCommandsIdChanged: {
@@ -50,23 +48,12 @@ Item {
     }
 
     onItemIdChanged: {
-//        objectModel.SetData("Id", itemId);
         documentsData.SetData("ItemId", itemId, model.index);
     }
 
     onItemNameChanged: {
-//        objectModel.SetData("Name", itemName);
         documentsData.SetData("Name", itemName, model.index);
     }
-
-//    TreeItemModel {
-//        id: objectModel;
-
-//        onModelChanged: {
-//            console.log("objectModel onModelChanged");
-//            console.log("DependentModel", objectModel.GetData("DependentModel"));
-//        }
-//    }
 
     Loader {
         id: commandsDelegateBase;
@@ -83,5 +70,15 @@ Item {
     }
 
     function updateGui(){
+    }
+
+    LoadingPage {
+        id: loadingPage;
+
+        z: 10;
+
+        anchors.fill: parent;
+
+        visible: false;
     }
 }

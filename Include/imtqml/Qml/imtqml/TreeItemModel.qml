@@ -28,13 +28,10 @@ JSONListModel {
             var retModel
             retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
             retModel.append(retVal);
-            //            var component = Qt.createComponent("TreeItemModel.qml");
-//            if (component.status === Component.Ready) {
-//                retModel = component.createObject(container);
-//                retModel.append(retVal);
-//            }
+
             return  retModel
         }
+
         return retVal
     }
 
@@ -54,17 +51,6 @@ JSONListModel {
             console.log("modelObject is null")
 
         modelObject[key] = value
-
-//        var xhr = new XMLHttpRequest;
-//        var json = {}
-//        json[key] = value
-//        for (var keyInfo in this.infoPath){
-//            json[keyInfo] = this.infoPath[keyInfo]
-//        }
-//        var txt_data = JSON.stringify(json)
-//        console.log("setData", json, txt_data, json.toString())
-//        xhr.open("POST", target);
-//        xhr.send(txt_data);
     }
 
 
@@ -147,34 +133,11 @@ JSONListModel {
 
     //Parse from the extern json to the intern model
     function Parse(json){
-        console.log("Parse", json);
-        console.log("start container", container);
         container.clear();
         this.json = json;
 
         this.updateJSONModel()
         this.updateTreeItemJSONModel()
-
-//        var obj = JSON.parse(json);
-//        for (let i = 0; i < obj.length; i++){
-//            var child = this.createComponent("imtqml/TreeItemModel.qml", this);
-//            child.append(obj[i])
-//            child.updateTreeItemJSONModel();
-////            let keysObj = Object.keys(obj[i]);
-////            for (let j = 0; j < keysObj.length; j++){
-////                if (typeof obj[i][keysObj[j]] == 'object'){
-////                    var child = this.createComponent("imtqml/TreeItemModel.qml", this);
-////                    child.append(obj[i][keysObj[j]])
-////                    child.Parse(JSON.stringify(child))
-////                }
-////            }
-////            container.append(child)
-//            container.append(obj[i])
-//            //this.updateTreeItemJSONModel();
-//        }
-
-//        this.updateTreeItemJSONModel();
-        console.log("finish container", container.toJSON());
     }
 
     function toJSON(){

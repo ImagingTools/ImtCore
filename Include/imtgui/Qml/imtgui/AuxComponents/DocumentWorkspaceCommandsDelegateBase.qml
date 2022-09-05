@@ -35,6 +35,14 @@ Item {
         }
     }
 
+    Component.onCompleted: {
+        loadingPage.visible = true;
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
+    }
+
     onCommandsIdChanged: {
         console.log("DocumentCommands onCommandsIdChanged", container.commandsId);
         Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
@@ -52,8 +60,17 @@ Item {
         }
     }
 
+    onItemLoaded: {
+        loadingPage.visible = false;
+    }
+
     onObjectModelChanged: {
         objectModel.modelChanged.connect(modelChanged);
+    }
+
+    function removeChanges(){
+        commandsProvider.changeCommandMode("Save", "Disabled");
+        documentManager.setDocumentTitle({"ItemId": documentBase.itemId, "Title": documentBase.itemName});
     }
 
     function commandHandle(commandId){
@@ -94,6 +111,12 @@ Item {
     Component {
         id: saveDialog;
         MessageDialog {
+
+            Component.onCompleted: {
+                console.log("saveDialog onCompleted");
+                buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
+            }
+
             onFinished: {
                 console.log("saveDialog onFinished", buttonId);
                 if (buttonId == "Yes"){
@@ -156,8 +179,7 @@ Item {
         documentBase.itemId = itemId;
         documentBase.itemName = itemName;
 
-        commandsProvider.changeCommandMode("Save", "Disabled");
-        multiDocView.setDocumentTitle({"ItemId": itemId, "Title": itemName});
+        removeChanges();
 
         objectModel.modelChanged.connect(modelChanged);
 
@@ -170,7 +192,7 @@ Item {
         console.log("documentClosed", documentBase.itemId);
         closed();
 
-        multiDocView.closeDocument(documentBase.itemId);
+        documentManager.closeDocument(documentBase.itemId);
     }
 
     function modelChanged(){
@@ -178,7 +200,7 @@ Item {
         commandsProvider.changeCommandMode("Save", "Normal");
 
         let suffix = "*";
-        multiDocView.setDocumentTitle({"ItemId": documentBase.itemId, "Title": documentBase.itemName + suffix});
+        documentManager.setDocumentTitle({"ItemId": documentBase.itemId, "Title": documentBase.itemName + suffix});
     }
 
     GqlModel {

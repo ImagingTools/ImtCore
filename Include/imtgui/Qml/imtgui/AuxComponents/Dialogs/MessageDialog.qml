@@ -8,6 +8,10 @@ Dialog {
 
     property string message;
 
+    function addButton(){
+        buttons.addButton();
+    }
+
     onMessageChanged: {
         messageDialog.bodyItem.message = messageDialog.message;
     }

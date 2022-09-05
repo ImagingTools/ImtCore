@@ -5,8 +5,6 @@ import imtqml 1.0
 Item {
     id: gqlModelBaseContainer;
 
-//    property string itemId;
-
     property string gqlModelHeadersInfo: commandsId + "Info";
     property string gqlModelItemsInfo: commandsId + "List";
     property string gqlModelObjectView: commandsId + "ObjectView";

@@ -36,7 +36,7 @@ void CObserverQmlComp::ApplyUrl(const imtbase::CTreeItemModel *settingsModelPtr)
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 		QQmlEngine* engine = qmlEngine(quickItem);
 		engine->setBaseUrl(serverUrl + *m_prefixServer);
-		QMetaObject::invokeMethod(quickItem, "updateModels");
+//		QMetaObject::invokeMethod(quickItem, "updateModels");
 	}
 }
 
@@ -65,11 +65,10 @@ void CObserverQmlComp::OnComponentCreated()
 //				m_settingsObserver.RegisterObject(m_settingsModelPtr, &CObserverQmlComp::OnSettingsUpdated);
 //				connect(m_settingsModelPtr, SIGNAL(modelChanged()), this, SLOT(OnModelChanged()));
 
-//				QMetaObject::invokeMethod(quickItem, "updateModels");
 				connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnModelChanged()));
 
-
 				ApplyUrl(m_settingsModelPtr);
+				QMetaObject::invokeMethod(quickItem, "updateModels");
 			}
 		}
 	}

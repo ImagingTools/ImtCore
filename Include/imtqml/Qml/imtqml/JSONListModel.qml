@@ -7,28 +7,24 @@ ListModel {
     property string inquiry: "";
 	property string target: "";
 
-//	property ListModel model : ListModel { id: jsonModel }
-//	property alias count: jsonModel.count
     property string state;
 
 	onSourceChanged: {
 		this.state = "Loading"
         if(this.source == "")
             return
-		var xhr = new XMLHttpRequest;
-		xhr.open("GET", source);
+        var xhr = new XMLHttpRequest;
+        xhr.open("GET", source);
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE){
-		this.json = xhr.responseText;
+                this.json = xhr.responseText;
                 this.updateJSONModel()
-//                console.log("Model",jsonModel.$items)
                 this.state = "Ready"
             }
-		}
-		xhr.send();
+        }
+        xhr.send();
 	}
 
-    //onJsonChanged: updateJSONModel()
     onInquiryChanged: {
 		this.updateJSONModel()
 	}

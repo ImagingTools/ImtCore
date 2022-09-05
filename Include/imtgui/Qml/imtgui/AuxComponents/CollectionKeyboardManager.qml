@@ -7,6 +7,18 @@ Item {
 
     onFocusChanged: {
         console.log("KeyboardManager onFocusChanged", focus);
+
+        if (focus){
+            test.forceActiveFocus()
+        }
+    }
+
+    Item {
+        id: test;
+
+        Keys.onPressed: {
+            console.log("test onPressed", event.key);
+        }
     }
 
     Keys.onPressed: {

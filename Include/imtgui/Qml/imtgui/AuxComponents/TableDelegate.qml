@@ -28,10 +28,6 @@ Rectangle {
         tableDelegateContainer.setContainerSize();
     }
 
-    onXChanged: {
-        console.log("TableDelegate onXChanged", tableDelegateContainer.x);
-    }
-
     function clearArray(){
         while(tableDelegateContainer.bodyArray.length > 0)
             tableDelegateContainer.bodyArray.pop();

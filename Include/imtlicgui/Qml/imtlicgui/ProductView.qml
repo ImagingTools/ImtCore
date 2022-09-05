@@ -145,6 +145,8 @@ DocumentBase {
                 onTextChanged: {
                     documentModel.SetData("Id", inputId.text);
                 }
+
+                KeyNavigation.tab: inputName;
             }
 
             Text {
@@ -169,6 +171,8 @@ DocumentBase {
                 onTextChanged: {
                     documentModel.SetData("Name", inputName.text);
                 }
+
+                KeyNavigation.tab: inputId;
             }
 
             Rectangle {
@@ -209,10 +213,6 @@ DocumentBase {
 
                 modelItems: treeViewModel.modelTreeView;
                 visible: itemId !== "" && collectionView.table.selectedIndex > -1;
-
-                onCheckBoxChanged: {
-                    treeViewController.checkBoxChanged(state, parentId, childId);
-                }
             }
         }
     }

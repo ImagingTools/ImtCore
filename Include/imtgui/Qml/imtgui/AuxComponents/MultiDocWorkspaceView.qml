@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 
 Item {
-    id: multiDocView;
+    id: documentManager;
 
     anchors.fill: parent;
 
@@ -13,18 +13,6 @@ Item {
     property alias pagesCount: docsData.count;
 
     property string operation;
-
-    Component.onCompleted: {
-        console.log("MultidocWorkspaceView onCompleted", tabPanelInternal.selectedIndex)
-    }
-
-    onFocusChanged: {
-        console.log("MultidocWorkspaceView onFocusChanged", focus);
-
-//        if (focus){
-//            activeItem.forceActiveFocus();
-//        }
-    }
 
     TreeItemModel {
         id: documentsData;

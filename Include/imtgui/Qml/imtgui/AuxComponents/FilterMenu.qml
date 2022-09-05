@@ -18,10 +18,6 @@ Rectangle {
         loaderDecorator.source = filterContainer.decoratorSource;
     }
 
-    onVisibleChanged: {
-        console.log("filterContainer onVisibleChanged", filterContainer.width, filterContainer.height);
-    }
-
     Loader {
         id: loaderDecorator;
 

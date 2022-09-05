@@ -24,8 +24,8 @@ Rectangle {
     property string backgroundColor: "transparent";
     property var textButton;
 
-    property int iconWidth: auxButtonContainer.width;
-    property int iconHeight: auxButtonContainer.height;
+    property int iconWidth: auxButtonContainer.width - 3;
+    property int iconHeight: auxButtonContainer.height - 3;
     property int fontPixelSize: Style.fontSize_common;
 
     property alias iconSource: image.source;
@@ -48,8 +48,8 @@ Rectangle {
 
         anchors.centerIn: parent;
 
-        height: auxButtonContainer.iconHeight - 3;
-        width: auxButtonContainer.iconWidth - 3;
+        height: auxButtonContainer.iconHeight;
+        width: auxButtonContainer.iconWidth;
 
         sourceSize.width: width;
         sourceSize.height: height;

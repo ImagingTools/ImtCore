@@ -10,11 +10,12 @@ Item {
 
     onStartPageObjChanged: {
         console.log("multiDocPageView onStartPageObjChanged");
-        multiDocView.addDocument(multiDocPageView.startPageObj)
+        documentManager.addDocument(multiDocPageView.startPageObj)
     }
 
     MultiDocWorkspaceView {
-        id: multiDocView;
+        id: documentManager;
+
         anchors.fill: parent;
     }
 }

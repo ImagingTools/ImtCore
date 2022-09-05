@@ -24,6 +24,12 @@ Item {
     signal textFilterChanged(string id, int index, string text);
     signal filterClicked();
 
+    onSelectedIndexChanged: {
+        if (selectedIndex > -1){
+            elementsList.forceActiveFocus();
+        }
+    }
+
     function getSelectedId(){
         if (tableContainer.selectedIndex > -1){
             if (tableContainer.elements.ContainsKey("Id", tableContainer.selectedIndex)){
@@ -191,6 +197,24 @@ Item {
         clip: true;
         spacing: 0;
         boundsBehavior: Flickable.StopAtBounds;
+
+        Keys.onUpPressed: {
+            if (tableContainer.selectedIndex > 0){
+                tableContainer.selectedIndex--;
+            }
+            else{
+                tableContainer.selectedIndex = elementsList.count - 1;
+            }
+        }
+
+        Keys.onDownPressed: {
+            if (tableContainer.selectedIndex < elementsList.count - 1){
+                tableContainer.selectedIndex++;
+            }
+            else{
+                tableContainer.selectedIndex = 0;
+            }
+        }
 
         delegate: TableDelegate {
             id: tableDelegate;

@@ -63,7 +63,7 @@ Rectangle {
 
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-                    licensesController.checkBoxLicenseClicked(model.Id, model.index, 2 - checkBoxLicense.checkState);
+                    model.LicenseState = 2 - checkBoxLicense.checkState;
                 }
             }
         }
@@ -109,7 +109,7 @@ Rectangle {
 
                 onClicked: {
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-                    licensesController.checkBoxExpirationClicked(model.Id, model.index, 2 - checkBoxExpiration.checkState);
+                    model.ExpirationState = 2 - checkBoxExpiration.checkState;
                 }
             }
         }
@@ -134,37 +134,28 @@ Rectangle {
             regExp: /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/;
         }
 
-//        DatePicker {
-//            id: datePicker;
-
-//            height: 200;
-//        }
-
-        CustomTextField{
-            id: inputDate;
+        DatePicker {
+            id: datePicker;
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: checkBoxExpiration.right;
             anchors.leftMargin: 5;
 
-            height: 20;
-            width: 100;
-
             visible: checkBoxExpiration.checkState === 2;
 
-            placeHolderText: "yyyy-MM-dd";
-            text: model.Expiration;
-            textSize: 17;
+            width: 100;
+            height: 20;
 
             Component.onCompleted: {
-                inputDate.textInputMask = "9999-00-00";
-                inputDate.textInputValidator = dateRegex;
+                console.log("onCompleted");
+                let date = model.Expiration;
+                let data = date.split("-");
+                datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
             }
 
-            onTextChanged: {
-                if (inputDate.acceptableInput){
-                    licensesController.textExpirationChanged(model.Id, model.index, inputDate.text);
-                }
+            onDateChanged: {
+                console.log("onDateChanged", getDate());
+                model.Expiration = getDate();
             }
         }
     }

@@ -25,13 +25,14 @@ Item {
     property bool loadData;
 
     Component.onCompleted: {
-        console.log("CollectionViewBase onCompleted", loadData);
+        console.log("CollectionViewBase onCompleted");
 
-        keyboardManager.forceActiveFocus();
+        tableInternal.focus = true;
     }
 
-    Keys.onPressed: {
-        console.log("CollectionViewBase onPressed", event.key);
+    onVisibleChanged: {
+        if (visible){
+        }
     }
 
     onCommandsIdChanged: {
@@ -121,6 +122,10 @@ Item {
         Component.onCompleted: {
             tableInternal.headerClicked.connect(sortController.headerClicked);
         }
+
+        Component.onDestruction: {
+            tableInternal.headerClicked.disconnect(sortController.headerClicked);
+        }
     }
 
     function setHeaderSort(headerId, sortOrder){
@@ -154,10 +159,6 @@ Item {
             tableInternal.selectedIndex = -1;
             baseCommands.updateModels();
         }
-    }
-
-    CollectionKeyboardManager{
-        id: keyboardManager;
     }
 
     CollectionViewBaseGqlModels {

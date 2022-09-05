@@ -37,7 +37,14 @@ public:
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
 
+	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+
 public Q_SLOTS:
+
+	bool Copy(CTreeItemModel* object);
 	int InsertNewItem();
 	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	imtbase::CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
@@ -86,8 +93,8 @@ private:
 	class Item
 	{
 	public:
-		Item() {  }
-		~Item() {  }
+		Item() {}
+		~Item() {}
 
 		void SetValue(const QByteArray& key, const QVariant& value) {
 			if (!m_map.contains(key)){

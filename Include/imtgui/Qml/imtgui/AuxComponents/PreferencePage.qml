@@ -16,19 +16,23 @@ Rectangle {
         id: commonModel;
     }
 
+    TreeItemModel {
+        id: serverCopyModel;
+    }
+
+    TreeItemModel {
+        id: localCopyModel;
+    }
+
     onServerModelChanged: {
         console.log("PreferenceDialog onServerModelChanged");
 
-        for (let i = 0; i < serverModel.GetItemsCount(); i++){
-            let pageId = serverModel.GetData("Id", i);
-            let index = getPageIndexByPageId(pageId)
+//        serverCopyModel.Copy(serverModel);
 
-            if (index < 0){
-                index = commonModel.InsertNewItem();
-            }
+        let json = serverModel.toJSON();
+        serverCopyModel.Parse(json);
 
-            commonModel.CopyItemDataFromModel(index, serverModel, i);
-        }
+        updateCommonModel(serverCopyModel);
 
         updateGui();
     }
@@ -36,24 +40,17 @@ Rectangle {
     onLocalModelChanged: {
         console.log("PreferenceDialog onLocalModelChanged");
 
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageId = localModel.GetData("Id", i);
-            let index = getPageIndexByPageId(pageId)
+        let json = localModel.toJSON();
+        console.log("json", json);
+        localCopyModel.Parse(json);
 
-            if (index < 0){
-                index = commonModel.InsertNewItem();
-            }
-            commonModel.CopyItemDataFromModel(index, localModel, i);
-        }
+        updateCommonModel(localCopyModel);
 
         updateGui();
     }
 
     onVisibleChanged: {
-        if (!visible){
-            settingsQuery.getSettings();
-        }
-        else{
+        if (visible){
             mainPanel.selectedIndex = 0;
             bodyPanelRepeater.model = commonModel.GetData("Elements");
         }
@@ -63,18 +60,21 @@ Rectangle {
         settingsQuery.getSettings();
     }
 
-    function serverModelUpdated(){
-        console.log("serverModelUpdated");
-        console.log(serverModel.toJSON());
-    }
-
-    function localModelUpdated(){
-        console.log("localModelUpdated");
-        console.log(localModel.toJSON());
-    }
-
     function updateGui(){
         mainPanelRepeater.model = commonModel;
+    }
+
+    function updateCommonModel(externModel){
+        for (let i = 0; i < externModel.GetItemsCount(); i++){
+            let pageId = externModel.GetData("Id", i);
+            let index = getPageIndexByPageId(pageId)
+
+            if (index < 0){
+                index = commonModel.InsertNewItem();
+            }
+
+            commonModel.CopyItemDataFromModel(index, externModel, i);
+        }
     }
 
     function getPageIndexByPageId(pageId){
@@ -151,6 +151,23 @@ Rectangle {
         return null;
     }
 
+    function getNetworkUrl(localModel){
+        console.log("Preferences getNetworkUrl");
+
+        let elements = localModel.GetData("Elements");
+
+        for (let i = 0; i < elements.GetItemsCount(); i++){
+            let elementId = elements.GetData("Id", i);
+            if (elementId == "ServerUrl"){
+                let elementValue = elements.GetData("Value", i);
+
+                return elementValue;
+            }
+        }
+
+        return null;
+    }
+
     function openFileDialog(){
         fileDialogSave.open();
     }
@@ -208,7 +225,7 @@ Rectangle {
             title: qsTr("Preferences");
 
             onCloseButtonClicked: {
-                container.visible = false;
+                buttonsDialog.buttonClicked("Cancel");
             }
         }
 
@@ -379,16 +396,38 @@ Rectangle {
                 console.log("ButtonsDialog onButtonClicked", buttonId);
 
                 if (buttonId == "Cancel"){
+                    let json = serverModel.toJSON();
+                    serverCopyModel.Parse(json);
+
+                    updateCommonModel(serverCopyModel);
+
+                    json = localModel.toJSON();
+                    localCopyModel.Parse(json);
+
+                    updateCommonModel(localCopyModel);
+
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
 
+                    let oldUrl = getNetworkUrl(localModel);
+                    let newUrl = getNetworkUrl(localCopyModel);
+
+                    console.log("oldUrl", oldUrl);
+                    console.log("newUrl", newUrl);
+                    if (oldUrl != newUrl){
+
+                        let json = localCopyModel.toJSON();
+                        localModel.Parse(json);
+
+                        window.settingsUpdate();
+                        window.updateModels();
+                    }
+
+                    let json = serverCopyModel.toJSON();
+                    serverModel.Parse(json);
+
                     preferenceSaveQuery.save();
-
-                    //Сигнал на обновление LocalModel
-                    window.settingsUpdate();
-
-//                    window.updateModels();
                 }
             }
         }

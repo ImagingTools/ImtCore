@@ -14,9 +14,6 @@ Item {
         let model = parameters["Model"];
         let commId = parameters["CommandsId"];
 
-        console.log("model", model);
-        console.log("commandsId", commId);
-
         commandsDecoratorContainer.commandsId = commId;
         repeaterCommands.model = model;
     }
@@ -37,8 +34,8 @@ Item {
                 text: model.Name;
                 isEmpty: model.Name === "";
                 imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
-//                imageSource: ":/Icons/Add_Off_Normal.svg";
                 fontName: Style.fontFamily;
+
                 checkable: model.Mode == "Normal";
 
                 onClicked: {

@@ -59,7 +59,31 @@ Rectangle {
 
                 property int currentIndex: 0;
 
-                delegate:  MenuPanelButton{
+                Keys.onUpPressed: {
+                    if (currentIndex > 0){
+                        currentIndex--;
+                    }
+                    else{
+                        currentIndex = lvPages.count - 1;
+                    }
+
+                    let curItem = lvPages.itemAt(currentIndex);
+                    curItem.clicked();
+                }
+
+                Keys.onDownPressed: {
+                    if (currentIndex < lvPages.count - 1){
+                        currentIndex++;
+                    }
+                    else{
+                        currentIndex = 0;
+                    }
+
+                    let curItem = lvPages.itemAt(currentIndex);
+                    curItem.clicked();
+                }
+
+                delegate: MenuPanelButton{
                     text:  model["Name"];
                     textColor: Style.textColor;
                     fontName: menuPanel.fontName;
@@ -76,21 +100,11 @@ Rectangle {
                         menuPanel.activeIcon = model["Icon"];
                         menuPanel.activePageIndex = model.index;
                         menuPanel.activePageId = model["PageId"];
+
+                        lvPages.forceActiveFocus();
                     }
                 }
             }
-        }
-    }
-
-    Timer {
-        id: pageIndexTimer;
-
-        interval: 10;
-
-        property int pageIndex: -1;
-
-        onTriggered: {
-            menuPanel.activePageIndex  = pageIndexTimer.pageIndex;
         }
     }
 
@@ -141,9 +155,8 @@ Rectangle {
                         menuPanel.activePageName = dataModelLocal.GetData("Name");
                         menuPanel.activeIcon = dataModelLocal.GetData("Icon");
 
-
-                        pageIndexTimer.pageIndex = 0;
-                        pageIndexTimer.start();
+                        menuPanel.activePageIndex = -1;
+                        menuPanel.activePageIndex = 0;
                     }
                     else if(this.ContainsKey("errors")){
                         var errorsModel = pagesModel.GetData("errors");

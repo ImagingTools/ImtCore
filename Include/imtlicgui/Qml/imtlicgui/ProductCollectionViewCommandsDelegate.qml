@@ -21,7 +21,7 @@ CollectionViewCommandsDelegateBase {
             let itemName = tableData.getSelectedName();
 
             let copyStr = qsTr("Copy of ");
-            multiDocView.addDocument({"Id":         itemId,
+            documentManager.addDocument({"Id":         itemId,
                                       "Name":       copyStr + itemName,
                                       "Source":     baseCollectionView.commands.objectViewEditorPath,
                                       "CommandsId": baseCollectionView.commands.objectViewEditorCommandsId});

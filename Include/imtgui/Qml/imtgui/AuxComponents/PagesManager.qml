@@ -7,7 +7,7 @@ Item {
 
     property TreeItemModel pageModel;
     property Item activeItem;
-    property int activePageIndex: -1;
+    property int activePageIndex: menuPanel.activePageIndex;
 
     onActiveItemChanged: {
         console.log("onActiveItemChanged", activeItem);
@@ -35,8 +35,6 @@ Item {
 
             onVisibleChanged: {
                 if(pagesDeleg.visible){
-
-
                     if (!pagesLoader.item){
                         var source = pageModel.GetData("Source", model.index);
                         pagesLoader.source = source;

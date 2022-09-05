@@ -166,11 +166,6 @@ DocumentBase {
 
             modelItems: treeViewModel.modelTreeView;
             visible: itemId !== "" && collectionView.table.selectedIndex > -1;
-
-            onCheckBoxChanged: {
-                console.log("PackageView onCheckBoxChanged", state, parentId, childId);
-                treeViewController.checkBoxChanged(state, parentId, childId);
-            }
         }
     }
 }

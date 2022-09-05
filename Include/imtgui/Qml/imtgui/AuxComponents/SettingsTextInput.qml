@@ -6,6 +6,8 @@ import imtgui 1.0
 Item {
     id: settingsTextInputContainer;
 
+    signal textInputFocusChanged();
+
     CustomTextField {
         id: tfcTextInput;
 
@@ -18,6 +20,10 @@ Item {
 
         onTextChanged: {
             model.Value = tfcTextInput.text;
+        }
+
+        onTextInputFocusChanged: {
+            settingsTextInputContainer.textInputFocusChanged();
         }
     }
 }

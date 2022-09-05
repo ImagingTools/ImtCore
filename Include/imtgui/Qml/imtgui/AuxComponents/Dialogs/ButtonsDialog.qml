@@ -52,6 +52,8 @@ Item {
                 hasText: true;
                 hasIcon: false;
 
+                focus: model.Active;
+
                 enabled: model.Enabled;
 
                 textButton: model.Name;

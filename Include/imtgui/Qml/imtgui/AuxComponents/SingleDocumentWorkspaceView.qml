@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 
 Item {
-    id: singleDocumentView;
+    id: documentManager;
 
     anchors.fill: parent;
 
@@ -18,9 +18,12 @@ Item {
         id: documentLoader;
 
         anchors.fill: parent;
+    }
 
-        onLoaded: {
-//            documentLoader.item.commandsId = model.CommandsId
+    function addDocument(document){
+
+        if (documentLoader.item){
+            documentLoader.item.addDocument(document);
         }
     }
 }
