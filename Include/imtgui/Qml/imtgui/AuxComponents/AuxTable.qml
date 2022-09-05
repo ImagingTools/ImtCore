@@ -6,6 +6,7 @@ Item {
 
     property int selectedIndex: -1;
     property int itemHeight: 35;
+    property int headerHeight: 35;
 
     property bool hasFilter: false;
     property bool hasSort: false;
@@ -14,6 +15,10 @@ Item {
 
     property alias delegate: elementsList.delegate;
     property alias elements: elementsList.model;
+
+    property alias headerDelegate: headersList.delegate;
+    property real headerElementWidth: (headersList.width - iconFilter.width)/headersList.count;
+    property alias headerElementHeight: headersList.height;
 
     property int radius: 7;
 
@@ -68,7 +73,7 @@ Item {
         anchors.right: parent.right;
         anchors.top: parent.top;
 
-        height: 35;
+        height: tableContainer.headerHeight;
 
         clip: true;
 

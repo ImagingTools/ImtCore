@@ -12,6 +12,7 @@ MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
 ComboBox 1.0 ./AuxComponents/ComboBox.qml
 CheckBox 1.0 ./AuxComponents/CheckBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
+TableDelegate 1.0 ./AuxComponents/TableDelegate.qml
 DatePicker 1.0 ./AuxComponents/DatePicker.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
 PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
