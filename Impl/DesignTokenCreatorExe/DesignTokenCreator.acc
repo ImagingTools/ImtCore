@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4952" Description="ACF"/>
-            <Version Id="1" Number="2151" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5014" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,6 +13,21 @@
         <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Design token generator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Client (CommandLine)"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Imaging tools"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="� Imaging tools"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Design token generator"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="VersionInfo"/>
                     </AttributeInfo>
@@ -32,36 +47,22 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConsoleLog" PackageId="BasePck" ComponentId="ConsoleLog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="DesignTokenArgumentsParser" PackageId="ImtDesignPck" ComponentId="DesignTokenArgumentsParser">
             <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="DesignTokenFileParser" PackageId="ImtDesignPck" ComponentId="DesignTokenFileParser">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="DesignTokenIconProcessor" PackageId="ImtDesignPck" ComponentId="DesignTokenIconProcessor">
-            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DesignTokenIconQmlGenerator" PackageId="ImtDesignPck" ComponentId="DesignTokenIconQmlGenerator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -75,49 +76,28 @@
                     <AttributeInfo Id="DesignTokenProcessors" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>DesignTokenIconProcessor</Value>
-                                <Value>DesignTokenStyleSheetProcessor</Value>
-                                <Value>DesignTokenQrcUpdater</Value>
-                                <Value>DesignTokenWebQrcGenerator</Value>
-                                <Value>DesignTokenIconQmlGenerator</Value>
+                                <Value>Processors/DesignTokenIconProcessor</Value>
+                                <Value>Processors/DesignTokenStyleSheetProcessor</Value>
+                                <Value>Processors/DesignTokenQrcUpdater</Value>
+                                <Value>Processors/DesignTokenWebQrcGenerator</Value>
+                                <Value>Processors/DesignTokenIconQmlGenerator</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="DesignTokenQrcUpdater" PackageId="ImtDesignPck" ComponentId="DesignTokenQrcUpdater">
+        <Element Id="Processors" PackageId="" ComponentId="Processors">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DesignTokenStyleSheetProcessor" PackageId="ImtDesignPck" ComponentId="DesignTokenStyleSheetProcessor">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DesignTokenWebQrcGenerator" PackageId="ImtDesignPck" ComponentId="DesignTokenWebQrcGenerator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenArgumentsParser"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -129,12 +109,133 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList>
-        <EmbeddedRegistry Id="ProcessorsTools">
+        <EmbeddedRegistry Id="Processors">
             <Data Description="" Keywords="">
-                <ElementsList/>
+                <ElementsList>
+                    <Element Id="DesignTokenFileParser" PackageId="ImtDesignPck" ComponentId="DesignTokenFileParser">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DesignTokenIconProcessor" PackageId="ImtDesignPck" ComponentId="DesignTokenIconProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="ArgumentsParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DesignTokenIconQmlGenerator" PackageId="ImtDesignPck" ComponentId="DesignTokenIconQmlGenerator">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="ArgumentsParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DesignTokenQrcUpdater" PackageId="ImtDesignPck" ComponentId="DesignTokenQrcUpdater">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="ArgumentsParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DesignTokenStyleSheetProcessor" PackageId="ImtDesignPck" ComponentId="DesignTokenStyleSheetProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="ArgumentsParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="DesignTokenWebQrcGenerator" PackageId="ImtDesignPck" ComponentId="DesignTokenWebQrcGenerator">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="ArgumentsParser">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces/>
-                <ExportedComponents/>
+                <ExportedComponents>
+                    <Component ExportedId="DesignTokenIconProcessor" ComponentId="DesignTokenIconProcessor"/>
+                    <Component ExportedId="DesignTokenIconQmlGenerator" ComponentId="DesignTokenIconQmlGenerator"/>
+                    <Component ExportedId="DesignTokenQrcUpdater" ComponentId="DesignTokenQrcUpdater"/>
+                    <Component ExportedId="DesignTokenStyleSheetProcessor" ComponentId="DesignTokenStyleSheetProcessor"/>
+                    <Component ExportedId="DesignTokenWebQrcGenerator" ComponentId="DesignTokenWebQrcGenerator"/>
+                </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>

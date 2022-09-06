@@ -30,6 +30,11 @@ QByteArray CDesignTokenStyleSheetProcessorComp::GetHelpString() const
 
 int CDesignTokenStyleSheetProcessorComp::Exec()
 {
+	if(m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath().isEmpty()){
+		qDebug() << "Style sheets dir is not set skipping...";
+		return 0;
+	}
+
 	if(!QDir(m_argumentParserAttrPtr->GetStyleSheetsInputDirectoryPath()).isReadable()){
 		return -1;
 	}
