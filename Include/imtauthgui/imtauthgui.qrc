@@ -23,6 +23,12 @@
         <file alias="imtauthgui/UserViewCommandsDelegate.qml">Qml/imtauthgui/UserViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserTreeViewController.qml">Qml/imtauthgui/UserTreeViewController.qml</file>
         <file alias="imtauthgui/CollectionViewWithMenu.qml">Qml/imtauthgui/CollectionViewWithMenu.qml</file>
+        <file alias="imtauthgui/TableUserRolesDelegate.qml">Qml/imtauthgui/TableUserRolesDelegate.qml</file>
+        <file alias="imtauthgui/UserRoles.qml">Qml/imtauthgui/UserRoles.qml</file>
+        <file alias="imtauthgui/UserRolesController.qml">Qml/imtauthgui/UserRolesController.qml</file>
+        <file alias="imtauthgui/TableUserPermissionsDelegate.qml">Qml/imtauthgui/TableUserPermissionsDelegate.qml</file>
+        <file alias="imtauthgui/UserPermissions.qml">Qml/imtauthgui/UserPermissions.qml</file>
+        <file alias="imtauthgui/UserPermissionsController.qml">Qml/imtauthgui/UserPermissionsController.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

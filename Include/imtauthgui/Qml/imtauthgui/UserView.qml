@@ -63,12 +63,12 @@ Rectangle {
                 ListElement{
                     Id: "Roles";
                     Name: "Roles";
-                    Source: "qrc:/qml/imtauthgui/UserEditor.qml"
+                    Source: "qrc:/qml/imtauthgui/UserRoles.qml"
                 }
                 ListElement{
                     Id: "Permissions";
                     Name: "Permissions";
-                    Source: "qrc:/qml/imtauthgui/UserEditor.qml"
+                    Source: "qrc:/qml/imtauthgui/UserPermissions.qml"
                 }
             }
 
