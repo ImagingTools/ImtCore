@@ -13,14 +13,33 @@ Rectangle {
         console.log("AdministrationView addDocument");
     }
 
+    Rectangle{
+        id: headerRect
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+        width: parent.width
+        height: 50
+        Text {
+            id: headerText;
+
+            anchors.left: parent.left;
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.leftMargin: 20;
+
+            font.pixelSize: Style.fontSize_title;
+            font.family: Style.fontFamily;
+
+            color: Style.titleColor;
+        }
+    }
     Rectangle {
         id: mainPanelBackground;
 
-        anchors.top: parent.top;
+        anchors.top: headerRect.bottom;
         anchors.left: parent.left;
 
         width: 150;
-        height: parent.height;
+        height: parent.height - headerRect.height;
 
         color: Style.alternateBaseColor;
 
@@ -85,6 +104,8 @@ Rectangle {
 
                             if (bodyLoader.item){
                                 bodyLoader.item.commandsId = model.Id;
+                                headerText.text = model.Id;
+
                             }
 
                             console.log("bodyLoader.item", bodyLoader.item);
@@ -99,10 +120,10 @@ Rectangle {
         id: bodyAdministration;
 
         anchors.left: mainPanelBackground.right;
-        anchors.top: parent.top;
+        anchors.top: headerRect.bottom;
 
         width: parent.width - mainPanelBackground.width;
-        height: parent.height;
+        height: parent.height - headerRect.height;
 
         Loader {
             id: bodyLoader;
@@ -110,7 +131,6 @@ Rectangle {
             anchors.fill: parent;
 
             onItemChanged: {
-
             }
         }
     }

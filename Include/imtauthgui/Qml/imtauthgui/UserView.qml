@@ -1,218 +1,143 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Acf 1.0
 import imtgui 1.0
 
-DocumentBase {
+Rectangle {
     id: container;
 
-    commandsDelegatePath: "../../imtauthgui/UserViewCommandsDelegate.qml";
+    anchors.fill: parent;
 
-    onDocumentModelChanged: {
-        let headers = documentModel.GetData("Headers");
-        let items = documentModel.GetData("Items");
-        let dependencies = documentModel.GetData("Features");
+//    property alias commandsId: userCollectionViewContainer.commandsId;
 
-        if (!items){
-            items = documentModel.AddTreeModel("Items");
-        }
-
-        if (!dependencies){
-            dependencies = documentModel.AddTreeModel("Features");
-        }
-
-        collectionView.table.headers = headers;
-        collectionView.table.elements = items;
-
-        undoRedoManager.model = documentModel;
+    function addDocument(document){
+        console.log("AdministrationView addDocument");
     }
 
-    onWidthChanged: {
-        console.log("container onWidthChanged", container.width);
-       if (container.width > 0 && container.width - rightPanel.width > 250){
-           splitter.x = container.width - rightPanel.width;
-       }
-    }
-
-    onCommandsIdChanged: {
-        console.log("ObjectView onCommandsIdChanged", container.commandsId);
-        collectionView.commandsId = commandsId;
-    }
-
-    onCommandsDelegateLoaded: {
-        commandsDelegate.tableData = collectionView.table;
-    }
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        commandsId: container.commandsId;
-        editorItem: container;
-
-        onModelParsed: {
-
-            collectionView.table.elements = documentModel.GetData("Items");
-            updateGui();
-        }
-    }
-
-    function updateGui(){
-        let index = collectionView.table.selectedIndex;
-        collectionView.table.selectedIndex = -1;
-        collectionView.table.selectedIndex = index;
-
-        inputId.text = documentModel.GetData("Id");
-        inputName.text = documentModel.GetData("Name");
-
-        collectionView.table.elements.Refresh();
-    }
-
-    CollectionViewBase {
-        id: collectionView;
-
+    Rectangle{
+        id: headerRect
+        anchors.top: parent.top;
         anchors.left: parent.left;
-        anchors.right: splitter.left;
+        width: parent.width
+        height: 50
+        Text {
+            id: headerText;
 
-        hasPagination: false;
-        hasFilter: false;
-        hasSort: false;
+            anchors.left: parent.left;
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.leftMargin: 20;
 
-        loadData: false;
+            font.pixelSize: Style.fontSize_title;
+            font.family: Style.fontFamily;
 
-        height: parent.height;
-
-        onSelectedItem: {
-            commandsDelegate.commandActivated("Edit");
+            color: Style.titleColor;
         }
     }
+    Rectangle {
+        id: mainPanelBackground;
 
-    Splitter {
-        id: splitter;
-        x: container.width - 250;
+        anchors.top: headerRect.bottom;
+        anchors.left: parent.left;
 
-        height: parent.height;
-        width: 4;
+        width: 150;
+        height: parent.height - headerRect.height;
 
-        onXChanged: {
-            if (!container.visible){
-                return;
-            }
-
-            if (splitter.x > container.width - titleHeader.width){
-                splitter.x = container.width - splitter.width;
-            }
-
-            if (splitter.x < 250){
-                splitter.x = 250;
-            }
-        }
-    }
-
-    Item {
-        id: rightPanel;
-
-        anchors.left: splitter.right;
-
-        width: container.width > 0 ? container.width - collectionView.width : 250;
-        height: parent.height;
+        color: Style.alternateBaseColor;
 
         Column {
-            id: content;
+            id: mainPanel;
 
             anchors.fill: parent;
-            anchors.rightMargin: 10;
+            anchors.topMargin: 10;
+
+            property int selectedIndex: -1;
 
             spacing: 5;
 
-            Text {
-                id: titleId;
-
-                anchors.left: headerTreeView.left;
-
-                text: qsTr("User-ID");
-                color: Style.textColor;
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
-
-            CustomTextField {
-                id: inputId;
-
-                width: parent.width;
-                height: 30;
-
-                placeHolderText: qsTr("Enter the User-ID");
-
-                onTextChanged: {
-                    documentModel.SetData("Id", inputId.text);
+            ListModel{
+                id: leftMenuModel
+                ListElement{
+                    Id: "General";
+                    Name: "General";
+                    Source: "qrc:/qml/imtauthgui/UserEditor.qml"
+                }
+                ListElement{
+                    Id: "Roles";
+                    Name: "Roles";
+                    Source: "qrc:/qml/imtauthgui/UserEditor.qml"
+                }
+                ListElement{
+                    Id: "Permissions";
+                    Name: "Permissions";
+                    Source: "qrc:/qml/imtauthgui/UserEditor.qml"
                 }
             }
 
-            Text {
-                id: titleName;
+            Repeater {
+                id: mainPanelRepeater;
 
-                anchors.left: headerTreeView.left;
+                model: leftMenuModel
 
-                text: qsTr("User Name");
-                color: Style.textColor;
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
+                delegate: AuxButton {
 
-            CustomTextField {
-                id: inputName;
-
-                width: parent.width;
-                height: 30;
-
-                placeHolderText: qsTr("Enter the User Name");
-
-                onTextChanged: {
-                    documentModel.SetData("Name", inputName.text);
-                }
-            }
-
-            Rectangle {
-                id: headerTreeView;
-
-                width: parent.width;
-                height: 35;
-
-                color: Style.baseColor;
-
-                Text {
-                    id: titleHeader;
-
-                    anchors.verticalCenter: headerTreeView.verticalCenter;
-
-                    anchors.left: headerTreeView.left;
+                    anchors.left: parent.left;
                     anchors.leftMargin: 10;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 10;
 
-                    text: qsTr("Features");
-                    color: Style.textColor;
-                    font.pixelSize: Style.fontSize_common;
-                    font.family: Style.fontFamilyBold;
-                    font.bold: true;
+                    height: 35;
+
+                    radius: 3;
+
+                    hasText: true;
+                    hasIcon: false;
+
+                    textButton: model.Name;
+
+                    backgroundColor: Style.mainColor
+
+                    borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
+
+                    Component.onCompleted: {
+                        if (model.index === 0){
+                            clicked();
+                        }
+                    }
+
+                    onClicked: {
+                        if (mainPanel.selectedIndex !== model.index){
+                            mainPanel.selectedIndex = model.index;
+
+                            bodyLoader.source = model.Source;
+
+                            if (bodyLoader.item){
+                                bodyLoader.item.commandsId = model.Id;
+                                headerText.text = model.Id;
+
+                            }
+
+                            console.log("bodyLoader.item", bodyLoader.item);
+                        }
+                    }
                 }
             }
+        }
+    }
 
-            UserTreeViewController {
-                id: treeViewController;
-            }
+    Rectangle{
+        id: bodyAdministration;
 
-            TreeView {
-                id: treeView;
+        anchors.left: mainPanelBackground.right;
+        anchors.top: headerRect.bottom;
 
-                height: container.height;
-                width: parent.width;
+        width: parent.width - mainPanelBackground.width;
+        height: parent.height - headerRect.height;
 
-                clip: true;
+        Loader {
+            id: bodyLoader;
 
-                modelItems: treeViewModel.modelTreeView;
-                visible: itemId !== "" && collectionView.table.selectedIndex > -1;
+            anchors.fill: parent;
 
-                onCheckBoxChanged: {
-                    treeViewController.checkBoxChanged(state, parentId, childId);
-                }
+            onItemChanged: {
             }
         }
     }

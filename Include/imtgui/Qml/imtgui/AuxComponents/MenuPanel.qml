@@ -31,6 +31,7 @@ Rectangle {
 
     function updateModels(){
         pagesModel.updateModel();
+        mainPanelInfoModel.updateModel();
     }
 
     onActivePageIndexChanged: {
@@ -100,6 +101,12 @@ Rectangle {
                         menuPanel.activeIcon = model["Icon"];
                         menuPanel.activePageIndex = model.index;
                         menuPanel.activePageId = model["PageId"];
+                        if (model["Name"] == "Administration"){
+                            topPanel.pageNameText = model["Name"];
+                        }
+                        else{
+                            topPanel.pageNameText = "";
+                        }
 
                         lvPages.forceActiveFocus();
                     }
@@ -168,5 +175,53 @@ Rectangle {
             }
         }
     }
+    GqlModel {
+        id: mainPanelInfoModel;
 
+        Component.onCompleted: {
+            mainPanelInfoModel.updateModel();
+        }
+
+        function updateModel() {
+            console.log( "mainPanelInfoModel update", "AdministrationPages");
+
+            var query = Gql.GqlRequest("query", "AdministrationPages");
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("LanguageId", Style.language);
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("items");
+            queryFields.InsertField("PageId");
+            queryFields.InsertField("Name");
+            queryFields.InsertField("Icon");
+            queryFields.InsertField("Source");
+            queryFields.InsertField("StartItem");
+            query.AddField(queryFields);
+            var gqlData = query.GetQuery();
+            console.log("mainPanelInfoModel query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            console.log("State:",this.state, mainPanelInfoModel)
+            if (this.state == "Ready"){
+
+                var dataModelLocal = this.GetData("data");
+
+                if(dataModelLocal.ContainsKey("AdministrationPages")){
+                    dataModelLocal = dataModelLocal.GetData("AdministrationPages")
+                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+                        dataModelLocal = dataModelLocal.GetData("items")
+                        console.log("AdministrationPages = ", dataModelLocal)
+                    }
+                    else if(this.ContainsKey("errors")){
+                        var errorsModel = pagesModel.GetData("errors");
+                        if(errorsModel !== null && errorsModel.ContainsKey("AdministrationPages")){
+                            console.log("message", errorsModel.GetData("AdministrationPages").GetData("message"))
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

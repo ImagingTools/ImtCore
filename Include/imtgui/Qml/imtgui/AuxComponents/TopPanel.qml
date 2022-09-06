@@ -8,6 +8,7 @@ Rectangle {
     color: Style.backgroundColor;
 
     property bool loginDialog: false;
+    property string pageNameText;
 
     Component.onCompleted: {
         console.log("TopPanel onCompleted");
@@ -21,6 +22,21 @@ Rectangle {
          if (topPanelDecoratorLoader.item){
              topPanelDecoratorLoader.item.width = topPanel.width;
          }
+    }
+    Text {
+        id: administrationText;
+
+        anchors.left: parent.left;
+        anchors.top: parent.top
+        anchors.leftMargin: 20;
+        anchors.topMargin: 15;
+        z:1000;
+        font.pixelSize: Style.fontSize_title;
+        font.family: Style.fontFamily;
+
+        color: Style.titleColor;
+
+        text: pageNameText;
     }
 
     Loader {
