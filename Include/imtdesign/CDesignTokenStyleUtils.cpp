@@ -59,7 +59,8 @@ const QMap<QString, QPalette::ColorRole>CDesignTokenStyleUtils::s_colorRolesName
 	std::make_pair("ToolTipText", QPalette::ColorRole::ToolTipText),
 	std::make_pair("PlaceholderText", QPalette::ColorRole::PlaceholderText),
 	std::make_pair("Foreground", QPalette::ColorRole::WindowText),
-	std::make_pair("Background", QPalette::ColorRole::Window)
+	std::make_pair("Background", QPalette::ColorRole::Window),
+	std::make_pair("PlaceholderText", QPalette::ColorRole::PlaceholderText)
 };
 
 
