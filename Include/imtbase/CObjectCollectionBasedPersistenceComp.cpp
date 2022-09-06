@@ -58,33 +58,62 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 			QStringList parts = path.split("/");
 			if (parts.count() == 2){
 				QByteArray parentId = parts[0].toUtf8();
-				QByteArray id = parts[1].toUtf8();
+				QByteArray proposedId = parts[1].toUtf8();
 
-				if (uri.hasQuery()){
+				QString objectName;
+				if (uri.hasQuery()) {
 					QUrlQuery query(uri.query());
-					if (query.hasQueryItem("name")){
-						QString name = query.queryItemValue("name");
+					if (query.hasQueryItem("name")) {
+						objectName = query.queryItemValue("name");
+					}
+				}
 
-						QByteArray documentId;
-						for (const QByteArray& id : m_collectionCompPtr->GetElementIds(0, -1, nullptr, parentId, imtbase::ICollectionInfo::IF_LEAF_ONLY)){
-							if (m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString() == filePath){
-								documentId = id;
-								break;
+				QByteArrayList ids = m_collectionCompPtr->GetElementIds(0, -1, nullptr, parentId, imtbase::ICollectionInfo::IF_LEAF_ONLY);
+
+				if (!proposedId.isEmpty() && objectName.isEmpty()){
+					if (ids.contains(proposedId)){
+						return m_collectionCompPtr->SetObjectData(proposedId, data) ? OS_OK : OS_FAILED;
+					}
+
+					return OS_FAILED;
+				}
+
+				if (proposedId.isEmpty() && !objectName.isEmpty()){
+					for (const QByteArray& id : ids){
+						QString collectionObjctName = m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+						if (collectionObjctName == objectName){
+							return m_collectionCompPtr->SetObjectData(id, data) ? OS_OK : OS_FAILED;
+						}
+					}
+
+					QByteArray objectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, proposedId, nullptr, nullptr, parentId);
+
+					return !objectId.isEmpty() ? OS_OK : OS_FAILED;
+				}
+
+				if (!proposedId.isEmpty() && !objectName.isEmpty()){
+					// The collection contains element with id == proposedId and name == objectName
+					if (ids.contains(proposedId)){
+						QString collectionObjctName = m_collectionCompPtr->GetElementInfo(proposedId, imtbase::ICollectionInfo::EIT_NAME).toString();
+						if (collectionObjctName == objectName){
+							return m_collectionCompPtr->SetObjectData(proposedId, data) ? OS_OK : OS_FAILED;
+						}
+
+						return OS_FAILED;
+					}
+
+					// The collection contains no elements with either id == proposedId or name == objectName
+					{
+						for (const QByteArray& id : ids){
+							QString collectionObjctName = m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+							if (collectionObjctName == objectName){
+								return OS_FAILED;
 							}
 						}
 
-						bool result = false;
-						if (documentId.isEmpty()){
-							documentId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, name, "", &data, id, nullptr, nullptr, parentId);
-							result = !documentId.isEmpty();
-						}
-						else{
-							result = m_collectionCompPtr->SetObjectData(documentId, data);
-						}
+						QByteArray objectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, proposedId, nullptr, nullptr, parentId);
 
-						if (result){
-							return OS_OK;
-						}
+						return !objectId.isEmpty() ? OS_OK : OS_FAILED;
 					}
 				}
 			}
