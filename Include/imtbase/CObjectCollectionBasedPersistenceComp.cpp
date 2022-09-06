@@ -68,7 +68,7 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 					}
 				}
 
-				QByteArrayList ids = m_collectionCompPtr->GetElementIds(0, -1, nullptr, parentId, imtbase::ICollectionInfo::IF_LEAF_ONLY);
+				imtbase::ICollectionInfo::Ids ids = m_collectionCompPtr->GetElementIds(0, -1, nullptr, parentId, imtbase::ICollectionInfo::IF_LEAF_ONLY);
 
 				if (!proposedId.isEmpty() && objectName.isEmpty()){
 					if (ids.contains(proposedId)){
