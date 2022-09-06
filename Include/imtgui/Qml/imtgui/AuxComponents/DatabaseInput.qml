@@ -12,9 +12,6 @@ Item {
 
     onParametersChanged: {
         settingsDatabaseInputRepeater.model = settingsDatabaseInputContainer.parameters;
-    }
-
-    onWidthChanged: {
         databaseInputColumn.width = width;
     }
 
@@ -40,7 +37,11 @@ Item {
                 }
 
                 onWidthChanged: {
-                    settingsDatabaseInputLoader.item.width = databaseInputDelegate.width;
+                    console.log("databaseInputDelegate onWidthChanged", width);
+
+                    if (settingsDatabaseInputLoader.item){
+                        settingsDatabaseInputLoader.item.width = databaseInputColumn.width;
+                    }
                 }
 
                 Loader {

@@ -5,6 +5,8 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegate {
     id: container;
 
+    showInputIdDialog: true;
+
     Component.onCompleted: {
         Events.subscribeEvent("TreeViewModelUpdated", updateGui)
     }

@@ -6,6 +6,8 @@ import imtqml 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
+    showInputIdDialog: true;
+
     property int accountCurrentIndex: customerCB.currentIndex;
     property int productCurrentIndex: productCB.currentIndex;
 

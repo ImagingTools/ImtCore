@@ -8,6 +8,10 @@ Item {
 
     signal textInputFocusChanged();
 
+    onWidthChanged: {
+        console.log("settingsTextInput onWidthChanged", width);
+    }
+
     CustomTextField {
         id: tfcTextInput;
 

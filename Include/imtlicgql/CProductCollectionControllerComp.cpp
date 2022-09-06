@@ -42,7 +42,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
-	imtbase::CTreeItemModel* childs = nullptr;
+	imtbase::CTreeItemModel* children = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QT_TR_NOOP("Internal error");
@@ -60,12 +60,12 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 
 		int index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", "Modification Time", index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(productId);
 		if (metaInfo.IsValid()){
 			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			childs->SetData("Value", date);
+			children->SetData("Value", date);
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -80,13 +80,13 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 			QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
 			index = metaInfoModel->InsertNewItem();
 			metaInfoModel->SetData("Name", "Licenses", index);
-			childs = metaInfoModel->AddTreeModel("Childs", index);
+			children = metaInfoModel->AddTreeModel("Children", index);
 			int childIndex;
 			for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-				childIndex = childs->InsertNewItem();
+				childIndex = children->InsertNewItem();
 				QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
 				QString value = licenseName + " (" + licenseCollectionId + ")";
-				childs->SetData("Value", value, childIndex);
+				children->SetData("Value", value, childIndex);
 			}
 		}
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);

@@ -9,17 +9,16 @@ Item {
     property var startPageObj;
 
     onStartPageObjChanged: {
-
         console.log("onStartPageObjChanged");
         documentLoader.source = startPageObj["Source"];
-        console.log("documentLoader.source", documentLoader.source);
 
-         if (documentLoader.item){
+        if (documentLoader.item){
+            documentLoader.item.commandsId = startPageObj["CommandsId"];
+        }
+    }
 
-             documentLoader.item.commandsId = startPageObj["CommandsId"];
-         }
-
-         console.log("documentLoader.item", documentLoader.item);
+    TreeItemModel {
+        id: documentsData;
     }
 
     Loader {
@@ -34,8 +33,17 @@ Item {
 
     function addDocument(document){
 
-        if (documentLoader.item){
-            documentLoader.item.addDocument(document);
-        }
+        documentsData.SetData("ItemId", document["Id"]);
+        documentsData.SetData("Title", document["Name"]);
+        documentsData.SetData("Source", document["Source"]);
+        documentsData.SetData("CommandsId", document["CommandsId"]);
+
+        stackView.push(document);
+    }
+
+    StackView {
+        id: stackView;
+
+        anchors.fill: parent;
     }
 }

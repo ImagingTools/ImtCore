@@ -41,7 +41,7 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
-	imtbase::CTreeItemModel* childs = nullptr;
+	imtbase::CTreeItemModel* children = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -59,12 +59,12 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 
 		int index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Modification Time"), index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(packageId);
 		if (metaInfo.IsValid()){
 			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			childs->SetData("Value", date);
+			children->SetData("Value", date);
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
@@ -84,17 +84,17 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 
 		index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Features"), index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 		int childIndex;
 
 		for (const QByteArray& featureCollectionId : featureCollectionIds){
 			const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 
 			if (featureInfoPtr != nullptr){
-				childIndex = childs->InsertNewItem();
+				childIndex = children->InsertNewItem();
 				QByteArray featureId = featureInfoPtr->GetFeatureId();
 				QString featureName = featureInfoPtr->GetFeatureName();
-				childs->SetData("Value", featureName, childIndex);
+				children->SetData("Value", featureName, childIndex);
 			}
 		}
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);

@@ -11,110 +11,110 @@ namespace imtauth
 
 
 /**
-    Interface for describing an user.
-    \ingroup User
+	Interface for describing an user.
+	\ingroup User
 */
 class IUserInfo:
-        virtual public iser::IObject
+		virtual public iser::IObject
 {
 public:
-    typedef QSet<QByteArray> FeatureIds;
-    typedef QSet<QByteArray> RoleIds;
+	typedef QSet<QByteArray> FeatureIds;
+	typedef QSet<QByteArray> RoleIds;
 
-    /**
-        Get list of all availiable permissions for this user.
-    */
-    virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const = 0;
+	/**
+		Get list of all availiable permissions for this user.
+	*/
+	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const = 0;
 
-    /**
-        Get list of all availiable roles for this user.
-    */
-    virtual const imtbase::IObjectCollection* GetRoleProvider() const = 0;
+	/**
+		Get list of all availiable roles for this user.
+	*/
+	virtual const imtbase::IObjectCollection* GetRoleProvider() const = 0;
 
-    /**
-        Get id of the user.
-    */
-    virtual QByteArray GetId() const = 0;
+	/**
+		Get id of the user.
+	*/
+	virtual QByteArray GetId() const = 0;
 
-    /**
-        Set id of the user.
-    */
+	/**
+		Set id of the user.
+	*/
 	virtual void SetId(QByteArray id) = 0;
 
-    /**
-        Get username of the user.
-    */
-    virtual QString GetUsername() const = 0;
+	/**
+		Get username of the user.
+	*/
+	virtual QString GetUsername() const = 0;
 
-    /**
-        Set username of the user.
-    */
+	/**
+		Set username of the user.
+	*/
 	virtual void SetUsername(QString username) = 0;
 
-    /**
-        Get name of the user.
-    */
-    virtual QString GetName() const = 0;
+	/**
+		Get name of the user.
+	*/
+	virtual QString GetName() const = 0;
 
-    /**
-        Set name of the user.
-    */
+	/**
+		Set name of the user.
+	*/
 	virtual void SetName(QString name) = 0;
 
-    /**
-        Get password hash of the user.
-    */
-    virtual QByteArray GetPasswordHash() const = 0;
+	/**
+		Get password hash of the user.
+	*/
+	virtual QByteArray GetPasswordHash() const = 0;
 
-    /**
-        Set password hash of the user.
-    */
+	/**
+		Set password hash of the user.
+	*/
 	virtual void SetPasswordHash(QByteArray passwordHash) = 0;
 
-    /**
-        Get e-mail of the user.
-    */
-    virtual QString GetMail() const = 0;
+	/**
+		Get e-mail of the user.
+	*/
+	virtual QString GetMail() const = 0;
 
-    /**
-        Set e-mail of the user.
-    */
+	/**
+		Set e-mail of the user.
+	*/
 	virtual void SetMail(QString mail) = 0;
 
-    /**
-        Get permissions of user.
-    */
-    virtual FeatureIds GetPermissions() const = 0;
+	/**
+		Get permissions of user.
+	*/
+	virtual FeatureIds GetPermissions() const = 0;
 
-    /**
-        Get local permissions of user.
-    */
-    virtual FeatureIds GetLocalPermissions() const = 0;
+	/**
+		Get local permissions of user.
+	*/
+	virtual FeatureIds GetLocalPermissions() const = 0;
 
-    /**
-        Set local permissions of user.
-    */
-    virtual void SetLocalPermissions(const FeatureIds &permissions) = 0;
+	/**
+		Set local permissions of user.
+	*/
+	virtual void SetLocalPermissions(const FeatureIds &permissions) = 0;
 
-    /**
-        Get user restrictions.
-    */
-    virtual FeatureIds GetProhibitions() const = 0;
+	/**
+		Get user restrictions.
+	*/
+	virtual FeatureIds GetProhibitions() const = 0;
 
-    /**
-        Set user restrictions.
-    */
-    virtual void SetProhibitions(const FeatureIds &prohibitions) = 0;
+	/**
+		Set user restrictions.
+	*/
+	virtual void SetProhibitions(const FeatureIds &prohibitions) = 0;
 
-    /**
-        Get user roles.
-    */
-    virtual RoleIds GetRoles() const = 0;
+	/**
+		Get user roles.
+	*/
+	virtual RoleIds GetRoles() const = 0;
 
-    /**
-        Set user roles.
-    */
-    virtual void SetRoles(const RoleIds &roles) = 0;
+	/**
+		Set user roles.
+	*/
+	virtual void SetRoles(const RoleIds &roles) = 0;
 };
 
 

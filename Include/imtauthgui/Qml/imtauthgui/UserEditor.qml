@@ -3,20 +3,14 @@ import imtgui 1.0
 import imtqml 1.0
 import Acf 1.0
 
-DocumentBase {
+Item {
     id: userEditorContainer;
 
-    commandsDelegatePath: "../../imtlicgui/UserEditorCommandsDelegate.qml"
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        commandsId: userEditorContainer.commandsId;
-        editorItem: userEditorContainer;
-
-        onModelParsed: {
-            updateGui();
-        }
+    function updateGui(){
+        console.log("UserEditor updateGui");
+        usernameInput.text = documentModel.GetData("Username");
+        nameInput.text = documentModel.GetData("Name");
+        mailInput.text = documentModel.GetData("Mail");
     }
 
     Flickable {
@@ -44,20 +38,6 @@ DocumentBase {
                 font.pixelSize: Style.fontSize_common;
             }
 
-            RegExpValidator {
-                id: regexValid;
-
-                Component.onCompleted: {
-                    console.log("RegExpValidator onCompleted");
-                    let regex = preferenceDialog.getInstanceMask();
-
-                    let re = new RegExp(regex)
-                    if (re){
-                        regexValid.regExp = re;
-                    }
-                }
-            }
-
             CustomTextField {
                 id: usernameInput;
 
@@ -65,8 +45,6 @@ DocumentBase {
                 height: 30;
 
                 placeHolderText: qsTr("Enter the Username");
-
-                textInputValidator: regexValid;
 
                 onTextChanged: {
                     documentModel.SetData("Username", usernameInput.text);
@@ -89,8 +67,6 @@ DocumentBase {
 
                 placeHolderText: qsTr("Enter the Name");
 
-                textInputValidator: regexValid;
-
                 onTextChanged: {
                     documentModel.SetData("Name", nameInput.text);
                 }
@@ -112,8 +88,6 @@ DocumentBase {
                 height: 30;
 
                 placeHolderText: qsTr("Enter the Email");
-
-                textInputValidator: regexValid;
 
                 onTextChanged: {
                     documentModel.SetData("Mail", nameInput.text);

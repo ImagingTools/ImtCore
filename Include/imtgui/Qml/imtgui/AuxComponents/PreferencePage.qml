@@ -27,8 +27,6 @@ Rectangle {
     onServerModelChanged: {
         console.log("PreferenceDialog onServerModelChanged");
 
-//        serverCopyModel.Copy(serverModel);
-
         let json = serverModel.toJSON();
         serverCopyModel.Parse(json);
 
@@ -350,7 +348,7 @@ Rectangle {
                             }
                             else if (componentType === "DatabaseSettingsInput"){
                                 loader.source = "DatabaseInput.qml";
-//                                loader.item.width = bodyPanel.width / 2;
+                                loader.item.width = bodyPanel.width;
                             }
                             else if (componentType === "TextInput"){
                                 loader.source = "SettingsTextInput.qml";
@@ -370,7 +368,7 @@ Rectangle {
                                 loader.item.parameters = model.Parameters;
                             }
 
-                            loader.item.width = bodyPanel.width / 2;
+//                            loader.item.width = bodyPanel.width / 2;
                         }
                     }
                 }

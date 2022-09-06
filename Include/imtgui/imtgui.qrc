@@ -3,7 +3,7 @@
         <file alias="Acf/qmldir">Qml/Acf/qmldir</file>
         <file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
         <file alias="Acf/Events.qml">Qml/Acf/Events.qml</file>
-	<file alias="Acf/core.js">Qml/Acf/core.js</file>
+        <file alias="Acf/core.js">Qml/Acf/core.js</file>
         <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
         <file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
         <file alias="imtgui/AuxComponents/AuxButton.qml">Qml/imtgui/AuxComponents/AuxButton.qml</file>
@@ -75,6 +75,7 @@
         <file alias="imtgui/AuxComponents/DocumentBase.qml">Qml/imtgui/AuxComponents/DocumentBase.qml</file>
         <file alias="imtgui/AuxComponents/SingleDocumentWorkspaceView.qml">Qml/imtgui/AuxComponents/SingleDocumentWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml</file>
+        <file alias="imtgui/AuxComponents/StackView.qml">Qml/imtgui/AuxComponents/StackView.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

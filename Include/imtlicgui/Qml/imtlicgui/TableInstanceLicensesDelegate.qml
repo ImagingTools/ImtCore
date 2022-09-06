@@ -146,6 +146,8 @@ Rectangle {
             width: 100;
             height: 20;
 
+            currentDayButtonVisible: false;
+
             Component.onCompleted: {
                 console.log("onCompleted");
                 let date = model.Expiration;

@@ -9,7 +9,7 @@ Item {
     property TreeItemModel objectModel: documentModel;
 
     property bool closingFlag: false;
-    property bool showInputIdDialog: true;
+    property bool showInputIdDialog: false;
 
     property string commandsId;
 
@@ -31,6 +31,7 @@ Item {
 
         onTriggered: {
             let itemId = documentsData.GetData("ItemId", model.index);
+            console.log("timer itemId", itemId);
             itemModel.updateModel(itemId)
         }
     }
@@ -275,14 +276,12 @@ Item {
         id: itemModel;
 
         function updateModel(itemId) {
-            console.log( "updateModel InstallationItem");
-
             var query = Gql.GqlRequest("query", commandsId + "Item");
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", itemId);
             query.AddParam(inputParams);
-
+            console.log("itemId", itemId);
             var queryFields = Gql.GqlObject("item");
 
             queryFields.InsertField("Id");
@@ -308,7 +307,6 @@ Item {
                 dataModelLocal = itemModel.GetData("data");
                 if(dataModelLocal.ContainsKey(commandsId + "Item")){
                     dataModelLocal = dataModelLocal.GetData(commandsId + "Item");
-
                     documentModel = dataModelLocal;
                     itemLoaded();
                 }

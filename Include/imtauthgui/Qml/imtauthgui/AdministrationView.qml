@@ -7,24 +7,21 @@ Rectangle {
 
     anchors.fill: parent;
 
-//    property alias commandsId: userCollectionViewContainer.commandsId;
+    Row {
+        id: header;
 
-    function addDocument(document){
-        console.log("AdministrationView addDocument");
-    }
-
-    Rectangle{
-        id: headerRect
         anchors.top: parent.top;
         anchors.left: parent.left;
-        width: parent.width
+        anchors.leftMargin: 10;
+
         height: 50
+
+        spacing: 20;
+
         Text {
             id: headerText;
 
-            anchors.left: parent.left;
             anchors.verticalCenter: parent.verticalCenter;
-            anchors.leftMargin: 20;
 
             font.pixelSize: Style.fontSize_title;
             font.family: Style.fontFamily;
@@ -32,14 +29,15 @@ Rectangle {
             color: Style.titleColor;
         }
     }
+
     Rectangle {
         id: mainPanelBackground;
 
-        anchors.top: headerRect.bottom;
+        anchors.top: header.bottom;
         anchors.left: parent.left;
+        anchors.bottom: parent.bottom;
 
         width: 150;
-        height: parent.height - headerRect.height;
 
         color: Style.alternateBaseColor;
 
@@ -55,10 +53,12 @@ Rectangle {
 
             ListModel{
                 id: leftMenuModel
+
                 ListElement{
                     Id: "Users";
                     Name: "Users";
                 }
+
                 ListElement{
                     Id: "Roles";
                     Name: "Roles";
@@ -105,10 +105,7 @@ Rectangle {
                             if (bodyLoader.item){
                                 bodyLoader.item.commandsId = model.Id;
                                 headerText.text = model.Id;
-
                             }
-
-                            console.log("bodyLoader.item", bodyLoader.item);
                         }
                     }
                 }
@@ -120,10 +117,9 @@ Rectangle {
         id: bodyAdministration;
 
         anchors.left: mainPanelBackground.right;
-        anchors.top: headerRect.bottom;
-
-        width: parent.width - mainPanelBackground.width;
-        height: parent.height - headerRect.height;
+        anchors.top: header.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.right: parent.right;
 
         Loader {
             id: bodyLoader;

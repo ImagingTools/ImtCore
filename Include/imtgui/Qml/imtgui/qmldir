@@ -24,6 +24,7 @@ Calendar 1.0 ./AuxComponents/Calendar.qml
 Pagination 1.0 ./AuxComponents/Pagination.qml
 MenuPanel 1.0 ./AuxComponents/MenuPanel.qml
 TopPanel 1.0 ./AuxComponents/TopPanel.qml
+StackView 1.0 ./AuxComponents/StackView.qml
 TopCenterPanel 1.0 ./AuxComponents/TopCenterPanel.qml
 TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
 TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml

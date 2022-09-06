@@ -3,33 +3,13 @@ import imtgui 1.0
 import imtqml 1.0
 import Acf 1.0
 
-DocumentBase {
+Item {
     id: userRolesContainer;
 
     property alias userRoles: rolesTable.elements;
 
-    commandsDelegatePath: "../../imtlicgui/UserEditorCommandsDelegate.qml"
-
-    onDocumentModelChanged: {
-
-        let userRolesModel = documentModel.GetData("Roles");
-        if (!userRolesModel){
-            userRolesModel = documentModel.AddTreeModel("Roles");
-        }
-
-        rolesTable.elements = userRolesModel;
-    }
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        commandsId: userRolesContainer.commandsId;
-        editorItem: userRolesContainer;
-
-        onModelParsed: {
-            userRoles = documentModel.GetData("Roles");
-            updateGui();
-        }
+    function updateGui(){
+        console.log("UserRoles updateGui");
     }
 
     Flickable {

@@ -12,6 +12,8 @@ Item {
     property string objectViewEditorPath;
     property string objectViewEditorCommandsId;
 
+    property string commandsId;
+
     property TreeItemModel headers;
     property TreeItemModel items;
 

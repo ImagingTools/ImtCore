@@ -43,8 +43,8 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(const QList<imtgql::CGql
 			QByteArray roleId = roleInfoPtr->GetRoleId();
 			QString roleName = roleInfoPtr->GetRoleName();
 
-            itemModel->SetData("RoleId", roleId);
-            itemModel->SetData("RoleName", roleName);
+			itemModel->SetData("RoleId", roleId);
+			itemModel->SetData("RoleName", roleName);
 
 			imtbase::CTreeItemModel* permissionsModel = new imtbase::CTreeItemModel();
 			imtbase::CTreeItemModel* prohibitionsModel = new imtbase::CTreeItemModel();
@@ -56,8 +56,8 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(const QList<imtgql::CGql
 					const imtlic::IFeatureInfo* permissionPtr = featuresPtr->GetFeatureInfo(id);
 					if (permissionPtr != nullptr){
 						int index = permissionsModel->InsertNewItem();
-                        permissionsModel->SetData("PermissionId", permissionPtr->GetFeatureId(), index);
-                        permissionsModel->SetData("PermissionName", permissionPtr->GetFeatureName(), index);
+						permissionsModel->SetData("PermissionId", permissionPtr->GetFeatureId(), index);
+						permissionsModel->SetData("PermissionName", permissionPtr->GetFeatureName(), index);
 					}
 				}
 				itemModel->SetExternTreeModel("Permissions", permissionsModel);
@@ -65,8 +65,8 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(const QList<imtgql::CGql
 					const imtlic::IFeatureInfo* prohibitionPtr = featuresPtr->GetFeatureInfo(id);
 					if (prohibitionPtr != nullptr){
 						int index = prohibitionsModel->InsertNewItem();
-                        prohibitionsModel->SetData("ProhibitionId", prohibitionPtr->GetFeatureId(), index);
-                        prohibitionsModel->SetData("ProhibitionName", prohibitionPtr->GetFeatureName(), index);
+						prohibitionsModel->SetData("ProhibitionId", prohibitionPtr->GetFeatureId(), index);
+						prohibitionsModel->SetData("ProhibitionName", prohibitionPtr->GetFeatureName(), index);
 					}
 				}
 				itemModel->SetExternTreeModel("Prohibitions", prohibitionsModel);
@@ -98,8 +98,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
-        if (itemModel.ContainsKey("RoleId")){
-            QByteArray roleId = itemModel.GetData("RoleId").toByteArray();
+		if (itemModel.ContainsKey("RoleId")){
+			QByteArray roleId = itemModel.GetData("RoleId").toByteArray();
 			if (roleId.isEmpty()){
 				if (objectId.isEmpty()){
 					errorMessage = QT_TR_NOOP("Role id can't be empty!");
@@ -114,8 +114,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 			}
 		}
 
-        if (itemModel.ContainsKey("RoleName")){
-            name = itemModel.GetData("RoleName").toString();
+		if (itemModel.ContainsKey("RoleName")){
+			name = itemModel.GetData("RoleName").toString();
 			roleInfoPtr->SetRoleName(name);
 		}
 
@@ -125,8 +125,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 			imtauth::IRole::FeatureIds *permissions = nullptr;
 			for(int index = 0; index < permissionsModel->GetItemsCount(); index++){
 				QByteArray featureId;
-                if (permissionsModel->ContainsKey("PermissionId")){
-                    featureId = permissionsModel->GetData("PermissionId", index).toByteArray();
+				if (permissionsModel->ContainsKey("PermissionId")){
+					featureId = permissionsModel->GetData("PermissionId", index).toByteArray();
 					if (!featureId.isEmpty()){
 						permissions->insert(featureId);
 					}
@@ -140,8 +140,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 			imtauth::IRole::FeatureIds *prohibitions = nullptr;
 			for(int index = 0; index < prohibitionsModel->GetItemsCount(); index++){
 				QByteArray featureId;
-                if (prohibitionsModel->ContainsKey("ProhibitionId")){
-                    featureId = prohibitionsModel->GetData("ProhibitionId", index).toByteArray();
+				if (prohibitionsModel->ContainsKey("ProhibitionId")){
+					featureId = prohibitionsModel->GetData("ProhibitionId", index).toByteArray();
 					if (!featureId.isEmpty()){
 						prohibitions->insert(featureId);
 					}

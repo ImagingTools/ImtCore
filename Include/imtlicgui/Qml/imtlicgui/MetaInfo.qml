@@ -35,8 +35,6 @@ Rectangle {
 
         visible: collectionMetaInfo.contentVisible;
 
-//        width: collectionMetaInfo.width;
-
         Repeater {
             id: repeaterColumn;
 
@@ -49,8 +47,7 @@ Rectangle {
                 height: childColumn.height + nameTitle.height + collectionMetaInfo.elementHeight;
 
                 Component.onCompleted: {
-                    console.log("MetaInfo Component.onCompleted", model.Childs);
-                    repeaterChilds.model = repeaterColumn.model.GetData("Childs", model.index);
+                    repeaterChilds.model = repeaterColumn.model.GetData("Children", model.index);
                 }
 
                 Text {

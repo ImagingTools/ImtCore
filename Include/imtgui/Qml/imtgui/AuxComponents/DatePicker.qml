@@ -21,15 +21,11 @@ Item {
 
     property int selectedIndexMonth: new Date().getMonth();
 
-    property int upButtonWidth: 15;
-    property int upButtonHeight: 10;
-
-    property int downButtonWidth: 15;
-    property int downButtonHeight: 10;
-
     property alias selectedYear: yearField.text;
     property alias selectedMonth: monthField.text;
     property alias selectedDay: dayField.text;
+
+    property alias currentDayButtonVisible: currentDate.visible;
 
     property bool completed: false;
 

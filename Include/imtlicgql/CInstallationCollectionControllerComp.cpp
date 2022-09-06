@@ -48,7 +48,7 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
-	imtbase::CTreeItemModel* childs = nullptr;
+	imtbase::CTreeItemModel* children = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -76,8 +76,8 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 
 		int index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Instance-ID"), index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
-		childs->SetData("Value", productInstanceId);
+		children = metaInfoModel->AddTreeModel("Children", index);
+		children->SetData("Value", productInstanceId);
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -95,15 +95,15 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 
 		index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Product-ID"), index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
-		childs->SetData("Value", productId);
+		children = metaInfoModel->AddTreeModel("Children", index);
+		children->SetData("Value", productId);
 
 		QByteArray accountId = productInstancePtr->GetCustomerId();
 
 		index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Account-ID"), index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
-		childs->SetData("Value", accountId);
+		children = metaInfoModel->AddTreeModel("Children", index);
+		children->SetData("Value", accountId);
 
 		const imtbase::ICollectionInfo& licenseList = productInstancePtr->GetLicenseInstances();
 
@@ -111,7 +111,7 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 
 		index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", QT_TR_NOOP("Licenses"), index);
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 
 		int childIndex;
 		for (const QByteArray& licenseCollectionId : licenseIds){
@@ -119,7 +119,7 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 
 			QDateTime date = licensePtr->GetExpiration();
 			if (licensePtr != nullptr){
-				childIndex = childs->InsertNewItem();
+				childIndex = children->InsertNewItem();
 				QString licenseName = licensePtr->GetLicenseName();
 				QString value = licenseName + " (" + QT_TR_NOOP("Valid until") + ": ";
 				if (date.isValid()){
@@ -128,7 +128,7 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 				else{
 					value += "Unlimited)";
 				}
-				childs->SetData("Value", value, childIndex);
+				children->SetData("Value", value, childIndex);
 			}
 		}
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);

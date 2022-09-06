@@ -1,16 +1,6 @@
 #include <imtlicgql/CUserControllerComp.h>
 
 
-// ImtCore includes
-#include <imtlic/CFeaturePackageCollectionUtility.h>
-#include <imtlic/CFeatureInfo.h>
-#include <imtlic/IFeaturePackage.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
-#include <imtgui/CObjectCollectionViewDelegate.h>
-#include <imtlic/CFeaturePackage.h>
-
-
-
 namespace imtlicgql
 {
 

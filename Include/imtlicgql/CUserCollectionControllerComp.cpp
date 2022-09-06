@@ -4,12 +4,9 @@
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <idoc/IDocumentMetaInfo.h>
-// ImtCore includes
-//#include <imtbase/IObjectCollectionInfo.h>
-//#include <imtlic/IProductInfo.h>
 
-#include <imtlic/CProductLicensingInfo.h>
-#include <imtlic/CLicenseInfo.h>
+// ImtCore includes
+#include <imtauth/IUserInfo.h>
 
 
 namespace imtlicgql
@@ -39,6 +36,23 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
+
+	QByteArray userId = GetObjectIdFromInputParams(inputParams);
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		if (userInfoPtr != nullptr){
+			imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles();
+
+//			imtauth::IRoleInfoProvider roleInfoProvider = userInfoPtr->GetRoleProvider();
+			for (const QByteArray& roleId : rolesIds){
+
+			}
+		}
+
+
+	}
 
 	return nullptr;
 }

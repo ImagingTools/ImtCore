@@ -3,33 +3,13 @@ import imtgui 1.0
 import imtqml 1.0
 import Acf 1.0
 
-DocumentBase {
+Item {
     id: userPermissionsContainer;
 
     property alias userPermissions: permissionsTable.elements;
 
-    commandsDelegatePath: "../../imtlicgui/UserEditorCommandsDelegate.qml"
-
-    onDocumentModelChanged: {
-
-        let userPermissionsModel = documentModel.GetData("Permissions");
-        if (!userPermissionsModel){
-            userPermissionsModel = documentModel.AddTreeModel("Permissions");
-        }
-
-        permissionsTable.elements = userPermissionsModel;
-    }
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        commandsId: userPermissionsContainer.commandsId;
-        editorItem: userPermissionsContainer;
-
-        onModelParsed: {
-            userPermissions = documentModel.GetData("Permissions");
-            updateGui();
-        }
+    function updateGui(){
+        console.log("UserPermissions updateGui");
     }
 
     Flickable {

@@ -47,7 +47,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
-	imtbase::CTreeItemModel* childs = nullptr;
+	imtbase::CTreeItemModel* children = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QT_TR_NOOP("Internal error");
@@ -117,9 +117,9 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		else{
 			metaInfoModel->SetData("Name", QT_TR_NOOP("Last Name"), index);
 		}
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 		QString lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
-		childs->SetData("Value", lastName);
+		children->SetData("Value", lastName);
 
 		index = metaInfoModel->InsertNewItem();
 		if (translatorPtr != nullptr){
@@ -128,10 +128,10 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		else{
 			metaInfoModel->SetData("Name", QT_TR_NOOP("First Name"), index);
 		}
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 
 		QString firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
-		childs->SetData("Value", firstName);
+		children->SetData("Value", firstName);
 
 		index = metaInfoModel->InsertNewItem();
 		if (translatorPtr != nullptr){
@@ -140,10 +140,10 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		else{
 			metaInfoModel->SetData("Name", QT_TR_NOOP("Email"), index);
 		}
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 
 		QString mail = ownerPtr->GetMail();
-		childs->SetData("Value", mail);
+		children->SetData("Value", mail);
 
 		index = metaInfoModel->InsertNewItem();
 		if (translatorPtr != nullptr){
@@ -152,11 +152,11 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		else{
 			metaInfoModel->SetData("Name", QT_TR_NOOP("Description"), index);
 		}
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 
 		QString description = accountInfoPtr->GetAccountDescription();
 
-		childs->SetData("Value", description);
+		children->SetData("Value", description);
 
 		index = metaInfoModel->InsertNewItem();
 		if (translatorPtr != nullptr){
@@ -165,11 +165,11 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		else{
 			metaInfoModel->SetData("Name", QT_TR_NOOP("Account Name"), index);
 		}
-		childs = metaInfoModel->AddTreeModel("Childs", index);
+		children = metaInfoModel->AddTreeModel("Children", index);
 
 		QString name = accountInfoPtr->GetAccountName();
 
-		childs->SetData("Value", name);
+		children->SetData("Value", name);
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}

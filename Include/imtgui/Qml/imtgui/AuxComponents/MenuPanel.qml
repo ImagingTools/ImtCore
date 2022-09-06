@@ -53,6 +53,8 @@ Rectangle {
             id: columnPages;
 
             spacing: menuPanel.spacing;
+
+            height: parent.height;
             width: parent.width;
 
             Repeater {

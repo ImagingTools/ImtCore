@@ -23,11 +23,13 @@ Item {
 
     Component.onCompleted: {
         console.log("documentBase onCompleted");
+        console.log("documentsData", documentsData);
         itemId = documentsData.GetData("ItemId", model.index);
         itemName = documentsData.GetData("Title", model.index);
     }
 
     onCommandsIdChanged: {
+        console.log("documentBase onCommandsIdChanged", commandsId);
         commandsProvider.commandsId = documentBase.commandsId;
         commandsDelegateBase.item.commandsId = documentBase.commandsId;
     }

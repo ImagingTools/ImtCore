@@ -2,29 +2,48 @@ import QtQuick 2.15
 import Acf 1.0
 import imtgui 1.0
 
-Rectangle {
+DocumentBase {
     id: container;
 
     anchors.fill: parent;
 
-//    property alias commandsId: userCollectionViewContainer.commandsId;
-
-    function addDocument(document){
-        console.log("AdministrationView addDocument");
+    function updateGui(){
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            loader.item.updateGui();
+        }
     }
 
-    Rectangle{
-        id: headerRect
+    Row {
+        id: header;
+
         anchors.top: parent.top;
         anchors.left: parent.left;
-        width: parent.width
+        anchors.leftMargin: 10;
+
         height: 50
+
+        spacing: 20;
+
+        AuxButton {
+            id: closeButton;
+
+            anchors.verticalCenter: parent.verticalCenter;
+
+            width: 25;
+            height: width;
+
+            iconSource: "../../../Icons/" + Style.theme + "/Left_On_Normal.svg";
+
+            onClicked: {
+                stackView.pop();
+            }
+        }
+
         Text {
             id: headerText;
 
-            anchors.left: parent.left;
             anchors.verticalCenter: parent.verticalCenter;
-            anchors.leftMargin: 20;
 
             font.pixelSize: Style.fontSize_title;
             font.family: Style.fontFamily;
@@ -32,14 +51,15 @@ Rectangle {
             color: Style.titleColor;
         }
     }
+
     Rectangle {
         id: mainPanelBackground;
 
-        anchors.top: headerRect.bottom;
+        anchors.top: header.bottom;
         anchors.left: parent.left;
+        anchors.bottom: parent.bottom;
 
         width: 150;
-        height: parent.height - headerRect.height;
 
         color: Style.alternateBaseColor;
 
@@ -55,16 +75,19 @@ Rectangle {
 
             ListModel{
                 id: leftMenuModel
+
                 ListElement{
                     Id: "General";
                     Name: "General";
                     Source: "qrc:/qml/imtauthgui/UserEditor.qml"
                 }
+
                 ListElement{
                     Id: "Roles";
                     Name: "Roles";
                     Source: "qrc:/qml/imtauthgui/UserRoles.qml"
                 }
+
                 ListElement{
                     Id: "Permissions";
                     Name: "Permissions";
@@ -75,7 +98,7 @@ Rectangle {
             Repeater {
                 id: mainPanelRepeater;
 
-                model: leftMenuModel
+                model: leftMenuModel;
 
                 delegate: AuxButton {
 
@@ -106,16 +129,6 @@ Rectangle {
                     onClicked: {
                         if (mainPanel.selectedIndex !== model.index){
                             mainPanel.selectedIndex = model.index;
-
-                            bodyLoader.source = model.Source;
-
-                            if (bodyLoader.item){
-                                bodyLoader.item.commandsId = model.Id;
-                                headerText.text = model.Id;
-
-                            }
-
-                            console.log("bodyLoader.item", bodyLoader.item);
                         }
                     }
                 }
@@ -123,22 +136,28 @@ Rectangle {
         }
     }
 
-    Rectangle{
+    Rectangle {
         id: bodyAdministration;
 
         anchors.left: mainPanelBackground.right;
-        anchors.top: headerRect.bottom;
+        anchors.top: header.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.right: parent.right;
 
-        width: parent.width - mainPanelBackground.width;
-        height: parent.height - headerRect.height;
+        Repeater {
+            id: bodyRepeater;
 
-        Loader {
-            id: bodyLoader;
+            model: leftMenuModel;
 
-            anchors.fill: parent;
+            delegate: Loader {
+                id: bodyLoader;
 
-            onItemChanged: {
+                anchors.fill: parent;
+
+                source: model.Source;
+                visible: mainPanel.selectedIndex == model.index;
             }
+
         }
     }
 }

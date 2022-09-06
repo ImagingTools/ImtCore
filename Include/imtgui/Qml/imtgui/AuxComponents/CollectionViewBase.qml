@@ -164,6 +164,8 @@ Item {
     CollectionViewBaseGqlModels {
         id: baseCommands;
 
+        commandsId: collectionViewBaseContainer.commandsId;
+
         onHeadersChanged: {
             tableInternal.headers = baseCommands.headers;
         }
