@@ -8,7 +8,7 @@ DocumentWorkspaceCommandsDelegate {
     showInputIdDialog: false;
 
     onCommandActivated: {
-        console.log("UsersCommands onCommandActivated", commandId); 
+        console.log("RolesCommands onCommandActivated", commandId);
     }
 
     onSelectedIndexChanged: {
