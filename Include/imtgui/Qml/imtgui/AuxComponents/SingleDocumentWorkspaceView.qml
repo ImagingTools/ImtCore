@@ -41,6 +41,10 @@ Item {
         stackView.push(document);
     }
 
+    function closeDocument(){
+        stackView.pop();
+    }
+
     StackView {
         id: stackView;
 

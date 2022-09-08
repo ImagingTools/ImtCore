@@ -25,6 +25,11 @@ DocumentBase {
 
         spacing: 20;
 
+        Rectangle {
+            anchors.fill: parent;
+            color: Style.baseColor;
+        }
+
         AuxButton {
             id: closeButton;
 
@@ -116,7 +121,7 @@ DocumentBase {
 
                     textButton: model.Name;
 
-                    backgroundColor: Style.mainColor
+                    backgroundColor: Style.mainColor;
 
                     borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
 

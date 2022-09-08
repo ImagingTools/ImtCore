@@ -50,8 +50,6 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(
 
 			}
 		}
-
-
 	}
 
 	return nullptr;

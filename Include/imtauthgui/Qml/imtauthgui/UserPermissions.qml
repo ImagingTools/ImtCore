@@ -56,7 +56,8 @@ Item {
 
                     Component.onCompleted: {
                         let index = headersModelPermissions.InsertNewItem();
-                        headersModelPermissions.SetData("PermissionId", "PermissionId", index)
+                        headersModelPermissions.SetData("Id", "Name", index)
+                        headersModelPermissions.SetData("Name", "Name", index)
                     }
                 }
 

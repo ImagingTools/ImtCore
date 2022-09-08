@@ -22,6 +22,55 @@ public:
 	typedef QSet<QByteArray> RoleIds;
 
 	/**
+		Supported action types.
+	*/
+	enum ActionType
+	{
+		/**
+			A login action.
+		*/
+		AT_LOGIN,
+
+		/**
+			A logout action.
+		*/
+		AT_LOGOUT,
+
+		/**
+			A password change action.
+		*/
+		AT_PASSWORD_CHANGE,
+
+		/**
+			A name change action.
+		*/
+		AT_NAME_CHANGE
+	};
+
+	enum MetaInfoTypes
+	{
+		/**
+			Username given as QString.
+		*/
+		MIT_USERNAME,
+
+		/**
+			Name given as QString.
+		*/
+		MIT_NAME,
+
+		/**
+			User description given as QString.
+		*/
+		MIT_DESCRIPTION,
+
+		/**
+			Contact email given as QString.
+		*/
+		MIT_CONTACT_EMAIL
+	};
+
+	/**
 		Get list of all availiable permissions for this user.
 	*/
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const = 0;

@@ -10,7 +10,7 @@ Item {
         console.log("UserEditor updateGui");
         usernameInput.text = documentModel.GetData("Username");
         nameInput.text = documentModel.GetData("Name");
-        mailInput.text = documentModel.GetData("Mail");
+        mailInput.text = documentModel.GetData("Email");
     }
 
     Flickable {
@@ -50,6 +50,29 @@ Item {
                     documentModel.SetData("Username", usernameInput.text);
                 }
             }
+
+            Text {
+                id: titlePassword;
+
+                text: qsTr("Password");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
+
+            CustomTextField {
+                id: passwordInput;
+
+                width: parent.width;
+                height: 30;
+
+                placeHolderText: qsTr("Enter the password");
+
+                onTextChanged: {
+                    documentModel.SetData("Password", passwordInput.text);
+                }
+            }
+
             Text {
                 id: titleName;
 
@@ -90,7 +113,7 @@ Item {
                 placeHolderText: qsTr("Enter the Email");
 
                 onTextChanged: {
-                    documentModel.SetData("Mail", nameInput.text);
+                    documentModel.SetData("Email", nameInput.text);
                 }
             }
 

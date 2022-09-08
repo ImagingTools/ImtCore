@@ -394,15 +394,20 @@ Rectangle {
                 console.log("ButtonsDialog onButtonClicked", buttonId);
 
                 if (buttonId == "Cancel"){
-                    let json = serverModel.toJSON();
-                    serverCopyModel.Parse(json);
 
-                    updateCommonModel(serverCopyModel);
+                    if (serverModel){
+                        let json = serverModel.toJSON();
+                        serverCopyModel.Parse(json);
 
-                    json = localModel.toJSON();
-                    localCopyModel.Parse(json);
+                        updateCommonModel(serverCopyModel);
+                    }
 
-                    updateCommonModel(localCopyModel);
+                    if (localModel){
+                        let json = localModel.toJSON();
+                        localCopyModel.Parse(json);
+
+                        updateCommonModel(localCopyModel);
+                    }
 
                     container.visible = false;
                 }

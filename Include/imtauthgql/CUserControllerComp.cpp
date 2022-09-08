@@ -28,11 +28,41 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 	dataModel->SetData("Username", "");
 	dataModel->SetData("Name", "");
 	dataModel->SetData("PasswordHash", "");
-	dataModel->SetData("Mail", "");
+	dataModel->SetData("Email", "");
 
 	imtbase::CTreeItemModel* permissionsModel = dataModel->AddTreeModel("Permissions");
 	imtbase::CTreeItemModel* prohibitionsModel = dataModel->AddTreeModel("Prohibitions");
 	imtbase::CTreeItemModel* rolesModel = dataModel->AddTreeModel("Roles");
+
+	int index = rolesModel->InsertNewItem();
+	rolesModel->SetData("Id", "User", index);
+	rolesModel->SetData("Name", "User", index);
+	rolesModel->SetData("State", 0, index);
+
+	index = rolesModel->InsertNewItem();
+	rolesModel->SetData("Id", "Admin", index);
+	rolesModel->SetData("Name", "Admin", index);
+	rolesModel->SetData("State", 0, index);
+
+	index = rolesModel->InsertNewItem();
+	rolesModel->SetData("Id", "Test", index);
+	rolesModel->SetData("Name", "Test", index);
+	rolesModel->SetData("State", 0, index);
+
+	index = rolesModel->InsertNewItem();
+	rolesModel->SetData("Id", "Developer", index);
+	rolesModel->SetData("Name", "Developer", index);
+	rolesModel->SetData("State", 0, index);
+
+	index = rolesModel->InsertNewItem();
+	rolesModel->SetData("Id", "ProjectViewer", index);
+	rolesModel->SetData("Name", "Project Viewer", index);
+	rolesModel->SetData("State", 0, index);
+
+	index = rolesModel->InsertNewItem();
+	rolesModel->SetData("Id", "SystemAdmin", index);
+	rolesModel->SetData("Name", "System Admin", index);
+	rolesModel->SetData("State", 0, index);
 
 	QByteArray userId = GetObjectIdFromInputParams(inputParams);
 
@@ -55,7 +85,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 		dataModel->SetData("Username", username);
 		dataModel->SetData("Name", name);
 		dataModel->SetData("PasswordHash", passwordHash);
-		dataModel->SetData("Mail", mail);
+		dataModel->SetData("Email", mail);
 
 		const imtlic::IFeatureInfoProvider* featuresPtr = userInfoPtr->GetPermissionProvider();
 
@@ -127,39 +157,30 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
-		if (itemModel.ContainsKey("UserId")){
-			QByteArray userId = itemModel.GetData("UserId").toByteArray();
-			if (!userId.isEmpty()){
-				userInfoPtr->SetId(userId);
-			}
-			else{
-				if (objectId.isEmpty()){
-					errorMessage = QT_TR_NOOP("User-ID can't be empty!");
-					return nullptr;
-				}
-				else{
-					userInfoPtr->SetId(objectId);
-				}
-			}
-		}
-
 		if (itemModel.ContainsKey("Username")){
 			QString username = itemModel.GetData("Username").toString();
+
+			if (username.isEmpty()){
+				errorMessage = QT_TR_NOOP("Username can't be empty!");
+
+				return nullptr;
+			}
+
 			userInfoPtr->SetUsername(username);
 		}
 
 		if (itemModel.ContainsKey("Name")){
-			name = itemModel.GetData("Username").toString();
-			userInfoPtr->SetUsername(name);
+			name = itemModel.GetData("Name").toString();
+			userInfoPtr->SetName(name);
 		}
 
-		if (itemModel.ContainsKey("PasswordHash")){
-			QByteArray passwordHash = itemModel.GetData("PasswordHash").toByteArray();
+		if (itemModel.ContainsKey("Password")){
+			QByteArray passwordHash = itemModel.GetData("Password").toByteArray();
 			userInfoPtr->SetPasswordHash(passwordHash);
 		}
 
-		if (itemModel.ContainsKey("Mail")){
-			QString mail = itemModel.GetData("Mail").toString();
+		if (itemModel.ContainsKey("Email")){
+			QString mail = itemModel.GetData("Email").toString();
 			userInfoPtr->SetMail(mail);
 		}
 
@@ -178,6 +199,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			}
 			userInfoPtr->SetLocalPermissions(*permissions);
 		}
+
 		if (itemModel.ContainsKey("Prohibitions")){
 			imtbase::CTreeItemModel* prohibitionsModel = nullptr;
 			prohibitionsModel = itemModel.GetTreeItemModel("Prohibitions");
@@ -193,21 +215,24 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			}
 			userInfoPtr->SetProhibitions(*prohibitions);
 		}
+
 		if (itemModel.ContainsKey("Roles")){
 			imtbase::CTreeItemModel* rolesModel = nullptr;
 			rolesModel = itemModel.GetTreeItemModel("Roles");
-			imtauth::IUserInfo::RoleIds *roles = nullptr;
+			imtauth::IUserInfo::RoleIds roles;
 			for(int index = 0; index < rolesModel->GetItemsCount(); index++){
 				QByteArray roleId;
 				if (rolesModel->ContainsKey("RoleId")){
 					roleId = rolesModel->GetData("RoleId", index).toByteArray();
 					if (!roleId.isEmpty()){
-						roles->insert(roleId);
+						roles << roleId;
 					}
 				}
 			}
-			userInfoPtr->SetRoles(*roles);
+
+			userInfoPtr->SetRoles(roles);
 		}
+
 		return userInfoPtr;
 	}
 

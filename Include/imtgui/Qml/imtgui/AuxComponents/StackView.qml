@@ -45,16 +45,6 @@ Item {
                 onLoaded: {
                     let object = pagesModel.get(model.index);
                     dialogLoader.item.commandsId = model.CommandsId;
-//                    for (let key in object) {
-//                        console.log("key", key);
-//                        console.log("model[key]", object[key]);
-
-//                        if (dialogLoader.item[key]){
-//                            dialogLoader.item[key] = object[key];
-//                        }
-
-//                        dialogLoader.item.commandsId = object["CommandsId"];
-//                    }
 
                     dialogLoader.item.forceActiveFocus();
                 }

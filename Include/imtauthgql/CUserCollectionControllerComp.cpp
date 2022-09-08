@@ -15,15 +15,19 @@ namespace imtauthgql
 
 QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
-	if (informationId == QByteArray("Added")){
-		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);;
-		if (metaInfo.IsValid()){
+	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+
+	if (metaInfo.IsValid()){
+		if (informationId == QByteArray("Username")){
+			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME);
+		}
+		else if (informationId == QByteArray("Email")){
+			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_CONTACT_EMAIL);
+		}
+		else if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
-	}
-	else if (informationId == QByteArray("LastModified")){
-		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
-		if (metaInfo.IsValid()){
+		else if (informationId == QByteArray("LastModified")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
 		}
 	}

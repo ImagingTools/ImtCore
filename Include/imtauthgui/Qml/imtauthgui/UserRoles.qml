@@ -10,6 +10,9 @@ Item {
 
     function updateGui(){
         console.log("UserRoles updateGui");
+
+        let rolesModel = documentModel.GetData("Roles");
+        rolesTable.elements = rolesModel;
     }
 
     Flickable {
@@ -57,8 +60,8 @@ Item {
                     Component.onCompleted: {
                         let index = headersModelRoles.InsertNewItem();
 
-                        headersModelRoles.SetData("RoleId", "RoleId", index)
-                        headersModelRoles.SetData("RoleName", "RoleName", index)
+                        headersModelRoles.SetData("Id", "Name", index)
+                        headersModelRoles.SetData("Name", "Name", index)
                     }
                 }
 

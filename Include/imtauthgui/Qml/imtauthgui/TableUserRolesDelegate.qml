@@ -56,14 +56,14 @@ Rectangle {
             anchors.left: leftPart.left;
             anchors.leftMargin: 10;
 
-            checkState: model.RoleState;
+            checkState: model.State;
 
             MouseArea {
                 anchors.fill: parent;
 
                 onClicked: {
                     console.log("TableUserRolesDelegate CheckBox onClicked");
-                    model.RoleState = 2 - checkBoxRole.checkState;
+                    model.State = 2 - checkBoxRole.checkState;
                 }
             }
         }
