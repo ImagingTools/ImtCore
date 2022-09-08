@@ -368,6 +368,9 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 void CThumbnailDecoratorGuiComp::OnGuiDestroyed()
 {
+	qApp->removeEventFilter(this);
+	removeEventFilter(this);
+
 	m_autoLogoutTimer.stop();
 	m_checkIsFullScreenTimer.stop();
 
