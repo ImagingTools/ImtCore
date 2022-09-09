@@ -46,6 +46,11 @@ public:
 				const QString& description) const override;
 
 protected:
+	void GenerateDifferences(
+				imtauth::IRole::FeatureIds& currentPermission,
+				imtauth::IRole::FeatureIds& newPermissions,
+				imtauth::IRole::FeatureIds& addedPermissions,
+				imtauth::IRole::FeatureIds& removedPermissions) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
@@ -56,6 +61,6 @@ private:
 };
 
 
-} // namespace imtauth
+} // namespace imtauthdb
 
 

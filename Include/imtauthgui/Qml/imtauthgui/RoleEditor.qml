@@ -8,8 +8,8 @@ Item {
 
     function updateGui(){
         console.log("RoleEditor updateGui");
-        roleIdInput.text = documentModel.GetData("RoleId");
-        roleNameInput.text = documentModel.GetData("RoleName");
+        roleIdInput.text = documentModel.GetData("Id");
+        roleNameInput.text = documentModel.GetData("Name");
     }
 
     Flickable {
@@ -31,7 +31,7 @@ Item {
             Text {
                 id: titleRoleId;
 
-                text: qsTr("Id");
+                text: qsTr("Role-ID");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
@@ -43,16 +43,17 @@ Item {
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the role Id");
+                placeHolderText: qsTr("Enter the Role-ID");
 
                 onTextChanged: {
-                    documentModel.SetData("RoleId", usernameInput.text);
+                    documentModel.SetData("Id", roleIdInput.text);
                 }
             }
+
             Text {
                 id: titleRoleName;
 
-                text: qsTr("Name");
+                text: qsTr("Role Name");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
@@ -64,13 +65,12 @@ Item {
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the role name");
+                placeHolderText: qsTr("Enter the Role name");
 
                 onTextChanged: {
-                    documentModel.SetData("RoleName", nameInput.text);
+                    documentModel.SetData("Name", roleNameInput.text);
                 }
             }
-
         }//Column bodyColumn
     }//Flickable
 }//Container

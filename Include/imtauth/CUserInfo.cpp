@@ -22,13 +22,13 @@ namespace imtauth
 
 const imtlic::IFeatureInfoProvider *CUserInfo::GetPermissionProvider() const
 {
-    return m_permissionProviderPtr;
+	return m_permissionProviderPtr;
 }
 
 
 const imtbase::IObjectCollection* CUserInfo::GetRoleProvider() const
 {
-    return m_roleProviderPtr;
+	return m_roleProviderPtr;
 }
 
 
@@ -108,85 +108,85 @@ void CUserInfo::SetMail(QString mail)
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_mail = mail;
-    }
+	}
 }
 
 
 IUserInfo::FeatureIds CUserInfo::GetPermissions() const
 {
-    IUserInfo::FeatureIds allPermissions;
+	IUserInfo::FeatureIds allPermissions;
 
-    for (QByteArray roleId : m_userRoles){
-        const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
-        allPermissions += rolePtr->GetPermissions();
-    }
+	for (QByteArray roleId : m_userRoles){
+		const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
+		allPermissions += rolePtr->GetPermissions();
+	}
 
-    allPermissions += m_userPermissions;
+	allPermissions += m_userPermissions;
 
-    for (QByteArray roleId : m_userRoles){
-        const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
-        IRole::FeatureIds prohibitions = rolePtr->GetProhibitions();
-        for (const QByteArray& prohibitionId : prohibitions){
-            allPermissions.remove(prohibitionId);
-        }
-    }
+	for (QByteArray roleId : m_userRoles){
+		const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
+		IRole::FeatureIds prohibitions = rolePtr->GetProhibitions();
+		for (const QByteArray& prohibitionId : prohibitions){
+			allPermissions.remove(prohibitionId);
+		}
+	}
 
-    return allPermissions;
+	return allPermissions;
 }
 
 
 IUserInfo::FeatureIds CUserInfo::GetLocalPermissions() const
 {
-    return m_userPermissions;
+	return m_userPermissions;
 }
 
 
 void CUserInfo::SetLocalPermissions(const FeatureIds &permissions)
 {
-    if (m_userPermissions != permissions){
-        istd::CChangeNotifier changeNotifier(this);
+	if (m_userPermissions != permissions){
+		istd::CChangeNotifier changeNotifier(this);
 
-        m_userPermissions = permissions;
-    }
+		m_userPermissions = permissions;
+	}
 }
 
 
 IUserInfo::FeatureIds CUserInfo::GetProhibitions() const
 {
-    return m_userRestrictions;
+	return m_userRestrictions;
 }
 
 
 void CUserInfo::SetProhibitions(const FeatureIds &prohibitions)
 {
-    if (m_userRestrictions != prohibitions){
-        istd::CChangeNotifier changeNotifier(this);
+	if (m_userRestrictions != prohibitions){
+		istd::CChangeNotifier changeNotifier(this);
 
-        m_userRestrictions = prohibitions;
-    }
+		m_userRestrictions = prohibitions;
+	}
 }
 
 
 IUserInfo::RoleIds CUserInfo::GetRoles() const
 {
-    return m_userRoles;
+	return m_userRoles;
 }
 
 
 void CUserInfo::SetRoles(const RoleIds &roles)
 {
-    if (m_userRoles != roles){
-        istd::CChangeNotifier changeNotifier(this);
+	if (m_userRoles != roles){
+		istd::CChangeNotifier changeNotifier(this);
 
-        m_userRoles = roles;
-    }
+		m_userRoles = roles;
+	}
 }
 
 
 bool CUserInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
-    bool retVal = true;
+	bool retVal = true;
 
 	static iser::CArchiveTag userIdTag("UserId", "ID of user", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(userIdTag);
@@ -213,32 +213,32 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_mail);
 	retVal = retVal && archive.EndTag(mailTag);
 
-    QByteArray permissionsTag = "Permissions";
-    QByteArray permissionTag = "Permission";
+	QByteArray permissionsTag = "Permissions";
+	QByteArray permissionTag = "Permission";
 	QByteArrayList permissions(m_userPermissions.begin(), m_userPermissions.end());
-    retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, permissionsTag, permissionTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, permissionsTag, permissionTag);
 
-    if (!archive.IsStoring()){
+	if (!archive.IsStoring()){
 		m_userPermissions = IRole::FeatureIds(permissions.begin(), permissions.end());
-    }
+	}
 
-    QByteArray restrictionsTag = "Restrictions";
-    QByteArray restrictionTag = "Restriction";
+	QByteArray restrictionsTag = "Restrictions";
+	QByteArray restrictionTag = "Restriction";
 	QByteArrayList restrictions(m_userRestrictions.begin(), m_userRestrictions.end());
-    retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, restrictionsTag, restrictionTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, restrictionsTag, restrictionTag);
 
-    if (!archive.IsStoring()){
+	if (!archive.IsStoring()){
 		m_userRestrictions = IRole::FeatureIds(restrictions.begin(), restrictions.end());
-    }
+	}
 
-    QByteArray rolesTag = "Roles";
-    QByteArray roleTag = "Role";
+	QByteArray rolesTag = "Roles";
+	QByteArray roleTag = "Role";
 	QByteArrayList roles(m_userRoles.begin(), m_userRoles.end());
-    retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, roles, rolesTag, roleTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, roles, rolesTag, roleTag);
 
-    if (!archive.IsStoring()){
+	if (!archive.IsStoring()){
 		m_userRoles = IRole::FeatureIds(roles.begin(), roles.end());
-    }
+	}
 
 	return retVal;
 }
@@ -255,15 +255,15 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
-        m_userId = sourcePtr->m_userId;
-        m_username = sourcePtr->m_username;
-        m_name = sourcePtr->m_name;
-        m_passwordHash = sourcePtr->m_passwordHash;
-        m_mail = sourcePtr->m_mail;
-        m_userPermissions = sourcePtr->m_userPermissions;
-        m_userRestrictions = sourcePtr->m_userRestrictions;
-        m_userRoles = sourcePtr->m_userRoles;
-        return true;
+		m_userId = sourcePtr->m_userId;
+		m_username = sourcePtr->m_username;
+		m_name = sourcePtr->m_name;
+		m_passwordHash = sourcePtr->m_passwordHash;
+		m_mail = sourcePtr->m_mail;
+		m_userPermissions = sourcePtr->m_userPermissions;
+		m_userRestrictions = sourcePtr->m_userRestrictions;
+		m_userRoles = sourcePtr->m_userRoles;
+		return true;
 	}
 
 	return false;
@@ -284,15 +284,15 @@ istd::IChangeable *CUserInfo::CloneMe(CompatibilityMode mode) const
 bool CUserInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
-    m_userId.clear();
-    m_username.clear();
-    m_name.clear();
-    m_passwordHash.clear();
-    m_mail.clear();
-    m_userPermissions.clear();
-    m_userRestrictions.clear();
-    m_userRoles.clear();
-    return true;
+	m_userId.clear();
+	m_username.clear();
+	m_name.clear();
+	m_passwordHash.clear();
+	m_mail.clear();
+	m_userPermissions.clear();
+	m_userRestrictions.clear();
+	m_userRoles.clear();
+	return true;
 }
 
 

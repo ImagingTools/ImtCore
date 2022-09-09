@@ -5,7 +5,8 @@
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionInfo.h>
+#include <imtauth/CUserInfoMetaInfo.h>
+#include <imtauth/IUserInfo.h>
 
 
 namespace imtauth
@@ -17,19 +18,30 @@ namespace imtauth
 // reimplemented (imtbase::IMetaInfoCreator)
 
 bool CUserInfoMetaInfoCreatorComp::CreateMetaInfo(
-            const istd::IChangeable* dataPtr,
-            const QByteArray& typeId,
-            idoc::MetaInfoPtr& metaInfoPtr) const
+		const istd::IChangeable* dataPtr,
+		const QByteArray& typeId,
+		idoc::MetaInfoPtr& metaInfoPtr) const
 {
-    return true;
-}
+	if (typeId != *m_objectTypeIdAttrPtr){
+		return false;
+	}
 
+	metaInfoPtr.SetPtr(new imod::TModelWrap<CUserInfoMetaInfo>);
 
-// public methods of embedded class MetaInfo
+	if (dataPtr == nullptr){
+		return true;
+	}
 
-QString CUserInfoMetaInfoCreatorComp::MetaInfo::GetMetaInfoName(int metaInfoType) const
-{
-    return QString();
+	const IUserInfo* userPtr = dynamic_cast<const IUserInfo*>(dataPtr);
+	if (userPtr == nullptr){
+		return false;
+	}
+
+	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_EMAIL, userPtr->GetMail());
+	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_NAME, userPtr->GetName());
+	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_USERNAME, userPtr->GetUsername());
+
+	return true;
 }
 
 

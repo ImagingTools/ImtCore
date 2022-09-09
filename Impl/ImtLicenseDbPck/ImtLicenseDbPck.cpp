@@ -35,11 +35,6 @@ I_EXPORT_COMPONENT(
 			"Product instance object delegate for SQL table",
 			"SQL Product License Instance Installation Delegate");
 
-I_EXPORT_COMPONENT(
-			UserDatabaseDelegate,
-			"User info object for SQL table",
-			"SQL User Delegate");
-
 
 } // namespace ImtLicenseDbPck
 

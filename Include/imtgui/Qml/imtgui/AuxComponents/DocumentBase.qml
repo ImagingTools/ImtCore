@@ -18,19 +18,28 @@ Item {
 
     property TreeItemModel documentModel;
 
+    property bool itemLoad: true;
+
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsProvider: commandsProviderBase;
 
     Component.onCompleted: {
         console.log("documentBase onCompleted");
         console.log("documentsData", documentsData);
-        itemId = documentsData.GetData("ItemId", model.index);
-        itemName = documentsData.GetData("Title", model.index);
+
+        if (itemLoad){
+            itemId = documentsData.GetData("ItemId", model.index);
+            itemName = documentsData.GetData("Title", model.index);
+        }
     }
 
     onCommandsIdChanged: {
         console.log("documentBase onCommandsIdChanged", commandsId);
-        commandsProvider.commandsId = documentBase.commandsId;
+
+        if (itemLoad){
+            commandsProvider.commandsId = documentBase.commandsId;
+        }
+
         commandsDelegateBase.item.commandsId = documentBase.commandsId;
     }
 
@@ -50,11 +59,15 @@ Item {
     }
 
     onItemIdChanged: {
-        documentsData.SetData("ItemId", itemId, model.index);
+        if (itemLoad){
+            documentsData.SetData("ItemId", itemId, model.index);
+        }
     }
 
     onItemNameChanged: {
-        documentsData.SetData("Name", itemName, model.index);
+        if (itemLoad){
+            documentsData.SetData("Name", itemName, model.index);
+        }
     }
 
     Loader {

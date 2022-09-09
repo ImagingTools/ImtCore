@@ -35,7 +35,28 @@ Item {
                 text: qsTr("Permissions");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_subtitle;
+            }
+
+            Text {
+                id: titleProducts;
+
+                text: qsTr("Products");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+            }
+
+            ComboBox {
+                id: products;
+
+                width: parent.width;
+                height: 23;
+
+                radius: 3;
+
+                onCurrentIndexChanged: {
+                }
             }
 
             Rectangle {
@@ -56,19 +77,16 @@ Item {
 
                     Component.onCompleted: {
                         let index = headersModelPermissions.InsertNewItem();
-                        headersModelPermissions.SetData("PermissionId", "PermissionId", index)
+                        headersModelPermissions.SetData("Id", "Name", index)
+                        headersModelPermissions.SetData("Name", "Name", index)
                     }
-                }
-
-                RolePermissionsController {
-                    id: permissionsController;
                 }
 
                 AuxTable {
                     id: permissionsTable;
 
                     anchors.fill: parent;
-                    anchors.margins: 10;
+                    anchors.margins: 2;
 
                     headers: headersModelPermissions;
 

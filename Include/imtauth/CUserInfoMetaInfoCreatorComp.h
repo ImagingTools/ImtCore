@@ -13,29 +13,19 @@ namespace imtauth
 
 
 /**
-    Meta-info creator for the roles information object.
+	Meta-info creator for the user information object.
 */
 class CUserInfoMetaInfoCreatorComp: public imtbase::CObjectMetaInfoCreatorCompBase
 {
 public:
-    typedef imtbase::CObjectMetaInfoCreatorCompBase BaseClass;
+	typedef imtbase::CObjectMetaInfoCreatorCompBase BaseClass;
 
-    I_BEGIN_COMPONENT(CUserInfoMetaInfoCreatorComp);
-    I_END_COMPONENT;
+	I_BEGIN_COMPONENT(CUserInfoMetaInfoCreatorComp);
+	I_END_COMPONENT;
 
 protected:
-    // reimplemented (imtbase::IMetaInfoCreator)
-    virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const override;
-
-private:
-    class MetaInfo: public idoc::CStandardDocumentMetaInfo
-    {
-    public:
-        typedef idoc::CStandardDocumentMetaInfo BaseClass;
-
-        // reimplemented (idoc::IDocumentMetaInfo)
-        virtual QString GetMetaInfoName(int metaInfoType) const override;
-    };
+	// reimplemented (imtbase::IMetaInfoCreator)
+	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const override;
 };
 
 

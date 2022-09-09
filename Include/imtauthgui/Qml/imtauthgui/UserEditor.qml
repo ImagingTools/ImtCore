@@ -11,6 +11,7 @@ Item {
         usernameInput.text = documentModel.GetData("Username");
         nameInput.text = documentModel.GetData("Name");
         mailInput.text = documentModel.GetData("Email");
+        passwordInput.text = documentModel.GetData("Password");
     }
 
     Flickable {
@@ -113,7 +114,7 @@ Item {
                 placeHolderText: qsTr("Enter the Email");
 
                 onTextChanged: {
-                    documentModel.SetData("Email", nameInput.text);
+                    documentModel.SetData("Email", mailInput.text);
                 }
             }
 

@@ -46,9 +46,11 @@ Item {
 
     onCommandsIdChanged: {
         console.log("DocumentCommands onCommandsIdChanged", container.commandsId);
-        Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
 
-        timer.start();
+        if (documentBase.itemLoad){
+            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
+            timer.start();
+        }
     }
 
     onVisibleChanged: {
@@ -204,6 +206,18 @@ Item {
         documentManager.setDocumentTitle({"ItemId": documentBase.itemId, "Title": documentBase.itemName + suffix});
     }
 
+    function saveObject(){
+        container.gqlModelQueryType = "Update";
+        container.gqlModelQueryTypeNotify = "updatedNotification";
+        saveQuery.updateModel();
+    }
+
+    function addObject(){
+        container.gqlModelQueryType = "Add";
+        container.gqlModelQueryTypeNotify = "addedNotification";
+        saveQuery.updateModel();
+    }
+
     GqlModel {
         id: saveQuery;
 
@@ -265,7 +279,9 @@ Item {
                         let itemId = dataModelLocal.GetData("Id");
                         let itemName = dataModelLocal.GetData("Name");
 
-                        documentSaved(itemId, itemName);
+                        if (documentBase.itemLoad){
+                            documentSaved(itemId, itemName);
+                        }
                     }
                 }
             }

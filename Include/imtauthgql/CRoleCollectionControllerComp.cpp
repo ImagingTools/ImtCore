@@ -45,7 +45,6 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* children = nullptr;
 
-
 	QByteArray roleId = GetObjectIdFromInputParams(inputParams);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;

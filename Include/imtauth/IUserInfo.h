@@ -67,7 +67,7 @@ public:
 		/**
 			Contact email given as QString.
 		*/
-		MIT_CONTACT_EMAIL
+		MIT_EMAIL
 	};
 
 	/**

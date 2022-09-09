@@ -22,7 +22,7 @@ QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &i
 			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME);
 		}
 		else if (informationId == QByteArray("Email")){
-			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_CONTACT_EMAIL);
+			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_EMAIL);
 		}
 		else if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
@@ -41,7 +41,35 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	return nullptr;
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* children = nullptr;
+
+	QByteArray userId = GetObjectIdFromInputParams(inputParams);
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		if (userInfoPtr != nullptr){
+			imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles();
+
+			int index = metaInfoModel->InsertNewItem();
+			metaInfoModel->SetData("Name", "Roles", index);
+			children = metaInfoModel->AddTreeModel("Children", index);
+
+			for (const QByteArray& roleId : rolesIds){
+				int childrenIndex = children->InsertNewItem();
+				children->SetData("Value", roleId, childrenIndex);
+			}
+		}
+
+		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
 }
 
 

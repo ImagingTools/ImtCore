@@ -13,67 +13,65 @@ namespace imtauthgql
 imtbase::CTreeItemModel *CRoleControllerComp::GetObject(const QList<imtgql::CGqlObject> &inputParams, const imtgql::CGqlObject &gqlObject, QString &errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemModel = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
+
+		return nullptr;
 	}
 
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
-	}
-	else{
-		dataModel = new imtbase::CTreeItemModel();
-		itemModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-		QByteArray roleId = GetObjectIdFromInputParams(inputParams);
+	dataModel->SetData("Id", "");
+	dataModel->SetData("Name", "");
 
-		QByteArrayList featureIds;
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(roleId, dataPtr)){
-			const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+	imtbase::CTreeItemModel* permissionsModel = dataModel->AddTreeModel("Permissions");
+	imtbase::CTreeItemModel* prohibitionsModel = dataModel->AddTreeModel("Prohibitions");
 
-			if (roleInfoPtr == nullptr){
-				errorMessage = QT_TR_NOOP("Unable to get a role info");
-				return nullptr;
+	QByteArray roleId = GetObjectIdFromInputParams(inputParams);
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+
+	if (m_objectCollectionCompPtr->GetObjectData(roleId, dataPtr)){
+		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+
+		if (roleInfoPtr == nullptr){
+			errorMessage = QT_TR_NOOP("Unable to get a role info");
+			return nullptr;
+		}
+
+		QByteArray roleId = roleInfoPtr->GetRoleId();
+		QString roleName = roleInfoPtr->GetRoleName();
+
+		dataModel->SetData("Id", roleId);
+		dataModel->SetData("Name", roleName);
+
+		const imtlic::IFeatureInfoProvider* featuresPtr = roleInfoPtr->GetPermissionProvider();
+
+		imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetPermissions();
+		imtauth::IRole::FeatureIds prohibitions = roleInfoPtr->GetProhibitions();
+
+		if (featuresPtr != nullptr){
+			for (const QByteArray& id : permissions){
+				const imtlic::IFeatureInfo* permissionPtr = featuresPtr->GetFeatureInfo(id);
+				if (permissionPtr != nullptr){
+					int index = permissionsModel->InsertNewItem();
+					permissionsModel->SetData("PermissionId", permissionPtr->GetFeatureId(), index);
+					permissionsModel->SetData("PermissionName", permissionPtr->GetFeatureName(), index);
+				}
 			}
 
-			QByteArray roleId = roleInfoPtr->GetRoleId();
-			QString roleName = roleInfoPtr->GetRoleName();
-
-			itemModel->SetData("RoleId", roleId);
-			itemModel->SetData("RoleName", roleName);
-
-			imtbase::CTreeItemModel* permissionsModel = new imtbase::CTreeItemModel();
-			imtbase::CTreeItemModel* prohibitionsModel = new imtbase::CTreeItemModel();
-			const imtlic::IFeatureInfoProvider* featuresPtr = roleInfoPtr->GetPermissionProvider();
-			imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetPermissions();
-			imtauth::IRole::FeatureIds prohibitions = roleInfoPtr->GetProhibitions();
-			if (featuresPtr != nullptr){
-				for (const QByteArray& id : permissions){
-					const imtlic::IFeatureInfo* permissionPtr = featuresPtr->GetFeatureInfo(id);
-					if (permissionPtr != nullptr){
-						int index = permissionsModel->InsertNewItem();
-						permissionsModel->SetData("PermissionId", permissionPtr->GetFeatureId(), index);
-						permissionsModel->SetData("PermissionName", permissionPtr->GetFeatureName(), index);
-					}
+			for (const QByteArray& id : prohibitions){
+				const imtlic::IFeatureInfo* prohibitionPtr = featuresPtr->GetFeatureInfo(id);
+				if (prohibitionPtr != nullptr){
+					int index = prohibitionsModel->InsertNewItem();
+					prohibitionsModel->SetData("ProhibitionId", prohibitionPtr->GetFeatureId(), index);
+					prohibitionsModel->SetData("ProhibitionName", prohibitionPtr->GetFeatureName(), index);
 				}
-				itemModel->SetExternTreeModel("Permissions", permissionsModel);
-				for (const QByteArray& id : prohibitions){
-					const imtlic::IFeatureInfo* prohibitionPtr = featuresPtr->GetFeatureInfo(id);
-					if (prohibitionPtr != nullptr){
-						int index = prohibitionsModel->InsertNewItem();
-						prohibitionsModel->SetData("ProhibitionId", prohibitionPtr->GetFeatureId(), index);
-						prohibitionsModel->SetData("ProhibitionName", prohibitionPtr->GetFeatureName(), index);
-					}
-				}
-				itemModel->SetExternTreeModel("Prohibitions", prohibitionsModel);
 			}
 		}
-		dataModel->SetExternTreeModel("item", itemModel);
 	}
+
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;
@@ -89,7 +87,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		imtauth::CRole *roleInfoPtr = new imtauth::CRole();
+		istd::TDelPtr<imtauth::CRole> roleInfoPtr = new imtauth::CRole();
+
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role!");
 			return nullptr;
@@ -98,8 +97,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
-		if (itemModel.ContainsKey("RoleId")){
-			QByteArray roleId = itemModel.GetData("RoleId").toByteArray();
+		if (itemModel.ContainsKey("Id")){
+			QByteArray roleId = itemModel.GetData("Id").toByteArray();
 			if (roleId.isEmpty()){
 				if (objectId.isEmpty()){
 					errorMessage = QT_TR_NOOP("Role id can't be empty!");
@@ -114,8 +113,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 			}
 		}
 
-		if (itemModel.ContainsKey("RoleName")){
-			name = itemModel.GetData("RoleName").toString();
+		if (itemModel.ContainsKey("Name")){
+			name = itemModel.GetData("Name").toString();
 			roleInfoPtr->SetRoleName(name);
 		}
 
@@ -150,7 +149,7 @@ istd::IChangeable *CRoleControllerComp::CreateObject(const QList<imtgql::CGqlObj
 			roleInfoPtr->SetProhibitions(*prohibitions);
 		}
 
-		return roleInfoPtr;
+		return roleInfoPtr.PopPtr();
 	}
 
 	errorMessage = QObject::tr("Can not create roke: %1").arg(QString(objectId));

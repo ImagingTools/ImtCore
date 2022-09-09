@@ -1,6 +1,13 @@
 #include <imtauthdb/CUserDatabaseDelegateComp.h>
 
 
+// ACF includes
+#include <imod/TModelWrap.h>
+
+// ImtCore includes
+#include <imtauth/CUserInfoMetaInfo.h>
+
+
 namespace imtauthdb
 {
 
@@ -25,8 +32,8 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QByte
 	}
 
 	QByteArray userId;
-	if (record.contains("Id")){
-		userId = record.value("Id").toByteArray();
+	if (record.contains("UserId")){
+		userId = record.value("UserId").toByteArray();
 		userPtr->SetUsername(userId);
 	}
 
@@ -61,7 +68,8 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QByte
 
 		if (permissionRecord.contains("PermissionId")){
 			permissionId = permissionRecord.value("PermissionId").toByteArray();
-			permissionsIds.insert(permissionId);
+
+			permissionsIds << permissionId;
 		}
 	}
 
@@ -112,7 +120,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 
 	NewObjectQuery retVal;
 
-	retVal.query += "\n" + QString("INSERT INTO Users(Id, Password, Name, Email, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+	retVal.query += "\n" + QString("INSERT INTO Users(UserId, Password, Name, Email, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 			.arg(qPrintable(userId))
 			.arg(qPrintable(passwordHash))
 			.arg(name)
@@ -132,7 +140,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				QString("INSERT INTO UserPermissions (UserId, PermissionId) VALUES('%1', '%2');")
 				.arg(qPrintable(userId))
 				.arg(qPrintable(permissionId)).toLocal8Bit();
-
 	}
 
 	for (const QByteArray& roleId : rolesIds){
@@ -140,7 +147,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				QString("INSERT INTO UserRoles(UserId, RoleId) VALUES('%1', '%2');")
 				.arg(qPrintable(userId))
 				.arg(qPrintable(roleId)).toLocal8Bit();
-
 	}
 
 	return retVal;
@@ -163,13 +169,14 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray retVal = QString("DELETE FROM Users WHERE Id = '%1';").arg(qPrintable(userId)).toLocal8Bit();
+		QByteArray retVal = QString("DELETE FROM Users WHERE UserId = '%1';").arg(qPrintable(userId)).toLocal8Bit();
 
 		return retVal;
 	}
 
 	return QByteArray();
 }
+
 
 QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
@@ -198,18 +205,17 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray newUserPasswordHash = newUserPtr->GetPasswordHash();
 	QString newMail = newUserPtr->GetMail();
 
-	QByteArray retVal = QString("UPDATE Users SET Id ='%1', Password = '%2', Name = '%3', Email = '%4', Description = '%5', LastModified = '%6' WHERE Id ='%7';")
+	QByteArray retVal = QString("UPDATE Users SET UserId ='%1', Password = '%2', Name = '%3', Email = '%4', Description = '%5', LastModified = '%6' WHERE UserId ='%7';")
 			.arg(qPrintable(newUserId))
-			.arg(qPrintable(newName))
 			.arg(qPrintable(newUserPasswordHash))
+			.arg(qPrintable(newName))
 			.arg(qPrintable(newMail))
+			.arg(qPrintable(""))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(oldUserId)).toLocal8Bit();
 
-	imtauth::IUserInfo::FeatureIds newPermissionsIds = newUserPtr->GetPermissions();
-	imtauth::IUserInfo::FeatureIds oldPermissionsIds = oldUserPtr->GetPermissions();
-	imtauth::IUserInfo::FeatureIds newProhibitionsIds = newUserPtr->GetProhibitions();
-	imtauth::IUserInfo::FeatureIds oldProhibitionsIds = oldUserPtr->GetProhibitions();
+	imtauth::IUserInfo::FeatureIds newPermissionsIds = newUserPtr->GetLocalPermissions();
+	imtauth::IUserInfo::FeatureIds oldPermissionsIds = oldUserPtr->GetLocalPermissions();
 
 	for (const QByteArray& permissionId : newPermissionsIds){
 		if (!oldPermissionsIds.contains(permissionId)){
@@ -228,6 +234,9 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(permissionId)).toLocal8Bit();
 		}
 	}
+
+	imtauth::IUserInfo::FeatureIds newProhibitionsIds = newUserPtr->GetProhibitions();
+	imtauth::IUserInfo::FeatureIds oldProhibitionsIds = oldUserPtr->GetProhibitions();
 
 	for (const QByteArray& prohibitionId : newProhibitionsIds){
 		if (!oldProhibitionsIds.contains(prohibitionId)){
@@ -293,7 +302,7 @@ QByteArray CUserDatabaseDelegateComp::CreateRenameObjectQuery(
 
 	QByteArray userId = qPrintable(userPtr->GetUsername());
 
-	QByteArray retVal = QString("UPDATE Users SET Name = '%1', LastModified = '%2' WHERE Id ='%3';")
+	QByteArray retVal = QString("UPDATE Users SET Name = '%1', LastModified = '%2' WHERE UserId ='%3';")
 			.arg(qPrintable(newObjectName))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(userId)).toLocal8Bit();
@@ -316,7 +325,7 @@ QByteArray CUserDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 idoc::MetaInfoPtr CUserDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-	return idoc::MetaInfoPtr();
+	return idoc::MetaInfoPtr(new imod::TModelWrap<imtauth::CUserInfoMetaInfo>);
 }
 
 
@@ -328,8 +337,8 @@ bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& re
 		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_NAME, name);
 	}
 
-	if (record.contains("Username")){
-		QString userName = record.value("Username").toString();
+	if (record.contains("UserId")){
+		QString userName = record.value("UserId").toString();
 
 		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_USERNAME, userName);
 	}
@@ -337,7 +346,7 @@ bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& re
 	if (record.contains("Email")){
 		QString email = record.value("Email").toString();
 
-		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_CONTACT_EMAIL, email);
+		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_EMAIL, email);
 	}
 
 	if (record.contains("Description")){

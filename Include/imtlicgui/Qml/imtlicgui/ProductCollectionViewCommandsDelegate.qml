@@ -13,6 +13,7 @@ CollectionViewCommandsDelegateBase {
 
         let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
         commandsProvider.changeCommandMode("Duplicate", mode);
+        commandsProvider.changeCommandMode("Export", mode);
     }
 
     onCommandActivated: {

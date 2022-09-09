@@ -7,11 +7,20 @@ DocumentBase {
 
     anchors.fill: parent;
 
+    onDocumentModelChanged: {
+        headerText.text = documentModel.GetData("Name");
+    }
+
     function updateGui(){
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             loader.item.updateGui();
         }
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+        color: Style.baseColor;
     }
 
     Row {
@@ -24,11 +33,6 @@ DocumentBase {
         height: 50
 
         spacing: 20;
-
-        Rectangle {
-            anchors.fill: parent;
-            color: Style.baseColor;
-        }
 
         AuxButton {
             id: closeButton;
@@ -162,7 +166,6 @@ DocumentBase {
                 source: model.Source;
                 visible: mainPanel.selectedIndex == model.index;
             }
-
         }
     }
 }

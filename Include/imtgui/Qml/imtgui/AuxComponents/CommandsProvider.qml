@@ -14,7 +14,6 @@ Item {
         modelCommands.updateModel();
     }
 
-
     function changeCommandMode(commandId, mode){
         console.log("CommandsController changeCommandMode");
 

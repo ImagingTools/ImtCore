@@ -100,12 +100,8 @@ Rectangle {
                         if (mainPanel.selectedIndex !== model.index){
                             mainPanel.selectedIndex = model.index;
 
-                            bodyLoader.source = "qrc:/qml/imtgui/AuxComponents/CollectionView.qml";
-
-                            if (bodyLoader.item){
-                                bodyLoader.item.commandsId = model.Id;
-                                headerText.text = model.Id;
-                            }
+                            collectionView.commandsId = model.Id;
+                            headerText.text = model.Id;
                         }
                     }
                 }
@@ -121,13 +117,10 @@ Rectangle {
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
 
-        Loader {
-            id: bodyLoader;
+        CollectionView {
+            id: collectionView;
 
             anchors.fill: parent;
-
-            onItemChanged: {
-            }
         }
     }
 }

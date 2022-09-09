@@ -10,55 +10,6 @@ namespace imtlicgql
 {
 
 
-imtbase::CTreeItemModel* CProductControllerComp::ListObjects(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
-{
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QT_TR_NOOP("Internal error");
-	}
-
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
-	}
-	else{
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		QByteArray productId = GetObjectIdFromInputParams(inputParams);
-
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
-			imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
-
-			if (licensePtr != nullptr){
-				QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
-				for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-					int itemIndex = itemsModel->InsertNewItem();
-					QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-					QString licenseDescription = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-					itemsModel->SetData("Id", licenseCollectionId, itemIndex);
-					itemsModel->SetData("Name", licenseName, itemIndex);
-					itemsModel->SetData("Description", licenseDescription, itemIndex);
-				}
-			}
-		}
-
-		itemsModel->SetIsArray(true);
-		dataModel->SetExternTreeModel("items", itemsModel);
-	}
-
-	rootModel->SetExternTreeModel("data", dataModel);
-
-	return rootModel;
-}
-
-
 istd::IChangeable* CProductControllerComp::CreateObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		QByteArray& objectId,

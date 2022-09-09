@@ -106,7 +106,8 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		imtauth::CAccountInfo *accountInfoPtr = new imtauth::CAccountInfo();
+		istd::TDelPtr<imtauth::CAccountInfo> accountInfoPtr = new imtauth::CAccountInfo();
+
 		if (accountInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
 			return nullptr;
@@ -179,7 +180,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		accountInfoPtr->SetAccountOwner(contactInfo);
 
-		return accountInfoPtr;
+		return accountInfoPtr.PopPtr();
 	}
 
 	errorMessage = QObject::tr("Can not create account: %1").arg(QString(objectId));
