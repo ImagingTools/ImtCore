@@ -127,8 +127,9 @@ void CMultiDocumentWorkspaceGuiCompBase::UpdateAllTitles()
 						QFileInfo(infoPtr->filePath).completeBaseName();
 
 			NameFrequencies::Iterator freqIter = nameFrequencies.find(titleName);
-			int& frequency = freqIter.value();
 			if (freqIter != nameFrequencies.end()){
+				int& frequency = freqIter.value();
+
 				frequency++;
 
 				titleName = tr("%1 <%2>").arg(titleName).arg(frequency + 1);
