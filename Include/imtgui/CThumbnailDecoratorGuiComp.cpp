@@ -64,6 +64,15 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 
 	qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
 	qRegisterMetaType<QProcess::ProcessState>();
+
+	m_supportedEvents.insert(QEvent::KeyRelease);
+	m_supportedEvents.insert(QEvent::MouseButtonRelease);
+	m_supportedEvents.insert(QEvent::MouseMove);
+	m_supportedEvents.insert(QEvent::Wheel);
+	m_supportedEvents.insert(QEvent::FocusIn);
+	m_supportedEvents.insert(QEvent::FocusOut);
+	m_supportedEvents.insert(QEvent::Enter);
+	m_supportedEvents.insert(QEvent::Leave);
 }
 
 
@@ -118,26 +127,17 @@ bool CThumbnailDecoratorGuiComp::eventFilter(QObject *watched, QEvent *event)
 		UpdateSpacing();
 	}
 
-	QSet<int> supportedEvents;
-	supportedEvents.insert(QEvent::KeyRelease);
-	supportedEvents.insert(QEvent::MouseButtonRelease);
-	supportedEvents.insert(QEvent::MouseMove);
-	supportedEvents.insert(QEvent::Wheel);
-	supportedEvents.insert(QEvent::FocusIn);
-	supportedEvents.insert(QEvent::FocusOut);
-	supportedEvents.insert(QEvent::Enter);
-	supportedEvents.insert(QEvent::Leave);
+	if (m_supportedEvents.contains(eventType)){
+		if (m_loginCompPtr.IsValid()){
+			bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
+			if (isLogged){
+				// Auto log off functionality is activated, aslo restart the timer after any user activity:
+				int autoLogoutSeconds = GetAutoLogoutTime();
+				if (autoLogoutSeconds > 0){
+					m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
 
-	if (m_loginCompPtr.IsValid()){
-		bool isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
-
-		if (isLogged && supportedEvents.contains(eventType)){
-			// Auto log off functionality is activated, aslo restart the timer after any user activity:
-			int autoLogoutSeconds = GetAutoLogoutTime();
-			if (autoLogoutSeconds > 0){
-				m_autoLogoutTimer.start(autoLogoutSeconds * 1000);
-
-				qApp->installEventFilter(this);
+					qApp->installEventFilter(this);
+				}
 			}
 		}
 

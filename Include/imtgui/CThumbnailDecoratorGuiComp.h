@@ -377,6 +377,8 @@ private:
 
 	int m_lastPageIndexForLoggedUser;
 	bool m_isExitProcess;
+
+	QSet<int> m_supportedEvents;
 };
 
 
