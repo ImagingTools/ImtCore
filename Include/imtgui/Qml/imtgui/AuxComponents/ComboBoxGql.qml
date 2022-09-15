@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 
 Item {
     id: comboBoxContainer;
@@ -21,13 +22,17 @@ Item {
 
     property int radius: 5;
     property int currentIndex: -1;
+    property int offset: 0;
+    property int count: 15;
+    property string commandId: "";
+    property string filterName: "Name";
     property Item delegate: PopupMenuDelegate{}
 
     signal clicked();
 
     onModelChanged: {
         if (comboBoxContainer.currentIndex > -1){
-            comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name");
+            comboBoxContainer.currentText = popup.model.GetData("Name");
         }
     }
 
@@ -42,15 +47,30 @@ Item {
 
     Component {
         id: popupMenu;
-        PopupMenuDialog {
-            delegate: PopupMenuDelegate{id: popupDelegate}
+        PopupMenuDialogGql {
+            id: popup
+            offset: comboBoxContainer.offset
+            count: comboBoxContainer.count
+            commandId: comboBoxContainer.commandId
+            filterName: comboBoxContainer.filterName
+            delegate: comboBoxContainer.delegate
             onFinished: {
                 comboBoxContainer.currentIndex = index;
+                comboBoxContainer.currentText = popup.model.GetData("Name", index);
+                popup.filterText = comboBoxContainer.currentText;
+            }
+            onTextEdited: {
+                comboBoxContainer.currentText = popup.filterText
             }
         }
     }
 
     Component.onCompleted: {
+        var index = filterIdsModel.InsertNewItem();
+        filterIdsModel.SetData("Id", filterName, index);
+        modelFilter.AddTreeModel("FilterIds");
+        modelFilter.SetData("FilterIds", filterIdsModel)
+        modelFilter.AddTreeModel("Sort");
         if (comboBoxContainer.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
         }
@@ -61,7 +81,7 @@ Item {
     }
 
     function openPopupMenu(){
-        var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
+        var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, 0);
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
                                                    "model": comboBoxContainer.model,
@@ -87,10 +107,14 @@ Item {
             GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
         }
 
+
+
         Text {
             id: cbTitleTxt;
 
             anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left
+            anchors.leftMargin: 10
 
             color: Style.textColor;
             text: comboBoxContainer.currentText;

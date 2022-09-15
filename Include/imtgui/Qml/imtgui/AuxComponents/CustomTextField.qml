@@ -29,6 +29,7 @@ Item {
     property alias borderWidth: mainRect.border.width;
 
     signal accepted();
+    signal textEdited();
 
     function setFocus(value) {
         textField.focus = value
@@ -90,6 +91,7 @@ Item {
         }
 
         onTextEdited: {
+            containerTextField.textEdited();
             console.log("CustomTextField onTextEdited");
         }
 

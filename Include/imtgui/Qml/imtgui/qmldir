@@ -35,6 +35,8 @@ LoginButton 1.0 ./AuxComponents/LoginButton.qml
 PagesManager 1.0 ./AuxComponents/PagesManager.qml
 PreferencePage 1.0 ./AuxComponents/PreferencePage.qml
 ServerConnectionManager 1.0 ./AuxComponents/ServerConnectionManager.qml
+ComboBoxGql 1.0 ./AuxComponents/ComboBoxGql.qml
+PopupMenuDelegate 1.0 ./AuxComponents/PopupMenuDelegate.qml
 
 LoginDialog 1.0 ./AuxComponents/Dialogs/LoginDialog.qml
 PopupMenuDialog 1.0 ./AuxComponents/Dialogs/PopupMenuDialog.qml
@@ -44,3 +46,4 @@ Dialog 1.0 ./AuxComponents/Dialogs/Dialog.qml
 ModalDialogManager 1.0 ./AuxComponents/Dialogs/ModalDialogManager.qml
 TopPanelDialog 1.0 ./AuxComponents/Dialogs/TopPanelDialog.qml
 ButtonsDialog 1.0 ./AuxComponents/Dialogs/ButtonsDialog.qml
+PopupMenuDialogGql 1.0 ./AuxComponents/Dialogs/PopupMenuDialogGql.qml
