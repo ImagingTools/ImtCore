@@ -12,7 +12,7 @@ namespace imtej
 class CReportProvider: virtual public IReportProvider
 {
 public:
-	virtual EjDocument* getReport(int reportId) override;
+	virtual EjDocument* getReport(iprm::IParamsSet* reportParams) override;
 };
 
 

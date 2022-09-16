@@ -30,7 +30,6 @@ I_EXPORT_COMPONENT(
 			"Inspection report simulator",
 			"Inspection Report Simulator");
 
-
 } // namespace ImtReportPck
 
 

@@ -10,7 +10,7 @@ namespace imtej
 
 // public methods
 
-bool CReportExport::exportReport(EjDocument* ejDocument)
+bool CReportExport::exportReport(EjDocument* ejDocument, QString const& file_name)
 {	bool state = false;
 	bool docx = m_convertorDocx.convert(ejDocument, "C:/ImagingTools/Tmp/tests.docx");
 	bool pdf = m_convertorPdf.convert(ejDocument, "C:/ImagingTools/Tmp/tests.pdf");

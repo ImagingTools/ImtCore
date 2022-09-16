@@ -15,7 +15,7 @@ namespace imtej
 class CReportExport: virtual public IReportExport
 {
 public:
-	virtual bool exportReport(EjDocument* ejDocument) override;
+	virtual bool exportReport(EjDocument* ejDocument, QString const& file_name) override;
 private:
 	EjConvertorDocx m_convertorDocx;
 	EjConvertorPdf m_convertorPdf;

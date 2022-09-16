@@ -22,7 +22,7 @@ class IObject2d;
 class IReportExport: virtual public istd::IPolymorphic
 {
 public:
-	virtual bool exportReport(EjDocument* ejDocument) = 0;
+	virtual bool exportReport(EjDocument* ejDocument, QString const& file_name) = 0;
 };
 
 

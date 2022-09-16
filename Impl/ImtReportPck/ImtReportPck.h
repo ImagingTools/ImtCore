@@ -10,7 +10,6 @@
 #include <imtreport/CInspectionReportBuilderComp.h>
 #include <imtreport/CInspectionReportSimulatorComp.h>
 
-
 /**
 	ImtReportPck package
 */
@@ -21,7 +20,6 @@ namespace ImtReportPck
 typedef icomp::TModelCompWrap<imtreport::CReportDocumentComp> ReportDocument;
 typedef imtreport::CInspectionReportBuilderComp InspectionReportBuilder;
 typedef imtreport::CInspectionReportSimulatorComp InspectionReportSimulator;
-
 
 } // namespace ImtReportPck
 
