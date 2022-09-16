@@ -12,6 +12,7 @@
 // ImtCore includes
 #include <imtbase/CParamsSetJoiner.h>
 #include <imtdb/CDatabaseEngineComp.h>
+#include <imtbase/CObjectCollection.h>
 
 
 namespace imtdb
@@ -212,6 +213,32 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 }
 
 
+istd::TSmartPtr<imtbase::IObjectCollection> CSqlDatabaseObjectCollectionComp::GetSubsetInfo(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
+{
+	istd::TSmartPtr<imtbase::IObjectCollection> collectionPtr(new imtbase::CObjectCollection);
+	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+
+	if (m_objectDelegateCompPtr.IsValid()){
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+		if (objectSelectionQuery.isEmpty()){
+			return collectionPtr;
+		}
+
+		QSqlError sqlError;
+		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+
+		while (sqlQuery.next()){
+			 istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
+			 DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
+				 return dataObjPtr;
+			 });
+			 collectionPtr->InsertNewObject(m_typeIdAttrPtr->GetValue(), "", "", dataPtr);
+		}
+	}
+	return collectionPtr;
+}
+
+
 // reimplemented (IObjectCollectionInfo)
 
 const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo() const
@@ -307,6 +334,7 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 
 	return retVal;
 }
+
 
 bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(imtbase::ICollectionInfo& subsetInfo, int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
 {

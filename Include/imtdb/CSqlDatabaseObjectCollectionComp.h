@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/CObjectCollection.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TModelUpdateBinder.h>
@@ -75,6 +76,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual istd::TSmartPtr<imtbase::IObjectCollection> GetSubsetInfo(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr, const Id& parentId = Id(), int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
@@ -107,6 +109,7 @@ public:
 	virtual bool SetElementName(const Id& objectId, const QString& name) override;
 	virtual bool SetElementDescription(const Id& objectId, const QString& description) override;
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
+
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
