@@ -22,7 +22,22 @@ static const QByteArray s_idColumn = "Id";
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(const QByteArray& objectId, int offset, int count, const iprm::IParamsSet* paramsPtr) const
+{
+	if (!objectId.isEmpty()){
+		QString baseQuery = GetBaseSelectionQuery();
+
+		return QString(
+			baseQuery + QString(" AND \"%1\".Id = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
+	}
+
+	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+}
+
+
+istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(
+			const QByteArray& /*typeId*/,
+			const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -74,32 +89,41 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		QByteArray documentContent;
 		if (WriteDataToMemory(*workingDocumentPtr, documentContent)){
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
+			QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
-			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-
-			retVal.query = QString("INSERT INTO %1(Id, %2, Name, Description, LastModified, Added, Checksum) VALUES('%3', '%4', '%5', '%6', '%7', '%8', '%9');")
+			retVal.query = QString("INSERT INTO \"%1\"(Id, Name, Description, Added, LastRevisionId) VALUES('%2', '%3', '%4', '%5', '%6');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
-						.arg(qPrintable (*m_documentContentColumnIdAttrPtr))
 						.arg(qPrintable(objectId))
-						.arg(qPrintable(documentContent.toBase64()))
 						.arg(objectName)
 						.arg(objectDescription)
 						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-						.arg(checksum)
+						.arg(qPrintable(revisionUuid))
 						.toLocal8Bit();
-			
+
+			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+
+			retVal.query += QString("INSERT INTO \"%1\"(Id, %2, %3, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8');")
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(qPrintable(s_documentIdColumn))
+				.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
+				.arg(qPrintable(revisionUuid))
+				.arg(qPrintable(objectId))
+				.arg(qPrintable(documentContent.toBase64()))
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(checksum)
+				.toLocal8Bit();
+
 			if (m_metaInfoTableDelegateCompPtr.IsValid()){
 				idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(valuePtr, typeId);
 				if (metaInfoPtr.IsValid()){
 					retVal.query += "\n";
 
-					QByteArrayList columnIds = {s_idColumn, s_documentIdColumn};
+					QByteArrayList columnIds = {s_idColumn, "RevisionId"};
 					columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
 					QStringList tableValues;
 					tableValues.push_back("'" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "'");
-					tableValues.push_back("'" + objectId + "'");
+					tableValues.push_back("'" + revisionUuid + "'");
 
 					for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()){
 						QVariant data = metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId));
@@ -109,7 +133,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 						tableValues.push_back("'" + value + "'");
 					}
 
-					retVal.query += QString("INSERT INTO %1(%2) VALUES(%3);")
+					retVal.query += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
 								.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 								.arg(qPrintable(columnIds.join(", ")))
 								.arg(tableValues.join(", "))
@@ -129,7 +153,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
-	QByteArray retVal = QString("DELETE FROM %1 WHERE %2 = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE %2 = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -146,7 +170,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	if (WriteDataToMemory(object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
-		retVal = QString("UPDATE %1 SET %2 = '%3', LastModified = '%4', Checksum = '%5' WHERE %6 = '%7';")
+		retVal = QString("UPDATE \"%1\" SET %2 = '%3', LastModified = '%4', Checksum = '%5' WHERE %6 = '%7';")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
 					.arg(qPrintable(documentContent.toBase64()))
@@ -156,9 +180,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(objectId))
 					.toLocal8Bit();
 
-		if (m_metaInfoTableDelegateCompPtr.IsValid()) {
+		if (m_metaInfoTableDelegateCompPtr.IsValid()){
 			idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(&object, collection.GetObjectTypeId(objectId));
-			if (metaInfoPtr.IsValid()) {
+			if (metaInfoPtr.IsValid()){
 				retVal += "\n";
 
 				QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
@@ -172,7 +196,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					valueTuples.push_back(columnId + " = " + "'" + value + "'");
 				}
 
-				retVal += QString("UPDATE %1 SET %2 WHERE %3 = '%4';")
+				retVal += QString("UPDATE \"%1\" SET %2 WHERE %3 = '%4';")
 							.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 							.arg(valueTuples.join(", "))
 							.arg(qPrintable(s_documentIdColumn))
@@ -212,7 +236,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 
 bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable& object, QByteArray& data) const
 {
-	if (!m_documentPersistenceCompPtr.IsValid()) {
+	if (!m_documentPersistenceCompPtr.IsValid()){
 		return false;
 	}
 
@@ -267,7 +291,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable
 
 bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data, istd::IChangeable& object) const
 {
-	if (!m_documentPersistenceCompPtr.IsValid()) {
+	if (!m_documentPersistenceCompPtr.IsValid()){
 		return false;
 	}
 
@@ -324,11 +348,24 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 
 QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 {
-	return QString("SELECT * from %1 JOIN %2 ON %1.%3 = %2.%4")
-				.arg(qPrintable(*m_tableNameAttrPtr))
+	QString metaInfoValuesQuery;
+	QString joinMetaInfoQuery;
+	if (m_metaInfoTableDelegateCompPtr.IsValid()){
+		QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
+		for (int i = 0; i < columnIds.count(); ++i){
+			metaInfoValuesQuery += QString(", \"%1\".%2").arg(qPrintable(*m_metaInfoTableNameAttrPtr)).arg(qPrintable(columnIds[i]));
+		}
+
+		joinMetaInfoQuery = QString("JOIN \"%1\" ON \"%2\".LastRevisionId = \"%1\".RevisionId")
 				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
-				.arg(qPrintable(s_idColumn))
-				.arg(qPrintable(s_documentIdColumn));
+				.arg(qPrintable(*m_tableNameAttrPtr));
+	}
+
+	return QString("SELECT \"%1\".*, \"%2\".document, \"%2\".lastmodified, \"%2\".checksum %3 FROM \"%1\" JOIN \"%2\" ON \"%1\".LastRevisionId = \"%2\".Id %4")
+		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+		.arg(metaInfoValuesQuery)
+		.arg(joinMetaInfoQuery);
 }
 
 
@@ -344,10 +381,10 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 
 	QByteArray objectId = record.value(qPrintable(s_idColumn)).toByteArray();
 
-	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM  %1 WHERE %3 = '%2'")
+	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM \"%1\" WHERE RevisionId = (SELECT lastRevisionId FROM \"%3\" WHERE Id = '%2')")
 				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 				.arg(qPrintable(objectId))
-				.arg(qPrintable(s_documentIdColumn))
+				.arg(qPrintable(*m_tableNameAttrPtr))
 				.toLocal8Bit();
 
 	QSqlQuery metaInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(sqlMetaInfoQuery);
@@ -355,8 +392,8 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 		QSqlRecord metaInfoRecord = metaInfoQuery.record();
 
 		objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
-		if (objectMetaInfoPtr.IsValid()) {
-			if (!SetObjectMetaInfoFromRecord(metaInfoRecord, *objectMetaInfoPtr)) {
+		if (objectMetaInfoPtr.IsValid()){
+			if (!SetObjectMetaInfoFromRecord(metaInfoRecord, *objectMetaInfoPtr)){
 				objectMetaInfoPtr.Reset();
 
 				return false;
@@ -365,7 +402,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 	}
 
 	collectionItemMetaInfoPtr.SetPtr(CreateCollectionItemMetaInfo(typeId));
-	if (collectionItemMetaInfoPtr.IsValid()) {
+	if (collectionItemMetaInfoPtr.IsValid()){
 		if (!SetCollectionItemMetaInfoFromRecord(record, *collectionItemMetaInfoPtr)){
 			collectionItemMetaInfoPtr.Reset();
 

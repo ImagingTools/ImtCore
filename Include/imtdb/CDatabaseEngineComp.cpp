@@ -589,4 +589,8 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 
 	return true;
 }
+
+
 } // namespace imtdb
+
+

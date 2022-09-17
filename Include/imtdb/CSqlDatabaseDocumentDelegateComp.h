@@ -28,6 +28,11 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual QByteArray GetSelectionQuery(
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual istd::IChangeable* CreateObjectFromRecord(
 				const QByteArray& typeId,
 				const QSqlRecord& record) const override;
