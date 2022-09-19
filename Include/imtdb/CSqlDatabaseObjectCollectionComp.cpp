@@ -213,30 +213,32 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 }
 
 
-istd::TSmartPtr<imtbase::IObjectCollection> CSqlDatabaseObjectCollectionComp::GetSubsetInfo(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
+imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
 {
-	istd::TSmartPtr<imtbase::IObjectCollection> collectionPtr(new imtbase::CObjectCollection);
-	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+    imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
+    imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
-	if (m_objectDelegateCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
-		if (objectSelectionQuery.isEmpty()){
-			return collectionPtr;
-		}
+    if (m_objectDelegateCompPtr.IsValid()){
+        QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+        if (objectSelectionQuery.isEmpty()){
+            return nullptr;
+        }
 
-		QSqlError sqlError;
-		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+        QSqlError sqlError;
+        QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
 
-		while (sqlQuery.next()){
-			 istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
-			 DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
-				 return dataObjPtr;
-			 });
-			 collectionPtr->InsertNewObject(m_typeIdAttrPtr->GetValue(), "", "", dataPtr);
-		}
-	}
-	return collectionPtr;
+        while (sqlQuery.next()){
+             istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
+             DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
+                 return dataObjPtr;
+             });
+             collectionPtr->InsertNewObject(m_typeIdAttrPtr->GetValue(), "", "", dataPtr);
+        }
+    }
+    return collectionPtr;
 }
+
+
 
 
 // reimplemented (IObjectCollectionInfo)
@@ -578,9 +580,8 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
 
-	BaseClass::OnComponentDestroyed();
+    BaseClass::OnComponentDestroyed();
 }
-
 
 } // namespace imtdb
 

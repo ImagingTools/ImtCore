@@ -596,6 +596,12 @@ bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const is
 }
 
 
+imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
+{
+    return nullptr;
+}
+
+
 // reimplemented (IObjectCollectionInfo)
 
 const iprm::IOptionsList* CFileCollectionCompBase::GetObjectTypesInfo() const
@@ -1596,5 +1602,3 @@ void CFileCollectionCompBase::ReaderThread::run()
 
 
 } // namespace imtrepo
-
-

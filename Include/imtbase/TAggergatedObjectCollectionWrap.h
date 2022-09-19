@@ -64,6 +64,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+    virtual imtbase::IObjectCollection *CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
@@ -112,6 +113,7 @@ protected:
 	iprm::COptionsManager m_types;
 
 	QByteArray m_collectionTagName;
+
 };
 
 
@@ -237,6 +239,13 @@ template<class BaseInterface, class ObjectImpl>
 inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
 {
 	return m_collection.SetObjectData(objectId, object, mode);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+inline imtbase::IObjectCollection* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const imtbase::ICollectionInfo::Id &parentId, int iterationFlags) const
+{
+    return m_collection.CreateSubCollection(offset, count, selectionParamsPtr, parentId, iterationFlags);
 }
 
 

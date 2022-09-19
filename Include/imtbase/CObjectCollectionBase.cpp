@@ -245,7 +245,13 @@ bool CObjectCollectionBase::SetObjectData(const Id& objectId, const istd::IChang
 		}
 	}
 
-	return false;
+    return false;
+}
+
+
+IObjectCollection *CObjectCollectionBase::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
+{
+    return nullptr;
 }
 
 
