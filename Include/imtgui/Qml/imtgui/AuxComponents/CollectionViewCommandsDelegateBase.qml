@@ -25,7 +25,7 @@ Item {
     signal removed(string id);
 
     /**
-        Requests ids for GQL models
+        Requests IDs for GQL models
     */
     property string gqlModelRemove;
     property string gqlModelRename;
@@ -48,6 +48,7 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
+        tableData.rightButtonMouseClicked.disconnect(openPopupMenu);
     }
 
     onCommandsIdChanged: {
@@ -85,14 +86,13 @@ Item {
 
         else if (commandId === "Close"){
             documentManager.closeDocument(itemId);
-
         }
 
         commandActivated(commandId);
     }
 
     onRenamed: {
-        documentManager.setDocumentTitle({"ItemId": id, "Title": newName});
+        documentManager.setDocumentTitle({"Id": id, "Title": newName});
 
         updateGui();
     }

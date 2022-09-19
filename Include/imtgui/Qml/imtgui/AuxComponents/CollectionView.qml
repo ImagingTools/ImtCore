@@ -6,7 +6,7 @@ import imtlicgui 1.0
 Item {
     id: collectionViewContainer;
 
-    anchors.fill: parent;
+    property int contentMargins: 0;
 
     property alias baseCollectionView: collectionViewBase;
 
@@ -18,8 +18,13 @@ Item {
     property string commandUpdateGui;
     property alias commandsDelegate: commandsLoader.item;
 
+    property alias tableElementsDelegate: collectionViewBase.tableElementsDelegate;
+    property alias tableHeadersDelegate: collectionViewBase.tableHeadersDelegate;
+    property alias elementsList: collectionViewBase.elementsList;
+    property alias metaInfo: collectionMetaInfo;
+
     Component.onCompleted: {
-        itemId = documentsData.GetData("ItemId", model.index);
+        itemId = documentsData.GetData("Id", model.index);
         itemName = documentsData.GetData("Title", model.index);
     }
 
@@ -90,6 +95,12 @@ Item {
         id: collectionViewModel;
     }
 
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.baseColor;
+    }
+
     CollectionViewBase {
         id: collectionViewBase;
 
@@ -97,6 +108,7 @@ Item {
         anchors.left: parent.left;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
+        anchors.margins: contentMargins;
 
         commandsId: parent.commandsId;
         loadData: true;

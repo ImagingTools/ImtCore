@@ -43,7 +43,6 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* children = nullptr;
 
 	QByteArray roleId = GetObjectIdFromInputParams(inputParams);
 
@@ -60,38 +59,93 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 		QString roleName = roleInfoPtr->GetRoleName();
 
 		int index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Permissions", index);
-		children = metaInfoModel->AddTreeModel("Children", index);
+		metaInfoModel->SetData("Name", "Included Roles", index);
+		imtbase::CTreeItemModel* children = metaInfoModel->AddTreeModel("Children", index);
 
-		imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetPermissions();
-		const imtlic::IFeatureInfoProvider* featuresPtr = roleInfoPtr->GetPermissionProvider();
+		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
-		for (const QByteArray& id : permissions){
-			const imtlic::IFeatureInfo* permissionPtr = featuresPtr->GetFeatureInfo(id);
-			if (permissionPtr != nullptr){
-				int childrenIndex = children->InsertNewItem();
-				QString permissionName = permissionPtr->GetFeatureName();
-				children->SetData("Value", permissionName, childrenIndex);
-			}
+		for (const QByteArray& parentRoleId : parentRolesIds){
+			int childrenIndex = children->InsertNewItem();
+
+			children->SetData("Value", parentRoleId, childrenIndex);
 		}
 
 		index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Prohibitions", index);
+		metaInfoModel->SetData("Name", "Permissions", index);
 		children = metaInfoModel->AddTreeModel("Children", index);
 
-		imtauth::IRole::FeatureIds prohibitions = roleInfoPtr->GetProhibitions();
+		imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
 
-		for (const QByteArray& id : prohibitions){
-			const imtlic::IFeatureInfo* prohibitionsPtr = featuresPtr->GetFeatureInfo(id);
-			if (prohibitionsPtr != nullptr){
-				int childrenIndex = children->InsertNewItem();
-				QString prohibitionName = prohibitionsPtr->GetFeatureName();
-				children->SetData("Value", prohibitionName, childrenIndex);
-			}
+		for (const QByteArray& id : permissions){
+			int childrenIndex = children->InsertNewItem();
+
+			children->SetData("Value", id, childrenIndex);
 		}
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
+}
+
+
+imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(
+			const QList<imtgql::CGqlObject>& inputParams,
+			const imtgql::CGqlObject& gqlObject,
+			QString& errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
+
+		imtbase::ICollectionInfo::Ids productsIds = m_productCollectionCompPtr->GetElementIds();
+
+		for (const imtbase::ICollectionInfo::Id& productId : productsIds){
+			QString productName = m_productCollectionCompPtr->GetElementInfo(productId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
+			int index = itemsModel->InsertNewItem();
+			itemsModel->SetData("Id", productId, index);
+			itemsModel->SetData("Name", productName, index);
+
+			imtbase::CTreeItemModel* rolesModel = itemsModel->AddTreeModel("Roles", index);
+
+			imtbase::ICollectionInfo::Ids rolesIds = m_objectCollectionCompPtr->GetElementIds();
+
+			for (const imtbase::ICollectionInfo::Id& roleObjectId : rolesIds){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_objectCollectionCompPtr->GetObjectData(roleObjectId, dataPtr)){
+					const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+
+					QByteArray roleId = roleInfoPtr->GetRoleId();
+					QByteArray roleProductId = roleInfoPtr->GetProductId();
+
+					if (productId == roleProductId){
+						int roleIndex = rolesModel->InsertNewItem();
+
+						QByteArray objectId = roleInfoPtr->GetRoleId() + *m_separatorObjectIdAttrPtr + roleProductId;
+
+						rolesModel->SetData("Id", objectId, roleIndex);
+						rolesModel->SetData("Name", roleInfoPtr->GetRoleName(), roleIndex);
+					}
+				}
+			}
+		}
+
+		dataModel->SetExternTreeModel("items", itemsModel);
+	}
+
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

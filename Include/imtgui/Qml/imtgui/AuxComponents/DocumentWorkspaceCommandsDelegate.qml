@@ -96,6 +96,9 @@ DocumentWorkspaceCommandsDelegateBase {
     Component {
         id: editDialog;
         EditDialog {
+
+            headers: container.tableData.headers;
+
             onFinished: {
                 if (buttonId == "Ok"){
                     let elementsModel = documentModel.GetData("Items");

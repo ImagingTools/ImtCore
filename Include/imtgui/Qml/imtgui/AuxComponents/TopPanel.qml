@@ -23,21 +23,21 @@ Rectangle {
              topPanelDecoratorLoader.item.width = topPanel.width;
          }
     }
-    Text {
-        id: administrationText;
+//    Text {
+//        id: administrationText;
 
-        anchors.left: parent.left;
-        anchors.top: parent.top
-        anchors.leftMargin: 20;
-        anchors.topMargin: 15;
-        z:1000;
-        font.pixelSize: Style.fontSize_title;
-        font.family: Style.fontFamily;
+//        anchors.left: parent.left;
+//        anchors.top: parent.top
+//        anchors.leftMargin: 20;
+//        anchors.topMargin: 15;
+//        z:1000;
+//        font.pixelSize: Style.fontSize_title;
+//        font.family: Style.fontFamily;
 
-        color: Style.titleColor;
+//        color: Style.titleColor;
 
-        text: pageNameText;
-    }
+//        text: pageNameText;
+//    }
 
     Loader {
         id: topPanelDecoratorLoader;

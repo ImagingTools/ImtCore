@@ -5,8 +5,6 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegate {
     id: container;
 
-    showInputIdDialog: false;
-
     onCommandActivated: {
         console.log("UsersCommands onCommandActivated", commandId); 
     }
@@ -29,4 +27,3 @@ DocumentWorkspaceCommandsDelegate {
         }
     }
 }
-

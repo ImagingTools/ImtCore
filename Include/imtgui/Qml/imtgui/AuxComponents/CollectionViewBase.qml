@@ -9,6 +9,10 @@ Item {
 
     property string commandsId;
 
+    property alias tableElementsDelegate: tableInternal.delegate;
+    property alias tableHeadersDelegate: tableInternal.headerDelegate;
+    property alias elementsList: tableInternal.elementsList;
+
     property var table: tableInternal;
     property bool hasPagination: true;
     property bool hasFilter: true;

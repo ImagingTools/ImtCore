@@ -13,11 +13,15 @@ void CRoleComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_featuresCompPtr.IsValid()){
-		m_permissionProviderPtr = m_featuresCompPtr.GetPtr();
+	if (m_parentRoleProviderCompPtr.IsValid()){
+		SetParentRoleProvider( m_parentRoleProviderCompPtr.GetPtr());
 	}
-    SetRoleId(m_roleIdAttrPtr->GetValue().toUtf8());
-    SetRoleName(m_roleNameAttrPtr->GetValue());
+}
+
+
+void CRoleComp::OnComponentDestroyed()
+{
+	BaseClass::OnComponentDestroyed();
 }
 
 

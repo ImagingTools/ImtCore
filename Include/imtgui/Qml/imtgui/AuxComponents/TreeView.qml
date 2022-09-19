@@ -8,7 +8,13 @@ Rectangle {
 
     property TreeItemModel modelItems;
 
-//    signal checkBoxChanged(int state, string parentId, string childId);
+    Component {
+        id: delegateComp;
+
+        TreeItemDelegate {
+            width: treeViewContainer.width;
+        }
+    }
 
     ListView {
         id: mainTreeView;
@@ -18,8 +24,6 @@ Rectangle {
         boundsBehavior: Flickable.StopAtBounds;
         model: treeViewContainer.modelItems;
 
-        delegate: TreeItemDelegate {
-            width: parent.width;
-        }
+        delegate: delegateComp;
     }
 }

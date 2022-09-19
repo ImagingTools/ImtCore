@@ -3,6 +3,8 @@
 
 // ImtCore includes
 #include <imtauth/IRole.h>
+#include <imtauth/IRoleInfoProvider.h>
+#include <imtlic/CProductLicensingInfo.h>
 
 
 namespace imtauth
@@ -14,7 +16,10 @@ class CRole: virtual public IRole
 public:
 	CRole();
 
+	void SetParentRoleProvider(const imtauth::IRoleInfoProvider* parentRoleProvider);
+
 	// reimplemented (iser::IRole)
+	virtual const IRoleInfoProvider* GetParentRolesProvider() const override;
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
 	virtual QByteArray GetRoleId() const override;
 	virtual void SetRoleId(const QByteArray &id) override;
@@ -25,8 +30,11 @@ public:
 	virtual void SetLocalPermissions(const IRole::FeatureIds &permissions) override;
 	virtual IRole::FeatureIds GetProhibitions() const override;
 	virtual void SetProhibitions(const IRole::FeatureIds &prohibitions) override;
-	virtual const QList<const IRole*> GetParents() const override;
-	virtual void SetParents(const QList<const IRole*> parents) override;
+	virtual QByteArrayList GetIncludedRoles() const override;
+	virtual QByteArray GetProductId() const override;
+	virtual void SetProductId(const QByteArray& productId) override;
+	virtual bool IncludeRole(const QByteArray& roleId) override;
+	virtual void ExcludeRole(const QByteArray& roleId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -38,14 +46,21 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	QByteArrayList GetParentRoles(const QByteArray& roleId) const;
+	void GetParentRoleList(const IRole& role, QByteArrayList& roleList) const;
+
+protected:
 	const imtlic::IFeatureInfoProvider* m_permissionProviderPtr;
 
 private:
-    QByteArray m_roleId;
-    QString m_roleName;
+	QByteArray m_roleId;
+	QByteArray m_productId;
+	QString m_roleName;
 	IRole::FeatureIds m_rolePermissions;
 	IRole::FeatureIds m_roleRestrictions;
-	QList<const IRole*> m_parents;
+	QByteArrayList m_parents;
+
+	const imtauth::IRoleInfoProvider* m_roleInfoProviderPtr;
 };
 
 

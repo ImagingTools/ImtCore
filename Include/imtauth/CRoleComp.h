@@ -23,20 +23,20 @@ public:
 	I_BEGIN_COMPONENT(CRoleComp);
 		I_REGISTER_INTERFACE(IRole);
 		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_ASSIGN(m_featuresCompPtr, "Features", "All features avaliable of this role", true, "Features");
-		I_ASSIGN(m_roleIdAttrPtr, "RoleId", "Role id", true, "");
-		I_ASSIGN(m_roleNameAttrPtr, "RoleName", "Role name", true, "");
+		I_REGISTER_INTERFACE(imtauth::IRoleInfoProvider);
+		I_ASSIGN(m_parentRoleProviderCompPtr, "ParentRoleProvider", "Parent role provider", true, "ParentRoleProvider");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 private:
-	I_REF(imtlic::IFeatureInfoProvider, m_featuresCompPtr);
-	I_TEXTATTR(m_roleIdAttrPtr);
-	I_TEXTATTR(m_roleNameAttrPtr);
+	I_REF(imtauth::IRoleInfoProvider, m_parentRoleProviderCompPtr);
 };
+
+
 } // namespace imtauth
 
 

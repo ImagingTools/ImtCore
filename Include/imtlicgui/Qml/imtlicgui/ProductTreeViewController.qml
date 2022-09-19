@@ -7,7 +7,7 @@ Item {
 
     property int selectedIndex: collectionView.table.selectedIndex;
 
-    signal checkBoxChanged(int state, string parentId, string childId);
+    signal checkBoxChanged(int state, string childId);
 
     Component.onCompleted: {
         commandsDelegate.edited.connect(edited);

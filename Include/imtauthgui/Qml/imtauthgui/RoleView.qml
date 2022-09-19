@@ -5,12 +5,35 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-    anchors.fill: parent;
-
     commandsDelegatePath: "../../imtauthgui/RoleViewCommandsDelegate.qml";
+
+    property TreeItemModel productsModel;
+
+    property TreeItemModel rolesModel; // Collection of the all roles
+
+    property int selectedIndex: -1;
+
+    property alias pageIndex: mainPanel.selectedIndex;
+
+    property Item includedRolesTable;
 
     onDocumentModelChanged: {
         headerText.text = documentModel.GetData("Name");
+    }
+
+    UndoRedoManager {
+        id: undoRedoManager;
+
+        commandsId: container.commandsId;
+        editorItem: container;
+
+        onModelParsed: {
+            updateGui();
+        }
+    }
+
+    onSelectedIndexChanged: {
+        console.log("RoleView onSelectedIndexChanged", selectedIndex);
     }
 
     function updateGui(){
@@ -32,7 +55,7 @@ DocumentBase {
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
-        height: 50
+        height: 40;
 
         spacing: 20;
 
@@ -121,7 +144,7 @@ DocumentBase {
 
                     textButton: model.Name;
 
-                    backgroundColor: Style.mainColor
+                    backgroundColor: Style.alternateBaseColor;
 
                     borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
 
@@ -162,7 +185,6 @@ DocumentBase {
                 source: model.Source;
                 visible: mainPanel.selectedIndex == model.index;
             }
-
         }
     }
 }

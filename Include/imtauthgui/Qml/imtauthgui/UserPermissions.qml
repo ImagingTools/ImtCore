@@ -12,6 +12,12 @@ Item {
         console.log("UserPermissions updateGui");
     }
 
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.alternateBaseColor;
+    }
+
     Flickable {
         anchors.fill: parent;
 
@@ -69,7 +75,7 @@ Item {
                     id: permissionsTable;
 
                     anchors.fill: parent;
-                    anchors.margins: 10;
+                    anchors.margins: 2;
 
                     headers: headersModelPermissions;
 

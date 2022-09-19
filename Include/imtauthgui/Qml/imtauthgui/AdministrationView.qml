@@ -7,6 +7,12 @@ Rectangle {
 
     anchors.fill: parent;
 
+    color: Style.backgroundColor;
+
+    function addHeader(header){
+        headerText.text += "/ " + header;
+    }
+
     Row {
         id: header;
 
@@ -14,7 +20,7 @@ Rectangle {
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
-        height: 50
+        height: 40
 
         spacing: 20;
 
@@ -51,17 +57,23 @@ Rectangle {
 
             spacing: 5;
 
+            onSelectedIndexChanged: {
+                 headerText.text =  "Administration" + " / " + leftMenuModel.get(selectedIndex).Id;
+            }
+
             ListModel{
                 id: leftMenuModel
 
                 ListElement{
                     Id: "Users";
                     Name: "Users";
+                    Source: "UserCollectionView.qml";
                 }
 
                 ListElement{
                     Id: "Roles";
                     Name: "Roles";
+                    Source: "RoleCollectionView.qml";
                 }
             }
 
@@ -86,7 +98,7 @@ Rectangle {
 
                     textButton: model.Name;
 
-                    backgroundColor: Style.mainColor
+                    backgroundColor: Style.alternateBaseColor;
 
                     borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
 
@@ -99,9 +111,6 @@ Rectangle {
                     onClicked: {
                         if (mainPanel.selectedIndex !== model.index){
                             mainPanel.selectedIndex = model.index;
-
-                            collectionView.commandsId = model.Id;
-                            headerText.text = model.Id;
                         }
                     }
                 }
@@ -117,10 +126,30 @@ Rectangle {
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
 
-        CollectionView {
-            id: collectionView;
+        Repeater {
+            id: bodyRepeater;
 
-            anchors.fill: parent;
+            model: leftMenuModel;
+
+            delegate: Loader {
+                id: bodyLoader;
+
+                anchors.fill: parent;
+
+                onVisibleChanged: {
+                    if (visible){
+                        if (!bodyLoader.item){
+                            bodyLoader.source = model.Source;
+                        }
+                    }
+                }
+
+                visible: mainPanel.selectedIndex == model.index;
+
+                onLoaded: {
+                    bodyLoader.item.commandsId = model.Id;
+                }
+            }
         }
     }
 }

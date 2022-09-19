@@ -14,6 +14,12 @@ Item {
         passwordInput.text = documentModel.GetData("Password");
     }
 
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.alternateBaseColor;
+    }
+
     Flickable {
         anchors.fill: parent;
         anchors.leftMargin: 20;

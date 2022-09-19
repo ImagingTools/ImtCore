@@ -19,8 +19,21 @@ namespace imtauth
 // public methods
 
 CRole::CRole()
-	:m_permissionProviderPtr(nullptr)
+	: m_permissionProviderPtr(nullptr),
+	  m_roleInfoProviderPtr(nullptr)
 {
+}
+
+
+void CRole::SetParentRoleProvider(const IRoleInfoProvider *parentRoleProvider)
+{
+	m_roleInfoProviderPtr = parentRoleProvider;
+}
+
+
+const IRoleInfoProvider *CRole::GetParentRolesProvider() const
+{
+	return m_roleInfoProviderPtr;
 }
 
 
@@ -65,15 +78,16 @@ void CRole::SetRoleName(const QString& name)
 IRole::FeatureIds CRole::GetPermissions() const
 {
 	IRole::FeatureIds allPermissions;
-	for (const IRole* rolePtr: m_parents){
-		allPermissions += rolePtr->GetPermissions();
-	}
+//	for (const QByteArray& roleId : m_parents){
+//		const IRole* role = m_roleInfoProviderPtr->GetRole(roleId);
+//		allPermissions += role->GetPermissions();
+//	}
 
-	allPermissions += m_rolePermissions;
+//	allPermissions += m_rolePermissions;
 
-	for (const QByteArray& prohibitionId : m_roleRestrictions){
-		allPermissions.remove(prohibitionId);
-	}
+//	for (const QByteArray& prohibitionId : m_roleRestrictions){
+//		allPermissions.remove(prohibitionId);
+//	}
 
 	return allPermissions;
 }
@@ -99,12 +113,6 @@ IRole::FeatureIds CRole::GetProhibitions() const
 {
 	IRole::FeatureIds allProhibitions;
 
-	for (const IRole* rolePtr: m_parents){
-		allProhibitions += rolePtr->GetPermissions();
-	}
-
-	allProhibitions += m_roleRestrictions;
-
 	return allProhibitions;
 }
 
@@ -119,19 +127,51 @@ void CRole::SetProhibitions(const IRole::FeatureIds& prohibitions)
 }
 
 
-const QList<const IRole*> CRole::GetParents() const
+QByteArrayList CRole::GetIncludedRoles() const
 {
 	return m_parents;
 }
 
 
-void CRole::SetParents(const QList<const IRole*> parents)
+QByteArray CRole::GetProductId() const
 {
-	if (m_parents != parents){
+	return m_productId;
+}
+
+
+void CRole::SetProductId(const QByteArray& productId)
+{
+	if (m_productId != productId){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_parents = parents;
+		m_productId = productId;
 	}
+}
+
+
+bool CRole::IncludeRole(const QByteArray &roleId)
+{
+	if (m_roleId == roleId){
+		return false;
+	}
+
+	QByteArrayList parentRoles = GetParentRoles(roleId);
+
+	if (parentRoles.contains(m_roleId)){
+		return false;
+	}
+
+	m_parents.append(roleId);
+
+	return true;
+}
+
+
+void CRole::ExcludeRole(const QByteArray &roleId)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_parents.removeOne(roleId);
 }
 
 
@@ -148,28 +188,42 @@ bool CRole::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_roleId);
 	retVal = retVal && archive.EndTag(roleIdTag);
 
+	static iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(productIdTag);
+	retVal = retVal && archive.Process(m_productId);
+	retVal = retVal && archive.EndTag(productIdTag);
+
 	static iser::CArchiveTag roleNameTag("RoleName", "Name of the role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleNameTag);
 	retVal = retVal && archive.Process(m_roleName);
 	retVal = retVal && archive.EndTag(roleNameTag);
 
-    QByteArray permissionsTag = "Permissions";
-    QByteArray permissionTag = "Permission";
+	QByteArray parentsRolesTag = "ParentsRoles";
+	QByteArray parentRoleTag = "ParentRole";
+	QByteArrayList parentsRoles(m_parents.begin(), m_parents.end());
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, parentsRoles, parentsRolesTag, parentRoleTag);
+
+	if (!archive.IsStoring()){
+		m_parents = QByteArrayList(parentsRoles.begin(), parentsRoles.end());
+	}
+
+	QByteArray permissionsTag = "Permissions";
+	QByteArray permissionTag = "Permission";
 	QByteArrayList permissions(m_rolePermissions.begin(),m_rolePermissions.end());
-    retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, permissionsTag, permissionTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, permissionsTag, permissionTag);
 
-    if (!archive.IsStoring()){
+	if (!archive.IsStoring()){
 		m_rolePermissions = IRole::FeatureIds(permissions.begin(), permissions.end());
-    }
+	}
 
-    QByteArray restrictionsTag = "Restrictions";
-    QByteArray restrictionTag = "Restriction";
+	QByteArray restrictionsTag = "Restrictions";
+	QByteArray restrictionTag = "Restriction";
 	QByteArrayList restrictions(m_roleRestrictions.begin(),m_roleRestrictions.end());
-    retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, restrictionsTag, restrictionTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, restrictionsTag, restrictionTag);
 
-    if (!archive.IsStoring()){
+	if (!archive.IsStoring()){
 		m_roleRestrictions = IRole::FeatureIds(restrictions.begin(), restrictions.end());
-    }
+	}
 
 	return retVal;
 }
@@ -190,6 +244,7 @@ bool CRole::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 	const CRole* sourcePtr = dynamic_cast<const CRole*>(&object);
 	if (sourcePtr != nullptr){
 		m_roleId = sourcePtr->m_roleId;
+		m_productId = sourcePtr->m_productId;
 		m_roleName = sourcePtr->m_roleName;
 		m_rolePermissions = sourcePtr->m_rolePermissions;
 		m_roleRestrictions = sourcePtr->m_roleRestrictions;
@@ -197,6 +252,7 @@ bool CRole::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 
 		if (mode == CM_WITH_REFS){
 			m_permissionProviderPtr = sourcePtr->m_permissionProviderPtr;
+			m_roleInfoProviderPtr = sourcePtr->m_roleInfoProviderPtr;
 		}
 
 		return true;
@@ -208,7 +264,7 @@ bool CRole::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 
 istd::IChangeable* CRole::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CRole> clonePtr(new CRole());
+	istd::TDelPtr<imtauth::CRole> clonePtr(new CRole());
 
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
@@ -223,12 +279,43 @@ bool CRole::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_roleId.clear();
+	m_productId.clear();
 	m_roleName.clear();
 	m_rolePermissions.clear();
 	m_roleRestrictions.clear();
 	m_parents.clear();
 
 	return true;
+}
+
+
+QByteArrayList CRole::GetParentRoles(const QByteArray &roleId) const
+{
+	QByteArrayList retVal;
+	if (m_roleInfoProviderPtr != nullptr){
+		const istd::TDelPtr<IRole> rolePtr(const_cast<IRole*>(m_roleInfoProviderPtr->GetRole(roleId, m_productId)));
+		if (rolePtr != nullptr){
+			GetParentRoleList(*rolePtr, retVal);
+		}
+	}
+
+	return retVal;
+}
+
+
+void CRole::GetParentRoleList(const IRole &role, QByteArrayList &roleList) const
+{
+	QByteArrayList includedRoles = role.GetIncludedRoles();
+
+	roleList += includedRoles;
+	if (m_roleInfoProviderPtr != nullptr){
+		for (const QByteArray& roleId : includedRoles){
+			const istd::TDelPtr<IRole> rolePtr(const_cast<IRole*>(m_roleInfoProviderPtr->GetRole(roleId, m_productId)));
+			if (rolePtr != nullptr){
+				GetParentRoleList(*rolePtr, roleList);
+			}
+		}
+	}
 }
 
 

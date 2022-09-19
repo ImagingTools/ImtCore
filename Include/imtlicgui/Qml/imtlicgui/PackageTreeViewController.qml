@@ -7,7 +7,7 @@ Item {
 
     property int selectedIndex: collectionView.table.selectedIndex;
 
-    signal checkBoxChanged(int state, string parentId, string childId);
+    signal checkBoxChanged(int state, string childId);
 
     Component.onCompleted: {
         commandsDelegate.removed.connect(removed);
@@ -153,17 +153,17 @@ Item {
         for (let i = 0; i < treeViewModel.modelTreeView.GetItemsCount(); i++){
             let m_packageId = treeViewModel.modelTreeView.GetData("Id", i);
             if (m_packageId === packageId){
-                let m_features = treeViewModel.modelTreeView.GetData("childItemModel", i);
+                let m_features = treeViewModel.modelTreeView.GetData("ChildModel", i);
 
                 for (let j = 0; j < m_features.GetItemsCount(); j++){
-                    let m_visible = m_features.GetData("visible", j)
+                    let m_visible = m_features.GetData("Visible", j)
                     if (!m_visible){
-                        m_features.SetData("visible", 1, j);
+                        m_features.SetData("Visible", 1, j);
                     }
 
                     let m_featureId = m_features.GetData("Id", j);
                     if (m_featureId === featureId){
-                        m_features.SetData("visible", 0, j);
+                        m_features.SetData("Visible", 0, j);
                     }
                 }
             }

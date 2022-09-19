@@ -14,6 +14,7 @@ Dialog {
     property bool autoGenerate: false;
 
     property TreeItemModel model;
+    property TreeItemModel headers;
 
     onFinished: {
         if (buttonId === "Ok"){

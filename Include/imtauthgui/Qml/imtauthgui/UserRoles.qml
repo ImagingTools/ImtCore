@@ -15,6 +15,12 @@ Item {
         rolesTable.elements = rolesModel;
     }
 
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.alternateBaseColor;
+    }
+
     Flickable {
         anchors.fill: parent;
 
@@ -65,15 +71,11 @@ Item {
                     }
                 }
 
-                UserRolesController {
-                    id: licensesController;
-                }
-
                 AuxTable {
                     id: rolesTable;
 
                     anchors.fill: parent;
-                    anchors.margins: 10;
+                    anchors.margins: 2;
 
                     headers: headersModelRoles;
 

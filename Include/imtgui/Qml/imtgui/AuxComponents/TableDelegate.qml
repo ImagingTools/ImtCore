@@ -47,6 +47,14 @@ Rectangle {
         }
     }
 
+    function getSelectedId(){
+        return model.Id;
+    }
+
+    function getSelectedName(){
+        return model.Name;
+    }
+
     Rectangle {
         id: selectionBackGround;
 

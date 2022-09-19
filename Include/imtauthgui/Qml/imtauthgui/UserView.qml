@@ -11,6 +11,17 @@ DocumentBase {
         headerText.text = documentModel.GetData("Name");
     }
 
+    UndoRedoManager {
+        id: undoRedoManager;
+
+        commandsId: container.commandsId;
+        editorItem: container;
+
+        onModelParsed: {
+            updateGui();
+        }
+    }
+
     function updateGui(){
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
@@ -125,7 +136,7 @@ DocumentBase {
 
                     textButton: model.Name;
 
-                    backgroundColor: Style.mainColor;
+                    backgroundColor: Style.alternateBaseColor;
 
                     borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
 

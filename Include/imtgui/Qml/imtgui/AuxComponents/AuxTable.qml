@@ -11,14 +11,19 @@ Item {
     property bool hasFilter: false;
     property bool hasSort: false;
 
+    property bool showHeaders: true;
+
     property TreeItemModel headers; //: elementsList.model;
 
     property alias delegate: elementsList.delegate;
     property alias elements: elementsList.model;
+    property alias elementsList: elementsList;
 
     property alias headerDelegate: headersList.delegate;
     property real headerElementWidth: (headersList.width - iconFilter.width)/headersList.count;
     property alias headerElementHeight: headersList.height;
+
+    property alias backgroundElementsColor: elementsBg.color;
 
     property int radius: 7;
 
@@ -36,10 +41,10 @@ Item {
     }
 
     function getSelectedId(){
+        console.log("getSelectedId");
         if (tableContainer.selectedIndex > -1){
-            if (tableContainer.elements.ContainsKey("Id", tableContainer.selectedIndex)){
-                return tableContainer.elements.GetData("Id", tableContainer.selectedIndex);
-            }
+            let item = elementsList.itemAtIndex(tableContainer.selectedIndex)
+            return item.getSelectedId();
         }
 
         return "";
@@ -47,9 +52,8 @@ Item {
 
     function getSelectedName(){
         if (tableContainer.selectedIndex > -1){
-            if (tableContainer.elements.ContainsKey("Name", tableContainer.selectedIndex)){
-                return tableContainer.elements.GetData("Name", tableContainer.selectedIndex);
-            }
+            let item = elementsList.itemAtIndex(tableContainer.selectedIndex)
+            return item.getSelectedName();
         }
 
         return "";
@@ -73,7 +77,9 @@ Item {
         anchors.right: parent.right;
         anchors.top: parent.top;
 
-        height: tableContainer.headerHeight;
+        height: visible ? tableContainer.headerHeight: 0;
+
+        visible: showHeaders;
 
         clip: true;
 
@@ -173,7 +179,7 @@ Item {
         anchors.right: headersPanel.right;
         anchors.rightMargin: 5;
 
-        visible: tableContainer.hasFilter;
+        visible: tableContainer.hasFilter && showHeaders;
 
         width: tableContainer.hasFilter ? 20 : 0;
         height: width;
@@ -187,6 +193,8 @@ Item {
     }
 
     Rectangle {
+        id: elementsBg;
+
         anchors.fill: elementsList;
         color: Style.baseColor;
     }

@@ -4,5 +4,4 @@ import imtgui 1.0
 
 CollectionViewCommandsDelegateBase {
     id: container;
-
 }

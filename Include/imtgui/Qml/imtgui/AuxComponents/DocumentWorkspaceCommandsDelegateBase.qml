@@ -16,6 +16,9 @@ Item {
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotify;
 
+    /**
+        Таймер чтобы запрос на Item не уходил одновременно с другими, иначе запрос не пройдет
+    */
     property alias updateItemTimer: timer.interval;
 
     signal entered(string value);
@@ -24,19 +27,22 @@ Item {
     signal commandActivated(string commandId);
     signal itemLoaded();
 
+    property var itemModelInputParams: ({});
+
     Timer {
         id: timer;
 
         interval: 0;
 
         onTriggered: {
-            let itemId = documentsData.GetData("ItemId", model.index);
-            console.log("timer itemId", itemId);
-            itemModel.updateModel(itemId)
+            itemModel.updateModel(itemModelInputParams)
         }
     }
 
     Component.onCompleted: {
+        console.log("DocumentCommands onCompleted");
+        let itemId = documentsData.GetData("Id", model.index);
+        itemModelInputParams["Id"] = itemId;
         loadingPage.visible = true;
     }
 
@@ -73,7 +79,7 @@ Item {
 
     function removeChanges(){
         commandsProvider.changeCommandMode("Save", "Disabled");
-        documentManager.setDocumentTitle({"ItemId": documentBase.itemId, "Title": documentBase.itemName});
+        documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName});
     }
 
     function commandHandle(commandId){
@@ -102,9 +108,11 @@ Item {
                 }
             }
             else{
-                container.gqlModelQueryType = "Update";
-                container.gqlModelQueryTypeNotify = "updatedNotification";
-                saveQuery.updateModel();
+//                container.gqlModelQueryType = "Update";
+//                container.gqlModelQueryTypeNotify = "updatedNotification";
+//                saveQuery.updateModel();
+
+                saveObject();
             }
         }
 
@@ -203,7 +211,7 @@ Item {
         commandsProvider.changeCommandMode("Save", "Normal");
 
         let suffix = "*";
-        documentManager.setDocumentTitle({"ItemId": documentBase.itemId, "Title": documentBase.itemName + suffix});
+        documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
     }
 
     function saveObject(){
@@ -291,13 +299,21 @@ Item {
     GqlModel {
         id: itemModel;
 
-        function updateModel(itemId) {
+        function updateModel(externInputParams) {
+            console.log("itemModel updateModel", externInputParams);
             var query = Gql.GqlRequest("query", commandsId + "Item");
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", itemId);
+
+            let keys = Object.keys(externInputParams)
+            for (let key of keys){
+                console.log("key", key, "value", externInputParams[key])
+                inputParams.InsertField(key, externInputParams[key]);
+            }
+
+//            inputParams.InsertField("Id", itemId);
             query.AddParam(inputParams);
-            console.log("itemId", itemId);
+
             var queryFields = Gql.GqlObject("item");
 
             queryFields.InsertField("Id");

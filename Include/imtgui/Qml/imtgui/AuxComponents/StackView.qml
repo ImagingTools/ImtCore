@@ -3,6 +3,8 @@ import QtQuick 2.12
 Item {
     id: container;
 
+    property int countPage: pagesModel.count;
+
     Component.onDestruction: {
         pagesModel.clear();
     }

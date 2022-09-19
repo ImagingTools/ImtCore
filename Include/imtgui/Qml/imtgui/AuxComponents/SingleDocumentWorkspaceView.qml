@@ -26,23 +26,30 @@ Item {
 
         anchors.fill: parent;
 
+        visible: stackView.countPage == 0;
+
         onLoaded: {
             console.log("onLoaded", source);
         }
     }
 
     function addDocument(document){
+        let keys = Object.keys(document);
 
-        documentsData.SetData("ItemId", document["Id"]);
+        for (let key of keys){
+            documentsData.SetData(key, document[key]);
+        }
+
         documentsData.SetData("Title", document["Name"]);
-        documentsData.SetData("Source", document["Source"]);
-        documentsData.SetData("CommandsId", document["CommandsId"]);
 
         stackView.push(document);
     }
 
     function closeDocument(){
         stackView.pop();
+    }
+
+    function setDocumentTitle(){
     }
 
     StackView {

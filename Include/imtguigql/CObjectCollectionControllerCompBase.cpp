@@ -190,21 +190,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	else{
 		QByteArray objectId;
 
-		QString splitObjectId;
-		if (m_separatorObjectIdAttrPtr.IsValid()){
-			splitObjectId = objectId;
-
-			QStringList splitData = splitObjectId.split(*m_separatorObjectIdAttrPtr);
-			splitObjectId = splitData[0].toUtf8();
-		}
-
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
 			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
 		}
 
 		if (errorMessage.isEmpty() && newObjectId.isEmpty()){
-			errorMessage = QObject::tr("Can not insert object: %1").arg(splitObjectId);
+			errorMessage = QObject::tr("Can not insert object: %1").arg(qPrintable(objectId));
 		}
 	}
 

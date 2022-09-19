@@ -24,7 +24,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 		}
 	}
 
-	return QString("SELECT COUNT(*) FROM \"%1\" %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
+	return QString("SELECT COUNT(*) FROM %1 %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
 }
 
 
@@ -155,7 +155,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery
 
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 {
-	return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
+	return QString("SELECT * FROM %1").arg(qPrintable(*m_tableNameAttrPtr));
 }
 
 

@@ -28,7 +28,7 @@ Item {
             var index = documentsData.InsertNewItem();
 
             //TODO -> Uuid
-            documentsData.SetData("ItemId", itemId, index);
+            documentsData.SetData("Id", itemId, index);
             documentsData.SetData("Title", document["Name"], index);
             documentsData.SetData("Source", document["Source"], index);
             documentsData.SetData("CommandsId", document["CommandsId"], index);
@@ -52,8 +52,12 @@ Item {
      }
 
     function setDocumentTitle(parameters){
-        let itemId = parameters["ItemId"];
+        console.log("MultidocWorkspaceView setDocumentTitle");
+        let itemId = parameters["Id"];
         let newTitle = parameters["Title"];
+
+        console.log("itemId", itemId);
+        console.log("newTitle", newTitle);
 
         let index = this.getDocumentIndexById(itemId);
         if (index >= 0){
@@ -65,7 +69,7 @@ Item {
         console.log("MultidocWorkspaceView getPageIndexById", documentId);
 
         for (var i = 1; i < documentsData.GetItemsCount(); i++){
-            var m_id = documentsData.GetData("ItemId", i);
+            var m_id = documentsData.GetData("Id", i);
             if (m_id === documentId){
                 return i;
             }

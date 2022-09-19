@@ -17,6 +17,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRoleDatabaseDelegateComp)
 		I_ASSIGN(m_roleInfoFactCompPtr, "Role", "Factory used for creation of the new role instance", true, "Role");
+		I_ASSIGN(m_roleCollectionCompPtr, "RoleCollection", "Role collection", true, "RoleCollection");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -44,6 +45,14 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
+	virtual QByteArray GetObjectIdFromRecord(
+				const QByteArray& typeId,
+				const QSqlRecord& record) const override;
+	virtual QByteArray GetSelectionQuery(
+				const QByteArray& objectId = QByteArray(),
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 protected:
 	void GenerateDifferences(
@@ -58,6 +67,7 @@ protected:
 
 private:
 	I_FACT(imtauth::IRole, m_roleInfoFactCompPtr);
+	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);
 };
 
 

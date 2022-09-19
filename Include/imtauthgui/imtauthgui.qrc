@@ -34,6 +34,9 @@
         <file alias="imtauthgui/RoleTreeViewController.qml">Qml/imtauthgui/RoleTreeViewController.qml</file>
         <file alias="imtauthgui/RoleViewCommandsDelegate.qml">Qml/imtauthgui/RoleViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/TableRolePermissionsDelegate.qml">Qml/imtauthgui/TableRolePermissionsDelegate.qml</file>
+        <file alias="imtauthgui/TableProductRolesDelegate.qml">Qml/imtauthgui/TableProductRolesDelegate.qml</file>
+        <file alias="imtauthgui/RolesDialog.qml">Qml/imtauthgui/RolesDialog.qml</file>
+		<file alias="imtauthgui/RolesDialogBody.qml">Qml/imtauthgui/RolesDialogBody.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

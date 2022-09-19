@@ -6,12 +6,13 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtauth/IRoleInfoProvider.h>
 #include <imtlic/IFeatureInfoProvider.h>
+#include <imtlic/IProductLicensingInfo.h>
 
 
 namespace imtauth
 {
-
 
 /**
 	Interface describing a role.
@@ -20,6 +21,8 @@ class IRole: virtual public iser::IObject
 {
 public:
 	typedef QSet<QByteArray> FeatureIds;
+
+	virtual const IRoleInfoProvider* GetParentRolesProvider() const = 0;
 
 	/**
 		Get list of all availiable permissions for this role.
@@ -72,16 +75,29 @@ public:
 	virtual void SetProhibitions(const FeatureIds &prohibitions) = 0;
 
 	/**
-		Get parents of role.
+		Get product ID.
 	*/
-	virtual const QList<const imtauth::IRole*> GetParents() const = 0;
+	virtual QByteArray GetProductId() const = 0;
 
 	/**
-		Set parents of role.
+		Set product of role.
 	*/
-	virtual void SetParents(const QList<const imtauth::IRole*> parents) = 0;
+	virtual void SetProductId(const QByteArray& productId) = 0;
 
+	/**
+		Get all parent roles.
+	*/
+	virtual QByteArrayList GetIncludedRoles() const  = 0;
 
+	/**
+		Insert parent role.
+	*/
+	virtual bool IncludeRole(const QByteArray& roleId) = 0;
+
+	/**
+		Remove parent role.
+	*/
+	virtual void ExcludeRole(const QByteArray& roleId) = 0;
 };
 
 

@@ -14,6 +14,8 @@ Rectangle {
 
     property int checkState: 0;
 
+    signal clicked();
+
     Image {
         anchors.centerIn: parent;
 
@@ -25,5 +27,13 @@ Rectangle {
 
         visible: container.checkState === 2;
         source: "../../../" + "Icons/" + Style.theme + "/Ok_On_Normal.svg";
+    }
+
+    MouseArea {
+        anchors.fill: parent;
+
+        onClicked: {
+            container.clicked();
+        }
     }
 }

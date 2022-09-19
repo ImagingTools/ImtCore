@@ -6,10 +6,26 @@ import Acf 1.0
 Item {
     id: rolePermissionsContainer;
 
-    property alias rolePermissions: permissionsTable.elements;
+    property int productIndex: -1;
+
+    onProductIndexChanged: {
+        container.productIndex = productIndex;
+    }
 
     function updateGui(){
         console.log("RolePermissions updateGui");
+
+        if (!documentModel.ContainsKey("Permissions")){
+            documentModel.AddTreeModel("Permissions");
+        }
+
+        permissionsTable.elements = documentModel.GetData("Permissions");
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.alternateBaseColor;
     }
 
     Flickable {
@@ -25,7 +41,7 @@ Item {
         Column {
             id: bodyColumn;
 
-            width: 500;
+            width: 400;
 
             spacing: 7;
 
@@ -35,28 +51,7 @@ Item {
                 text: qsTr("Permissions");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_subtitle;
-            }
-
-            Text {
-                id: titleProducts;
-
-                text: qsTr("Products");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
-            }
-
-            ComboBox {
-                id: products;
-
-                width: parent.width;
-                height: 23;
-
-                radius: 3;
-
-                onCurrentIndexChanged: {
-                }
             }
 
             Rectangle {
@@ -65,7 +60,7 @@ Item {
                 anchors.horizontalCenter: bodyColumn.horizontalCenter;
 
                 width: bodyColumn.width;
-                height: 300;
+                height: 200;
 
                 color: Style.imagingToolsGradient1;
 

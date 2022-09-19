@@ -28,7 +28,7 @@ Item {
         console.log("documentsData", documentsData);
 
         if (itemLoad){
-            itemId = documentsData.GetData("ItemId", model.index);
+            itemId = documentsData.GetData("Id", model.index);
             itemName = documentsData.GetData("Title", model.index);
         }
     }
@@ -60,7 +60,7 @@ Item {
 
     onItemIdChanged: {
         if (itemLoad){
-            documentsData.SetData("ItemId", itemId, model.index);
+            documentsData.SetData("Id", itemId, model.index);
         }
     }
 

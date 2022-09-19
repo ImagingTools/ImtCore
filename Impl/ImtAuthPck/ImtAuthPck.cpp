@@ -55,24 +55,24 @@ I_EXPORT_COMPONENT(
 			"Role Metainfo Creator");
 
 I_EXPORT_COMPONENT(
-            RoleCollection,
-            "List of all roles",
-            "List of all roles");
+			UserInfo,
+			"User Info",
+			"User Info");
 
 I_EXPORT_COMPONENT(
-            UserInfo,
-            "User Info",
-            "User Info");
+			UserCollection,
+			"List of all users",
+			"List of all users");
 
 I_EXPORT_COMPONENT(
-            UserCollection,
-            "List of all users",
-            "List of all users");
+			UserInfoMetaInfoCreator,
+			"User metainfo creator",
+			"User Metainfo Creator");
 
 I_EXPORT_COMPONENT(
-            UserInfoMetaInfoCreator,
-            "User metainfo creator",
-            "User Metainfo Creator");
+			RoleCollectionAdapter,
+			"Adapting the collection to the provider",
+			"Role Collection Adapter");
 
 
 } // namespace ImtAuthPck

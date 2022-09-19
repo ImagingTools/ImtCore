@@ -74,7 +74,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				QString featureDescription = featuresModelPtr->GetData("Description", i).toString();
 
 				if (featureId.isEmpty()){
-					errorMessage = QT_TR_NOOP(featureName + " has an empty Feature-ID!");
+					errorMessage = QT_TR_NOOP(featureName + " " + "has an empty Feature-ID!");
 
 					return nullptr;
 				}
@@ -85,6 +85,8 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 				featurePackagePtr->InsertNewObject("FeatureInfo", featureName, featureDescription, featureInfoPtr.GetPtr());
 
+//				QString name = featureInfoPtr->GetFeatureName();
+
 				if (dependenciesModelPtr != nullptr){
 					QStringList featureDependenciesKeys = dependenciesModelPtr->GetKeys();
 					for (const QString& key : featureDependenciesKeys){
@@ -93,6 +95,14 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 							featurePackagePtr->SetFeatureDependencies(key.toUtf8(), values);
 						}
 					}
+
+//					for (const QString& key : featureDependenciesKeys){
+//						QByteArrayList features = featurePackagePtr->GetFeatureDependencies(key.toUtf8());
+
+//						for (const QByteArray& feature : features){
+////							featurePackagePtr->GetFeatureInfo()
+//						}
+//					}
 				}
 			}
 		}
@@ -255,18 +265,18 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 
 			treeItemModel->SetData("Id", collectionId, index);
 			treeItemModel->SetData("Name", collectionId, index);
-			treeItemModel->SetData("stateChecked", 0, index);
-			treeItemModel->SetData("level", 0, index);
-			treeItemModel->SetData("visible", 1, index);
-			treeItemModel->SetData("isActive", 1, index);
-			treeItemModel->SetData("isOpened", 1, index);
+			treeItemModel->SetData("State", Qt::Unchecked, index);
+			treeItemModel->SetData("Level", 0, index);
+			treeItemModel->SetData("Visible", true, index);
+			treeItemModel->SetData("Active", true, index);
+			treeItemModel->SetData("Opened", true, index);
 
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 				const imtlic::IFeaturePackage* packagePtr  = dynamic_cast<const imtlic::IFeaturePackage*>(dataPtr.GetPtr());
 				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 
-				imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("childItemModel", index);
+				imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("ChildModel", index);
 
 				for (const QByteArray& featureCollectionId : featureCollectionIds){
 					QString featureId = packagePtr->GetFeatureInfo(featureCollectionId)->GetFeatureId();
@@ -276,11 +286,11 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 
 					childItemModel->SetData("Id", featureId, childItemIndex);
 					childItemModel->SetData("Name", featureName, childItemIndex);
-					childItemModel->SetData("stateChecked", 0, childItemIndex);
-					childItemModel->SetData("level", 1, childItemIndex);
-					childItemModel->SetData("visible", 1, childItemIndex);
-					childItemModel->SetData("isActive", 1, childItemIndex);
-					childItemModel->SetData("packageId", collectionId, childItemIndex);
+					childItemModel->SetData("State", Qt::Unchecked, childItemIndex);
+					childItemModel->SetData("Level", 1, childItemIndex);
+					childItemModel->SetData("Visible", true, childItemIndex);
+					childItemModel->SetData("Active", true, childItemIndex);
+					childItemModel->SetData("Opened", false, childItemIndex);
 				}
 			}
 		}

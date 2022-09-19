@@ -30,7 +30,7 @@ Item {
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
             let curId = treeViewModelContainer.modelTreeView.GetData("Id", i);
             if (curId == packageId){
-                var childModelItems = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
+                var childModelItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
                 if (childModelItems){
                     for (let j = 0; j < childModelItems.GetItemsCount(); j++){
                         let curFeatureId = childModelItems.GetData("Id", j);
@@ -56,7 +56,7 @@ Item {
         }
 
         for (var i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
-            var modelChildren = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
+            var modelChildren = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             var currentPackageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
             if (!modelChildren){
                 continue;
@@ -74,7 +74,7 @@ Item {
                 }
             }
 
-           treeViewModelContainer.modelTreeView.SetData("childItemModel", modelChildren, i);
+           treeViewModelContainer.modelTreeView.SetData("ChildModel", modelChildren, i);
         }
     }
 
@@ -82,7 +82,7 @@ Item {
         console.log("selectFeature", feature);
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
             let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
-            let childItems = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
+            let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             if (childItems){
                 let featureFind = false;
                 for (let j = 0; j < childItems.GetItemsCount(); j++){
@@ -90,20 +90,20 @@ Item {
                    // let value = packageId + "." + featureId;
                     if (feature == featureId){
                         featureFind = true;
-                        childItems.SetData("stateChecked", 2, j);
-                        childItems.SetData("isActive", 1, j);
+                        childItems.SetData("State", 2, j);
+                        childItems.SetData("Active", true, j);
                         let downDepends = []
                         featureDependenciesModel.getFeaturesDependsByFeature(feature, downDepends)
                         console.log("downDepends", downDepends);
                         if (downDepends.length > 0){
-                            treeViewModelContainer.updateDataFeatureList(downDepends, 2, 0);
+                            treeViewModelContainer.updateDataFeatureList(downDepends, 2, false);
                         }
                         break;
                     }
                 }
 
                 if (featureFind){
-                    treeViewModelContainer.modelTreeView.SetData("childItemModel", childItems, i);
+                    treeViewModelContainer.modelTreeView.SetData("ChildModel", childItems, i);
                 }
             }
         }
@@ -113,7 +113,7 @@ Item {
         console.log("deselectFeature", feature);
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
             let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
-            let childItems = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
+            let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             if (childItems){
                 let featureFind = false;
                 for (let j = 0; j < childItems.GetItemsCount(); j++){
@@ -122,18 +122,18 @@ Item {
 
                     if (feature == value){
                         featureFind = true;
-                        childItems.SetData("stateChecked", 0, j);
+                        childItems.SetData("State", 0, j);
                         let upDepends = []
                         featureDependenciesModel.getFeaturesDependsByFeature(feature, upDepends)
                         if (upDepends.length > 0){
-                            treeViewModelContainer.updateDataFeatureList(upDepends, 0, 1);
+                            treeViewModelContainer.updateDataFeatureList(upDepends, 0, true);
                         }
                         break;
                     }
                 }
 
                 if (featureFind){
-                    treeViewModelContainer.modelTreeView.SetData("childItemModel", childItems, i);
+                    treeViewModelContainer.modelTreeView.SetData("ChildModel", childItems, i);
                 }
             }
         }
@@ -147,7 +147,7 @@ Item {
         }
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
             let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
-            let childItems = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
+            let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             if (childItems){
                 for (let j = 0; j < childItems.GetItemsCount(); j++){
                     let featureId = childItems.GetData("Id", j);
@@ -155,11 +155,11 @@ Item {
 
                     if (features.indexOf(value) >= 0){
                         console.log("value stateChecked changed ->", stateChecked);
-                        childItems.SetData("stateChecked", stateChecked, j);
-                        childItems.SetData("isActive", isActive, j);
+                        childItems.SetData("State", stateChecked, j);
+                        childItems.SetData("Active", isActive, j);
                     }
                 }
-                treeViewModelContainer.modelTreeView.SetData("childItemModel", childItems, i);
+                treeViewModelContainer.modelTreeView.SetData("ChildModel", childItems, i);
             }
         }
     }
@@ -169,12 +169,12 @@ Item {
     */
     function resetProperties(){
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
-            let childrenItems = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
+            let childrenItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             if (childrenItems){
                 for (let j = 0; j < childrenItems.GetItemsCount(); j++){
-                    childrenItems.SetData("stateChecked", 0, j);
-                    childrenItems.SetData("isActive", 1, j);
-                    childrenItems.SetData("visible", 1, j);
+                    childrenItems.SetData("State", 0, j);
+                    childrenItems.SetData("Active", true, j);
+                    childrenItems.SetData("Visible", true, j);
                 }
             }
         }
@@ -187,18 +187,17 @@ Item {
             var currentPackageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
 
             if (currentPackageId === packageId){
-                var modelChildren = treeViewModelContainer.modelTreeView.GetData("childItemModel", i);
+                var modelChildren = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
 
                 if (modelChildren){
                     let childIndex = modelChildren.InsertNewItem();
 
                     modelChildren.SetData("Id", featureId, childIndex);
                     modelChildren.SetData("Name", featureName, childIndex);
-                    modelChildren.SetData("stateChecked", 0, childIndex);
-                    modelChildren.SetData("level", 1, childIndex);
-                    modelChildren.SetData("visible", 0, childIndex);
-                    modelChildren.SetData("isActive", 1, childIndex);
-                    modelChildren.SetData("packageId", packageId, childIndex);
+                    modelChildren.SetData("State", 0, childIndex);
+                    modelChildren.SetData("Level", 1, childIndex);
+                    modelChildren.SetData("Visible", false, childIndex);
+                    modelChildren.SetData("Active", true, childIndex);
                     break;
                 }
             }

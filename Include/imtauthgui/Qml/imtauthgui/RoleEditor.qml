@@ -6,10 +6,32 @@ import Acf 1.0
 Item {
     id: roleEditorContainer;
 
+    anchors.fill: parent;
+
+    Component.onCompleted: {
+        container.includedRolesTable = includesTable;
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.alternateBaseColor;
+    }
+
     function updateGui(){
         console.log("RoleEditor updateGui");
         roleIdInput.text = documentModel.GetData("Id");
         roleNameInput.text = documentModel.GetData("Name");
+
+        productNameInput.text = documentModel.GetData("ProductId");
+
+        let parents = documentModel.GetData("Parents");
+
+        if (!parents){
+            documentModel.AddTreeModel("Parents");
+        }
+
+        includesTable.elements = documentModel.GetData("Parents");
     }
 
     Flickable {
@@ -24,9 +46,27 @@ Item {
         Column {
             id: bodyColumn;
 
-            width: 500;
+            width: 400;
 
             spacing: 7;
+
+            Text {
+                id: titleProductId;
+
+                text: qsTr("Product-ID");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
+
+            CustomTextField {
+                id: productNameInput;
+
+                width: parent.width;
+                height: 30;
+
+                readOnly: true;
+            }
 
             Text {
                 id: titleRoleId;
@@ -70,6 +110,52 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Name", roleNameInput.text);
                 }
+            }
+
+            Text {
+                id: titleIncludes;
+
+                text: qsTr("Included roles");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
+
+            Rectangle {
+                id: tableBg;
+
+                width: bodyColumn.width;
+                height: 200;
+
+                color: Style.imagingToolsGradient1;
+
+                border.width: 1;
+                border.color: Style.borderColor;
+
+                TreeItemModel {
+                    id: headersModelRoles;
+
+                    Component.onCompleted: {
+                        let index = headersModelRoles.InsertNewItem();
+                        headersModelRoles.SetData("Id", "Name", index)
+                        headersModelRoles.SetData("Name", "Name", index)
+                    }
+                }
+
+                AuxTable {
+                    id: includesTable;
+
+                    anchors.fill: parent;
+                    anchors.margins: 2;
+
+                    headers: headersModelRoles;
+
+                    onSelectedIndexChanged: {
+                        console.log("includesTable onSelectedIndexChanged");
+
+//                        container.selectedIndex = includesTable.selectedIndex;
+                    }
+                }//AuxTable includesTable
             }
         }//Column bodyColumn
     }//Flickable

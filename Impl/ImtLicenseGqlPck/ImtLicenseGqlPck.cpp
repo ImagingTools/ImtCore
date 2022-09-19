@@ -75,6 +75,12 @@ I_EXPORT_COMPONENT(
 		"Features Export Provider");
 
 
+I_EXPORT_COMPONENT(
+		ProductFeaturesController,
+		"ProductFeaturesController",
+		"Product Features Controller");
+
+
 } // namespace ImtLicenseGqlPck
 
 

@@ -98,6 +98,56 @@ FocusScope {
 
             KeyNavigation.tab: inputName;
         }
+
+        TreeItemModel {
+            id: featureTableHeaders;
+
+            Component.onCompleted: {
+                let index = featureTableHeaders.InsertNewItem();
+                featureTableHeaders.SetData("Name", "Name", index);
+                featureTableHeaders.SetData("Id", "Name", index);
+            }
+        }
+
+        AuxTable {
+            id: featureTable;
+
+            width: bodyColumn.width;
+            height: 200;
+
+            headers: featureTableHeaders;
+            elements: model;
+
+            itemHeight: 25;
+
+            delegate: Item {
+
+                height: 25;
+                width: bodyColumn.width;
+
+                CheckBox {
+                    id: checkBox;
+
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 10;
+                    anchors.verticalCenter: parent.verticalCenter;
+                }
+
+                Text {
+                    id: title;
+
+                    anchors.left: checkBox.right;
+                    anchors.leftMargin: 10;
+                    anchors.verticalCenter: parent.verticalCenter;
+
+                    text: model.Name;
+                    color: Style.textColor;
+
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_common;
+                }
+            }
+        }
     }
 
     function checkValidId(inputId){

@@ -56,14 +56,14 @@ Rectangle {
             anchors.left: leftPart.left;
             anchors.leftMargin: 10;
 
-            checkState: model.PermissionState;
+            checkState: model.State;
 
             MouseArea {
                 anchors.fill: parent;
 
                 onClicked: {
                     console.log("TableRolePermissionsDelegate CheckBox onClicked");
-                    model.PermissionState = 2 - checkBoxPermission.checkState;
+                    model.State = 2 - checkBoxPermission.checkState;
                 }
             }
         }
@@ -75,7 +75,7 @@ Rectangle {
             anchors.left: checkBoxPermission.right;
             anchors.leftMargin: 10;
 
-            text: model.Name;
+            text: model.Id;
 
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
