@@ -137,7 +137,7 @@ void CObjectCollectionMetaInfoViewComp::OnGuiCreated()
 	shadowPtr->setColor(QColor("#555555"));
 
 	PreviewFrame->setGraphicsEffect(shadowPtr);
-	}
+}
 
 
 void CObjectCollectionMetaInfoViewComp::OnGuiDestroyed()
@@ -158,15 +158,6 @@ void CObjectCollectionMetaInfoViewComp::OnGuiRetranslate()
 		UpdateGui(istd::IChangeable::GetAnyChange());
 	}
 }
-
-
-void CObjectCollectionMetaInfoViewComp::OnGuiDesignChanged()
-{
-	BaseClass::OnGuiDesignChanged();
-
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionMetaInfoView");
-}
-
 
 
 // reimplemented (iqtgui::TGuiObserverWrap)

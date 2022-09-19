@@ -102,13 +102,15 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
-			retVal.query += QString("INSERT INTO \"%1\"(Id, %2, %3, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8');")
+			retVal.query += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
 				.arg(qPrintable(revisionUuid))
 				.arg(qPrintable(objectId))
 				.arg(qPrintable(documentContent.toBase64()))
+				.arg(1)
+				.arg(QObject::tr("Initial revision"))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(checksum)
 				.toLocal8Bit();
@@ -169,39 +171,53 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	QByteArray documentContent;
 	if (WriteDataToMemory(object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+		QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
-		retVal = QString("UPDATE \"%1\" SET %2 = '%3', LastModified = '%4', Checksum = '%5' WHERE %6 = '%7';")
+		retVal = QString("UPDATE \"%1\" SET LastRevisionId = '%2' WHERE %3 = '%4';")
 					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
-					.arg(qPrintable(documentContent.toBase64()))
-					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-					.arg(checksum)
+					.arg(qPrintable(revisionUuid))
 					.arg(qPrintable(s_idColumn))
 					.arg(qPrintable(objectId))
 					.toLocal8Bit();
 
-		if (m_metaInfoTableDelegateCompPtr.IsValid()){
+		retVal += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
+			.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+			.arg(qPrintable(s_documentIdColumn))
+			.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
+			.arg(qPrintable(revisionUuid))
+			.arg(qPrintable(objectId))
+			.arg(qPrintable(documentContent.toBase64()))
+			.arg(777777)
+			.arg(QObject::tr("...."))
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+			.arg(checksum)
+			.toLocal8Bit();
+
+		if (m_metaInfoTableDelegateCompPtr.IsValid()) {
 			idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(&object, collection.GetObjectTypeId(objectId));
-			if (metaInfoPtr.IsValid()){
+			if (metaInfoPtr.IsValid()) {
 				retVal += "\n";
 
-				QByteArrayList columnIds = m_metaInfoTableDelegateCompPtr->GetColumnIds();
+				QByteArrayList columnIds = { s_idColumn, "RevisionId" };
+				columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
-				QStringList valueTuples;
-				for (const QByteArray& columnId : columnIds){
+				QStringList tableValues;
+				tableValues.push_back("'" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "'");
+				tableValues.push_back("'" + revisionUuid + "'");
+
+				for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()) {
 					QVariant data = metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId));
 
 					QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
 
-					valueTuples.push_back(columnId + " = " + "'" + value + "'");
+					tableValues.push_back("'" + value + "'");
 				}
 
-				retVal += QString("UPDATE \"%1\" SET %2 WHERE %3 = '%4';")
-							.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
-							.arg(valueTuples.join(", "))
-							.arg(qPrintable(s_documentIdColumn))
-							.arg(qPrintable(objectId))
-							.toLocal8Bit();
+				retVal += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
+					.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+					.arg(qPrintable(columnIds.join(", ")))
+					.arg(tableValues.join(", "))
+					.toLocal8Bit();
 			}
 		}
 	}
@@ -361,7 +377,7 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 				.arg(qPrintable(*m_tableNameAttrPtr));
 	}
 
-	return QString("SELECT \"%1\".*, \"%2\".document, \"%2\".lastmodified, \"%2\".checksum %3 FROM \"%1\" JOIN \"%2\" ON \"%1\".LastRevisionId = \"%2\".Id %4")
+	return QString("SELECT \"%1\".*, \"%2\".document, \"%2\".lastmodified, \"%2\".checksum, \"%2\".RevisionNumber, \"%2\".Comment %3 FROM \"%1\" JOIN \"%2\" ON \"%1\".LastRevisionId = \"%2\".Id %4")
 		.arg(qPrintable(*m_tableNameAttrPtr))
 		.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 		.arg(metaInfoValuesQuery)

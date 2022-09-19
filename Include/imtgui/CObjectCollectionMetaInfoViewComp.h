@@ -39,7 +39,6 @@ protected:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
-	virtual void OnGuiDesignChanged() override;
 
 private:
 	I_MULTIATTR(int, m_ignoreIdsAttrPtr);

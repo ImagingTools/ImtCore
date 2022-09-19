@@ -11,7 +11,6 @@
 #include <iprm/IOptionsList.h>
 #include <istd/CChangeGroup.h>
 #include <istd/CSystem.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 #include <ifilegui/CFileDialogLoaderComp.h>
 
 // ImtCore includes

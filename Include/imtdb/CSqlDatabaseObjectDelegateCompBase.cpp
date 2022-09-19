@@ -182,11 +182,17 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, insertionTime);
 	}
 
-	if (record.contains("LastModified")){
+	if (record.contains("LastModified")) {
 		QDateTime lastModificationTime = record.value("LastModified").toDateTime();
 
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModificationTime);
+	}
+
+	if (record.contains("RevisionNumber")) {
+		qlonglong revisionNumber = record.value("RevisionNumber").toLongLong();
+
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION, revisionNumber);
 	}
 
 	return true;
