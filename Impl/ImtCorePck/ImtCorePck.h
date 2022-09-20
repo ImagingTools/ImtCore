@@ -30,6 +30,7 @@
 #include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CCollectionDataControllerComp.h>
 #include <imtbase/CQtResourceLoaderComp.h>
+#include <imtbase/CUrlParamComp.h>
 
 
 /**
@@ -73,6 +74,7 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable>> TimeFilterParam;
 typedef imtbase::CCollectionDataControllerComp CollectionDataController;
 typedef imtbase::CQtResourceLoaderComp QtResourceLoaderComp;
+typedef icomp::TModelCompWrap<imtbase::CUrlParamComp> UrlParam;
 
 
 } // namespace ImtCorePck
