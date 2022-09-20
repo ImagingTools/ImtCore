@@ -16,6 +16,7 @@ Rectangle {
     property bool highlighted: ma.containsMouse;
     property bool hasIcon: auxButtonContainer.iconSource !== "";
     property bool hasText: false;
+    property bool fontBold: false;
     property bool borderExist: false;
     property bool enabled: true;
     property bool pressed: false;
@@ -29,6 +30,7 @@ Rectangle {
     property int fontPixelSize: Style.fontSize_common;
 
     property alias iconSource: image.source;
+    property alias fontColor: text.color;
 
     signal clicked;
 
@@ -58,6 +60,8 @@ Rectangle {
     }
 
     Text {
+        id: text;
+
         anchors.horizontalCenter: auxButtonContainer.horizontalCenter;
         anchors.verticalCenter: auxButtonContainer.verticalCenter;
 
@@ -65,6 +69,7 @@ Rectangle {
 
         font.pixelSize: auxButtonContainer.fontPixelSize;
         font.family: Style.fontFamily;
+        font.bold: auxButtonContainer.fontBold;
         text: auxButtonContainer.textButton;
 
         visible: auxButtonContainer.hasText;
