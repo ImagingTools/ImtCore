@@ -15,18 +15,27 @@ Item {
     property alias textInputValidator: textField.validator;
     property alias readOnly: textField.readOnly;
     property alias horizontalAlignment: textField.horizontalAlignment;
+    property alias borderWidth: mainRect.border.width;
+    property alias color: mainRect.color;
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;
+
+    property string fontColor: Style.textColor;
+    property string placeHolderFontColor: "gray";
 
     property color borderColor: Style.iconColorOnSelected;
 
     property int radius: 0;
     property int textSize: 15;
-    property int placeHolderTextSize: Style.fontSize_common;
+    property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
+    property int margin: 5;
 
-    property alias borderWidth: mainRect.border.width;
+    property bool fontBold: false;
+
+    property real placeHolderOpacity: 1;
+
 
     signal accepted();
     signal textEdited();
@@ -67,11 +76,12 @@ Item {
         id: textField;
 
         anchors.fill: parent;
-        anchors.leftMargin: 5;
-        anchors.rightMargin: 5;
+        anchors.leftMargin: containerTextField.margin;
+        anchors.rightMargin: containerTextField.margin;
 
-        color: Style.textColor;
+        color: containerTextField.fontColor;
         font.pixelSize: containerTextField.textSize;
+        font.bold: containerTextField.fontBold;
         font.family: Style.fontFamily;
 
         echoMode: containerTextField.echoMode;
@@ -104,10 +114,12 @@ Item {
             text: containerTextField.placeHolderText;
 
             font.pixelSize: containerTextField.placeHolderTextSize;
+            font.bold: containerTextField.fontBold;
             font.family: Style.fontFamily;
 
             //TODO -> Style
-            color: "gray";
+            color: containerTextField.placeHolderFontColor;
+            opacity: containerTextField.placeHolderOpacity;
 
             visible: textField.text == "";
         }
