@@ -131,6 +131,13 @@ void CInternetConnectionCheckerComp::SendRequest()
 		QNetworkRequest request;
 		request.setUrl(*m_urlAttrPtr);
 
+		if (m_urlParamCompPtr.IsValid()){
+			QUrl url = m_urlParamCompPtr->GetUrl();
+			if (url.isValid() && (url.scheme() == "http" || url.scheme() == "https")){
+				request.setUrl(url);
+			}
+		}
+
 #if QT_VERSION > QT_VERSION_CHECK(5, 14, 0)
 		request.setTransferTimeout(m_requestTimeout);
 #endif

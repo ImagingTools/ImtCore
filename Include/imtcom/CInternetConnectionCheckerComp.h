@@ -9,6 +9,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtbase/IUrlParam.h>
 #include <imtcom/IInternetConnectionStatusProvider.h>
 
 
@@ -27,7 +28,8 @@ public:
 
 	I_BEGIN_COMPONENT(CInternetConnectionCheckerComp);
 		I_REGISTER_INTERFACE(IInternetConnectionStatusProvider);
-		I_ASSIGN(m_urlAttrPtr, "Url", "URL to check availability", true, "https://google.com");
+		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "URL Param", false, "UrlParam");
+		I_ASSIGN(m_urlAttrPtr, "Url", "URL to check availability, if UrlParam is invalid", true, "https://google.com");
 		I_ASSIGN(m_requestTimeoutAttrPtr, "RequestTimeout", "Request timeout", true, 1000)
 		I_ASSIGN(m_requestDelayAttrPtr, "RequestDelay", "Delay between two consecutive requests", true, 1000);
 		I_ASSIGN(m_retryCountAttrPtr, "RetryCount", "Number of retries after failure before going offline", true, 10);
@@ -51,6 +53,7 @@ private:
 	void SendRequest();
 
 private:
+	I_REF(imtbase::IUrlParam, m_urlParamCompPtr);
 	I_ATTR(QString, m_urlAttrPtr);
 	I_ATTR(int, m_requestTimeoutAttrPtr);
 	I_ATTR(int, m_requestDelayAttrPtr);
