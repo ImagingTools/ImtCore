@@ -4,6 +4,7 @@
 #include "labelblock.h"
 #include "intvarlen.h"
 #include <QLocale>
+#include <QIODevice>
 #include <QGuiApplication>
 
 /* a=target variable, b=bit number to act upon 0-n */

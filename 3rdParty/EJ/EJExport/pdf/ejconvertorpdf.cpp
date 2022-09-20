@@ -4,7 +4,11 @@
 #include "ejtableblocks.h"
 #include "export_global.h"
 #include "ejstoragehelper.h"
+
+#include <QtCore>
+
 const QString EjConvertorPdf::format = "pdf";
+
 /*НОВАЯ ТЕСТОВАЯ ИНФОРМАЦИЯ
 FFFFFFFFFFFFFFFFFFFFFF*/
 
@@ -28,7 +32,11 @@ bool EjConvertorPdf::write(EjDocument *doc, QString file_name, QPrinter *print)
     {
        printer = print;
        printer->setOutputFormat(QPrinter::NativeFormat);
+#if QT_VERSION < 0x060000
        printer->setPageMargins (0, 15, 0, 0, QPrinter::Unit::Millimeter);
+#else
+	   printer->setPageMargins (QMarginsF(0, 15, 0, 0));
+#endif
     }else
     {
         printer->setOutputFileName(file_name);
@@ -64,8 +72,13 @@ bool EjConvertorPdf::write(EjDocument *doc, QString file_name, QPrinter *print)
 void EjConvertorPdf::setSettings(EjDocument *doc, QPrinter *printer)
 {
     printer->setOutputFormat(QPrinter::PdfFormat);
+#if QT_VERSION < 0x060000
     printer->setOrientation(QPrinter::Portrait);
     printer->setPageMargins (0, 15, 0, 0, QPrinter::Unit::Millimeter);
+#else
+	printer->setPageOrientation(QPageLayout::Portrait);
+	printer->setPageMargins (QMarginsF(0, 15, 0, 0));
+#endif
     printer->setFullPage(false);
 }
 

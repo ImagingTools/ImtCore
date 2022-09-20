@@ -1,6 +1,8 @@
 #include "ejtableblocks.h"
 #include "intvarlen.h"
 
+#include "QIODevice"
+
 
 EjTableBlock::EjTableBlock() : EjGroupBlock()
 {

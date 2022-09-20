@@ -64,17 +64,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 	MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
-set(outlibdir "${PROJECT_SOURCE_DIR}/../libs")
+#set(outlibdir "${PROJECT_SOURCE_DIR}/../libs/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
 
-set_target_properties( ${PROJECT_NAME}
-	PROPERTIES
-	ARCHIVE_OUTPUT_DIRECTORY ${outlibdir}
-	LIBRARY_OUTPUT_DIRECTORY ${outlibdir}
-	RUNTIME_OUTPUT_DIRECTORY ${outlibdir}
-	POSITION_INDEPENDENT_CODE ON
-)
+#set_target_properties( ${PROJECT_NAME}
+#	PROPERTIES
+#	ARCHIVE_OUTPUT_DIRECTORY ${outlibdir}
+#	LIBRARY_OUTPUT_DIRECTORY ${outlibdir}
+#	RUNTIME_OUTPUT_DIRECTORY ${outlibdir}
+#	POSITION_INDEPENDENT_CODE ON
+#)
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_import_qml_plugins(${PROJECT_NAME})
-    qt_finalize_executable(${PROJECT_NAME})
+#    qt_import_qml_plugins(${PROJECT_NAME})
+#    qt_finalize_executable(${PROJECT_NAME})
 endif()
