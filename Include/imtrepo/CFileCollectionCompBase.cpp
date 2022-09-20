@@ -22,6 +22,7 @@
 // ImtCore includes
 #include <imtcore/Version.h>
 #include <imtbase/CTempDir.h>
+#include <imtbase/CObjectCollection.h>
 
 
 namespace imtrepo
@@ -598,7 +599,19 @@ bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const is
 
 imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
 {
-    return nullptr;
+	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
+	m_filesLock.lockForRead();
+
+	int objectsCount = count >= 0 ? qMin(count, m_files.count()) : m_files.count();
+
+	for (int fileIndex = offset; fileIndex < objectsCount; ++fileIndex){
+		collectionPtr->InsertNewObject(m_files[fileIndex].typeId, m_files[fileIndex].objectName, "", m_files[fileIndex].CloneMe());
+	}
+
+	m_filesLock.unlock();
+
+	return collectionPtr;
+
 }
 
 

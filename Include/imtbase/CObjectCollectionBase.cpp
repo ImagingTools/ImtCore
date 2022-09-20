@@ -14,6 +14,7 @@
 // ImtCore includes
 #include <imtcore/Version.h>
 #include <imtbase/MetaTypes.h>
+#include <imtbase/CObjectCollection.h>
 
 
 namespace imtbase
@@ -251,7 +252,17 @@ bool CObjectCollectionBase::SetObjectData(const Id& objectId, const istd::IChang
 
 IObjectCollection *CObjectCollectionBase::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
 {
-    return nullptr;
+	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
+
+	Q_ASSERT(offset >= 0);
+
+	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
+
+	for (int i = offset; i < objectsCount; i++){
+		collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].objectPtr);
+	}
+
+	return collectionPtr;
 }
 
 
