@@ -11,7 +11,7 @@ bool ParagraphDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node,
     node = node.firstChild();
     while (!node.isNull())
     {
-       qDebug() << node.toElement().tagName();
+//       qDebug() << node.toElement().tagName();
        WordDocumentReader *editor = editors->value(node.toElement().tagName());
        if(editor != nullptr)
        {
@@ -38,7 +38,7 @@ bool TableDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node, QMa
     node = node.firstChild();
     while (!node.isNull())
     {
-       qDebug() << node.toElement().tagName();
+//       qDebug() << node.toElement().tagName();
        WordDocumentReader *editor = editors->value(node.toElement().tagName());
        if(editor != nullptr)
        {
@@ -87,7 +87,7 @@ bool TableRowDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node, 
     node = node.firstChild();
     while (!node.isNull())
     {
-       qDebug() << node.toElement().tagName();
+//       qDebug() << node.toElement().tagName();
        WordDocumentReader *editor = editors->value(node.toElement().tagName());
        if(editor != nullptr){
            result &= editor->edit(document, node, editors);
@@ -111,7 +111,7 @@ bool TableCellDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node,
     node = node.firstChild();
     while (!node.isNull())
     {
-       qDebug() << node.toElement().tagName();
+//       qDebug() << node.toElement().tagName();
        WordDocumentReader *editor = editors->value(node.toElement().tagName());
        if(editor != nullptr)
        {
@@ -230,8 +230,8 @@ bool tcPrDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node, QMap
                 break;
             }
         }
-        qDebug() << "Коорд: " <<  document.getIndexRow() << " " <<  document.getIndexCol();
-        qDebug() << "Merge: " << row << " " << col;
+//        qDebug() << "Коорд: " <<  document.getIndexRow() << " " <<  document.getIndexCol();
+//        qDebug() << "Merge: " << row << " " << col;
         document.merge(row, col);
     }
     document.applyCellStyles();
@@ -244,7 +244,7 @@ bool RDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node, QMap<QS
     node = node.firstChild();
     while (!node.isNull())
     {
-       qDebug() << node.toElement().tagName();
+//       qDebug() << node.toElement().tagName();
        WordDocumentReader *editor = editors->value(node.toElement().tagName());
        if(editor != nullptr){
            result &= editor->edit(document, node, editors);
@@ -257,7 +257,7 @@ bool RDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node, QMap<QS
 bool TextDocumentReader::edit(EjDocxToUjfDocument &document, QDomNode node, QMap<QString, WordDocumentReader*> *editors)
 {
     QString text = node.firstChild().nodeValue();
-    qDebug() << text;
+//    qDebug() << text;
     document.setText(text);
     return true;
 }

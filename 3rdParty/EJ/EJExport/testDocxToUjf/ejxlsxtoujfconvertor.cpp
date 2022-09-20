@@ -48,10 +48,10 @@ bool EjXlsxToUjfConvertor::readStylesDocument(QString fileName)
         return false;
     }
     bool result = true;
-    qDebug() <<  "----------";
+//    qDebug() <<  "----------";
       QDomNode node = dom.documentElement().firstChild();
       while (!node.isNull()) {
-         qDebug() << node.toElement().tagName();
+//         qDebug() << node.toElement().tagName();
          StylesExcelDocumentReader *editor = editors.value(node.toElement().tagName());
          if(editor != nullptr){
              result &= editor->read(stylesDocument, node);
@@ -77,7 +77,7 @@ bool EjXlsxToUjfConvertor::readStringsDocument(QString fileName)
     bool result = true;
       QDomNode node = dom.documentElement().firstChild();
       while (!node.isNull()) {
-         qDebug() << node.toElement().tagName();
+//         qDebug() << node.toElement().tagName();
          StringsExcelDocumentReader *editor = editorsStrings.value(node.toElement().tagName());
          if(editor != nullptr){
              result &= editor->read(sharedStrings, node, &editorsStrings);
@@ -90,7 +90,7 @@ bool EjXlsxToUjfConvertor::readStringsDocument(QString fileName)
 
 bool EjXlsxToUjfConvertor::readSheetDocument(EjDocument *doc, QString fileName)
 {
-    qDebug() <<  "READ SHEET XLSX DOC";
+//    qDebug() <<  "READ SHEET XLSX DOC";
     QFile xmlfile(fileName);
     if(!xmlfile.exists()){
         return false;
@@ -104,7 +104,7 @@ bool EjXlsxToUjfConvertor::readSheetDocument(EjDocument *doc, QString fileName)
     bool result = true;
      QDomNode node = dom.documentElement().firstChild();
       while (!node.isNull()) {
-         qDebug() << node.toElement().tagName();
+//         qDebug() << node.toElement().tagName();
          SheetExcelDocumentReader *editor = editorsSheet.value(node.toElement().tagName());
          if(editor != nullptr){
              result &= editor->read(document, stylesDocument, sharedStrings, node, &editorsSheet);

@@ -15,7 +15,7 @@ bool FontsStyleDocumentReader::read(StylesExcel& document, QDomNode node)
         Font m_font;
         for(int j = 0; j < childs.size(); j++){
             QDomNode childsNode = childs.at(j);
-            qDebug() << childsNode.nodeName();
+//            qDebug() << childsNode.nodeName();
             if (childsNode.nodeName() == "sz") {
                 m_font.setSize(childsNode.attributes().namedItem("val").nodeValue().toInt());
             } else if(childsNode.nodeName() == "color"){
@@ -62,7 +62,7 @@ bool BordersStyleDocumentReader::read(StylesExcel& document, QDomNode node)
         Borders m_border;
         for(int j = 0; j < childs.size(); j++){
             QDomNode childsNode = childs.at(j);
-            qDebug() << childsNode.nodeName();
+//            qDebug() << childsNode.nodeName();
             int width = document.getWidthByString(childsNode.attributes().namedItem("style").nodeValue());
             if(childsNode.nodeName() == "left") {
                 m_border.setLeft(width);

@@ -1428,9 +1428,9 @@ int EjTableBlock::nextCell(int index)
         index++;
     while(index < endBlock() && m_doc->lBlocks->at(index)->type != BASECELL && m_doc->lBlocks->at(index)->type != END_GROUP)
     {
-        qDebug() << "Index: " << index;
+//        qDebug() << "Index: " << index;
         index++;
-        qDebug() << "Index: " << index;
+//        qDebug() << "Index: " << index;
     }
     return index;
 }

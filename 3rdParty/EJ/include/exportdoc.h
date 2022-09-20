@@ -2,7 +2,7 @@
 #define EXPORTDOC_H
 #include <QString>
 #include <QPrinter>
-#include "common.h"
+#include "ejcommon.h"
 
 #if defined(EXPORT_LIBRARY)
 #  define EXPORTSHARED_EXPORT Q_DECL_EXPORT

@@ -15,7 +15,7 @@ int TextWriterExcel::edit(EjSheetDocument *sheet_document, EjSharedStringsDocume
     if(!sheet_document->getActiveTable()){
         sharedStrings_document->startNewString = true;
          sharedStrings_document->addText(text_block->text, false);
-         qDebug() << text_block->text;
+//         qDebug() << text_block->text;
     }
     else{
           EjUtils utils;
@@ -67,7 +67,7 @@ int CellWriterExcel::edit(EjSheetDocument *sheet_document, EjSharedStringsDocume
     sheet_document->setFillId(fillId);
     sheet_document->setBorderId(borderId);
     sharedStrings_document->setTempTextFromCell(cell_block->getText());
-    qDebug() << cell_block->getText();
+//    qDebug() << cell_block->getText();
     if(cell_block->getText().isEmpty()){
         int styleId = styles_document->addXfToCellXfs(fillId,
                                                       borderId);

@@ -39,10 +39,10 @@ bool EjDocxToUjfConvertor::readDoc(EjDocument* doc, QString fileName)
     }
     document.controlSetDocument(doc);
     bool result = true;
-     qDebug() <<  "----------";
+//     qDebug() <<  "----------";
       QDomNode node = dom.documentElement().firstChildElement("w:body").firstChild();
       while (!node.isNull()) {
-         qDebug() << node.toElement().tagName();
+//         qDebug() << node.toElement().tagName();
          WordDocumentReader *editor = editors.value(node.toElement().tagName());
          if(editor != nullptr){
              result &= editor->edit(document, node, &editors);

@@ -58,7 +58,7 @@ bool EjConvertorPdf::write(EjDocument *doc, QString file_name, QPrinter *print)
               printer->newPage();
               page_index++;
         }
-        qDebug() << block->type;
+//        qDebug() << block->type;
 		EjPdfDocumentWriter *editor = editors.value(block->type, nullptr);
         if (editor != nullptr)
         {

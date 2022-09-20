@@ -73,7 +73,7 @@ StyleWriterWord::~StyleWriterWord() {
 }
 
 bool StyleParagraphWriterWord::edit(EjWordDocument& document, EjNumStyleBlock *block) {
-    qDebug() << "Алигн: " << ((EjParagraphStyle*)block->style)->m_align;
+//    qDebug() << "Алигн: " << ((EjParagraphStyle*)block->style)->m_align;
     return document.setAilgn(((EjParagraphStyle*)block->style)->m_align);
 }
 

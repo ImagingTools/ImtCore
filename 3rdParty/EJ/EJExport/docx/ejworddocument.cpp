@@ -630,7 +630,7 @@ bool EjWordDocument::addImage(QString const& name) {
         v_imagedata.setAttribute("r:id", "rId" + QString::number(relations[name]));
         blocks[blocks.size()-1].appendChild(v_imagedata);
     }
-    qDebug() << name;
+//    qDebug() << name;
 
     return true;
 }

@@ -23,7 +23,7 @@ bool EjConvertorExcel::readDoc(EjDocument *doc){
 
     for(int i = 0; i < list->size(); i++){
 		EjBlock* block = list->at(i);
-        qDebug() << block->type;
+//        qDebug() << block->type;
 		EjExcelDocumentWriter *editor =editors.value(block->type, nullptr);
         if(editor != nullptr){
             editor->edit(&sheet_document, &sharedStrings_document, &styles_document, list, i);

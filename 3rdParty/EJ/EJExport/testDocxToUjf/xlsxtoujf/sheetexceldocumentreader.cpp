@@ -27,7 +27,7 @@ bool SheetDataExcelDocumentReader::read(XlsxToUjfDocument &document, StylesExcel
     bool result = true;
     node = node.firstChild();
       while (!node.isNull()) {
-         qDebug() << node.toElement().tagName();
+//         qDebug() << node.toElement().tagName();
          SheetExcelDocumentReader *editor = editorsSheet->value(node.toElement().tagName());
          if(editor != nullptr){
              result &= editor->read(document, styles, strings, node, editorsSheet);
@@ -43,7 +43,7 @@ bool RowExcelDocumentReader::read(XlsxToUjfDocument &document, StylesExcel& styl
     document.indexRowIncr();
     node = node.firstChild();
       while (!node.isNull()) {
-         qDebug() << node.toElement().tagName();
+//         qDebug() << node.toElement().tagName();
          SheetExcelDocumentReader *editor = editorsSheet->value(node.toElement().tagName());
          if(editor != nullptr){
              result &= editor->read(document, styles, strings, node, editorsSheet);

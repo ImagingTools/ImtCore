@@ -29,7 +29,7 @@ bool EjConvertorCSV::write(EjDocument *doc) {
    int i = 0;
    while (i < list->size()) {
 	   EjBlock *block = list->at(i);
-       qDebug() << block->type;
+//       qDebug() << block->type;
 	   EjCSVDocumentWriter *editor = editors.value(block->type, nullptr);
        if (editor != nullptr) {
             i = editor->edit(document, *list, i);

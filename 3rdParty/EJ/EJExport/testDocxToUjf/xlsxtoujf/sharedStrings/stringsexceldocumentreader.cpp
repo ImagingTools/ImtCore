@@ -15,7 +15,7 @@ bool TagSiExcelDocumentReader::read(SharedStrings& document, QDomNode node,
        }
        node = node.nextSibling();
     }
-    qDebug() << "Добавленный текст" <<document.curText;
+//    qDebug() << "Добавленный текст" <<document.curText;
     document.addString(document.curText);
     return result;
 }

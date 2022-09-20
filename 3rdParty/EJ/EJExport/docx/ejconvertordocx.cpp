@@ -12,7 +12,7 @@ bool EjConvertorDocx::unzip() const {
 }
 
 bool EjConvertorDocx::zip(QString const& file_name) const {
-    qDebug() << "FileName to ZIP: " << file_name;
+//    qDebug() << "FileName to ZIP: " << file_name;
     return zipper.toZip(temp_folder + subfolder, file_name);
 }
 
@@ -27,12 +27,12 @@ bool EjConvertorDocx::readDoc(EjDocument *doc) {
     document.addOrientation(doc->attributes()->getDocLayout()->docOrientation());
     bool result = true;
 	const QList<EjBlock*> &list = *doc->lBlocks;
-    qDebug() << "Блоки:";
+//    qDebug() << "Блоки:";
     for (int i = 0; i < list.size() && result; ++i) {
 		EjBlock* block = list[i];
-        qDebug() << block->type;
+//        qDebug() << block->type;
     }
-    qDebug() << "-----";
+//    qDebug() << "-----";
 
     for (int i = 0; i < list.size() && result; ++i) {
 		EjBlock* block = list[i];
@@ -40,7 +40,7 @@ bool EjConvertorDocx::readDoc(EjDocument *doc) {
         if (editor != nullptr) {
             result = editor->edit(document, block);
         } else {
-            qDebug() << block->type;
+//            qDebug() << block->type;
         }
     }
     document.finish();

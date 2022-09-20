@@ -23,11 +23,11 @@ bool ExportDoc::openFile(QString fName)
 
 bool ExportDoc::exportDocument(Document *doc, QString fileName, QString ext)
 {
-    qDebug() << "Export document" << fileName << ext;
-    qDebug() << "Count Styles" << doc->lStyles->count();
-    qDebug() << "Count Pages" << doc->lPages->count();
-    qDebug() << "Count Strings" << doc->lStrings->count();
-    qDebug() << "Count blocks" << doc->lBlocks->count();
+//    qDebug() << "Export document" << fileName << ext;
+//    qDebug() << "Count Styles" << doc->lStyles->count();
+//    qDebug() << "Count Pages" << doc->lPages->count();
+//    qDebug() << "Count Strings" << doc->lStrings->count();
+//    qDebug() << "Count blocks" << doc->lBlocks->count();
 
     bool result = false;
 
