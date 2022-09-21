@@ -13,6 +13,8 @@ class CReportProvider: virtual public IReportProvider
 {
 public:
 	virtual EjDocument* getReport(iprm::IParamsSet* reportParams) override;
+
+	virtual QString getReportId() override;
 };
 
 

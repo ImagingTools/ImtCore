@@ -23,6 +23,8 @@ class IReportProvider: virtual public istd::IPolymorphic
 {
 public:
 	virtual EjDocument* getReport(iprm::IParamsSet* reportParams) = 0;
+
+	virtual QString getReportId() = 0;
 };
 
 

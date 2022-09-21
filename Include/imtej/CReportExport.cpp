@@ -11,15 +11,19 @@ namespace imtej
 // public methods
 
 bool CReportExport::exportReport(EjDocument* ejDocument, QString const& file_name)
-{	bool state = false;
-	bool docx = m_convertorDocx.convert(ejDocument, "C:/ImagingTools/Tmp/tests.docx");
-	bool pdf = m_convertorPdf.convert(ejDocument, "C:/ImagingTools/Tmp/tests.pdf");
-	bool excel = m_convertorExcel.convert(ejDocument, "C:/ImagingTools/Tmp/tests.xlsx");
-	if(docx)
+{
+	if(file_name.endsWith("docx"))
 	{
-		state = true;
+		return m_convertorDocx.convert(ejDocument, "C:/ImagingTools/Tmp/" + file_name);
 	}
-	return state;
+	if(file_name.endsWith("pdf"))
+	{
+		return m_convertorPdf.convert(ejDocument, "C:/ImagingTools/Tmp/" + file_name);
+	}
+	if(file_name.endsWith("xlsx"))
+	{
+		return m_convertorExcel.convert(ejDocument, "C:/ImagingTools/Tmp/" + file_name);;
+	}
 }
 
 
