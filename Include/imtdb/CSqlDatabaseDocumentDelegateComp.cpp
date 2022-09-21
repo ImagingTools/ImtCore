@@ -181,17 +181,17 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.toLocal8Bit();
 
 		retVal += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
-			.arg(qPrintable(*m_revisionsTableNameAttrPtr))
-			.arg(qPrintable(s_documentIdColumn))
-			.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
-			.arg(qPrintable(revisionUuid))
-			.arg(qPrintable(objectId))
-			.arg(qPrintable(documentContent.toBase64()))
-			.arg(777777)
-			.arg(QObject::tr("...."))
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(checksum)
-			.toLocal8Bit();
+					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+					.arg(qPrintable(s_documentIdColumn))
+					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
+					.arg(qPrintable(revisionUuid))
+					.arg(qPrintable(objectId))
+					.arg(qPrintable(documentContent.toBase64()))
+					.arg(777777)
+					.arg(QObject::tr("...."))
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(checksum)
+					.toLocal8Bit();
 
 		if (m_metaInfoTableDelegateCompPtr.IsValid()) {
 			idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(&object, collection.GetObjectTypeId(objectId));
