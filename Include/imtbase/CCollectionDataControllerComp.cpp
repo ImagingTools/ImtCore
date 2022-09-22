@@ -1,6 +1,9 @@
 #include <imtbase/CCollectionDataControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QFileInfo>
+
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 
@@ -57,7 +60,43 @@ QByteArray CCollectionDataControllerComp::ImportFile(
 			const QString& sourceFilePath,
 			const ICollectionInfo::Id& /*parentId*/) const
 {
+	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
+	if (persistencePtr != nullptr){
+		imtbase::IObjectCollection::DataPtr dataPtr(CreateObjectInstance(typeId));
+		if (dataPtr.IsValid()) {
+			int state= persistencePtr->LoadFromFile(*dataPtr, sourceFilePath);
+			if (state == ifile::IFilePersistence::OS_OK){
+				QFileInfo fileInfo(sourceFilePath);
+
+				return collection.InsertNewObject(typeId, fileInfo.baseName(), QString(QObject::tr("Import from %1").arg(sourceFilePath)), dataPtr);
+			}
+		}
+	}
+
 	return QByteArray();
+}
+
+
+// protected methods
+
+istd::IChangeable* CCollectionDataControllerComp::CreateObjectInstance(const QByteArray& typeId) const
+{
+	int factoryIndex = -1;
+
+	if (m_resourceTypesCompPtr.IsValid()){
+		for (int i = 0; i < m_resourceTypesCompPtr->GetOptionsCount(); ++i){
+			if (typeId == m_resourceTypesCompPtr->GetOptionId(i)){
+				factoryIndex = i;
+				break;
+			}
+		}
+	}
+
+	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
+		return m_objectFactoryListCompPtr.CreateInstance(factoryIndex);
+	}
+
+	return nullptr;
 }
 
 

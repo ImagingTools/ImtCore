@@ -317,7 +317,7 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
-	if (m_objectDelegateCompPtr.IsValid()){
+	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
 		if (objectSelectionQuery.isEmpty()){
 			return Ids();
