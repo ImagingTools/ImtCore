@@ -36,8 +36,15 @@ public:
 
 	// reimplemented (ICollectionDataController)
 	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
-	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& targetFilePath = QString()) const override;
-	virtual Id ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString(), const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const override;
+	virtual bool ExportFile(
+				const imtbase::IObjectCollection& collection,
+				const Id& objectId,
+				const QString& targetFilePath = QString()) const override;
+	virtual Id ImportFile(
+				imtbase::IObjectCollection& collection,
+				const QByteArray& typeId,
+				const QString& sourceFilePath = QString(),
+				const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const IRevisionController* GetRevisionController() const override;
@@ -61,8 +68,8 @@ public:
 	virtual bool RemoveElement(const Id& elementId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
-    virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-    virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
+	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;

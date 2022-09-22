@@ -111,6 +111,6 @@ bool CUrlParam::ResetData(CompatibilityMode mode)
 }
 
 
-} // namespace iprm
+} // namespace imtbase
 
 

@@ -19,14 +19,6 @@ class IUrlParam: virtual public iser::ISerializable
 {
 public:
 	/**
-		Data model change notification flags.
-	*/
-	enum ChangeFlags
-	{
-		CF_CHANGED = 0x25345e0
-	};
-
-	/**
 		Get the object URL.
 	*/
 	virtual const QUrl& GetUrl() const = 0;
