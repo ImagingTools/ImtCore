@@ -316,6 +316,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(OnAutoLogoutTimer()));
 	connect(&m_checkIsFullScreenTimer, SIGNAL(timeout()), this, SLOT(OnCheckIsFullScreenTimer()));
+	connect(ExitButton, &QToolButton::clicked, qApp, &QApplication::quit, Qt::QueuedConnection);
 
 	m_checkIsFullScreenTimer.start(500);
 
@@ -362,7 +363,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	CurrentPageLabel->setVisible(showPageTitle);
-
 }
 
 
@@ -495,13 +495,6 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 		m_pagesCompPtr->SetSelectedOptionIndex(info.pageIndex);
 	}
-}
-
-
-void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
-{
-	bool ignoredPtr;
-	OnTryClose(&ignoredPtr);
 }
 
 
