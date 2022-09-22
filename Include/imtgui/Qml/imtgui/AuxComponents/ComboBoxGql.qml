@@ -26,6 +26,7 @@ Item {
     property int count: 15;
     property string commandId: "";
     property string filterName: "Name";
+    property string filterText: "";
     property Item delegate: PopupMenuDelegate{}
 
     signal clicked();
@@ -54,13 +55,15 @@ Item {
             commandId: comboBoxContainer.commandId
             filterName: comboBoxContainer.filterName
             delegate: comboBoxContainer.delegate
+            onFilterTextChanged: {
+                comboBoxContainer.filterText = popup.filterText
+            }
             onFinished: {
                 comboBoxContainer.currentIndex = index;
                 comboBoxContainer.currentText = popup.model.GetData("Name", index);
-                popup.filterText = comboBoxContainer.currentText;
-            }
-            onTextEdited: {
-                comboBoxContainer.currentText = popup.filterText
+                if (comboBoxContainer.currentText == ""){
+                    comboBoxContainer.currentText = popup.filterText;
+                }
             }
         }
     }

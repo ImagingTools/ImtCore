@@ -19,7 +19,7 @@ Rectangle {
     property int count: 15;
     property string commandId: "";
     property string filterName: "Name";
-    property string filterText: "";
+    property alias filterText: filterField.text;
     property bool endListStatus: false;
     property bool requestStatus: true;
     property Item delegate: PopupMenuDelegate{}
@@ -75,13 +75,13 @@ Rectangle {
         height: 30;
         anchors.top: parent.top
         anchors.left: parent.left
-        text: filterText;
-
         onTextEdited: {
             offset = 0;
-            filterText = filterField.text
             modelFilter.SetData("TextFilter", filterText);
             itemsModel.updateModel(0);
+        }
+        onAccepted: {
+            root.closeDialog();
         }
 
     }
