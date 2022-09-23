@@ -61,8 +61,8 @@ public:
 	virtual bool CancelTransaction() const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQuery(const QByteArray& queryString, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
-	virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
-	virtual QSqlQuery ExecSqlQueryFromFile(const QByteArray& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
+	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
+	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 
 	static void DrectBindValue(QByteArray* string, const QByteArray& what, const QByteArray& expr);
 	static void DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what);
@@ -73,7 +73,7 @@ public:
 protected:
 	virtual bool OpenDatabase() const;
 	virtual bool CreateDatabase() const;
-	virtual bool Migration() const;
+	virtual bool ExecuteDatabasePatches() const;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
 
