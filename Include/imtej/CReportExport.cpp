@@ -14,15 +14,15 @@ bool CReportExport::exportReport(EjDocument* ejDocument, QString const& file_nam
 {
 	if(file_name.endsWith("docx"))
 	{
-		return m_convertorDocx.convert(ejDocument, "C:/ImagingTools/Tmp/" + file_name);
+		return m_convertorDocx.convert(ejDocument, file_name);
 	}
 	if(file_name.endsWith("pdf"))
 	{
-		return m_convertorPdf.convert(ejDocument, "C:/ImagingTools/Tmp/" + file_name);
+		return m_convertorPdf.convert(ejDocument, file_name);
 	}
 	if(file_name.endsWith("xlsx"))
 	{
-		return m_convertorExcel.convert(ejDocument, "C:/ImagingTools/Tmp/" + file_name);;
+		return m_convertorExcel.convert(ejDocument, file_name);;
 	}
 }
 
