@@ -69,11 +69,6 @@ Item {
     }
 
     Component.onCompleted: {
-        var index = filterIdsModel.InsertNewItem();
-        filterIdsModel.SetData("Id", filterName, index);
-        modelFilter.AddTreeModel("FilterIds");
-        modelFilter.SetData("FilterIds", filterIdsModel)
-        modelFilter.AddTreeModel("Sort");
         if (comboBoxContainer.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
         }

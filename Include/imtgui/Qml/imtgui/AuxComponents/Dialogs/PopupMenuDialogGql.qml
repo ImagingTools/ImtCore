@@ -194,6 +194,7 @@ Rectangle {
                     if (dataModelLocal.ContainsKey(commandId)){
                         dataModelLocal = dataModelLocal.GetData(commandId);
                         dataModelLocal = dataModelLocal.GetData("items");
+                        console.log(commandId, " = ", dataModelLocal);
                         if (offset == 0){
                             model = dataModelLocal;
                             loadedRec.visible = false;
