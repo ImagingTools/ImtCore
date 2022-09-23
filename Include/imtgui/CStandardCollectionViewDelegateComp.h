@@ -40,7 +40,7 @@ public:
 
 	// reimplemented (ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
-	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
+	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr, const imtbase::ICollectionFilter* filterPtr) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 
 protected:

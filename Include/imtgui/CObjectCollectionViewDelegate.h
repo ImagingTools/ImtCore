@@ -62,7 +62,10 @@ public:
 	~CObjectCollectionViewDelegate();
 
 	// reimplemented (ICollectionViewDelegate)
-	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
+	virtual bool InitializeDelegate(
+				imtbase::IObjectCollection* collectionPtr,
+				iqtgui::IGuiObject* parentGuiPtr,
+				const imtbase::ICollectionFilter* filterPtr) override;
 	virtual const iqtgui::IVisualStatus& GetDocumentTypeStatus() const override;
 	virtual QByteArray GetSupportedTypeId() const override;
 	virtual QAbstractItemDelegate* GetColumnItemDelegate(const QByteArray& columnId) const override;
@@ -161,7 +164,7 @@ protected:
 
 	imtbase::IObjectCollection* m_collectionPtr;
 	iqtgui::IGuiObject* m_parentGuiPtr;
-
+	const imtbase::ICollectionFilter* m_filterPtr;
 	imtbase::ICollectionInfo::Ids m_selectedItemIds;
 	QByteArray m_selectedTypeId;
 

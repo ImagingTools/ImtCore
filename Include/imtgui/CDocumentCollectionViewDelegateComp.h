@@ -55,7 +55,10 @@ public:
 
 	// reimplemented (imtgui::ICollectionViewDelegate)
 	virtual QByteArray GetSupportedTypeId() const override;
-	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) override;
+	virtual bool InitializeDelegate(
+				imtbase::IObjectCollection* collectionPtr,
+				iqtgui::IGuiObject* parentGuiPtr,
+				const imtbase::ICollectionFilter* filterPtr) override;
 	virtual QByteArray CreateNewObject(
 				const QByteArray& typeId,
 				const QString& objectName,

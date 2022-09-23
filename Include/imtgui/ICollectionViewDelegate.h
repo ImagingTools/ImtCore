@@ -15,6 +15,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/ICollectionFilter.h>
 
 
 namespace imtgui
@@ -106,7 +107,10 @@ public:
 	/**
 		Initialize the delegate for the collection instance.
 	*/
-	virtual bool InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr) = 0;
+	virtual bool InitializeDelegate(
+				imtbase::IObjectCollection* collectionPtr,
+				iqtgui::IGuiObject* parentGuiPtr,
+				const imtbase::ICollectionFilter* filterPtr) = 0;
 
 	/**
 		Get access to the visual status of the document type supported by this delegate.

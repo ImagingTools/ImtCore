@@ -302,11 +302,11 @@ void CObjectCollectionViewComp::OnGuiModelAttached()
 	Q_ASSERT(objectPtr != nullptr);
 
 	if (m_viewDelegateMap.isEmpty()){
-		m_defaultViewDelegate.InitializeDelegate(objectPtr, this);
+		m_defaultViewDelegate.InitializeDelegate(objectPtr, this, &m_tableModel.GetFilter());
 	}
 
 	for (ViewDelegateMap::Iterator iter = m_viewDelegateMap.begin(); iter != m_viewDelegateMap.end(); ++iter){
-		iter.value()->InitializeDelegate(objectPtr, this);
+		iter.value()->InitializeDelegate(objectPtr, this, &m_tableModel.GetFilter());
 	}
 
 	BaseClass::OnGuiModelAttached();
@@ -1589,6 +1589,12 @@ void CObjectCollectionViewComp::TableModel::SetSorting(int logicalIndex, Qt::Sor
 void CObjectCollectionViewComp::TableModel::SetCurrentTypeId(const QByteArray & typeId)
 {
 	m_filter.SetObjectTypeId(typeId);
+}
+
+
+const imtbase::ICollectionFilter& CObjectCollectionViewComp::TableModel::GetFilter() const
+{
+	return m_filter;
 }
 
 

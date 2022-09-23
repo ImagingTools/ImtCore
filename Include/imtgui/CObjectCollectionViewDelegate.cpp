@@ -72,7 +72,9 @@ CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	m_importCommand(tr("Import"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_exportCommand(tr("Export"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_restoreCommand(tr("Restore"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
-	m_collectionPtr(nullptr)
+	m_collectionPtr(nullptr),
+	m_parentGuiPtr(nullptr),
+	m_filterPtr(nullptr)
 {
 	SetupSummaryInformation();
 
@@ -90,10 +92,14 @@ CObjectCollectionViewDelegate::~CObjectCollectionViewDelegate()
 
 // reimplemented (ICollectionViewDelegate)
 
-bool CObjectCollectionViewDelegate::InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr)
+bool CObjectCollectionViewDelegate::InitializeDelegate(
+			imtbase::IObjectCollection* collectionPtr,
+			iqtgui::IGuiObject* parentGuiPtr,
+			const imtbase::ICollectionFilter* filterPtr)
 {
 	m_collectionPtr = collectionPtr;
 	m_parentGuiPtr = parentGuiPtr;
+	m_filterPtr = filterPtr;
 
 	if (m_collectionPtr != nullptr){
 		SetupCommands();

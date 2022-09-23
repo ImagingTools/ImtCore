@@ -14,17 +14,22 @@ namespace imtgui
 
 
 CPluginStatusMonitorViewDelegateComp::CPluginStatusMonitorViewDelegateComp()
-	:m_collectionPtr(nullptr)
+	:m_collectionPtr(nullptr),
+	m_filterPtr(nullptr)
 {
 }
 
 
 // reimplemented (ICollectionViewDelegate)
 
-bool CPluginStatusMonitorViewDelegateComp::InitializeDelegate(imtbase::IObjectCollection* collectionPtr, iqtgui::IGuiObject* parentGuiPtr)
+bool CPluginStatusMonitorViewDelegateComp::InitializeDelegate(
+			imtbase::IObjectCollection* collectionPtr,
+			iqtgui::IGuiObject* parentGuiPtr,
+			const imtbase::ICollectionFilter* filterPtr)
 {
 	m_collectionPtr = collectionPtr;
 	m_parentGuiPtr = parentGuiPtr;
+	m_filterPtr = filterPtr;
 
 	if (m_collectionPtr != nullptr){
 		OnLanguageChanged();

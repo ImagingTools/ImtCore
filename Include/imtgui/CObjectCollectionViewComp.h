@@ -313,6 +313,7 @@ private:
 		void SetFilter(const QString& textFilter);
 		void SetSorting(int logicalIndex, Qt::SortOrder order);
 		void SetCurrentTypeId(const QByteArray& typeId);
+		const imtbase::ICollectionFilter& GetFilter() const;
 
 		// reimplemented (QAbstractTableModel)
 		virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;

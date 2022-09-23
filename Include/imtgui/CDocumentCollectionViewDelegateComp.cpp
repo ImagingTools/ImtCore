@@ -41,9 +41,10 @@ QByteArray CDocumentCollectionViewDelegateComp::GetSupportedTypeId() const
 
 bool CDocumentCollectionViewDelegateComp::InitializeDelegate(
 			imtbase::IObjectCollection* collectionPtr,
-			iqtgui::IGuiObject* parentGuiPtr)
+			iqtgui::IGuiObject* parentGuiPtr,
+			const imtbase::ICollectionFilter* filterPtr)
 {
-	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr)){
+	if (!BaseClass2::InitializeDelegate(collectionPtr, parentGuiPtr, filterPtr)){
 		return false;
 	}
 
