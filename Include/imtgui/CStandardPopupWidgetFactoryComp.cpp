@@ -18,6 +18,8 @@ IPopupWidget* CStandardPopupWidgetFactoryComp::CreateInstance(const QByteArray& 
 	if (keyId.isEmpty()){
 		return new CStandardPopupWidget();
 	}
+
+	return nullptr;
 }
 
 
