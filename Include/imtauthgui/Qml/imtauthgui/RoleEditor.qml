@@ -18,10 +18,29 @@ Item {
         color: Style.alternateBaseColor;
     }
 
+    ListModel{
+        id: commandsModel;
+
+        ListElement{
+            Id: "New";
+            Name: qsTr("New");
+            Mode: "Disabled";
+            IconSource: "../../../../Icons/Light/Add_Off_Normal.svg";
+        }
+
+        ListElement{
+            Id: "Remove";
+            Name: qsTr("Remove");
+            Mode: "Disabled";
+            IconSource: "../../../../Icons/Light/Delete_Off_Normal.svg";
+        }
+    }
+
     function updateGui(){
         console.log("RoleEditor updateGui");
         roleIdInput.text = documentModel.GetData("Id");
         roleNameInput.text = documentModel.GetData("Name");
+        descriptionInput.text = documentModel.GetData("Description");
 
         productNameInput.text = documentModel.GetData("ProductId");
 
@@ -113,6 +132,28 @@ Item {
             }
 
             Text {
+                id: titleDescription;
+
+                text: qsTr("Description");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
+
+            CustomTextField {
+                id: descriptionInput;
+
+                width: parent.width;
+                height: 30;
+
+                placeHolderText: qsTr("Enter the description");
+
+                onTextChanged: {
+                    documentModel.SetData("Description", descriptionInput.text);
+                }
+            }
+
+            Text {
                 id: titleIncludes;
 
                 text: qsTr("Included roles");
@@ -121,41 +162,79 @@ Item {
                 font.pixelSize: Style.fontSize_common;
             }
 
-            Rectangle {
-                id: tableBg;
+            Item {
+                id: rowCommands;
 
+                height: 220;
                 width: bodyColumn.width;
-                height: 200;
 
-                color: Style.imagingToolsGradient1;
+                clip: true;
 
-                border.width: 1;
-                border.color: Style.borderColor;
+                MouseArea {
+                    anchors.fill: parent;
+                }
 
-                TreeItemModel {
-                    id: headersModelRoles;
+                Row {
+                    id: row;
 
-                    Component.onCompleted: {
-                        let index = headersModelRoles.InsertNewItem();
-                        headersModelRoles.SetData("Id", "Name", index)
-                        headersModelRoles.SetData("Name", "Name", index)
+                    spacing: 10;
+
+                    Repeater {
+                        model: commandsModel;
+
+                        delegate: AuxButton {
+                            anchors.verticalCenter: rowCommands.verticalCenter;
+
+                            width: 18;
+                            height: width;
+
+                            iconSource: model.IconSource;
+
+                            onClicked: {
+                                Events.sendEvent(commandsId + "CommandActivated", model.Id);
+                            }
+                        }
                     }
                 }
 
-                AuxTable {
-                    id: includesTable;
+                Rectangle {
+                    id: tableBg;
 
-                    anchors.fill: parent;
-                    anchors.margins: 2;
+                    anchors.top: row.bottom;
 
-                    headers: headersModelRoles;
+                    width: bodyColumn.width;
+                    height: 200;
 
-                    onSelectedIndexChanged: {
-                        console.log("includesTable onSelectedIndexChanged");
+                    color: Style.imagingToolsGradient1;
 
-//                        container.selectedIndex = includesTable.selectedIndex;
+                    border.width: 1;
+                    border.color: Style.borderColor;
+
+                    TreeItemModel {
+                        id: headersModelRoles;
+
+                        Component.onCompleted: {
+                            let index = headersModelRoles.InsertNewItem();
+                            headersModelRoles.SetData("Id", "Name", index)
+                            headersModelRoles.SetData("Name", "Name", index)
+                        }
                     }
-                }//AuxTable includesTable
+
+                    AuxTable {
+                        id: includesTable;
+
+                        anchors.fill: parent;
+                        anchors.margins: 2;
+
+                        headers: headersModelRoles;
+
+                        onSelectedIndexChanged: {
+                            console.log("includesTable onSelectedIndexChanged");
+
+    //                        container.selectedIndex = includesTable.selectedIndex;
+                        }
+                    }//AuxTable includesTable
+                }
             }
         }//Column bodyColumn
     }//Flickable

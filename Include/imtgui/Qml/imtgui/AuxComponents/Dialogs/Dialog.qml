@@ -22,6 +22,8 @@ Rectangle {
 
     signal finished(string buttonId);
 
+    property Component content;
+
     onFocusChanged: {
         console.log("Dialog onFocusChanged", focus);
 
@@ -35,11 +37,9 @@ Rectangle {
     }
 
     onFinished: {
-
         if (root){
             root.closeDialog();
         }
-
     }
 
     onTitleChanged: {
@@ -75,11 +75,10 @@ Rectangle {
         Loader {
             id: loaderBodyDialog;
 
-            onItemChanged: {
-                console.log("Dialog onItemChanged", loaderBodyDialog.item);
-                if (loaderBodyDialog.item){
-                    loaderBodyDialog.item.width = dialogContainer.width;
-                }
+            sourceComponent: content;
+
+            onLoaded: {
+                loaderBodyDialog.item.width = dialogContainer.width;
             }
         }
 

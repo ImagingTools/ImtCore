@@ -7,8 +7,10 @@ DocumentBase {
 
     anchors.fill: parent;
 
+    property string title: qsTr("Users");
+
     onDocumentModelChanged: {
-        headerText.text = documentModel.GetData("Name");
+        headerText.text = title + " / " + documentModel.GetData("Name");
     }
 
     UndoRedoManager {
@@ -31,7 +33,7 @@ DocumentBase {
 
     Rectangle {
         anchors.fill: parent;
-        color: Style.baseColor;
+        color: Style.backgroundColor;
     }
 
     Row {
@@ -41,7 +43,7 @@ DocumentBase {
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
-        height: 50
+        height: 40
 
         spacing: 20;
 

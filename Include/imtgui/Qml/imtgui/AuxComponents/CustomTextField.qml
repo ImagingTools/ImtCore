@@ -96,10 +96,6 @@ Item {
             containerTextField.accepted();
         }
 
-        onEditingFinished: {
-            console.log("CustomTextField onEditingFinished");
-        }
-
         onTextEdited: {
             containerTextField.textEdited();
             console.log("CustomTextField onTextEdited");

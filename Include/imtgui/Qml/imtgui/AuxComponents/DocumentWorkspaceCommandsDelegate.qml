@@ -51,7 +51,8 @@ DocumentWorkspaceCommandsDelegateBase {
                                                        "valueId":      id,
                                                        "valueName":    name,
                                                        "model":        tableData.elements,
-                                                       "autoGenerate": true});
+                                                       "autoGenerate": true,
+                                                       "index":        container.selectedIndex});
         }
         else if (commandId === "SetDescription"){
             let elements = tableData.elements;
@@ -96,9 +97,6 @@ DocumentWorkspaceCommandsDelegateBase {
     Component {
         id: editDialog;
         EditDialog {
-
-            headers: container.tableData.headers;
-
             onFinished: {
                 if (buttonId == "Ok"){
                     let elementsModel = documentModel.GetData("Items");

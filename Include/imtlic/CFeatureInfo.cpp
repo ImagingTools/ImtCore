@@ -62,6 +62,33 @@ QString CFeatureInfo::GetFeatureName() const
 }
 
 
+QList<const IFeatureInfo*> CFeatureInfo::GetSubFeatures() const
+{
+	return m_subFeatures;
+}
+
+
+bool CFeatureInfo::InsertSubFeature(const IFeatureInfo* subFeatureInfo)
+{
+	m_subFeatures.append(subFeatureInfo);
+
+	return true;
+}
+
+
+void CFeatureInfo::DeleteSubFeature(const QByteArray &subFeatureId)
+{
+	for (const IFeatureInfo* subFeatureInfo : m_subFeatures){
+		QByteArray featureId = subFeatureInfo->GetFeatureId();
+
+		if (subFeatureId == featureId){
+			m_subFeatures.removeAll(subFeatureInfo);
+			break;
+		}
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CFeatureInfo::Serialize(iser::IArchive& archive)
@@ -98,6 +125,7 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 		m_id = sourcePtr->GetFeatureId();
 		m_name = sourcePtr->GetFeatureName();
+		m_subFeatures = sourcePtr->GetSubFeatures();
 
 		return true;
 	}
@@ -110,7 +138,7 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 {
 	const imtlic::IFeatureInfo* sourcePtr = dynamic_cast<const imtlic::IFeatureInfo*>(&object);
 	if (sourcePtr != nullptr){
-		return (m_id == sourcePtr->GetFeatureId() && m_name == sourcePtr->GetFeatureName());
+		return (m_id == sourcePtr->GetFeatureId() && m_name == sourcePtr->GetFeatureName() && m_subFeatures == sourcePtr->GetSubFeatures());
 	}
 
 	return false;
@@ -134,6 +162,7 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_id.clear();
 	m_name.clear();
+	m_subFeatures.clear();
 
 	return true;
 }

@@ -52,6 +52,9 @@ protected:
 				QByteArrayList& removedFeatures,
 				QByteArrayList& updatedFeatures) const;
 
+	void CreateSubFeaturesFromRecord(imtlic::IFeatureInfo* subFeatureInfoPtr, const QByteArray& subFeaturesQuery) const;
+	void CreateInsertSubFeaturesQuery(const imtlic::IFeatureInfo* featureInfoPtr, QByteArray &retVal) const;
+
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;

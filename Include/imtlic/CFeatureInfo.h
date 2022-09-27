@@ -21,6 +21,9 @@ public:
 	virtual const imtlic::IFeatureInfoProvider* GetFeaturePackage() const override;
 	virtual QByteArray GetFeatureId() const override;
 	virtual QString GetFeatureName() const override;
+	virtual QList<const IFeatureInfo*> GetSubFeatures() const override;
+	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
+	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -36,6 +39,8 @@ protected:
 	const imtlic::IFeatureInfoProvider* m_packagePtr;
 	QByteArray m_id;
 	QString m_name;
+
+	QList<const IFeatureInfo*> m_subFeatures;
 };
 
 

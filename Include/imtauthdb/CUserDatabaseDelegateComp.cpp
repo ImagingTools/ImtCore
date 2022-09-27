@@ -55,7 +55,7 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QByte
 		userPtr->SetMail(mail);
 	}
 
-	QByteArray selectUserPermissions = QString("SELECT * from UserPermissions WHERE UserId = '%1'").arg(qPrintable(userId)).toUtf8();
+	QByteArray selectUserPermissions = QString("SELECT * from \"UserPermissions\" WHERE UserId = '%1'").arg(qPrintable(userId)).toUtf8();
 
 	QSqlError error;
 	QSqlQuery userPermissionsQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectUserPermissions, &error);
@@ -75,7 +75,7 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QByte
 
 	userPtr->SetLocalPermissions(permissionsIds);
 
-	QByteArray selectUserRoles = QString("SELECT * from UserRoles WHERE UserId = '%1'").arg(qPrintable(userId)).toUtf8();
+	QByteArray selectUserRoles = QString("SELECT * from \"UserRoles\" WHERE UserId = '%1'").arg(qPrintable(userId)).toUtf8();
 
 	QSqlQuery userRolesQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectUserRoles, &error);
 
@@ -120,7 +120,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 
 	NewObjectQuery retVal;
 
-	retVal.query += "\n" + QString("INSERT INTO Users(UserId, Password, Name, Email, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+	retVal.query += "\n" + QString("INSERT INTO \"Users\" (UserId, Password, Name, Email, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 			.arg(qPrintable(userId))
 			.arg(qPrintable(passwordHash))
 			.arg(name)
@@ -137,14 +137,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 
 	for (const QByteArray& permissionId : permissionsIds){
 		retVal.query += "\n" +
-				QString("INSERT INTO UserPermissions (UserId, PermissionId) VALUES('%1', '%2');")
+				QString("INSERT INTO \"UserPermissions\" (UserId, PermissionId) VALUES('%1', '%2');")
 				.arg(qPrintable(userId))
 				.arg(qPrintable(permissionId)).toLocal8Bit();
 	}
 
 	for (const QByteArray& roleId : rolesIds){
 		retVal.query += "\n" +
-				QString("INSERT INTO UserRoles(UserId, RoleId) VALUES('%1', '%2');")
+				QString("INSERT INTO \"UserRoles\" (UserId, RoleId) VALUES('%1', '%2');")
 				.arg(qPrintable(userId))
 				.arg(qPrintable(roleId)).toLocal8Bit();
 	}
@@ -169,7 +169,7 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray retVal = QString("DELETE FROM Users WHERE UserId = '%1';").arg(qPrintable(userId)).toLocal8Bit();
+		QByteArray retVal = QString("DELETE FROM \"Users\" WHERE UserId = '%1';").arg(qPrintable(userId)).toLocal8Bit();
 
 		return retVal;
 	}
@@ -205,7 +205,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray newUserPasswordHash = newUserPtr->GetPasswordHash();
 	QString newMail = newUserPtr->GetMail();
 
-	QByteArray retVal = QString("UPDATE Users SET UserId ='%1', Password = '%2', Name = '%3', Email = '%4', Description = '%5', LastModified = '%6' WHERE UserId ='%7';")
+	QByteArray retVal = QString("UPDATE \"Users\" SET UserId ='%1', Password = '%2', Name = '%3', Email = '%4', Description = '%5', LastModified = '%6' WHERE UserId ='%7';")
 			.arg(qPrintable(newUserId))
 			.arg(qPrintable(newUserPasswordHash))
 			.arg(qPrintable(newName))
@@ -220,7 +220,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& permissionId : newPermissionsIds){
 		if (!oldPermissionsIds.contains(permissionId)){
 			retVal += "\n" +
-					QString("INSERT INTO UserPermissions(UserId, PermissionId) VALUES('%1', '%2');")
+					QString("INSERT INTO \"UserPermissions\" (UserId, PermissionId) VALUES('%1', '%2');")
 					.arg(qPrintable(newUserId))
 					.arg(qPrintable(permissionId)).toLocal8Bit();
 		}
@@ -229,7 +229,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& permissionId : oldPermissionsIds){
 		if (!newPermissionsIds.contains(permissionId)){
 			retVal += "\n" +
-					QString("DELETE FROM UserPermissions WHERE UserId = '%1' AND PermissionId = '%2';")
+					QString("DELETE FROM \"UserPermissions\" WHERE UserId = '%1' AND PermissionId = '%2';")
 					.arg(qPrintable(newUserId))
 					.arg(qPrintable(permissionId)).toLocal8Bit();
 		}
@@ -241,7 +241,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& prohibitionId : newProhibitionsIds){
 		if (!oldProhibitionsIds.contains(prohibitionId)){
 			retVal += "\n" +
-					QString("INSERT INTO UserProhibitions(UserId, ProhibitionId) VALUES('%1', '%2');")
+					QString("INSERT INTO \"UserProhibitions\" (UserId, ProhibitionId) VALUES('%1', '%2');")
 					.arg(qPrintable(newUserId))
 					.arg(qPrintable(prohibitionId)).toLocal8Bit();
 		}
@@ -250,7 +250,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& prohibitionId : oldProhibitionsIds){
 		if (!newProhibitionsIds.contains(prohibitionId)){
 			retVal += "\n" +
-					QString("DELETE FROM UserProhibitions WHERE UserId = '%1' AND ProhibitionId = '%2';")
+					QString("DELETE FROM \"UserProhibitions\" WHERE UserId = '%1' AND ProhibitionId = '%2';")
 					.arg(qPrintable(newUserId))
 					.arg(qPrintable(prohibitionId)).toLocal8Bit();
 		}
@@ -262,7 +262,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& roleId : newRolesIds){
 		if (!oldRolesIds.contains(roleId)){
 			retVal += "\n" +
-					QString("INSERT INTO UserRoles(UserId, RoleId) VALUES('%1', '%2');")
+					QString("INSERT INTO \"UserRoles\" (UserId, RoleId) VALUES('%1', '%2');")
 					.arg(qPrintable(newUserId))
 					.arg(qPrintable(roleId)).toLocal8Bit();
 		}
@@ -271,7 +271,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	for (const QByteArray& roleId : oldRolesIds){
 		if (!newRolesIds.contains(roleId)){
 			retVal += "\n" +
-					QString("DELETE FROM UserRoles WHERE UserId = '%1' AND RoleId = '%2';")
+					QString("DELETE FROM \"UserRoles\" WHERE UserId = '%1' AND RoleId = '%2';")
 					.arg(qPrintable(newUserId))
 					.arg(qPrintable(roleId)).toLocal8Bit();
 		}
@@ -302,7 +302,7 @@ QByteArray CUserDatabaseDelegateComp::CreateRenameObjectQuery(
 
 	QByteArray userId = qPrintable(userPtr->GetUsername());
 
-	QByteArray retVal = QString("UPDATE Users SET Name = '%1', LastModified = '%2' WHERE UserId ='%3';")
+	QByteArray retVal = QString("UPDATE \"Users\" SET Name = '%1', LastModified = '%2' WHERE UserId ='%3';")
 			.arg(qPrintable(newObjectName))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(userId)).toLocal8Bit();

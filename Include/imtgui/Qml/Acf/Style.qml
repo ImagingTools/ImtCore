@@ -50,6 +50,10 @@ Item {
 
     property string buttonColor: "#C0C0C0";
     property string buttonBorderColor: "#CCCCCC";
+    property color inactive_buttonColor: "#C0C0C0";
+    property color buttonText: "#335777";
+    property color inactive_buttonText: "#335777";
+
     property string borderColor: "#d0d0d2";
     property string borderColor2: "#a4a4a6";
 
@@ -70,6 +74,7 @@ Item {
 
     property string textColor: "#335777";
     property string textSelected: "#0078d7";
+    property color inactive_textColor: "#dedede";
 
     property string camera: "/Icons/Light/Camera.svg";
 
@@ -136,11 +141,18 @@ Item {
         Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
         Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
         Style.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource);
+
         Style.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
         Style.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
+        Style.inactive_textColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
+
         Style.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
-        Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "HeaderBorder", dataSource);
+
+        Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
         Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
+        Style.inactive_buttonColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
+        Style.buttonText = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
+        Style.inactive_buttonText = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
 
         Style.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
 
@@ -170,7 +182,6 @@ Item {
         Style.topRightPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "RightPanel");
         Style.topLeftPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "LeftPanel");
         Style.customPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "CustomPanel", "Base");
-
     }
 
     GqlModel {

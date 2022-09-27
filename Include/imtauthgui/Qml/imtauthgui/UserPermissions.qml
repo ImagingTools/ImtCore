@@ -31,7 +31,7 @@ Item {
         Column {
             id: bodyColumn;
 
-            width: 500;
+            width: 400;
 
             spacing: 7;
 
@@ -50,7 +50,7 @@ Item {
                 anchors.horizontalCenter: bodyColumn.horizontalCenter;
 
                 width: bodyColumn.width;
-                height: 300;
+                height: 200;
 
                 color: Style.imagingToolsGradient1;
 

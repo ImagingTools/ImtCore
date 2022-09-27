@@ -58,7 +58,7 @@ Rectangle {
             spacing: 5;
 
             onSelectedIndexChanged: {
-                 headerText.text =  "Administration" + " / " + leftMenuModel.get(selectedIndex).Id;
+                 headerText.text = "Administration" + " / " + leftMenuModel.get(selectedIndex).Id;
             }
 
             ListModel{
@@ -80,7 +80,7 @@ Rectangle {
             Repeater {
                 id: mainPanelRepeater;
 
-                model: leftMenuModel
+                model: leftMenuModel;
 
                 delegate: AuxButton {
 
@@ -112,6 +112,17 @@ Rectangle {
                         if (mainPanel.selectedIndex !== model.index){
                             mainPanel.selectedIndex = model.index;
                         }
+                    }
+
+                    Rectangle {
+                        anchors.top: parent.top;
+                        anchors.bottom: parent.bottom;
+                        anchors.left: parent.left;
+
+                        width: 5;
+
+                        color: Style.iconColorOnSelected;
+                        visible: mainPanel.selectedIndex == model.index;
                     }
                 }
             }

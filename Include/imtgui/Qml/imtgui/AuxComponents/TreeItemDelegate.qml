@@ -8,15 +8,16 @@ Item {
 
     property int itemHeight: 30;
 
-    Component.onCompleted: {
-        console.log("TreeItemDelegate onCompleted");
+    property TreeItemModel childModel: model.ChildModel ? model.ChildModel : null;
 
-        if (model.ChildModel){
-            childModelRepeater.model = model.ChildModel;
-        }
+    signal doubleClicked;
+
+    onChildModelChanged: {
+        console.log("onChildModelChanged");
+        childModelRepeater.model = model.ChildModel;
     }
 
-    Item {
+    Rectangle {
         id: body;
 
         anchors.top: parent.top;
@@ -27,12 +28,18 @@ Item {
 
         visible: model.Visible;
 
-        Component.onCompleted: {
-            if (model.ChildModel){
-                iconArrow.visible = true;
+        color: model.Selected ? Style.selectedColor : "transparent";
+
+        MouseArea {
+            anchors.fill: parent;
+
+            onClicked: {
+                resetSelectedItem(modelItems);
+                model.Selected = true;
             }
-            else{
-                checkBox.visible = true;
+
+            onDoubleClicked: {
+                treeItemDelegate.doubleClicked();
             }
         }
 
@@ -46,7 +53,7 @@ Item {
             width: 10;
             height: 10;
 
-            visible: false;
+            visible: childModelRepeater.count > 0;
 
             source: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                      "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
@@ -69,11 +76,9 @@ Item {
         CheckBox {
             id: checkBox;
 
-            anchors.left: parent.left;
-            anchors.leftMargin: 10;
+            anchors.left: iconArrow.right;
+            anchors.leftMargin: 5;
             anchors.verticalCenter: parent.verticalCenter;
-
-            visible: false;
 
             checkState: model.State;
 
@@ -87,7 +92,7 @@ Item {
         Text {
             id: title;
 
-            anchors.left: iconArrow.right;
+            anchors.left: checkBox.right;
             anchors.leftMargin: 10;
             anchors.verticalCenter: parent.verticalCenter;
 

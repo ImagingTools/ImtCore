@@ -109,6 +109,8 @@ Rectangle {
 
         anchors.fill: parent;
 
+        root: window;
+
         visible: false;
     }
 

@@ -7,11 +7,11 @@ Rectangle {
     radius: 2;
 
     border.width: 1;
-    border.color: auxButtonContainer.borderColor;
+    border.color: highlighted ? Style.iconColorOnSelected : borderColor;
 
-    color: auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
+    color: !enabled ? Style.inactive_buttonColor : auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
                                         auxButtonContainer.highlighted ? Style.selectedColor :
-                                                                         auxButtonContainer.backgroundColor;
+                                                                         backgroundColor;
 
     property bool highlighted: ma.containsMouse;
     property bool hasIcon: auxButtonContainer.iconSource !== "";
@@ -65,7 +65,7 @@ Rectangle {
         anchors.horizontalCenter: auxButtonContainer.horizontalCenter;
         anchors.verticalCenter: auxButtonContainer.verticalCenter;
 
-        color: auxButtonContainer.enabled ? Style.textColor : Style.disabledInActiveTextColor;
+        color: auxButtonContainer.enabled ? Style.buttonText : Style.inactive_buttonText;
 
         font.pixelSize: auxButtonContainer.fontPixelSize;
         font.family: Style.fontFamily;

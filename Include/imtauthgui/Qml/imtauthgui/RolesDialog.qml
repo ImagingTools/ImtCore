@@ -11,8 +11,6 @@ Dialog {
     property int selectedIndex: bodyItem.selectedIndex;
 
     onFinished: {
-        if (buttonId === "Include"){
-        }
     }
 
     onProductIdChanged: {

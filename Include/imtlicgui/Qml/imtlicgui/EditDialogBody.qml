@@ -7,17 +7,6 @@ FocusScope {
 
     height: bodyColumn.height + 40;
 
-    property string titleId;
-    property string titleName;
-
-    property alias inputName: inputName.text;
-    property alias inputId: inputId.text;
-
-    property alias inputNameField: inputName;
-    property alias inputIdField: inputId;
-
-    property bool autoGenerate: false;
-
     onFocusChanged: {
         console.log("InputBody onFocusChanged", focus);
 
@@ -42,7 +31,8 @@ FocusScope {
         Text {
             id: titleName;
 
-            text: container.titleName;
+            text: editDialogContainer.titleName;
+
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
@@ -54,11 +44,13 @@ FocusScope {
             width: bodyColumn.width;
             height: 30;
 
+            text: editDialogContainer.valueName;
+
             KeyNavigation.tab: inputId;
 
             onAccepted: {
                 if (checkValidId(inputId.text)){
-                    buttonsDialog.buttonClicked("Ok");
+                    editDialogContainer.buttons.buttonClicked('Ok')
                 }
             }
         }
@@ -66,7 +58,7 @@ FocusScope {
         Text {
             anchors.topMargin: 10;
 
-            text: container.titleId;
+            text: editDialogContainer.titleId;
 
             color: Style.textColor;
             font.family: Style.fontFamily;
@@ -79,6 +71,8 @@ FocusScope {
             width: bodyColumn.width;
             height: 30;
 
+            text: editDialogContainer.valueId;
+
             onTextInputFocusChanged: {
                 if (textInputFocus && autoGenerate && inputId.text == ""){
                     generateKey();
@@ -87,66 +81,38 @@ FocusScope {
 
             onTextChanged: {
                 let state = checkValidId(inputId.text);
-                buttonsDialog.setButtonState("Ok", state);
+//                editDialogContainer.buttons.setButtonState('Ok', state)
             }
 
             onAccepted: {
-                if (checkValidId(inputId.text)){
-                    buttonsDialog.buttonClicked("Ok");
-                }
+//                if (checkValidId(inputId.text)){
+//                    editDialogContainer.buttons.buttonClicked('Ok')
+//                }
+                editDialogContainer.buttons.buttonClicked('Ok')
             }
 
             KeyNavigation.tab: inputName;
         }
 
-        TreeItemModel {
-            id: featureTableHeaders;
+        Text {
+            anchors.topMargin: 10;
 
-            Component.onCompleted: {
-                let index = featureTableHeaders.InsertNewItem();
-                featureTableHeaders.SetData("Name", "Name", index);
-                featureTableHeaders.SetData("Id", "Name", index);
-            }
+            text: qsTr("Subfeatures");
+
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
         }
 
-        AuxTable {
-            id: featureTable;
+        TableTreeViewEditor {
+            id: treeView;
 
             width: bodyColumn.width;
             height: 200;
 
-            headers: featureTableHeaders;
-            elements: model;
+            modelItems: editDialogContainer.subFeaturesModel;
 
-            itemHeight: 25;
-
-            delegate: Item {
-
-                height: 25;
-                width: bodyColumn.width;
-
-                CheckBox {
-                    id: checkBox;
-
-                    anchors.left: parent.left;
-                    anchors.leftMargin: 10;
-                    anchors.verticalCenter: parent.verticalCenter;
-                }
-
-                Text {
-                    id: title;
-
-                    anchors.left: checkBox.right;
-                    anchors.leftMargin: 10;
-                    anchors.verticalCenter: parent.verticalCenter;
-
-                    text: model.Name;
-                    color: Style.textColor;
-
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-                }
-            }
+            clip: true;
         }
     }
 

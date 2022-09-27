@@ -715,6 +715,7 @@ void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &cha
 void CTreeItemModel::OnEndChanges(const ChangeSet& changeSet)
 {
 	BaseClass::OnEndChanges(changeSet);
+
 	emit modelChanged();
 }
 

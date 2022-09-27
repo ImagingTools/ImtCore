@@ -34,7 +34,7 @@ Item {
         Column {
             id: bodyColumn;
 
-            width: 500;
+            width: 400;
 
             spacing: 7;
 

@@ -30,7 +30,7 @@ CollectionView {
 
         elementsList.spacing = 10;
         baseCollectionView.table.showHeaders = false;
-      //  baseCollectionView.table.backgroundElementsColor = Style.alternateBaseColor;
+        baseCollectionView.hasPagination = false;
     }
 
     function selectItem(id, name){

@@ -16,6 +16,8 @@ namespace imtlic
 class IFeatureInfo: virtual public iser::ISerializable
 {
 public:
+	typedef QSet<QByteArray> FeatureIds;
+
 	/**
 		Get the feature package for this feature.
 	*/
@@ -30,6 +32,21 @@ public:
 		Get the feature name.
 	*/
 	virtual QString GetFeatureName() const = 0;
+
+	/**
+		Get all sub features for this feature.
+	*/
+	virtual QList<const IFeatureInfo*> GetSubFeatures() const  = 0;
+
+	/**
+		Insert sub feature.
+	*/
+	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) = 0;
+
+	/**
+		Remove sub feature.
+	*/
+	virtual void DeleteSubFeature(const QByteArray& subFeatureId) = 0;
 };
 
 

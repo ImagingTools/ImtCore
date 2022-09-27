@@ -9,6 +9,8 @@ Rectangle {
 
     color: "#80808080"
 
+    property Item root;
+
     property TreeItemModel serverModel;
     property TreeItemModel localModel;
 
@@ -423,8 +425,8 @@ Rectangle {
                         let json = localCopyModel.toJSON();
                         localModel.Parse(json);
 
-                        window.settingsUpdate();
-                        window.updateModels();
+                        root.settingsUpdate();
+                        root.updateModels();
                     }
 
                     let json = serverCopyModel.toJSON();

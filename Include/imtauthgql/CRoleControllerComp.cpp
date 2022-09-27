@@ -37,6 +37,7 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 	dataModel->SetData("Id", roleId);
 	dataModel->SetData("ProductId", productId);
 	dataModel->SetData("Name", "");
+	dataModel->SetData("Description", "");
 
 	imtbase::IObjectCollection::DataPtr productDataPtr;
 	if (m_productCollectionCompPtr->GetObjectData(productId, productDataPtr)){
@@ -77,13 +78,10 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		QByteArray roleId = roleInfoPtr->GetRoleId();
 		QString roleName = roleInfoPtr->GetRoleName();
 
-		if (m_separatorObjectIdAttrPtr.IsValid()){
-			QString objectIdStr = roleId;
-			QStringList splitData = objectIdStr.split(*m_separatorObjectIdAttrPtr);
-			roleId = splitData[0].toUtf8();
-		}
-
 		dataModel->SetData("Name", roleName);
+
+		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+		dataModel->SetData("Description", description);
 
 		const QByteArrayList parentsRolesIds  = roleInfoPtr->GetIncludedRoles();
 

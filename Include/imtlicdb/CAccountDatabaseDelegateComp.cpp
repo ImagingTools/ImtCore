@@ -49,51 +49,6 @@ istd::IChangeable* CAccountDatabaseDelegateComp::CreateObjectFromRecord(const QB
 	imtauth::CContactInfo contactInfo;
 	if (record.contains("Type")){
 		QString type = record.value("Type").toString();
-
-		QByteArray accountInfo;
-		if (type == "private"){
-			accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_PERSON);
-
-			accountInfo = QString("SELECT * from PrivateAccounts WHERE AccountId = '%1'").arg(qPrintable(accountId)).toUtf8();
-		}
-		else{
-			accountInfoPtr->SetAccountType(imtauth::IAccountInfo::AT_COMPANY);
-
-			accountInfo = QString("SELECT * from CompanyAccounts WHERE AccountId = '%1'").arg(qPrintable(accountId)).toUtf8();
-		}
-
-//		QSqlError error;
-//		QSqlQuery accountInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(accountInfo, &error, true);
-
-//		if (error.type() != QSqlError::NoError){
-//			return nullptr;
-//		}
-
-//		QSqlRecord accountInfoRecord = accountInfoQuery.record();
-
-//		if (accountInfoRecord.contains("GenderType")){
-//			QString genderType = accountInfoRecord.value("GenderType").toString();
-//			if (genderType == "male"){
-//				contactInfo.SetGenderType(imtauth::IContactInfo::GT_MALE);
-//			}
-//			else if (genderType == "female"){
-//				contactInfo.SetGenderType(imtauth::IContactInfo::GT_FEMALE);
-//			}
-//			else if (genderType == "diverse"){
-//				contactInfo.SetGenderType(imtauth::IContactInfo::GT_DIVERSE);
-//			}
-//		}
-//		else if (accountInfoRecord.contains("Nickname")){
-//			QString nickname = accountInfoRecord.value("GenderType").toString();
-//			contactInfo.SetNameField(imtauth::IContactInfo::NFT_NICKNAME, nickname);
-//		}
-//		else if (accountInfoRecord.contains("BirthDay")){
-//			QDate birthDay = accountInfoRecord.value("BirthDay").toDate();
-//			contactInfo.SetBirthday(birthDay);
-//		}
-//		else if (accountInfoRecord.contains("Country")){
-//			QString country = accountInfoRecord.value("Country").toString();
-//		}
 	}
 
 	if (record.contains("OwnerMail")){
@@ -176,7 +131,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAccountDatabaseDelegateComp::Cre
 
 	NewObjectQuery retVal;
 
-	retVal.query = QString("INSERT INTO Accounts(Id, Name, Description, Type, OwnerMail, OwnerLastName, OwnerFirstName) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+	retVal.query = QString("INSERT INTO \"Accounts\" (Id, Name, Description, Type, OwnerMail, OwnerLastName, OwnerFirstName) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 							.arg(qPrintable(accountId))
 							.arg(accountName)
 							.arg(accountDescription)
@@ -185,13 +140,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAccountDatabaseDelegateComp::Cre
 							.arg(lastName)
 							.arg(firstName)
 							.toLocal8Bit();
-
-//	retVal.query += QString("INSERT INTO PrivateAccounts(AccountId, GenderType, Nickname, BirthDay) VALUES('%1', '%2', '%3', '%4');")
-//							.arg(qPrintable(accountId))
-//							.arg(qPrintable(gender))
-//							.arg(accountDescription)
-//							.arg(birthDay.toString(Qt::ISODate))
-//							.toLocal8Bit();
 
 	retVal.objectName = accountName;
 
@@ -210,7 +158,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray retVal = QString("DELETE FROM Accounts WHERE Id = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
+		QByteArray retVal = QString("DELETE FROM \"Accounts\" WHERE Id = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
 
 		return retVal;
 	}
@@ -259,7 +207,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateUpdateObjectQuery(
 		firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
 	}
 
-	QByteArray retVal = QString("UPDATE Accounts SET Id ='%1', Name = '%2', Description = '%3', Type = '%4', OwnerMail = '%5', OwnerLastName = '%6', OwnerFirstName = '%7' WHERE Id ='%8';")
+	QByteArray retVal = QString("UPDATE \"Accounts\" SET Id ='%1', Name = '%2', Description = '%3', Type = '%4', OwnerMail = '%5', OwnerLastName = '%6', OwnerFirstName = '%7' WHERE Id ='%8';")
 							.arg(qPrintable(accountId))
 							.arg(accountName)
 							.arg(accountDescription)
@@ -294,7 +242,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateRenameObjectQuery(
 	}
 
 	QByteArray newId = newObjectName.toUtf8();
-	QByteArray retVal = QString("UPDATE Accounts SET Id = '%1', Name = '%2' WHERE Id = '%3';")
+	QByteArray retVal = QString("UPDATE \"Accounts\" SET Id = '%1', Name = '%2' WHERE Id = '%3';")
 			.arg(qPrintable(newId))
 			.arg(newObjectName)
 			.arg(qPrintable(objectId)).toLocal8Bit();
@@ -318,7 +266,7 @@ QByteArray CAccountDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE Accounts SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE \"Accounts\" SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }

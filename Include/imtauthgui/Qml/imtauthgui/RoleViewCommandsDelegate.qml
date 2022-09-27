@@ -42,13 +42,13 @@ DocumentWorkspaceCommandsDelegateBase {
     onCommandActivated: {
         console.log("DocumentCommands onCommandActivated", container.itemId, commandId);
 
-        if (commandId === "Include"){
+        if (commandId === "New"){
             let productId = documentModel.GetData("ProductId");
 
             modalDialogManager.openDialog(rolesDialog, {"productId": productId,
                                                         "model":     rolesModel});
         }
-        else if (commandId === "Exclude"){
+        else if (commandId === "Remove"){
             let includesRoles = documentModel.GetData("Parents");
             includesRoles.RemoveItem(selectedIndex);
 

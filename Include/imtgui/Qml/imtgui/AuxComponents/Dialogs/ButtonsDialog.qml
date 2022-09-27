@@ -55,10 +55,12 @@ Item {
                 focus: model.Active;
 
                 enabled: model.Enabled;
+//                enabled: false;
 
                 textButton: model.Name;
-                borderColor: delegateButton.highlighted ? Style.iconColorOnSelected : Style.buttonColor;
-                backgroundColor: Style.imagingToolsGradient1;
+
+                backgroundColor: Style.buttonColor;
+                borderColor: Style.buttonBorderColor;
 
                 onClicked: {
                     console.log("AuxButton onClicked", model.Id);

@@ -3,61 +3,60 @@ import Acf 1.0
 import imtgui 1.0
 
 Dialog {
-    id: container;
+    id: editDialogContainer;
+
+    width: 700;
 
     property string titleId;
     property string titleName;
 
-    property string valueId;
+    property string valueId: null;
     property string valueName;
 
     property bool autoGenerate: false;
 
     property TreeItemModel model;
-    property TreeItemModel headers;
+    property alias subFeaturesModel: subFeaturesCopyModel;
 
-    onFinished: {
-        if (buttonId === "Ok"){
-            container.valueId = container.bodyItem.inputId;
-            container.valueName = container.bodyItem.inputName;
-        }
+    property int index: -1;
+
+    content: EditDialogBody {
     }
 
-    onTitleIdChanged: {
-        console.log("EditDialog onTitleIdChanged", titleId);
-        container.bodyItem.titleId = container.titleId;
-        console.log("container.bodyItem.titleId", container.bodyItem.titleId);
-    }
-
-    onTitleNameChanged: {
-        container.bodyItem.titleName = container.titleName;
-    }
-
-    onValueIdChanged: {
-        container.bodyItem.inputId = container.valueId;
-    }
-
-    onValueNameChanged: {
-        container.bodyItem.inputName = container.valueName;
-    }
-
-    onAutoGenerateChanged: {
-        container.bodyItem.autoGenerate = container.autoGenerate;
+    TreeItemModel {
+        id: subFeaturesCopyModel;
     }
 
     Component.onCompleted: {
-        container.buttons.addButton({"Id": "Ok", "Name": "OK", "Enabled": true});
-        container.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
+        editDialogContainer.buttons.addButton({"Id": "Ok", "Name": "OK", "Enabled": true});
+        editDialogContainer.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
 
-        container.bodySource = "../../../imtlicgui/EditDialogBody.qml";
-        container.title = qsTr("Edit");
+        editDialogContainer.title = qsTr("Edit");
     }
 
-    function setInputNameValidator(validator){
-//        container.bodyItem.inputName.setValidator(validator);
+    onFinished: {
+        if (buttonId === "Ok"){
+            let subFeaturesModel = model.GetData("ChildModel", index);
+
+            let json = editDialogContainer.subFeaturesModel.toJSON();
+            subFeaturesModel.Parse(json);
+
+//            editDialogContainer.valueId = editDialogContainer.bodyItem.inputId;
+//            editDialogContainer.valueName = editDialogContainer.bodyItem.inputName;
+        }
     }
 
-    function setInputIdValidator(validator){
-//        container.bodyItem.inputId.setValidator(validator);
+    onValueIdChanged: {
+        getSubFeaturesFromModel();
+    }
+
+    function getSubFeaturesFromModel(){
+        let subFeaturesModel = model.GetData("ChildModel", index);
+        if (!subFeaturesModel){
+            subFeaturesModel = model.AddTreeModel("ChildModel", index);
+        }
+
+        let json = subFeaturesModel.toJSON();
+        editDialogContainer.subFeaturesModel.Parse(json);
     }
 }

@@ -141,7 +141,7 @@ Item {
                     width: productRolesDelegate.width;
                     height: body.height;
 
-                    color: rolesRepeater.selectedIndex == model.index ? "#204682B4" : "transparent";
+                    color: rolesRepeater.selectedIndex == model.index ? Style.selectedColor : "transparent";
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter;

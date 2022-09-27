@@ -17,8 +17,12 @@ DocumentBase {
 
     property Item includedRolesTable;
 
+    property string title: qsTr("Roles");
+
     onDocumentModelChanged: {
-        headerText.text = documentModel.GetData("Name");
+        headerText.text = title + " / " + documentModel.GetData("Name");
+
+        removeElementFromRolesModel();
     }
 
     UndoRedoManager {
@@ -36,6 +40,31 @@ DocumentBase {
         console.log("RoleView onSelectedIndexChanged", selectedIndex);
     }
 
+    function removeElementFromRolesModel(){
+        console.log("removeElementFromRolesModel");
+        let roleId = documentModel.GetData("Id");
+        let productId = documentModel.GetData("ProductId");
+        for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+            let currentProductId = rolesModel.GetData("Id", i);
+            if (productId == currentProductId){
+                let roles = rolesModel.GetData("Roles", i);
+
+                for (let j = 0; j < roles.GetItemsCount(); j++){
+                    let currentRoleId = roles.GetData("Id", j);
+
+                    if (roleId == currentRoleId){
+
+                        console.log("RemoveData", j);
+                        roles.RemoveData(j);
+                        break;
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
     function updateGui(){
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
@@ -45,7 +74,7 @@ DocumentBase {
 
     Rectangle {
         anchors.fill: parent;
-        color: Style.baseColor;
+        color: Style.backgroundColor;
     }
 
     Row {
@@ -57,7 +86,7 @@ DocumentBase {
 
         height: 40;
 
-        spacing: 20;
+        spacing: 10;
 
         AuxButton {
             id: closeButton;
