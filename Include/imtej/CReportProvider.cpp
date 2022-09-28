@@ -89,7 +89,13 @@ EjDocument* CReportProvider::getReport(iprm::IParamsSet* reportParams)
 	control.setParagraphStyle(&curParagraph);
 	curTextStyle.m_font.setPixelSize(7);
 	control.setTextStyle(&curTextStyle);
-	control.setText("«Батыс су арнасы» – ЖШС " + QString::number(date.date().year()) +" ж. қыркүйек айында ұсынылған қызметтері үшін/за услуги оказанные в " + QDate::longMonthName(date.date().month()) +" "+ QString::number(date.date().year())+" г. ТОО «Батыс су арнасы» ");
+	control.setText(
+				"«Батыс су арнасы» – ЖШС " +
+				QString::number(date.date().year()) +
+				" ж. қыркүйек айында ұсынылған қызметтері үшін/за услуги оказанные в " +
+				date.toString("MMMM") +
+				" " +
+				QString::number(date.date().year()) + " г. ТОО «Батыс су арнасы» ");
 	control.inputEnter();
 
 	curTextStyle.setDefault();
@@ -129,7 +135,7 @@ EjDocument* CReportProvider::getReport(iprm::IParamsSet* reportParams)
 
 	control.activeIndex = table->cellIndex(0,6,ejDoc->lBlocks);
 	curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
-	curCell->setText(date.toString("MM.yyyy")+" ж. есептеледі/начислено за " +date.toString("MM.yyyy") + " г.",&control);
+	curCell->setText(date.toString("MM.yyyy")+" ж. есептеледі/начислено за " + date.toString("MM.yyyy") + " г.",&control);
 
 	control.activeIndex = table->cellIndex(0,7,ejDoc->lBlocks);
 	curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);

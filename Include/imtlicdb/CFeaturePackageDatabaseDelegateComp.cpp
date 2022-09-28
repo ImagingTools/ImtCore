@@ -316,8 +316,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			QString featureName = featureInfoPtr->GetFeatureName();
 			QString featureDescription = newObjectPtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-			retVal += "\n" +
-				QString("UPDATE \"Features\" SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4' WHERE PackageId = '%5' AND Id = '%6';")
+			retVal += QString("\nUPDATE \"Features\" SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4' WHERE PackageId = '%5' AND Id = '%6';")
 				.arg(qPrintable(updatedFeatureId))
 				.arg(featureName)
 				.arg(featureDescription)
@@ -325,7 +324,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(newPackageId))
 				.arg(qPrintable(updatedFeatureId)).toLocal8Bit();
 
-			retVal += "\n" + QString("DELETE FROM \"Features\" WHERE parentid = '%1';").arg(qPrintable(updatedFeatureId));
+			retVal += QString("\nDELETE FROM \"Features\" WHERE parentid = '%1';").arg(qPrintable(updatedFeatureId)).toLocal8Bit();
 
 			CreateInsertSubFeaturesQuery(featureInfoPtr, retVal);
 		}
