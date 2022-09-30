@@ -38,6 +38,7 @@
 #include <imtgui/CPopupControllerComp.h>
 #include <imtgui/CStandardPopupWidgetFactoryComp.h>
 #include <imtgui/CPopupTestGuiComp.h>
+#include <imtgui/CStandardClientAreaProviderComp.h>
 
 
 /**
@@ -79,6 +80,7 @@ typedef imtgui::CPaginationGuiComp PaginationGui;
 typedef imtgui::CPopupControllerComp PopupController;
 typedef imtgui::CStandardPopupWidgetFactoryComp StandardPopupWidgetFactory;
 typedef imtgui::CPopupTestGuiComp PopupTestGui;
+typedef icomp::TModelCompWrap<imtgui::CStandardClientAreaProviderComp> StandardClientAreaProvider;
 
 
 } // namespace ImtGuiPck

@@ -177,6 +177,11 @@ I_EXPORT_COMPONENT(
 			"Popup test gui",
 			"Popup Gui");
 
+I_EXPORT_COMPONENT(
+			StandardClientAreaProvider,
+			"Standard client area provider",
+			"Client Area Provider");
+
 
 } // namespace ImtGuiPck
 
