@@ -332,6 +332,7 @@ bool CMenuPanel::SetPageOrder(const QByteArray& pageId, int position)
 			QStandardItem* oldItem = activeModelPtr->itemFromIndex(index);
 			QStandardItem* newItem = new QStandardItem();
 			newItem->setText(oldItem->text());
+			newItem->setToolTip(oldItem->text());
 			newItem->setIcon(oldItem->icon());
 			newItem->setData(oldItem->data((DR_PAGE_ID)));
 
@@ -411,8 +412,14 @@ bool CMenuPanel::SetPageName(const QByteArray& pageId, const QString& pageName)
 	const QStandardItemModel* activeModelPtr = &m_model;
 	QModelIndex index = GetModelIndex(pageId, &activeModelPtr);
 	if (index.isValid()){
-		activeModelPtr->itemFromIndex(index)->setText(pageName);
+		QStandardItem* pageItemPtr = activeModelPtr->itemFromIndex(index);
+		Q_ASSERT(pageItemPtr != nullptr);
+
+		pageItemPtr->setText(pageName);
+		pageItemPtr->setToolTip(pageName);
+
 		m_maxWidth = CalculateMaxItemWith();
+
 		return true;
 	}
 
