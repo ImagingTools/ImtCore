@@ -99,6 +99,12 @@ void CStandardCollectionViewDelegateComp::SetupCommands()
 }
 
 
+bool CStandardCollectionViewDelegateComp::IsBundlePersistenceSupported(ifile::IFileTypeInfo::QueryFlags /*flags*/) const
+{
+	return *m_useCompressorAttrPtr;
+}
+
+
 // reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 
 void CStandardCollectionViewDelegateComp::OnDesignSchemaChanged()

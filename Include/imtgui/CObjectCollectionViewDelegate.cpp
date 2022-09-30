@@ -622,7 +622,7 @@ const ifile::IFileTypeInfo* CObjectCollectionViewDelegate::FindFileInfo(const QB
 }
 
 
-QString CObjectCollectionViewDelegate::CreateFileImportFilter() const
+QString CObjectCollectionViewDelegate::CreateFileImportFilter(bool useBundle) const
 {
 	QStringList filters;
 	QStringList allExt;
@@ -632,8 +632,10 @@ QString CObjectCollectionViewDelegate::CreateFileImportFilter() const
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
-	filters.append("Compressed item folder (*.zip)");
-	allExt.append("zip");
+	if (useBundle) {
+		filters.append("Compressed item folder (*.zip)");
+		allExt.append("zip");
+	}
 
 	if (allExt.size() > 1){
 		filters.prepend(tr("All known documents (%1)").arg("*." + allExt.join(" *.")));
@@ -643,7 +645,7 @@ QString CObjectCollectionViewDelegate::CreateFileImportFilter() const
 }
 
 
-QString CObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& objectId) const
+QString CObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& objectId, bool useBundle) const
 {
 	QStringList filters;
 	QStringList allExt;
@@ -655,11 +657,18 @@ QString CObjectCollectionViewDelegate::CreateFileExportFilter(const QByteArray& 
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
-	filters.append("Compressed item folder (*.zip)");
-
-	allExt.append("zip");
+	if (useBundle){
+		filters.append("Compressed item folder (*.zip)");
+		allExt.append("zip");
+	}
 
 	return filters.join(";;");
+}
+
+
+bool CObjectCollectionViewDelegate::IsBundlePersistenceSupported(ifile::IFileTypeInfo::QueryFlags /*flags*/) const
+{
+	return false;
 }
 
 
@@ -761,7 +770,7 @@ void CObjectCollectionViewDelegate::OnImport()
 				(m_parentGuiPtr != nullptr) ? m_parentGuiPtr->GetWidget() : nullptr,
 				tr("Import File"),
 				QString(),
-				CreateFileImportFilter());
+				CreateFileImportFilter(IsBundlePersistenceSupported(ifile::IFileTypeInfo::QF_LOAD)));
 
 	if (!files.isEmpty()){
 		for (const QString& filePath : files){
@@ -795,7 +804,7 @@ void CObjectCollectionViewDelegate::OnExport()
 
 	QByteArray objectId = m_selectedItemIds[0];
 
-	QString filters = CreateFileExportFilter(objectId);
+	QString filters = CreateFileExportFilter(objectId, IsBundlePersistenceSupported(ifile::IFileTypeInfo::QF_SAVE));
 	QString selectedFilter = FindSelectedFilter(filters, m_exportFilePath);
 	m_exportFilePath = ComposeExportFilePath(m_exportFilePath, GetExportFileName(*m_collectionPtr, objectId));
 	m_exportFilePath = QFileDialog::getSaveFileName(
@@ -843,7 +852,7 @@ void CObjectCollectionViewDelegate::OnRestore()
 					revisionControllerPtr,
 					objectId,
 					fileName,
-					CreateFileExportFilter(objectId));
+					CreateFileExportFilter(objectId, IsBundlePersistenceSupported(ifile::IFileTypeInfo::QF_SAVE)));
 
 		if (dialog.exec() == QDialog::Accepted){
 			int revision = dialog.GetSelectedRevision();

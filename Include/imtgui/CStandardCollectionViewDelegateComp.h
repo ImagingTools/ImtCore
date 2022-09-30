@@ -34,6 +34,7 @@ public:
 		I_ASSIGN(m_statusIconsProviderCompPtr, "StatusIcons", "Icons for delegate visual status", false, "StatusIcons");
 		I_ASSIGN(m_editDialogCompPtr, "EditDialog", "Dialog used for editing the collection items", false, "EditDialog");
 		I_ASSIGN_TO(m_editDialogObserverCompPtr, m_editDialogCompPtr, true);
+		I_ASSIGN(m_useCompressorAttrPtr, "UseCompressor", "If enable, use ZIP-compression for import/export of objects", true, true);
 	I_END_COMPONENT;
 
 	CStandardCollectionViewDelegateComp();
@@ -49,6 +50,7 @@ protected:
 
 	// reimplemented (CObjectCollectionViewDelegate)
 	virtual void SetupCommands() override;
+	virtual bool IsBundlePersistenceSupported(ifile::IFileTypeInfo::QueryFlags flags) const;
 
 	// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 	virtual void OnDesignSchemaChanged() override;
@@ -66,6 +68,11 @@ private:
 	void InitializeVisualStatus();
 
 private:
+	/**
+		If enable, use ZIP-compression for import/export of objects.
+	*/
+	I_ATTR(bool, m_useCompressorAttrPtr);
+
 	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
 	I_REF(iqtgui::IIconProvider, m_statusIconsProviderCompPtr);
 

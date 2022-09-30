@@ -114,8 +114,9 @@ protected:
 	virtual void AfterRestore(const QByteArray& objectId, bool isRestoreSuccessful);
 	virtual QByteArray FindTypeIdFromFile(const QString& filePath) const;
 	virtual const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const;
-	virtual QString CreateFileImportFilter() const;
-	virtual QString CreateFileExportFilter(const QByteArray& objectId) const;
+	virtual QString CreateFileImportFilter(bool useBundle) const;
+	virtual QString CreateFileExportFilter(const QByteArray& objectId, bool useBundle) const;
+	virtual bool IsBundlePersistenceSupported(ifile::IFileTypeInfo::QueryFlags flags) const;
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;

@@ -44,6 +44,7 @@ public:
 		I_ASSIGN(m_documentManagerCompPtr, "DocumentManager", "Document manager", true, "DocumentManager");
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
 		I_ASSIGN(m_informationViewCompPtr, "InformationView", "Document summary information view", false, "InformationView");
+		I_ASSIGN(m_useCompressorAttrPtr, "UseCompressor", "If enable, use ZIP-compression for import/export of objects", true, true);
 	I_END_COMPONENT;
 
 	enum CommandGroup
@@ -128,6 +129,7 @@ protected:
 	virtual const ifile::IFileTypeInfo* FindFileInfo(const QByteArray& typeId, FileOperationType operationType) const;
 	virtual void SetupCommands() override;
 	virtual void SetupInsertCommand() override;
+	virtual bool IsBundlePersistenceSupported(ifile::IFileTypeInfo::QueryFlags flags) const override;
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;
@@ -156,6 +158,11 @@ private:
 		Type-ID of the related document/object.
 	*/
 	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
+
+	/**
+		If enable, use ZIP-compression for import/export of objects.
+	*/
+	I_ATTR(bool, m_useCompressorAttrPtr);
 
 	/**
 		Provider of status icons.

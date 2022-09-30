@@ -415,6 +415,12 @@ void CDocumentCollectionViewDelegateComp::SetupInsertCommand()
 }
 
 
+bool CDocumentCollectionViewDelegateComp::IsBundlePersistenceSupported(ifile::IFileTypeInfo::QueryFlags /*flags*/) const
+{
+	return *m_useCompressorAttrPtr;
+}
+
+
 // reimplemented (ibase::TLocalizableWrap)
 
 void CDocumentCollectionViewDelegateComp::OnLanguageChanged()
