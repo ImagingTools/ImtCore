@@ -134,6 +134,11 @@ I_EXPORT_COMPONENT(
 			"URL parameter",
 			"URL Parameter");
 
+I_EXPORT_COMPONENT(
+			FilteredMessageConsumer,
+			"Filter for message consumer",
+			"Filter Message Consumer");
+
 
 } // namespace ImtCorePck
 
