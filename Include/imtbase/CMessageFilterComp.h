@@ -20,6 +20,7 @@ public:
 	I_BEGIN_COMPONENT(CMessageFilterComp);
 		I_ASSIGN_MULTI_0(m_acceptMessageIdsAttrPtr, "AcceptMessageIds", "Message IDs to accept", false);
 		I_ASSIGN_MULTI_0(m_rejectMessageIdsAttrPtr, "RejectMessageIds", "Message IDs to reject", false);
+		I_ASSIGN(m_filteredMessageConsumerCompPtr, "FilterdMessageConsumer", "Message consumer for filtered messages", false, "Log");
 	I_END_COMPONENT;
 
 	// reimplemented (ilog::IMessageConsumer)
