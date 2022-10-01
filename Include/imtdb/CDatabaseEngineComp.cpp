@@ -493,10 +493,10 @@ bool CDatabaseEngineComp::IsDatabaseServerConnected() const
 QString CDatabaseEngineComp::GetDatabaseName() const
 {
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
-		return m_databaseAccessSettingsCompPtr->GetDatabaseName().toLower();
+        return m_databaseAccessSettingsCompPtr->GetDatabaseName();
 	}
 
-	return (*m_dbNameAttrPtr).toLower();
+    return *m_dbNameAttrPtr;
 }
 
 
