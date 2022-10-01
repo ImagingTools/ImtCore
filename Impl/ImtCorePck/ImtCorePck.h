@@ -31,7 +31,7 @@
 #include <imtbase/CCollectionDataControllerComp.h>
 #include <imtbase/CQtResourceLoaderComp.h>
 #include <imtbase/CUrlParamComp.h>
-#include <imtbase/CFilteredMessageConsumerComp.h>
+#include <imtbase/CMessageFilterComp.h>
 
 
 /**
@@ -76,7 +76,7 @@ typedef icomp::TModelCompWrap<
 typedef imtbase::CCollectionDataControllerComp CollectionDataController;
 typedef imtbase::CQtResourceLoaderComp QtResourceLoaderComp;
 typedef icomp::TModelCompWrap<imtbase::CUrlParamComp> UrlParam;
-typedef imtbase::CFilteredMessageConsumerComp FilteredMessageConsumer;
+typedef imtbase::CMessageFilterComp MessageFilter;
 
 
 } // namespace ImtCorePck

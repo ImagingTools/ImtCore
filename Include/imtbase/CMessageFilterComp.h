@@ -12,12 +12,12 @@ namespace imtbase
 {
 
 
-class CFilteredMessageConsumerComp: public ilog::TMessageDelegatorComp<icomp::CComponentBase>
+class CMessageFilterComp: public ilog::TMessageDelegatorComp<icomp::CComponentBase>
 {
 public:
 	typedef ilog::TMessageDelegatorComp<icomp::CComponentBase> BaseClass;
 
-	I_BEGIN_COMPONENT(CFilteredMessageConsumerComp);
+	I_BEGIN_COMPONENT(CMessageFilterComp);
 		I_ASSIGN_MULTI_0(m_acceptMessageIdsAttrPtr, "AcceptMessageIds", "Message IDs to accept", false);
 		I_ASSIGN_MULTI_0(m_rejectMessageIdsAttrPtr, "RejectMessageIds", "Message IDs to reject", false);
 	I_END_COMPONENT;

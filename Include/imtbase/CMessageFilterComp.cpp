@@ -1,4 +1,4 @@
-#include <imtbase/CFilteredMessageConsumerComp.h>
+#include <imtbase/CMessageFilterComp.h>
 
 
 namespace imtbase
@@ -9,7 +9,7 @@ namespace imtbase
 
 // reimplemented (ilog::IMessageConsumer)
 
-bool CFilteredMessageConsumerComp::IsMessageSupported(int messageCategory, int messageId, const istd::IInformationProvider* messagePtr) const
+bool CMessageFilterComp::IsMessageSupported(int messageCategory, int messageId, const istd::IInformationProvider* messagePtr) const
 {
 	bool retVal = false;
 
@@ -31,7 +31,7 @@ bool CFilteredMessageConsumerComp::IsMessageSupported(int messageCategory, int m
 }
 
 
-void CFilteredMessageConsumerComp::AddMessage(const MessagePtr& messagePtr)
+void CMessageFilterComp::AddMessage(const MessagePtr& messagePtr)
 {
 	BaseClass::AddMessage(messagePtr);
 
@@ -45,7 +45,7 @@ void CFilteredMessageConsumerComp::AddMessage(const MessagePtr& messagePtr)
 
 // private methods
 
-bool CFilteredMessageConsumerComp::IsMessageAccepted(int messageId)
+bool CMessageFilterComp::IsMessageAccepted(int messageId)
 {
 	QSet<int> rejectedIds;
 	if (m_rejectMessageIdsAttrPtr.IsValid()){
