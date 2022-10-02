@@ -45,6 +45,8 @@ public:
 		I_ASSIGN_TO(m_documentManagerModelCompPtr, m_documentManagerCompPtr, true);
 		I_ASSIGN(m_informationViewCompPtr, "InformationView", "Document summary information view", false, "InformationView");
 		I_ASSIGN(m_useCompressorAttrPtr, "UseCompressor", "If enable, use ZIP-compression for import/export of objects", true, true);
+		I_ASSIGN(m_editCommandLabelAttrPtr, "EditCommandLabel", "Label of the edit command", true, "Edit");
+		I_ASSIGN(m_editCommandDescriptionAttrPtr, "EditCommandDescription", "Description of the edit command", true, "Edit existing object");
 	I_END_COMPONENT;
 
 	enum CommandGroup
@@ -154,6 +156,16 @@ private:
 	void InitializeVisualStatus();
 
 private:
+	/**
+		Label for "Edit"-command.
+	*/
+	I_TEXTATTR(m_editCommandLabelAttrPtr);
+
+	/**
+		Description of the "Edit"-command.
+	*/
+	I_TEXTATTR(m_editCommandDescriptionAttrPtr);
+
 	/**
 		Type-ID of the related document/object.
 	*/

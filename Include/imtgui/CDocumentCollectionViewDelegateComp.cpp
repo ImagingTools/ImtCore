@@ -427,7 +427,7 @@ void CDocumentCollectionViewDelegateComp::OnLanguageChanged()
 {
 	BaseClass2::OnLanguageChanged();
 
-	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), GetIcon(":/Icons/Edit"));
+	m_editContentsCommand.SetVisuals(*m_editCommandLabelAttrPtr, *m_editCommandLabelAttrPtr, *m_editCommandDescriptionAttrPtr, GetIcon(":/Icons/Edit"));
 }
 
 
@@ -585,7 +585,11 @@ int CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::SaveToFile(
 
 // reimplemented (ifile::IFileTypeInfo)
 
-bool CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::GetFileExtensions(QStringList& result, const istd::IChangeable* dataObjectPtr, int flags, bool doAppend) const
+bool CDocumentCollectionViewDelegateComp::ObjectPersistenceProxy::GetFileExtensions(
+			QStringList& result,
+			const istd::IChangeable* dataObjectPtr,
+			int flags,
+			bool doAppend) const
 {
 	for (int i = 0; i < m_parent.m_openedDocuments.GetCount(); ++i){
 		const ICollectionViewDelegate::ObjectInfo* documentInfoPtr = m_parent.m_openedDocuments.GetAt(i);
