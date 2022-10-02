@@ -45,7 +45,7 @@ void CMessageFilterComp::AddMessage(const MessagePtr& messagePtr)
 
 // private methods
 
-bool CMessageFilterComp::IsMessageAccepted(int messageId)
+bool CMessageFilterComp::IsMessageAccepted(int messageId) const
 {
 	QSet<int> rejectedIds;
 	if (m_rejectMessageIdsAttrPtr.IsValid()){
