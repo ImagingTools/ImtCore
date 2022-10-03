@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4948" Description="ACF"/>
-            <Version Id="1" Number="2151" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5021" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -333,6 +333,7 @@
         <Component ExportedId="LoginLog" ComponentId="StandardLoginGui/LoginLog"/>
         <Component ExportedId="MenuPanelVisibility" ComponentId="MenuPanelVisibility"/>
         <Component ExportedId="PageCommands" ComponentId="CommandsMultiplexer"/>
+        <Component ExportedId="PopupController" ComponentId="Pages/PopupController"/>
         <Component ExportedId="RuntimeStatus" ComponentId="GuiApplication/RuntimeStatus"/>
         <Component ExportedId="SettingsProvider" ComponentId="SettingsProvider"/>
         <Component ExportedId="SplashScreen" ComponentId="SplashScreen"/>

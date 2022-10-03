@@ -26,7 +26,7 @@ public:
 		I_ASSIGN(m_popupDefaultTimeoutAttrPtr, "PopupDefaultTimeout", "Timeout value in msecs before the popup closes, a zero or negative value requires user action to close", true, 3000);
 	I_END_COMPONENT;
 
-	// reimplemented (iqtgui::CGuiComponentBase)
+	// pseudo-reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiShown() override;
 	virtual void OnGuiHidden() override;
