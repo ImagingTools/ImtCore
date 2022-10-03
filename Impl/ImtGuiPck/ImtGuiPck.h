@@ -39,6 +39,7 @@
 #include <imtgui/CStandardPopupWidgetFactoryComp.h>
 #include <imtgui/CPopupTestGuiComp.h>
 #include <imtgui/CStandardClientAreaProviderComp.h>
+#include <imtgui/TPopupControllerCompWrap.h>
 
 
 /**
@@ -49,7 +50,8 @@ namespace ImtGuiPck
 
 
 typedef imtbase::TComponentFactoryComp<iqtgui::IGuiObject> GuiComponentFactory;
-typedef imtgui::CThumbnailDecoratorGuiComp ThumbnailDecoratorGui;
+typedef imtgui::TPopupControllerCompWrap<
+			imtgui::CThumbnailDecoratorGuiComp> ThumbnailDecoratorGui;
 typedef imtgui::CSingleStatusProviderGuiComp SingleStatusProviderGui;
 typedef imtgui::CMultiStatusProviderGuiComp MultiStatusProviderGui;
 typedef icomp::TModelCompWrap<imtgui::CObjectCollectionViewComp> ObjectCollectionView;

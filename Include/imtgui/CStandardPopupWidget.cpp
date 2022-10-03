@@ -62,11 +62,11 @@ void CStandardPopupWidget::paintEvent(QPaintEvent* /*event*/)
 	painter.setRenderHint(QPainter::Antialiasing);
 
 	static const std::map<istd::IInformationProvider::InformationCategory, QColor> backgroundColorLevels{
-		{istd::IInformationProvider::InformationCategory::IC_NONE, QColor(0,0,0,192)},
-		{istd::IInformationProvider::InformationCategory::IC_INFO, QColor(0,200,0,192)},
-		{istd::IInformationProvider::InformationCategory::IC_WARNING, QColor(200,200,0,192)},
-		{istd::IInformationProvider::InformationCategory::IC_ERROR, QColor(200,0,0,192)},
-		{istd::IInformationProvider::InformationCategory::IC_CRITICAL, QColor(100,0,0,192)},
+		{istd::IInformationProvider::InformationCategory::IC_NONE, QColor(0,0,0)},
+		{istd::IInformationProvider::InformationCategory::IC_INFO, QColor(0,200,0)},
+		{istd::IInformationProvider::InformationCategory::IC_WARNING, QColor(200,200,0)},
+		{istd::IInformationProvider::InformationCategory::IC_ERROR, QColor(200,0,0)},
+		{istd::IInformationProvider::InformationCategory::IC_CRITICAL, QColor(100,0,0)},
 	};
 
 	istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::InformationCategory::IC_NONE;
