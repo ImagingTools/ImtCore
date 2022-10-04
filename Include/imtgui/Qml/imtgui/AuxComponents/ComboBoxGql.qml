@@ -10,6 +10,8 @@ Item {
     height: 30;
 
     property var model;
+    property var properties;
+    property var gettedParams;
 
     property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
 
@@ -37,15 +39,6 @@ Item {
         }
     }
 
-    onCurrentIndexChanged: {
-        console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
-        if (comboBoxContainer.currentIndex > -1){
-            let name = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
-            console.log("name", name);
-            comboBoxContainer.currentText = name;
-        }
-    }
-
     Component {
         id: popupMenu;
         PopupMenuDialogGql {
@@ -55,15 +48,31 @@ Item {
             commandId: comboBoxContainer.commandId
             filterName: comboBoxContainer.filterName
             delegate: comboBoxContainer.delegate
+            properties: comboBoxContainer.properties;
+            gettedParams: comboBoxContainer.gettedParams;
             onFilterTextChanged: {
-                comboBoxContainer.filterText = popup.filterText
+                comboBoxContainer.filterText = popup.filterText;
+                comboBoxContainer.currentIndex = -1;
+                comboBoxContainer.currentText = popup.filterText;
             }
             onFinished: {
+                if (index > -1){
+                    for (var item = 0; item < gettedParams.GetItemsCount(); item++){
+                        let param = comboBoxContainer.gettedParams.GetData("Name",  item);
+                        let value = popup.model.GetData(param, index);
+                        console.log(param, " = ", value);
+                        comboBoxContainer.gettedParams.SetData("Value", value, item);
+                    }
+                }
                 comboBoxContainer.currentIndex = index;
                 comboBoxContainer.currentText = popup.model.GetData("Name", index);
                 if (comboBoxContainer.currentText == ""){
                     comboBoxContainer.currentText = popup.filterText;
                 }
+            }
+            onPropertiesChanged: {
+                comboBoxContainer.currentIndex = -1;
+                comboBoxContainer.currentText = ""
             }
         }
     }

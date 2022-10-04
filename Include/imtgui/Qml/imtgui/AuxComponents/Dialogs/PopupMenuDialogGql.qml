@@ -21,8 +21,9 @@ Rectangle {
     property string filterName: "Name";
     property alias filterText: filterField.text;
     property bool endListStatus: false;
-    property bool requestStatus: true;
     property Item delegate: PopupMenuDelegate{}
+    property var properties;
+    property var gettedParams;
 
     /**
         Count of the visible item, if value = -1 then count unlimited
@@ -46,6 +47,13 @@ Rectangle {
 
     onModelChanged: {
         popupMenuListView.model = model;
+    }
+    onPropertiesChanged: {
+        for (var item = 0; item < properties.GetItemsCount(); item++){
+            modelFilter.SetData(properties.GetData("Id", item),  properties.GetData("Value", item));
+        }
+        itemsModel.updateModel(0);
+//        root.closeDialog();
     }
 
     onRootChanged: {
@@ -76,6 +84,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         onTextEdited: {
+            comboBoxContainer.currentIndex = -1;
             offset = 0;
             modelFilter.SetData("TextFilter", filterText);
             itemsModel.updateModel(0);
@@ -169,10 +178,11 @@ Rectangle {
             viewParams.InsertField("FilterModel", jsonString);
             inputParams.InsertFieldObject(viewParams);
             var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
+            for (var item = 0; item < gettedParams.GetItemsCount(); item++){
+                var nameParam = gettedParams.GetData("Name", item);
+                queryFields.InsertField(nameParam);
+            }
             query.AddField(queryFields)
-
             var gqlData = query.GetQuery();
 
             this.SetGqlQuery(gqlData);
