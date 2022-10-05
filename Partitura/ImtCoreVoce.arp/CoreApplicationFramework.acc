@@ -229,6 +229,21 @@
                     <AttributeInfo Id="PageUiContainer" Type="Reference" ExportId="MainUiPages">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="PopupAnchorCorner" Type="Integer" ExportId="PopupAnchorCorner">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupDefaultTimeout" Type="Integer" ExportId="PopupDefaultTimeout">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupEventHandler" Type="Reference[]" ExportId="PopupEventHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupSpacing" Type="Integer" ExportId="PopupSpacing">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupWidgetFactory" Type="Reference" ExportId="PopupWidgetFactory">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="QuitDialogIgnored" Type="Boolean" ExportId="QuitDialogIgnored">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
