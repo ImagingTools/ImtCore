@@ -316,7 +316,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 
 	connect(&m_autoLogoutTimer, SIGNAL(timeout()), this, SLOT(OnAutoLogoutTimer()));
 	connect(&m_checkIsFullScreenTimer, SIGNAL(timeout()), this, SLOT(OnCheckIsFullScreenTimer()));
-	connect(ExitButton, &QToolButton::clicked, qApp, &QApplication::quit, Qt::QueuedConnection);
 
 	m_checkIsFullScreenTimer.start(500);
 
@@ -363,6 +362,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	CurrentPageLabel->setVisible(showPageTitle);
+
 }
 
 
@@ -454,11 +454,7 @@ void CThumbnailDecoratorGuiComp::OnTryClose(bool* ignoredPtr)
 				m_pagesWidgetCompPtr->OnTryClose(&ignored);
 			}
 
-			if (ignored){
-				return;
-			}
-
-			ExitApplication();
+			*ignoredPtr = ignored;
 		}
 	}
 }
@@ -495,6 +491,12 @@ void CThumbnailDecoratorGuiComp::on_PageList_clicked(const QModelIndex& index)
 
 		m_pagesCompPtr->SetSelectedOptionIndex(info.pageIndex);
 	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_ExitButton_clicked()
+{
+	ExitApplication();
 }
 
 
@@ -1087,7 +1089,7 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 
 	switch (action){
 	case UA_APPLICATION_EXIT:
-	return hasCloseRight && !m_isExitProcess;
+	return hasCloseRight;
 	case UA_HOME_ENABLED:
 	return isHomeEnabled;
 	case UA_LOGIN_CONTROL_ENABLED:
@@ -1103,16 +1105,15 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 
 void CThumbnailDecoratorGuiComp::ExitApplication()
 {
-	m_isExitProcess = true;
 	QWidget* topWidgetPtr = GetWidget();
 	while (topWidgetPtr->parentWidget() != NULL){
 		topWidgetPtr = topWidgetPtr->parentWidget();
 	}
 
 	if (topWidgetPtr != NULL){
-		topWidgetPtr->close();
-
-		qApp->quit();
+		if (topWidgetPtr->close()){
+			qApp->quit();
+		}
 	}
 }
 

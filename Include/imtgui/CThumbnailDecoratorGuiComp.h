@@ -196,6 +196,7 @@ protected:
 
 private Q_SLOTS:
 	void on_PageList_clicked(const QModelIndex& index);
+	void on_ExitButton_clicked();
 	void on_SubPages_itemSelectionChanged();
 	void on_HomeButton_clicked();
 	void on_LoginControlButton_clicked();
