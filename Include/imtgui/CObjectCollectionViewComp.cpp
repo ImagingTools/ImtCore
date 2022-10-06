@@ -801,7 +801,7 @@ void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selec
 
 void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 {
-	int sourceRow = item.row(); //m_proxyModelPtr->mapToSource(item).row();
+	int sourceRow = item.row();
 	QByteArray itemId = m_tableModel.data(m_tableModel.index(sourceRow, 0), DR_OBJECT_ID).toByteArray();
 
 	const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
