@@ -21,15 +21,19 @@ Item {
 
     property bool textCentered: false;
     property bool menuVisible: false;
+    property bool isColor: false;
+    property bool backVisible: true;
 
     property int radius: 5;
     property int currentIndex: -1;
     property int offset: 0;
     property int count: 15;
+    property int delegateRadius: 0;
+    property int textSize: Style.fontSize_common;
     property string commandId: "";
     property string filterName: "Name";
     property string filterText: "";
-    property Item delegate: PopupMenuDelegate{}
+    property Item delegate: PopupMenuDelegate{};
 
     signal clicked();
 
@@ -42,14 +46,16 @@ Item {
     Component {
         id: popupMenu;
         PopupMenuDialogGql {
-            id: popup
-            offset: comboBoxContainer.offset
-            count: comboBoxContainer.count
-            commandId: comboBoxContainer.commandId
-            filterName: comboBoxContainer.filterName
-            delegate: comboBoxContainer.delegate
+            id: popup;
+            offset: comboBoxContainer.offset;
+            count: comboBoxContainer.count;
+            commandId: comboBoxContainer.commandId;
+            filterName: comboBoxContainer.filterName;
+            delegate: comboBoxContainer.delegate;
             properties: comboBoxContainer.properties;
             gettedParams: comboBoxContainer.gettedParams;
+            delegateRadius: comboBoxContainer.delegateRadius;
+            textSize: comboBoxContainer.textSize;
             onFilterTextChanged: {
                 comboBoxContainer.filterText = popup.filterText;
                 comboBoxContainer.currentIndex = -1;
@@ -69,11 +75,14 @@ Item {
                 if (comboBoxContainer.currentText == ""){
                     comboBoxContainer.currentText = popup.filterText;
                 }
+
             }
             onPropertiesChanged: {
                 comboBoxContainer.currentIndex = -1;
-                comboBoxContainer.currentText = ""
+                comboBoxContainer.currentText = "";
             }
+
+
         }
     }
 
@@ -102,16 +111,16 @@ Item {
         anchors.fill: parent;
 
         border.color: comboBoxContainer.borderColor;
-        border.width: 1;
+        border.width: !comboBoxContainer.backVisible ? 0 :1;
 
         radius: comboBoxContainer.radius;
         color: comboBoxContainer.backgroundColor;
 
         gradient: Gradient {
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+            GradientStop { position: 0.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
         }
 
 
@@ -120,13 +129,14 @@ Item {
             id: cbTitleTxt;
 
             anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: parent.left
-            anchors.leftMargin: 10
+            anchors.left: parent.left;
+            anchors.leftMargin: 10;
 
             color: Style.textColor;
             text: comboBoxContainer.currentText;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: comboBoxContainer.textSize;
+            visible: comboBoxContainer.backVisible;
         }
 
         Image {
@@ -154,9 +164,10 @@ Item {
 
             onClicked: {
                 console.log("ComboBox clicked !");
-
                 openPopupMenu();
                 comboBoxContainer.clicked();
+
+
             }
         }
     }

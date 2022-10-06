@@ -5,8 +5,11 @@ import imtgui 1.0
 import imtqml 1.0
 
 Item {
+    id: popupMenuDelegate;
+
     width: popupMenuContainer.width;
     height: popupMenuContainer.itemHeight;
+    property int textSize: Style.fontSize_common;
 
     MouseArea {
         id: mouseArea;
@@ -55,7 +58,7 @@ Item {
 
         text: model.Name;
         color: Style.textColor;
-        font.pixelSize: Style.fontSize_common;
+        font.pixelSize: popupMenuDelegate.textSize;
         font.family: Style.fontFamily;
     }
 }

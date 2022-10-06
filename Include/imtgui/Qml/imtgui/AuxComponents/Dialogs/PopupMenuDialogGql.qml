@@ -16,6 +16,8 @@ Rectangle {
     property int itemWidth: 200;
     property int itemHeight: 26;
     property int offset: 0;
+    property int delegateRadius: 0;
+    property int textSize: Style.fontSize_common;
     property int count: 15;
     property string commandId: "";
     property string filterName: "Name";
@@ -34,12 +36,15 @@ Rectangle {
     signal endList();
     signal textEdited();
 
+
     TreeItemModel{
         id: modelFilter
     }
     TreeItemModel{
         id: filterIdsModel
     }
+
+
 
     onFinished: {
         root.closeDialog();
@@ -81,8 +86,10 @@ Rectangle {
         z: 100;
         width: parent.width;
         height: 30;
+        radius: popupMenuContainer.delegateRadius;
         anchors.top: parent.top
         anchors.left: parent.left
+        textSize: popupMenuContainer.textSize;
         onTextEdited: {
             comboBoxContainer.currentIndex = -1;
             offset = 0;
@@ -91,6 +98,7 @@ Rectangle {
         }
         onAccepted: {
             root.closeDialog();
+            popupMenuContainer.close();
         }
 
     }
@@ -102,6 +110,7 @@ Rectangle {
 
         width: popupMenuContainer.width;
         height: popupMenuListView.height;
+        radius: popupMenuContainer.delegateRadius;
 
         color: Style.baseColor;
 
@@ -113,6 +122,7 @@ Rectangle {
             anchors.fill: parent
             opacity: 0.5
             visible: false;
+
             Text {
 
                 anchors.centerIn: parent;
@@ -144,7 +154,7 @@ Rectangle {
                     }
                 }
             }
-            delegate: PopupMenuDelegate{}// Delegate Item
+            delegate: PopupMenuDelegate{textSize: popupMenuContainer.textSize}// Delegate Item
         }//ListView
     }//ItemListView
 

@@ -4,6 +4,7 @@ Item {
     id: container;
 
     property alias backgroundItem: background;
+    property bool openST: false;
 
     Component.onDestruction: {
         modalDialogModels.clear();
@@ -16,6 +17,7 @@ Item {
     function openDialog(comp, parameters){
         console.log("DialogsManager addDialog", comp);
         modalDialogModels.append({"Component": comp, "Parameters": parameters});
+        container.openST = true;
     }
 
     function closeDialog(){
@@ -24,6 +26,9 @@ Item {
         if (modalDialogModels.count > 0){
             modalDialogModels.remove(modalDialogModels.count - 1);
         }
+
+        container.openST = false;
+
     }
 
     Rectangle {
