@@ -38,7 +38,6 @@ namespace imtgui
 CObjectCollectionViewComp::CObjectCollectionViewComp()
 	:m_semaphoreCounter(0),
 	m_currentInformationViewPtr(nullptr),
-	m_eventBasedUpdateEnabled(false),
 	m_tableModel(*this)
 {
 	m_pageSelection.SetParent(this);
@@ -153,6 +152,10 @@ void CObjectCollectionViewComp::OnPageSelectionUpdated()
 {
 	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 	if (collectionPtr != nullptr){
+		m_itemsSelection[m_currentTypeId].clear();
+
+		ItemList->selectionModel()->clearSelection();
+
 		m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
 	}
 }
@@ -418,14 +421,6 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	UpdateGui(istd::IChangeable::GetAnyChange());
-}
-
-
-void CObjectCollectionViewComp::OnGuiDesignChanged()
-{
-	BaseClass::OnGuiDesignChanged();
-
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ObjectCollectionView");
 }
 
 

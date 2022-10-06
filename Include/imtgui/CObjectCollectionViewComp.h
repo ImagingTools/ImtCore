@@ -149,7 +149,6 @@ protected:
 	virtual void OnGuiCreated() override;
 	virtual void OnGuiDestroyed() override;
 	virtual void OnGuiRetranslate() override;
-	virtual void OnGuiDesignChanged() override;
 
 	// reimplemented (imod::CMultiModelDispatcherBase)
 	virtual void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
@@ -244,7 +243,7 @@ private:
 
 	void UpdateTypeStatus();
 
-	bool eventFilter(QObject* object, QEvent* event);
+	bool eventFilter(QObject* object, QEvent* event) override;
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -370,8 +369,6 @@ private:
 	I_REF(iprm::ISelectionParam, m_filterSelectionCompPtr);
 	I_REF(iqtgui::IGuiObject, m_paginationGuiCompPtr);
 	I_REF(imod::IObserver, m_paginationGuiObserverCompPtr);
-
-	bool m_eventBasedUpdateEnabled;
 };
 
 
