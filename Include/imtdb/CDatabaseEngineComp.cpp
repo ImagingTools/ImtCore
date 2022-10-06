@@ -564,7 +564,7 @@ int CDatabaseEngineComp::GetLastMigration() const
 			return avaliableMigration;
 		}
 		else{
-			SendErrorMessage(0, "Directory of migration is not exist", "Migration");
+			SendErrorMessage(0, "Directory containing SQL-migration files doesn't exist", "Migration");
 			return -1;
 		}
 	}
