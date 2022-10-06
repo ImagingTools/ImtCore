@@ -141,7 +141,7 @@ void CInternetConnectionCheckerComp::SendRequest()
 #if QT_VERSION > QT_VERSION_CHECK(5, 14, 0)
 		request.setTransferTimeout(m_requestTimeout);
 #endif
-		QNetworkReply* replyPtr = m_managerPtr->get(request);
+		QNetworkReply* replyPtr = m_managerPtr->head(request);
 		if (replyPtr != nullptr){
 			connect(replyPtr, &QNetworkReply::finished, this, &CInternetConnectionCheckerComp::OnRequestFinished);
 		}
