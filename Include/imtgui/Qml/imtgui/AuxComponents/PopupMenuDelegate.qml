@@ -10,6 +10,9 @@ Item {
     width: popupMenuContainer.width;
     height: popupMenuContainer.itemHeight;
     property int textSize: Style.fontSize_common;
+    property alias text: mainText.text;
+    signal clicked(string commandId, int index);
+
 
     MouseArea {
         id: mouseArea;
@@ -20,7 +23,9 @@ Item {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
-            finished(model.Id, model.index);
+
+            popupMenuDelegate.clicked(model.Id, model.index);
+            //finished(model.Id, model.index);
         }
     }
 
@@ -52,6 +57,8 @@ Item {
     }
 
     Text {
+        id: mainText;
+
         anchors.left: iconItem2.right;
         anchors.leftMargin: 10;
         anchors.verticalCenter: parent.verticalCenter;

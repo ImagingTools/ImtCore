@@ -23,7 +23,7 @@ Rectangle {
     property string filterName: "Name";
     property alias filterText: filterField.text;
     property bool endListStatus: false;
-    property Item delegate: PopupMenuDelegate{}
+    property Component delegate: PopupMenuDelegate{onClicked: {finished(commandId, index)}};
     property var properties;
     property var gettedParams;
 
@@ -35,6 +35,8 @@ Rectangle {
     signal finished(string commandId, int index);
     signal endList();
     signal textEdited();
+
+
 
 
     TreeItemModel{
@@ -154,7 +156,9 @@ Rectangle {
                     }
                 }
             }
-            delegate: PopupMenuDelegate{textSize: popupMenuContainer.textSize}// Delegate Item
+            //delegate: PopupMenuDelegate{textSize: popupMenuContainer.textSize}// Delegate Item
+            delegate: popupMenuContainer.delegate;
+
         }//ListView
     }//ItemListView
 

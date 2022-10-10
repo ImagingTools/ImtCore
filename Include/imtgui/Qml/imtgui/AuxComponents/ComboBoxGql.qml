@@ -29,13 +29,18 @@ Item {
     property int offset: 0;
     property int count: 15;
     property int delegateRadius: 0;
+    property int itemHeight: 26;
     property int textSize: Style.fontSize_common;
     property string commandId: "";
     property string filterName: "Name";
     property string filterText: "";
-    property Item delegate: PopupMenuDelegate{};
+    property Component delegate: PopupMenuDelegate{};
+    property alias popupComp: popupMenu;
+
 
     signal clicked();
+    signal finished(string commandId, int index);
+
 
     onModelChanged: {
         if (comboBoxContainer.currentIndex > -1){
@@ -55,13 +60,20 @@ Item {
             properties: comboBoxContainer.properties;
             gettedParams: comboBoxContainer.gettedParams;
             delegateRadius: comboBoxContainer.delegateRadius;
+            itemHeight: comboBoxContainer.itemHeight;
             textSize: comboBoxContainer.textSize;
+            Connections{
+                target: comboBoxContainer;
+                onFinished: popup.finished(commandId, index)
+            }
             onFilterTextChanged: {
                 comboBoxContainer.filterText = popup.filterText;
                 comboBoxContainer.currentIndex = -1;
                 comboBoxContainer.currentText = popup.filterText;
             }
             onFinished: {
+                console.log(index)
+                console.log(commandId)
                 if (index > -1){
                     for (var item = 0; item < gettedParams.GetItemsCount(); item++){
                         let param = comboBoxContainer.gettedParams.GetData("Name",  item);
