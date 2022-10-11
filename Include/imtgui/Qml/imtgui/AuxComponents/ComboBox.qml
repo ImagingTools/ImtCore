@@ -21,7 +21,7 @@ Item {
 
     property int radius: 5;
     property int currentIndex: -1;
-    property Item delegate: PopupMenuDelegate{}
+    property Component delegate: PopupMenuDelegate{};
 
     signal clicked();
 
@@ -43,7 +43,7 @@ Item {
     Component {
         id: popupMenu;
         PopupMenuDialog {
-            delegate: PopupMenuDelegate{id: popupDelegate}
+            delegate: comboBoxContainer.delegate;
             onFinished: {
                 comboBoxContainer.currentIndex = index;
             }

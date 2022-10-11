@@ -25,7 +25,7 @@ Item {
         onClicked: {
 
             popupMenuDelegate.clicked(model.Id, model.index);
-            //finished(model.Id, model.index);
+            finished(model.Id, model.index);
         }
     }
 
