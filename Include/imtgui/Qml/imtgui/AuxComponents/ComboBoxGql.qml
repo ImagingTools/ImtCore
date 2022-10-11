@@ -34,7 +34,7 @@ Item {
     property string commandId: "";
     property string filterName: "Name";
     property string filterText: "";
-    property Component delegate: PopupMenuDelegate{};
+    property Component delegate: PopupMenuDelegate{width: comboBoxContainer.width; height: comboBoxContainer.height;};
     property alias popupComp: popupMenu;
 
 

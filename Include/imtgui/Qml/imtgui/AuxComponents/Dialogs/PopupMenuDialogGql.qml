@@ -15,6 +15,7 @@ Rectangle {
 
     property int itemWidth: 200;
     property int itemHeight: 26;
+    property int filterHeight: 30;
     property int offset: 0;
     property int delegateRadius: 0;
     property int textSize: Style.fontSize_common;
@@ -87,10 +88,11 @@ Rectangle {
         id: filterField;
         z: 100;
         width: parent.width;
-        height: 30;
+        height: popupMenuContainer.filterHeight;
+        margin: 10;
         radius: popupMenuContainer.delegateRadius;
-        anchors.top: parent.top
-        anchors.left: parent.left
+        anchors.top: parent.top;
+        anchors.left: parent.left;
         textSize: popupMenuContainer.textSize;
         onTextEdited: {
             comboBoxContainer.currentIndex = -1;
