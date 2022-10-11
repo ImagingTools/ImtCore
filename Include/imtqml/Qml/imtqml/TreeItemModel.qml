@@ -44,7 +44,7 @@ JSONListModel {
         if(this.count === 0 && row === 0){
             this.append({})
         }
-        console.log("setData",key,value,row)
+//        console.log("setData",key,value,row)
         var modelObject = this.get(row)
 
         if (modelObject === null)
@@ -56,6 +56,24 @@ JSONListModel {
 
     function SetExternTreeModel(key, value, row){
         this.SetData(key, value, row)
+    }
+
+    function CopyItemDataFromModel(index, model, externIndex){
+        var keys = model.GetKeys();
+
+        for(var key in keys){
+            let value = model.GetData(keys[key], externIndex);
+            this.SetData(keys[key], value, index);
+        }
+    }
+
+    function CopyItemDataToModel(index, model, externIndex){
+        var keys = this.GetKeys();
+
+        for(var key in keys){
+            let value = this.GetData(keys[key], index);
+            model.SetData(keys[key], value, externIndex);
+        }
     }
 
     function GetKeys(){
@@ -185,7 +203,7 @@ JSONListModel {
     }
 
     function updateTreeItemJSONModel(){
-        console.log("updateTreeItemJSONModel")
+//        console.log("updateTreeItemJSONModel")
         for(var row = 0; row < this.GetItemsCount(); row++){
             var modelObject = this.get(row)
             var keys = Object.keys(modelObject)
@@ -201,6 +219,4 @@ JSONListModel {
             }
         }
     }
-
-
 }
