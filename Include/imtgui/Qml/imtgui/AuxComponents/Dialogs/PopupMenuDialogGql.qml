@@ -24,6 +24,8 @@ Rectangle {
     property string filterName: "Name";
     property alias filterText: filterField.text;
     property bool endListStatus: false;
+    property bool hiddenBackground: true;
+
     property Component delegate: PopupMenuDelegate{onClicked: {finished(commandId, index)}};
     property var properties;
     property var gettedParams;
@@ -68,7 +70,9 @@ Rectangle {
         /**
             Opacity of the background = 0
         */
-        root.backgroundItem.opacity = 0;
+        if(popupMenuContainer.hiddenBackground){
+            root.backgroundItem.opacity = 0;
+        }
 
         /**
             Close the dialog by clicking on the background

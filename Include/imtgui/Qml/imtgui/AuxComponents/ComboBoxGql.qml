@@ -23,6 +23,7 @@ Item {
     property bool menuVisible: false;
     property bool isColor: false;
     property bool backVisible: true;
+    property bool hiddenBackground: true;
 
     property int radius: 5;
     property int currentIndex: -1;
@@ -36,6 +37,7 @@ Item {
     property string filterText: "";
     property Component delegate: PopupMenuDelegate{width: comboBoxContainer.width; height: comboBoxContainer.height;};
     property alias popupComp: popupMenu;
+    property alias gradient: cbMainRect.gradient;
 
 
     signal clicked();
@@ -60,6 +62,7 @@ Item {
             properties: comboBoxContainer.properties;
             gettedParams: comboBoxContainer.gettedParams;
             delegateRadius: comboBoxContainer.delegateRadius;
+            hiddenBackground: comboBoxContainer.hiddenBackground;
             itemHeight: comboBoxContainer.itemHeight;
             textSize: comboBoxContainer.textSize;
             Connections{

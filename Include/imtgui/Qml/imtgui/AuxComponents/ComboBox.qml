@@ -18,6 +18,8 @@ Item {
 
     property bool textCentered: false;
     property bool menuVisible: false;
+    property bool hiddenBackground: true;
+
 
     property int radius: 5;
     property int currentIndex: -1;
@@ -44,6 +46,7 @@ Item {
         id: popupMenu;
         PopupMenuDialog {
             delegate: comboBoxContainer.delegate;
+            hiddenBackground: comboBoxContainer.hiddenBackground;
             onFinished: {
                 comboBoxContainer.currentIndex = index;
             }

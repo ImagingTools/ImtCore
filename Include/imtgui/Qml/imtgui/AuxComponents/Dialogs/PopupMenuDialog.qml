@@ -16,7 +16,10 @@ Rectangle {
     property int itemWidth: 200;
     property int itemHeight: 26;
 
-    property Item delegate: PopupMenuDelegate{}
+    property bool hiddenBackground: true;
+
+
+    property Component delegate: PopupMenuDelegate{}
 
 
     /**
@@ -38,7 +41,10 @@ Rectangle {
         /**
             Opacity of the background = 0
         */
-        root.backgroundItem.opacity = 0;
+        if(popupMenuContainer.hiddenBackground){
+            root.backgroundItem.opacity = 0;
+        }
+
 
         /**
             Close the dialog by clicking on the background

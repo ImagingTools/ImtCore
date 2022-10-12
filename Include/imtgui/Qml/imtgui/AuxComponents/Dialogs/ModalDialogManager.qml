@@ -5,6 +5,7 @@ Item {
 
     property alias backgroundItem: background;
     property bool openST: false;
+    property alias count: modalDialogs.count;
 
     Component.onDestruction: {
         modalDialogModels.clear();
@@ -44,6 +45,7 @@ Item {
         MouseArea {
             id: backgroundArea;
             anchors.fill: parent;
+            hoverEnabled: true;
 
             onWheel: {}
         }
