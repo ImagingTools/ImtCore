@@ -12,6 +12,7 @@ Item {
     property var model;
     property var properties;
     property var gettedParams;
+    property var filterIdsModel;
 
     property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
 
@@ -61,6 +62,7 @@ Item {
             delegate: comboBoxContainer.delegate;
             properties: comboBoxContainer.properties;
             gettedParams: comboBoxContainer.gettedParams;
+            filterIdsModel: comboBoxContainer.filterIdsModel;
             delegateRadius: comboBoxContainer.delegateRadius;
             hiddenBackground: comboBoxContainer.hiddenBackground;
             itemHeight: comboBoxContainer.itemHeight;

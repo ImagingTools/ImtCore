@@ -29,6 +29,7 @@ Rectangle {
     property Component delegate: PopupMenuDelegate{onClicked: {finished(commandId, index)}};
     property var properties;
     property var gettedParams;
+    property var filterIdsModel;
 
     /**
         Count of the visible item, if value = -1 then count unlimited
@@ -39,17 +40,9 @@ Rectangle {
     signal endList();
     signal textEdited();
 
-
-
-
     TreeItemModel{
         id: modelFilter
     }
-    TreeItemModel{
-        id: filterIdsModel
-    }
-
-
 
     onFinished: {
         root.closeDialog();
@@ -80,8 +73,6 @@ Rectangle {
         root.backgroundItem.backgroundAreaItem.clicked.connect(root.closeDialog);
     }
     Component.onCompleted: {
-        var index = filterIdsModel.InsertNewItem();
-        filterIdsModel.SetData("Id", "Name", index);
         modelFilter.AddTreeModel("FilterIds");
         modelFilter.SetData("FilterIds", filterIdsModel)
         modelFilter.AddTreeModel("Sort");
