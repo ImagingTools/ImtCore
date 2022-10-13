@@ -15,13 +15,13 @@ ListModel {
             return
         var xhr = new XMLHttpRequest;
         xhr.open("GET", source);
-        xhr.onreadystatechange = () => {
+        xhr.onreadystatechange = function(){
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
                 this.updateJSONModel()
                 this.state = "Ready"
             }
-        }
+        }.bind(this)
         xhr.send();
 	}
 

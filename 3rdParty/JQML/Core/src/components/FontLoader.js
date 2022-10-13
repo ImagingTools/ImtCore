@@ -1,0 +1,58 @@
+import {QtObject} from './QtObject'
+
+export class FontLoader extends QtObject {
+
+    static Null = 0
+    static Loading = 1
+    static Ready = 2
+    static Error = 3
+
+    constructor(parent) {
+        super(parent)
+
+        this.$cP('name', '')
+        this.$cP('source', '').connect(this, this.$sourceChanged)
+        this.$cP('status', FontLoader.Null)
+    }
+    $domCreate(){
+        super.$domCreate()
+
+    }
+
+    $sourceChanged(){
+        this.status = FontLoader.Loading
+
+        let path = []
+        let temp = this.$p.source.val.split('/')
+        this.name = temp[temp.length-1].split('.')[0]
+        // if(Core.hostPath !== '') path.push(Core.hostPath)
+        // if(Core.rootPath !== '') path.push(Core.rootPath)
+        if(this.$basePath !== '') path.push(this.$basePath)
+        path.push(this.$p.source.val)
+
+        let domStyle = document.createElement("style")
+        domStyle.innerHTML = `@font-face { font-family: ${this.$p.name.val}; src: url('${path.join('/')}'); }`
+        document.head.appendChild(domStyle)
+
+        document.fonts.load(`12px ${this.$p.name.val}`).then((fonts)=>{
+            if(fonts.length) this.status = FontLoader.Ready; else this.status = FontLoader.Error;
+        })
+
+        // let xhr = new XMLHttpRequest()
+        // xhr.open('GET', path.join('/'))
+        // xhr.onload = () => {
+        //     if(xhr.status >= 200 && xhr.status <= 300){
+        //         this.status = FontLoader.Ready
+        //     } else {
+        //         this.status = FontLoader.Error
+        //     }
+        // }
+        // xhr.onerror = () => {
+        //     this.status = FontLoader.Error
+        // }
+        // xhr.send()
+    }
+
+}
+
+QML.FontLoader = FontLoader

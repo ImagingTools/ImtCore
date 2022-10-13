@@ -10,7 +10,7 @@ TreeItemModel {
         xhr.open("POST", "../../graphql");
         xhr.send(gqlData);
 
-        xhr.onreadystatechange = () => {
+        xhr.onreadystatechange = function(){
 //        xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
@@ -18,6 +18,6 @@ TreeItemModel {
                 this.updateTreeItemJSONModel()
                 this.state = "Ready"
             }
-        }
+        }.bind(this)
     }
 }

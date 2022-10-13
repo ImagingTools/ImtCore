@@ -22,10 +22,10 @@ Item {
 
     function sortObj(unordered){
        return Object.keys(unordered).sort().reduce(
-          (obj, key) => {
+          function(obj, key){
             obj[key] = unordered[key];
             return obj;
-          },
+          }.bind(this),
           {}
         );
     }
@@ -57,19 +57,19 @@ Item {
     function sortByKey(obj){
         return Object.keys(obj)
         .sort()
-        .reduce((accumulator, key) => {
+        .reduce(function(accumulator, key){
           if (typeof obj[key] === "object") {
             // recurse nested properties that are also objects
             if (obj[key] == null) {
               accumulator[key] = null;
             } else if (isArray(obj[key])) {
-              accumulator[key] = obj[key].map((item) => {
+              accumulator[key] = obj[key].map(function(item){
                 if (typeof item === "object") {
                   return sortByKey(item);
                 } else {
                   return item;
                 }
-              });
+              }.bind(this));
             } else {
               accumulator[key] = sortByKey(obj[key]);
             }
@@ -77,7 +77,7 @@ Item {
             accumulator[key] = obj[key];
           }
           return accumulator;
-        }, {});
+        }.bind(this), {});
     }
 
 //    function jsonCompare(json1, json2){

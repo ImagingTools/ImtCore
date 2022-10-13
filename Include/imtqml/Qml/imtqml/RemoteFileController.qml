@@ -22,12 +22,12 @@ QtObject {
 
         xhr.overrideMimeType('text/xml');
 
-        reader.onload = ()=>{
+        reader.onload = function(){
             xhr.open("POST", `../../files/${fileUrl.name}`);
             xhr.send(reader.result)
-        }
+        }.bind(this)
 
-        xhr.onreadystatechange = () => {
+        xhr.onreadystatechange = function(){
             if (xhr.readyState === xhr.DONE && xhr.status === 409) {
                 var existingHash = xhr.responseXML.getElementsByTagName("p")[2].innerHTML;
                 this.json = existingHash;
@@ -39,10 +39,10 @@ QtObject {
                 this.state = "Ready"
                 this.fileUploaded(fileUrl)
             }
-        }
-        xhr.onprogress = (event)=>{
+        }.bind(this)
+        xhr.onprogress = function(event){
             this.progress(event.loaded, event.total)
-        }
+        }.bind(this)
 
     }
 
@@ -56,12 +56,12 @@ QtObject {
         xhr.open("DELETE", `../../files/${fileHash}`);
         xhr.send(fileHash)
 
-        xhr.onreadystatechange = () => {
+        xhr.onreadystatechange = function(){
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
                 this.state = "Ready"
                 this.fileDeleted(fileUrl)
             }
-        }
+        }.bind(this)
     }
 }
