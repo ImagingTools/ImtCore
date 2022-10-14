@@ -26,6 +26,7 @@ Item {
     property bool backVisible: true;
     property bool hiddenBackground: true;
     property bool canClose: true;
+    property bool complexModel: false;
 
     property int radius: 5;
     property int currentIndex: -1;
@@ -40,6 +41,14 @@ Item {
     property Component delegate: PopupMenuDelegate{width: comboBoxContainer.width; height: comboBoxContainer.height;};
     property alias popupComp: popupMenu;
     property alias gradient: cbMainRect.gradient;
+
+    signal setCurrentText(var modelll, int index);
+
+    onSetCurrentText: {
+        if(!comboBoxContainer.complexModel){
+            comboBoxContainer.currentText = modelll.GetData("Name",index);
+        }
+    }
 
 
     signal clicked();
@@ -69,6 +78,9 @@ Item {
             itemHeight: comboBoxContainer.itemHeight;
             textSize: comboBoxContainer.textSize;
             canClose: comboBoxContainer.canClose;
+//            function getCurrentText(index){
+//                return popup.model.GetData("Name",index);
+//            }
             Connections{
                 target: comboBoxContainer;
                 onFinished: popup.finished(commandId, index)
@@ -91,7 +103,8 @@ Item {
                     }
                 }
                 comboBoxContainer.currentIndex = index;
-                comboBoxContainer.currentText = popup.model.GetData("Name", index);
+                //comboBoxContainer.currentText = popup.model.GetData("Name", index);
+                comboBoxContainer.setCurrentText(popup.model,index)
                 if (comboBoxContainer.currentText == ""){
                     comboBoxContainer.currentText = popup.filterText;
                 }
