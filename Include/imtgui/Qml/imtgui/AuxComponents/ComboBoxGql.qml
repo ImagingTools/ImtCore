@@ -25,6 +25,7 @@ Item {
     property bool isColor: false;
     property bool backVisible: true;
     property bool hiddenBackground: true;
+    property bool canClose: true;
 
     property int radius: 5;
     property int currentIndex: -1;
@@ -67,6 +68,7 @@ Item {
             hiddenBackground: comboBoxContainer.hiddenBackground;
             itemHeight: comboBoxContainer.itemHeight;
             textSize: comboBoxContainer.textSize;
+            canClose: comboBoxContainer.canClose;
             Connections{
                 target: comboBoxContainer;
                 onFinished: popup.finished(commandId, index)

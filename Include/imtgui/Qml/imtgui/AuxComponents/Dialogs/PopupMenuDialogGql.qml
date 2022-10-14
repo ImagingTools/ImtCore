@@ -25,6 +25,7 @@ Rectangle {
     property alias filterText: filterField.text;
     property bool endListStatus: false;
     property bool hiddenBackground: true;
+    property bool canClose: true;
 
     property Component delegate: PopupMenuDelegate{onClicked: {finished(commandId, index)}};
     property var properties;
@@ -45,7 +46,9 @@ Rectangle {
     }
 
     onFinished: {
-        root.closeDialog();
+        if(popupMenuContainer.canClose){
+            root.closeDialog();
+        }
     }
 
     onModelChanged: {
