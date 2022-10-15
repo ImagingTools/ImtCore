@@ -64,6 +64,7 @@ let IDList = new Set()
 function getBaseStructure(){
     return {
         class: '',
+        Singleton: false,
         id: new Set(),
         properties: {},
         propertiesAlias: {},
@@ -79,6 +80,17 @@ function getBaseStructure(){
         connectionSignals: [],
         defineSignals: {},
         children: [],
+    }
+}
+function qmlpragma(m, instructions, file){
+    for(let p of m){
+        if(p[0] === 'qmlpragma'){
+            if(p[1] === 'Singleton') {
+                
+                // instructions.SingletonName = name
+                instructions.Singleton = true
+            }
+        }
     }
 }
 function qmlimport(m, instructions, file){
@@ -104,6 +116,7 @@ function qmlimport(m, instructions, file){
         }
     }
 }
+let ignoreSingletons = new Set()
 function qmlelem(m, instructions, file){
     let cls = m[1]
     let childInstructions = getBaseStructure()
@@ -135,6 +148,11 @@ function qmlelem(m, instructions, file){
                 parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
                 let meta = parser.parse(data)
                 
+                if(meta[3]) {
+                    qmlpragma(meta[3], childInstructions, childFile)
+                    let name = childFile.split('/').pop().replaceAll('.qml', '')
+                    if(childInstructions.Singleton === true) ignoreSingletons.add(name)
+                }
                 qmlimport(meta[1], childInstructions, childFile)
                 preCompile(meta[2][1], meta[2][3], meta[2][2], childInstructions, childFile)
                 cls = meta[2][1]
@@ -148,6 +166,11 @@ function qmlelem(m, instructions, file){
                         parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
                         let meta = parser.parse(data)
                         
+                        if(meta[3]) {
+                            qmlpragma(meta[3], childInstructions, childFile)
+                            let name = childFile.split('/').pop().replaceAll('.qml', '')
+                            if(childInstructions.Singleton === true) ignoreSingletons.add(name)
+                        }
                         qmlimport(meta[1], childInstructions, childFile)
                         preCompile(meta[2][1], meta[2][3], meta[2][2], childInstructions, childFile)
                         cls = meta[2][1]
@@ -191,12 +214,12 @@ function qmlpropdef(m, instructions, file){
     try {
         let name = m[1]
         parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
-        let _meta = parser.parse(m[4])
+        let _meta = parser.parse(m[4].replaceAll('};', '}'))
         if(!_meta[2]) throw 1
         let propertyInstructions = getBaseStructure()
         preCompile(_meta[2][1], _meta[2][3], _meta[2][2], propertyInstructions) 
         instructions.propertiesQMLNew[name] = propertyInstructions
-    } catch {
+    } catch(error) {
         let name = m[1]
         let type = m[2]
         let val = m[4] ? m[4].trimStart().trimEnd() : undefined
@@ -296,7 +319,7 @@ function qmlprop(m, instructions, file){
             let _meta = parser.parse(m[3])
             let validatorInstructions = getBaseStructure()
             preCompile(_meta[2][1], _meta[2][3], _meta[2][2], validatorInstructions, file) 
-            instructions.propertiesSpecial.validator = validatorInstructions
+            instructions.propertiesQML.validator = validatorInstructions
         } catch {
             instructions.propertiesLazy[m[1]] = m[3]
         }
@@ -401,6 +424,7 @@ for(let file of files){
     
     parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
     let meta = parser.parse(data)
+    if(meta[3]) qmlpragma(meta[3], instructions, file)
     qmlimport(meta[1], instructions, file)
 
     if(meta[2][0] === 'qmlelem'){
@@ -705,6 +729,12 @@ function anchorsReplace(instructions){
 
 for(file in compiledFiles){
     anchorsReplace(compiledFiles[file].instructions)
+
+    let name = file.split('/').pop().replaceAll('.qml', '')
+    if(compiledFiles[file].instructions.Singleton === true){
+        compiledFiles[file].instructions.id.add(`\`${name}\``)
+        IDList.add(name)
+    }
     IDReplace(compiledFiles[file].instructions)
     // PropertyReplace(compiledFiles[file].instructions)
 }
@@ -802,18 +832,30 @@ function compile(instructions, code, curr = '$root', prev = ''){
 
 let jqml = []
 let jqmlExports = []
+let Singletons = []
 for(file in compiledFiles){
     let name = file.split('/').pop().replaceAll('.qml', '')
-    jqmlExports.push(name)
     let code = []
     let instructions = compiledFiles[file].instructions
+    if(instructions.Singleton === true && !ignoreSingletons.has(name)){
+        Singletons.push(name)
+    } else {
+        jqmlExports.push(name)
+    }
+
     code.push(`function ${name}($parent){`)
+    // for(let child of instructions.children){
+    //     if(child.Singleton === true){
+    //         code.push(`IDManager.list[\`${child.SingletonName}\`][0].$destroy()`)
+    //     }
+    // }
     code.push(`let $LVL = Core.LVL++`)
     compile(instructions, code)
     // code.push(`PropertyManager.update()`)
     // code.push(`$root.$uP()`)
     code.push(`return $root`)
     code.push(`}`)
+
     compiledFiles[file].code = code.join('\n')
     jqml.push(compiledFiles[file].code)
     fs.writeFile(file.replaceAll('.qml', '.js'), compiledFiles[file].code, function(error){
@@ -823,7 +865,7 @@ for(file in compiledFiles){
 
 
 
-let fullCode = (jqml.join('\n') + `\nCore.exports = {${jqmlExports.join(',')}}`).split('\n')
+let fullCode = (jqml.join('\n') + `\nCore.exports = {${jqmlExports.join(',')}}` + `\nCore.Singletons = {${Singletons.join(',')}}`).split('\n')
 let i = 0
 while(i < fullCode.length){
     fullCode[i] = fullCode[i].trimStart()

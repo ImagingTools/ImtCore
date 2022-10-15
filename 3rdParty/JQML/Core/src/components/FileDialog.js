@@ -27,7 +27,14 @@ export class FileDialog extends Item {
         this.$cP('fileUrls', [])
         this.$cP('folder', '')
         this.$cP('selectExisting', false)
-
+        this.$cP('shortcuts', {
+            'desktop': '',
+            'documents': '',
+            'home': '',
+            'music': '',
+            'movies': '',
+            'pictures': '',
+        })
 
         this.$s.accepted = Signal()
         this.$s.rejected = Signal()

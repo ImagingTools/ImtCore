@@ -134,6 +134,7 @@ global.IDManager = {
 global.Core = {
     FPS: 60,
     exports: {},
+    Singletons: {},
     components: {...QML},
     animations: {},
     LVL: 0,
@@ -281,6 +282,10 @@ global.Core = {
         //     console.log(err)
         // }
         // if(fullImport) fullImport()
+
+        for(let sing in this.Singletons){
+            this.Singletons[sing](root)
+        }
 
         this.cC(document.body.dataset.qml, root, this.LVL++)
     

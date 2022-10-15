@@ -48,10 +48,10 @@ export class TextInput extends Item {
         this.$s.textEdited = Signal()
     }
     $validatorChanged(){
-        if(this.$validator) this.$validator.$destroy()
+        // if(this.$validator) this.$validator.$destroy()
 
-        this.validator(this)
-        this.$validator = this.children.splice(this.children.length-1, 1)[0]
+        // this.validator(this)
+        // this.$validator = this.children.splice(this.children.length-1, 1)[0]
     }
 
     $domCreate(){
@@ -70,8 +70,8 @@ export class TextInput extends Item {
 
 
         this.impl.addEventListener("input", function(e) {
-            if(this.$validator){
-                if(this.$validator.validate(this.impl.value)){
+            if(this.$p.validator.val){
+                if(this.$p.validator.val.validate(this.impl.value)){
                     this.text = this.impl.value
                 } else {
                     this.impl.value = this.$p.text.val
@@ -277,7 +277,7 @@ export class TextInput extends Item {
     }
 
     $destroy(){
-        if(this.$validator) this.$validator.$destroy()
+        // if(this.$validator) this.$validator.$destroy()
         this.impl.remove()
         super.$destroy()
     }

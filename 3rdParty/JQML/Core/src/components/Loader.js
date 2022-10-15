@@ -83,6 +83,14 @@ export class Loader extends Item {
                 // path.push(this.source)
 
                 this.item = Core.cC(this.source, this)
+                this.$p.width.depends.add(this.$p.item.val.$p.width.signal)
+                this.$p.item.val.$p.width.signal.connections[this.$p.width.PID] = ()=>{
+                    this.width = this.$p.item.val.$p.width.val
+                }
+                this.$p.height.depends.add(this.$p.item.val.$p.height.signal)
+                this.$p.item.val.$p.height.signal.connections[this.$p.height.PID] = ()=>{
+                    this.height = this.$p.item.val.$p.height.val
+                }
                 this.item.$uP()
             // } catch (err) {
             //     this.item = undefined
@@ -118,13 +126,25 @@ export class Loader extends Item {
     $updateGeometry(){
         if(this.$p.item.val && this.$p.item.val.$p){
             if(this.$wAuto){
-                this.width = this.$p.item.val.$p.width.val
+                // this.width = this.$p.item.val.$p.width.val
+                
+                // this.$p.width.val = this.$p.item.val.$p.width.val
+                // this.dom.style.width = `${this.$p.item.val.$p.width.val}px`
+                // if(this.$p.x.func) this.$p.x.val = this.$p.x.func()
+                // this.$xChanged()
+
                 this.$wAuto = true
                 // this.$p.width.val = this.item.width
                 // this.dom.style.width = `${this.width}px`
             }
             if(this.$hAuto){
-                this.height = this.$p.item.val.$p.height.val
+                // this.height = this.$p.item.val.$p.height.val
+                
+                // this.$p.height.val = this.$p.item.val.$p.height.val
+                // this.dom.style.height = `${this.$p.item.val.$p.height.val}px`
+                // if(this.$p.y.func) this.$p.y.val = this.$p.y.func()
+                // this.$yChanged()
+
                 this.$hAuto = true
                 // this.$p.height.val = this.item.height
                 // this.dom.style.height = `${this.height}px`

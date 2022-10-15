@@ -51,6 +51,11 @@ export class Timer extends QtObject {
         }, this.interval)
     }
 
+    $destroy(){
+        clearTimeout(this.$timer)
+        super.$destroy()
+    }
+
 }
 
 QML.Timer = Timer

@@ -191,8 +191,6 @@ export class ListView extends Flickable {
 
     $destroy(){
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
-        this.$model = null
-        this.$delegate = null
         this.impl.remove()
         super.$destroy()
     }

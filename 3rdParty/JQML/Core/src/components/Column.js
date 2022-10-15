@@ -61,19 +61,26 @@ export class Column extends Item {
                 width = this.$p.width.func()
                 if(this.$p.width.val !== width){
                     this.$p.width.val = width
-                    this.$p.width.signal()
+                    this.dom.style.width = `${this.$p.width.val}px`
+                    this.$xChanged()
+                    // this.$p.width.signal()
                 }
             } else {
                 if(this.$p.width.val !== width){
                     this.$p.width.val = width
-                    this.$p.width.signal()
+                    this.dom.style.width = `${this.$p.width.val}px`
+                    this.$xChanged()
+                    // this.$p.width.signal()
                 }
             }        
             
             this.$wAuto = true
         }
         if(this.$hAuto){
-            this.height = dy
+            this.$p.height.val = dy
+            this.dom.style.height = `${this.$p.height.val}px`
+            this.$yChanged()
+            // this.height = dy
             this.$hAuto = true
         }
 

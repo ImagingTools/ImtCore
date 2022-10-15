@@ -76,6 +76,7 @@ export class QtObject {
             }
             
         }
+        
 
         for(let child of this.children){
             child.$uP()
@@ -267,7 +268,7 @@ export class QtObject {
         let signal = Signal()
 
         this.$p[name] = {
-            'val': undefined,
+            'val': '',
             'signal': signal,
             'depends': new Set(),
             'func': ()=>{
