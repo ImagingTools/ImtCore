@@ -9,24 +9,27 @@ Item {
 
     property TreeItemModel commandsModel;
 
+    property bool localData: false; //The commands model is not loaded from the server
+
+    signal modelLoaded();
+    signal commandModeChanged(string commandId, string newMode);
+
     onCommandsIdChanged: {
         console.log("commandsProviderContainer onCommandsIdChanged", commandsProviderContainer.commandsId);
         modelCommands.updateModel();
     }
 
     function changeCommandMode(commandId, mode){
-        console.log("CommandsController changeCommandMode");
-
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             if (m_commandId == commandId){
                 commandsProviderContainer.commandsModel.SetData("Mode", mode, i);
+                commandModeChanged(commandId, mode);
             }
         }
     }
 
     function getCommandMode(commandId){
-        console.log("CommandsController getCommandMode", commandId);
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
@@ -38,6 +41,14 @@ Item {
         }
 
         return null;
+    }
+
+    function mergeModelWith(externModel){
+        for (let i = 0; i < externModel.GetItemsCount(); i++){
+
+            let index = commandsModel.InsertNewItem()
+            commandsModel.CopyItemDataFromModel(index, externModel, i)
+        }
     }
 
     GqlModel {
@@ -56,6 +67,7 @@ Item {
             queryFields.InsertField("Name");
             queryFields.InsertField("Icon");
             queryFields.InsertField("Mode");
+            queryFields.InsertField("Visible");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -82,6 +94,8 @@ Item {
                             commandsProviderContainer.commandsModel = dataModelLocal;
                             Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
                                                                       "CommandsId": commandsProviderContainer.commandsId});
+
+                            modelLoaded();
                         }
                     }
                 }

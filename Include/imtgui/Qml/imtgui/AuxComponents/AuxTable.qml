@@ -59,6 +59,15 @@ Item {
         return "";
     }
 
+    function getSelectedItemData(){
+        if (tableContainer.selectedIndex > -1){
+            let item = elementsList.itemAtIndex(tableContainer.selectedIndex)
+            return item.getItemData();
+        }
+
+        return null;
+    }
+
     MouseArea {
         id: maTable;
 
@@ -79,11 +88,11 @@ Item {
 
         height: visible ? tableContainer.headerHeight: 0;
 
-        visible: showHeaders;
+        visible: headersList.count > 0 && showHeaders;
 
         clip: true;
 
-        ListView{
+        ListView {
             id: headersList;
 
             anchors.fill: parent;
@@ -199,6 +208,32 @@ Item {
         color: Style.baseColor;
     }
 
+    Component {
+        id: elementDelegateComp;
+
+        TableDelegate {
+            height: tableContainer.itemHeight;
+            width: elementsList.width;
+
+            selected: tableContainer.selectedIndex === model.index;
+
+            onClicked: {
+                tableContainer.selectedIndex = model.index;
+            }
+
+            onRightButtonMouseClicked: {
+                console.log("AuxTable onRightButtonMouseClicked", mX, mY);
+                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                tableContainer.rightButtonMouseClicked(point.x, point.y);
+            }
+
+            onDoubleClicked: {
+                console.log("onDoubleClicked", model["Id"], model["Name"])
+                tableContainer.selectItem(model.Id, model.Name);
+            }
+        }
+    }
+
     ListView {
         id: elementsList;
 
@@ -207,9 +242,9 @@ Item {
         anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
 
-        clip: true;
-        spacing: 0;
         boundsBehavior: Flickable.StopAtBounds;
+
+        clip: true;
 
         Keys.onUpPressed: {
             if (tableContainer.selectedIndex > 0){
@@ -229,35 +264,37 @@ Item {
             }
         }
 
-        delegate: TableDelegate {
-            id: tableDelegate;
+        delegate: elementDelegateComp;
 
-            height: tableContainer.itemHeight;
-            width: elementsList.width;
+//        delegate: TableDelegate {
+//            id: tableDelegate;
 
-            selected: tableContainer.selectedIndex === model.index;
-            radius: tableContainer.radius;
+//            height: tableContainer.itemHeight;
+//            width: elementsList.width;
 
-            Component.onCompleted: {
-                for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
-                }
-            }
+//            selected: tableContainer.selectedIndex === model.index;
+//            radius: tableContainer.radius;
 
-            onClicked: {
-                tableContainer.selectedIndex = model.index;
-            }
+//            Component.onCompleted: {
+//                for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+//                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
+//                }
+//            }
 
-            onRightButtonMouseClicked: {
-                console.log("AuxTable onRightButtonMouseClicked", mX, mY);
-                var point = tableDelegate.mapToItem(thumbnailDecoratorContainer, mX, mY);
-                tableContainer.rightButtonMouseClicked(point.x, point.y);
-            }
+//            onClicked: {
+//                tableContainer.selectedIndex = model.index;
+//            }
 
-            onDoubleClicked: {
-                console.log("onDoubleClicked", model["Id"], model["Name"])
-                tableContainer.selectItem(model.Id, model.Name);
-            }
-        }//Elements delegate
+//            onRightButtonMouseClicked: {
+//                console.log("AuxTable onRightButtonMouseClicked", mX, mY);
+//                var point = tableDelegate.mapToItem(thumbnailDecoratorContainer, mX, mY);
+//                tableContainer.rightButtonMouseClicked(point.x, point.y);
+//            }
+
+//            onDoubleClicked: {
+//                console.log("onDoubleClicked", model["Id"], model["Name"])
+//                tableContainer.selectItem(model.Id, model.Name);
+//            }
+//        }//Elements delegate
     }//Elements ListView
 }

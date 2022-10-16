@@ -25,7 +25,7 @@ Item {
     Rectangle {
         anchors.fill: parent;
 
-        color: Style.alternateBaseColor;
+        color: Style.backgroundColor;
     }
 
     Flickable {

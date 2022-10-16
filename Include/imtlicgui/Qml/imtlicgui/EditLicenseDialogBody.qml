@@ -7,8 +7,6 @@ FocusScope {
 
     height: bodyColumn.height + 40;
 
-    property alias treeViewEditor: treeView;
-
     onFocusChanged: {
         console.log("InputBody onFocusChanged", focus);
 
@@ -51,16 +49,13 @@ FocusScope {
             KeyNavigation.tab: inputId;
 
             onTextChanged: {
-//                editDialogContainer.valueName = inputName.text;
-
-                dialogModel.SetData("Name", inputName.text);
+                editDialogContainer.valueName = inputName.text;
             }
 
             onAccepted: {
-//                if (checkValidId(inputId.text)){
-//                    editDialogContainer.buttons.buttonClicked('Ok')
-//                }
-                editDialogContainer.buttons.buttonClicked('Ok')
+                if (checkValidId(inputId.text)){
+                    editDialogContainer.buttons.buttonClicked('Ok')
+                }
             }
         }
 
@@ -83,21 +78,13 @@ FocusScope {
             text: editDialogContainer.valueId;
 
             onTextInputFocusChanged: {
-                if (textInputFocus && inputId.text == ""){
-                    generateKey();
+                if (textInputFocus && autoGenerate && inputId.text == ""){
+                    //generateKey();
                 }
             }
 
             onTextChanged: {
-                if (inputId.text != valueId){
-
-                    let state = checkValidId(inputId.text);
-                    if (state){
-                        dialogModel.SetData("Id", inputId.text);
-                    }
-
-                    editDialogContainer.buttons.setButtonState('Ok', state)
-                }
+                editDialogContainer.valueId = inputId.text;
             }
 
             onAccepted: {
@@ -106,27 +93,6 @@ FocusScope {
 
             KeyNavigation.tab: inputName;
         }
-
-        Text {
-            anchors.topMargin: 10;
-
-            text: qsTr("Subfeatures");
-
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-        }
-
-        TableTreeViewEditor {
-            id: treeView;
-
-            width: bodyColumn.width;
-            height: 300;
-
-//            modelItems: editDialogContainer.subFeaturesModel;
-
-            clip: true;
-        }
     }
 
     function checkValidId(inputId){
@@ -134,8 +100,8 @@ FocusScope {
             return false
         }
 
-        for (let i = 0; i < featuresModel.GetItemsCount(); i++){
-            let id = featuresModel.GetData("Id", i);
+        for (let i = 0; i < editDialogContainer.licensesModel.GetItemsCount(); i++){
+            let id = editDialogContainer.licensesModel.GetData("Id", i);
             if (id === inputId){
                 return false;
             }
@@ -144,12 +110,4 @@ FocusScope {
         return true;
     }
 
-    function generateKey(){
-        console.log("EditDialog generateKey...");
-        if (inputName.text !== "") {
-            var key = inputName.text;
-            key = key.replace(/\s+/g, '');
-            inputId.text = key;
-        }
-    }
 }

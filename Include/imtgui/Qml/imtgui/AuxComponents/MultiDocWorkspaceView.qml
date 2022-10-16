@@ -40,7 +40,6 @@ Item {
     }
 
     function closeDocument(itemId){
-         console.log("MultidocWorkspaceView closeDocument", itemId);
          let index = this.getDocumentIndexById(itemId);;
          if (index >= 0){
              documentsData.RemoveItem(index);
@@ -52,12 +51,8 @@ Item {
      }
 
     function setDocumentTitle(parameters){
-        console.log("MultidocWorkspaceView setDocumentTitle");
         let itemId = parameters["Id"];
         let newTitle = parameters["Title"];
-
-        console.log("itemId", itemId);
-        console.log("newTitle", newTitle);
 
         let index = this.getDocumentIndexById(itemId);
         if (index >= 0){
@@ -66,8 +61,6 @@ Item {
     }
 
     function getDocumentIndexById(documentId){
-        console.log("MultidocWorkspaceView getPageIndexById", documentId);
-
         for (var i = 1; i < documentsData.GetItemsCount(); i++){
             var m_id = documentsData.GetData("Id", i);
             if (m_id === documentId){
@@ -88,8 +81,6 @@ Item {
         model: documentsData;
 
         onCloseItem: {
-            console.log("MultiDocWorkspaceView TabPanel onCloseItem", index)
-
             let item = documentsData.GetData("Item", index);
             item.commandsDelegate.commandHandle("Close");
         }
@@ -144,7 +135,6 @@ Item {
                 anchors.fill: parent;
 
                 Component.onCompleted: {
-                    console.log("dataLoader onCompleted", model.Source);
                     dataLoader.source = model.Source;
                 }
 

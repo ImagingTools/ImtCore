@@ -83,7 +83,7 @@ DocumentBase {
 
         width: 150;
 
-        color: Style.alternateBaseColor;
+        color: Style.backgroundColor;
 
         Column {
             id: mainPanel;
@@ -108,12 +108,6 @@ DocumentBase {
                     Id: "Roles";
                     Name: "Roles";
                     Source: "qrc:/qml/imtauthgui/UserRoles.qml"
-                }
-
-                ListElement{
-                    Id: "Permissions";
-                    Name: "Permissions";
-                    Source: "qrc:/qml/imtauthgui/UserPermissions.qml"
                 }
             }
 

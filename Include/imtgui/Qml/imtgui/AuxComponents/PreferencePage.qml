@@ -7,7 +7,7 @@ import QtQuick.Dialogs 1.3
 Rectangle {
     id: container;
 
-    color: "#80808080"
+    color: Style.dialogBackgroundColor;
 
     property Item root;
 
@@ -387,8 +387,8 @@ Rectangle {
 
             Component.onCompleted: {
 
-                addButton({"Id":"Apply", "Name":"Apply", "Enabled": true});
-                addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
+                addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": true});
+                addButton({"Id":"Cancel", "Name": qsTr("Cancel"), "Enabled": true});
 
             }
 
@@ -414,6 +414,9 @@ Rectangle {
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
+
+//                    let language = getSelectedLanguage();
+//                    context.language = language;
 
                     let oldUrl = getNetworkUrl(localModel);
                     let newUrl = getNetworkUrl(localCopyModel);

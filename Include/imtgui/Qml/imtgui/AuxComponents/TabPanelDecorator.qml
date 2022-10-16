@@ -46,7 +46,7 @@ Item {
             sourceSize.height: height;
 
             fillMode: Image.PreserveAspectFit;
-            source:  "../../../" + "Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
+            source:  "../../../Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
         }
     }
 

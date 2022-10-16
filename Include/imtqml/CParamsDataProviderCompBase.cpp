@@ -44,8 +44,10 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 		QByteArray languageId = GetLanguageIdFromInputParams(params);
 
 		if (languageId.isEmpty()){
-			currentIndex = 2;
-			languageId = "ru_RU";
+//			currentIndex = 2;
+//			languageId = "ru_RU";
+
+			currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
 		}
 		else{
 			currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
@@ -62,7 +64,8 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 			if (m_translationManagerCompPtr->GetSlaveTranslationManager() != nullptr && currentIndex >= 0){
 				const QTranslator* slaveTranslatorPtr = m_translationManagerCompPtr->GetSlaveTranslationManager()->GetLanguageTranslator(currentIndex);
 				QString text1 = slaveTranslatorPtr->translate("Attribute", paramName.toUtf8());
-				rootModelPtr->SetData("Name", slaveTranslatorPtr->translate("Attribute", paramName.toUtf8()));
+//				rootModelPtr->SetData("Name", slaveTranslatorPtr->translate("Attribute", paramName.toUtf8()));
+				rootModelPtr->SetData("Name", paramName);
 			}
 		}
 		else{

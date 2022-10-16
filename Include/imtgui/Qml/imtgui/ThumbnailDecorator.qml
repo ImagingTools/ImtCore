@@ -28,7 +28,6 @@ Rectangle {
         console.log("ThumbnailDecorator updateModels()");
 
         menuPanel.updateModels();
-        topPanel.updateModels();
 
         preferenceDialog.updateModel();
     }
@@ -113,6 +112,14 @@ Rectangle {
 
         visible: false;
     }
+
+//    AuthorizationPage {
+//        id: authorizationPage;
+
+//        z: 20;
+
+//        anchors.fill: parent;
+//    }
 
     ModalDialogManager {
         id: modalDialogManager;

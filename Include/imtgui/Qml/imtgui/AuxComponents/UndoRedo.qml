@@ -12,7 +12,7 @@ Item {
     signal modelAdded();
 
     function undo(){
-        console.log("UndoRedo undo");
+//        console.log("UndoRedo undo");
 
         if (undoRedo.undoStack.length > 1){
 
@@ -28,7 +28,7 @@ Item {
     }
 
     function redo(){
-        console.log("UndoRedo redo");
+//        console.log("UndoRedo redo");
 
         if (undoRedo.redoStack.length > 0){
 
@@ -44,7 +44,7 @@ Item {
     }
 
     function addModel(obj){
-        console.log("UndoRedo addModel", JSON.stringify(obj));
+//        console.log("UndoRedo addModel", JSON.stringify(obj));
 
         undoRedo.undoStack.push(JSON.stringify(obj));
         undoRedo.redoStack = [];

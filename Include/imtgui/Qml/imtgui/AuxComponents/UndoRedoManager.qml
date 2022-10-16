@@ -47,12 +47,10 @@ Item {
     }
 
     onCommandsIdChanged: {
-        console.log("UndoRedo onCommandsIdChanged", undoRedoManager.commandsId);
         Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
     }
 
     onVisibleChanged: {
-        console.log("UndoRedoManager onVisibleChanged", undoRedoManager.visible);
         if (undoRedoManager.visible){
             model.modelChanged.connect(modelUpdated);
             Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
@@ -64,8 +62,6 @@ Item {
     }
 
     function modelUpdated(){
-        console.log("undoRedoManager modelUpdated");
-
         undoRedo.addModel(model);
         timerCheckModel.start();
     }
@@ -111,8 +107,6 @@ Item {
     }
 
     function commandHandle(commandId){
-        console.log("UndoRedo commandHandle", commandId, undoRedo);
-
         let result = null;
         if (commandId === "Undo"){
             result = undoRedo.undo();
@@ -131,7 +125,6 @@ Item {
 
     function parseModel(json){
         model.modelChanged.disconnect(modelUpdated);
-        console.log("UndoRedo parseModel", json);
         json = json.replace(/\\/g, '');
         json = json.slice(1, json.length - 1);
 

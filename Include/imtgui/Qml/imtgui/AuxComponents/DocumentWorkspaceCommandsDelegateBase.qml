@@ -8,6 +8,8 @@ Item {
 
     property TreeItemModel objectModel: documentModel;
 
+    property Item documentBase;
+
     property bool closingFlag: false;
     property bool showInputIdDialog: false;
 
@@ -43,7 +45,7 @@ Item {
         console.log("DocumentCommands onCompleted");
         let itemId = documentsData.GetData("Id", model.index);
         itemModelInputParams["Id"] = itemId;
-        loadingPage.visible = true;
+//        loadingPage.visible = true;
     }
 
     Component.onDestruction: {
@@ -60,17 +62,13 @@ Item {
     }
 
     onVisibleChanged: {
-        console.log("DocumentCommands onVisibleChanged", itemId, container.visible);
-        if (container.visible){
-            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
+        console.log("DocumentCommands onVisibleChanged");
+        if (visible){
+            Events.subscribeEvent(commandsId + "CommandActivated", commandHandle);
         }
         else{
-            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
+            Events.unSubscribeEvent(commandsId + "CommandActivated", commandHandle)
         }
-    }
-
-    onItemLoaded: {
-        loadingPage.visible = false;
     }
 
     onObjectModelChanged: {
@@ -83,7 +81,7 @@ Item {
     }
 
     function commandHandle(commandId){
-        console.log("DocumentCommandsBase commandHandle", commandId);
+        console.log("DocumentCommandsBase commandHandle", documentBase.itemId, commandId);
         if (commandId == "Close"){
             let saveMode = commandsProvider.getCommandMode("Save");
             if (saveMode && saveMode == "Normal"){
@@ -95,6 +93,8 @@ Item {
         }
         else if (commandId == "Save"){
             let itemId = documentBase.itemId;
+
+            console.log("itemId", itemId);
 
             if (itemId === ""){
                 container.gqlModelQueryType = "Add";
@@ -108,10 +108,6 @@ Item {
                 }
             }
             else{
-//                container.gqlModelQueryType = "Update";
-//                container.gqlModelQueryTypeNotify = "updatedNotification";
-//                saveQuery.updateModel();
-
                 saveObject();
             }
         }
@@ -307,11 +303,9 @@ Item {
 
             let keys = Object.keys(externInputParams)
             for (let key of keys){
-                console.log("key", key, "value", externInputParams[key])
                 inputParams.InsertField(key, externInputParams[key]);
             }
 
-//            inputParams.InsertField("Id", itemId);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("item");

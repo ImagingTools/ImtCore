@@ -9,6 +9,7 @@
 namespace imtlic
 {
 
+
 class CFeaturePackage:
 			public CFeatureContainer,
 			virtual public IFeatureDependenciesManager

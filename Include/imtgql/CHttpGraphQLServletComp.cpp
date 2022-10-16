@@ -50,6 +50,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					if(sourceItemModel != nullptr){
 						imtbase::CTreeItemModel* dataItemModel = rootModel.GetTreeItemModel("data");
 						imtbase::CTreeItemModel* errorsSourceItemModel = sourceItemModel->GetTreeItemModel("errors");
+
 						dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));
 						if (errorsSourceItemModel != nullptr){
 							imtbase::CTreeItemModel* errorsItemModel = rootModel.GetTreeItemModel("errors");

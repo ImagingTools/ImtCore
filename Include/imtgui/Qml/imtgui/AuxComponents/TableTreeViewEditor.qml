@@ -4,88 +4,20 @@ import Acf 1.0
 Item {
     id: treeViewContainer;
 
-    property string commandsId: "TreeView";
+    property alias headers: table.headers;
+    property alias elements: table.elements;
 
-    property TreeItemModel modelItems;
+    property alias table: table;
 
-    Rectangle {
-        anchors.fill: rowCommands;
-        color: Style.alternateBaseColor;
-    }
+    property ModelIndex selectedIndex: null;
 
-    function resetSelectedItem(model){
-        let count = model.GetItemsCount();
-        for (let i = 0; i < count; i++){
-            let selected = model.GetData("Selected", i);
+    Timer {
+        id: timer;
 
-            if (selected){
-                model.SetData("Selected", false, i);
-            }
+        interval: 100;
 
-            let childModel = model.GetData("ChildModel", i);
-            if (childModel){
-                resetSelectedItem(childModel);
-            }
-        }
-    }
-
-    Row {
-        id: rowCommands;
-
-        height: 25;
-        width: parent.width;
-
-        clip: true;
-
-        MouseArea {
-            anchors.fill: parent;
-        }
-
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.verticalCenter: parent.verticalCenter;
-
-            spacing: 10;
-
-            Repeater {
-                model: commandsDelegate.commandsModel;
-
-                delegate: AuxButton {
-                    anchors.verticalCenter: rowCommands.verticalCenter;
-
-                    width: 21;
-                    height: width;
-
-                    iconSource: model.IconSource;
-
-                    onClicked: {
-                        Events.sendEvent(commandsId + "CommandActivated", model.Id);
-                    }
-                }
-            }
-        }
-    }
-
-
-    TreeItemModel {
-        id: headersModel;
-
-        Component.onCompleted: {
-            let index = headersModel.InsertNewItem();
-
-            headersModel.SetData("Id", "FeatureId", index);
-            headersModel.SetData("Name", "Feature-ID", index);
-
-            index = headersModel.InsertNewItem();
-
-            headersModel.SetData("Id", "FeatureName", index);
-            headersModel.SetData("Name", "Feature Name", index);
-
-            index = headersModel.InsertNewItem();
-
-            headersModel.SetData("Id", "FeatureDescription", index);
-            headersModel.SetData("Name", "Description", index);
-
+        onTriggered: {
+            selectedIndex = null;
         }
     }
 
@@ -93,10 +25,21 @@ Item {
         id: delegateComp;
 
         TableTreeItemDelegate {
+            id: delegate;
+
             width: treeViewContainer.width;
 
-            onDoubleClicked: {
+            onClicked: {
+                if (delegate.modelIndex.equal(selectedIndex)){
+                    timer.start();
+                }
+                else{
+                    selectedIndex = modelIndex;
+                }
+            }
 
+            onDoubleClicked: {
+                timer.stop();
             }
         }
     }
@@ -104,20 +47,9 @@ Item {
     AuxTable {
         id: table;
 
-        anchors.top: rowCommands.bottom;
-
         width: parent.width;
         height: parent.height;
 
-        headers: headersModel;
-
-        elements: treeViewContainer.modelItems;
-
         delegate: delegateComp;
-    }
-
-    TreeViewCommandsDelegateBase {
-        id: commandsDelegate;
-        treeViewModel: modelItems;
     }
 }

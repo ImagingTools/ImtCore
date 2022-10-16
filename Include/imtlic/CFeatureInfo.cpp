@@ -17,7 +17,8 @@ namespace imtlic
 
 CFeatureInfo::CFeatureInfo()
 	:m_name(QObject::tr("Feature")),
-	m_packagePtr(nullptr)
+	m_packagePtr(nullptr),
+	m_parentFeaturePtr(nullptr)
 {
 }
 
@@ -42,6 +43,26 @@ void CFeatureInfo::SetFeatureName(const QString& featureName)
 }
 
 
+void CFeatureInfo::SetOptional(bool optional)
+{
+	if (m_optional != optional){
+		istd::CChangeNotifier notifier(this);
+
+		m_optional = optional;
+	}
+}
+
+
+void CFeatureInfo::SetParentFeature(const IFeatureInfo *parentFeaturePtr)
+{
+	if (m_parentFeaturePtr != parentFeaturePtr){
+		istd::CChangeNotifier notifier(this);
+
+		m_parentFeaturePtr = parentFeaturePtr;
+	}
+}
+
+
 // reimplemented (IFeatureInfo)
 
 const imtlic::IFeatureInfoProvider* CFeatureInfo::GetFeaturePackage() const
@@ -62,6 +83,18 @@ QString CFeatureInfo::GetFeatureName() const
 }
 
 
+bool CFeatureInfo::IsOptional() const
+{
+	return m_optional;
+}
+
+
+const IFeatureInfo *CFeatureInfo::GetParentFeature() const
+{
+	return m_parentFeaturePtr;
+}
+
+
 QList<const IFeatureInfo*> CFeatureInfo::GetSubFeatures() const
 {
 	return m_subFeatures;
@@ -70,9 +103,16 @@ QList<const IFeatureInfo*> CFeatureInfo::GetSubFeatures() const
 
 bool CFeatureInfo::InsertSubFeature(const IFeatureInfo* subFeatureInfo)
 {
-	m_subFeatures.append(subFeatureInfo);
+	bool retVal = false;
+	if (this != subFeatureInfo){
+		istd::CChangeNotifier notifier(this);
 
-	return true;
+		m_subFeatures.append(subFeatureInfo);
+
+		retVal = true;
+	}
+
+	return retVal;
 }
 
 
@@ -82,7 +122,10 @@ void CFeatureInfo::DeleteSubFeature(const QByteArray &subFeatureId)
 		QByteArray featureId = subFeatureInfo->GetFeatureId();
 
 		if (subFeatureId == featureId){
+			istd::CChangeNotifier notifier(this);
+
 			m_subFeatures.removeAll(subFeatureInfo);
+
 			break;
 		}
 	}
@@ -105,6 +148,11 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(featureNameTag);
 
+	static iser::CArchiveTag featureOptionalTag("Optional", "Optional of the feature", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(featureOptionalTag);
+	retVal = retVal && archive.Process(m_optional);
+	retVal = retVal && archive.EndTag(featureOptionalTag);
+
 	return retVal;
 }
 
@@ -119,13 +167,15 @@ int CFeatureInfo::GetSupportedOperations() const
 
 bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const imtlic::IFeatureInfo* sourcePtr = dynamic_cast<const imtlic::IFeatureInfo*>(&object);
+	const imtlic::CFeatureInfo* sourcePtr = dynamic_cast<const imtlic::CFeatureInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_id = sourcePtr->GetFeatureId();
 		m_name = sourcePtr->GetFeatureName();
+		m_optional = sourcePtr->IsOptional();
 		m_subFeatures = sourcePtr->GetSubFeatures();
+		m_parentFeaturePtr = sourcePtr->GetParentFeature();
 
 		return true;
 	}
@@ -136,9 +186,13 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 bool CFeatureInfo::IsEqual(const IChangeable& object) const
 {
-	const imtlic::IFeatureInfo* sourcePtr = dynamic_cast<const imtlic::IFeatureInfo*>(&object);
+	const imtlic::CFeatureInfo* sourcePtr = dynamic_cast<const imtlic::CFeatureInfo*>(&object);
 	if (sourcePtr != nullptr){
-		return (m_id == sourcePtr->GetFeatureId() && m_name == sourcePtr->GetFeatureName() && m_subFeatures == sourcePtr->GetSubFeatures());
+		return (m_id == sourcePtr->GetFeatureId() &&
+				m_name == sourcePtr->GetFeatureName() &&
+				m_optional == sourcePtr->IsOptional() &&
+				m_parentFeaturePtr == sourcePtr->GetParentFeature() &&
+				m_subFeatures == sourcePtr->GetSubFeatures());
 	}
 
 	return false;
@@ -163,6 +217,7 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 	m_id.clear();
 	m_name.clear();
 	m_subFeatures.clear();
+	m_parentFeaturePtr = nullptr;
 
 	return true;
 }

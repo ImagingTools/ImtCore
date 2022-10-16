@@ -57,6 +57,8 @@ Item {
     property string borderColor: "#d0d0d2";
     property string borderColor2: "#a4a4a6";
 
+    property string dialogBackgroundColor: "#80808080";
+
     property string imagingToolsGradient0: "#f6f6f6";
     property string imagingToolsGradient1: "#e3e3e5";
     property string imagingToolsGradient2: "#d4d4d6";

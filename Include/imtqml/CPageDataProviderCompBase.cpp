@@ -34,8 +34,11 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 				int currentIndex = -1;
 
 				if (languageId.isEmpty()){
-					currentIndex = 0;
-					languageId = "en_US";
+//					currentIndex = 0;
+
+//					languageId = "en_US";
+
+					currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
 				}
 				else{
 					currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
@@ -44,8 +47,11 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 				if (currentIndex >= 0){
 					const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
 					if (translatorPtr != nullptr){
-						QString tr = translatorPtr->translate("Attribute", (*m_pageNameAttrPtr).toUtf8());
-						rootModelPtr->SetData(PageEnum::NAME, translatorPtr->translate("Attribute", (*m_pageNameAttrPtr).toUtf8()));
+						QString pageName = (*m_pageNameAttrPtr);
+						QString tr = translatorPtr->translate("Attribute", pageName.toUtf8());
+//						rootModelPtr->SetData(PageEnum::NAME, translatorPtr->translate("Attribute", (*m_pageNameAttrPtr).toUtf8()));
+
+						rootModelPtr->SetData(PageEnum::NAME, pageName);
 					}
 				}
 			}

@@ -17,7 +17,7 @@ Item {
     Rectangle {
         anchors.fill: parent;
 
-        color: Style.alternateBaseColor;
+        color: Style.backgroundColor;
     }
 
     Flickable {
@@ -74,6 +74,8 @@ Item {
                 height: 30;
 
                 placeHolderText: qsTr("Enter the password");
+
+                echoMode: TextInput.Password;
 
                 onTextChanged: {
                     documentModel.SetData("Password", passwordInput.text);

@@ -38,7 +38,10 @@ Item {
 
                 checkable: model.Mode == "Normal";
 
+                visible: model.Visible;
+
                 onClicked: {
+                    console.log("model.Visible", model.Visible);
                     Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
                 }
             }

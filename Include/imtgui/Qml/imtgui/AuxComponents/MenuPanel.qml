@@ -38,84 +38,107 @@ Rectangle {
         lvPages.currentIndex = menuPanel.activePageIndex;
     }
 
-    Flickable {
+    ListView {
+        id: lvPages;
+
         anchors.fill: parent;
-        anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
-        anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
 
-        contentWidth: columnPages.width;
-        contentHeight: columnPages.height + 50;
         boundsBehavior: Flickable.StopAtBounds;
+        delegate: MenuPanelButton {
+            text:  model["Name"];
+            textColor: Style.textColor;
+            fontName: menuPanel.fontName;
+            imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Selected.svg":
+                                                     "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
 
-        clip: true;
+            selected: lvPages.currentIndex === model.index;
 
-        Column {
-            id: columnPages;
+            decoratorSource : Style.menuButtonDecoratorPath;
 
-            spacing: menuPanel.spacing;
+            onClicked: {
+                lvPages.currentIndex = model.index;
+                menuPanel.activePageName = model["Name"];
+                menuPanel.activeIcon = model["Icon"];
+                menuPanel.activePageIndex = model.index;
+                menuPanel.activePageId = model["PageId"];
 
-            height: parent.height;
-            width: parent.width;
-
-            Repeater {
-                id: lvPages;
-
-                property int currentIndex: 0;
-
-                Keys.onUpPressed: {
-                    if (currentIndex > 0){
-                        currentIndex--;
-                    }
-                    else{
-                        currentIndex = lvPages.count - 1;
-                    }
-
-                    let curItem = lvPages.itemAt(currentIndex);
-                    curItem.clicked();
-                }
-
-                Keys.onDownPressed: {
-                    if (currentIndex < lvPages.count - 1){
-                        currentIndex++;
-                    }
-                    else{
-                        currentIndex = 0;
-                    }
-
-                    let curItem = lvPages.itemAt(currentIndex);
-                    curItem.clicked();
-                }
-
-                delegate: MenuPanelButton{
-                    text:  model["Name"];
-                    textColor: Style.textColor;
-                    fontName: menuPanel.fontName;
-                    imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Selected.svg":
-                                                             "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
-
-                    selected: lvPages.currentIndex === model.index;
-
-                    decoratorSource : Style.menuButtonDecoratorPath;
-
-                    onClicked: {
-                        lvPages.currentIndex = model.index;
-                        menuPanel.activePageName = model["Name"];
-                        menuPanel.activeIcon = model["Icon"];
-                        menuPanel.activePageIndex = model.index;
-                        menuPanel.activePageId = model["PageId"];
-                        if (model["Name"] == "Administration"){
-                            topPanel.pageNameText = model["Name"];
-                        }
-                        else{
-                            topPanel.pageNameText = "";
-                        }
-
-                        lvPages.forceActiveFocus();
-                    }
-                }
+                lvPages.forceActiveFocus();
             }
         }
     }
+
+//    Flickable {
+//        anchors.fill: parent;
+//        anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
+//        anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
+
+//        contentWidth: columnPages.width;
+//        contentHeight: columnPages.height + 50;
+//        boundsBehavior: Flickable.StopAtBounds;
+
+//        clip: true;
+
+//        Column {
+//            id: columnPages;
+
+//            spacing: menuPanel.spacing;
+
+//            height: parent.height;
+//            width: parent.width;
+
+//            Repeater {
+//                id: lvPages;
+
+//                property int currentIndex: 0;
+
+//                Keys.onUpPressed: {
+//                    if (currentIndex > 0){
+//                        currentIndex--;
+//                    }
+//                    else{
+//                        currentIndex = lvPages.count - 1;
+//                    }
+
+//                    let curItem = lvPages.itemAt(currentIndex);
+//                    curItem.clicked();
+//                }
+
+//                Keys.onDownPressed: {
+//                    if (currentIndex < lvPages.count - 1){
+//                        currentIndex++;
+//                    }
+//                    else{
+//                        currentIndex = 0;
+//                    }
+
+//                    let curItem = lvPages.itemAt(currentIndex);
+//                    curItem.clicked();
+//                }
+
+//                delegate: MenuPanelButton{
+//                    text:  model["Name"];
+//                    textColor: Style.textColor;
+//                    fontName: menuPanel.fontName;
+//                    imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Selected.svg":
+//                                                             "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
+
+//                    selected: lvPages.currentIndex === model.index;
+
+//                    decoratorSource : Style.menuButtonDecoratorPath;
+
+//                    onClicked: {
+//                        lvPages.currentIndex = model.index;
+//                        menuPanel.activePageName = model["Name"];
+//                        menuPanel.activeIcon = model["Icon"];
+//                        menuPanel.activePageIndex = model.index;
+//                        menuPanel.activePageId = model["PageId"];
+
+//                        lvPages.forceActiveFocus();
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     GqlModel {
         id: pagesModel;
@@ -124,7 +147,8 @@ Rectangle {
             var query = Gql.GqlRequest("query", "PagesData") ;
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("LanguageId", Style.language);
+//            inputParams.InsertField("LanguageId", Style.language);
+            inputParams.InsertField("LanguageId", "ru_RU");
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");

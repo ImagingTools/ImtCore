@@ -45,7 +45,7 @@ Rectangle {
 
         width: 150;
 
-        color: Style.alternateBaseColor;
+        color: Style.baseColor;
 
         Column {
             id: mainPanel;

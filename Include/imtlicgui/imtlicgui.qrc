@@ -7,6 +7,7 @@
         <file alias="imtlicgui/PackageCollectionView.qml">Qml/imtlicgui/PackageCollectionView.qml</file>
         <file alias="imtlicgui/PackageView.qml">Qml/imtlicgui/PackageView.qml</file>
         <file alias="imtlicgui/EditDialog.qml">Qml/imtlicgui/EditDialog.qml</file>
+	<file alias="imtlicgui/EditLicenseDialog.qml">Qml/imtlicgui/EditLicenseDialog.qml</file>
         <file alias="imtlicgui/InstallationEditor.qml">Qml/imtlicgui/InstallationEditor.qml</file>
         <file alias="imtlicgui/FeaturesTreeView.qml">Qml/imtlicgui/FeaturesTreeView.qml</file>
         <file alias="imtlicgui/TreeViewModel.qml">Qml/imtlicgui/TreeViewModel.qml</file>
@@ -23,6 +24,7 @@
         <file alias="imtlicgui/PackageViewCommandsDelegate.qml">Qml/imtlicgui/PackageViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/ProductViewCommandsDelegate.qml">Qml/imtlicgui/ProductViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/EditDialogBody.qml">Qml/imtlicgui/EditDialogBody.qml</file>
+	<file alias="imtlicgui/EditLicenseDialogBody.qml">Qml/imtlicgui/EditLicenseDialogBody.qml</file>
         <file alias="imtlicgui/InstallationEditorCommandsDelegate.qml">Qml/imtlicgui/InstallationEditorCommandsDelegate.qml</file>
         <file alias="imtlicgui/ProductTreeViewController.qml">Qml/imtlicgui/ProductTreeViewController.qml</file>
         <file alias="imtlicgui/PackageTreeViewController.qml">Qml/imtlicgui/PackageTreeViewController.qml</file>

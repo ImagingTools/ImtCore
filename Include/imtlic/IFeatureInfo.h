@@ -34,6 +34,16 @@ public:
 	virtual QString GetFeatureName() const = 0;
 
 	/**
+		Get the feature ID.
+	*/
+	virtual bool IsOptional() const = 0;
+
+	/**
+		Get the parent feature pointer.
+	*/
+	virtual const IFeatureInfo* GetParentFeature() const = 0;
+
+	/**
 		Get all sub features for this feature.
 	*/
 	virtual QList<const IFeatureInfo*> GetSubFeatures() const  = 0;

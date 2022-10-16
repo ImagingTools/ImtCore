@@ -5,7 +5,11 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-    commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml";
+    commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml"
+
+//    commandsDelegate: ProductViewCommandsDelegate {
+//        tableData: collectionView.table;
+//    }
 
     onDocumentModelChanged: {
         let headers = documentModel.GetData("Headers");
@@ -56,6 +60,8 @@ DocumentBase {
     }
 
     function updateGui(){
+        console.log("updateGui");
+
         let index = collectionView.table.selectedIndex;
         collectionView.table.selectedIndex = -1;
         collectionView.table.selectedIndex = index;
@@ -213,6 +219,14 @@ DocumentBase {
 
                 modelItems: treeViewModel.modelTreeView;
                 visible: itemId !== "" && collectionView.table.selectedIndex > -1;
+
+                Component.onCompleted: {
+                    treeView.itemStateChanged.connect(treeViewController.itemStateChanged);
+                }
+
+                onItemStateChanged: {
+                    console.log("TreeView onItemStateChanged", itemData.Id, itemData.State);
+                }
             }
         }
     }

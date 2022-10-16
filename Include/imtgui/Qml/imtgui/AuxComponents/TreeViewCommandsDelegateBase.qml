@@ -7,9 +7,9 @@ Item {
 
     property TreeItemModel treeViewModel;
 
-    property alias commandsModel: commandsModel;
-
     signal commandActivated(string commandId);
+
+    property int selectedCount: table.selectedElements.count;
 
     Component.onCompleted: {
         Events.subscribeEvent(treeViewContainer.commandsId + "CommandActivated", commandHandle);
@@ -19,11 +19,17 @@ Item {
         Events.unSubscribeEvent(treeViewContainer.commandsId + "CommandActivated", commandHandle)
     }
 
-    function modelUpdated(){
+    onSelectedCountChanged: {
+        console.log("onSelectedCountChanged", treeViewDelegate.selectedCount);
+        let mode = treeViewDelegate.selectedCount > 0 ? "Normal" : "Disabled";
 
+        commandsProvider.changeCommandMode("New", mode);
+        commandsProvider.changeCommandMode("Remove", mode);
     }
 
     function insertNewItem(model){
+        console.log("", model);
+        console.log("=====================================");
         let index = model.InsertNewItem();
 
         model.SetData("Id", "", index);
@@ -33,36 +39,25 @@ Item {
         model.SetData("Selected", false, index);
         model.SetData("Visible", true, index);
         model.SetData("State", 0, index);
-        //model.SetData("Level", level, index);
+        model.SetData("Optional", 2, index);
+
+        let parentModel = model.GetParent();
+
+        let level = 1;
+        if (parentModel){
+            let id = parentModel.GetData("Id");
+            let parentLevel = Number(parentModel.GetData("Level"));
+            level = parentLevel + 1;
+        }
+
+        model.SetData("Level", level, index);
         model.AddTreeModel("ChildModel", index);
+
+        console.log("=====================================");
 
         return index;
     }
 
-    ListModel{
-        id: commandsModel;
-
-        ListElement{
-            Id: "NewRoot";
-            Name: qsTr("NewRoot");
-            Mode: "Disabled";
-            IconSource: "../../../../Icons/Light/PointsAdd_Off_Normal.svg";
-        }
-
-        ListElement{
-            Id: "New";
-            Name: qsTr("New");
-            Mode: "Disabled";
-            IconSource: "../../../../Icons/Light/Add_Off_Normal.svg";
-        }
-
-        ListElement{
-            Id: "Remove";
-            Name: qsTr("Remove");
-            Mode: "Disabled";
-            IconSource: "../../../../Icons/Light/Delete_Off_Normal.svg";
-        }
-    }
 
 //    /**
 //       The tree has only one selected item warrantly
@@ -74,9 +69,6 @@ Item {
             let id = model.GetData("Id", i);
             let selectedItem = model.GetData("Selected", i);
 
-            console.log("Id", id);
-            console.log("Selected", selectedItem);
-            console.log();
             if (selectedItem){
                 return model;
             }
@@ -93,41 +85,8 @@ Item {
         return null;
     }
 
-
-    /**
-       The tree has only one selected item warrantly
-    */
-//    function getSelectedItem(object){
-//        let model = object["Model"];
-//        let count = model.GetItemsCount();
-//        for (let i = 0; i < count; i++){
-//            let id = model.GetData("Id", i);
-//            let selectedItem = model.GetData("Selected", i);
-
-//            console.log("Id", id);
-//            console.log("Selected", selectedItem);
-//            console.log();
-
-//            if (selectedItem){
-//                object["Index"] = i;
-//                return true;
-//            }
-
-//            let childModel = model.GetData("ChildModel", i);
-//            if (childModel){
-
-//                object["Model"] = childModel;
-//                object["Level"]++;
-
-//                return getSelectedItem(object);
-//            }
-//        }
-
-//        return false;
-//    }
-
     function getSelectedItemIndex(model){
-
+        console.log("getSelectedItemIndex", model);
         if (!model){
             return -1;
         }
@@ -165,23 +124,14 @@ Item {
         if (commandId == "NewRoot"){
             let index = insertNewItem(treeViewModel);
 
-            treeViewModel.SetData("Id", "Test" + index, index);
-            treeViewModel.SetData("Name", "Test" + index, index);
+            treeViewModel.SetData("Id", "", index);
+            treeViewModel.SetData("Name", "Feature Name", index);
+
+            treeViewModel.Refresh();
         }
         else if (commandId == "New"){
             let item = getSelectedItem(treeViewModel);
             let index = getSelectedItemIndex(item);
-
-//            let params = {"Model": treeViewModel,
-//                          "Index": 0,
-//                          "Level": 0}
-
-//            let result = getSelectedItem(params);
-//            let index = params["Index"];
-//            let level = params["Level"];
-
-//            let item = params["Model"];
-//            let index = getSelectedItemIndex(item);
 
             let childModel = item.GetData("ChildModel", index);
             if (!childModel){
@@ -190,51 +140,17 @@ Item {
 
             let childIndex = insertNewItem(childModel);
 
-//            treeViewModel.Refresh();
+            childModel.SetData("Id", "", childIndex);
+            childModel.SetData("Name", "Feature Name", childIndex);
 
-            childModel.SetData("Id", "Test" + childIndex, childIndex);
-            childModel.SetData("Name", "Test" + childIndex, childIndex);
-
-//            childModel.Refresh();
             treeViewModel.Refresh();
         }
         else if (commandId == "Remove"){
-//            let params = {"Model": treeViewModel,
-//                          "Index": 0,
-//                          "Level": 0};
 
             let item = getSelectedItem(treeViewModel);
             let index = getSelectedItemIndex(item);
             item.RemoveItem(index);
 
-
-//            if (item){
-//                let model = params["Model"];
-//                let index = params["Index"];
-
-//                model.RemoveItem(index);
-
-//            }
-
-//            let index = getSelectedItemIndex(item);
-
-
-//            treeViewModel.Refresh();
-        }
-        else if (commandId == "Edit"){
-
-            let params = {"Model": treeViewModel,
-                          "Index": 0,
-                          "Level": 0};
-
-
-            let item = getSelectedItem(params);
-//            let index = getSelectedItemIndex(item);
-
-
-            let name = item.GetData("Name", index);
-
-            modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item:"), "inputValue": name});
         }
         else{
             commandActivated(commandId);

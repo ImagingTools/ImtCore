@@ -59,7 +59,7 @@ Item {
                 }
 
                 let upFeatures = [];
-                featureDependenciesModel.getFeaturesDependsByFeatureUp(rootKey, upFeatures);
+                featureDependenciesModel.getAllParentsDependsFeatures(rootKey, upFeatures);
 
                 if (upFeatures.length > 0){
                     treeViewModel.updateDataFeatureList(upFeatures, 0, 0);

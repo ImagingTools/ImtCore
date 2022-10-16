@@ -35,8 +35,10 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QL
 
 					int currentIndex = -1;
 					if (languageId.isEmpty()){
-						currentIndex = 0;
-						languageId = "en_US";
+//						currentIndex = 0;
+//						languageId = "en_US";
+
+						currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
 					}
 					else{
 						currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
@@ -45,7 +47,8 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QL
 					if (currentIndex >= 0){
 						const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
 						if (translatorPtr != nullptr){
-							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandsNamesAttrPtr[i].toUtf8()), i);
+//							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandsNamesAttrPtr[i].toUtf8()), i);
+							treeModel->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
 						}
 					}
 				}
@@ -53,11 +56,17 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QL
 					treeModel->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
 				}
 			}
+
 			if (fields[indexField] == CommandEnum::ICON && m_commandsDefaultStatusIconAttrPtr.GetCount() > i){
 				treeModel->SetData(CommandEnum::ICON, m_commandsDefaultStatusIconAttrPtr[i], i);
 			}
+
 			if (fields[indexField] == CommandEnum::MODE){
 				treeModel->SetData(CommandEnum::MODE, m_commandsDefaultModesAttrPtr[i], i);
+			}
+
+			if (fields[indexField] == "Visible"){
+				treeModel->SetData("Visible", true, i);
 			}
 		}
 	}

@@ -2,19 +2,131 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-Item {
+TreeViewControllerBase {
     id: container;
 
     property int selectedIndex: collectionView.table.selectedIndex;
 
     signal checkBoxChanged(int state, string childId);
 
-    Component.onCompleted: {
-        commandsDelegate.edited.connect(edited);
+    onSelectedIndexChanged: {
+        console.log("ProductTreeView onSelectedIndexChanged", selectedIndex);
+        if (selectedIndex > -1){
+            let rootKey = collectionView.table.getSelectedId();
+
+            treeView.visible = rootKey != null && rootKey != "";
+            let featuresModel = documentModel.GetData("Features");
+
+            treeView.itemStateChanged.disconnect(itemStateChanged);
+            treeViewModel.resetProperties();
+            treeView.itemStateChanged.connect(itemStateChanged);
+
+            if (featuresModel){
+                if (featuresModel.ContainsKey(rootKey)){
+                    let licenseFeaturesModel = featuresModel.GetData(rootKey);
+
+                    let parentFeatures = []
+                    getParentFeatures(licenseFeaturesModel, parentFeatures);
+
+                    let selectedFeatures = []
+
+                    for (let parentId of parentFeatures){
+                        getFeaturesLeaves(licenseFeaturesModel, parentId, selectedFeatures);
+                    }
+
+                    console.log('selectedFeatures', selectedFeatures);
+
+                    for (let featureId of selectedFeatures){
+                        treeViewModel.selectFeature(featureId);
+                    }
+                }
+            }
+        }
     }
 
-    Component.onDestruction: {
-        commandsDelegate.edited.disconnect(edited);
+    function itemStateChanged(itemData){
+        console.log("ProductTreeView itemStateChanged", itemData);
+        let featuresModel = documentModel.GetData("Features");
+
+        if (!featuresModel){
+            featuresModel = documentModel.AddTreeModel("Features");
+        }
+
+        let itemId = itemData.Id;
+        let itemName = itemData.Name;
+        let itemState = itemData.State;
+        let itemOptional = itemData.Optional;
+
+        let itemParentId = null;
+
+        if (itemData.Parent && itemData.Parent.Level > 0){
+            itemParentId = itemData.Parent.Id;
+        }
+
+        let licenseId = collectionView.table.getSelectedId();
+
+        if (itemState == Qt.Checked || itemState == Qt.PartiallyChecked){
+
+            let licenseFeaturesModel;
+            if (featuresModel.ContainsKey(licenseId)){
+                licenseFeaturesModel = featuresModel.GetData(licenseId);
+            }
+            else{
+                licenseFeaturesModel = featuresModel.AddTreeModel(licenseId);
+            }
+
+            let itemIndex = -1;
+            for (let i = 0; i < licenseFeaturesModel.GetItemsCount(); i++){
+                let curItemId = licenseFeaturesModel.GetData("Id", i);
+
+                if (curItemId == itemId){
+                    itemIndex = i;
+                    break;
+                }
+            }
+
+            if (itemIndex < 0){
+                itemIndex = licenseFeaturesModel.InsertNewItem();
+            }
+
+            if (licenseFeaturesModel.ContainsKey("State", itemIndex)){
+                let curState = licenseFeaturesModel.GetData("State", itemIndex);
+                if (curState == itemState){
+                    return;
+                }
+            }
+
+            licenseFeaturesModel.SetData("Id", itemId, itemIndex);
+            licenseFeaturesModel.SetData("Name", itemName, itemIndex);
+            licenseFeaturesModel.SetData("State", itemState, itemIndex);
+            licenseFeaturesModel.SetData("Optional", itemOptional, itemIndex);
+            licenseFeaturesModel.SetData("ParentId", itemParentId, itemIndex);
+        }
+        else if (itemState == Qt.Unchecked){
+            if (featuresModel.ContainsKey(licenseId)){
+                let licenseFeaturesModel = featuresModel.GetData(licenseId);
+
+                let itemIndex = -1;
+                for (let i = 0; i < licenseFeaturesModel.GetItemsCount(); i++){
+                    let curItemId = licenseFeaturesModel.GetData("Id", i);
+
+                    if (curItemId == itemId){
+                        itemIndex = i;
+                        break;
+                    }
+                }
+
+                if (itemIndex >= 0){
+                    licenseFeaturesModel.RemoveItem(itemIndex);
+                }
+
+                if (licenseFeaturesModel.GetItemsCount() == 0){
+                    featuresModel.RemoveData(licenseId);
+                }
+            }
+        }
+
+        console.log("featuresModel", featuresModel.toJSON());
     }
 
     function synchronise(){
@@ -38,87 +150,31 @@ Item {
         }
     }
 
-    onSelectedIndexChanged: {
+//     function getParentFeatures(model, retVal){
+//         for (let i = 0; i < model.GetItemsCount(); i++){
+//             let currentFeatureId = model.GetData("Id", i);
+//             let currentParentFeatureId = model.GetData("ParentId", i);
 
-        if (selectedIndex > -1){
-            let rootKey = collectionView.table.getSelectedId();
+//             if (!currentParentFeatureId){
+//                 retVal.push(currentFeatureId);
+//             }
+//         }
+//     }
 
-            treeView.visible = rootKey != null && rootKey != "";
+//     function getFeaturesLeaves(model, parentId, retVal){
+//         let result = []
+//         for (let i = 0; i < model.GetItemsCount(); i++){
+//             let currentFeatureId = model.GetData("Id", i);
+//             let currentParentFeatureId = model.GetData("ParentId", i);
 
-            treeViewModel.resetProperties();
+//             if (currentParentFeatureId == parentId){
+//                 result.push(currentFeatureId)
+//                 getFeaturesLeaves(model, currentFeatureId, retVal);
+//             }
+//         }
 
-            let featuresModel = documentModel.GetData("Features");
-
-            if (featuresModel){
-                let strValues = featuresModel.GetData(rootKey);
-                if (strValues){
-                    let values = strValues.split(';');
-                    for (let value of values){
-                        treeViewModel.selectFeature(value);
-                    }
-                }
-
-                let upFeatures = [];
-                featureDependenciesModel.getFeaturesDependsByFeatureUp(rootKey, upFeatures);
-
-                if (upFeatures.length > 0){
-                    treeViewModel.updateDataFeatureList(upFeatures, 0, 0);
-                }
-            }
-        }
-    }
-
-    onCheckBoxChanged: {
-
-        let rootLicenseId = collectionView.table.getSelectedId();
-        let rootKey = rootLicenseId;
-        let value = childId;
-
-        if (state == 0){
-            treeViewModel.deselectFeature(value);
-        }
-
-        let featuresModel = documentModel.GetData("Features");
-
-        if (!featuresModel){
-            featuresModel = documentModel.AddTreeModel("Features");
-        }
-
-        if (featuresModel.ContainsKey(rootKey)){
-            let str = lisensesFeaturesModel.modelLicenseFeatures.GetData(rootKey);
-            let arr = str.split(";");
-            if (state == 0){
-                if (arr){
-                    let index = arr.indexOf(value);
-                    if (index > -1){
-                        arr.splice(index, 1);
-                    }
-
-                    if (arr.length == 0){
-                        featuresModel.RemoveData(rootKey);
-                    }
-                    else{
-                        let resStr = arr.join(';');
-                        featuresModel.SetData(rootKey, resStr);
-                    }
-                }
-            }
-            else{
-                if (arr.indexOf(value) == -1){
-                    arr.push(value);
-                    let resStr = arr.join(';');
-                    featuresModel.SetData(rootKey, resStr);
-                }
-            }
-        }
-        else{
-            featuresModel.SetData(rootKey, value);
-        }
-
-        if (state == 2){
-            treeViewModel.selectFeature(value);
-        }
-
-        synchronise()
-    }
+//         if (result.length == 0){
+//             retVal.push(parentId)
+//         }
+//     }
 }

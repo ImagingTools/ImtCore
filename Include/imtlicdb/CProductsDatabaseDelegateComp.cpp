@@ -89,16 +89,18 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 
 			imtlic::ILicenseInfo::FeatureInfo featureInfo;
 
-			QByteArray featureId, packageId;
+			QByteArray featureId;
 			if (licenseFeatureRecord.contains("FeatureId")){
 				featureId = licenseFeatureRecord.value("FeatureId").toByteArray();
 			}
 
-			if (licenseFeatureRecord.contains("PackageId")){
-				packageId = licenseFeatureRecord.value("PackageId").toByteArray();
+			QByteArray parentFeatureId;
+			if (licenseFeatureRecord.contains("ParentFeatureId")){
+				parentFeatureId = licenseFeatureRecord.value("ParentFeatureId").toByteArray();
 			}
 
 			featureInfo.id = featureId;
+			featureInfo.parentId = parentFeatureId;
 
 			if (featureInfo.id.isEmpty()){
 				return nullptr;
@@ -168,12 +170,22 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 
 			imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
 			for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
-				retVal.query += "\n" +
-							QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId) VALUES('%1', '%2');")
-							.arg(qPrintable(licenseId))
-							.arg(qPrintable(featureInfo.id))
-							.toLocal8Bit();
 
+				if (featureInfo.parentId.isEmpty()){
+					retVal.query += "\n" +
+								QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId) VALUES('%1', '%2');")
+								.arg(qPrintable(licenseId))
+								.arg(qPrintable(featureInfo.id))
+								.toLocal8Bit();
+				}
+				else{
+					retVal.query += "\n" +
+								QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId, ParentFeatureId) VALUES('%1', '%2', '%3');")
+								.arg(qPrintable(licenseId))
+								.arg(qPrintable(featureInfo.id))
+								.arg(qPrintable(featureInfo.parentId))
+								.toLocal8Bit();
+				}
 			}
 		}
 	}
@@ -266,11 +278,22 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			imtlic::ILicenseInfo::FeatureInfos currentFeatures = licenseInfoPtr->GetFeatureInfos();
 
 			for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : currentFeatures){
-				retVal += "\n" +
-							QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId) VALUES('%1', '%2');")
-							.arg(qPrintable(licenseId))
-							.arg(qPrintable(featureInfo.id))
-							.toLocal8Bit();
+
+				if (featureInfo.parentId.isEmpty()){
+					retVal += "\n" +
+								QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId) VALUES('%1', '%2');")
+								.arg(qPrintable(licenseId))
+								.arg(qPrintable(featureInfo.id))
+								.toLocal8Bit();
+				}
+				else{
+					retVal += "\n" +
+								QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId, ParentFeatureId) VALUES('%1', '%2', '%3');")
+								.arg(qPrintable(licenseId))
+								.arg(qPrintable(featureInfo.id))
+								.arg(qPrintable(featureInfo.parentId))
+								.toLocal8Bit();
+				}
 			}
 		}
 	}
@@ -316,11 +339,28 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 			// Add new features to the license:
 			for (const QByteArray& addedFeatureId : addedFeatures){
-				retVal += "\n" +
-							QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId) VALUES('%1', '%2');")
-							.arg(qPrintable(collectionLicenseId))
-							.arg(qPrintable(addedFeatureId))
-							.toLocal8Bit();
+
+				imtlic::ILicenseInfo::FeatureInfos currentFeatures = newLicenseInfoPtr->GetFeatureInfos();
+
+				for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : currentFeatures){
+					if (featureInfo.id == addedFeatureId){
+						if (featureInfo.parentId.isEmpty()){
+							retVal += "\n" +
+										QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId) VALUES('%1', '%2');")
+										.arg(qPrintable(collectionLicenseId))
+										.arg(qPrintable(featureInfo.id))
+										.toLocal8Bit();
+						}
+						else{
+							retVal += "\n" +
+										QString("INSERT INTO \"ProductLicenseFeatures\" (LicenseId, FeatureId, ParentFeatureId) VALUES('%1', '%2', '%3');")
+										.arg(qPrintable(collectionLicenseId))
+										.arg(qPrintable(featureInfo.id))
+										.arg(qPrintable(featureInfo.parentId))
+										.toLocal8Bit();
+						}
+					}
+				}
 			}
 
 			// Delete removed features to the license:
@@ -332,6 +372,8 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			}
 		}
 	}
+
+	qDebug() << "retval " << retVal;
 
 	return retVal;
 }

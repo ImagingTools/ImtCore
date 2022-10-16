@@ -7,6 +7,11 @@ namespace imtauthgql
 
 imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
+	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
+
+	for (const imtgql::CGqlObject& gqlObject : *paramList){
+	}
+
 	return nullptr;
 }
 

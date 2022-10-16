@@ -5,9 +5,8 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
+//    commandsDelegate: RoleViewCommandsDelegate {}
     commandsDelegatePath: "../../imtauthgui/RoleViewCommandsDelegate.qml";
-
-    property TreeItemModel productsModel;
 
     property TreeItemModel rolesModel; // Collection of the all roles
 
@@ -17,7 +16,8 @@ DocumentBase {
 
     property Item includedRolesTable;
 
-    property string title: qsTr("Roles");
+    property string productId: "";
+    property string title: productId + " / " + qsTr("Roles");
 
     onDocumentModelChanged: {
         headerText.text = title + " / " + documentModel.GetData("Name");
@@ -80,6 +80,8 @@ DocumentBase {
     Row {
         id: header;
 
+        z: 10;
+
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.leftMargin: 10;
@@ -87,6 +89,8 @@ DocumentBase {
         height: 40;
 
         spacing: 10;
+
+        clip: true;
 
         AuxButton {
             id: closeButton;
@@ -124,7 +128,7 @@ DocumentBase {
 
         width: 150;
 
-        color: Style.alternateBaseColor;
+        color: Style.backgroundColor;
 
         Column {
             id: mainPanel;
@@ -195,6 +199,8 @@ DocumentBase {
 
     Rectangle {
         id: bodyAdministration;
+
+        z: 5;
 
         anchors.left: mainPanelBackground.right;
         anchors.top: header.bottom;

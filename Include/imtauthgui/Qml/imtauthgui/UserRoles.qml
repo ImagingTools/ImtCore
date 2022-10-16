@@ -11,14 +11,14 @@ Item {
     function updateGui(){
         console.log("UserRoles updateGui");
 
-        let rolesModel = documentModel.GetData("Roles");
+        let rolesModel = documentModel.GetData("Products");
         rolesTable.elements = rolesModel;
     }
 
     Rectangle {
         anchors.fill: parent;
 
-        color: Style.alternateBaseColor;
+        color: Style.backgroundColor;
     }
 
     Flickable {
@@ -47,52 +47,62 @@ Item {
                 font.pixelSize: Style.fontSize_common;
             }
 
-            Rectangle {
-                id: rolesBlock;
-
-                anchors.horizontalCenter: bodyColumn.horizontalCenter;
+            AuxTable {
+                id: rolesTable;
 
                 width: bodyColumn.width;
                 height: 300;
 
-                color: Style.imagingToolsGradient1;
+                showHeaders: false;
 
-                border.width: 1;
-                border.color: Style.borderColor;
+                clip: true;
 
-                TreeItemModel {
-                    id: headersModelRoles;
+                delegate: TableUserRolesDelegate {
+                    id: delegate;
 
-                    Component.onCompleted: {
-                        let index = headersModelRoles.InsertNewItem();
-
-                        headersModelRoles.SetData("Id", "Name", index)
-                        headersModelRoles.SetData("Name", "Name", index)
-                    }
+                    width: parent.width;
                 }
 
-                AuxTable {
-                    id: rolesTable;
+            }//AuxTable rolesTable
 
-                    anchors.fill: parent;
-                    anchors.margins: 2;
+            Text {
+                id: titlePermissions;
 
-                    headers: headersModelRoles;
+                text: qsTr("Permissions");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
 
-                    delegate: TableUserRolesDelegate {
-                        id: delegate;
+            TreeItemModel {
+                id: headersModelPermissions;
 
-                        width: parent.width;
-                        height: 35;
+                Component.onCompleted: {
+                    let index = headersModelPermissions.InsertNewItem();
+                    headersModelPermissions.SetData("Id", "Name", index)
+                    headersModelPermissions.SetData("Name", "Name", index)
+                }
+            }
 
-                        selected: rolesTable.selectedIndex === model.index;
+            AuxTable {
+                id: permissionsTable;
 
-                        onClicked: {
-                            rolesTable.selectedIndex = model.index;
-                        }
+                width: bodyColumn.width;
+                height: 200;
+
+                headers: headersModelPermissions;
+
+                delegate: TableUserPermissionsDelegate {
+                    width: parent.width;
+                    height: 35;
+
+                    selected: permissionsTable.selectedIndex === model.index;
+
+                    onClicked: {
+                        permissionsTable.selectedIndex = model.index;
                     }
-                }//AuxTable rolesTable
-            }//Rectangle licensesBlock
+                }
+            }//AuxTable permissionsTable
         }//Column bodyColumn
     }//Flickable
 }//Container

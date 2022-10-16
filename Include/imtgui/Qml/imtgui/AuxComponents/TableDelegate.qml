@@ -24,8 +24,18 @@ Rectangle {
     signal rightButtonMouseClicked(int mX, int mY);
     signal doubleClicked;
 
+    Component.onCompleted: {
+        for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            addToArray(model[tableContainer.headers.GetData("Id", i)]);
+        }
+    }
+
     onBodyArrayChanged: {
         tableDelegateContainer.setContainerSize();
+    }
+
+    function getItemData(){
+        return model;
     }
 
     function clearArray(){

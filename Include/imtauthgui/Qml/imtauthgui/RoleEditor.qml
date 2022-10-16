@@ -8,31 +8,61 @@ Item {
 
     anchors.fill: parent;
 
+    signal commandModeChanged(string commandId, string newMode);
+
     Component.onCompleted: {
         container.includedRolesTable = includesTable;
+
+        commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
+        commandsProvider.commandModeChanged.connect(commandModeChanged);
+    }
+
+    Component.onDestruction: {
+        commandsProvider.modelLoaded.disconnect(onCommandsModelLoaded);
+        commandsProvider.commandModeChanged.disconnect(commandModeChanged);
+    }
+
+    onCommandModeChanged: {
+        for (let i = 0; i < commandsModel.GetItemsCount(); i++){
+            let currentCommandId = commandsModel.GetData("Id", i);
+
+            if (currentCommandId == commandId){
+                commandsModel.SetData("Mode", newMode, i);
+            }
+        }
+    }
+
+    function onCommandsModelLoaded(){
+        commandsProvider.mergeModelWith(commandsModel);
     }
 
     Rectangle {
         anchors.fill: parent;
 
-        color: Style.alternateBaseColor;
+        color: Style.backgroundColor;
     }
 
-    ListModel{
+    TreeItemModel {
         id: commandsModel;
 
-        ListElement{
-            Id: "New";
-            Name: qsTr("New");
-            Mode: "Disabled";
-            IconSource: "../../../../Icons/Light/Add_Off_Normal.svg";
-        }
+        Component.onCompleted: {
+            let index = commandsModel.InsertNewItem();
 
-        ListElement{
-            Id: "Remove";
-            Name: qsTr("Remove");
-            Mode: "Disabled";
-            IconSource: "../../../../Icons/Light/Delete_Off_Normal.svg";
+            commandsModel.SetData("Id", "Include", index);
+            commandsModel.SetData("Name", "Include", index);
+            commandsModel.SetData("Mode", "Normal", index);
+            commandsModel.SetData("IconSource", "Add", index);
+            commandsModel.SetData("Visible", false, index);
+
+            index = commandsModel.InsertNewItem();
+
+            commandsModel.SetData("Id", "Exclude", index);
+            commandsModel.SetData("Name", "Exclude", index);
+            commandsModel.SetData("Mode", "Disabled", index);
+            commandsModel.SetData("IconSource", "Delete", index);
+            commandsModel.SetData("Visible", false, index);
+
+            repeater.model = commandsModel;
         }
     }
 
@@ -42,7 +72,7 @@ Item {
         roleNameInput.text = documentModel.GetData("Name");
         descriptionInput.text = documentModel.GetData("Description");
 
-        productNameInput.text = documentModel.GetData("ProductId");
+        productId = documentModel.GetData("ProductId")
 
         let parents = documentModel.GetData("Parents");
 
@@ -62,30 +92,14 @@ Item {
 
         boundsBehavior: Flickable.StopAtBounds;
 
+        clip: true;
+
         Column {
             id: bodyColumn;
 
             width: 400;
 
             spacing: 7;
-
-            Text {
-                id: titleProductId;
-
-                text: qsTr("Product-ID");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
-
-            CustomTextField {
-                id: productNameInput;
-
-                width: parent.width;
-                height: 30;
-
-                readOnly: true;
-            }
 
             Text {
                 id: titleRoleId;
@@ -165,7 +179,7 @@ Item {
             Item {
                 id: rowCommands;
 
-                height: 220;
+                height: 250;
                 width: bodyColumn.width;
 
                 clip: true;
@@ -174,67 +188,63 @@ Item {
                     anchors.fill: parent;
                 }
 
-                Row {
-                    id: row;
+                Rectangle {
+                    id: topRect;
 
-                    spacing: 10;
+                    width: parent.width;
+                    height: 25;
 
-                    Repeater {
-                        model: commandsModel;
+                    color: Style.alternateBaseColor;
 
-                        delegate: AuxButton {
-                            anchors.verticalCenter: rowCommands.verticalCenter;
+                    Row {
+                        id: row;
 
-                            width: 18;
-                            height: width;
+                        anchors.horizontalCenter: parent.horizontalCenter;
+                        anchors.verticalCenter: parent.verticalCenter;
 
-                            iconSource: model.IconSource;
+                        spacing: 10;
 
-                            onClicked: {
-                                Events.sendEvent(commandsId + "CommandActivated", model.Id);
+                        Repeater {
+                            id: repeater;
+
+                            delegate: AuxButton {
+                                anchors.verticalCenter: rowCommands.verticalCenter;
+
+                                width: 18;
+                                height: width;
+
+                                iconSource: "../../../../Icons/Light/" + model.IconSource +"_Off_" + model.Mode + ".svg";
+
+                                enabled: model.Mode == "Normal";
+
+                                onClicked: {
+                                    Events.sendEvent(commandsId + "CommandActivated", model.Id);
+                                }
                             }
                         }
                     }
                 }
 
-                Rectangle {
-                    id: tableBg;
+                TreeItemModel {
+                    id: headersModelRoles;
 
-                    anchors.top: row.bottom;
+                    Component.onCompleted: {
+                        let index = headersModelRoles.InsertNewItem();
+                        headersModelRoles.SetData("Id", "Name", index)
+                        headersModelRoles.SetData("Name", "Name", index)
+                    }
+                }
 
-                    width: bodyColumn.width;
+                AuxTable {
+                    id: includesTable;
+
+                    anchors.top: topRect.bottom;
+
+                    width: parent.width;
                     height: 200;
 
-                    color: Style.imagingToolsGradient1;
-
-                    border.width: 1;
-                    border.color: Style.borderColor;
-
-                    TreeItemModel {
-                        id: headersModelRoles;
-
-                        Component.onCompleted: {
-                            let index = headersModelRoles.InsertNewItem();
-                            headersModelRoles.SetData("Id", "Name", index)
-                            headersModelRoles.SetData("Name", "Name", index)
-                        }
-                    }
-
-                    AuxTable {
-                        id: includesTable;
-
-                        anchors.fill: parent;
-                        anchors.margins: 2;
-
-                        headers: headersModelRoles;
-
-                        onSelectedIndexChanged: {
-                            console.log("includesTable onSelectedIndexChanged");
-
-    //                        container.selectedIndex = includesTable.selectedIndex;
-                        }
-                    }//AuxTable includesTable
-                }
+                    headers: headersModelRoles;
+                }//AuxTable includesTable
             }
         }//Column bodyColumn
     }//Flickable

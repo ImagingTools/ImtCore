@@ -12,7 +12,11 @@ Item {
     function headerClicked(headerId){
         console.log("headerClicked", headerId);
 
-        let order = sortModel.GetData(headerId);
+        let order = "";
+
+        if(sortModel.ContainsKey(headerId)){
+            order = sortModel.GetData(headerId);
+        }
 
         if (order == "ASC"){
             sortModel.SetData(headerId, "DESC");

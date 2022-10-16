@@ -2,86 +2,128 @@ import QtQuick 2.0
 import imtgui 1.0
 import Acf 1.0
 
-Rectangle {
-    id: rolesTableDelegate;
+Item {
+    id: productRolesDelegate;
 
-    color: Style.baseColor;
+    height: body.height + rolesColumn.height;
 
-    property bool selected: false;
-    property string name;
+    property int index: model.index;
 
-    signal clicked;
-    signal doubleClicked;
+    property int selectedIndex: -1;
 
-    Rectangle{
-        id: selectionBackGround;
-
-        anchors.fill: parent;
-        color: "#4682B4";
-
-        opacity: 0.2;
-        radius: 2;
-        visible: rolesTableDelegate.selected;
-    }
-
-    MouseArea {
-        id: ma;
-
-        anchors.fill: parent;
-
-        onClicked: {
-            rolesTableDelegate.clicked();
-        }
-
-        onDoubleClicked: {
-            rolesTableDelegate.doubleClicked();
+    Component.onCompleted: {
+        console.log("productRolesDelegate onCompleted", model.Roles);
+        if (model.Roles){
+            rolesRepeater.model = model.Roles;
         }
     }
 
-    Item {
-        id: leftPart;
-
-        anchors.left: parent.left;
-        anchors.verticalCenter: parent.verticalCenter;
-
-        width: parent.width;
-        height: parent.height;
-
-        clip: true;
-
-        CheckBox {
-            id: checkBoxRole;
-
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: leftPart.left;
-            anchors.leftMargin: 10;
-
-            checkState: model.State;
-
-            MouseArea {
-                anchors.fill: parent;
-
-                onClicked: {
-                    console.log("TableUserRolesDelegate CheckBox onClicked");
-                    model.State = 2 - checkBoxRole.checkState;
-                }
-            }
+    onSelectedIndexChanged: {
+        if (selectedIndex != index){
+            rolesRepeater.selectedIndex = -1;
         }
+    }
+
+    Rectangle {
+        id: body;
+
+        width: productRolesDelegate.width;
+        height: 30;
+
+        color: Style.alternateBaseColor;
+
+        border.width: 1;
+        border.color: Style.imagingToolsGradient2;
 
         Text {
-            id: titleRolesTable;
-
             anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: checkBoxRole.right;
+            anchors.left: parent.left;
             anchors.leftMargin: 10;
 
             text: model.Name;
 
-            font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+            font.family: Style.fontFamilyBold;
+            font.bold: true;
+
             color: Style.textColor;
             wrapMode: Text.WordWrap;
             elide: Text.ElideRight;
         }
     }
+
+    Rectangle {
+        id: rolesBg;
+
+        anchors.top: body.bottom;
+
+        color: "transparent";
+
+        width: productRolesDelegate.width;
+        height: rolesColumn.height;
+
+        border.color: Style.imagingToolsGradient2;
+        border.width: 1;
+
+        Column {
+            id: rolesColumn;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.verticalCenter: parent.verticalCenter;
+
+            width: rolesBg.width - 2;
+
+            Repeater {
+                id: rolesRepeater;
+
+                property int selectedIndex: -1;
+
+                onSelectedIndexChanged: {
+                    if (productRolesDelegate.selectedIndex == index){
+                        baseCollectionView.selectedIndexChanged(selectedIndex);
+                    }
+                }
+
+                delegate: Rectangle {
+                    width: productRolesDelegate.width;
+                    height: body.height;
+
+                    color: rolesRepeater.selectedIndex == model.index ? Style.selectedColor : "transparent";
+
+                    CheckBox {
+                        id: checkBoxRole;
+
+                        anchors.verticalCenter: parent.verticalCenter;
+                        anchors.left: parent.left;
+                        anchors.leftMargin: 10;
+
+                        checkState: model.State;
+
+                        MouseArea {
+                            anchors.fill: parent;
+
+                            onClicked: {
+                                model.State = 2 - checkBoxRole.checkState;
+                            }
+                        }
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter;
+                        anchors.left: checkBoxRole.right;
+                        anchors.leftMargin: 10;
+
+                        text: model.Name;
+
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                        color: Style.textColor;
+                        wrapMode: Text.WordWrap;
+                        elide: Text.ElideRight;
+                    }
+                }
+            }
+        }//Column
+    }
 }
+

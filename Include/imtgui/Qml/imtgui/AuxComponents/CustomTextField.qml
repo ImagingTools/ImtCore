@@ -24,7 +24,7 @@ Item {
     property string fontColor: Style.textColor;
     property string placeHolderFontColor: "gray";
 
-    property color borderColor: Style.iconColorOnSelected;
+    property color borderColor: textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
     property int radius: 0;
     property int textSize: 15;

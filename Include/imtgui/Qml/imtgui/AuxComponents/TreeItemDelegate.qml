@@ -10,7 +10,16 @@ Item {
 
     property TreeItemModel childModel: model.ChildModel ? model.ChildModel : null;
 
+    property int state: model.State;
+    property string itemId: model.Id;
+
+    property bool itemVisible: model.Visible;
+    property bool itemActive: model.Active;
+
+    property var itemData: model;
+
     signal doubleClicked;
+    signal clicked(var itemData, int index);
 
     onChildModelChanged: {
         console.log("onChildModelChanged");
@@ -26,7 +35,7 @@ Item {
         width: parent.width;
         height: model.Visible ? treeItemDelegate.itemHeight : 0;
 
-        visible: model.Visible;
+        visible: itemData.Visible;
 
         color: model.Selected ? Style.selectedColor : "transparent";
 
@@ -34,8 +43,13 @@ Item {
             anchors.fill: parent;
 
             onClicked: {
-                resetSelectedItem(modelItems);
-                model.Selected = true;
+                 console.log();
+                console.log("Id", model.Id);
+                console.log("Optional", model.Optional);
+                console.log("State", model.State);
+                console.log("Level", model.Level);
+
+                treeItemDelegate.clicked(model, model.index);
             }
 
             onDoubleClicked: {
@@ -82,17 +96,26 @@ Item {
 
             checkState: model.State;
 
-            onClicked: {
-//                model.State = 2 - model.State;
+            visible: model.Level >= 1 && model.Optional;
 
-                treeViewController.checkBoxChanged(2 - checkBox.checkState, model.Id);
+            onClicked: {
+                if (!model.Active){
+                    return;
+                }
+
+                if (model.State == Qt.PartiallyChecked){
+                    model.State = Qt.Checked;
+                }
+                else{
+                    model.State = Qt.Checked - model.State;
+                }
             }
         }
 
         Text {
             id: title;
 
-            anchors.left: checkBox.right;
+            anchors.left: checkBox.visible ? checkBox.right : iconArrow.right;
             anchors.leftMargin: 10;
             anchors.verticalCenter: parent.verticalCenter;
 
@@ -112,12 +135,28 @@ Item {
 
         width: treeItemDelegate.width - 20;
 
-        visible: model.Opened;
+        visible: model.Opened && model.Visible;
+
+//        visible: itemData.Parent ? itemData.Parent.Opened && itemData.Parent.Visible : model.Opened && model.Visible;
 
         Repeater {
             id: childModelRepeater;
 
             delegate: delegateComp;
+
+            onItemAdded: {
+                console.log('Repeater onItemAdded', itemData.Level);
+
+                if (itemData.Level >= 1){
+                    item.itemData.Parent = itemData;
+                    if (!itemData.Children){
+                        itemData.Children = [item.itemData]
+                    }
+                    else{
+                        itemData.Children.push(item.itemData);
+                    }
+                }
+            }
         }
     }
 }

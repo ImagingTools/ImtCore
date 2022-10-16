@@ -58,9 +58,16 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(
 			metaInfoModel->SetData("Name", "Roles", index);
 			children = metaInfoModel->AddTreeModel("Children", index);
 
-			for (const QByteArray& roleId : rolesIds){
-				int childrenIndex = children->InsertNewItem();
-				children->SetData("Value", roleId, childrenIndex);
+			for (const QByteArray& productRoleId : rolesIds){
+				QStringList data = QString(productRoleId).split(*m_separatorObjectIdAttrPtr);
+
+				if (data.size() == 2){
+					QByteArray roleId = data[0].toUtf8();
+					QByteArray productId = data[1].toUtf8();
+
+					int childrenIndex = children->InsertNewItem();
+					children->SetData("Value", roleId + " (" + productId + ")", childrenIndex);
+				}
 			}
 		}
 

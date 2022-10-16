@@ -608,6 +608,10 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 					quint32 intVal = value.toUInt();
 					retVal = retVal && archive.Process(intVal);
 				}
+				else if (value.type() == QVariant::Double){
+					double doubleVal = value.toDouble();
+					retVal = retVal && archive.Process(doubleVal);
+				}
 				else if (value.type() == QVariant::LongLong){
 					qint64 intVal = value.toLongLong();
 					retVal = retVal && archive.Process(intVal);

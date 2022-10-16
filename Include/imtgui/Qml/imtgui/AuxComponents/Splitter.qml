@@ -18,7 +18,6 @@ Rectangle {
         cursorShape: Qt.SplitHCursor;
 
         onMouseXChanged: {
-            console.log("MouseX =", mouseX);
             if (splitterContainer.type !== 0x1){
                 return;
             }

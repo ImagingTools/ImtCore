@@ -9,7 +9,7 @@ Rectangle {
     border.width: 1;
     border.color: highlighted ? Style.iconColorOnSelected : borderColor;
 
-    color: !enabled ? Style.inactive_buttonColor : auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
+    color: /*!enabled ? Style.backgroundColor : */auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
                                         auxButtonContainer.highlighted ? Style.selectedColor :
                                                                          backgroundColor;
 
@@ -23,7 +23,7 @@ Rectangle {
 
     property string borderColor: "transparent";
     property string backgroundColor: "transparent";
-    property var textButton;
+    property string textButton: "";
 
     property int iconWidth: auxButtonContainer.width - 3;
     property int iconHeight: auxButtonContainer.height - 3;

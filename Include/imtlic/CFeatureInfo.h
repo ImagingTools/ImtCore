@@ -4,6 +4,8 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureInfo.h>
+//#include <imtlic/CFeatureContainer.h>
+
 
 namespace imtlic
 {
@@ -16,11 +18,15 @@ public:
 
 	void SetFeatureId(const QByteArray& featureId);
 	void SetFeatureName(const QString& featureName);
+	void SetOptional(bool optional);
+	void SetParentFeature(const IFeatureInfo* parentFeaturePtr);
 
 	// reimplemented (IFeatureInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetFeaturePackage() const override;
 	virtual QByteArray GetFeatureId() const override;
 	virtual QString GetFeatureName() const override;
+	virtual bool IsOptional() const override;
+	virtual const IFeatureInfo* GetParentFeature() const override;
 	virtual QList<const IFeatureInfo*> GetSubFeatures() const override;
 	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
 	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
@@ -39,8 +45,9 @@ protected:
 	const imtlic::IFeatureInfoProvider* m_packagePtr;
 	QByteArray m_id;
 	QString m_name;
-
+	bool m_optional;
 	QList<const IFeatureInfo*> m_subFeatures;
+	const IFeatureInfo* m_parentFeaturePtr;
 };
 
 

@@ -7,24 +7,35 @@ Dialog {
 
     width: 700;
 
-    property string titleId;
-    property string titleName;
+    property string titleId: qsTr("Feature-ID");
+    property string titleName: qsTr("Feature Name");
 
     property string valueId: null;
-    property string valueName;
+    property string valueName: null;
 
     property bool autoGenerate: false;
 
-    property TreeItemModel model;
+    property TreeItemModel featuresModel;
     property alias subFeaturesModel: subFeaturesCopyModel;
 
     property int index: -1;
 
     content: EditDialogBody {
+        id: dialogBody;
+    }
+
+    TreeItemModel {
+        id: dialogModel;
     }
 
     TreeItemModel {
         id: subFeaturesCopyModel;
+    }
+
+    function subFeaturesModelUpdated(){
+        console.log("subFeaturesModelUpdated");
+
+        buttons.setButtonState('Ok', true);
     }
 
     Component.onCompleted: {
@@ -34,15 +45,22 @@ Dialog {
         editDialogContainer.title = qsTr("Edit");
     }
 
+    Component.onDestruction: {
+        subFeaturesCopyModel.modelChanged.disconnect(subFeaturesModelUpdated);
+    }
+
     onFinished: {
         if (buttonId === "Ok"){
-            let subFeaturesModel = model.GetData("ChildModel", index);
+            console.log("onFinished", buttonId);
+            let subFeaturesModel = featuresModel.GetData("ChildModel", index);
 
             let json = editDialogContainer.subFeaturesModel.toJSON();
+            console.log("json", json);
+
             subFeaturesModel.Parse(json);
 
-//            editDialogContainer.valueId = editDialogContainer.bodyItem.inputId;
-//            editDialogContainer.valueName = editDialogContainer.bodyItem.inputName;
+            valueId = dialogModel.GetData("Id");
+            valueName = dialogModel.GetData("Name");
         }
     }
 
@@ -51,12 +69,22 @@ Dialog {
     }
 
     function getSubFeaturesFromModel(){
-        let subFeaturesModel = model.GetData("ChildModel", index);
+        console.log("getSubFeaturesFromModel");
+        let subFeaturesModel = featuresModel.GetData("ChildModel", index);
         if (!subFeaturesModel){
-            subFeaturesModel = model.AddTreeModel("ChildModel", index);
+            subFeaturesModel = featuresModel.AddTreeModel("ChildModel", index);
+        }
+        else{
+            let json = subFeaturesModel.toJSON();
+            console.log("subFeaturesModel", subFeaturesModel.GetItemsCount());
+
+            console.log("json", json);
+
+            editDialogContainer.subFeaturesModel.Parse(json);
+
+            console.log("subFeaturesModel", editDialogContainer.subFeaturesModel.toJSON());
         }
 
-        let json = subFeaturesModel.toJSON();
-        editDialogContainer.subFeaturesModel.Parse(json);
+        subFeaturesCopyModel.modelChanged.connect(subFeaturesModelUpdated);
     }
 }

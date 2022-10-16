@@ -31,10 +31,11 @@ public:
 	{
 		QByteArray id;
 		QString name;
+		QByteArray parentId;
 
 		bool operator==(const FeatureInfo& other) const
 		{
-			return (id == other.id) && (name == other.name);
+			return (id == other.id) && (name == other.name) && (parentId == other.parentId);
 		}
 	
 		bool operator!=(const FeatureInfo& other) const

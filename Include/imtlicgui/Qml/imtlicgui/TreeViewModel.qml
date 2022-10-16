@@ -69,7 +69,7 @@ Item {
                     console.log("FeaturesTreeView removeFeatureInTreeViewModel Removed", packageId, featureId);
                     modelChildren.RemoveItem(j);
 
-                    featureDependenciesModel.removeDependsFeature(featureDependenciesModel.modelFeatureDependencies, featureId);
+                    featureDependenciesModel.removeDependsFeature(featureDependenciesModel.model, featureId);
                     break;
                 }
             }
@@ -80,34 +80,64 @@ Item {
 
     function selectFeature(feature){
         console.log("selectFeature", feature);
-        for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
-            let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
-            let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
-            if (childItems){
-                let featureFind = false;
-                for (let j = 0; j < childItems.GetItemsCount(); j++){
-                    let featureId = childItems.GetData("Id", j);
-                   // let value = packageId + "." + featureId;
-                    if (feature == featureId){
-                        featureFind = true;
-                        childItems.SetData("State", 2, j);
-                        childItems.SetData("Active", true, j);
-                        let downDepends = []
-                        featureDependenciesModel.getFeaturesDependsByFeature(feature, downDepends)
-                        console.log("downDepends", downDepends);
-                        if (downDepends.length > 0){
-                            treeViewModelContainer.updateDataFeatureList(downDepends, 2, false);
-                        }
-                        break;
-                    }
-                }
 
-                if (featureFind){
-                    treeViewModelContainer.modelTreeView.SetData("ChildModel", childItems, i);
-                }
-            }
-        }
+        recursiveSelection(modelTreeView, feature);
+//        for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
+//            let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
+//            let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
+//            if (childItems){
+//                for (let j = 0; j < childItems.GetItemsCount(); j++){
+//                    let featureId = childItems.GetData("Id", j);
+//                    if (feature == featureId){
+//                        childItems.SetData("State", Qt.Checked, j);
+//                        childItems.SetData("Active", true, j);
+//                    }
+//                }
+//            }
+//        }
     }
+
+    function recursiveSelection(model, featureId){
+         for (let i = 0; i < model.GetItemsCount(); i++){
+             let itemId = model.GetData("Id", i);
+
+             if (itemId == featureId){
+                 model.SetData("State", Qt.Checked, i);
+                 model.SetData("Active", true, i);
+
+                 return;
+             }
+
+             let childModel = model.GetData("ChildModel", i);
+
+             if (childModel){
+                 recursiveSelection(childModel, featureId);
+             }
+         }
+    }
+
+//    function selectFeature(feature){
+//        console.log("selectFeature", feature);
+//        for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
+//            let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
+//            let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
+//            if (childItems){
+//                for (let j = 0; j < childItems.GetItemsCount(); j++){
+//                    let featureId = childItems.GetData("Id", j);
+//                    if (feature == featureId){
+//                        childItems.SetData("State", 2, j);
+//                        childItems.SetData("Active", true, j);
+//                        let downDepends = []
+//                        featureDependenciesModel.getAllChildrenDependsFeatures(feature, downDepends)
+//                        if (downDepends.length > 0){
+//                            treeViewModelContainer.updateDataFeatureList(downDepends, 2, false);
+//                        }
+//                        break;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     function deselectFeature(feature){
         console.log("deselectFeature", feature);
@@ -115,69 +145,96 @@ Item {
             let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
             let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             if (childItems){
-                let featureFind = false;
                 for (let j = 0; j < childItems.GetItemsCount(); j++){
                     let featureId = childItems.GetData("Id", j);
                     let value = featureId;
 
                     if (feature == value){
-                        featureFind = true;
+
                         childItems.SetData("State", 0, j);
                         let upDepends = []
-                        featureDependenciesModel.getFeaturesDependsByFeature(feature, upDepends)
+                        featureDependenciesModel.getAllChildrenDependsFeatures(feature, upDepends)
+
                         if (upDepends.length > 0){
                             treeViewModelContainer.updateDataFeatureList(upDepends, 0, true);
                         }
+
                         break;
                     }
-                }
-
-                if (featureFind){
-                    treeViewModelContainer.modelTreeView.SetData("ChildModel", childItems, i);
                 }
             }
         }
     }
 
-    function updateDataFeatureList(features, stateChecked, isActive){
-        console.log("updateDataFeatureList");
-
-        if (features.length <= 0){
+    function setValueToProperty(prop, value, features){
+        if (features.length == 0){
             return;
         }
+
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
             let packageId = treeViewModelContainer.modelTreeView.GetData("Id", i);
             let childItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             if (childItems){
-                for (let j = 0; j < childItems.GetItemsCount(); j++){
-                    let featureId = childItems.GetData("Id", j);
-                    let value = featureId;
-
-                    if (features.indexOf(value) >= 0){
-                        console.log("value stateChecked changed ->", stateChecked);
-                        childItems.SetData("State", stateChecked, j);
-                        childItems.SetData("Active", isActive, j);
-                    }
-                }
-                treeViewModelContainer.modelTreeView.SetData("ChildModel", childItems, i);
+                _setValueToPropertyRecursive(childItems, prop, value, features);
             }
         }
     }
 
-    /*
-      Сброс всех stateChecked и isActive в дереве
-    */
+    function _setValueToPropertyRecursive(model, prop, value, features){
+        console.log("_makeFeaturesInactiveRecursive", model, features);
+
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let featureId = model.GetData("Id", i);
+
+            if (features.includes(featureId)){
+
+                if (model.ContainsKey(prop)){
+                    console.log("model SetDAta", prop, value);
+                    model.SetData(prop, value, i);
+                }
+            }
+
+            let childModel = model.GetData("ChildModel", i);
+
+            if (childModel){
+                _setValueToPropertyRecursive(childModel, prop, value, features);
+            }
+        }
+    }
+
+
     function resetProperties(){
         for (let i = 0; i < treeViewModelContainer.modelTreeView.GetItemsCount(); i++){
             let childrenItems = treeViewModelContainer.modelTreeView.GetData("ChildModel", i);
             if (childrenItems){
-                for (let j = 0; j < childrenItems.GetItemsCount(); j++){
-                    childrenItems.SetData("State", 0, j);
-                    childrenItems.SetData("Active", true, j);
-                    childrenItems.SetData("Visible", true, j);
-                }
+                _resetRecursive(childrenItems);
             }
         }
+    }
+
+    function _resetRecursive(model){
+         for (let i = 0; i < model.GetItemsCount(); i++){             
+             let state = model.GetData("State", i);
+             let isActive = model.GetData("Active", i);
+             let isVisible = model.GetData("Visible", i);
+
+             if (state != Qt.Unchecked){
+                 model.SetData("State", Qt.Unchecked, i);
+             }
+
+             if (!isActive){
+                 model.SetData("Active", true, i);
+             }
+
+             if (!isVisible){
+                 model.SetData("Visible", true, i);
+             }
+
+             let childModel = model.GetData("ChildModel", i);
+             if (childModel){
+                 _resetRecursive(childModel);
+             }
+         }
     }
 
     function addFeatureInTreeViewModel(packageId, featureId, featureName){
@@ -219,6 +276,8 @@ Item {
 
             var gqlData = query.GetQuery();
             console.log("TreeView query ", gqlData);
+
+            Events.sendEvent("TreeViewModelUpdateStarted");
             this.SetGqlQuery(gqlData);
         }
 
@@ -232,7 +291,7 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
 
                         treeViewModelContainer.modelTreeView = dataModelLocal;
-                        Events.sendEvent("TreeViewModelUpdated");
+                        Events.sendEvent("TreeViewModelUpdateFinished");
                     }
                 }
             }

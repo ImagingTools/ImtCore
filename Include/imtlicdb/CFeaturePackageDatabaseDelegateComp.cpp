@@ -44,6 +44,8 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 		QString featureName;
 		QString description;
 
+		bool isOptional = false;
+
 		if (featureRecord.contains("Id")){
 			featureId = featureRecord.value("Id").toByteArray();
 		}
@@ -56,12 +58,18 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 			description = featureRecord.value("Description").toString();
 		}
 
-		istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
+		if (featureRecord.contains("Optional")){
+			isOptional = featureRecord.value("Optional").toBool();
+		}
+
+		imtlic::CFeatureInfo* featureInfoPtr = new imtlic::CFeatureInfo;
+
 		featureInfoPtr->SetFeatureId(featureId);
 		featureInfoPtr->SetFeatureName(featureName);
+		featureInfoPtr->SetOptional(isOptional);
 
 		QByteArrayList featureDependencies;
-		QByteArray dependenciesQuery = QString("SELECT dependencyid FROM \"FeatureDependencies\" WHERE featureid = '%1'").arg(qPrintable(featureId)).toUtf8();
+		QByteArray dependenciesQuery = QString("SELECT DependencyId FROM \"FeatureDependencies\" WHERE FeatureId = '%1'").arg(qPrintable(featureId)).toUtf8();
 		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
 
 		while (dependenciesSqlQuery.next()){
@@ -75,15 +83,15 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 			featureDependencies.append(dependFeatureId);
 		}
 
-		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE ParentId = '%1'").arg(qPrintable(featureId)).toUtf8();
-
-		CreateSubFeaturesFromRecord(featureInfoPtr.GetPtr(), subFeaturesQuery);
-
-		featurePackagePtr->InsertNewObject("FeatureInfo", featureName, description, featureInfoPtr.GetPtr());
-
 		if (!featureDependencies.isEmpty()){
 			featurePackagePtr->SetFeatureDependencies(featureId, featureDependencies);
 		}
+
+		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE ParentId = '%1'").arg(qPrintable(featureId)).toUtf8();
+
+		CreateSubFeaturesFromRecord(featurePackagePtr.GetPtr(), featureInfoPtr, subFeaturesQuery);
+
+		featurePackagePtr->InsertNewObject("FeatureInfo", featureName, description, featureInfoPtr);
 	}
 
 	if (!packageId.isEmpty() && !packageName.isEmpty()){
@@ -95,6 +103,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 
 
 void CFeaturePackageDatabaseDelegateComp::CreateSubFeaturesFromRecord(
+		imtlic::CFeaturePackage* featurePackagePtr,
 		imtlic::IFeatureInfo* featureInfoPtr,
 		const QByteArray& query) const
 {
@@ -113,20 +122,54 @@ void CFeaturePackageDatabaseDelegateComp::CreateSubFeaturesFromRecord(
 			subFeatureName = subFeaturesRecord.value("Name").toString();
 		}
 
+		QString subFeatureDescription;
+		if (subFeaturesRecord.contains("Description")){
+			subFeatureDescription = subFeaturesRecord.value("Description").toString();
+		}
+
+		bool isOptional = false;
+		if (subFeaturesRecord.contains("Optional")){
+			isOptional = subFeaturesRecord.value("Optional").toBool();
+		}
+
 		imtlic::CFeatureInfo* subFeatureInfoPtr = new imtlic::CFeatureInfo;
+
 		subFeatureInfoPtr->SetFeatureId(subFeatureId);
 		subFeatureInfoPtr->SetFeatureName(subFeatureName);
+		subFeatureInfoPtr->SetOptional(isOptional);
 
 		featureInfoPtr->InsertSubFeature(subFeatureInfoPtr);
+		subFeatureInfoPtr->SetParentFeature(featureInfoPtr);
 
 		QByteArray parentFeatureId;
 		if (subFeaturesRecord.contains("ParentId")){
 			parentFeatureId = subFeaturesRecord.value("ParentId").toByteArray();
 		}
 
-		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE ParentId = '%1'").arg(qPrintable(subFeatureId)).toUtf8();
+		QByteArrayList featureDependencies;
+		QByteArray dependenciesQuery = QString("SELECT DependencyId FROM \"FeatureDependencies\" WHERE FeatureId = '%1'").arg(qPrintable(subFeatureId)).toUtf8();
+		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
 
-		CreateSubFeaturesFromRecord(subFeatureInfoPtr, subFeaturesQuery);
+		while (dependenciesSqlQuery.next()){
+			QSqlRecord depFeatureRecord = dependenciesSqlQuery.record();
+			QByteArray dependFeatureId;
+
+			if (depFeatureRecord.contains("DependencyId")){
+				dependFeatureId = depFeatureRecord.value("DependencyId").toByteArray();
+			}
+
+			featureDependencies << dependFeatureId;
+		}
+
+		if (!featureDependencies.isEmpty()){
+			featurePackagePtr->SetFeatureDependencies(subFeatureId, featureDependencies);
+		}
+
+		featurePackagePtr->InsertNewObject("FeatureInfo", subFeatureName, subFeatureDescription, subFeatureInfoPtr);
+
+		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE ParentId = '%1';").arg(qPrintable(subFeatureId)).toUtf8();
+
+		CreateSubFeaturesFromRecord(featurePackagePtr, subFeatureInfoPtr, subFeaturesQuery);
 	}
 }
 
@@ -164,13 +207,19 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 			if (featureInfoPtr != nullptr){
 				QByteArray featureId = featureInfoPtr->GetFeatureId();
 				QString featureName = featureInfoPtr->GetFeatureName();
+				bool isOptional = featureInfoPtr->IsOptional();
+
 				QString featureDescription = featurePackagePtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
 				retVal.query += "\n" + 
-							QString("INSERT INTO \"Features\"(Id, Name, Description, PackageId) VALUES('%1', '%2', '%3', '%4');")
+							QString("INSERT INTO \"Features\"(Id, Name, Description, PackageId, Optional) VALUES('%1', '%2', '%3', '%4', '%5');")
 										.arg(qPrintable(featureId))
 										.arg(featureName)
 										.arg(featureDescription)
-										.arg(qPrintable(packageId)).toLocal8Bit();
+										.arg(qPrintable(packageId))
+										.arg(isOptional).toLocal8Bit();
+
+				CreateInsertSubFeaturesQuery(featurePackagePtr, featureInfoPtr, retVal.query);
 
 				QByteArrayList dependsIds = featurePackagePtr->GetFeatureDependencies(featureId);
 				if (dependsIds.size() > 0){
@@ -215,7 +264,10 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
 }
 
 
-void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(const imtlic::IFeatureInfo *featureInfoPtr, QByteArray &retVal) const
+void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
+		const imtlic::CFeaturePackage* featurePackagePtr,
+		const imtlic::IFeatureInfo *featureInfoPtr,
+		QByteArray &retVal) const
 {
 	QList<const imtlic::IFeatureInfo*> subFeatures = featureInfoPtr->GetSubFeatures();
 
@@ -224,15 +276,35 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(const imt
 	for (const imtlic::IFeatureInfo* featureInfo : subFeatures){
 		QByteArray featureId = featureInfo->GetFeatureId();
 		QString featureName = featureInfo->GetFeatureName();
+		bool isOptional = featureInfo->IsOptional();
+
+		QByteArray collectionId = featurePackagePtr->GetFeatureCollectionId(featureId);
+		QString featureDescription = featurePackagePtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 		retVal += "\n" +
-					QString("INSERT INTO \"Features\"(Id, Name, Description, ParentId) VALUES('%1', '%2', '%3', '%4');")
+					QString("INSERT INTO \"Features\"(Id, Name, Description, ParentId, Optional) VALUES('%1', '%2', '%3', '%4', '%5');")
 								.arg(qPrintable(featureId))
 								.arg(featureName)
-								.arg("")
-								.arg(qPrintable(parentFeatureId)).toLocal8Bit();
+								.arg(featureDescription)
+								.arg(qPrintable(parentFeatureId))
+								.arg(isOptional).toLocal8Bit();
 
-		CreateInsertSubFeaturesQuery(featureInfo, retVal);
+		QByteArrayList featureDependencies = featurePackagePtr->GetFeatureDependencies(featureId);
+
+		if (!featureDependencies.isEmpty()){
+			retVal += "\n" +
+						QString("DELETE FROM \"FeatureDependencies\" WHERE FeatureId = '%1';").arg(qPrintable(featureId)).toLocal8Bit();
+
+			for (const QByteArray& dependencyFeatureId : featureDependencies){
+				retVal += "\n" +
+						QString("INSERT INTO \"FeatureDependencies\" (FeatureId, DependencyId) VALUES('%1', '%2');")
+						.arg(qPrintable(featureId))
+						.arg(qPrintable(dependencyFeatureId))
+						.toLocal8Bit();
+			}
+		}
+
+		CreateInsertSubFeaturesQuery(featurePackagePtr, featureInfo, retVal);
 	}
 }
 
@@ -279,18 +351,20 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			QByteArray collectionId = newObjectPtr->GetFeatureCollectionId(addFeatureId);
 
 			QString featureName = featureInfoPtr->GetFeatureName();
+			bool isOptional = featureInfoPtr->IsOptional();
 			QString featureDescription = newObjectPtr->GetFeatureList().GetElementInfo(
 						collectionId,
 						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 			retVal += "\n" +
-						QString("INSERT INTO \"Features\" (Id, Name, Description, PackageId) VALUES('%1', '%2', '%3', '%4');")
+						QString("INSERT INTO \"Features\" (Id, Name, Description, PackageId, Optional) VALUES('%1', '%2', '%3', '%4', '%5');")
 									.arg(qPrintable(addFeatureId))
 									.arg(featureName)
 									.arg(featureDescription)
-									.arg(qPrintable(newPackageId)).toLocal8Bit();
+									.arg(qPrintable(newPackageId))
+									.arg(isOptional).toLocal8Bit();
 
-			CreateInsertSubFeaturesQuery(featureInfoPtr, retVal);
+			CreateInsertSubFeaturesQuery(newObjectPtr, featureInfoPtr, retVal);
 		}
 	}
 
@@ -316,17 +390,20 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			QString featureName = featureInfoPtr->GetFeatureName();
 			QString featureDescription = newObjectPtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-			retVal += QString("\nUPDATE \"Features\" SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4' WHERE PackageId = '%5' AND Id = '%6';")
+			bool isOptional = featureInfoPtr->IsOptional();
+
+			retVal += QString("\nUPDATE \"Features\" SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4', Optional = '%5' WHERE PackageId = '%6' AND Id = '%7';")
 				.arg(qPrintable(updatedFeatureId))
 				.arg(featureName)
 				.arg(featureDescription)
 				.arg(qPrintable(newPackageId))
+				.arg(isOptional)
 				.arg(qPrintable(newPackageId))
 				.arg(qPrintable(updatedFeatureId)).toLocal8Bit();
 
-			retVal += QString("\nDELETE FROM \"Features\" WHERE parentid = '%1';").arg(qPrintable(updatedFeatureId)).toLocal8Bit();
+			retVal += QString("\nDELETE FROM \"Features\" WHERE ParentId = '%1';").arg(qPrintable(updatedFeatureId)).toLocal8Bit();
 
-			CreateInsertSubFeaturesQuery(featureInfoPtr, retVal);
+			CreateInsertSubFeaturesQuery(newObjectPtr, featureInfoPtr, retVal);
 		}
 	}
 
@@ -442,7 +519,10 @@ void CFeaturePackageDatabaseDelegateComp::GenerateDifferences(
 		Q_ASSERT(featureInfoPtr != nullptr);
 		Q_ASSERT(!featureInfoPtr->GetFeatureId().isEmpty());
 
-		newFeatureIds.push_back(featureInfoPtr->GetFeatureId());
+		const imtlic::IFeatureInfo* parentFeatureInfoPtr = featureInfoPtr->GetParentFeature();
+		if (parentFeatureInfoPtr == nullptr){
+			newFeatureIds.push_back(featureInfoPtr->GetFeatureId());
+		}
 	}
 
 	// Calculate added features:

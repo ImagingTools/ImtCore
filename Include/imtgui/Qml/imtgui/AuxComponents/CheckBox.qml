@@ -12,9 +12,22 @@ Rectangle {
     border.width: 1;
     border.color: Style.borderColor;
 
-    property int checkState: 0;
+    property int checkState: Qt.Unchecked;
 
     signal clicked();
+
+    Rectangle {
+        id: rect;
+
+        anchors.centerIn: parent;
+
+        height: container.height - 4;
+        width: height;
+
+        color: Style.textColor;
+
+        visible: container.checkState == Qt.PartiallyChecked;
+    }
 
     Image {
         anchors.centerIn: parent;
@@ -25,12 +38,14 @@ Rectangle {
         sourceSize.width: width;
         sourceSize.height: height;
 
-        visible: container.checkState === 2;
-        source: "../../../" + "Icons/" + Style.theme + "/Ok_On_Normal.svg";
+        visible: container.checkState != Qt.PartiallyChecked;
+        source: container.checkState == Qt.Checked ? "../../../Icons/" + Style.theme + "/Ok_On_Normal.svg" : "";
     }
 
     MouseArea {
         anchors.fill: parent;
+
+        cursorShape: Qt.PointingHandCursor;
 
         onClicked: {
             container.clicked();

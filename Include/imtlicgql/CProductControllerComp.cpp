@@ -10,6 +10,57 @@ namespace imtlicgql
 {
 
 
+imtbase::CTreeItemModel* CProductControllerComp::ListObjects(
+			const QList<imtgql::CGqlObject>& inputParams,
+			const imtgql::CGqlObject& gqlObject,
+			QString& errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* itemsModel = nullptr;
+
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QT_TR_NOOP("Internal error");
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		itemsModel = new imtbase::CTreeItemModel();
+
+		QByteArray productId = GetObjectIdFromInputParams(inputParams);
+
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
+			imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
+
+			if (licensePtr != nullptr){
+				QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
+
+				for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+					int itemIndex = itemsModel->InsertNewItem();
+					QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
+					QString licenseDescription = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+					itemsModel->SetData("Id", licenseCollectionId, itemIndex);
+					itemsModel->SetData("Name", licenseName, itemIndex);
+					itemsModel->SetData("Description", licenseDescription, itemIndex);
+				}
+			}
+		}
+
+		dataModel->SetExternTreeModel("items", itemsModel);
+	}
+
+	rootModel->SetExternTreeModel("data", dataModel);
+
+	return rootModel;
+}
+
+
 istd::IChangeable* CProductControllerComp::CreateObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		QByteArray& objectId,
@@ -103,12 +154,31 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 				if (featuresModel != nullptr){
 					QByteArray key = licenseId;
 					if (featuresModel->ContainsKey(key)){
-						QStringList valuesList = featuresModel->GetData(key).toString().split(';');
-						imtlic::ILicenseInfo::FeatureInfo featureInfo;
-						for (const QString& value : valuesList){
-							featureInfo.id = value.toUtf8();
-							featureInfos.push_back(featureInfo);
+
+						imtbase::CTreeItemModel* licenseFeaturesModel = featuresModel->GetTreeItemModel(key);
+						if (licenseFeaturesModel != nullptr){
+
+							for (int i = 0; i < licenseFeaturesModel->GetItemsCount(); i++){
+								imtlic::ILicenseInfo::FeatureInfo featureInfo;
+
+								QByteArray featureId = licenseFeaturesModel->GetData("Id", i).toByteArray();
+								QByteArray parentFeatureId = licenseFeaturesModel->GetData("ParentId", i).toByteArray();
+								QString featureName = licenseFeaturesModel->GetData("Name", i).toString();
+
+								featureInfo.name = featureName;
+								featureInfo.id = featureId;
+								featureInfo.parentId = parentFeatureId;
+
+								featureInfos.push_back(featureInfo);
+							}
 						}
+
+//						QStringList valuesList = featuresModel->GetData(key).toString().split(';');
+//						imtlic::ILicenseInfo::FeatureInfo featureInfo;
+//						for (const QString& value : valuesList){
+//							featureInfo.id = value.toUtf8();
+//							featureInfos.push_back(featureInfo);
+//						}
 					}
 				}
 				licenseInfoPtr->SetFeatureInfos(featureInfos);
@@ -182,19 +252,28 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(
 				licensesModel->SetData("Description", description, index);
 
 				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-				if (featureInfos.size() > 0){
-					QByteArray key = licenseId;
-					QString value;
-					for (int i = 0; i < featureInfos.size(); i++){
-						if (i != 0){
-							value += ';';
-						}
 
-						value += featureInfos[i].id;
-					}
+				imtbase::CTreeItemModel* licenseFeaturesModel = featuresModel->AddTreeModel(licenseId);
+				for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
+					int index = licenseFeaturesModel->InsertNewItem();
 
-					featuresModel->SetData(key, value);
+					licenseFeaturesModel->SetData("Id", featureInfo.id, index);
+					licenseFeaturesModel->SetData("Name", featureInfo.name, index);
+					licenseFeaturesModel->SetData("ParentId", featureInfo.parentId, index);
 				}
+//				if (featureInfos.size() > 0){
+//					QByteArray key = licenseId;
+//					QString value;
+//					for (int i = 0; i < featureInfos.size(); i++){
+//						if (i != 0){
+//							value += ';';
+//						}
+
+//						value += featureInfos[i].id;
+//					}
+
+//					featuresModel->SetData(key, value);
+//				}
 			}
 		}
 	}

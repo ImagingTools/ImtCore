@@ -6,7 +6,8 @@ import imtgui 1.0
 DocumentBase {
     id: accountEditorContainer;
 
-    commandsDelegatePath: "../../imtauthgui/AccountEditorCommandsDelegate.qml"
+//    commandsDelegate: AccountEditorCommandsDelegate{}
+    commandsDelegatePath: "../../imtauthgui/AccountEditorCommandsDelegate.qml";
 
     property int textInputHeight: 30;
 

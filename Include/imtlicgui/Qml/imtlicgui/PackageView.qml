@@ -5,7 +5,12 @@ import imtgui 1.0
 DocumentBase {
     id: packageViewContainer;
 
-    commandsDelegatePath: "../../imtlicgui/PackageViewCommandsDelegate.qml"
+//    commandsDelegate: PackageViewCommandsDelegate {}
+    commandsDelegatePath: "../../imtlicgui/PackageViewCommandsDelegate.qml";
+
+    Component.onCompleted: {
+        commandsDelegate.tableTreeViewEditor = collectionView;
+    }
 
     onDocumentModelChanged: {
         console.log("documentBase onDocumentModelChanged");
@@ -22,26 +27,23 @@ DocumentBase {
             dependencies = documentModel.AddTreeModel("Dependencies");
         }
 
-        collectionView.table.headers = headers;
-        collectionView.table.elements = items;
+        collectionView.headers = headers;
+        collectionView.elements = items;
 
-        undoRedoManager.model = documentModel;
-    }
+        for (let i = 0; i < treeView.model.GetItemsCount(); i++){
+            let packageId = treeView.model.GetData("Id", i);
 
-    onCommandsDelegateLoaded: {
-        commandsDelegate.tableData = collectionView.table;
-    }
-
-    onWidthChanged: {
-        console.log("packageViewContainer onWidthChanged", packageViewContainer.width);
-        if (packageViewContainer.width > 0 && packageViewContainer.width - rightPanel.width > 250){
-            splitter.x = packageViewContainer.width - rightPanel.width;
+            if (packageId == itemId){
+                treeView.model.SetData("ChildModel", collectionView.elements, i);
+                break;
+            }
         }
     }
 
-    onCommandsIdChanged: {
-        console.log("ObjectView onCommandsIdChanged", packageViewContainer.commandsId);
-        collectionView.commandsId = commandsId;
+    onWidthChanged: {
+        if (packageViewContainer.width > 0 && packageViewContainer.width - rightPanel.width > 250){
+            splitter.x = packageViewContainer.width - rightPanel.width;
+        }
     }
 
     UndoRedoManager {
@@ -51,41 +53,23 @@ DocumentBase {
         editorItem: packageViewContainer;
 
         onModelParsed: {
-
-            collectionView.table.elements = documentModel.GetData("Items");
-            updateGui();
         }
     }
 
     function updateGui(){
         console.log("PackageView updateGui")
 
-        let index = collectionView.table.selectedIndex;
-        collectionView.table.selectedIndex = -1;
-        collectionView.table.selectedIndex = index;
-
-        documentModel.Refresh();
-
-        collectionView.table.elements.Refresh();
+        collectionView.elements = 0;
+        collectionView.elements = documentModel.GetData("Items");
     }
 
-    CollectionViewBase {
+    TableTreeViewEditor {
         id: collectionView;
 
         anchors.left: parent.left;
         anchors.right: splitter.left;
 
-        hasPagination: false;
-        hasFilter: false;
-        hasSort: false;
-
-        loadData: false;
-
         height: parent.height;
-
-        onSelectedItem: {
-            commandsDelegate.commandActivated("Edit");
-        }
     }
 
     Splitter {
@@ -154,6 +138,8 @@ DocumentBase {
 
         PackageTreeViewController {
             id: treeViewController;
+
+            documentItem: packageViewContainer;
         }
 
         TreeView {
@@ -164,8 +150,8 @@ DocumentBase {
 
             clip: true;
 
-            modelItems: treeViewModel.modelTreeView;
-            visible: itemId !== "" && collectionView.table.selectedIndex > -1;
+//            modelItems: treeViewModel.modelTreeView;
+            visible: itemId !== "" && collectionView.selectedIndex != null;
         }
     }
 }

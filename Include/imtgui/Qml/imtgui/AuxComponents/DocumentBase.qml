@@ -10,22 +10,23 @@ Item {
 
     property string itemId;
     property string itemName;
-
     property string commandsId;
-    property string commandsDelegatePath: "DocumentWorkspaceCommandsDelegateBase.qml";
-
-    signal commandsDelegateLoaded();
 
     property TreeItemModel documentModel;
 
     property bool itemLoad: true;
 
-    property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsProvider: commandsProviderBase;
 
+//    property Item commandsDelegate : DocumentWorkspaceCommandsDelegateBase {}
+
+    property string commandsDelegatePath: "DocumentWorkspaceCommandsDelegateBase.qml";
+    property alias commandsDelegate: commandsDelegateBase.item;
+
+    signal commandsDelegateLoaded();
+
     Component.onCompleted: {
-        console.log("documentBase onCompleted");
-        console.log("documentsData", documentsData);
+        commandsDelegate.documentBase = documentBase;
 
         if (itemLoad){
             itemId = documentsData.GetData("Id", model.index);
@@ -40,6 +41,7 @@ Item {
             commandsProvider.commandsId = documentBase.commandsId;
         }
 
+//        commandsDelegate.commandsId = documentBase.commandsId;
         commandsDelegateBase.item.commandsId = documentBase.commandsId;
     }
 
@@ -70,30 +72,24 @@ Item {
         }
     }
 
-    Loader {
-        id: commandsDelegateBase;
-
-        source: commandsDelegatePath;
-
-        onLoaded: {
-            commandsDelegateLoaded();
-        }
-    }
-
     CommandsProvider {
         id: commandsProviderBase;
     }
 
-    function updateGui(){
-    }
+    function updateGui(){}
 
-    LoadingPage {
-        id: loadingPage;
+    Loader {
+        id: commandsDelegateBase;
 
-        z: 10;
+//        sourceComponent: commandsDelegateComp;
 
-        anchors.fill: parent;
+        source: commandsDelegatePath;
 
-        visible: false;
+        onLoaded: {
+            item.documentBase = documentBase;
+//            item.commandsId = commandsId;
+
+            commandsDelegateLoaded();
+        }
     }
 }

@@ -161,6 +161,8 @@ bool CRole::IncludeRole(const QByteArray &roleId)
 		return false;
 	}
 
+	istd::CChangeNotifier changeNotifier(this);
+
 	m_parents.append(roleId);
 
 	return true;

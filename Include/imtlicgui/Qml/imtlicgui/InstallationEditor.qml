@@ -8,7 +8,8 @@ DocumentBase {
 
     property alias activeLicenses: licensesTable.elements;
 
-    commandsDelegatePath: "../../imtlicgui/InstallationEditorCommandsDelegate.qml"
+//    commandsDelegate: InstallationEditorCommandsDelegate {}
+    commandsDelegatePath: "../../imtlicgui/InstallationEditorCommandsDelegate.qml";
 
     onDocumentModelChanged: {
 

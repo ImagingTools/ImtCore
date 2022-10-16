@@ -26,7 +26,7 @@ Item {
 
         for (let key of keys){
             let value = dependenciesModel.GetData(key);
-            featureDependenciesModel.modelFeatureDependencies.SetData(key, value);
+            featureDependenciesModel.model.SetData(key, value);
         }
     }
 
@@ -78,7 +78,7 @@ Item {
             }
 
             let upFeatures = [];
-            featureDependenciesModel.getFeaturesDependsByFeatureUp(rootkey, upFeatures);
+            featureDependenciesModel.getAllParentsDependsFeatures(rootkey, upFeatures);
 
             if (upFeatures.length > 0){
                 treeViewModel.updateDataFeatureList(upFeatures, 0, 0);

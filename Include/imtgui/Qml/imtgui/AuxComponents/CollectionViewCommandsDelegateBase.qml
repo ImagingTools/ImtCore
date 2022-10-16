@@ -79,8 +79,12 @@ Item {
             modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
         else if (commandId === "SetDescription"){
+            console.log("tableData", tableData);
             let elements = tableData.elements;
             let selectedDescription = elements.GetData("Description", selectedIndex);
+            console.log("selectedIndex", selectedIndex);
+            console.log("selectedDescription", selectedDescription);
+
             modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
         }
 
@@ -118,7 +122,10 @@ Item {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
+
+                    console.log("removeDialog", buttonId);
                     let itemId = tableData.getSelectedId();
+                    console.log("itemId", itemId);
                     removeModel.updateModel(itemId);
                 }
             }

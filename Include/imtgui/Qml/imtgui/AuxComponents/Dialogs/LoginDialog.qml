@@ -1,10 +1,7 @@
 import QtQuick 2.0
 import QtQuick 2.15
 import Acf 1.0
-import imtqml 1.0
 import imtgui 1.0
-import QtQuick.Dialogs 1.3
-import imtauthgui 1.0
 
 Rectangle {
     id: loginContainer;
@@ -22,16 +19,10 @@ Rectangle {
     property real backgroundOpacity: 0.3;
     property bool centered: true;
 
-    property Item loaderDialog;
-    property Item thumbnailItem;
+    property Item root;
 
     property TreeItemModel localSettings;
     property TreeItemModel serverSettings;
-
-
-    Component.onCompleted: {
-        console.log("LoginDialog onCompleted");
-    }
 
     Rectangle{
         id: headerRec;
@@ -70,7 +61,7 @@ Rectangle {
         width: loginContainer.width - 150;
         height: 30;
 
-        onInputTextChanged: {
+        onTextChanged: {
             console.log("LoginTextInput onInputTextChanged");
         }
     }
@@ -82,14 +73,15 @@ Rectangle {
         anchors.leftMargin: 75;
         width: loginContainer.width - 150;
         height: 30;
-//        echoMode: TextInput.Password
-        onInputTextChanged: {
+        echoMode: TextInput.Password
+
+        onTextChanged: {
             console.log("PasswordTextInput onInputTextChanged");
         }
     }
     Rectangle{
         id: footerRec;
-        width: passwordTextInput;
+        width: passwordTextInput.width;
         anchors.left: parent.left;
         anchors.top: passwordTextInput.bottom;
         anchors.topMargin: 10;
@@ -100,16 +92,14 @@ Rectangle {
             anchors.top: parent.top;
             anchors.topMargin: 10;
             anchors.leftMargin: 10;
-            checkState: 1;
-            MouseArea {
-                anchors.fill: parent;
-                onClicked: {
-                    if (checkRemember.checkState == 1){
-                        checkRemember.checkState = 2
-                    }
-                    else{
-                       checkRemember.checkState = 1
-                    }
+            checkState: Qt.Unchecked;
+
+            onClicked: {
+                if (checkRemember.checkState == Qt.Unchecked){
+                    checkRemember.checkState = Qt.Checked
+                }
+                else{
+                   checkRemember.checkState = Qt.Unchecked
                 }
             }
         }
@@ -139,7 +129,7 @@ Rectangle {
             }
         }
     }
-    AuxButton{
+    AuxButton {
         id: loginButton;
         anchors.top: footerRec.bottom;
         anchors.left: parent.left;

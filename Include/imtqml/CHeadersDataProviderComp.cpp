@@ -38,9 +38,9 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 
 				int currentIndex;
 				if (languageId.isEmpty()){
-//					currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
-					currentIndex = 0;
-					languageId = "en_US";
+					currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
+//					currentIndex = 0;
+//					languageId = "en_US";
 				}
 				else{
 					currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
@@ -49,7 +49,9 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 				if (currentIndex >= 0){
 					const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
 					if (translatorPtr != nullptr){
-						headersModel->SetData("Name", translatorPtr->translate("Attribute", m_headersNamesAttrPtr[i].toUtf8()), i);
+//						headersModel->SetData("Name", translatorPtr->translate("Attribute", m_headersNamesAttrPtr[i].toUtf8()), i);
+
+						headersModel->SetData("Name", m_headersNamesAttrPtr[i], i);
 					}
 				}
 			}

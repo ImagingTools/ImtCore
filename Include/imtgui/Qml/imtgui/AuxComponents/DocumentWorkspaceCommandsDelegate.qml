@@ -42,18 +42,6 @@ DocumentWorkspaceCommandsDelegateBase {
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
         }
-        else if (commandId === "Edit"){
-            let id = container.tableData.getSelectedId();
-            let name = container.tableData.getSelectedName();
-
-            modalDialogManager.openDialog(editDialog, {"titleId":      qsTr("Item-ID"),
-                                                       "titleName":    qsTr("Item Name"),
-                                                       "valueId":      id,
-                                                       "valueName":    name,
-                                                       "model":        tableData.elements,
-                                                       "autoGenerate": true,
-                                                       "index":        container.selectedIndex});
-        }
         else if (commandId === "SetDescription"){
             let elements = tableData.elements;
             let selectedDescription = elements.GetData("Description", selectedIndex);
@@ -89,27 +77,6 @@ DocumentWorkspaceCommandsDelegateBase {
                     }
 
                     removed(removedId);
-                }
-            }
-        }
-    }
-
-    Component {
-        id: editDialog;
-        EditDialog {
-            onFinished: {
-                if (buttonId == "Ok"){
-                    let elementsModel = documentModel.GetData("Items");
-
-                    let oldId = elementsModel.GetData("Id", selectedIndex);
-                    let oldName = elementsModel.GetData("Name", selectedIndex);
-
-                    elementsModel.SetData("Name", valueName, container.selectedIndex);
-                    elementsModel.SetData("Id", valueId, container.selectedIndex);
-
-                    edited(oldId, oldName);
-
-                    documentBase.updateGui();
                 }
             }
         }

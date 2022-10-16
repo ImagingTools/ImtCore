@@ -29,6 +29,7 @@
         <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/InputDialog.qml">Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml</file>
         <file alias="imtgui/AuxComponents/PreferencePage.qml">Qml/imtgui/AuxComponents/PreferencePage.qml</file>
+        <file alias="imtgui/AuxComponents/AuthorizationPage.qml">Qml/imtgui/AuxComponents/AuthorizationPage.qml</file>
         <file alias="imtgui/AuxComponents/Splitter.qml">Qml/imtgui/AuxComponents/Splitter.qml</file>
         <file alias="imtgui/MouseTest.qml">Qml/imtgui/MouseTest.qml</file>
         <file alias="imtgui/AuxComponents/SettingsComboBox.qml">Qml/imtgui/AuxComponents/SettingsComboBox.qml</file>
@@ -83,6 +84,8 @@
         <file alias="imtgui/AuxComponents/TreeViewEditor.qml">Qml/imtgui/AuxComponents/TreeViewEditor.qml</file>
         <file alias="imtgui/AuxComponents/TableTreeViewEditor.qml">Qml/imtgui/AuxComponents/TableTreeViewEditor.qml</file>
         <file alias="imtgui/AuxComponents/TableTreeItemDelegate.qml">Qml/imtgui/AuxComponents/TableTreeItemDelegate.qml</file>
+        <file alias="imtgui/AuxComponents/ModelIndex.qml">Qml/imtgui/AuxComponents/ModelIndex.qml</file>
+        <file alias="imtgui/AuxComponents/TreeViewControllerBase.qml">Qml/imtgui/AuxComponents/TreeViewControllerBase.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

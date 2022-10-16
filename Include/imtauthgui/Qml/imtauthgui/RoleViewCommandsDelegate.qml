@@ -8,8 +8,6 @@ DocumentWorkspaceCommandsDelegateBase {
 
     property int selectedIndex: includedRolesTable.selectedIndex;
 
-    property int pageIndex: container.pageIndex;
-
     Component.onCompleted: {
         console.log("RoleViewDelegate onCompleted");
 
@@ -26,29 +24,16 @@ DocumentWorkspaceCommandsDelegateBase {
         commandsProvider.changeCommandMode("Exclude", mode);
     }
 
-    onPageIndexChanged: {
-        let mode = pageIndex == 0 ? "Normal" : "Disabled";
-
-        commandsProvider.changeCommandMode("Include", mode);
-
-        if (pageIndex != 0){
-            commandsProvider.changeCommandMode("Exclude", "Disabled")
-        }
-        else{
-            delegateContainer.selectedIndexChanged();
-        }
-    }
-
     onCommandActivated: {
         console.log("DocumentCommands onCommandActivated", container.itemId, commandId);
 
-        if (commandId === "New"){
+        if (commandId === "Include"){
             let productId = documentModel.GetData("ProductId");
 
             modalDialogManager.openDialog(rolesDialog, {"productId": productId,
                                                         "model":     rolesModel});
         }
-        else if (commandId === "Remove"){
+        else if (commandId === "Exclude"){
             let includesRoles = documentModel.GetData("Parents");
             includesRoles.RemoveItem(selectedIndex);
 

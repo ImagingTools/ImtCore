@@ -23,36 +23,16 @@ void CContextComp::SetLanguage(QString translation)
 		if (languageIndex >= 0){
 			const QTranslator* translator =  m_translationManagerCompPtr->GetLanguageTranslator(languageIndex);
 			if (translator != nullptr){
-				//qApp->installTranslator(const_cast<QTranslator*>(translator));
+				qApp->installTranslator(const_cast<QTranslator*>(translator));
 
-//				if (m_engine != nullptr){
-//					m_engine->retranslate();
-//				}
+				if (m_engine != nullptr){
+					m_engine->retranslate();
+				}
 
 				emit LanguageChanged();
 			}
 		}
 	}
-
-//	if (m_translationManagerCompPtr.load(*m_filePrefix + '_' + translation + ".qm", "C:/Sybnavigation/ITDevelopment/ImtCore/Include/imtgui/CMake/")){
-//		qApp->installTranslator(&m_translator);
-//		if (m_engine != nullptr){
-//			m_engine->retranslate();
-//		}
-//		int languageIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
-//		if (languageIndex >= 0){
-//			const QTranslator* translator =  m_translationManagerCompPtr->GetLanguageTranslator(languageIndex);
-//			if (translator != nullptr){
-//				qApp->installTranslator(const_cast<QTranslator*>(translator));
-//			}
-
-//		}
-//		m_translationManagerCompPtr->GetLanguageTranslator(languageIndex);
-//		dynamic_cast<QTranslator*>(m_translationManagerCompPtr.GetPtr())
-//		qApp->installTranslator(m_translationManagerCompPtr);
-//		m_language = translation;
-//		emit LanguageChanged();
-//	}
 }
 
 

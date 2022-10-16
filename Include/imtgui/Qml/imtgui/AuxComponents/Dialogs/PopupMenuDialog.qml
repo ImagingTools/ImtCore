@@ -18,7 +18,6 @@ Rectangle {
 
     property bool hiddenBackground: true;
 
-
     property Component delegate: PopupMenuDelegate{}
 
 

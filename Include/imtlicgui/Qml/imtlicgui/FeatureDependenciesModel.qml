@@ -5,7 +5,7 @@ import imtqml 1.0
 Item {
     id: featureDependenciesModelContainer;
 
-    property TreeItemModel modelFeatureDependencies;
+    property TreeItemModel model;
 
     Component.onCompleted: {
         Events.subscribeEvent("FeatureDependenciesUpdate", updateModel);
@@ -21,18 +21,18 @@ Item {
 
     function featureIdChanged(oldId, newId){
         console.log("featureIdChanged", oldId, newId);
-        console.log("featureDependenciesModelContainer.modelFeatureDependencies 1", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
+        console.log("featureDependenciesModelContainer.model 1", featureDependenciesModelContainer.model.toJSON());
 
-        let keys = featureDependenciesModelContainer.modelFeatureDependencies.GetKeys();
+        let keys = featureDependenciesModelContainer.model.GetKeys();
         for (let i = 0; i < keys.length; i++){
             let key = keys[i];
-            let value = featureDependenciesModelContainer.modelFeatureDependencies.GetData(key);
+            let value = featureDependenciesModelContainer.model.GetData(key);
 
             if (key == oldId){
                 console.log("Key changed",key, oldId);
-                featureDependenciesModelContainer.modelFeatureDependencies.SetData(newId, value);
-//                featureDependenciesModelContainer.modelFeatureDependencies.SetData(key, "");
-                featureDependenciesModelContainer.modelFeatureDependencies.RemoveData(key);
+                featureDependenciesModelContainer.model.SetData(newId, value);
+//                featureDependenciesModelContainer.model.SetData(key, "");
+                featureDependenciesModelContainer.model.RemoveData(key);
                 break;
             }
 
@@ -48,13 +48,13 @@ Item {
 
                     let newValue = value.replace(removeValue, '');
                     newValue += ';' + newId;
-                    featureDependenciesModelContainer.modelFeatureDependencies.SetData(key, newValue);
+                    featureDependenciesModelContainer.model.SetData(key, newValue);
                 }
             }
         }
 
-        featureDependenciesModelContainer.modelFeatureDependencies.Refresh();
-        console.log("featureDependenciesModelContainer.modelFeatureDependencies 2", featureDependenciesModelContainer.modelFeatureDependencies.toJSON());
+        featureDependenciesModelContainer.model.Refresh();
+        console.log("featureDependenciesModelContainer.model 2", featureDependenciesModelContainer.model.toJSON());
 
     }
 
@@ -103,22 +103,61 @@ Item {
         }
     }
 
+    function getDependsFeatures(key){
+        let result = []
+
+        if (model.ContainsKey(key)){
+            let valuesStr = model.GetData(key);
+
+            let values = valuesStr.split(';');
+            for (let value of values){
+                result.push(value);
+            }
+        }
+
+        return result;
+    }
+
+    function getParentFeatures(key){
+        console.log("getParentFeature", key);
+        console.log("model", model.toJSON());
+
+        let result = []
+        for (let curKey of model.GetKeys()) {
+            let valuesStr = model.GetData(curKey);
+            if (valuesStr){
+                let values = valuesStr.split(";");
+
+                let index = values.indexOf(key);
+
+                if (index > -1){
+                    result.push(curKey);
+                }
+            }
+        }
+
+        return result;
+    }
+
     /*
       Вернуть список feature от которых зависит переданная
     */
-    function getFeaturesDependsByFeature(key, list){
-        console.log("getFeaturesDependsByFeature", key, list);
-        if (featureDependenciesModelContainer.modelFeatureDependencies.ContainsKey(key)){
-            let valuesStr = featureDependenciesModelContainer.modelFeatureDependencies.GetData(key);
-            if (valuesStr){
-                let values = valuesStr.split(';');
-                for (let value of values){
-                    list.push(value);
-                }
+    function getAllChildrenDependsFeatures(key, list){
+        console.log("getAllChildrenDependsFeatures", key, list);
 
-                for (let value of values) {
-                    featureDependenciesModelContainer.getFeaturesDependsByFeature(value, list);
-                }
+        if (!model){
+            return;
+        }
+
+        if (model.ContainsKey(key)){
+            let dependenciesModel = model.GetData(key);
+
+            for (let i = 0; i < dependenciesModel.GetItemsCount(); i++){
+                let featureId = dependenciesModel.GetData("Id", i);
+
+                list.push(featureId);
+
+                getAllChildrenDependsFeatures(featureId, list);
             }
         }
     }
@@ -126,16 +165,24 @@ Item {
     /*
       Вернуть список feature зависящих от переданной
     */
-    function getFeaturesDependsByFeatureUp(key, list){
-        console.log("getFeaturesDependsByFeatureUp", key, list);
-        var arr = featureDependenciesModelContainer.modelFeatureDependencies.GetKeys();
-        for (let curKey of featureDependenciesModelContainer.modelFeatureDependencies.GetKeys()) {
-            let valuesStr = featureDependenciesModelContainer.modelFeatureDependencies.GetData(curKey);
-            if (valuesStr){
-                let values = valuesStr.split(";");
-                if (values.indexOf(key) > -1){
-                    list.push(curKey);
-                    featureDependenciesModelContainer.getFeaturesDependsByFeatureUp(curKey, list);
+    function getAllParentsDependsFeatures(key, list){
+        console.log("getAllParentsDependsFeatures", key, list);
+
+        if (!model){
+            return;
+        }
+
+        var keys = model.GetKeys();
+        for (let curKey of keys){
+            let dependenciesModel = model.GetData(curKey);
+            if (dependenciesModel){
+                for (let i = 0; i < dependenciesModel.GetItemsCount(); i++){
+                    let featureId = dependenciesModel.GetData("Id", i);
+
+                    if (featureId == key){
+                        list.push(curKey);
+                        getAllParentsDependsFeatures(curKey, list);
+                    }
                 }
             }
         }
@@ -158,16 +205,20 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, dependenciesModel);
             if (this.state === "Ready"){
+                console.log("FeaturesDependencies READY", dependenciesModel.toJSON());
                 var dataModelLocal = this.GetData("data");
                 if (dataModelLocal.ContainsKey("FeaturesDependencies")) {
                     dataModelLocal = dataModelLocal.GetData("FeaturesDependencies");
-                    if (dataModelLocal.ContainsKey("TreeModel")) {
-                        dataModelLocal = dataModelLocal.GetData("TreeModel");
 
-                        featureDependenciesModelContainer.modelFeatureDependencies = dataModelLocal;
-                        Events.sendEvent("FeatureDependenciesUpdated");
-                        console.log(" featureDependencies updated", featureDependenciesModelContainer.modelFeatureDependencies);
-                    }
+                    model = dataModelLocal;
+                    Events.sendEvent("FeatureDependenciesUpdated");
+                }
+                else{
+                    dataModelLocal = dependenciesModel.AddTreeModel("FeaturesDependencies");
+
+                    model = dataModelLocal;
+                    Events.sendEvent("FeatureDependenciesUpdated");
+
                 }
             }
         }

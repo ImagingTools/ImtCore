@@ -10,12 +10,12 @@ namespace imtlicdb
 {
 
 
-class CFeaturePackageDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+class CUsersSessionsDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CFeaturePackageDatabaseDelegateComp)
+	I_BEGIN_COMPONENT(CUsersSessionsDatabaseDelegateComp)
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -43,21 +43,6 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
-
-protected:
-	void GenerateDifferences(
-				const imtlic::CFeaturePackage& currentPackage,
-				const imtlic::CFeaturePackage& newPackage,
-				QByteArrayList& addFeatures,
-				QByteArrayList& removedFeatures,
-				QByteArrayList& updatedFeatures) const;
-
-	void CreateSubFeaturesFromRecord(imtlic::CFeaturePackage* featurePackagePtr, imtlic::IFeatureInfo* subFeatureInfoPtr, const QByteArray& subFeaturesQuery) const;
-	void CreateInsertSubFeaturesQuery(const imtlic::CFeaturePackage* featurePackagePtr, const imtlic::IFeatureInfo* featureInfoPtr, QByteArray &retVal) const;
-
-	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
-	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
-	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 };
 
 

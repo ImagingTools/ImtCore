@@ -316,7 +316,7 @@ Item {
                         childItems.SetData("stateChecked", 2, j);
                         childItems.SetData("isActive", 1, j);
                         let downDepends = []
-                        featuresTreeViewContainer.getFeaturesDependsByFeature(feature, downDepends);
+                        featuresTreeViewContainer.getAllChildrenDependsFeatures(feature, downDepends);
                         console.log("downDepends", downDepends);
                         if (downDepends.length > 0){
                             featuresTreeViewContainer.updateDataFeatureList(downDepends, 2, 0);
@@ -349,7 +349,7 @@ Item {
                         featureFind = true;
                         childItems.SetData("stateChecked", 0, j);
                         let upDepends = []
-                        featuresTreeViewContainer.getFeaturesDependsByFeature(feature, upDepends);
+                        featuresTreeViewContainer.getAllChildrenDependsFeatures(feature, upDepends);
                         //console.log("upDepends", upDepends);
                         if (upDepends.length > 0){
                             featuresTreeViewContainer.updateDataFeatureList(upDepends, 0, 1);
@@ -370,8 +370,8 @@ Item {
     /*
       Вернуть список feature от которых зависит переданная
     */
-    function getFeaturesDependsByFeature(key, list){
-        console.log("getFeaturesDependsByFeature", key, list);
+    function getAllChildrenDependsFeatures(key, list){
+        console.log("getAllChildrenDependsFeatures", key, list);
         if (featuresTreeViewContainer.modelDepends.ContainsKey(key)){
             let valuesStr = featuresTreeViewContainer.modelDepends.GetData(key);
             if (valuesStr){
@@ -381,7 +381,7 @@ Item {
                 }
 
                 for (let value of values) {
-                    featuresTreeViewContainer.getFeaturesDependsByFeature(value, list);
+                    featuresTreeViewContainer.getAllChildrenDependsFeatures(value, list);
                 }
             }
         }
@@ -390,8 +390,8 @@ Item {
     /*
       Вернуть список feature зависящих от переданной
     */
-    function getFeaturesDependsByFeatureUp(key, list){
-        console.log("getFeaturesDependsByFeatureUp", key, list);
+    function getAllParentsDependsFeatures(key, list){
+        console.log("getAllParentsDependsFeatures", key, list);
         var arr = featuresTreeViewContainer.modelDepends.GetKeys();
         for (let curKey of featuresTreeViewContainer.modelDepends.GetKeys()) {
             let valuesStr = featuresTreeViewContainer.modelDepends.GetData(curKey);
@@ -399,7 +399,7 @@ Item {
                 let values = valuesStr.split(";");
                 if (values.indexOf(key) > -1){
                     list.push(curKey);
-                    featuresTreeViewContainer.getFeaturesDependsByFeatureUp(curKey, list);
+                    featuresTreeViewContainer.getAllParentsDependsFeatures(curKey, list);
                 }
             }
         }

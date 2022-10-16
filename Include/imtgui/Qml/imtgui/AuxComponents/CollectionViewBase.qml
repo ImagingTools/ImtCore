@@ -34,11 +34,6 @@ Item {
         tableInternal.focus = true;
     }
 
-    onVisibleChanged: {
-        if (visible){
-        }
-    }
-
     onCommandsIdChanged: {
         console.log("CollectionViewBase onCommandsIdChanged", loadData);
 
@@ -50,8 +45,11 @@ Item {
     Shortcut {
         sequence: "Ctrl+F";
         onActivated: {
+            console.log("onActivated Ctrl+F");
             filterMenu.visible = !filterMenu.visible;
         }
+
+        context: Qt.ApplicationShortcut;
     }
 
     FilterMenu {

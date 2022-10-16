@@ -20,6 +20,7 @@ TextButton 1.0 ./AuxComponents/TextButton.qml
 CustomTextField 1.0 ./AuxComponents/CustomTextField.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
 TreeViewEditor 1.0 ./AuxComponents/TreeViewEditor.qml
+TreeViewControllerBase 1.0 ./AuxComponents/TreeViewControllerBase.qml
 TableTreeViewEditor 1.0 ./AuxComponents/TableTreeViewEditor.qml
 Splitter 1.0 ./AuxComponents/Splitter.qml
 Calendar 1.0 ./AuxComponents/Calendar.qml
@@ -27,6 +28,7 @@ Pagination 1.0 ./AuxComponents/Pagination.qml
 MenuPanel 1.0 ./AuxComponents/MenuPanel.qml
 TopPanel 1.0 ./AuxComponents/TopPanel.qml
 StackView 1.0 ./AuxComponents/StackView.qml
+ModelIndex 1.0 ./AuxComponents/ModelIndex.qml
 TopCenterPanel 1.0 ./AuxComponents/TopCenterPanel.qml
 TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
 TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml
