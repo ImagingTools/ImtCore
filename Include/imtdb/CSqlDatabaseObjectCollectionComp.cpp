@@ -219,8 +219,8 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 			const iprm::IParamsSet *selectionParamsPtr,
 			const Id &parentId, int iterationFlags) const
 {
-	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
-	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+    imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
+    imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
 	if (m_objectDelegateCompPtr.IsValid()) {
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);

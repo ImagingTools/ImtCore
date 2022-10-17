@@ -41,6 +41,7 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
 		I_ASSIGN(m_objectFactoryCompPtr, "ObjectFactory", "List of factories used for object creation", false, "ObjectFactory");
+        I_ASSIGN(m_objectCollectionFactoryCompPtr, "ObjectCollectionFactory", "Factory used for object collection creation", false, "ObjectCollectionFactory");
 		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID corresponding to the registered factory", true, "Default");
 		I_ASSIGN(m_typeNameAttrPtr, "TypeName", "Type name corresponding to the registered factory", true, "Default");
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
@@ -140,6 +141,7 @@ protected:
 
 private:
 	I_FACT(istd::IChangeable, m_objectFactoryCompPtr);
+    I_FACT(imtbase::IObjectCollection, m_objectCollectionFactoryCompPtr);
 	I_REF(ISqlDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_ATTR(QByteArray, m_typeIdAttrPtr);
