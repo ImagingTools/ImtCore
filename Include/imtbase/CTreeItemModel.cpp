@@ -53,6 +53,13 @@ void CTreeItemModel::SetState(const QString &newState)
 
 // public slots
 
+
+void CTreeItemModel::SetParent(QObject* parent)
+{
+    this->setParent(parent);
+}
+
+
 bool CTreeItemModel::Copy(CTreeItemModel* object)
 {
 	bool result = CopyFrom(*object);
@@ -550,8 +557,9 @@ bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 istd::IChangeable* CTreeItemModel::CloneMe(CompatibilityMode mode) const
 {
 
-	return NULL;
+    return NULL;
 }
+
 
 
 // protected methods

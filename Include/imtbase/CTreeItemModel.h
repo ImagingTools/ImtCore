@@ -44,6 +44,7 @@ public:
 
 public Q_SLOTS:
 
+    void SetParent(QObject *parent);
 	bool Copy(CTreeItemModel* object);
 	int InsertNewItem();
 	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
