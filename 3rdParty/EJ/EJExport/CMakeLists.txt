@@ -21,8 +21,8 @@ set(CMAKE_CXX_FLAGS_RELEASE_INIT "${CMAKE_CXX_FLAGS_RELEASE_INIT} /Ot /Oi /Ob2 /
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Xml PrintSupport)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Xml PrintSupport)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Xml PrintSupport)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Xml PrintSupport)
 
 message("QT_VERSION ${QT_VERSION}")
 
@@ -30,38 +30,38 @@ add_compile_definitions(COMMON_LIBRARY)
 
 set(PROJECT_SOURCES
 		../common/ejcommon.cpp
-		docx/ejconvertordocx.cpp
-		docx/ejworddocument.cpp
-		docx/ejworddocumenteditors.cpp
-		pdf/ejconvertorpdf.cpp
-		pdf/ejpdfdocument.cpp
-		pdf/ejpdfdocumenteditor.cpp
-		standart_function.cpp
-		csv/ejcsvdocument.cpp
-		csv/ejcsvdocumenteditor.cpp
-		csv/ejconvertorcsv.cpp
-		testDocxToUjf/ejbaseujfconvertor.cpp
-		testDocxToUjf/ejbaseujfdocument.cpp
-		testDocxToUjf/docxtoujf/ejdocxtoujfdocument.cpp
-		testDocxToUjf/docxtoujf/docxtoujfdocumenteditors.cpp 
-		testDocxToUjf/ejdocxtoujfconvertor.cpp
-		testDocxToUjf/xlsxtoujf/sharedStrings/sharedstrings.cpp 
-		testDocxToUjf/xlsxtoujf/sharedStrings/stringsexceldocumentreader.cpp 
-		testDocxToUjf/xlsxtoujf/sheetexceldocumentreader.cpp 
-		testDocxToUjf/xlsxtoujf/styles/models/borders.cpp 
-		testDocxToUjf/xlsxtoujf/styles/models/cellxfs.cpp 
-		testDocxToUjf/xlsxtoujf/styles/models/fill.cpp 
-		testDocxToUjf/xlsxtoujf/styles/models/font.cpp 
-		testDocxToUjf/xlsxtoujf/styles/stylesexcel.cpp 
-		testDocxToUjf/xlsxtoujf/styles/stylesexceldocumentreader.cpp 
-		testDocxToUjf/xlsxtoujf/xlsxtoujfdocument.cpp 
-		testDocxToUjf/ejxlsxtoujfconvertor.cpp
-		xlsx/ejconvertorexcel.cpp
-		xlsx/documents/ejsharedstringsdocument.cpp
-		xlsx/documents/ejsheetdocument.cpp
-		xlsx/documents/ejstylesdocument.cpp
-		xlsx/ejexceldocumenteditors.cpp
-		xlsx/ejutils.cpp
+                docx/ejconvertordocx.cpp
+                docx/ejworddocument.cpp
+                docx/ejworddocumenteditors.cpp
+                pdf/ejconvertorpdf.cpp
+                pdf/ejpdfdocument.cpp
+                pdf/ejpdfdocumenteditor.cpp
+                standart_function.cpp
+                csv/ejcsvdocument.cpp
+                csv/ejcsvdocumenteditor.cpp
+                csv/ejconvertorcsv.cpp
+                testDocxToUjf/ejbaseujfconvertor.cpp
+                testDocxToUjf/ejbaseujfdocument.cpp
+                testDocxToUjf/docxtoujf/ejdocxtoujfdocument.cpp
+                testDocxToUjf/docxtoujf/docxtoujfdocumenteditors.cpp
+                testDocxToUjf/ejdocxtoujfconvertor.cpp
+                testDocxToUjf/xlsxtoujf/sharedStrings/sharedstrings.cpp
+                testDocxToUjf/xlsxtoujf/sharedStrings/stringsexceldocumentreader.cpp
+                testDocxToUjf/xlsxtoujf/sheetexceldocumentreader.cpp
+                testDocxToUjf/xlsxtoujf/styles/models/borders.cpp
+                testDocxToUjf/xlsxtoujf/styles/models/cellxfs.cpp
+                testDocxToUjf/xlsxtoujf/styles/models/fill.cpp
+                testDocxToUjf/xlsxtoujf/styles/models/font.cpp
+                testDocxToUjf/xlsxtoujf/styles/stylesexcel.cpp
+                testDocxToUjf/xlsxtoujf/styles/stylesexceldocumentreader.cpp
+                testDocxToUjf/xlsxtoujf/xlsxtoujfdocument.cpp
+                testDocxToUjf/ejxlsxtoujfconvertor.cpp
+                xlsx/ejconvertorexcel.cpp
+                xlsx/documents/ejsharedstringsdocument.cpp
+                xlsx/documents/ejsheetdocument.cpp
+                xlsx/documents/ejstylesdocument.cpp
+                xlsx/ejexceldocumenteditors.cpp
+                xlsx/ejutils.cpp
 		../include/exportdoc.h
 		../include/ejcommon.h
 		docx/ejconvertordocx.h
@@ -97,9 +97,9 @@ set(PROJECT_SOURCES
 		xlsx/documents/ejstylesdocument.h
 		xlsx/ejexceldocumenteditors.h
 		xlsx/ejutils.h
-		mini_zipper/zipper.cpp
+                mini_zipper/zipper.cpp
 		mini_zipper/zipper.h
-		mini_zipper/qtiocompressor.cpp
+                mini_zipper/qtiocompressor.cpp
 		mini_zipper/qtiocompressor.h
 		ejexport.qrc
 )
@@ -123,7 +123,7 @@ add_library(${PROJECT_NAME} ${PROJECT_SOURCES})
 target_compile_definitions(${PROJECT_NAME}
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(${PROJECT_NAME}
-  PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Xml Qt${QT_VERSION_MAJOR}::PrintSupport)
+  PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Xml Qt${QT_VERSION_MAJOR}::PrintSupport)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

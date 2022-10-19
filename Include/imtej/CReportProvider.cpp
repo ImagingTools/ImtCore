@@ -394,7 +394,7 @@ EjDocument* CReportProvider::getReport(iprm::IParamsSet* reportParams)
     control.setTextStyle(&curTextStyle);*/
 
     /*ЗП Список*/
-
+    //количество строк будет изменяться в зависимости от количества лиц
     /*EjTableBlock *table = new EjTableBlock(3 ,6, ejDoc, control.activeIndex);
 
     control.activeIndex = table->cellIndex(0,0,ejDoc->lBlocks);
@@ -422,13 +422,266 @@ EjDocument* CReportProvider::getReport(iprm::IParamsSet* reportParams)
     control.activeIndex = table->cellIndex(0,5,ejDoc->lBlocks);
     curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
     curCell->setText("Оплата_тг",&control);*/
+    /*----------------Кол-во потребителей---------------*/
+
+    curParagraph.m_align = EjParagraphStyle::AlignHCenter;
+    control.setParagraphStyle(&curParagraph);
+    curTextStyle.m_font.setPixelSize(12);
+    curTextStyle.m_font.setBold(true);
+    control.setTextStyle(&curTextStyle);
+    control.setText("Информация о потребителях на " + date.toString("dd.MM.yyyy"));
+    control.inputEnter();
+    control.inputEnter();
+    curTextStyle.setDefault();
+    control.setTextStyle(&curTextStyle);
+
+    EjCellStyle cellStyleHead;
+    cellStyleHead.topBorder()->m_width = 100;
+    cellStyleHead.bottomBorder()->m_width = 100;
+    cellStyleHead.leftBorder()->m_width = 100;
+    cellStyleHead.rightBorder()->m_width = 100;
+    cellStyleHead.verticalLine()->m_width = 100;
+    cellStyleHead.horisontalLine()->m_width = 100;
+    cellStyleHead.m_brushColor = QColor("#DDEBF7");
+
+    EjCellStyle cellStyleBody;
+    cellStyleBody.topBorder()->m_width = 200;
+    cellStyleBody.bottomBorder()->m_width = 100;
+    cellStyleBody.leftBorder()->m_width = 100;
+    cellStyleBody.rightBorder()->m_width = 100;
+    cellStyleBody.verticalLine()->m_width = 100;
+    cellStyleBody.horisontalLine()->m_width = 100;
+    cellStyleBody.m_brushColor = QColor("#DDEBF7");
+
+
+
+    EjTableBlock *table = new EjTableBlock(16 ,3, ejDoc, control.activeIndex);
+
+    table->setCellStyles(0,0,16,3,&cellStyleHead);
+
+    curParagraph.m_align = EjParagraphStyle::AlignHCenter;
+    control.setParagraphStyle(&curParagraph);
+    curTextStyle.m_font.setPixelSize(14);
+    curTextStyle.m_font.setBold(true);
+    control.setTextStyle(&curTextStyle);
+
+    control.activeIndex = table->cellIndex(0,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("Кол-во дом.общее",&control);
+
+    control.activeIndex = table->cellIndex(0,1,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("Кол-во абонентов",&control);
+
+    control.activeIndex = table->cellIndex(0,2,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("Кол-во водомеров",&control);
+
+    curTextStyle.setDefault();
+    control.setTextStyle(&curTextStyle);
+    curTextStyle.m_font.setBold(true);
+    curTextStyle.m_font.setPixelSize(12);
+    control.setTextStyle(&curTextStyle);
+
+    control.activeIndex = table->cellIndex(2,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("в т.ч Кол-во дом.БС",&control);
+    table->setCellStyle(curCell,&cellStyleBody);
+
+    control.activeIndex = table->cellIndex(4,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("в т.ч Кол-во дом.ЧС",&control);
+    table->setCellStyle(curCell,&cellStyleBody);
+
+    control.activeIndex = table->cellIndex(6,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("Кол-во дом. с канализ.",&control);
+    table->setCellStyle(curCell,&cellStyleBody);
+
+    control.activeIndex = table->cellIndex(8,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("в т.ч Кол-во дом.БС",&control);
+    table->setCellStyle(curCell,&cellStyleBody);
+
+    control.activeIndex = table->cellIndex(10,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("в т.ч Кол-во дом.ЧС",&control);
+    table->setCellStyle(curCell,&cellStyleBody);
+
+    control.activeIndex = table->cellIndex(12,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("Кол-во дом.ЧС С водопр.",&control);
+    table->setCellStyle(curCell,&cellStyleBody);
+
+    control.activeIndex = table->cellIndex(14,0,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("Кол-во дом.ЧС по колонке",&control);
+    table->setCellStyle(curCell,&cellStyleBody);
+
+    for(int i = 2; i <= 14; i+=2){
+
+        control.activeIndex = table->cellIndex(i,1,ejDoc->lBlocks);
+        curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+        curCell->setText("Кол-во абон",&control);
+        table->setCellStyle(curCell,&cellStyleBody);
+
+        control.activeIndex = table->cellIndex(i,2,ejDoc->lBlocks);
+        curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+        curCell->setText("Кол-во водомеров",&control);
+        table->setCellStyle(curCell,&cellStyleBody);
+    }
+    /*------------------Информация о потребителях---------------------*/
+    /*curParagraph.m_align = EjParagraphStyle::AlignHCenter;
+    control.setParagraphStyle(&curParagraph);
+    curTextStyle.m_font.setPixelSize(14);
+    control.setTextStyle(&curTextStyle);
+    control.setText("Информация о потребителях на " + date.toString("dd.MM.yyyy"));
+    control.inputEnter();
+    control.inputEnter();
+    curTextStyle.setDefault();
+    control.setTextStyle(&curTextStyle);
+
+    EjCellStyle cellStyle;
+
+    //количество строк изменяется  от количества городов, филиаолов.
+    EjTableBlock *table = new EjTableBlock(3 ,14, ejDoc, control.activeIndex);
+
+    for(int i = 0; i < 14; i++){
+        table->setColumMinWidth(100,i);
+        table->setColumMaxWidth(150,i);
+    }
+
+    control.setParagraphStyle(&curParagraph);
+    curTextStyle.m_font.setPixelSize(10);
+    control.setTextStyle(&curTextStyle);
+
+    control.activeIndex = table->cellIndex(0,1,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(1,3);
+    curCell->setText("Количество домой",&control);
+
+    control.activeIndex = table->cellIndex(1,1,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("Всего",&control);
+
+    control.activeIndex = table->cellIndex(1,2,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(1,2);
+    curCell->setText("По чс",&control);
+
+    control.activeIndex = table->cellIndex(2,2,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("с водопроводом",&control);
+
+    control.activeIndex = table->cellIndex(2,3,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->setText("без водопровода",&control);
+
+    control.activeIndex = table->cellIndex(0,4,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(1,3);
+    curCell->setText("Количество абонентов",&control);
+
+    control.activeIndex = table->cellIndex(1,4,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("Всего",&control);
+
+
+    control.activeIndex = table->cellIndex(1,5,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("с водопроводом",&control);
+
+    control.activeIndex = table->cellIndex(1,6,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("пользуются колонкой",&control);
+
+    control.activeIndex = table->cellIndex(0,7,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(3,1);
+    curCell->setText("Количество абонентов с ПУ",&control);
+
+    control.activeIndex = table->cellIndex(0,8,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(1,3);
+    curCell->setText("Количество ПУ",&control);
+
+    control.activeIndex = table->cellIndex(1,8,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("Всего",&control);
+
+
+    control.activeIndex = table->cellIndex(1,9,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("х/в",&control);
+
+    control.activeIndex = table->cellIndex(1,10,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("г/в",&control);
+
+    control.activeIndex = table->cellIndex(0,11,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(1,3);
+    curCell->setText("Количество проживающих",&control);
+
+    control.activeIndex = table->cellIndex(1,11,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("Всего",&control);
+
+
+    control.activeIndex = table->cellIndex(1,12,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("с ПУ",&control);
+
+    control.activeIndex = table->cellIndex(1,13,ejDoc->lBlocks);
+    curCell = (EjCellBlock*)ejDoc->lBlocks->at(control.activeIndex);
+    curCell->visible = false;
+    curCell->merge(2,1);
+    curCell->setText("по норме в т.ч по колонке",&control);*/
+
+
+
+
+
+
 
     control.calcData();
     return ejDoc;
 }
 
-QString CReportProvider::getReportId(){
-    return "reportTest";
+QByteArrayList  CReportProvider::getReportIds(){
+    QByteArrayList retVal;
+
+//    if (m_contextIdsCompPtr.IsValid()){
+//        for (int i = 0; i < m_contextIdsCompPtr.GetCount(); i++){
+//            retVal << m_contextIdsCompPtr[i];
+//        }
+//    }
+
+    return retVal;
 }
 
 } // namespace imtej

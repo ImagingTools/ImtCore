@@ -6,7 +6,7 @@
 #include<QStandardPaths>
 #include "../convertor.h"
 #include "../include/ejcommon.h"
-#include "zipper.h"
+#include <zipper.h>
 #include "ejworddocument.h"
 #include "ejworddocumenteditors.h"
 

@@ -13,17 +13,21 @@ namespace imtej
 bool CReportExport::exportReport(EjDocument* ejDocument, QString const& file_name)
 {
 	if(file_name.endsWith("docx"))
-	{
-		return m_convertorDocx.convert(ejDocument, file_name);
+    {
+        EjConvertorDocx* docxConvertorPtr = new EjConvertorDocx();
+        return docxConvertorPtr->convert(ejDocument, file_name);
 	}
 	if(file_name.endsWith("pdf"))
-	{
-		return m_convertorPdf.convert(ejDocument, file_name);
+    {
+        EjConvertorPdf* pdfConvertorPtr = new EjConvertorPdf();
+        return pdfConvertorPtr->convert(ejDocument, file_name);
 	}
 	if(file_name.endsWith("xlsx"))
-	{
-		return m_convertorExcel.convert(ejDocument, file_name);;
+    {
+        EjConvertorExcel* excelConvertorPtr = new EjConvertorExcel();
+        return excelConvertorPtr->convert(ejDocument, file_name);;
 	}
+    return false;
 }
 
 

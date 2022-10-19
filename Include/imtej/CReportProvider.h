@@ -2,19 +2,19 @@
 
 
 // ImtCore includes
-#include <imtej/IReportProvider.h>
+#include <imtej/IEjDocumentProvider.h>
 
 
 namespace imtej
 {
 
 
-class CReportProvider: virtual public IReportProvider
+class CReportProvider: virtual public IEjDocumentProvider
 {
 public:
 	virtual EjDocument* getReport(iprm::IParamsSet* reportParams) override;
 
-	virtual QString getReportId() override;
+    virtual QByteArrayList getReportIds() override;
 };
 
 

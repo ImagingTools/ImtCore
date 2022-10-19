@@ -1,6 +1,6 @@
 include_directories(${IMTCOREDIR}/3rdParty/EJ/include)
 include_directories(${IMTCOREDIR}/3rdParty/EJ/EjExport/mini_zipper/)
-include(${IACFDIR}/Config/CMake/zlib.cmake)
+
 
 
 if(WIN32)

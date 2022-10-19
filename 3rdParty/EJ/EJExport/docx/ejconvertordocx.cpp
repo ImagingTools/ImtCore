@@ -1,5 +1,4 @@
 #include "ejconvertordocx.h"
-
 #include "imageblock.h"
 #include "ejtableblocks.h"
 #include "export_global.h"
@@ -8,7 +7,7 @@
 const QString EjConvertorDocx::format = "docx";
 
 bool EjConvertorDocx::unzip() const {
-	return zipper.unzip(temp_folder + subfolder, ":/formats/" + format + ".zip");
+    return zipper.unzip(temp_folder + subfolder, ":/formats/" + format + ".zip");
 }
 
 bool EjConvertorDocx::zip(QString const& file_name) const {

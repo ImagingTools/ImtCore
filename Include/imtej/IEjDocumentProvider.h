@@ -8,6 +8,7 @@
 #include <ejdocument.h>
 #include <ejtableblocks.h>
 
+
 namespace imtej
 {
 
@@ -16,19 +17,13 @@ class IObject2d;
 
 
 /**
-	Interface for a creating report in EjDocument format.
+	Interface for export EjDocument format to Office formats.
 */
 
-class IReportProvider: virtual public istd::IPolymorphic
+class IEjDocumentProvider: virtual public istd::IPolymorphic
 {
 public:
-    enum ReportInfo
-    {
-        RI_SUCCESS = 1,
-        RI_NOT_SUCCESS = 0
-    };
-
-    virtual ReportInfo createReport(iprm::IParamsSet* reportParams, QString reportPath) = 0;
+    virtual EjDocument* getReport(iprm::IParamsSet* reportParams) = 0;
 
     virtual QByteArrayList getReportIds() = 0;
 };

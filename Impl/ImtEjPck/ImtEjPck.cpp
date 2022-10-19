@@ -14,10 +14,10 @@ I_EXPORT_PACKAGE(
 			"EJ document-related component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") "Report");
 
-I_EXPORT_COMPONENT(
-			EjProvider,
-			"Document creator in EJ format",
-			"Create EJ Document");
+//I_EXPORT_COMPONENT(
+//			EjProvider,
+//			"Document creator in EJ format",
+//			"Create EJ Document");
 
 I_EXPORT_COMPONENT(
 			EjExport,

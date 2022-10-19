@@ -8,9 +8,12 @@ include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${IMTCOREDIR}/Config/CMake/EjDoc.cmake)
 include(${IMTCOREDIR}/Config/CMake/EjExport.cmake)
+include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
+include(${IMTCOREDIR}/Config/CMake/EjMiniZipper.cmake)
 
-target_link_libraries(${PROJECT_NAME} imtej imtbase)
 
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 
+target_link_libraries(${PROJECT_NAME} imtej imtbase)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::PrintSupport)
+
