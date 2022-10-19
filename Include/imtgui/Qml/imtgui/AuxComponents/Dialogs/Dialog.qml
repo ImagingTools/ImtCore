@@ -20,6 +20,8 @@ Rectangle {
 
     property alias buttons: buttonsDialog;
 
+    property string notClosingButtons: "";
+
     signal finished(string buttonId);
 
     property Component content;
@@ -37,8 +39,11 @@ Rectangle {
     }
 
     onFinished: {
+
         if (root){
-            root.closeDialog();
+            if(dialogContainer.notClosingButtons.indexOf(buttonId) == -1){
+                root.closeDialog();
+            }
         }
     }
 
