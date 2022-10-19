@@ -4,9 +4,6 @@
 // STL includes
 #include <cmath>
 
-// ACF includes
-#include <iprm/CParamsSet.h>
-
 // ImtCore includes
 #include <imtqml/CCommandDataEnumProviderComp.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -360,7 +357,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
 		}
 
-		imtbase::CCollectionFilter m_filter;
+        iprm::CParamsSet filterParams;
+        imtbase::CCollectionFilter m_filter;
 		int offset = 0, count = -1;
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
@@ -398,9 +396,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 					}
 				}
 			}
+
+            filterParams.SetEditableParameter("Filter", &m_filter);
+            this->SetAdditionalFilters(*viewParamsGql, &filterParams);
 		}
-		iprm::CParamsSet filterParams;
-		filterParams.SetEditableParameter("Filter", &m_filter);
+
 
 		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
 		if (pagesCount < 0){
@@ -618,6 +618,11 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 			QString &errorMessage) const
 {
 	return nullptr;
+}
+
+void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const
+{
+
 }
 
 

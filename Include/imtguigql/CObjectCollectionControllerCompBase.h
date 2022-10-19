@@ -3,6 +3,7 @@
 // ACF includes
 #include <iqt/ITranslationManager.h>
 #include <iprm/ITextParam.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
@@ -91,6 +92,11 @@ protected:
 		Create object from the GraphQL
 	*/
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
+
+    /**
+        Set multiple optional additional filters to initially get a more refined collection.
+    */
+    virtual void SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
