@@ -75,8 +75,6 @@ function(imtcore_compile_web)
 		${QRC_WEB_FILE}
 		PRE_BUILD
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/WebCompiler/webcompiler.py ${webdirs}
-		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML
-		COMMAND npm run compile ../../Bin/web/src
 		COMMENT
 		"WEB COMPILER for ${PROJECT_NAME}"
 		)
