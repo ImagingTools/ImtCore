@@ -1,9 +1,13 @@
-#include "qzip.cpp"
 #include "zipper.h"
 #include "qzipwriter_p.h"
+
 #include <qtiocompressor.h>
 #include <fstream>
 #include <QDebug>
+#include <QDataStream>
+#include <QBuffer>
+#include <QDirIterator>
+
 
 bool Zipper::toZip(QString path_files, QString const& zip_path) const {
     char snm = '/';

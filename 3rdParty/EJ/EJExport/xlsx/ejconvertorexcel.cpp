@@ -2,6 +2,11 @@
 #include "ejconvertorexcel.h"
 #include "ejtableblocks.h"
 #include "ejutils.h"
+
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+
+
 const QString EjConvertorExcel::format = "xlsx";
 
 

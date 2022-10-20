@@ -97,9 +97,9 @@ set(PROJECT_SOURCES
 		xlsx/documents/ejstylesdocument.h
 		xlsx/ejexceldocumenteditors.h
 		xlsx/ejutils.h
-                mini_zipper/zipper.cpp
+		mini_zipper/zipper.cpp
 		mini_zipper/zipper.h
-                mini_zipper/qtiocompressor.cpp
+		mini_zipper/qtiocompressor.cpp
 		mini_zipper/qtiocompressor.h
 		ejexport.qrc
 )
@@ -131,17 +131,23 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-#set(outlibdir "${PROJECT_SOURCE_DIR}/../libs/${CMAKE_BUILD_TYPE}_${TARGETNAME}")
+if(${MSVC_TOOLSET_VERSION} STREQUAL 142)
+	set(COMPILER_NAME "VC16")
+elseif(${MSVC_TOOLSET_VERSION} STREQUAL 143)
+	set(COMPILER_NAME "VC17")
+else()
+	set(COMPILER_NAME "CLang")
+endif()
 
-#set_target_properties( ${PROJECT_NAME}
-#	PROPERTIES
-#	ARCHIVE_OUTPUT_DIRECTORY ${outlibdir}
-#	LIBRARY_OUTPUT_DIRECTORY ${outlibdir}
-#	RUNTIME_OUTPUT_DIRECTORY ${outlibdir}
-#	POSITION_INDEPENDENT_CODE ON
-#)
 
-#if(QT_VERSION_MAJOR EQUAL 6)
-#    qt_import_qml_plugins(${PROJECT_NAME})
-#    qt_finalize_executable(${PROJECT_NAME})
-#endif()
+set(outlibdir "${PROJECT_SOURCE_DIR}/../libs/${CMAKE_BUILD_TYPE}_Qt${QT_VERSION_MAJOR}_${COMPILER_NAME}_x64")
+
+set_target_properties( ${PROJECT_NAME}
+	PROPERTIES
+	ARCHIVE_OUTPUT_DIRECTORY ${outlibdir}
+	LIBRARY_OUTPUT_DIRECTORY ${outlibdir}
+	RUNTIME_OUTPUT_DIRECTORY ${outlibdir}
+	POSITION_INDEPENDENT_CODE ON
+)
+
+

@@ -1,11 +1,7 @@
 #ifndef ZIPPER_H
 #define ZIPPER_H
 
-#include <QDataStream>
-#include <QBuffer>
-#include <QDirIterator>
-#include "qzipwriter_p.h"
-#include "qtiocompressor.h"
+#include <QtCore/QString>
 
 class Zipper {
 public:

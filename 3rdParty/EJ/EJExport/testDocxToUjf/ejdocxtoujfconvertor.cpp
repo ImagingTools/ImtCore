@@ -2,6 +2,8 @@
 #include <QPair>
 #include <QStandardPaths>
 
+#include <QtCore/QFile>
+#include <QtCore/QDir>
 
 EjDocxToUjfConvertor::EjDocxToUjfConvertor():
     temp_folder(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + '/'), subfolder("ujf_test/")

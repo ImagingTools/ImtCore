@@ -4,6 +4,9 @@
 #include "export_global.h"
 #include "ejstoragehelper.h"
 
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+
 const QString EjConvertorDocx::format = "docx";
 
 bool EjConvertorDocx::unzip() const {

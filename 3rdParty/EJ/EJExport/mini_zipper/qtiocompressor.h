@@ -66,7 +66,7 @@
 #endif
 
 class QtIOCompressorPrivate;
-class QT_QTIOCOMPRESSOR_EXPORT QtIOCompressor : public QIODevice
+class QtIOCompressor : public QIODevice
 {
 Q_OBJECT
 public:

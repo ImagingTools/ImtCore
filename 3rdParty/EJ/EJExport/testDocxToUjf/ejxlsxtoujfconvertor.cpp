@@ -1,5 +1,10 @@
 #include "ejxlsxtoujfconvertor.h"
 
+
+#include <QtCore/QFile>
+#include <QtCore/QDir>
+
+
 EjXlsxToUjfConvertor::EjXlsxToUjfConvertor():
     temp_folder(QStandardPaths::writableLocation(QStandardPaths::TempLocation) + '/'), subfolder("ujf_test/")
 {
