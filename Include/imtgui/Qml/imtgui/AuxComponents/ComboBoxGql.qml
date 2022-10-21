@@ -91,7 +91,7 @@ Item {
                 comboBoxContainer.currentText = popup.filterText;
             }
             onFinished: {
-                console.log("__________FINISHED______________")
+                //console.log("__________FINISHED______________")
                 console.log(index)
                 console.log(commandId)
                 if (index > -1){
