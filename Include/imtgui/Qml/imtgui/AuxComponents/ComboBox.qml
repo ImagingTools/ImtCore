@@ -20,6 +20,9 @@ Item {
     property bool menuVisible: false;
     property bool hiddenBackground: true;
 
+    property int dialogsCountPrev: 1000;
+    property int dialogsCount: modalDialogManager.count;
+    property bool openST: false;
 
     property int radius: 5;
     property int currentIndex: -1;
@@ -61,15 +64,26 @@ Item {
             cbTitleTxt.anchors.left = cbMainRect.left;
             cbTitleTxt.anchors.leftMargin = 10;
         }
+
     }
 
+    onDialogsCountChanged: {
+        comboBoxContainer.openST = comboBoxContainer.dialogsCount > comboBoxContainer.dialogsCountPrev;
+        if(!openST && dialogsCountPrev < 1000){
+            dialogsCountPrev = 1000;
+        }
+    }
+
+
     function openPopupMenu(){
+        comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
         var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
                                                    "model": comboBoxContainer.model,
                                                    "width": comboBoxContainer.width,
                                                    "countVisibleItem": 5 });
+
     }
 
     Rectangle {

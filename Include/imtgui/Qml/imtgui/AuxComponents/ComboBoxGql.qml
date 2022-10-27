@@ -4,7 +4,7 @@ import imtgui 1.0
 import imtqml 1.0
 
 Item {
-    id: comboBoxContainer;
+    id: comboBoxContainerGql;
 
     width: 90;
     height: 30;
@@ -14,7 +14,7 @@ Item {
     property var gettedParams;
     property var filterIdsModel;
 
-    property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
+    property color borderColor: comboBoxContainerGql.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
 
     property color backgroundColor: Style.baseColor;
 
@@ -27,6 +27,7 @@ Item {
     property bool hiddenBackground: true;
     property bool canClose: true;
     property bool complexModel: false;
+    property bool openST: false;
 
     property int radius: 5;
     property int currentIndex: -1;
@@ -35,18 +36,22 @@ Item {
     property int delegateRadius: 0;
     property int itemHeight: 26;
     property int textSize: Style.fontSize_common;
+    property int dialogsCountPrev: 1000;
+    property int dialogsCount: modalDialogManager.count;
+
     property string commandId: "";
     property string filterName: "Name";
     property string filterText: "";
-    property Component delegate: PopupMenuDelegate{width: comboBoxContainer.width; height: comboBoxContainer.height;};
+    property Component delegate: PopupMenuDelegate{width: comboBoxContainerGql.width; height: comboBoxContainerGql.height;};
     property alias popupComp: popupMenu;
     property alias gradient: cbMainRect.gradient;
+
 
     signal setCurrentText(var modelll, int index);
 
     onSetCurrentText: {
-        if(!comboBoxContainer.complexModel){
-            comboBoxContainer.currentText = modelll.GetData("Name",index);
+        if(!comboBoxContainerGql.complexModel){
+            comboBoxContainerGql.currentText = modelll.GetData("Name",index);
         }
     }
 
@@ -56,39 +61,48 @@ Item {
 
 
     onModelChanged: {
-        if (comboBoxContainer.currentIndex > -1){
-            comboBoxContainer.currentText = popup.model.GetData("Name");
+        if (comboBoxContainerGql.currentIndex > -1){
+            comboBoxContainerGql.currentText = popup.model.GetData("Name");
         }
     }
+
+    onDialogsCountChanged: {
+
+        comboBoxContainerGql.openST = comboBoxContainerGql.dialogsCount > comboBoxContainerGql.dialogsCountPrev;
+        if(!openST && dialogsCountPrev < 1000){
+            dialogsCountPrev = 1000;
+        }
+    }
+
 
     Component {
         id: popupMenu;
         PopupMenuDialogGql {
             id: popup;
-            offset: comboBoxContainer.offset;
-            count: comboBoxContainer.count;
-            commandId: comboBoxContainer.commandId;
-            filterName: comboBoxContainer.filterName;
-            delegate: comboBoxContainer.delegate;
-            properties: comboBoxContainer.properties;
-            gettedParams: comboBoxContainer.gettedParams;
-            filterIdsModel: comboBoxContainer.filterIdsModel;
-            delegateRadius: comboBoxContainer.delegateRadius;
-            hiddenBackground: comboBoxContainer.hiddenBackground;
-            itemHeight: comboBoxContainer.itemHeight;
-            textSize: comboBoxContainer.textSize;
-            canClose: comboBoxContainer.canClose;
+            offset: comboBoxContainerGql.offset;
+            count: comboBoxContainerGql.count;
+            commandId: comboBoxContainerGql.commandId;
+            filterName: comboBoxContainerGql.filterName;
+            delegate: comboBoxContainerGql.delegate;
+            properties: comboBoxContainerGql.properties;
+            gettedParams: comboBoxContainerGql.gettedParams;
+            filterIdsModel: comboBoxContainerGql.filterIdsModel;
+            delegateRadius: comboBoxContainerGql.delegateRadius;
+            hiddenBackground: comboBoxContainerGql.hiddenBackground;
+            itemHeight: comboBoxContainerGql.itemHeight;
+            textSize: comboBoxContainerGql.textSize;
+            canClose: comboBoxContainerGql.canClose;
 //            function getCurrentText(index){
 //                return popup.model.GetData("Name",index);
 //            }
             Connections{
-                target: comboBoxContainer;
+                target: comboBoxContainerGql;
                 onFinished: popup.finished(commandId, index)
             }
             onFilterTextChanged: {
-                comboBoxContainer.filterText = popup.filterText;
-                comboBoxContainer.currentIndex = -1;
-                comboBoxContainer.currentText = popup.filterText;
+                comboBoxContainerGql.filterText = popup.filterText;
+                comboBoxContainerGql.currentIndex = -1;
+                comboBoxContainerGql.currentText = popup.filterText;
             }
             onFinished: {
                 //console.log("__________FINISHED______________")
@@ -96,23 +110,23 @@ Item {
                 console.log(commandId)
                 if (index > -1){
                     for (var item = 0; item < gettedParams.GetItemsCount(); item++){
-                        let param = comboBoxContainer.gettedParams.GetData("Name",  item);
+                        let param = comboBoxContainerGql.gettedParams.GetData("Name",  item);
                         let value = popup.model.GetData(param, index);
                         console.log(param, " = ", value);
-                        comboBoxContainer.gettedParams.SetData("Value", value, item);
+                        comboBoxContainerGql.gettedParams.SetData("Value", value, item);
                     }
                 }
-                comboBoxContainer.currentIndex = index;
-                //comboBoxContainer.currentText = popup.model.GetData("Name", index);
-                comboBoxContainer.setCurrentText(popup.model,index)
-                if (comboBoxContainer.currentText == ""){
-                    comboBoxContainer.currentText = popup.filterText;
+                comboBoxContainerGql.currentIndex = index;
+                //comboBoxContainerGql.currentText = popup.model.GetData("Name", index);
+                comboBoxContainerGql.setCurrentText(popup.model,index)
+                if (comboBoxContainerGql.currentText == ""){
+                    comboBoxContainerGql.currentText = popup.filterText;
                 }
 
             }
             onPropertiesChanged: {
-                comboBoxContainer.currentIndex = -1;
-                comboBoxContainer.currentText = "";
+                comboBoxContainerGql.currentIndex = -1;
+                comboBoxContainerGql.currentText = "";
             }
 
 
@@ -120,7 +134,7 @@ Item {
     }
 
     Component.onCompleted: {
-        if (comboBoxContainer.textCentered){
+        if (comboBoxContainerGql.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
         }
         else {
@@ -130,11 +144,12 @@ Item {
     }
 
     function openPopupMenu(){
-        var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, 0);
+        comboBoxContainerGql.dialogsCountPrev = modalDialogManager.count;
+        var point = comboBoxContainerGql.mapToItem(thumbnailDecoratorContainer, 0, 0);
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
-                                                   "model": comboBoxContainer.model,
-                                                   "width": comboBoxContainer.width,
+                                                   "model": comboBoxContainerGql.model,
+                                                   "width": comboBoxContainerGql.width,
                                                    "countVisibleItem": 5 });
     }
 
@@ -143,17 +158,17 @@ Item {
 
         anchors.fill: parent;
 
-        border.color: comboBoxContainer.borderColor;
-        border.width: !comboBoxContainer.backVisible ? 0 :1;
+        border.color: comboBoxContainerGql.borderColor;
+        border.width: !comboBoxContainerGql.backVisible ? 0 :1;
 
-        radius: comboBoxContainer.radius;
-        color: comboBoxContainer.backgroundColor;
+        radius: comboBoxContainerGql.radius;
+        color: comboBoxContainerGql.backgroundColor;
 
         gradient: Gradient {
-            GradientStop { position: 0.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
+            GradientStop { position: 0.0; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
         }
 
 
@@ -166,10 +181,10 @@ Item {
             anchors.leftMargin: 10;
 
             color: Style.textColor;
-            text: comboBoxContainer.currentText;
+            text: comboBoxContainerGql.currentText;
             font.family: Style.fontFamily;
-            font.pixelSize: comboBoxContainer.textSize;
-            visible: comboBoxContainer.backVisible;
+            font.pixelSize: comboBoxContainerGql.textSize;
+            visible: comboBoxContainerGql.backVisible;
         }
 
         Image {
@@ -198,7 +213,7 @@ Item {
             onClicked: {
                 console.log("ComboBox clicked !");
                 openPopupMenu();
-                comboBoxContainer.clicked();
+                comboBoxContainerGql.clicked();
 
 
             }

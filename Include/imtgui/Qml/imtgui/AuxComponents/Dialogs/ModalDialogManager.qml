@@ -4,8 +4,8 @@ Item {
     id: container;
 
     property alias backgroundItem: background;
-    property bool openST: false;
-    property alias count: modalDialogs.count;
+    property alias count: modalDialogModels.count;
+
 
     Component.onDestruction: {
         modalDialogModels.clear();
@@ -18,7 +18,6 @@ Item {
     function openDialog(comp, parameters){
         console.log("DialogsManager addDialog", comp);
         modalDialogModels.append({"Component": comp, "Parameters": parameters});
-        container.openST = true;
     }
 
     function closeDialog(){
@@ -28,7 +27,6 @@ Item {
             modalDialogModels.remove(modalDialogModels.count - 1);
         }
 
-        container.openST = false;
 
     }
 
