@@ -29,6 +29,7 @@ Item {
 
     signal selectItem(string idSelected, string name);
     signal rightButtonMouseClicked(int mouseX, int mouseY);
+    signal doubleClicked(int mouseX, int mouseY);
     signal setActiveFocusFromTable();
     signal headerClicked(string headerId);
     signal textFilterChanged(string id, int index, string text);
@@ -229,7 +230,10 @@ Item {
 
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
+                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                tableContainer.doubleClicked(point.x, point.y)
                 tableContainer.selectItem(model.Id, model.Name);
+
             }
         }
     }

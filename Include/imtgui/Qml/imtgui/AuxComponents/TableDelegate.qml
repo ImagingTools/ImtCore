@@ -22,7 +22,7 @@ Rectangle {
 
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);
-    signal doubleClicked;
+    signal doubleClicked(int mX, int mY);
 
     Component.onCompleted: {
         for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
@@ -161,7 +161,7 @@ Rectangle {
                 return;
             }
 
-            tableDelegateContainer.doubleClicked();
+            tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
         }
     }
 }
