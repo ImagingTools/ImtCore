@@ -78,12 +78,14 @@ Item {
     }
 
     function resetProperties(){
+        undoRedoManager.model.modelChanged.disconnect(undoRedoManager.modelUpdated);
         for (let i = 0; i < treeView.model.GetItemsCount(); i++){
             let childrenItems = treeView.model.GetData("ChildModel", i);
             if (childrenItems){
                 _resetRecursive(childrenItems);
             }
         }
+        undoRedoManager.model.modelChanged.connect(undoRedoManager.modelUpdated);
     }
 
     function _resetRecursive(model){

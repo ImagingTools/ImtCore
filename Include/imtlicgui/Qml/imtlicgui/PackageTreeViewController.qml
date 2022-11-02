@@ -16,16 +16,15 @@ TreeViewControllerBase {
             let rootkey = container.selectedIndex.itemData.Id;
             treeView.visible = itemId != "" && rootkey != null && rootkey != "";
 
-            commandsDelegate.disconnectModelChanged();
-            treeView.itemStateChanged.disconnect(itemStateChanged);
-//            undoRedoManager.model.modelChanged.disconnect(undoRedoManager.modelUpdated);
-
+           // commandsDelegate.disconnectModelChanged();
+           // treeView.itemStateChanged.disconnect(itemStateChanged);
+            console.log("resetProperties");
             resetProperties();
+
+            console.log("hideCurrentItem");
             hideCurrentItem();
 
             let model = documentModel.GetData("Items");
-
-            console.log("model", model.toJSON());
 
             //Get path of indexes for the selected item.
             let indexes = selectedIndex.getIndexes();
@@ -41,26 +40,29 @@ TreeViewControllerBase {
             console.log("model 2", model.toJSON());
 
             let dependenciesModel = model.GetData('DependenciesModel', itemIndex);
-
             if (!dependenciesModel){
                 dependenciesModel = model.AddTreeModel('DependenciesModel', itemIndex);
             }
 
-            console.log("dependenciesModel", dependenciesModel.toJSON());
             let parentFeatures = []
             getParentFeatures(dependenciesModel, parentFeatures);
 
-            console.log("parentFeatures", parentFeatures);
             let selectedFeatures = []
 
             for (let parentId of parentFeatures){
                 getFeaturesLeaves(dependenciesModel, parentId, selectedFeatures);
             }
 
-            console.log("selectedFeatures", selectedFeatures);
-
             for (let featureId of selectedFeatures){
+                console.log("selectFeature start", featureId);
                 selectFeature(featureId);
+                console.log("selectFeature end", featureId);
+
+                let itemData = treeView.getItemDataById(featureId);
+
+                if (itemData){
+                    treeView.itemsStateChanged(itemData);
+                }
 
                 let childrenDepends = []
                 featureDependenciesModel.getAllChildrenDependsFeatures(featureId, childrenDepends);
@@ -69,12 +71,11 @@ TreeViewControllerBase {
 
             let parentDepends = []
             featureDependenciesModel.getAllParentsDependsFeatures(rootkey, parentDepends);
-//            treeViewModel.setValueToProperty("Visible", false, parentDepends);
             setValueToProperty("Visible", false, parentDepends);
 
-            commandsDelegate.connectModelChanged();
-            treeView.itemStateChanged.connect(itemStateChanged);
-//            undoRedoManager.model.modelChanged.connect(undoRedoManager.modelUpdated);
+            //commandsDelegate.connectModelChanged();
+           // treeView.itemStateChanged.connect(itemStateChanged);
+            //undoRedoManager.model.modelChanged.connect(undoRedoManager.modelUpdated);
         }
         else{
             treeView.visible = false;
@@ -111,8 +112,6 @@ TreeViewControllerBase {
         for (let index of indexes){
             model = model.GetData('ChildModel', index)
         }
-
-//        undoRedoManager.beginChanges();
 
         let dependenciesModel = model.GetData('DependenciesModel', itemIndex);
 
@@ -170,10 +169,7 @@ TreeViewControllerBase {
             }
 
             setValueToProperty("Active", true, childrenDepends);
-
         }
-
-//        undoRedoManager.endChanges();
 
         synchronise();
     }
@@ -200,6 +196,8 @@ TreeViewControllerBase {
     }
 
     function  hideCurrentItem(){
+        undoRedoManager.model.modelChanged.disconnect(undoRedoManager.modelUpdated);
+
         let packageId = documentItem.itemId;
         let featureId = selectedIndex.itemData.Id;
 
@@ -212,6 +210,8 @@ TreeViewControllerBase {
                 break;
             }
         }
+
+        undoRedoManager.model.modelChanged.connect(undoRedoManager.modelUpdated);
     }
 
     function _updateVisibleElements(model, itemId){

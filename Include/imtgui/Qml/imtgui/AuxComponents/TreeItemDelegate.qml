@@ -22,6 +22,8 @@ Item {
 
     property int childrenCount: childModelRepeater.count;
 
+    property alias childRepeater: childModelRepeater;
+
     signal doubleClicked;
     signal clicked(var itemData, int index);
 
@@ -125,8 +127,10 @@ Item {
                         model.State = Qt.Checked - model.State;
                     }
 
-                    treeView._itemStateChanged(itemData, model.State, true);
-                    treeView._itemStateChanged(itemData, model.State, false);
+                    treeView.itemsStateChanged(itemData);
+
+//                    treeView.childrenStateChanged(itemData, model.State);
+//                    treeView.parentStateChanged(itemData, model.State);
 //                    treeItemDelegate.stateChanged.disconnect(treeView.itemStateChanged);
                 }
             }

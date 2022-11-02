@@ -17,9 +17,9 @@ TreeViewControllerBase {
             treeView.visible = rootKey != null && rootKey != "";
             let featuresModel = documentModel.GetData("Features");
 
-            treeView.itemStateChanged.disconnect(itemStateChanged);
+//            treeView.itemStateChanged.disconnect(itemStateChanged);
             resetProperties();
-            treeView.itemStateChanged.connect(itemStateChanged);
+//            treeView.itemStateChanged.connect(itemStateChanged);
 
             if (featuresModel){
                 if (featuresModel.ContainsKey(rootKey)){
@@ -38,6 +38,12 @@ TreeViewControllerBase {
 
                     for (let featureId of selectedFeatures){
                         selectFeature(featureId);
+
+                        let itemData = treeView.getItemDataById(featureId);
+
+                        if (itemData){
+                            treeView.itemsStateChanged(itemData);
+                        }
 
                         let childrenDepends = []
                         featureDependenciesModel.getAllChildrenDependsFeatures(featureId, childrenDepends);

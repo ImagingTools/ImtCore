@@ -12,6 +12,8 @@ Rectangle {
 
     property alias itemDelegate: delegateLoader.sourceComponent;
 
+    property UndoRedoManager undoRedoManager;
+
     TreeItemModel {
         id: modelItems;
     }
@@ -23,6 +25,57 @@ Rectangle {
     Component.onDestruction: {
         Events.unSubscribeEvent("TreeViewModelUpdateFinished", refreshModel)
     }
+
+    function getItemDataById(itemId){
+        //Обход по делегатам packages
+        for (let i = 0; i < mainTreeView.count; i++){
+            let item = mainTreeView.itemAtIndex(i);
+
+            let childRepeater = item.childRepeater;
+
+            //Обход по делегатам репитора children
+            for (let j = 0; j < childRepeater.count; j++){
+                let childItem = childRepeater.itemAt(j);
+
+                let itemData = childItem.itemData;
+                console.log("itemData", itemData);
+                let currentItemId = itemData.Id;
+
+                if (currentItemId == itemId){
+                    return itemData;
+                }
+
+                if (itemData.Children){
+                    let result = _getItemDataRecursive(itemData.Children, itemId);
+
+                    if (result != null){
+                        return result;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
+     function _getItemDataRecursive(children, itemId){
+         if (children){
+             for (let child of children){
+                 if (child.Id == itemId){
+                     return child;
+                 }
+
+                 if (child.Children){
+                      let result = _getItemDataRecursive(child.Children, itemId);
+                     if (result != null){
+                         return result;
+                     }
+                 }
+             }
+         }
+
+         return null;
+     }
 
     function refreshModel(){
         treeViewContainer.model = 0;
@@ -70,44 +123,59 @@ Rectangle {
         }
     }
 
-    function _itemStateChanged(itemData, state, isForward){
-        console.log("_itemStateChanged", itemData.Id, state, isForward);
-        if (isForward){
-            if (itemData.Children){
-                for (let child of itemData.Children){
-                    if (child.Active && child.State != state){
-                        child.State = state;
-                        _itemStateChanged(child, state,  true);
-                    }
+    function itemsStateChanged(itemData){
+        console.log("itemsStateChanged");
+        if (undoRedoManager){
+            undoRedoManager.beginChanges();
+        }
+
+        itemStateChanged(itemData);
+
+        childrenStateChanged(itemData, itemData.State);
+        parentStateChanged(itemData, itemData.State);
+
+        if (undoRedoManager){
+            undoRedoManager.endChanges();
+        }
+    }
+
+    function childrenStateChanged(itemData, state){
+        if (itemData.Children){
+            for (let child of itemData.Children){
+                if (child.Active && child.State != state){
+                    child.State = state;
+                    itemStateChanged(child);
+                    childrenStateChanged(child, state);
                 }
             }
         }
-        else{
-            let parent = itemData.Parent;
-            if (parent && parent.Active){
-                let isAllChecked = checkState(parent, Qt.Checked);
-                let isAllUnchecked = checkState(parent, Qt.Unchecked);
+    }
 
-                if (isAllChecked){
-                    if (parent.State != Qt.Checked){
-                        parent.State = Qt.Checked
-                    }
-                }
-                else if (isAllUnchecked){
-                    if (parent.State != Qt.Unchecked){
-                        parent.State = Qt.Unchecked
-                    }
-                }
-                else if (!isAllChecked && !isAllUnchecked){
-                    if (parent.State != Qt.PartiallyChecked){
-                        parent.State = Qt.PartiallyChecked
-                    }
-                }
+    function parentStateChanged(itemData, state){
+        console.log("parentStateChanged", itemData.Id, itemData.State);
+        let parent = itemData.Parent;
+        if (parent && parent.Active){
+            let isAllChecked = checkState(parent, Qt.Checked);
+            let isAllUnchecked = checkState(parent, Qt.Unchecked);
 
-                if (parent.Parent){
-                    _itemStateChanged(parent.Parent, state, false);
+            if (isAllChecked){
+                if (parent.State != Qt.Checked){
+                    parent.State = Qt.Checked
                 }
             }
+            else if (isAllUnchecked){
+                if (parent.State != Qt.Unchecked){
+                    parent.State = Qt.Unchecked
+                }
+            }
+            else if (!isAllChecked && !isAllUnchecked){
+                if (parent.State != Qt.PartiallyChecked){
+                    parent.State = Qt.PartiallyChecked
+                }
+            }
+
+            parentStateChanged(parent, state);
+            itemStateChanged(parent);
         }
     }
 
@@ -145,113 +213,8 @@ Rectangle {
                      }
                  }
             }
-
-//            onStateChanged: {
-//                if (itemData.Children && state != Qt.PartiallyChecked){
-//                    let children = itemData.Children;
-//                    for (let child of children){
-//                        if (child.Active && child.State != state){
-//                            child.State = state;
-//                        }
-//                    }
-//                }
-
-//                if (itemData.Parent && itemData.Parent.Active){
-//                    let isAllChecked = checkState(itemData.Parent, Qt.Checked);
-//                    let isAllUnchecked = checkState(itemData.Parent, Qt.Unchecked);
-
-//                    if (isAllChecked){
-//                        if (itemData.Parent.State != Qt.Checked){
-//                            itemData.Parent.State = Qt.Checked
-//                        }
-//                    }
-//                    else if (isAllUnchecked){
-//                        if (itemData.Parent.State != Qt.Unchecked){
-//                            itemData.Parent.State = Qt.Unchecked
-//                        }
-//                    }
-//                    else if (!isAllChecked && !isAllUnchecked){
-//                        if (itemData.Parent.State != Qt.PartiallyChecked){
-//                            itemData.Parent.State = Qt.PartiallyChecked
-//                        }
-//                    }
-//                }
-
-//                treeViewContainer.itemStateChanged(itemData);
-//            }
         }
     }
-
-//    Component {
-//        id: delegateComp;
-
-//        TreeItemDelegate {
-//            width: treeViewContainer.width;
-
-//            onClicked: {
-//                resetSelectedItem(modelItems);
-//                itemData.Selected = true;
-//            }
-
-//            onItemVisibleChanged: {
-//                console.log("TreeView onItemVisibleChanged", itemData.Id, itemData.Visible);
-//                if (itemData.Parent){
-//                    itemData.Parent.Visible = itemData.Visible;
-//                }
-//            }
-
-//            onItemActiveChanged: {
-//                if (itemData.Parent){
-//                    if (itemData.Parent.Active != itemData.Active){
-//                        itemData.Parent.Active = itemData.Active;
-//                    }
-//                }
-
-//                 if (itemData.Children){
-//                     let children = itemData.Children;
-//                     for (let child of children){
-//                         if (child.Active != itemActive){
-//                             child.Active = itemActive;
-//                         }
-//                     }
-//                 }
-//            }
-
-//            onStateChanged: {
-//                if (itemData.Children && state != Qt.PartiallyChecked){
-//                    let children = itemData.Children;
-//                    for (let child of children){
-//                        if (child.Active && child.State != state){
-//                            child.State = state;
-//                        }
-//                    }
-//                }
-
-//                if (itemData.Parent && itemData.Parent.Active){
-//                    let isAllChecked = checkState(itemData.Parent, Qt.Checked);
-//                    let isAllUnchecked = checkState(itemData.Parent, Qt.Unchecked);
-
-//                    if (isAllChecked){
-//                        if (itemData.Parent.State != Qt.Checked){
-//                            itemData.Parent.State = Qt.Checked
-//                        }
-//                    }
-//                    else if (isAllUnchecked){
-//                        if (itemData.Parent.State != Qt.Unchecked){
-//                            itemData.Parent.State = Qt.Unchecked
-//                        }
-//                    }
-//                    else if (!isAllChecked && !isAllUnchecked){
-//                        if (itemData.Parent.State != Qt.PartiallyChecked){
-//                            itemData.Parent.State = Qt.PartiallyChecked
-//                        }
-//                    }
-//                }
-
-//                treeViewContainer.itemStateChanged(itemData);
-//            }
-//        }
-//    }
 
     ListView {
         id: mainTreeView;

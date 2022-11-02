@@ -52,16 +52,16 @@ DocumentBase {
         commandsDelegate.undoRedoManager = undoRedoManager;
     }
 
-//    UndoRedoManager {
-//        id: undoRedoManager;
+    UndoRedoManager {
+        id: undoRedoManager;
 
-//        commandsId: packageViewContainer.commandsId;
-//        editorItem: packageViewContainer;
+        commandsId: packageViewContainer.commandsId;
+        editorItem: packageViewContainer;
 
-//        onModelParsed: {
-//            updateGui();
-//        }
-//    }
+        onModelParsed: {
+            updateGui();
+        }
+    }
 
     function updateGui(){
         console.log("PackageView updateGui", documentModel.toJSON())
@@ -174,6 +174,8 @@ DocumentBase {
 
             visible: itemId !== "" && collectionView.selectedIndex != null;
 
+            undoRedoManager: undoRedoManager;
+
             itemDelegate: PackageTreeItemDelegate {
                 width: treeView.width;
             }
@@ -183,26 +185,12 @@ DocumentBase {
                 model.Parse(json);
             }
 
-            onItemStateChanged: {
-               // undoRedoManager.beginChanges();
-
-                timer.start(500);
-            }
-
             function refreshModel(){
                 console.log("PackageView refreshModel");
                 clearModel();
                 let json = treeViewModel.modelTreeView.toJSON();
                 model.Parse(json);
                 model.Refresh();
-            }
-        }
-
-        Timer {
-            id: timer;
-
-            onTriggered: {
-              //  undoRedoManager.endChanges();
             }
         }
     }
