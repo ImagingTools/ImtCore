@@ -6,7 +6,7 @@ Item {
 
     height: 40;
 
-    focus: textField.activeFocus;
+   // focus: textField.activeFocus;
 
     property alias text: textField.text;
     property alias acceptableInput: textField.acceptableInput;
@@ -17,6 +17,8 @@ Item {
     property alias horizontalAlignment: textField.horizontalAlignment;
     property alias borderWidth: mainRect.border.width;
     property alias color: mainRect.color;
+
+    property alias maximumLength: textField.maximumLength;
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;

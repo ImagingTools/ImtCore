@@ -86,7 +86,7 @@ Item {
 
     Component.onCompleted: {
         console.log("Style onCompleted");
-       styleContainer.changeSchemeDesign("");
+       //styleContainer.changeSchemeDesign("");
     }
 
     function getImageSource (name, styleTheme, buttonState, buttonMode)
@@ -138,7 +138,9 @@ Item {
     }
 
     function parseStyleTheme(themeType){
+        console.log("parseStyleTheme", themeType);
         let dataSource = themeType.GetData("source");
+        console.log("dataSource", dataSource.toJSON());
         Style.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
         Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
         Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
@@ -207,26 +209,33 @@ Item {
 
         onStateChanged: {
             console.log("State:", this.state, styleQuery);
+            console.log("AAAAA");
             if (this.state === "Ready") {
-
+                console.log("BBBBB");
                 var dataModelLocal;
 
                 if (styleQuery.ContainsKey("errors")){
                     return;
                 }
 
+                console.log("styleQuery");
                 if (styleQuery.ContainsKey("data")){
                     dataModelLocal = styleQuery.GetData("data");
 
+                    console.log("data");
+
                     if(dataModelLocal.ContainsKey("GetStyle")) {
+                        console.log("GetStyle");
                         dataModelLocal = dataModelLocal.GetData("GetStyle");
                     }
 
                     if (dataModelLocal.ContainsKey("theme")){
+                        console.log("theme");
                         styleContainer.theme = dataModelLocal.GetData("theme");
                     }
 
                     if(dataModelLocal.ContainsKey("source")){
+                        console.log("source");
                         styleContainer.parseStyleTheme(dataModelLocal);
                     }
                 }

@@ -8,12 +8,14 @@ Rectangle {
 
     color: Style.dialogBackgroundColor;
 
+    signal accepted();
+
+    property string login;
+
     MouseArea {
         anchors.fill: parent;
 
-        onClicked: {
-            authPageContainer.visible = false;
-        }
+        onClicked: {}
     }
 
     Rectangle {
@@ -26,14 +28,8 @@ Rectangle {
         height: 380;
 
         radius: 3;
-
         clip: true;
-
         color: Style.backgroundColor;
-
-        property Item root;
-
-        property string userToken;
 
         Rectangle{
             id: headerRec;
@@ -57,139 +53,186 @@ Rectangle {
                 text: qsTr("Welcome to Lisa");
             }
 
-            Text{
-                id: loginText;
+//            Text{
+//                id: loginText;
 
-                anchors.top: welcomeText.bottom;
-                anchors.topMargin: 20;
-                anchors.left: parent.left;
-                anchors.leftMargin: (parent.width-loginText.width)/2;
+//                anchors.top: welcomeText.bottom;
+//                anchors.topMargin: 20;
+//                anchors.left: parent.left;
+//                anchors.leftMargin: (parent.width-loginText.width)/2;
+
+//                color: Style.textColor;
+//                font.family: Style.fontFamily;
+//                font.pixelSize: Style.fontSize_common;
+//                text: qsTr("Please login");
+//            }
+        }
+
+        Column {
+            id: bodyColumn;
+
+            anchors.top: headerRec.bottom;
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            spacing: 7;
+
+            Text {
+                id: titleLogin;
+
+                text: qsTr("Login");
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
-                text: qsTr("Please login");
             }
-        }
 
-        CustomTextField {
-            id: loginTextInput;
+            CustomTextField {
+                id: loginTextInput;
 
-            anchors.left: parent.left;
-            anchors.top: headerRec.bottom;
-            anchors.topMargin: 50;
-            anchors.leftMargin: 75;
+                width: 300;
+                height: 30;
 
-            width: loginContainer.width - 150;
-            height: 30;
+                placeHolderText: qsTr("Enter the login");
 
-            placeHolderText: qsTr("Enter the login");
+                KeyNavigation.tab: passwordTextInput;
 
-            onTextChanged: {
-                console.log("LoginTextInput onInputTextChanged");
-            }
-        }
-
-        CustomTextField {
-            id: passwordTextInput;
-
-            anchors.left: parent.left;
-            anchors.top: loginTextInput.bottom;
-            anchors.topMargin: 30;
-            anchors.leftMargin: 75;
-
-            width: loginContainer.width - 150;
-            height: 30;
-
-            placeHolderText: qsTr("Enter the password");
-            echoMode: TextInput.Password
-
-            onTextChanged: {
-                console.log("PasswordTextInput onInputTextChanged");
-            }
-        }
-
-        Rectangle{
-            id: footerRec;
-
-            width: passwordTextInput.width;
-
-            anchors.left: parent.left;
-            anchors.top: passwordTextInput.bottom;
-            anchors.topMargin: 10;
-            anchors.leftMargin: 75;
-
-            CheckBox{
-                id: checkRemember;
-
-                anchors.left: parent.left;
-                anchors.top: parent.top;
-                anchors.topMargin: 10;
-                anchors.leftMargin: 10;
-
-                checkState: Qt.Unchecked;
-
-                onClicked: {
-                    if (checkRemember.checkState == Qt.Unchecked){
-                        checkRemember.checkState = Qt.Checked
+                onTextChanged: {
+                    if (errorMessage.text != ""){
+                        errorMessage.text = "";
                     }
-                    else{
-                       checkRemember.checkState = Qt.Unchecked
+                }
+
+                onAccepted: {
+                    if (passwordTextInput.text != "" && loginTextInput.text != ""){
+                        loginButton.clicked();
                     }
                 }
             }
 
-            Text{
-                id: rememberText;
+            Text {
+                id: titlePassword;
 
-                anchors.top: parent.top;
-                anchors.topMargin: 7;
-                anchors.left: checkRemember.right;
-                anchors.leftMargin: 7;
+                text: qsTr("Password");
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_small;
-                text: qsTr("Remember me");
+                font.pixelSize: Style.fontSize_common;
             }
 
-            Text{
-                id: forgotText;
+            CustomTextField {
+                id: passwordTextInput;
 
-                anchors.top: parent.top;
-                anchors.topMargin: 7;
-                anchors.left: rememberText.right;
-                anchors.leftMargin: 120;
+                width: 300;
+                height: 30;
 
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_small;
-    //            text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
-                onLinkActivated: {
-                    Qt.openUrlExternally(link)
+                placeHolderText: qsTr("Enter the password");
+                echoMode: TextInput.Password
+
+                KeyNavigation.tab: loginTextInput;
+
+                onTextChanged: {
+                    if (errorMessage.text != ""){
+                        errorMessage.text = "";
+                    }
+                }
+
+                onAccepted: {
+                    if (passwordTextInput.text != "" && loginTextInput.text != ""){
+                        loginButton.clicked();
+                    }
                 }
             }
-        }
 
-        AuxButton {
-            id: loginButton;
+            Text {
+                id: errorMessage;
 
-            anchors.top: footerRec.bottom;
-            anchors.left: parent.left;
-            anchors.topMargin: 50;
-            anchors.leftMargin: (parent.width - width)/2;
+                color: Style.errorTextColor;
 
-            width: 100;
-            height: 30;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
 
-            hasText: true;
-            textButton: qsTr("Login");
-            color: Style.buttonColor;
-            onClicked: {
-                console.log("LoginDialog loginButton onClicked");
-
-                authorizationGqlModel.authorization();
+                visible: errorMessage.text != "";
             }
+
+//            Item {
+//                id: remember;
+
+//                width: parent.width;
+//                height: 40;
+
+//                CheckBox {
+//                    id: checkRemember;
+
+//                    anchors.verticalCenter: parent.verticalCenter;
+
+//                    checkState: Qt.Unchecked;
+
+//                    onClicked: {
+//                        if (checkRemember.checkState == Qt.Unchecked){
+//                            checkRemember.checkState = Qt.Checked
+//                        }
+//                        else{
+//                           checkRemember.checkState = Qt.Unchecked
+//                        }
+//                    }
+//                }
+
+//                Text {
+//                    id: rememberText;
+
+//                    anchors.left: checkRemember.right;
+//                    anchors.leftMargin: 7;
+//                    anchors.verticalCenter: parent.verticalCenter;
+
+//                    color: Style.textColor;
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_small;
+//                    text: qsTr("Remember me");
+//                }
+//                Text{
+//                    id: forgotText;
+
+//                    anchors.top: parent.top;
+//                    anchors.topMargin: 7;
+//                    anchors.left: rememberText.right;
+//                    anchors.leftMargin: 120;
+
+//                    color: Style.textColor;
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_small;
+//                    //            text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
+//                    onLinkActivated: {
+//                        Qt.openUrlExternally(link)
+//                    }
+//                }
+//            }
+
+             Item {
+                 id: buttonItem;
+
+                 width: parent.width;
+                 height: 100;
+
+                 AuxButton {
+                     id: loginButton;
+
+                     anchors.horizontalCenter: parent.horizontalCenter;
+                     anchors.verticalCenter: parent.verticalCenter;
+
+                     width: 100;
+                     height: 30;
+
+                     hasText: true;
+                     textButton: qsTr("Login");
+                     color: Style.buttonColor;
+
+                     enabled: loginTextInput.text != "" && passwordTextInput.text != "";
+
+                     onClicked: {
+                         authorizationGqlModel.authorization();
+                     }
+                 }
+             }
         }
     }
 
@@ -206,12 +249,7 @@ Rectangle {
 
             query.AddParam(inputParams);
 
-//            var queryFields = Gql.GqlObject("items");
-//            queryFields.InsertField("UserMode");
-//            query.AddField(queryFields);
-
             var gqlData = query.GetQuery();
-            console.log("TopPanel GqlModel getUserMode query ", gqlData);
 
             this.SetGqlQuery(gqlData);
         }
@@ -222,32 +260,32 @@ Rectangle {
                 var dataModelLocal;
 
                 if (authorizationGqlModel.ContainsKey("errors")){
+                    dataModelLocal = authorizationGqlModel.GetData("errors")
+                     dataModelLocal = dataModelLocal.GetData("UserAuthorization")
+
+                    let message = dataModelLocal.GetData("message");
+                    errorMessage.text = message;
+
                     return;
                 }
 
                 if (authorizationGqlModel.ContainsKey("data")){
-                    dataModelLocal = modelUserMode.GetData("data")
-//                    if (dataModelLocal.ContainsKey("GetUserMode")){
-//                        dataModelLocal = dataModelLocal.GetData("GetUserMode");
-//                        if(dataModelLocal.ContainsKey("items")){
-//                            dataModelLocal = dataModelLocal.GetData("items");
-//                            if(dataModelLocal.ContainsKey("Value")){
-//                                dataModelLocal = dataModelLocal.GetData("Value");
-//                                if (dataModelLocal == 0){
-//                                    loginDialog = false
-//                                }
-//                                else{
-//                                    loginDialog = true
-//                                }
-//                                if (dataModelLocal == 2){
-//                                    var source = "AuxComponents/LoginDialog.qml";
-//                                    var parameters = {};
-//                                    parameters["localSettings"] = thumbnailDecoratorContainer.localSettings;
-//                                    thumbnailDecoratorContainer.openDialog(source, parameters);
-//                                }
-//                            }
-//                        }
-//                    }
+                    dataModelLocal = authorizationGqlModel.GetData("data")
+
+                    if (dataModelLocal.ContainsKey("UserAuthorization")){
+                        dataModelLocal = dataModelLocal.GetData("UserAuthorization")
+
+                        if (dataModelLocal.ContainsKey("Token")){
+                            let token = dataModelLocal.GetData("Token")
+
+                            this.SetGlobalAccessToken(token);
+
+                            let login = dataModelLocal.GetData("Login")
+                            authPageContainer.login = login;
+
+                            accepted();
+                        }
+                    }
                 }
             }
         }

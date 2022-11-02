@@ -243,8 +243,6 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 }
 
 
-
-
 // reimplemented (IObjectCollectionInfo)
 
 const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo() const

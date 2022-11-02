@@ -74,6 +74,21 @@ I_EXPORT_COMPONENT(
 			"Adapting the collection to the provider",
 			"Role Collection Adapter");
 
+I_EXPORT_COMPONENT(
+			CheckPermissions,
+			"Check permissions",
+			"Check Permissions");
+
+I_EXPORT_COMPONENT(
+			PermissionsProvider,
+			"Permissions provider",
+			"Permissions Provider");
+
+I_EXPORT_COMPONENT(
+			CollectionPermissionsProvider,
+			"Collection permissions provider",
+			"Collection Permissions Provider");
+
 
 } // namespace ImtAuthPck
 

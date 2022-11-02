@@ -17,8 +17,8 @@ void CUserInfoComp::OnComponentCreated()
 		m_permissionProviderPtr = m_featuresCompPtr.GetPtr();
 	}
 
-	if (m_rolesCompPtr.IsValid()){
-		m_roleProviderPtr = m_rolesCompPtr.GetPtr();
+	if (m_roleProviderCompPtr.IsValid()){
+		m_roleProviderPtr = m_roleProviderCompPtr.GetPtr();
 	}
 }
 

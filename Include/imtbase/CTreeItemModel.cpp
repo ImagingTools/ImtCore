@@ -732,6 +732,12 @@ void CTreeItemModel::OnEndChanges(const ChangeSet& changeSet)
 }
 
 
+void CTreeItemModel::OnBeginChanges()
+{
+	BaseClass::OnBeginChanges();
+}
+
+
 } // namespace imtbase
 
 

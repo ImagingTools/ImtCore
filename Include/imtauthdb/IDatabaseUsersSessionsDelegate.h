@@ -16,7 +16,7 @@ namespace imtauthdb
 class IDatabaseUsersSessionsDelegate: virtual public istd::IPolymorphic
 {
 public:
-	virtual QList<QUuid> GetAllTokens(con st QByteArray& userId) const = 0;
+	virtual QList<QUuid> GetAllTokens(const QByteArray& userId) const = 0;
 	virtual QByteArray CreateInsertNewTokenQuery(const QByteArray& userId) const = 0;
 	virtual QByteArray CreateDeleteTokenQuery(const QUuid& uuid) const = 0;
 

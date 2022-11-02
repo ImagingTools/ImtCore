@@ -26,35 +26,19 @@ const imtlic::IFeatureInfoProvider *CUserInfo::GetPermissionProvider() const
 }
 
 
-const imtbase::IObjectCollection* CUserInfo::GetRoleProvider() const
+const imtauth::IRoleInfoProvider* CUserInfo::GetRoleProvider() const
 {
 	return m_roleProviderPtr;
 }
 
 
-QByteArray CUserInfo::GetId() const
-{
-	return m_userId;
-}
-
-
-void CUserInfo::SetId(QByteArray id)
-{
-	if (m_userId != id){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_userId = id;
-	}
-}
-
-
-QString CUserInfo::GetUsername() const
+QByteArray CUserInfo::GetUsername() const
 {
 	return m_username;
 }
 
 
-void CUserInfo::SetUsername(QString username)
+void CUserInfo::SetUsername(const QByteArray& username)
 {
 	if (m_username != username){
 		istd::CChangeNotifier changeNotifier(this);
@@ -70,7 +54,7 @@ QString CUserInfo::GetName() const
 }
 
 
-void CUserInfo::SetName(QString name)
+void CUserInfo::SetName(const QString& name)
 {
 	if (m_name != name){
 		istd::CChangeNotifier changeNotifier(this);
@@ -86,7 +70,7 @@ QByteArray CUserInfo::GetPasswordHash() const
 }
 
 
-void CUserInfo::SetPasswordHash(QByteArray passwordHash)
+void CUserInfo::SetPasswordHash(const QByteArray& passwordHash)
 {
 	if (m_passwordHash != passwordHash){
 		istd::CChangeNotifier changeNotifier(this);
@@ -102,7 +86,7 @@ QString CUserInfo::GetMail() const
 }
 
 
-void CUserInfo::SetMail(QString mail)
+void CUserInfo::SetMail(const QString& mail)
 {
 	if (m_mail != mail){
 		istd::CChangeNotifier changeNotifier(this);
@@ -116,20 +100,16 @@ IUserInfo::FeatureIds CUserInfo::GetPermissions() const
 {
 	IUserInfo::FeatureIds allPermissions;
 
-//	for (QByteArray roleId : m_userRoles){
-//		const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
-//		allPermissions += rolePtr->GetPermissions();
-//	}
+	if (m_roleProviderPtr != nullptr){
+		for (QByteArray roleId : m_userRoles){
+			const IRole* rolePtr = m_roleProviderPtr->GetRole(roleId);
+			if (rolePtr != nullptr){
+				allPermissions += rolePtr->GetPermissions();
+			}
+		}
+	}
 
-//	allPermissions += m_userPermissions;
-
-//	for (QByteArray roleId : m_userRoles){
-//		const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(m_roleProviderPtr->GetObjectPtr(roleId));
-//		IRole::FeatureIds prohibitions = rolePtr->GetProhibitions();
-//		for (const QByteArray& prohibitionId : prohibitions){
-//			allPermissions.remove(prohibitionId);
-//		}
-//	}
+	allPermissions += m_userPermissions;
 
 	return allPermissions;
 }
@@ -187,11 +167,6 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 	bool retVal = true;
-
-	static iser::CArchiveTag userIdTag("UserId", "ID of user", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(userIdTag);
-	retVal = retVal && archive.Process(m_userId);
-	retVal = retVal && archive.EndTag(userIdTag);
 
 	static iser::CArchiveTag usernameTag("Username", "Username of user", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(usernameTag);
@@ -255,7 +230,7 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
-		m_userId = sourcePtr->m_userId;
+
 		m_username = sourcePtr->m_username;
 		m_name = sourcePtr->m_name;
 		m_passwordHash = sourcePtr->m_passwordHash;
@@ -263,6 +238,8 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 		m_userPermissions = sourcePtr->m_userPermissions;
 		m_userRestrictions = sourcePtr->m_userRestrictions;
 		m_userRoles = sourcePtr->m_userRoles;
+		m_roleProviderPtr = sourcePtr->m_roleProviderPtr;
+
 		return true;
 	}
 
@@ -284,7 +261,7 @@ istd::IChangeable *CUserInfo::CloneMe(CompatibilityMode mode) const
 bool CUserInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
-	m_userId.clear();
+
 	m_username.clear();
 	m_name.clear();
 	m_passwordHash.clear();
@@ -292,9 +269,10 @@ bool CUserInfo::ResetData(CompatibilityMode mode)
 	m_userPermissions.clear();
 	m_userRestrictions.clear();
 	m_userRoles.clear();
+	m_roleProviderPtr = nullptr;
+
 	return true;
 }
-
 
 
 } // namespace imtauth

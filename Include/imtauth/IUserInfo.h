@@ -3,8 +3,11 @@
 
 // ACF includes
 #include <iser/IObject.h>
+
+// ImtCore includes
 #include <imtauth/IRole.h>
 #include <imtauth/IRoleInfoProvider.h>
+
 
 namespace imtauth
 {
@@ -78,27 +81,17 @@ public:
 	/**
 		Get list of all availiable roles for this user.
 	*/
-	virtual const imtbase::IObjectCollection* GetRoleProvider() const = 0;
-
-	/**
-		Get id of the user.
-	*/
-	virtual QByteArray GetId() const = 0;
-
-	/**
-		Set id of the user.
-	*/
-	virtual void SetId(QByteArray id) = 0;
+	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const = 0;
 
 	/**
 		Get username of the user.
 	*/
-	virtual QString GetUsername() const = 0;
+	virtual QByteArray GetUsername() const = 0;
 
 	/**
 		Set username of the user.
 	*/
-	virtual void SetUsername(QString username) = 0;
+	virtual void SetUsername(const QByteArray& username) = 0;
 
 	/**
 		Get name of the user.
@@ -108,7 +101,7 @@ public:
 	/**
 		Set name of the user.
 	*/
-	virtual void SetName(QString name) = 0;
+	virtual void SetName(const QString& name) = 0;
 
 	/**
 		Get password hash of the user.
@@ -118,7 +111,7 @@ public:
 	/**
 		Set password hash of the user.
 	*/
-	virtual void SetPasswordHash(QByteArray passwordHash) = 0;
+	virtual void SetPasswordHash(const QByteArray& passwordHash) = 0;
 
 	/**
 		Get e-mail of the user.
@@ -128,7 +121,7 @@ public:
 	/**
 		Set e-mail of the user.
 	*/
-	virtual void SetMail(QString mail) = 0;
+	virtual void SetMail(const QString& mail) = 0;
 
 	/**
 		Get permissions of user.

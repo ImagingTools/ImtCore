@@ -5,6 +5,7 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpServletCompBase.h>
 #include <imtgql/IGqlRepresentationDataController.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtgql
@@ -18,6 +19,9 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_ASSIGN_MULTI_0(m_gqlRepresentationDataControllerCompPtr, "GqlRepresentationDataController", "Gql representationDataController", true);
+		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
+		I_ASSIGN(m_settingsCollectionCompPtr, "SettingsCollection", "Settings collection", true, "SettingsCollection");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -37,6 +41,9 @@ private:
 
 private:
 	I_MULTIREF(imtgql::IGqlRepresentationDataController, m_gqlRepresentationDataControllerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_settingsCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 };
 
 

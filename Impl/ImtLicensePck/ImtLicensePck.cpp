@@ -84,6 +84,16 @@ I_EXPORT_COMPONENT(
 			"Feature Container",
 			"Feature Container Collection Package");
 
+I_EXPORT_COMPONENT(
+			ProductInfoProvider,
+			"Product info provider",
+			"Product Info Provider");
+
+I_EXPORT_COMPONENT(
+			CollectionProductInfoProvider,
+			"Collection product info provider",
+			"Collection Product Info Provider");
+
 
 } // namespace ImtLicensePck
 

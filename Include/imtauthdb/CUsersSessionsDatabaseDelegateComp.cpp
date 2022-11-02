@@ -3,9 +3,11 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
+#include <imtauth/CSessionInfo.h>
+#include <imtauth/CUserInfo.h>
 
 
-namespace imtlicdb
+namespace imtauthdb
 {
 
 
@@ -19,7 +21,22 @@ istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(co
 		return nullptr;
 	}
 
-	return nullptr;
+	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
+
+	QUuid token;
+	if (record.contains("AccessToken")){
+		token = record.value("AccessToken").toUuid();
+		sessionInfoPtr->SetToken(token);
+	}
+
+	QByteArray userId;
+	if (record.contains("UserId")){
+		userId = record.value("UserId").toByteArray();
+	}
+
+	sessionInfoPtr->SetUserId(userId);
+
+	return sessionInfoPtr.PopPtr();
 }
 
 
@@ -30,7 +47,23 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 			const QString& objectDescription,
 			const istd::IChangeable* valuePtr) const
 {
-	return NewObjectQuery();
+	const imtauth::ISession* sessionPtr = dynamic_cast<const imtauth::ISession*>(valuePtr);
+	if (sessionPtr == nullptr){
+		return NewObjectQuery();
+	}
+
+	QUuid token = sessionPtr->GetToken();
+
+	QByteArray userId = sessionPtr->GetUserId();;
+
+	NewObjectQuery retVal;
+
+	retVal.query += QString("\nINSERT INTO \"UsersSessions\" (AccessToken, UserId, LastActivity) VALUES ('%1', '%2', '%3');")
+			.arg(token.toString())
+			.arg(qPrintable(userId))
+			.arg(QDateTime::currentDateTime().toString(Qt::ISODate)).toLocal8Bit();
+
+	return retVal;
 }
 
 
@@ -69,6 +102,6 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-} // namespace imtlicdb
+} // namespace imtauthdb
 
 

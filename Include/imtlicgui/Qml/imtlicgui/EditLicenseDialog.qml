@@ -13,8 +13,6 @@ Dialog {
     property string valueId: null;
     property string valueName: null;
 
-    property bool autoGenerate: false;
-
     property TreeItemModel licensesModel;
 
     property int index: -1;

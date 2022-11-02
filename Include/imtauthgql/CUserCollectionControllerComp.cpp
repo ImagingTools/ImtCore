@@ -15,7 +15,7 @@ namespace imtauthgql
 
 QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
-	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 
 	if (metaInfo.IsValid()){
 		if (informationId == QByteArray("Username")){

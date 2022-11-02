@@ -20,7 +20,7 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(
 		const QByteArray &informationId,
 		const QByteArray &objectId) const
 {
-	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	if (metaInfo.IsValid()){
 		if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);

@@ -9,6 +9,14 @@ Item {
 
     property string commandsId;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("CommandsDecoratorClear", clearModel);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("CommandsDecoratorClear", clearModel);
+    }
+
     function setCommandsModel(parameters){
         console.log("CommandsDecorator setCommandsModel", parameters, commandsDecoratorContainer);
         let model = parameters["Model"];
@@ -16,6 +24,10 @@ Item {
 
         commandsDecoratorContainer.commandsId = commId;
         repeaterCommands.model = model;
+    }
+
+    function clearModel(){
+        repeaterCommands.model = 0;
     }
 
     Row {

@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5005" Description="ACF"/>
+            <Version Id="0" Number="5026" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -30,6 +30,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RelativeFileNameParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Pasword" Type="Id" ExportId="Password">
+                        <Data IsEnabled="true" Value="root"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Port" Type="Integer" ExportId="PgPort">
                         <Data IsEnabled="true" Value="5432"/>

@@ -23,11 +23,16 @@ I_EXPORT_COMPONENT(
 			EncryptionBasePersistence,
 			"Persistence based on encrypted data",
 			"Persistence Encryption Decryption")
-			
+
 I_EXPORT_COMPONENT(
 			StaticEncryptionKeyProvider,
 			"Static provider of the encryption keys",
 			"Keys AES RSA Encryption Decryption");
+
+I_EXPORT_COMPONENT(
+			HashCalculator,
+			"MD5 Hash Calculator",
+			"MD5 Hash Calculator");
 
 
 } // namespace ImtCryptPck

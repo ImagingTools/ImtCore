@@ -29,5 +29,6 @@
         <file alias="imtlicgui/ProductTreeViewController.qml">Qml/imtlicgui/ProductTreeViewController.qml</file>
         <file alias="imtlicgui/PackageTreeViewController.qml">Qml/imtlicgui/PackageTreeViewController.qml</file>
 	<file alias="imtlicgui/InstallationLicensesController.qml">Qml/imtlicgui/InstallationLicensesController.qml</file>
+	<file alias="imtlicgui/PackageTreeItemDelegate.qml">Qml/imtlicgui/PackageTreeItemDelegate.qml</file>
     </qresource>
 </RCC>

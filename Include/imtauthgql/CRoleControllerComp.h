@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
 #include <imtauth/IRole.h>
+#include <imtauth/IPermissionsProvider.h>
 
 
 namespace imtauthgql
@@ -17,7 +18,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRoleControllerComp);
 		I_ASSIGN(m_roleFactCompPtr, "RoleFactory", "Factory used for creation of the new role", true, "RoleFactory");
-		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product collection", true, "ProductCollection");
+		I_ASSIGN(m_productProviderCompPtr, "ProductProvider", "Product provider", true, "ProductProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -26,7 +27,7 @@ protected:
 
 private:
 	I_FACT(imtauth::IRole, m_roleFactCompPtr);
-	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
+	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
 };
 
 

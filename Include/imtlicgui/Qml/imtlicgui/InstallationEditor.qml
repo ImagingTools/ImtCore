@@ -11,6 +11,8 @@ DocumentBase {
 //    commandsDelegate: InstallationEditorCommandsDelegate {}
     commandsDelegatePath: "../../imtlicgui/InstallationEditorCommandsDelegate.qml";
 
+//    property bool instanceIdAcceptable: helperInput.acceptableInput;
+
     onDocumentModelChanged: {
 
         let activeLicensesModel = documentModel.GetData("ActiveLicenses");
@@ -99,18 +101,44 @@ DocumentBase {
             }
 
             CustomTextField {
+                id: helperInput;
+                visible: false;
+                textInputValidator: regexValid;
+
+                onTextChanged: {
+                    errorMessage.visible = !acceptableInput;
+                }
+            }
+
+            CustomTextField {
                 id: instanceIdInput;
 
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the instance ID");
+                placeHolderText: qsTr("Enter the instance-ID");
 
-                textInputValidator: regexValid;
+                borderColor: helperInput.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+
+                maximumLength: 17;
 
                 onTextChanged: {
+                    helperInput.text = instanceIdInput.text;
                     documentModel.SetData("Id", instanceIdInput.text);
                 }
+            }
+
+            Text {
+                id: errorMessage;
+
+                color: Style.errorTextColor;
+
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Incorrect input instance-ID");
+
+                visible: false;
             }
 
             Text {

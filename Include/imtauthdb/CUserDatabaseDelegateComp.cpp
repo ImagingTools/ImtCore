@@ -361,31 +361,18 @@ idoc::MetaInfoPtr CUserDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArr
 
 bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (record.contains("Name")){
-		QString name = record.value("Name").toString();
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
+	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
+		idoc::MetaInfoPtr retVal;
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "UserInfo", retVal)){
+			Q_ASSERT(retVal.IsValid());
 
-		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_NAME, name);
+			return metaInfo.CopyFrom(*retVal);
+		}
 	}
 
-	if (record.contains("UserId")){
-		QString userName = record.value("UserId").toString();
+	return false;
 
-		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_USERNAME, userName);
-	}
-
-	if (record.contains("Email")){
-		QString email = record.value("Email").toString();
-
-		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_EMAIL, email);
-	}
-
-	if (record.contains("Description")){
-		QString description = record.value("Description").toString();
-
-		metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_DESCRIPTION, description);
-	}
-
-	return true;
 }
 
 

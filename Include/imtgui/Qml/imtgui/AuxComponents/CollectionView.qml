@@ -139,8 +139,6 @@ Item {
         tableData: collectionViewBase.table;
 
         contentVisible: collectionViewBase.table.selectedIndex != -1;
-
-        color: Style.backgroundColor;
     }
 }
 

@@ -41,7 +41,7 @@ public:
 
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields) override;
+	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 	virtual imtbase::CTreeItemModel* UpdateBaseModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
 				imtbase::CTreeItemModel* baseModel) override;

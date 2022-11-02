@@ -32,6 +32,17 @@ Rectangle {
         preferenceDialog.updateModel();
     }
 
+    function clearModels(){
+        console.log("ThumbnailDecorator clearModels");
+        console.log("menuPanel.model1", menuPanel.model.toJSON());
+
+        menuPanel.clearModels();
+        pagesManager.clearModels();
+
+        preferenceDialog.clearModels();
+        Events.sendEvent("CommandsDecoratorClear");
+    }
+
     MenuPanel {
         id: menuPanel;
 
@@ -101,6 +112,21 @@ Rectangle {
         preferenceDialog.visible = visible;
     }
 
+    AuthorizationPage {
+        id: authorizationPage;
+
+        anchors.fill: parent;
+        anchors.topMargin: 60;
+
+        visible: !preferenceDialog.visible;
+
+        onAccepted: {
+            visible = false;
+
+            updateAllModels();
+        }
+    }
+
     PreferencePage {
         id: preferenceDialog;
 
@@ -112,14 +138,6 @@ Rectangle {
 
         visible: false;
     }
-
-//    AuthorizationPage {
-//        id: authorizationPage;
-
-//        z: 20;
-
-//        anchors.fill: parent;
-//    }
 
     ModalDialogManager {
         id: modalDialogManager;

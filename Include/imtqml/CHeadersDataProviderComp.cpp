@@ -22,7 +22,8 @@ QByteArray CHeadersDataProviderComp::GetModelId() const
 
 imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 		const QList<imtgql::CGqlObject>& params,
-		const QByteArrayList& /*fields*/)
+		const QByteArrayList& /*fields*/,
+		const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
 

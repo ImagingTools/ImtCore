@@ -3,13 +3,15 @@ import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
 
-Rectangle {
+Flickable {
     id: collectionMetaInfo;
 
-    height: parent.height;
     width: 200;
 
-    color: Style.backgroundColor;
+    contentWidth: width;
+    contentHeight: height + 50;
+
+    boundsBehavior: Flickable.StopAtBounds;
 
     property string gqlModelMetaInfo;
 
@@ -21,8 +23,10 @@ Rectangle {
 
     property Item tableData;
 
-    onModelDataChanged: {
-        console.log("MetaInfo onModelDataChanged", collectionMetaInfo.modelData);
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.backgroundColor;
     }
 
     Column {
@@ -78,7 +82,6 @@ Rectangle {
 
                     width: collectionMetaInfo.width;
 
-
                     Repeater {
                         id: repeaterChilds;
 
@@ -110,7 +113,7 @@ Rectangle {
                 }
             }
         }
-    }
+    }//Column main
 
     function getMetaInfo(){
         metaInfo.getMetaInfo();

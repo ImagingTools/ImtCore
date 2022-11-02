@@ -75,7 +75,7 @@ Rectangle {
             anchors.left: checkBoxPermission.right;
             anchors.leftMargin: 10;
 
-            text: model.Id;
+            text: model.Name;
 
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;

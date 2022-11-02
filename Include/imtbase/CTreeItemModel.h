@@ -41,10 +41,11 @@ public:
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual void OnEndChanges(const ChangeSet& changeSet) override;
+	virtual void OnBeginChanges() override;
 
 public Q_SLOTS:
-
-    void SetParent(QObject *parent);
+	void SetParent(QObject *parent);
 	bool Copy(CTreeItemModel* object);
 	int InsertNewItem();
 	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
@@ -82,8 +83,6 @@ public Q_SLOTS:
 	virtual QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
 	virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 	virtual QHash<int, QByteArray> roleNames() const override;
-
-	virtual void OnEndChanges(const ChangeSet& changeSet) override;
 
 Q_SIGNALS:
 	void stateChanged(const QString& state);

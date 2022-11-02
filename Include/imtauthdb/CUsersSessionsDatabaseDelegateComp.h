@@ -6,7 +6,7 @@
 #include <imtlic/CFeaturePackage.h>
 
 
-namespace imtlicdb
+namespace imtauthdb
 {
 
 
@@ -46,6 +46,6 @@ public:
 };
 
 
-} // namespace imtlicdb
+} // namespace imtauthdb
 
 

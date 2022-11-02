@@ -4,8 +4,6 @@ import imtqml 1.0
 
 Rectangle {
     id: topRightPanel;
-
-
     property Item topPanel;
 
     property string decoratorSource;
@@ -30,7 +28,6 @@ Rectangle {
         }
     }
 
-
     Loader {
         id: decoratorLoader;
 
@@ -41,7 +38,5 @@ Rectangle {
             }
         }
     }
-
-
 }
 

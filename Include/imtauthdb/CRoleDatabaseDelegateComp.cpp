@@ -170,6 +170,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 
 	}
 
+	qDebug() << "retVal " << retVal.query;
+
 	return retVal;
 }
 

@@ -78,16 +78,14 @@ void CRole::SetRoleName(const QString& name)
 IRole::FeatureIds CRole::GetPermissions() const
 {
 	IRole::FeatureIds allPermissions;
-//	for (const QByteArray& roleId : m_parents){
-//		const IRole* role = m_roleInfoProviderPtr->GetRole(roleId);
-//		allPermissions += role->GetPermissions();
-//	}
+	for (const QByteArray& roleId : m_parents){
+		const IRole* role = m_roleInfoProviderPtr->GetRole(roleId);
+		if (role != nullptr){
+			allPermissions += role->GetPermissions();
+		}
+	}
 
-//	allPermissions += m_rolePermissions;
-
-//	for (const QByteArray& prohibitionId : m_roleRestrictions){
-//		allPermissions.remove(prohibitionId);
-//	}
+	allPermissions += m_rolePermissions;
 
 	return allPermissions;
 }

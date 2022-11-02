@@ -21,7 +21,8 @@ Item {
 
         anchors.left: parent.left;
 
-        width: 0.95 * topPanelDecorator.width;
+//        width: 0.95 * topPanelDecorator.width;
+        width: topPanelDecorator.width - rightPanel.width;
         height: topPanelDecorator.height;
 
         topPanel: topPanelDecorator.topPanel;
@@ -43,7 +44,8 @@ Item {
 
         anchors.right: parent.right;
 
-        width: topPanelDecorator.width - topCenterPanel.width;
+//        width: topPanelDecorator.width - topCenterPanel.width;
+        width: 100;
         height: topPanelDecorator.height;
 
         decoratorSource: Style.topRightPanelDecoratorPath;

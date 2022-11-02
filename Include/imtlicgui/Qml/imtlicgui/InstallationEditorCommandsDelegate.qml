@@ -11,8 +11,9 @@ DocumentWorkspaceCommandsDelegateBase {
     property int accountCurrentIndex: customerCB.currentIndex;
     property int productCurrentIndex: productCB.currentIndex;
 
-    Component.onCompleted: {
+    property bool instanceIdAcceptable: helperInput.acceptableInput;
 
+    Component.onCompleted: {
         updateItemTimer = 200;
         itemsModel.updateModel("AccountsList");
 
@@ -21,6 +22,14 @@ DocumentWorkspaceCommandsDelegateBase {
 
     onEntered: {
         objectModel.SetData("Name", value);
+    }
+
+    onInstanceIdAcceptableChanged: {
+        console.log("InstallationCommands onInstanceIdAcceptableChanged", instanceIdAcceptable);
+
+        if (!instanceIdAcceptable){
+            commandsProvider.changeCommandMode("Save", "Disabled");
+        }
     }
 
     Timer {
@@ -71,6 +80,18 @@ DocumentWorkspaceCommandsDelegateBase {
             }
         }
     }
+
+    function modelChanged(){
+        console.log("InstallationCommands modelChanged", instanceIdAcceptable);
+
+        if (instanceIdAcceptable){
+            commandsProvider.changeCommandMode("Save", "Normal");
+
+            let suffix = "*";
+            documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
+        }
+    }
+
 
     GqlModel {
         id: itemsModel;

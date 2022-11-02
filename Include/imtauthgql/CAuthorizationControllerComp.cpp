@@ -1,6 +1,11 @@
 #include <imtauthgql/CAuthorizationControllerComp.h>
 
 
+// ImtCore includes
+#include <imtauth/CUserInfo.h>
+#include <imtauth/CSessionInfo.h>
+
+
 namespace imtauthgql
 {
 
@@ -9,22 +14,70 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtg
 {
 	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
 
-	for (const imtgql::CGqlObject& gqlObject : *paramList){
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+
+	QByteArray login;
+	QByteArray password;
+
+	if (paramList->size() > 0){
+		if (paramList->at(0).GetFieldIds().contains("Login")){
+			login = paramList->at(0).GetFieldArgumentValue("Login").toByteArray();
+		}
+
+		if (paramList->at(0).GetFieldIds().contains("Password")){
+			password = paramList->at(0).GetFieldArgumentValue("Password").toByteArray();
+		}
 	}
 
-	return nullptr;
+	QByteArray passwordHash;
+	if (m_hashCalculatorCompPtr.IsValid()){
+		passwordHash = m_hashCalculatorCompPtr->Calculate(login + password);
+	}
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_userCollectionCompPtr->GetObjectData(login, dataPtr)){
+		const imtauth::CUserInfo* userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+		if (userInfoPtr != nullptr){
+			QByteArray userPassword = userInfoPtr->GetPasswordHash();
+			if (userPassword == passwordHash){
+				dataModel = new imtbase::CTreeItemModel();
+
+				QByteArray tokenValue = QUuid::createUuid().toByteArray();
+
+				dataModel->SetData("Token", tokenValue);
+				dataModel->SetData("Login", login);
+
+				istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
+
+				sessionInfoPtr->SetUserId(login);
+				sessionInfoPtr->SetToken(tokenValue);
+
+				if (m_sessionCollectionCompPtr.IsValid()){
+					m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
+				}
+
+				rootModelPtr->SetExternTreeModel("data", dataModel);
+
+				return rootModelPtr;
+			}
+		}
+	}
+
+	errorMessage = QT_TR_NOOP("Invalid username or password");
+
+	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
+	rootModelPtr->SetExternTreeModel("errors", errorsItemModelPtr);
+	errorsItemModelPtr->SetData("message", errorMessage);
+
+	return rootModelPtr;
 }
 
 
-bool CAuthorizationControllerComp::LoginMatch(const QString& login) const
+bool CAuthorizationControllerComp::LoginMatch(const QByteArray& login) const
 {
-	return false;
-}
-
-
-bool CAuthorizationControllerComp::PasswordMatch(const QString& login, const QString& password) const
-{
-	return false;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	return m_userCollectionCompPtr->GetObjectData(login, dataPtr);
 }
 
 

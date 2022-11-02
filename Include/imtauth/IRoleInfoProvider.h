@@ -42,6 +42,11 @@ public:
 		Get information for role by Role-ID and Product-ID.
 	*/
 	virtual const imtauth::IRole* GetRole(const QByteArray& roleId, const QByteArray& productId) const = 0;
+
+	/**
+		Get information for role by Object-ID.
+	*/
+	virtual const imtauth::IRole* GetRole(const QByteArray& objectId) const = 0;
 };
 
 

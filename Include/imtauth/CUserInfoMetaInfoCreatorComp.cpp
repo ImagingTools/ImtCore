@@ -37,6 +37,8 @@ bool CUserInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
+	QByteArray username = userPtr->GetUsername();
+	QString email =  userPtr->GetMail();
 	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_EMAIL, userPtr->GetMail());
 	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_NAME, userPtr->GetName());
 	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_USERNAME, userPtr->GetUsername());

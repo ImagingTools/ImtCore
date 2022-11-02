@@ -21,16 +21,20 @@ QByteArray CJoinDataProviderComp::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CJoinDataProviderComp::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields)
+imtbase::CTreeItemModel* CJoinDataProviderComp::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* rootModel = nullptr;
 	if (m_representationDataProviderCompPtr.GetCount() > 0){
 		rootModel = new imtbase::CTreeItemModel();
 		rootModel->SetIsArray(true);
 		for (int index = 0; index < m_representationDataProviderCompPtr.GetCount(); index++){
-			imtbase::CTreeItemModel* externModel = m_representationDataProviderCompPtr[index]->GetTreeItemModel(params, fields);
-			rootModel->InsertNewItem();
-			rootModel->CopyItemDataFromModel(index, externModel);
+			imtbase::CTreeItemModel* externModel = m_representationDataProviderCompPtr[index]->GetTreeItemModel(params, fields, gqlContext);
+			if (externModel != nullptr){
+				int itemIndex = rootModel->InsertNewItem();
+				QString json = externModel->toJSON();
+				rootModel->CopyItemDataFromModel(itemIndex, externModel);
+				QString json2 = rootModel->toJSON();
+			}
 		}
 	}
 

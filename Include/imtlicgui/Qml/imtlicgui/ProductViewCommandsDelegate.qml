@@ -34,7 +34,7 @@ DocumentWorkspaceCommandsDelegateBase {
         if (commandId === "New"){
             let elements = container.tableData.elements;
             let index = elements.InsertNewItem();
-            elements.SetData("Name", "Item Name", index);
+            elements.SetData("Name", "License Name", index);
             elements.SetData("Id", "", index);
             elements.SetData("Description", "", index);
 
@@ -73,7 +73,6 @@ DocumentWorkspaceCommandsDelegateBase {
             modalDialogManager.openDialog(editDialog, {"valueId":      id,
                                                        "valueName":    name,
                                                        "licensesModel":tableData.elements,
-                                                       "autoGenerate": true,
                                                        "index":        tableData.selectedIndex});
         }
 

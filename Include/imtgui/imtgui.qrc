@@ -86,6 +86,8 @@
         <file alias="imtgui/AuxComponents/TableTreeItemDelegate.qml">Qml/imtgui/AuxComponents/TableTreeItemDelegate.qml</file>
         <file alias="imtgui/AuxComponents/ModelIndex.qml">Qml/imtgui/AuxComponents/ModelIndex.qml</file>
         <file alias="imtgui/AuxComponents/TreeViewControllerBase.qml">Qml/imtgui/AuxComponents/TreeViewControllerBase.qml</file>
+        <file alias="imtgui/AuxComponents/UserPanel.qml">Qml/imtgui/AuxComponents/UserPanel.qml</file>
+        <file alias="imtgui/AuxComponents/UserPanelDelegate.qml">Qml/imtgui/AuxComponents/UserPanelDelegate.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

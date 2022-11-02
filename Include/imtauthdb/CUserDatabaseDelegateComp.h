@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtauth/CUserInfo.h>
+#include <imtcrypt/IHashCalculator.h>
 
 
 namespace imtauthdb
@@ -17,6 +18,7 @@ public:
 
 	I_BEGIN_COMPONENT(CUserDatabaseDelegateComp)
 		I_ASSIGN(m_userInfoFactCompPtr, "UserInfo", "Factory used for creation of the new user", true, "UserInfo");
+		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta information creator for the user", true, "MetaInfoCreator");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -53,6 +55,7 @@ protected:
 
 private:
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);
+	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 };
 
 

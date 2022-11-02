@@ -18,7 +18,8 @@ QByteArray CObjectViewDataProviderComp::GetModelId() const
 
 imtbase::CTreeItemModel* CObjectViewDataProviderComp::GetTreeItemModel(
 		const QList<imtgql::CGqlObject>& params,
-		const QByteArrayList& /*fields*/)
+		const QByteArrayList& /*fields*/,
+		const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
 

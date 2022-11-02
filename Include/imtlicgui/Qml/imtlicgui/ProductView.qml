@@ -46,18 +46,18 @@ DocumentBase {
         commandsDelegate.tableData = collectionView.table;
     }
 
-    UndoRedoManager {
-        id: undoRedoManager;
+//    UndoRedoManager {
+//        id: undoRedoManager;
 
-        commandsId: container.commandsId;
-        editorItem: container;
+//        commandsId: container.commandsId;
+//        editorItem: container;
 
-        onModelParsed: {
+//        onModelParsed: {
 
-            collectionView.table.elements = documentModel.GetData("Items");
-            updateGui();
-        }
-    }
+//            collectionView.table.elements = documentModel.GetData("Items");
+//            updateGui();
+//        }
+//    }
 
     function updateGui(){
         console.log("updateGui");
@@ -217,7 +217,7 @@ DocumentBase {
 
                 clip: true;
 
-                modelItems: treeViewModel.modelTreeView;
+                model: treeViewModel.modelTreeView;
                 visible: itemId !== "" && collectionView.table.selectedIndex > -1;
 
                 Component.onCompleted: {

@@ -14,6 +14,10 @@ Rectangle {
     property TreeItemModel serverModel;
     property TreeItemModel localModel;
 
+    Component.onDestruction: {
+        container.destroy();
+    }
+
     TreeItemModel {
         id: commonModel;
     }
@@ -56,7 +60,16 @@ Rectangle {
         }
     }
 
+    function clearModels(){
+        serverModel.Clear();
+        localModel.Clear();
+
+        mainPanelRepeater.model = 0;
+        bodyPanelRepeater.model = 0;
+    }
+
     function updateModel(){
+        console.log("PreferenceDialog getSettings");
         settingsQuery.getSettings();
     }
 
@@ -450,11 +463,8 @@ Rectangle {
                 inputParams.InsertField ("LanguageId", Style.language);
                 query.AddParam(inputParams);
 
-                var queryFields = Gql.GqlObject("items");
-                queryFields.InsertField("Mode");
-                queryFields.InsertField("Language");
-                queryFields.InsertField("DBSettings");
-
+                var queryFields = Gql.GqlObject("Get");
+                queryFields.InsertField("Id");
                 query.AddField(queryFields);
 
                 var gqlData = query.GetQuery();
@@ -464,28 +474,30 @@ Rectangle {
 
             onStateChanged: {
                 console.log("State:", this.state, settingsQuery);
-                var dataModelLocal;
 
-                if (settingsQuery.ContainsKey("errors")){
-                    dataModelLocal = settingsQuery.GetData("errors");
+                if (this.state === "Ready") {
+                    var dataModelLocal;
 
-                    return;
-                }
+                    if (settingsQuery.ContainsKey("errors")){
+                        dataModelLocal = settingsQuery.GetData("errors");
 
-                if (settingsQuery.ContainsKey("data")){
-                    dataModelLocal = settingsQuery.GetData("data");
+                        return;
+                    }
 
-                    if (dataModelLocal.ContainsKey("GetSettings")){
-                        dataModelLocal = dataModelLocal.GetData("GetSettings");
-                        dataModelLocal = dataModelLocal.GetData("items");
+                    if (settingsQuery.ContainsKey("data")){
+                        dataModelLocal = settingsQuery.GetData("data");
 
-                        serverModel = dataModelLocal;
+                        if (dataModelLocal.ContainsKey("GetSettings")){
+                            dataModelLocal = dataModelLocal.GetData("GetSettings");
 
-                        let scheme = getDesignScheme();
-                        Style.changeSchemeDesign(scheme);
+                            serverModel = dataModelLocal;
 
-                        let language = getSelectedLanguage();
-                        context.language = language;
+                            let scheme = getDesignScheme();
+                            Style.changeSchemeDesign(scheme);
+
+                            let language = getSelectedLanguage();
+                            context.language = language;
+                        }
                     }
                 }
             }
@@ -504,11 +516,8 @@ Rectangle {
                 inputParams.InsertField ("Item", jsonString);
                 query.AddParam(inputParams);
 
-                var queryFields = Gql.GqlObject("items");
-
-                queryFields.InsertField("Mode");
-                queryFields.InsertField("Language");
-                queryFields.InsertField("DBSettings");
+                var queryFields = Gql.GqlObject("Save");
+                queryFields.InsertField("Id");
                 query.AddField(queryFields);
 
                 var gqlData = query.GetQuery();
@@ -520,9 +529,7 @@ Rectangle {
                 console.log("State:", this.state, preferenceSaveQuery);
                 if (this.state === "Ready") {
 
-
                     if (this.ContainsKey("errors")){
-
                         return;
                     }
 

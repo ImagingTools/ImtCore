@@ -21,6 +21,8 @@
 #include <imtlic/CProductInstanceMetaInfoCreatorComp.h>
 #include <imtlic/CLicenseControllerComp.h>
 #include <imtlic/CFeatureContainer.h>
+#include <imtlic/CProductInfoProviderComp.h>
+#include <imtlic/CCollectionProductInfoProviderComp.h>
 
 
 /**
@@ -69,6 +71,8 @@ typedef icomp::TModelCompWrap<
 						imtbase::IObjectCollectionInfo,
 						imtbase::ICollectionInfo,
 						iser::ISerializable>> FeatureContainer;
+typedef imtlic::CProductInfoProviderComp ProductInfoProvider;
+typedef imtlic::CCollectionProductInfoProviderComp CollectionProductInfoProvider;
 
 
 } // namespace ImtLicensePck

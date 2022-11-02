@@ -13,6 +13,26 @@ Item {
     signal modelParsed();
     signal commandActivated(string commandId);
 
+    signal beginChanges();
+    signal endChanges();
+
+    property bool isDirty: false;
+
+    onBeginChanges: {
+        if (!isDirty){
+            model.modelChanged.disconnect(modelUpdated);
+            isDirty = true;
+        }
+    }
+
+    onEndChanges: {
+        if (isDirty){
+            modelUpdated();
+            model.modelChanged.connect(modelUpdated);
+            isDirty = false;
+        }
+    }
+
     onModelChanged: {
         console.log("undoRedoManager onModelChanged");
 
@@ -51,6 +71,7 @@ Item {
     }
 
     onVisibleChanged: {
+        console.log("undoRedoManager onVisibleChanged", visible);
         if (undoRedoManager.visible){
             model.modelChanged.connect(modelUpdated);
             Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);

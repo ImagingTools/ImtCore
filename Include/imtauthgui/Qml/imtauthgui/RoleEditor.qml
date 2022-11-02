@@ -15,6 +15,8 @@ Item {
 
         commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
         commandsProvider.commandModeChanged.connect(commandModeChanged);
+
+        roleIdInput.focus = true;
     }
 
     Component.onDestruction: {
@@ -121,6 +123,8 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Id", roleIdInput.text);
                 }
+
+                KeyNavigation.tab: roleNameInput;
             }
 
             Text {
@@ -143,6 +147,8 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Name", roleNameInput.text);
                 }
+
+                KeyNavigation.tab: descriptionInput;
             }
 
             Text {
@@ -165,6 +171,8 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Description", descriptionInput.text);
                 }
+
+                KeyNavigation.tab: roleIdInput;
             }
 
             Text {

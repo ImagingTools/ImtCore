@@ -6,7 +6,11 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlContext.h>
 #include <imtrest/IProtocolEngine.h>
+#include <imtauth/ISession.h>
+#include <imtauth/IUserInfo.h>
+#include <imtauth/IUserSettings.h>
 
 
 namespace imtgql
@@ -28,6 +32,86 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
 												.arg(qPrintable(request.GetBody()))
 												.arg(errorPosition);
+	}
+
+	QByteArray accessToken = headers.value("X-authentication-token");
+
+	if (m_sessionCollectionCompPtr.IsValid() && !accessToken.isEmpty()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_sessionCollectionCompPtr->GetObjectData(accessToken, dataPtr)){
+			const imtauth::ISession* sessionInfoPtr = dynamic_cast<const imtauth::ISession*>(dataPtr.GetPtr());
+			if (sessionInfoPtr != nullptr){
+				imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
+
+				QByteArray userId = sessionInfoPtr->GetUserId();
+
+				if (m_userCollectionCompPtr.IsValid()){
+					imtbase::IObjectCollection::DataPtr userDataPtr;
+					if (m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+						const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+						if (userInfoPtr != nullptr){
+							gqlContextPtr->SetUserInfo(dynamic_cast<const imtauth::IUserInfo*>(userInfoPtr->CloneMe()));
+						}
+					}
+				}
+
+				if (m_settingsCollectionCompPtr.IsValid()){
+					imtbase::IObjectCollection::DataPtr settingsDataPtr;
+					if (m_settingsCollectionCompPtr->GetObjectData(userId, settingsDataPtr)){
+						const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(settingsDataPtr.GetPtr());
+						if (userSettingsPtr != nullptr){
+							QByteArray settingsData = userSettingsPtr->GetSettings();
+							QJsonDocument jsonResponse = QJsonDocument::fromJson(settingsData);
+							QJsonObject jsonObject = jsonResponse.object();
+//							if (jsonResponse.isArray()){
+//								QJsonArray jsonArray = jsonResponse.array();
+
+//								QJsonObject generalObj;
+//								for (const QJsonValue & value : jsonArray){
+//									QJsonObject obj = value.toObject();
+
+//									if (obj["Id"] == "General"){
+//										generalObj = obj;
+//										break;
+//									}
+//								}
+
+//								if (!generalObj.isEmpty()){
+//									QJsonArray jsonElementsArray = generalObj["Elements"].toArray();
+
+//									QJsonObject schemeObj;
+//									QJsonObject languageObj;
+
+//									for (const QJsonValue & value : jsonElementsArray){
+//										QJsonObject obj = value.toObject();
+
+//										if (obj["Id"] == "Mode"){
+//											int value = obj["Value"].toInt();
+//											QJsonArray jsonParametersArray = obj["Parameters"].toArray();
+//											QJsonObject parameterObj = jsonParametersArray.at(value).toObject();
+
+//											QByteArray design = parameterObj["Id"].toString().toUtf8();
+//											gqlContextPtr->SetDesignScheme(design);
+//										}
+//										else if (obj["Id"] == "Language"){
+//											int value = obj["Value"].toInt();
+//											QJsonArray jsonParametersArray = obj["Parameters"].toArray();
+//											QJsonObject parameterObj = jsonParametersArray.at(value).toObject();
+
+//											QByteArray language = parameterObj["Id"].toString().toUtf8();
+//											gqlContextPtr->SetLanguageId(language);
+//										}
+//									}
+//								}
+//							}
+						}
+					}
+				}
+
+				gqlContextPtr->SetToken(accessToken);
+				gqlRequest.SetGqlContext(gqlContextPtr);
+			}
+		}
 	}
 
 	QByteArray representationData;

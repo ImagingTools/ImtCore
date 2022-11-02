@@ -103,6 +103,7 @@ private:
 	QString GetPassword() const;
 	int GetLastMigration() const;
 	int GetDatabaseVersion() const;
+	bool TableExist(const QString& tableName) const;
 
 	template <typename Interface>
 	static Interface* ExtractDatabaseAccessSettings(CDatabaseEngineComp& component)

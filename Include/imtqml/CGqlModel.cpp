@@ -15,6 +15,8 @@ namespace imtqml
 {
 
 
+QString CGqlModel::s_accessToken = QString();
+
 CGqlModel::CGqlModel(QObject *parent)
 	: imtbase::CTreeItemModel(parent)
 {
@@ -39,11 +41,15 @@ bool CGqlModel::SetGqlQuery(QString query)
 		urlPath.append("/graphql");
 		requestUrl.setPath(urlPath);
 
-		qDebug() << "SetGqlQuery" << requestUrl << " " << query.toUtf8();
+		QNetworkRequest networkRequest = QNetworkRequest(requestUrl);
 
-		QNetworkReply* reply = accessManager->post(QNetworkRequest(requestUrl), query.toUtf8());
-		connect(reply, &QNetworkReply::finished,
-				this, &CGqlModel::replyFinished);
+		if (!s_accessToken.isEmpty()){
+			networkRequest.setRawHeader("X-authentication-token", s_accessToken.toUtf8());
+		}
+
+		QNetworkReply* reply = accessManager->post(networkRequest, query.toUtf8());
+		connect(reply, &QNetworkReply::finished, this, &CGqlModel::replyFinished);
+
 		return true;
 	}
 
@@ -60,6 +66,14 @@ void CGqlModel::replyFinished()
 		Parse(representationData);
 		SetState("Ready");
 		reply->deleteLater();
+	}
+}
+
+
+void CGqlModel::SetGlobalAccessToken(const QString &accessToken)
+{
+	if (s_accessToken != accessToken){
+		s_accessToken = accessToken;
 	}
 }
 

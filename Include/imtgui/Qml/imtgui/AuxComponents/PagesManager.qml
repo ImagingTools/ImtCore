@@ -13,13 +13,21 @@ Item {
         console.log("onActiveItemChanged", activeItem);
     }
 
+    onPageModelChanged: {
+        pagesData.model = container.pageModel;
+    }
+
+    function clearModels(){
+        pageModel.Clear();
+        pagesData.model = 0;
+    }
+
     Repeater {
         id: pagesData;
 
         anchors.fill: parent;
 
         clip: true;
-        model: container.pageModel;
 
         delegate: Item {
             id: pagesDeleg;
@@ -31,8 +39,7 @@ Item {
 
             /**
                 The page will be loaded only by click if it hasn't loaded yet
-             */
-
+            */
             onVisibleChanged: {
                 if(pagesDeleg.visible){
                     if (!pagesLoader.item){

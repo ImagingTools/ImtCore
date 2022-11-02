@@ -102,6 +102,19 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 			featureInfo.id = featureId;
 			featureInfo.parentId = parentFeatureId;
 
+			QByteArray selectFeatureQuery = QString("SELECT * from \"Features\" WHERE Id = '%1'").arg(qPrintable(featureId)).toUtf8();
+			QSqlQuery selectFeatureSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectFeatureQuery, &error);
+
+			if (selectFeatureSqlQuery.next()){
+				QSqlRecord featureRecord = selectFeatureSqlQuery.record();
+
+				QString featureName;
+				if (featureRecord.contains("Name")){
+					featureName = featureRecord.value("Name").toString();
+					featureInfo.name = featureName;
+				}
+			}
+
 			if (featureInfo.id.isEmpty()){
 				return nullptr;
 			}

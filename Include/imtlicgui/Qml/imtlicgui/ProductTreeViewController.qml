@@ -18,7 +18,7 @@ TreeViewControllerBase {
             let featuresModel = documentModel.GetData("Features");
 
             treeView.itemStateChanged.disconnect(itemStateChanged);
-            treeViewModel.resetProperties();
+            resetProperties();
             treeView.itemStateChanged.connect(itemStateChanged);
 
             if (featuresModel){
@@ -37,7 +37,11 @@ TreeViewControllerBase {
                     console.log('selectedFeatures', selectedFeatures);
 
                     for (let featureId of selectedFeatures){
-                        treeViewModel.selectFeature(featureId);
+                        selectFeature(featureId);
+
+                        let childrenDepends = []
+                        featureDependenciesModel.getAllChildrenDependsFeatures(featureId, childrenDepends);
+                        setValueToProperty("Active", false, childrenDepends);
                     }
                 }
             }
@@ -64,6 +68,9 @@ TreeViewControllerBase {
         }
 
         let licenseId = collectionView.table.getSelectedId();
+
+        let childrenDepends = []
+        featureDependenciesModel.getAllChildrenDependsFeatures(itemId, childrenDepends);
 
         if (itemState == Qt.Checked || itemState == Qt.PartiallyChecked){
 
@@ -101,6 +108,8 @@ TreeViewControllerBase {
             licenseFeaturesModel.SetData("State", itemState, itemIndex);
             licenseFeaturesModel.SetData("Optional", itemOptional, itemIndex);
             licenseFeaturesModel.SetData("ParentId", itemParentId, itemIndex);
+
+            setValueToProperty("Active", false, childrenDepends);
         }
         else if (itemState == Qt.Unchecked){
             if (featuresModel.ContainsKey(licenseId)){
@@ -123,9 +132,10 @@ TreeViewControllerBase {
                 if (licenseFeaturesModel.GetItemsCount() == 0){
                     featuresModel.RemoveData(licenseId);
                 }
+
+                setValueToProperty("Active", true, childrenDepends);
             }
         }
-
         console.log("featuresModel", featuresModel.toJSON());
     }
 

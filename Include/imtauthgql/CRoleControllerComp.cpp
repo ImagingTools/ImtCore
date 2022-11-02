@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtauth/CRole.h>
 #include <imtlic/CFeatureInfo.h>
+#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtauthgql
@@ -15,7 +16,7 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid() || !m_productCollectionCompPtr.IsValid()){
+	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
 		return nullptr;
@@ -39,28 +40,26 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 	dataModel->SetData("Name", "");
 	dataModel->SetData("Description", "");
 
-	imtbase::IObjectCollection::DataPtr productDataPtr;
-	if (m_productCollectionCompPtr->GetObjectData(productId, productDataPtr)){
-		const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(productDataPtr.GetPtr());
+	if (m_productProviderCompPtr.IsValid()){
+		imtbase::CTreeItemModel* productsModel = m_productProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
+		if (productsModel != nullptr){
+			for (int i = 0; i < productsModel->GetItemsCount(); i++){
+				QByteArray currentProductId = productsModel->GetData("Id", i).toByteArray();
+				if (currentProductId == productId){
+					imtbase::CTreeItemModel* productPermissionsModel = productsModel->GetTreeItemModel("Permissions", i);
+					if (productPermissionsModel != nullptr){
+						for (int j = 0; j < productPermissionsModel->GetItemsCount(); j++){
+							QByteArray featureId = productPermissionsModel->GetData("Id", j).toByteArray();
+							QString featureName = productPermissionsModel->GetData("Name", j).toString();
 
-		const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
-		const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
+							int index = permissionsModel->InsertNewItem();
 
-		for (const QByteArray& licenseId : licenseCollectionIds){
-			const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
-			if (licenseInfoPtr == nullptr){
-				continue;
-			}
-
-			imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-			for (int i = 0; i < featureInfos.size(); i++){
-				QByteArray featureId = featureInfos[i].id;
-				QString featureName = featureInfos[i].name;
-
-				int index = permissionsModel->InsertNewItem();
-				permissionsModel->SetData("Id", featureId, index);
-				permissionsModel->SetData("Name", featureName, index);
-				permissionsModel->SetData("State", Qt::CheckState::Unchecked, index);
+							permissionsModel->SetData("Id", featureId, index);
+							permissionsModel->SetData("Name", featureName, index);
+							permissionsModel->SetData("State", Qt::CheckState::Unchecked, index);
+						}
+					}
+				}
 			}
 		}
 	}

@@ -6,6 +6,10 @@ import Acf 1.0
 Item {
     id: userEditorContainer;
 
+    Component.onCompleted: {
+        usernameInput.focus = true;
+    }
+
     function updateGui(){
         console.log("UserEditor updateGui");
         usernameInput.text = documentModel.GetData("Username");
@@ -56,6 +60,8 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Username", usernameInput.text);
                 }
+
+                KeyNavigation.tab: passwordInput;
             }
 
             Text {
@@ -80,6 +86,8 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Password", passwordInput.text);
                 }
+
+                KeyNavigation.tab: nameInput;
             }
 
             Text {
@@ -102,6 +110,8 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Name", nameInput.text);
                 }
+
+                KeyNavigation.tab: mailInput;
             }
 
             Text {
@@ -124,6 +134,8 @@ Item {
                 onTextChanged: {
                     documentModel.SetData("Email", mailInput.text);
                 }
+
+                KeyNavigation.tab: usernameInput;
             }
 
         }//Column bodyColumn

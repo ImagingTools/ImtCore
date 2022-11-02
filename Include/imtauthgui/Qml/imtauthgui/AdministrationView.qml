@@ -58,7 +58,7 @@ Rectangle {
             spacing: 5;
 
             onSelectedIndexChanged: {
-                 headerText.text = "Administration" + " / " + leftMenuModel.get(selectedIndex).Id;
+                 headerText.text = qsTr("Administration") + " / " + leftMenuModel.get(selectedIndex).Id;
             }
 
             ListModel{
@@ -66,13 +66,13 @@ Rectangle {
 
                 ListElement{
                     Id: "Users";
-                    Name: "Users";
+                    Name: qsTr("Users");
                     Source: "UserCollectionView.qml";
                 }
 
                 ListElement{
                     Id: "Roles";
-                    Name: "Roles";
+                    Name: qsTr("Roles");
                     Source: "RoleCollectionView.qml";
                 }
             }

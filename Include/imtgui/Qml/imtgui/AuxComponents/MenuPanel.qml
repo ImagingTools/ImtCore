@@ -18,12 +18,12 @@ Rectangle {
     property string activeIcon;
     property string firstElementImageSources: [];
 
-    property alias model: lvPages.model;
+//    property alias model: lvPages.model;
 
     property int activePageIndex: -1;
     property int pagesCount: lvPages.count;
 
-//    property Item activeItem: pagesManager.activeItem;
+    property TreeItemModel model;
 
     property int spacing: 0;
 
@@ -31,11 +31,22 @@ Rectangle {
 
     function updateModels(){
         pagesModel.updateModel();
-        mainPanelInfoModel.updateModel();
+//        mainPanelInfoModel.updateModel();
+    }
+
+    function clearModels(){
+        model.Clear();
+        lvPages.model = 0;
     }
 
     onActivePageIndexChanged: {
         lvPages.currentIndex = menuPanel.activePageIndex;
+    }
+
+    onModelChanged: {
+        console.log("MenuPanel onModelChanged", model);
+
+        lvPages.model = model;
     }
 
     ListView {
@@ -44,6 +55,9 @@ Rectangle {
         anchors.fill: parent;
 
         boundsBehavior: Flickable.StopAtBounds;
+
+//        model: menuPanel.model;
+
         delegate: MenuPanelButton {
             text:  model["Name"];
             textColor: Style.textColor;
@@ -182,7 +196,7 @@ Rectangle {
                     dataModelLocal = dataModelLocal.GetData("PagesData")
                     if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
                         dataModelLocal = dataModelLocal.GetData("items")
-                        lvPages.model = dataModelLocal
+                        model = dataModelLocal
 
                         menuPanel.activePageId = dataModelLocal.GetData("PageId");
                         menuPanel.activePageName = dataModelLocal.GetData("Name");
@@ -201,53 +215,53 @@ Rectangle {
             }
         }
     }
-    GqlModel {
-        id: mainPanelInfoModel;
+//    GqlModel {
+//        id: mainPanelInfoModel;
 
-        Component.onCompleted: {
-            mainPanelInfoModel.updateModel();
-        }
+//        Component.onCompleted: {
+//            mainPanelInfoModel.updateModel();
+//        }
 
-        function updateModel() {
-            console.log( "mainPanelInfoModel update", "AdministrationPages");
+//        function updateModel() {
+//            console.log( "mainPanelInfoModel update", "AdministrationPages");
 
-            var query = Gql.GqlRequest("query", "AdministrationPages");
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("LanguageId", Style.language);
-            query.AddParam(inputParams);
+//            var query = Gql.GqlRequest("query", "AdministrationPages");
+//            var inputParams = Gql.GqlObject("input");
+//            inputParams.InsertField("LanguageId", Style.language);
+//            query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("PageId");
-            queryFields.InsertField("Name");
-            queryFields.InsertField("Icon");
-            queryFields.InsertField("Source");
-            queryFields.InsertField("StartItem");
-            query.AddField(queryFields);
-            var gqlData = query.GetQuery();
-            console.log("mainPanelInfoModel query ", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
+//            var queryFields = Gql.GqlObject("items");
+//            queryFields.InsertField("PageId");
+//            queryFields.InsertField("Name");
+//            queryFields.InsertField("Icon");
+//            queryFields.InsertField("Source");
+//            queryFields.InsertField("StartItem");
+//            query.AddField(queryFields);
+//            var gqlData = query.GetQuery();
+//            console.log("mainPanelInfoModel query ", gqlData);
+//            this.SetGqlQuery(gqlData);
+//        }
 
-        onStateChanged: {
-            console.log("State:",this.state, mainPanelInfoModel)
-            if (this.state == "Ready"){
+//        onStateChanged: {
+//            console.log("State:",this.state, mainPanelInfoModel)
+//            if (this.state == "Ready"){
 
-                var dataModelLocal = this.GetData("data");
+//                var dataModelLocal = this.GetData("data");
 
-                if(dataModelLocal.ContainsKey("AdministrationPages")){
-                    dataModelLocal = dataModelLocal.GetData("AdministrationPages")
-                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
-                        dataModelLocal = dataModelLocal.GetData("items")
-                        console.log("AdministrationPages = ", dataModelLocal)
-                    }
-                    else if(this.ContainsKey("errors")){
-                        var errorsModel = pagesModel.GetData("errors");
-                        if(errorsModel !== null && errorsModel.ContainsKey("AdministrationPages")){
-                            console.log("message", errorsModel.GetData("AdministrationPages").GetData("message"))
-                        }
-                    }
-                }
-            }
-        }
-    }
+//                if(dataModelLocal.ContainsKey("AdministrationPages")){
+//                    dataModelLocal = dataModelLocal.GetData("AdministrationPages")
+//                    if(dataModelLocal !== null && dataModelLocal.ContainsKey("items")){
+//                        dataModelLocal = dataModelLocal.GetData("items")
+//                        console.log("AdministrationPages = ", dataModelLocal)
+//                    }
+//                    else if(this.ContainsKey("errors")){
+//                        var errorsModel = pagesModel.GetData("errors");
+//                        if(errorsModel !== null && errorsModel.ContainsKey("AdministrationPages")){
+//                            console.log("message", errorsModel.GetData("AdministrationPages").GetData("message"))
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 }

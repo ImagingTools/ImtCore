@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QTranslator>
 
+// ImtCore includes
+#include <imtauth/IUserInfo.h>
+
 
 namespace imtqml
 {
@@ -19,9 +22,36 @@ QByteArray CPageDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields)
+imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params, const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+
+	if (gqlContext != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
+
+		bool result = true;
+		if (userInfoPtr != nullptr){
+			QByteArray userId = userInfoPtr->GetUsername();
+			if (userId != "admin"){
+				imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
+
+				QByteArrayList permissionIds;
+				for (int i = 0; i < m_permissionIdsAttrPtr.GetCount(); i++){
+					permissionIds << m_permissionIdsAttrPtr[i];
+				}
+
+				if (m_permissionIdsAttrPtr.IsValid()){
+					if (m_checkPermissionCompPtr.IsValid()){
+						result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
+					}
+				}
+			}
+		}
+
+		if (!result){
+			return nullptr;
+		}
+	}
 
 	for (int indexField = 0; indexField < fields.count(); indexField++){
 		if (fields[indexField] == PageEnum::ID){

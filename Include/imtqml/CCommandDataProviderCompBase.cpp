@@ -20,7 +20,10 @@ QByteArray CCommandDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields)
+imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(
+		const QList<imtgql::CGqlObject>& params,
+		const QByteArrayList& fields,
+		const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
 	for (int i = 0; i < m_commandsIdsAttrPtr.GetCount(); ++i){

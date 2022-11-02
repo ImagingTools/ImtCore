@@ -78,13 +78,21 @@ FocusScope {
             text: editDialogContainer.valueId;
 
             onTextInputFocusChanged: {
-                if (textInputFocus && autoGenerate && inputId.text == ""){
-                    //generateKey();
+                if (textInputFocus && inputId.text == ""){
+                    generateKey();
                 }
             }
 
             onTextChanged: {
-                editDialogContainer.valueId = inputId.text;
+                let flag = checkValidId(inputId.text);
+
+                console.log("flag", flag);
+
+                editDialogContainer.buttons.setButtonState("Ok", flag);
+
+                if (flag){
+                    editDialogContainer.valueId = inputId.text;
+                }
             }
 
             onAccepted: {
@@ -96,7 +104,7 @@ FocusScope {
     }
 
     function checkValidId(inputId){
-        if (inputId == ""){
+        if (inputId == "" || !editDialogContainer.licensesModel){
             return false
         }
 
@@ -110,4 +118,7 @@ FocusScope {
         return true;
     }
 
+    function generateKey(){
+        inputId.text = "00.0001"
+    }
 }

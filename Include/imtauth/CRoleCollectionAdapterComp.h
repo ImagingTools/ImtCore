@@ -27,6 +27,7 @@ public:
 	// reimplemented (IRoleInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetRoleList() const override;
 	virtual const IRole* GetRole(const QByteArray& roleId, const QByteArray& productId) const override;
+	virtual const IRole* GetRole(const QByteArray& objectId) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_roleCollectionCompPtr);

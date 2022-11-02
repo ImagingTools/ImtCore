@@ -19,7 +19,8 @@ namespace imtgql
 imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& commandId)
 	:m_commandId(commandId),
 	m_requestType(requestType),
-	m_activeGqlObjectPtr(nullptr)
+	m_activeGqlObjectPtr(nullptr),
+	m_gqlContextPtr(nullptr)
 {
 }
 
@@ -100,6 +101,11 @@ QByteArray CGqlRequest::GetQuery() const
 	return queryData;
 }
 
+
+IGqlContext* CGqlRequest::GetGqlContext() const
+{
+	return m_gqlContextPtr;
+}
 
 
 bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
@@ -364,6 +370,7 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 			m_commandId = sourcePtr->m_commandId;
 			m_params = sourcePtr->m_params;
 			m_fields = sourcePtr->m_fields;
+			m_gqlContextPtr = sourcePtr->m_gqlContextPtr;
 
 			return true;
 		}
@@ -391,6 +398,7 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_commandId.clear();
 	m_params.clear();
 	m_fields.clear();
+	m_gqlContextPtr = nullptr;
 
 	return true;
 }
@@ -602,6 +610,16 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 		m_activeGqlObjectPtr->InsertField(m_currentField, QVariant(text));
 	}
 
+}
+
+
+void CGqlRequest::SetGqlContext(const IGqlContext *gqlContext)
+{
+	if (m_gqlContextPtr != gqlContext){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_gqlContextPtr = const_cast<IGqlContext*>(gqlContext);
+	}
 }
 
 

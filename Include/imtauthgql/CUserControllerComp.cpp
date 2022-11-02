@@ -91,33 +91,15 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 			return nullptr;
 		}
 
-		QByteArray id = userInfoPtr->GetId();
-		QString username = userInfoPtr->GetUsername();
+		QByteArray username = userInfoPtr->GetUsername();
 		QString name = userInfoPtr->GetName();
 		QByteArray passwordHash = userInfoPtr->GetPasswordHash();
 		QString mail = userInfoPtr->GetMail();
 
-		dataModel->SetData("UserId", id);
 		dataModel->SetData("Username", username);
 		dataModel->SetData("Name", name);
 		dataModel->SetData("Password", passwordHash);
 		dataModel->SetData("Email", mail);
-
-		const imtlic::IFeatureInfoProvider* featuresPtr = userInfoPtr->GetPermissionProvider();
-
-		imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetLocalPermissions();
-
-		if (featuresPtr != nullptr){
-			for (const QByteArray& id : permissions){
-				const imtlic::IFeatureInfo* permissionPtr = featuresPtr->GetFeatureInfo(id);
-
-				if (permissionPtr != nullptr){
-					int index = permissionsModel->InsertNewItem();
-					permissionsModel->SetData("PermissionId", permissionPtr->GetFeatureId(), index);
-					permissionsModel->SetData("PermissionName", permissionPtr->GetFeatureName(), index);
-				}
-			}
-		}
 
 		imtauth::IUserInfo::RoleIds roles = userInfoPtr->GetRoles();
 
@@ -184,8 +166,9 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		imtbase::CTreeItemModel itemModel;
 		itemModel.Parse(itemData);
 
+		QByteArray username;
 		if (itemModel.ContainsKey("Username")){
-			QByteArray username = itemModel.GetData("Username").toByteArray();
+			username = itemModel.GetData("Username").toByteArray();
 
 			if (username.isEmpty()){
 				errorMessage = QT_TR_NOOP("Username can't be empty!");
@@ -204,8 +187,27 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		}
 
 		if (itemModel.ContainsKey("Password")){
-			QByteArray passwordHash = itemModel.GetData("Password").toByteArray();
-			userInfoPtr->SetPasswordHash(passwordHash);
+			QByteArray password = itemModel.GetData("Password").toByteArray();
+
+			bool calculate = true;
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(username, dataPtr)){
+				const imtauth::IUserInfo* currentuserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+				if (currentuserInfoPtr != nullptr){
+					QByteArray currentPasswordHash = currentuserInfoPtr->GetPasswordHash();
+					if (currentPasswordHash == password){
+						calculate = false;
+					}
+				}
+			}
+
+			if (calculate){
+				if (m_hashCalculatorCompPtr.IsValid()){
+					password = m_hashCalculatorCompPtr->Calculate(username + password);
+				}
+			}
+
+			userInfoPtr->SetPasswordHash(password);
 		}
 
 		if (itemModel.ContainsKey("Email")){

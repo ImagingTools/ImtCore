@@ -4,6 +4,8 @@
 // ACF includes
 #include <iser/IObject.h>
 
+// ImtCore includes
+#include <imtgql/IGqlContext.h>
 
 namespace imtgql
 {
@@ -36,6 +38,7 @@ public:
 	virtual QByteArray GetCommandId() const = 0;
 	virtual RequestType GetRequestType() const = 0;
 	virtual QByteArray GetQuery() const = 0;
+	virtual imtgql::IGqlContext* GetGqlContext() const = 0;
 };
 
 

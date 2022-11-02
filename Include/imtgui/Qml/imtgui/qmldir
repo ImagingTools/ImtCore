@@ -1,6 +1,7 @@
 module imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
 
+AuthorizationPage 1.0 ./AuxComponents/AuthorizationPage.qml
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
 CollectionViewBase 1.0 ./AuxComponents/CollectionViewBase.qml
 CollectionViewCommandsDelegateBase 1.0 ./AuxComponents/CollectionViewCommandsDelegateBase.qml
@@ -19,6 +20,7 @@ PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
 TextButton 1.0 ./AuxComponents/TextButton.qml
 CustomTextField 1.0 ./AuxComponents/CustomTextField.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
+TreeItemDelegate 1.0 ./AuxComponents/TreeItemDelegate.qml
 TreeViewEditor 1.0 ./AuxComponents/TreeViewEditor.qml
 TreeViewControllerBase 1.0 ./AuxComponents/TreeViewControllerBase.qml
 TableTreeViewEditor 1.0 ./AuxComponents/TableTreeViewEditor.qml

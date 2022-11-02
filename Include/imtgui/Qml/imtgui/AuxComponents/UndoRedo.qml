@@ -44,7 +44,7 @@ Item {
     }
 
     function addModel(obj){
-//        console.log("UndoRedo addModel", JSON.stringify(obj));
+        console.log("UndoRedo addModel", JSON.stringify(obj));
 
         undoRedo.undoStack.push(JSON.stringify(obj));
         undoRedo.redoStack = [];

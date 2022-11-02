@@ -28,7 +28,8 @@ QByteArray CDatabaseSettingsDataProviderComp::GetModelId() const
 
 imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 			const QList<imtgql::CGqlObject>& params,
-			const QByteArrayList& /*fields*/)
+			const QByteArrayList& /*fields*/,
+			const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 

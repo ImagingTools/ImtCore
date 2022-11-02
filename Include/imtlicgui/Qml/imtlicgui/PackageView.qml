@@ -30,6 +30,8 @@ DocumentBase {
         collectionView.headers = headers;
         collectionView.elements = items;
 
+//        treeView.refreshModel();
+
         for (let i = 0; i < treeView.model.GetItemsCount(); i++){
             let packageId = treeView.model.GetData("Id", i);
 
@@ -46,21 +48,41 @@ DocumentBase {
         }
     }
 
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        commandsId: packageViewContainer.commandsId;
-        editorItem: packageViewContainer;
-
-        onModelParsed: {
-        }
+    onCommandsDelegateLoaded: {
+        commandsDelegate.undoRedoManager = undoRedoManager;
     }
 
+//    UndoRedoManager {
+//        id: undoRedoManager;
+
+//        commandsId: packageViewContainer.commandsId;
+//        editorItem: packageViewContainer;
+
+//        onModelParsed: {
+//            updateGui();
+//        }
+//    }
+
     function updateGui(){
-        console.log("PackageView updateGui")
+        console.log("PackageView updateGui", documentModel.toJSON())
 
         collectionView.elements = 0;
-        collectionView.elements = documentModel.GetData("Items");
+
+        let itemsModel = documentModel.GetData("Items");
+
+        if (!itemsModel){
+            itemsModel = documentModel.AddTreeModel("Items");
+        }
+
+        collectionView.elements = itemsModel;
+
+        var selectedIndex = collectionView.selectedIndex;
+        collectionView.selectedIndex = null;
+        collectionView.selectedIndex = selectedIndex;
+
+        treeView.model.Refresh();
+
+//        treeView.refreshModel();
     }
 
     TableTreeViewEditor {
@@ -150,8 +172,38 @@ DocumentBase {
 
             clip: true;
 
-//            modelItems: treeViewModel.modelTreeView;
             visible: itemId !== "" && collectionView.selectedIndex != null;
+
+            itemDelegate: PackageTreeItemDelegate {
+                width: treeView.width;
+            }
+
+            Component.onCompleted: {
+                let json = treeViewModel.modelTreeView.toJSON();
+                model.Parse(json);
+            }
+
+            onItemStateChanged: {
+               // undoRedoManager.beginChanges();
+
+                timer.start(500);
+            }
+
+            function refreshModel(){
+                console.log("PackageView refreshModel");
+                clearModel();
+                let json = treeViewModel.modelTreeView.toJSON();
+                model.Parse(json);
+                model.Refresh();
+            }
+        }
+
+        Timer {
+            id: timer;
+
+            onTriggered: {
+              //  undoRedoManager.endChanges();
+            }
         }
     }
 }

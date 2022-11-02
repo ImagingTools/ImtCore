@@ -9,9 +9,7 @@ CollectionViewCommandsDelegateBase {
 //        collectionViewBase.commands.onItemsChanged.connect(updateTreeView);
     }
 
-    function updateTreeView(){
-//        Events.sendEvent("TreeViewModelUpdate");
-
-//        updateGui();
+    onRemoved: {
+        Events.sendEvent("TreeViewModelUpdate");
     }
 }

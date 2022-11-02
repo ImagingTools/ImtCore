@@ -29,8 +29,8 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
 		return nullptr;
@@ -81,10 +81,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 // protected methods
 
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
-			const imtgql::CGqlRequest& gqlRequest, 
-			imtgql::CGqlObject& gqlObject,
-			QString& errorMessage,
-			int& operationType) const
+		const imtgql::CGqlRequest& gqlRequest,
+		imtgql::CGqlObject& gqlObject,
+		QString& errorMessage,
+		int& operationType) const
 {
 	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
 	if(fieldList == nullptr){
@@ -162,18 +162,18 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
@@ -216,9 +216,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
@@ -271,9 +271,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QString newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
@@ -299,9 +299,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescription(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QString description = inputParams.at(0).GetFieldArgumentValue("Description").toString();
@@ -330,9 +330,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
@@ -357,8 +357,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
 		}
 
-        iprm::CParamsSet filterParams;
-        imtbase::CCollectionFilter m_filter;
+		iprm::CParamsSet filterParams;
+		imtbase::CCollectionFilter m_filter;
 		int offset = 0, count = -1;
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
@@ -397,10 +397,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 				}
 			}
 
-            filterParams.SetEditableParameter("Filter", &m_filter);
-            this->SetAdditionalFilters(*viewParamsGql, &filterParams);
+			filterParams.SetEditableParameter("Filter", &m_filter);
+			this->SetAdditionalFilters(*viewParamsGql, &filterParams);
 		}
-
 
 		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
 		if (pagesCount < 0){
@@ -431,9 +430,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = "No collection component was set";
@@ -474,9 +473,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	QByteArrayList fields;
@@ -544,18 +543,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
 
 
 bool CObjectCollectionControllerCompBase::SetupGqlItem(
-			const imtgql::CGqlObject& gqlObject,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const QByteArray& collectionId,
-			QString& errorMessage) const
+		const imtgql::CGqlObject& gqlObject,
+		imtbase::CTreeItemModel& model,
+		int itemIndex,
+		const QByteArray& collectionId,
+		QString& errorMessage) const
 {
 	bool retVal = true;
 	QByteArrayList informationIds = GetInformationIds(gqlObject);
 
 	if (!informationIds.isEmpty()){
-		idoc::MetaInfoPtr metaInfo;
-		metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
+//		idoc::MetaInfoPtr metaInfo;
+//		metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
 
@@ -569,14 +568,15 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 				elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 			}
 			else{
-				if (metaInfo.IsValid()){
+				idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);;
+				if (elementMetaInfo.IsValid()){
 					if (informationId == QByteArray("Added")){
-						elementInformation = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
-							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+						elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+								.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					}
 					else if (informationId == QByteArray("LastModified")){
-						elementInformation = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
-							.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+						elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
+								.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 					}
 				}
 			}
@@ -611,11 +611,11 @@ QVariant CObjectCollectionControllerCompBase::GetObjectInformation(const QByteAr
 
 
 istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			QByteArray& objectId,
-			QString& name,
-			QString& description,
-			QString &errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		QByteArray& objectId,
+		QString& name,
+		QString& description,
+		QString &errorMessage) const
 {
 	return nullptr;
 }

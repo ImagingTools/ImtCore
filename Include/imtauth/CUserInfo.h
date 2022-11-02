@@ -10,25 +10,22 @@
 namespace imtauth
 {
 
+
 class CUserInfo: virtual public IUserInfo
 {
 
 public:
-	typedef CRole BaseClass;
-
 	// reimplemented (iser::IUserInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
-	virtual const imtbase::IObjectCollection* GetRoleProvider() const override;
-	virtual QByteArray GetId() const override;
-	virtual void SetId(QByteArray id) override;
-	virtual QString GetUsername() const override;
-	virtual void SetUsername(QString username) override;
+	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const override;
+	virtual QByteArray GetUsername() const override;
+	virtual void SetUsername(const QByteArray& username) override;
 	virtual QString GetName() const override;
-	virtual void SetName(QString name) override;
+	virtual void SetName(const QString& name) override;
 	virtual QByteArray GetPasswordHash() const override;
-	virtual void SetPasswordHash(QByteArray passwordHash) override;
+	virtual void SetPasswordHash(const QByteArray& passwordHash) override;
 	virtual QString GetMail() const override;
-	virtual void SetMail(QString mail) override;
+	virtual void SetMail(const QString& mail) override;
 	virtual FeatureIds GetPermissions() const override;
 	virtual FeatureIds GetLocalPermissions() const override;
 	virtual void SetLocalPermissions(const FeatureIds &permissions) override;
@@ -48,11 +45,10 @@ public:
 
 protected:
 	const imtlic::IFeatureInfoProvider* m_permissionProviderPtr;
-	const imtbase::IObjectCollection* m_roleProviderPtr;
+	const imtauth::IRoleInfoProvider* m_roleProviderPtr;
 
 private:
-	QByteArray m_userId;
-	QString m_username;
+	QByteArray m_username;
 	QString m_name;
 	QByteArray m_passwordHash;
 	QString m_mail;

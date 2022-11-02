@@ -44,7 +44,7 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateResponse(const imtgq
 	if(m_commandsDataProviderCompPtr.IsValid() && isSetResponce){
 		for (int index = 0; index < m_commandsDataProviderCompPtr.GetCount(); index++){
 			if (m_commandsDataProviderCompPtr[index]->GetModelId() == commandsId){
-				itemsModel = m_commandsDataProviderCompPtr[index]->GetTreeItemModel(*paramList, fields);
+				itemsModel = m_commandsDataProviderCompPtr[index]->GetTreeItemModel(*paramList, fields, gqlRequest.GetGqlContext());
 			}
 		}
 		if (itemsModel == nullptr){

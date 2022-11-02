@@ -252,7 +252,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 			createDatabaseQuery = scriptFile.readAll();
 
-			createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
+			createDatabaseQuery = createDatabaseQuery.arg(GetDatabaseName());
 
 			scriptFile.close();
 		}
@@ -338,7 +338,20 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 		for (int index = databaseVersion + 1; index <= lastMigration; index++){
 			QSqlError sqlError;
 			if (index == 0){
-				ExecSqlQueryFromFile(folder.filePath("GetRevision.sql"), &sqlError);
+				QFile sqlQueryFile(folder.filePath("GetRevision.sql"));
+				sqlQueryFile.open(QFile::ReadOnly);
+				QByteArray queryString = sqlQueryFile.readAll();
+				sqlQueryFile.close();
+
+				if (TableExist("Revisions")){
+					queryString = QString(queryString).arg("Revisions").toUtf8();
+				}
+				else{
+					queryString = QString(queryString).arg("revisions").toUtf8();
+				}
+
+				ExecSqlQuery(queryString, &sqlError);
+
 				if (sqlError.type() != QSqlError::NoError){
 					qCritical() << __FILE__ << __LINE__
 								<< "\n\t| Unable to migration database"
@@ -363,9 +376,26 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 					return false;
 				}
 			}
-			QVariantMap valuesRevision;
-			valuesRevision.insert(":Revision",index);
-			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql"), valuesRevision, &sqlError);
+//			QVariantMap setValuesRevision;
+//			setValuesRevision.insert(":Revision", index);
+//			setValuesRevision.insert(":TableName", "revisions");
+//			if (TableExist("Revisions")){
+//				setValuesRevision.insert(":TableName", "Revisions");
+//			}
+
+			QFile sqlQueryFile(folder.filePath("SetRevision.sql"));
+			sqlQueryFile.open(QFile::ReadOnly);
+			QByteArray queryString = sqlQueryFile.readAll();
+			sqlQueryFile.close();
+
+			if (TableExist("Revisions")){
+				queryString = QString(queryString).arg("Revisions").arg(index).toUtf8();
+			}
+			else{
+				queryString = QString(queryString).arg("revisions").arg(index).toUtf8();
+			}
+
+			ExecSqlQuery(queryString, &sqlError);
 			if (sqlError.type() != QSqlError::NoError){
 				return false;
 			}
@@ -577,7 +607,20 @@ int CDatabaseEngineComp::GetDatabaseVersion() const
 	if (m_migrationFolderPathCompPtr.IsValid()){
 		QSqlError sqlError;
 		QDir folder(m_migrationFolderPathCompPtr->GetPath());
-		QSqlQuery queryGetRevision = ExecSqlQueryFromFile(folder.filePath("GetRevision.sql"), &sqlError);
+
+		QFile sqlQueryFile(folder.filePath("GetRevision.sql"));
+		sqlQueryFile.open(QFile::ReadOnly);
+		QByteArray queryString = sqlQueryFile.readAll();
+		sqlQueryFile.close();
+
+		if (TableExist("Revisions")){
+			queryString = QString(queryString).arg("Revisions").toUtf8();
+		}
+		else{
+			queryString = QString(queryString).arg("revisions").toUtf8();
+		}
+
+		QSqlQuery queryGetRevision = ExecSqlQuery(queryString, &sqlError);
 		if (sqlError.type() != QSqlError::NoError){
 			return -1;
 		}
@@ -589,6 +632,32 @@ int CDatabaseEngineComp::GetDatabaseVersion() const
 		}
 	}
 	return -1;
+}
+
+
+bool CDatabaseEngineComp::TableExist(const QString &tableName) const
+{
+	QString query = QString("SELECT EXISTS (SELECT 1 FROM pg_tables WHERE TableName = '%1');").arg(tableName);
+
+	QSqlError error;
+	QSqlQuery sqlQuery = ExecSqlQuery(query.toUtf8(), &error);
+
+	if (error.type() != QSqlError::NoError){
+		SendErrorMessage(0, QString("\n\t| Exists table could not be created""\n\t| Error: %1").arg(error.text()));
+
+		return false;
+	}
+
+	while (sqlQuery.next()){
+		QSqlRecord record = sqlQuery.record();
+
+		if (record.contains("exists")){
+			bool result = record.value("exists").toBool();
+			return result;
+		}
+	}
+
+	return false;
 }
 
 
@@ -617,5 +686,3 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 
 
 } // namespace imtdb
-
-

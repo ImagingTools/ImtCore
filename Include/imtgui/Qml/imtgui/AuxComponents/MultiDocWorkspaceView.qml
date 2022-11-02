@@ -107,7 +107,7 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: tabPanelInternal.bottom;
-        anchors.topMargin: 20;//thumbnailDecoratorContainer.mainMargin;
+       // anchors.topMargin: 20;//thumbnailDecoratorContainer.mainMargin;
         anchors.bottom: parent.bottom;
 
         clip: true;

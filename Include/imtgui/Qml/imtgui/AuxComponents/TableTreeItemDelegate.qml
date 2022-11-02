@@ -49,10 +49,6 @@ Item {
         width: parent.width;
         height: treeItemDelegate.itemHeight;
 
-//        height: model.Visible ? treeItemDelegate.itemHeight : 0;
-
-//        visible: model.Visible;
-
         color: modelIndex.equal(selectedIndex) ? Style.selectedColor : "transparent";
 
         MouseArea {
@@ -204,7 +200,7 @@ Item {
                 anchors.leftMargin: 10;
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: parent.width - 30;
+                width: parent.width - 10;
 
                 text: model.Name ? model.Name : "";
 //                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;

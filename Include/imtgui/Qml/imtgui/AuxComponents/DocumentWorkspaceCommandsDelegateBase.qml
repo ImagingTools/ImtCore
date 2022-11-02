@@ -75,6 +75,14 @@ Item {
         objectModel.modelChanged.connect(modelChanged);
     }
 
+    function disconnectModelChanged(){
+        objectModel.modelChanged.disconnect(modelChanged);
+    }
+
+    function connectModelChanged(){
+        objectModel.modelChanged.connect(modelChanged);
+    }
+
     function removeChanges(){
         commandsProvider.changeCommandMode("Save", "Disabled");
         documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName});

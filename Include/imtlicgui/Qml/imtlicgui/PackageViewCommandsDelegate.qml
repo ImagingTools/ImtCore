@@ -8,14 +8,10 @@ DocumentWorkspaceCommandsDelegateBase {
     showInputIdDialog: true;
 
     property Item tableTreeViewEditor;
-
-    Component.onCompleted: {
-        Events.subscribeEvent("TreeViewModelUpdateFinished", updateGui)
-    }
+    property UndoRedoManager undoRedoManager;
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("TreeViewModelUpdateFinished", updateGui)
-        tableTreeViewEditor.selectedIndexChanged.disconnect(indexChanged)
+        tableTreeViewEditor.selectedIndexChanged.disconnect(indexChanged);
     }
 
     onEntered: {
@@ -29,11 +25,10 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onSaved: {
-        if (gqlModelQueryType == "Add"){
-            Events.sendEvent("TreeViewModelUpdate");
-        }
-
+        Events.sendEvent("TreeViewModelUpdate");
         Events.sendEvent("FeatureDependenciesUpdate");
+
+        updateGui();
     }
 
     onClosed: {
@@ -78,21 +73,18 @@ DocumentWorkspaceCommandsDelegateBase {
                 }
             }
 
+//            undoRedoManager.beginChanges();
             let childIndex = insertNewItem(childModel)
 
             childModel.SetData("Id", "", childIndex);
             childModel.SetData("Name", "Feature Name", childIndex);
 
+//            undoRedoManager.endChanges();
             updateGui();
-
-//            tableTreeViewEditor.table.elements = 0;
-//            tableTreeViewEditor.table.elements = objectModel.GetData("Items");
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected feature from the package ?")});
         }
-
-
     }
 
     function indexChanged(){
@@ -140,15 +132,10 @@ DocumentWorkspaceCommandsDelegateBase {
                     let model = tableTreeViewEditor.elements; //Elements model
 
                     //Get path of indexes for the selected item.
-                    console.log("tableTreeViewEditor", tableTreeViewEditor);
-                    console.log("tableTreeViewEditor.selectedIndex", tableTreeViewEditor.selectedIndex);
                     let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
-                    console.log("indexes", indexes);
 
                     //Последний индекс наш item(ChildModel может не быть у него)
                     let itemIndex = indexes.pop()
-
-                    console.log("itemIndex", itemIndex);
 
                     if (itemIndex >= 0){
                         for (let index of indexes){
@@ -156,8 +143,41 @@ DocumentWorkspaceCommandsDelegateBase {
                         }
 
                          model.RemoveItem(itemIndex);
+
+                        tableTreeViewEditor.selectedIndex = null;
                     }
                 }
+            }
+        }
+    }
+
+    /**
+        Remove dependencies for feature in the current package.
+    */
+    function removeDependencies(model, dependencyId){
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let dependenciesModel = model.GetData("DependenciesModel", i);
+
+            if (dependenciesModel){
+                let index = -1;
+                for (let j = 0; j < dependenciesModel.GetItemsCount(); j++){
+                    let featureId = dependenciesModel.GetData("Id", j);
+
+                    if (featureId == dependencyId){
+                        index = j;
+
+                        break;
+                    }
+                }
+
+                if (index >= 0){
+                    dependenciesModel.RemoveItem(index);
+                }
+            }
+
+            let childModel = model.GetData("ChildModel", i);
+            if (childModel){
+                removeDependencies(childModel, dependencyId);
             }
         }
     }

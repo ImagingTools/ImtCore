@@ -16,7 +16,9 @@ TreeViewControllerBase {
             let rootkey = container.selectedIndex.itemData.Id;
             treeView.visible = itemId != "" && rootkey != null && rootkey != "";
 
+            commandsDelegate.disconnectModelChanged();
             treeView.itemStateChanged.disconnect(itemStateChanged);
+//            undoRedoManager.model.modelChanged.disconnect(undoRedoManager.modelUpdated);
 
             resetProperties();
             hideCurrentItem();
@@ -61,11 +63,7 @@ TreeViewControllerBase {
                 selectFeature(featureId);
 
                 let childrenDepends = []
-
                 featureDependenciesModel.getAllChildrenDependsFeatures(featureId, childrenDepends);
-                console.log("childrenDepends", childrenDepends);
-
-//                treeViewModel.setValueToProperty("Active", false, childrenDepends);
                 setValueToProperty("Active", false, childrenDepends);
             }
 
@@ -74,7 +72,12 @@ TreeViewControllerBase {
 //            treeViewModel.setValueToProperty("Visible", false, parentDepends);
             setValueToProperty("Visible", false, parentDepends);
 
+            commandsDelegate.connectModelChanged();
             treeView.itemStateChanged.connect(itemStateChanged);
+//            undoRedoManager.model.modelChanged.connect(undoRedoManager.modelUpdated);
+        }
+        else{
+            treeView.visible = false;
         }
     }
 
@@ -86,6 +89,10 @@ TreeViewControllerBase {
         let itemName = itemData.Name;
         let itemState = itemData.State;
         let itemOptional = itemData.Optional;
+
+        if (rootkey == itemId){
+            return;
+        }
 
         let itemParentId = null;
 
@@ -104,6 +111,8 @@ TreeViewControllerBase {
         for (let index of indexes){
             model = model.GetData('ChildModel', index)
         }
+
+//        undoRedoManager.beginChanges();
 
         let dependenciesModel = model.GetData('DependenciesModel', itemIndex);
 
@@ -164,6 +173,8 @@ TreeViewControllerBase {
 
         }
 
+//        undoRedoManager.endChanges();
+
         synchronise();
     }
 
@@ -223,39 +234,4 @@ TreeViewControllerBase {
             }
         }
     }
-//    function updateGui(){
-//        console.log("PackageTreeView updateGui");
-//        let tableElementsModel = documentModel.GetData("Items");
-
-//        let packageId = itemId;
-//        if (packageId != ""){
-//            let treeElementsModel;
-//            for (let i = 0; i < treeView.model.GetItemsCount(); i++){
-//                let currentPackageId = treeView.model.GetData("Id", i);
-//                if (currentPackageId == packageId){
-//                    treeElementsModel = treeView.model.GetData("ChildModel", i);
-
-//                    break;
-//                }
-//            }
-
-//            if (treeElementsModel){
-//                for (let i = 0; i < tableElementsModel.GetItemsCount(); i++){
-//                    let childModel = tableElementsModel.GetData("ChildModel", i);
-//                    let elementId = tableElementsModel.GetData("Id", i);
-
-//                    let treeElementId = treeElementsModel.GetData("Id", i);
-
-//                    let index = i;
-//                    if (!treeElementId){
-//                        index = treeElementsModel.InsertNewItem();
-//                    }
-
-//                    treeElementsModel.SetData("ChildModel", childModel, index);
-//                }
-
-//                treeView.model.Refresh();
-//            }
-//        }
-//    }
 }

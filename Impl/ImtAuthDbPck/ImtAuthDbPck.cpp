@@ -21,9 +21,19 @@ I_EXPORT_COMPONENT(
 			"SQL Role Delegate");
 
 I_EXPORT_COMPONENT(
-            UserDatabaseDelegate,
-            "User object delegate for SQL table",
-            "SQL User Delegate");
+			UserDatabaseDelegate,
+			"User object delegate for SQL table",
+			"SQL User Delegate");
+
+I_EXPORT_COMPONENT(
+			UsersSessionsDatabaseDelegate,
+			"User sessions delegate for SQL table",
+			"SQL User Session Delegate");
+
+I_EXPORT_COMPONENT(
+			UsersSettingsDatabaseDelegate,
+			"User settings delegate for SQL table",
+			"SQL User Settings Delegate");
 
 
 } // namespace ImtAuthDbPck

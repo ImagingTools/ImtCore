@@ -19,6 +19,10 @@
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
+#include <imtauth/CCheckPermissionCompBase.h>
+#include <imtauth/CPermissionsProviderComp.h>
+#include <imtauth/CCollectionPermissionsProviderComp.h>
+
 
 namespace ImtAuthPck
 {
@@ -54,6 +58,9 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable>> UserCollection;
 typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
+typedef imtauth::CCheckPermissionCompBase CheckPermissions;
+typedef imtauth::CPermissionsProviderComp PermissionsProvider;
+typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
 
 
 } // namespace ImtAuthPck
