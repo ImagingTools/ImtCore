@@ -139,6 +139,11 @@ I_EXPORT_COMPONENT(
 			"Filter for messages",
 			"Filter Message");
 
+I_EXPORT_COMPONENT(
+			LoginBasedEnabler,
+			"Enabler based on login state",
+			"Login Enabler");
+
 
 } // namespace ImtCorePck
 

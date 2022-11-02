@@ -49,7 +49,8 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_itemDelegate(nullptr),
 	m_lastPageIndexForLoggedUser(-1),
 	m_isExitProcess(false),
-	m_additionalCommandsObserver(*this)
+	m_additionalCommandsObserver(*this),
+	m_additionalCommandActivatorsObserver(*this)
 {
 	m_rootCommands.InsertChild(&m_commands);
 	m_minItemSize = QSize(100, 50);
@@ -307,7 +308,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		}
 	}
 
-	LoginControlButton->setVisible(m_loginCompPtr.IsValid());
 	UserNameLabel->setVisible(false);
 	
 	installEventFilter(this);
@@ -362,7 +362,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	CurrentPageLabel->setVisible(showPageTitle);
-
 }
 
 
@@ -467,6 +466,31 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 	if (IsGuiCreated()) {
 		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
 	}
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CThumbnailDecoratorGuiComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	for (int i = 0; i < m_additionalCommandActivatorsCompPtr.GetCount(); i++){
+		if (m_additionalCommandActivatorsCompPtr[i] != nullptr){
+			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>(m_additionalCommandActivatorsCompPtr[i]);
+			if (modelPtr != nullptr){
+				m_additionalCommandActivatorsObserver.RegisterModel(modelPtr, i);
+			}
+		}
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::OnComponentDestroyed()
+{
+	m_additionalCommandActivatorsObserver.UnregisterAllModels();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
@@ -769,6 +793,7 @@ void CThumbnailDecoratorGuiComp::UpdateLoginButtonsState()
 
 	ExitButton->setEnabled(IsUserActionAllowed(UA_APPLICATION_EXIT));
 
+	LoginControlButton->setVisible(m_loginCompPtr.IsValid() && m_loginCompPtr->GetLoggedUser() != nullptr);
 	LoginControlButton->setEnabled(IsUserActionAllowed(UA_LOGIN_CONTROL_ENABLED));
 
 	HomeButton->setEnabled(IsUserActionAllowed(UA_HOME_ENABLED));
@@ -1009,6 +1034,34 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 }
 
 
+void CThumbnailDecoratorGuiComp::UpdateAdditionalCommandsEnabled()
+{
+	if (m_additionalCommandsProviderCompPtr.IsValid() && m_additionalCommandActivatorsCompPtr.IsValid()){
+		const ibase::IHierarchicalCommand* commandsPtr = m_additionalCommandsProviderCompPtr->GetCommands();
+		if (commandsPtr != nullptr){
+			int count = m_additionalCommandIdsAttrPtr.GetCount();
+			count = qMin(count, m_additionalCommandActivatorsCompPtr.GetCount());
+			for (int i = 0; i < count; i++){
+				QByteArray commandId = m_additionalCommandIdsAttrPtr[i];
+				iprm::IEnableableParam* activatorPtr = m_additionalCommandActivatorsCompPtr[i];
+
+				if (!commandId.isEmpty() && activatorPtr != nullptr){
+					const ibase::IHierarchicalCommand* foundCommandPtr = FindCommand(commandsPtr, commandId);
+					if (foundCommandPtr != nullptr){
+						bool isActive = activatorPtr->IsEnabled();
+						QAction* actionPtr = const_cast<QAction*>(dynamic_cast<const QAction*>(foundCommandPtr));
+						Q_ASSERT(actionPtr != nullptr);
+						if (actionPtr != nullptr){
+							actionPtr->setVisible(isActive);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
 CThumbnailDecoratorGuiComp::LoginMode CThumbnailDecoratorGuiComp::GetLoginMode()
 {
 	if (m_defaultPageIndexAttrPtr.IsValid()){
@@ -1121,6 +1174,27 @@ void CThumbnailDecoratorGuiComp::ExitApplication()
 bool CThumbnailDecoratorGuiComp::IsHomePageEnabled() const
 {
 	return !*m_hideHomeButtonAttrPtr;
+}
+
+
+const ibase::IHierarchicalCommand* CThumbnailDecoratorGuiComp::FindCommand(const ibase::IHierarchicalCommand* commandPtr, const QByteArray& commandId) const
+{
+	if (commandPtr->GetCommandId() == commandId){
+		return commandPtr;
+	}
+
+	int count = commandPtr->GetChildsCount();
+	for (int i = 0; i < count; i++){
+		const ibase::IHierarchicalCommand* childCommandPtr = dynamic_cast<const ibase::IHierarchicalCommand*>(commandPtr->GetChild(i));
+		if (childCommandPtr != nullptr){
+			const ibase::IHierarchicalCommand* foundCommandPtr = FindCommand(childCommandPtr, commandId);
+			if (foundCommandPtr != nullptr){
+				return foundCommandPtr;
+			}
+		}
+	}
+
+	return (const ibase::IHierarchicalCommand*) nullptr;
 }
 
 
@@ -1302,6 +1376,8 @@ void CThumbnailDecoratorGuiComp::UpdateAdditionalCommands()
 			}
 		}
 	}
+
+	UpdateAdditionalCommandsEnabled();
 }
 
 
@@ -1551,7 +1627,7 @@ void CThumbnailDecoratorGuiComp::LoginObserver::OnModelChanged(int /*modelId*/, 
 }
 
 
-// protected methods of embedded class PageStatusObserver
+// public methods of embedded class PageStatusObserver
 
 CThumbnailDecoratorGuiComp::PageVisualStatusObserver::PageVisualStatusObserver(CThumbnailDecoratorGuiComp& parent)
 	:m_parent(parent)
@@ -1564,6 +1640,22 @@ CThumbnailDecoratorGuiComp::PageVisualStatusObserver::PageVisualStatusObserver(C
 void CThumbnailDecoratorGuiComp::PageVisualStatusObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdatePageState();
+}
+
+
+// public methods of embedded class PageStatusObserver
+
+CThumbnailDecoratorGuiComp::AdditionalCommendActivatorsObserver::AdditionalCommendActivatorsObserver(CThumbnailDecoratorGuiComp& parent)
+	:m_parent(parent)
+{
+}
+
+
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CThumbnailDecoratorGuiComp::AdditionalCommendActivatorsObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
+{
+	m_parent.UpdateAdditionalCommandsEnabled();
 }
 
 

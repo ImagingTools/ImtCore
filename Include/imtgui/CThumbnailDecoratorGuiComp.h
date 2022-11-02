@@ -98,6 +98,8 @@ public:
 		I_ASSIGN(m_quitDialogIgnoredAttrPtr, "QuitDialogIgnored", "If true, exit application without dialog", true, false);
 		I_ASSIGN(m_additionalCommandsProviderCompPtr, "AdditionalCommands", "Additional tool commands showed on the right side of the main tool bar", false, "AdditionalCommands");
 		I_ASSIGN_TO(m_additionalCommandsProviderModelCompPtr, m_additionalCommandsProviderCompPtr, false);
+		I_ASSIGN_MULTI_0(m_additionalCommandIdsAttrPtr, "AdditionalCommandIds", "Additional command IDs", false);
+		I_ASSIGN_MULTI_0(m_additionalCommandActivatorsCompPtr, "AdditionalCommandActivators", "Additional command activators that allow the display of commands", false);
 		I_ASSIGN(m_rightsCommandsCompPtr, "RightsCommands", "Additional tool commands showed on the right side of the login button", false, "RightsCommands");
 	I_END_COMPONENT;
 
@@ -109,6 +111,8 @@ protected:
 	I_ATTR(bool, m_quitDialogIgnoredAttrPtr);
 	I_REF(ibase::ICommandsProvider, m_additionalCommandsProviderCompPtr);
 	I_REF(imod::IModel, m_additionalCommandsProviderModelCompPtr);
+	I_MULTIATTR(QByteArray, m_additionalCommandIdsAttrPtr);
+	I_MULTIREF(iprm::IEnableableParam, m_additionalCommandActivatorsCompPtr);
 	I_REF(ibase::ICommandsProvider, m_rightsCommandsCompPtr);
 };
 
@@ -194,6 +198,10 @@ protected:
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 	virtual void OnGuiDesignChanged();
 
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
 private Q_SLOTS:
 	void on_PageList_clicked(const QModelIndex& index);
 	void on_ExitButton_clicked();
@@ -215,12 +223,14 @@ private:
 	void CreatePages(const iprm::ISelectionParam* selectionPtr);
 	void CreateMenu(const iprm::ISelectionParam* selectionPtr, QTreeWidgetItem* parentItemPtr);
 	void UpdatePageState();
+	void UpdateAdditionalCommandsEnabled();
 	LoginMode GetLoginMode();
 	int GetAutoLogoutTime() const;
 	void ProcessLogout();
 	bool IsUserActionAllowed(UserAction action);
 	void ExitApplication();
 	bool IsHomePageEnabled() const;
+	const ibase::IHierarchicalCommand* FindCommand(const ibase::IHierarchicalCommand* commandPtr, const QByteArray& commandId) const;
 
 	/**
 		Calculate layout of page thumbnails based on m_horizontalItemsViewAttrPtr and m_verticalItemsViewAttrPtr
@@ -326,11 +336,25 @@ private:
 	};
 
 
+	class AdditionalCommendActivatorsObserver: public imod::CMultiModelDispatcherBase
+	{
+	public:
+		explicit AdditionalCommendActivatorsObserver(CThumbnailDecoratorGuiComp& parent);
+
+		// reimplemented (imod::CMultiModelDispatcherBase)
+		void OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet) override;
+
+	private:
+		CThumbnailDecoratorGuiComp& m_parent;
+	};
+
+
 	CommandsObserver m_commandsObserver;
 	AdditionalCommandsObserver m_additionalCommandsObserver;
 	PageModelObserver m_pageModelObserver;
 	LoginObserver m_loginObserver;
 	PageVisualStatusObserver m_pageVisualStatusObserver;
+	AdditionalCommendActivatorsObserver m_additionalCommandActivatorsObserver;
 
 	QStandardItemModel m_menuItemModel;
 	imtbase::CCollectionInfo* m_widgetList;
