@@ -163,6 +163,16 @@
                     <AttributeInfo Id="AccountMenu" Type="Reference" ExportId="AccountMenu">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="AdditionalCommandActivators" Type="Reference[]" ExportId="AdditionalCommandActivators">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AdditionalCommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PreferencesDialog</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="AdditionalCommands" Type="Reference" ExportId="AdditionalCommands">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
