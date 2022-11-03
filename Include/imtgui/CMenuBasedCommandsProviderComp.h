@@ -32,6 +32,7 @@ public:
 		I_ASSIGN(m_menuGuiCompPtr, "MenuGuiObject", "The gui object, provides menu", true, "MenuGuiObject");
 		I_ASSIGN(m_menuAnchorProviderCompPtr, "MenuAnchorProvider", "The widget provider for positioning the GUI component", true, "MenuAnchorProvider");
 		I_ASSIGN_TO(m_menuCommandVisualStatusProviderCompPtr, m_menuGuiCompPtr, true);
+		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "Menu activation command ID", true, "")
 	I_END_COMPONENT;
 
 	CMenuBasedCommandsProviderComp();
@@ -65,8 +66,8 @@ private:
 private:
 	I_REF(iqtgui::IGuiObject, m_menuGuiCompPtr);
 	I_REF(imtgui::IWidgetProvider, m_menuAnchorProviderCompPtr);
-
 	I_REF(iqtgui::IVisualStatusProvider, m_menuCommandVisualStatusProviderCompPtr);
+	I_ATTR(QByteArray, m_commandIdAttrPtr);
 
 	iqtgui::CHierarchicalCommand m_rootMenuCommand;
 	iqtgui::CHierarchicalCommand m_mainMenuCommand;
