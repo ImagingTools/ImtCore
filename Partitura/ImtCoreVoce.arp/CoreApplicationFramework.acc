@@ -166,12 +166,8 @@
                     <AttributeInfo Id="AdditionalCommandActivators" Type="Reference[]" ExportId="AdditionalCommandActivators">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="AdditionalCommandIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>PreferencesDialog</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="AdditionalCommandIds" Type="Id[]" ExportId="AdditionalCommandIds">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="AdditionalCommands" Type="Reference" ExportId="AdditionalCommands">
                         <Data IsEnabled="false"/>
