@@ -14,6 +14,7 @@ TreeItemModel {
 //        xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
+                this.state = "Processing"
                 this.updateJSONModel()
                 this.updateTreeItemJSONModel()
                 this.state = "Ready"

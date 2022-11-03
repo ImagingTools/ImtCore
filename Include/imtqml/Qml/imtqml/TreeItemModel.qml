@@ -53,6 +53,11 @@ JSONListModel {
         modelObject[key] = value
     }
 
+    function Clear(){
+        this.clear();
+        console.log("ccleared", this)
+    }
+
 
     function SetExternTreeModel(key, value, row){
         this.SetData(key, value, row)
