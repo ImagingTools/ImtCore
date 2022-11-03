@@ -41,7 +41,7 @@ void CMenuBasedCommandsProviderComp::OnSystemStarted()
 
 	m_rootMenuCommand.InsertChild(&m_mainMenuCommand);
 	m_mainMenuCommand.InsertChild(m_menuCommand);
-	m_mainMenuCommand.SetCommandId(*m_commandIdAttrPtr);
+	m_menuCommand->SetCommandId(*m_commandIdAttrPtr);
 
 	m_mainWidgetPtr = m_menuAnchorProviderCompPtr->GetWidgetPtr("Main");
 	m_topFramePtr = m_menuAnchorProviderCompPtr->GetWidgetPtr("TopFrame");
