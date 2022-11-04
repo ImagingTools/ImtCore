@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="Commands" PackageId="ImtGuiGqlPck" ComponentId="CommandsDataController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandsDataProviderCompPtr" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UsersCommandDataProvider</Value>
+                                <Value>UserEditCommandDataProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CommandsData</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Demultiplexer" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRepresentationDataController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Commands</Value>
+                                <Value>UserDataController</Value>
+                                <Value>UserListController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="HashCalculator" PackageId="ImtCryptPck" ComponentId="HashCalculator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ObjectViewDataProvider" PackageId="ImtQmlPck" ComponentId="ObjectViewDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectViewModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="User"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectViewPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtauthgui/UserView.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserDataController" PackageId="ImtAuthGqlPck" ComponentId="UserController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="HashCalculator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserAdd</Value>
+                                <Value>UserUpdate</Value>
+                                <Value>UserItem</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RolesCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserEditCommandDataProvider" PackageId="ImtQmlPck" ComponentId="CommandDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandsDefaultModes" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Disabled</Value>
+                                <Value>Disabled</Value>
+                                <Value></Value>
+                                <Value>Disabled</Value>
+                                <Value></Value>
+                                <Value>Normal</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsDefaultStatusIcon" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Undo</Value>
+                                <Value>Redo</Value>
+                                <Value></Value>
+                                <Value>Save</Value>
+                                <Value></Value>
+                                <Value>Close</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Undo</Value>
+                                <Value>Redo</Value>
+                                <Value></Value>
+                                <Value>Save</Value>
+                                <Value></Value>
+                                <Value>Close</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="User"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Undo</Value>
+                                <Value>Redo</Value>
+                                <Value></Value>
+                                <Value>Save</Value>
+                                <Value></Value>
+                                <Value>Close</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserListController" PackageId="ImtAuthGqlPck" ComponentId="UserCollectionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UsersHeadersDataProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UsersInfo</Value>
+                                <Value>UsersList</Value>
+                                <Value>UsersRemove</Value>
+                                <Value>UsersMetaInfo</Value>
+                                <Value>UsersRename</Value>
+                                <Value>UsersSetDescription</Value>
+                                <Value>UsersObjectView</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectViewProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ObjectViewDataProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UsersCommandDataProvider" PackageId="ImtQmlPck" ComponentId="CommandDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandsDefaultModes" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Normal</Value>
+                                <Value>Disabled</Value>
+                                <Value></Value>
+                                <Value>Disabled</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsDefaultStatusIcon" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Add</Value>
+                                <Value>Delete</Value>
+                                <Value></Value>
+                                <Value>Edit</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>New</Value>
+                                <Value>Remove</Value>
+                                <Value></Value>
+                                <Value>Edit</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Users"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Create user account</Value>
+                                <Value>Remove</Value>
+                                <Value></Value>
+                                <Value>Edit</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UsersHeadersDataProvider" PackageId="ImtQmlPck" ComponentId="HeadersDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="HeadersIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Username</Value>
+                                <Value>Name</Value>
+                                <Value>Email</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HeadersModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Users"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HeadersNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Username</Value>
+                                <Value>Name</Value>
+                                <Value>Email</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SearchByFilterIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Username</Value>
+                                <Value>Name</Value>
+                                <Value>Email</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="VisualStatus" PackageId="ImtQmlPck" ComponentId="PageDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="PageDefaultStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="LightSettings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Users"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Administration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageOffSelectedStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../Icons/LightSettings_Off_Selected.svg"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageOnSelectedStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../Icons/LightSettings_On_Selected.svg"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageSourceItem" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtgui/AuxComponents/SingleDocumentWorkspaceView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartSourceItem" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtauthgui/UserCollectionView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRepresentationDataController" ComponentId="Demultiplexer"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="UsersPageVisualStatus" ComponentId="VisualStatus"/>
+    </ExportedComponents>
+</Acf>

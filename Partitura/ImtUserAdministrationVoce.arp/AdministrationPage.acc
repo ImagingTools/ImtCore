@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>ц2йц</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="AdministrationPageDataController" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRepresentationDataController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Pages/RolesPage</Value>
+                                <Value>Pages/UsersPage</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AdministrationPages" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRepresentationDataController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AdministrationPageDataController</Value>
+                                <Value>PagesDataController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="JoinDataProvider" PackageId="ImtQmlPck" ComponentId="JoinDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RepresentationDataProvider" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Pages/RolesPageVisualStatus</Value>
+                                <Value>Pages/UsersPageVisualStatus</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Pages" PackageId="" ComponentId="Pages">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductPermissionsProviders" Type="Reference[]" ExportId="ProductPermissionsProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PagesDataController" PackageId="ImtGuiGqlPck" ComponentId="PagesDataController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AdministrationPages</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MutationDataDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="JoinDataProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PagesDataProviderCompPtr" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="JoinDataProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="VisualStatus" PackageId="ImtQmlPck" ComponentId="PageDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CheckPermissions" Type="Reference" ExportId="CheckPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageDefaultStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="LightSettings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Administration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Administration"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageOffSelectedStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../Icons/LightSettings_Off_Selected.svg"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageOnSelectedStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../Icons/LightSettings_On_Selected.svg"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageSourceItem" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtgui/AuxComponents/SingleDocumentWorkspaceView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>AdministrationView</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartSourceItem" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtauthgui/AdministrationView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="Pages">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="RoleRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RolesPage" PackageId="ImtUserAdministrationVoce" ComponentId="RolesPage">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductIds">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductNames">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ProductPermissionsProviders" Type="Reference[]" ExportId="ProductPermissionsProviders">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleRepository/RoleRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UserSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserSqlRepository">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UsersPage" PackageId="ImtUserAdministrationVoce" ComponentId="UsersPage">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleRepository/RoleRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UserSqlRepository/UserRepository"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces/>
+                <ExportedComponents>
+                    <Component ExportedId="RolesPage" ComponentId="RolesPage"/>
+                    <Component ExportedId="RolesPageVisualStatus" ComponentId="RolesPage/RolesPageVisualStatus"/>
+                    <Component ExportedId="UserInfo" ComponentId="UserRepository/UserInfo"/>
+                    <Component ExportedId="UserRepository" ComponentId="UserRepository/UserRepository"/>
+                    <Component ExportedId="UsersPage" ComponentId="UsersPage"/>
+                    <Component ExportedId="UsersPageVisualStatus" ComponentId="UsersPage/UsersPageVisualStatus"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRepresentationDataController" ComponentId="AdministrationPages"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="AdministrationPages"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="AdministrationPageVisualStatus" ComponentId="VisualStatus"/>
+        <Component ExportedId="AdministrationPages" ComponentId="AdministrationPages"/>
+    </ExportedComponents>
+</Acf>

@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="Commands" PackageId="ImtGuiGqlPck" ComponentId="CommandsDataController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandsDataProviderCompPtr" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleEditCommandDataProvider</Value>
+                                <Value>RolesCommandDataProvider</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CommandsData</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Demultiplexer" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRepresentationDataController" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleListController</Value>
+                                <Value>RoleDataController</Value>
+                                <Value>Commands</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ObjectViewDataProvider" PackageId="ImtQmlPck" ComponentId="ObjectViewDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectViewModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectViewPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtauthgui/RoleView.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ProductInfoProvider" PackageId="ImtLicensePck" ComponentId="ProductInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="PermissionsProvider" Type="Reference[]" ExportId="ProductPermissionsProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParentRoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleDataController" PackageId="ImtAuthGqlPck" ComponentId="RoleController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleItem</Value>
+                                <Value>RoleAdd</Value>
+                                <Value>RoleUpdate</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleEditCommandDataProvider" PackageId="ImtQmlPck" ComponentId="CommandDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandsDefaultModes" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Disabled</Value>
+                                <Value>Disabled</Value>
+                                <Value></Value>
+                                <Value>Disabled</Value>
+                                <Value></Value>
+                                <Value>Normal</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsDefaultStatusIcon" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Undo</Value>
+                                <Value>Redo</Value>
+                                <Value></Value>
+                                <Value>Save</Value>
+                                <Value></Value>
+                                <Value>Close</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Undo</Value>
+                                <Value>Redo</Value>
+                                <Value></Value>
+                                <Value>Save</Value>
+                                <Value></Value>
+                                <Value>Close</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Undo</Value>
+                                <Value>Redo</Value>
+                                <Value></Value>
+                                <Value>Save</Value>
+                                <Value></Value>
+                                <Value>Close</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleListController" PackageId="ImtAuthGqlPck" ComponentId="RoleCollectionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RolesHeadersDataProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RolesInfo</Value>
+                                <Value>RolesList</Value>
+                                <Value>RolesRemove</Value>
+                                <Value>RolesMetaInfo</Value>
+                                <Value>RolesRename</Value>
+                                <Value>RolesSetDescription</Value>
+                                <Value>RolesObjectView</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectViewProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ObjectViewDataProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ProductInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RolesCommandDataProvider" PackageId="ImtQmlPck" ComponentId="CommandDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandsDefaultModes" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Disabled</Value>
+                                <Value>Disabled</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsDefaultStatusIcon" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Delete</Value>
+                                <Value>Edit</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Remove</Value>
+                                <Value>Edit</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandsNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Remove</Value>
+                                <Value>Edit</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RolesHeadersDataProvider" PackageId="ImtQmlPck" ComponentId="HeadersDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="HeadersIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Name</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HeadersModelId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HeadersNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Role Name</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SearchByFilterIds" Type="String[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Name</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="VisualStatus" PackageId="ImtQmlPck" ComponentId="PageDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="PageDefaultStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageOffSelectedStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../Icons/Account_Off_Selected.svg"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageOnSelectedStatusIcon" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../Icons/Account_On_Selected.svg"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageSourceItem" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtgui/AuxComponents/SingleDocumentWorkspaceView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartSourceItem" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtgui/AuxComponents/RoleCollectionView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRepresentationDataController" ComponentId="Demultiplexer"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Demultiplexer"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="RolesPageVisualStatus" ComponentId="VisualStatus"/>
+    </ExportedComponents>
+</Acf>

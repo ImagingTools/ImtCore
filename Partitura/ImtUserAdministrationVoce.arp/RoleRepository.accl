@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5024" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="OptionsListAdapter" X="600" Y="650" Note=""/>
+        <Element ComponentName="Repository" X="550" Y="425" Note=""/>
+        <Element ComponentName="Role" X="1050" Y="75" Note=""/>
+        <Element ComponentName="RoleCollectionAdapter" X="700" Y="225" Note=""/>
+        <Element ComponentName="RoleDatabaseDelegate" X="175" Y="75" Note=""/>
+        <Element ComponentName="RoleMetaInfoCreator" X="175" Y="650" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

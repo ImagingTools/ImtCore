@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5026" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="OptionsListAdapter" X="600" Y="500" Note=""/>
+        <Element ComponentName="Repository" X="625" Y="325" Note=""/>
+        <Element ComponentName="UserDatabaseDelegate" X="225" Y="175" Note=""/>
+        <Element ComponentName="UserInfo" X="600" Y="150" Note=""/>
+        <Element ComponentName="UserMetaInfoCreator" X="225" Y="500" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

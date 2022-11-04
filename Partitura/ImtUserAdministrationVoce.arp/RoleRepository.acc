@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5024" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="OptionsListAdapter" PackageId="ImtCorePck" ComponentId="OptionsListAdapter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CollectionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleMetaInfoCreator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleDatabaseDelegate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParentRoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="RoleDatabaseDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="RoleId"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Role" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Roles"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RoleMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="RoleMetaInfoCreator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleCollectionAdapter"/>
+        <Component ExportedId="RoleRepository" ComponentId="Repository"/>
+    </ExportedComponents>
+</Acf>
