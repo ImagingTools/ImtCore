@@ -38,7 +38,7 @@ namespace imtqml
 {
 
 
-CRemoteFileController::CRemoteFileController(QObject *parent) : QObject(parent)
+CRemoteFileController::CRemoteFileController(QObject *parent) : QObject(parent), m_isAutoOpen(true)
 {
 
 }
@@ -241,12 +241,21 @@ void CRemoteFileController::OnFileDownloaded()
 			QDir().mkpath(m_downloadedFileLocation);
 		}
 		QFile downloadedFile(m_downloadedFileLocation +'/' + m_preferredFileNameForSave);
+		QFileInfo fileInfo(downloadedFile);
+		if(!QDir().exists(fileInfo.absoluteDir().absolutePath())){
+			QDir().mkpath(fileInfo.absoluteDir().absolutePath());
+		}
 		downloadedFile.open(QFile::WriteOnly);
 		downloadedFile.write(representationData);
 		downloadedFile.close();
 		SetState("Ready");
 		if(!reply->error()){
-            Q_EMIT fileDownloaded(downloadedFile.fileName());
+			if (m_isAutoOpen){
+				OpenFile(downloadedFile.fileName());
+			}
+			else{
+				Q_EMIT fileDownloaded(downloadedFile.fileName());
+			}
         }
         else {
             Q_EMIT fileDownloadFailed();

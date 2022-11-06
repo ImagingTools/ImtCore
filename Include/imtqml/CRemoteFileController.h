@@ -89,6 +89,7 @@ private:
 	QByteArray m_json;
     qint64 m_bytesLoaded;
 	qint64 m_bytesTotal;
+	bool m_isAutoOpen;
 };
 
 
