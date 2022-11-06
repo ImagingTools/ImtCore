@@ -200,30 +200,17 @@ bool CRole::Serialize(iser::IArchive& archive)
 
 	QByteArray parentsRolesTag = "ParentsRoles";
 	QByteArray parentRoleTag = "ParentRole";
-	QByteArrayList parentsRoles(m_parents.begin(), m_parents.end());
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, parentsRoles, parentsRolesTag, parentRoleTag);
-
-	if (!archive.IsStoring()){
-		m_parents = QByteArrayList(parentsRoles.begin(), parentsRoles.end());
-	}
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parents, parentsRolesTag, parentRoleTag);
 
 	QByteArray permissionsTag = "Permissions";
 	QByteArray permissionTag = "Permission";
-	QByteArrayList permissions(m_rolePermissions.begin(),m_rolePermissions.end());
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, permissionsTag, permissionTag);
-
-	if (!archive.IsStoring()){
-		m_rolePermissions = IRole::FeatureIds(permissions.begin(), permissions.end());
-	}
+	QByteArrayList rolePermission = m_rolePermissions.values();
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, rolePermission, permissionsTag, permissionTag);
 
 	QByteArray restrictionsTag = "Restrictions";
 	QByteArray restrictionTag = "Restriction";
-	QByteArrayList restrictions(m_roleRestrictions.begin(),m_roleRestrictions.end());
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, restrictionsTag, restrictionTag);
-
-	if (!archive.IsStoring()){
-		m_roleRestrictions = IRole::FeatureIds(restrictions.begin(), restrictions.end());
-	}
+	QByteArrayList roleRestrictions = m_roleRestrictions.values();
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, roleRestrictions, restrictionsTag, restrictionTag);
 
 	return retVal;
 }
