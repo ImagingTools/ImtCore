@@ -1,1 +1,1 @@
-ALTER TABLE tests DROP COLUMN ShortDescription;
+ALTER TABLE "Tests" DROP COLUMN ShortDescription;

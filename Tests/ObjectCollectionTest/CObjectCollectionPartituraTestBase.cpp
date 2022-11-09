@@ -44,7 +44,7 @@ void CObjectCollectionPartituraTestBase::cleanup()
 		imtdb::IDatabaseEngine* databaseEnginePtr = compositePtr->GetComponentInterface<imtdb::IDatabaseEngine>();
 		if (databaseEnginePtr != nullptr){
 			QSqlError sqlError;
-			QSqlQuery sqlQuery = databaseEnginePtr->ExecSqlQuery(QByteArray("DELETE FROM public.tests CASCADE;"), &sqlError);
+			QSqlQuery sqlQuery = databaseEnginePtr->ExecSqlQuery(QByteArray("DELETE FROM \"Tests\" CASCADE;"), &sqlError);
 		}
 	}
 }

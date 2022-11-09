@@ -9,9 +9,9 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationInfo" X="1025" Y="200" Note=""/>
-        <Element ComponentName="OptionsListAdapter" X="625" Y="725" Note=""/>
+        <Element ComponentName="OptionsListAdapter" X="625" Y="700" Note=""/>
         <Element ComponentName="Persistence" X="1000" Y="600" Note=""/>
-        <Element ComponentName="PgSqlDatabaseEngine" X="600" Y="225" Note=""/>
+        <Element ComponentName="PgSqlDatabaseEngine" X="625" Y="250" Note=""/>
         <Element ComponentName="PreferencesDatabase" X="850" Y="325" Note=""/>
         <Element ComponentName="RelativeFileNameParam" X="625" Y="125" Note=""/>
         <Element ComponentName="Repository" X="600" Y="475" Note=""/>

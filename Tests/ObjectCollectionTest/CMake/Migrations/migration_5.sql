@@ -1,2 +1,2 @@
-ALTER TABLE tests ADD COLUMN Added timestamp;
-ALTER TABLE tests ADD COLUMN LastModified timestamp;
+ALTER TABLE "Tests" ADD COLUMN Added timestamp;
+ALTER TABLE "Tests" ADD COLUMN LastModified timestamp;
