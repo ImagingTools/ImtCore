@@ -79,7 +79,13 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 		return -1;
 	}
 
-	QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
+	QFileInfo fileInfo = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath);
+	if (!fileInfo.exists()){
+		return -1;
+	}
+
+//	QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
+	QString revisionsPath = fileInfo.path() + "/Revisions";
 
 	if (istd::CSystem::EnsurePathExists(revisionsPath)){
 		int newRevision = 0;
