@@ -1,1 +1,1 @@
-INSERT INTO Revisions (Revision) VALUES (:Revision);
+INSERT INTO "%1" (Revision) VALUES (%2);
