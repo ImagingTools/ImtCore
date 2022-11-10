@@ -136,38 +136,6 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(
 				}
 			}
 		}
-//		imtbase::ICollectionInfo::Ids productsIds = m_productCollectionCompPtr->GetElementIds();
-
-//		for (const imtbase::ICollectionInfo::Id& productId : productsIds){
-//			QString productName = m_productCollectionCompPtr->GetElementInfo(productId, imtbase::ICollectionInfo::EIT_NAME).toString();
-
-//			int index = itemsModel->InsertNewItem();
-//			itemsModel->SetData("Id", productId, index);
-//			itemsModel->SetData("Name", productName, index);
-
-//			imtbase::CTreeItemModel* rolesModel = itemsModel->AddTreeModel("Roles", index);
-
-//			imtbase::ICollectionInfo::Ids rolesIds = m_objectCollectionCompPtr->GetElementIds();
-
-//			for (const imtbase::ICollectionInfo::Id& roleObjectId : rolesIds){
-//				imtbase::IObjectCollection::DataPtr dataPtr;
-//				if (m_objectCollectionCompPtr->GetObjectData(roleObjectId, dataPtr)){
-//					const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-
-//					QByteArray roleId = roleInfoPtr->GetRoleId();
-//					QByteArray roleProductId = roleInfoPtr->GetProductId();
-
-//					if (productId == roleProductId){
-//						int roleIndex = rolesModel->InsertNewItem();
-
-//						QByteArray objectId = roleInfoPtr->GetRoleId() + *m_separatorObjectIdAttrPtr + roleProductId;
-
-//						rolesModel->SetData("Id", objectId, roleIndex);
-//						rolesModel->SetData("Name", roleInfoPtr->GetRoleName(), roleIndex);
-//					}
-//				}
-//			}
-//		}
 
 		dataModel->SetExternTreeModel("items", itemsModel);
 	}

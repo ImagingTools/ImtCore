@@ -51,7 +51,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtg
 				istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 
 				sessionInfoPtr->SetUserId(login);
-				sessionInfoPtr->SetToken(tokenValue);
+				sessionInfoPtr->SetToken(QUuid(tokenValue));
 
 				if (m_sessionCollectionCompPtr.IsValid()){
 					m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
