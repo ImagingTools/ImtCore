@@ -381,10 +381,6 @@
             <property name="text">
              <string>Quit</string>
             </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/Icons/PowerOff</normaloff>:/Icons/PowerOff</iconset>
-            </property>
             <property name="iconSize">
              <size>
               <width>24</width>

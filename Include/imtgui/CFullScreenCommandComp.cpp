@@ -28,7 +28,7 @@ void CFullScreenCommandComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	m_mainMenuCommand.SetName(*m_rootMenuNameAttrPtr);
-	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
+	m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, GetIcon(*m_actionIconScreenOffAttrPtr));
 	m_rootMenuCommand.InsertChild(&m_mainMenuCommand);
 	m_mainMenuCommand.InsertChild(&m_switchCommand);
 
@@ -104,13 +104,13 @@ void CFullScreenCommandComp::OnCommandActivated()
 	if (mainWidgetPtr->isFullScreen()){
 		mainWidgetPtr->showMaximized();
 		if (m_actionIconScreenOnAttrPtr.IsValid()){
-			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, QIcon(*m_actionIconScreenOnAttrPtr));
+			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, GetIcon(*m_actionIconScreenOnAttrPtr));
 		}
 	}
 	else{
 		mainWidgetPtr->showFullScreen();
 		if (m_actionIconScreenOnAttrPtr.IsValid()){
-			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, QIcon(*m_actionIconScreenOffAttrPtr));
+			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, GetIcon(*m_actionIconScreenOffAttrPtr));
 		}
 	}
 }
