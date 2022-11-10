@@ -168,7 +168,7 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	if (!sqlQuery.last()){
+    if (!sqlQuery.next()){
 		return false;
 	}
 
