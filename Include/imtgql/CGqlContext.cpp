@@ -159,7 +159,7 @@ bool CGqlContext::ResetData(CompatibilityMode mode)
 
 	m_languageId.clear();
 	m_designScheme.clear();
-	m_token = NULL;
+	m_token = QUuid();
 	m_userInfoPtr = nullptr;
 
 	return true;

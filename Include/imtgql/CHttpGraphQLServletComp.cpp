@@ -63,52 +63,11 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 							QByteArray settingsData = userSettingsPtr->GetSettings();
 							QJsonDocument jsonResponse = QJsonDocument::fromJson(settingsData);
 							QJsonObject jsonObject = jsonResponse.object();
-//							if (jsonResponse.isArray()){
-//								QJsonArray jsonArray = jsonResponse.array();
-
-//								QJsonObject generalObj;
-//								for (const QJsonValue & value : jsonArray){
-//									QJsonObject obj = value.toObject();
-
-//									if (obj["Id"] == "General"){
-//										generalObj = obj;
-//										break;
-//									}
-//								}
-
-//								if (!generalObj.isEmpty()){
-//									QJsonArray jsonElementsArray = generalObj["Elements"].toArray();
-
-//									QJsonObject schemeObj;
-//									QJsonObject languageObj;
-
-//									for (const QJsonValue & value : jsonElementsArray){
-//										QJsonObject obj = value.toObject();
-
-//										if (obj["Id"] == "Mode"){
-//											int value = obj["Value"].toInt();
-//											QJsonArray jsonParametersArray = obj["Parameters"].toArray();
-//											QJsonObject parameterObj = jsonParametersArray.at(value).toObject();
-
-//											QByteArray design = parameterObj["Id"].toString().toUtf8();
-//											gqlContextPtr->SetDesignScheme(design);
-//										}
-//										else if (obj["Id"] == "Language"){
-//											int value = obj["Value"].toInt();
-//											QJsonArray jsonParametersArray = obj["Parameters"].toArray();
-//											QJsonObject parameterObj = jsonParametersArray.at(value).toObject();
-
-//											QByteArray language = parameterObj["Id"].toString().toUtf8();
-//											gqlContextPtr->SetLanguageId(language);
-//										}
-//									}
-//								}
-//							}
 						}
 					}
 				}
 
-				gqlContextPtr->SetToken(accessToken);
+				gqlContextPtr->SetToken(QUuid(accessToken));
 				gqlRequest.SetGqlContext(gqlContextPtr);
 			}
 		}
