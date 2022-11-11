@@ -311,10 +311,6 @@
             <property name="text">
              <string>Log out</string>
             </property>
-            <property name="icon">
-             <iconset>
-              <normaloff>:/Icons/Account</normaloff>:/Icons/Account</iconset>
-            </property>
             <property name="iconSize">
              <size>
               <width>24</width>
@@ -471,7 +467,6 @@
               <widget class="QTreeWidget" name="SubPages">
                <property name="font">
                 <font>
-                 <weight>75</weight>
                  <bold>true</bold>
                 </font>
                </property>
