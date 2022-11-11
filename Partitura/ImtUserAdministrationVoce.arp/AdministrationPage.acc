@@ -55,9 +55,6 @@
         <Element Id="Pages" PackageId="" ComponentId="Pages">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductIds">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -66,6 +63,15 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ProductPermissionsProviders" Type="Reference[]" ExportId="ProductPermissionsProviders">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/RoleCollectionAdapter"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/RoleRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserSqlRepository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -88,6 +94,15 @@
                     </AttributeInfo>
                     <AttributeInfo Id="PagesDataProviderCompPtr" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="JoinDataProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Repositories" PackageId="" ComponentId="Repositories">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -137,15 +152,6 @@
         <EmbeddedRegistry Id="Pages">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="RoleRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
                     <Element Id="RolesPage" PackageId="ImtUserAdministrationVoce" ComponentId="RolesPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -158,23 +164,11 @@
                                 <AttributeInfo Id="ProductPermissionsProviders" Type="Reference[]" ExportId="ProductPermissionsProviders">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleRepository/RoleRepository"/>
+                                <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                                     <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="UserSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserSqlRepository">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -182,17 +176,17 @@
                     <Element Id="UsersPage" PackageId="ImtUserAdministrationVoce" ComponentId="UsersPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleRepository/RoleRepository"/>
+                                <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RoleRepository">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="UserSqlRepository/UserRepository"/>
+                                <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -210,6 +204,40 @@
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
+        <EmbeddedRegistry Id="Repositories">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="RoleRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="UserSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserSqlRepository">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces/>
+                <ExportedComponents>
+                    <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleRepository/RoleCollectionAdapter"/>
+                    <Component ExportedId="RoleRepository" ComponentId="RoleRepository"/>
+                    <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
     </EmbeddedRegistriesList>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRepresentationDataController" ComponentId="AdministrationPages"/>
@@ -218,5 +246,6 @@
     <ExportedComponents>
         <Component ExportedId="AdministrationPageVisualStatus" ComponentId="VisualStatus"/>
         <Component ExportedId="AdministrationPages" ComponentId="AdministrationPages"/>
+        <Component ExportedId="UserSqlRepository" ComponentId="Repositories/UserSqlRepository"/>
     </ExportedComponents>
 </Acf>

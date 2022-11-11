@@ -13,15 +13,21 @@
         <Element ComponentName="JoinDataProvider" X="275" Y="375" Note=""/>
         <Element ComponentName="Pages" X="925" Y="375" Note=""/>
         <Element ComponentName="PagesDataController" X="275" Y="225" Note=""/>
+        <Element ComponentName="Repositories" X="950" Y="525" Note=""/>
         <Element ComponentName="VisualStatus" X="175" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="RoleRepository" X="600" Y="250" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="600" Y="425" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="Pages">
             <PositionMap>
-                <Element ComponentName="RoleRepository" X="600" Y="375" Note=""/>
-                <Element ComponentName="RolesPage" X="175" Y="375" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="1000" Y="575" Note=""/>
-                <Element ComponentName="UsersPage" X="1000" Y="375" Note=""/>
+                <Element ComponentName="RolesPage" X="350" Y="400" Note=""/>
+                <Element ComponentName="UsersPage" X="825" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
