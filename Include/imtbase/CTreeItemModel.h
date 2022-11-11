@@ -59,7 +59,8 @@ public Q_SLOTS:
 	imtbase::CTreeItemModel* GetParent() const;
 	bool IsTreeModel(const QByteArray &key, int index = 0) const;
 	bool ContainsKey(const QByteArray &key, int index = 0) const;
-	imtbase::CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
+    bool IsValidData(const QByteArray &key, int index = 0) const;
+    imtbase::CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
 	int GetItemsCount() const;
 	void GetKeys(QList<QByteArray>& keys, int index = 0);
 	QList<QString> GetKeys(int index = 0);

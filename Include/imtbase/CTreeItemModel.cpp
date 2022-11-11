@@ -312,7 +312,13 @@ bool CTreeItemModel::ContainsKey(const QByteArray &key, int index) const
 		retVal = m_items[index]->ContainsKey(key);
 	}
 
-	return retVal;
+    return retVal;
+}
+
+
+bool CTreeItemModel::IsValidData(const QByteArray &key, int index) const
+{
+    return GetData(key, index) != QVariant();
 }
 
 
