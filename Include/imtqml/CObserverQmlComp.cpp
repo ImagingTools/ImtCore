@@ -22,21 +22,25 @@ void CObserverQmlComp::OnSettingsUpdated(const istd::IChangeable::ChangeSet &cha
 	QList<imtgql::CGqlObject> params;
 
 	if (changeSet.GetChangeInfoMap().count() > 0){
-		ApplyUrl(settingsModelPtr);
+		ApplyUrl();
 		m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(params, model);
 	}
 }
 
 
-void CObserverQmlComp::ApplyUrl(const imtbase::CTreeItemModel *settingsModelPtr)
+void CObserverQmlComp::ApplyUrl() const
 {
-	imtbase::CTreeItemModel* elementsModel = settingsModelPtr->GetTreeItemModel("Elements");
-	if (elementsModel != nullptr && m_quickObjectComp.IsValid()){
-		QString serverUrl = elementsModel->GetData("Value").toString();
-		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
-		QQmlEngine* engine = qmlEngine(quickItem);
-		engine->setBaseUrl(serverUrl + *m_prefixServer);
-//		QMetaObject::invokeMethod(quickItem, "updateModels");
+	const imtbase::CTreeItemModel* pageModelPtr = GetPageModel("NetworkSettings");
+	if (pageModelPtr != nullptr){
+		imtbase::CTreeItemModel* elementsModelPtr = pageModelPtr->GetTreeItemModel("Elements");
+		if (elementsModelPtr != nullptr && m_quickObjectComp.IsValid()){
+			if (elementsModelPtr->ContainsKey("Value")){
+				QString serverUrl = elementsModelPtr->GetData("Value").toString();
+				QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
+				QQmlEngine* engine = qmlEngine(quickItem);
+				engine->setBaseUrl(serverUrl + *m_prefixServer);
+			}
+		}
 	}
 }
 
@@ -50,7 +54,7 @@ void CObserverQmlComp::OnComponentCreated()
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 
 		if (quickItem != nullptr){
-			connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
+//			connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
 
 			if (m_pagesDataProviderCompPtr.IsValid()){
 				QList<imtgql::CGqlObject> params;
@@ -60,14 +64,16 @@ void CObserverQmlComp::OnComponentCreated()
 				QByteArrayList fields;
 				fields.append("NetworkSettings");
 				m_settingsModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);
-				QVariant data = QVariant::fromValue(m_settingsModelPtr);
-				quickItem->setProperty("localSettings", data);
+				if (m_settingsModelPtr != nullptr){
+					QVariant data = QVariant::fromValue(m_settingsModelPtr);
+					quickItem->setProperty("localSettings", data);
+				}
 //				m_settingsObserver.RegisterObject(m_settingsModelPtr, &CObserverQmlComp::OnSettingsUpdated);
-//				connect(m_settingsModelPtr, SIGNAL(modelChanged()), this, SLOT(OnModelChanged()));
+//				connect(m_settingsModelPtr, SIGNAL(modelChanged), this, SLOT(OnModelChanged));
 
-				connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnModelChanged()));
+				connect(quickItem, SIGNAL(settingsUpdate(QString)), this, SLOT(OnModelChanged(QString)));
 
-				ApplyUrl(m_settingsModelPtr);
+				ApplyUrl();
 				QMetaObject::invokeMethod(quickItem, "updateModels");
 			}
 		}
@@ -95,13 +101,40 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 }
 
 
-void CObserverQmlComp::OnModelChanged()
+void CObserverQmlComp::OnModelChanged(const QString& pageId)
 {
 	qDebug() << "ObserverQml OnModelChanged";
 	QList<imtgql::CGqlObject> params;
 
-	ApplyUrl(m_settingsModelPtr);
-	m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(params, m_settingsModelPtr);
+	imtgql::CGqlObject gqlObject;
+	gqlObject.InsertField("Id", pageId);
+	params << gqlObject;
+
+	const imtbase::CTreeItemModel* pageModelPtr = GetPageModel(pageId.toUtf8());
+	if (pageModelPtr != nullptr){
+		ApplyUrl();
+		m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(params, const_cast<imtbase::CTreeItemModel*>(pageModelPtr));
+	}
+}
+
+
+const imtbase::CTreeItemModel* CObserverQmlComp::GetPageModel(const QByteArray &pageId) const
+{
+	imtbase::CTreeItemModel* pageModelPtr = nullptr;
+
+	for (int i = 0; i < m_settingsModelPtr->GetItemsCount(); i++){
+		if (m_settingsModelPtr->ContainsKey("Id", i)){
+			QByteArray currentPageId = m_settingsModelPtr->GetData("Id", i).toByteArray();
+			if (currentPageId == pageId){
+				pageModelPtr = new imtbase::CTreeItemModel();
+				int index = pageModelPtr->InsertNewItem();
+				m_settingsModelPtr->CopyItemDataToModel(i, pageModelPtr, index);
+				break;
+			}
+		}
+	}
+
+	return pageModelPtr;
 }
 
 

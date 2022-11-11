@@ -15,8 +15,6 @@
 #include <imtgql/IGqlMutationDataControllerDelegate.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 
-#include <QTimer>
-
 
 namespace imtqml
 {
@@ -26,7 +24,7 @@ class CObserverQmlComp: public QObject, public ilog::CLoggerComponentBase
 {
     Q_OBJECT
 public:
-		typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObserverQmlComp);
 		I_ASSIGN(m_pagesDataProviderCompPtr, "PagesDataProviderCompPtr", "List of pages providers for join", false, "");
@@ -43,10 +41,12 @@ public:
 
 protected:
 	void OnSettingsUpdated(const istd::IChangeable::ChangeSet& changeSet, const imtbase::CTreeItemModel* settingsModelPtr);
-	void ApplyUrl(const imtbase::CTreeItemModel* settingsModelPtr);
+	void ApplyUrl() const;
+	const imtbase::CTreeItemModel* GetPageModel(const QByteArray& pageId) const;
+
 private Q_SLOTS:
 	void OnChangeSourceItem(QString src);
-	void OnModelChanged();
+	void OnModelChanged(const QString& page);
 
 private:
 	I_REF(imtqml::IQuickObject, m_quickObjectComp);

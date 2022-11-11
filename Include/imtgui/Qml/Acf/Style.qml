@@ -86,7 +86,7 @@ Item {
 
     Component.onCompleted: {
         console.log("Style onCompleted");
-       //styleContainer.changeSchemeDesign("");
+       //styleContainer.getDesignScheme("");
     }
 
     function getImageSource (name, styleTheme, buttonState, buttonMode)
@@ -105,7 +105,7 @@ Item {
         source: "../../Fonts/Ubuntu-Medium.ttf";
     }
 
-    function changeSchemeDesign(theme){
+    function getDesignScheme(theme){
         console.log("PreferenceDialog callGetStyleQuery", theme);
         styleQuery.getStyle(theme);
     }
@@ -198,8 +198,9 @@ Item {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("style");
-            queryFields.InsertField("theme");
-            queryFields.InsertField("source");
+            queryFields.InsertField("theme", theme);
+            queryFields.InsertField("source", "source");
+            queryFields.InsertField("test", "test");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

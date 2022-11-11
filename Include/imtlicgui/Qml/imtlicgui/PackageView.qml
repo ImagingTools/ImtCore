@@ -6,9 +6,14 @@ DocumentBase {
     id: packageViewContainer;
 
 //    commandsDelegate: PackageViewCommandsDelegate {}
-    commandsDelegatePath: "../../imtlicgui/PackageViewCommandsDelegate.qml";
+//    commandsDelegatePath: "../../imtlicgui/PackageViewCommandsDelegate.qml";
+
+    commandsDelegateSourceComp: PackageViewCommandsDelegate {
+    }
 
     Component.onCompleted: {
+        console.log("PackageView onCompleted");
+
         commandsDelegate.tableTreeViewEditor = collectionView;
     }
 

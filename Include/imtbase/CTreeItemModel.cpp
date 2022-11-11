@@ -380,6 +380,7 @@ bool CTreeItemModel::Parse(const QByteArray &data)
 {
 	Clear();
 	QJsonParseError error;
+	qDebug() << "data" << data;
 	QJsonDocument document = QJsonDocument::fromJson(data, &error);
 	if (error.error != QJsonParseError::NoError){
 		qCritical()  << "Error for parsing json document:" << error.errorString();
@@ -728,7 +729,7 @@ void CTreeItemModel::OnEndChanges(const ChangeSet& changeSet)
 {
 	BaseClass::OnEndChanges(changeSet);
 
-	emit modelChanged();
+	emit modelChanged(changeSet);
 }
 
 

@@ -44,12 +44,12 @@ public:
 	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 	virtual imtbase::CTreeItemModel* UpdateBaseModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
-				imtbase::CTreeItemModel* baseModel) override;
+				imtbase::CTreeItemModel* baseModel,
+				const imtgql::IGqlContext* gqlContext) override;
 private:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
 	I_MULTIREF(imtbase::IItemBasedRepresentationDataProvider, m_representationDataProviderCompPtr);
 	I_MULTIREF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
-
 };
 
 

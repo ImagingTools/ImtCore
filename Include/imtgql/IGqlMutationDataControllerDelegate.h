@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlObject.h>
+#include <imtgql/IGqlContext.h>
 
 
 namespace imtgql
@@ -21,7 +22,8 @@ class IGqlMutationDataControllerDelegate: virtual public istd::IPolymorphic
 public:
 	virtual imtbase::CTreeItemModel* UpdateBaseModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
-				imtbase::CTreeItemModel* baseModel) = 0;
+				imtbase::CTreeItemModel* baseModel,
+				const imtgql::IGqlContext* gqlContext = nullptr) = 0;
 };
 
 

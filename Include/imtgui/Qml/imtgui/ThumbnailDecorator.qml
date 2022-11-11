@@ -15,27 +15,21 @@ Rectangle {
     property int mainMargin: 0;
     property int mainRadius: 0;
 
-    Component.onCompleted: {
-        console.log("ThumbnailDecorator onCompleted");
-    }
-
     onLocalSettingsChanged: {
-        console.log("ThumbnailDecorator onLocalSettingsChanged");
         preferenceDialog.localModel = thumbnailDecoratorContainer.localSettings;
     }
+
+    property alias authorizationPage: authorizationPage;
+    property alias preferencePage: preferenceDialog;
 
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
 
-        menuPanel.updateModels();
-
+        pagesManager.updateModel();
         preferenceDialog.updateModel();
     }
 
     function clearModels(){
-        console.log("ThumbnailDecorator clearModels");
-        console.log("menuPanel.model1", menuPanel.model.toJSON());
-
         menuPanel.clearModels();
         pagesManager.clearModels();
 
@@ -52,6 +46,8 @@ Rectangle {
         anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
         anchors.bottom: customPanel.top;
         anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
+
+        model: pagesManager.pageModel;
     }
 
     Item {
@@ -118,7 +114,7 @@ Rectangle {
         anchors.fill: parent;
         anchors.topMargin: 60;
 
-        visible: !preferenceDialog.visible;
+        visible: false;
 
         onAccepted: {
             visible = false;

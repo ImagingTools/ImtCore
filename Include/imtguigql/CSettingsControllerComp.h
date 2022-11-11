@@ -1,12 +1,10 @@
 #pragma once
 
 
-// ACF includes
-#include <iprm/IParamsSet.h>
-
 // ImtCore includes
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IGqlMutationDataControllerDelegate.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 
@@ -22,13 +20,10 @@ public:
 
 	I_BEGIN_COMPONENT(CSettingsControllerComp);
 		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider)
-		I_REGISTER_INTERFACE(imtbase::IObjectCollection)
-		I_REGISTER_INTERFACE(iprm::IParamsSet)
-		I_REGISTER_INTERFACE(imtdb::IDatabaseLoginSettings)
-		I_ASSIGN(m_settingsParamsSetCompPtr, "SettingsParamsSet", "Settings parameters", true, "SettingsParamsSet");
-		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", true, "UserSettingsCollection");
+		I_REGISTER_INTERFACE(imtgql::IGqlMutationDataControllerDelegate)
 		I_ASSIGN(m_settingsDataProviderCompPtr, "SettingsDataProvider", "Settings data provider", true, "");
-		I_ASSIGN(m_databaseSettingsCompPtr, "DatabaseSettings", "Parameter of database settings", false, "");
+		I_ASSIGN(m_mutationDataControllerCompPtr, "MutationDataProvider", "Provides data to the controller for saving", true, "");
+//		I_ASSIGN_MULTI_0(m_mutationDataControllersCompPtr, "MutationDataControllers", "Mutation data controllers", false);
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -54,10 +49,9 @@ protected:
 			QString& errorMessage) const;
 
 private:
-	I_REF(iprm::IParamsSet, m_settingsParamsSetCompPtr);
-	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_settingsDataProviderCompPtr);
-	I_REF(imtdb::IDatabaseLoginSettings, m_databaseSettingsCompPtr);
+	I_REF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataControllerCompPtr);
+//	I_MULTIREF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataControllersCompPtr);
 };
 
 

@@ -281,6 +281,7 @@ Rectangle {
                             this.SetGlobalAccessToken(token);
 
                             let login = dataModelLocal.GetData("Login")
+
                             authPageContainer.login = login;
 
                             accepted();

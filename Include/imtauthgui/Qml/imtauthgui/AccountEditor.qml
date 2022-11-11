@@ -7,7 +7,9 @@ DocumentBase {
     id: accountEditorContainer;
 
 //    commandsDelegate: AccountEditorCommandsDelegate{}
-    commandsDelegatePath: "../../imtauthgui/AccountEditorCommandsDelegate.qml";
+//    commandsDelegatePath: "../../imtauthgui/AccountEditorCommandsDelegate.qml";
+
+    commandsDelegateSourceComp: AccountEditorCommandsDelegate {}
 
     property int textInputHeight: 30;
 

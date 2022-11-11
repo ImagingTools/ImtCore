@@ -53,3 +53,5 @@ ModalDialogManager 1.0 ./AuxComponents/Dialogs/ModalDialogManager.qml
 TopPanelDialog 1.0 ./AuxComponents/Dialogs/TopPanelDialog.qml
 ButtonsDialog 1.0 ./AuxComponents/Dialogs/ButtonsDialog.qml
 PopupMenuDialogGql 1.0 ./AuxComponents/Dialogs/PopupMenuDialogGql.qml
+
+DocumentViewBase 1.0 ./AuxComponents/DocumentViewBase.qml

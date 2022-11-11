@@ -16,12 +16,14 @@ Item {
 
     property bool itemLoad: true;
 
-    property alias commandsProvider: commandsProviderBase;
+    property alias commandsProvider: commandsProviderBase.item;
+    property alias commandsProviderSourceCompr: commandsProviderBase.sourceComponent;
 
 //    property Item commandsDelegate : DocumentWorkspaceCommandsDelegateBase {}
 
-    property string commandsDelegatePath: "DocumentWorkspaceCommandsDelegateBase.qml";
+//    property string commandsDelegatePath: "DocumentWorkspaceCommandsDelegateBase.qml";
     property alias commandsDelegate: commandsDelegateBase.item;
+    property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
     signal commandsDelegateLoaded();
 
@@ -38,7 +40,8 @@ Item {
         console.log("documentBase onCommandsIdChanged", commandsId);
 
         if (itemLoad){
-            commandsProvider.commandsId = documentBase.commandsId;
+//            commandsProvider.commandsId = documentBase.commandsId;
+            commandsProviderBase.item.commandsId = documentBase.commandsId;
         }
 
 //        commandsDelegate.commandsId = documentBase.commandsId;
@@ -72,18 +75,28 @@ Item {
         }
     }
 
-    CommandsProvider {
-        id: commandsProviderBase;
-    }
+//    CommandsProvider {
+//        id: commandsProviderBase;
+//    }
 
     function updateGui(){}
 
     Loader {
+        id: commandsProviderBase;
+
+        sourceComponent: CommandsProvider {
+        }
+
+        onLoaded: {
+        }
+    }
+
+    Loader {
         id: commandsDelegateBase;
 
-//        sourceComponent: commandsDelegateComp;
-
-        source: commandsDelegatePath;
+        sourceComponent: DocumentWorkspaceCommandsDelegateBase {
+        }
+//        source: commandsDelegatePath;
 
         onLoaded: {
             item.documentBase = documentBase;

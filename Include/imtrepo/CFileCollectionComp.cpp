@@ -79,7 +79,9 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 		return -1;
 	}
 
-	QFileInfo fileInfo = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath);
+	IFileObjectCollection::FileInfo fileCollectionInfo = collectionPtr->GetFileInfo(objectId);
+
+	QFileInfo fileInfo = QFileInfo(fileCollectionInfo.filePath);
 	if (!fileInfo.exists()){
 		return -1;
 	}

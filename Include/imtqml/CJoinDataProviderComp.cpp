@@ -30,10 +30,10 @@ imtbase::CTreeItemModel* CJoinDataProviderComp::GetTreeItemModel(const QList<imt
 		for (int index = 0; index < m_representationDataProviderCompPtr.GetCount(); index++){
 			imtbase::CTreeItemModel* externModel = m_representationDataProviderCompPtr[index]->GetTreeItemModel(params, fields, gqlContext);
 			if (externModel != nullptr){
-				int itemIndex = rootModel->InsertNewItem();
-				QString json = externModel->toJSON();
-				rootModel->CopyItemDataFromModel(itemIndex, externModel);
-				QString json2 = rootModel->toJSON();
+				for (int j = 0; j < externModel->GetItemsCount(); j++){
+					int itemIndex = rootModel->InsertNewItem();
+					rootModel->CopyItemDataFromModel(itemIndex, externModel, j);
+				}
 			}
 		}
 	}
@@ -44,23 +44,18 @@ imtbase::CTreeItemModel* CJoinDataProviderComp::GetTreeItemModel(const QList<imt
 
 // reimplemented (imtgql::IGqlMutationDataControllerDelegate)
 
-imtbase::CTreeItemModel* CJoinDataProviderComp::UpdateBaseModelFromRepresentation(const QList<imtgql::CGqlObject> &params, imtbase::CTreeItemModel *baseModel)
+imtbase::CTreeItemModel* CJoinDataProviderComp::UpdateBaseModelFromRepresentation(const QList<imtgql::CGqlObject> &params, imtbase::CTreeItemModel *baseModelPtr, const imtgql::IGqlContext* gqlContext)
 {
-	imtbase::CTreeItemModel* rootModel = nullptr;
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 
-	if (m_mutationDataDelegateCompPtr.GetCount() > 0){
-		rootModel = new imtbase::CTreeItemModel();
-		rootModel->SetIsArray(true);
+	for (int index = 0; index < m_mutationDataDelegateCompPtr.GetCount(); index++){
+//		imtbase::CTreeItemModel* pagesModel = new imtbase::CTreeItemModel();
+//		baseModel->CopyItemDataToModel(index, pagesModel);
 
-		for (int index = 0; index < m_mutationDataDelegateCompPtr.GetCount(); index++){
-			imtbase::CTreeItemModel* pagesModel = new imtbase::CTreeItemModel();
-			baseModel->CopyItemDataToModel(index, pagesModel);
+		imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[index]->UpdateBaseModelFromRepresentation(params, baseModelPtr, gqlContext);
 
-			imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[index]->UpdateBaseModelFromRepresentation(params, pagesModel);
-
-			rootModel->InsertNewItem();
-			rootModel->CopyItemDataFromModel(index, externModel);
-		}
+//		rootModel->InsertNewItem();
+//		rootModel->CopyItemDataFromModel(index, externModel);
 	}
 
 	return rootModel;

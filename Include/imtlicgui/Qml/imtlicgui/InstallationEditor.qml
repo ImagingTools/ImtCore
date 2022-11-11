@@ -9,12 +9,13 @@ DocumentBase {
     property alias activeLicenses: licensesTable.elements;
 
 //    commandsDelegate: InstallationEditorCommandsDelegate {}
-    commandsDelegatePath: "../../imtlicgui/InstallationEditorCommandsDelegate.qml";
+//    commandsDelegatePath: "../../imtlicgui/InstallationEditorCommandsDelegate.qml";
+
+    commandsDelegateSourceComp: InstallationEditorCommandsDelegate {}
 
 //    property bool instanceIdAcceptable: helperInput.acceptableInput;
 
     onDocumentModelChanged: {
-
         let activeLicensesModel = documentModel.GetData("ActiveLicenses");
         if (!activeLicensesModel){
             activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");

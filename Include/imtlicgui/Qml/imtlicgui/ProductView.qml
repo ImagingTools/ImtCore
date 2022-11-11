@@ -5,11 +5,11 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-    commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml"
+//    commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml"
 
-//    commandsDelegate: ProductViewCommandsDelegate {
-//        tableData: collectionView.table;
-//    }
+    commandsDelegateSourceComp: ProductViewCommandsDelegate {
+        tableData: collectionView.table;
+    }
 
     onDocumentModelChanged: {
         let headers = documentModel.GetData("Headers");
@@ -43,7 +43,7 @@ DocumentBase {
     }
 
     onCommandsDelegateLoaded: {
-        commandsDelegate.tableData = collectionView.table;
+//        commandsDelegate.tableData = collectionView.table;
     }
 
     UndoRedoManager {

@@ -81,7 +81,8 @@ public:
 	// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
 	virtual imtbase::CTreeItemModel* UpdateBaseModelFromRepresentation(
 			const QList<imtgql::CGqlObject>& params,
-			imtbase::CTreeItemModel* baseModel) override;
+			imtbase::CTreeItemModel* baseModel,
+			const imtgql::IGqlContext* gqlContext) override;
 
 private:
 	I_ATTR(QByteArray, m_paramIdAttrPtr);

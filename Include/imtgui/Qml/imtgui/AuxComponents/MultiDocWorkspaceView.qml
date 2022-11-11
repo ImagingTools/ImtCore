@@ -14,6 +14,8 @@ Item {
 
     property string operation;
 
+//    property var documentsData: {[]};
+
     TreeItemModel {
         id: documentsData;
     }

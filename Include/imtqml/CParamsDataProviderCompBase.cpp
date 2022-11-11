@@ -166,36 +166,57 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 
 imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromRepresentation(
 		const QList<imtgql::CGqlObject> &params,
-		imtbase::CTreeItemModel *baseModel)
+		imtbase::CTreeItemModel *baseModel,
+		const imtgql::IGqlContext* gqlContext)
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
-	if (m_paramIdAttrPtr.IsValid()){
-		rootModel->SetData("Id", *m_paramIdAttrPtr);
+	QByteArray inputParameterId;
+	if (params.count() > 0){
+		inputParameterId = params.at(0).GetFieldArgumentValue("Id").toByteArray();
 	}
 
-	if (m_paramNameAttrPtr.IsValid()){
-		rootModel->SetData("Name", *m_paramNameAttrPtr);
+	QByteArray parameterId = *m_paramIdAttrPtr;
+
+	if (!inputParameterId.isEmpty()){
+		if (parameterId != inputParameterId){
+			return nullptr;
+		}
 	}
+
+	rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
+	rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
 
 	if (!m_parameterCompPtr.IsValid()){
-		if (m_mutationDataDelegateCompPtr.IsValid()){
-			imtbase::CTreeItemModel* elementsModel = baseModel->GetTreeItemModel("Elements");
+		if (baseModel->ContainsKey("Elements")){
+			imtbase::CTreeItemModel* elementsModelPtr = baseModel->GetTreeItemModel("Elements");
 
-			imtbase::CTreeItemModel* rootElementsModel = rootModel->AddTreeModel("Elements");
+	//		imtbase::CTreeItemModel* rootElementsModel = rootModelPtr->AddTreeModel("Elements");
 
-			for (int index = 0; index < m_mutationDataDelegateCompPtr.GetCount(); index++){
-				imtbase::CTreeItemModel* elementModel = new imtbase::CTreeItemModel();
-				elementsModel->CopyItemDataToModel(index, elementModel);
+			for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
+				imtbase::CTreeItemModel elementModel;
+				elementsModelPtr->CopyItemDataToModel(i, &elementModel);
+				QList<imtgql::CGqlObject> parametersList;
 
-				imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[index]->UpdateBaseModelFromRepresentation(params, elementModel);
-				rootElementsModel->InsertNewItem();
-				rootElementsModel->CopyItemDataFromModel(index, externModel);
+				if (elementModel.ContainsKey("Id")){
+					QByteArray elementId = elementModel.GetData("Id").toByteArray();
+					imtgql::CGqlObject gqlObject;
+					gqlObject.InsertField("Id", QString(elementId));
+					parametersList << gqlObject;
+				}
+
+				imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(parametersList, &elementModel);
+	//			if (externModel != nullptr){
+	//				for (int j = 0; j < externModel->GetItemsCount(); j++){
+	//					int index = rootElementsModel->InsertNewItem();
+	//					rootElementsModel->CopyItemDataFromModel(index, externModel, j);
+	//				}
+	//			}
 			}
 		}
 	}
 	else{
-		int type = 0;;
+		int type = 0;
 		if (m_paramComponentTypeAttrPtr.IsValid()){
 			type = *m_paramComponentTypeAttrPtr;
 		}
@@ -225,10 +246,10 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromReprese
 				sourcePtr->SetText(value);
 			}
 		}
-		rootModel->SetData("Status", "OK");
+		rootModelPtr->SetData("Status", "OK");
 	}
 
-	return rootModel;
+	return rootModelPtr;
 }
 
 

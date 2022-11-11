@@ -80,26 +80,6 @@ imtbase::CTreeItemModel* CSettingsControllerComp::GetSettings(
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
-	if (m_userSettingsCollectionCompPtr.IsValid() && gqlContext != nullptr){
-		imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
-		if (userInfoPtr != nullptr){
-			QByteArray userId = userInfoPtr->GetUsername();
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
-				const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(dataPtr.GetPtr());
-				if (userSettingsPtr != nullptr){
-					dataModel = new imtbase::CTreeItemModel();
-					QByteArray settingsData = userSettingsPtr->GetSettings();
-					if (dataModel->Parse(settingsData)){
-						rootModel->SetExternTreeModel("data", dataModel);
-
-						return rootModel;
-					}
-				}
-			}
-		}
-	}
-
 	if (m_settingsDataProviderCompPtr.IsValid()){
 		dataModel =  m_settingsDataProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList(), gqlContext);
 	}
@@ -117,86 +97,42 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 		QString &errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-	if (m_userSettingsCollectionCompPtr.IsValid() && gqlContext != nullptr){
-		imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
-		if (userInfoPtr != nullptr){
-			QByteArray userId = userInfoPtr->GetUsername();
+	if (m_mutationDataControllerCompPtr.IsValid()){
+		if (inputParams.count() > 0){
+			QList<imtgql::CGqlObject> params;
 			QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 			if (!itemData.isEmpty()){
-				QJsonDocument jsonResponse = QJsonDocument::fromJson(itemData);
-				QJsonObject jsonObject = jsonResponse.object();
-				if (jsonResponse.isArray()){
-					QJsonArray jsonArray = jsonResponse.array();
-					QJsonObject databaseObj;
-					for (const QJsonValue & value : jsonArray){
-						QJsonObject obj = value.toObject();
+				imtbase::CTreeItemModel settingsModel;
+				settingsModel.Parse(itemData);
 
-						if (obj["Id"] == "DBSettings"){
-							databaseObj = obj;
-							break;
-						}
-					}
+//				for (int i = 0; i < settingsModel.GetItemsCount(); i++){
+//					imtbase::CTreeItemModel pageModel;
+//					settingsModel.CopyItemDataToModel(i, &pageModel);
 
-					if (!databaseObj.isEmpty()){
-						QJsonArray jsonElementsArray = databaseObj["Elements"].toArray();
+//					QString pageId;
+//					if (pageModel.ContainsKey("Id")){
+//						pageId = pageModel.GetData("Id").toString();
+//					}
 
-						QJsonObject elementsObj;
-						for (const QJsonValue & value : jsonElementsArray){
-							QJsonObject obj = value.toObject();
+//					QList<imtgql::CGqlObject> params;
+//					imtgql::CGqlObject gqlObject;
+//					gqlObject.InsertField("Id", pageId);
+//					params << gqlObject;
 
-							if (obj["Id"] == "LisaSettings"){
-								elementsObj = obj;
-								break;
-							}
-						}
-
-						if (!elementsObj.isEmpty()){
-							QJsonArray jsonParametersArray = elementsObj["Parameters"].toArray();
-
-							for (const QJsonValue & value : jsonParametersArray){
-								QJsonObject obj = value.toObject();
-								QByteArray objectId = obj["Id"].toString().toUtf8();
-								QByteArray parameterValue = obj["Value"].toString().toUtf8();
-								if (objectId == "DBName"){
-									m_databaseSettingsCompPtr->SetDatabaseName(parameterValue);
-								}
-								else if (objectId == "Host"){
-									m_databaseSettingsCompPtr->SetHost(parameterValue);
-								}
-								else if (objectId == "Password"){
-									m_databaseSettingsCompPtr->SetPassword(parameterValue);
-								}
-								else if (objectId == "Port"){
-									m_databaseSettingsCompPtr->SetPort(parameterValue.toInt());
-								}
-								else if (objectId == "Username"){
-									m_databaseSettingsCompPtr->SetUserName(parameterValue);
-								}
-							}
-						}
-					}
-				}
-
-				istd::TDelPtr<imtauth::CUserSettings> userSettingsPtr = new imtauth::CUserSettings();
-				userSettingsPtr->SetUserId(userId);
-				userSettingsPtr->SetSettings(itemData);
-
-				imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
-				if (collectionIds.contains(userId)){
-					m_userSettingsCollectionCompPtr->SetObjectData(userId, *userSettingsPtr);
-				}
-				else{
-					m_userSettingsCollectionCompPtr->InsertNewObject("", "", "", userSettingsPtr.PopPtr(), userId);
-				}
-
-				rootModel->SetData("Status", "Ok");
+//					m_mutationDataControllersCompPtr[i]->UpdateBaseModelFromRepresentation(params, &pageModel, gqlContext);
+//				}
+				dataModel = m_mutationDataControllerCompPtr->UpdateBaseModelFromRepresentation(params, &settingsModel, gqlContext);
 			}
 		}
 	}
 
+	rootModel->SetExternTreeModel("data", dataModel);
+
 	return rootModel;
 }
+
 
 } // namespace imtgql
 

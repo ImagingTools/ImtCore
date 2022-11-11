@@ -10,12 +10,12 @@
 #include <iser/CJsonStringReadArchive.h>
 
 
-
 namespace imtqml
 {
 
 
 QString CGqlModel::s_accessToken = QString();
+
 
 CGqlModel::CGqlModel(QObject *parent)
 	: imtbase::CTreeItemModel(parent)
@@ -23,10 +23,12 @@ CGqlModel::CGqlModel(QObject *parent)
 
 }
 
+
 CGqlModel::~CGqlModel()
 {
 
 }
+
 
 bool CGqlModel::SetGqlQuery(QString query)
 {

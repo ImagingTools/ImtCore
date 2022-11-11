@@ -30,7 +30,6 @@ Item {
     }
 
     function getCommandMode(commandId){
-
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             let m_mode = commandsProviderContainer.commandsModel.GetData("Mode", i);
@@ -102,5 +101,4 @@ Item {
             }
         }
     }
-
 }

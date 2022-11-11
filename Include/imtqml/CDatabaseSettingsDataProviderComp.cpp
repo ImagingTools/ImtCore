@@ -155,7 +155,8 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 
 imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::UpdateBaseModelFromRepresentation(
 		const QList<imtgql::CGqlObject>& params,
-		imtbase::CTreeItemModel* baseModelPtr)
+		imtbase::CTreeItemModel* baseModelPtr,
+		const imtgql::IGqlContext* gqlContext)
 {
 	Q_ASSERT(baseModelPtr != nullptr);
 

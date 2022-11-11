@@ -9,12 +9,12 @@ Rectangle {
 
     color: Style.theme === "Dark" ? Style.baseColor: Style.backgroundColor;
 
-    property int selectedIndex: -1;
+    property int selectedIndex: 0;
     property int count: 0;
 
     property string firstElementImageSource;
 
-    property var headersArray: [];
+//    property var headersArray: [];
 
     property alias model: list.model;
 
@@ -36,11 +36,10 @@ Rectangle {
         orientation: ListView.Horizontal;
 
         spacing: 0;
-        model: 4;
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        delegate: TabDelegate{
+        delegate: TabDelegate {
             height: list.height;
 
             selected: model.index === tabPanelContainer.selectedIndex;
@@ -52,7 +51,7 @@ Rectangle {
             decoratorSource: Style.tabPanelDecoratorPath;
 
             onClicked: {
-                console.log("TabDelegate onClicked")
+                console.log("TabDelegate onClicked", list.model)
                 tabPanelContainer.selectedIndex = model.index;
             }
 

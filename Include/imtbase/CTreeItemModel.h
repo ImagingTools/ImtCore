@@ -87,7 +87,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
-	void modelChanged();
+	void modelChanged(const ChangeSet& changeSet);
 
 private:
 	class Item

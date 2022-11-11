@@ -6,7 +6,9 @@ DocumentBase {
     id: container;
 
 //    commandsDelegate: RoleViewCommandsDelegate {}
-    commandsDelegatePath: "../../imtauthgui/RoleViewCommandsDelegate.qml";
+//    commandsDelegatePath: "../../imtauthgui/RoleViewCommandsDelegate.qml";
+
+    commandsDelegateSourceComp: RoleViewCommandsDelegate {}
 
     property TreeItemModel rolesModel; // Collection of the all roles
 

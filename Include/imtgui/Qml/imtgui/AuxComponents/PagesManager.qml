@@ -5,7 +5,7 @@ import imtqml 1.0
 Item {
     id: container;
 
-    property TreeItemModel pageModel;
+    property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem;
     property int activePageIndex: menuPanel.activePageIndex;
 
@@ -14,12 +14,29 @@ Item {
     }
 
     onPageModelChanged: {
+        console.log("onPageModelChanged", pageModel);
         pagesData.model = container.pageModel;
+    }
+
+    function updateModel(){
+        pagesProvider.updateModel();
     }
 
     function clearModels(){
         pageModel.Clear();
         pagesData.model = 0;
+    }
+
+    PagesProvider {
+        id: pagesProvider;
+
+        onPagesModelChanged: {
+            console.log("pagesProvider onPagesModelChanged");
+            container.pageModel = pagesModel;
+
+            let component = Qt.createComponent("PageData.qml");
+            let sprite = component.createObject(pagesProvider, {"pageId": 100, "y": 100});
+        }
     }
 
     Repeater {
@@ -67,5 +84,29 @@ Item {
             }
         }
     }
+
+//    property var pagesData: {[]};
+//    property PageData currentPage;
+
+//    Repeater {
+//        id: pagesRepeater;
+
+//        anchors.fill: parent;
+
+//        model: pagesData;
+
+//        delegate: Loader {
+//            id: pageViewLoader;
+
+//            anchors.fill: parent;
+
+//            sourceComponent: model.pageView;
+
+//            visible: model.pageId == currentPage.pageId;
+
+//            onLoaded: {
+//            }
+//        }
+//    }
 }
 

@@ -10,6 +10,13 @@ Rectangle {
     property Item topPanel;
 
     property string decoratorSource;
+//    property Component decorator: TopCenterPanelDecorator {};
+
+//    Loader {
+//        id: decoratorLoader;
+
+//        sourceComponent: decorator;
+//    }
 
     onDecoratorSourceChanged: {
         if (topCenterPanel.decoratorSource){

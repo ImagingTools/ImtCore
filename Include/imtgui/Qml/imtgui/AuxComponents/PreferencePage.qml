@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
 import QtQuick.Dialogs 1.3
+import "../../Acf/core.js" as Lodash
 
 Rectangle {
     id: container;
@@ -15,7 +16,7 @@ Rectangle {
     property TreeItemModel localModel;
 
     Component.onDestruction: {
-        container.destroy();
+        clearModels();
     }
 
     TreeItemModel {
@@ -32,11 +33,11 @@ Rectangle {
 
     onServerModelChanged: {
         console.log("PreferenceDialog onServerModelChanged");
-
         let json = serverModel.toJSON();
         serverCopyModel.Parse(json);
 
         updateCommonModel(serverCopyModel);
+        updateLocalModel();
 
         updateGui();
     }
@@ -45,7 +46,6 @@ Rectangle {
         console.log("PreferenceDialog onLocalModelChanged");
 
         let json = localModel.toJSON();
-        console.log("json", json);
         localCopyModel.Parse(json);
 
         updateCommonModel(localCopyModel);
@@ -77,6 +77,25 @@ Rectangle {
         mainPanelRepeater.model = commonModel;
     }
 
+    function updateLocalModel(){
+        for (let i = 0; i < localModel.GetItemsCount(); i++){
+            let pageId = localModel.GetData("Id", i);
+
+            let index = -1;
+            for (let j = 0; j < serverModel.GetItemsCount(); j++){
+                let id = serverModel.GetData("Id", j);
+                if (id == pageId){
+                    index = j;
+                    break;
+                }
+            }
+
+            if (index >= 0){
+                localModel.CopyItemDataFromModel(i, serverModel, index);
+            }
+        }
+    }
+
     function updateCommonModel(externModel){
         for (let i = 0; i < externModel.GetItemsCount(); i++){
             let pageId = externModel.GetData("Id", i);
@@ -90,9 +109,15 @@ Rectangle {
         }
     }
 
-    function getPageIndexByPageId(pageId){
-        for (let i = 0; i < commonModel.GetItemsCount(); i++){
-            let id = commonModel.GetData("Id", i);
+    function getPageIndexByPageId(pageId, model){
+        console.log("Preferences getPageIndexByPageId", pageId);
+
+        if (!model){
+            model = commonModel;
+        }
+
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let id = model.GetData("Id", i);
             if (id == pageId){
                 return i;
             }
@@ -120,15 +145,17 @@ Rectangle {
         return null;
     }
 
-    function getDesignScheme(){
-        console.log("Preferences getDesignScheme");
-        let generalPageIndex = getPageIndexByPageId("General");
+    function getDesignScheme(model){
+        console.log("Preferences getDesignScheme", model.toJSON());
+        let generalPageIndex = getPageIndexByPageId("General", model);
+        console.log("generalPageIndex", generalPageIndex);
         if (generalPageIndex >= 0){
-            var elements = commonModel.GetData("Elements", generalPageIndex);
+            var elements = model.GetData("Elements", generalPageIndex);
 
             for (let i = 0; i < elements.GetItemsCount(); i++){
                 let elementId = elements.GetData("Id", i);
-                if (elementId === "Mode"){
+                console.log("elementId", elementId);
+                if (elementId == "Mode"){
                     let elementValue = elements.GetData("Value", i);
                     let parameters = elements.GetData("Parameters", i);
 
@@ -427,30 +454,66 @@ Rectangle {
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
-
-//                    let language = getSelectedLanguage();
-//                    context.language = language;
-
                     let oldUrl = getNetworkUrl(localModel);
                     let newUrl = getNetworkUrl(localCopyModel);
 
                     console.log("oldUrl", oldUrl);
                     console.log("newUrl", newUrl);
                     if (oldUrl != newUrl){
+                        let json = localCopyModel.toJSON();
 
+//                        localModel.SetData("Test", "test");
+                        localModel.Parse(json);
+
+                        root.settingsUpdate("NetworkSettings");
+                        //root.updateModels();
+                    }
+
+                    let oldDesign = getDesignScheme(localModel)
+                    let newDesign = getDesignScheme(localCopyModel);
+
+                    if (oldDesign != newDesign){
                         let json = localCopyModel.toJSON();
                         localModel.Parse(json);
 
-                        root.settingsUpdate();
-                        root.updateModels();
+                        root.settingsUpdate("General");
+
+                        if (!serverModel){
+                            Style.getDesignScheme(newDesign);
+                        }
                     }
+//                    oldDesign = getDesignScheme(serverModel)
+//                    newDesign = getDesignScheme(serverCopyModel);
 
-                    let json = serverCopyModel.toJSON();
-                    serverModel.Parse(json);
+//                    if (oldDesign != newDesign){
+//                        let json = localCopyModel.toJSON();
+//                        localModel.Parse(json);
 
-                    preferenceSaveQuery.save();
+//                        root.settingsUpdate();
+
+//                        if (!serverModel){
+//                            Style.getDesignScheme(newDesign);
+//                        }
+//                    }
+
+                    if (serverModel){
+                        let json = serverCopyModel.toJSON();
+                        serverModel.Parse(json);
+
+                        preferenceSaveQuery.save();
+                    }
                 }
             }
+        }
+
+        function getDirtyPagesFromLocalModel(){
+            if (_.isEqual(localModel, localCopyModel)){
+
+            }
+        }
+
+        function getDirtyPagesFromServerModel(){
+
         }
 
         GqlModel {
@@ -492,8 +555,8 @@ Rectangle {
 
                             serverModel = dataModelLocal;
 
-                            let scheme = getDesignScheme();
-                            Style.changeSchemeDesign(scheme);
+                            let scheme = getDesignScheme(serverModel);
+                            Style.getDesignScheme(scheme);
 
                             let language = getSelectedLanguage();
                             context.language = language;
@@ -537,8 +600,8 @@ Rectangle {
 
                         let dataModelLocal = this.GetData("data");
 
-                        let scheme = getDesignScheme();
-                        Style.changeSchemeDesign(scheme);
+                        let scheme = getDesignScheme(serverModel);
+                        Style.getDesignScheme(scheme);
                     }
                 }
             }
