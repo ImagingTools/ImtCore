@@ -10,29 +10,6 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="SettingsController" PackageId="ImtGuiGqlPck" ComponentId="SettingsController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseSettings" Type="Reference" ExportId="DBSettings">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetSettings</Value>
-                                <Value>SaveSettings</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SettingsDataProvider" Type="Reference" ExportId="SettingsDataProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserSettingsRepository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="UserSettingsRepository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -75,7 +52,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRepresentationDataController" ComponentId="SettingsController"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="UserSettingsRepository"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

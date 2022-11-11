@@ -23,6 +23,7 @@
 #include <imtqml/CClientUserContextComp.h>
 #include <imtqml/CApplicationInfoDataProviderComp.h>
 #include <imtqml/CObjectViewDataProviderComp.h>
+#include <imtqml/CSettingsDatabasePagesProviderComp.h>
 
 
 /**
@@ -49,6 +50,7 @@ typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp Context;
 typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
+typedef imtqml::CSettingsDatabasePagesProviderComp SettingsDatabasePagesProvider;
 
 
 } // namespace ImtQmlPck

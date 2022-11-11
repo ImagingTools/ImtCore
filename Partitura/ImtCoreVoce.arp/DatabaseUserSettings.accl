@@ -8,7 +8,6 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="SettingsController" X="675" Y="150" Note=""/>
         <Element ComponentName="UserSettingsRepository" X="675" Y="275" Note=""/>
         <Element ComponentName="UsersSettingsDatabaseDelegate" X="675" Y="425" Note=""/>
     </PositionMap>

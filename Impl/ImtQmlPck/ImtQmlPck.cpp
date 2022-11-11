@@ -102,6 +102,11 @@ I_EXPORT_COMPONENT(
 			"Object view data provider",
 			"Object view data provider");
 
+I_EXPORT_COMPONENT(
+			SettingsDatabasePagesProvider,
+			"Settings Database Pages Provider",
+			"Settings database pages provider");
+
 
 } // namespace ImtQmlPck
 
