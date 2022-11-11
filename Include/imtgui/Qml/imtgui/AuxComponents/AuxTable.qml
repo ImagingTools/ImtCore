@@ -15,6 +15,15 @@ Item {
 
     property TreeItemModel headers; //: elementsList.model;
 
+    property TreeItemModel tableDecorator : TreeItemModel{};
+
+    property TreeItemModel temp : TreeItemModel{};//УБРАТЬ!!!
+
+    property TreeItemModel headerDecorator : TreeItemModel{};
+    property TreeItemModel cellDecorator : TreeItemModel{};
+    property TreeItemModel widthDecorator : TreeItemModel{};
+    property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
+
     property alias delegate: elementsList.delegate;
     property alias elements: elementsList.model;
     property alias elementsList: elementsList;
@@ -27,6 +36,48 @@ Item {
 
     property int radius: 7;
 
+    //
+    property string borderColorHorizontal: "transparent";
+    property string borderColorVertical: "transparent";
+    property int horizontalBorderSize: 0;
+    property int verticalBorderSize: 0;
+
+    property bool visibleLeftBorderFirst: true;
+    property bool visibleRightBorderLast: false;
+    property bool visibleTopBorderFirst: false;
+    property bool visibleBottomBorderLast: true;
+
+    property bool canSetBorderParams: false;
+    property int wrapMode: Text.NoWrap;
+    property int elideMode: Text.ElideRight;
+    property bool isRightBorder: false;
+    //
+
+    //properties for delegate:
+    property string borderColorHorizontal_deleg: "transparent";
+    property string borderColorVertical_deleg: "transparent";
+    property int horizontalBorderSize_deleg: 0;
+    property int verticalBorderSize_deleg: 0;
+
+    property bool visibleLeftBorderFirst_deleg: true;
+    property bool visibleRightBorderLast_deleg: false;
+    property bool visibleTopBorderFirst_deleg: false;
+    property bool visibleBottomBorderLast_deleg: true;
+
+    property bool canSetBorderParams_deleg: false;
+    property int wrapMode_deleg: Text.NoWrap;
+    property int elideMode_deleg: Text.ElideRight;
+    property bool isRightBorder_deleg: false;
+    //properties for delegate
+
+    property string maxLengthText: '';
+
+    property int textMarginHor: 8;
+    property int textMarginVer: 8;
+
+    property bool emptyDecor: true;
+    property bool emptyDecorHeader: true;
+
     signal selectItem(string idSelected, string name);
     signal rightButtonMouseClicked(int mouseX, int mouseY);
     signal doubleClicked(int mouseX, int mouseY);
@@ -35,16 +86,148 @@ Item {
     signal textFilterChanged(string id, int index, string text);
     signal filterClicked();
 
+    signal widthRecalc();
+
+    Component.onCompleted: {
+        tableContainer.setWidth();
+    }
+
+    onTableDecoratorChanged: {
+        tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
+        tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
+        tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
+
+        tableContainer.emptyDecor = !tableDecorator.GetItemsCount();
+        tableContainer.emptyDecorHeader = !headerDecorator.GetItemsCount();
+
+        tableContainer.setBorderParams();
+        tableContainer.setWidth();
+
+    }
+
     onSelectedIndexChanged: {
         if (selectedIndex > -1){
             elementsList.forceActiveFocus();
         }
     }
 
+    onWidthChanged: {
+        tableContainer.setWidth();
+    }
+
+
+    function setWidth(){
+
+        tableContainer.widthDecoratorDynamic.Clear();
+        tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
+
+        if(!tableContainer.tableDecorator.GetItemsCount()||!tableContainer.widthDecorator.GetItemsCount()){
+            tableContainer.widthRecalc();
+            return;
+        }
+
+        var count_ = 0;
+        var lengthMinus = 0;
+
+        for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
+
+            var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
+            var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
+
+            if((width_ == -1) && (widthPercent_ == -1)){
+                count_++;
+            }
+            else{
+                width_ = width_< 0 ? 0 : width_;
+                widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableContainer.width/100;
+                lengthMinus += Math.max(width_,widthPercent_);
+            }
+        }
+
+        if((tableContainer.width - lengthMinus) < 0 || count_ == tableContainer.widthDecorator.GetItemsCount() ){
+            tableContainer.widthDecoratorDynamic.Clear();
+            tableContainer.widthRecalc();
+            return;
+        }
+
+        for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
+
+            var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
+            var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
+
+            if(width_ < 0  && widthPercent_ < 0 ){
+                if(count_){
+                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
+                }
+            }
+            else if(width_ < 0  && widthPercent_ >= 0){
+                tableContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableContainer.width/100,i);
+            }
+
+            width_ = tableContainer.widthDecoratorDynamic.IsValidData("Width",i) ? tableContainer.widthDecoratorDynamic.GetData("Width",i): -1;
+
+            if(width_ < 0){
+                if(count_){
+                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
+                }
+
+            }
+
+        }
+
+        tableContainer.widthRecalc();
+    }
+
+    function setBorderParams(){
+
+        if(tableContainer.emptyDecorHeader && !tableContainer.canSetBorderParams){
+            return;
+        }
+
+        if(tableContainer.headerDecorator.IsValidData("BorderColorHorizontal")){
+            tableContainer.borderColorHorizontal = tableContainer.headerDecorator.GetData("BorderColorHorizontal");
+        }
+        if(tableContainer.headerDecorator.IsValidData("BorderColorVertical")){
+            tableContainer.borderColorVertical = tableContainer.headerDecorator.GetData("BorderColorVertical");
+        }
+        if(tableContainer.headerDecorator.IsValidData("HorizontalBorderSize")){
+            tableContainer.horizontalBorderSize = tableContainer.headerDecorator.GetData("HorizontalBorderSize");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VerticalBorderSize")){
+            tableContainer.verticalBorderSize = tableContainer.headerDecorator.GetData("VerticalBorderSize");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleLeftBorderFirst")){
+            tableContainer.visibleLeftBorderFirst = tableContainer.headerDecorator.GetData("VisibleLeftBorderFirst");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleRightBorderLast")){
+            tableContainer.visibleRightBorderLast = tableContainer.headerDecorator.GetData("VisibleRightBorderLast");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleTopBorderFirst")){
+            tableContainer.visibleTopBorderFirst = tableContainer.headerDecorator.GetData("VisibleTopBorderFirst");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleBottomBorderLast")){
+            tableContainer.visibleBottomBorderLast = tableContainer.headerDecorator.GetData("VisibleBottomBorderLast");
+        }
+        if(tableContainer.headerDecorator.IsValidData("WrapMode")){
+            tableContainer.wrapMode = tableContainer.headerDecorator.GetData("WrapMode");
+        }
+        if(tableContainer.headerDecorator.IsValidData("IsRightBorder")){
+            tableContainer.isRightBorder = tableContainer.headerDecorator.GetData("IsRightBorder");
+        }
+        if(tableContainer.headerDecorator.IsValidData("ElideMode")){
+            tableContainer.elideMode = tableContainer.headerDecorator.GetData("ElideMode");
+        }
+
+    }
+
+    function setCellHeight(){
+
+    }
+
     function getSelectedId(){
         console.log("getSelectedId");
         if (tableContainer.selectedIndex > -1){
-            let item = elementsList.itemAtIndex(tableContainer.selectedIndex)
+            let item = elementsList.itemAtIndex(tableContainer.selectedIndex);
             return item.getSelectedId();
         }
 
@@ -53,7 +236,7 @@ Item {
 
     function getSelectedName(){
         if (tableContainer.selectedIndex > -1){
-            let item = elementsList.itemAtIndex(tableContainer.selectedIndex)
+            let item = elementsList.itemAtIndex(tableContainer.selectedIndex);
             return item.getSelectedName();
         }
 
@@ -62,7 +245,7 @@ Item {
 
     function getSelectedItemData(){
         if (tableContainer.selectedIndex > -1){
-            let item = elementsList.itemAtIndex(tableContainer.selectedIndex)
+            let item = elementsList.itemAtIndex(tableContainer.selectedIndex);
             return item.getItemData();
         }
 
@@ -104,46 +287,230 @@ Item {
             model: tableContainer.headers;
             boundsBehavior: Flickable.StopAtBounds;
 
-            delegate: Rectangle{
+            delegate: Item{
                 id: deleg;
 
-                width: (headersList.width - iconFilter.width)/headersList.count;
+
                 height: headersList.height;
 
-                color: Style.baseColor;
+                Connections{
+                    target: tableContainer;
+                    function onWidthRecalc(){
+                        deleg.setCellWidth();
 
-                Text {
-                    id: name;
+                    }
+                }
 
-                    anchors.verticalCenter: parent.verticalCenter;
+                Component.onCompleted: {
+                    deleg.setCellWidth();
+                }
+
+                function setCellWidth(){
+                    var defaultWidth = (headersList.width - iconFilter.width)/headersList.count;
+                    var widthFromModel = widthDecoratorDynamic.IsValidData("Width", model.index) ? widthDecoratorDynamic.GetData("Width", model.index) : -1;
+
+
+                    if(!tableContainer.widthDecoratorDynamic.GetItemsCount()){
+                        width = defaultWidth;
+                    }
+                    else if(widthFromModel >= 0){
+                        width = widthFromModel;
+                    }
+                    else{
+                        width = defaultWidth;
+                    }
+
+                }
+
+                //borders
+                Rectangle{
+                    id: leftBorder;
                     anchors.left: parent.left;
-                    anchors.right: iconSort.left;
-                    anchors.leftMargin: 8;
-
-                    font.pixelSize: Style.fontSize_common * deleg.scale;
-                    font.family: Style.fontFamilyBold;
-                    font.bold: true;
-                    color: Style.textColor;
-                    text: model.Name;
-                    elide: Text.ElideRight;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: tableContainer.isRightBorder ? tableContainer.verticalBorderSize * tableContainer.visibleLeftBorderFirst * (model.index == 0)
+                                                        : tableContainer.visibleLeftBorderFirst ? tableContainer.verticalBorderSize : model.index > 0 ? tableContainer.verticalBorderSize : 0;
+                    color:  tableContainer.borderColorVertical;
                 }
 
-                Image {
-                    id: iconSort;
-
-                    anchors.verticalCenter: parent.verticalCenter;
+                Rectangle{
+                    id: rightBorder;
                     anchors.right: parent.right;
-                    anchors.rightMargin: 8;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: !tableContainer.isRightBorder ?
+                               tableContainer.verticalBorderSize * tableContainer.visibleRightBorderLast  * (model.index == (headersList.count -1)) * (headersList.count > 0) :
+                               tableContainer.visibleRightBorderLast ? tableContainer.verticalBorderSize  :
+                                                                       tableContainer.verticalBorderSize * (model.index < (headersList.count -1));
 
-                    height: 10;
-                    width: 10;
-
-                    visible: headersList.currentIndex === model.index && tableContainer.hasSort;
-
-                    source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
-                    sourceSize.width: width;
-                    sourceSize.height: height;
+                    color: tableContainer.borderColorVertical;
                 }
+
+                Rectangle{
+                    id: topBorder;
+                    anchors.top: parent.top;
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    height: tableContainer.visibleTopBorderFirst  ? tableContainer.horizontalBorderSize : 0;
+                    color: tableContainer.borderColorHorizontal;
+                }
+
+                Rectangle{
+                    id: bottomBorder;
+                    anchors.bottom: parent.bottom;
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
+                    color:  tableContainer.borderColorHorizontal;
+                }
+                //borders
+
+                Rectangle{
+                    id: mainRec;
+                    anchors.top: topBorder.height > 0 ? topBorder.bottom : parent.top;
+                    anchors.left: leftBorder.width > 0 ? leftBorder.right : parent.left;
+                    anchors.right: rightBorder.width > 0 ? rightBorder.left : parent.right;
+                    anchors.bottom: bottomBorder.height > 0 ? bottomBorder.top : parent.bottom;
+                    color: tableContainer.emptyDecorHeader ? Style.baseColor :
+                                                             headerDecorator.IsValidData("Color", model.index) ?
+                                                                 headerDecorator.GetData("Color", model.index) :
+                                                                 Style.baseColor;
+
+
+                    radius: tableContainer.emptyDecorHeader ? 0 :
+                                                              headerDecorator.IsValidData("CellRadius", model.index) ?
+                                                                  headerDecorator.GetData("CellRadius", model.index) :0;
+
+
+
+
+                    //cornerPatches
+                    Rectangle{
+                        id: leftTopCornerPatch;
+                        anchors.left: parent.left;
+                        anchors.top: parent.top;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   headerDecorator.IsValidData("LeftTopRound", model.index) ?
+                                                                       !headerDecorator.GetData("LeftTopRound", model.index) :true;
+                    }
+
+                    Rectangle{
+                        id: rightTopCornerPatch;
+                        anchors.right: parent.right;
+                        anchors.top: parent.top;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   headerDecorator.IsValidData("RightTopRound", model.index) ?
+                                                                       !headerDecorator.GetData("RightTopRound", model.index) :true;
+
+
+                    }
+
+                    Rectangle{
+                        id: leftBottomCornerPatch;
+                        anchors.left: parent.left;
+                        anchors.bottom: parent.bottom;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   headerDecorator.IsValidData("LeftBottomRound", model.index) ?
+                                                                       !headerDecorator.GetData("LeftBottomRound", model.index) :true;
+
+
+                    }
+
+                    Rectangle{
+                        id: rightBottomCornerPatch;
+                        anchors.right:  parent.right;
+                        anchors.bottom: parent.bottom;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   headerDecorator.IsValidData("RightBottomRound", model.index) ?
+                                                                       !headerDecorator.GetData("RightBottomRound", model.index) :true;
+
+                    }
+                    //cornerPatches
+
+                    Text {
+                        id: name;
+
+                        anchors.verticalCenter: parent.verticalCenter;
+                        anchors.left: parent.left;
+                        anchors.right: iconSort.visible ? iconSort.left : parent.right;
+                        anchors.leftMargin: tableContainer.textMarginHor;
+                        anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
+
+                        verticalAlignment: Text.AlignVCenter;
+                        horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
+                                                                               headerDecorator.IsValidData("TextPosition", model.index) ?
+                                                                                   headerDecorator.GetData("TextPosition", model.index) :
+                                                                                   Text.AlignLeft;
+
+
+
+
+                        font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
+                                                                          headerDecorator.IsValidData("FontSize", model.index) ?
+                                                                              headerDecorator.GetData("FontSize", model.index) :
+                                                                              Style.fontSize_common * deleg.scale;
+
+
+                        font.family: Style.fontFamilyBold;
+
+                        font.bold: tableContainer.emptyDecorHeader ? true :
+                                                                     headerDecorator.IsValidData("FontBold", model.index) ?
+                                                                         headerDecorator.GetData("FontBold", model.index) :
+                                                                         true;
+
+
+                        color: tableContainer.emptyDecorHeader ? Style.textColor :
+                                                                 headerDecorator.IsValidData("FontColor", model.index) ?
+                                                                     headerDecorator.GetData("FontColor", model.index) :
+                                                                     Style.textColor;
+                        elide: tableContainer.elideMode;
+
+                        wrapMode: tableContainer.wrapMode;
+
+                        onLinkActivated: {
+                            Qt.openUrlExternally(link)
+                        }
+
+                        text: model.Name;
+
+
+
+                    }
+
+                    Image {
+                        id: iconSort;
+
+                        anchors.verticalCenter: parent.verticalCenter;
+                        anchors.right: parent.right;
+                        anchors.rightMargin: visible ? tableContainer.textMarginHor : 0;
+
+                        height: 10;
+                        width: visible ? 10 : 0;
+
+                        visible: headersList.currentIndex === model.index && tableContainer.hasSort;
+
+                        source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                        sourceSize.width: width;
+                        sourceSize.height: height;
+                    }
+
+                }//mainRec
+
+
+                ////
+
 
                 MouseArea {
                     id: headerMa;
@@ -165,7 +532,9 @@ Item {
                         tableContainer.headerClicked(model.Id);
                     }
                 }
-            }
+
+            }//delegate
+
         }//Headers ListView
 
         Rectangle{
@@ -179,6 +548,7 @@ Item {
 
             //TODO -> Style
             color: "lightgray";
+            visible: tableContainer.emptyDecor;
         }
     }//headers
 
@@ -209,34 +579,7 @@ Item {
         color: Style.baseColor;
     }
 
-    Component {
-        id: elementDelegateComp;
 
-        TableDelegate {
-            height: tableContainer.itemHeight;
-            width: elementsList.width;
-
-            selected: tableContainer.selectedIndex === model.index;
-
-            onClicked: {
-                tableContainer.selectedIndex = model.index;
-            }
-
-            onRightButtonMouseClicked: {
-                console.log("AuxTable onRightButtonMouseClicked", mX, mY);
-                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
-                tableContainer.rightButtonMouseClicked(point.x, point.y);
-            }
-
-            onDoubleClicked: {
-                console.log("onDoubleClicked", model["Id"], model["Name"])
-                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
-                tableContainer.doubleClicked(point.x, point.y)
-                tableContainer.selectItem(model.Id, model.Name);
-
-            }
-        }
-    }
 
     ListView {
         id: elementsList;
@@ -268,37 +611,70 @@ Item {
             }
         }
 
-        delegate: elementDelegateComp;
 
-//        delegate: TableDelegate {
-//            id: tableDelegate;
+        delegate:
 
-//            height: tableContainer.itemHeight;
-//            width: elementsList.width;
+            TableDelegate {
+            id: tableDelegate;
 
-//            selected: tableContainer.selectedIndex === model.index;
-//            radius: tableContainer.radius;
+            height: tableContainer.itemHeight;
+            width: elementsList.width;
+            minHeight: tableContainer.itemHeight;
 
-//            Component.onCompleted: {
-//                for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-//                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
-//                }
-//            }
+            selected: tableContainer.selectedIndex === model.index;
 
-//            onClicked: {
-//                tableContainer.selectedIndex = model.index;
-//            }
+            //!!!
+            cellDecorator: tableContainer.cellDecorator;
+            widthDecoratorDynamic: tableContainer.widthDecoratorDynamic;
 
-//            onRightButtonMouseClicked: {
-//                console.log("AuxTable onRightButtonMouseClicked", mX, mY);
-//                var point = tableDelegate.mapToItem(thumbnailDecoratorContainer, mX, mY);
-//                tableContainer.rightButtonMouseClicked(point.x, point.y);
-//            }
+            borderColorHorizontal: tableContainer.borderColorHorizontal_deleg;
+            borderColorVertical: tableContainer.borderColorVertical_deleg;
+            horizontalBorderSize: tableContainer.horizontalBorderSize_deleg;
+            verticalBorderSize: tableContainer.verticalBorderSize_deleg;
 
-//            onDoubleClicked: {
-//                console.log("onDoubleClicked", model["Id"], model["Name"])
-//                tableContainer.selectItem(model.Id, model.Name);
-//            }
-//        }//Elements delegate
+            visibleLeftBorderFirst: tableContainer.visibleLeftBorderFirst_deleg;
+            visibleRightBorderLast: tableContainer.visibleRightBorderLast_deleg;
+            visibleTopBorderFirst: tableContainer.visibleTopBorderFirst_deleg;
+            visibleBottomBorderLast: tableContainer.visibleBottomBorderLast_deleg;
+
+            canSetBorderParams: tableContainer.canSetBorderParams_deleg;
+            wrapMode:  tableContainer.wrapMode_deleg;
+            elideMode: tableContainer.elideMode_deleg;
+            isRightBorder: tableContainer.isRightBorder_deleg;
+
+            Connections{
+                target: tableContainer;
+                function onWidthRecalc(){
+                    tableDelegate.widthRecalc();
+                }
+            }
+            //!!!
+
+            Component.onCompleted: {
+                for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
+                }
+            }
+
+            onClicked: {
+                tableContainer.selectedIndex = model.index;
+
+            }
+
+            onRightButtonMouseClicked: {
+                console.log("AuxTable onRightButtonMouseClicked", mX, mY);
+                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                tableContainer.rightButtonMouseClicked(point.x, point.y);
+            }
+
+            onDoubleClicked: {
+                console.log("onDoubleClicked", model["Id"], model["Name"])
+                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                tableContainer.doubleClicked(point.x, point.y)
+                tableContainer.selectItem(model.Id, model.Name);
+
+            }
+        }
+
     }//Elements ListView
 }
