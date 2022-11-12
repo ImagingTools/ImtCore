@@ -53,6 +53,7 @@ Rectangle {
     signal widthRecalc();
 
     Component.onCompleted: {
+        tableDelegateContainer.minHeight = tableDelegateContainer.height;
         widthRecalc();
     }
 

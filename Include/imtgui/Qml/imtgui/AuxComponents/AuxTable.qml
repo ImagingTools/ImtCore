@@ -7,6 +7,7 @@ Item {
     property int selectedIndex: -1;
     property int itemHeight: 35;
     property int headerHeight: 35;
+    property int headerMinHeight: 35;
 
     property bool hasFilter: false;
     property bool hasSort: false;
@@ -16,8 +17,6 @@ Item {
     property TreeItemModel headers; //: elementsList.model;
 
     property TreeItemModel tableDecorator : TreeItemModel{};
-
-    property TreeItemModel temp : TreeItemModel{};//УБРАТЬ!!!
 
     property TreeItemModel headerDecorator : TreeItemModel{};
     property TreeItemModel cellDecorator : TreeItemModel{};
@@ -87,12 +86,16 @@ Item {
     signal filterClicked();
 
     signal widthRecalc();
+    signal heightRecalc();
 
     Component.onCompleted: {
+        tableContainer.headerMinHeight = tableContainer.headerHeight;
         tableContainer.setWidth();
     }
 
+
     onTableDecoratorChanged: {
+
         tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
         tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
         tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
@@ -102,6 +105,16 @@ Item {
 
         tableContainer.setBorderParams();
         tableContainer.setWidth();
+
+        if(tableContainer.wrapMode !== Text.NoWrap){
+            for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+                heightModel.append({"cellHeight": 0});
+            }
+            tableContainer.heightRecalc();
+            pause.stop();
+            pause.start();
+        }
+
 
     }
 
@@ -113,6 +126,34 @@ Item {
 
     onWidthChanged: {
         tableContainer.setWidth();
+        if(tableContainer.wrapMode !== Text.NoWrap){
+            pause.stop();
+            pause.start();
+        }
+    }
+
+    function setCellHeight(){
+
+        var maxVal = 0;
+        for(var i = 0; i < heightModel.count; i++){
+            var currVal = heightModel.get(i).cellHeight;
+            if(currVal > maxVal){
+                maxVal = currVal;
+            }
+        }
+        tableContainer.headerHeight = Math.max(maxVal, tableContainer.headerMinHeight);
+    }
+
+    PauseAnimation {
+        id: pause;
+        duration: 100;
+        onFinished: {
+            setCellHeight();
+        }
+    }
+
+    ListModel{
+        id: heightModel;
     }
 
 
@@ -220,9 +261,6 @@ Item {
 
     }
 
-    function setCellHeight(){
-
-    }
 
     function getSelectedId(){
         console.log("getSelectedId");
@@ -484,6 +522,31 @@ Item {
                         }
 
                         text: model.Name;
+
+                        onHeightChanged: {
+                            name.sendHeightData();
+                        }
+
+                        function sendHeightData(){
+                            if(tableContainer.wrapMode !== Text.NoWrap){
+                                if(model.index < heightModel.count){
+                                    var height_ = name.height +
+                                            2*tableContainer.textMarginVer +
+                                            topBorder.height + bottomBorder.height;
+
+                                    heightModel.setProperty(model.index, "cellHeight", height_);
+
+                                }
+                            }
+                        }
+
+                        Connections{
+                            target: tableContainer;
+                            function onHeightRecalc(){
+                                name.sendHeightData();
+
+                            }
+                        }
 
 
 
