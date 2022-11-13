@@ -3,14 +3,10 @@ import QtQuick 2.12
 Rectangle{
     id:scrollContainer;
 
-    anchors.right: targetItem.right;
-    anchors.rightMargin: 4;
-    anchors.bottom: targetItem.bottom;
     height: vertical ? targetItem.height : secondSize;
     width: vertical ? secondSize : targetItem.width;
     color: backgroundColor;
     radius: 4;
-    //opacity: !canFade ? 1 : isMoving ? 1 : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? 1 : 0
 
     property var targetItem;
     property bool vertical: true;
@@ -32,8 +28,7 @@ Rectangle{
 
     property bool visibleState: !canFade ? 1 : isMoving ? 1 : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? 1 : 0;
 
-    property bool inSideTarget: scrollContainer.vertical ? (scrollContainer.anchors.rightMargin > (- scrollContainer.secondSize)) || (scrollContainer.anchors.leftMargin < 0):
-                                                           (scrollContainer.anchors.bottomMargin > (- scrollContainer.secondSize))|| (scrollContainer.anchors.topMargin < 0);
+    property bool inSideTarget: false;
 
 
     Component.onCompleted: {
