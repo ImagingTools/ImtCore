@@ -259,7 +259,7 @@ IObjectCollection *CObjectCollectionBase::CreateSubCollection(int offset, int co
 	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
 
 	for (int i = offset; i < objectsCount; i++){
-		collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].objectPtr);
+        collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].objectPtr, m_objects[i].id);
 	}
 
 	return collectionPtr;

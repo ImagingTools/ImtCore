@@ -236,7 +236,8 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 			DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr]() {
 				return dataObjPtr;
 				});
-			collectionPtr->InsertNewObject(m_typeIdAttrPtr->GetValue(), "", "", dataPtr);
+            QByteArray idObject = m_objectDelegateCompPtr->GetObjectIdFromRecord(m_typeIdAttrPtr->GetValue(), sqlQuery.record());
+            collectionPtr->InsertNewObject(m_typeIdAttrPtr->GetValue(), "", "", dataPtr, idObject);
 		}
 	}
 	return collectionPtr;
