@@ -70,8 +70,10 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 
 int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment) const
 {
+	qDebug() << "BackupObject" << objectId << userComment;
 	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
 	if (collectionPtr == nullptr || !m_compressorCompPtr.IsValid()){
+		qDebug() << "BackupObject Invalid data";
 		return -1;
 	}
 
@@ -83,6 +85,7 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 
 	QFileInfo fileInfo = QFileInfo(fileCollectionInfo.filePath);
 	if (!fileInfo.exists()){
+		qDebug() << "File not exists" << fileCollectionInfo.filePath;
 		return -1;
 	}
 
@@ -149,6 +152,7 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 
 						int fileIndex = GetFileIndexById(objectId);
 						if (fileIndex < 0){
+							qDebug() << "fileIndex -1";
 							return -1;
 						}
 
@@ -189,6 +193,8 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 	else{
 		SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(revisionsPath));
 	}
+
+	qDebug() << "Return -1";
 
 	return -1;
 }
