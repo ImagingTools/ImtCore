@@ -655,7 +655,6 @@ Item {
         boundsBehavior: Flickable.StopAtBounds;
 
         clip: true;
-
         Keys.onUpPressed: {
             if (tableContainer.selectedIndex > 0){
                 tableContainer.selectedIndex--;
