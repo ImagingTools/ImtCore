@@ -18,6 +18,7 @@ Rectangle {
 
 
     property TreeItemModel cellDecorator : TreeItemModel{};
+    property TreeItemModel widthDecorator : TreeItemModel{};
     property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
 
     property bool emptyDecorCell: true;
@@ -54,8 +55,13 @@ Rectangle {
     signal widthRecalc();
 
     Component.onCompleted: {
+        Component.onCompleted
         tableDelegateContainer.minHeight = tableDelegateContainer.height;
         widthRecalc();
+    }
+
+    onWidthDecoratorChanged: {
+        tableDelegateContainer.setWidth();
     }
 
     onCellDecoratorChanged: {
@@ -129,9 +135,70 @@ Rectangle {
 
     }
 
+    function setWidth(){
+
+        tableDelegateContainer.widthDecoratorDynamic.Clear();
+        tableDelegateContainer.widthDecoratorDynamic.Copy(tableDelegateContainer.widthDecorator);
+
+        if(!tableDelegateContainer.widthDecorator.GetItemsCount()){
+            tableDelegateContainer.widthRecalc();
+            return;
+        }
+
+        var count_ = 0;
+        var lengthMinus = 0;
+
+        for(var i = 0; i < tableDelegateContainer.widthDecorator.GetItemsCount(); i++){
+
+            var width_ = tableDelegateContainer.widthDecorator.IsValidData("Width",i) ? tableDelegateContainer.widthDecorator.GetData("Width",i): -1;
+            var widthPercent_ = tableDelegateContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableDelegateContainer.widthDecorator.GetData("WidthPercent",i): -1;
+
+            if((width_ == -1) && (widthPercent_ == -1)){
+                count_++;
+            }
+            else{
+                width_ = width_< 0 ? 0 : width_;
+                widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableDelegateContainer.width/100;
+                lengthMinus += Math.max(width_,widthPercent_);
+            }
+        }
+
+        if((tableDelegateContainer.width - lengthMinus) < 0 || count_ == tableDelegateContainer.widthDecorator.GetItemsCount() ){
+            tableDelegateContainer.widthDecoratorDynamic.Clear();
+            tableDelegateContainer.widthRecalc();
+            return;
+        }
+
+        for(var i = 0; i < tableDelegateContainer.widthDecorator.GetItemsCount(); i++){
+
+            var width_ = tableDelegateContainer.widthDecorator.IsValidData("Width",i) ? tableDelegateContainer.widthDecorator.GetData("Width",i): -1;
+            var widthPercent_ = tableDelegateContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableDelegateContainer.widthDecorator.GetData("WidthPercent",i): -1;
+
+            if(width_ < 0  && widthPercent_ < 0 ){
+                if(count_){
+                    tableDelegateContainer.widthDecoratorDynamic.SetData("Width",(tableDelegateContainer.width - lengthMinus)/count_,i);
+                }
+            }
+            else if(width_ < 0  && widthPercent_ >= 0){
+                tableDelegateContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableDelegateContainer.width/100,i);
+            }
+
+            width_ = tableDelegateContainer.widthDecoratorDynamic.IsValidData("Width",i) ? tableDelegateContainer.widthDecoratorDynamic.GetData("Width",i): -1;
+
+            if(width_ < 0){
+                if(count_){
+                    tableDelegateContainer.widthDecoratorDynamic.SetData("Width",(tableDelegateContainer.width - lengthMinus)/count_,i);
+                }
+
+            }
+
+        }
+
+        tableDelegateContainer.widthRecalc();
+    }
 
     onWidthChanged: {
-
+        tableDelegateContainer.setWidth();
         if(tableDelegateContainer.wrapMode !== Text.NoWrap){
             pause.stop();
             pause.start();

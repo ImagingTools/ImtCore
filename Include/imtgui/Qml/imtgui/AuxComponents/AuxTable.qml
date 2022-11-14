@@ -677,6 +677,7 @@ Item {
         delegate:
 
             TableDelegate {
+
             id: tableDelegate;
 
             height: tableContainer.itemHeight;
@@ -687,7 +688,7 @@ Item {
 
             //!!!
             cellDecorator: tableContainer.cellDecorator;
-            widthDecoratorDynamic: tableContainer.widthDecoratorDynamic;
+            widthDecorator: tableContainer.widthDecorator;
 
             borderColorHorizontal: tableContainer.borderColorHorizontal_deleg;
             borderColorVertical: tableContainer.borderColorVertical_deleg;
@@ -704,12 +705,6 @@ Item {
             elideMode: tableContainer.elideMode_deleg;
             isRightBorder: tableContainer.isRightBorder_deleg;
 
-            Connections{
-                target: tableContainer;
-                function onWidthRecalc(){
-                    tableDelegate.widthRecalc();
-                }
-            }
             //!!!
 
             Component.onCompleted: {
