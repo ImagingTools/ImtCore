@@ -20,6 +20,7 @@ Rectangle{
     property bool canFade: false;
     property bool isMoving: false;
     property int pauseDuration: 300;
+    property int indicatorMargin: 0;
 
 
     property real koeff: vertical ? (scrollIndicator.height > scrollContainer.minSize ? 1 :(targetItem.height-scrollContainer.minSize)/(targetItem.contentHeight-targetItem.height)):
@@ -226,7 +227,7 @@ Rectangle{
                                       (parent.height - height)/2;
 
 
-        width: scrollContainer.vertical ? (parent.width - 4) :
+        width: scrollContainer.vertical ? (parent.width - 2*scrollContainer.indicatorMargin) :
                                           scrollContainer.targetItem.contentWidth <= scrollContainer.targetItem.width ? scrollContainer.targetItem.width :
                                                                                                                         (scrollContainer.targetItem.width - (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)) < scrollContainer.minSize ? scrollContainer.minSize :
                                                                                                                                                                                                                                                                       (scrollContainer.targetItem.width - (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width));
@@ -234,7 +235,7 @@ Rectangle{
         height: scrollContainer.vertical ? (scrollContainer.targetItem.contentHeight <= scrollContainer.targetItem.height ? scrollContainer.targetItem.height :
                                                                                                                             (scrollContainer.targetItem.height - (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)) < scrollContainer.minSize ? scrollContainer.minSize :
                                                                                                                                                                                                                                                                              (scrollContainer.targetItem.height - (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height))):
-                                           (parent.height - 4);
+                                           (parent.height - 2*scrollContainer.indicatorMargin);
 
         radius: scrollContainer.indicatorRadius;
         color: scrollContainer.indicatorColor;
