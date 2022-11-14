@@ -8,7 +8,7 @@ Item {
     height: 30;
     width: 50;
 
-    property string username: authorizationPage.login;
+    property string username: authorizationPage.tokenProvider.login;
 
     Text {
         id: usernameText;

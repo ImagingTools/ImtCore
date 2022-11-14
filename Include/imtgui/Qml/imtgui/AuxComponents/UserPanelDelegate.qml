@@ -5,7 +5,7 @@ Item {
     id: root;
 
     function logout(){
-        authorizationPage.login = "";
+        authorizationPage.tokenProvider.login = "";
         thumbnailDecoratorContainer.clearModels();
         authorizationPage.visible = true;
     }

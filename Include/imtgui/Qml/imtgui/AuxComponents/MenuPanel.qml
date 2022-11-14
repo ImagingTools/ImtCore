@@ -25,6 +25,10 @@ Rectangle {
 
     property int spacing: 0;
 
+//    property Component menuButtonDecorator: MenuPanelButtonDecorator {
+//        width: 80;
+//    };
+
     signal activePageChanged;
 
     function clearModels(){
@@ -65,6 +69,8 @@ Rectangle {
             selected: lvPages.currentIndex === model.index;
 
             decoratorSource : Style.menuButtonDecoratorPath;
+
+//            decoratorComp: menuButtonDecorator;
 
             onClicked: {
                 lvPages.currentIndex = model.index;

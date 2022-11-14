@@ -12,51 +12,31 @@ Rectangle {
 
     property Item root;
 
-    property TreeItemModel serverModel;
-    property TreeItemModel localModel;
+    property TreeItemModel serverModel: TreeItemModel {}
+    property TreeItemModel localModel: TreeItemModel {}
 
-    Component.onDestruction: {
-        clearModels();
-    }
-
-    TreeItemModel {
-        id: commonModel;
-    }
-
-    TreeItemModel {
-        id: serverCopyModel;
-    }
-
-    TreeItemModel {
-        id: localCopyModel;
-    }
-
-    onServerModelChanged: {
-        console.log("PreferenceDialog onServerModelChanged");
-        let json = serverModel.toJSON();
-        serverCopyModel.Parse(json);
-
-        updateCommonModel(serverCopyModel);
-        updateLocalModel();
-
-        updateGui();
-    }
-
-    onLocalModelChanged: {
-        console.log("PreferenceDialog onLocalModelChanged");
-
-        let json = localModel.toJSON();
-        localCopyModel.Parse(json);
-
-        updateCommonModel(localCopyModel);
-
-        updateGui();
-    }
+    property TreeItemModel commonModel: TreeItemModel {}
 
     onVisibleChanged: {
         if (visible){
-            mainPanel.selectedIndex = 0;
-            bodyPanelRepeater.model = commonModel.GetData("Elements");
+            if (settingsProvider.localModel){
+                let localModelJson = settingsProvider.localModel.toJSON();
+                localModel.Parse(localModelJson);
+
+                updateCommonModel(localModel);
+            }
+
+            if (settingsProvider.serverModel){
+                let serverModelJson = settingsProvider.serverModel.toJSON();
+                serverModel.Parse(serverModelJson);
+
+                updateCommonModel(serverModel);
+            }
+
+            updateGui();
+        }
+        else{
+            clearModels();
         }
     }
 
@@ -68,32 +48,11 @@ Rectangle {
         bodyPanelRepeater.model = 0;
     }
 
-    function updateModel(){
-        console.log("PreferenceDialog getSettings");
-        settingsQuery.getSettings();
-    }
-
     function updateGui(){
         mainPanelRepeater.model = commonModel;
-    }
 
-    function updateLocalModel(){
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageId = localModel.GetData("Id", i);
-
-            let index = -1;
-            for (let j = 0; j < serverModel.GetItemsCount(); j++){
-                let id = serverModel.GetData("Id", j);
-                if (id == pageId){
-                    index = j;
-                    break;
-                }
-            }
-
-            if (index >= 0){
-                localModel.CopyItemDataFromModel(i, serverModel, index);
-            }
-        }
+        mainPanel.selectedIndex = 0;
+        bodyPanelRepeater.model = commonModel.GetData("Elements");
     }
 
     function updateCommonModel(externModel){
@@ -126,90 +85,53 @@ Rectangle {
         return -1;
     }
 
-    function getInstanceMask(){
-        console.log("Preferences getInstanceMask");
-        let generalPageIndex = getPageIndexByPageId("General");
-        if (generalPageIndex >= 0){
-            var elements = commonModel.GetData("Elements", generalPageIndex);
-
-            for (let i = 0; i < elements.GetItemsCount(); i++){
-                let elementId = elements.GetData("Id", i);
-                if (elementId === "InstanceMask"){
-                    let elementValue = elements.GetData("Value", i);
-
-                    return elementValue;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function getDesignScheme(model){
-        console.log("Preferences getDesignScheme", model.toJSON());
-        let generalPageIndex = getPageIndexByPageId("General", model);
-        console.log("generalPageIndex", generalPageIndex);
-        if (generalPageIndex >= 0){
-            var elements = model.GetData("Elements", generalPageIndex);
-
-            for (let i = 0; i < elements.GetItemsCount(); i++){
-                let elementId = elements.GetData("Id", i);
-                console.log("elementId", elementId);
-                if (elementId == "Mode"){
-                    let elementValue = elements.GetData("Value", i);
-                    let parameters = elements.GetData("Parameters", i);
-
-                    let scheme = parameters.GetData("Id", elementValue);
-
-                    return scheme;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function getSelectedLanguage(){
-        console.log("Preferences getSelectedLanguage");
-        let generalPageIndex = getPageIndexByPageId("General");
-        if (generalPageIndex >= 0){
-            var elements = commonModel.GetData("Elements", generalPageIndex);
-
-            for (let i = 0; i < elements.GetItemsCount(); i++){
-                let elementId = elements.GetData("Id", i);
-                if (elementId === "Language"){
-                    let elementValue = elements.GetData("Value", i);
-                    let parameters = elements.GetData("Parameters", i);
-
-                    let scheme = parameters.GetData("Id", elementValue);
-
-                    return scheme;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function getNetworkUrl(localModel){
-        console.log("Preferences getNetworkUrl");
-
-        let elements = localModel.GetData("Elements");
-
-        for (let i = 0; i < elements.GetItemsCount(); i++){
-            let elementId = elements.GetData("Id", i);
-            if (elementId == "ServerUrl"){
-                let elementValue = elements.GetData("Value", i);
-
-                return elementValue;
-            }
-        }
-
-        return null;
-    }
-
     function openFileDialog(){
         fileDialogSave.open();
+    }
+
+    function getDirtyPagesFromLocalModel(){
+        let pageIds = []
+
+        for (let i = 0; i < localModel.GetItemsCount(); i++){
+            let pageCopyModel = localModel.GetModelFromItem(i);
+            let pageModel = settingsProvider.localModel.GetModelFromItem(i);
+
+            let pageCopyModelJson = pageCopyModel.toJSON();
+            let pageModelJson = pageModel.toJSON();
+
+            console.log("pageCopyModelJson", pageCopyModelJson);
+            console.log("pageModelJson", pageModelJson);
+
+            if (_.isEqual(pageCopyModelJson, pageModelJson)){
+                console.log("EQUAL");
+            }
+            else{
+                console.log("NOT EQUAL");
+                let pageId = localModel.GetData("Id", i)
+                pageIds.push(pageId);
+            }
+        }
+
+        return pageIds;
+    }
+
+    function getDirtyPagesFromServerModel(){
+        let pageIds = []
+
+        for (let i = 0; i < serverModel.GetItemsCount(); i++){
+            let pageCopyModel = serverModel.GetModelFromItem(i);
+            let pageModel = settingsProvider.serverModel.GetModelFromItem(i);
+
+            let pageCopyModelJson = pageCopyModel.toJSON();
+            let pageModelJson = pageModel.toJSON();
+
+            if (!_.isEqual(pageCopyModelJson, pageModelJson)){
+                let pageId = serverModel.GetData("Id", i)
+                pageIds.push(pageId);
+            }
+        }
+
+        return pageIds;
     }
 
     RemoteFileController {
@@ -332,9 +254,7 @@ Rectangle {
             }
         }
 
-        Column {
-            id: bodyPanel;
-
+        Flickable {
             anchors.top: topPanelDialog.bottom;
             anchors.topMargin: 10;
             anchors.left: mainPanelBackground.right;
@@ -342,80 +262,104 @@ Rectangle {
             anchors.right: parent.right;
             anchors.rightMargin: 10;
             anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 50;
 
-            height: parent.height;
+            clip: true;
 
-            Repeater {
-                id: bodyPanelRepeater;
+//            height: parent.height;
 
-                delegate: Item {
+            contentWidth: width;
+            contentHeight: height + 100;
 
-                    width: bodyPanel.width;
-                    height: 100;
+            boundsBehavior: Flickable.StopAtBounds;
 
-                    Text {
-                        id: titleItem;
+            Column {
+                id: bodyPanel;
 
-                        text: model.Name;
+//                width: 200;
 
-                        font.pixelSize: Style.fontSize_common;
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                    }
+                anchors.fill: parent;
 
-                    Rectangle {
-                        id: rectSeparator;
+//                anchors.top: topPanelDialog.bottom;
+//                anchors.topMargin: 10;
+//                anchors.left: mainPanelBackground.right;
+//                anchors.leftMargin: 10;
+//                anchors.right: parent.right;
+//                anchors.rightMargin: 10;
+//                anchors.bottom: parent.bottom;
 
-                        anchors.top: titleItem.bottom;
-                        anchors.topMargin: 5;
+//                height: parent.height;
 
-                        width: parent.width;
-                        height: 1;
+                Repeater {
+                    id: bodyPanelRepeater;
 
-                        color: Style.buttonBorderColor;
-                    }
+                    delegate: Item {
 
-                    Loader {
-                        id: loader;
+                        width: bodyPanel.width;
+                        height: 100;
 
-                        anchors.top: rectSeparator.bottom;
-                        anchors.topMargin: 15;
+                        Text {
+                            id: titleItem;
 
-                        Component.onCompleted: {
-                            var componentType = model.ComponentType;
+                            text: model.Name;
 
-                            if (componentType === "ComboBox"){
-                                loader.source = "SettingsComboBox.qml";
-                                loader.item.width = bodyPanel.width / 2;
+                            font.pixelSize: Style.fontSize_common;
+                            color: Style.textColor;
+                            font.family: Style.fontFamily;
+                        }
+
+                        Rectangle {
+                            id: rectSeparator;
+
+                            anchors.top: titleItem.bottom;
+                            anchors.topMargin: 5;
+
+                            width: parent.width;
+                            height: 1;
+
+                            color: Style.buttonBorderColor;
+                        }
+
+                        Loader {
+                            id: loader;
+
+                            anchors.top: rectSeparator.bottom;
+                            anchors.topMargin: 15;
+
+                            Component.onCompleted: {
+                                var componentType = model.ComponentType;
+
+                                if (componentType === "ComboBox"){
+                                    loader.source = "SettingsComboBox.qml";
+                                    loader.item.width = bodyPanel.width / 2;
+                                }
+                                else if (componentType === "DatabaseSettingsInput"){
+                                    loader.source = "DatabaseInput.qml";
+                                    loader.item.width = bodyPanel.width;
+                                }
+                                else if (componentType === "TextInput"){
+                                    loader.source = "SettingsTextInput.qml";
+                                    loader.item.width = bodyPanel.width;
+                                }
+                                else if (componentType === "Button"){
+                                    loader.source = "SettingsButton.qml";
+                                    loader.item.width = bodyPanel.width / 3;
+                                }
+                                else if (componentType === "TextLabel"){
+                                    loader.source = "SettingsTextLabel.qml";
+
+                                    loader.item.width = bodyPanel.width / 3;
+                                }
+
+                                if (loader.item.parameters){
+                                    loader.item.parameters = model.Parameters;
+                                }
                             }
-                            else if (componentType === "DatabaseSettingsInput"){
-                                loader.source = "DatabaseInput.qml";
-                                loader.item.width = bodyPanel.width;
-                            }
-                            else if (componentType === "TextInput"){
-                                loader.source = "SettingsTextInput.qml";
-                                loader.item.width = bodyPanel.width;
-                            }
-                            else if (componentType === "Button"){
-                                loader.source = "SettingsButton.qml";
-                                loader.item.width = bodyPanel.width / 3;
-                            }
-                            else if (componentType === "TextLabel"){
-                                loader.source = "SettingsTextLabel.qml";
-
-                                loader.item.width = bodyPanel.width / 3;
-                            }
-
-                            if (loader.item.parameters){
-                                loader.item.parameters = model.Parameters;
-                            }
-
-//                            loader.item.width = bodyPanel.width / 2;
                         }
                     }
                 }
-            }
-        }
+            }//Column
+        }//Flickable
 
         ButtonsDialog {
             id: buttonsDialog;
@@ -426,182 +370,33 @@ Rectangle {
             anchors.bottomMargin: 10;
 
             Component.onCompleted: {
-
                 addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": true});
                 addButton({"Id":"Cancel", "Name": qsTr("Cancel"), "Enabled": true});
-
             }
 
             onButtonClicked: {
                 console.log("ButtonsDialog onButtonClicked", buttonId);
 
                 if (buttonId == "Cancel"){
-
-                    if (serverModel){
-                        let json = serverModel.toJSON();
-                        serverCopyModel.Parse(json);
-
-                        updateCommonModel(serverCopyModel);
-                    }
-
-                    if (localModel){
-                        let json = localModel.toJSON();
-                        localCopyModel.Parse(json);
-
-                        updateCommonModel(localCopyModel);
-                    }
-
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
-                    let oldUrl = getNetworkUrl(localModel);
-                    let newUrl = getNetworkUrl(localCopyModel);
+                    let serverPageIds = getDirtyPagesFromServerModel();
 
-                    console.log("oldUrl", oldUrl);
-                    console.log("newUrl", newUrl);
-                    if (oldUrl != newUrl){
-                        let json = localCopyModel.toJSON();
+                    if (serverPageIds.length > 0){
+                        let serverModelJson = serverModel.toJSON();
+                        settingsProvider.serverModel.Parse(serverModelJson);
 
-//                        localModel.SetData("Test", "test");
-                        localModel.Parse(json);
-
-                        root.settingsUpdate("NetworkSettings");
-                        //root.updateModels();
+                        settingsProvider.saveServerModel(serverPageIds);
                     }
 
-                    let oldDesign = getDesignScheme(localModel)
-                    let newDesign = getDesignScheme(localCopyModel);
+                    let localPageIds = getDirtyPagesFromLocalModel();
 
-                    if (oldDesign != newDesign){
-                        let json = localCopyModel.toJSON();
-                        localModel.Parse(json);
+                    if (localPageIds.length > 0){
+                        let localModelJson = localModel.toJSON();
+                        settingsProvider.localModel.Parse(localModelJson);
 
-                        root.settingsUpdate("General");
-
-                        if (!serverModel){
-                            Style.getDesignScheme(newDesign);
-                        }
-                    }
-//                    oldDesign = getDesignScheme(serverModel)
-//                    newDesign = getDesignScheme(serverCopyModel);
-
-//                    if (oldDesign != newDesign){
-//                        let json = localCopyModel.toJSON();
-//                        localModel.Parse(json);
-
-//                        root.settingsUpdate();
-
-//                        if (!serverModel){
-//                            Style.getDesignScheme(newDesign);
-//                        }
-//                    }
-
-                    if (serverModel){
-                        let json = serverCopyModel.toJSON();
-                        serverModel.Parse(json);
-
-                        preferenceSaveQuery.save();
-                    }
-                }
-            }
-        }
-
-        function getDirtyPagesFromLocalModel(){
-            if (_.isEqual(localModel, localCopyModel)){
-
-            }
-        }
-
-        function getDirtyPagesFromServerModel(){
-
-        }
-
-        GqlModel {
-            id: settingsQuery;
-
-            function getSettings() {
-                var query = Gql.GqlRequest("query", "GetSettings");
-
-                var inputParams = Gql.GqlObject("input");
-                inputParams.InsertField ("LanguageId", Style.language);
-                query.AddParam(inputParams);
-
-                var queryFields = Gql.GqlObject("Get");
-                queryFields.InsertField("Id");
-                query.AddField(queryFields);
-
-                var gqlData = query.GetQuery();
-                console.log("PreferenceDialog GqlModel getSettings query ", gqlData);
-                this.SetGqlQuery(gqlData);
-            }
-
-            onStateChanged: {
-                console.log("State:", this.state, settingsQuery);
-
-                if (this.state === "Ready") {
-                    var dataModelLocal;
-
-                    if (settingsQuery.ContainsKey("errors")){
-                        dataModelLocal = settingsQuery.GetData("errors");
-
-                        return;
-                    }
-
-                    if (settingsQuery.ContainsKey("data")){
-                        dataModelLocal = settingsQuery.GetData("data");
-
-                        if (dataModelLocal.ContainsKey("GetSettings")){
-                            dataModelLocal = dataModelLocal.GetData("GetSettings");
-
-                            serverModel = dataModelLocal;
-
-                            let scheme = getDesignScheme(serverModel);
-                            Style.getDesignScheme(scheme);
-
-                            let language = getSelectedLanguage();
-                            context.language = language;
-                        }
-                    }
-                }
-            }
-        }//GetSettings
-
-        GqlModel {
-            id: preferenceSaveQuery;
-
-            function save(){
-                var query = Gql.GqlRequest("mutation", "SaveSettings");
-
-                var inputParams = Gql.GqlObject("input");
-                var jsonString = serverModel.toJSON();
-                jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
-
-                inputParams.InsertField ("Item", jsonString);
-                query.AddParam(inputParams);
-
-                var queryFields = Gql.GqlObject("Save");
-                queryFields.InsertField("Id");
-                query.AddField(queryFields);
-
-                var gqlData = query.GetQuery();
-                console.log("Preference GqlModel SaveSettings query ", gqlData);
-                this.SetGqlQuery(gqlData);
-            }
-
-            onStateChanged: {
-                console.log("State:", this.state, preferenceSaveQuery);
-                if (this.state === "Ready") {
-
-                    if (this.ContainsKey("errors")){
-                        return;
-                    }
-
-                    if (this.ContainsKey("data")){
-
-                        let dataModelLocal = this.GetData("data");
-
-                        let scheme = getDesignScheme(serverModel);
-                        Style.getDesignScheme(scheme);
+                        settingsProvider.saveLocalModel(localPageIds);
                     }
                 }
             }

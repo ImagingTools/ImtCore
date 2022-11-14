@@ -16,6 +16,20 @@ namespace imtqml
 
 // public methods
 
+const imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetElementModel(const QByteArray &elementId, const imtbase::CTreeItemModel* elementsModelPtr) const
+{
+	for (int i = 0; i < elementsModelPtr->GetItemsCount(); i++){
+		if (elementsModelPtr->ContainsKey("Id", i)){
+			QByteArray currentElementId = elementsModelPtr->GetData("Id", i).toByteArray();
+			if (currentElementId == elementId){
+				return elementsModelPtr->GetModelFromItem(i);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 // reimplemented (imtbase::IItemBasedRepresentationProvider)
 
 QByteArray CParamsDataProviderCompBase::GetModelId() const
@@ -105,12 +119,11 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 
 	if (m_paramSubElementsCompPtr.IsValid()){
 		imtbase::CTreeItemModel* externModel = new imtbase::CTreeItemModel();
-		externModel->SetIsArray(true);
 
 		for (int i = 0; i < m_paramSubElementsCompPtr.GetCount(); i++){
 			imtbase::CTreeItemModel* elementModel = m_paramSubElementsCompPtr[i]->GetTreeItemModel(params, fields);
-			externModel->InsertNewItem();
-			externModel->CopyItemDataFromModel(i, elementModel);
+			int externIndex = externModel->InsertNewItem();
+			externModel->CopyItemDataFromModel(externIndex, elementModel);
 		}
 
 		rootModelPtr->SetExternTreeModel("Elements", externModel);
@@ -171,81 +184,118 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromReprese
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
-	QByteArray inputParameterId;
-	if (params.count() > 0){
-		inputParameterId = params.at(0).GetFieldArgumentValue("Id").toByteArray();
-	}
-
 	QByteArray parameterId = *m_paramIdAttrPtr;
 
-	if (!inputParameterId.isEmpty()){
-		if (parameterId != inputParameterId){
-			return nullptr;
-		}
-	}
-
-	rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
+	rootModelPtr->SetData("Id", parameterId);
 	rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
 
 	if (!m_parameterCompPtr.IsValid()){
-		if (baseModel->ContainsKey("Elements")){
-			imtbase::CTreeItemModel* elementsModelPtr = baseModel->GetTreeItemModel("Elements");
-
-	//		imtbase::CTreeItemModel* rootElementsModel = rootModelPtr->AddTreeModel("Elements");
+		const imtbase::CTreeItemModel* pageModelPtr = GetElementModel(parameterId, baseModel);
+		if (pageModelPtr != nullptr){
+			imtbase::CTreeItemModel* elementsModelPtr = pageModelPtr->GetTreeItemModel("Elements");
 
 			for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
-				imtbase::CTreeItemModel elementModel;
-				elementsModelPtr->CopyItemDataToModel(i, &elementModel);
-				QList<imtgql::CGqlObject> parametersList;
+				m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(QList<imtgql::CGqlObject>(), elementsModelPtr);
+			}
+		}
 
-				if (elementModel.ContainsKey("Id")){
-					QByteArray elementId = elementModel.GetData("Id").toByteArray();
-					imtgql::CGqlObject gqlObject;
-					gqlObject.InsertField("Id", QString(elementId));
-					parametersList << gqlObject;
+//		if (baseModel->ContainsKey("Elements")){
+//			imtbase::CTreeItemModel* elementsModelPtr = baseModel->GetTreeItemModel("Elements");
+
+//			QList<imtgql::CGqlObject> parametersList;
+//			for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
+//				m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(parametersList, elementsModelPtr);
+//			}
+
+//	//		imtbase::CTreeItemModel* rootElementsModel = rootModelPtr->AddTreeModel("Elements");
+
+//			for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
+//				imtbase::CTreeItemModel elementModel;
+//				elementsModelPtr->CopyItemDataToModel(i, &elementModel);
+//				QList<imtgql::CGqlObject> parametersList;
+
+//				if (elementModel.ContainsKey("Id")){
+//					QByteArray elementId = elementModel.GetData("Id").toByteArray();
+//					imtgql::CGqlObject gqlObject;
+//					gqlObject.InsertField("Id", QString(elementId));
+//					parametersList << gqlObject;
+//				}
+
+//				imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(parametersList, &elementModel);
+//	//			if (externModel != nullptr){
+//	//				for (int j = 0; j < externModel->GetItemsCount(); j++){
+//	//					int index = rootElementsModel->InsertNewItem();
+//	//					rootElementsModel->CopyItemDataFromModel(index, externModel, j);
+//	//				}
+//	//			}
+//			}
+//		}
+	}
+	else {
+		const imtbase::CTreeItemModel* elementModelPtr = GetElementModel(parameterId, baseModel);
+		if (elementModelPtr != nullptr){
+			int type = 0;
+			if (m_paramComponentTypeAttrPtr.IsValid()){
+				type = *m_paramComponentTypeAttrPtr;
+			}
+
+			if (type == CT_COMBOBOX){
+				iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
+				if (selectionParam == nullptr){
+					return nullptr;
 				}
 
-				imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(parametersList, &elementModel);
-	//			if (externModel != nullptr){
-	//				for (int j = 0; j < externModel->GetItemsCount(); j++){
-	//					int index = rootElementsModel->InsertNewItem();
-	//					rootElementsModel->CopyItemDataFromModel(index, externModel, j);
-	//				}
-	//			}
+				int value = 0;
+				if (elementModelPtr->ContainsKey("Value")){
+					value = elementModelPtr->GetData("Value").toInt();
+				}
+
+				selectionParam->SetSelectedOptionIndex(value);
+			}
+			else if (type == CT_TEXT_INPUT){
+				iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
+
+				QString value;
+				if (elementModelPtr->ContainsKey("Value")){
+					value = elementModelPtr->GetData("Value").toString();
+				}
+
+				if (sourcePtr != nullptr){
+					sourcePtr->SetText(value);
+				}
 			}
 		}
-	}
-	else{
-		int type = 0;
-		if (m_paramComponentTypeAttrPtr.IsValid()){
-			type = *m_paramComponentTypeAttrPtr;
-		}
 
-		if (type == CT_COMBOBOX){
-			iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
-			if (selectionParam == nullptr){
-				return nullptr;
-			}
+//		int type = 0;
+//		if (m_paramComponentTypeAttrPtr.IsValid()){
+//			type = *m_paramComponentTypeAttrPtr;
+//		}
 
-			int value = 0;
-			if (baseModel->ContainsKey("Value")){
-				value = baseModel->GetData("Value").toInt();
-			}
+//		if (type == CT_COMBOBOX){
+//			iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
+//			if (selectionParam == nullptr){
+//				return nullptr;
+//			}
 
-			selectionParam->SetSelectedOptionIndex(value);
-		}
-		else if (type == CT_TEXT_INPUT){
-			iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
+//			int value = 0;
+//			if (baseModel->ContainsKey("Value")){
+//				value = baseModel->GetData("Value").toInt();
+//			}
 
-			QString value;
-			if (baseModel->ContainsKey("Value")){
-				value = baseModel->GetData("Value").toString();
-			}
+//			selectionParam->SetSelectedOptionIndex(value);
+//		}
+//		else if (type == CT_TEXT_INPUT){
+//			iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
 
-			if (sourcePtr != nullptr){
-				sourcePtr->SetText(value);
-			}
-		}
+//			QString value;
+//			if (baseModel->ContainsKey("Value")){
+//				value = baseModel->GetData("Value").toString();
+//			}
+
+//			if (sourcePtr != nullptr){
+//				sourcePtr->SetText(value);
+//			}
+//		}
 		rootModelPtr->SetData("Status", "OK");
 	}
 

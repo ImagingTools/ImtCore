@@ -9,24 +9,19 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property TreeItemModel localSettings;
     property bool serverIsConnection: true;
 
     property int mainMargin: 0;
     property int mainRadius: 0;
 
-    onLocalSettingsChanged: {
-        preferenceDialog.localModel = thumbnailDecoratorContainer.localSettings;
-    }
-
     property alias authorizationPage: authorizationPage;
     property alias preferencePage: preferenceDialog;
+    property alias userManagementProvider: userManagementProvider;
 
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
 
         pagesManager.updateModel();
-        preferenceDialog.updateModel();
     }
 
     function clearModels(){
@@ -72,7 +67,7 @@ Rectangle {
         }
     }
 
-    PagesManager{
+    PagesManager {
         id: pagesManager;
 
         anchors.left: menuPanel.right;
@@ -115,12 +110,6 @@ Rectangle {
         anchors.topMargin: 60;
 
         visible: false;
-
-        onAccepted: {
-            visible = false;
-
-            updateAllModels();
-        }
     }
 
     PreferencePage {
@@ -141,5 +130,18 @@ Rectangle {
         z: 30;
 
         anchors.fill: parent;
+    }
+
+    UserManagementProvider {
+        id: userManagementProvider;
+
+        onUserModeChanged: {
+            if (userMode == "NO_USER_MANAGEMENT"){
+                updateAllModels();
+            }
+            else if (userMode == "STRONG_USER_MANAGEMENT"){
+                authorizationPage.visible = true;
+            }
+        }
     }
 }

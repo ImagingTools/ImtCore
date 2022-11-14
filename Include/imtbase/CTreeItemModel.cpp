@@ -172,7 +172,7 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 }
 
 
-bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel *externTreeModel, int externIndex)
+bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel *externTreeModel, int externIndex) const
 {
 	bool retVal = false;
 	QList<QByteArray> keys;
@@ -333,13 +333,29 @@ imtbase::CTreeItemModel* CTreeItemModel::GetTreeItemModel(const QByteArray& key,
 }
 
 
+CTreeItemModel *CTreeItemModel::GetModelFromItem(int itemIndex) const
+{
+	int itemCount = GetItemsCount();
+
+	if (itemCount <= itemIndex){
+		return nullptr;
+	}
+
+	CTreeItemModel* modelPtr = new CTreeItemModel();
+
+	CopyItemDataToModel(itemIndex, modelPtr);
+
+	return modelPtr;
+}
+
+
 int CTreeItemModel::GetItemsCount() const
 {
 	return m_items.count();
 }
 
 
-void CTreeItemModel::GetKeys(QList<QByteArray>& keys, int index)
+void CTreeItemModel::GetKeys(QList<QByteArray>& keys, int index) const
 {
 	if (index >= 0 && index < m_items.count()){
 		m_items[index]->GetKeys(keys);
@@ -347,7 +363,7 @@ void CTreeItemModel::GetKeys(QList<QByteArray>& keys, int index)
 }
 
 
-QList<QString> CTreeItemModel::GetKeys(int index)
+QList<QString> CTreeItemModel::GetKeys(int index) const
 {
 	QList<QByteArray> keys;
 	if (index >= 0 && index < m_items.count()){

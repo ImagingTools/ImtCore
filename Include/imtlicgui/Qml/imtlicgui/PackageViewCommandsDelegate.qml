@@ -142,9 +142,11 @@ DocumentWorkspaceCommandsDelegateBase {
                             model = model.GetData('ChildModel', index)
                         }
 
-                         model.RemoveItem(itemIndex);
+                        model.RemoveItem(itemIndex);
 
                         tableTreeViewEditor.selectedIndex = null;
+
+                        treeView.model.Refresh();
                     }
                 }
             }

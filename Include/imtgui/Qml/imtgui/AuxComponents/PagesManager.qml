@@ -33,9 +33,6 @@ Item {
         onPagesModelChanged: {
             console.log("pagesProvider onPagesModelChanged");
             container.pageModel = pagesModel;
-
-            let component = Qt.createComponent("PageData.qml");
-            let sprite = component.createObject(pagesProvider, {"pageId": 100, "y": 100});
         }
     }
 
@@ -84,29 +81,5 @@ Item {
             }
         }
     }
-
-//    property var pagesData: {[]};
-//    property PageData currentPage;
-
-//    Repeater {
-//        id: pagesRepeater;
-
-//        anchors.fill: parent;
-
-//        model: pagesData;
-
-//        delegate: Loader {
-//            id: pageViewLoader;
-
-//            anchors.fill: parent;
-
-//            sourceComponent: model.pageView;
-
-//            visible: model.pageId == currentPage.pageId;
-
-//            onLoaded: {
-//            }
-//        }
-//    }
 }
 

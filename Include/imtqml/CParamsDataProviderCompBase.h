@@ -74,6 +74,9 @@ public:
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
+protected:
+	const imtbase::CTreeItemModel* GetElementModel(const QByteArray& elemementId, const imtbase::CTreeItemModel* elementsModelPtr) const;
+
 	// reimplemented (imtbase::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
 	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
@@ -84,7 +87,7 @@ public:
 			imtbase::CTreeItemModel* baseModel,
 			const imtgql::IGqlContext* gqlContext) override;
 
-private:
+protected:
 	I_ATTR(QByteArray, m_paramIdAttrPtr);
 	I_TEXTATTR(m_paramNameAttrPtr);
 	I_ATTR(int, m_paramComponentTypeAttrPtr);

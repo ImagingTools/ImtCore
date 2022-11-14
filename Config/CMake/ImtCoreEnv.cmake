@@ -37,7 +37,7 @@ if(NOT DEFINED ZLIBDIR)
 	endif()
 endif()
 if(NOT DEFINED NICPDIR)
-	set(NICPDIR "${IMTROOTDIR}/3rdParty/nicp")
+	set(NICPDIR "${ACULADIR}/3rdParty/nicp")
 endif()
 
 

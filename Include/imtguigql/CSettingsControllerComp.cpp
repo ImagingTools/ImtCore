@@ -103,6 +103,9 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 		if (inputParams.count() > 0){
 			QList<imtgql::CGqlObject> params;
 			QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+
+			qDebug() << "itemData" << itemData;
+
 			if (!itemData.isEmpty()){
 				imtbase::CTreeItemModel settingsModel;
 				settingsModel.Parse(itemData);

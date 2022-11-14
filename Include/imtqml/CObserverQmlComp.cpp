@@ -103,7 +103,6 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 
 void CObserverQmlComp::OnModelChanged(const QString& pageId)
 {
-	qDebug() << "ObserverQml OnModelChanged";
 	QList<imtgql::CGqlObject> params;
 
 	imtgql::CGqlObject gqlObject;

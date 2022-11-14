@@ -86,8 +86,6 @@ DocumentBase {
         collectionView.selectedIndex = selectedIndex;
 
         treeView.model.Refresh();
-
-//        treeView.refreshModel();
     }
 
     TableTreeViewEditor {

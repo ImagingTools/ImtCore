@@ -33,11 +33,7 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
-	QByteArray paramId;
-	QString paramName;
-
 	if (m_paramIdAttrPtr.IsValid()){
-		paramId = *m_paramIdAttrPtr;
 		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
 	}
 
@@ -60,18 +56,22 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 	}
 
 	if (m_paramNameAttrPtr.IsValid()){
-		paramName = *m_paramNameAttrPtr;
-		if (translatorPtr != nullptr){
-			if (m_translationManagerCompPtr->GetSlaveTranslationManager() != nullptr && currentIndex >= 0){
-				const QTranslator* slaveTranslatorPtr = m_translationManagerCompPtr->GetSlaveTranslationManager()->GetLanguageTranslator(currentIndex);
-				QString text1 = slaveTranslatorPtr->translate("Attribute", paramName.toUtf8());
-				rootModelPtr->SetData("Name", slaveTranslatorPtr->translate("Attribute", paramName.toUtf8()));
-			}
-		}
-		else{
-			rootModelPtr->SetData("Name", paramName);
-		}
+		rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
 	}
+
+//	if (m_paramNameAttrPtr.IsValid()){
+//		paramName = *m_paramNameAttrPtr;
+//		if (translatorPtr != nullptr){
+//			if (m_translationManagerCompPtr->GetSlaveTranslationManager() != nullptr && currentIndex >= 0){
+//				const QTranslator* slaveTranslatorPtr = m_translationManagerCompPtr->GetSlaveTranslationManager()->GetLanguageTranslator(currentIndex);
+//				QString text1 = slaveTranslatorPtr->translate("Attribute", paramName.toUtf8());
+//				rootModelPtr->SetData("Name", slaveTranslatorPtr->translate("Attribute", paramName.toUtf8()));
+//			}
+//		}
+//		else{
+//			rootModelPtr->SetData("Name", paramName);
+//		}
+//	}
 
 	rootModelPtr->SetData("ComponentType", "DatabaseSettingsInput");
 
@@ -166,8 +166,12 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::UpdateBaseModelFromR
 		return nullptr;
 	}
 
-	if (baseModelPtr->ContainsKey("Parameters")){
-		imtbase::CTreeItemModel* parameters = baseModelPtr->GetTreeItemModel("Parameters");
+	QByteArray parameterId = *m_paramIdAttrPtr;
+
+	const imtbase::CTreeItemModel* elementModelPtr = GetElementModel(parameterId, baseModelPtr);
+
+	if (elementModelPtr->ContainsKey("Parameters")){
+		imtbase::CTreeItemModel* parameters = elementModelPtr->GetTreeItemModel("Parameters");
 
 		for (int k = 0; k < parameters->GetItemsCount(); k++){
 			QByteArray parameterId = parameters->GetData("Id", k).toByteArray();

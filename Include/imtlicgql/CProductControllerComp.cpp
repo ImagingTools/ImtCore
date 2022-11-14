@@ -365,6 +365,7 @@ bool CProductControllerComp::GetOperationFromRequest(
 			operationType = OT_USER_OPERATION + 2;
 			return true;
 		}
+
 		if (BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
 			return true;
 		}

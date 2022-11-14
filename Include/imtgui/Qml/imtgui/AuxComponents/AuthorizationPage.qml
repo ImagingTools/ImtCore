@@ -8,9 +8,7 @@ Rectangle {
 
     color: Style.dialogBackgroundColor;
 
-    signal accepted();
-
-    property string login;
+    property alias tokenProvider: userTokenProvider;
 
     MouseArea {
         anchors.fill: parent;
@@ -229,67 +227,19 @@ Rectangle {
                      enabled: loginTextInput.text != "" && passwordTextInput.text != "";
 
                      onClicked: {
-                         authorizationGqlModel.authorization();
+                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
                      }
                  }
              }
         }
     }
 
-    GqlModel{
-        id: authorizationGqlModel;
+    UserTokenProvider {
+        id: userTokenProvider;
 
-        function authorization() {
-            var query = Gql.GqlRequest("query", "UserAuthorization");
-
-            var inputParams = Gql.GqlObject("input");
-
-            inputParams.InsertField ("Login", loginTextInput.text);
-            inputParams.InsertField ("Password", passwordTextInput.text);
-
-            query.AddParam(inputParams);
-
-            var gqlData = query.GetQuery();
-
-            this.SetGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, authorizationGqlModel);
-            if (this.state === "Ready"){
-                var dataModelLocal;
-
-                if (authorizationGqlModel.ContainsKey("errors")){
-                    dataModelLocal = authorizationGqlModel.GetData("errors")
-                     dataModelLocal = dataModelLocal.GetData("UserAuthorization")
-
-                    let message = dataModelLocal.GetData("message");
-                    errorMessage.text = message;
-
-                    return;
-                }
-
-                if (authorizationGqlModel.ContainsKey("data")){
-                    dataModelLocal = authorizationGqlModel.GetData("data")
-
-                    if (dataModelLocal.ContainsKey("UserAuthorization")){
-                        dataModelLocal = dataModelLocal.GetData("UserAuthorization")
-
-                        if (dataModelLocal.ContainsKey("Token")){
-                            let token = dataModelLocal.GetData("Token")
-
-                            this.SetGlobalAccessToken(token);
-
-                            let login = dataModelLocal.GetData("Login")
-
-                            authPageContainer.login = login;
-
-                            accepted();
-                        }
-                    }
-                }
-            }
+        onAccepted: {
+            window.updateAllModels();
+            authPageContainer.visible = false;
         }
     }
 }
-
