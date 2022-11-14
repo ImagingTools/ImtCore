@@ -73,7 +73,8 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 	qDebug() << "BackupObject" << objectId << userComment;
 	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
 	if (collectionPtr == nullptr || !m_compressorCompPtr.IsValid()){
-		qDebug() << "BackupObject Invalid data";
+		qDebug() << "m_compressorCompPtr" << m_compressorCompPtr.IsValid();
+		qDebug() << collectionPtr << "BackupObject Invalid data";
 		return -1;
 	}
 
