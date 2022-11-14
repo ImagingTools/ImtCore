@@ -5,6 +5,7 @@ Rectangle {
     id: tableDelegateContainer;
 
     width: 1000;
+    height: minHeight;
     color: "transparent";
 
     property int textTopMargin: 8;
@@ -147,6 +148,9 @@ Rectangle {
     }
 
     function setCellHeight(){
+        if(tableDelegateContainer.wrapMode == Text.NoWrap){
+            return;
+        }
 
         var maxVal = 0;
         for(var i = 0; i < heightModel.count; i++){
