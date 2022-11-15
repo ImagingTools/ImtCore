@@ -12,6 +12,7 @@ Rectangle {
     color: Style.baseColor;
 
     property string title;
+    property bool hasIcon: true;
 
     signal closeButtonClicked(string buttonId);
 
@@ -29,13 +30,15 @@ Rectangle {
         sourceSize.width: width;
 
         source: "../../../../" + "Icons/" + Style.theme + "/LisaIcon.svg";
+
+        visible: topPanelDialogContainer.hasIcon;
     }
 
     Text {
         id: titleDialog;
 
-        anchors.left: iconDialog.right;
-        anchors.leftMargin: 10;
+        anchors.left: topPanelDialogContainer.hasIcon ? iconDialog.right : parent.left;
+        anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
         anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
 
         text: topPanelDialogContainer.title;

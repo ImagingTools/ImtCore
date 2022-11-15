@@ -14,6 +14,7 @@ Rectangle {
     property string bodySource;
 
     property bool centered: true;
+    property bool hasIcon: true;
 
     property Item root;
     property Item bodyItem: loaderBodyDialog.item;
@@ -71,6 +72,7 @@ Rectangle {
 
             width: dialogContainer.width;
             height: 40;
+            hasIcon: dialogContainer.hasIcon;
 
             onCloseButtonClicked: {
                 dialogContainer.finished(buttonId);
