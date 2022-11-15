@@ -67,6 +67,9 @@ Item {
     property int wrapMode_deleg: Text.NoWrap;
     property int elideMode_deleg: Text.ElideRight;
     property bool isRightBorder_deleg: false;
+
+    property int textMarginHor_deleg: 8;
+    property int textMarginVer_deleg: 8;
     //properties for delegate
 
     property string maxLengthText: '';
@@ -705,6 +708,8 @@ Item {
             elideMode: tableContainer.elideMode_deleg;
             isRightBorder: tableContainer.isRightBorder_deleg;
 
+            textMarginHor: tableContainer.textMarginHor_deleg;
+            textMarginVer: tableContainer.textMarginVer_deleg;
             //!!!
 
             Component.onCompleted: {
