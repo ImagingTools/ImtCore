@@ -462,7 +462,8 @@ Rectangle {
                         Qt.openUrlExternally(link);
                     }
 
-                    text: tableDelegateContainer.bodyArray[model.index];
+                    text: tableDelegateContainer.bodyArray[model.index] == undefined ? "" :
+                                                                                      tableDelegateContainer.bodyArray[model.index];
 
                     onHeightChanged: {
                         if(tableDelegateContainer.wrapMode !== Text.NoWrap){
