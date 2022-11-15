@@ -42,7 +42,7 @@ Item {
     property string commandId: "";
     property string filterName: "Name";
     property string filterText: "";
-    property Component delegate: PopupMenuDelegate{width: comboBoxContainerGql.width; height: comboBoxContainerGql.height;};
+    property Component delegate: PopupMenuDelegate{width: comboBoxContainerGql.width; height: comboBoxContainerGql.itemHeight;};
     property alias popupComp: popupMenu;
     property alias gradient: cbMainRect.gradient;
 

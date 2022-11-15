@@ -50,7 +50,7 @@ Item {
 
             anchors.fill: parent;
 
-            source: model.IconSource;
+            source: model.IconSource == undefined ? "" : model.IconSource;
             sourceSize.width: width;
             sourceSize.height: height;
         }
