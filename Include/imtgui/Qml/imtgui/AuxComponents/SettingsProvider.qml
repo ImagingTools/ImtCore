@@ -5,6 +5,8 @@ import imtqml 1.0
 Item {
     id: container;
 
+    property Item root;
+
     property TreeItemModel serverModel: TreeItemModel {}
     property TreeItemModel localModel: TreeItemModel {}
 
@@ -38,13 +40,13 @@ Item {
         for (let pageId of pageIds){
             if (pageId == "General" && serverModel.GetItemsCount() == 0){
                 applyDesignScheme();
-                window.settingsUpdate(pageId);
+                root.settingsUpdate(pageId);
             }
             else if (pageId == "General" && serverModel.GetItemsCount() > 0){
                 continue;
             }
 
-            window.settingsUpdate(pageId);
+            root.settingsUpdate(pageId);
         }
     }
 
@@ -56,7 +58,7 @@ Item {
                 applyDesignScheme();
 
 //                console.log("localModel", localModel.toJSON());
-                window.settingsUpdate(pageId);
+                root.settingsUpdate(pageId);
             }
         }
 
