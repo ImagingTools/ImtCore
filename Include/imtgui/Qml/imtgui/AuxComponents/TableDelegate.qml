@@ -55,9 +55,8 @@ Rectangle {
     signal widthRecalc();
 
     Component.onCompleted: {
-        Component.onCompleted
         tableDelegateContainer.minHeight = tableDelegateContainer.height;
-        widthRecalc();
+        tableDelegateContainer.setWidth();
     }
 
     onWidthDecoratorChanged: {
@@ -278,6 +277,7 @@ Rectangle {
             }
 
             Component.onCompleted: {
+                //tableDelegateContainer.widthRecalc.connect(deleg.setCellWidth)
                 deleg.setCellWidth();
             }
 
@@ -464,6 +464,7 @@ Rectangle {
 
                     text: tableDelegateContainer.bodyArray[model.index] == undefined ? "" :
                                                                                       tableDelegateContainer.bodyArray[model.index];
+
 
                     onHeightChanged: {
                         if(tableDelegateContainer.wrapMode !== Text.NoWrap){

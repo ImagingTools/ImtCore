@@ -95,10 +95,15 @@ Item {
 //            function getCurrentText(index){
 //                return popup.model.GetData("Name",index);
 //            }
-            Connections{
-                target: comboBoxContainerGql;
-                onFinished: popup.finished(commandId, index)
+//            Connections{
+//                target: comboBoxContainerGql;
+//                onFinished: popup.finished(commandId, index)
+//            }
+
+            Component.onCompleted: {
+                comboBoxContainerGql.finished.connect(popup.finished);
             }
+
             onFilterTextChanged: {
                 comboBoxContainerGql.filterText = popup.filterText;
                 comboBoxContainerGql.currentIndex = -1;

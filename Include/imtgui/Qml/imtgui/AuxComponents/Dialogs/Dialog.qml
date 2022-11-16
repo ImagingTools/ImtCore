@@ -12,12 +12,14 @@ Rectangle {
 
     property string title;
     property string bodySource;
+    property string topPanelSource;
 
     property bool centered: true;
     property bool hasIcon: true;
 
     property Item root;
     property Item bodyItem: loaderBodyDialog.item;
+
 
     property alias buttons: buttonsDialog;
 
@@ -26,6 +28,13 @@ Rectangle {
     signal finished(string buttonId);
 
     property Component content;
+
+//    Connections{
+//        target: loaderTopPanel.item;
+//        function onCloseButtonClicked(buttonId){
+//            dialogContainer.finished(buttonId);
+//        }
+//    }
 
     onFocusChanged: {
         console.log("Dialog onFocusChanged", focus);
@@ -50,12 +59,17 @@ Rectangle {
 
     onTitleChanged: {
         console.log("Dialog onTitleChanged", title);
-        topPanelDialog.title = title;
+        loaderTopPanel.item.title = title;
     }
 
     onBodySourceChanged: {
         loaderBodyDialog.source = dialogContainer.bodySource;
     }
+
+    onTopPanelSourceChanged: {
+        loaderTopPanel.source = dialogContainer.topPanelSource;
+    }
+
 
     MouseArea {
         anchors.fill: parent;
@@ -67,17 +81,21 @@ Rectangle {
 
         width: dialogContainer.width;
 
-        TopPanelDialog {
-            id: topPanelDialog;
+        Loader {
+            id: loaderTopPanel;
 
-            width: dialogContainer.width;
-            height: 40;
-            hasIcon: dialogContainer.hasIcon;
-
-            onCloseButtonClicked: {
-                dialogContainer.finished(buttonId);
+            sourceComponent: content;
+            source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+            onLoaded:  {
+                loaderTopPanel.item.width = dialogContainer.width;
+                loaderTopPanel.item.title = dialogContainer.title;
+                loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+            }
+            onSourceChanged: {
+                loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
             }
         }
+
 
         Loader {
             id: loaderBodyDialog;

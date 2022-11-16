@@ -334,15 +334,16 @@ Item {
 
                 height: headersList.height;
 
-                Connections{
-                    target: tableContainer;
-                    function onWidthRecalc(){
-                        deleg.setCellWidth();
+//                Connections{
+//                    target: tableContainer;
+//                    function onWidthRecalc(){
+//                        deleg.setCellWidth();
 
-                    }
-                }
+//                    }
+//                }
 
                 Component.onCompleted: {
+                    tableContainer.widthRecalc.connect(deleg.setCellWidth);
                     deleg.setCellWidth();
                 }
 
@@ -526,6 +527,10 @@ Item {
 
                         text: model.Name;
 
+                        Component.onCompleted: {
+                            tableContainer.heightRecalc.connect(name.sendHeightData);
+                        }
+
                         onHeightChanged: {
                             name.sendHeightData();
                         }
@@ -543,13 +548,13 @@ Item {
                             }
                         }
 
-                        Connections{
-                            target: tableContainer;
-                            function onHeightRecalc(){
-                                name.sendHeightData();
+//                        Connections{
+//                            target: tableContainer;
+//                            function onHeightRecalc(){
+//                                name.sendHeightData();
 
-                            }
-                        }
+//                            }
+//                        }
 
 
 
