@@ -35,14 +35,19 @@ Item {
     property int count: 15;
     property int delegateRadius: 0;
     property int itemHeight: 26;
-    property int textSize: Style.fontSize_common;
+    property int filterHeiht: 30;
+    property int textSize: Style.fontSize_common;//
+    property int textDelegateSize: Style.fontSize_common;
     property int dialogsCountPrev: 1000;
     property int dialogsCount: modalDialogManager.count;
 
     property string commandId: "";
     property string filterName: "Name";
     property string filterText: "";
+    property string fontColor: Style.textColor;//
+
     property Component delegate: PopupMenuDelegate{width: comboBoxContainerGql.width; height: comboBoxContainerGql.itemHeight;};
+
     property alias popupComp: popupMenu;
     property alias gradient: cbMainRect.gradient;
 
@@ -81,6 +86,7 @@ Item {
         id: popupMenu;
         PopupMenuDialogGql {
             id: popup;
+
             offset: comboBoxContainerGql.offset;
             count: comboBoxContainerGql.count;
             commandId: comboBoxContainerGql.commandId;
@@ -92,7 +98,9 @@ Item {
             delegateRadius: comboBoxContainerGql.delegateRadius;
             hiddenBackground: comboBoxContainerGql.hiddenBackground;
             itemHeight: comboBoxContainerGql.itemHeight;
+            filterHeight: comboBoxContainerGql.filterHeiht;
             textSize: comboBoxContainerGql.textSize;
+            fontColor: comboBoxContainerGql.fontColor;
             canClose: comboBoxContainerGql.canClose;
 //            function getCurrentText(index){
 //                return popup.model.GetData("Name",index);

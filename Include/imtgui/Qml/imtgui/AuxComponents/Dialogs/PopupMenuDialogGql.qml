@@ -22,12 +22,15 @@ Rectangle {
     property int count: 15;
     property string commandId: "";
     property string filterName: "Name";
+    property string fontColor: Style.textColor;
     property alias filterText: filterField.text;
     property bool endListStatus: false;
     property bool hiddenBackground: true;
     property bool canClose: true;
 
-    property Component delegate: PopupMenuDelegate{onClicked: {finished(commandId, index)}};
+    property Component delegate: PopupMenuDelegate{textSize: popupMenuContainer.textSize; fontColor: popupMenuContainer.fontColor;onClicked: {finished(commandId, index)}}
+
+
     property var properties;
     property var gettedParams;
     property var filterIdsModel;
@@ -84,6 +87,7 @@ Rectangle {
 
     CustomTextField {
         id: filterField;
+
         z: 100;
         width: parent.width;
         height: popupMenuContainer.filterHeight;
@@ -92,6 +96,7 @@ Rectangle {
         anchors.top: parent.top;
         anchors.left: parent.left;
         textSize: popupMenuContainer.textSize;
+        fontColor: popupMenuContainer.fontColor;
         onTextEdited: {
             comboBoxContainer.currentIndex = -1;
             offset = 0;

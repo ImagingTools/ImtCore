@@ -10,6 +10,7 @@ Item {
     width: popupMenuContainer.width;
     height: popupMenuContainer.itemHeight;
     property int textSize: Style.fontSize_common;
+    property string fontColor: Style.textColor;
     property alias text: mainText.text;
     signal clicked(string commandId, int index);
 
@@ -64,7 +65,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter;
 
         text: model.Name;
-        color: Style.textColor;
+        color: popupMenuDelegate.fontColor;
         font.pixelSize: popupMenuDelegate.textSize;
         font.family: Style.fontFamily;
     }
