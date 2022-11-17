@@ -47,6 +47,8 @@ Rectangle {
     property int textMarginHor: 8;
     property int textMarginVer: textTopMargin;
 
+    property bool compl: false;
+
 
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);
@@ -55,6 +57,7 @@ Rectangle {
     signal widthRecalc();
 
     Component.onCompleted: {
+        tableDelegateContainer.compl = true;
         tableDelegateContainer.minHeight = tableDelegateContainer.height;
         tableDelegateContainer.setWidth();
     }
@@ -261,6 +264,10 @@ Rectangle {
         clip: true;
         orientation: ListView.Horizontal;
         spacing: 0;
+        property bool compl: false;
+        Component.onCompleted: {
+            dataList.compl = true;
+        }
         model: tableDelegateContainer.count;
 
         delegate: Item {
@@ -268,20 +275,35 @@ Rectangle {
 
 
             height: tableDelegateContainer.height;
+            width: tableDelegateContainer.width/tableDelegateContainer.count;
 
-            Connections{
-                target: tableDelegateContainer;
-                function onWidthRecalc(){
-                    deleg.setCellWidth()
-                }
-            }
+            property bool compl: false;
+            property bool complCompl: deleg.compl && dataList.compl;
+
+
+//            Connections{
+//                target: tableDelegateContainer;
+//                function onWidthRecalc(){
+//                    deleg.setCellWidth()
+//                }
+//            }
 
             Component.onCompleted: {
-                //tableDelegateContainer.widthRecalc.connect(deleg.setCellWidth)
-                deleg.setCellWidth();
+                compl = true;
+
+            }
+            onComplComplChanged: {
+                if(deleg.complCompl){
+                    tableDelegateContainer.widthRecalc.connect(deleg.setCellWidth)
+                    deleg.setCellWidth();
+                }
+
             }
 
             function setCellWidth(){
+                if(!deleg.complCompl){
+                    return;
+                }
 
                 var defaultWidth = dataList.count == 0 ? 0 : tableDelegateContainer.width/dataList.count;
                 var widthFromModel = widthDecoratorDynamic.IsValidData("Width", model.index) ? widthDecoratorDynamic.GetData("Width", model.index) : -1;
