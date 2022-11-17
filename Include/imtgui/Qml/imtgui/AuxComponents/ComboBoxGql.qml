@@ -46,6 +46,8 @@ Item {
     property alias popupComp: popupMenu;
     property alias gradient: cbMainRect.gradient;
 
+    property alias image: cbArrowIcon;
+
 
     signal setCurrentText(var modelll, int index);
 

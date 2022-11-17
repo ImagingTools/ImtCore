@@ -27,6 +27,7 @@ Item {
     property int radius: 5;
     property int currentIndex: -1;
     property Component delegate: PopupMenuDelegate{};
+    property alias image: cbArrowIcon;
 
     signal clicked();
 

@@ -20,7 +20,7 @@ Rectangle {
     property Item root;
     property Item bodyItem: loaderBodyDialog.item;
 
-
+    property alias topPanel: loaderTopPanel.item;
     property alias buttons: buttonsDialog;
 
     property string notClosingButtons: "";
@@ -93,6 +93,7 @@ Rectangle {
             }
             onSourceChanged: {
                 loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+                loaderTopPanel.item.title = dialogContainer.title;
             }
         }
 
