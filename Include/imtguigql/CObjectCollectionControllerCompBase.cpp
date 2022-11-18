@@ -54,8 +54,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 		return GetObject(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_UPDATE:
 		return UpdateObject(*inputParamsPtr, gqlObject, errorMessage);
-    case OT_UPDATE_COLLECTION:
-        return UpdateCollection(*inputParamsPtr, gqlObject, errorMessage);
+	case OT_UPDATE_COLLECTION:
+		return UpdateCollection(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_DELETE:
 		return DeleteObject(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_RENAME:
@@ -65,7 +65,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
 	case OT_LIST:
 		return ListObjects(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_HEADERS:
-		return GetHeaders(*inputParamsPtr, gqlObject, errorMessage);
+		return GetHeaders(*inputParamsPtr, gqlObject, gqlRequest.GetGqlContext(), errorMessage);
 	case OT_METAINFO:
 		return GetMetaInfo(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_OBJECT_VIEW:
@@ -120,11 +120,11 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			operationType = OT_UPDATE;
 			return true;
 		}
-        if (fieldList->at(i).GetId() == "updatedCollectionNotification"){
-            gqlObject = fieldList->at(i);
-            operationType = OT_UPDATE_COLLECTION;
-            return true;
-        }
+		if (fieldList->at(i).GetId() == "updatedCollectionNotification"){
+			gqlObject = fieldList->at(i);
+			operationType = OT_UPDATE_COLLECTION;
+			return true;
+		}
 		if (fieldList->at(i).GetId() == "removedNotification"){
 			gqlObject = fieldList->at(i);
 			operationType = OT_DELETE;
@@ -277,52 +277,52 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 }
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
-            const QList<imtgql::CGqlObject>& inputParams,
-            const imtgql::CGqlObject& gqlObject,
-            QString& errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		const imtgql::CGqlObject& gqlObject,
+		QString& errorMessage) const
 {
-    imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-    imtbase::CTreeItemModel* dataModel = nullptr;
-    imtbase::CTreeItemModel* notificationModel = nullptr;
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-    QByteArray objectIds = inputParams.at(0).GetFieldArgumentValue("Ids").toByteArray();
+	QByteArray objectIds = inputParams.at(0).GetFieldArgumentValue("Ids").toByteArray();
 
-    if (!objectIds.isEmpty()){
-        imtbase::CTreeItemModel objectIdsModel;
-        objectIdsModel.Parse(objectIds);
+	if (!objectIds.isEmpty()){
+		imtbase::CTreeItemModel objectIdsModel;
+		objectIdsModel.Parse(objectIds);
 
-        for (int i = 0; i < objectIdsModel.GetItemsCount(); i++){
-            QString name, description;
+		for (int i = 0; i < objectIdsModel.GetItemsCount(); i++){
+			QString name, description;
 
-            QByteArray objectId = objectIdsModel.GetData("Id", i).toByteArray();
-            if (!objectId.isEmpty()){
-                istd::IChangeable* savedObject = CreateObject(inputParams, objectId, name, description, errorMessage);
-                if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObject)){
-                    errorMessage += QObject::tr("Could not update object: %1; ").arg(qPrintable(objectId));
-                    objectIdsModel.SetData("Failed", true, i);
-                }
-            }
-        }
-        if (!errorMessage.isEmpty()){
-            imtbase::CTreeItemModel* errorsModel = rootModel->AddTreeModel("errors");
-            errorsModel->SetData("message", errorMessage);
-        }
-        else{
-            dataModel = new imtbase::CTreeItemModel();
-            notificationModel = new imtbase::CTreeItemModel();
+			QByteArray objectId = objectIdsModel.GetData("Id", i).toByteArray();
+			if (!objectId.isEmpty()){
+				istd::IChangeable* savedObject = CreateObject(inputParams, objectId, name, description, errorMessage);
+				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObject)){
+					errorMessage += QObject::tr("Could not update object: %1; ").arg(qPrintable(objectId));
+					objectIdsModel.SetData("Failed", true, i);
+				}
+			}
+		}
+		if (!errorMessage.isEmpty()){
+			imtbase::CTreeItemModel* errorsModel = rootModel->AddTreeModel("errors");
+			errorsModel->SetData("message", errorMessage);
+		}
+		else{
+			dataModel = new imtbase::CTreeItemModel();
+			notificationModel = new imtbase::CTreeItemModel();
 
-            for(int i = 0; i < objectIdsModel.GetItemsCount(); ++i){
-                int index = notificationModel->InsertNewItem();
-                if(!objectIdsModel.ContainsKey("Failed", i)){
-                    notificationModel->SetData("Id", objectIdsModel.GetData("Id", i), index);
-                }
-            }
+			for(int i = 0; i < objectIdsModel.GetItemsCount(); ++i){
+				int index = notificationModel->InsertNewItem();
+				if(!objectIdsModel.ContainsKey("Failed", i)){
+					notificationModel->SetData("Id", objectIdsModel.GetData("Id", i), index);
+				}
+			}
 
-            dataModel->SetExternTreeModel("updatedCollectionNotification", notificationModel);
-        }
-    }
-    rootModel->SetExternTreeModel("data", dataModel);
-    return rootModel;
+			dataModel->SetExternTreeModel("updatedCollectionNotification", notificationModel);
+		}
+	}
+	rootModel->SetExternTreeModel("data", dataModel);
+	return rootModel;
 }
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
@@ -530,6 +530,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
+		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
@@ -541,7 +542,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, fields);
+		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, fields, gqlContext);
 		if (headersModel != nullptr){
 			rootModel->SetExternTreeModel("data", headersModel);
 		}
@@ -608,8 +609,6 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	QByteArrayList informationIds = GetInformationIds(gqlObject);
 
 	if (!informationIds.isEmpty()){
-//		idoc::MetaInfoPtr metaInfo;
-//		metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
 
