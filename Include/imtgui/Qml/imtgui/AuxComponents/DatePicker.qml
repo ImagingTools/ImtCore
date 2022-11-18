@@ -48,6 +48,7 @@ Item {
     property string textFieldColor: Style.baseColor;
     property string fontColor: Style.textColor;
     property string textFieldBorderColor: "";//textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+    property int textFieldMargin: 5;
     //buttons
     property int buttonWidth: 15;
     property int buttonHeight: 10;
@@ -144,6 +145,7 @@ Item {
                 fontColor: datePicker.fontColor;
                 color: datePicker.textFieldColor;
                 borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                margin: datePicker.textFieldMargin;
 
                 textInputValidator: yearValid;
 
@@ -224,6 +226,7 @@ Item {
                 fontColor: datePicker.fontColor;
                 color: datePicker.textFieldColor;
                 borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                margin: datePicker.textFieldMargin;
 
                 readOnly: true;
                 horizontalAlignment: TextInput.AlignHCenter;
@@ -319,6 +322,7 @@ Item {
                 fontColor: datePicker.fontColor;
                 color: datePicker.textFieldColor;
                 borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                margin: datePicker.textFieldMargin;
 
                 horizontalAlignment: TextInput.AlignHCenter;
                 textInputValidator: dayValid;

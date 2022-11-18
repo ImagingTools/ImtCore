@@ -13,6 +13,7 @@ Rectangle {
     border.color: Style.borderColor;
 
     property int checkState: Qt.Unchecked;
+    property alias imageSource: image.source;
 
     signal clicked();
 
@@ -30,6 +31,8 @@ Rectangle {
     }
 
     Image {
+        id: image;
+
         anchors.centerIn: parent;
 
         height: container.height - 1;
