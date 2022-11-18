@@ -46,7 +46,7 @@ Item {
     property string filterText: "";
     property string fontColor: Style.textColor;//
 
-    property Component delegate: PopupMenuDelegate{width: comboBoxContainerGql.width; height: comboBoxContainerGql.itemHeight;};
+    property Component delegate: PopupMenuDelegate{width: comboBoxContainerGql.width; height: comboBoxContainerGql.itemHeight;textSize: comboBoxContainerGql.textSize; fontColor: comboBoxContainerGql.fontColor};
 
     property alias popupComp: popupMenu;
     property alias gradient: cbMainRect.gradient;
