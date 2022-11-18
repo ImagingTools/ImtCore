@@ -2,7 +2,9 @@ import QtQuick 2.12
 import Acf 1.0
 
 Item {
+    id: datePicker;
 
+    height: 20;
     property var monthNames:
     [
         qsTr("January"),
@@ -28,6 +30,31 @@ Item {
     property alias currentDayButtonVisible: currentDate.visible;
 
     property bool completed: false;
+
+    //icons
+    property int iconWidth: 12;
+    property int iconHeight: 10;
+    property string iconUpSource: "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
+    property string iconDownSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+    //margins
+    property int mainMargin: 0;
+    //CustomTextField
+    property int textFieldHeight: 20;
+    property int textFieldWidthYear: 42;
+    property int textFieldWidthMonth: 85;
+    property int textFieldWidthDay: 25;
+    property int textFieldRadius:0;
+    property int textSize: 15;
+    property string textFieldColor: Style.baseColor;
+    property string fontColor: Style.textColor;
+    property string textFieldBorderColor: "";//textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+    //buttons
+    property int buttonWidth: 15;
+    property int buttonHeight: 10;
+
+    property string buttonColor:"";
+    property int buttonHighlighted: -1;
+    //
 
     signal dateChanged();
 
@@ -90,7 +117,7 @@ Item {
     }
 
     Row {
-        height: 20;
+        height: datePicker.height;
 
         spacing: 10;
 
@@ -101,13 +128,22 @@ Item {
         }
 
         Row {
+            id: mainRow;
             height: parent.height;
+            spacing: datePicker.mainMargin;
 
             CustomTextField {
                 id: yearField;
 
-                height: 20;
-                width: 42;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                height: datePicker.textFieldHeight;
+                width: datePicker.textFieldWidthYear;
+                radius: datePicker.textFieldRadius;
+                textSize: datePicker.textSize;
+                fontColor: datePicker.fontColor;
+                color: datePicker.textFieldColor;
+                borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
                 textInputValidator: yearValid;
 
@@ -121,16 +157,19 @@ Item {
             }
 
             Column {
+                anchors.verticalCenter: parent.verticalCenter;
                 AuxButton {
                     id: yearUpButton;
 
-                    width: 15;
-                    height: 10;
+                    width: datePicker.buttonWidth;
+                    height: datePicker.buttonHeight;
 
-                    iconWidth: 12;
-                    iconHeight: 10;
+                    iconWidth: datePicker.iconWidth;
+                    iconHeight: datePicker.iconHeight;
+                    iconSource: datePicker.iconUpSource;
 
-                    iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
+                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
                     onClicked: {
                         let selectedYear = Number(yearField.text);
@@ -146,13 +185,16 @@ Item {
                 AuxButton {
                     id: yearDownButton;
 
-                    width: 15;
-                    height: 10;
+                    width: datePicker.buttonWidth;
+                    height: datePicker.buttonHeight;
 
-                    iconWidth: 12;
-                    iconHeight: 10;
+                    iconWidth: datePicker.iconWidth;
+                    iconHeight: datePicker.iconHeight;
+                    iconSource: datePicker.iconDownSource;
 
-                    iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+
 
                     onClicked: {
                         if (yearField.text == ""){
@@ -173,8 +215,15 @@ Item {
             CustomTextField {
                 id: monthField;
 
-                height: 20;
-                width: 85;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                height: datePicker.textFieldHeight;
+                width: datePicker.textFieldWidthMonth;
+                radius: datePicker.textFieldRadius;
+                textSize: datePicker.textSize;
+                fontColor: datePicker.fontColor;
+                color: datePicker.textFieldColor;
+                borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
                 readOnly: true;
                 horizontalAlignment: TextInput.AlignHCenter;
@@ -191,16 +240,20 @@ Item {
             }
 
             Column {
+                anchors.verticalCenter: parent.verticalCenter;
                 AuxButton {
                     id: monthUpButton;
 
-                    width: 15;
-                    height: 10;
+                    width: datePicker.buttonWidth;
+                    height: datePicker.buttonHeight;
 
-                    iconWidth: 12;
-                    iconHeight: 10;
+                    iconWidth: datePicker.iconWidth;
+                    iconHeight: datePicker.iconHeight;
+                    iconSource: datePicker.iconUpSource;
 
-                    iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
+                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+
 
                     onClicked: {
 
@@ -221,13 +274,16 @@ Item {
                 AuxButton {
                     id: monthDownButton;
 
-                    width: 15;
-                    height: 10;
+                    width: datePicker.buttonWidth;
+                    height: datePicker.buttonHeight;
 
-                    iconWidth: 12;
-                    iconHeight: 10;
+                    iconWidth: datePicker.iconWidth;
+                    iconHeight: datePicker.iconHeight;
+                    iconSource: datePicker.iconDownSource;
 
-                    iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+
 
                     onClicked: {
                         let index;
@@ -254,8 +310,15 @@ Item {
             CustomTextField {
                 id: dayField;
 
-                height: 20;
-                width: 25;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                height: datePicker.textFieldHeight;
+                width: datePicker.textFieldWidthDay;
+                radius: datePicker.textFieldRadius;
+                textSize: datePicker.textSize;
+                fontColor: datePicker.fontColor;
+                color: datePicker.textFieldColor;
+                borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
                 horizontalAlignment: TextInput.AlignHCenter;
                 textInputValidator: dayValid;
@@ -272,16 +335,21 @@ Item {
             Column {
                 id: dayButtons;
 
+                anchors.verticalCenter: parent.verticalCenter;
+
                 AuxButton {
                     id: dayUpButton;
 
-                    width: 15;
-                    height: 10;
+                    width: datePicker.buttonWidth;
+                    height: datePicker.buttonHeight;
 
-                    iconWidth: 12;
-                    iconHeight: 10;
+                    iconWidth: datePicker.iconWidth;
+                    iconHeight: datePicker.iconHeight;
+                    iconSource: datePicker.iconUpSource;
 
-                    iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
+                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+
 
                     onClicked: {
                         let selectedDay = Number(dayField.text);
@@ -298,13 +366,16 @@ Item {
                 AuxButton {
                     id: dayDownButton;
 
-                    width: 15;
-                    height: 10;
+                    width: datePicker.buttonWidth;
+                    height: datePicker.buttonHeight;
 
-                    iconWidth: 12;
-                    iconHeight: 10;
+                    iconWidth: datePicker.iconWidth;
+                    iconHeight: datePicker.iconHeight;
+                    iconSource: datePicker.iconDownSource;
 
-                    iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+
 
                     onClicked: {
                         let selectedDay = Number(dayField.text);

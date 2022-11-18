@@ -9,11 +9,14 @@ Rectangle {
     border.width: 1;
     border.color: highlighted ? Style.iconColorOnSelected : borderColor;
 
-    color: /*!enabled ? Style.backgroundColor : */auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
-                                        auxButtonContainer.highlighted ? Style.selectedColor :
-                                                                         backgroundColor;
+    color: defaultColor;
 
+    property string defaultColor: /*!enabled ? Style.backgroundColor : */auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
+                                                                                                                                        auxButtonContainer.highlighted ? Style.selectedColor :
+                                                                                                                                                                         backgroundColor;
+    property string defaultFontColor: auxButtonContainer.enabled ? Style.buttonText : Style.inactive_buttonText;
     property bool highlighted: ma.containsMouse;
+    property bool containsMouse: ma.containsMouse;
     property bool hasIcon: auxButtonContainer.iconSource !== "";
     property bool hasText: false;
     property bool fontBold: false;
