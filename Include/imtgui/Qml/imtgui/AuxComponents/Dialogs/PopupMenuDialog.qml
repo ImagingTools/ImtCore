@@ -16,9 +16,13 @@ Rectangle {
     property int itemWidth: 200;
     property int itemHeight: 26;
 
+    property int textSize: Style.fontSize_common;
+    property string fontColor: Style.textColor;
+
     property bool hiddenBackground: true;
 
-    property Component delegate: PopupMenuDelegate{}
+    property Component delegate: PopupMenuDelegate{width: popupMenuContainer.width; height: popupMenuContainer.itemHeight; textSize: popupMenuContainer.textSize;fontColor: popupMenuContainer.fontColor;
+        }
 
 
     /**
@@ -29,6 +33,7 @@ Rectangle {
     signal finished(string commandId, int index);
 
     onFinished: {
+        console.log("___________FINISHED__________")
         root.closeDialog();
     }
 
@@ -73,7 +78,7 @@ Rectangle {
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
 
-            delegate: PopupMenuDelegate{}// Delegate Item
+            delegate: popupMenuContainer.delegate;
         }//ListView
     }//ItemListView
 

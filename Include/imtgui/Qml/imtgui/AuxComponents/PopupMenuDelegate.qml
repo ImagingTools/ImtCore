@@ -7,11 +7,10 @@ import imtqml 1.0
 Item {
     id: popupMenuDelegate;
 
-    width: popupMenuContainer.width;
-    height: popupMenuContainer.itemHeight;
     property int textSize: Style.fontSize_common;
     property string fontColor: Style.textColor;
     property alias text: mainText.text;
+
     signal clicked(string commandId, int index);
 
 

@@ -26,10 +26,17 @@ Item {
 
     property int radius: 5;
     property int currentIndex: -1;
-    property Component delegate: PopupMenuDelegate{};
+    property Component delegate: PopupMenuDelegate{width: comboBoxContainer.width; height: comboBoxContainer.itemHeight; textSize: comboBoxContainer.textSize;fontColor: comboBoxContainer.fontColor;
+        };
+
     property alias image: cbArrowIcon;
 
+    property int textSize: Style.fontSize_common;
+    property int itemHeight: 26;
+    property string fontColor: Style.textColor;
+
     signal clicked();
+    signal finished(string commandId, int index);
 
     onModelChanged: {
         if (comboBoxContainer.currentIndex > -1){
@@ -38,6 +45,7 @@ Item {
     }
 
     onCurrentIndexChanged: {
+        console.log("____________INDEX_CHANGED____________")
         console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (comboBoxContainer.currentIndex > -1){
             let name = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
@@ -49,10 +57,19 @@ Item {
     Component {
         id: popupMenu;
         PopupMenuDialog {
+            id: popup;
+
             delegate: comboBoxContainer.delegate;
+            width: comboBoxContainer.width;
+            itemHeight: comboBoxContainer.itemHeight;
             hiddenBackground: comboBoxContainer.hiddenBackground;
+            textSize: comboBoxContainer.textSize;
+            fontColor: comboBoxContainer.fontColor;
             onFinished: {
                 comboBoxContainer.currentIndex = index;
+            }
+            Component.onCompleted: {
+                comboBoxContainer.finished.connect(popup.finished);
             }
         }
     }
@@ -110,10 +127,10 @@ Item {
 
             anchors.verticalCenter: parent.verticalCenter;
 
-            color: Style.textColor;
+            color: comboBoxContainer.fontColor;
             text: comboBoxContainer.currentText;
             font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
+            font.pixelSize: comboBoxContainer.textSize;
         }
 
         Image {
