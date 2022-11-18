@@ -33,7 +33,6 @@ Rectangle {
     signal finished(string commandId, int index);
 
     onFinished: {
-        console.log("___________FINISHED__________")
         root.closeDialog();
     }
 

@@ -45,7 +45,6 @@ Item {
     }
 
     onCurrentIndexChanged: {
-        console.log("____________INDEX_CHANGED____________")
         console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (comboBoxContainer.currentIndex > -1){
             let name = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
