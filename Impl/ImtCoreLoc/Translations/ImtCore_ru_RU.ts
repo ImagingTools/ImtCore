@@ -2,180 +2,56 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru_RU">
 <context>
-    <name>AccountCollectionView2</name>
-    <message>
-        <location filename="../../../Bin/web/src/imtauthgui/AccountCollectionView2.qml" line="+29"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView2.qml" line="+29"/>
-        <source>Edit</source>
-        <translation>Редактировать</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView2.qml" line="+1"/>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView2.qml" line="+2"/>
-        <source>Set Description</source>
-        <translation>Установить описание</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView2.qml" line="+1"/>
-        <source>Rename</source>
-        <translation>Переименовать</translation>
-    </message>
-    <message>
-        <location line="+34"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView2.qml" line="+34"/>
-        <source>Please enter the description of the account: </source>
-        <translation>Пожалуйста, введите описание аккаунт:</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView2.qml" line="+12"/>
-        <source>Please enter the name of the account: </source>
-        <translation>Пожалуйста, введите название аккаунта:</translation>
-    </message>
-</context>
-<context>
     <name>AccountEditor</name>
     <message>
-        <location filename="../../../Bin/web/src/imtauthgui/AccountEditor.qml" line="+110"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor.qml" line="+74"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor.qml" line="+77"/>
         <source>Account name</source>
         <translation>Название аккаунта</translation>
     </message>
     <message>
-        <location line="+20"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor.qml" line="+23"/>
+        <location line="+23"/>
         <source>Account description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location line="+18"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor.qml" line="+20"/>
+        <location line="+20"/>
         <source>Company address</source>
         <translation>Адрес компании</translation>
     </message>
     <message>
-        <location line="+76"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor.qml" line="+110"/>
+        <location line="+110"/>
         <source>Account Owner</source>
         <translation>Владелец аккаунта</translation>
     </message>
 </context>
 <context>
-    <name>AccountEditor2</name>
+    <name>AdministrationView</name>
     <message>
-        <location filename="../../../Bin/web/src/imtauthgui/AccountEditor2.qml" line="+149"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+149"/>
-        <source>Save all changes ?</source>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AdministrationView.qml" line="+61"/>
+        <source>Administration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+125"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+125"/>
-        <source>Account name</source>
-        <translation type="unfinished">Название аккаунта</translation>
+        <location line="+8"/>
+        <source>Users</source>
+        <translation type="unfinished">Пользователи</translation>
     </message>
     <message>
-        <location line="+43"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+43"/>
-        <source>Account description</source>
-        <translation type="unfinished">Описание</translation>
-    </message>
-    <message>
-        <location line="+43"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+43"/>
-        <source>Company address</source>
-        <translation type="unfinished">Адрес компании</translation>
-    </message>
-    <message>
-        <location line="+30"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+30"/>
-        <source>Country</source>
-        <translation type="unfinished">Страна</translation>
-    </message>
-    <message>
-        <location line="+60"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+60"/>
-        <source>City</source>
-        <translation type="unfinished">Город</translation>
-    </message>
-    <message>
-        <location line="+60"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+60"/>
-        <source>Postal code</source>
-        <translation type="unfinished">Почтовый индекс</translation>
-    </message>
-    <message>
-        <location line="+60"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+60"/>
-        <source>Street</source>
-        <translation type="unfinished">Улица</translation>
-    </message>
-    <message>
-        <location line="+55"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+55"/>
-        <source>Account Owner</source>
-        <translation type="unfinished">Владелец аккаунта</translation>
-    </message>
-    <message>
-        <location line="+25"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+25"/>
-        <source>Email</source>
-        <translation type="unfinished">Email</translation>
-    </message>
-    <message>
-        <location line="+60"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+60"/>
-        <source>BirthDay</source>
-        <translation type="unfinished">День рождения</translation>
-    </message>
-    <message>
-        <location line="+63"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+63"/>
-        <source>Gender</source>
-        <translation type="unfinished">Пол</translation>
-    </message>
-    <message>
-        <location line="+75"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+75"/>
-        <source>First name</source>
-        <translation type="unfinished">Имя</translation>
-    </message>
-    <message>
-        <location line="+59"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+59"/>
-        <source>Last name</source>
-        <translation type="unfinished">Фамилия</translation>
-    </message>
-    <message>
-        <location line="+59"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+59"/>
-        <source>Nickname</source>
-        <translation type="unfinished">Никнейм</translation>
-    </message>
-    <message>
-        <location line="+56"/>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountEditor2.qml" line="+56"/>
-        <source>Addresses</source>
-        <translation type="unfinished">Адресы</translation>
+        <location line="+6"/>
+        <source>Roles</source>
+        <translation type="unfinished">Роли</translation>
     </message>
 </context>
 <context>
     <name>Attribute</name>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+33"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+37"/>
         <location line="+4"/>
         <source>Design token generator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="-6"/>
         <source>. Imaging tools</source>
         <translation type="unfinished"></translation>
     </message>
@@ -185,25 +61,25 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-6"/>
         <source>Imaging tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+69"/>
+        <location line="+66"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+123"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>ImagingTools GmbH</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>Preference File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -215,16 +91,16 @@
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
         <source>Text file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
@@ -232,16 +108,118 @@
         <translation>Редактирование лицензии</translation>
     </message>
     <message>
-        <location line="-4"/>
+        <location line="-68"/>
+        <location line="+26"/>
+        <location line="+32"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-64"/>
+        <location line="+12"/>
+        <location line="+48"/>
         <location line="+6"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
     <message>
+        <location line="-72"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-88"/>
+        <location line="+26"/>
+        <source>Administration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-24"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-30"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
+        <location line="+16"/>
+        <source>Roles</source>
+        <translation type="unfinished">Роли</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+24"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+10"/>
+        <source>Remove</source>
+        <translation type="unfinished">Удалить</translation>
+    </message>
+    <message>
+        <location line="-20"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <source>Role Name</source>
+        <translation type="unfinished">Название</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+24"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+30"/>
+        <source>Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-22"/>
+        <location line="+24"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
+        <location line="+30"/>
+        <source>Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-20"/>
+        <location line="+24"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location line="+30"/>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-20"/>
+        <location line="+24"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location line="+30"/>
+        <source>Close</source>
+        <translation type="unfinished">Закрыть</translation>
+    </message>
+    <message>
+        <location line="-22"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-22"/>
+        <source>Users</source>
+        <translation type="unfinished">Пользователи</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <source>Create user account</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+20"/>
+        <source>Username</source>
+        <translation>Имя пользователя</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <source>Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <source>Email</source>
+        <translation type="unfinished">Email</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+46"/>
+        <source>Settings</source>
+        <translation>Настройки</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-44"/>
         <source>STL</source>
         <translation type="unfinished"></translation>
     </message>
@@ -298,13 +276,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+16"/>
         <source>Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Report Files</source>
         <translation type="unfinished"></translation>
@@ -313,32 +291,28 @@
 <context>
     <name>AuthorizationPage</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/AuthorizationPage.qml" line="+57"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/AuthorizationPage.qml" line="+51"/>
         <source>Welcome to Lisa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Please login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
+        <location line="+42"/>
         <source>Enter the login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+20"/>
+        <source>Password</source>
+        <translation type="unfinished">Пароль</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Enter the password</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Введите пароль</translation>
     </message>
     <message>
-        <location line="+49"/>
-        <source>Remember me</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+33"/>
+        <location line="-46"/>
+        <location line="+144"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1008,7 +982,7 @@
         <location line="+5"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CPluginStatusViewerComp.h" line="+2"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1403,7 +1377,7 @@
     <name>CThumbnailDecoratorGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+463"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+456"/>
         <source>Main Window</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1436,7 +1410,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+19"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+4"/>
         <source>Dashboard</source>
         <translation type="unfinished"></translation>
@@ -1532,44 +1506,37 @@
 <context>
     <name>CollectionViewCommandsDelegateBase</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+115"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+168"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+172"/>
         <source>Edit</source>
         <translation type="unfinished">Редактировать</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+1"/>
         <source>Remove</source>
         <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+1"/>
         <source>Rename</source>
         <translation type="unfinished">Переименовать</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+1"/>
         <source>Set Description</source>
         <translation type="unfinished">Установить описание</translation>
     </message>
     <message>
-        <location line="+13"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="-101"/>
+        <location line="-105"/>
         <source>Remove selected item from the collection ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+9"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+9"/>
         <source>Please enter the name of the document:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+5"/>
+        <location line="+9"/>
         <source>Please enter the description of the document:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1688,7 +1655,7 @@
     <message>
         <location line="+2"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1744,47 +1711,27 @@
 <context>
     <name>DocumentWorkspaceCommandsDelegate</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+154"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+114"/>
         <source>Edit</source>
         <translation type="unfinished">Редактировать</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+1"/>
         <source>Remove</source>
         <translation type="unfinished">Удалить</translation>
     </message>
     <message>
         <location line="+1"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+1"/>
         <source>Set Description</source>
         <translation type="unfinished">Установить описание</translation>
     </message>
     <message>
-        <location line="+17"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="-73"/>
+        <location line="-73"/>
         <source>Remove selected item from the document ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Item-ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Item Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Please enter the name of the item: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+10"/>
+        <location line="+10"/>
         <source>Please enter the description of the item:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1792,7 +1739,7 @@
 <context>
     <name>DocumentWorkspaceCommandsDelegateBase</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml" line="+92"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml" line="+96"/>
         <source>Save all changes ?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1823,13 +1770,12 @@
 <context>
     <name>EditDialog</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/EditDialog.qml" line="+46"/>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/EditDialog.qml" line="+45"/>
         <source>Edit</source>
         <translation type="unfinished">Редактировать</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/EditDialog.qml" line="-35"/>
+        <location line="-35"/>
         <source>Feature-ID</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1848,50 +1794,6 @@
     </message>
 </context>
 <context>
-    <name>EditFeatureDialog2</name>
-    <message>
-        <location filename="../../../Bin/web/src/imtlicgui/EditFeatureDialog2.qml" line="+67"/>
-        <location line="+346"/>
-        <source>Feature-ID can&apos;t be empty!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-334"/>
-        <source>Feature-ID already exists!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>Feature Name can&apos;t be empty!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+67"/>
-        <source>Edit feature</source>
-        <translation type="unfinished">Редактирование свойства</translation>
-    </message>
-    <message>
-        <location line="+41"/>
-        <source>Feature Name</source>
-        <translation type="unfinished">Название</translation>
-    </message>
-    <message>
-        <location line="+60"/>
-        <source>Feature-ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+70"/>
-        <source>OK</source>
-        <translation type="unfinished">OK</translation>
-    </message>
-    <message>
-        <location line="+47"/>
-        <source>Cancel</source>
-        <translation type="unfinished">Отмена</translation>
-    </message>
-</context>
-<context>
     <name>EditLicenseDialog</name>
     <message>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/EditLicenseDialog.qml" line="+10"/>
@@ -1899,12 +1801,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+17"/>
         <source>Edit License</source>
         <translation>Редактирование лицензии</translation>
     </message>
     <message>
-        <location line="-18"/>
+        <location line="-16"/>
         <source>License Name</source>
         <translation>Название</translation>
     </message>
@@ -1912,17 +1814,8 @@
 <context>
     <name>FilterPanelDecorator</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/FilterPanelDecorator.qml" line="+42"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/FilterPanelDecorator.qml" line="+46"/>
         <source>Enter some text to filter the item list</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>FilterPanelDecorator2</name>
-    <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/FilterPanelDecorator2.qml" line="+64"/>
-        <source>Filter</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1950,30 +1843,20 @@
 <context>
     <name>InputDialog</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/Dialogs/InputDialog.qml" line="+33"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml" line="+33"/>
         <source>Input</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>InstallationCollectionView2</name>
-    <message>
-        <location filename="../../../Bin/web/src/imtlicgui/InstallationCollectionView2.qml" line="+323"/>
-        <source>Save file</source>
-        <translation type="unfinished">Сохранить файл</translation>
-    </message>
-</context>
-<context>
     <name>InstallationCollectionViewCommandsDelegate</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/InstallationCollectionViewCommandsDelegate.qml" line="+45"/>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationCollectionViewCommandsDelegate.qml" line="+43"/>
         <source>Save file</source>
         <translation type="unfinished">Сохранить файл</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationCollectionViewCommandsDelegate.qml" line="-20"/>
+        <location line="-20"/>
         <source>Copy of </source>
         <translation type="unfinished"></translation>
     </message>
@@ -1981,120 +1864,72 @@
 <context>
     <name>InstallationEditor</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/InstallationEditor.qml" line="+101"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationEditor.qml" line="+80"/>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationEditor.qml" line="+84"/>
         <source>Instance-ID</source>
         <translation type="unfinished">ID Инсталляции</translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationEditor.qml" line="+26"/>
-        <source>Enter the instance ID</source>
+        <location line="+36"/>
+        <source>Enter the instance-ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationEditor.qml" line="+12"/>
+        <location line="+20"/>
+        <source>Incorrect input instance-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
         <source>Customer</source>
         <translation type="unfinished">Покупатель</translation>
     </message>
     <message>
         <location line="+23"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationEditor.qml" line="+23"/>
         <source>Product</source>
         <translation type="unfinished">Продукт</translation>
     </message>
     <message>
         <location line="+24"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationEditor.qml" line="+24"/>
         <source>Licenses</source>
         <translation type="unfinished">Лицензии</translation>
     </message>
 </context>
 <context>
-    <name>InstallationEditorCommandsDelegate</name>
-    <message>
-        <location filename="../../../Bin/web/src/imtlicgui/InstallationEditorCommandsDelegate.qml" line="+113"/>
-        <source>Please enter the name of the installation:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>InstallationInfoEditor</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/InstallationInfoEditor.qml" line="+248"/>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationInfoEditor.qml" line="+247"/>
         <source>Save all changes ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+131"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationInfoEditor.qml" line="+131"/>
         <source>Instance-ID</source>
         <translation>ID Инсталляции</translation>
     </message>
     <message>
         <location line="+43"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationInfoEditor.qml" line="+43"/>
         <source>Enter the instance ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationInfoEditor.qml" line="+34"/>
         <source>Customer</source>
         <translation>Покупатель</translation>
     </message>
     <message>
         <location line="+85"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationInfoEditor.qml" line="+85"/>
         <source>Product</source>
         <translation>Продукт</translation>
     </message>
     <message>
         <location line="+86"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/InstallationInfoEditor.qml" line="+86"/>
         <source>Licenses</source>
         <translation>Лицензии</translation>
     </message>
 </context>
 <context>
-    <name>InstallationInfoEditor_</name>
-    <message>
-        <location filename="../../../Bin/web/src/imtlicgui/InstallationInfoEditor_.qml" line="+237"/>
-        <source>Save all changes ?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+127"/>
-        <source>Instance-ID</source>
-        <translation type="unfinished">ID Инсталляции</translation>
-    </message>
-    <message>
-        <location line="+42"/>
-        <source>Enter the instance ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+34"/>
-        <source>Customer</source>
-        <translation type="unfinished">Покупатель</translation>
-    </message>
-    <message>
-        <location line="+85"/>
-        <source>Product</source>
-        <translation type="unfinished">Продукт</translation>
-    </message>
-    <message>
-        <location line="+86"/>
-        <source>Licenses</source>
-        <translation type="unfinished">Лицензии</translation>
-    </message>
-</context>
-<context>
     <name>LoadingPage</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/LoadingPage.qml" line="+13"/>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/LoadingPage.qml" line="+13"/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
@@ -2103,26 +1938,22 @@
 <context>
     <name>LoginDialog</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+50"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+41"/>
         <source>Welcome to Lisa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+11"/>
         <source>Please login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+64"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+63"/>
+        <location line="+63"/>
         <source>Remember me</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+26"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2130,7 +1961,6 @@
 <context>
     <name>MessageDialog</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/Dialogs/MessageDialog.qml" line="+19"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml" line="+23"/>
         <source>Message</source>
         <translation type="unfinished"></translation>
@@ -2152,141 +1982,40 @@
     </message>
 </context>
 <context>
-    <name>PackageCollectionView2</name>
-    <message>
-        <location filename="../../../Bin/web/src/imtlicgui/PackageCollectionView2.qml" line="+66"/>
-        <source>Edit</source>
-        <translation type="unfinished">Редактировать</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Set Description</source>
-        <translation type="unfinished">Установить описание</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rename</source>
-        <translation type="unfinished">Переименовать</translation>
-    </message>
-    <message>
-        <location line="+77"/>
-        <source>Please enter the description of the package: </source>
-        <translation type="unfinished">Пожалуйста, введите описание  пакета:</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Please enter the name of the package: </source>
-        <translation type="unfinished">Пожалуйста, введите название пакета:</translation>
-    </message>
-</context>
-<context>
     <name>PackageView</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/PackageView.qml" line="+16"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/PackageView.qml" line="+154"/>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/PackageView.qml" line="+146"/>
         <source>Dependencies</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>PackageView2</name>
+    <name>PackageViewCommandsDelegate</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/PackageView2.qml" line="+82"/>
-        <source>Edit</source>
-        <translation type="unfinished">Редактировать</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Set Description</source>
-        <translation type="unfinished">Установить описание</translation>
-    </message>
-    <message>
-        <location line="+133"/>
-        <source>Please enter the description of the feature:</source>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/PackageViewCommandsDelegate.qml" line="+86"/>
+        <source>Remove selected feature from the package ?</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+37"/>
-        <source>has an empty id!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Please enter the name of the package: </source>
-        <translation type="unfinished">Пожалуйста, введите название пакета:</translation>
-    </message>
-    <message>
-        <location line="+28"/>
-        <source>Save all changes ?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+387"/>
-        <source>Dependencies</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>Please save the package first!</source>
-        <translation type="unfinished">Пожалуйста, сперва сохраните пакет!</translation>
     </message>
 </context>
 <context>
     <name>PreferenceDialog</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/PreferenceDialog.qml" line="+186"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="+186"/>
         <source>Preferences</source>
         <translation>Настройки</translation>
     </message>
     <message>
         <location line="+297"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="+297"/>
         <source>Apply</source>
         <translation>Применить</translation>
     </message>
     <message>
         <location line="+70"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="+70"/>
         <source>Close</source>
         <translation>Закрыть</translation>
     </message>
     <message>
         <location line="+127"/>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="+127"/>
-        <source>Save file</source>
-        <translation type="unfinished">Сохранить файл</translation>
-    </message>
-</context>
-<context>
-    <name>PreferenceDialog2</name>
-    <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog2.qml" line="+158"/>
-        <source>Preferences</source>
-        <translation type="unfinished">Настройки</translation>
-    </message>
-    <message>
-        <location line="+296"/>
-        <source>Apply</source>
-        <translation type="unfinished">Применить</translation>
-    </message>
-    <message>
-        <location line="+70"/>
-        <source>Close</source>
-        <translation type="unfinished">Закрыть</translation>
-    </message>
-    <message>
-        <location line="+123"/>
         <source>Save file</source>
         <translation type="unfinished">Сохранить файл</translation>
     </message>
@@ -2294,7 +2023,7 @@
 <context>
     <name>PreferencePage</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferencePage.qml" line="+182"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferencePage.qml" line="+144"/>
         <source>Save file</source>
         <translation type="unfinished">Сохранить файл</translation>
     </message>
@@ -2303,50 +2032,26 @@
         <source>Preferences</source>
         <translation type="unfinished">Настройки</translation>
     </message>
-</context>
-<context>
-    <name>ProductCollectionView2</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/ProductCollectionView2.qml" line="+30"/>
-        <source>Edit</source>
-        <translation type="unfinished">Редактировать</translation>
+        <location line="+186"/>
+        <source>Apply</source>
+        <translation type="unfinished">Применить</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Set Description</source>
-        <translation type="unfinished">Установить описание</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Rename</source>
-        <translation type="unfinished">Переименовать</translation>
-    </message>
-    <message>
-        <location line="+32"/>
-        <source>Please enter the description of the product: </source>
-        <translation type="unfinished">Пожалуйста, введите описание продукта:</translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Please enter the name of the product: </source>
-        <translation type="unfinished">Пожалуйста, введите название продукта:</translation>
+        <source>Cancel</source>
+        <translation type="unfinished">Отмена</translation>
     </message>
 </context>
 <context>
     <name>ProductCollectionViewCommandsDelegate</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+28"/>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+24"/>
         <source>Copy of </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml" line="+18"/>
+        <location line="+18"/>
         <source>Save file</source>
         <translation type="unfinished">Сохранить файл</translation>
     </message>
@@ -2354,40 +2059,45 @@
 <context>
     <name>ProductView</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/ProductView.qml" line="+145"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+131"/>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+137"/>
         <source>Product-ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+12"/>
         <source>Enter the Product-ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+15"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+14"/>
+        <location line="+14"/>
         <source>Product Name</source>
         <translation>Название продукта</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+12"/>
+        <location line="+12"/>
         <source>Enter the Product Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-167"/>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+25"/>
+        <location line="+25"/>
         <source>Features</source>
         <translation>Свойства</translation>
     </message>
 </context>
 <context>
-    <name>ProductView2</name>
+    <name>ProductViewCommandsDelegate</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/ProductView2.qml" line="+62"/>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductViewCommandsDelegate.qml" line="+44"/>
+        <source>Remove selected item from the document ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Please enter the description of the item:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+105"/>
         <source>Edit</source>
         <translation type="unfinished">Редактировать</translation>
     </message>
@@ -2397,54 +2107,9 @@
         <translation type="unfinished">Удалить</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>Set Description</source>
         <translation type="unfinished">Установить описание</translation>
-    </message>
-    <message>
-        <location line="+177"/>
-        <source>has an invalid id!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Save all changes ?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+429"/>
-        <source>Product-ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Enter the product ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+42"/>
-        <source>Product Name</source>
-        <translation type="unfinished">Название продукта</translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Enter the product name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+42"/>
-        <source>Features</source>
-        <translation type="unfinished">Свойства</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Please save the product first!</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2680,23 +2345,23 @@
     </message>
     <message>
         <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+102"/>
-        <location filename="../../../Include/imtauthgql/CRoleControllerComp.cpp" line="+19"/>
+        <location filename="../../../Include/imtauthgql/CRoleControllerComp.cpp" line="+20"/>
         <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="+19"/>
-        <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+188"/>
+        <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+192"/>
         <location line="+55"/>
-        <location line="+103"/>
-        <location line="+139"/>
+        <location line="+151"/>
+        <location line="+141"/>
         <location filename="../../../Include/imtlicgql/CAccountControllerComp.cpp" line="+20"/>
         <location filename="../../../Include/imtlicgql/CFeaturePackageCollectionControllerComp.cpp" line="+47"/>
         <location filename="../../../Include/imtlicgql/CInstallationCollectionControllerComp.cpp" line="+54"/>
         <location filename="../../../Include/imtlicgql/CInstallationControllerComp.cpp" line="+24"/>
-        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="+188"/>
+        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="+272"/>
         <location filename="../../../Include/imtlicgql/CProductControllerComp.cpp" line="+204"/>
         <source>Internal error</source>
         <translation type="unfinished">Внутренняя ошибка</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="-286"/>
+        <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="-336"/>
         <source>Can not insert object: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2711,7 +2376,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+192"/>
+        <location line="+43"/>
+        <source>Could not update object: %1; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+199"/>
         <source>No object-ID could not be extracted from the request</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3026,14 +2696,14 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+172"/>
+        <location filename="../../../Include/imtrepo/CFileCollectionComp.cpp" line="+185"/>
         <source>Target file &apos;%1&apos; could not be created</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+4"/>
-        <location line="+80"/>
+        <location line="+82"/>
         <location line="+59"/>
         <source>Target folder &apos;%1&apos; could not be created</source>
         <translation type="unfinished"></translation>
@@ -3300,25 +2970,25 @@ Errors: 0</source>
     <message>
         <location line="+2"/>
         <source>Username</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Название</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauthgql/CRoleControllerComp.cpp" line="+111"/>
+        <location filename="../../../Include/imtauthgql/CRoleControllerComp.cpp" line="+109"/>
         <source>Can not create role: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="+153"/>
+        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="+135"/>
         <source>Can not create User: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+89"/>
+        <location line="+109"/>
         <source>Can not create user: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3344,8 +3014,8 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="-163"/>
-        <location line="+88"/>
+        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="-247"/>
+        <location line="+102"/>
         <source>Can not create package: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3455,7 +3125,7 @@ Errors: 0</source>
 <context>
     <name>RoleEditor</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RoleEditor.qml" line="+107"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RoleEditor.qml" line="+109"/>
         <source>Role-ID</source>
         <translation>ID Роли</translation>
     </message>
@@ -3465,7 +3135,7 @@ Errors: 0</source>
         <translation>Введите ID</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>Role Name</source>
         <translation>Название</translation>
     </message>
@@ -3475,7 +3145,7 @@ Errors: 0</source>
         <translation>Введите название</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
@@ -3485,7 +3155,7 @@ Errors: 0</source>
         <translation>Введите описание</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>Included roles</source>
         <translation>Включенные роли</translation>
     </message>
@@ -3501,7 +3171,7 @@ Errors: 0</source>
 <context>
     <name>RoleView</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RoleView.qml" line="+21"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RoleView.qml" line="+22"/>
         <source>Roles</source>
         <translation>Роли</translation>
     </message>
@@ -3517,13 +3187,12 @@ Errors: 0</source>
 <context>
     <name>ServerConnectionManager</name>
     <message>
-        <location filename="../../../Bin/web/src/imtgui/AuxComponents/ServerConnectionManager.qml" line="+56"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/ServerConnectionManager.qml" line="+52"/>
         <source>There is no connection to the server!</source>
         <translation>Нет соединения с сервером!</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/ServerConnectionManager.qml" line="+19"/>
+        <location line="+19"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
     </message>
@@ -3559,7 +3228,6 @@ Errors: 0</source>
 <context>
     <name>TableInstanceLicensesDelegate</name>
     <message>
-        <location filename="../../../Bin/web/src/imtlicgui/TableInstanceLicensesDelegate.qml" line="+124"/>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/TableInstanceLicensesDelegate.qml" line="+124"/>
         <source>Unlimited</source>
         <translation>Бессрочный</translation>
@@ -3621,7 +3289,7 @@ Errors: 0</source>
 <context>
     <name>UserEditor</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserEditor.qml" line="+42"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserEditor.qml" line="+46"/>
         <source>Username</source>
         <translation>Название</translation>
     </message>
@@ -3631,7 +3299,7 @@ Errors: 0</source>
         <translation>Введите название</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>Password</source>
         <translation>Пароль</translation>
     </message>
@@ -3641,7 +3309,7 @@ Errors: 0</source>
         <translation>Введите пароль</translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+14"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
@@ -3651,7 +3319,7 @@ Errors: 0</source>
         <translation>Введите имя</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>Email address</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3659,6 +3327,14 @@ Errors: 0</source>
         <location line="+12"/>
         <source>Enter the Email</source>
         <translation>Введите email</translation>
+    </message>
+</context>
+<context>
+    <name>UserPanel</name>
+    <message>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/UserPanel.qml" line="+62"/>
+        <source>Logout</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3677,7 +3353,7 @@ Errors: 0</source>
         <translation>Роли</translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+27"/>
         <source>Permissions</source>
         <translation>Разрешения</translation>
     </message>
@@ -3954,6 +3630,14 @@ Errors: 0</source>
     </message>
 </context>
 <context>
+    <name>imtauthgql::CAuthorizationControllerComp</name>
+    <message>
+        <location filename="../../../Include/imtauthgql/CAuthorizationControllerComp.cpp" line="+67"/>
+        <source>Invalid username or password</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>imtauthgql::CRoleCollectionControllerComp</name>
     <message>
         <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="-48"/>
@@ -3987,17 +3671,17 @@ Errors: 0</source>
 <context>
     <name>imtauthgql::CUserControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="-171"/>
+        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="-173"/>
         <source>Unable to get an user info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+90"/>
+        <location line="+72"/>
         <source>Unable to get an account info!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Username can&apos;t be empty!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4114,6 +3798,14 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtauthgui/CStandardLoginGuiComp.cpp" line="+135"/>
         <source>Login failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtgql::CGqlRepresentationDataControllerCompBase</name>
+    <message>
+        <location filename="../../../Include/imtgql/CGqlRepresentationDataControllerCompBase.cpp" line="+21"/>
+        <source>Invalid permissions for </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4373,13 +4065,13 @@ Errors: 0</source>
 <context>
     <name>imtgui::CObjectCollectionViewComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+91"/>
+        <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+90"/>
         <location line="+22"/>
         <source>Reading collection...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+726"/>
+        <location line="+722"/>
         <source>Edit...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4476,7 +4168,7 @@ Errors: 0</source>
         <location line="+0"/>
         <location line="+140"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location line="-126"/>
@@ -4617,7 +4309,7 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/CPluginStatusMonitorViewDelegateComp.cpp" line="+237"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Имя</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -4678,13 +4370,13 @@ Errors: 0</source>
 <context>
     <name>imtgui::CThumbnailDecoratorGuiComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+412"/>
-        <location line="+253"/>
+        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+411"/>
+        <location line="+283"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-219"/>
+        <location line="-249"/>
         <source>Quit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4694,7 +4386,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+355"/>
+        <location line="+386"/>
         <location line="+154"/>
         <source>&lt;unnamed&gt;</source>
         <translation type="unfinished"></translation>
@@ -4899,7 +4591,7 @@ Errors: 0</source>
 <context>
     <name>imtlicgql::CPackageControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="-79"/>
+        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="-93"/>
         <source>Unable to get an feature package</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5266,7 +4958,7 @@ Errors: 0</source>
 <context>
     <name>imtqml::CDatabaseSettingsDataProviderComp</name>
     <message>
-        <location filename="../../../Include/imtqml/CDatabaseSettingsDataProviderComp.cpp" line="+85"/>
+        <location filename="../../../Include/imtqml/CDatabaseSettingsDataProviderComp.cpp" line="+86"/>
         <location line="+3"/>
         <source>DB Name</source>
         <translation>Название БД</translation>

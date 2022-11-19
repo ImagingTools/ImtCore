@@ -56,12 +56,12 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 	const QTranslator* translatorPtr = nullptr;
 	int currentIndex = -1;
 	if (m_translationManagerCompPtr.IsValid()){
-		QByteArray languageId = GetLanguageIdFromInputParams(params);
+		QByteArray languageId;
+		if(gqlContext != nullptr){
+			languageId = gqlContext->GetLanguageId();
+		}
 
 		if (languageId.isEmpty()){
-//			currentIndex = 2;
-//			languageId = "ru_RU";
-
 			currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
 		}
 		else{
@@ -76,11 +76,11 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 	if (m_paramNameAttrPtr.IsValid()){
 		paramName = *m_paramNameAttrPtr;
 		if (translatorPtr != nullptr){
-			if (m_translationManagerCompPtr->GetSlaveTranslationManager() != nullptr && currentIndex >= 0){
-				const QTranslator* slaveTranslatorPtr = m_translationManagerCompPtr->GetSlaveTranslationManager()->GetLanguageTranslator(currentIndex);
-				QString text1 = slaveTranslatorPtr->translate("Attribute", paramName.toUtf8());
-//				rootModelPtr->SetData("Name", slaveTranslatorPtr->translate("Attribute", paramName.toUtf8()));
-				rootModelPtr->SetData("Name", paramName);
+			const iqt::ITranslationManager* slaveManagerPtr = m_translationManagerCompPtr->GetSlaveTranslationManager();
+			if (slaveManagerPtr != nullptr && currentIndex >= 0){
+				const QTranslator* slaveTranslatorPtr = slaveManagerPtr->GetLanguageTranslator(currentIndex);
+				QString paramNameTr = slaveTranslatorPtr->translate("Attribute", paramName.toUtf8());
+				rootModelPtr->SetData("Name", paramNameTr);
 			}
 		}
 		else{

@@ -31,19 +31,17 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 
 		bool result = true;
 		if (userInfoPtr != nullptr){
-			QByteArray userId = userInfoPtr->GetUsername();
-			if (userId != "admin"){
-				imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
+			QByteArray userId = userInfoPtr->GetUserId();
+			imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
 
-				QByteArrayList permissionIds;
-				for (int i = 0; i < m_permissionIdsAttrPtr.GetCount(); i++){
-					permissionIds << m_permissionIdsAttrPtr[i];
-				}
+			QByteArrayList permissionIds;
+			for (int i = 0; i < m_permissionIdsAttrPtr.GetCount(); i++){
+				permissionIds << m_permissionIdsAttrPtr[i];
+			}
 
-				if (m_permissionIdsAttrPtr.IsValid()){
-					if (m_checkPermissionCompPtr.IsValid()){
-						result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
-					}
+			if (m_permissionIdsAttrPtr.IsValid()){
+				if (m_checkPermissionCompPtr.IsValid()){
+					result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
 				}
 			}
 		}
@@ -60,14 +58,13 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 		}
 		if (fields[indexField] == PageEnum::NAME){
 			if (m_translationManagerCompPtr.IsValid()){
-				QByteArray languageId = GetLanguageIdFromInputParams(params);
+				QByteArray languageId;
+				if(gqlContext != nullptr){
+					languageId = gqlContext->GetLanguageId();
+				}
 				int currentIndex = -1;
 
 				if (languageId.isEmpty()){
-//					currentIndex = 0;
-
-//					languageId = "en_US";
-
 					currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
 				}
 				else{
@@ -75,13 +72,15 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 				}
 
 				if (currentIndex >= 0){
-					const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
-					if (translatorPtr != nullptr){
-						QString pageName = (*m_pageNameAttrPtr);
-						QString tr = translatorPtr->translate("Attribute", pageName.toUtf8());
-//						rootModelPtr->SetData(PageEnum::NAME, translatorPtr->translate("Attribute", (*m_pageNameAttrPtr).toUtf8()));
+					const iqt::ITranslationManager* slaveManagerPtr = m_translationManagerCompPtr->GetSlaveTranslationManager();
+					if(slaveManagerPtr != nullptr){
+						const QTranslator* translatorPtr = slaveManagerPtr->GetLanguageTranslator(currentIndex);
+						if (translatorPtr != nullptr){
+							QString pageName = (*m_pageNameAttrPtr);
+							QString pageNameTr = translatorPtr->translate("Attribute", pageName.toUtf8());
 
-						rootModelPtr->SetData(PageEnum::NAME, pageName);
+							rootModelPtr->SetData(PageEnum::NAME, pageNameTr);
+						}
 					}
 				}
 			}

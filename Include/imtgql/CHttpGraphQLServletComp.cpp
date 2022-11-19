@@ -63,6 +63,18 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 							QByteArray settingsData = userSettingsPtr->GetSettings();
 							QJsonDocument jsonResponse = QJsonDocument::fromJson(settingsData);
 							QJsonObject jsonObject = jsonResponse.object();
+							QJsonArray elements = jsonObject.take("Elements").toArray();
+							QString languageId;
+							for(const QJsonValue &value: elements)
+							{
+								if(value.toObject()["Id"] == "Language")
+								{
+									int languageIndex = value.toObject()["Value"].toInt();
+									QJsonValue languageArray = value.toObject()["Parameters"];
+									languageId = languageArray.toArray()[languageIndex].toObject()["Id"].toString();
+								}
+							}
+							gqlContextPtr->SetLanguageId(languageId.toUtf8());
 						}
 					}
 				}

@@ -31,7 +31,7 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetTreeItemModel(
 	if (m_userSettingsCollectionCompPtr.IsValid() && gqlContext != nullptr){
 		imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			QByteArray userId = userInfoPtr->GetUsername();
+			QByteArray userId = userInfoPtr->GetUserId();
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
 				const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(dataPtr.GetPtr());
@@ -67,7 +67,7 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::UpdateBaseModelFromR
 		if (m_userSettingsCollectionCompPtr.IsValid() && gqlContext != nullptr){
 			imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
 			if (userInfoPtr != nullptr){
-				QByteArray userId = userInfoPtr->GetUsername();
+				QByteArray userId = userInfoPtr->GetUserId();
 				QByteArray itemData = elementModelPtr->toJSON().toUtf8();
 				if (!itemData.isEmpty()){
 					istd::TDelPtr<imtauth::CUserSettings> userSettingsPtr = new imtauth::CUserSettings();

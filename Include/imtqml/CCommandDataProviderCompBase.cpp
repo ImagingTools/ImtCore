@@ -34,13 +34,13 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(
 			}
 			if (fields[indexField] == CommandEnum::NAME && m_commandsNamesAttrPtr.GetCount() > i){
 				if (m_translationManagerCompPtr.IsValid()){
-					QByteArray languageId = GetLanguageIdFromInputParams(params);
-
+					QByteArray languageId;
+					if(gqlContext != nullptr){
+						languageId = gqlContext->GetLanguageId();
+					}
 					int currentIndex = -1;
-					if (languageId.isEmpty()){
-//						currentIndex = 0;
-//						languageId = "en_US";
 
+					if (languageId.isEmpty()){
 						currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
 					}
 					else{
@@ -48,10 +48,21 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(
 					}
 
 					if (currentIndex >= 0){
-						const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
-						if (translatorPtr != nullptr){
-//							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandsNamesAttrPtr[i].toUtf8()), i);
-							treeModel->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
+//						const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
+//						if (translatorPtr != nullptr){
+////							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandsNamesAttrPtr[i].toUtf8()), i);
+//							treeModel->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
+//						}
+						const iqt::ITranslationManager* slaveManagerPtr = m_translationManagerCompPtr->GetSlaveTranslationManager();
+						if(slaveManagerPtr != nullptr){
+							const QTranslator* translatorPtr = slaveManagerPtr->GetLanguageTranslator(currentIndex);
+							if (translatorPtr != nullptr){
+								QString commandName = m_commandsNamesAttrPtr[i];
+								QString path = translatorPtr->filePath();
+								QString commandNameTr = translatorPtr->translate("Attribute", commandName.toUtf8());
+
+								treeModel->SetData(CommandEnum::NAME, commandNameTr, i);
+							}
 						}
 					}
 				}
