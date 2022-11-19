@@ -32,18 +32,18 @@ const imtauth::IRoleInfoProvider* CUserInfo::GetRoleProvider() const
 }
 
 
-QByteArray CUserInfo::GetUsername() const
+QByteArray CUserInfo::GetUserId() const
 {
-	return m_username;
+	return m_userId;
 }
 
 
-void CUserInfo::SetUsername(const QByteArray& username)
+void CUserInfo::SetUserId(const QByteArray& userId)
 {
-	if (m_username != username){
+	if (m_userId != userId){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_username = username;
+		m_userId = userId;
 	}
 }
 
@@ -170,7 +170,7 @@ bool CUserInfo::Serialize(iser::IArchive &archive)
 
 	static iser::CArchiveTag usernameTag("Username", "Username of user", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(usernameTag);
-	retVal = retVal && archive.Process(m_username);
+	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(usernameTag);
 
 	static iser::CArchiveTag nameTag("Name", "Name of user", iser::CArchiveTag::TT_LEAF);
@@ -219,7 +219,7 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_username = sourcePtr->m_username;
+		m_userId = sourcePtr->m_userId;
 		m_name = sourcePtr->m_name;
 		m_passwordHash = sourcePtr->m_passwordHash;
 		m_mail = sourcePtr->m_mail;
@@ -250,7 +250,7 @@ bool CUserInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_username.clear();
+	m_userId.clear();
 	m_name.clear();
 	m_passwordHash.clear();
 	m_mail.clear();

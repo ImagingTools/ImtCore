@@ -91,7 +91,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 			return nullptr;
 		}
 
-		QByteArray username = userInfoPtr->GetUsername();
+		QByteArray username = userInfoPtr->GetUserId();
 		QString name = userInfoPtr->GetName();
 		QByteArray passwordHash = userInfoPtr->GetPasswordHash();
 		QString mail = userInfoPtr->GetMail();
@@ -178,7 +178,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 			objectId = username;
 
-			userInfoPtr->SetUsername(username);
+			userInfoPtr->SetUserId(username);
 		}
 
 		if (itemModel.ContainsKey("Name")){

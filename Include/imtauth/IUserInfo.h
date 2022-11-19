@@ -86,12 +86,12 @@ public:
 	/**
 		Get username of the user.
 	*/
-	virtual QByteArray GetUsername() const = 0;
+	virtual QByteArray GetUserId() const = 0;
 
 	/**
 		Set username of the user.
 	*/
-	virtual void SetUsername(const QByteArray& username) = 0;
+	virtual void SetUserId(const QByteArray& userId) = 0;
 
 	/**
 		Get name of the user.

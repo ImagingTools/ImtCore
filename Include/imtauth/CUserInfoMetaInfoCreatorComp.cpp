@@ -37,11 +37,11 @@ bool CUserInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	QByteArray username = userPtr->GetUsername();
+	QByteArray username = userPtr->GetUserId();
 	QString email =  userPtr->GetMail();
 	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_EMAIL, userPtr->GetMail());
 	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_NAME, userPtr->GetName());
-	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_USERNAME, userPtr->GetUsername());
+	metaInfoPtr->SetMetaInfo(IUserInfo::MetaInfoTypes::MIT_USERNAME, userPtr->GetUserId());
 
 	return true;
 }
