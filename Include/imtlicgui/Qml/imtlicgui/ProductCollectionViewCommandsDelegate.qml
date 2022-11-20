@@ -50,7 +50,7 @@ CollectionViewCommandsDelegateBase {
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
 
-            let id = tableData.getSelectedId();
+            let id = 0;
 
             if (fileName == ""){
                 fileName = {};

@@ -54,5 +54,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="UserSettingsRepository"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsRepository"/>
+    </ExportedComponents>
 </Acf>

@@ -22,6 +22,7 @@
 #include <imtauth/CCheckPermissionCompBase.h>
 #include <imtauth/CPermissionsProviderComp.h>
 #include <imtauth/CCollectionPermissionsProviderComp.h>
+#include <imtauth/CCheckPermissionOrComp.h>
 
 
 namespace ImtAuthPck
@@ -61,6 +62,7 @@ typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::CPermissionsProviderComp PermissionsProvider;
 typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
+typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 
 
 } // namespace ImtAuthPck

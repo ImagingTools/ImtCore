@@ -21,6 +21,8 @@ public:
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
+
+
 private:
 };
 

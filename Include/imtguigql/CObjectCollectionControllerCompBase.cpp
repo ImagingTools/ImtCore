@@ -28,7 +28,7 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateResponse(
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {

@@ -29,6 +29,22 @@ I_EXPORT_COMPONENT(
 			"GraphQLDemultiplexer",
 			"GraphQL Demultiplexer");
 
+I_EXPORT_COMPONENT(
+            SingleCommandPermissionsProvider,
+            "SingleCommandPermissionsProvider",
+            "Single Command Permissions Provider");
+
+I_EXPORT_COMPONENT(
+			CommandPermissionsProviderJoiner,
+			"CommandPermissionsProviderJoiner",
+			"Command Permissions Provider Joiner Comp");
+
+I_EXPORT_COMPONENT(
+			PermissionsController,
+			"PermissionsController",
+			"Permissions Controller");
+
+
 
 } // namespace ImtGqlPck
 

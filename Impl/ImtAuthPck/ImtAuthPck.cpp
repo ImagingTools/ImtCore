@@ -89,6 +89,11 @@ I_EXPORT_COMPONENT(
 			"Collection permissions provider",
 			"Collection Permissions Provider");
 
+I_EXPORT_COMPONENT(
+			CheckPermissionOr,
+			"Check Permission Or",
+			"Check Permission Or");
+
 
 } // namespace ImtAuthPck
 

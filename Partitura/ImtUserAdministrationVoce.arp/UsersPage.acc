@@ -66,6 +66,12 @@
         <Element Id="UserDataController" PackageId="ImtAuthGqlPck" ComponentId="UserController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CheckPermissions" Type="Reference" ExportId="CheckPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="CommandPermissions">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="HashCalculator"/>
                     </AttributeInfo>

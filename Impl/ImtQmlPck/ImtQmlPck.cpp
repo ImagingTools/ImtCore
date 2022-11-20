@@ -107,6 +107,12 @@ I_EXPORT_COMPONENT(
 			"Settings Database Pages Provider",
 			"Settings database pages provider");
 
+I_EXPORT_COMPONENT(
+			CommandPermissionsFilter,
+			"Command Permissions Filter",
+			"Command Permissions Filter");
+
+
 
 } // namespace ImtQmlPck
 

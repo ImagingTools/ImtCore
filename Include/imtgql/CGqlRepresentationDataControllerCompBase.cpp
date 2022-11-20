@@ -7,6 +7,25 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
+imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+
+	if(CheckPermissions(gqlRequest, errorMessage))
+	{
+		return CreateInternalResponse(gqlRequest, errorMessage);
+	}
+	const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+	QString userName = userInfoPtr->GetName();
+
+	errorMessage = QT_TR_NOOP("Invalid permissions for " + userName);
+
+	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
+	rootModelPtr->SetExternTreeModel("errors", errorsItemModelPtr);
+	errorsItemModelPtr->SetData("message", errorMessage);
+	return rootModelPtr;
+}
+
 QByteArrayList CGqlRepresentationDataControllerCompBase::GetModelIds() const
 {
 	QByteArrayList retVal;
@@ -33,6 +52,44 @@ QByteArrayList CGqlRepresentationDataControllerCompBase::GetContextIds() const
 
 	return retVal;
 }
+
+
+// protected methods
+// reimplemented (imtgql::CGqlRepresentationDataControllerCompBase)
+imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	return nullptr;
+}
+
+bool CGqlRepresentationDataControllerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	bool result = true;
+	if (gqlRequest.GetGqlContext() != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+
+		if (userInfoPtr != nullptr){
+			QByteArray userId = userInfoPtr->GetUserId();
+			if (userId != "admin"){
+				if(m_commandPermissionsCompPtr.IsValid())
+				{
+					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
+					QByteArray gqlCommand = gqlRequest.GetCommandId();
+					QByteArrayList commandIds = m_commandPermissionsCompPtr->GetCommandIds();
+					if(commandIds.contains(gqlCommand))
+					{
+						QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(gqlCommand);
+						if (m_checkPermissionCompPtr.IsValid()){
+							result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
 
 
 } // namespace imtgql

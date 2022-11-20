@@ -36,7 +36,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtg
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_userCollectionCompPtr->GetObjectData(login, dataPtr)){
+	if (m_userCollectionCompPtr.IsValid() && m_userCollectionCompPtr->GetObjectData(login, dataPtr)){
 		const imtauth::CUserInfo* userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
 			QByteArray userPassword = userInfoPtr->GetPasswordHash();
@@ -72,6 +72,9 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtg
 
 	return rootModelPtr;
 }
+
+
+
 
 
 bool CAuthorizationControllerComp::LoginMatch(const QByteArray& login) const

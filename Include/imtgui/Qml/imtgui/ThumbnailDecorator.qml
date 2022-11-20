@@ -112,6 +112,11 @@ Rectangle {
         visible: false;
     }
 
+    PermissionsProvider
+    {
+        id: permissionsProvider;
+    }
+
     PreferencePage {
         id: preferenceDialog;
 

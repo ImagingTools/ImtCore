@@ -24,6 +24,7 @@
 #include <imtqml/CApplicationInfoDataProviderComp.h>
 #include <imtqml/CObjectViewDataProviderComp.h>
 #include <imtqml/CSettingsDatabasePageProviderComp.h>
+#include <imtqml/CCommandPermissionsFilterComp.h>
 
 
 /**
@@ -51,6 +52,7 @@ typedef imtqml::CClientUserContextComp Context;
 typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
 typedef imtqml::CSettingsDatabasePageProviderComp SettingsDatabasePagesProvider;
+typedef imtqml::CCommandPermissionsFilterComp CommandPermissionsFilter;
 
 
 } // namespace ImtQmlPck
