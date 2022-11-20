@@ -32,16 +32,18 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 		bool result = true;
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetUserId();
-			imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
+			if(userId != "admin"){
+				imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
 
-			QByteArrayList permissionIds;
-			for (int i = 0; i < m_permissionIdsAttrPtr.GetCount(); i++){
-				permissionIds << m_permissionIdsAttrPtr[i];
-			}
+				QByteArrayList permissionIds;
+				for (int i = 0; i < m_permissionIdsAttrPtr.GetCount(); i++){
+					permissionIds << m_permissionIdsAttrPtr[i];
+				}
 
-			if (m_permissionIdsAttrPtr.IsValid()){
-				if (m_checkPermissionCompPtr.IsValid()){
-					result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
+				if (m_permissionIdsAttrPtr.IsValid()){
+					if (m_checkPermissionCompPtr.IsValid()){
+						result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
+					}
 				}
 			}
 		}
@@ -77,6 +79,7 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 						const QTranslator* translatorPtr = slaveManagerPtr->GetLanguageTranslator(currentIndex);
 						if (translatorPtr != nullptr){
 							QString pageName = (*m_pageNameAttrPtr);
+							QString path =translatorPtr->filePath();
 							QString pageNameTr = translatorPtr->translate("Attribute", pageName.toUtf8());
 
 							rootModelPtr->SetData(PageEnum::NAME, pageNameTr);
