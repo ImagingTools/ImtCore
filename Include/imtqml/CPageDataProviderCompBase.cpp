@@ -32,7 +32,7 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 		bool result = true;
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetUserId();
-			if(userId != "admin"){
+			if(!userInfoPtr->IsAdmin()){
 				imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
 
 				QByteArrayList permissionIds;

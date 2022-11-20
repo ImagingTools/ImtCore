@@ -23,7 +23,7 @@ imtbase::CTreeItemModel* CPermissionsControllerComp::CreateResponse(const imtgql
 
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetUserId();
-			if (userId != "admin"){
+			if (!userInfoPtr->IsAdmin()){
 				if(m_commandPermissionsProviderCompPtr.IsValid())
 				{
 					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();

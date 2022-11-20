@@ -163,6 +163,12 @@ void CUserInfo::SetRoles(const RoleIds &roles)
 }
 
 
+bool CUserInfo::IsAdmin() const
+{
+	return false;
+}
+
+
 bool CUserInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);

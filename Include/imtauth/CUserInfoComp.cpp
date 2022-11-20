@@ -23,4 +23,16 @@ void CUserInfoComp::OnComponentCreated()
 }
 
 
+bool CUserInfoComp::IsAdmin() const
+{
+	bool isAdmin = false;
+
+	if (m_adminIdAttrPtr.IsValid()){
+		isAdmin = *m_adminIdAttrPtr == GetUserId();
+	}
+
+	return isAdmin;
+}
+
+
 } // namespace imtauth

@@ -33,6 +33,7 @@ public:
 	virtual void SetProhibitions(const FeatureIds &prohibitions) override;
 	virtual RoleIds GetRoles() const override;
 	virtual void SetRoles(const RoleIds &roles) override;
+	virtual bool IsAdmin() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;

@@ -69,7 +69,7 @@ bool CGqlRepresentationDataControllerCompBase::CheckPermissions(const imtgql::CG
 
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetUserId();
-			if (userId != "admin"){
+			if (!userInfoPtr->IsAdmin()){
 				if(m_commandPermissionsCompPtr.IsValid())
 				{
 					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();

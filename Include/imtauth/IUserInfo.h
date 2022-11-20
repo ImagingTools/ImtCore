@@ -157,6 +157,11 @@ public:
 		Set user roles.
 	*/
 	virtual void SetRoles(const RoleIds &roles) = 0;
+
+	/**
+		Check admin user.
+	*/
+	virtual bool IsAdmin() const = 0;
 };
 
 
