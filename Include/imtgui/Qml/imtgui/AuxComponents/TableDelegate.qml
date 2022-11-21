@@ -97,7 +97,10 @@ Rectangle {
     }
 
     function setBorderParams(){
-        if(tableDelegateContainer.emptyDecorCell || !tableDelegateContainer.canSetBorderParams){
+        if(tableDelegateContainer.emptyDecorCell){
+            return;
+        }
+        if(!tableDelegateContainer.canSetBorderParams){
             return;
         }
 

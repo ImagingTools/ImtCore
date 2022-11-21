@@ -224,7 +224,10 @@ Item {
 
     function setBorderParams(){
 
-        if(tableContainer.emptyDecorHeader && !tableContainer.canSetBorderParams){
+        if(tableContainer.emptyDecorHeader){
+            return;
+        }
+        if(!tableContainer.canSetBorderParams){
             return;
         }
 
