@@ -49,7 +49,6 @@ Rectangle {
     }
 
     onFinished: {
-        console.log("_________FINISHED_________________",buttonId);
         if (root){
             if(dialogContainer.notClosingButtons.indexOf(buttonId) == -1){
                 root.closeDialog();
