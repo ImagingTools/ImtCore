@@ -238,6 +238,7 @@ Rectangle {
         id: userTokenProvider;
 
         onAccepted: {
+            console.log('DEBUG::UserTokenProvider.onAccepted')
             window.updateAllModels();
             authPageContainer.visible = false;
         }

@@ -120,27 +120,76 @@ export class GridView extends Flickable {
                     this.count = i
                 }
             } else if (typeof this.model === 'object'){
-                if(this.$model && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
+                // if(this.$model && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
+                if(this.model && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
                 if(this.model.$data){
                     this.model.$deps[this.UID] = this
-                    for(let i = 0; i < this.model.$data.length; i++){    
-                        let obj = this.delegate(this) 
-                        let tempModel = {
-                            'index': i
-                        } 
-                        for(let name in this.model.$data[i].$p){
-                            tempModel[name] = this.model.$data[i].$p[name].val
+
+                    if(Array.isArray(this.model.$data)){
+                        for(let i = 0; i < this.model.$data[0].length; i++){    
+                            let obj = this.delegate(this) 
+                            let tempModel = {
+                                'index': i
+                            } 
+                            if(this.model.$data[0][i].$data){
+                                if(Array.isArray(this.model.$data[0][i].$data)){
+                                    for(let name in this.model.$data[0][i].$data[0]){
+                                        tempModel[name] = this.model.$data[0][i].$data[0][name]
+                                    }
+                                } else {
+                                    for(let name in this.model.$data[0][i].$data){
+                                        tempModel[name] = this.model.$data[0][i].$data[name]
+                                    }
+                                }
+                                
+                            } else if(this.model.$data[0][i].$p){
+                                for(let name in this.model.$data[0][i].$p){
+                                    tempModel[name] = this.model.$data[0][i].$p[name].val
+                                }
+                            } else {
+                                for(let name in this.model.$data[0][i]){
+                                    tempModel[name] = this.model.$data[0][i][name]
+                                }
+                            }
+                            
+                            // UID += UID - tempUID
+                            // obj.$cPC('model', {
+                            //     model: this.model.$data[i],
+                            //     index: i,
+                            // })
+                            obj.$cPC('model',tempModel)
+                            obj.$cP('index',i)
+                            childRecursive(obj, tempModel, i)
+                            this.count = i
                         }
-                        // UID += UID - tempUID
-                        // obj.$cPC('model', {
-                        //     model: this.model.$data[i],
-                        //     index: i,
-                        // })
-                        obj.$cPC('model',tempModel)
-                        obj.$cP('index',i)
-                        childRecursive(obj, tempModel, i)
-                        this.count = i
+                    } else {
+                        for(let i = 0; i < this.model.$data.length; i++){    
+                            let obj = this.delegate(this) 
+                            let tempModel = {
+                                'index': i
+                            } 
+                            if(this.model.$data[i].$p){
+                                for(let name in this.model.$data[i].$p){
+                                    tempModel[name] = this.model.$data[i].$p[name].val
+                                }
+                            } else {
+                                for(let name in this.model.$data[i]){
+                                    tempModel[name] = this.model.$data[i][name]
+                                }
+                            }
+                            
+                            // UID += UID - tempUID
+                            // obj.$cPC('model', {
+                            //     model: this.model.$data[i],
+                            //     index: i,
+                            // })
+                            obj.$cPC('model',tempModel)
+                            obj.$cP('index',i)
+                            childRecursive(obj, tempModel, i)
+                            this.count = i
+                        }
                     }
+                    
                 } else {
                     for(let i = 0; i < this.model.length; i++){
                         // let tempUID = UID   

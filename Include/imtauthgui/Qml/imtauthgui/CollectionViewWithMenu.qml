@@ -77,8 +77,8 @@ Item {
         id: commandsLoader;
 
         Component.onCompleted: {
-            console.log("commandsLoader.source", commandsDelegatePath);
-            commandsLoader.source = commandsDelegatePath;
+            console.log("commandsLoader.source", parent.commandsDelegatePath);
+            commandsLoader.source = parent.commandsDelegatePath;
         }
 
         onLoaded: {

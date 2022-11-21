@@ -13,6 +13,7 @@ Item {
     property alias tableHeadersDelegate: tableInternal.headerDelegate;
     property alias elementsList: tableInternal.elementsList;
 
+    property string itemId;
     property var table: tableInternal;
     property bool hasPagination: true;
     property bool hasFilter: true;
@@ -165,6 +166,9 @@ Item {
 
     CollectionViewBaseGqlModels {
         id: baseCommands;
+
+        itemId: collectionViewBaseContainer.itemId;
+        table: collectionViewBaseContainer.table;
 
         commandsId: collectionViewBaseContainer.commandsId;
 

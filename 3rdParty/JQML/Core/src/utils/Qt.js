@@ -33,7 +33,9 @@ export var Qt = {
     ClosedHandCursor: 'grabbing',
     DragCopyCursor: 'none',
 
-
+    WindowShortcut: 0,
+    ApplicationShortcut: 1,
+    
     openUrlExternally: function(url){
         return window.open(url, '_blank')
     },

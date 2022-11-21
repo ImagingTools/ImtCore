@@ -211,6 +211,9 @@ export class TextInput extends Item {
         this.contentHeight = rect.height
         tempDom.remove()
     }
+    selectAll(){
+        this.impl.select()
+    }
     $colorChanged(){
         this.impl.style.color = `${this.$p.color.val}`
     }

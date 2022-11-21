@@ -31,7 +31,7 @@ Item {
 
         fillMode: Image.PreserveAspectFit;
 
-        source: imageSource;
+        source: parent.imageSource;
         sourceSize.height: height;
         sourceSize.width: width;
     }
@@ -44,7 +44,7 @@ Item {
         width: 5;
 
         color: Style.iconColorOnSelected;
-        visible: selected;
+        visible: parent.selected;
     }
 
     Text {
@@ -53,8 +53,8 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        text: title;
-        color: selected ? Style.iconColorOnSelected: Style.textColor;
+        text: parent.title;
+        color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
         font.pixelSize: container.fontSize;
         font.family: Style.fontFamily;
     }

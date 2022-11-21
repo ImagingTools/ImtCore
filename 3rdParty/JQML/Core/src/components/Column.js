@@ -24,6 +24,8 @@ export class Column extends Item {
     $widthChanged(){
         super.$widthChanged()
         this.$wAuto = false
+
+        
     }
     $heightChanged(){
         super.$heightChanged()
@@ -44,8 +46,17 @@ export class Column extends Item {
                     if(rChild.$p.width.val > rWidth) rWidth = rChild.$p.width.val
                     k++
                 }
-                child.height = rDy
-                child.width = rWidth
+                // child.height = rDy
+                // child.width = rWidth
+                if(child.$p.height.val < rDy){
+                    child.$p.height.val = rDy
+                    child.dom.style.height = `${child.$p.height.val}px`
+                }
+
+                if(child.$p.width.val < rWidth){
+                    child.$p.width.val = rWidth
+                    child.dom.style.width = `${child.$p.width.val}px`
+                }
 
 
             }
@@ -53,6 +64,7 @@ export class Column extends Item {
             child.y = i === 0 ? 0 : dy + this.$p.spacing.val
             dy += child.$p.height.val + (i === 0 ? 0 : this.$p.spacing.val)
             if(child.$p.width.val > width) width = child.$p.width.val
+            
             i++
         }
         
@@ -76,14 +88,20 @@ export class Column extends Item {
             
             this.$wAuto = true
         }
-        if(this.$hAuto){
-            this.$p.height.val = dy
-            this.dom.style.height = `${this.$p.height.val}px`
-            this.$yChanged()
-            // this.height = dy
+        if(this.$hAuto || this.$p.height.val < dy){
+            // this.$p.height.val = dy
+            // this.dom.style.height = `${this.$p.height.val}px`
+            // this.$yChanged()
+            this.height = dy
             this.$hAuto = true
         }
 
+        for(let child of this.children){
+            if(child.$changedWidth){
+                child.width = this.$p.width.val
+                child.$changedWidth = true
+            } 
+        }
 
         super.$updateGeometry()
     }

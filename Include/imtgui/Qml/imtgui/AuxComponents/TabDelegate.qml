@@ -62,7 +62,7 @@ Item{
         height: parent.height * 0.3;
         width: height;
 
-        visible: !firstElement;
+        visible: !parent.firstElement;
 
         Image {
             id: closeImage;

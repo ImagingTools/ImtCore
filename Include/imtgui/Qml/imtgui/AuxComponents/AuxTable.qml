@@ -316,7 +316,7 @@ Item {
 
         height: visible ? tableContainer.headerHeight: 0;
 
-        visible: headersList.count > 0 && showHeaders;
+        visible: headersList.count > 0 && tableContainer.showHeaders;
 
         clip: true;
 
@@ -352,7 +352,7 @@ Item {
 
                 function setCellWidth(){
                     var defaultWidth = (headersList.width - iconFilter.width)/headersList.count;
-                    var widthFromModel = widthDecoratorDynamic.IsValidData("Width", model.index) ? widthDecoratorDynamic.GetData("Width", model.index) : -1;
+                    var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
 
                     if(!tableContainer.widthDecoratorDynamic.GetItemsCount()){
@@ -633,7 +633,7 @@ Item {
         anchors.right: headersPanel.right;
         anchors.rightMargin: 5;
 
-        visible: tableContainer.hasFilter && showHeaders;
+        visible: tableContainer.hasFilter && tableContainer.showHeaders;
 
         width: tableContainer.hasFilter ? 20 : 0;
         height: width;

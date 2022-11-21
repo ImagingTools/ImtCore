@@ -20,6 +20,8 @@ Item {
     }
 
     function changeCommandMode(commandId, mode){
+        if(commandsModel === undefined) return;
+
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             if (m_commandId == commandId){
@@ -30,6 +32,8 @@ Item {
     }
 
     function getCommandMode(commandId){
+        if(commandsModel === undefined) return;
+
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             let m_mode = commandsProviderContainer.commandsModel.GetData("Mode", i);
@@ -94,7 +98,7 @@ Item {
                             Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
                                                                       "CommandsId": commandsProviderContainer.commandsId});
 
-                            modelLoaded();
+                            commandsProviderContainer.modelLoaded();
                         }
                     }
                 }

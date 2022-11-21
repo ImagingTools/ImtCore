@@ -35,7 +35,7 @@ Item {
         textCentered: false;
 
         onCurrentIndexChanged: {
-            currentValueChanged();
+            parent.currentValueChanged();
         }
     }
 

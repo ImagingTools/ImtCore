@@ -16,11 +16,14 @@ export class GradientStop extends QtObject  {
         this.parent.$gradientChanged()
     }
     $destroy(){
-        let indx = this.parent.$p.stops.val.indexOf(this)
-        if(indx >= 0){
-            this.parent.$p.stops.val.splice(indx, 1)
-            this.parent.$s.stopsChanged()
+        if(this.parent){
+            let indx = this.parent.$p.stops.val.indexOf(this)
+            if(indx >= 0){
+                this.parent.$p.stops.val.splice(indx, 1)
+                this.parent.$s.stopsChanged()
+            }
         }
+        
         super.$destroy()
     }
 }

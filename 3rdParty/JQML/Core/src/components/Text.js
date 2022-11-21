@@ -1,5 +1,6 @@
 import {Item} from './Item'
 import {Font} from '../utils/Font'
+import {Signal} from '../utils/Signal'
 
 
 export class Text extends Item {
@@ -38,6 +39,8 @@ export class Text extends Item {
         this.$cP('wrapMode', Text.NoWrap).connect(this.$wrapModeChanged.bind(this))
         this.$cP('textFormat', Text.AutoText)
         this.$cPC('font', Font()).connect(this.$fontChanged.bind(this))
+
+        this.$s.linkActivated = Signal()
     }
 
     $domCreate(){
@@ -194,7 +197,7 @@ export class Text extends Item {
 
         if(this.$p['font.family'].val && this.$p['font.pixelSize'].val){
             document.fonts.load(`${this.$p['font.pixelSize'].val}px ${this.$p['font.family'].val}`).then((fonts)=>{
-                if(fonts.length) this.$calcWH()
+                if(fonts.length && this.$p) this.$calcWH()
             })
         }
     }

@@ -65,10 +65,10 @@ Rectangle {
             fontName: menuPanel.fontName;
             imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Selected.svg":
                                                      "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
-
+            decoratorSource : Style.menuButtonDecoratorPath;
             selected: lvPages.currentIndex === model.index;
 
-            decoratorSource : Style.menuButtonDecoratorPath;
+
 
 //            decoratorComp: menuButtonDecorator;
 

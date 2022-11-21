@@ -21,7 +21,13 @@ JSONListModel {
         if(row === null)
             row = 0
         var modelObject = this.get(row)
-        var retVal = modelObject[key]
+        var retVal = modelObject ? modelObject[key] : null
+
+//        if(retVal === undefined){
+//            modelObject = this.get(0)[row]
+//            retVal = modelObject.$data[0][key]
+//        }
+
         if (retVal === null)
             return null
         if(typeof retVal === 'object' && retVal._qmlName !== 'TreeItemModel.qml'){
@@ -58,6 +64,9 @@ JSONListModel {
         console.log("ccleared", this)
     }
 
+    function IsValidData(key, row){
+        return this.GetData(key, row) ? true : false
+    }
 
     function SetExternTreeModel(key, value, row){
         this.SetData(key, value, row)
@@ -79,6 +88,26 @@ JSONListModel {
             let value = this.GetData(keys[key], index);
             model.SetData(keys[key], value, externIndex);
         }
+    }
+
+    function GetModelFromItem(index){
+        if(count <= 0 || index < 0 || index >= count) return;
+
+        let item = this.get(index);
+        let retModel = this.createComponent("imtqml/TreeItemModel.qml", null);
+        CopyItemDataToModel(index, retModel, 0)
+        return retModel;
+
+    }
+
+    function Copy(obj){
+        if(!obj) return false
+
+        this.clear()
+        for(let i = 0; i < obj.count; i++){
+            this.CopyItemDataFromModel(this.InsertNewItem(), obj, i)
+        }
+        return true
     }
 
     function GetKeys(){
@@ -155,9 +184,9 @@ JSONListModel {
     }
 
     //Parse from the extern json to the intern model
-    function Parse(json){
+    function Parse(jsonString){
         container.clear();
-        this.json = json;
+        this.json = jsonString;
 
         this.updateJSONModel()
         this.updateTreeItemJSONModel()

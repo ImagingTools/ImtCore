@@ -26,8 +26,14 @@ Item {
 
     property int radius: 5;
     property int currentIndex: -1;
-    property Component delegate: PopupMenuDelegate{width: comboBoxContainer.width; height: comboBoxContainer.itemHeight; textSize: comboBoxContainer.textSize;fontColor: comboBoxContainer.fontColor;
-        };
+    property Component delegate: PopupMenuDelegate{
+        width: comboBoxContainer.width;
+        height: comboBoxContainer.itemHeight;
+        textSize: comboBoxContainer.textSize;
+        fontColor: comboBoxContainer.fontColor;
+
+        rootItem: comboBoxContainer;
+       };
 
     property alias image: cbArrowIcon;
 
@@ -39,12 +45,14 @@ Item {
     signal finished(string commandId, int index);
 
     onModelChanged: {
+        console.log("DEBUG::2022-11-13::onModelChanged", model)
         if (comboBoxContainer.currentIndex > -1){
             comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name");
         }
     }
 
     onCurrentIndexChanged: {
+        console.log("DEBUG::2022-11-13::onCurrentIndexChanged", comboBoxContainer.currentIndex)
         console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (comboBoxContainer.currentIndex > -1){
             let name = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
@@ -65,6 +73,7 @@ Item {
             textSize: comboBoxContainer.textSize;
             fontColor: comboBoxContainer.fontColor;
             onFinished: {
+                console.log("DEBUG::2022-11-13::onFinished", index)
                 comboBoxContainer.currentIndex = index;
             }
             Component.onCompleted: {
@@ -74,6 +83,7 @@ Item {
     }
 
     Component.onCompleted: {
+        console.log("DEBUG::2022-11-13::onCompleted", comboBoxContainer.currentIndex)
         if (comboBoxContainer.textCentered){
             cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
         }
@@ -95,6 +105,7 @@ Item {
     function openPopupMenu(){
         comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
         var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
+        console.log("DEBUG::", point.x, point.y, comboBoxContainer.model, comboBoxContainer.width)
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
                                                    "model": comboBoxContainer.model,
@@ -157,8 +168,8 @@ Item {
 
             onClicked: {
                 console.log("ComboBox clicked !");
-
-                openPopupMenu();
+                console.log("DEBUG::", comboBoxContainer.model)
+                comboBoxContainer.openPopupMenu();
                 comboBoxContainer.clicked();
             }
         }

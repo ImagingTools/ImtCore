@@ -7,7 +7,7 @@ import imtqml 1.0
 Rectangle {
     id: popupMenuContainer;
 
-    width: popupMenuContainer.itemWidth;
+    width: itemWidth;
     height: popupMenuListView.height;
 
     property var model;
@@ -28,7 +28,13 @@ Rectangle {
     property bool hiddenBackground: true;
     property bool canClose: true;
 
-    property Component delegate: PopupMenuDelegate{textSize: popupMenuContainer.textSize; fontColor: popupMenuContainer.fontColor;onClicked: {finished(commandId, index)}}
+    property Component delegate: PopupMenuDelegate{
+        textSize: popupMenuContainer.textSize;
+        fontColor: popupMenuContainer.fontColor;
+        onClicked: {popupMenuContainer.finished(commandId, index)}
+
+        rootItem: popupMenuContainer;
+    }
 
 
     property var properties;

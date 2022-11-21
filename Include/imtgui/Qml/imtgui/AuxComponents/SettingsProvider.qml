@@ -27,7 +27,7 @@ Item {
         interval: 100;
 
         onTriggered: {
-            applyDesignScheme();
+            container.applyDesignScheme();
         }
     }
 
@@ -206,7 +206,7 @@ Item {
                     if (dataModelLocal.ContainsKey("GetSettings")){
                         dataModelLocal = dataModelLocal.GetData("GetSettings");
 
-                        serverModel = dataModelLocal;
+                        container.serverModel = dataModelLocal;
                     }
                 }
             }
@@ -220,7 +220,7 @@ Item {
             var query = Gql.GqlRequest("mutation", "SaveSettings");
 
             var inputParams = Gql.GqlObject("input");
-            var jsonString = serverModel.toJSON();
+            var jsonString = container.serverModel.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);

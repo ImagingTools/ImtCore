@@ -13,6 +13,10 @@ export class Item extends QtObject {
     static Left = 7
     static Center = 8
 
+    $changedWidth = true
+    $changedHeight = true
+    
+
     constructor(parent) {
         super(parent)
 
@@ -53,12 +57,19 @@ export class Item extends QtObject {
         // this.$cP('implicitWidth', 'real', 0)
         // this.$cP('implicitHeight', 'real', 0)
 
-        this.$cP('left', ()=>{return this.x - (this.width*(1-this.scale)/2)})
-        this.$cP('right', ()=>{return this.x + this.width - (this.width*(1-this.scale)/2)})
-        this.$cP('top', ()=>{return this.y - (this.height*(1-this.scale)/2)})
-        this.$cP('bottom', ()=>{return this.y + this.height - (this.height*(1-this.scale)/2)})
-        this.$cP('horizontalCenter', ()=>{return this.x+this.width/2})
-        this.$cP('verticalCenter', ()=>{return this.y+this.height/2})
+        // this.$cP('left', ()=>{return this.x - (this.width*(1-this.scale)/2)})
+        // this.$cP('right', ()=>{return this.x + this.width - (this.width*(1-this.scale)/2)})
+        // this.$cP('top', ()=>{return this.y - (this.height*(1-this.scale)/2)})
+        // this.$cP('bottom', ()=>{return this.y + this.height - (this.height*(1-this.scale)/2)})
+        // this.$cP('horizontalCenter', ()=>{return this.x+this.width/2})
+        // this.$cP('verticalCenter', ()=>{return this.y+this.height/2})
+        this.$cP('left', ()=>{return this.dom.getBoundingClientRect().left - (this.width*(1-this.scale)/2)})
+        this.$cP('right', ()=>{return this.dom.getBoundingClientRect().left + this.width - (this.width*(1-this.scale)/2)})
+        this.$cP('top', ()=>{return this.dom.getBoundingClientRect().top - (this.height*(1-this.scale)/2)})
+        this.$cP('bottom', ()=>{return this.dom.getBoundingClientRect().top + this.height - (this.height*(1-this.scale)/2)})
+        this.$cP('horizontalCenter', ()=>{return this.dom.getBoundingClientRect().left+this.width/2})
+        this.$cP('verticalCenter', ()=>{return this.dom.getBoundingClientRect().top+this.height/2})
+        this.$cP('childrenRect', ()=>{return {}})
 
 
         this.$cP('x', 0).connect(this.$xChanged.bind(this))
@@ -141,7 +152,7 @@ export class Item extends QtObject {
             this.parent.dom.appendChild(this.dom)
         }
         this.dom.style.position = 'absolute'
-        this.dom.style.overflow = 'hidden'
+        this.dom.style.overflow = 'unset'
         this.dom.style.zIndex = /*2147483646/2 + */this.$p.z.val
         this.dom.classList.add(this.constructor.name)
         this.dom.id = `el-${this.UID}`
@@ -162,27 +173,40 @@ export class Item extends QtObject {
     $xChanged(){
         this.dom.style.left = `${this.$p.x.val}px`
         // this.$updateGeometry()
+        if(this.parent) this.parent.$updateChildrenRect()
         this.$updateRect()
     }
     $yChanged(){
         this.dom.style.top = `${this.$p.y.val}px`
         // this.$updateGeometry()
-        this.$updateRect()
+        if(this.parent) this.parent.$updateChildrenRect()
+        this.$updateRect()    
     }
     $zChanged(){
         this.dom.style.zIndex = /*2147483646/2 + */this.$p.z.val
     }
     $widthChanged(){
+        this.$changedWidth = false
         this.dom.style.width = `${this.$p.width.val}px`
+
+        if(this.parent) this.parent.$updateChildrenRect()
         this.$updateRect()
         this.$updateGeometry()
+        
+        if(this.parent && this.parent.dom && this.parent.$changedWidth && this.parent.width < this.width) this.parent.width = this.width
     }
     $heightChanged(){
+        this.$changedHeight = false
         this.dom.style.height = `${this.$p.height.val}px`
+
+        if(this.parent) this.parent.$updateChildrenRect()
         this.$updateRect()
         this.$updateGeometry()
+        
+        if(this.parent && this.parent.dom && this.parent.$changedHeight && this.parent.height < this.height) this.parent.height = this.height
     }
     $visibleChanged(){
+        this.dom.style.opacity = this.$p.visible.val ? this.$p.opacity.val : 0
         this.dom.style.visibility = this.$p.visible.val ? 'visible' : 'hidden'
         this.dom.style.zIndex = this.$p.visible.val ? /*2147483646/2 +*/ this.$p.z.val : -1
     }
@@ -214,6 +238,9 @@ export class Item extends QtObject {
             case Item.Left: this.dom.style.transformOrigin = 'left'; break;
         }
         
+    }
+    forceActiveFocus(){
+        this.focus = true
     }
     // $anchorsChanged(){
         
@@ -281,20 +308,52 @@ export class Item extends QtObject {
         // }
     // }
 
+    $updateGeometry(){
+        if(this.parent) this.parent.$updateGeometry()
+    }
+
+    $updateChildrenRect(){
+        let left = 99999999
+        let right = -99999999
+        let top = 99999999
+        let bottom = -99999999
+
+        for(let child of this.children){
+            if(child.dom){
+                let cRect = child.dom.getBoundingClientRect()
+                if(left > cRect.left) left = cRect.left
+                if(right < cRect.right) right = cRect.right
+                if(top > cRect.top) top = cRect.top
+                if(bottom < cRect.bottom) bottom = cRect.bottom
+
+            }
+        }
+        this.childrenRect = {
+            x: left,
+            y: top,
+            width: right - left,
+            height: bottom - top,
+        }
+    }
     $updateRect(){
-        // let rect = this.dom.getBoundingClientRect()
-        // this.left = rect.left - (this.$p.width.val*(1-this.$p.scale.val)/2)
-        // this.right = rect.right
-        // this.top = rect.top - (this.$p.height.val*(1-this.$p.scale.val)/2)
-        // this.bottom = rect.bottom
-        // this.horizontalCenter = rect.left+this.$p.width.val/2
-        // this.verticalCenter = rect.top+this.$p.height.val/2
+        let rect = this.dom.getBoundingClientRect()
+        this.left = rect.left - (this.$p.width.val*(1-this.$p.scale.val)/2)
+        this.right = rect.right
+        this.top = rect.top - (this.$p.height.val*(1-this.$p.scale.val)/2)
+        this.bottom = rect.bottom
+        this.horizontalCenter = rect.left+this.$p.width.val/2
+        this.verticalCenter = rect.top+this.$p.height.val/2
 
+        for(let child of this.children){
+            if(child.dom) child.$updateRect()
+        }
 
+        
         // if(this.$p['anchors.left'].val || this.$p['anchors.right'].val || this.$p['anchors.top'].val || this.$p['anchors.bottom'].val){
         //     this.$anchorsChanged()
         // }
     }
+
 
     mapToItem(item, x, y){
 		let parent = this.parent

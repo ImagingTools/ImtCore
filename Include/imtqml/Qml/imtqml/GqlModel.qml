@@ -2,6 +2,11 @@ import QtQuick 2.0
 
 TreeItemModel {
     id: container;
+
+    function SetGlobalAccessToken(token){
+        console.log("SetGlobalAccessToken",token)
+        XMLHttpRequest.QMLAuthToken = token
+    }
     
     function SetGqlQuery(gqlData){
         console.log("SetGqlQuery",gqlData)

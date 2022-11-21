@@ -16,7 +16,7 @@ Rectangle {
 
     property alias authorizationPage: authorizationPage;
     property alias preferencePage: preferenceDialog;
-    property alias userManagementProvider: userManagementProvider;
+    property alias userManagementProvider: userManagement;
 
     function updateModels() {
         console.log("ThumbnailDecorator updateModels()");
@@ -75,8 +75,6 @@ Rectangle {
         anchors.top: topPanel.bottom;
         anchors.bottom: thumbnailDecoratorContainer.bottom;
 
-        pageModel: menuPanel.model;
-
         activePageIndex: menuPanel.activePageIndex;
     }
 
@@ -110,6 +108,10 @@ Rectangle {
         anchors.topMargin: 60;
 
         visible: false;
+
+        Component.onCompleted: {
+            console.log('DEBUG::authorizationPage', this)
+        }
     }
 
     PermissionsProvider
@@ -138,9 +140,10 @@ Rectangle {
     }
 
     UserManagementProvider {
-        id: userManagementProvider;
+        id: userManagement;
 
         onUserModeChanged: {
+            console.log('DEBUG::userManagementProvider')
             if (userMode == "NO_USER_MANAGEMENT"){
                 updateAllModels();
             }

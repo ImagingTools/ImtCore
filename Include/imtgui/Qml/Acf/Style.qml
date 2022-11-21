@@ -177,6 +177,8 @@ Item {
 
         let dataDecorators = themeType.GetData("decorators");
 
+        console.log('DEBUG::dataDecorators', dataDecorators)
+
         Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "MainButton");
         Style.subMenuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "SubButton");
         Style.tabPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TabPanel", "Base");

@@ -137,6 +137,7 @@ Item {
                 anchors.fill: parent;
 
                 Component.onCompleted: {
+                    console.log("DEBUG::dataLoader.source: ", model.Source);
                     dataLoader.source = model.Source;
                 }
 

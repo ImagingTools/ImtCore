@@ -32,7 +32,7 @@ Item {
         radius: 8;
 
         color: Style.iconColorOnSelected;
-        visible: selected;
+        visible: parent.selected;
     }
 
     Text {
@@ -40,8 +40,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
 
-        text: title;
-        color: selected ? Style.iconColorOnSelected: Style.textColor;
+        text: parent.title;
+        color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
         font.pixelSize: container.fontSize;
         font.family: Style.fontFamily;
     }

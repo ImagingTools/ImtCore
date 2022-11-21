@@ -32,7 +32,7 @@ Item {
 
         onPagesModelChanged: {
             console.log("pagesProvider onPagesModelChanged");
-            container.pageModel = pagesModel;
+            container.pageModel = pagesProvider.pagesModel;
         }
     }
 
@@ -49,7 +49,7 @@ Item {
             anchors.fill: parent;
             anchors.margins: thumbnailDecoratorContainer.mainMargin;
 
-            visible: activePageIndex === model.index;
+            visible: container.activePageIndex === model.index;
 
             /**
                 The page will be loaded only by click if it hasn't loaded yet
@@ -57,7 +57,8 @@ Item {
             onVisibleChanged: {
                 if(pagesDeleg.visible){
                     if (!pagesLoader.item){
-                        var source = pageModel.GetData("Source", model.index);
+                        var source = container.pageModel.GetData("Source", model.index);
+                        console.log('DEBUG::', pagesLoader)
                         pagesLoader.source = source;
                     }
 

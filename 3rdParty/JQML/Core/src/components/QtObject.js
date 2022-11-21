@@ -34,6 +34,7 @@ export class QtObject {
         properties: [],
         aliases: [],
     }
+    context = {}
     ID = new Set()
     LVL = new Set()
 
@@ -59,21 +60,41 @@ export class QtObject {
         // console.log(this)
 
     }
-
+    $tryComplete(){
+        if(this.$uL.properties.length + this.$uL.aliases.length === 0) this.$s['Component.completed']()
+    }
     $uP(){
+        let errors = new Set()
         this.$ready = true
         let updated = false
+        
 
         while(this.$uL.properties.length){
             updated = true
             let propName = this.$uL.properties.shift()
-            // caller = this.$p[propName]
-            let val = this.$p[propName].func()
-            // caller = null
-            if(this.$p[propName].val !== val){
-                this.$p[propName].val = val
-                this.$p[propName].signal()
+            try {
+                let val = this.$p[propName].func()
+                if(this.$p[propName].val !== val){
+                    this.$p[propName].val = val
+                    this.$p[propName].signal()
+                }
+            } catch (error) {
+                if(!errors.has(propName)){
+                    this.$uL.properties.push(propName)
+                    errors.add(propName)
+                } else {
+                    setTimeout(()=>{
+                        let val = this.$p[propName].func()
+                        if(this.$p[propName].val !== val){
+                            this.$p[propName].val = val
+                            this.$p[propName].signal()
+                        }
+                    }, 500)
+                    //console.log(`DEBUG::${this.UID}-${propName}`, error)
+                }
+                
             }
+            
             
         }
         
@@ -81,6 +102,7 @@ export class QtObject {
         for(let child of this.children){
             child.$uP()
         }
+        
 
         while(this.$uL.aliases.length){
             updated = true
@@ -88,8 +110,13 @@ export class QtObject {
             caller = this.$p[propName]
             let val = caller.func()
             caller = null
+            
             if(this.$p[propName].val !== val){
                 this.$p[propName].val = val
+                if(this.$p[propName].getter() !== val){
+                    this.$p[propName].setter(val)
+                }
+                
                 this.$p[propName].signal()
             }
             
@@ -251,13 +278,24 @@ export class QtObject {
         // }
 
         if(this.$p[name]){
-            this.$p[name].func = ()=>{
-                caller = this.$p[name]
-                let res = func()
-                caller = null
-                return res
+            if(this.$p[name].type === 'alias'){
+                this.$p[name].func = ()=>{
+                    caller = this.$p[name]
+                    let res = func()
+                    caller = null
+                    return res
+                }
+                this.$uL.aliases.push(name)
+            } else {
+                this.$p[name].func = ()=>{
+                    caller = this.$p[name]
+                    let res = func()
+                    caller = null
+                    return res
+                }
+                this.$uL.properties.push(name)
             }
-            this.$uL.properties.push(name)
+            
         } else {
             this.$cP(name, func)
         }
@@ -270,6 +308,9 @@ export class QtObject {
         this.$p[name] = {
             'val': '',
             'signal': signal,
+            'type': 'alias',
+            'setter': setter,
+            'getter': getter,
             'depends': new Set(),
             'func': ()=>{
                 caller = this.$p[name]
@@ -344,10 +385,13 @@ export class QtObject {
     }
 
     $updateGeometry(){
-        if(this.parent) this.parent.$updateGeometry()
+        
     }
     
     $domCreate(){
+        
+    }
+    $updateChildrenRect(){
         
     }
     $updateRect(){
@@ -386,19 +430,27 @@ export class QtObject {
             this.$p[propName].depends.clear()
             this.$p[propName].signal.connections = {}      
         }
-        for(let sigName in this.$s){
-            this.$s[sigName].connections = {}
-        }
+        setTimeout(()=>{
+            
+            for(let sigName in this.$s){
+                this.$s[sigName].connections = {}
+                for(let key in this.$s[sigName].repeats){
+                    clearTimeout(this.$s[sigName].repeats[key])
+                }
+            }
+            for(let key in this){
+                delete this[key]
+            }
+        }, 500)
 
         this.$s['Component.destruction']()
-
-        for(let key in this){
-            this[key] = null
-        }
+    
+        
+        
     }
 
     createComponent(_componentPath, _parent){
-        return Core.createComponent(_componentPath, _parent)
+        return Core.cC(_componentPath, _parent)
     }
     
 }

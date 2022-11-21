@@ -7,7 +7,7 @@ import imtqml 1.0
 Rectangle {
     id: popupMenuContainer;
 
-    width: popupMenuContainer.itemWidth;
+    width: itemWidth;
     height: popupMenuListView.height;
 
     property var model;
@@ -21,8 +21,15 @@ Rectangle {
 
     property bool hiddenBackground: true;
 
-    property Component delegate: PopupMenuDelegate{width: popupMenuContainer.width; height: popupMenuContainer.itemHeight; textSize: popupMenuContainer.textSize;fontColor: popupMenuContainer.fontColor;
-        }
+    property Component delegate: PopupMenuDelegate{
+
+        width: popupMenuContainer.width;
+        height: popupMenuContainer.itemHeight;
+        textSize: popupMenuContainer.textSize;
+        fontColor: popupMenuContainer.fontColor;
+
+        rootItem: popupMenuContainer;
+    }
 
 
     /**
@@ -70,9 +77,10 @@ Rectangle {
             id: popupMenuListView;
 
             width: popupMenuContainer.width;
-            height: (countVisibleItem == -1 || countVisibleItem > popupMenuListView.count) ?
-                        popupMenuListView.count * popupMenuContainer.itemHeight :
-                        countVisibleItem * popupMenuContainer.itemHeight;
+//            height: (parent.countVisibleItem == -1 || parent.countVisibleItem > popupMenuListView.count) ?
+//                        popupMenuListView.count * popupMenuContainer.itemHeight :
+//                        parent.countVisibleItem * popupMenuContainer.itemHeight;
+            height: 5 * popupMenuContainer.itemHeight;
 
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;

@@ -39,14 +39,28 @@ export class MouseArea extends Item {
         this.$s.doubleClicked = Signal()
         this.$s.positionChanged = Signal()
 
+		this.clicked = this.$s.clicked
+		this.entered = this.$s.entered
+		this.exited = this.$s.exited
+		this.canceled = this.$s.canceled
+		this.pressAndHold  = this.$s.pressAndHold 
+		// this.pressed = this.$s.pressed
+		this.released = this.$s.released
+		this.wheel = this.$s.wheel
+		this.doubleClicked = this.$s.doubleClicked
+		this.positionChanged = this.$s.positionChanged
+
         this.$cP('acceptedButtons', Qt.LeftButton)
         this.$cP('containsMouse', false)
         this.$cP('hoverEnabled', false)
         this.$cP('pressed', false)
+		this.$cP('propagateComposedEvents', false)
+		this.$cP('preventStealing', false)
         this.$cP('pressAndHoldInterval', 800)
         this.$cP('mouseX', 0)
         this.$cP('mouseY', 0)
         this.$cP('cursorShape', 'default').connect(this.$cursorShapeChanged.bind(this))
+
         
         this.tempMouse = {
 			x: 0,
@@ -63,7 +77,7 @@ export class MouseArea extends Item {
 	}
 
     $fillMouse(e){
-		this.mouse.accepted = false
+		// this.mouse.accepted = false
 		let rrr = this.dom.getBoundingClientRect()
 		if(e.type.indexOf('touch') >= 0){
 			this.mouse.x = e.changedTouches[0].pageX - rrr.x
@@ -87,7 +101,7 @@ export class MouseArea extends Item {
 		}				
 	}
 	$feelWheel(e){
-		this.wheel.accepted = false
+		// this.wheel.accepted = false
 		this.wheel.x = e.offsetX
 		this.wheel.y = e.offsetY
 		this.wheel.modifiers = 0x00000000
@@ -111,7 +125,7 @@ export class MouseArea extends Item {
 	$mousedown(e, state) {
 		e.preventDefault()
 		if(this.$p.enabled.val){
-			state.blocked(this)
+			if(!this.mouse.accepted) state.blocked(this)
 			if(this.availableButton(e.button)){
 				this.$fillMouse(e)
 				this.pressed = true
@@ -128,7 +142,7 @@ export class MouseArea extends Item {
 
 			if(this.$timerPressAndHold) clearTimeout(this.$timerPressAndHold)
 			this.$timerPressAndHold = setTimeout(()=>{
-				this.$s.pressAndHold()
+				if(this.$s) this.$s.pressAndHold()
 			}, this.pressAndHoldInterval)
 			
 		}
@@ -136,7 +150,7 @@ export class MouseArea extends Item {
 	$mouseup(e, state) {
 		e.preventDefault()
 		if(this.$p.enabled.val){
-			state.release()
+			if(!this.mouse.accepted) state.release()
 			if(this.availableButton(e.button)){
 				this.$fillMouse(e)
 				this.pressed = false
@@ -156,7 +170,7 @@ export class MouseArea extends Item {
 					this.$lastClickOrTouch = now
 				}
 			}
-			if(!this.$p.hoverEnabled.val){
+			if(this.$p && !this.$p.hoverEnabled.val){
 				this.containsMouse = false
 				this.hover = false
 			}
@@ -167,6 +181,7 @@ export class MouseArea extends Item {
 	}
 	$mousemove(e, state) {
 		e.preventDefault()
+		this.$mouseover(e, state)
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
 			
@@ -176,7 +191,7 @@ export class MouseArea extends Item {
 				this.containsMouse = false
 				this.hover = false
 				this.$s.exited()
-				state.release()
+				if(!this.mouse.accepted) state.release()
 				state.view.$mousedown(e, state)
 				
 			} else {
@@ -198,9 +213,10 @@ export class MouseArea extends Item {
 	$contextmenu(e, state) {
 		e.preventDefault()
 	}
+
 	$mouseover(e, state){
 		e.preventDefault()
-		if(this.$p.hoverEnabled.val && this.$p.enabled.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
+		if(this.$p.hoverEnabled.val && this.$p.enabled.val && !this.$p.containsMouse.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
 			this.$fillMouse(e)
 			this.containsMouse = true
 			this.hover = true
@@ -210,7 +226,7 @@ export class MouseArea extends Item {
 	$mouseout(e, state){
 		e.preventDefault()
 		// if(e.offsetX > this.width || e.offsetY > this.height || e.offsetX < 0 || e.offsetY < 0)
-		if(this.$p.hoverEnabled.val && this.$p.enabled.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
+		if(this.$p.hoverEnabled.val && this.$p.enabled.val && this.$p.containsMouse.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
 			//this.$fillMouse(e)
 			this.containsMouse = false
 			this.hover = false
@@ -220,7 +236,7 @@ export class MouseArea extends Item {
 	$touchstart(e, state) {
 		e.preventDefault()
 		if(this.$p.enabled.val){
-			state.blocked(this)
+			if(!this.mouse.accepted) state.blocked(this)
 			this.$fillMouse(e)
 			this.pressed = true
 			this.$s.pressed()
@@ -240,7 +256,7 @@ export class MouseArea extends Item {
 	$touchend(e, state) {
 		e.preventDefault()
 		if(this.$p.enabled.val){
-			state.release()
+			if(!this.mouse.accepted) state.release()
 			this.$fillMouse(e)
 			this.pressed = false
 			this.$s.released()
@@ -278,7 +294,7 @@ export class MouseArea extends Item {
 				this.containsMouse = false
 				this.hover = false
 				this.$s.exited()
-				state.release()
+				if(!this.mouse.accepted) state.release()
 				state.view.$mousedown(e, state)
 				
 			} else {

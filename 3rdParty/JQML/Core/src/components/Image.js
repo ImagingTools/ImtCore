@@ -151,11 +151,17 @@ export class Image extends Item {
             this.status = Image.Loading
             let source = this.$p.source.val.replaceAll(/[\n,\t, ]/g, '')
             let path = []
-            // if(Core.hostPath !== '') path.push(Core.hostPath)
-            // if(Core.rootPath !== '') path.push(Core.rootPath)
-            if(this.$basePath !== '') path.push(this.$basePath)
-            path.push(source)
-            let fullpath = path.join('/')
+            if(Core.rootPath !== ''){
+                path.push(Core.rootPath)
+                path.push(source.replaceAll('../', '').replaceAll('./', ''))
+            } else {    
+                // if(Core.hostPath !== '') path.push(Core.hostPath)
+                // if(Core.rootPath !== '') path.push(Core.rootPath)
+                if(this.$basePath !== '') path.push(this.$basePath)
+                path.push(source)
+            }
+            
+            let fullpath = path.join('/').replaceAll('//', '/')
             
             this.$img.src = fullpath
         }

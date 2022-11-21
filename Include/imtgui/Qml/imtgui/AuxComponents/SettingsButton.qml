@@ -21,7 +21,7 @@ Item {
         backgroundColor: Style.imagingToolsGradient1;
 
         onClicked: {
-            openFileDialog();
+            container.openFileDialog();
         }
     }
 }

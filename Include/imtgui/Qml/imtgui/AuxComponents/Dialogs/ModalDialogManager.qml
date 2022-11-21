@@ -69,9 +69,10 @@ Item {
                 sourceComponent: model.Component;
 
                 onLoaded: {
+                    console.log("DEBUG::", model)
                     dialogLoader.item["root"] = container;
                     for (let key in model.Parameters) {
-                        console.log(key, model.Parameters[key]);
+                        console.log("DEBUG::key", key, model.Parameters[key]);
                         dialogLoader.item[key] = model.Parameters[key];
                     }
                     if (dialogLoader.item.centered){

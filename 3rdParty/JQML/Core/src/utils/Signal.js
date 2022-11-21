@@ -8,26 +8,13 @@ export function Signal(...args){
         }
         for(let key in signal.connections){
 
-            // try {
-                signal.connections[key](...args)
-            // } catch (err1) {
-            //     let num = 0
-            //     let interval = setInterval(()=>{
-            //         try {
-            //             signal.connections[key](...args)
-            //             clearInterval(interval)
-            //         } catch (err2) {
-            //             if(num > 3) {
-            //                 clearInterval(interval)
-                            
-            //             }
-            //             console.log(`ERROR(${num})::signal[${key}]`, signal.connections[key])
-            //             num++
-            //         }
-                    
-            //     }, 100 + num * 100)
-            //     signal.repeats[key] = interval
-            // }
+            try {
+                if(signal.connections[key]) signal.connections[key](...args)
+            } catch (err1) {
+                signal.repeats[key] = setTimeout(()=>{
+                    signal.connections[key](...args)
+                }, 500)
+            }
             
             // let interval = setInterval(()=>{
             //     try{
@@ -44,14 +31,26 @@ export function Signal(...args){
     signal.context = {}
     signal.connections = {}
     signal.connect = (...args) => {
+        let name = args.length === 1 ? args[0].name : args[1].name
+        let count = 0
+        while(signal.connections[name + count]){
+            count++
+        }
         switch(args.length){
-            case 1: signal.connections[args[0].name] = args[0]; break;
-            case 2: signal.connections[args[1].name] = args[1].bind(args[0]); break;
+            case 1: signal.connections[name + count] = args[0]; break;
+            case 2: signal.connections[name + count] = args[1].bind(args[0]); break;
         }
         return signal
     }
     signal.disconnect = (...args) => {
-        delete signal.connections[args[0].name]
+        let find = false
+        for(let key in signal.connections){
+            if(!find && signal.connections[key] === args[0]){
+                delete signal.connections[key]
+                find = true
+            }
+        }
+        // delete signal.connections[args[0].name]
     }
     return signal
 }

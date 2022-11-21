@@ -14,7 +14,7 @@ Item {
     /**
         The property for tracking changes to the selected item
     */
-    property int selectedIndex: containerBase.tableData.selectedIndex;
+    property int selectedIndex: containerBase.tableData ? containerBase.tableData.selectedIndex: -1;
 
     property string commandsId;
 

@@ -43,8 +43,9 @@ export class Row extends Item {
                     if(rChild.height > rHeight) rHeight = rChild.height
                     k++
                 }
-                child.width = rDx
-                child.height = rHeight
+
+                if(child.width < rDx) child.width = rDx
+                if(child.height < rHeight) child.height = rHeight
 
 
             }
@@ -55,7 +56,7 @@ export class Row extends Item {
             i++
         }
 
-        if(this.$wAuto){
+        if(this.$wAuto || this.width < dx){
             this.width = dx
             this.$wAuto = true
         }
@@ -75,6 +76,13 @@ export class Row extends Item {
                 }
             }     
             this.$hAuto = true
+        }
+
+        for(let child of this.children){
+            if(child.$changedHeight){
+                child.height = this.$p.height.val
+                child.$changedHeight = true
+            } 
         }
 
         super.$updateGeometry()

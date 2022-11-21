@@ -82,8 +82,8 @@ Item {
         id: commandsLoader;
 
         Component.onCompleted: {
-            console.log("commandsLoader.source", commandsDelegatePath);
-            commandsLoader.source = commandsDelegatePath;
+            console.log("commandsLoader.source", parent.commandsDelegatePath);
+            commandsLoader.source = parent.commandsDelegatePath;
         }
 
         onLoaded: {
@@ -108,7 +108,9 @@ Item {
         anchors.left: parent.left;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
-        anchors.margins: contentMargins;
+        anchors.margins: parent.contentMargins;
+
+        itemId: collectionViewContainer.itemId;
 
         commandsId: parent.commandsId;
         loadData: true;

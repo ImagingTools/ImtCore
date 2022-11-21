@@ -14,8 +14,9 @@ Item {
         userModeGqlModel.getUserMode();
     }
 
-    function authorization(login, password){
-        authorizationGqlModel.authorization(login, password);
+    function authorization(loginF, passwordF){
+        console.log('DEBUG::authorization', loginF, passwordF)
+        authorizationGqlModel.authorization(loginF, passwordF);
     }
 
     GqlModel{
@@ -66,7 +67,7 @@ Item {
                             let login = dataModelLocal.GetData("Login")
                             container.login = login;
 
-                            accepted();
+                            container.accepted();
                         }
                     }
                 }

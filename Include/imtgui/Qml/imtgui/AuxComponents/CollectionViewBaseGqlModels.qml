@@ -12,6 +12,9 @@ Item {
     property string objectViewEditorPath;
     property string objectViewEditorCommandsId;
 
+    property string itemId;
+    property var table;
+
     property string commandsId;
 
     property TreeItemModel headers;
@@ -88,11 +91,11 @@ Item {
         id: itemsInfoModel;
 
         function updateModel() {
-            console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
+            //console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
-
-            let height = collectionViewBaseContainer.height - pagination.height - table.itemHeight; //Убрать высоту от заголовка и меню пагинации
-            let count = Math.floor(height / table.itemHeight);
+            let itemHeight = 35; // hack
+            let height = collectionViewBaseContainer.height - pagination.height - itemHeight; //Убрать высоту от заголовка и меню пагинации
+            let count = Math.floor(height / itemHeight);
             let offset = (pagination.currentValue - 1) * count;
 
             var viewParams = Gql.GqlObject("viewParams");
@@ -106,9 +109,9 @@ Item {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
 
-            if (itemId){
-                inputParams.InsertField("Id", itemId);
-            }
+//            if (itemId){
+//                inputParams.InsertField("Id", itemId);
+//            }
 
             query.AddParam(inputParams);
 
@@ -139,7 +142,7 @@ Item {
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
                         if (dataModelLocal.ContainsKey("items")){
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
-                            table.selectedIndex = -1;
+                            gqlModelBaseContainer.table.selectedIndex = -1;
                         }
 
                         if (dataModelLocal.ContainsKey("notification")){

@@ -10,24 +10,15 @@ Item {
     property int textSize: Style.fontSize_common;
     property string fontColor: Style.textColor;
     property alias text: mainText.text;
+    property Item rootItem;
 
     signal clicked(string commandId, int index);
 
-
-    MouseArea {
-        id: mouseArea;
-
-        anchors.fill: parent;
-
-        hoverEnabled: true;
-        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
-        onClicked: {
-
-            popupMenuDelegate.clicked(model.Id, model.index);
-            finished(model.Id, model.index);
-        }
+    Component.onCompleted: {
+        console.log("DEBUG::", model.Id, model.index, width, height, visible, x, y, z, parent)
     }
+
+
 
     Rectangle {
         anchors.fill: parent;
@@ -67,5 +58,20 @@ Item {
         color: popupMenuDelegate.fontColor;
         font.pixelSize: popupMenuDelegate.textSize;
         font.family: Style.fontFamily;
+    }
+
+    MouseArea {
+        id: mouseArea;
+
+        anchors.fill: parent;
+
+        hoverEnabled: true;
+        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+        onClicked: {
+            console.log("DEBUG::2022-11-13")
+            popupMenuDelegate.clicked(model.Id, model.index);
+            popupMenuDelegate.rootItem.finished(model.Id, model.index)
+        }
     }
 }
