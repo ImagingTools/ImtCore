@@ -49,7 +49,7 @@ Rectangle {
     }
 
     onFinished: {
-
+        console.log("_________FINISHED_________________",buttonId);
         if (root){
             if(dialogContainer.notClosingButtons.indexOf(buttonId) == -1){
                 root.closeDialog();
@@ -92,7 +92,7 @@ Rectangle {
                 loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
             }
             onSourceChanged: {
-                loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+                //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
                 loaderTopPanel.item.title = dialogContainer.title;
             }
         }
