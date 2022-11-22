@@ -3,6 +3,7 @@ import Acf 1.0
 import imtqml 1.0
 
 Item {
+    property alias iconSource: preferenceButton.iconSource;
 
     AuxButton {
         id: preferenceButton;
