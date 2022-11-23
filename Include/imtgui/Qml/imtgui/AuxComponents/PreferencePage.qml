@@ -20,8 +20,16 @@ Rectangle {
 
     property alias leftPanelWidth: mainPanelBackground.width;
     property alias mainWidth: mainRec.width;
+    property alias mainHeight: mainRec.height;
     property alias topPanelSource: loaderTopPanel.source;
+    property alias buttonsRowComp: buttonsDialog.buttonComp;
+
     property string backgroundColor: Style.backgroundColor;
+
+    property int fontSize: Style.fontSize_common;
+    property string fontColor: Style.textColor;
+
+
 
     property Component buttonComp :Component{
         AuxButton {
@@ -258,6 +266,7 @@ Rectangle {
 
                         Item{
                         id: buttonContainer;
+
                         anchors.left: parent.left;
                         anchors.leftMargin: 10;
                         anchors.right: parent.right;
@@ -355,8 +364,8 @@ Rectangle {
 
                             text: model.Name;
 
-                            font.pixelSize: Style.fontSize_common;
-                            color: Style.textColor;
+                            font.pixelSize: container.fontSize;
+                            color: container.fontColor;
                             font.family: Style.fontFamily;
                         }
 

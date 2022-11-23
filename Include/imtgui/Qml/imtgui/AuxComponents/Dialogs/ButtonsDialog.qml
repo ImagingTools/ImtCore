@@ -9,6 +9,22 @@ Item {
     height: 30;
     width: rowButtons.width;
 
+    property Component buttonComp :Component{
+        AuxButton {
+            id: delegateButton;
+
+            width: 70;
+            height: 25;
+
+            hasText: true;
+            hasIcon: false;
+
+            backgroundColor: Style.buttonColor;
+            borderColor: Style.buttonBorderColor;
+
+        }//button
+    }
+
     signal buttonClicked(string buttonId);
 
     function addButton(buttonObj){
@@ -43,29 +59,45 @@ Item {
 
             model: buttonsModel;
 
-            delegate: AuxButton {
-                id: delegateButton;
+            delegate: Item{
+                id: buttonContainer;
 
-                width: 70;
-                height: 25;
-
-                hasText: true;
-                hasIcon: false;
-
-                focus: model.Active;
-
-                enabled: model.Enabled;
-
-                textButton: model.Name;
-
-                backgroundColor: Style.buttonColor;
-                borderColor: Style.buttonBorderColor;
-
+                width: buttonLoader.width;
+                height: buttonLoader.height;
+                property bool enabled_: model.Enabled;
+                property bool focus_: model.Active;
+                signal clicked();
                 onClicked: {
                     console.log("AuxButton onClicked", model.Id);
                     buttonsDialogContainer.buttonClicked(model.Id);
+
                 }
+                onEnabled_Changed: {
+                    buttonLoader.item.enabled = buttonContainer.enabled_;
+                }
+                onFocus_Changed: {
+                    buttonLoader.item.focus = buttonContainer.focus_;
+                }
+
+                Loader{
+                    id: buttonLoader;
+                    sourceComponent: buttonsDialogContainer.buttonComp;
+
+                    onLoaded: {
+                        buttonLoader.item.clicked.connect(buttonContainer.clicked)
+                        buttonLoader.item.textButton = model.Name;
+                        if(buttonLoader.item){
+                            buttonsDialogContainer.height = buttonLoader.item.height;
+                            buttonLoader.width = buttonLoader.item.width;
+                            buttonLoader.height = buttonLoader.item.height;
+                        }
+                    }
+
+                }
+
             }
+
+
         }
     }
 }
