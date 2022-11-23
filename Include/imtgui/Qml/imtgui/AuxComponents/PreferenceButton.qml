@@ -4,6 +4,8 @@ import imtqml 1.0
 
 Item {
     property alias iconSource: preferenceButton.iconSource;
+    property alias color: preferenceButton.color;
+    property alias highlighted: preferenceButton.highlighted;
 
     AuxButton {
         id: preferenceButton;

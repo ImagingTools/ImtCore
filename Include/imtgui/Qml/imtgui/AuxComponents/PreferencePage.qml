@@ -9,6 +9,7 @@ Rectangle {
     id: container;
 
     color: Style.dialogBackgroundColor;
+    radius: 3;
 
     property Item root;
 
@@ -16,6 +17,31 @@ Rectangle {
     property TreeItemModel localModel: TreeItemModel {}
 
     property TreeItemModel commonModel: TreeItemModel {}
+
+    property alias leftPanelWidth: mainPanelBackground.width;
+    property alias mainWidth: mainRec.width;
+    property alias topPanelSource: loaderTopPanel.source;
+    property string backgroundColor: Style.backgroundColor;
+
+    property Component buttonComp :Component{
+        AuxButton {
+            id: button;
+
+            width: mainPanelRepeater.width;
+            height: 35;
+
+            radius: 3;
+
+            hasText: true;
+            hasIcon: false;
+
+            property bool selected: false;
+
+            borderColor: selected ? Style.iconColorOnSelected : Style.buttonColor;
+
+        }
+    }
+
 
     onVisibleChanged: {
         if (visible){
@@ -134,6 +160,10 @@ Rectangle {
         return pageIds;
     }
 
+    function close(buttonId){
+        container.visible = false;
+    }
+
     RemoteFileController {
         id: remoteFileController;
     }
@@ -167,6 +197,7 @@ Rectangle {
     }
 
     Rectangle {
+        id: mainRec;
 
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
@@ -174,27 +205,30 @@ Rectangle {
         width: 450;
         height: 480;
 
-        radius: 3;
+        radius: container.radius;
 
-        color: Style.backgroundColor;
+        color: container.backgroundColor;
 
-        TopPanelDialog {
-            id: topPanelDialog;
+
+        Loader {
+            id: loaderTopPanel;
 
             width: parent.width;
-            height: 40;
-
-            title: qsTr("Preferences");
-
-            onCloseButtonClicked: {
-                buttonsDialog.buttonClicked("Cancel");
+            source: "../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+            onLoaded:  {
+                loaderTopPanel.item.title = "Preferences";
+                loaderTopPanel.item.closeButtonClicked.connect(container.close);
+            }
+            onSourceChanged: {
+                loaderTopPanel.item.title = "Preferences";
             }
         }
+
 
         Rectangle {
             id: mainPanelBackground;
 
-            anchors.top: topPanelDialog.bottom;
+            anchors.top: loaderTopPanel.bottom;
             anchors.left: parent.left;
             anchors.bottom: buttonsDialog.top;
             anchors.margins: 10;
@@ -203,6 +237,8 @@ Rectangle {
             height: parent.height;
 
             color: Style.baseColor;
+
+
 
             Column {
                 id: mainPanel;
@@ -217,45 +253,61 @@ Rectangle {
                 Repeater {
                     id: mainPanelRepeater;
 
-                    delegate: AuxButton {
 
+                    delegate:
+
+                        Item{
+                        id: buttonContainer;
                         anchors.left: parent.left;
                         anchors.leftMargin: 10;
                         anchors.right: parent.right;
                         anchors.rightMargin: 10;
 
-                        height: 35;
+                        height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 35;
+                        property bool selected: mainPanel.selectedIndex === model.index;
+                        signal clicked();
+                        onSelectedChanged: {
+                            buttonLoader.item.selected = buttonContainer.selected;
 
-                        radius: 3;
-
-                        hasText: true;
-                        hasIcon: false;
-
-                        textButton: model.Name;
-
-                        borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
-
+                        }
                         Component.onCompleted: {
                             if (model.index === 0){
                                 clicked();
                             }
                         }
-
                         onClicked: {
                             if (mainPanel.selectedIndex !== model.index){
                                 bodyPanelRepeater.model = model.Elements;
                                 mainPanel.selectedIndex = model.index;
                             }
+
                         }
-                    }
+
+                        Loader{
+                            id: buttonLoader;
+                            anchors.fill: parent;
+                            sourceComponent: container.buttonComp;
+                            onLoaded: {
+                                buttonLoader.item.clicked.connect(buttonContainer.clicked)
+                                buttonLoader.item.textButton = model.Name;
+                            }
+
+                        }
+
+
+                    }//delegate
+
+
                 }
 
                 onSelectedIndexChanged: {}
             }
         }
 
+
+
         Flickable {
-            anchors.top: topPanelDialog.bottom;
+            anchors.top: loaderTopPanel.bottom;
             anchors.topMargin: 10;
             anchors.left: mainPanelBackground.right;
             anchors.leftMargin: 10;
@@ -266,7 +318,7 @@ Rectangle {
 
             clip: true;
 
-//            height: parent.height;
+            //            height: parent.height;
 
             contentWidth: width;
             contentHeight: height + 100;
@@ -276,19 +328,19 @@ Rectangle {
             Column {
                 id: bodyPanel;
 
-//                width: 200;
+                //                width: 200;
 
                 anchors.fill: parent;
 
-//                anchors.top: topPanelDialog.bottom;
-//                anchors.topMargin: 10;
-//                anchors.left: mainPanelBackground.right;
-//                anchors.leftMargin: 10;
-//                anchors.right: parent.right;
-//                anchors.rightMargin: 10;
-//                anchors.bottom: parent.bottom;
+                //                anchors.top: topPanelDialog.bottom;
+                //                anchors.topMargin: 10;
+                //                anchors.left: mainPanelBackground.right;
+                //                anchors.leftMargin: 10;
+                //                anchors.right: parent.right;
+                //                anchors.rightMargin: 10;
+                //                anchors.bottom: parent.bottom;
 
-//                height: parent.height;
+                //                height: parent.height;
 
                 Repeater {
                     id: bodyPanelRepeater;
