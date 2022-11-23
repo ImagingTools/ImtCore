@@ -80,7 +80,7 @@ Rectangle {
 //            height: (parent.countVisibleItem == -1 || parent.countVisibleItem > popupMenuListView.count) ?
 //                        popupMenuListView.count * popupMenuContainer.itemHeight :
 //                        parent.countVisibleItem * popupMenuContainer.itemHeight;
-            height: 5 * popupMenuContainer.itemHeight;
+            height: Math.min(5 * popupMenuContainer.itemHeight, contentHeight);
 
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
