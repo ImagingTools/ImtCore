@@ -12,7 +12,7 @@ namespace imtej
 class CReportProvider: virtual public IEjDocumentProvider
 {
 public:
-	virtual EjDocument* getReport(iprm::IParamsSet* reportParams) override;
+	virtual EjDocument* getReport(iprm::IParamsSet* reportParams,  const QTranslator* translatorPtr) override;
 
     virtual QByteArrayList getReportIds() override;
 };

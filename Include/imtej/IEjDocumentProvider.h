@@ -4,6 +4,7 @@
 #include <istd/IPolymorphic.h>
 #include <iprm/IParamsSet.h>
 
+
 //EjDoc includes
 #include <ejdocument.h>
 #include <ejtableblocks.h>
@@ -23,7 +24,7 @@ class IObject2d;
 class IEjDocumentProvider: virtual public istd::IPolymorphic
 {
 public:
-    virtual EjDocument* getReport(iprm::IParamsSet* reportParams) = 0;
+	virtual EjDocument* getReport(iprm::IParamsSet* reportParams, const QTranslator* translatorPtr) = 0;
 
     virtual QByteArrayList getReportIds() = 0;
 };
