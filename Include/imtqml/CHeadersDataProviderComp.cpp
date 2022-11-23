@@ -38,33 +38,11 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 				if(gqlContext != nullptr){
 					languageId =  gqlContext->GetLanguageId();
 				}
-				int currentIndex = - 1;
 
-				if (languageId.isEmpty()){
-					currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
-				}
-				else{
-					currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-				}
+				QString headerName = m_headersNamesAttrPtr[i];
+				QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId);
+				headersModelPtr->SetData("Name", headerNameTr, i);
 
-				if (currentIndex >= 0){
-//					const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
-//					if (translatorPtr != nullptr){
-////						headersModel->SetData("Name", translatorPtr->translate("Attribute", m_headersNamesAttrPtr[i].toUtf8()), i);
-
-//						headersModel->SetData("Name", m_headersNamesAttrPtr[i], i);
-//					}
-					const iqt::ITranslationManager* slaveManagerPtr = m_translationManagerCompPtr->GetSlaveTranslationManager();
-					if(slaveManagerPtr != nullptr){
-						const QTranslator* translatorPtr = slaveManagerPtr->GetLanguageTranslator(currentIndex);
-						if (translatorPtr != nullptr){
-							QString headerName = m_headersNamesAttrPtr[i];
-							QString path = translatorPtr->filePath();
-							QString headerNameTr = translatorPtr->translate("Attribute", headerName.toUtf8());
-							headersModelPtr->SetData("Name", headerNameTr, i);
-						}
-					}
-				}
 			}
 			else{
 				headersModelPtr->SetData("Name", m_headersNamesAttrPtr[i], i);

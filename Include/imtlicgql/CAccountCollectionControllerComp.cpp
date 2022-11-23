@@ -69,7 +69,6 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 		const QTranslator* translatorPtr = nullptr;
 		if (m_translationManagerCompPtr.IsValid()){
-//			QByteArray languageId = GetLanguageIdFromInputParams(inputParams);
 			QByteArray languageId;
 			languageId = "en_US";
 			if (languageId.isEmpty()){

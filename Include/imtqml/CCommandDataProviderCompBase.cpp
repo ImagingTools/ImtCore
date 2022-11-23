@@ -25,12 +25,12 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(
 		const QByteArrayList& fields,
 		const imtgql::IGqlContext* gqlContext)
 {
-	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* treeModelPtr = new imtbase::CTreeItemModel();
 	for (int i = 0; i < m_commandsIdsAttrPtr.GetCount(); ++i){
-		treeModel->InsertNewItem();
+		treeModelPtr->InsertNewItem();
 		for (int indexField = 0; indexField < fields.count(); indexField++){
 			if (fields[indexField] == CommandEnum::ID){
-				treeModel->SetData(CommandEnum::ID, m_commandsIdsAttrPtr[i], i);
+				treeModelPtr->SetData(CommandEnum::ID, m_commandsIdsAttrPtr[i], i);
 			}
 			if (fields[indexField] == CommandEnum::NAME && m_commandsNamesAttrPtr.GetCount() > i){
 				if (m_translationManagerCompPtr.IsValid()){
@@ -38,54 +38,32 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(
 					if(gqlContext != nullptr){
 						languageId = gqlContext->GetLanguageId();
 					}
-					int currentIndex = -1;
 
-					if (languageId.isEmpty()){
-						currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
-					}
-					else{
-						currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-					}
+					QString commandName = m_commandsNamesAttrPtr[i];
+					QString commandNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), commandName.toUtf8(), languageId);
 
-					if (currentIndex >= 0){
-//						const QTranslator* translatorPtr = m_translationManagerCompPtr->GetLanguageTranslator(currentIndex);
-//						if (translatorPtr != nullptr){
-////							treeModel->SetData(CommandEnum::NAME, translatorPtr->translate("Attribute", m_commandsNamesAttrPtr[i].toUtf8()), i);
-//							treeModel->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
-//						}
-						const iqt::ITranslationManager* slaveManagerPtr = m_translationManagerCompPtr->GetSlaveTranslationManager();
-						if(slaveManagerPtr != nullptr){
-							const QTranslator* translatorPtr = slaveManagerPtr->GetLanguageTranslator(currentIndex);
-							if (translatorPtr != nullptr){
-								QString commandName = m_commandsNamesAttrPtr[i];
-								QString path = translatorPtr->filePath();
-								QString commandNameTr = translatorPtr->translate("Attribute", commandName.toUtf8());
-
-								treeModel->SetData(CommandEnum::NAME, commandNameTr, i);
-							}
-						}
-					}
+					treeModelPtr->SetData(CommandEnum::NAME, commandNameTr, i);
 				}
 				else{
-					treeModel->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
+					treeModelPtr->SetData(CommandEnum::NAME, m_commandsNamesAttrPtr[i].toUtf8(), i);
 				}
 			}
 
 			if (fields[indexField] == CommandEnum::ICON && m_commandsDefaultStatusIconAttrPtr.GetCount() > i){
-				treeModel->SetData(CommandEnum::ICON, m_commandsDefaultStatusIconAttrPtr[i], i);
+				treeModelPtr->SetData(CommandEnum::ICON, m_commandsDefaultStatusIconAttrPtr[i], i);
 			}
 
 			if (fields[indexField] == CommandEnum::MODE){
-				treeModel->SetData(CommandEnum::MODE, m_commandsDefaultModesAttrPtr[i], i);
+				treeModelPtr->SetData(CommandEnum::MODE, m_commandsDefaultModesAttrPtr[i], i);
 			}
 
 			if (fields[indexField] == "Visible"){
-				treeModel->SetData("Visible", true, i);
+				treeModelPtr->SetData("Visible", true, i);
 			}
 		}
 	}
 
-	return treeModel;
+	return treeModelPtr;
 }
 
 

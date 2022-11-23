@@ -64,28 +64,10 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 				if(gqlContext != nullptr){
 					languageId = gqlContext->GetLanguageId();
 				}
-				int currentIndex = -1;
+				QString pageName = (*m_pageNameAttrPtr);
+				QByteArray pageNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), pageName.toUtf8(), languageId);
 
-				if (languageId.isEmpty()){
-					currentIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
-				}
-				else{
-					currentIndex = iprm::FindOptionIndexById(languageId, m_translationManagerCompPtr->GetLanguagesInfo());
-				}
-
-				if (currentIndex >= 0){
-					const iqt::ITranslationManager* slaveManagerPtr = m_translationManagerCompPtr->GetSlaveTranslationManager();
-					if(slaveManagerPtr != nullptr){
-						const QTranslator* translatorPtr = slaveManagerPtr->GetLanguageTranslator(currentIndex);
-						if (translatorPtr != nullptr){
-							QString pageName = (*m_pageNameAttrPtr);
-							QString path =translatorPtr->filePath();
-							QString pageNameTr = translatorPtr->translate("Attribute", pageName.toUtf8());
-
-							rootModelPtr->SetData(PageEnum::NAME, pageNameTr);
-						}
-					}
-				}
+				rootModelPtr->SetData(PageEnum::NAME, pageNameTr);
 			}
 			else{
 				rootModelPtr->SetData(PageEnum::NAME, *m_pageNameAttrPtr);

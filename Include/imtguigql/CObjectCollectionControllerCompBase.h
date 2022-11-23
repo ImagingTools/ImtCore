@@ -9,7 +9,6 @@
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
-#include <imtgql/CUserOptionsProviderBase.h>
 
 #undef GetObject
 
@@ -18,8 +17,7 @@ namespace imtguigql
 
 
 class CObjectCollectionControllerCompBase:
-			public imtgql::CGqlRepresentationDataControllerCompBase,
-			public imtgql::CUserOptionsProviderBase
+			public imtgql::CGqlRepresentationDataControllerCompBase
 {
 public:
 	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;

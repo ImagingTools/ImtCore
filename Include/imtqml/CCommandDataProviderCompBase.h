@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtqml/CCommandDataEnumProviderComp.h>
-#include <imtgql/CUserOptionsProviderBase.h>
+#include <imtbase/imtbase.h>
 
 
 namespace imtqml
@@ -17,7 +17,6 @@ namespace imtqml
 
 class CCommandDataProviderCompBase:
 		public icomp::CComponentBase,
-		public imtgql::CUserOptionsProviderBase,
 		public imtbase::IItemBasedRepresentationDataProvider
 {
 public:

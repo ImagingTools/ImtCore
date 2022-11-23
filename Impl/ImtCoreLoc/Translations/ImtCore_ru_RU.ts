@@ -45,41 +45,41 @@
 <context>
     <name>Attribute</name>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+37"/>
-        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+33"/>
+        <location line="+6"/>
         <source>Design token generator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="-4"/>
         <source>. Imaging tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+2"/>
         <source>Client (CommandLine)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-6"/>
+        <location line="+4"/>
         <source>Imaging tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+66"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+123"/>
+        <location line="+56"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+125"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>ImagingTools GmbH</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <source>Preference File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -96,10 +96,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
+        <location line="+4"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+4"/>
@@ -108,93 +108,93 @@
         <translation>Редактирование лицензии</translation>
     </message>
     <message>
-        <location line="-68"/>
-        <location line="+26"/>
+        <location line="-56"/>
         <location line="+32"/>
+        <location line="+16"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-64"/>
-        <location line="+12"/>
-        <location line="+48"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-80"/>
+        <location line="+26"/>
+        <location line="+50"/>
         <location line="+6"/>
         <source>Edit</source>
         <translation>Редактировать</translation>
     </message>
     <message>
-        <location line="-72"/>
-        <location line="+26"/>
+        <location line="-74"/>
+        <location line="+32"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-88"/>
-        <location line="+26"/>
+        <location line="+52"/>
         <source>Administration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-24"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
-        <location line="+16"/>
+        <location line="-30"/>
+        <location line="+14"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-50"/>
+        <location line="+6"/>
         <source>Roles</source>
         <translation type="unfinished">Роли</translation>
     </message>
     <message>
         <location line="+2"/>
+        <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+10"/>
         <source>Remove</source>
         <translation type="unfinished">Удалить</translation>
     </message>
     <message>
-        <location line="-20"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location line="-26"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-18"/>
         <source>Role Name</source>
         <translation type="unfinished">Название</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="-18"/>
         <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+22"/>
         <source>Undo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-22"/>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-28"/>
+        <location line="-28"/>
         <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-20"/>
+        <location line="+22"/>
         <source>Redo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-20"/>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location line="-26"/>
         <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-18"/>
+        <location line="+22"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-20"/>
-        <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location line="-26"/>
         <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-18"/>
+        <location line="+22"/>
         <source>Close</source>
         <translation type="unfinished">Закрыть</translation>
     </message>
     <message>
-        <location line="-22"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-22"/>
+        <location line="-20"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-20"/>
         <source>Users</source>
         <translation type="unfinished">Пользователи</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location line="+22"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Create user account</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="-20"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+20"/>
         <source>Username</source>
         <translation>Имя пользователя</translation>
@@ -212,8 +212,8 @@
         <translation type="unfinished">Email</translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+46"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+48"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
@@ -277,13 +277,13 @@
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+16"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+18"/>
         <source>Report</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>Report Files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1562,7 +1562,7 @@
 <context>
     <name>DatePicker</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+8"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+10"/>
         <source>January</source>
         <translation>Январь</translation>
     </message>
@@ -2350,7 +2350,7 @@
         <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+192"/>
         <location line="+55"/>
         <location line="+151"/>
-        <location line="+141"/>
+        <location line="+142"/>
         <location filename="../../../Include/imtlicgql/CAccountControllerComp.cpp" line="+20"/>
         <location filename="../../../Include/imtlicgql/CFeaturePackageCollectionControllerComp.cpp" line="+47"/>
         <location filename="../../../Include/imtlicgql/CInstallationCollectionControllerComp.cpp" line="+54"/>
@@ -2361,7 +2361,7 @@
         <translation type="unfinished">Внутренняя ошибка</translation>
     </message>
     <message>
-        <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="-336"/>
+        <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="-337"/>
         <source>Can not insert object: %1</source>
         <translation type="unfinished"></translation>
     </message>

@@ -10,7 +10,8 @@
 #include <imtauth/IContactInfo.h>
 #include <imtbase/IItemBasedRepresentationDataProvider.h>
 #include <imtgql/IGqlMutationDataControllerDelegate.h>
-#include <imtgql/CUserOptionsProviderBase.h>
+#include <imtbase/imtbase.h>
+
 
 
 namespace imtqml
@@ -22,7 +23,6 @@ namespace imtqml
 */
 class CParamsDataProviderCompBase:
 			public icomp::CComponentBase,
-			public imtgql::CUserOptionsProviderBase,
 			public imtbase::IItemBasedRepresentationDataProvider,
 			public imtgql::IGqlMutationDataControllerDelegate
 {
