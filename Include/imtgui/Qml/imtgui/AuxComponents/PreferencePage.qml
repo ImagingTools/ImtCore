@@ -6,7 +6,7 @@ import QtQuick.Dialogs 1.3
 import "../../Acf/core.js" as Lodash
 
 Rectangle {
-    id: container;
+    id: preferencePage;
 
     color: Style.dialogBackgroundColor;
     radius: 3;
@@ -24,10 +24,16 @@ Rectangle {
     property alias topPanelSource: loaderTopPanel.source;
     property alias buttonsRowComp: buttonsDialog.buttonComp;
 
+    property string settingsComboSource: "SettingsComboBox.qml";
+    property string settingsDataBaseInputSource: "DatabaseInput.qml";
+    property string settingsTextInputSource: "SettingsTextInput.qml";
+    property string settingsButtonSource: "SettingsButton.qml";
+    property string settingsTextLabelSource: "SettingsTextLabel.qml";
+
     property string backgroundColor: Style.backgroundColor;
+    property string fontColor: Style.textColor;
 
     property int fontSize: Style.fontSize_common;
-    property string fontColor: Style.textColor;
 
 
 
@@ -169,7 +175,7 @@ Rectangle {
     }
 
     function close(buttonId){
-        container.visible = false;
+        preferencePage.visible = false;
     }
 
     RemoteFileController {
@@ -213,9 +219,9 @@ Rectangle {
         width: 450;
         height: 480;
 
-        radius: container.radius;
+        radius: preferencePage.radius;
 
-        color: container.backgroundColor;
+        color: preferencePage.backgroundColor;
 
 
         Loader {
@@ -225,7 +231,7 @@ Rectangle {
             source: "../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
             onLoaded:  {
                 loaderTopPanel.item.title = "Preferences";
-                loaderTopPanel.item.closeButtonClicked.connect(container.close);
+                loaderTopPanel.item.closeButtonClicked.connect(preferencePage.close);
             }
             onSourceChanged: {
                 loaderTopPanel.item.title = "Preferences";
@@ -295,7 +301,7 @@ Rectangle {
                         Loader{
                             id: buttonLoader;
                             anchors.fill: parent;
-                            sourceComponent: container.buttonComp;
+                            sourceComponent: preferencePage.buttonComp;
                             onLoaded: {
                                 buttonLoader.item.clicked.connect(buttonContainer.clicked)
                                 buttonLoader.item.textButton = model.Name;
@@ -327,7 +333,6 @@ Rectangle {
 
             clip: true;
 
-            //            height: parent.height;
 
             contentWidth: width;
             contentHeight: height + 100;
@@ -364,8 +369,8 @@ Rectangle {
 
                             text: model.Name;
 
-                            font.pixelSize: container.fontSize;
-                            color: container.fontColor;
+                            font.pixelSize: preferencePage.fontSize;
+                            color: preferencePage.fontColor;
                             font.family: Style.fontFamily;
                         }
 
@@ -391,23 +396,23 @@ Rectangle {
                                 var componentType = model.ComponentType;
 
                                 if (componentType === "ComboBox"){
-                                    loader.source = "SettingsComboBox.qml";
+                                    loader.source = preferencePage.settingsComboSource;
                                     loader.item.width = bodyPanel.width / 2;
                                 }
                                 else if (componentType === "DatabaseSettingsInput"){
-                                    loader.source = "DatabaseInput.qml";
+                                    loader.source = preferencePage.settingsDataBaseInputSource;
                                     loader.item.width = bodyPanel.width;
                                 }
                                 else if (componentType === "TextInput"){
-                                    loader.source = "SettingsTextInput.qml";
+                                    loader.source = preferencePage.settingsTextInputSource;
                                     loader.item.width = bodyPanel.width;
                                 }
                                 else if (componentType === "Button"){
-                                    loader.source = "SettingsButton.qml";
+                                    loader.source = preferencePage.settingsButtonSource;
                                     loader.item.width = bodyPanel.width / 3;
                                 }
                                 else if (componentType === "TextLabel"){
-                                    loader.source = "SettingsTextLabel.qml";
+                                    loader.source = preferencePage.settingsTextLabelSource;
 
                                     loader.item.width = bodyPanel.width / 3;
                                 }
@@ -439,7 +444,7 @@ Rectangle {
                 console.log("ButtonsDialog onButtonClicked", buttonId);
 
                 if (buttonId == "Cancel"){
-                    container.visible = false;
+                    preferencePage.visible = false;
                 }
                 else if (buttonId == "Apply"){
                     let serverPageIds = getDirtyPagesFromServerModel();
