@@ -4,7 +4,7 @@
 #include <imtdb/IDatabaseLoginSettings.h>
 #include <imtqml/CParamsDataProviderCompBase.h>
 
-
+// hairable component omly 41-st
 namespace imtqml
 {
 
