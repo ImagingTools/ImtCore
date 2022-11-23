@@ -6,7 +6,7 @@ import QtQuick.Dialogs 1.3
 import "../../Acf/core.js" as Lodash
 
 Rectangle {
-    id: preferencePage;
+    id: container;
 
     color: Style.dialogBackgroundColor;
     radius: 3;
@@ -175,7 +175,7 @@ Rectangle {
     }
 
     function close(buttonId){
-        preferencePage.visible = false;
+        container.visible = false;
     }
 
     RemoteFileController {
@@ -219,9 +219,9 @@ Rectangle {
         width: 450;
         height: 480;
 
-        radius: preferencePage.radius;
+        radius: container.radius;
 
-        color: preferencePage.backgroundColor;
+        color: container.backgroundColor;
 
 
         Loader {
@@ -231,7 +231,7 @@ Rectangle {
             source: "../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
             onLoaded:  {
                 loaderTopPanel.item.title = "Preferences";
-                loaderTopPanel.item.closeButtonClicked.connect(preferencePage.close);
+                loaderTopPanel.item.closeButtonClicked.connect(container.close);
             }
             onSourceChanged: {
                 loaderTopPanel.item.title = "Preferences";
@@ -301,7 +301,7 @@ Rectangle {
                         Loader{
                             id: buttonLoader;
                             anchors.fill: parent;
-                            sourceComponent: preferencePage.buttonComp;
+                            sourceComponent: container.buttonComp;
                             onLoaded: {
                                 buttonLoader.item.clicked.connect(buttonContainer.clicked)
                                 buttonLoader.item.textButton = model.Name;
@@ -369,8 +369,8 @@ Rectangle {
 
                             text: model.Name;
 
-                            font.pixelSize: preferencePage.fontSize;
-                            color: preferencePage.fontColor;
+                            font.pixelSize: container.fontSize;
+                            color: container.fontColor;
                             font.family: Style.fontFamily;
                         }
 
@@ -396,23 +396,23 @@ Rectangle {
                                 var componentType = model.ComponentType;
 
                                 if (componentType === "ComboBox"){
-                                    loader.source = preferencePage.settingsComboSource;
+                                    loader.source = container.settingsComboSource;
                                     loader.item.width = bodyPanel.width / 2;
                                 }
                                 else if (componentType === "DatabaseSettingsInput"){
-                                    loader.source = preferencePage.settingsDataBaseInputSource;
+                                    loader.source = container.settingsDataBaseInputSource;
                                     loader.item.width = bodyPanel.width;
                                 }
                                 else if (componentType === "TextInput"){
-                                    loader.source = preferencePage.settingsTextInputSource;
+                                    loader.source = container.settingsTextInputSource;
                                     loader.item.width = bodyPanel.width;
                                 }
                                 else if (componentType === "Button"){
-                                    loader.source = preferencePage.settingsButtonSource;
+                                    loader.source = container.settingsButtonSource;
                                     loader.item.width = bodyPanel.width / 3;
                                 }
                                 else if (componentType === "TextLabel"){
-                                    loader.source = preferencePage.settingsTextLabelSource;
+                                    loader.source = container.settingsTextLabelSource;
 
                                     loader.item.width = bodyPanel.width / 3;
                                 }
@@ -444,7 +444,7 @@ Rectangle {
                 console.log("ButtonsDialog onButtonClicked", buttonId);
 
                 if (buttonId == "Cancel"){
-                    preferencePage.visible = false;
+                    container.visible = false;
                 }
                 else if (buttonId == "Apply"){
                     let serverPageIds = getDirtyPagesFromServerModel();
