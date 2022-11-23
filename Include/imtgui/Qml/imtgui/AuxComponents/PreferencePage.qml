@@ -328,14 +328,14 @@ Rectangle {
             anchors.leftMargin: 10;
             anchors.right: parent.right;
             anchors.rightMargin: 10;
-            anchors.bottom: parent.bottom;
-            anchors.bottomMargin: 50;
+            anchors.bottom: buttonsDialog.bottom;
+            anchors.bottomMargin: 20;
 
             clip: true;
 
 
             contentWidth: width;
-            contentHeight: height + 100;
+            contentHeight: bodyPanel.height;
 
             boundsBehavior: Flickable.StopAtBounds;
 
