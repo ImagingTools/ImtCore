@@ -40,17 +40,28 @@ Item {
         Repeater {
             id: repeaterCommands;
 
-            delegate: TopButton {
+            delegate:
+                BaseButton {
+
                 id: topButtonDelegate;
 
+                decoratorSource: "TopButtonDecorator.qml";
+
                 text: model.Name;
-                isEmpty: model.Name === "";
                 imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
-                fontName: Style.fontFamily;
 
-                checkable: model.Mode == "Normal";
-
+                enabled:  model.Mode == "Normal";
                 visible: model.Visible;
+
+//                TopButton {
+//                text: model.Name;
+//                isEmpty: model.Name === "";
+//                imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
+//                fontName: Style.fontFamily;
+
+//                checkable: model.Mode == "Normal";
+
+//                visible: model.Visible;
 
                 onClicked: {
                     console.log("model.Visible", model.Visible);
