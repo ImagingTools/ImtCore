@@ -3,6 +3,7 @@
 // ACF includes
 #include <istd/IPolymorphic.h>
 #include <iprm/IParamsSet.h>
+#include <iqt/ITranslationManager.h>
 
 
 //EjDoc includes
@@ -24,7 +25,7 @@ class IObject2d;
 class IEjDocumentProvider: virtual public istd::IPolymorphic
 {
 public:
-	virtual EjDocument* getReport(iprm::IParamsSet* reportParams, const QTranslator* translatorPtr) = 0;
+	virtual EjDocument* getReport(iprm::IParamsSet* reportParams, const iqt::ITranslationManager* translatorPtr = nullptr, const QByteArray& userLanguage = "") = 0;
 
     virtual QByteArrayList getReportIds() = 0;
 };

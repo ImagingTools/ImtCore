@@ -39,8 +39,9 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 					languageId =  gqlContext->GetLanguageId();
 				}
 
+				QByteArray context = "Attribute";
 				QString headerName = m_headersNamesAttrPtr[i];
-				QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId);
+				QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId, context);
 				headersModelPtr->SetData("Name", headerNameTr, i);
 
 			}

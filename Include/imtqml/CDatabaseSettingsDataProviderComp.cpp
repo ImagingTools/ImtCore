@@ -47,8 +47,9 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 			languageId = gqlContext->GetLanguageId();
 		}
 		if (m_paramNameAttrPtr.IsValid()){
+			QByteArray context = "Attribute";
 			QString paramName = *m_paramNameAttrPtr;
-			QString paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId);
+			QString paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, context);
 			rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
 		}
 	}
@@ -189,8 +190,9 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::UpdateBaseModelFromR
 			}
 
 			if (baseModelPtr->ContainsKey("Name")){
+				QByteArray context = "Attribute";
 				paramName = baseModelPtr->GetData("Name").toString();
-				QByteArray paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId);
+				QByteArray paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, context);
 				rootModel->SetData("Name", paramNameTr);
 			}
 		}

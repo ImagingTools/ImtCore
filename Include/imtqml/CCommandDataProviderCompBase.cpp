@@ -38,9 +38,9 @@ imtbase::CTreeItemModel* CCommandDataProviderCompBase::GetTreeItemModel(
 					if(gqlContext != nullptr){
 						languageId = gqlContext->GetLanguageId();
 					}
-
+					QByteArray context = "Attribute";
 					QString commandName = m_commandsNamesAttrPtr[i];
-					QString commandNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), commandName.toUtf8(), languageId);
+					QString commandNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), commandName.toUtf8(), languageId, context);
 
 					treeModelPtr->SetData(CommandEnum::NAME, commandNameTr, i);
 				}

@@ -64,8 +64,9 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 				if(gqlContext != nullptr){
 					languageId = gqlContext->GetLanguageId();
 				}
+				QByteArray context = "Attribute";
 				QString pageName = (*m_pageNameAttrPtr);
-				QByteArray pageNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), pageName.toUtf8(), languageId);
+				QByteArray pageNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), pageName.toUtf8(), languageId, context);
 
 				rootModelPtr->SetData(PageEnum::NAME, pageNameTr);
 			}

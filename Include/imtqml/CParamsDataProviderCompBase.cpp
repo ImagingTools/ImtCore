@@ -61,8 +61,10 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 		}
 
 		if (m_paramNameAttrPtr.IsValid()){
+
+			QByteArray context = "Attribute";
 			paramName = *m_paramNameAttrPtr;
-			QString paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId);
+			QString paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, context);
 			rootModelPtr->SetData("Name", paramNameTr);
 		}
 	}

@@ -22,7 +22,7 @@ namespace imtbase
 	and return translate when finds it.
 	If not found, returns the original phrase.
 */
-QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const QByteArray& phrase, const QByteArray& languageId);
+QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const QByteArray& phrase, const QByteArray& languageId, const QByteArray& context);
 
 
 } // namespace imtbase

@@ -12,7 +12,7 @@ namespace imtej
 
 // public methods
 
-EjDocument* CReportProvider::getReport(iprm::IParamsSet* reportParams,  const QTranslator* translatorPtr)
+EjDocument* CReportProvider::getReport(iprm::IParamsSet* reportParams,  const iqt::ITranslationManager* translatorPtr, const QByteArray& userLanguage)
 {
     //	EjDocument* ejDoc = new EjDocument();
     //	ejDoc->attributes()->setTemplateKey64(1234);

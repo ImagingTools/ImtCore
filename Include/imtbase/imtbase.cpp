@@ -6,7 +6,7 @@ namespace imtbase
 {
 
 
-QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const QByteArray& phrase, const QByteArray& languageId)
+QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const QByteArray& phrase, const QByteArray& languageId, const QByteArray& context)
 {
 	int currentIndex = -1;
 
@@ -21,11 +21,11 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 		QString phraseTr;
 		const QTranslator* translatorPtr = translationManagerPtr->GetLanguageTranslator(currentIndex);
 		if (translatorPtr != nullptr){
-			phraseTr = translatorPtr->translate("Attribute", phrase);
+			phraseTr = translatorPtr->translate(context, phrase);
 			if(phraseTr.isEmpty()){
 				const iqt::ITranslationManager* slaveTranslatorManager = translationManagerPtr->GetSlaveTranslationManager();
 				if(slaveTranslatorManager != nullptr){
-					GetTranslation(slaveTranslatorManager, phrase, languageId);
+					GetTranslation(slaveTranslatorManager, phrase, languageId, context);
 				}
 				else{
 					return phrase;
