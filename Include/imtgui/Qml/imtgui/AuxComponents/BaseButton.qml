@@ -53,37 +53,55 @@ Item {
 
 
     onVisibleChanged: {
-        loader.item.visible = baseButton.visible;
+        if(loader.item){
+            loader.item.visible = baseButton.visible;
+        }
     }
 
     onTextChanged: {
-        loader.item.text = baseButton.text;
+        if(loader.item){
+            loader.item.text = baseButton.text;
+        }
     }
     onImageSourceChanged: {
-        if(baseButton.imageSource !== ""){
+        if(loader.item && baseButton.imageSource !== ""){
             loader.item.imageSource = baseButton.imageSource;
         }
     }
     onActiveChanged: {
-        loader.item.active = baseButton.active;
+        if(loader.item){
+            loader.item.active = baseButton.active;
+        }
     }
     onFocusedChanged: {
-        loader.item.focused = baseButton.focused;
+        if(loader.item){
+            loader.item.focused = baseButton.focused;
+        }
     }
     onIsPressedChanged: {
-        loader.item.isPressed = baseButton.isPressed;
+        if(loader.item){
+            loader.item.isPressed = baseButton.isPressed;
+        }
     }
     onHoveredChanged: {
-        loader.item.hovered = baseButton.hovered;
+        if(loader.item){
+            loader.item.hovered = baseButton.hovered;
+        }
     }
     onMainButtonChanged: {
-        loader.item.mainButton = baseButton.mainButton;
+        if(loader.item){
+            loader.item.mainButton = baseButton.mainButton;
+        }
     }
     onEnabledChanged: {
-        loader.item.enabled = baseButton.enabled;
+        if(loader.item){
+            loader.item.enabled = baseButton.enabled;
+        }
     }
     onHighlightedChanged: {
-        loader.item.highlighted = baseButton.highlighted;
+        if(loader.item){
+            loader.item.highlighted = baseButton.highlighted;
+        }
     }
 
 
