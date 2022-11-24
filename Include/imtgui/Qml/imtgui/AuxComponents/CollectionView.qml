@@ -12,8 +12,10 @@ Item {
 
     property string itemId;
     property string itemName;
+    property bool isUsedDocumentManager: true;
 
     property string commandsId;
+    property string editorPath;
     property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
     property string commandUpdateGui;
     property alias commandsDelegate: commandsLoader.item;
@@ -71,11 +73,50 @@ Item {
     }
 
     function selectItem(id, name){
-        console.log("CollectionView selectItem", id, name);
         let editorPath = collectionViewBase.commands.objectViewEditorPath;
         let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
+        console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
-        documentManager.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+        if (collectionViewContainer.isUsedDocumentManager){
+            documentManager.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+        }
+        else{
+            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});
+        }
+    }
+
+    Component {
+        id: contentDialog;
+        Item {
+            id: content;
+            property Item root;
+            property bool centered: true;
+            property string contentId;
+            property string contentName;
+            property string contentSource;
+            property string contentCommandsId;
+            width: contentLoader.width;
+            height: contentLoader.height;
+
+            onRootChanged: {
+                contentLoader.item.root = content.root;
+            }
+
+            Loader {
+                id: contentLoader;
+                anchors.centerIn: parent;
+                source: content.contentSource;
+                onLoaded: {
+                    contentLoader.item.root = content.root;
+                    contentLoader.width = item.width;
+                    contentLoader.height = item.height;
+                    contentLoader.item.itemId = content.contentId;
+                    contentLoader.item.itemName = content.contentName;
+                    contentLoader.item.commandsId = content.contentCommandsId;
+                }
+            }
+        }
+
     }
 
     Loader {
