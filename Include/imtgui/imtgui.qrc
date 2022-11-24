@@ -95,6 +95,9 @@
 	<file alias="imtgui/AuxComponents/SettingsProvider.qml">Qml/imtgui/AuxComponents/SettingsProvider.qml</file>
 	<file alias="imtgui/AuxComponents/UserManagementProvider.qml">Qml/imtgui/AuxComponents/UserManagementProvider.qml</file>
 	<file alias="imtgui/AuxComponents/UserTokenProvider.qml">Qml/imtgui/AuxComponents/UserTokenProvider.qml</file>
+
+        <file alias="imtgui/AuxComponents/BaseButton.qml">Qml/imtgui/AuxComponents/BaseButton.qml</file>
+        <file alias="imtgui/AuxComponents/TopButtonDecorator.qml">Qml/imtgui/AuxComponents/TopButtonDecorator.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

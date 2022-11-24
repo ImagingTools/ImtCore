@@ -11,7 +11,7 @@ Item {
 
     //required parameters in every decorator
     property string text: "";
-    property string imageSource: "../Icons/Add.svg";
+    property string imageSource: "";
 
     property bool active: false;
     property bool focused: false;
