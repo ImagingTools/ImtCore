@@ -60,7 +60,9 @@ Item {
         loader.item.text = baseButton.text;
     }
     onImageSourceChanged: {
-        loader.item.imageSource = baseButton.imageSource;
+        if(baseButton.imageSource !== ""){
+            loader.item.imageSource = baseButton.imageSource;
+        }
     }
     onActiveChanged: {
         loader.item.active = baseButton.active;
