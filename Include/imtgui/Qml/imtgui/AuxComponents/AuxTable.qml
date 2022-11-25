@@ -28,12 +28,14 @@ Item {
     property alias elementsList: elementsList;
 
     property alias headerDelegate: headersList.delegate;
-    property real headerElementWidth: (headersList.width - iconFilter.width)/headersList.count;
+    property real headerElementWidth: (headersList.width)/headersList.count;
     property alias headerElementHeight: headersList.height;
 
     property alias backgroundElementsColor: elementsBg.color;
 
     property int radius: 7;
+
+    property alias columnCount: headersList.count;
 
     //
     property string borderColorHorizontal: "transparent";
@@ -351,7 +353,7 @@ Item {
                 }
 
                 function setCellWidth(){
-                    var defaultWidth = (headersList.width - iconFilter.width)/headersList.count;
+                    var defaultWidth = (headersList.width)/headersList.count;
                     var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
 
@@ -631,7 +633,7 @@ Item {
 
         anchors.verticalCenter: headersPanel.verticalCenter;
         anchors.right: headersPanel.right;
-        anchors.rightMargin: 5;
+        anchors.rightMargin: -width;
 
         visible: tableContainer.hasFilter && tableContainer.showHeaders;
 
