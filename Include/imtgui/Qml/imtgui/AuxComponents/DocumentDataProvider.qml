@@ -4,7 +4,7 @@ import imtgui 1.0
 import imtlicgui 1.0
 
 Item {
-    id: documentBase;
+    id: documentDataProvider;
 
     anchors.fill: parent;
 
@@ -19,32 +19,18 @@ Item {
     property alias commandsProvider: commandsProviderBase.item;
     property alias commandsProviderSourceCompr: commandsProviderBase.sourceComponent;
 
-//    property Item commandsDelegate : DocumentWorkspaceCommandsDelegateBase {}
-
-//    property string commandsDelegatePath: "DocumentWorkspaceCommandsDelegateBase.qml";
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
     signal commandsDelegateLoaded();
 
     Component.onCompleted: {
-        commandsDelegate.documentBase = documentBase;
-
-        if (itemLoad){
-            itemId = documentsData.GetData("Id", model.index);
-            itemName = documentsData.GetData("Title", model.index);
-        }
+        commandsDelegate.documentBase = documentDataProvider;
     }
 
     onCommandsIdChanged: {
         console.log("documentBase onCommandsIdChanged", commandsId);
 
-        if (itemLoad){
-//            commandsProvider.commandsId = documentBase.commandsId;
-            commandsProviderBase.item.commandsId = documentBase.commandsId;
-        }
-
-//        commandsDelegate.commandsId = documentBase.commandsId;
         commandsDelegateBase.item.commandsId = documentBase.commandsId;
     }
 
@@ -59,25 +45,9 @@ Item {
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                                       "CommandsId": commandsProvider.commandsId});
 
-            documentBase.updateGui();
+            documentDataProvider.updateGui();
         }
     }
-
-    onItemIdChanged: {
-        if (itemLoad){
-            documentsData.SetData("Id", itemId, model.index);
-        }
-    }
-
-    onItemNameChanged: {
-        if (itemLoad){
-            documentsData.SetData("Name", itemName, model.index);
-        }
-    }
-
-//    CommandsProvider {
-//        id: commandsProviderBase;
-//    }
 
     function updateGui(){}
 
@@ -96,12 +66,9 @@ Item {
 
         sourceComponent: DocumentWorkspaceCommandsDelegateBase {
         }
-//        source: commandsDelegatePath;
 
         onLoaded: {
-            item.documentBase = documentBase;
-//            item.commandsId = commandsId;
-
+            item.documentBase = documentDataProvider;
             commandsDelegateLoaded();
         }
     }

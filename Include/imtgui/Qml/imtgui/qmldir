@@ -63,3 +63,5 @@ PopupMenuDialogGql 1.0 ./AuxComponents/Dialogs/PopupMenuDialogGql.qml
 
 DocumentViewBase 1.0 ./AuxComponents/DocumentViewBase.qml
 SettingsProvider 1.0 ./AuxComponents/SettingsProvider.qml
+
+DocumentDataProvider 1.0 ./AuxComponents/DocumentDataProvider.qml
