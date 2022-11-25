@@ -7,7 +7,7 @@ BaseButtonDecorator {
 
     height: 56;
     width: isEmpty ? 30 : 73;
-    scale: highlighted ? 0.985 : 1;
+    scale: isHighlighted ? 0.985 : 1;
 
 
     property string textColor: Style.textColor;
@@ -87,7 +87,7 @@ BaseButtonDecorator {
         height: 4;
         width: button.width/1.8;
         color: Style.greenColor;
-        visible: topButtonDecorator.enabled && topButtonDecorator.highlighted;
+        visible: topButtonDecorator.enabled && topButtonDecorator.isHighlighted;
     }
 
     Text {

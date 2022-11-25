@@ -13,12 +13,12 @@ Item {
     property string text: "";
     property string imageSource: "";
 
-    property bool active: false;
-    property bool focused: false;
+    property bool isActive: false;
+    property bool isFocused: false;
     property bool isPressed: false;
-    property bool hovered: containsMouse;
-    property bool mainButton: false;
-    property bool highlighted: false;
+    property bool isHovered: enabled ? ma.containsMouse : false;
+    property bool isMainButton: false;
+    property bool isHighlighted: false;
     //
 
     property bool containsMouse: enabled ? ma.containsMouse : false;
@@ -31,18 +31,20 @@ Item {
     signal entered();
     signal exited();
 
+
+
+    onPressed: {
+        //baseButton.isPressed = !baseButton.isPressed;
+        baseButton.isHighlighted = true;
+    }
+    onReleased: {
+        baseButton.isHighlighted = false;
+    }
     onClicked: {
 
     }
     onDoubleClicked: {
 
-    }
-    onPressed: {
-        //baseButton.isPressed = !baseButton.isPressed;
-        baseButton.highlighted = true;
-    }
-    onReleased: {
-        baseButton.highlighted = false;
     }
     onEntered: {
 
@@ -83,14 +85,14 @@ Item {
             loader.item.imageSource = baseButton.imageSource;
         }
     }
-    onActiveChanged: {
+    onIsActiveChanged: {
         if(loader.item){
-            loader.item.active = baseButton.active;
+            loader.item.isActive = baseButton.isActive;
         }
     }
-    onFocusedChanged: {
+    onIsFocusedChanged: {
         if(loader.item){
-            loader.item.focused = baseButton.focused;
+            loader.item.isFocused = baseButton.isFocused;
         }
     }
     onIsPressedChanged: {
@@ -98,14 +100,14 @@ Item {
             loader.item.isPressed = baseButton.isPressed;
         }
     }
-    onHoveredChanged: {
+    onIsHoveredChanged: {
         if(loader.item){
-            loader.item.hovered = baseButton.hovered;
+            loader.item.isHovered = baseButton.isHovered;
         }
     }
-    onMainButtonChanged: {
+    onIsMainButtonChanged: {
         if(loader.item){
-            loader.item.mainButton = baseButton.mainButton;
+            loader.item.isMainButton = baseButton.isMainButton;
         }
     }
     onEnabledChanged: {
@@ -113,9 +115,9 @@ Item {
             loader.item.enabled = baseButton.enabled;
         }
     }
-    onHighlightedChanged: {
+    onIsHighlightedChanged: {
         if(loader.item){
-            loader.item.highlighted = baseButton.highlighted;
+            loader.item.isHighlighted = baseButton.isHighlighted;
         }
     }
 
@@ -129,13 +131,13 @@ Item {
 
             loader.item.text = baseButton.text;
             loader.item.imageSource = baseButton.imageSource;
-            loader.item.active = baseButton.active;
-            loader.item.focused = baseButton.focused;
+            loader.item.isActive = baseButton.isActive;
+            loader.item.isFocused = baseButton.isFocused;
             loader.item.isPressed = baseButton.isPressed;
-            loader.item.hovered = baseButton.hovered;
-            loader.item.mainButton = baseButton.mainButton;
+            loader.item.isHovered = baseButton.isHovered;
+            loader.item.isMainButton = baseButton.isMainButton;
             loader.item.enabled = baseButton.enabled;
-            loader.item.highlighted = baseButton.highlighted;
+            loader.item.isHighlighted = baseButton.isHighlighted;
 
             loader.width = loader.item.width;
             loader.width = loader.item.width;
@@ -162,10 +164,12 @@ Item {
             baseButton.doubleClicked();
         }
         onPressed: {
-            baseButton.pressed;
+            baseButton.pressed();
+
         }
         onReleased: {
             baseButton.released();
+
         }
         onEntered: {
             baseButton.entered();

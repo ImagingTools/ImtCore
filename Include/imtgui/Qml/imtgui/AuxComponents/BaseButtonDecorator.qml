@@ -8,12 +8,12 @@ Item {
     property string text: "";
     property string imageSource: "";
 
-    property bool active: false;
-    property bool focused: false;
+    property bool isActive: false;
+    property bool isFocused: false;
     property bool isPressed: false;
-    property bool hovered: containsMouse;
-    property bool mainButton: false;
-    property bool highlighted: false;
+    property bool isHovered: containsMouse;
+    property bool isMainButton: false;
+    property bool isHighlighted: false;
     //
     
 }
