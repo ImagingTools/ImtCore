@@ -23,6 +23,10 @@ Item {
     property alias tableElementsDelegate: collectionViewBase.tableElementsDelegate;
     property alias tableHeadersDelegate: collectionViewBase.tableHeadersDelegate;
     property alias elementsList: collectionViewBase.elementsList;
+    property alias tableMinWidth: collectionViewBase.tableMinWidth;
+    property alias tableDecoratorPath: collectionViewBase.tableDecoratorPath;
+    property alias tableHeaderHeight: collectionViewBase.tableHeaderHeight;
+    property alias tableItemHeight: collectionViewBase.tableItemHeight;
     property alias metaInfo: collectionMetaInfo;
 
     Component.onCompleted: {
