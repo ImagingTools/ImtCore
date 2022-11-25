@@ -99,6 +99,7 @@
         <file alias="imtgui/AuxComponents/BaseButton.qml">Qml/imtgui/AuxComponents/BaseButton.qml</file>
         <file alias="imtgui/AuxComponents/TopButtonDecorator.qml">Qml/imtgui/AuxComponents/TopButtonDecorator.qml</file>
         <file alias="imtgui/AuxComponents/CommonButtonDecorator.qml">Qml/imtgui/AuxComponents/CommonButtonDecorator.qml</file>
+        <file alias="imtgui/AuxComponents/BaseButtonDecorator.qml">Qml/imtgui/AuxComponents/BaseButtonDecorator.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
