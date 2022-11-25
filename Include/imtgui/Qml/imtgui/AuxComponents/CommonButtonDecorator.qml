@@ -11,15 +11,17 @@ BaseButtonDecorator {
     Rectangle{
         id: mainRec;
 
-
         anchors.fill: parent;
 
         radius: 2;
 
-        color: Style.buttonColor;
+        color: commonButtonDecorator.isHighlighted && commonButtonDecorator.isHovered ? Style.hover :
+                                                                              commonButtonDecorator.isHovered ? Style.selectedColor:
+                                                                              Style.buttonColor;
+
 
         border.width: 1;
-        border.color: Style.buttonBorderColor;
+        border.color: commonButtonDecorator.isHovered ? Style.iconColorOnSelected : Style.buttonBorderColor;
 
         Text {
             id: text;
@@ -38,3 +40,4 @@ BaseButtonDecorator {
     }
 
 }
+

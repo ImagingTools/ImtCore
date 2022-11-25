@@ -91,6 +91,8 @@ Item {
         }
     }
     onIsFocusedChanged: {
+        baseButton.isHighlighted = baseButton.isFocused;
+
         if(loader.item){
             loader.item.isFocused = baseButton.isFocused;
         }
