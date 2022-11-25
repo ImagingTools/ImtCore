@@ -52,7 +52,7 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 			QString paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, context);
 			rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
 		}
-	}
+    }// to copy
 
 	if (m_paramNameAttrPtr.IsValid()){
 		rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
