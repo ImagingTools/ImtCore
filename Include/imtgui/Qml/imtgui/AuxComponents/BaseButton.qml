@@ -58,6 +58,21 @@ Item {
         }
     }
 
+    onWidthChanged: {
+        if(baseButton.width !== loader.width){
+            loader.width = baseButton.width;
+            loader.item.width = baseButton.width;
+        }
+
+    }
+
+    onHeightChanged: {
+        if(baseButton.height !== loader.height){
+            loader.height = baseButton.height;
+            loader.item.height = baseButton.height;
+        }
+    }
+
     onTextChanged: {
         if(loader.item){
             loader.item.text = baseButton.text;
