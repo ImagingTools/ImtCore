@@ -104,7 +104,7 @@ Rectangle {
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
         onTextEdited: {
-            comboBoxContainer.currentIndex = -1;
+            comboBoxContainerGql.currentIndex = -1;
             offset = 0;
             modelFilter.SetData("TextFilter", filterText);
             itemsModel.updateModel(0);
