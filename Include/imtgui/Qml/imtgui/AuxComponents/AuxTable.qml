@@ -378,6 +378,25 @@ Item {
                 }
 
                 //borders
+
+                Rectangle{
+                    id: topBorder;
+                    anchors.top: parent.top;
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    height: tableContainer.visibleTopBorderFirst  ? tableContainer.horizontalBorderSize : 0;
+                    color: tableContainer.borderColorHorizontal;
+                }
+
+                Rectangle{
+                    id: bottomBorder;
+                    anchors.bottom: parent.bottom;
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
+                    color:  tableContainer.borderColorHorizontal;
+                }
+
                 Rectangle{
                     id: leftBorder;
                     anchors.left: parent.left;
@@ -401,23 +420,7 @@ Item {
                     color: tableContainer.borderColorVertical;
                 }
 
-                Rectangle{
-                    id: topBorder;
-                    anchors.top: parent.top;
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-                    height: tableContainer.visibleTopBorderFirst  ? tableContainer.horizontalBorderSize : 0;
-                    color: tableContainer.borderColorHorizontal;
-                }
 
-                Rectangle{
-                    id: bottomBorder;
-                    anchors.bottom: parent.bottom;
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-                    height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
-                    color:  tableContainer.borderColorHorizontal;
-                }
                 //borders
 
                 Rectangle{
@@ -571,7 +574,7 @@ Item {
 
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.right: parent.right;
-                        anchors.rightMargin: visible ? tableContainer.textMarginHor : 0;
+                        anchors.rightMargin: visible ? Math.max(tableContainer.textMarginHor, tableContainer.verticalBorderSize) : 0;
 
                         height: 10;
                         width: visible ? 10 : 0;

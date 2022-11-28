@@ -318,6 +318,25 @@ Rectangle {
             }
 
             //borders
+
+            Rectangle{
+                id: topBorder;
+                anchors.top: parent.top;
+                anchors.left: parent.left;
+                anchors.right: parent.right;
+                height: tableDelegateContainer.visibleTopBorderFirst  ? tableDelegateContainer.horizontalBorderSize : 0;
+                color: tableDelegateContainer.borderColorHorizontal;
+            }
+
+            Rectangle{
+                id: bottomBorder;
+                anchors.bottom: parent.bottom;
+                anchors.left: parent.left;
+                anchors.right: parent.right;
+                height: tableDelegateContainer.visibleBottomBorderLast ? tableDelegateContainer.horizontalBorderSize : 0;
+                color:  tableDelegateContainer.borderColorHorizontal;
+            }
+
             Rectangle{
                 id: leftBorder;
                 anchors.left: parent.left;
@@ -341,23 +360,7 @@ Rectangle {
                 color: tableDelegateContainer.borderColorVertical;
             }
 
-            Rectangle{
-                id: topBorder;
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.right: parent.right;
-                height: tableDelegateContainer.visibleTopBorderFirst  ? tableDelegateContainer.horizontalBorderSize : 0;
-                color: tableDelegateContainer.borderColorHorizontal;
-            }
 
-            Rectangle{
-                id: bottomBorder;
-                anchors.bottom: parent.bottom;
-                anchors.left: parent.left;
-                anchors.right: parent.right;
-                height: tableDelegateContainer.visibleBottomBorderLast ? tableDelegateContainer.horizontalBorderSize : 0;
-                color:  tableDelegateContainer.borderColorHorizontal;
-            }
             //borders
 
             Rectangle{
