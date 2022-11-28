@@ -284,15 +284,9 @@ Rectangle {
             property bool complCompl: deleg.compl && dataList.compl;
 
 
-//            Connections{
-//                target: tableDelegateContainer;
-//                function onWidthRecalc(){
-//                    deleg.setCellWidth()
-//                }
-//            }
 
             Component.onCompleted: {
-                compl = true;
+                deleg.compl = true;
 
             }
             onComplComplChanged: {

@@ -332,27 +332,35 @@ Item {
             spacing: 0;
             model: tableContainer.headers;
             boundsBehavior: Flickable.StopAtBounds;
-
+            property bool compl: false;
+            Component.onCompleted: {
+                headersList.compl = true;
+            }
             delegate: Item{
                 id: deleg;
 
 
                 height: headersList.height;
 
-//                Connections{
-//                    target: tableContainer;
-//                    function onWidthRecalc(){
-//                        deleg.setCellWidth();
-
-//                    }
-//                }
+                property bool compl: false;
+                property bool complCompl: deleg.compl && headersList.compl;
 
                 Component.onCompleted: {
-                    tableContainer.widthRecalc.connect(deleg.setCellWidth);
-                    deleg.setCellWidth();
+                    deleg.compl = true;
+                }
+                onComplComplChanged: {
+                    if(deleg.complCompl){
+                        tableContainer.widthRecalc.connect(deleg.setCellWidth);
+                        deleg.setCellWidth();
+                    }
+
                 }
 
                 function setCellWidth(){
+                    if(!deleg.complCompl){
+                        return;
+                    }
+
                     var defaultWidth = (headersList.width)/headersList.count;
                     var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
@@ -553,13 +561,6 @@ Item {
                             }
                         }
 
-//                        Connections{
-//                            target: tableContainer;
-//                            function onHeightRecalc(){
-//                                name.sendHeightData();
-
-//                            }
-//                        }
 
 
 
