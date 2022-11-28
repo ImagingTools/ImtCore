@@ -579,7 +579,8 @@ Item {
                         height: 10;
                         width: visible ? 10 : 0;
 
-                        visible: headersList.currentIndex === model.index && tableContainer.hasSort;
+                        //visible: headersList.currentIndex === model.index && tableContainer.hasSort;
+                        visible: tableContainer.hasSort;
 
                         source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
                         sourceSize.width: width;
