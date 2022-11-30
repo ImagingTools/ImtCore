@@ -13,6 +13,7 @@ Item {
     property string itemId;
     property string itemName;
     property bool isUsedDocumentManager: true;
+    property bool visibleMetaInfo: true;
 
     property string commandsId;
     property string editorPath;
@@ -169,6 +170,7 @@ Item {
             console.log("CollectionViewBase onItemSelected");
             selectItem(id, name);
         }
+
     }
 
     CommandsProvider {
@@ -180,12 +182,15 @@ Item {
 
         anchors.right: parent.right;
 
-        width: 200;
+        width: visible ? 200 : 1;
         height: parent.height;
+
+        visible: collectionViewContainer.visibleMetaInfo;
 
         tableData: collectionViewBase.table;
 
         contentVisible: collectionViewBase.table.selectedIndex != -1;
+
     }
 }
 
