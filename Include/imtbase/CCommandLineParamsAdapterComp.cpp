@@ -83,7 +83,7 @@ void CCommandLineParamsAdapterComp::OnUpdate(const istd::IChangeable::ChangeSet&
 					case PT_DOUBLE:
 						{
 							bool isOk;
-							int value = optionValue.toDouble(&isOk);
+							double value = optionValue.toDouble(&isOk);
 							if (!isOk){
 								ResetData();
 								return;
