@@ -40,7 +40,7 @@ void CCommandLineParamsAdapterComp::OnUpdate(const istd::IChangeable::ChangeSet&
 	for (int i = 0; i < listItemCount; i++){
 		QString param = optionListPtr->GetOptionName(i);
 		if (param.startsWith(*m_prefixAttrPtr)){
-			optionName = param.last(param.size() - (*m_prefixAttrPtr).size());
+			optionName = param.mid((*m_prefixAttrPtr).size());
 			optionValue.clear();
 		}
 		else{
