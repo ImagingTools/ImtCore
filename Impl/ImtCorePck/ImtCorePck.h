@@ -33,6 +33,7 @@
 #include <imtbase/CUrlParamComp.h>
 #include <imtbase/CMessageFilterComp.h>
 #include <imtbase/CLoginBasedEnablerComp.h>
+#include <imtbase/CCommandLineParamsAdapterComp.h>
 
 
 /**
@@ -79,6 +80,7 @@ typedef imtbase::CQtResourceLoaderComp QtResourceLoaderComp;
 typedef icomp::TModelCompWrap<imtbase::CUrlParamComp> UrlParam;
 typedef imtbase::CMessageFilterComp MessageFilter;
 typedef icomp::TModelCompWrap<imtbase::CLoginBasedEnablerComp> LoginBasedEnabler;
+typedef icomp::TModelCompWrap<imtbase::CCommandLineParamsAdapterComp> CommandLineParamsAdapter;
 
 
 } // namespace ImtCorePck

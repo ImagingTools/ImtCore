@@ -144,6 +144,11 @@ I_EXPORT_COMPONENT(
 			"Enabler based on login state",
 			"Login Enabler");
 
+I_EXPORT_COMPONENT(
+			CommandLineParamsAdapter,
+			"Adapter from command line parameters to ParamSet",
+			"Adapter ParamSet Command Parameter");
+
 
 } // namespace ImtCorePck
 
