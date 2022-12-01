@@ -8,18 +8,42 @@ DocumentBase {
     anchors.fill: parent;
 
     property string title: qsTr("Users");
+    property string username: qsTr("New User");
+
+    onItemNameChanged: {
+        if (documentModel.ContainsKey("Name")){
+            let username = documentModel.GetData("Name");
+            if (username != ""){
+                container.username = username;
+            }
+        }
+    }
 
     onDocumentModelChanged: {
-        headerText.text = title + " / " + documentModel.GetData("Name");
+        console.log("UserView onDocumentModelChanged", documentModel);
+
+        if (documentModel.ContainsKey("Name")){
+            let username = documentModel.GetData("Name");
+            if (username != ""){
+                container.username = username;
+            }
+        }
+
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            loader.item.undoRedoManager = undoRedoManager;
+            loader.item.documentModel = documentModel;
+        }
+
+        undoRedoManager.registerModel(documentModel);
     }
 
     UndoRedoManager {
         id: undoRedoManager;
 
         commandsId: container.commandsId;
-        editorItem: container;
 
-        onModelParsed: {
+        onModelStateChanged: {
             updateGui();
         }
     }
@@ -58,7 +82,7 @@ DocumentBase {
             iconSource: "../../../Icons/" + Style.theme + "/Left_On_Normal.svg";
 
             onClicked: {
-                stackView.pop();
+                Events.sendEvent("UserCommandActivated", "Close")
             }
         }
 
@@ -71,6 +95,8 @@ DocumentBase {
             font.family: Style.fontFamily;
 
             color: Style.titleColor;
+
+            text: container.title + " / " + container.username;
         }
     }
 
@@ -171,6 +197,7 @@ DocumentBase {
                 anchors.fill: parent;
 
                 source: model.Source;
+
                 visible: mainPanel.selectedIndex == model.index;
             }
         }

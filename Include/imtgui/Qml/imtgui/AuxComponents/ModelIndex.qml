@@ -6,27 +6,17 @@ Item {
 
     property var itemData;
 
-    property ModelIndex parentIndex; //Reference on the parent index model.
+    property var delegateItem: null; //Reference on the delegate from model.
 
-    //property var children: {[]}; //Reference on the all children index models.
+    property ModelIndex parentIndex: null; //Reference on the parent index model.
+
+    property var children: {[]}; //Reference on the all children index models.
 
     property int index: -1;
-    property int level: 1;
-
-    onParentIndexChanged: {
-        if (parentIndex){
-            level = parentIndex.level + 1;
-            parentIndex.parentIndexChanged.connect(parentIndexChanged);
-        }
-    }
-
-    Component.onDestruction: {
-        if (parentIndex){
-            parentIndex.parentIndexChanged.disconnect(parentIndexChanged);
-        }
-    }
 
     function equal(otherIndex){
+
+        console.log("equal")
         if (!otherIndex || level != otherIndex.level){
             return false;
         }
@@ -60,6 +50,7 @@ Item {
         Get full path to the item from model index.
     */
     function getIndexes(){
+        console.log("getIndexes")
         let result = []
         _recursiveIndexes(root, result);
 
@@ -70,6 +61,7 @@ Item {
         private function
     */
     function _recursiveIndexes(modelIndex, retval){
+        console.log("_recursiveIndexes")
         if (modelIndex){
             retval.push(modelIndex.index)
             _recursiveIndexes(modelIndex.parentIndex, retval);

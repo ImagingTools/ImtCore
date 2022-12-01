@@ -8,19 +8,25 @@ Dialog {
     property TreeItemModel model;
     property string productId;
 
-    property int selectedIndex: bodyItem.selectedIndex;
+    property var selectedIndex;
+
+    contentComp: RolesDialogBody {
+    }
 
     onFinished: {
+        if (buttonId == "Include"){
+            container.selectedIndex = contentItem.tableView.selectedIndex;
+        }
     }
 
     onProductIdChanged: {
         console.log("RolesDialog onProductIdChanged", productId);
-        bodyItem.productId = productId;
+        contentItem.productId = productId;
     }
 
     onModelChanged: {
         console.log("RolesDialog onModelChanged", model);
-        bodyItem.model = model;
+        contentItem.model = model;
     }
 
     Component.onCompleted: {

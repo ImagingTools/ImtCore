@@ -42,7 +42,7 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 			}
 			else{
 				imtbase::CTreeItemModel itemModel;
-				itemModel.Parse(itemData);
+				itemModel.CreateFromJson(itemData);
 
 				itemsModel = m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(*paramList, &itemModel);
 			}

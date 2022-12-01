@@ -28,6 +28,6 @@ Item {
         }
 
         setHeaderSort(headerId, order);
-        baseCommands.updateModels();
+        baseCommands.updateItemsModel();
     }
 }

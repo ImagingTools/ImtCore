@@ -75,6 +75,22 @@ void CRole::SetRoleName(const QString& name)
 }
 
 
+QString CRole::GetRoleDescription() const
+{
+	return m_roleDescription;
+}
+
+
+void CRole::SetRoleDescription(const QString &description)
+{
+	if (m_roleDescription != description){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_roleDescription = description;
+	}
+}
+
+
 IRole::FeatureIds CRole::GetPermissions() const
 {
 	IRole::FeatureIds allPermissions;
@@ -198,6 +214,11 @@ bool CRole::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_roleName);
 	retVal = retVal && archive.EndTag(roleNameTag);
 
+	static iser::CArchiveTag roleDescriptionTag("RoleDescription", "Description of the role", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(roleDescriptionTag);
+	retVal = retVal && archive.Process(m_roleDescription);
+	retVal = retVal && archive.EndTag(roleDescriptionTag);
+
 	QByteArray parentsRolesTag = "ParentsRoles";
 	QByteArray parentRoleTag = "ParentRole";
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_parents, parentsRolesTag, parentRoleTag);
@@ -233,6 +254,7 @@ bool CRole::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		m_roleId = sourcePtr->m_roleId;
 		m_productId = sourcePtr->m_productId;
 		m_roleName = sourcePtr->m_roleName;
+		m_roleDescription = sourcePtr->m_roleDescription;
 		m_rolePermissions = sourcePtr->m_rolePermissions;
 		m_roleRestrictions = sourcePtr->m_roleRestrictions;
 		m_parents = sourcePtr->m_parents;
@@ -268,6 +290,7 @@ bool CRole::ResetData(CompatibilityMode /*mode*/)
 	m_roleId.clear();
 	m_productId.clear();
 	m_roleName.clear();
+	m_roleDescription.clear();
 	m_rolePermissions.clear();
 	m_roleRestrictions.clear();
 	m_parents.clear();

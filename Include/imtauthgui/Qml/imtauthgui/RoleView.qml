@@ -5,9 +5,6 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-//    commandsDelegate: RoleViewCommandsDelegate {}
-//    commandsDelegatePath: "../../imtauthgui/RoleViewCommandsDelegate.qml";
-
     commandsDelegateSourceComp: RoleViewCommandsDelegate {}
 
     property TreeItemModel rolesModel; // Collection of the all roles
@@ -16,54 +13,59 @@ DocumentBase {
 
     property alias pageIndex: mainPanel.selectedIndex;
 
-    property Item includedRolesTable;
+    property BasicTableView includedRolesTable;
 
     property string productId: "";
-    property string title: productId + " / " + qsTr("Roles");
+    property string title;
+    property string roleName: qsTr("New Role");
+
+    onItemNameChanged: {
+        if (documentModel.ContainsKey("Name")){
+            let roleName = documentModel.GetData("Name");
+
+            if (roleName != ""){
+                container.roleName = roleName;
+            }
+        }
+    }
+
+    onProductIdChanged: {
+        console.log("onProductIdChanged", productId);
+        title = container.productId + " / " + qsTr("Roles");
+    }
 
     onDocumentModelChanged: {
-        headerText.text = title + " / " + documentModel.GetData("Name");
+        console.log("onDocumentModelChanged", documentModel.toJSON());
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            loader.item.documentModel = documentModel;
+            loader.item.undoRedoManager = undoRedoManager;
+        }
 
-        removeElementFromRolesModel();
+        if (documentModel.ContainsKey("Name")){
+            let roleName = documentModel.GetData("Name");
+
+            if (roleName != ""){
+                container.roleName = roleName;
+            }
+        }
+
+        if (documentModel.ContainsKey("ProductId")){
+
+            container.productId = documentModel.GetData("ProductId")
+            console.log("productId", productId);
+        }
+
+        undoRedoManager.registerModel(documentModel);
     }
 
     UndoRedoManager {
         id: undoRedoManager;
 
         commandsId: container.commandsId;
-        editorItem: container;
 
-        onModelParsed: {
+        onModelStateChanged: {
             updateGui();
-        }
-    }
-
-    onSelectedIndexChanged: {
-        console.log("RoleView onSelectedIndexChanged", selectedIndex);
-    }
-
-    function removeElementFromRolesModel(){
-        console.log("removeElementFromRolesModel");
-        let roleId = documentModel.GetData("Id");
-        let productId = documentModel.GetData("ProductId");
-        for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-            let currentProductId = rolesModel.GetData("Id", i);
-            if (productId == currentProductId){
-                let roles = rolesModel.GetData("Roles", i);
-
-                for (let j = 0; j < roles.GetItemsCount(); j++){
-                    let currentRoleId = roles.GetData("Id", j);
-
-                    if (roleId == currentRoleId){
-
-                        console.log("RemoveData", j);
-                        roles.RemoveData(j);
-                        break;
-                    }
-                }
-
-                break;
-            }
         }
     }
 
@@ -105,7 +107,7 @@ DocumentBase {
             iconSource: "../../../Icons/" + Style.theme + "/Left_On_Normal.svg";
 
             onClicked: {
-                stackView.pop();
+                Events.sendEvent("RoleCommandActivated", "Close")
             }
         }
 
@@ -118,6 +120,8 @@ DocumentBase {
             font.family: Style.fontFamily;
 
             color: Style.titleColor;
+
+            text: container.title + " / " + container.roleName;
         }
     }
 

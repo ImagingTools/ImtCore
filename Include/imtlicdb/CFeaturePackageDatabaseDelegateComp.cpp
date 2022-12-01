@@ -67,10 +67,11 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 		featureInfoPtr->SetFeatureName(featureName);
 		featureInfoPtr->SetOptional(isOptional);
 
-		QByteArrayList featureDependencies;
+
 		QByteArray dependenciesQuery = QString("SELECT DependencyId FROM \"FeatureDependencies\" WHERE FeatureId = '%1'").arg(qPrintable(featureId)).toUtf8();
 		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
 
+		QByteArrayList featureDependencies;
 		while (dependenciesSqlQuery.next()){
 			QSqlRecord depFeatureRecord = dependenciesSqlQuery.record();
 			QByteArray dependFeatureId, dependPackageId;
@@ -145,10 +146,11 @@ void CFeaturePackageDatabaseDelegateComp::CreateSubFeaturesFromRecord(
 			parentFeatureId = subFeaturesRecord.value("ParentId").toByteArray();
 		}
 
-		QByteArrayList featureDependencies;
+
 		QByteArray dependenciesQuery = QString("SELECT DependencyId FROM \"FeatureDependencies\" WHERE FeatureId = '%1'").arg(qPrintable(subFeatureId)).toUtf8();
 		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
 
+		QByteArrayList featureDependencies;
 		while (dependenciesSqlQuery.next()){
 			QSqlRecord depFeatureRecord = dependenciesSqlQuery.record();
 			QByteArray dependFeatureId;
@@ -385,11 +387,6 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	// Delete removed features to the package:
 	for (const QByteArray& removedFeatureId : removedFeatures){
-//		retVal += "\n" +
-//					QString("DELETE FROM \"FeatureDependencies\" WHERE FeatureId = '%1' OR DependencyId = '%2';")
-//									.arg(qPrintable(removedFeatureId))
-//									.arg(qPrintable(removedFeatureId))
-//									.toLocal8Bit();
 		retVal += "\n" +
 					QString("DELETE FROM \"Features\" WHERE Id = '%1' AND PackageId = '%2';")
 								.arg(qPrintable(removedFeatureId))

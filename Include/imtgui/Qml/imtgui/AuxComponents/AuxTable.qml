@@ -579,12 +579,33 @@ Item {
                         height: 10;
                         width: visible ? 10 : 0;
 
-                        //visible: headersList.currentIndex === model.index && tableContainer.hasSort;
-                        visible: tableContainer.hasSort;
+                        visible: headersList.currentIndex === model.index && tableContainer.hasSort;
 
-                        source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
                         sourceSize.width: width;
                         sourceSize.height: height;
+
+                        onStateChanged: {
+                            console.log("onStateChanged", state);
+                        }
+
+                        state: "up";
+
+                        states: [
+                            State {
+                                name: "up"
+                                PropertyChanges {
+                                    target: iconSort;
+                                    source: "../../../Icons/" + Style.theme + "/Up_On_Normal.svg";
+                                }
+                            },
+                            State {
+                                name: "down"
+                                PropertyChanges {
+                                    target: iconSort;
+                                    source: "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
+                                }
+                            }
+                        ]
                     }
 
                 }//mainRec
@@ -610,6 +631,14 @@ Item {
 
                     onClicked: {
                         headersList.currentIndex = model.index;
+
+                        if (iconSort.state == "up"){
+                            iconSort.state = "down";
+                        }
+                        else{
+                            iconSort.state = "up";
+                        }
+
                         tableContainer.headerClicked(model.Id);
                     }
                 }

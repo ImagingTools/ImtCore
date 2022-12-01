@@ -7,38 +7,52 @@ Item {
     id: undoRedoManager;
 
     property string commandsId;
-    property TreeItemModel model: documentModel;
-    property Item editorItem;
 
-    signal modelParsed();
+    property TreeItemModel observedModel;
+
+    signal modelStateChanged();
     signal commandActivated(string commandId);
 
-    signal beginChanges();
-    signal endChanges();
-
     property bool isDirty: false;
+    property bool transaction: false;
 
-    onBeginChanges: {
-        if (!isDirty){
-            model.modelChanged.disconnect(modelUpdated);
-            isDirty = true;
-        }
-    }
-
-    onEndChanges: {
+    function beginChanges(){
+        console.log("UndoRedoManager beginChanges");
         if (isDirty){
-            modelUpdated();
-            model.modelChanged.connect(modelUpdated);
+            console.assert(isDirty == true,  "beginChanges():: beginChanges isDirty == true");
+
+            return;
+        }
+
+        isDirty = true;
+
+        transaction = true;
+    }
+
+    function endChanges(){
+        console.log("UndoRedoManager endChanges");
+        if (!isDirty){
+            console.assert(isDirty == false,  "endChanges():: beginChanges isDirty = false");
+
+            return;
+        }
+        else{
             isDirty = false;
+
+            modelUpdated();
+
+            transaction = false
         }
     }
 
-    onModelChanged: {
-        console.log("undoRedoManager onModelChanged");
+    function registerModel(model){
+        if (undoRedoManager.observedModel != model){
+            undoRedoManager.observedModel = model;
 
-        undoRedo.addModel(model);
+            undoRedo.addModel(observedModel);
 
-        model.modelChanged.connect(modelUpdated);
+            observedModel.modelChanged.connect(modelUpdated);
+        }
     }
 
     Timer {
@@ -47,7 +61,7 @@ Item {
         interval: 10;
 
         onTriggered: {
-            let newModel = JSON.stringify(model)
+            let newModel = JSON.stringify(observedModel)
 
             let startModel = undoRedo.undoStack[0];
             if (_.isEqual(newModel, startModel)){
@@ -56,7 +70,7 @@ Item {
         }
     }
 
-    onModelParsed: {
+    onModelStateChanged: {
         if (undoRedo.undoStack.length == 1){
             commandsDelegate.removeChanges();
         }
@@ -73,18 +87,20 @@ Item {
     onVisibleChanged: {
         console.log("undoRedoManager onVisibleChanged", visible);
         if (undoRedoManager.visible){
-            model.modelChanged.connect(modelUpdated);
+            observedModel.modelChanged.connect(modelUpdated);
             Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
         }
         else{
-            model.modelChanged.disconnect(modelUpdated);
+            observedModel.modelChanged.disconnect(modelUpdated);
             Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle)
         }
     }
 
     function modelUpdated(){
-        undoRedo.addModel(model);
-        timerCheckModel.start();
+        console.log("undoRedoManager modelUpdated", isDirty);
+        if (transaction &&!isDirty){
+            undoRedo.addModel(observedModel);
+        }
     }
 
     Shortcut {
@@ -128,6 +144,7 @@ Item {
     }
 
     function commandHandle(commandId){
+        console.log("undoRedoManager commandHandle", commandId);
         let result = null;
         if (commandId === "Undo"){
             result = undoRedo.undo();
@@ -140,19 +157,21 @@ Item {
 
         if (result !== null){
 
-            parseModel(result);
+            createModel(result);
+
+            modelStateChanged();
         }
     }
 
-    function parseModel(json){
-        model.modelChanged.disconnect(modelUpdated);
+    function createModel(json){
+        observedModel.modelChanged.disconnect(modelUpdated);
+        console.log("createModel", json);
+
         json = json.replace(/\\/g, '');
         json = json.slice(1, json.length - 1);
 
-        model.Parse(json);
+        observedModel.CreateFromJson(json);
 
-        modelParsed();
-
-        model.modelChanged.connect(modelUpdated);
+        observedModel.modelChanged.connect(modelUpdated);
     }
 }

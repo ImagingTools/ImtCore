@@ -62,18 +62,18 @@ Rectangle {
             }
 
             ListModel{
-                id: leftMenuModel
-
-                ListElement{
-                    Id: "Users";
-                    Name: qsTr("Users");
-                    Source: "UserCollectionView.qml";
-                }
+                id: leftMenuModel;
 
                 ListElement{
                     Id: "Roles";
                     Name: qsTr("Roles");
                     Source: "RoleCollectionView.qml";
+                }
+
+                ListElement{
+                    Id: "Users";
+                    Name: qsTr("Users");
+                    Source: "UserCollectionView.qml";
                 }
             }
 

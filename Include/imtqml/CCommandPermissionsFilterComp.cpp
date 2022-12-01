@@ -29,25 +29,25 @@ imtbase::CTreeItemModel* CCommandPermissionsFilterComp::GetTreeItemModel(
 	}
 	imtbase::CTreeItemModel* commandsModelPtr = m_commandsProviderCompPtr->GetTreeItemModel(params, fields, gqlContext);
 	imtbase::CTreeItemModel* filteredCommandsModelPtr =new imtbase::CTreeItemModel();
-	qDebug() << "commandsModelPtr: " << commandsModelPtr->toJSON();
+
 	if (gqlContext != nullptr && commandsModelPtr != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			const QByteArray userId = userInfoPtr->GetUserId();
-				if(m_commandPermissionsProviderCompPtr.IsValid()){
-					imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions();
-					for(int i = 0; i < commandsModelPtr->GetItemsCount(); i++){
-						const QByteArray commandId = commandsModelPtr->GetData("Id", i).toByteArray();
-						const QByteArrayList permissionIds = m_commandPermissionsProviderCompPtr->GetCommandPermissions(commandId);
-						if(m_checkPermissionCompPtr->CheckPermission(userPermissions, permissionIds)){
-							int index = filteredCommandsModelPtr->InsertNewItem();
-							commandsModelPtr->CopyItemDataToModel(i,filteredCommandsModelPtr, index);
-						}
+			if(m_commandPermissionsProviderCompPtr.IsValid()){
+				imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions();
+				for(int i = 0; i < commandsModelPtr->GetItemsCount(); i++){
+					const QByteArray commandId = commandsModelPtr->GetData("Id", i).toByteArray();
+					const QByteArrayList permissionIds = m_commandPermissionsProviderCompPtr->GetCommandPermissions(commandId);
+
+					if(userInfoPtr->IsAdmin() || m_checkPermissionCompPtr->CheckPermission(userPermissions, permissionIds)){
+						int index = filteredCommandsModelPtr->InsertNewItem();
+						commandsModelPtr->CopyItemDataToModel(i,filteredCommandsModelPtr, index);
 					}
 				}
+			}
 		}
 	}
-
 
 	return filteredCommandsModelPtr;
 }

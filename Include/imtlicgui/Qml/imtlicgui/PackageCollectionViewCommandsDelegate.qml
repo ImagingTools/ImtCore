@@ -10,6 +10,8 @@ CollectionViewCommandsDelegateBase {
     }
 
     onRemoved: {
-        Events.sendEvent("TreeViewModelUpdate");
+//        Events.sendEvent("TreeViewModelUpdate");
+
+        featuresProvider.updateModel();
     }
 }

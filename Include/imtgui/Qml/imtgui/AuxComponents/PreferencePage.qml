@@ -59,16 +59,21 @@ Rectangle {
 
     onVisibleChanged: {
         if (visible){
+
             if (settingsProvider.localModel){
                 let localModelJson = settingsProvider.localModel.toJSON();
-                localModel.Parse(localModelJson);
+                localModel.CreateFromJson(localModelJson);
 
                 updateCommonModel(localModel);
             }
 
+            console.log("settingsProvider.serverModel", settingsProvider.serverModel.toJSON());
+
             if (settingsProvider.serverModel){
+
+                console.log("YES");
                 let serverModelJson = settingsProvider.serverModel.toJSON();
-                serverModel.Parse(serverModelJson);
+                serverModel.CreateFromJson(serverModelJson);
 
                 updateCommonModel(serverModel);
             }
@@ -83,6 +88,7 @@ Rectangle {
     function clearModels(){
         serverModel.Clear();
         localModel.Clear();
+        commonModel.Clear();
 
         mainPanelRepeater.model = 0;
         bodyPanelRepeater.model = 0;
@@ -451,7 +457,7 @@ Rectangle {
 
                     if (serverPageIds.length > 0){
                         let serverModelJson = serverModel.toJSON();
-                        settingsProvider.serverModel.Parse(serverModelJson);
+                        settingsProvider.serverModel.CreateFromJson(serverModelJson);
 
                         settingsProvider.saveServerModel(serverPageIds);
                     }
@@ -460,7 +466,7 @@ Rectangle {
 
                     if (localPageIds.length > 0){
                         let localModelJson = localModel.toJSON();
-                        settingsProvider.localModel.Parse(localModelJson);
+                        settingsProvider.localModel.CreateFromJson(localModelJson);
 
                         settingsProvider.saveLocalModel(localPageIds);
                     }

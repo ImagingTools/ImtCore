@@ -6,13 +6,147 @@ import Acf 1.0
 Item {
     id: userRolesContainer;
 
-    property alias userRoles: rolesTable.elements;
+    property TreeItemModel documentModel: TreeItemModel {}
+    property UndoRedoManager undoRedoManager: null;
+
+    property bool blockUpdatingModel: false;
+
+    Component.onCompleted: {
+        rolesProvider.updateModel();
+    }
+
+    onDocumentModelChanged: {
+        console.log("UserRoles onDocumentModelChanged", documentModel);
+
+        updateGui();
+    }
 
     function updateGui(){
         console.log("UserRoles updateGui");
+        blockUpdatingModel = true;
 
-        let rolesModel = documentModel.GetData("Products");
-        rolesTable.elements = rolesModel;
+        let selectedRolesList = []
+        let selectedRoles = documentModel.GetData("Products");
+        if (!selectedRoles){
+            selectedRoles = documentModel.AddTreeModel("Products");
+        }
+
+        for (let i = 0; i < selectedRoles.GetItemsCount(); i++){
+            let productId = selectedRoles.GetData("Id", i);
+            let rolesModel = selectedRoles.GetData("Roles", i);
+            if (rolesModel){
+                for (let j = 0; j < rolesModel.GetItemsCount(); j++){
+                    let roleId = rolesModel.GetData("Id", j);
+
+                    let value = productId + ';' + roleId;
+
+                    selectedRolesList.push(value)
+                }
+            }
+        }
+
+        rolesTable.rowModel.clear();
+        rolesTable.height = 0;
+
+        for (let i = 0; i < rolesProvider.model.GetItemsCount(); i++){
+            let productId = rolesProvider.model.GetData("Id", i);
+
+            let row = {"Id": productId, "Name": productId, "Roles": []};
+            let rolesModel = rolesProvider.model.GetData("Roles", i);
+            if (rolesModel){
+                let roles = []
+                for (let j = 0; j < rolesModel.GetItemsCount(); j++){
+
+                    let roleId = rolesModel.GetData("Id", j);
+                    let roleName = rolesModel.GetData("Name", j);
+
+                    let value = productId + ';' + roleId;
+
+                    let roleRow = {"Id": roleId, "Name": roleName, "CheckState": Qt.Unchecked}
+
+                    if (selectedRolesList.includes(value)){
+                        roleRow["CheckState"] = Qt.Checked;
+                    }
+
+                    roles.push(roleRow)
+                }
+
+                row["Roles"] = roles;
+            }
+
+            rolesTable.addRow(row);
+        }
+
+        permissionsTable.rowModel.clear();
+        permissionsTable.height = permissionsTable.headerHeight;
+
+        //Permissions update...
+
+        blockUpdatingModel = false;
+    }
+
+    function updateModel(){
+        console.log("UserRoles updateModel");
+
+        undoRedoManager.beginChanges();
+
+        let selectedRoles = documentModel.AddTreeModel("Products");
+
+        for (let i = 0; i < rolesTable.rowCount; i++){
+            let rowObj = rolesTable.rowModel.get(i);
+
+            let productId = rowObj["Id"];
+
+            let roles = rowObj["Roles"];
+
+            console.log("roles", roles);
+
+            for (let j = 0; j < roles.count; j++){
+                let roleObj = roles.get(j);
+
+                console.log("roleObj", roleObj);
+
+                let roleId = roleObj["Id"];
+                let roleName = roleObj["Name"];
+                let state = roleObj["CheckState"];
+
+                if (state == Qt.Checked){
+                    let productIndex = -1;
+
+                    for (let k = 0; k < selectedRoles.GetItemsCount(); k++){
+                        let selectedProductId = selectedRoles.GetData("Id", k);
+                        if (selectedProductId == productId){
+                            productIndex = k;
+                            break;
+                        }
+                    }
+
+                    let rolesModel;
+                    if (productIndex < 0){
+                        productIndex = selectedRoles.InsertNewItem();
+
+                        selectedRoles.SetData("Id", productId, productIndex);
+                        selectedRoles.SetData("Name", productId, productIndex);
+
+                        rolesModel = selectedRoles.AddTreeModel("Roles", productIndex);
+                    }
+                    else{
+                        rolesModel = selectedRoles.GetData("Roles", productIndex)
+                    }
+
+                    let roleIndex = rolesModel.InsertNewItem();
+
+                    rolesModel.SetData("Id", roleId, roleIndex);
+                    rolesModel.SetData("Name", roleName, roleIndex);
+                }
+            }
+        }
+
+        undoRedoManager.endChanges();
+    }
+
+    RolesProvider {
+        id: rolesProvider;
     }
 
     Rectangle {
@@ -47,23 +181,30 @@ Item {
                 font.pixelSize: Style.fontSize_common;
             }
 
-            AuxTable {
+            BasicTableView {
                 id: rolesTable;
 
                 width: bodyColumn.width;
-                height: 300;
 
-                showHeaders: false;
+                headerVisible: false;
 
-                clip: true;
-
-                delegate: TableUserRolesDelegate {
-                    id: delegate;
-
-                    width: parent.width;
+                rowDelegate: TableUserRolesDelegate {
+                    Component.onCompleted: {
+                        rolesTable.height += height;
+                    }
                 }
 
-            }//AuxTable rolesTable
+                Component.onCompleted: {
+                    rolesTable.addColumn({"Id": "Name", "Name": "Name"})
+                }
+
+                onRowModelDataChanged: {
+                    console.error("onRowModelDataChanged", prop)
+                    if (!blockUpdatingModel){
+                        updateModel();
+                    }
+                }
+            }
 
             Text {
                 id: titlePermissions;
@@ -74,35 +215,22 @@ Item {
                 font.pixelSize: Style.fontSize_common;
             }
 
-            TreeItemModel {
-                id: headersModelPermissions;
-
-                Component.onCompleted: {
-                    let index = headersModelPermissions.InsertNewItem();
-                    headersModelPermissions.SetData("Id", "Name", index)
-                    headersModelPermissions.SetData("Name", "Name", index)
-                }
-            }
-
-            AuxTable {
+            BasicTableView {
                 id: permissionsTable;
 
                 width: bodyColumn.width;
-                height: 200;
+                height: permissionsTable.headerHeight;
 
-                headers: headersModelPermissions;
-
-                delegate: TableUserPermissionsDelegate {
-                    width: parent.width;
-                    height: 35;
-
-                    selected: permissionsTable.selectedIndex === model.index;
-
-                    onClicked: {
-                        permissionsTable.selectedIndex = model.index;
+                rowDelegate: TableViewItemDelegateBase {
+                    Component.onCompleted: {
+                        permissionsTable.height += height;
                     }
                 }
-            }//AuxTable permissionsTable
+
+                Component.onCompleted: {
+                    permissionsTable.addColumn({"Id": "Name", "Name": "Name"})
+                }
+            }
         }//Column bodyColumn
     }//Flickable
 }//Container

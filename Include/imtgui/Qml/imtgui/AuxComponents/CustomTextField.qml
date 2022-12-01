@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import Acf 1.0;
 
-Item {
+FocusScope {
     id: containerTextField;
 
     height: 40;
@@ -38,9 +38,21 @@ Item {
 
     property real placeHolderOpacity: 1;
 
-
     signal accepted();
+    signal cancelled();
     signal textEdited();
+    signal editingFinished();
+
+    Keys.onPressed: {
+        if (activeFocus){
+            console.log("CustomTextField onPressed")
+
+            if (event.key == Qt.Key_Escape) {
+                console.log("Key_Escape")
+                cancelled();
+            }
+        }
+    }
 
     function setFocus(value) {
         textField.focus = value
@@ -50,7 +62,10 @@ Item {
         console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus)
 
         if (focus){
-            textField.selectAll();
+            if (!readOnly){
+                textField.selectAll();
+            }
+
             textField.forceActiveFocus();
         }
     }
@@ -60,7 +75,8 @@ Item {
 
         anchors.fill: parent;
 
-        color: Style.baseColor;
+        color: readOnly ? Style.alternateBaseColor : Style.baseColor;
+
         radius: containerTextField.radius;
 
         border.color: textField.activeFocus ? containerTextField.borderColor : Style.hover;
@@ -71,7 +87,7 @@ Item {
         id: mouseArea;
 
         anchors.fill: textField;
-        cursorShape: Qt.IBeamCursor;
+        cursorShape: readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
     }
 
     TextInput {
@@ -93,6 +109,13 @@ Item {
         selectByMouse: true;
         clip: true;
 
+        onActiveFocusChanged: {
+            console.log("CustomTextField onActiveFocusChanged", activeFocus);
+            if (!activeFocus){
+                containerTextField.editingFinished();
+            }
+        }
+
         onAccepted: {
             console.log("CustomTextField onAccepted");
             containerTextField.accepted();
@@ -101,6 +124,10 @@ Item {
         onTextEdited: {
             containerTextField.textEdited();
             console.log("CustomTextField onTextEdited");
+        }
+
+        onEditingFinished: {
+            containerTextField.editingFinished();
         }
 
         Text {

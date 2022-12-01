@@ -17,7 +17,7 @@ Dialog {
 
     property int index: -1;
 
-    content: EditLicenseDialogBody {
+    contentComp: EditLicenseDialogBody {
     }
 
     Component.onCompleted: {

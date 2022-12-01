@@ -10,15 +10,25 @@ Item {
     property TreeItemModel model;
     property string productId;
 
-    property int selectedIndex: table.selectedIndex;
+    property alias tableView: table;
 
     onProductIdChanged: {
+        console.log("onProductIdChanged", productId, model.toJSON());
         for (let i = 0; i < model.GetItemsCount(); i++){
             let currentProductId = model.GetData("Id", i);
+            console.log("currentProductId", currentProductId);
             if (currentProductId == productId){
                 let roles = model.GetData("Roles", i);
 
-                table.elements = roles;
+                for (let j = 0; j < roles.GetItemsCount(); j++){
+                    let roleId = roles.GetData("Id", j);
+                    let roleName = roles.GetData("Name", j);
+
+                    console.log("roleId", roleId);
+
+                    table.addRow({"Id": roleId, "Name": roleName});
+                }
+
                 break;
             }
         }
@@ -37,23 +47,15 @@ Item {
 
         spacing: 5;
 
-        TreeItemModel {
-            id: headersModelRoles;
-
-            Component.onCompleted: {
-                let index = headersModelRoles.InsertNewItem();
-                headersModelRoles.SetData("Id", "Name", index)
-                headersModelRoles.SetData("Name", "Name", index)
-            }
-        }
-
-        AuxTable {
+        BasicTableView {
             id: table;
 
             width: bodyColumn.width;
             height: 150;
 
-            headers: headersModelRoles;
+            Component.onCompleted: {
+                table.addColumn({"Id": "Name", "Name": "Name"});
+            }
         }
     }//Column
 }

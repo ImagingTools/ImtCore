@@ -2,128 +2,112 @@ import QtQuick 2.0
 import imtgui 1.0
 import Acf 1.0
 
-Item {
+TableViewItemDelegateBase {
     id: productRolesDelegate;
 
-    height: body.height + rolesColumn.height;
+    height: root.rowItemHeight + footerItem.height;
 
-    property int index: model.index;
+    root: rolesTable;
 
-    property int selectedIndex: -1;
+    highlightDelegate: Rectangle {
+        id: highlight;
 
-    Component.onCompleted: {
-        console.log("productRolesDelegate onCompleted", model.Roles);
-        if (model.Roles){
-            rolesRepeater.model = model.Roles;
-        }
-    }
-
-    onSelectedIndexChanged: {
-        if (selectedIndex != index){
-            rolesRepeater.selectedIndex = -1;
-        }
-    }
-
-    Rectangle {
-        id: body;
-
-        width: productRolesDelegate.width;
-        height: 30;
+        width: parent.width;
 
         color: Style.alternateBaseColor;
 
         border.width: 1;
         border.color: Style.imagingToolsGradient2;
+    }
 
-        Text {
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: parent.left;
-            anchors.leftMargin: 10;
+    rowBodyDelegate: Row {
+        height: root.rowItemHeight;
+        width: parent.width;
 
-            text: model.Name;
+        Item {
+            height: root.rowItemHeight;
+            width: parent.width;
 
-            font.pixelSize: Style.fontSize_common;
-            font.family: Style.fontFamilyBold;
-            font.bold: true;
+            Text {
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+                anchors.leftMargin: 10;
 
-            color: Style.textColor;
-            wrapMode: Text.WordWrap;
-            elide: Text.ElideRight;
+                text: model.Name;
+
+                font.pixelSize: Style.fontSize_common;
+                font.family: Style.fontFamilyBold;
+                font.bold: true;
+
+                color: Style.textColor;
+                wrapMode: Text.WordWrap;
+                elide: Text.ElideRight;
+            }
         }
     }
 
-    Rectangle {
-        id: rolesBg;
+    footerDelegate: Column {
+        id: rolesColumn;
 
-        anchors.top: body.bottom;
+        width: parent.width;
 
-        color: "transparent";
+        property var rolesModel: model.Roles ? model.Roles : null;
 
-        width: productRolesDelegate.width;
-        height: rolesColumn.height;
+        onRolesModelChanged: {
+            console.log("onRolesModelChanged", rolesModel)
+            if (rolesModel != null){
+                rolesRepeater.model = rolesModel;
+            }
+        }
 
-        border.color: Style.imagingToolsGradient2;
-        border.width: 1;
+//        Rectangle {
+//            anchors.fill: rolesRepeater;
 
-        Column {
-            id: rolesColumn;
+//            border.width: 1;
+//            border.color: Style.imagingToolsGradient2;
+//        }
 
-            anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.verticalCenter: parent.verticalCenter;
+        Repeater {
+            id: rolesRepeater;
 
-            width: rolesBg.width - 2;
+            delegate: Rectangle {
+                width: productRolesDelegate.width;
+                height: root.rowItemHeight;
 
-            Repeater {
-                id: rolesRepeater;
+                border.width: 1;
+                border.color: "transparent";
 
-                property int selectedIndex: -1;
+                CheckBox {
+                    id: checkBoxRole;
 
-                onSelectedIndexChanged: {
-                    if (productRolesDelegate.selectedIndex == index){
-                        baseCollectionView.selectedIndexChanged(selectedIndex);
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 10;
+
+                    checkState: model.CheckState;
+
+                    onClicked: {
+                        console.log("checkBoxRole onClicked", model.CheckState)
+                        model.CheckState = Qt.Checked - model.CheckState;
+
+                        root.rowModelDataChanged(productRolesDelegate, "CheckState");
                     }
                 }
 
-                delegate: Rectangle {
-                    width: productRolesDelegate.width;
-                    height: body.height;
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.left: checkBoxRole.right;
+                    anchors.leftMargin: 10;
 
-                    color: rolesRepeater.selectedIndex == model.index ? Style.selectedColor : "transparent";
+                    text: model.Name;
 
-                    CheckBox {
-                        id: checkBoxRole;
-
-                        anchors.verticalCenter: parent.verticalCenter;
-                        anchors.left: parent.left;
-                        anchors.leftMargin: 10;
-
-                        checkState: model.State;
-
-                        MouseArea {
-                            anchors.fill: parent;
-
-                            onClicked: {
-                                model.State = 2 - checkBoxRole.checkState;
-                            }
-                        }
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter;
-                        anchors.left: checkBoxRole.right;
-                        anchors.leftMargin: 10;
-
-                        text: model.Name;
-
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-                        color: Style.textColor;
-                        wrapMode: Text.WordWrap;
-                        elide: Text.ElideRight;
-                    }
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_common;
+                    color: Style.textColor;
+                    wrapMode: Text.WordWrap;
+                    elide: Text.ElideRight;
                 }
             }
-        }//Column
-    }
+        }
+    }//Column
 }
-

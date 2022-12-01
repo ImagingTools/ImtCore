@@ -31,6 +31,8 @@ Item {
 
     property bool completed: false;
 
+    property bool startWithCurrentDay: true;
+
     //icons
     property int iconWidth: 12;
     property int iconHeight: 10;
@@ -60,10 +62,14 @@ Item {
     signal dateChanged();
 
     Component.onCompleted: {
-        let currentDate = new Date();
-        yearField.text = currentDate.getFullYear();
-        selectedIndexMonth = currentDate.getMonth();
-        dayField.text = currentDate.getDate();
+        console.log("onCompleted");
+
+        if (startWithCurrentDay){
+            let currentDate = new Date();
+            yearField.text = currentDate.getFullYear();
+            selectedIndexMonth = currentDate.getMonth();
+            dayField.text = currentDate.getDate();
+        }
 
         completed = true;
     }
@@ -99,6 +105,11 @@ Item {
         }
 
         return selectedYear + "-" + monthStr + "-" + dayStr;
+    }
+
+    function setCurrentDay(){
+        let date = new Date();
+        setDate(date.getFullYear(), date.getMonth(), date.getDate());
     }
 
     function checkDate(year, month, day){
@@ -413,8 +424,7 @@ Item {
                 cursorShape: Qt.PointingHandCursor;
 
                 onClicked: {
-                    let date = new Date();
-                    setDate(date.getFullYear(), date.getMonth(), date.getDate());
+                    setCurrentDay();
                 }
             }
         }

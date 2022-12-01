@@ -38,7 +38,7 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetTreeItemModel(
 				if (userSettingsPtr != nullptr){
 					dataModelPtr = new imtbase::CTreeItemModel();
 					QByteArray settingsData = userSettingsPtr->GetSettings();
-					dataModelPtr->Parse(settingsData);
+					dataModelPtr->CreateFromJson(settingsData);
 				}
 			}
 			else if (m_settingsDataProviderCompPtr.IsValid()){

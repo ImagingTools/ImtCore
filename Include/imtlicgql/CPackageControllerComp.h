@@ -25,8 +25,8 @@ protected:
 	virtual imtbase::CTreeItemModel* GetDependencies(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const override;
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const override;
 
-	void InsertSubFeaturesToDataFromModel(imtlic::CFeaturePackage* packagePtr, imtlic::IFeatureInfo* parentFeaturePtr, const imtbase::CTreeItemModel* subFeaturesModel) const;
-	void InsertSubFeaturesToModelFromData(const imtlic::CFeaturePackage* packagePtr, const imtlic::IFeatureInfo* parentFeaturePtr, imtbase::CTreeItemModel* subFeaturesModel) const;
+	bool InsertSubFeaturesToDataFromModel(imtlic::CFeaturePackage* packagePtr, imtlic::IFeatureInfo* parentFeaturePtr, const imtbase::CTreeItemModel* dependenciesModel, const imtbase::CTreeItemModel* subFeaturesModel, QString& errorMessage) const;
+	void InsertSubFeaturesToModelFromData(const imtlic::CFeaturePackage* packagePtr, const imtlic::IFeatureInfo* parentFeaturePtr, imtbase::CTreeItemModel* dependenciesModel, imtbase::CTreeItemModel* subFeaturesModel) const;
 };
 
 

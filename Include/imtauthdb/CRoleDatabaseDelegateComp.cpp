@@ -126,12 +126,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 		roleName = objectName;
 	}
 
+	QString roleDescription = rolePtr->GetRoleDescription();
+
 	NewObjectQuery retVal;
 	retVal.query = QString("INSERT INTO \"Roles\"(RoleId, ProductId, Name, Description) VALUES('%1', '%2', '%3', '%4');")
 			.arg(qPrintable(roleId))
 			.arg(qPrintable(productId))
 			.arg(roleName)
-			.arg(objectDescription)
+			.arg(roleDescription)
 			.toLocal8Bit();
 	retVal.objectName = roleName;
 
@@ -236,7 +238,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QString newRoleName = newRolePtr->GetRoleName();
 
-	QString description = m_roleCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+	QString description = newRolePtr->GetRoleDescription();
 
 	QByteArray retVal = QString("UPDATE \"Roles\" SET RoleId ='%1', ProductId ='%2', Name = '%3', Description = '%4' WHERE RoleId ='%5' AND ProductId = '%6';")
 			.arg(qPrintable(newRoleId))
@@ -501,12 +503,12 @@ idoc::MetaInfoPtr CRoleDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArr
 
 bool CRoleDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
+//	if (record.contains("Description")){
+//		QString description = record.value("Description").toString();
 
-	if (record.contains("Description")){
-		QString description = record.value("Description").toString();
+//		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::ElementInfoType::EIT_DESCRIPTION, description);
+//	}
 
-		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::ElementInfoType::EIT_DESCRIPTION, description);
-	}
 	return true;
 }
 

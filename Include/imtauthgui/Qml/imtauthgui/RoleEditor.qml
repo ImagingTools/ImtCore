@@ -6,7 +6,10 @@ import Acf 1.0
 Item {
     id: roleEditorContainer;
 
-    anchors.fill: parent;
+    property TreeItemModel documentModel: TreeItemModel {}
+    property UndoRedoManager undoRedoManager: null;
+
+    property bool blockUpdatingModel: false;
 
     signal commandModeChanged(string commandId, string newMode);
 
@@ -16,7 +19,7 @@ Item {
         commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
         commandsProvider.commandModeChanged.connect(commandModeChanged);
 
-        roleIdInput.focus = true;
+        roleNameInput.focus = true;
     }
 
     Component.onDestruction: {
@@ -32,6 +35,10 @@ Item {
                 commandsModel.SetData("Mode", newMode, i);
             }
         }
+    }
+
+    onDocumentModelChanged: {
+        updateGui();
     }
 
     function onCommandsModelLoaded(){
@@ -69,20 +76,64 @@ Item {
     }
 
     function updateGui(){
-        console.log("RoleEditor updateGui");
-        roleIdInput.text = documentModel.GetData("Id");
-        roleNameInput.text = documentModel.GetData("Name");
-        descriptionInput.text = documentModel.GetData("Description");
+        console.log("RoleEditor updateGui", documentModel.toJSON());
 
-        productId = documentModel.GetData("ProductId")
+        blockUpdatingModel = true;
 
-        let parents = documentModel.GetData("Parents");
-
-        if (!parents){
-            documentModel.AddTreeModel("Parents");
+        if (documentModel.ContainsKey("Id")){
+            roleIdInput.text = documentModel.GetData("Id");
         }
 
-        includesTable.elements = documentModel.GetData("Parents");
+        if (documentModel.ContainsKey("Name")){
+            roleNameInput.text = documentModel.GetData("Name");
+        }
+
+        if (documentModel.ContainsKey("Description")){
+            descriptionInput.text = documentModel.GetData("Description");
+        }
+
+        let parents = documentModel.GetData("Parents");
+        if (!parents){
+            parents = documentModel.AddTreeModel("Parents");
+        }
+
+        includesTable.rowModel.clear();
+        includesTable.height = includesTable.headerHeight + includesTable.rowItemHeight;
+
+        for (let i = 0; i < parents.GetItemsCount(); i++){
+            let parentId = parents.GetData("Id", i);
+            let parentName = parents.GetData("Name", i);
+
+            let row = {"Id": parentId, "Name": parentName}
+
+            includesTable.addRow(row);
+        }
+
+        blockUpdatingModel = false;
+    }
+
+    function updateModel(){
+        console.log("RoleEditor updateModel");
+        undoRedoManager.beginChanges();
+
+        documentModel.SetData("Id", roleIdInput.text);
+        documentModel.SetData("Name", roleNameInput.text);
+        documentModel.SetData("Description", descriptionInput.text);
+
+        let parents = documentModel.AddTreeModel("Parents");
+
+        let rowModel = includesTable.rowModel;
+
+        for (let i = 0; i < includesTable.rowModel.count; i++){
+            let rowObj = includesTable.rowModel.get(i);
+
+            let index = parents.InsertNewItem();
+
+            parents.SetData("Id", rowObj["Id"], index);
+            parents.SetData("Name", rowObj["Name"], index);
+        }
+
+        undoRedoManager.endChanges();
     }
 
     Flickable {
@@ -99,33 +150,10 @@ Item {
         Column {
             id: bodyColumn;
 
+            height: roleEditorContainer.height;
             width: 400;
 
             spacing: 7;
-
-            Text {
-                id: titleRoleId;
-
-                text: qsTr("Role-ID");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
-
-            CustomTextField {
-                id: roleIdInput;
-
-                width: parent.width;
-                height: 30;
-
-                placeHolderText: qsTr("Enter the Role-ID");
-
-                onTextChanged: {
-                    documentModel.SetData("Id", roleIdInput.text);
-                }
-
-                KeyNavigation.tab: roleNameInput;
-            }
 
             Text {
                 id: titleRoleName;
@@ -144,9 +172,33 @@ Item {
 
                 placeHolderText: qsTr("Enter the Role name");
 
-                onTextChanged: {
-                    documentModel.SetData("Name", roleNameInput.text);
+                onEditingFinished: {
+                    console.log("roleNameInput onEditingFinished");
+                    let oldText = documentModel.GetData("Name");
+                    if (oldText != roleNameInput.text){
+                        roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
+                        updateModel();
+                    }
                 }
+
+                KeyNavigation.tab: roleIdInput;
+            }
+
+            Text {
+                id: titleRoleId;
+
+                text: qsTr("Role-ID");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
+
+            CustomTextField {
+                id: roleIdInput;
+
+                width: parent.width;
+                height: 30;
+                readOnly: true;
 
                 KeyNavigation.tab: descriptionInput;
             }
@@ -168,11 +220,14 @@ Item {
 
                 placeHolderText: qsTr("Enter the description");
 
-                onTextChanged: {
-                    documentModel.SetData("Description", descriptionInput.text);
+                onEditingFinished: {
+                    let oldText = documentModel.GetData("Description");
+                    if (oldText != descriptionInput.text){
+                        updateModel();
+                    }
                 }
 
-                KeyNavigation.tab: roleIdInput;
+                KeyNavigation.tab: roleNameInput;
             }
 
             Text {
@@ -185,19 +240,11 @@ Item {
             }
 
             Item {
-                id: rowCommands;
-
-                height: 250;
-                width: bodyColumn.width;
-
-                clip: true;
-
-                MouseArea {
-                    anchors.fill: parent;
-                }
+                width: parent.width;
+                height: 325;
 
                 Rectangle {
-                    id: topRect;
+                    id: commands;
 
                     width: parent.width;
                     height: 25;
@@ -233,26 +280,48 @@ Item {
                     }
                 }
 
-                TreeItemModel {
-                    id: headersModelRoles;
-
-                    Component.onCompleted: {
-                        let index = headersModelRoles.InsertNewItem();
-                        headersModelRoles.SetData("Id", "Name", index)
-                        headersModelRoles.SetData("Name", "Name", index)
-                    }
-                }
-
-                AuxTable {
+                BasicTableView {
                     id: includesTable;
 
-                    anchors.top: topRect.bottom;
+                    anchors.top: commands.bottom;
 
                     width: parent.width;
-                    height: 200;
+                    height: headerHeight + rowItemHeight;
 
-                    headers: headersModelRoles;
-                }//AuxTable includesTable
+                    rowDelegate: TableViewItemDelegateBase {
+                        root: includesTable;
+
+                        Component.onCompleted: {
+                            let newHeight = includesTable.rowCount * includesTable.rowItemHeight + includesTable.headerHeight;
+                            if (newHeight > includesTable.height){
+                                includesTable.height = newHeight;
+                            }
+                        }
+
+                        Component.onDestruction: {
+                            let newHeight = includesTable.height - height;
+                            if (newHeight >= includesTable.headerHeight + includesTable.rowItemHeight){
+                                includesTable.height = newHeight;
+                            }
+                        }
+                    }
+
+                    Component.onCompleted: {
+                        includesTable.addColumn({"Id": "Name", "Name": "Name"})
+                    }
+
+                    onRowAdded: {
+                        if (!blockUpdatingModel){
+                            updateModel();
+                        }
+                    }
+
+                    onRowRemoved: {
+                        if (!blockUpdatingModel){
+                            updateModel();
+                        }
+                    }
+                }
             }
         }//Column bodyColumn
     }//Flickable

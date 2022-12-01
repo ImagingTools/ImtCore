@@ -6,16 +6,60 @@ import Acf 1.0
 Item {
     id: userEditorContainer;
 
+    property TreeItemModel documentModel: TreeItemModel {}
+    property UndoRedoManager undoRedoManager: null;
+
+    property bool blockUpdatingModel: false;
+
     Component.onCompleted: {
-        usernameInput.focus = true;
+//        usernameInput.focus = true;
+    }
+
+    onDocumentModelChanged: {
+        console.log("UserEditor onDocumentModelChanged", documentModel);
+
+        updateGui();
+    }
+
+    onUndoRedoManagerChanged: {
+        console.log("UserEditor onUndoRedoManagerChanged", undoRedoManager);
     }
 
     function updateGui(){
         console.log("UserEditor updateGui");
-        usernameInput.text = documentModel.GetData("Username");
-        nameInput.text = documentModel.GetData("Name");
-        mailInput.text = documentModel.GetData("Email");
-        passwordInput.text = documentModel.GetData("Password");
+
+        blockUpdatingModel = true;
+
+        if (documentModel.ContainsKey("Username")){
+            usernameInput.text = documentModel.GetData("Username");
+        }
+
+        if (documentModel.ContainsKey("Name")){
+            nameInput.text = documentModel.GetData("Name");
+        }
+
+        if (documentModel.ContainsKey("Email")){
+            mailInput.text = documentModel.GetData("Email");
+        }
+
+        if (documentModel.ContainsKey("Password")){
+            passwordInput.text = documentModel.GetData("Password");
+        }
+
+        blockUpdatingModel = false;
+    }
+
+    function updateModel(){
+        console.log("UserEditor updateModel");
+
+        undoRedoManager.beginChanges();
+
+        documentModel.SetData("Username", usernameInput.text);
+        documentModel.SetData("Name", nameInput.text);
+        documentModel.SetData("Email", mailInput.text);
+        documentModel.SetData("Password", passwordInput.text);
+
+        undoRedoManager.endChanges();
     }
 
     Rectangle {
@@ -55,10 +99,14 @@ Item {
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the Username");
+                placeHolderText: qsTr("Enter the username");
 
-                onTextChanged: {
-                    documentModel.SetData("Username", usernameInput.text);
+                onEditingFinished: {
+                    console.log("onEditingFinished Username");
+                    let oldText = documentModel.GetData("Username");
+                    if (oldText != usernameInput.text){
+                        updateModel();
+                    }
                 }
 
                 KeyNavigation.tab: passwordInput;
@@ -83,8 +131,11 @@ Item {
 
                 echoMode: TextInput.Password;
 
-                onTextChanged: {
-                    documentModel.SetData("Password", passwordInput.text);
+                onEditingFinished: {
+                    let oldText = documentModel.GetData("Password");
+                    if (oldText != passwordInput.text){
+                        updateModel();
+                    }
                 }
 
                 KeyNavigation.tab: nameInput;
@@ -105,10 +156,13 @@ Item {
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the Name");
+                placeHolderText: qsTr("Enter the name");
 
-                onTextChanged: {
-                    documentModel.SetData("Name", nameInput.text);
+                onEditingFinished: {
+                    let oldText = documentModel.GetData("Name");
+                    if (oldText != nameInput.text){
+                        updateModel();
+                    }
                 }
 
                 KeyNavigation.tab: mailInput;
@@ -129,15 +183,17 @@ Item {
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the Email");
+                placeHolderText: qsTr("Enter the email");
 
-                onTextChanged: {
-                    documentModel.SetData("Email", mailInput.text);
+                onEditingFinished: {
+                    let oldText = documentModel.GetData("Email");
+                    if (oldText != mailInput.text){
+                        updateModel();
+                    }
                 }
 
                 KeyNavigation.tab: usernameInput;
             }
-
         }//Column bodyColumn
     }//Flickable
 }//Container

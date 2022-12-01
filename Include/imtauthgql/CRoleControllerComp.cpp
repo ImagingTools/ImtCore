@@ -23,7 +23,7 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 	}
 
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* permissionsModel = dataModel->AddTreeModel("Permissions");
+	imtbase::CTreeItemModel* permissionsModelPtr = dataModel->AddTreeModel("Permissions");
 	imtbase::CTreeItemModel* parentsModel = dataModel->AddTreeModel("Parents");
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
@@ -40,35 +40,33 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 	dataModel->SetData("Name", "");
 	dataModel->SetData("Description", "");
 
-	if (m_productProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* productsModel = m_productProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
-		if (productsModel != nullptr){
-			for (int i = 0; i < productsModel->GetItemsCount(); i++){
-				QByteArray currentProductId = productsModel->GetData("Id", i).toByteArray();
-				if (currentProductId == productId){
-					imtbase::CTreeItemModel* productPermissionsModel = productsModel->GetTreeItemModel("Permissions", i);
-					if (productPermissionsModel != nullptr){
-						for (int j = 0; j < productPermissionsModel->GetItemsCount(); j++){
-							QByteArray featureId = productPermissionsModel->GetData("Id", j).toByteArray();
-							QString featureName = productPermissionsModel->GetData("Name", j).toString();
+//	if (m_productProviderCompPtr.IsValid()){
+//		imtbase::CTreeItemModel* productsModel = m_productProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
+//		if (productsModel != nullptr){
+//			for (int i = 0; i < productsModel->GetItemsCount(); i++){
+//				QByteArray currentProductId = productsModel->GetData("Id", i).toByteArray();
+//				if (currentProductId == productId){
+//					imtbase::CTreeItemModel* productPermissionsModel = productsModel->GetTreeItemModel("Permissions", i);
+//					if (productPermissionsModel != nullptr){
+//						for (int j = 0; j < productPermissionsModel->GetItemsCount(); j++){
+//							QByteArray featureId = productPermissionsModel->GetData("Id", j).toByteArray();
+//							QString featureName = productPermissionsModel->GetData("Name", j).toString();
 
-							int index = permissionsModel->InsertNewItem();
+//							int index = permissionsModelPtr->InsertNewItem();
 
-							permissionsModel->SetData("Id", featureId, index);
-							permissionsModel->SetData("Name", featureName, index);
-							permissionsModel->SetData("State", Qt::CheckState::Unchecked, index);
-						}
-					}
-				}
-			}
-		}
-	}
+//							permissionsModelPtr->SetData("Id", featureId, index);
+//							permissionsModelPtr->SetData("Name", featureName, index);
+//							permissionsModelPtr->SetData("State", Qt::CheckState::Unchecked, index);
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
 			return nullptr;
@@ -83,7 +81,6 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		dataModel->SetData("Description", description);
 
 		const QByteArrayList parentsRolesIds  = roleInfoPtr->GetIncludedRoles();
-
 		for (const QByteArray& parentRoleId : parentsRolesIds){
 			QByteArray objectRoleParentId = parentRoleId + *m_separatorObjectIdAttrPtr + productId;
 			imtbase::IObjectCollection::DataPtr parentRoleDataPtr;
@@ -100,15 +97,9 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		}
 
 		imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
-
 		for (const QByteArray& permissionId : permissions){
-			for (int i = 0; i < permissionsModel->GetItemsCount(); i++){
-				QByteArray id = permissionsModel->GetData("Id", i).toByteArray();
-
-				if (permissionId == id){
-					permissionsModel->SetData("State", Qt::CheckState::Checked, i);
-				}
-			}
+			int index = permissionsModelPtr->InsertNewItem();
+			permissionsModelPtr->SetData("Id", permissionId, index);
 		}
 	}
 
@@ -140,7 +131,7 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 		}
 
 		imtbase::CTreeItemModel itemModel;
-		itemModel.Parse(itemData);
+		itemModel.CreateFromJson(itemData);
 
 		QByteArray roleId;
 		if (itemModel.ContainsKey("Id")){
@@ -157,6 +148,11 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
 			roleInfoPtr->SetRoleName(name);
+		}
+
+		if (itemModel.ContainsKey("Description")){
+			description = itemModel.GetData("Description").toString();
+			roleInfoPtr->SetRoleDescription(description);
 		}
 
 		QByteArray productId;
@@ -190,26 +186,23 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 		}
 
 		if (itemModel.ContainsKey("Permissions")){
-			imtbase::CTreeItemModel* permissionsModel = itemModel.GetTreeItemModel("Permissions");
+			imtbase::CTreeItemModel* permissionsModelPtr = itemModel.GetTreeItemModel("Permissions");
+			if (permissionsModelPtr != nullptr){
+				imtauth::IRole::FeatureIds permissions;
 
-			imtauth::IRole::FeatureIds permissions;
-			imtauth::IRole::FeatureIds prohibitions;
+				for(int index = 0; index < permissionsModelPtr->GetItemsCount(); index++){
+					QByteArray featureId;
+					if (permissionsModelPtr->ContainsKey("Id", index)){
+						featureId = permissionsModelPtr->GetData("Id", index).toByteArray();
+					}
 
-			for(int index = 0; index < permissionsModel->GetItemsCount(); index++){
-				QByteArray featureId = permissionsModel->GetData("Id", index).toByteArray();
-
-				int state = permissionsModel->GetData("State", index).toInt();
-
-				if (state == Qt::Checked){
-					permissions << featureId;
+					if (!featureId.isEmpty()){
+						permissions << featureId;
+					}
 				}
-//				else if (state == Qt::Unchecked){
-//					prohibitions << featureId;
-//				}
-			}
 
-			roleInfoPtr->SetLocalPermissions(permissions);
-			roleInfoPtr->SetProhibitions(prohibitions);
+				roleInfoPtr->SetLocalPermissions(permissions);
+			}
 		}
 
 		return roleInfoPtr.PopPtr();

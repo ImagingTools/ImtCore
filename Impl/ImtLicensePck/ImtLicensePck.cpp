@@ -94,6 +94,11 @@ I_EXPORT_COMPONENT(
 			"Collection product info provider",
 			"Collection Product Info Provider");
 
+I_EXPORT_COMPONENT(
+			FeatureInfoProvider,
+			"Feature info provider",
+			"Feature Info Provider");
+
 
 } // namespace ImtLicensePck
 

@@ -6,7 +6,9 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: delegateContainer;
 
-    property int selectedIndex: includedRolesTable.selectedIndex;
+    property var selectedIndex: includedRolesTable.selectedIndex;
+
+    property TreeItemModel rolesModel: TreeItemModel {};
 
     Component.onCompleted: {
         console.log("RoleViewDelegate onCompleted");
@@ -19,7 +21,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
     onSelectedIndexChanged: {
         console.log("RoleViewDelegate onSelectedIndexChanged", selectedIndex);
-        let mode = delegateContainer.selectedIndex > -1 ? "Normal" : "Disabled";
+        let mode = delegateContainer.selectedIndex != null ? "Normal" : "Disabled";
 
         commandsProvider.changeCommandMode("Exclude", mode);
     }
@@ -31,16 +33,14 @@ DocumentWorkspaceCommandsDelegateBase {
             let productId = documentModel.GetData("ProductId");
 
             modalDialogManager.openDialog(rolesDialog, {"productId": productId,
-                                                        "model":     rolesModel});
+                                              "model":     rolesModel});
         }
         else if (commandId === "Exclude"){
-            let includesRoles = documentModel.GetData("Parents");
-            includesRoles.RemoveItem(selectedIndex);
+            let indexes = includedRolesTable.selectedIndex.getIndexes();
 
-            let countRoles = includesRoles.GetItemsCount();
-            if (selectedIndex >= countRoles){
-                includedRolesTable.selectedIndex = -1;
-            }
+            includedRolesTable.removeRow(indexes);
+
+            includedRolesTable.selectedIndex = null;
         }
     }
 
@@ -50,39 +50,24 @@ DocumentWorkspaceCommandsDelegateBase {
         RolesDialog {
             onFinished: {
                 if (buttonId == "Include"){
-                    let roleId = documentModel.GetData("Id");
-                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        let currentProductId = rolesModel.GetData("Id", i);
 
-                        if (currentProductId == productId){
-                            let roles = rolesModel.GetData("Roles", i);
+                    let parentId = selectedIndex.itemData.Id;
+                    let parentName = selectedIndex.itemData.Name;
 
-                            let selectedRoleId = roles.GetData("Id", selectedIndex);
-                            let selectedRoleName = roles.GetData("Name", selectedIndex);
+                    let row = {"Id": parentId, "Name": parentName};
 
-                            if (selectedRoleId == roleId){
-                                continue;
-                            }
+                    for (let i = 0; i < includedRolesTable.rowCount; i++){
+                        let rowObj = includedRolesTable.rowModel.get(i);
+                        let rowId = rowObj["Id"];
 
-                            let includesRoles = documentModel.GetData("Parents");
-                            let roleFind = false;
-                            for (let j = 0; j < includesRoles.GetItemsCount(); j++){
-                                let roleId = includesRoles.GetData("Id", j);
+                        if (parentId == rowId){
+                            console.error("ERROR::The role cannot be included:", parentId);
 
-                                if (roleId == selectedRoleId){
-                                    roleFind = true;
-                                    break;
-                                }
-                            }
-
-                            if (!roleFind){
-                                let index = includesRoles.InsertNewItem();
-
-                                includesRoles.SetData("Id", selectedRoleId, index);
-                                includesRoles.SetData("Name", selectedRoleName, index);
-                            }
+                            return;
                         }
                     }
+
+                    includedRolesTable.addRow(row);
                 }
             }
         }

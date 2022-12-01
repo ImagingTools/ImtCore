@@ -25,10 +25,14 @@ Rectangle {
     }
 
     function clearModels(){
+        console.log("ThumbnailDecorator clearModels()");
+
         menuPanel.clearModels();
         pagesManager.clearModels();
 
         preferenceDialog.clearModels();
+        settingsProvider.clearModel();
+
         Events.sendEvent("CommandsDecoratorClear");
     }
 
@@ -108,10 +112,6 @@ Rectangle {
         anchors.topMargin: 60;
 
         visible: false;
-
-        Component.onCompleted: {
-            console.log('DEBUG::authorizationPage', this)
-        }
     }
 
     PermissionsProvider

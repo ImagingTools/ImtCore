@@ -57,6 +57,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 
 		QByteArray roleId = roleInfoPtr->GetRoleId();
 		QString roleName = roleInfoPtr->GetRoleName();
+		QByteArray roleProductId = roleInfoPtr->GetProductId();
 
 		int index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", "Included Roles", index);
@@ -64,11 +65,21 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
-		for (const QByteArray& parentRoleId : parentRolesIds){
-			int childrenIndex = children->InsertNewItem();
+//		for (const QByteArray& parentRoleId : parentRolesIds){
+//			QByteArray objectId = parentRoleId + *m_separatorObjectIdAttrPtr + roleProductId;
 
-			children->SetData("Value", parentRoleId, childrenIndex);
-		}
+//			imtbase::IObjectCollection::DataPtr parentDataPtr;
+//			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+//				const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
+//				if (parentRoleInfoPtr != nullptr){
+//					QString parentRoleName = parentRoleInfoPtr->GetRoleName();
+
+//					int childrenIndex = children->InsertNewItem();
+
+//					children->SetData("Value", parentRoleName, childrenIndex);
+//				}
+//			}
+//		}
 
 		index = metaInfoModel->InsertNewItem();
 		metaInfoModel->SetData("Name", "Permissions", index);

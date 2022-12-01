@@ -8,16 +8,18 @@ DocumentWorkspaceCommandsDelegateBase {
 
     showInputIdDialog: true;
 
-    property int accountCurrentIndex: customerCB.currentIndex;
-    property int productCurrentIndex: productCB.currentIndex;
+//    autoUpdate: false;
 
     property bool instanceIdAcceptable: helperInput.acceptableInput;
 
     Component.onCompleted: {
-        updateItemTimer = 200;
-        itemsModel.updateModel("AccountsList");
+        updateItemTimer = 400;
 
-        timer.start();
+        itemsModel.updateModel("AccountsList");
+        itemsModel.updateModel("ProductsList");
+
+
+//        timer.start();
     }
 
     onEntered: {
@@ -35,30 +37,11 @@ DocumentWorkspaceCommandsDelegateBase {
     Timer {
         id: timer;
 
-        interval: 100;
+        interval: 200;
 
         onTriggered: {
             itemsModel.updateModel("ProductsList");
         }
-    }
-
-    onProductCurrentIndexChanged: {
-        console.log("InstallationCommands onProductCurrentIndexChanged", productCurrentIndex);
-
-        if (!productCB.model){
-            return;
-        }
-
-        let productId = productCB.model.GetData("Id", productCurrentIndex);
-        if (documentModel.GetData("ActiveLicenses").ContainsKey("ProductId")){
-            let currentProductId = documentModel.GetData("ActiveLicenses").GetData("ProductId");
-
-            if (currentProductId == productId){
-                return;
-            }
-        }
-
-        licensesModel.updateModel(productId);
     }
 
     Component {
@@ -117,6 +100,8 @@ DocumentWorkspaceCommandsDelegateBase {
         onStateChanged: {
             console.log("State:", this.state, itemsModel);
             if (this.state === "Ready"){
+
+                console.log("itemsModel Ready");
                 let dataModelLocal;
 
                 if (itemsModel.ContainsKey("errors")){
@@ -126,80 +111,33 @@ DocumentWorkspaceCommandsDelegateBase {
 
                 if (itemsModel.ContainsKey("data")){
                     dataModelLocal = itemsModel.GetData("data");
-                    console.log("itemsModel", itemsModel);
+
                     if (dataModelLocal.ContainsKey("AccountsList")){
                         dataModelLocal = dataModelLocal.GetData("AccountsList");
                         dataModelLocal = dataModelLocal.GetData("items");
 
-                        customerCB.model = dataModelLocal;
+//                        customerCB.model = dataModelLocal;
+
+                        installationEditorContainer.accountsModel = dataModelLocal;
+
+//                        itemsModel.updateModel("ProductsList");
 
                         console.log("customerCB.model", customerCB.model);
                     }
                     else if (dataModelLocal.ContainsKey("ProductsList")){
+
+                        console.log("ProductsList");
                         dataModelLocal = dataModelLocal.GetData("ProductsList");
 
                         dataModelLocal = dataModelLocal.GetData("items");
+                        console.log("items");
 
-                        productCB.model = dataModelLocal;
+                        installationEditorContainer.productsModel = dataModelLocal;
 
-                        console.log("productCB.model", productCB.model);
-
+//                        container.updateModel();
                     }
                 }
             }
         }
     }//GqlModel itemsModel
-
-    GqlModel {
-        id: licensesModel;
-
-        function updateModel(productId) {
-            console.log( "InstallationEditor licensesModel", licensesModel);
-            var query = Gql.GqlRequest("query", "ProductList");
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", productId);
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            query.AddField(queryFields)
-
-            var gqlData = query.GetQuery();
-            console.log("InstallationInfoEditor items query", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, licensesModel);
-            if (this.state === "Ready"){
-                let dataModelLocal;
-
-                if (licensesModel.ContainsKey("errors")){
-
-                    return;
-                }
-
-                if (licensesModel.ContainsKey("data")){
-                    dataModelLocal = licensesModel.GetData("data");
-                    if (dataModelLocal.ContainsKey("ProductList")){
-                        dataModelLocal = dataModelLocal.GetData("ProductList");
-                        if(dataModelLocal.ContainsKey("items")){
-                            dataModelLocal = dataModelLocal.GetData("items");
-
-                            for (let i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                                dataModelLocal.SetData("LicenseState", 0, i);
-                                dataModelLocal.SetData("ExpirationState", 0, i);
-                                dataModelLocal.SetData("Expiration", "Unlimited", i);
-                            }
-
-                            activeLicenses = dataModelLocal;
-                            documentModel.SetExternTreeModel("ActiveLicenses", dataModelLocal);
-                        }
-                    }
-                }
-            }
-        }
-    }//GqlModel licensesModel
 }

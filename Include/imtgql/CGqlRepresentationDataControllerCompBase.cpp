@@ -15,6 +15,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateRespons
 	{
 		return CreateInternalResponse(gqlRequest, errorMessage);
 	}
+
 	const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
 	QString userName = userInfoPtr->GetName();
 
@@ -55,11 +56,14 @@ QByteArrayList CGqlRepresentationDataControllerCompBase::GetContextIds() const
 
 
 // protected methods
+
 // reimplemented (imtgql::CGqlRepresentationDataControllerCompBase)
+
 imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	return nullptr;
 }
+
 
 bool CGqlRepresentationDataControllerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
@@ -89,7 +93,6 @@ bool CGqlRepresentationDataControllerCompBase::CheckPermissions(const imtgql::CG
 
 	return result;
 }
-
 
 
 } // namespace imtgql

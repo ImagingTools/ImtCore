@@ -27,7 +27,8 @@ Rectangle {
 
     signal finished(string buttonId);
 
-    property Component content;
+    property alias contentComp: loaderBodyDialog.sourceComponent;
+    readonly property alias contentItem: loaderBodyDialog.item;
 
 //    Connections{
 //        target: loaderTopPanel.item;
@@ -69,7 +70,6 @@ Rectangle {
         loaderTopPanel.source = dialogContainer.topPanelSource;
     }
 
-
     MouseArea {
         anchors.fill: parent;
         onClicked: {}
@@ -83,7 +83,7 @@ Rectangle {
         Loader {
             id: loaderTopPanel;
 
-            sourceComponent: content;
+//            sourceComponent: contentComp;
             source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
             onLoaded:  {
                 loaderTopPanel.item.width = dialogContainer.width;
@@ -96,26 +96,34 @@ Rectangle {
             }
         }
 
-
         Loader {
             id: loaderBodyDialog;
 
-            sourceComponent: content;
+            sourceComponent: contentComp;
 
             onLoaded: {
                 loaderBodyDialog.item.width = dialogContainer.width;
             }
         }
 
-        ButtonsDialog {
-            id: buttonsDialog;
-
+        Item {
             anchors.right: parent.right;
             anchors.rightMargin: 10;
 
-            onButtonClicked: {
-                console.log("ButtonsDialog onButtonClicked", buttonId);
-                dialogContainer.finished(buttonId);
+            width: buttonsDialog.width;
+            height: buttonsDialog.height + 10;
+
+            ButtonsDialog {
+                id: buttonsDialog;
+
+                anchors.right: parent.right;
+                anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 10;
+
+                onButtonClicked: {
+                    console.log("ButtonsDialog onButtonClicked", buttonId);
+                    dialogContainer.finished(buttonId);
+                }
             }
         }
     }

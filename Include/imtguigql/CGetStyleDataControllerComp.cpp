@@ -89,14 +89,14 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 		if (resource.open(QIODevice::ReadOnly)){
 			QByteArray resources = resource.readAll();
 			sourceModelPtr = new imtbase::CTreeItemModel();
-			sourceModelPtr->Parse(resources);
+			sourceModelPtr->CreateFromJson(resources);
 			dataModelPtr->SetExternTreeModel("source", sourceModelPtr);
 		}
 
 		QFile decorators(":/Decorators/" + prefix + "decorators.theme");
 		if (decorators.open(QIODevice::ReadOnly)){
 			imtbase::CTreeItemModel* decoratorsModelPtr = new imtbase::CTreeItemModel();
-			if (decoratorsModelPtr->Parse(decorators.readAll())){
+			if (decoratorsModelPtr->CreateFromJson(decorators.readAll())){
 				dataModelPtr->SetExternTreeModel("decorators", decoratorsModelPtr);
 			}
 		}

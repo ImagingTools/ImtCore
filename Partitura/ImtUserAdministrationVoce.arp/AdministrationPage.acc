@@ -55,13 +55,7 @@
         <Element Id="Pages" PackageId="" ComponentId="Pages">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductNames">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductPermissionsProviders" Type="Reference[]" ExportId="ProductPermissionsProviders">
+                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="ProductProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
@@ -161,13 +155,7 @@
                     <Element Id="RolesPage" PackageId="ImtUserAdministrationVoce" ComponentId="RolesPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductIds">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductNames">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ProductPermissionsProviders" Type="Reference[]" ExportId="ProductPermissionsProviders">
+                                <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="ProductProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RoleRepository" Type="Reference" ExportId="RoleRepository">

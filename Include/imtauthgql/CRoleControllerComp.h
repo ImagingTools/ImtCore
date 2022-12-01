@@ -18,7 +18,7 @@ public:
 
 	I_BEGIN_COMPONENT(CRoleControllerComp);
 		I_ASSIGN(m_roleFactCompPtr, "RoleFactory", "Factory used for creation of the new role", true, "RoleFactory");
-		I_ASSIGN(m_productProviderCompPtr, "ProductProvider", "Product provider", true, "ProductProvider");
+//		I_ASSIGN(m_productProviderCompPtr, "ProductProvider", "Product provider", true, "ProductProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -27,7 +27,7 @@ protected:
 
 private:
 	I_FACT(imtauth::IRole, m_roleFactCompPtr);
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
+//	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
 };
 
 

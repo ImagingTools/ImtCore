@@ -25,6 +25,8 @@ public:
 	virtual void SetRoleId(const QByteArray &id) override;
 	virtual QString GetRoleName() const override;
 	virtual void SetRoleName(const QString &name) override;
+	virtual QString GetRoleDescription() const override;
+	virtual void SetRoleDescription(const QString &description) override;
 	virtual IRole::FeatureIds GetPermissions() const override;
 	virtual IRole::FeatureIds GetLocalPermissions() const override;
 	virtual void SetLocalPermissions(const IRole::FeatureIds &permissions) override;
@@ -56,6 +58,7 @@ private:
 	QByteArray m_roleId;
 	QByteArray m_productId;
 	QString m_roleName;
+	QString m_roleDescription;
 	IRole::FeatureIds m_rolePermissions;
 	IRole::FeatureIds m_roleRestrictions;
 	QByteArrayList m_parents;

@@ -1,11 +1,9 @@
 module imtlicgui
-PackagesView 1.0 PackagesView.qml
+
 EditDialog 1.0 EditDialog.qml
 MetaInfo 1.0 MetaInfo.qml
-FeaturesTreeView 1.0 FeaturesTreeView.qml
-TreeViewModel 1.0 TreeViewModel.qml
-FeatureDependenciesModel 1.0 FeatureDependenciesModel.qml
+FeaturesProvider 1.0 FeaturesProvider.qml
+LicensesProvider 1.0 LicensesProvider.qml
+FeaturesDependenciesProvider 1.0 FeaturesDependenciesProvider.qml
 LicenseFeaturesModel 1.0 LicenseFeaturesModel.qml
-LoadingPage 1.0 LoadingPage.qml
-ObjectView 1.0 ObjectView.qml
-ObjectViewCommandsDelegate 1.0 ObjectViewCommandsDelegate.qml
+

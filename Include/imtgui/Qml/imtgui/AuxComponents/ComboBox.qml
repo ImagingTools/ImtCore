@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 import imtgui 1.0
 
-Item {
+FocusScope {
     id: comboBoxContainer;
 
     width: 90;
@@ -26,12 +26,12 @@ Item {
 
     property int radius: 5;
     property int currentIndex: -1;
+
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainer.width;
         height: comboBoxContainer.itemHeight;
         textSize: comboBoxContainer.textSize;
         fontColor: comboBoxContainer.fontColor;
-
         rootItem: comboBoxContainer;
        };
 

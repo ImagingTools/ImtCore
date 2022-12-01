@@ -28,41 +28,6 @@ const imtbase::IObjectCollection* CProductLicensingInfo::GetFeaturePackages() co
 }
 
 
-//const imtlic::IFeatureInfoProvider* CProductLicensingInfo::GetProductFeatures() const
-//{
-//	istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
-
-//	const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = GetLicenseList().GetElementIds();
-
-//	for (const QByteArray& licenseId : licenseCollectionIds){
-//		const imtlic::ILicenseInfo* licenseInfoPtr = GetLicenseInfo(licenseId);
-//		if (licenseInfoPtr == nullptr){
-//			continue;
-//		}
-
-//		imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-
-//		for (int i = 0; i < featureInfos.size(); i++){
-//			QByteArray featureId = featureInfos[i].id;
-//			const imtlic::IFeatureInfo* featurePtr = featurePackagePtr->GetFeatureInfo(featureId);
-//			if (featurePtr == nullptr){
-//				QString featureName = featureInfos[i].name;
-
-//				istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
-
-//				featureInfoPtr->SetFeatureId(featureId);
-//				featureInfoPtr->SetFeatureName(featureName);
-
-//				featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr.GetPtr());
-//			}
-//		}
-
-//	}
-
-//	return featurePackagePtr.PopPtr();
-//}
-
-
 // reimplemented (imtlic::IProductInfo)
 
 const IProductInfo* CProductLicensingInfo::GetProductFamilyInfo() const

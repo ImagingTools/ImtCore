@@ -153,6 +153,13 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_optional);
 	retVal = retVal && archive.EndTag(featureOptionalTag);
 
+//	static iser::CArchiveTag subFeaturesTag("SubFeatures", "SubFeatures", iser::CArchiveTag::TT_GROUP);
+//	retVal = retVal && archive.BeginTag(subFeaturesTag);
+//	for (const IFeatureInfo* featureInfo : m_subFeatures){
+//		retVal = retVal && const_cast<IFeatureInfo*>(featureInfo)->Serialize(archive);
+//	}
+//	retVal = retVal && archive.EndTag(subFeaturesTag);
+
 	return retVal;
 }
 

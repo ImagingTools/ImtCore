@@ -7,6 +7,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
 #include <QtCore/QtDebug>
+#include <QtCore/QVariantMap>
 
 // ACF includes
 #include <iser/ISerializable.h>
@@ -47,6 +48,7 @@ public:
 public Q_SLOTS:
 	void SetParent(QObject *parent);
 	bool Copy(CTreeItemModel* object);
+	void InsertNewItemWithParameters(int index, const QVariantMap& map);
 	int InsertNewItem();
 	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	imtbase::CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
@@ -59,8 +61,8 @@ public Q_SLOTS:
 	imtbase::CTreeItemModel* GetParent() const;
 	bool IsTreeModel(const QByteArray &key, int index = 0) const;
 	bool ContainsKey(const QByteArray &key, int index = 0) const;
-    bool IsValidData(const QByteArray &key, int index = 0) const;
-    imtbase::CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
+	bool IsValidData(const QByteArray &key, int index = 0) const;
+	imtbase::CTreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const;
 	imtbase::CTreeItemModel* GetModelFromItem(int itemIndex = 0) const;
 	int GetItemsCount() const;
 	void GetKeys(QList<QByteArray>& keys, int index = 0) const;
@@ -68,7 +70,7 @@ public Q_SLOTS:
 	void Clear();
 	bool IsArray();
 	void SetIsArray(const bool& isArray);
-	bool Parse(const QByteArray& data);
+	bool CreateFromJson(const QByteArray& jsonContent);
 
 	void SetQueryParam(const QByteArray& key, const QByteArray& value);
 	QByteArray GetQueryParam(const QByteArray& key);

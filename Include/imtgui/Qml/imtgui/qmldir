@@ -65,3 +65,9 @@ DocumentViewBase 1.0 ./AuxComponents/DocumentViewBase.qml
 SettingsProvider 1.0 ./AuxComponents/SettingsProvider.qml
 
 DocumentDataProvider 1.0 ./AuxComponents/DocumentDataProvider.qml
+
+BasicTableView 1.0 ./AuxComponents/BasicTableView.qml
+BasicTreeView 1.0 ./AuxComponents/BasicTreeView.qml
+TableViewItemDelegateBase 1.0 ./AuxComponents/TableViewItemDelegateBase.qml
+TreeViewItemDelegateBase 1.0 ./AuxComponents/TreeViewItemDelegateBase.qml
+TableViewSelection 1.0 ./AuxComponents/TableViewSelection.qml

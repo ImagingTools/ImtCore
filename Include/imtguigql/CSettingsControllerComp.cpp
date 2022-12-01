@@ -108,7 +108,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 
 			if (!itemData.isEmpty()){
 				imtbase::CTreeItemModel settingsModel;
-				settingsModel.Parse(itemData);
+				settingsModel.CreateFromJson(itemData);
 
 //				for (int i = 0; i < settingsModel.GetItemsCount(); i++){
 //					imtbase::CTreeItemModel pageModel;

@@ -9,6 +9,7 @@ Item {
     width: 50;
 
     property string username: authorizationPage.tokenProvider.login;
+    property bool enabled: authorizationPage.state == "authorized";
 
     Text {
         id: usernameText;
@@ -34,6 +35,8 @@ Item {
         height: 24;
 
         iconSource: "../../../Icons/" + Style.theme + "/Account.svg";
+
+        enabled: root.enabled;
 
         onClicked: {
             var point = mapToItem(thumbnailDecoratorContainer, x - width, y + height);

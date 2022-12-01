@@ -5,23 +5,25 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
-    showInputIdDialog: false;
+    showInputIdDialog: true;
 
-    property Item tableData;
+    property Item tableData: null;
 
-    property int selectedIndex: container.tableData.selectedIndex;
+    property ModelIndex selectedIndex: tableData != null ? container.tableData.selectedIndex: null;
 
     signal edited(string itemId, string itemName);
     signal removed(string itemId);
 
-    onTableDataChanged: {
-        console.log("DocumentView onTableDataChanged");
-        tableData.rightButtonMouseClicked.connect(openPopupMenu);
-    }
-
     onSelectedIndexChanged: {
-        console.log("CollectionViewCommands onSelectedIndexChanged", container.selectedIndex, container);
-        let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
+        console.log("CollectionViewCommands onSelectedIndexChanged");
+        let mode = "Disabled";
+
+        if (container.selectedIndex != null){
+            let level = container.selectedIndex.itemData.Level;
+            if (level == 0){
+                mode = "Normal";
+            }
+        }
 
         commandsProvider.changeCommandMode("Remove", mode);
         commandsProvider.changeCommandMode("Edit", mode);
@@ -32,56 +34,16 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("ProductsCommands onCommandActivated", commandId);
 
         if (commandId === "New"){
-            let elements = container.tableData.elements;
-            let index = elements.InsertNewItem();
-            elements.SetData("Name", "License Name", index);
-            elements.SetData("Id", "", index);
-            elements.SetData("Description", "", index);
-
-            documentBase.updateGui();
+            tableData.insertRow([tableData.rowCount], {"Id": "", "Name": "License Name", "Description": ""});
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
         }
-        else if (commandId === "SetDescription"){
-            let elements = tableData.elements;
-            let selectedDescription = elements.GetData("Description", selectedIndex);
-
-            if (!selectedDescription){
-                selectedDescription = ""
-            }
-
-            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the item:"),
-                                                                 "inputValue": selectedDescription});
-        }
-        else if (commandId === "Duplicate"){
-            let elements = container.tableData.elements;
-
-            let selectedId = elements.GetData("Id", container.selectedIndex);
-            let selectedName = elements.GetData("Name", container.selectedIndex);
-            let selectedDescription = elements.GetData("Description", container.selectedIndex);
-
-            let index = elements.InsertNewItem();
-            elements.SetData("Name", "Copy of " + selectedName, index);
-            elements.SetData("Id", selectedId, index);
-            elements.SetData("Description", selectedDescription, index);
-        }
-        else if (commandId === "Edit"){
-            let id = tableData.getSelectedId();
-            let name = tableData.getSelectedName();
-
-            modalDialogManager.openDialog(editDialog, {"valueId":      id,
-                                                       "valueName":    name,
-                                                       "licensesModel":tableData.elements,
-                                                       "index":        tableData.selectedIndex});
-        }
-
-        updateGui();
     }
 
-    function openPopupMenu(x, y){
-        modalDialogManager.closeDialog();
-        modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
+    onEntered: {
+        objectModel.SetData("Id", value);
+        objectModel.SetData("Name", value);
     }
 
     Component {
@@ -89,18 +51,9 @@ DocumentWorkspaceCommandsDelegateBase {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
-                    let elementsModel = documentModel.GetData("Items");
-
                     let selectedIndex = container.tableData.selectedIndex;
-                    let removedId = elementsModel.GetData("Id", selectedIndex);
 
-                    elementsModel.RemoveItem(selectedIndex);
-
-                    if (selectedIndex === elementsModel.GetItemsCount()){
-                        container.tableData.selectedIndex = -1;
-                    }
-
-                    removed(removedId);
+                    tableData.removeRow([selectedIndex.index]);
                 }
             }
         }

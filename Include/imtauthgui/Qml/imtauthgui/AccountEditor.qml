@@ -6,24 +6,27 @@ import imtgui 1.0
 DocumentBase {
     id: accountEditorContainer;
 
-//    commandsDelegate: AccountEditorCommandsDelegate{}
-//    commandsDelegatePath: "../../imtauthgui/AccountEditorCommandsDelegate.qml";
+    anchors.fill: parent;
 
     commandsDelegateSourceComp: AccountEditorCommandsDelegate {}
 
     property int textInputHeight: 30;
 
-    onDocumentModelChanged: {
+    Component.onCompleted: {
         accountNameInput.focus = true;
+    }
+
+    onDocumentModelChanged: {
+        updateGui();
+        undoRedoManager.registerModel(documentModel);
     }
 
     UndoRedoManager {
         id: undoRedoManager;
 
         commandsId: accountEditorContainer.commandsId;
-        editorItem: accountEditorContainer;
 
-        onModelParsed: {
+        onModelStateChanged: {
             updateGui();
         }
     }
@@ -33,25 +36,81 @@ DocumentBase {
         accountNameInput.text = documentModel.GetData("Name");
         accountDescriptionInput.text = documentModel.GetData("Description");
 
-        for (let i = 0; i < accountOwnerModel.count; i++){
-            let id = accountOwnerModel.get(i).Id;
-            console.log("Id", id)
-            if (id === "Email"){
-                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("Email"))
-            }
-            else if (id === "FirstName"){
-                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("FirstName"))
-            }
-            else if (id === "LastName"){
-                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("LastName"))
-            }
-            else if (id === "NickName"){
-                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("NickName"))
-            }
-            else if (id === "BirthDay"){
-                accountOwnerModel.setProperty(i, "Value", documentModel.GetData("BirthDay"))
-            }
+        if (documentModel.ContainsKey("Addresses")){
+            let addressesModel = documentModel.GetData("Addresses");
+
+            countryInput.text = addressesModel.GetData("Country");
+            postalCodeInput.text = addressesModel.GetData("PostalCode");
+            cityInput.text = addressesModel.GetData("City");
+            streetInput.text = addressesModel.GetData("Street");
         }
+
+        if (documentModel.ContainsKey("FirstName")){
+            firstNameInput.text = documentModel.GetData("FirstName");
+        }
+        if (documentModel.ContainsKey("LastName")){
+            lastNameInput.text = documentModel.GetData("LastName");
+        }
+        if (documentModel.ContainsKey("NickName")){
+            nickNameInput.text = documentModel.GetData("NickName");
+        }
+        if (documentModel.ContainsKey("Email")){
+            emailInput.text = documentModel.GetData("Email");
+        }
+        if (documentModel.ContainsKey("BirthDay")){
+            birthDayInput.text = documentModel.GetData("BirthDay");
+        }
+    }
+
+    function updateModel(){
+        console.log("updateModel");
+
+        undoRedoManager.beginChanges();
+
+        let name = accountNameInput.text;
+        documentModel.SetData("Name", name)
+
+        let description = accountDescriptionInput.text;
+        documentModel.SetData("Description", description)
+
+        if (documentModel.ContainsKey("Addresses")){
+            let adressesModel = documentModel.GetData("Addresses");
+
+            let country = countryInput.text;
+            adressesModel.SetData("Country", country)
+
+            let postalCode = postalCodeInput.text;
+            adressesModel.SetData("PostalCode", postalCode)
+
+            let city = cityInput.text;
+            adressesModel.SetData("City", city)
+
+            let street = streetInput.text;
+            adressesModel.SetData("Street", street)
+        }
+
+        let firstName = firstNameInput.text;
+        documentModel.SetData("FirstName", firstName)
+
+        let lastName = lastNameInput.text;
+        documentModel.SetData("LastName", lastName)
+
+        let nickName = nickNameInput.text;
+        documentModel.SetData("NickName", nickName)
+
+        let email = emailInput.text;
+        documentModel.SetData("Email", email)
+
+        let birthDay = birthDayInput.text;
+        documentModel.SetData("BirthDay", birthDay)
+
+        undoRedoManager.endChanges();
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.backgroundColor;
     }
 
     Flickable {
@@ -86,10 +145,11 @@ DocumentBase {
                 height: accountEditorContainer.textInputHeight;
                 width: bodyColumn.width;
 
-                onTextChanged: {
-                    console.log("AccountEditor onTextChanged");
-                    documentModel.SetData("Id", accountNameInput.text);
-                    documentModel.SetData("Name", accountNameInput.text);
+                onEditingFinished: {
+                    let oldText = documentModel.GetData("Name");
+                    if (oldText != accountNameInput.text){
+                        updateModel();
+                    }
                 }
 
                 KeyNavigation.tab: accountDescriptionInput;
@@ -109,11 +169,14 @@ DocumentBase {
                 height: accountEditorContainer.textInputHeight;
                 width: bodyColumn.width;
 
-                onTextChanged: {
-                    documentModel.SetData("Description", accountDescriptionInput.text);
+                onEditingFinished: {
+                    let oldText = documentModel.GetData("Description");
+                    if (oldText != accountDescriptionInput.text){
+                        updateModel();
+                    }
                 }
 
-                KeyNavigation.tab: repeater;
+                KeyNavigation.tab: countryInput;
             }
 
             Text {
@@ -142,86 +205,109 @@ DocumentBase {
 
                     width: parent.width - 20;
 
-                    spacing: 10;
+                    spacing: 7;
 
-                    ListModel {
-                        id: addressModel;
-                        Component.onCompleted: {
-                            addressModel.append({"Id": "Country", "Name": "Country", "Value": ""});
-                            addressModel.append({"Id": "City", "Name": "City", "Value": ""});
-                            addressModel.append({"Id": "PostalCode", "Name": "Postal code", "Value": ""});
-                            addressModel.append({"Id": "Street", "Name": "Street", "Value": ""});
-                        }
+                    Text {
+                        id: countryTitle;
+                        text: qsTr("Country");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
                     }
 
-                    Repeater {
-                        id: repeater;
+                    CustomTextField {
+                        id: countryInput;
 
-                        model: addressModel;
+                        height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
 
-                        onFocusChanged: {
-                            if (focus){
-                                let item  = repeater.itemAt(0)
-                                item.focus = true;
-                            }
-                        }
-
-                        delegate: Item {
-                            id: delegateItem;
-
-                            width: parent.width;
-                            height: fieldInput.height + title.height;
-
-                            Text {
-                                id: title;
-
-                                text: model.Name;
-                                color: Style.textColor;
-                                font.family: Style.fontFamily;
-                                font.pixelSize: Style.fontSize_common;
-                            }
-
-                            onFocusChanged: {
-                                if (focus){
-                                    fieldInput.focus = true;
-                                }
-                            }
-
-                            CustomTextField {
-                                id: fieldInput;
-                                anchors.top: title.bottom;
-                                anchors.topMargin: 7;
-
-                                height: accountEditorContainer.textInputHeight;
-                                width: companyAddressBlock.width;
-
-                                text: model.Value;
-
-                                onTextChanged: {
-                                    documentModel.SetData(model.Id, fieldInput.text);
-                                }
-
-                                Keys.onBacktabPressed: {
-                                    if (model.index > 0){
-                                        let item  = repeater.itemAt(model.index - 1)
-                                        item.focus = true;
-                                    }
-                                    else{
-                                        accountDescriptionInput.focus = true;
-                                    }
-                                }
-
-                                Keys.onTabPressed: {
-                                    if (model.index < repeater.count - 1){
-                                        let item  = repeater.itemAt(model.index + 1)
-                                        item.focus = true;
-                                    }
-                                    else{
-                                        repeaterOwnerBlock.focus = true;
-                                    }
+                        onEditingFinished: {
+                            if (documentModel.ContainsKey("Addresses")){
+                                let adressesModel = documentModel.GetData("Addresses");
+                                let oldText = adressesModel.GetData("Country");
+                                if (oldText != countryInput.text){
+                                    updateModel();
                                 }
                             }
                         }
+
+                        KeyNavigation.tab: cityInput;
+                    }
+
+                    Text {
+                        text: qsTr("City");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: cityInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
+
+                        onEditingFinished: {
+                            if (documentModel.ContainsKey("Addresses")){
+                                let adressesModel = documentModel.GetData("Addresses");
+                                let oldText = adressesModel.GetData("City");
+                                if (oldText != cityInput.text){
+                                    updateModel();
+                                }
+                            }
+                        }
+                        KeyNavigation.tab: postalCodeInput;
+                    }
+
+                    Text {
+                        text: qsTr("Postal Code");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: postalCodeInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
+
+                        onEditingFinished: {
+                            if (documentModel.ContainsKey("Addresses")){
+                                let adressesModel = documentModel.GetData("Addresses");
+                                let oldText = adressesModel.GetData("PostalCode");
+                                if (oldText != postalCodeInput.text){
+                                    updateModel();
+                                }
+                            }
+                        }
+                        KeyNavigation.tab: streetInput;
+                    }
+
+                    Text {
+                        text: qsTr("Street");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: streetInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
+
+                        onEditingFinished: {
+                            if (documentModel.ContainsKey("Addresses")){
+                                let adressesModel = documentModel.GetData("Addresses");
+                                let oldText = adressesModel.GetData("Street");
+                                if (oldText != streetInput.text){
+                                    updateModel();
+                                }
+                            }
+                        }
+
+                        KeyNavigation.tab: emailInput;
                     }
                 }// Company address block
             }//Company address block borders
@@ -253,87 +339,122 @@ DocumentBase {
 
                     width: parent.width - 20;
 
-                    spacing: 10;
+                    spacing: 7;
 
-                    ListModel {
-                        id: accountOwnerModel;
-
-                        Component.onCompleted: {
-                            accountOwnerModel.append({"Id": "Email", "Name": "Email", "Value": ""});
-                            accountOwnerModel.append({"Id": "BirthDay", "Name": "BirthDay", "Value": ""});
-                            accountOwnerModel.append({"Id": "FirstName", "Name": "First name","Value": ""});
-                            accountOwnerModel.append({"Id": "LastName", "Name": "Last name","Value": ""});
-                            accountOwnerModel.append({"Id": "NickName", "Name": "Nickname","Value": ""});
-                        }
+                    Text {
+                        text: qsTr("Email");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
                     }
 
-                    Repeater {
-                        id: repeaterOwnerBlock;
+                    CustomTextField {
+                        id: emailInput;
 
-                        model: accountOwnerModel;
+                        height: accountEditorContainer.textInputHeight;
+                        width: accountOwnerBlock.width;
 
-                        onFocusChanged: {
-                            if (focus){
-                                let item  = repeaterOwnerBlock.itemAt(0)
-                                item.focus = true;
+                        onEditingFinished: {
+                            let oldText = documentModel.GetData("Email");
+                            if (oldText != emailInput.text){
+                                updateModel();
                             }
                         }
 
-                        delegate: Item {
-                            width: parent.width;
-                            height: fieldInputOwnerBlock.height + titleOwnerBlock.height;
+                        KeyNavigation.tab: birthDayInput;
+                    }
 
-                            onFocusChanged: {
-                                if (focus){
-                                    fieldInputOwnerBlock.focus = true;
-                                }
-                            }
+                    Text {
+                        text: qsTr("Birthday");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
 
-                            Text {
-                                id: titleOwnerBlock;
+                    CustomTextField {
+                        id: birthDayInput;
 
-                                text: model.Name;
-                                color: Style.textColor;
-                                font.family: Style.fontFamily;
-                                font.pixelSize: Style.fontSize_common;
-                            }
+                        height: accountEditorContainer.textInputHeight;
+                        width: accountOwnerBlock.width;
 
-                            CustomTextField {
-                                id: fieldInputOwnerBlock;
-
-                                anchors.top: titleOwnerBlock.bottom;
-                                anchors.topMargin: 7;
-
-                                height: accountEditorContainer.textInputHeight;
-                                width: accountOwnerBlock.width;
-
-                                text: model.Value;
-
-                                onTextChanged: {
-                                    documentModel.SetData(model.Id, fieldInputOwnerBlock.text);
-                                }
-
-                                Keys.onBacktabPressed: {
-                                    let item ;
-                                    if (model.index > 0){
-                                        item  = repeaterOwnerBlock.itemAt(model.index - 1)
-                                    }
-                                    else{
-                                        item = repeater.itemAt(repeater.count - 1);
-
-                                    }
-
-                                    item.focus = true;
-                                }
-
-                                Keys.onTabPressed: {
-                                    if (model.index < repeaterOwnerBlock.count - 1){
-                                        let item  = repeaterOwnerBlock.itemAt(model.index + 1)
-                                        item.focus = true;
-                                    }
-                                }
+                        onEditingFinished: {
+                            let oldText = documentModel.GetData("BirthDay");
+                            if (oldText != birthDayInput.text){
+                                updateModel();
                             }
                         }
+
+                        KeyNavigation.tab: firstNameInput;
+                    }
+
+                    Text {
+                        text: qsTr("First Name");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: firstNameInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: accountOwnerBlock.width;
+
+                        onEditingFinished: {
+                            let oldText = documentModel.GetData("FirstName");
+                            if (oldText != firstNameInput.text){
+                                updateModel();
+                            }
+                        }
+
+                        KeyNavigation.tab: lastNameInput;
+                    }
+
+                    Text {
+                        text: qsTr("Last Name");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: lastNameInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: accountOwnerBlock.width;
+
+                        onEditingFinished: {
+                            let oldText = documentModel.GetData("LastName");
+                            if (oldText != lastNameInput.text){
+                                updateModel();
+                            }
+                        }
+
+                        KeyNavigation.tab: nickNameInput;
+                    }
+
+
+                    Text {
+                        text: qsTr("Nickname");
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: nickNameInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: accountOwnerBlock.width;
+
+                        onEditingFinished: {
+                            let oldText = documentModel.GetData("NickName");
+                            if (oldText != nickNameInput.text){
+                                updateModel();
+                            }
+                        }
+
+                        KeyNavigation.tab: accountNameInput;
                     }
                 } // Account owner block
             } //Account owner borders

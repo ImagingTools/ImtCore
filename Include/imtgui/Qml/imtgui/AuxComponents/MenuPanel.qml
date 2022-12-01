@@ -25,15 +25,12 @@ Rectangle {
 
     property int spacing: 0;
 
-//    property Component menuButtonDecorator: MenuPanelButtonDecorator {
-//        width: 80;
-//    };
-
     signal activePageChanged;
 
     function clearModels(){
         model.Clear();
         lvPages.model = 0;
+        activePageIndex = -1;
     }
 
     onActivePageIndexChanged: {
@@ -67,10 +64,6 @@ Rectangle {
                                                      "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
             decoratorSource : Style.menuButtonDecoratorPath;
             selected: lvPages.currentIndex === model.index;
-
-
-
-//            decoratorComp: menuButtonDecorator;
 
             onClicked: {
                 lvPages.currentIndex = model.index;

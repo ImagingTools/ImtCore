@@ -8,10 +8,9 @@ DocumentWorkspaceCommandsDelegateBase {
     showInputIdDialog: true;
 
     property Item tableTreeViewEditor;
-    property UndoRedoManager undoRedoManager;
 
     Component.onDestruction: {
-        tableTreeViewEditor.selectedIndexChanged.disconnect(indexChanged);
+        tableTreeViewEditor.selectedIndexChanged.disconnect(selectedIndexChanged);
     }
 
     onEntered: {
@@ -20,107 +19,84 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onTableTreeViewEditorChanged: {
-        console.log('DocumentCommands onTableTreeViewEditorChanged');
-        tableTreeViewEditor.selectedIndexChanged.connect(indexChanged)
+        tableTreeViewEditor.selectedIndexChanged.connect(selectedIndexChanged)
     }
 
     onSaved: {
-        Events.sendEvent("TreeViewModelUpdate");
-        Events.sendEvent("FeatureDependenciesUpdate");
-
-        updateGui();
-    }
-
-    onClosed: {
-        Events.sendEvent("TreeViewModelUpdate");
-        Events.sendEvent("FeatureDependenciesUpdate");
-    }
-
-    onVisibleChanged: {
-        console.log("PackageViewCommands onVisibleChanged", visible);
-        console.log(objectModel.GetData("Id"));
+        featuresProvider.updateModel();
     }
 
     onCommandActivated: {
         console.log("PackageViewCommands onCommandActivated", commandId);
-
-        let model = tableTreeViewEditor.elements; //Elements model
-
-        let itemIndex = -1;
-        if (tableTreeViewEditor.selectedIndex){
-            //Get path of indexes for the selected item.
-            let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
-
-            //Последний индекс наш item(ChildModel может не быть у него)
-            itemIndex = indexes.pop()
-
-            if (itemIndex >= 0){
-                for (let index of indexes){
-                    model = model.GetData('ChildModel', index)
-                }
-            }
-        }
-
         if (commandId === "New"){
-            let childModel;
-            if (itemIndex < 0){
-                childModel = model;
+            let insertIndexes = []
+            if (tableTreeViewEditor.selectedIndex == null){
+                insertIndexes.push(tableTreeViewEditor.rowCount);
             }
-            else{
-                childModel = model.GetData('ChildModel', itemIndex);
-                if (!childModel){
-                    childModel = model.AddTreeModel('ChildModel', itemIndex);
-                }
+            else {
+                let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
+
+                let childrenIndexes = tableTreeViewEditor.selectedIndex.children;
+
+                indexes.push(childrenIndexes.length)
+
+                insertIndexes = indexes;
             }
 
-//            undoRedoManager.beginChanges();
-            let childIndex = insertNewItem(childModel)
-
-            childModel.SetData("Id", "", childIndex);
-            childModel.SetData("Name", "Feature Name", childIndex);
-
-//            undoRedoManager.endChanges();
-            updateGui();
+            tableTreeViewEditor.insertRow(insertIndexes, {"Id": "", "Name": "Feature Name", "Description": "", "Optional": false});
         }
         else if (commandId === "Remove"){
-            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected feature from the package ?")});
-        }
-    }
+//            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected feature from the package ?")});
 
-    function indexChanged(){
-        console.log('DocumentCommands indexChanged', tableTreeViewEditor.selectedIndex);
+            let removedFeatureId = tableTreeViewEditor.selectedIndex.itemData.Id;
+            let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
 
-        let mode = tableTreeViewEditor.selectedIndex ? "Normal" : "Disabled";
-        commandsProvider.changeCommandMode("Remove", mode);
-    }
+            let removedFeaturesIds = []
+            getAllRemovedFeatures(tableTreeViewEditor.selectedIndex, removedFeaturesIds);
 
-    function insertNewItem(model){
-        let index = model.InsertNewItem();
+            console.log("Remove indexes", indexes);
 
-        model.SetData("Description", "", index);
-        model.SetData("Active", true, index);
-        model.SetData("Opened", false, index);
-        model.SetData("Selected", false, index);
-        model.SetData("Visible", true, index);
-        model.SetData("State", Qt.Unchecked, index);
-        model.SetData("Optional", false, index);
+            tableTreeViewEditor.removeRow(indexes);
 
-        let parentModel = model.GetParent();
+            //Удаление всех зависимостей от этой фичи
+            let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
+            if (dependenciesModel){
 
-        let level = 1;
-        if (parentModel && parentModel != model){
-            let id = parentModel.GetData("Id");
-            let parentLevel = Number(parentModel.GetData("Level"));
+                for (let removedFeatureId of removedFeaturesIds){
+                    if (dependenciesModel.ContainsKey(removedFeatureId)){
+                        dependenciesModel.RemoveData(removedFeatureId);
+                    }
 
-            if (parentLevel){
-                level = parentLevel + 1;
+                    let keys = dependenciesModel.GetKeys();
+
+                    for (let i = 0; i < keys.length; i++){
+                        let key = keys[i];
+                        let values = dependenciesModel.GetData(key);
+
+                        if (values != ""){
+                            let dependenciesList = values.split(';')
+
+                            if (dependenciesList.includes(removedFeatureId)){
+                                let pos = dependenciesList.indexOf(removedFeatureId)
+                                dependenciesList.splice(pos, 1);
+
+                                let newDependencies = dependenciesList.join(';');
+                                dependenciesModel.SetData(key, newDependencies);
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
 
-        model.SetData("Level", level, index);
-        model.AddTreeModel("ChildModel", index);
+    function selectedIndexChanged(){
+        console.log('DocumentCommands indexChanged', tableTreeViewEditor.selectedIndex);
 
-        return index;
+        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
+        packageViewContainer.commandsProvider.changeCommandMode("Remove", mode);
+
+        console.log('End DocumentCommands indexChanged', tableTreeViewEditor.selectedIndex);
     }
 
     Component {
@@ -129,58 +105,60 @@ DocumentWorkspaceCommandsDelegateBase {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
-                    let model = tableTreeViewEditor.elements; //Elements model
 
-                    //Get path of indexes for the selected item.
+                    let removedFeatureId = tableTreeViewEditor.selectedIndex.itemData.Id;
                     let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
 
-                    //Последний индекс наш item(ChildModel может не быть у него)
-                    let itemIndex = indexes.pop()
+                    let removedFeaturesIds = []
+                    getAllRemovedFeatures(tableTreeViewEditor.selectedIndex, removedFeaturesIds);
 
-                    if (itemIndex >= 0){
-                        for (let index of indexes){
-                            model = model.GetData('ChildModel', index)
+                    console.log("Remove indexes", indexes);
+
+                    tableTreeViewEditor.removeRow(indexes);
+
+                    //Удаление всех зависимостей от этой фичи
+                    let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
+                    if (dependenciesModel){
+
+                        for (let removedFeatureId of removedFeaturesIds){
+                            if (dependenciesModel.ContainsKey(removedFeatureId)){
+                                dependenciesModel.RemoveData(removedFeatureId);
+                            }
+
+                            let keys = dependenciesModel.GetKeys();
+
+                            for (let i = 0; i < keys.length; i++){
+                                let key = keys[i];
+                                let values = dependenciesModel.GetData(key);
+
+                                if (values != ""){
+                                    let dependenciesList = values.split(';')
+
+                                    if (dependenciesList.includes(removedFeatureId)){
+                                        let pos = dependenciesList.indexOf(removedFeatureId)
+                                        dependenciesList.splice(pos, 1);
+
+                                        let newDependencies = dependenciesList.join(';');
+                                        dependenciesModel.SetData(key, newDependencies);
+                                    }
+                                }
+                            }
                         }
-
-                        model.RemoveItem(itemIndex);
-
-                        tableTreeViewEditor.selectedIndex = null;
-
-                        treeView.model.Refresh();
                     }
                 }
             }
         }
     }
 
-    /**
-        Remove dependencies for feature in the current package.
-    */
-    function removeDependencies(model, dependencyId){
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            let dependenciesModel = model.GetData("DependenciesModel", i);
+    function getAllRemovedFeatures(index, retVal){
+        console.log("getAllRemovedFeatures", index, retVal);
+        let children = index.children;
 
-            if (dependenciesModel){
-                let index = -1;
-                for (let j = 0; j < dependenciesModel.GetItemsCount(); j++){
-                    let featureId = dependenciesModel.GetData("Id", j);
+        for (let child of children){
+            let id = child.itemData.Id;
+            retVal.push(id)
 
-                    if (featureId == dependencyId){
-                        index = j;
-
-                        break;
-                    }
-                }
-
-                if (index >= 0){
-                    dependenciesModel.RemoveItem(index);
-                }
-            }
-
-            let childModel = model.GetData("ChildModel", i);
-            if (childModel){
-                removeDependencies(childModel, dependencyId);
-            }
+            getAllRemovedFeatures(child, retVal)
         }
     }
 }

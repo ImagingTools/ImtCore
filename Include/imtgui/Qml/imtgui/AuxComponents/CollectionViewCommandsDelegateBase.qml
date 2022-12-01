@@ -122,10 +122,7 @@ Item {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
-
-                    console.log("removeDialog", buttonId);
                     let itemId = tableData.getSelectedId();
-                    console.log("itemId", itemId);
                     removeModel.updateModel(itemId);
                 }
             }

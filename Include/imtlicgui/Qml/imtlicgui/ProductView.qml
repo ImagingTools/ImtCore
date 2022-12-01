@@ -5,110 +5,413 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-//    commandsDelegatePath: "../../imtlicgui/ProductViewCommandsDelegate.qml"
+    property bool blockUpdatingModel: false;
 
     commandsDelegateSourceComp: ProductViewCommandsDelegate {
-        tableData: collectionView.table;
+        tableData: tableView;
     }
 
     onDocumentModelChanged: {
         let headers = documentModel.GetData("Headers");
-        let items = documentModel.GetData("Items");
-        let dependencies = documentModel.GetData("Features");
+        tableView.columnModel.clear();
+        for (let i = 0; i < headers.GetItemsCount(); i++){
+            let headerId = headers.GetData("Id", i);
+            let headerName = headers.GetData("Name", i);
 
+            tableView.addColumn({"Id": headerId, "Name": headerName});
+        }
+
+        let items = documentModel.GetData("Items");
         if (!items){
             items = documentModel.AddTreeModel("Items");
         }
 
+        let dependencies = documentModel.GetData("Features");
         if (!dependencies){
             dependencies = documentModel.AddTreeModel("Features");
         }
 
-        collectionView.table.headers = headers;
-        collectionView.table.elements = items;
+        updateGui();
 
-        undoRedoManager.model = documentModel;
-    }
-
-    onWidthChanged: {
-        console.log("container onWidthChanged", container.width);
-       if (container.width > 0 && container.width - rightPanel.width > 250){
-           splitter.x = container.width - rightPanel.width;
-       }
-    }
-
-    onCommandsIdChanged: {
-        console.log("ObjectView onCommandsIdChanged", container.commandsId);
-        collectionView.commandsId = commandsId;
+        undoRedoManager.registerModel(documentModel);
     }
 
     onCommandsDelegateLoaded: {
-//        commandsDelegate.tableData = collectionView.table;
+        commandsDelegate.tableData = tableView;
     }
 
     UndoRedoManager {
         id: undoRedoManager;
 
         commandsId: container.commandsId;
-        editorItem: container;
 
-        onModelParsed: {
+        onModelStateChanged: {
+            console.log("UndoRedoManager onModelStateChanged");
 
-            collectionView.table.elements = documentModel.GetData("Items");
             updateGui();
         }
     }
 
-    function updateGui(){
-        console.log("updateGui");
+    function updateModel(){
+        console.log("Begin updateModel");
+        undoRedoManager.beginChanges();
 
-        let index = collectionView.table.selectedIndex;
-        collectionView.table.selectedIndex = -1;
-        collectionView.table.selectedIndex = index;
+        let items = documentModel.AddTreeModel("Items");
+        let featuresModel = documentModel.AddTreeModel("Features");
 
-        inputId.text = documentModel.GetData("Id");
-        inputName.text = documentModel.GetData("Name");
+        for (let i = 0; i < tableView.rowModel.count; i++){
+            let rowObj = tableView.rowModel.get(i);
 
-        collectionView.table.elements.Refresh();
+            let index = items.InsertNewItem();
+
+            items.SetData("Id", rowObj["Id"], index);
+            items.SetData("Name", rowObj["Name"], index);
+            items.SetData("Description", rowObj["Description"], index);
+
+            let rowChildModel = rowObj["ChildModel"]
+            if (rowChildModel.count > 0){
+                licenseFeaturesUpdateModel(rowObj["Id"], rowChildModel, featuresModel);
+            }
+        }
+
+
+        undoRedoManager.endChanges();
+        console.log("End updateModel");
     }
 
-    CollectionViewBase {
-        id: collectionView;
 
-        anchors.left: parent.left;
-        anchors.right: splitter.left;
+    //Обновление Features
+    function licenseFeaturesUpdateModel(licenseId, guiModel, featuresModel){
+        let featureModel = featuresModel.AddTreeModel(licenseId);
 
-        hasPagination: false;
-        hasFilter: false;
-        hasSort: false;
+        for (let i = 0; i < guiModel.count; i++){
+            let index = featureModel.InsertNewItem();
 
-        loadData: false;
+            let rowObj = guiModel.get(i);
 
-        height: parent.height;
+            let rowId = rowObj["Id"];
+            let rowName = rowObj["Name"];
+            let description = rowObj["Description"];
+            let optional = rowObj["Optional"];
 
-        onSelectedItem: {
-            commandsDelegate.commandActivated("Edit");
+            featureModel.SetData("Id", rowId, index);
+            featureModel.SetData("Name", rowName, index);
+            featureModel.SetData("Description", description, index);
+            featureModel.SetData("Optional", optional, index);
+
+            let rowChildModel = rowObj["ChildModel"]
+            if (rowChildModel.count > 0){
+                recursiveLicenseFeaturesUpdateModel(rowChildModel, featureModel);
+            }
         }
     }
 
-    Splitter {
-        id: splitter;
-        x: container.width - 250;
+    //Обновление Subfeatures
+    function recursiveLicenseFeaturesUpdateModel(guiModel, featureModel){
+        for (let i = 0; i < guiModel.count; i++){
+            let rowObj = guiModel.get(i);
+
+            let rowId = rowObj["Id"];
+            let rowName = rowObj["Name"];
+            let description = rowObj["Description"];
+            let optional = rowObj["Optional"];
+            let state = rowObj["State"];
+
+            if (state == Qt.Checked){
+                let index = featureModel.InsertNewItem();
+
+                featureModel.SetData("Id", rowId, index);
+                featureModel.SetData("Name", rowName, index);
+                featureModel.SetData("Description", description, index);
+                featureModel.SetData("Optional", optional, index);
+            }
+
+            let rowChildModel = rowObj["ChildModel"]
+            if (rowChildModel.count > 0){
+                recursiveLicenseFeaturesUpdateModel(rowChildModel, featureModel);
+            }
+        }
+    }
+
+    function updateGui(){
+        console.log("begin updateGui");
+        blockUpdatingModel = true;
+
+        tableView.rowModel.clear();
+
+        let items = documentModel.GetData("Items");
+        if (!items){
+            items = documentModel.AddTreeModel("Items");
+        }
+
+        let featuresModel = documentModel.GetData("Features");
+        if (!featuresModel){
+            featuresModel = documentModel.AddTreeModel("Features");
+        }
+
+        for (let i = 0; i < items.GetItemsCount(); i++){
+            let licenseId = items.GetData("Id", i);
+            let licenseName = items.GetData("Name", i);
+            let description = items.GetData("Description", i);
+
+            tableView.insertRow([i], {"Id": licenseId, "Name": licenseName, "Description": description});
+
+            if (featuresModel.ContainsKey(licenseId)){
+                let featureModel = featuresModel.GetData(licenseId);
+                let optionalFeatureIds = getOptionalFeatures(featureModel);
+                let notOptionalFeatureIds = getNotOptionalFeatures(featureModel);
+
+                for (let j = 0; j < notOptionalFeatureIds.length; j++){
+                    let featureId = notOptionalFeatureIds[j];
+
+                    licenseFeaturesUpdateGui(licenseId, featureId, i, optionalFeatureIds);
+                }
+            }
+        }
+
+        blockUpdatingModel = false;
+        console.log("End updateGui");
+    }
+
+    function licenseFeaturesUpdateGui(licenseId, featureId, index, optionalFeatureIds){
+        console.log("licenseFeaturesUpdateGui", licenseId);
+        let model = featuresProvider.model;
+
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let childModel = model.GetData("ChildModel", i);
+            if (childModel){
+                for (let j = 0; j < childModel.GetItemsCount(); j++){
+                    let childFeatureId = childModel.GetData("Id", j);
+                    let childFeatureName = childModel.GetData("Name", j);
+                    let childFeatureDescription = childModel.GetData("Description", j);
+                    let optional = childModel.GetData("Optional", j);
+
+                    if (childFeatureId == featureId){
+                        tableView.insertRow([index, 0], {"LicenseId": licenseId, "Id": childFeatureId, "Name": childFeatureName, "Description": childFeatureDescription, "Optional": optional, "State": Qt.Unchecked});
+
+                        let subFeaturesModel = childModel.GetData("ChildModel", j);
+                        if (subFeaturesModel){
+                            licenseFeaturesRecursiveUpdateGui(subFeaturesModel, [index, 0], optionalFeatureIds, licenseId);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function licenseFeaturesRecursiveUpdateGui(model, indexes, optionalFeatureIds, licenseId){
+        console.log("recursiveUpdateGui", licenseId);
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let rowId = model.GetData("Id", i);
+            let rowName = model.GetData("Name", i);
+            let description = model.GetData("Description", i);
+            let optional = model.GetData("Optional", i);
+
+            let row = {"LicenseId": licenseId, "Id": rowId, "Name": rowName, "Description": description, "Optional": optional, "State": Qt.Unchecked};
+            if (optionalFeatureIds.includes(rowId)){
+                row["State"] = Qt.Checked;
+            }
+
+            tableView.insertRow(indexes.concat([i]), row);
+
+            let childModel = model.GetData("ChildModel", i);
+            if (childModel){
+                let childIndexes = []
+                childIndexes = childIndexes.concat(indexes.concat([i]))
+                licenseFeaturesRecursiveUpdateGui(childModel, childIndexes, optionalFeatureIds, licenseId);
+            }
+        }
+    }
+
+    function getNotOptionalFeatures(model){
+        let retVal = []
+
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let featureId = model.GetData("Id", i);
+            let isOptional = model.GetData("Optional", i);
+
+            if (!isOptional){
+                retVal.push(featureId);
+            }
+        }
+
+        return retVal;
+    }
+
+    function getOptionalFeatures(model){
+        let retVal = []
+
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let featureId = model.GetData("Id", i);
+            let isOptional = model.GetData("Optional", i);
+
+            if (isOptional){
+                retVal.push(featureId);
+            }
+        }
+
+        return retVal;
+    }
+
+    Component {
+        id: featuresDialog;
+
+        FeaturesDialog {
+            onFinished: {
+                if (buttonId == "Add"){
+                    undoRedoManager.beginChanges();
+
+                    let featuresModel = documentModel.GetData("Features");
+                    if (!featuresModel){
+                        featuresModel = documentModel.AddTreeModel("Features");
+                    }
+
+                    let licenseId = tableView.selectedIndex.itemData.Id;
+
+                    let featureId = selectedIndex.itemData.Id;
+                    let featureName = selectedIndex.itemData.Name;
+                    let isOptional = selectedIndex.itemData.Optional;
+
+                    if (featuresModel.ContainsKey(licenseId)){
+                        let featureModel = featuresModel.GetData(licenseId);
+
+                        let index = -1;
+                        for (let i = 0; i < featureModel.GetItemsCount(); i++){
+                            let productFeatureId = featureModel.GetData("Id", i);
+                            if (productFeatureId == featureId){
+                                index = i;
+                                break;
+                            }
+                        }
+
+                        if (index < 0){
+                            let itemIndex = featureModel.InsertNewItem();
+
+                            featureModel.SetData("Id", featureId, itemIndex);
+                            featureModel.SetData("Name", featureName, itemIndex);
+                            featureModel.SetData("Optional", isOptional, itemIndex);
+                        }
+                    }
+                    else{
+                        let featureModel = featuresModel.AddTreeModel(licenseId);
+
+                        featureModel.SetData("Id", featureId);
+                        featureModel.SetData("Name", featureName);
+                        featureModel.SetData("Optional", isOptional);
+                    }
+
+                    undoRedoManager.endChanges();
+
+                    container.updateGui();
+                }
+            }
+        }
+    }
+
+    BasicTreeView {
+        id: tableView;
+
+        anchors.top: parent.top
+        anchors.left: parent.left;
+        anchors.right: rightPanel.left;
 
         height: parent.height;
-        width: 4;
 
-        onXChanged: {
-            if (!container.visible){
-                return;
+        readOnly: false;
+
+        rowDelegate: ProductViewItemDelegate {
+            onAddButtonClicked: {
+                tableView.selectedIndex = modelIndex;
+                console.log("ProductViewItemDelegate onButtonClicked");
+                modalDialogManager.openDialog(featuresDialog, {});
             }
 
-            if (splitter.x > container.width - titleHeader.width){
-                splitter.x = container.width - splitter.width;
+            onRemoveButtonClicked: {
+                tableView.removeRow(modelIndex.getIndexes());
+            }
+        }
+
+        onRowAdded: {
+            console.log("onRowAdded");
+            if (!blockUpdatingModel){
+               updateModel();
+            }
+        }
+
+        onRowRemoved: {
+            console.log("onRowRemoved");
+            if (!blockUpdatingModel){
+                updateModel();
+            }
+        }
+
+        onRowModelDataChanged: {
+            console.log("onRowModelDataChanged", prop);
+            if (!blockUpdatingModel){
+                updateModel();
             }
 
-            if (splitter.x < 250){
-                splitter.x = 250;
+            if (prop == "State"){
+
+
+//                if (!blockUpdatingModel){
+//                    updateModel();
+//                }
+
+
+//                let index = delegate.modelIndex;
+
+//                let state = index.itemData.State;
+
+//                let featuresModel = documentModel.GetData("Features");
+//                if (!featuresModel){
+//                    featuresModel = documentModel.AddTreeModel("Features");
+//                }
+
+//                let licenseId = index.itemData.LicenseId;
+//                let featureId = index.itemData.Id;
+//                let featureName = index.itemData.Name;
+//                let isOptional = index.itemData.Optional;
+
+//                console.log("licenseId", licenseId);
+
+//                if (state == Qt.Checked){
+//                    if (featuresModel.ContainsKey(licenseId)){
+//                        let featureModel = featuresModel.GetData(licenseId);
+
+//                        if (!featureModel){
+//                            featureModel = featuresModel.AddTreeModel(licenseId);
+//                        }
+
+//                        let itemIndex = featureModel.InsertNewItem();
+
+//                        featureModel.SetData("Id", featureId, itemIndex);
+//                        featureModel.SetData("Name", featureName, itemIndex);
+//                        featureModel.SetData("Optional", isOptional, itemIndex);
+//                    }
+//                }
+//                else if (state == Qt.Unchecked){
+//                    if (featuresModel.ContainsKey(licenseId)){
+//                        let featureModel = featuresModel.GetData(licenseId);
+
+//                        let removedIndex = -1;
+//                        for (let i = 0; i < featureModel.GetItemsCount(); i++){
+//                            let productFeatureId = featureModel.GetData("Id", i);
+//                            if (productFeatureId == featureId){
+//                                removedIndex = i;
+//                                break;
+//                            }
+//                        }
+
+//                        if (removedIndex >= 0){
+//                            featureModel.RemoveItem(removedIndex);
+//                        }
+
+//                        if (featureModel.GetItemsCount() == 0){
+//                            featuresModel.RemoveData(licenseId)
+//                        }
+//                    }
+//                }
             }
         }
     }
@@ -116,16 +419,16 @@ DocumentBase {
     Item {
         id: rightPanel;
 
-        anchors.left: splitter.right;
+        anchors.right: parent.right;
 
-        width: container.width > 0 ? container.width - collectionView.width : 250;
+//        width: container.width > 0 ? container.width - tableView.width : 250;
+        width: 0;
         height: parent.height;
 
         Column {
             id: content;
 
-            anchors.fill: parent;
-            anchors.rightMargin: 10;
+            width: parent.width;
 
             spacing: 5;
 
@@ -146,10 +449,10 @@ DocumentBase {
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the Product-ID");
+                placeHolderText: qsTr("Enter the product id");
 
-                onTextChanged: {
-                    documentModel.SetData("Id", inputId.text);
+                onEditingFinished: {
+
                 }
 
                 KeyNavigation.tab: inputName;
@@ -158,7 +461,7 @@ DocumentBase {
             Text {
                 id: titleName;
 
-                anchors.left: headerTreeView.left;
+//                anchors.left: headerTreeView.left;
 
                 text: qsTr("Product Name");
                 color: Style.textColor;
@@ -172,61 +475,13 @@ DocumentBase {
                 width: parent.width;
                 height: 30;
 
-                placeHolderText: qsTr("Enter the Product Name");
+                placeHolderText: qsTr("Enter the product name");
 
-                onTextChanged: {
-                    documentModel.SetData("Name", inputName.text);
+                onEditingFinished: {
+
                 }
 
                 KeyNavigation.tab: inputId;
-            }
-
-            Rectangle {
-                id: headerTreeView;
-
-                width: parent.width;
-                height: 35;
-
-                color: Style.baseColor;
-
-                Text {
-                    id: titleHeader;
-
-                    anchors.verticalCenter: headerTreeView.verticalCenter;
-
-                    anchors.left: headerTreeView.left;
-                    anchors.leftMargin: 10;
-
-                    text: qsTr("Features");
-                    color: Style.textColor;
-                    font.pixelSize: Style.fontSize_common;
-                    font.family: Style.fontFamilyBold;
-                    font.bold: true;
-                }
-            }
-
-            ProductTreeViewController {
-                id: treeViewController;
-            }
-
-            TreeView {
-                id: treeView;
-
-                height: container.height;
-                width: parent.width;
-
-                clip: true;
-
-                model: treeViewModel.modelTreeView;
-                visible: itemId !== "" && collectionView.table.selectedIndex > -1;
-
-                Component.onCompleted: {
-                    treeView.itemStateChanged.connect(treeViewController.itemStateChanged);
-                }
-
-                onItemStateChanged: {
-                    console.log("TreeView onItemStateChanged", itemData.Id, itemData.State);
-                }
             }
         }
     }

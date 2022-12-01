@@ -10,7 +10,9 @@ Rectangle {
     color: "transparent";
 
     border.width: 1;
-    border.color: Style.borderColor;
+    border.color: isActive ? Style.borderColor : Style.disabledInActiveTextColor;
+
+    property bool isActive: true;
 
     property int checkState: Qt.Unchecked;
     property alias imageSource: image.source;
@@ -42,13 +44,16 @@ Rectangle {
         sourceSize.height: height;
 
         visible: container.checkState != Qt.PartiallyChecked;
-        source: container.checkState == Qt.Checked ? "../../../Icons/" + Style.theme + "/Ok_On_Normal.svg" : "";
+        source: isActive ? container.checkState == Qt.Checked ? "../../../Icons/" + Style.theme + "/Ok_On_Normal.svg" : "" :
+            container.checkState == Qt.Checked ? "../../../Icons/" + Style.theme + "/Ok_On_Disabled.svg" : "";
     }
 
     MouseArea {
         anchors.fill: parent;
 
         cursorShape: Qt.PointingHandCursor;
+
+        visible: isActive;
 
         onClicked: {
             container.clicked();

@@ -50,6 +50,16 @@ public:
 	virtual void SetRoleName(const QString& name) = 0;
 
 	/**
+		Get role description.
+	*/
+	virtual QString GetRoleDescription() const = 0;
+
+	/**
+		Set role description.
+	*/
+	virtual void SetRoleDescription(const QString& description) = 0;
+
+	/**
 		Get result permissions of role.
 	*/
 	virtual FeatureIds GetPermissions() const = 0;

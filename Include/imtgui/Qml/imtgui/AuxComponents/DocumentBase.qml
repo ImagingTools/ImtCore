@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtlicgui 1.0
 
-Item {
+FocusScope {
     id: documentBase;
 
     anchors.fill: parent;
@@ -12,20 +12,27 @@ Item {
     property string itemName;
     property string commandsId;
 
-    property TreeItemModel documentModel:TreeItemModel{};
+    property TreeItemModel documentModel: TreeItemModel{};
 
     property bool itemLoad: true;
 
-    property alias commandsProvider: commandsProviderBase.item;
-    property alias commandsProviderSourceCompr: commandsProviderBase.sourceComponent;
-
-//    property Item commandsDelegate : DocumentWorkspaceCommandsDelegateBase {}
-
-//    property string commandsDelegatePath: "DocumentWorkspaceCommandsDelegateBase.qml";
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
+    property CommandsProvider commandsProvider: CommandsProvider {
+        commandsId: documentBase.commandsId;
+    }
+
     signal commandsDelegateLoaded();
+
+//    Shortcut {
+//        sequence: "Ctrl+S";
+
+//        onActivated: {
+//            console.log("Ctrl+S onActivated");
+//            commandsDelegate.commandHandle("Save")
+//        }
+//    }
 
     Component.onCompleted: {
         commandsDelegate.documentBase = documentBase;
@@ -41,17 +48,15 @@ Item {
 
         if (itemLoad){
 //            commandsProvider.commandsId = documentBase.commandsId;
-            commandsProviderBase.item.commandsId = documentBase.commandsId;
         }
 
-//        commandsDelegate.commandsId = documentBase.commandsId;
-        commandsDelegateBase.item.commandsId = documentBase.commandsId;
+        commandsDelegate.commandsId = documentBase.commandsId;
     }
 
     onDocumentModelChanged: {
         console.log("documentBase onDocumentModelChanged");
 
-        updateGui();
+//        updateGui();
     }
 
     onVisibleChanged: {
@@ -59,7 +64,8 @@ Item {
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                                       "CommandsId": commandsProvider.commandsId});
 
-            documentBase.updateGui();
+            documentBase.forceActiveFocus();
+//            documentBase.updateGui();
         }
     }
 
@@ -75,33 +81,16 @@ Item {
         }
     }
 
-//    CommandsProvider {
-//        id: commandsProviderBase;
-//    }
-
     function updateGui(){}
-
-    Loader {
-        id: commandsProviderBase;
-
-        sourceComponent: CommandsProvider {
-        }
-
-        onLoaded: {
-        }
-    }
 
     Loader {
         id: commandsDelegateBase;
 
         sourceComponent: DocumentWorkspaceCommandsDelegateBase {
         }
-//        source: commandsDelegatePath;
 
         onLoaded: {
             item.documentBase = documentBase;
-//            item.commandsId = commandsId;
-
             commandsDelegateLoaded();
         }
     }

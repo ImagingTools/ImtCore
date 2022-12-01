@@ -20,7 +20,7 @@ Dialog {
 
     property int index: -1;
 
-    content: EditDialogBody {
+    contentComp: EditDialogBody {
         id: dialogBody;
     }
 
@@ -57,7 +57,7 @@ Dialog {
             let json = editDialogContainer.subFeaturesModel.toJSON();
             console.log("json", json);
 
-            subFeaturesModel.Parse(json);
+            subFeaturesModel.CreateFromJson(json);
 
             valueId = dialogModel.GetData("Id");
             valueName = dialogModel.GetData("Name");
@@ -80,7 +80,7 @@ Dialog {
 
             console.log("json", json);
 
-            editDialogContainer.subFeaturesModel.Parse(json);
+            editDialogContainer.subFeaturesModel.CreateFromJson(json);
 
             console.log("subFeaturesModel", editDialogContainer.subFeaturesModel.toJSON());
         }

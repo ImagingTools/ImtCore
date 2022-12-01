@@ -289,7 +289,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 
 	if (!objectIds.isEmpty()){
 		imtbase::CTreeItemModel objectIdsModel;
-		objectIdsModel.Parse(objectIds);
+		objectIdsModel.CreateFromJson(objectIds);
 
 		for (int i = 0; i < objectIdsModel.GetItemsCount(); i++){
 			QString name, description;
@@ -422,7 +422,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
 			if (!filterBA.isEmpty()){
 				imtbase::CTreeItemModel generalModel;
-				generalModel.Parse(filterBA);
+				generalModel.CreateFromJson(filterBA);
 
 				imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("FilterIds");
 				if (filterModel != nullptr){
@@ -464,8 +464,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		notificationModel->SetData("PagesCount", pagesCount);
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-		imtbase::IObjectCollection::DataPtr dataPtr;
-
 		for (const QByteArray& collectionId : collectionIds){
 			int itemIndex = itemsModel->InsertNewItem();
 			if (itemIndex >= 0){

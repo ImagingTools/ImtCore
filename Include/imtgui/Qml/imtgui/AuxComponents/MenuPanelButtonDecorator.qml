@@ -5,7 +5,7 @@ import imtqml 1.0
 Item {
     id: leftPanelElement;
 
-    width: 80;
+    width: 90;
     height: 80;
 
     property string title: "";
@@ -26,8 +26,8 @@ Item {
         anchors.top: parent.top;
         anchors.topMargin: 5;
 
-        width: 50;
-        height: 50;
+        width: 60;
+        height: 45;
 
         fillMode: Image.PreserveAspectFit;
 
@@ -47,15 +47,25 @@ Item {
         visible: parent.selected;
     }
 
-    Text {
-        id: description;
-
+    Item {
         anchors.bottom: parent.bottom;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        text: parent.title;
-        color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
-        font.pixelSize: container.fontSize;
-        font.family: Style.fontFamily;
+        width: 70;
+        height: description.height;
+
+        Text {
+            id: description;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            elide: Text.ElideRight;
+
+            text: leftPanelElement.title;
+            color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
+            font.pixelSize: container.fontSize;
+            font.family: Style.fontFamily;
+        }
     }
 }

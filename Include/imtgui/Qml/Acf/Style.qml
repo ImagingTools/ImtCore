@@ -11,7 +11,6 @@ Item {
     property string color_text_titles: "#7700FF";
     property string color_text_notActive: "#C2CEDB";
 
-
     property string language;
 
     property string mainText: "STYLE!!!";

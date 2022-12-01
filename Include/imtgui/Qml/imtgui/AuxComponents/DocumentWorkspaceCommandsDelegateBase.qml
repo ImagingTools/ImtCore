@@ -23,6 +23,8 @@ Item {
     */
     property alias updateItemTimer: timer.interval;
 
+    property bool autoUpdate: true;
+
     signal entered(string value);
     signal saved(string id, string name);
     signal closed();
@@ -45,7 +47,6 @@ Item {
         console.log("DocumentCommands onCompleted");
         let itemId = documentsData.GetData("Id", model.index);
         itemModelInputParams["Id"] = itemId;
-//        loadingPage.visible = true;
     }
 
     Component.onDestruction: {
@@ -57,7 +58,10 @@ Item {
 
         if (documentBase.itemLoad){
             Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-            timer.start();
+
+            if (autoUpdate){
+                timer.start();
+            }
         }
     }
 
@@ -126,7 +130,6 @@ Item {
     Component {
         id: saveDialog;
         MessageDialog {
-
             Component.onCompleted: {
                 console.log("saveDialog onCompleted");
                 buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
@@ -161,8 +164,9 @@ Item {
 
     Component {
         id: errorDialog;
-        MessageDialog {
 
+        MessageDialog {
+            title: qsTr("Error");
             onFinished: {
                 if (closingFlag){
                     closingFlag = false;
@@ -298,6 +302,10 @@ Item {
                 }
             }
         }
+    }
+
+    function updateModel(){
+        itemModel.updateModel(itemModelInputParams);
     }
 
     GqlModel {

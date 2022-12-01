@@ -4,7 +4,6 @@
 // ACF includes
 #include <istd/TChangeDelegator.h>
 
-
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
 #include <imtlic/IFeaturePackage.h>
@@ -36,7 +35,10 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		}
 
 		imtbase::CTreeItemModel itemModel;
-		itemModel.Parse(itemData);
+
+		if (!itemModel.CreateFromJson(itemData)){
+			return nullptr;
+		}
 
 		if (itemModel.ContainsKey("Id")){
 			objectId = itemModel.GetData("Id").toByteArray();
@@ -65,16 +67,27 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			featuresModelPtr = itemModel.GetTreeItemModel("Items");
 		}
 
+		imtbase::CTreeItemModel* dependenciesModelPtr = nullptr;
+
+		if (itemModel.ContainsKey("DependenciesModel")){
+			dependenciesModelPtr = itemModel.GetTreeItemModel("DependenciesModel");
+		}
+
 		if (featuresModelPtr != nullptr){
 			for (int i = 0; i < featuresModelPtr->GetItemsCount(); i++){
+				QString featureName;
+				if (featuresModelPtr->ContainsKey("Name", i)){
+					featureName = featuresModelPtr->GetData("Name", i).toString();
+				}
+
 				QByteArray featureId;
 				if (featuresModelPtr->ContainsKey("Id", i)){
 					featureId = featuresModelPtr->GetData("Id", i).toByteArray();
 				}
 
-				QString featureName;
-				if (featuresModelPtr->ContainsKey("Name", i)){
-					featureName = featuresModelPtr->GetData("Name", i).toString();
+				if (featureId.isEmpty()){
+					errorMessage = QT_TR_NOOP("Feature-ID cannot be empty!");
+					return nullptr;
 				}
 
 				QString featureDescription;
@@ -100,23 +113,22 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 				if (featuresModelPtr->ContainsKey("ChildModel", i)){
 					imtbase::CTreeItemModel* subFeaturesModelPtr = featuresModelPtr->GetTreeItemModel("ChildModel", i);
-					InsertSubFeaturesToDataFromModel(featurePackagePtr.GetPtr(), featureInfoPtr, subFeaturesModelPtr);
+					bool result = InsertSubFeaturesToDataFromModel(featurePackagePtr.GetPtr(), featureInfoPtr, dependenciesModelPtr, subFeaturesModelPtr, errorMessage);
+					if (!result){
+						return nullptr;
+					}
 				}
 
 				featurePackagePtr->InsertNewObject("FeatureInfo", featureName, featureDescription, featureInfoPtr);
 
-				if (featuresModelPtr->ContainsKey("DependenciesModel", i)){
-					imtbase::CTreeItemModel* dependenciesModel = featuresModelPtr->GetTreeItemModel("DependenciesModel", i);
+				if (dependenciesModelPtr != nullptr){
+					if (dependenciesModelPtr->ContainsKey(featureId)){
+						QByteArray dependencies = dependenciesModelPtr->GetData(featureId).toByteArray();
 
-					QByteArrayList featureDependencies;
-					for (int i = 0; i < dependenciesModel->GetItemsCount(); i++){
-						QByteArray dependencyFeatureId = dependenciesModel->GetData("Id", i).toByteArray();
-
-						featureDependencies << dependencyFeatureId;
-					}
-
-					if (!featureDependencies.isEmpty()){
-						featurePackagePtr->SetFeatureDependencies(featureId, featureDependencies);
+						if (!dependencies.isEmpty()){
+							QByteArrayList dependenciesList = dependencies.split(';');
+							featurePackagePtr->SetFeatureDependencies(featureId, dependenciesList);
+						}
 					}
 				}
 			}
@@ -130,15 +142,22 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 }
 
 
-void CPackageControllerComp::InsertSubFeaturesToDataFromModel(
+bool CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 		imtlic::CFeaturePackage* packagePtr,
 		imtlic::IFeatureInfo* parentFeaturePtr,
-		const imtbase::CTreeItemModel* subFeaturesModelPtr) const
+		const imtbase::CTreeItemModel* dependenciesModelPtr,
+		const imtbase::CTreeItemModel* subFeaturesModelPtr,
+		QString& errorMessage) const
 {
 	for (int i = 0; i < subFeaturesModelPtr->GetItemsCount(); i++){
 		QByteArray featureId;
 		if (subFeaturesModelPtr->ContainsKey("Id", i)){
 			featureId = subFeaturesModelPtr->GetData("Id", i).toByteArray();
+		}
+
+		if (featureId.isEmpty()){
+			errorMessage = QT_TR_NOOP("Feature-ID cannot be empty!");
+			return false;
 		}
 
 		QString featureName;
@@ -169,18 +188,14 @@ void CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 
 		packagePtr->InsertNewObject("FeatureInfo", featureName, description, featureInfoPtr);
 
-		if (subFeaturesModelPtr->ContainsKey("DependenciesModel", i)){
-			imtbase::CTreeItemModel* dependenciesModel = subFeaturesModelPtr->GetTreeItemModel("DependenciesModel", i);
+		if (dependenciesModelPtr != nullptr){
+			if (dependenciesModelPtr->ContainsKey(featureId)){
+				QByteArray dependencies = dependenciesModelPtr->GetData(featureId).toByteArray();
 
-			QByteArrayList featureDependencies;
-			for (int i = 0; i < dependenciesModel->GetItemsCount(); i++){
-				QByteArray dependencyFeatureId = dependenciesModel->GetData("Id", i).toByteArray();
-
-				featureDependencies << dependencyFeatureId;
-			}
-
-			if (!featureDependencies.isEmpty()){
-				packagePtr->SetFeatureDependencies(featureId, featureDependencies);
+				if (!dependencies.isEmpty()){
+					QByteArrayList dependenciesList = dependencies.split(';');
+					packagePtr->SetFeatureDependencies(featureId, dependenciesList);
+				}
 			}
 		}
 
@@ -189,15 +204,21 @@ void CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 		if (subFeaturesModelPtr->ContainsKey("ChildModel", i)){
 			imtbase::CTreeItemModel *subModelPtr = subFeaturesModelPtr->GetTreeItemModel("ChildModel", i);
 
-			InsertSubFeaturesToDataFromModel(packagePtr, featureInfoPtr, subModelPtr);
+			bool result = InsertSubFeaturesToDataFromModel(packagePtr, featureInfoPtr, dependenciesModelPtr, subModelPtr, errorMessage);
+			if (!result){
+				return false;
+			}
 		}
 	}
+
+	return true;
 }
 
 
 void CPackageControllerComp::InsertSubFeaturesToModelFromData(
 		const imtlic::CFeaturePackage* packagePtr,
 		const imtlic::IFeatureInfo *featurePtr,
+		imtbase::CTreeItemModel* dependenciesModelPtr,
 		imtbase::CTreeItemModel *featuresModel) const
 {
 	QList<const imtlic::IFeatureInfo*> subFeatures = featurePtr->GetSubFeatures();
@@ -218,47 +239,17 @@ void CPackageControllerComp::InsertSubFeaturesToModelFromData(
 		featuresModel->SetData("Optional", isOptional, index);
 		featuresModel->SetData("Description", featureDescription, index);
 
-		featuresModel->SetData("Active", true, index);
-		featuresModel->SetData("Visible", true, index);
-		featuresModel->SetData("Opened", false, index);
-		featuresModel->SetData("Selected", false, index);
-		featuresModel->SetData("State", Qt::Unchecked, index);
-
-//		if (isOptional){
-//			featuresModel->SetData("State", Qt::Unchecked, index);
-//		}
-//		else{
-//			featuresModel->SetData("State", Qt::Checked, index);
-//		}
-
-		imtbase::CTreeItemModel *parentModel = featuresModel->GetParent();
-		int level = parentModel->GetData("Level").toInt();
-		featuresModel->SetData("Level", level + 1, index);
-
-		imtbase::CTreeItemModel* dependenciesModel = featuresModel->AddTreeModel("DependenciesModel", index);
-		QByteArrayList featureDependencies = packagePtr->GetFeatureDependencies(featureId);
-
-		for (const QByteArray& dependencyFeatureId : featureDependencies){
-			int i = dependenciesModel->InsertNewItem();
-
-			dependenciesModel->SetData("Id", dependencyFeatureId, i);
-
-			const imtlic::IFeatureInfo* dependencyFeatureInfoPtr = packagePtr->FindFeatureById(dependencyFeatureId);
-			if (dependencyFeatureInfoPtr != nullptr){
-				const imtlic::IFeatureInfo* dependencyFeatureInfoPtr = packagePtr->FindFeatureById(dependencyFeatureId);
-				if (dependencyFeatureInfoPtr != nullptr){
-					const imtlic::IFeatureInfo* parentDependencyFeatureInfoPtr = dependencyFeatureInfoPtr->GetParentFeature();
-					if (parentDependencyFeatureInfoPtr != nullptr){
-						QByteArray parentFeatureId = parentDependencyFeatureInfoPtr->GetFeatureId();
-						dependenciesModel->SetData("ParentId", parentFeatureId, i);
-					}
-				}
+		if (dependenciesModelPtr != nullptr){
+			QByteArrayList featureDependenciesList = packagePtr->GetFeatureDependencies(featureId);
+			if (!featureDependenciesList.isEmpty()){
+				QByteArray dependencies = featureDependenciesList.join(';');
+				dependenciesModelPtr->SetData(featureId, dependencies);
 			}
 		}
 
 		imtbase::CTreeItemModel *subFeaturesModel = featuresModel->AddTreeModel("ChildModel", index);
 
-		InsertSubFeaturesToModelFromData(packagePtr, subFeatureInfoPtr, subFeaturesModel);
+		InsertSubFeaturesToModelFromData(packagePtr, subFeatureInfoPtr, dependenciesModelPtr, subFeaturesModel);
 	}
 }
 
@@ -274,8 +265,8 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();;
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();;
 
 	QByteArray packageId = GetObjectIdFromInputParams(inputParams);
 
@@ -284,21 +275,26 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 	if (m_headersProviderCompPtr.IsValid()){
 		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
 		imtbase::CTreeItemModel* headers = headersModel->GetTreeItemModel("Headers");
-		dataModel->SetExternTreeModel("Headers", headers);
+		dataModelPtr->SetExternTreeModel("Headers", headers);
 	}
 
-	imtbase::CTreeItemModel* featuresModel = dataModel->AddTreeModel("Items");
+	dataModelPtr->SetData("Id", "");
+	dataModelPtr->SetData("Name", "");
+	dataModelPtr->SetData("Description", "");
+
+	imtbase::CTreeItemModel* featuresModel = dataModelPtr->AddTreeModel("Items");
+	imtbase::CTreeItemModel* dependenciesModelPtr = dataModelPtr->AddTreeModel("DependenciesModel");
 
 	if (m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
 		const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(dataPtr.GetPtr());
 		if (packagePtr != nullptr){
-			dataModel->SetData("Id", packagePtr->GetPackageId());
+			dataModelPtr->SetData("Id", packagePtr->GetPackageId());
 
 			QString name = m_objectCollectionCompPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			dataModel->SetData("Name", name);
+			dataModelPtr->SetData("Name", name);
 
 			QString description = m_objectCollectionCompPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-			dataModel->SetData("Description", description);
+			dataModelPtr->SetData("Description", description);
 
 			QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 
@@ -322,55 +318,27 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 						featuresModel->SetData("Optional", isOptional, index);
 						featuresModel->SetData("Description", featureDescription, index);
 
-						featuresModel->SetData("Active", true, index);
-						featuresModel->SetData("Visible", true, index);
-						featuresModel->SetData("Opened", false, index);
-						featuresModel->SetData("Selected", false, index);
-						featuresModel->SetData("Level", 1, index);
+						QByteArrayList featureDependenciesList = packagePtr->GetFeatureDependencies(featureId);
 
-						featuresModel->SetData("State", Qt::Unchecked, index);
-
-//						if (isOptional){
-//							featuresModel->SetData("State", Qt::Unchecked, index);
-//						}
-//						else{
-//							featuresModel->SetData("State", Qt::Checked, index);
-//						}
-
-						imtbase::CTreeItemModel* dependenciesModel = featuresModel->AddTreeModel("DependenciesModel", index);
-
-						QByteArrayList featureDependencies = packagePtr->GetFeatureDependencies(featureId);
-
-						for (const QByteArray& dependencyFeatureId : featureDependencies){
-							int index = dependenciesModel->InsertNewItem();
-
-							dependenciesModel->SetData("Id", dependencyFeatureId, index);
-
-							const imtlic::IFeatureInfo* dependencyFeatureInfoPtr = packagePtr->FindFeatureById(dependencyFeatureId);
-							if (dependencyFeatureInfoPtr != nullptr){
-								const imtlic::IFeatureInfo* dependencyFeatureInfoPtr = packagePtr->FindFeatureById(dependencyFeatureId);
-								if (dependencyFeatureInfoPtr != nullptr){
-									const imtlic::IFeatureInfo* parentDependencyFeatureInfoPtr = dependencyFeatureInfoPtr->GetParentFeature();
-									if (parentDependencyFeatureInfoPtr != nullptr){
-										QByteArray parentFeatureId = parentDependencyFeatureInfoPtr->GetFeatureId();
-										dependenciesModel->SetData("ParentId", parentFeatureId, index);
-									}
-								}
+						if (dependenciesModelPtr != nullptr){
+							if (!featureDependenciesList.isEmpty()){
+								QByteArray dependencies = featureDependenciesList.join(';');
+								dependenciesModelPtr->SetData(featureId, dependencies);
 							}
 						}
 
 						imtbase::CTreeItemModel* subFeaturesModel = featuresModel->AddTreeModel("ChildModel", index);
 
-						InsertSubFeaturesToModelFromData(packagePtr, featureInfoPtr, subFeaturesModel);
+						InsertSubFeaturesToModelFromData(packagePtr, featureInfoPtr, dependenciesModelPtr, subFeaturesModel);
 					}
 				}
 			}
 		}
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
 
-	return rootModel;
+	return rootModelPtr;
 }
 
 
@@ -379,56 +347,42 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 			const imtgql::CGqlObject& gqlObject,
 			QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
 	}
-	else {
-		imtbase::CTreeItemModel* dataModel = rootModel->AddTreeModel("data");
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-		for (const QByteArray& collectionId : collectionIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (!m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				continue;
-			}
-			const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(dataPtr.GetPtr());
-			if (packagePtr != nullptr){
-				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureCollectionId : featureCollectionIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
-					if (featureInfoPtr != nullptr){
-						QByteArray featureId = featureInfoPtr->GetFeatureId();
-						QByteArrayList featureDependencies = packagePtr->GetFeatureDependencies(featureId);
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	imtbase::CTreeItemModel* dependenciesModelPtr = dataModelPtr->AddTreeModel("DependenciesModel");
 
-						if (!featureDependencies.isEmpty()){
-							imtbase::CTreeItemModel* dependenciesModel = dataModel->AddTreeModel(featureId);
+	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+	for (const QByteArray& collectionId : collectionIds){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (!m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+			continue;
+		}
+		const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(dataPtr.GetPtr());
+		if (packagePtr != nullptr){
+			imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
+			for (const QByteArray& featureCollectionId : featureCollectionIds){
+				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
 
-							for (const QByteArray& dependencyId : featureDependencies){
-								int index = dependenciesModel->InsertNewItem();
+				if (featureInfoPtr != nullptr){
+					QByteArray featureId = featureInfoPtr->GetFeatureId();
+					QByteArrayList featureDependenciesList = packagePtr->GetFeatureDependencies(featureId);
 
-								dependenciesModel->SetData("Id", dependencyId, index);
-
-								const imtlic::IFeatureInfo* dependencyFeatureInfoPtr = packagePtr->FindFeatureById(dependencyId);
-								if (dependencyFeatureInfoPtr != nullptr){
-									const imtlic::IFeatureInfo* parentDependencyFeatureInfoPtr = dependencyFeatureInfoPtr->GetParentFeature();
-									if (parentDependencyFeatureInfoPtr != nullptr){
-										QByteArray parentFeatureId = parentDependencyFeatureInfoPtr->GetFeatureId();
-										dependenciesModel->SetData("ParentId", parentFeatureId, index);
-									}
-								}
-							}
-						}
+					if (!featureDependenciesList.isEmpty()){
+						QByteArray featureDependencies = featureDependenciesList.join(';');
+						dependenciesModelPtr->SetData(featureId, featureDependencies);
 					}
 				}
 			}
 		}
 	}
 
-	return rootModel;
+	return rootModelPtr;
 }
 
 
@@ -437,80 +391,67 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
 			const imtgql::CGqlObject& gqlObject,
 			QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* treeItemModel = nullptr;
-	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* dataModelPtr = nullptr;
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		dataModel = new imtbase::CTreeItemModel();
+		dataModelPtr = new imtbase::CTreeItemModel();
 		treeItemModel = new imtbase::CTreeItemModel();
 		treeItemModel->SetIsArray(true);
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-		int index;
 
 		for (const QByteArray& collectionId : collectionIds){
-			index = treeItemModel->InsertNewItem();
-
-			treeItemModel->SetData("Id", collectionId, index);
-			treeItemModel->SetData("Name", collectionId, index);
-			treeItemModel->SetData("State", Qt::Unchecked, index);
-			treeItemModel->SetData("Level", 0, index);
-			treeItemModel->SetData("Visible", true, index);
-			treeItemModel->SetData("Active", true, index);
-			treeItemModel->SetData("Opened", true, index);
-			treeItemModel->SetData("Selected", false, index);
 
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 				const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(dataPtr.GetPtr());
-				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
+				if (packagePtr != nullptr){
+					QByteArray packageId = packagePtr->GetPackageId();
+					QString packageName = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-				imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("ChildModel", index);
+					int index = treeItemModel->InsertNewItem();
 
-				for (const QByteArray& featureCollectionId : featureCollectionIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
-					if (featureInfoPtr != nullptr){
-						const imtlic::IFeatureInfo* parentFeatureInfoPtr = featureInfoPtr->GetParentFeature();
-						if (parentFeatureInfoPtr == nullptr){
-							QString featureId = featureInfoPtr->GetFeatureId();
-							QString featureName = featureInfoPtr->GetFeatureName();
-							bool isOptional = featureInfoPtr->IsOptional();
+					treeItemModel->SetData("Id", packageId, index);
+					treeItemModel->SetData("Name", packageName, index);
 
-							int childItemIndex = childItemModel->InsertNewItem();
+					QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 
-							childItemModel->SetData("Id", featureId, childItemIndex);
-							childItemModel->SetData("Name", featureName, childItemIndex);
-							childItemModel->SetData("Level", 1, childItemIndex);
-							childItemModel->SetData("Visible", true, childItemIndex);
-							childItemModel->SetData("Active", true, childItemIndex);
-							childItemModel->SetData("Opened", false, childItemIndex);
-							childItemModel->SetData("Selected", false, childItemIndex);
-							childItemModel->SetData("Optional", isOptional, childItemIndex);
-							childItemModel->SetData("State", Qt::Unchecked, childItemIndex);
-//							if (isOptional){
-//								childItemModel->SetData("State", Qt::Unchecked, childItemIndex);
-//							}
-//							else{
-//								childItemModel->SetData("State", Qt::Checked, childItemIndex);
-//							}
+					imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("ChildModel", index);
 
-							imtbase::CTreeItemModel* subFeaturesModel = childItemModel->AddTreeModel("ChildModel", childItemIndex);
+					for (const QByteArray& featureCollectionId : featureCollectionIds){
+						const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+						if (featureInfoPtr != nullptr){
+							const imtlic::IFeatureInfo* parentFeatureInfoPtr = featureInfoPtr->GetParentFeature();
+							if (parentFeatureInfoPtr == nullptr){
+								QString featureId = featureInfoPtr->GetFeatureId();
+								QString featureName = featureInfoPtr->GetFeatureName();
+								bool isOptional = featureInfoPtr->IsOptional();
 
-							InsertSubFeaturesToModelFromData(packagePtr, featureInfoPtr, subFeaturesModel);
+								int childItemIndex = childItemModel->InsertNewItem();
+
+								childItemModel->SetData("Id", featureId, childItemIndex);
+								childItemModel->SetData("Name", featureName, childItemIndex);
+								childItemModel->SetData("Optional", isOptional, childItemIndex);
+
+								imtbase::CTreeItemModel* subFeaturesModel = childItemModel->AddTreeModel("ChildModel", childItemIndex);
+
+								InsertSubFeaturesToModelFromData(packagePtr, featureInfoPtr, nullptr, subFeaturesModel);
+							}
 						}
 					}
 				}
 			}
 		}
-		dataModel->SetExternTreeModel("TreeModel", treeItemModel);
+		dataModelPtr->SetExternTreeModel("TreeModel", treeItemModel);
 	}
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
 
-	return rootModel;
+	return rootModelPtr;
 }
 
 

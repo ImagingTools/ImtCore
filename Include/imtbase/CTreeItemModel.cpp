@@ -67,6 +67,24 @@ bool CTreeItemModel::Copy(CTreeItemModel* object)
 }
 
 
+void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &map)
+{
+	if (index < 0 || index > m_items.count()){
+		return;
+	}
+
+	beginInsertRows(QModelIndex(), index, index);
+
+	m_items.insert(index, new Item());
+
+	for(auto value = map.cbegin(); value != map.cend(); ++ value){
+		SetData(value.key().toUtf8(), *value, index);
+	}
+
+	endInsertRows();
+}
+
+
 int CTreeItemModel::InsertNewItem()
 {
 	m_items.append(new Item());
@@ -398,14 +416,14 @@ void CTreeItemModel::SetIsArray(const bool &isArray)
 }
 
 
-bool CTreeItemModel::Parse(const QByteArray &data)
+bool CTreeItemModel::CreateFromJson(const QByteArray &jsonContent)
 {
 	Clear();
 	QJsonParseError error;
-	qDebug() << "data" << data;
-	QJsonDocument document = QJsonDocument::fromJson(data, &error);
+
+	QJsonDocument document = QJsonDocument::fromJson(jsonContent, &error);
 	if (error.error != QJsonParseError::NoError){
-		qCritical()  << "Error for parsing json document:" << error.errorString();
+		qCritical()  << "Error during parsing JSON document:" << error.errorString();
 		return false;
 	}
 
@@ -416,7 +434,7 @@ bool CTreeItemModel::Parse(const QByteArray &data)
 		for (auto v : jsonArray){
 			index = InsertNewItem();
 			QJsonObject element = v.toObject();
-			retVal &= ParseRecursive(element, index);
+			retVal = retVal && ParseRecursive(element, index);
 		}
 	}
 	else{

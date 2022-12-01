@@ -31,6 +31,10 @@ Item {
         }
     }
 
+    function clearModel(){
+        serverModel.Clear();
+    }
+
     function updateModel(){
         settingsQuery.getSettings();
     }
@@ -127,6 +131,7 @@ Item {
     }
 
     function getInstanceMask(){
+        console.log("getInstanceMask");
         for (let i = 0; i < localModel.GetItemsCount(); i++){
             let pageModel = localModel.GetModelFromItem(i);
 
@@ -138,7 +143,7 @@ Item {
                     for (let j = 0; j < elements.GetItemsCount(); j++){
                         let elementId = elements.GetData("Id", j);
                         if (elementId == "InstanceMask"){
-                            let elementValue = elements.GetData("Value", i);
+                            let elementValue = elements.GetData("Value", j);
                             return elementValue;
                         }
                     }

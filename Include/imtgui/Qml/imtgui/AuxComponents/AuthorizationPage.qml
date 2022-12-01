@@ -8,7 +8,30 @@ Rectangle {
 
     color: Style.dialogBackgroundColor;
 
+    states: [
+        State {
+            name: "unauthorized"
+//            PropertyChanges { target: myRect; color: "red" }
+        }
+        ,
+        State {
+            name: "authorized"
+//            PropertyChanges { target: myRect; color: "red" }
+        }
+    ]
+
     property alias tokenProvider: userTokenProvider;
+
+    onVisibleChanged: {
+        if (visible){
+            authPageContainer.state = "unauthorized";
+
+            passwordTextInput.text = "";
+            loginTextInput.text = ""
+
+            loginTextInput.focus = true;
+        }
+    }
 
     MouseArea {
         anchors.fill: parent;
@@ -239,6 +262,8 @@ Rectangle {
 
         onAccepted: {
             console.log('DEBUG::UserTokenProvider.onAccepted')
+            authPageContainer.state = "authorized";
+
             window.updateAllModels();
             authPageContainer.visible = false;
         }

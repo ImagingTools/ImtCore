@@ -21,6 +21,8 @@ Item {
 
     property ModelIndex modelIndex: ModelIndex {};
 
+    property bool isOpen: true;
+
     Component.onCompleted: {
         console.log("TreeItemDelegate onCompleted");
         modelIndex.itemData = model;
@@ -183,13 +185,13 @@ Item {
                 width: 15;
                 height: width;
 
-                iconSource: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
+                iconSource: isOpen ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                        "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
                 visible: childModelRepeater.count > 0;
 
                 onClicked: {
-                    model.Opened = !model.Opened;
+                    isOpen = !isOpen;
                 }
             }
 
@@ -350,7 +352,7 @@ Item {
         anchors.top: rowBody.bottom;
         anchors.right: parent.right;
 
-        visible: model.Opened;
+        visible: isOpen;
 
         Repeater {
             id: childModelRepeater;

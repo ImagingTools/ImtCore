@@ -8,18 +8,17 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Commands" X="600" Y="475" Note=""/>
-        <Element ComponentName="Demultiplexer" X="725" Y="50" Note=""/>
-        <Element ComponentName="ObjectViewDataProvider" X="1025" Y="600" Note=""/>
-        <Element ComponentName="ProductInfoProvider" X="525" Y="225" Note=""/>
-        <Element ComponentName="Role" X="100" Y="325" Note=""/>
-        <Element ComponentName="RoleCollectionAdapter" X="150" Y="425" Note=""/>
-        <Element ComponentName="RoleDataController" X="125" Y="200" Note=""/>
-        <Element ComponentName="RoleEditCommandDataProvider" X="600" Y="600" Note=""/>
-        <Element ComponentName="RoleListController" X="925" Y="225" Note=""/>
-        <Element ComponentName="RolesCommandDataProvider" X="150" Y="575" Note=""/>
-        <Element ComponentName="RolesHeadersDataProvider" X="1050" Y="50" Note=""/>
-        <Element ComponentName="VisualStatus" X="125" Y="50" Note=""/>
+        <Element ComponentName="Commands" X="550" Y="300" Note=""/>
+        <Element ComponentName="Demultiplexer" X="570.757359313" Y="76.4142135624" Note=""/>
+        <Element ComponentName="ObjectViewDataProvider" X="1025" Y="525" Note=""/>
+        <Element ComponentName="Role" X="100" Y="425" Note=""/>
+        <Element ComponentName="RoleCollectionAdapter" X="125" Y="525" Note=""/>
+        <Element ComponentName="RoleDataController" X="250" Y="300" Note=""/>
+        <Element ComponentName="RoleEditCommandDataProvider" X="700" Y="525" Note=""/>
+        <Element ComponentName="RoleListController" X="875" Y="300" Note=""/>
+        <Element ComponentName="RolesCommandDataProvider" X="375" Y="525" Note=""/>
+        <Element ComponentName="RolesHeadersDataProvider" X="1000" Y="75" Note=""/>
+        <Element ComponentName="VisualStatus" X="175" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

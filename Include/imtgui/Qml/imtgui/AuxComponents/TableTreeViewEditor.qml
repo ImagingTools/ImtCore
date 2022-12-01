@@ -9,7 +9,13 @@ Item {
 
     property alias table: table;
 
+    property alias delegateComp: delegateLoader.sourceComponent;
+
     property ModelIndex selectedIndex: null;
+
+    property bool readOnly: false;
+
+    readonly property alias timer: timer;
 
     Timer {
         id: timer;
@@ -21,10 +27,10 @@ Item {
         }
     }
 
-    Component {
-        id: delegateComp;
+    Loader {
+        id: delegateLoader;
 
-        TableTreeItemDelegate {
+        sourceComponent: TableTreeItemDelegate {
             id: delegate;
 
             width: treeViewContainer.width;

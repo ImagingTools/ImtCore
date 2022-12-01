@@ -58,21 +58,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ProductInfoProvider" PackageId="ImtLicensePck" ComponentId="ProductInfoProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PermissionsProvider" Type="Reference[]" ExportId="ProductPermissionsProviders">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductNames">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
@@ -108,9 +93,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ProductInfoProvider"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
                         <Data IsEnabled="true" Value="Role"/>
@@ -212,8 +194,8 @@
                     <AttributeInfo Id="ObjectViewProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ObjectViewDataProvider"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ProductInfoProvider"/>
+                    <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="ProductProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>

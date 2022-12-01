@@ -28,6 +28,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 	dataModel->SetData("LastName", "");
 	dataModel->SetData("NickName", "");
 	dataModel->SetData("Email", "");
+	dataModel->SetData("BirthDay", "");
 
 	QByteArray accountId = GetObjectIdFromInputParams(inputParams);
 
@@ -114,7 +115,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		}
 
 		imtbase::CTreeItemModel itemModel;
-		itemModel.Parse(itemData);
+		itemModel.CreateFromJson(itemData);
 
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
