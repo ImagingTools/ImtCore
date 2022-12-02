@@ -169,4 +169,4 @@ function(jqml_compile_web)
 	set_property(SOURCE ${QRC_CPP_WEB_FILE} PROPERTY SKIP_AUTOMOC ON)
 	target_sources(${PROJECT_NAME} PRIVATE ${QRC_CPP_WEB_FILE})
 
-endfunction(imtcore_compile_web)
+endfunction(jqml_compile_web)
