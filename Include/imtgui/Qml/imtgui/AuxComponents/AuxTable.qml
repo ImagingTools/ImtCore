@@ -687,6 +687,7 @@ Item {
 
         anchors.fill: elementsList;
         color: Style.baseColor;
+        radius: tableContainer.radius;
     }
 
 
