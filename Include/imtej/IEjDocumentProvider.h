@@ -25,7 +25,7 @@ class IObject2d;
 class IEjDocumentProvider: virtual public istd::IPolymorphic
 {
 public:
-	virtual EjDocument* getReport(iprm::IParamsSet* reportParams, const iqt::ITranslationManager* translatorPtr = nullptr, const QByteArray& userLanguage = "") = 0;
+    virtual EjDocument* getReport(iprm::IParamsSet* reportParams, const istd::IChangeable* dataObjectPtr = NULL, const iqt::ITranslationManager* translatorPtr = nullptr, const QByteArray& userLanguage = "") = 0;
 
     virtual QByteArrayList getReportIds() = 0;
 };

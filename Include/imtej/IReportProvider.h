@@ -28,7 +28,7 @@ public:
         RI_NOT_SUCCESS = 0
     };
 
-	virtual ReportInfo createReport(iprm::IParamsSet* reportParams, const QString& reportPath, const QByteArray& userLanguage) = 0;
+    virtual ReportInfo createReport(iprm::IParamsSet* reportParams, const QString& reportPath, const QByteArray& userLanguage, const istd::IChangeable* dataObjectPtr = NULL) = 0;
 
     virtual QByteArrayList getReportIds() = 0;
 };

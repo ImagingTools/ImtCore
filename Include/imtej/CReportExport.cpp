@@ -25,7 +25,7 @@ bool CReportExport::exportReport(EjDocument* ejDocument, QString const& file_nam
 	if(file_name.endsWith("xlsx"))
     {
         EjConvertorExcel* excelConvertorPtr = new EjConvertorExcel();
-        return excelConvertorPtr->convert(ejDocument, file_name);;
+        return excelConvertorPtr->convert(ejDocument, file_name);
 	}
     return false;
 }
