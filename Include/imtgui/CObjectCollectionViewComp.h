@@ -237,13 +237,10 @@ private:
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();
 	void ValidateSectionSize(int logicalIndex, int newSize);
-
-	void SaveItemsSelection();
-	void RestoreItemsSelection();
-
 	void UpdateTypeStatus();
 
-	bool eventFilter(QObject* object, QEvent* event) override;
+	// reimplemented (QObject)
+	virtual bool eventFilter(QObject* object, QEvent* event) override;
 
 private Q_SLOTS:
 	void OnSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
@@ -253,11 +250,6 @@ private Q_SLOTS:
 	void OnSectionMoved(int logicalIndex, int oldVisualIndex, int newVisualIndex);
 	void OnSortingChanged(int logicalIndex, Qt::SortOrder order);
 	void OnTypeChanged();
-
-	void OnContextMenuRename(bool checked);
-	void OnContextMenuEditDescription(bool checked);
-	void OnContextMenuEditDocument(bool checked);
-	void OnContextMenuRemove(bool checked);
 
 	void OnFilterChanged(const QString& text);
 	void OnSearchShortCut();
@@ -355,8 +347,6 @@ private:
 	typedef QVector<ColumnSettings> ColumnsList;
 	typedef QMap<QString, ColumnsList> TypeIdColumnsSettings;
 	mutable TypeIdColumnsSettings m_typeIdColumnsSettings;
-
-	QMap<QByteArray, QByteArrayList> m_itemsSelection;
 
 	iqtgui::IGuiObject* m_currentInformationViewPtr;
 

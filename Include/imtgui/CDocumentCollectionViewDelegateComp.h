@@ -49,11 +49,6 @@ public:
 		I_ASSIGN(m_editCommandDescriptionAttrPtr, "EditCommandDescription", "Description of the edit command", true, "Edit existing object");
 	I_END_COMPONENT;
 
-	enum CommandGroup
-	{
-		CG_DOCUMENT_MANAGER = 2100
-	};
-
 	CDocumentCollectionViewDelegateComp();
 
 	// reimplemented (imtgui::ICollectionViewDelegate)
@@ -209,8 +204,6 @@ private:
 
 private:
 	ifile::IFileMetaInfoProvider::MetaInfoPtr m_selectedMetaInfoPtr;
-
-	iqtgui::CHierarchicalCommand m_editContentsCommand;
 
 	ObjectPersistenceProxy m_collectionPersistence;
 

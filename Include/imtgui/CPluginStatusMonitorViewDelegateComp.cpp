@@ -217,6 +217,10 @@ bool CPluginStatusMonitorViewDelegateComp::IsCommandSupported(int /*commandId*/)
 	return false;
 }
 
+void CPluginStatusMonitorViewDelegateComp::SetupContextMenu(QMenu& /*menu*/) const
+{
+}
+
 
 // reimplemented (ibase::ICommandsProvider)
 

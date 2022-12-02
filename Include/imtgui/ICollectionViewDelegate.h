@@ -7,6 +7,7 @@
 #include <QtCore/QVector>
 #include <QtCore/QVariant>
 #include <QtWidgets/QAbstractItemDelegate>
+#include <QtWidgets/QMenu>
 
 // ACF includes
 #include <ibase/ICommandsProvider.h>
@@ -209,6 +210,11 @@ public:
 		By calling this method, the base class determines whether the command is supported by the child.
 	*/
 	virtual bool IsCommandSupported(int commandId) const = 0;
+
+	/**
+		Setup the context menu.
+	*/
+	virtual void SetupContextMenu(QMenu& menu) const = 0;
 };
 
 

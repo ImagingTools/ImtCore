@@ -69,7 +69,25 @@ imtbase::ISelection::SelectionMode CObjectCollectionViewComp::GetSelectionMode()
 
 imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 {
-	return m_itemsSelection[m_currentTypeId].toVector();
+	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
+
+	imtbase::ICollectionInfo::Ids itemIds;
+
+	QSet<QByteArray> selectedTypes;
+
+	if (!selectedIndexes.isEmpty()){
+		const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+		Q_ASSERT(collectionPtr != nullptr);
+		for (int i = 0; i < selectedIndexes.count(); ++i){
+			QModelIndex mappedIndex = selectedIndexes[i];
+			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
+			if (!itemId.isEmpty()){
+				itemIds.push_back(itemId);
+			}
+		}
+	}
+
+	return itemIds;
 }
 
 
@@ -152,8 +170,6 @@ void CObjectCollectionViewComp::OnPageSelectionUpdated()
 {
 	imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 	if (collectionPtr != nullptr){
-		m_itemsSelection[m_currentTypeId].clear();
-
 		ItemList->selectionModel()->clearSelection();
 
 		m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
@@ -714,37 +730,6 @@ void CObjectCollectionViewComp::ValidateSectionSize(int logicalIndex, int newSiz
 }
 
 
-void CObjectCollectionViewComp::SaveItemsSelection()
-{
-	m_itemsSelection[m_currentTypeId].clear();
-
-	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
-	if (!selectedIndexes.isEmpty()){
-		for (int i = 0; i < selectedIndexes.count(); i++){
-			QModelIndex mappedIndex = selectedIndexes[i];
-			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-			
-			m_itemsSelection[m_currentTypeId].append(itemId);
-		}
-	}
-}
-
-
-void CObjectCollectionViewComp::RestoreItemsSelection()
-{
-	QItemSelection selection;
-
-	for (int i = 0; i < m_tableModel.rowCount(); i++){
-		QModelIndex mappedIndex = m_tableModel.index(i, 0);
-		QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-		if (m_itemsSelection[m_currentTypeId].contains(itemId)){
-			selection.append(QItemSelectionRange(m_tableModel.index(i, 0)));
-		}
-	}
-	ItemList->selectionModel()->select(selection, QItemSelectionModel::Select | QItemSelectionModel::Rows);
-}
-
-
 void CObjectCollectionViewComp::UpdateTypeStatus()
 {
 	for (int delegateIndex = 0; delegateIndex < m_viewDelegatesCompPtr.GetCount(); ++delegateIndex){
@@ -790,12 +775,7 @@ void CObjectCollectionViewComp::OnSelectionChanged(const QItemSelection& /*selec
 
 	istd::CChangeNotifier notifier(this);
 
-	SaveItemsSelection();
 	UpdateCommands();
-
-	if (ItemList->selectionModel()->selectedRows().isEmpty()){
-		ItemList->setCurrentIndex(QModelIndex());
-	}
 }
 
 
@@ -824,36 +804,11 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 		return;
 	}
 
-	QAction* actionRename;
-	QAction* actionEditDescription;
-	QAction* actionEditDocument;
-	QAction* actionRemove;
 	QMenu menu(ItemList);
 
-	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_EDIT)){
-		actionEditDocument = menu.addAction(QIcon(":/Icons/Edit"), tr("Edit..."));
-		connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDocument);
-	}
+	const imtgui::ICollectionViewDelegate& currentViewDelegate = GetViewDelegate(m_currentTypeId);
 
-	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
-		actionRemove = menu.addAction(QIcon(":/Icons/Remove"), tr("Remove"));
-		connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRemove);
-	}
-
-	if (selectedIndexes.count() == 1){
-		if (menu.actions().count() > 0){
-			menu.addSeparator();
-		}
-
-		if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_EDIT_DESCRIPTION)){
-			actionEditDescription = menu.addAction(tr("Set Description..."));
-			connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuEditDescription);
-		}
-		if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_RENAME)){
-			actionRename = menu.addAction(tr("Rename..."));
-			connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewComp::OnContextMenuRename);
-		}
-	}
+	currentViewDelegate.SetupContextMenu(menu);
 
 	if (menu.actions().count() > 0){
 		menu.exec(ItemList->viewport()->mapToGlobal(point));
@@ -933,8 +888,6 @@ void CObjectCollectionViewComp::OnTypeChanged()
 {
 	SignalSemaphore semaphore(m_semaphoreCounter);
 
-	SaveItemsSelection();
-
 	m_currentTypeId.clear();
 
 	QList<QTreeWidgetItem*> selectedItems = TypeList->selectedItems();
@@ -969,12 +922,10 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	}
 
 	if (m_semaphoreCounter == 1){
-		RestoreItemsSelection();
 		RestoreColumnsSettings();
 	}
 	else{
 		if (!m_currentTypeId.isEmpty() && m_typeIdColumnsSettings.contains(m_currentTypeId)){
-			RestoreItemsSelection();
 			RestoreColumnsSettings();
 		}
 	}
@@ -1013,91 +964,6 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
 
 	UpdateCommands();
-}
-
-
-void CObjectCollectionViewComp::OnContextMenuRename(bool /*checked*/)
-{
-	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
-	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
-
-	if (selectedIndexes.count() != 1){
-		return;
-	}
-
-	if (!selectedIndexes.isEmpty()){
-		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i];
-			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-			if (!itemId.isEmpty()){
-				delegate.RenameObject(itemId, "");
-			}
-		}
-	}
-}
-
-
-void CObjectCollectionViewComp::OnContextMenuEditDescription(bool /*checked*/)
-{
-	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
-
-	if (selectedIndexes.count() != 1){
-		return;
-	}
-
-	if (!selectedIndexes.isEmpty()){
-		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i];
-			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-			if (!itemId.isEmpty()){
-				imtbase::IObjectCollection* objectPtr = GetObservedObject();
-				QString description = objectPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_DESCRIPTION).toString();
-
-				bool ok;
-				QString newDescription = QInputDialog::getText(ItemList, tr("Enter object description"), tr("Description"), QLineEdit::Normal, description, &ok);
-				if (ok){
-					objectPtr->SetElementDescription(itemId, newDescription);
-				}
-			}
-		}
-	}
-}
-
-
-void CObjectCollectionViewComp::OnContextMenuEditDocument(bool /*checked*/)
-{
-	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
-	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
-
-	if (!selectedIndexes.isEmpty()){
-		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i];
-			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-			if (!itemId.isEmpty()){
-				delegate.OpenDocumentEditor(itemId);
-			}
-		}
-	}
-}
-
-
-void CObjectCollectionViewComp::OnContextMenuRemove(bool /*checked*/)
-{
-	ICollectionViewDelegate & delegate = GetViewDelegateRef(m_currentTypeId);
-	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
-
-	QVector<QByteArray> itemIds;
-	if (!selectedIndexes.isEmpty()){
-		for (int i = 0; i < selectedIndexes.count(); ++i){
-			QModelIndex mappedIndex = selectedIndexes[i];
-			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
-			if (!itemId.isEmpty()){
-				itemIds.append(itemId);
-			}
-		}
-	}
-
-	delegate.RemoveObjects(itemIds);
 }
 
 
@@ -1164,13 +1030,13 @@ void CObjectCollectionViewComp::OnEscShortCut()
 
 void CObjectCollectionViewComp::OnDelShortCut()
 {
-	OnContextMenuRemove(false);
+	// OnContextMenuRemove(false);
 }
 
 
 void CObjectCollectionViewComp::OnRenameShortCut()
 {
-	OnContextMenuRename(false);
+	// OnContextMenuRename(false);
 }
 
 
@@ -1178,6 +1044,8 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 {
 	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 	Q_ASSERT(collectionPtr != nullptr);
+
+	ItemList->clearSelection();
 
 	{
 		SignalSemaphore semaphore(m_semaphoreCounter);
@@ -1238,14 +1106,13 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 			else{
 				TypeList->hide();
 			}
-
 		}
 	}
 
 	m_tableModel.SetSorting(ItemList->header()->sortIndicatorSection(), ItemList->header()->sortIndicatorOrder());
 
 	m_tableModel.UpdateFromData(*collectionPtr, changeSet);
-
+	
 	RestoreColumnsSettings();
 }
 

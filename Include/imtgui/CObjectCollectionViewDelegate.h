@@ -55,6 +55,7 @@ public:
 		CI_IMPORT,
 		CI_EXPORT,
 		CI_RESTORE,
+		CG_DOCUMENT_MANAGER,
 		CI_USER = BaseClass::CI_USER + 100
 	};
 
@@ -88,6 +89,7 @@ public:
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
 	virtual bool IsCommandSupported(int commandId) const override;
+	virtual void SetupContextMenu(QMenu& menu) const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
@@ -148,12 +150,16 @@ protected Q_SLOTS:
 	virtual void OnImport();
 	virtual void OnExport();
 	virtual void OnRestore();
+	virtual void OnRename(bool checked);
+	virtual void OnEditDescription(bool checked);
+	virtual void OnEdit(bool checked);
 
 protected:
 	// commands
 	iqtgui::CHierarchicalCommand m_rootCommands;
 
 	iqtgui::CHierarchicalCommand m_editCommands;
+	iqtgui::CHierarchicalCommand m_editContentsCommand;
 	iqtgui::CHierarchicalCommand m_insertCommand;
 	iqtgui::CHierarchicalCommand m_duplicateCommand;
 	iqtgui::CHierarchicalCommand m_removeCommand;

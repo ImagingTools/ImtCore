@@ -9,6 +9,16 @@ namespace imtdbgui
 {
 
 
+// public methods
+
+CDatabaseLoginSettingsEditorComp::CDatabaseLoginSettingsEditorComp()
+	:m_addressEditEnablerObserver(*this),
+	m_databaseNameEditEnablerObserver(*this),
+	m_generalEditEnablerObserver(*this)
+{
+}
+
+
 // protected methods
 
 // reimplemented (imod::IModelEditor)
@@ -43,6 +53,43 @@ void CDatabaseLoginSettingsEditorComp::UpdateGui(const istd::IChangeable::Change
 }
 
 
+// reimplemented (iqtgui::CGuiComponentBase)
+
+void CDatabaseLoginSettingsEditorComp::OnGuiCreated()
+{
+	BaseClass::OnGuiCreated();
+
+	if (m_addressEditEnablerCompPtr.IsValid()){
+		m_addressEditEnablerObserver.RegisterObject(m_addressEditEnablerCompPtr.GetPtr(), &CDatabaseLoginSettingsEditorComp::OnAddressEditEnabled);
+
+		HostEdit->setEnabled(m_addressEditEnablerCompPtr->IsEnabled());
+		PortEdit->setEnabled(m_addressEditEnablerCompPtr->IsEnabled());
+	}
+
+	if (m_databaseNameEditEnablerCompPtr.IsValid()){
+		m_databaseNameEditEnablerObserver.RegisterObject(m_databaseNameEditEnablerCompPtr.GetPtr(), &CDatabaseLoginSettingsEditorComp::OnDatabaseNameEditEnabled);
+
+		DatabaseNameEdit->setEnabled(m_databaseNameEditEnablerCompPtr->IsEnabled());
+	}
+
+	if (m_generalEditEnablerCompPtr.IsValid()){
+		m_generalEditEnablerObserver.RegisterObject(m_generalEditEnablerCompPtr.GetPtr(), &CDatabaseLoginSettingsEditorComp::OnGeneralEditEnabled);
+
+		SetReadOnly(!m_generalEditEnablerCompPtr->IsEnabled());
+	}
+}
+
+
+void CDatabaseLoginSettingsEditorComp::OnGuiDestroyed()
+{
+	BaseClass::OnGuiDestroyed();
+
+	m_addressEditEnablerObserver.UnregisterAllObjects();
+	m_databaseNameEditEnablerObserver.UnregisterAllObjects();
+	m_generalEditEnablerObserver.UnregisterAllObjects();
+}
+
+
 // private slots
 
 void CDatabaseLoginSettingsEditorComp::on_HostEdit_editingFinished()
@@ -72,6 +119,39 @@ void CDatabaseLoginSettingsEditorComp::on_UserEdit_editingFinished()
 void CDatabaseLoginSettingsEditorComp::on_PasswordEdit_editingFinished()
 {
 	DoUpdateModel();
+}
+
+
+// private methods
+
+void CDatabaseLoginSettingsEditorComp::OnAddressEditEnabled(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const iprm::IEnableableParam* objectPtr)
+{
+	if (objectPtr != nullptr){
+		HostEdit->setEnabled(objectPtr->IsEnabled());
+		PortEdit->setEnabled(objectPtr->IsEnabled());
+	}
+}
+
+
+void CDatabaseLoginSettingsEditorComp::OnDatabaseNameEditEnabled(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const iprm::IEnableableParam* objectPtr)
+{
+	if (objectPtr != nullptr){
+		DatabaseNameEdit->setEnabled(objectPtr->IsEnabled());
+	}
+}
+
+
+void CDatabaseLoginSettingsEditorComp::OnGeneralEditEnabled(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const iprm::IEnableableParam* objectPtr)
+{
+	if (objectPtr != nullptr){
+		BaseClass::SetReadOnly(!objectPtr->IsEnabled());
+	}
 }
 
 

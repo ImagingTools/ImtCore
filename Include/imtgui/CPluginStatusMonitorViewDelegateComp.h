@@ -65,6 +65,7 @@ public:
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;
 	virtual bool IsCommandSupported(int commandId) const override;
+	virtual void SetupContextMenu(QMenu& menu) const override;
 
 	// reimplemented (ibase::ICommandsProvider)
 	virtual const ibase::IHierarchicalCommand* GetCommands() const override;

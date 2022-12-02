@@ -25,8 +25,7 @@ namespace imtgui
 
 CDocumentCollectionViewDelegateComp::CDocumentCollectionViewDelegateComp()
 	:m_collectionPersistence(*this),
-	m_documentManagerObserver(*this),
-	m_editContentsCommand(tr("Edit"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER)
+	m_documentManagerObserver(*this)
 {
 }
 
@@ -93,7 +92,7 @@ QByteArray CDocumentCollectionViewDelegateComp::ImportObject(const QByteArray& t
 				if (state == ifile::IFilePersistence::OS_OK){
 					QFileInfo sourceFileInfo(sourcePath);
 
-					QString documentName = sourceFileInfo.baseName();
+					QString documentName = sourceFileInfo.completeBaseName();
 
 					QByteArray documentId = m_collectionPtr->InsertNewObject(typeId, documentName, QString(tr("Imported from %1")).arg(sourceFileInfo.fileName()), documentPtr.GetPtr());
 					if (!documentId.isEmpty()){

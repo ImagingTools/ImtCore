@@ -67,6 +67,7 @@ QString CObjectCollectionViewDelegate::s_dateTimeFormat = QString("dd.MM.yyyy hh
 CObjectCollectionViewDelegate::CObjectCollectionViewDelegate()
 	:m_editCommands(tr("&Edit"), 100),
 	m_insertCommand(tr("New"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
+	m_editContentsCommand(tr("Edit"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_DOCUMENT_MANAGER),
 	m_duplicateCommand(tr("Duplicate"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_removeCommand(tr("Remove"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
 	m_importCommand(tr("Import"), 100, ibase::ICommand::CF_GLOBAL_MENU | ibase::ICommand::CF_TOOLBAR, CG_EDIT),
@@ -388,6 +389,36 @@ iqtgui::IGuiObject* CObjectCollectionViewDelegate::GetInformationView() const
 bool CObjectCollectionViewDelegate::IsCommandSupported(int /*commandId*/) const
 {
 	return true;
+}
+
+
+void CObjectCollectionViewDelegate::SetupContextMenu(QMenu& menu) const
+{
+	if (IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_EDIT)){
+		QAction* actionEditDocument = menu.addAction(m_editContentsCommand.icon(), m_editContentsCommand.text());
+		connect(actionEditDocument, &QAction::triggered, this, &CObjectCollectionViewDelegate::OnEdit);
+	}
+
+	if (IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
+		QAction* actionRemove = menu.addAction(m_removeCommand.icon(), m_removeCommand.text());
+		connect(actionRemove, &QAction::triggered, this, &CObjectCollectionViewDelegate::OnRemove);
+	}
+
+	if (m_selectedItemIds.count() == 1){
+		if (menu.actions().count() > 0){
+			menu.addSeparator();
+		}
+
+		if (IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_EDIT_DESCRIPTION)){
+			QAction* actionEditDescription = menu.addAction(tr("Set Description..."));
+			connect(actionEditDescription, &QAction::triggered, this, &CObjectCollectionViewDelegate::OnEditDescription);
+		}
+
+		if (IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_RENAME)){
+			QAction* actionRename = menu.addAction(tr("Rename..."));
+			connect(actionRename, &QAction::triggered, this, &CObjectCollectionViewDelegate::OnRename);
+		}
+	}
 }
 
 
@@ -869,6 +900,51 @@ void CObjectCollectionViewDelegate::OnRestore()
 	}
 }
 
+void CObjectCollectionViewDelegate::OnRename(bool /*checked*/)
+{
+	if (m_selectedItemIds.count() != 1){
+		return;
+	}
+
+	for (const QByteArray& itemId : m_selectedItemIds) {
+		if (!itemId.isEmpty()) {
+			RenameObject(itemId, "");
+		}
+	}
+}
+
+
+void CObjectCollectionViewDelegate::OnEditDescription(bool /*checked*/)
+{
+	if (m_selectedItemIds.count() != 1) {
+		return;
+	}
+
+	Q_ASSERT(m_parentGuiPtr != nullptr);
+	Q_ASSERT(m_collectionPtr != nullptr);
+
+	for (const QByteArray& itemId : m_selectedItemIds) {
+		if (!itemId.isEmpty() && (m_collectionPtr != nullptr) && (m_parentGuiPtr != nullptr)){
+			QString description = m_collectionPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_DESCRIPTION).toString();
+
+			bool ok;
+			QString newDescription = QInputDialog::getText(m_parentGuiPtr->GetWidget(), tr("Enter object description"), tr("Description"), QLineEdit::Normal, description, &ok);
+			if (ok){
+				m_collectionPtr->SetElementDescription(itemId, newDescription);
+			}
+		}
+	}
+}
+
+
+void CObjectCollectionViewDelegate::OnEdit(bool /*checked*/)
+{
+	for (const QByteArray& itemId : m_selectedItemIds){
+		if (!itemId.isEmpty()) {
+			OpenDocumentEditor(itemId);
+		}
+	}
+}
 
 
 // public methods of the embedded class VisualStatus
