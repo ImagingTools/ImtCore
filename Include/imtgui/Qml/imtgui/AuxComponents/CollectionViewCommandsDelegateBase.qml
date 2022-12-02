@@ -64,7 +64,7 @@ Item {
     function commandHandle(commandId){
         console.log("CollectionView commandHandle", commandId);
         if (commandId === "New"){
-            baseCollectionView.selectedItem("", "<new item>");
+            baseCollectionView.selectedItem("", "");
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
