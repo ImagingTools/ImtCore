@@ -1,4 +1,4 @@
 module Acf
 singleton Style 1.0 Style.qml
 singleton Events 1.0 Events.qml
-Lodash 1.0 core
+Lodash 1.0 core.js
