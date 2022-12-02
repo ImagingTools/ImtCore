@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="Acf/qmldir">Qml/Acf/qmldir</file>
-        <file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
         <file alias="Acf/Events.qml">Qml/Acf/Events.qml</file>
         <file alias="Acf/core.js">Qml/Acf/core.js</file>
         <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>

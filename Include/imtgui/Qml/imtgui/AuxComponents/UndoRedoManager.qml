@@ -1,8 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0;
 
-import "../../Acf/core.js" as Lodash
-
 Item {
     id: undoRedoManager;
 

@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
 import QtQuick.Dialogs 1.3
-import "../../Acf/core.js" as Lodash
+
 
 Rectangle {
     id: container;
