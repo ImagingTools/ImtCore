@@ -45,12 +45,8 @@ Item {
 
                 id: topButtonDelegate;
 
-                decoratorSource: "TopButtonDecorator.qml";
-                //decoratorSource: "../../../../NeoPro/TopButtonDecoratorNeoPro.qml";
-
-                //imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
+                decoratorSource: Style.topButtonDecoratorPath !==undefined ? Style.topButtonDecoratorPath: "TopButtonDecorator.qml";
                 imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
-
                 enabled:  model.Mode == "Normal";
                 visible: model.Visible;
 
