@@ -584,28 +584,13 @@ Item {
                         sourceSize.width: width;
                         sourceSize.height: height;
 
-                        onStateChanged: {
-                            console.log("onStateChanged", state);
-                        }
+                        source: iconSort.state_ == "up" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
+                                                          "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
 
-                        state: "up";
 
-                        states: [
-                            State {
-                                name: "up"
-                                PropertyChanges {
-                                    target: iconSort;
-                                    source: "../../../Icons/" + Style.theme + "/Up_On_Normal.svg";
-                                }
-                            },
-                            State {
-                                name: "down"
-                                PropertyChanges {
-                                    target: iconSort;
-                                    source: "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
-                                }
-                            }
-                        ]
+                        property string state_: "up";
+
+
                     }
 
                 }//mainRec
@@ -632,11 +617,11 @@ Item {
                     onClicked: {
                         headersList.currentIndex = model.index;
 
-                        if (iconSort.state == "up"){
-                            iconSort.state = "down";
+                        if (iconSort.state_ == "up"){
+                            iconSort.state_ = "down";
                         }
                         else{
-                            iconSort.state = "up";
+                            iconSort.state_ = "up";
                         }
 
                         tableContainer.headerClicked(model.Id);
