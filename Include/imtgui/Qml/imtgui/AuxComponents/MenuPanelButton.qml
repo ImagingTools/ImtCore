@@ -42,6 +42,10 @@ Item {
         loaderDecorator.item.selected = container.selected;
     }
 
+    onHighlightedChanged: {
+        loaderDecorator.item.highlighted = container.highlighted;
+    }
+
     onImageSourceChanged: {
         loaderDecorator.item.imageSource = container.imageSource;
     }
