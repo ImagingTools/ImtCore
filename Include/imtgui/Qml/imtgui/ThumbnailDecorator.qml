@@ -10,6 +10,7 @@ Rectangle {
     color: Style.backgroundColor;
 
     property bool serverIsConnection: true;
+    property Item root;
 
     property int mainMargin: 0;
     property int mainRadius: 0;
@@ -110,6 +111,7 @@ Rectangle {
 
         anchors.fill: parent;
         anchors.topMargin: 60;
+        windows: thumbnailDecoratorContainer.root;
 
         visible: false;
     }
@@ -127,6 +129,8 @@ Rectangle {
         anchors.fill: parent;
 
         root: window;
+
+        settingsProvider: window.settingsProvider;
 
         visible: false;
     }

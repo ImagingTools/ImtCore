@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iqt/ITranslationManager.h>
 
 // ImtCore includes
 #include <imtgql/IGqlRepresentationDataController.h>
@@ -27,6 +28,7 @@ public:
 		I_ASSIGN_MULTI_0(m_contextIdsCompPtr, "ContextIds", "List of context-IDs for GraphQL-response", false);
 		I_ASSIGN(m_commandPermissionsCompPtr, "CommandPermissions", "Command Permissions", false, "Command Permissions");
 		I_ASSIGN(m_checkPermissionCompPtr, "CheckPermissions", "Check permissions", false, "CheckPermissions");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
@@ -42,6 +44,7 @@ protected:
 	I_MULTIATTR(QByteArray, m_contextIdsCompPtr);
 	I_REF(imtgql::ICommandPermissionsProvider, m_commandPermissionsCompPtr);
 	I_REF(imtauth::ICheckPermission, m_checkPermissionCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

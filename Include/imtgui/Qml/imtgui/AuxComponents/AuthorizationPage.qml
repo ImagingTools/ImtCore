@@ -7,6 +7,7 @@ Rectangle {
     id: authPageContainer;
 
     color: Style.dialogBackgroundColor;
+    property var windows;
 
     states: [
         State {
@@ -261,10 +262,10 @@ Rectangle {
         id: userTokenProvider;
 
         onAccepted: {
-            console.log('DEBUG::UserTokenProvider.onAccepted')
+            console.log('DEBUG::UserTokenProvider.onAccepted', authPageContainer.windows)
             authPageContainer.state = "authorized";
-
-            window.updateAllModels();
+            var pageContainer =  authPageContainer.windows;
+            pageContainer.updateAllModels();
             authPageContainer.visible = false;
         }
     }

@@ -88,43 +88,6 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::UpdateBaseModelFromR
 
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 
-//	if (m_userSettingsCollectionCompPtr.IsValid() && gqlContext != nullptr){
-//		imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
-//		if (userInfoPtr != nullptr){
-//			QByteArray userId = userInfoPtr->GetUsername();
-//			QByteArray itemData = baseModelPtr->toJSON().toUtf8();
-//			if (!itemData.isEmpty()){
-//				QJsonDocument jsonResponse = QJsonDocument::fromJson(itemData);
-//				if (jsonResponse.isArray()){
-//					QJsonArray jsonArray = jsonResponse.array();
-//					QJsonValue saveValue;
-//					for (const QJsonValue & value : jsonArray){
-//						QJsonObject obj = value.toObject();
-//						if (obj["Id"] == "General"){
-//							saveValue = value;
-//							break;
-//						}
-//					}
-
-//					if (!saveValue.isNull()){
-//						istd::TDelPtr<imtauth::CUserSettings> userSettingsPtr = new imtauth::CUserSettings();
-//						userSettingsPtr->SetUserId(userId);
-//						userSettingsPtr->SetSettings(saveValue.toString().toUtf8());
-
-//						imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
-//						if (collectionIds.contains(userId)){
-//							m_userSettingsCollectionCompPtr->SetObjectData(userId, *userSettingsPtr);
-//						}
-//						else{
-//							m_userSettingsCollectionCompPtr->InsertNewObject("", "", "", userSettingsPtr.PopPtr(), userId);
-//						}
-//					}
-//				}
-
-//				rootModel->SetData("Status", "Ok");
-//			}
-//		}
-//	}
 
 	return rootModel;
 }

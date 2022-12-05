@@ -35,7 +35,7 @@ Rectangle {
 
     property int fontSize: Style.fontSize_common;
 
-
+    property SettingsProvider settingsProvider;
 
     property Component buttonComp :Component{
         AuxButton {
@@ -453,10 +453,12 @@ Rectangle {
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
+                    console.log("Apply")
                     let serverPageIds = getDirtyPagesFromServerModel();
 
                     if (serverPageIds.length > 0){
                         let serverModelJson = serverModel.toJSON();
+                        console.log("serverModelJson", serverModelJson)
                         settingsProvider.serverModel.CreateFromJson(serverModelJson);
 
                         settingsProvider.saveServerModel(serverPageIds);
@@ -466,6 +468,7 @@ Rectangle {
 
                     if (localPageIds.length > 0){
                         let localModelJson = localModel.toJSON();
+                        console.log("localModelJson", localModelJson)
                         settingsProvider.localModel.CreateFromJson(localModelJson);
 
                         settingsProvider.saveLocalModel(localPageIds);
