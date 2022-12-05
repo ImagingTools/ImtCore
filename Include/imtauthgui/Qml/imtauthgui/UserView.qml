@@ -287,46 +287,6 @@ DocumentBase {
                 }
             }//Repeater
 
-
-
-            //            Repeater {
-            //                id: mainPanelRepeater;
-
-            //                model: leftMenuModel;
-
-            //                delegate: AuxButton {
-
-            //                    anchors.left: parent.left;
-            //                    anchors.leftMargin: 10;
-            //                    anchors.right: parent.right;
-            //                    anchors.rightMargin: 10;
-
-            //                    height: 35;
-
-            //                    radius: 3;
-
-            //                    hasText: true;
-            //                    hasIcon: false;
-
-            //                    textButton: model.Name;
-
-            //                    backgroundColor: Style.alternateBaseColor;
-
-            //                    borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
-
-            //                    Component.onCompleted: {
-            //                        if (model.index === 0){
-            //                            clicked();
-            //                        }
-            //                    }
-
-            //                    onClicked: {
-            //                        if (mainPanel.selectedIndex !== model.index){
-            //                            mainPanel.selectedIndex = model.index;
-            //                        }
-            //                    }
-            //                }
-            //            }//Repeater
         }
     }
 
