@@ -145,14 +145,32 @@ Item {
         undoRedoManager.endChanges();
     }
 
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
+        }
+    }
+
     RolesProvider {
         id: rolesProvider;
     }
 
     Rectangle {
+        id: background;
         anchors.fill: parent;
-
         color: Style.backgroundColor;
+        Loader{
+            id: backgroundDecoratorLoader;
+
+            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+            onLoaded: {
+                if(backgroundDecoratorLoader.item){
+                    backgroundDecoratorLoader.item.rootItem = background;
+                }
+            }
+        }
+
     }
 
     Flickable {
