@@ -56,7 +56,7 @@ Item{
         id: closeButton;
 
         anchors.right: loaderDecorator.right;
-        anchors.rightMargin: 5;
+        anchors.rightMargin: 8;
         anchors.verticalCenter: parent.verticalCenter;
 
         height: parent.height * 0.3;
