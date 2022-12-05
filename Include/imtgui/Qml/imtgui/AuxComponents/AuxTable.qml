@@ -655,6 +655,7 @@ Item {
         anchors.rightMargin: -width;
 
         visible: tableContainer.hasFilter && tableContainer.showHeaders;
+        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
         width: tableContainer.hasFilter ? 20 : 0;
         height: width;
