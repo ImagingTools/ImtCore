@@ -27,6 +27,7 @@ FocusScope {
     property string placeHolderFontColor: "gray";
 
     property color borderColor: textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+    property string borderColorConst: "";
 
     property int radius: 0;
     property int textSize: 15;
@@ -79,7 +80,7 @@ FocusScope {
 
         radius: containerTextField.radius;
 
-        border.color: textField.activeFocus ? containerTextField.borderColor : Style.hover;
+        border.color: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst: textField.activeFocus ? containerTextField.borderColor : Style.hover;
         border.width: 1;
     }
 
