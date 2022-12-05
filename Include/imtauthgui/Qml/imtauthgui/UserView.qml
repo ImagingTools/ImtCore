@@ -10,6 +10,10 @@ DocumentBase {
     property string title: qsTr("Users");
     property string username: qsTr("New User");
 
+    property int mainMargin: 0;
+    property int panelWidth: 150;
+
+
     onItemNameChanged: {
         if (documentModel.ContainsKey("Name")){
             let username = documentModel.GetData("Name");
@@ -38,6 +42,8 @@ DocumentBase {
         undoRedoManager.registerModel(documentModel);
     }
 
+
+
     UndoRedoManager {
         id: undoRedoManager;
 
@@ -55,9 +61,27 @@ DocumentBase {
         }
     }
 
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
+        }
+    }
+
     Rectangle {
+        id: background;
         anchors.fill: parent;
         color: Style.backgroundColor;
+        Loader{
+            id: backgroundDecoratorLoader;
+
+            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+            onLoaded: {
+                if(backgroundDecoratorLoader.item){
+                    backgroundDecoratorLoader.item.rootItem = background;
+                }
+            }
+        }
     }
 
     Row {
@@ -75,7 +99,7 @@ DocumentBase {
             id: closeButton;
 
             anchors.verticalCenter: parent.verticalCenter;
-
+            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
             width: 25;
             height: width;
 
@@ -97,6 +121,17 @@ DocumentBase {
             color: Style.titleColor;
 
             text: container.title + " / " + container.username;
+
+            Loader{
+                id: titleDecoratorLoader;
+
+                sourceComponent: Style.titleDecorator !==undefined ? Style.titleDecorator: emptyDecorator;
+                onLoaded: {
+                    if(titleDecoratorLoader.item){
+                        titleDecoratorLoader.item.rootItem = headerText;
+                    }
+                }
+            }
         }
     }
 
@@ -106,20 +141,76 @@ DocumentBase {
         anchors.top: header.bottom;
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
+        anchors.topMargin: container.mainMargin;
+        anchors.leftMargin: container.mainMargin;
 
-        width: 150;
+
+        width: container.panelWidth;
 
         color: Style.backgroundColor;
+
+        Loader{
+            id: mainPanelBackgroundDecoratorLoader;
+
+            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+            onLoaded: {
+                if(mainPanelBackgroundDecoratorLoader.item){
+                    mainPanelBackgroundDecoratorLoader.item.rootItem = mainPanelBackground;
+                }
+            }
+        }
+
+        Item{
+            id: columnContainer;
+            width: parent.width;
+            height: mainPanel.height + 2*mainPanel.anchors.topMargin;
+
+
+            Loader{
+                id: mainPanelFrameLoader;
+
+                anchors.fill: parent;
+
+                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+
+                onLoaded: {
+                    if(mainPanelFrameLoader.item){
+                        container.mainMargin = mainPanelFrameLoader.item.mainMargin;
+                        container.panelWidth = mainPanelFrameLoader.item.panelWidth;
+                    }
+                }
+            }
+
+        }
+
+        Component{
+            id: defaultButton;
+
+            AuxButton {
+                height: 35;
+                radius: 3;
+
+                hasText: true;
+                hasIcon: false;
+
+                backgroundColor: Style.alternateBaseColor;
+                borderColor: selected ? Style.iconColorOnSelected : Style.buttonColor;
+
+                property bool selected: false;
+            }
+        }
 
         Column {
             id: mainPanel;
 
-            anchors.fill: parent;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
             anchors.topMargin: 10;
 
             property int selectedIndex: -1;
 
-            spacing: 5;
+            spacing: 10;
 
             ListModel{
                 id: leftMenuModel
@@ -142,25 +233,30 @@ DocumentBase {
 
                 model: leftMenuModel;
 
-                delegate: AuxButton {
+                delegate: Item {
+                    id: buttonContainer;
 
                     anchors.left: parent.left;
                     anchors.leftMargin: 10;
                     anchors.right: parent.right;
                     anchors.rightMargin: 10;
 
-                    height: 35;
+                    height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 35
 
-                    radius: 3;
+                    property string text:  model.Name;
+                    property bool selected: mainPanel.selectedIndex == model.index;
+                    signal clicked();
 
-                    hasText: true;
-                    hasIcon: false;
-
-                    textButton: model.Name;
-
-                    backgroundColor: Style.alternateBaseColor;
-
-                    borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
+                    onSelectedChanged: {
+                        if(buttonLoader.item.selected !==undefined){
+                            buttonLoader.item.selected = buttonContainer.selected;
+                        }
+                    }
+                    onTextChanged: {
+                        if(buttonLoader.item.textButton !==undefined){
+                            buttonLoader.item.textButton = buttonContainer.text;
+                        }
+                    }
 
                     Component.onCompleted: {
                         if (model.index === 0){
@@ -173,8 +269,64 @@ DocumentBase {
                             mainPanel.selectedIndex = model.index;
                         }
                     }
+
+                    Loader{
+                        id: buttonLoader;
+
+                        anchors.fill: parent;
+                        sourceComponent:  Style.auxButtonComponent !== undefined ? Style.auxButtonComponent: defaultButton;
+
+                        onLoaded: {
+                            if(buttonLoader.item){
+                                buttonLoader.item.clicked.connect(buttonContainer.clicked);
+                                buttonLoader.item.selected = buttonContainer.selected;
+                                buttonLoader.item.textButton = buttonContainer.text;
+                            }
+                        }
+                    }
                 }
-            }
+            }//Repeater
+
+
+
+            //            Repeater {
+            //                id: mainPanelRepeater;
+
+            //                model: leftMenuModel;
+
+            //                delegate: AuxButton {
+
+            //                    anchors.left: parent.left;
+            //                    anchors.leftMargin: 10;
+            //                    anchors.right: parent.right;
+            //                    anchors.rightMargin: 10;
+
+            //                    height: 35;
+
+            //                    radius: 3;
+
+            //                    hasText: true;
+            //                    hasIcon: false;
+
+            //                    textButton: model.Name;
+
+            //                    backgroundColor: Style.alternateBaseColor;
+
+            //                    borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
+
+            //                    Component.onCompleted: {
+            //                        if (model.index === 0){
+            //                            clicked();
+            //                        }
+            //                    }
+
+            //                    onClicked: {
+            //                        if (mainPanel.selectedIndex !== model.index){
+            //                            mainPanel.selectedIndex = model.index;
+            //                        }
+            //                    }
+            //                }
+            //            }//Repeater
         }
     }
 
@@ -185,6 +337,9 @@ DocumentBase {
         anchors.top: header.bottom;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
+        anchors.topMargin: container.mainMargin;
+        anchors.leftMargin: container.mainMargin;
+        anchors.rightMargin: container.mainMargin;
 
         Repeater {
             id: bodyRepeater;
@@ -202,4 +357,6 @@ DocumentBase {
             }
         }
     }
+
+
 }
