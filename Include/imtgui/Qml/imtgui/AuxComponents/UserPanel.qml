@@ -11,6 +11,11 @@ Item {
     property string username: authorizationPage.tokenProvider.login;
     property bool enabled: authorizationPage.state == "authorized";
 
+    property alias username: usernameText.text;
+    property alias iconSource: loginButton.iconSource;
+
+    property bool isExitButton: false;
+
     Text {
         id: usernameText;
 
@@ -34,14 +39,21 @@ Item {
         width: 24;
         height: 24;
 
+        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
         iconSource: "../../../Icons/" + Style.theme + "/Account.svg";
 
         enabled: root.enabled;
 
         onClicked: {
-            var point = mapToItem(thumbnailDecoratorContainer, x - width, y + height);
-            point.x = point.x - 200;
-            modalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
+            if(root.isExitButton){
+                panelDelegate.logout();
+            }
+            else{
+                var point = mapToItem(thumbnailDecoratorContainer, x - width, y + height);
+                point.x = point.x - 200;
+                modalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
+            }
         }
     }
 

@@ -9,17 +9,8 @@ Rectangle {
     color: Style.dialogBackgroundColor;
     property var windows;
 
-    states: [
-        State {
-            name: "unauthorized"
-//            PropertyChanges { target: myRect; color: "red" }
-        }
-        ,
-        State {
-            name: "authorized"
-//            PropertyChanges { target: myRect; color: "red" }
-        }
-    ]
+    property string state;
+
 
     property alias tokenProvider: userTokenProvider;
 
