@@ -7,7 +7,10 @@ Dialog {
 
     title: qsTr("Message");
 
+    topPanelSource: Style.topPanelDialogPath !==undefined ? Style.topPanelDialogPath: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+
     property string message;
+
 
     function addButton(){
         buttons.addButton();
@@ -17,10 +20,32 @@ Dialog {
         messageDialog.bodyItem.message = messageDialog.message;
     }
 
+
+
     Component.onCompleted: {
         messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes", "Enabled": true});
         messageDialog.buttons.addButton({"Id":"No", "Name":"No", "Enabled": true});
 
         messageDialog.bodySource = "MessageDialogBody.qml";
     }
+
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
+        }
+    }
+
+    Loader{
+        id: messageDecoratorLoader;
+
+        sourceComponent: Style.messageDecorator !==undefined ? Style.messageDecorator: emptyDecorator;
+        onLoaded: {
+            if(messageDecoratorLoader.item){
+                messageDecoratorLoader.item.rootItem = messageDialog;
+            }
+        }
+    }
+
+
 }

@@ -10,6 +10,7 @@ Rectangle {
 
     color: Style.backgroundColor;
 
+
     property string title;
     property string bodySource;
     property string topPanelSource;
@@ -23,6 +24,7 @@ Rectangle {
     property alias topPanel: loaderTopPanel.item;
     property alias buttons: buttonsDialog;
 
+
     property string notClosingButtons: "";
 
     signal finished(string buttonId);
@@ -30,12 +32,6 @@ Rectangle {
     property alias contentComp: loaderBodyDialog.sourceComponent;
     readonly property alias contentItem: loaderBodyDialog.item;
 
-//    Connections{
-//        target: loaderTopPanel.item;
-//        function onCloseButtonClicked(buttonId){
-//            dialogContainer.finished(buttonId);
-//        }
-//    }
 
     onFocusChanged: {
         console.log("Dialog onFocusChanged", focus);

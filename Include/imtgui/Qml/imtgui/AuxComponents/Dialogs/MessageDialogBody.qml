@@ -3,12 +3,16 @@ import Acf 1.0
 import imtqml 1.0
 import imtauthgui 1.0
 
-Item {
+Rectangle {
     id: inputDialogBodyContainer;
 
-    height: columnBody.height + 40;
+    height: Style.size_minMessageHeight ==undefined ? columnBody.height + 40 :
+                                                      Math.max(Style.size_minMessageHeight,columnBody.height + 40);
+    color: "transparent";
 
     property string message;
+
+
 
     Column {
         id: columnBody;

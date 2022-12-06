@@ -81,7 +81,8 @@ Item {
 
                 Loader{
                     id: buttonLoader;
-                    sourceComponent: buttonsDialogContainer.buttonComp;
+
+                    sourceComponent: Style.dialogButtonComponent !==undefined ? Style.dialogButtonComponent: buttonsDialogContainer.buttonComp;
 
                     onLoaded: {
                         buttonLoader.item.clicked.connect(buttonContainer.clicked)
