@@ -241,7 +241,7 @@ DocumentBase {
                     anchors.right: parent.right;
                     anchors.rightMargin: 10;
 
-                    height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 35
+                    height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 35;
 
                     property string text:  model.Name;
                     property bool selected: mainPanel.selectedIndex == model.index;

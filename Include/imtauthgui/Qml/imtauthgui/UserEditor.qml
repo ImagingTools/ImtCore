@@ -145,10 +145,6 @@ Item {
                     width: parent.width;
                     height: 30;
 
-                    onReadOnlyChanged: {
-                        console.log("_________READONLY________",readOnly);
-                    }
-
                     placeHolderText: qsTr("Enter the username");
 
                     onEditingFinished: {

@@ -11,8 +11,10 @@ Rectangle {
 
     property string state;
 
-
     property alias tokenProvider: userTokenProvider;
+
+    property int mainRadius: 3;
+    property string mainColor: Style.backgroundColor;
 
     onVisibleChanged: {
         if (visible){
@@ -22,6 +24,28 @@ Rectangle {
             loginTextInput.text = ""
 
             loginTextInput.focus = true;
+        }
+    }
+
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
+        }
+    }
+
+    Component{
+        id: defaultButton;
+
+        AuxButton {
+            width: 100;
+            height: 30;
+
+            hasText: true;
+            hasIcon: false;
+
+            color: Style.buttonColor;
+
         }
     }
 
@@ -37,20 +61,25 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: 450;
-        height: 380;
+        //width: 450;
+        //height: 380;
 
-        radius: 3;
+        width: 400;
+        height: 350;
+
+        radius: authPageContainer.mainRadius;
+        color: authPageContainer.mainColor;
+
         clip: true;
-        color: Style.backgroundColor;
 
         Rectangle{
             id: headerRec;
 
             width: parent.width;
-            height: 100;
+            height: 80;
 
-            color: Style.backgroundColor;
+            color: parent.color;
+            radius: parent.radius;
 
             Text{
                 id: welcomeText;
@@ -63,22 +92,23 @@ Rectangle {
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_title;
-                text: qsTr("Welcome to Lisa");
+
+                text: qsTr("Welcome");
             }
 
-//            Text{
-//                id: loginText;
+            //            Text{
+            //                id: loginText;
 
-//                anchors.top: welcomeText.bottom;
-//                anchors.topMargin: 20;
-//                anchors.left: parent.left;
-//                anchors.leftMargin: (parent.width-loginText.width)/2;
+            //                anchors.top: welcomeText.bottom;
+            //                anchors.topMargin: 20;
+            //                anchors.left: parent.left;
+            //                anchors.leftMargin: (parent.width-loginText.width)/2;
 
-//                color: Style.textColor;
-//                font.family: Style.fontFamily;
-//                font.pixelSize: Style.fontSize_common;
-//                text: qsTr("Please login");
-//            }
+            //                color: Style.textColor;
+            //                font.family: Style.fontFamily;
+            //                font.pixelSize: Style.fontSize_common;
+            //                text: qsTr("Please login");
+            //            }
         }
 
         Column {
@@ -87,16 +117,27 @@ Rectangle {
             anchors.top: headerRec.bottom;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            spacing: 7;
+            spacing: 10;
 
             Text {
                 id: titleLogin;
 
-                text: qsTr("Login");
-
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Login");
+
+                Loader{
+                    id: titleDecoratorLoader1;
+
+                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(titleDecoratorLoader1.item){
+                            titleDecoratorLoader1.item.rootItem = titleLogin;
+                        }
+                    }
+                }
             }
 
             CustomTextField {
@@ -106,7 +147,6 @@ Rectangle {
                 height: 30;
 
                 placeHolderText: qsTr("Enter the login");
-
                 KeyNavigation.tab: passwordTextInput;
 
                 onTextChanged: {
@@ -120,16 +160,38 @@ Rectangle {
                         loginButton.clicked();
                     }
                 }
+
+                Loader{
+                    id: inputDecoratorLoader1;
+
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader1.item){
+                            inputDecoratorLoader1.item.rootItem = loginTextInput;
+                        }
+                    }
+                }
             }
 
             Text {
                 id: titlePassword;
 
-                text: qsTr("Password");
-
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Password");
+
+                Loader{
+                    id: titleDecoratorLoader2;
+
+                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(titleDecoratorLoader2.item){
+                            titleDecoratorLoader2.item.rootItem = titlePassword;
+                        }
+                    }
+                }
             }
 
             CustomTextField {
@@ -154,98 +216,147 @@ Rectangle {
                         loginButton.clicked();
                     }
                 }
+
+                Loader{
+                    id: inputDecoratorLoader2;
+
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader2.item){
+                            inputDecoratorLoader2.item.rootItem = passwordTextInput;
+                        }
+                    }
+                }
             }
 
-            Text {
-                id: errorMessage;
+            Item{
+                id: errorMessageItem;
 
-                color: Style.errorTextColor;
+                width: parent.width;
+                height: 20;
 
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+                Text {
+                    id: errorMessage;
 
-                visible: errorMessage.text != "";
+                    anchors.verticalCenter: parent.verticalCenter;
+
+                    color:  Style.errorTextColor;
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_common;
+
+                    visible:  errorMessage.text != "";
+                }
+
             }
 
-//            Item {
-//                id: remember;
 
-//                width: parent.width;
-//                height: 40;
+            //            Item {
+            //                id: remember;
 
-//                CheckBox {
-//                    id: checkRemember;
+            //                width: parent.width;
+            //                height: 40;
 
-//                    anchors.verticalCenter: parent.verticalCenter;
+            //                CheckBox {
+            //                    id: checkRemember;
 
-//                    checkState: Qt.Unchecked;
+            //                    anchors.verticalCenter: parent.verticalCenter;
 
-//                    onClicked: {
-//                        if (checkRemember.checkState == Qt.Unchecked){
-//                            checkRemember.checkState = Qt.Checked
-//                        }
-//                        else{
-//                           checkRemember.checkState = Qt.Unchecked
-//                        }
-//                    }
-//                }
+            //                    checkState: Qt.Unchecked;
 
-//                Text {
-//                    id: rememberText;
+            //                    onClicked: {
+            //                        if (checkRemember.checkState == Qt.Unchecked){
+            //                            checkRemember.checkState = Qt.Checked
+            //                        }
+            //                        else{
+            //                           checkRemember.checkState = Qt.Unchecked
+            //                        }
+            //                    }
+            //                }
 
-//                    anchors.left: checkRemember.right;
-//                    anchors.leftMargin: 7;
-//                    anchors.verticalCenter: parent.verticalCenter;
+            //                Text {
+            //                    id: rememberText;
 
-//                    color: Style.textColor;
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_small;
-//                    text: qsTr("Remember me");
-//                }
-//                Text{
-//                    id: forgotText;
+            //                    anchors.left: checkRemember.right;
+            //                    anchors.leftMargin: 7;
+            //                    anchors.verticalCenter: parent.verticalCenter;
 
-//                    anchors.top: parent.top;
-//                    anchors.topMargin: 7;
-//                    anchors.left: rememberText.right;
-//                    anchors.leftMargin: 120;
+            //                    color: Style.textColor;
+            //                    font.family: Style.fontFamily;
+            //                    font.pixelSize: Style.fontSize_small;
+            //                    text: qsTr("Remember me");
+            //                }
+            //                Text{
+            //                    id: forgotText;
 
-//                    color: Style.textColor;
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_small;
-//                    //            text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
-//                    onLinkActivated: {
-//                        Qt.openUrlExternally(link)
-//                    }
-//                }
-//            }
+            //                    anchors.top: parent.top;
+            //                    anchors.topMargin: 7;
+            //                    anchors.left: rememberText.right;
+            //                    anchors.leftMargin: 120;
 
-             Item {
-                 id: buttonItem;
+            //                    color: Style.textColor;
+            //                    font.family: Style.fontFamily;
+            //                    font.pixelSize: Style.fontSize_small;
+            //                    //            text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
+            //                    onLinkActivated: {
+            //                        Qt.openUrlExternally(link)
+            //                    }
+            //                }
+            //            }
 
-                 width: parent.width;
-                 height: 100;
+            Item {
+                id: buttonItem;
 
-                 AuxButton {
-                     id: loginButton;
+                width: parent.width;
+                height: 70;
 
-                     anchors.horizontalCenter: parent.horizontalCenter;
-                     anchors.verticalCenter: parent.verticalCenter;
+                Item {
+                    id: loginButton;
 
-                     width: 100;
-                     height: 30;
+                    anchors.centerIn: parent;
 
-                     hasText: true;
-                     textButton: qsTr("Login");
-                     color: Style.buttonColor;
+                    width: parent.width;
+                    height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 30;
 
-                     enabled: loginTextInput.text != "" && passwordTextInput.text != "";
+                    enabled: loginTextInput.text != "" && passwordTextInput.text != "";
 
-                     onClicked: {
-                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
-                     }
-                 }
-             }
+                    property string text:  qsTr("Login");
+
+                    signal clicked();
+
+                    onTextChanged: {
+                        if(buttonLoader.item.textButton !==undefined){
+                            buttonLoader.item.textButton = loginButton.text;
+                        }
+                    }
+                    onEnabledChanged: {
+                        if(buttonLoader.item){
+                            buttonLoader.item.enabled = loginButton.enabled;
+
+                        }
+                    }
+
+                    onClicked: {
+                        userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
+                    }
+
+                    Loader{
+                        id: buttonLoader;
+
+                        anchors.centerIn:  parent;
+                        sourceComponent:  Style.dialogButtonComponent !== undefined ? Style.dialogButtonComponent: defaultButton;
+
+                        onLoaded: {
+                            if(buttonLoader.item){
+                                buttonLoader.item.clicked.connect(loginButton.clicked);
+                                buttonLoader.item.textButton = loginButton.text;
+                                buttonLoader.item.enabled = loginButton.enabled;
+                            }
+                        }
+                    }
+                }
+
+
+            }
         }
     }
 
