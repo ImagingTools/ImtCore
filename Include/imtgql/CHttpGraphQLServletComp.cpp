@@ -71,7 +71,10 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 								{
 									int languageIndex = value.toObject()["Value"].toInt();
 									QJsonValue languageArray = value.toObject()["Parameters"];
-									languageId = languageArray.toArray()[languageIndex].toObject()["Id"].toString();
+                                    int countLanguages = languageArray.toArray().count();
+                                    if(languageIndex >= 0 && countLanguages > 0 && countLanguages > languageIndex){
+                                        languageId = languageArray.toArray()[languageIndex].toObject()["Id"].toString();
+                                    }
 								}
 							}
 							gqlContextPtr->SetLanguageId(languageId.toUtf8());
