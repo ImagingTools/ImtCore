@@ -14,6 +14,8 @@ Item {
     property bool isHovered: containsMouse;
     property bool isMainButton: false;
     property bool isHighlighted: false;
+
+    property bool selected: false;
     //
     
 }

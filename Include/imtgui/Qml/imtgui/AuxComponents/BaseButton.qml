@@ -22,6 +22,8 @@ Item {
     //
 
     property bool containsMouse: enabled ? ma.containsMouse : false;
+    property bool selected: false;
+
 
 
     signal clicked();
@@ -121,6 +123,13 @@ Item {
         if(loader.item){
             loader.item.isHighlighted = baseButton.isHighlighted;
         }
+    }
+
+    onSelectedChanged: {
+        if(loader.item){
+            loader.item.selected = baseButton.selected;
+        }
+
     }
 
 
