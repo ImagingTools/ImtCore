@@ -30,6 +30,7 @@ const imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetElementModel(cons
 	return nullptr;
 }
 
+
 // reimplemented (imtbase::IItemBasedRepresentationProvider)
 
 QByteArray CParamsDataProviderCompBase::GetModelId() const
@@ -53,7 +54,6 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
 	}
 
-
 	if (m_translationManagerCompPtr.IsValid()){
 		QByteArray languageId;
 		if(gqlContext != nullptr){
@@ -71,8 +71,6 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 	else{
 		rootModelPtr->SetData("Name", paramName);
 	}
-
-
 
 	int type = 0;;
 	if (m_paramComponentTypeAttrPtr.IsValid()){
@@ -163,7 +161,7 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 
 // reimplemented (imtgql::IGqlMutationDataControllerDelegate)
 
-imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromRepresentation(
+bool CParamsDataProviderCompBase::UpdateModelFromRepresentation(
 		const QList<imtgql::CGqlObject> &params,
 		imtbase::CTreeItemModel *baseModel,
 		const imtgql::IGqlContext* gqlContext)
@@ -181,41 +179,9 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromReprese
 			imtbase::CTreeItemModel* elementsModelPtr = pageModelPtr->GetTreeItemModel("Elements");
 
 			for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
-				m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(QList<imtgql::CGqlObject>(), elementsModelPtr);
+				m_mutationDataDelegateCompPtr[i]->UpdateModelFromRepresentation(QList<imtgql::CGqlObject>(), elementsModelPtr);
 			}
 		}
-
-//		if (baseModel->ContainsKey("Elements")){
-//			imtbase::CTreeItemModel* elementsModelPtr = baseModel->GetTreeItemModel("Elements");
-
-//			QList<imtgql::CGqlObject> parametersList;
-//			for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
-//				m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(parametersList, elementsModelPtr);
-//			}
-
-//	//		imtbase::CTreeItemModel* rootElementsModel = rootModelPtr->AddTreeModel("Elements");
-
-//			for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
-//				imtbase::CTreeItemModel elementModel;
-//				elementsModelPtr->CopyItemDataToModel(i, &elementModel);
-//				QList<imtgql::CGqlObject> parametersList;
-
-//				if (elementModel.ContainsKey("Id")){
-//					QByteArray elementId = elementModel.GetData("Id").toByteArray();
-//					imtgql::CGqlObject gqlObject;
-//					gqlObject.InsertField("Id", QString(elementId));
-//					parametersList << gqlObject;
-//				}
-
-//				imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[i]->UpdateBaseModelFromRepresentation(parametersList, &elementModel);
-//	//			if (externModel != nullptr){
-//	//				for (int j = 0; j < externModel->GetItemsCount(); j++){
-//	//					int index = rootElementsModel->InsertNewItem();
-//	//					rootElementsModel->CopyItemDataFromModel(index, externModel, j);
-//	//				}
-//	//			}
-//			}
-//		}
 	}
 	else {
 		const imtbase::CTreeItemModel* elementModelPtr = GetElementModel(parameterId, baseModel);
@@ -228,7 +194,7 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromReprese
 			if (type == CT_COMBOBOX){
 				iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
 				if (selectionParam == nullptr){
-					return nullptr;
+					return false;
 				}
 
 				int value = 0;
@@ -252,36 +218,6 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::UpdateBaseModelFromReprese
 			}
 		}
 
-//		int type = 0;
-//		if (m_paramComponentTypeAttrPtr.IsValid()){
-//			type = *m_paramComponentTypeAttrPtr;
-//		}
-
-//		if (type == CT_COMBOBOX){
-//			iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
-//			if (selectionParam == nullptr){
-//				return nullptr;
-//			}
-
-//			int value = 0;
-//			if (baseModel->ContainsKey("Value")){
-//				value = baseModel->GetData("Value").toInt();
-//			}
-
-//			selectionParam->SetSelectedOptionIndex(value);
-//		}
-//		else if (type == CT_TEXT_INPUT){
-//			iprm::ITextParam* sourcePtr = dynamic_cast<iprm::ITextParam*>(m_parameterCompPtr.GetPtr());
-
-//			QString value;
-//			if (baseModel->ContainsKey("Value")){
-//				value = baseModel->GetData("Value").toString();
-//			}
-
-//			if (sourcePtr != nullptr){
-//				sourcePtr->SetText(value);
-//			}
-//		}
 		rootModelPtr->SetData("Status", "OK");
 	}
 

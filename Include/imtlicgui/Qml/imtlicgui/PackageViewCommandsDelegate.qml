@@ -43,7 +43,7 @@ DocumentWorkspaceCommandsDelegateBase {
                 insertIndexes = indexes;
             }
 
-            tableTreeViewEditor.insertRow(insertIndexes, {"Id": "", "Name": "Feature Name", "Description": "", "Optional": false});
+            tableTreeViewEditor.insertRow(insertIndexes, {"Id": "", "Name": "Feature Name", "Description": "", "Optional": false, "Selected": true});
         }
         else if (commandId === "Remove"){
 //            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected feature from the package ?")});
@@ -91,12 +91,8 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     function selectedIndexChanged(){
-        console.log('DocumentCommands indexChanged', tableTreeViewEditor.selectedIndex);
-
         let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
         packageViewContainer.commandsProvider.changeCommandMode("Remove", mode);
-
-        console.log('End DocumentCommands indexChanged', tableTreeViewEditor.selectedIndex);
     }
 
     Component {

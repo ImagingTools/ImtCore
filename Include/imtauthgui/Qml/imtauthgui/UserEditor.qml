@@ -15,7 +15,7 @@ Item {
     property int panelWidth: 400;
 
     Component.onCompleted: {
-//        usernameInput.focus = true;
+        usernameInput.focus = true;
     }
 
     onDocumentModelChanged: {
@@ -230,16 +230,6 @@ Item {
 
                     text: qsTr("Name");
 
-                    Loader{
-                        id: titleDecoratorLoader3;
-
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader3.item){
-                                titleDecoratorLoader3.item.rootItem = titleName;
-                            }
-                        }
-                    }
                 }
 
                 CustomTextField {
@@ -292,11 +282,19 @@ Item {
                     }
                 }
 
+                RegExpValidator {
+                    id: mailValid;
+
+                    regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+                }
+
                 CustomTextField {
                     id: mailInput;
 
                     width: parent.width;
                     height: 30;
+
+                    textInputValidator: mailValid;
 
                     placeHolderText: qsTr("Enter the email");
 

@@ -140,7 +140,7 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 
 // reimplemented (imtgql::IGqlMutationDataControllerDelegate)
 
-imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::UpdateBaseModelFromRepresentation(
+bool CDatabaseSettingsDataProviderComp::UpdateModelFromRepresentation(
 		const QList<imtgql::CGqlObject>& params,
 		imtbase::CTreeItemModel* baseModelPtr,
 		const imtgql::IGqlContext* gqlContext)
@@ -150,7 +150,7 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::UpdateBaseModelFromR
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 
 	if (!m_databaseSettingsCompPtr.IsValid()){
-		return nullptr;
+		return false;
 	}
 
 	QByteArray parameterId = *m_paramIdAttrPtr;
@@ -207,7 +207,7 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::UpdateBaseModelFromR
 
 	} 
 
-	return rootModel;
+	return true;
 }
 
 

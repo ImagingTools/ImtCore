@@ -25,14 +25,7 @@ public:
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
-
-
-
 private:
-	bool LoginMatch(const QByteArray& login) const;
-	int GetUserId(const QString& verificationLogin) const;
-	bool ChangePassword(const QByteArray& userId, const QString& oldPassword, const QString& newPassword);
-
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
 	I_REF(imtcrypt::IHashCalculator, m_hashCalculatorCompPtr);

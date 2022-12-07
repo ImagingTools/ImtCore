@@ -34,10 +34,14 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("ProductsCommands onCommandActivated", commandId);
 
         if (commandId === "New"){
-            tableData.insertRow([tableData.rowCount], {"Id": "", "Name": "License Name", "Description": ""});
+            tableData.insertRow([tableData.rowCount], {"Id": "", "Name": "License Name", "Description": "", "Selected": true});
         }
         else if (commandId === "Remove"){
-            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
+//            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
+
+            let selectedIndex = container.tableData.selectedIndex;
+
+            tableData.removeRow([selectedIndex.index]);
         }
     }
 

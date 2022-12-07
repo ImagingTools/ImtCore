@@ -231,6 +231,8 @@ Item {
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                visible: false;
             }
 
             BasicTableView {
@@ -238,6 +240,8 @@ Item {
 
                 width: bodyColumn.width;
                 height: permissionsTable.headerHeight;
+
+                visible: false;
 
                 rowDelegate: TableViewItemDelegateBase {
                     Component.onCompleted: {

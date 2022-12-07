@@ -16,22 +16,7 @@ FocusScope {
     property ModelIndex modelIndex: ModelIndex {
         itemData: model;
         index: model.index;
-//        delegateItem: delegate;
     };
-
-    onActiveFocusChanged: {
-        console.log("TableViewItemDelegate onActiveFocusChanged", activeFocus);
-    }
-
-    onFocusChanged: {
-        console.log("TableViewItemDelegate onFocusChanged", focus);
-    }
-
-    Component.onCompleted: {
-        console.log("TableViewItemDelegate onCompleted", model.Id, model.Name);
-    }
-
-    property bool selected: false;
 
     property var itemData: model;
 
@@ -71,10 +56,10 @@ FocusScope {
         width: parent.width;
         height: root.rowItemHeight;
 
+        visible: model.Selected;
+
         sourceComponent: Rectangle {
             id: highlight;
-
-            visible: model.Selected;
 
             color: Style.selectedColor;
         }
@@ -154,6 +139,21 @@ FocusScope {
         anchors.top: headerDelegateLoader.bottom;
     }
 
+    function updateSelection(){
+        if (root.selection.contains(model)){
+            console.log("contains");
+
+            root.selection.deselect(model);
+            root.selectedIndex = null;
+        }
+        else{
+            console.log("not contains");
+
+            root.selection.select(model);
+            root.selectedIndex = modelIndex;
+        }
+    }
+
     MouseArea {
         id: mouseAreaBase;
 
@@ -165,23 +165,23 @@ FocusScope {
             console.log("onClicked");
 
             if (root.selection.contains(model)){
+                console.log("contains");
+
                 root.selection.deselect(model);
                 root.selectedIndex = null;
             }
             else{
+                console.log("not contains");
+
                 root.selection.select(model);
                 root.selectedIndex = modelIndex;
             }
 
             delegate.clicked();
-            console.log("delegate.focus = true");
 
             rowBodyItem.forceActiveFocus();
 
             root.focus = true;
-//            delegate.focus = true;
-
-//            delegate.forceActiveFocus();
         }
     }
 

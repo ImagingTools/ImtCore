@@ -33,18 +33,18 @@ void imtauth::CUserSettings::SetUserId(const QByteArray& userId)
 }
 
 
-QByteArray imtauth::CUserSettings::GetSettings() const
+iprm::IParamsSet *CUserSettings::GetSettings() const
 {
-	return m_settingsJson;
+	return m_settingsPtr;
 }
 
 
-void imtauth::CUserSettings::SetSettings(const QByteArray& jsonData)
+void CUserSettings::SetSettings(const iprm::IParamsSet *paramsSet)
 {
-	if (m_settingsJson != jsonData){
+	if (m_settingsPtr != paramsSet){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_settingsJson = jsonData;
+		m_settingsPtr = const_cast<iprm::IParamsSet*>(paramsSet);
 	}
 }
 
@@ -63,7 +63,8 @@ bool imtauth::CUserSettings::Serialize(iser::IArchive &archive)
 
 	static iser::CArchiveTag settingsTag("Settings", "Settings params set", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(settingsTag);
-	retVal = retVal && archive.Process(m_settingsJson);
+	retVal = retVal && m_settingsPtr->Serialize(archive);
+//	retVal = retVal && archive.Process(m_settingsJson);
 	retVal = retVal && archive.EndTag(settingsTag);
 
 	return retVal;
@@ -85,7 +86,7 @@ bool imtauth::CUserSettings::CopyFrom(const IChangeable &object, CompatibilityMo
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_userId = sourcePtr->m_userId;
-		m_settingsJson = sourcePtr->m_settingsJson;
+		m_settingsPtr = sourcePtr->m_settingsPtr;
 
 		return true;
 	}
@@ -110,12 +111,10 @@ bool imtauth::CUserSettings::ResetData(CompatibilityMode mode)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_userId.clear();
-	m_settingsJson.clear();
+	m_settingsPtr = nullptr;
 
 	return true;
 }
 
 
 } // namespace imtauth
-
-

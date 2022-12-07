@@ -155,6 +155,9 @@
                     <Element Id="RolesPage" PackageId="ImtUserAdministrationVoce" ComponentId="RolesPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="FeatureInfoProvider" Type="Reference" ExportId="FeatureInfoProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="ProductProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>

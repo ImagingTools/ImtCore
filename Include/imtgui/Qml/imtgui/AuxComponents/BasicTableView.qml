@@ -42,14 +42,6 @@ FocusScope {
         console.log("TableView onPressed");
     }
 
-//    MouseArea {
-//        anchors.fill: parent;
-
-//        onClicked: {
-//            console.log("BG onClicked");
-//        }
-//    }
-
     Loader {
         id: backgroundLoader;
 

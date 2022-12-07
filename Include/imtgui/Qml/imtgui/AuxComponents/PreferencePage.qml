@@ -145,9 +145,6 @@ Rectangle {
             let pageCopyModelJson = pageCopyModel.toJSON();
             let pageModelJson = pageModel.toJSON();
 
-            console.log("pageCopyModelJson", pageCopyModelJson);
-            console.log("pageModelJson", pageModelJson);
-
             if (_.isEqual(pageCopyModelJson, pageModelJson)){
                 console.log("EQUAL");
             }

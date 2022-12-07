@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import Acf 1.0
 import imtqml 1.0
+import imtgui 1.0
 
 Item {
     id: container;
@@ -9,6 +10,54 @@ Item {
 
     function updateModel(){
         userModeGqlModel.getUserMode();
+    }
+
+    Component {
+        id: passwordInputDialog;
+
+        SuperUserPasswordDialog {
+            title: qsTr("Set a password");
+
+            onFinished: {
+                if (buttonId == "Ok"){
+                    console.log("onFinished", inputValue);
+
+                    saveQuery.updateModel(inputValue);
+                }
+            }
+        }
+    }
+
+    GqlModel {
+        id: saveQuery;
+
+        function updateModel(password){
+            console.log( "updateModel saveModel");
+            var query = Gql.GqlRequest("query", "UserAdd");
+
+            var queryFields = Gql.GqlObject('addedNotification');
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("Id", "su");
+
+            let obj = {"Username": "su", "UserId": "su", "Password": password, "Name": "superuser"}
+
+            var jsonString = JSON.stringify(obj);
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+
+            inputParams.InsertField ("Item", jsonString);
+
+            query.AddParam(inputParams);
+
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Successed");
+
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+
+            this.SetGqlQuery(gqlData);
+        }
     }
 
     GqlModel{
@@ -46,17 +95,13 @@ Item {
                     if (dataModelLocal.ContainsKey("GetUserMode")){
                         dataModelLocal = dataModelLocal.GetData("GetUserMode");
 
-                        if (dataModelLocal.ContainsKey("items")){
-                            dataModelLocal = dataModelLocal.GetData("items");
+                        let value = dataModelLocal.GetData("Value");
+                        let superUserExists = dataModelLocal.GetData("SuperUserExists");
 
-                            let value = dataModelLocal.GetData("Value");
-                            let parameters = dataModelLocal.GetData("Parameters");
+                        container.userMode = value;
 
-                            if (parameters){
-                                let userMode = parameters.GetData("Id", value);
-
-                                container.userMode = userMode;
-                            }
+                        if (superUserExists == false){
+                            modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for superuser: ")});
                         }
                     }
                 }

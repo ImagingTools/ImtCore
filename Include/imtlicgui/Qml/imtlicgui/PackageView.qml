@@ -20,15 +20,6 @@ DocumentBase {
         commandsDelegate.tableTreeViewEditor = tableView;
     }
 
-    Shortcut {
-        sequence: "Ctrl+S";
-
-        onActivated: {
-            console.log("Ctrl+S onActivated");
-            commandsDelegate.commandHandle("Save")
-        }
-    }
-
     Component.onDestruction: {
         featuresProvider.modelChanged.disconnect(updateTreeViewModel);
     }
@@ -274,7 +265,7 @@ DocumentBase {
         onRowAdded: {
             console.log("onRowAdded");
             if (!blockUpdatingModel){
-               updateModel();
+                updateModel();
             }
         }
 
@@ -496,7 +487,7 @@ DocumentBase {
         }
 
         function findChildrenFeatureDependencies(featureId, retVal){
-             console.log("findChildrenFeatureDependencies");
+            console.log("findChildrenFeatureDependencies");
             let dependenciesModel = documentModel.GetData("DependenciesModel");
 
             if (!dependenciesModel){

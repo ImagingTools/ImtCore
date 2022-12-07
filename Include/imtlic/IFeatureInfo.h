@@ -46,7 +46,7 @@ public:
 	/**
 		Get all sub features for this feature.
 	*/
-	virtual QList<const IFeatureInfo*> GetSubFeatures() const  = 0;
+	virtual QVector<const IFeatureInfo*> GetSubFeatures() const  = 0;
 
 	/**
 		Insert sub feature.
@@ -58,6 +58,9 @@ public:
 	*/
 	virtual void DeleteSubFeature(const QByteArray& subFeatureId) = 0;
 };
+
+
+typedef QVector<const IFeatureInfo*> FeatureInfoList;
 
 
 } // namespace imtlic

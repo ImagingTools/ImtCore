@@ -165,6 +165,9 @@
         <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AdminId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

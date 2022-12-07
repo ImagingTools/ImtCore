@@ -313,7 +313,7 @@ DocumentBase {
 
         anchors.top: parent.top
         anchors.left: parent.left;
-        anchors.right: rightPanel.left;
+        anchors.right: parent.right;
 
         height: parent.height;
 
@@ -349,139 +349,6 @@ DocumentBase {
             console.log("onRowModelDataChanged", prop);
             if (!blockUpdatingModel){
                 updateModel();
-            }
-
-            if (prop == "State"){
-
-
-//                if (!blockUpdatingModel){
-//                    updateModel();
-//                }
-
-
-//                let index = delegate.modelIndex;
-
-//                let state = index.itemData.State;
-
-//                let featuresModel = documentModel.GetData("Features");
-//                if (!featuresModel){
-//                    featuresModel = documentModel.AddTreeModel("Features");
-//                }
-
-//                let licenseId = index.itemData.LicenseId;
-//                let featureId = index.itemData.Id;
-//                let featureName = index.itemData.Name;
-//                let isOptional = index.itemData.Optional;
-
-//                console.log("licenseId", licenseId);
-
-//                if (state == Qt.Checked){
-//                    if (featuresModel.ContainsKey(licenseId)){
-//                        let featureModel = featuresModel.GetData(licenseId);
-
-//                        if (!featureModel){
-//                            featureModel = featuresModel.AddTreeModel(licenseId);
-//                        }
-
-//                        let itemIndex = featureModel.InsertNewItem();
-
-//                        featureModel.SetData("Id", featureId, itemIndex);
-//                        featureModel.SetData("Name", featureName, itemIndex);
-//                        featureModel.SetData("Optional", isOptional, itemIndex);
-//                    }
-//                }
-//                else if (state == Qt.Unchecked){
-//                    if (featuresModel.ContainsKey(licenseId)){
-//                        let featureModel = featuresModel.GetData(licenseId);
-
-//                        let removedIndex = -1;
-//                        for (let i = 0; i < featureModel.GetItemsCount(); i++){
-//                            let productFeatureId = featureModel.GetData("Id", i);
-//                            if (productFeatureId == featureId){
-//                                removedIndex = i;
-//                                break;
-//                            }
-//                        }
-
-//                        if (removedIndex >= 0){
-//                            featureModel.RemoveItem(removedIndex);
-//                        }
-
-//                        if (featureModel.GetItemsCount() == 0){
-//                            featuresModel.RemoveData(licenseId)
-//                        }
-//                    }
-//                }
-            }
-        }
-    }
-
-    Item {
-        id: rightPanel;
-
-        anchors.right: parent.right;
-
-//        width: container.width > 0 ? container.width - tableView.width : 250;
-        width: 0;
-        height: parent.height;
-
-        Column {
-            id: content;
-
-            width: parent.width;
-
-            spacing: 5;
-
-            Text {
-                id: titleId;
-
-                anchors.left: headerTreeView.left;
-
-                text: qsTr("Product-ID");
-                color: Style.textColor;
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
-
-            CustomTextField {
-                id: inputId;
-
-                width: parent.width;
-                height: 30;
-
-                placeHolderText: qsTr("Enter the product id");
-
-                onEditingFinished: {
-
-                }
-
-                KeyNavigation.tab: inputName;
-            }
-
-            Text {
-                id: titleName;
-
-//                anchors.left: headerTreeView.left;
-
-                text: qsTr("Product Name");
-                color: Style.textColor;
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-            }
-
-            CustomTextField {
-                id: inputName;
-
-                width: parent.width;
-                height: 30;
-
-                placeHolderText: qsTr("Enter the product name");
-
-                onEditingFinished: {
-
-                }
-
-                KeyNavigation.tab: inputId;
             }
         }
     }

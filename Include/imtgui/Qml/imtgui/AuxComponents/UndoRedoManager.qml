@@ -101,20 +101,6 @@ Item {
         }
     }
 
-    Shortcut {
-        sequence: "Ctrl+Z";
-        onActivated: {
-            commandActivated("Undo");
-        }
-    }
-
-    Shortcut {
-        sequence: "Ctrl+Shift+Z";
-        onActivated: {
-            commandActivated("Redo");
-        }
-    }
-
     UndoRedo {
         id: undoRedo;
 
@@ -145,10 +131,16 @@ Item {
         console.log("undoRedoManager commandHandle", commandId);
         let result = null;
         if (commandId === "Undo"){
-            result = undoRedo.undo();
+            let undoMode = commandsProvider.getCommandMode("Undo");
+            if (undoMode == "Normal"){
+                result = undoRedo.undo();
+            }
         }
         else if (commandId === "Redo"){
-            result = undoRedo.redo();
+            let redoMode = commandsProvider.getCommandMode("Redo");
+            if (redoMode == "Normal"){
+                result = undoRedo.redo();
+            }
         }
 
         commandActivated(commandId);

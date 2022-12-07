@@ -27,22 +27,12 @@ public:
 	/**
 		Get params set settings of the user .
 	*/
-	virtual QByteArray GetSettings() const = 0;
+	virtual iprm::IParamsSet* GetSettings() const = 0;
 
 	/**
 		Set params set settings of the user .
 	*/
-	virtual void SetSettings(const QByteArray& jsonData) = 0;
-
-//	/**
-//		Get params set settings of the user .
-//	*/
-//	virtual iprm::IParamsSet* GetSettings() const = 0;
-
-//	/**
-//		Set params set settings of the user .
-//	*/
-//	virtual void SetSettings(const iprm::IParamsSet* paramsSet) = 0;
+	virtual void SetSettings(const iprm::IParamsSet* paramsSet) = 0;
 };
 
 

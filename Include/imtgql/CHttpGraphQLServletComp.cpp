@@ -3,6 +3,8 @@
 
 // ACF includes
 #include <iser/CJsonStringWriteArchive.h>
+#include <iprm/ISelectionParam.h>
+#include <iprm/IOptionsList.h>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
@@ -60,24 +62,18 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					if (m_settingsCollectionCompPtr->GetObjectData(userId, settingsDataPtr)){
 						const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(settingsDataPtr.GetPtr());
 						if (userSettingsPtr != nullptr){
-							QByteArray settingsData = userSettingsPtr->GetSettings();
-							QJsonDocument jsonResponse = QJsonDocument::fromJson(settingsData);
-							QJsonObject jsonObject = jsonResponse.object();
-							QJsonArray elements = jsonObject.take("Elements").toArray();
-							QString languageId;
-							for(const QJsonValue &value: elements)
-							{
-								if(value.toObject()["Id"] == "Language")
-								{
-									int languageIndex = value.toObject()["Value"].toInt();
-									QJsonValue languageArray = value.toObject()["Parameters"];
-                                    int countLanguages = languageArray.toArray().count();
-                                    if(languageIndex >= 0 && countLanguages > 0 && countLanguages > languageIndex){
-                                        languageId = languageArray.toArray()[languageIndex].toObject()["Id"].toString();
-                                    }
+							iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
+							if (settingsPtr != nullptr){
+								const iprm::ISelectionParam* languageParamPtr = dynamic_cast<const iprm::ISelectionParam*>(settingsPtr->GetParameter("Language"));
+								if (languageParamPtr != nullptr){
+									const iprm::IOptionsList* optionList = languageParamPtr->GetSelectionConstraints();
+									int index = languageParamPtr->GetSelectedOptionIndex();
+
+									QByteArray languageId = optionList->GetOptionId(index);
+
+									gqlContextPtr->SetLanguageId(languageId);
 								}
 							}
-							gqlContextPtr->SetLanguageId(languageId.toUtf8());
 						}
 					}
 				}

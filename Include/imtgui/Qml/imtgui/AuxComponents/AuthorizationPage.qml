@@ -45,7 +45,6 @@ Rectangle {
             hasIcon: false;
 
             color: Style.buttonColor;
-
         }
     }
 
@@ -60,9 +59,6 @@ Rectangle {
 
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
-
-        //width: 450;
-        //height: 380;
 
         width: 400;
         height: 350;
@@ -354,8 +350,6 @@ Rectangle {
                         }
                     }
                 }
-
-
             }
         }
     }

@@ -27,7 +27,7 @@ public:
 	virtual QString GetFeatureName() const override;
 	virtual bool IsOptional() const override;
 	virtual const IFeatureInfo* GetParentFeature() const override;
-	virtual QList<const IFeatureInfo*> GetSubFeatures() const override;
+	virtual FeatureInfoList GetSubFeatures() const override;
 	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
 	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
 
@@ -46,7 +46,7 @@ protected:
 	QByteArray m_id;
 	QString m_name;
 	bool m_optional;
-	QList<const IFeatureInfo*> m_subFeatures;
+	FeatureInfoList m_subFeatures;
 	const IFeatureInfo* m_parentFeaturePtr;
 };
 

@@ -15,6 +15,7 @@ QtObject {
 //    }
 
     function select(item){
+        console.log("select", item);
 //        if (selectionMode == SelectionMode.SM_SINGLE_SELECTION){
 //            items = []
 //        }
@@ -25,16 +26,26 @@ QtObject {
 
         items.push(item)
 
+        console.log("items", items);
+
         selectionChanged();
     }
 
     function deselect(item){
+        console.log("deselect", item);
+
         item.Selected = false;
 
+        console.log("items 1 ", items);
+
         let pos = items.indexOf(item)
+        console.log("pos", pos);
+
         if (pos >= 0){
             items.splice(pos, 1)
         }
+
+        console.log("items 2 ", items);
 
         selectionChanged();
     }

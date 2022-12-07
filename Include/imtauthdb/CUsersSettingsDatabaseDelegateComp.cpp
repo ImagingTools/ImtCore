@@ -2,8 +2,8 @@
 
 
 // ACF includes
-#include <iser/CJsonStringWriteArchive.h>
-#include <iser/CJsonStringReadArchive.h>
+#include <iser/CMemoryWriteArchive.h>
+#include <iser/CMemoryReadArchive.h>
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
@@ -35,12 +35,28 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 
 	userSettingsPtr->SetUserId(userId);
 
-	QByteArray settingsData;
-	if (record.contains("Settings")){
-		settingsData = record.value("Settings").toByteArray();
+	QByteArray data;
+
+	if (!m_parameterCompPtr.IsValid()){
+		return nullptr;
 	}
 
-	userSettingsPtr->SetSettings(settingsData);
+	iprm::IParamsSet* paramSetPtr = dynamic_cast<iprm::IParamsSet*>(m_parameterCompPtr.GetPtr());
+	if (paramSetPtr != nullptr){
+		if (record.contains("Settings")){
+			data = record.value("Settings").toByteArray();
+
+			data = QByteArray::fromBase64(record.value("Settings").toByteArray());
+
+			iser::CMemoryReadArchive archive(data.constData(), data.size());
+
+			if (!paramSetPtr->Serialize(archive)){
+				return nullptr;
+			}
+
+			userSettingsPtr->SetSettings(paramSetPtr);
+		}
+	}
 
 	return userSettingsPtr.PopPtr();
 }
@@ -58,19 +74,27 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 		return NewObjectQuery();
 	}
 
-//	iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
-	QByteArray settingsJson = userSettingsPtr->GetSettings();
+	iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
 	QByteArray userId = userSettingsPtr->GetUserId();
 
-//	QByteArray data;
-//	iser::CJsonStringWriteArchive archive(data);
-//	settingsPtr->Serialize(archive);
+	QByteArray data;
+
+	{
+		iser::CMemoryWriteArchive archive(m_versionInfoCompPtr.GetPtr());
+
+		bool retVal = settingsPtr->Serialize(archive);
+		if (!retVal){
+			return NewObjectQuery();
+		}
+
+		data = QByteArray((const char*) archive.GetBuffer(), archive.GetBufferSize()).toBase64();
+	}
 
 	NewObjectQuery retVal;
 
 	retVal.query += QString("\nINSERT INTO \"UsersSettings\" (UserId, Settings) VALUES ('%1', '%2');")
 			.arg(qPrintable(userId))
-			.arg(qPrintable(settingsJson)).toLocal8Bit();
+			.arg(qPrintable(data)).toLocal8Bit();
 
 	return retVal;
 }
@@ -96,11 +120,24 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	QByteArray userId = userSettingsPtr->GetUserId();
-	QByteArray settingsData = userSettingsPtr->GetSettings();
+
+	iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
+
+	QByteArray data;
+	{
+		iser::CMemoryWriteArchive archive;
+
+		bool retVal = settingsPtr->Serialize(archive);
+		if (!retVal){
+			return QByteArray();
+		}
+
+		data = QByteArray((const char*) archive.GetBuffer(), archive.GetBufferSize()).toBase64();
+	}
 
 	QByteArray retVal = QString("UPDATE \"UsersSettings\" SET UserId ='%1', Settings = '%2' WHERE UserId ='%3';")
 			.arg(qPrintable(userId))
-			.arg(qPrintable(settingsData))
+			.arg(qPrintable(data))
 			.arg(qPrintable(objectId))
 			.toLocal8Bit();
 

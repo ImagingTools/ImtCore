@@ -116,8 +116,7 @@ Rectangle {
         visible: false;
     }
 
-    PermissionsProvider
-    {
+    PermissionsProvider {
         id: permissionsProvider;
     }
 

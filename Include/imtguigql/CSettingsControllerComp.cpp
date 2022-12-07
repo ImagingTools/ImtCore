@@ -104,8 +104,6 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 			QList<imtgql::CGqlObject> params;
 			QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 
-			qDebug() << "itemData" << itemData;
-
 			if (!itemData.isEmpty()){
 				imtbase::CTreeItemModel settingsModel;
 				settingsModel.CreateFromJson(itemData);
@@ -126,7 +124,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 
 //					m_mutationDataControllersCompPtr[i]->UpdateBaseModelFromRepresentation(params, &pageModel, gqlContext);
 //				}
-				dataModel = m_mutationDataControllerCompPtr->UpdateBaseModelFromRepresentation(params, &settingsModel, gqlContext);
+				bool result = m_mutationDataControllerCompPtr->UpdateModelFromRepresentation(params, &settingsModel, gqlContext);
 			}
 		}
 	}
@@ -138,5 +136,3 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 
 
 } // namespace imtgql
-
-

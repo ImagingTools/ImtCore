@@ -7,14 +7,6 @@ TreeViewItemDelegateBase {
 
     root: tableView;
 
-    Component.onCompleted: {
-        console.log("packageTreeItemDelegate onCompleted");
-
-        packageTreeItemDelegate.forceActiveFocus();
-
-        mouseArea.clicked(null);
-    }
-
     onClicked: {
         console.log("packageTreeItemDelegate onCompleted", model.Name);
         rowBodyItem.forceActiveFocus();
@@ -94,44 +86,6 @@ TreeViewItemDelegateBase {
                         root.rowModelDataChanged(packageTreeItemDelegate, "Name");
                     }
                 }
-
-//                onTextInputFocusChanged: {
-//                    if (!textInputFocus){
-//                        visible = false;
-//                    }
-//                }
-
-//                onAccepted: {
-//                    visible = false;
-
-//                    if (model.Name != inputName.text){
-//                        model.Name = inputName.text;
-
-//                        if (model.Id == ""){
-//                            let id = model.Name.replace(/\s+/g, '');
-//                            model.Id = id;
-//                        }
-
-//                        root.rowModelDataChanged(packageTreeItemDelegate, "Name");
-//                    }
-//                }
-
-//                onEditingFinished: {
-//                    console.log("inputName onEditingFinished");
-
-//                    visible = false;
-
-//                    if (model.Name != inputName.text){
-//                        model.Name = inputName.text;
-
-//                        if (model.Id == ""){
-//                            let id = model.Name.replace(/\s+/g, '');
-//                            model.Id = id;
-//                        }
-
-//                        root.rowModelDataChanged(packageTreeItemDelegate, "Name");
-//                    }
-//                }
             }
         }
 
@@ -183,23 +137,6 @@ TreeViewItemDelegateBase {
                 text: model.Id ? model.Id : "";
 
                 visible: false;
-
-//                onTextInputFocusChanged: {
-//                    if (!textInputFocus){
-//                        visible = false;
-//                    }
-//                }
-
-//                onAccepted: {
-//                    visible = false;
-
-//                    if (model.Id != inputId.text){
-//                        model.Id = inputId.text;
-
-
-//                        root.rowModelDataChanged(packageTreeItemDelegate, "Id");
-//                    }
-//                }
 
                 onCancelled: {
                     visible = false;
@@ -268,22 +205,6 @@ TreeViewItemDelegateBase {
                 text: model.Description ? model.Description : "";
 
                 visible: false;
-
-//                onTextInputFocusChanged: {
-//                    if (!textInputFocus){
-//                        visible = false;
-//                    }
-//                }
-
-//                onAccepted: {
-//                    visible = false;
-
-//                    if (model.Description != inputDescription.text){
-//                        model.Description = inputDescription.text;
-
-//                        root.rowModelDataChanged(packageTreeItemDelegate, "Description");
-//                    }
-//                }
 
                 onCancelled: {
                     visible = false;

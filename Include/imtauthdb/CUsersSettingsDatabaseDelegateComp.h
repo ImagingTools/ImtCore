@@ -16,6 +16,8 @@ public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUsersSettingsDatabaseDelegateComp)
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Provide information about archive versions", false, "VersionInfo");
+		I_ASSIGN(m_parameterCompPtr, "Parameter", "Parameter of params data", false, "");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -44,6 +46,9 @@ public:
 				const QByteArray& objectId,
 				const QString& description) const override;
 
+protected:
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
+	I_REF(iser::ISerializable, m_parameterCompPtr);
 };
 
 

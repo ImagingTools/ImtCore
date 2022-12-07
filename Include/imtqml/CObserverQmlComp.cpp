@@ -23,7 +23,7 @@ void CObserverQmlComp::OnSettingsUpdated(const istd::IChangeable::ChangeSet &cha
 
 	if (changeSet.GetChangeInfoMap().count() > 0){
 		ApplyUrl();
-		m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(params, model);
+		m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, model);
 	}
 }
 
@@ -54,8 +54,6 @@ void CObserverQmlComp::OnComponentCreated()
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
 
 		if (quickItem != nullptr){
-//			connect(quickItem, SIGNAL(changeSourceItem(QString)), this, SLOT(OnChangeSourceItem(QString)));
-
 			if (m_pagesDataProviderCompPtr.IsValid()){
 				QList<imtgql::CGqlObject> params;
 				imtgql::CGqlObject *inputParams = new imtgql::CGqlObject("input");
@@ -68,8 +66,6 @@ void CObserverQmlComp::OnComponentCreated()
 					QVariant data = QVariant::fromValue(m_settingsModelPtr);
 					quickItem->setProperty("localSettings", data);
 				}
-//				m_settingsObserver.RegisterObject(m_settingsModelPtr, &CObserverQmlComp::OnSettingsUpdated);
-//				connect(m_settingsModelPtr, SIGNAL(modelChanged), this, SLOT(OnModelChanged));
 
 				connect(quickItem, SIGNAL(settingsUpdate(QString)), this, SLOT(OnModelChanged(QString)));
 
@@ -112,7 +108,7 @@ void CObserverQmlComp::OnModelChanged(const QString& pageId)
 	const imtbase::CTreeItemModel* pageModelPtr = GetPageModel(pageId.toUtf8());
 	if (pageModelPtr != nullptr){
 		ApplyUrl();
-		m_mutationDataDelegateCompPtr->UpdateBaseModelFromRepresentation(params, const_cast<imtbase::CTreeItemModel*>(pageModelPtr));
+		m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, const_cast<imtbase::CTreeItemModel*>(pageModelPtr));
 	}
 }
 

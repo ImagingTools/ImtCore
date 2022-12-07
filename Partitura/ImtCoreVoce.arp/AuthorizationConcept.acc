@@ -35,7 +35,26 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="AuthorizationOptionsController" PackageId="ImtGuiGqlPck" ComponentId="PagesDataController">
+        <Element Id="AuthorizationOptionsController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationOptionsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetUserMode</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserModeParameter" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserMode"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="AuthorizationOptionsController_2" PackageId="ImtGuiGqlPck" ComponentId="PagesDataController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
@@ -119,9 +138,6 @@
                         <Data IsEnabled="true" Value="UserMode"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="UserMode"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Parameter" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserMode"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">

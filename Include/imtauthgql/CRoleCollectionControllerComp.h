@@ -20,12 +20,12 @@ public:
 	I_END_COMPONENT;
 
 protected:
-
 	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
-	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
-	virtual imtbase::CTreeItemModel* GetMetaInfo(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* ListObjects(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
+	virtual imtbase::CTreeItemModel* GetMetaInfo(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* ListObjects(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, const imtgql::IGqlContext* gqlContext, QString& errorMessage) const override;
 
+protected:
 	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
 };
 

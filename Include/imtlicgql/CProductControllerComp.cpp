@@ -14,6 +14,7 @@ namespace imtlicgql
 imtbase::CTreeItemModel* CProductControllerComp::ListObjects(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
+			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();

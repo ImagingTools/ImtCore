@@ -65,32 +65,33 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
-//		for (const QByteArray& parentRoleId : parentRolesIds){
-//			QByteArray objectId = parentRoleId + *m_separatorObjectIdAttrPtr + roleProductId;
+		for (const QByteArray& parentRoleId : parentRolesIds){
+			QByteArray objectId = parentRoleId + *m_separatorObjectIdAttrPtr + roleProductId;
 
-//			imtbase::IObjectCollection::DataPtr parentDataPtr;
-//			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-//				const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
-//				if (parentRoleInfoPtr != nullptr){
-//					QString parentRoleName = parentRoleInfoPtr->GetRoleName();
+			imtbase::IObjectCollection::DataPtr parentDataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(objectId, parentDataPtr)){
+				const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
+				if (parentRoleInfoPtr != nullptr){
+					QString parentRoleName = parentRoleInfoPtr->GetRoleName();
 
-//					int childrenIndex = children->InsertNewItem();
+					int childrenIndex = children->InsertNewItem();
 
-//					children->SetData("Value", parentRoleName, childrenIndex);
-//				}
-//			}
-//		}
+					children->SetData("Value", parentRoleName, childrenIndex);
+				}
+			}
+		}
 
 		index = metaInfoModel->InsertNewItem();
+
 		metaInfoModel->SetData("Name", "Permissions", index);
 		children = metaInfoModel->AddTreeModel("Children", index);
 
-		imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
+		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetLocalPermissions();
 
-		for (const QByteArray& id : permissions){
+		for (const QByteArray& permissionId : permissionsIds){
 			int childrenIndex = children->InsertNewItem();
 
-			children->SetData("Value", id, childrenIndex);
+			children->SetData("Value", permissionId, childrenIndex);
 		}
 
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
@@ -104,6 +105,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
+			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();

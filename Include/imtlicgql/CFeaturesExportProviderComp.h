@@ -10,6 +10,7 @@
 #include <imtbase/IBinaryDataProvider.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
+#include <imtlic/IFeatureInfoProvider.h>
 
 
 namespace imtlicgql
@@ -17,26 +18,27 @@ namespace imtlicgql
 
 
 /**
-    This component accepts data and returns it in encrypted form
+	This component accepts data and returns it in encrypted form
 */
 class CFeaturesExportProviderComp:
-        public imtbase::IBinaryDataProvider,
-        public ilog::CLoggerComponentBase
+		public imtbase::IBinaryDataProvider,
+		public ilog::CLoggerComponentBase
 {
 public:
-    typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
-    I_BEGIN_COMPONENT(CFeaturesExportProviderComp);
-        I_REGISTER_INTERFACE(imtbase::IBinaryDataProvider);
-        I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product collection", true, "ProductCollection");
-    I_END_COMPONENT;
+	I_BEGIN_COMPONENT(CFeaturesExportProviderComp);
+		I_REGISTER_INTERFACE(imtbase::IBinaryDataProvider);
+		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product collection", true, "ProductCollection");
+		I_ASSIGN(m_featureInfoProviderCompPtr, "FeatureInfoProvider", "Feature info provider", true, "FeatureInfoProvider");
+	I_END_COMPONENT;
 
-    // reimplemented (imtbase::IBinaryDataProvider)
-    virtual bool GetData(QByteArray& data, const QByteArray& dataId) const override;
+	// reimplemented (imtbase::IBinaryDataProvider)
+	virtual bool GetData(QByteArray& data, const QByteArray& dataId) const override;
 
 private:
-    I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
-
+	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
+	I_REF(imtlic::IFeatureInfoProvider, m_featureInfoProviderCompPtr);
 };
 
 

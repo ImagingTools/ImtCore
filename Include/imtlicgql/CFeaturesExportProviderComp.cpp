@@ -1,17 +1,19 @@
-// ImtCore includes
 #include <imtlicgql/CFeaturesExportProviderComp.h>
-#include <imtlic/IProductInstanceInfo.h>
-#include <imtlic/CLicenseInfo.h>
-#include <imtlic/IProductLicensingInfo.h>
-#include <imtbase/ICollectionInfo.h>
-#include <imtlic/CFeaturePackage.h>
-#include <ifile/CCompactXmlFileWriteArchive.h>
+
 
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
 #include <QtCore/QTemporaryDir>
 #include <QtCore/QFileInfo>
+
+// ImtCore includes
+#include <imtlic/IProductInstanceInfo.h>
+#include <imtlic/CLicenseInfo.h>
+#include <imtlic/IProductLicensingInfo.h>
+#include <imtbase/ICollectionInfo.h>
+#include <imtlic/CFeaturePackage.h>
+#include <ifile/CCompactXmlFileWriteArchive.h>
 
 
 namespace imtlicgql
@@ -33,20 +35,18 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
 		for (const QByteArray& licenseId : licenseCollectionIds){
 			const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
-			if (licenseInfoPtr == nullptr){
-				continue;
-			}
+			if (licenseInfoPtr != nullptr){
+				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
+				for (int i = 0; i < featureInfos.size(); i++){
+					QByteArray featureId = featureInfos[i].id;
 
-			imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-			for (int i = 0; i < featureInfos.size(); i++){
-				QByteArray featureId = featureInfos[i].id;
-				const imtlic::IFeatureInfo* featurePtr = featurePackagePtr->GetFeatureInfo(featureId);
-				if (featurePtr == nullptr){
-					QString featureName = featureInfos[i].name;
-					istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr = new imtlic::CFeatureInfo;
-					featureInfoPtr->SetFeatureId(featureId);
-					featureInfoPtr->SetFeatureName(featureName);
-					featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr.GetPtr());
+					if (m_featureInfoProviderCompPtr.IsValid()){
+						const imtlic::IFeatureInfo* featureInfoPtr = m_featureInfoProviderCompPtr->GetFeatureInfo(featureId);
+						if (featureInfoPtr != nullptr){
+							QString featureName = featureInfoPtr->GetFeatureName();
+							featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr);
+						}
+					}
 				}
 			}
 		}
@@ -54,6 +54,7 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 		QString filePathTmp = QDir::tempPath() + "/"  + QUuid::createUuid().toString() + ".xml";
 		{
 			ifile::CCompactXmlFileWriteArchive writeArchive(filePathTmp);
+
 			featurePackagePtr->Serialize(writeArchive);
 		}
 

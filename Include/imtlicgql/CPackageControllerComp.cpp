@@ -199,7 +199,7 @@ bool CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 			}
 		}
 
-		QList<const imtlic::IFeatureInfo*> subFeatures = parentFeaturePtr->GetSubFeatures();
+		imtlic::FeatureInfoList subFeatures = parentFeaturePtr->GetSubFeatures();
 
 		if (subFeaturesModelPtr->ContainsKey("ChildModel", i)){
 			imtbase::CTreeItemModel *subModelPtr = subFeaturesModelPtr->GetTreeItemModel("ChildModel", i);
@@ -221,7 +221,7 @@ void CPackageControllerComp::InsertSubFeaturesToModelFromData(
 		imtbase::CTreeItemModel* dependenciesModelPtr,
 		imtbase::CTreeItemModel *featuresModel) const
 {
-	QList<const imtlic::IFeatureInfo*> subFeatures = featurePtr->GetSubFeatures();
+	imtlic::FeatureInfoList subFeatures = featurePtr->GetSubFeatures();
 
 	for (const imtlic::IFeatureInfo* subFeatureInfoPtr : subFeatures){
 		int index = featuresModel->InsertNewItem();

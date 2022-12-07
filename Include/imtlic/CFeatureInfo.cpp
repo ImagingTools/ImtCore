@@ -95,7 +95,7 @@ const IFeatureInfo *CFeatureInfo::GetParentFeature() const
 }
 
 
-QList<const IFeatureInfo*> CFeatureInfo::GetSubFeatures() const
+FeatureInfoList CFeatureInfo::GetSubFeatures() const
 {
 	return m_subFeatures;
 }
@@ -143,6 +143,8 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_id);
 	retVal = retVal && archive.EndTag(featureIdTag);
 
+	QByteArray featureId = m_id;
+
 	static iser::CArchiveTag featureNameTag("Name", "Feature name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(featureNameTag);
 	retVal = retVal && archive.Process(m_name);
@@ -153,12 +155,24 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_optional);
 	retVal = retVal && archive.EndTag(featureOptionalTag);
 
-//	static iser::CArchiveTag subFeaturesTag("SubFeatures", "SubFeatures", iser::CArchiveTag::TT_GROUP);
-//	retVal = retVal && archive.BeginTag(subFeaturesTag);
-//	for (const IFeatureInfo* featureInfo : m_subFeatures){
-//		retVal = retVal && const_cast<IFeatureInfo*>(featureInfo)->Serialize(archive);
-//	}
-//	retVal = retVal && archive.EndTag(subFeaturesTag);
+	static iser::CArchiveTag subFeaturesTag("SubFeatures", "Subfeatures of the feature", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag subfeatureTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &subFeaturesTag);
+
+	int subfeaturesCount = m_subFeatures.count();
+
+	retVal = retVal && archive.BeginMultiTag(subFeaturesTag, subfeatureTag, subfeaturesCount);
+
+	if (!archive.IsStoring()){
+		m_subFeatures.resize(subfeaturesCount);
+	}
+
+	for (const IFeatureInfo* featureInfo : m_subFeatures){
+		retVal = retVal && archive.BeginTag(subfeatureTag);
+		retVal = retVal && const_cast<IFeatureInfo*>(featureInfo)->Serialize(archive);
+		retVal = retVal && archive.EndTag(subfeatureTag);
+	}
+
+	retVal = retVal && archive.EndTag(subFeaturesTag);
 
 	return retVal;
 }

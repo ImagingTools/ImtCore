@@ -275,7 +275,7 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
 		const imtlic::IFeatureInfo *featureInfoPtr,
 		QByteArray &retVal) const
 {
-	QList<const imtlic::IFeatureInfo*> subFeatures = featureInfoPtr->GetSubFeatures();
+	imtlic::FeatureInfoList subFeatures = featureInfoPtr->GetSubFeatures();
 
 	QByteArray parentFeatureId = featureInfoPtr->GetFeatureId();
 

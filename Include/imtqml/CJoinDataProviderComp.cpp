@@ -44,7 +44,7 @@ imtbase::CTreeItemModel* CJoinDataProviderComp::GetTreeItemModel(const QList<imt
 
 // reimplemented (imtgql::IGqlMutationDataControllerDelegate)
 
-imtbase::CTreeItemModel* CJoinDataProviderComp::UpdateBaseModelFromRepresentation(const QList<imtgql::CGqlObject> &params, imtbase::CTreeItemModel *baseModelPtr, const imtgql::IGqlContext* gqlContext)
+bool CJoinDataProviderComp::UpdateModelFromRepresentation(const QList<imtgql::CGqlObject> &params, imtbase::CTreeItemModel *baseModelPtr, const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 
@@ -52,7 +52,7 @@ imtbase::CTreeItemModel* CJoinDataProviderComp::UpdateBaseModelFromRepresentatio
 //		imtbase::CTreeItemModel* pagesModel = new imtbase::CTreeItemModel();
 //		baseModel->CopyItemDataToModel(index, pagesModel);
 
-		imtbase::CTreeItemModel* externModel = m_mutationDataDelegateCompPtr[index]->UpdateBaseModelFromRepresentation(params, baseModelPtr, gqlContext);
+		m_mutationDataDelegateCompPtr[index]->UpdateModelFromRepresentation(params, baseModelPtr, gqlContext);
 
 //		rootModel->InsertNewItem();
 //		rootModel->CopyItemDataFromModel(index, externModel);

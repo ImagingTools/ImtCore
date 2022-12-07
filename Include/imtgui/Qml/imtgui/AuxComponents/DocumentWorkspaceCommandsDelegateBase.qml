@@ -104,23 +104,23 @@ Item {
             }
         }
         else if (commandId == "Save"){
-            let itemId = documentBase.itemId;
+            let saveMode = commandsProvider.getCommandMode("Save");
+            if (saveMode == "Normal"){
+                let itemId = documentBase.itemId;
+                if (itemId === ""){
+                    container.gqlModelQueryType = "Add";
+                    container.gqlModelQueryTypeNotify = "addedNotification";
 
-            console.log("itemId", itemId);
-
-            if (itemId === ""){
-                container.gqlModelQueryType = "Add";
-                container.gqlModelQueryTypeNotify = "addedNotification";
-
-                if (showInputIdDialog){
-                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
+                    if (showInputIdDialog){
+                        modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
+                    }
+                    else{
+                        saveQuery.updateModel();
+                    }
                 }
                 else{
-                    saveQuery.updateModel();
+                    saveObject();
                 }
-            }
-            else{
-                saveObject();
             }
         }
 
@@ -175,12 +175,12 @@ Item {
         }
     }
 
-    Shortcut {
-        sequence: "Ctrl+S";
-        onActivated: {
-            commandActivated("Save");
-        }
-    }
+//    Shortcut {
+//        sequence: "Ctrl+S";
+//        onActivated: {
+//            commandActivated("Save");
+//        }
+//    }
 
     /**
         Обновляем данные только после получения результата с сервера, удостоверясь

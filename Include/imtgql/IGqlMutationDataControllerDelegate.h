@@ -20,7 +20,7 @@ namespace imtgql
 class IGqlMutationDataControllerDelegate: virtual public istd::IPolymorphic
 {
 public:
-	virtual imtbase::CTreeItemModel* UpdateBaseModelFromRepresentation(
+	virtual bool UpdateModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
 				imtbase::CTreeItemModel* baseModel,
 				const imtgql::IGqlContext* gqlContext = nullptr) = 0;

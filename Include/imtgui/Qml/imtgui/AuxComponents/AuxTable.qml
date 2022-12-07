@@ -513,8 +513,6 @@ Item {
                                                                                    Text.AlignLeft;
 
 
-
-
                         font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
                                                                           headerDecorator.IsValidData("FontSize", model.index) ?
                                                                               headerDecorator.GetData("FontSize", model.index) :

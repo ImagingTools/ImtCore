@@ -74,28 +74,6 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtg
 }
 
 
-
-
-
-bool CAuthorizationControllerComp::LoginMatch(const QByteArray& login) const
-{
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	return m_userCollectionCompPtr->GetObjectData(login, dataPtr);
-}
-
-
-int CAuthorizationControllerComp::GetUserId(const QString& verificationLogin) const
-{
-	return 0;
-}
-
-
-bool CAuthorizationControllerComp::ChangePassword(const QByteArray& userId, const QString& oldPassword, const QString& newPassword)
-{
-	return false;
-}
-
-
 } // namespace imtauthgql
 
 

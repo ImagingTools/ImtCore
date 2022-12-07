@@ -17,17 +17,17 @@
         <Element ComponentName="VisualStatus" X="175" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Repositories">
-            <PositionMap>
-                <Element ComponentName="RoleRepository" X="600" Y="250" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="600" Y="425" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Pages">
             <PositionMap>
                 <Element ComponentName="RolesPage" X="350" Y="400" Note=""/>
                 <Element ComponentName="UsersPage" X="825" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="RoleRepository" X="600" Y="250" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="600" Y="425" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

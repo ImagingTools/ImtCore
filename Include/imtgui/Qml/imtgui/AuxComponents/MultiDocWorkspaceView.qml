@@ -100,7 +100,6 @@ Item {
                 tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
             }
         }
-
     }
 
     ListView {
@@ -128,6 +127,7 @@ Item {
             onVisibleChanged: {
                 if(docsDataDeleg.visible){
                     activeItem = dataLoader.item;
+                    activeItem.forceActiveFocus();
                 }
             }
 

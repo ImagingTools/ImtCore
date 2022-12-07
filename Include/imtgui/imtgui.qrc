@@ -106,6 +106,9 @@
 	<file alias="imtgui/AuxComponents/TableViewItemDelegateBase.qml">Qml/imtgui/AuxComponents/TableViewItemDelegateBase.qml</file>
 	<file alias="imtgui/AuxComponents/TreeViewItemDelegateBase.qml">Qml/imtgui/AuxComponents/TreeViewItemDelegateBase.qml</file>
 	<file alias="imtgui/AuxComponents/TableViewSelection.qml">Qml/imtgui/AuxComponents/TableViewSelection.qml</file>
+	
+	<file alias="imtgui/AuxComponents/SuperUserPasswordDialog.qml">Qml/imtgui/AuxComponents/SuperUserPasswordDialog.qml</file>
+
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

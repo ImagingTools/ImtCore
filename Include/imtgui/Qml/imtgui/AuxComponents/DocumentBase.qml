@@ -8,6 +8,8 @@ FocusScope {
 
     anchors.fill: parent;
 
+    focus: true;
+
     property string itemId;
     property string itemName;
     property string commandsId;
@@ -25,14 +27,42 @@ FocusScope {
 
     signal commandsDelegateLoaded();
 
-//    Shortcut {
-//        sequence: "Ctrl+S";
+    Shortcut {
+        sequence: "Ctrl+S";
 
-//        onActivated: {
-//            console.log("Ctrl+S onActivated");
-//            commandsDelegate.commandHandle("Save")
-//        }
-//    }
+        enabled: visible;
+
+        onActivated: {
+            console.log("Ctrl+S onActivated");
+            Events.sendEvent(commandsId + "CommandActivated", "Save");
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Z";
+
+        enabled: visible;
+
+        onActivated: {
+            console.log("Ctrl+Z onActivated");
+            Events.sendEvent(commandsId + "CommandActivated", "Undo");
+        }
+
+        onActivatedAmbiguously: {
+            console.log("Ctrl+Z onActivatedAmbiguously");
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+Z";
+
+        enabled: visible;
+
+        onActivated: {
+            console.log("Ctrl+Shift+Z onActivated");
+            Events.sendEvent(commandsId + "CommandActivated", "Redo");
+        }
+    }
 
     Component.onCompleted: {
         commandsDelegate.documentBase = documentBase;

@@ -132,12 +132,12 @@ Item {
 
     function getInstanceMask(){
         console.log("getInstanceMask");
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
+        for (let i = 0; i < serverModel.GetItemsCount(); i++){
+            let pageModel = serverModel.GetModelFromItem(i);
 
             if (pageModel){
                 let pageId = pageModel.GetData("Id");
-                if (pageId == "General"){
+                if (pageId == "Server"){
                     let elements = pageModel.GetData("Elements");
 
                     for (let j = 0; j < elements.GetItemsCount(); j++){

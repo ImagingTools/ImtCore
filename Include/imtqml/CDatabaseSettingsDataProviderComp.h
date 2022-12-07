@@ -30,7 +30,7 @@ public:
 				const imtgql::IGqlContext* gqlContext) override;
 
 	// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
-	virtual imtbase::CTreeItemModel* UpdateBaseModelFromRepresentation(
+	virtual bool UpdateModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
 				imtbase::CTreeItemModel* baseModel,
 				const imtgql::IGqlContext* gqlContext) override;

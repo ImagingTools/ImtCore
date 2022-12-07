@@ -84,7 +84,11 @@ TreeViewItemDelegateBase {
 
                 visible: false;
 
-                onAccepted: {
+                onCancelled: {
+                    visible = false;
+                }
+
+                onEditingFinished: {
                     visible = false;
 
                     if (model.Name != inputName.text){
@@ -156,12 +160,15 @@ TreeViewItemDelegateBase {
 
                     visible: false;
 
-                    onAccepted: {
+                    onCancelled: {
+                        visible = false;
+                    }
+
+                    onEditingFinished: {
                         visible = false;
 
                         if (model.Id != inputId.text){
                             model.Id = inputId.text;
-
 
                             root.rowModelDataChanged(productTreeItemDelegate, "Id");
                         }
@@ -225,12 +232,15 @@ TreeViewItemDelegateBase {
 
                     visible: false;
 
-                    onAccepted: {
+                    onCancelled: {
+                        visible = false;
+                    }
+
+                    onEditingFinished: {
                         visible = false;
 
                         if (model.Description != inputDescription.text){
                             model.Description = inputDescription.text;
-
 
                             root.rowModelDataChanged(productTreeItemDelegate, "Description");
                         }

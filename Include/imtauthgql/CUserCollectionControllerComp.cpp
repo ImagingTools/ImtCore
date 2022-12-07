@@ -23,12 +23,18 @@ namespace imtauthgql
 imtbase::CTreeItemModel* CUserCollectionControllerComp::ListObjects(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
+		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
+
+	imtauth::IUserInfo* contextUserInfoPtr = nullptr;
+	if (gqlContext != nullptr){
+		contextUserInfoPtr = gqlContext->GetUserInfo();
+	}
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -105,7 +111,17 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::ListObjects(
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 				imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 				if (userInfoPtr != nullptr){
+
+					bool add = false;
+
 					if (!userInfoPtr->IsAdmin()){
+						add = true;
+					}
+					else if (contextUserInfoPtr != nullptr){
+						add = contextUserInfoPtr->IsAdmin();
+					}
+
+					if (add){
 						int itemIndex = itemsModel->InsertNewItem();
 						if (itemIndex >= 0){
 							if (!SetupGqlItem(gqlObject, *itemsModel, itemIndex, collectionId, errorMessage)){
@@ -117,10 +133,10 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::ListObjects(
 			}
 		}
 
-		itemsModel->SetIsArray(true);
 		dataModel->SetExternTreeModel("items", itemsModel);
 		dataModel->SetExternTreeModel("notification", notificationModel);
 	}
+
 	rootModel->SetExternTreeModel("data", dataModel);
 
 	return rootModel;

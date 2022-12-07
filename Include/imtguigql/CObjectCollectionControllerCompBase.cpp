@@ -63,7 +63,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 	case OT_SET_DESCRIPTION:
 		return SetObjectDescription(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_LIST:
-		return ListObjects(*inputParamsPtr, gqlObject, errorMessage);
+		return ListObjects(*inputParamsPtr, gqlObject, gqlRequest.GetGqlContext(), errorMessage);
 	case OT_HEADERS:
 		return GetHeaders(*inputParamsPtr, gqlObject, gqlRequest.GetGqlContext(), errorMessage);
 	case OT_METAINFO:
@@ -387,6 +387,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
+		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
@@ -502,7 +503,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 	bool retVal = m_objectCollectionCompPtr->RemoveElement(objectId);
 	if (!retVal){
-		errorMessage = QObject::tr("Can not remove object: %1").arg(QString(objectId));
+		errorMessage = QObject::tr("Can't remove object: %1").arg(QString(objectId));
 	}
 
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();

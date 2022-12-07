@@ -178,6 +178,10 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
+		if (userPtr->IsAdmin()){
+			return QByteArray();
+		}
+
 		QByteArray userId = qPrintable(userPtr->GetUserId());
 		if (userId.isEmpty()){
 			return QByteArray();
