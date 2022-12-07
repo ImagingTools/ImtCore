@@ -17,6 +17,9 @@ Rectangle {
     property int checkState: Qt.Unchecked;
     property alias imageSource: image.source;
 
+    property string imageSourceActive: "../../../Icons/" + Style.theme + "/Ok_On_Normal.svg";
+    property string imageSourceNotActive: "../../../Icons/" + Style.theme + "/Ok_On_Disabled.svg";
+
     signal clicked();
 
     Rectangle {
@@ -44,8 +47,8 @@ Rectangle {
         sourceSize.height: height;
 
         visible: container.checkState != Qt.PartiallyChecked;
-        source: isActive ? container.checkState == Qt.Checked ? "../../../Icons/" + Style.theme + "/Ok_On_Normal.svg" : "" :
-            container.checkState == Qt.Checked ? "../../../Icons/" + Style.theme + "/Ok_On_Disabled.svg" : "";
+        source: isActive ? container.checkState == Qt.Checked ? container.imageSourceActive : "" :
+            container.checkState == Qt.Checked ? container.imageSourceNotActive : "";
     }
 
     MouseArea {
