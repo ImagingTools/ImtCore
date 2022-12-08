@@ -5,8 +5,17 @@ import imtgui 1.0
 Dialog {
     id: inputDialogContainer;
 
+    topPanelSource: Style.topPanelDialogPath !==undefined ? Style.topPanelDialogPath: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+
+
     property string message;
     property string inputValue;
+
+    Component.onCompleted: {
+        console.log("InputDialog onCompleted", inputDialogContainer);
+
+        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": false, "Active": true});
+    }
 
     onFinished: {
         if (buttonId === "Ok"){
@@ -17,7 +26,7 @@ Dialog {
     contentComp: Item {
         id: inputDialogBodyContainer;
 
-        height: columnBody.height + 40;
+        height: columnBody.height + 60;
 
 //        property string message;
         property alias inputValue: inputField.text;
@@ -38,7 +47,7 @@ Dialog {
             anchors.rightMargin: 10;
             anchors.leftMargin: 10;
 
-            spacing: 5;
+            spacing: 10;
 
             Text {
                 id: message;
@@ -65,22 +74,53 @@ Dialog {
                 text: inputDialogContainer.inputValue;
 
                 echoMode: TextInput.Password;
+                property bool ok: inputField.text !== "";
+
+                onOkChanged: {
+                    inputDialogContainer.buttons.setButtonState("Ok", inputField.ok);
+                }
 
                 onTextChanged: {
-                    let state = text != "";
-//                    inputDialogContainer.buttons.setButtonState("Ok", state)
                 }
 
                 onAccepted: {
-                    inputDialogContainer.buttons.buttonClicked("Ok");
+                    if(inputField.ok){
+                        inputDialogContainer.buttons.buttonClicked("Ok");
+                    }
+                }
+
+                Loader{
+                    id: inputDecoratorLoader;
+
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader.item){
+                            inputDecoratorLoader.item.rootItem = inputField;
+                        }
+                    }
                 }
             }
         }
     }
 
-    Component.onCompleted: {
-        console.log("InputDialog onCompleted", inputDialogContainer);
 
-        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": false, "Active": true});
+
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
+        }
+    }
+
+    Loader{
+        id: messageDecoratorLoader;
+
+        sourceComponent: Style.messageDecorator !==undefined ? Style.messageDecorator: emptyDecorator;
+        onLoaded: {
+            if(messageDecoratorLoader.item){
+                messageDecoratorLoader.item.rootItem = inputDialogContainer;
+            }
+            inputDialogContainer.width = 300;
+        }
     }
 }
