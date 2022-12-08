@@ -34,19 +34,7 @@ Rectangle {
         }
     }
 
-    Component{
-        id: defaultButton;
 
-        AuxButton {
-            width: 100;
-            height: 30;
-
-            hasText: true;
-            hasIcon: false;
-
-            color: Style.buttonColor;
-        }
-    }
 
     MouseArea {
         anchors.fill: parent;
@@ -305,52 +293,59 @@ Rectangle {
                 width: parent.width;
                 height: 70;
 
-                Item {
-                    id: loginButton;
-
+                BaseButton{
                     anchors.centerIn: parent;
 
-                    width: parent.width;
-                    height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 30;
-
+                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+                    text: qsTr("Login");
                     enabled: loginTextInput.text != "" && passwordTextInput.text != "";
-
-                    property string text:  qsTr("Login");
-
-                    signal clicked();
-
-                    onTextChanged: {
-                        if(buttonLoader.item.textButton !==undefined){
-                            buttonLoader.item.textButton = loginButton.text;
-                        }
-                    }
-                    onEnabledChanged: {
-                        if(buttonLoader.item){
-                            buttonLoader.item.enabled = loginButton.enabled;
-
-                        }
-                    }
 
                     onClicked: {
                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
                     }
 
-                    Loader{
-                        id: buttonLoader;
-
-                        anchors.centerIn:  parent;
-                        sourceComponent:  Style.dialogButtonComponent !== undefined ? Style.dialogButtonComponent: defaultButton;
-
-                        onLoaded: {
-                            if(buttonLoader.item){
-                                buttonLoader.item.clicked.connect(loginButton.clicked);
-                                buttonLoader.item.textButton = loginButton.text;
-                                buttonLoader.item.enabled = loginButton.enabled;
-                            }
-                        }
-                    }
                 }
+
+            }//
+        }
+    }
+
+
+    Component{
+        id: defaultButtonDecorator;
+        BaseButtonDecorator {
+            id: commonButtonDecorator;
+
+            width: 100;
+            height: 30;
+
+            Rectangle{
+                id: mainRec;
+
+                anchors.fill: parent;
+
+                radius: 2;
+                color: Style.buttonColor;
+
+                border.width: 1;
+                border.color: commonButtonDecorator.isHovered || commonButtonDecorator.selected ? Style.iconColorOnSelected : Style.buttonBorderColor;
+
+                Text {
+                    id: text;
+
+                    anchors.centerIn: parent;
+
+                    color: commonButtonDecorator.enabled ? Style.buttonText : Style.inactive_buttonText;
+
+                    font.pixelSize: Style.fontSize_common;
+                    font.family: Style.fontFamily;
+
+                    text: commonButtonDecorator.text;
+
+                }
+
             }
+
         }
     }
 
