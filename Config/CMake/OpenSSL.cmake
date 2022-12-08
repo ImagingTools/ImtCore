@@ -7,9 +7,11 @@ if(WIN32)
         target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x86/libcrypto.lib)
     endif()
 elseif(ANDROID)
-    target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/android/libcrypto.so)
+    target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/android/libcrypto_1_1.so)
+    target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/android/libssl_1_1.so)
     set(ANDROID_EXTRA_LIBS
-        ${OPENSSLDIR}/lib/android/libcrypto.so
+        ${OPENSSLDIR}/lib/android/libcrypto_1_1.so
+        ${OPENSSLDIR}/lib/android/libssl_1_1.so
         CACHE INTERNAL "")
     message("ANDROID_EXTRA_LIBS ${ANDROID_EXTRA_LIBS}")
 elseif(APPLE)
