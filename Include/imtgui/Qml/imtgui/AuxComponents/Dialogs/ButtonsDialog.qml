@@ -9,21 +9,6 @@ Item {
     height: 30;
     width: rowButtons.width;
 
-    property Component buttonComp :Component{
-        AuxButton {
-            id: delegateButton;
-
-            width: 70;
-            height: 25;
-
-            hasText: true;
-            hasIcon: false;
-
-            backgroundColor: Style.buttonColor;
-            borderColor: Style.buttonBorderColor;
-
-        }//button
-    }
 
     signal buttonClicked(string buttonId);
 
@@ -47,6 +32,14 @@ Item {
         id: buttonsModel;
     }
 
+    Component{
+        id: defaultButtonDecorator;
+        CommonButtonDecorator{
+            width: 70;
+            height: 25;
+        }
+    }
+
     Row {
         id: rowButtons;
 
@@ -59,44 +52,29 @@ Item {
 
             model: buttonsModel;
 
-            delegate: Item{
+            delegate:
+
+                BaseButton{
                 id: buttonContainer;
 
-                width: buttonLoader.width;
-                height: buttonLoader.height;
-                property bool enabled_: model.Enabled;
-                property bool focus_: model.Active;
-                signal clicked();
+                enabled: model.Enabled;
+                isFocused: model.Active;
+
+                text: model.Name;
+
+                decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+
+                onLoaded: {
+                    buttonsDialogContainer.height = buttonContainer.height;
+                }
+
                 onClicked: {
-                    console.log("AuxButton onClicked", model.Id);
+                    console.log("Button onClicked", model.Id);
                     buttonsDialogContainer.buttonClicked(model.Id);
-
-                }
-                onEnabled_Changed: {
-                    buttonLoader.item.enabled = buttonContainer.enabled_;
-                }
-                onFocus_Changed: {
-                    buttonLoader.item.focus = buttonContainer.focus_;
                 }
 
-                Loader{
-                    id: buttonLoader;
 
-                    sourceComponent: Style.dialogButtonComponent !==undefined ? Style.dialogButtonComponent: buttonsDialogContainer.buttonComp;
-
-                    onLoaded: {
-                        buttonLoader.item.clicked.connect(buttonContainer.clicked)
-                        buttonLoader.item.textButton = model.Name;
-                        if(buttonLoader.item){
-                            buttonsDialogContainer.height = buttonLoader.item.height;
-                            buttonLoader.width = buttonLoader.item.width;
-                            buttonLoader.height = buttonLoader.item.height;
-                        }
-                    }
-
-                }
-
-            }
+            }//delegate
 
 
         }

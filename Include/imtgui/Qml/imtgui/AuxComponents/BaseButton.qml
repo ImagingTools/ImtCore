@@ -34,6 +34,8 @@ Item {
     signal entered();
     signal exited();
 
+    signal loaded();
+
 
 
     onPressed: {
@@ -139,6 +141,12 @@ Item {
         }
     }
 
+    Keys.onPressed: {
+        console.log("Button Key pressed!")
+        if (event.key === Qt.Key_Return){
+            baseButton.clicked();
+        }
+     }
 
     Loader{
         id: loader;
@@ -156,11 +164,15 @@ Item {
             loader.item.isMainButton = baseButton.isMainButton;
             loader.item.enabled = baseButton.enabled;
             loader.item.isHighlighted = baseButton.isHighlighted;
+            loader.item.selected = baseButton.selected;
+            loader.item.color = baseButton.color;
 
             loader.width = loader.item.width;
             loader.width = loader.item.width;
 
             loader.item.visible = baseButton.visible;
+
+            baseButton.loaded();
 
         }
 

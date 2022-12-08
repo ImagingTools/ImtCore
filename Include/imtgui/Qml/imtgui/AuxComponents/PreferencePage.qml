@@ -22,7 +22,6 @@ Rectangle {
     property alias mainWidth: mainRec.width;
     property alias mainHeight: mainRec.height;
     property alias topPanelSource: loaderTopPanel.source;
-    property alias buttonsRowComp: buttonsDialog.buttonComp;
 
     property string settingsComboSource: "SettingsComboBox.qml";
     property string settingsDataBaseInputSource: "DatabaseInput.qml";
