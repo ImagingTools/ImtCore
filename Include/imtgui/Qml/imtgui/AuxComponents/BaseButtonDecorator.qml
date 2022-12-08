@@ -16,6 +16,7 @@ Item {
     property bool isHighlighted: false;
 
     property bool selected: false;
+    property string color: "";
     //
     
 }

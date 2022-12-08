@@ -312,42 +312,12 @@ Rectangle {
         }
     }
 
-
     Component{
         id: defaultButtonDecorator;
-        BaseButtonDecorator {
-            id: commonButtonDecorator;
-
+        CommonButtonDecorator{
             width: 100;
             height: 30;
-
-            Rectangle{
-                id: mainRec;
-
-                anchors.fill: parent;
-
-                radius: 2;
-                color: Style.buttonColor;
-
-                border.width: 1;
-                border.color: commonButtonDecorator.isHovered || commonButtonDecorator.selected ? Style.iconColorOnSelected : Style.buttonBorderColor;
-
-                Text {
-                    id: text;
-
-                    anchors.centerIn: parent;
-
-                    color: commonButtonDecorator.enabled ? Style.buttonText : Style.inactive_buttonText;
-
-                    font.pixelSize: Style.fontSize_common;
-                    font.family: Style.fontFamily;
-
-                    text: commonButtonDecorator.text;
-
-                }
-
-            }
-
+            color: Style.buttonColor;
         }
     }
 

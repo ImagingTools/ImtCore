@@ -15,7 +15,7 @@ BaseButtonDecorator {
 
         radius: 2;
 
-        color: commonButtonDecorator.isHighlighted && commonButtonDecorator.isHovered ? Style.hover :
+        color: commonButtonDecorator.color !== "" ? commonButtonDecorator.color : commonButtonDecorator.isHighlighted && commonButtonDecorator.isHovered ? Style.hover :
                                                                               commonButtonDecorator.isHovered ? Style.selectedColor:
                                                                               Style.buttonColor;
 

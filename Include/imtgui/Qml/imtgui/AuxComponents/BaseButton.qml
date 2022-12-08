@@ -23,6 +23,7 @@ Item {
 
     property bool containsMouse: enabled ? ma.containsMouse : false;
     property bool selected: false;
+    property string color: "";
 
 
 
@@ -130,6 +131,12 @@ Item {
             loader.item.selected = baseButton.selected;
         }
 
+    }
+
+    onColorChanged: {
+        if(loader.item && baseButton.color !== ""){
+            loader.item.color = baseButton.color;
+        }
     }
 
 

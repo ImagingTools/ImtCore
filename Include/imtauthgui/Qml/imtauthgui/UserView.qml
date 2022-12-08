@@ -183,22 +183,7 @@ DocumentBase {
 
         }
 
-        Component{
-            id: defaultButton;
 
-            AuxButton {
-                height: 35;
-                radius: 3;
-
-                hasText: true;
-                hasIcon: false;
-
-                backgroundColor: Style.alternateBaseColor;
-                borderColor: selected ? Style.iconColorOnSelected : Style.buttonColor;
-
-                property bool selected: false;
-            }
-        }
 
         Column {
             id: mainPanel;
@@ -228,12 +213,25 @@ DocumentBase {
                 }
             }
 
+
+            Component{
+                id: defaultButtonDecorator;
+
+                CommonButtonDecorator{
+                    height: 35;
+                    color: Style.alternateBaseColor;
+                }
+            }
+
+
             Repeater {
                 id: mainPanelRepeater;
 
                 model: leftMenuModel;
 
-                delegate: Item {
+                delegate:
+
+                    BaseButton{
                     id: buttonContainer;
 
                     anchors.left: parent.left;
@@ -241,22 +239,10 @@ DocumentBase {
                     anchors.right: parent.right;
                     anchors.rightMargin: 10;
 
-                    height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 35;
+                    text:  model.Name;
+                    selected: mainPanel.selectedIndex == model.index;
 
-                    property string text:  model.Name;
-                    property bool selected: mainPanel.selectedIndex == model.index;
-                    signal clicked();
-
-                    onSelectedChanged: {
-                        if(buttonLoader.item.selected !==undefined){
-                            buttonLoader.item.selected = buttonContainer.selected;
-                        }
-                    }
-                    onTextChanged: {
-                        if(buttonLoader.item.textButton !==undefined){
-                            buttonLoader.item.textButton = buttonContainer.text;
-                        }
-                    }
+                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
                     Component.onCompleted: {
                         if (model.index === 0){
@@ -270,21 +256,8 @@ DocumentBase {
                         }
                     }
 
-                    Loader{
-                        id: buttonLoader;
-
-                        anchors.fill: parent;
-                        sourceComponent:  Style.auxButtonComponent !== undefined ? Style.auxButtonComponent: defaultButton;
-
-                        onLoaded: {
-                            if(buttonLoader.item){
-                                buttonLoader.item.clicked.connect(buttonContainer.clicked);
-                                buttonLoader.item.selected = buttonContainer.selected;
-                                buttonLoader.item.textButton = buttonContainer.text;
-                            }
-                        }
-                    }
                 }
+
             }//Repeater
 
         }
