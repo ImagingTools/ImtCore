@@ -30,6 +30,11 @@ Item {
         repeaterCommands.model = 0;
     }
 
+    Component{
+        id: defaultButtonDecorator;
+        TopButtonDecorator{}
+    }
+
     Row {
         id: rowCommands;
 
@@ -45,7 +50,7 @@ Item {
 
                 id: topButtonDelegate;
 
-                decoratorSource: Style.topButtonDecoratorPath !==undefined ? Style.topButtonDecoratorPath: "TopButtonDecorator.qml";
+                decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
                 imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
                 enabled:  model.Mode == "Normal";
                 visible: model.Visible;

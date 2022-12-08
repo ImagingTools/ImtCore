@@ -21,7 +21,7 @@ BaseButtonDecorator {
 
 
         border.width: 1;
-        border.color: commonButtonDecorator.isHovered ? Style.iconColorOnSelected : Style.buttonBorderColor;
+        border.color: commonButtonDecorator.isHovered || commonButtonDecorator.selected ? Style.iconColorOnSelected : Style.buttonBorderColor;
 
         Text {
             id: text;
