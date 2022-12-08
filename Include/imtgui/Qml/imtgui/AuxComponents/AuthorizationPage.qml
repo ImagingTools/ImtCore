@@ -294,6 +294,8 @@ Rectangle {
                 height: 70;
 
                 BaseButton{
+                    id: loginButton;
+
                     anchors.centerIn: parent;
 
                     decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
