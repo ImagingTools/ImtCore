@@ -7,7 +7,8 @@ Dialog {
 
     title: qsTr("Message");
 
-    topPanelSource: Style.topPanelDialogPath !==undefined ? Style.topPanelDialogPath: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+
+    topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     property string message;
 

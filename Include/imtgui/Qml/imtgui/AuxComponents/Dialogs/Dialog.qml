@@ -30,7 +30,12 @@ Rectangle {
     signal finished(string buttonId);
 
     property alias contentComp: loaderBodyDialog.sourceComponent;
+    property alias topPanelComp: loaderTopPanel.sourceComponent;
     readonly property alias contentItem: loaderBodyDialog.item;
+
+    property Component topPanelDefault: Component{
+        TopPanelDialog{}
+    }
 
 
     onFocusChanged: {
@@ -86,7 +91,7 @@ Rectangle {
                 loaderTopPanel.item.title = dialogContainer.title;
                 loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
             }
-            onSourceChanged: {
+            onItemChanged: {
                 //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
                 loaderTopPanel.item.title = dialogContainer.title;
             }

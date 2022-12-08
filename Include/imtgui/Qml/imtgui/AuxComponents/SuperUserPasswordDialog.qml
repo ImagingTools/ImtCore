@@ -5,8 +5,7 @@ import imtgui 1.0
 Dialog {
     id: inputDialogContainer;
 
-    topPanelSource: Style.topPanelDialogPath !==undefined ? Style.topPanelDialogPath: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
-
+    topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     property string message;
     property string inputValue;
