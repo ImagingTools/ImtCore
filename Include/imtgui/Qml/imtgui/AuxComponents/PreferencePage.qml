@@ -37,25 +37,6 @@ Rectangle {
 
     property SettingsProvider settingsProvider;
 
-    property Component buttonComp :Component{
-        AuxButton {
-            id: button;
-
-            width: mainPanelRepeater.width;
-            height: 35;
-
-            radius: 3;
-
-            hasText: true;
-            hasIcon: false;
-
-            property bool selected: false;
-
-            borderColor: selected ? Style.iconColorOnSelected : Style.buttonColor;
-
-        }
-    }
-
 
     onVisibleChanged: {
         if (visible){
@@ -256,6 +237,14 @@ Rectangle {
             color: Style.baseColor;
 
 
+            Component{
+                id: defaultButtonDecorator;
+
+                CommonButtonDecorator{
+                    width: mainPanelRepeater.width;
+                    height: 35;
+                }
+            }
 
             Column {
                 id: mainPanel;
@@ -272,8 +261,8 @@ Rectangle {
 
 
                     delegate:
+                        BaseButton{
 
-                        Item{
                         id: buttonContainer;
 
                         anchors.left: parent.left;
@@ -281,13 +270,11 @@ Rectangle {
                         anchors.right: parent.right;
                         anchors.rightMargin: 10;
 
-                        height: buttonLoader.item.height !== undefined ? buttonLoader.item.height : 35;
-                        property bool selected: mainPanel.selectedIndex === model.index;
-                        signal clicked();
-                        onSelectedChanged: {
-                            buttonLoader.item.selected = buttonContainer.selected;
+                        decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
-                        }
+                        selected: mainPanel.selectedIndex === model.index;
+                        text: model.Name;
+
                         Component.onCompleted: {
                             if (model.index === 0){
                                 clicked();
@@ -301,20 +288,7 @@ Rectangle {
 
                         }
 
-                        Loader{
-                            id: buttonLoader;
-                            anchors.fill: parent;
-                            sourceComponent: container.buttonComp;
-                            onLoaded: {
-                                buttonLoader.item.clicked.connect(buttonContainer.clicked)
-                                buttonLoader.item.textButton = model.Name;
-                            }
-
-                        }
-
-
                     }//delegate
-
 
                 }
 
