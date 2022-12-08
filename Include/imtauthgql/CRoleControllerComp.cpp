@@ -14,6 +14,7 @@ namespace imtauthgql
 imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
+		const imtgql::IGqlContext* gqlContext,
 		QString &errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -22,9 +23,9 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* permissionsModelPtr = dataModel->AddTreeModel("Permissions");
-	imtbase::CTreeItemModel* parentsModel = dataModel->AddTreeModel("Parents");
+	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* permissionsModelPtr = dataModelPtr->AddTreeModel("Permissions");
+	imtbase::CTreeItemModel* parentsModel = dataModelPtr->AddTreeModel("Parents");
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	QByteArray productId = inputParams.at(0).GetFieldArgumentValue("ProductId").toByteArray();
@@ -35,34 +36,10 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		roleId = qPrintable(data[0]);
 	}
 
-	dataModel->SetData("Id", roleId);
-	dataModel->SetData("ProductId", productId);
-	dataModel->SetData("Name", "");
-	dataModel->SetData("Description", "");
-
-//	if (m_productProviderCompPtr.IsValid()){
-//		imtbase::CTreeItemModel* productsModel = m_productProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
-//		if (productsModel != nullptr){
-//			for (int i = 0; i < productsModel->GetItemsCount(); i++){
-//				QByteArray currentProductId = productsModel->GetData("Id", i).toByteArray();
-//				if (currentProductId == productId){
-//					imtbase::CTreeItemModel* productPermissionsModel = productsModel->GetTreeItemModel("Permissions", i);
-//					if (productPermissionsModel != nullptr){
-//						for (int j = 0; j < productPermissionsModel->GetItemsCount(); j++){
-//							QByteArray featureId = productPermissionsModel->GetData("Id", j).toByteArray();
-//							QString featureName = productPermissionsModel->GetData("Name", j).toString();
-
-//							int index = permissionsModelPtr->InsertNewItem();
-
-//							permissionsModelPtr->SetData("Id", featureId, index);
-//							permissionsModelPtr->SetData("Name", featureName, index);
-//							permissionsModelPtr->SetData("State", Qt::CheckState::Unchecked, index);
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
+	dataModelPtr->SetData("Id", roleId);
+	dataModelPtr->SetData("ProductId", productId);
+	dataModelPtr->SetData("Name", "");
+	dataModelPtr->SetData("Description", "");
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -75,10 +52,10 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		QByteArray roleId = roleInfoPtr->GetRoleId();
 		QString roleName = roleInfoPtr->GetRoleName();
 
-		dataModel->SetData("Name", roleName);
+		dataModelPtr->SetData("Name", roleName);
 
 		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-		dataModel->SetData("Description", description);
+		dataModelPtr->SetData("Description", description);
 
 		const QByteArrayList parentsRolesIds  = roleInfoPtr->GetIncludedRoles();
 		for (const QByteArray& parentRoleId : parentsRolesIds){
@@ -104,7 +81,7 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 	}
 
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModel->SetExternTreeModel("data", dataModelPtr);
 
 	return rootModel;
 }

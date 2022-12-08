@@ -37,6 +37,16 @@ DocumentBase {
             documentModel.AddTreeModel("DependenciesModel");
         }
 
+        tableView.columnModel.clear();
+        let headers = documentModel.GetData("Headers");
+
+        for (let i = 0; i < headers.GetItemsCount(); i++){
+            let headerId = headers.GetData("Id", i);
+            let headerName = headers.GetData("Name", i);
+
+            tableView.addColumn({"Id": headerId, "Name": headerName});
+        }
+
         syncronise();
 
         updateGui();
@@ -92,17 +102,7 @@ DocumentBase {
         console.log("Begin updateGui");
         blockUpdatingModel = true;
 
-        tableView.columnModel.clear();
         tableView.rowModel.clear();
-
-        let headers = documentModel.GetData("Headers");
-
-        for (let i = 0; i < headers.GetItemsCount(); i++){
-            let headerId = headers.GetData("Id", i);
-            let headerName = headers.GetData("Name", i);
-
-            tableView.addColumn({"Id": headerId, "Name": headerName});
-        }
 
         let items = documentModel.GetData("Items");
         if (!items){

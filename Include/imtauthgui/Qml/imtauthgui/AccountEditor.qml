@@ -348,11 +348,19 @@ DocumentBase {
                         font.pixelSize: Style.fontSize_common;
                     }
 
+                    RegExpValidator {
+                        id: mailValid;
+
+                        regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+                    }
+
                     CustomTextField {
                         id: emailInput;
 
                         height: accountEditorContainer.textInputHeight;
                         width: accountOwnerBlock.width;
+
+                        textInputValidator: mailValid;
 
                         onEditingFinished: {
                             let oldText = documentModel.GetData("Email");

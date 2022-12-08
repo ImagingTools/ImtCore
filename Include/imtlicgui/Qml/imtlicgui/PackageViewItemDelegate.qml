@@ -7,11 +7,6 @@ TreeViewItemDelegateBase {
 
     root: tableView;
 
-    onClicked: {
-        console.log("packageTreeItemDelegate onCompleted", model.Name);
-        rowBodyItem.forceActiveFocus();
-    }
-
     rowBodyDelegate: Row {
         id: row;
 

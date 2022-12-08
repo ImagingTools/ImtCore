@@ -25,11 +25,11 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 		const QByteArrayList& /*fields*/,
 		const imtgql::IGqlContext* gqlContext)
 {
-	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
 
 	if (m_headersIdsAttrPtr.IsValid()){
 		QByteArray languageId;
-		imtbase::CTreeItemModel* headersModelPtr = treeModel->AddTreeModel("Headers");
+		imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("Headers");
 		for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); i++){
 			headersModelPtr->InsertNewItem();
 			headersModelPtr->SetData("Id", m_headersIdsAttrPtr[i], i);
@@ -43,24 +43,23 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
 				QString headerName = m_headersNamesAttrPtr[i];
 				QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId, context);
 				headersModelPtr->SetData("Name", headerNameTr, i);
-
 			}
 			else{
 				headersModelPtr->SetData("Name", m_headersNamesAttrPtr[i], i);
 			}
 		}
-		treeModel->SetData("LanguageId", languageId);
+//		dataModelPtr->SetData("LanguageId", languageId);
 	}
 
 	if (m_headersSearchByFilterAttrPtr.IsValid()){
-		imtbase::CTreeItemModel* searchModel = treeModel->AddTreeModel("FilterSearch");
+		imtbase::CTreeItemModel* searchModel = dataModelPtr->AddTreeModel("FilterSearch");
 		for (int i = 0; i < m_headersSearchByFilterAttrPtr.GetCount(); i++){
 			int index = searchModel->InsertNewItem();
 			searchModel->SetData("Id", m_headersSearchByFilterAttrPtr[i], index);
 		}
 	}
 
-	return treeModel;
+	return dataModelPtr;
 }
 
 

@@ -20,8 +20,21 @@ TableViewItemDelegateBase {
     signal parentCheckStateChanged(var data);
     signal childrenCheckStateChanged(var data);
 
-    function checkBoxClick(){
-        prefixRowItem.click();
+    onSelectedChanged: {
+        console.log("packageTreeItemDelegate onSelectedChanged", selected);
+        if (selected){
+            root.selectedIndex = modelIndex;
+        }
+        else{
+            root.selectedIndex = null;
+        }
+
+        updateSelection();
+    }
+
+    onClicked: {
+        console.log("packageTreeItemDelegate onCompleted", model.Name);
+        rowBodyItem.forceActiveFocus();
     }
 
     prefixRowDelegate: Row {

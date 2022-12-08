@@ -64,7 +64,7 @@ Item {
     function commandHandle(commandId){
         console.log("CollectionView commandHandle", commandId);
         if (commandId === "New"){
-            baseCollectionView.selectedItem("", "");
+            baseCollectionView.selectedItem("", "<new item>");
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
@@ -82,8 +82,6 @@ Item {
             console.log("tableData", tableData);
             let elements = tableData.elements;
             let selectedDescription = elements.GetData("Description", selectedIndex);
-            console.log("selectedIndex", selectedIndex);
-            console.log("selectedDescription", selectedDescription);
 
             modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
         }

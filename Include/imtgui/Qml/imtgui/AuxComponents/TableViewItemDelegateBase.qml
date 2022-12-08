@@ -40,6 +40,8 @@ FocusScope {
 
     readonly property alias prefixRowLoader: prefixRowLoader;
 
+    property bool selected: model.Selected;
+
     signal clicked();
 
     Loader {
@@ -56,7 +58,7 @@ FocusScope {
         width: parent.width;
         height: root.rowItemHeight;
 
-        visible: model.Selected;
+        visible: delegate.selected;
 
         sourceComponent: Rectangle {
             id: highlight;
@@ -164,18 +166,20 @@ FocusScope {
         onClicked: {
             console.log("onClicked");
 
-            if (root.selection.contains(model)){
-                console.log("contains");
+            updateSelection();
 
-                root.selection.deselect(model);
-                root.selectedIndex = null;
-            }
-            else{
-                console.log("not contains");
+//            if (root.selection.contains(model)){
+//                console.log("contains");
 
-                root.selection.select(model);
-                root.selectedIndex = modelIndex;
-            }
+//                root.selection.deselect(model);
+//                root.selectedIndex = null;
+//            }
+//            else{
+//                console.log("not contains");
+
+//                root.selection.select(model);
+//                root.selectedIndex = modelIndex;
+//            }
 
             delegate.clicked();
 

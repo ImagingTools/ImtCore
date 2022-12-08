@@ -69,8 +69,12 @@ FocusScope {
 
         boundsBehavior: Flickable.StopAtBounds;
 
+        headerPositioning: ListView.OverlayHeader;
+
         header: FocusScope {
             id: headerItem;
+
+            z: 2;
 
             height: visible ? tableViewRoot.headerHeight : 0;
             width: listView.width;

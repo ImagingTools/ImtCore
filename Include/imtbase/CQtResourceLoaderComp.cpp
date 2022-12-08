@@ -27,9 +27,8 @@ void CQtResourceLoaderComp::OnComponentCreated()
 			QByteArray data = resourceFile.readAll();
 			resourceFile.close();
 
-//			iser::CCompactXmlMemReadArchive archive(data);
+			iser::CCompactXmlMemReadArchive archive(data);
 
-			ifile::CCompactXmlFileReadArchive archive(data);
 			m_targetObjectCompPtr->Serialize(archive);
 		}
 	}

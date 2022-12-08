@@ -321,8 +321,6 @@ Item {
             }//Column bodyColumn
 
         }//columnContainer
-
-
         //
     }
 

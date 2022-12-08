@@ -13,6 +13,7 @@ namespace imtauthgql
 imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
+		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){

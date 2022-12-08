@@ -51,7 +51,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 	case OT_NEW:
 		return InsertObject(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_GET:
-		return GetObject(*inputParamsPtr, gqlObject, errorMessage);
+		return GetObject(*inputParamsPtr, gqlObject, gqlRequest.GetGqlContext(), errorMessage);
 	case OT_UPDATE:
 		return UpdateObject(*inputParamsPtr, gqlObject, errorMessage);
 	case OT_UPDATE_COLLECTION:
@@ -171,6 +171,7 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
+		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
 	return nullptr;

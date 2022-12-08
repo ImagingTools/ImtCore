@@ -257,6 +257,7 @@ void CPackageControllerComp::InsertSubFeaturesToModelFromData(
 imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
+			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -273,9 +274,11 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 	imtbase::IObjectCollection::DataPtr dataPtr;
 
 	if (m_headersProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
-		imtbase::CTreeItemModel* headers = headersModel->GetTreeItemModel("Headers");
-		dataModelPtr->SetExternTreeModel("Headers", headers);
+		imtbase::CTreeItemModel* headersInfoModelPtr = m_headersProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList(), gqlContext);
+		if (headersInfoModelPtr != nullptr){
+			imtbase::CTreeItemModel* headersModelPtr = headersInfoModelPtr->GetTreeItemModel("Headers");
+			dataModelPtr->SetExternTreeModel("Headers", headersModelPtr);
+		}
 	}
 
 	dataModelPtr->SetData("Id", "");
