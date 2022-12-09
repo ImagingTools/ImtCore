@@ -16,6 +16,8 @@ Rectangle {
     property int mainRadius: 3;
     property string mainColor: Style.backgroundColor;
 
+    property alias title: welcomeText.text;
+
     onVisibleChanged: {
         if (visible){
             authPageContainer.state = "unauthorized";
@@ -209,8 +211,38 @@ Rectangle {
                         if(inputDecoratorLoader2.item){
                             inputDecoratorLoader2.item.rootItem = passwordTextInput;
                         }
+
                     }
                 }
+
+                AuxButton {
+                    id: eyeButton;
+
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 4;
+
+                    height: Math.min(24, parent.height - 10);
+                    width: height;
+
+                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
+                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
+                                          passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
+
+                    onClicked: {
+                        if(passwordTextInput.echoMode == TextInput.Password){
+                            passwordTextInput.echoMode = TextInput.Normal;
+                        }
+                        else if(passwordTextInput.echoMode == TextInput.Normal){
+                            passwordTextInput.echoMode = TextInput.Password;
+                        }
+                    }
+
+
+                }
+
+
             }
 
             Item{
