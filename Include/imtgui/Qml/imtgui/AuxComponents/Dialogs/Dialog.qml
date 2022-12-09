@@ -17,6 +17,7 @@ Rectangle {
 
     property bool centered: true;
     property bool hasIcon: true;
+    property bool canClose: true;
 
     property Item root;
     property Item bodyItem: loaderBodyDialog.item;
@@ -52,7 +53,7 @@ Rectangle {
 
     onFinished: {
         if (root){
-            if(dialogContainer.notClosingButtons.indexOf(buttonId) == -1){
+            if((dialogContainer.notClosingButtons.indexOf(buttonId) == -1) && dialogContainer.canClose){
                 root.closeDialog();
             }
         }
