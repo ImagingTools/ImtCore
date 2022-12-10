@@ -2,18 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4947" Description="ACF"/>
-            <Version Id="1" Number="2150" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5016" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="HttpProtocolEngine" X="875" Y="425" Note=""/>
-        <Element ComponentName="HttpRootHandler" X="250" Y="500" Note=""/>
-        <Element ComponentName="TcpServer" X="625" Y="300" Note=""/>
-        <Element ComponentName="WebSocketHttpRootHandler" X="275" Y="600" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="872.12213284" Y="500" Note=""/>
-        <Element ComponentName="WebSocketServer" X="625" Y="575" Note=""/>
+        <Element ComponentName="HttpProtocolEngine" X="875" Y="375" Note=""/>
+        <Element ComponentName="HttpRootHandler" X="275" Y="375" Note=""/>
+        <Element ComponentName="TcpServer" X="550" Y="175" Note=""/>
+        <Element ComponentName="WebSocketHttpRootHandler" X="275" Y="700" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="925" Y="700" Note=""/>
+        <Element ComponentName="WebSocketServer" X="550" Y="500" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
