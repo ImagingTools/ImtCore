@@ -46,7 +46,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServiceApplication" PackageId="QtExtPck" ComponentId="ServiceApplication">
+        <Element Id="ServiceApplication" PackageId="QtExPck" ComponentId="ServiceApplication">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInstance" Type="Reference" ExportId="">
