@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5032" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Application" X="475" Y="175" Note=""/>
+        <Element ComponentName="ApplicationInfo" X="850" Y="175" Note=""/>
+        <Element ComponentName="ConsoleLog" X="175" Y="450" Note=""/>
+        <Element ComponentName="LogFilePath" X="850" Y="700" Note=""/>
+        <Element ComponentName="LogSystemLocation" X="850" Y="450" Note=""/>
+        <Element ComponentName="TextFileLog" X="175" Y="700" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
