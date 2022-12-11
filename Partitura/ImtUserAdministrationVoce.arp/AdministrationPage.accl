@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -13,7 +13,7 @@
         <Element ComponentName="JoinDataProvider" X="275" Y="375" Note=""/>
         <Element ComponentName="Pages" X="925" Y="375" Note=""/>
         <Element ComponentName="PagesDataController" X="275" Y="225" Note=""/>
-        <Element ComponentName="Repositories" X="950" Y="525" Note=""/>
+        <Element ComponentName="Repositories" X="925" Y="525" Note=""/>
         <Element ComponentName="VisualStatus" X="175" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>

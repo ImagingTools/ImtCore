@@ -156,15 +156,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TextButton" PackageId="BasePck" ComponentId="TextParam">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Download"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -174,6 +165,5 @@
         <Component ExportedId="DatabaseAccessSettings" ComponentId="DatabaseAccessSettings"/>
         <Component ExportedId="Mask" ComponentId="Mask"/>
         <Component ExportedId="Preferences" ComponentId="Preferences"/>
-        <Component ExportedId="TextButton" ComponentId="TextButton"/>
     </ExportedComponents>
 </Acf>

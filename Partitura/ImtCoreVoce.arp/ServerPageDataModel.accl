@@ -16,7 +16,6 @@
         <Element ComponentName="Preferences" X="550" Y="75" Note=""/>
         <Element ComponentName="PreferencesFilePath" X="1075" Y="100" Note=""/>
         <Element ComponentName="SystemLocation" X="1075" Y="25" Note=""/>
-        <Element ComponentName="TextButton" X="75" Y="250" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
