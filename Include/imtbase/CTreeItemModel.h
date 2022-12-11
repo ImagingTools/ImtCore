@@ -28,6 +28,7 @@ class CTreeItemModel: public QAbstractListModel, public istd::CChangeDelegator, 
 
 public:
 	typedef istd::CChangeDelegator BaseClass;
+	typedef QAbstractListModel BaseClass2;
 
 	explicit CTreeItemModel(QObject* parent = nullptr);
 	~CTreeItemModel();

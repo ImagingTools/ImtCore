@@ -16,28 +16,41 @@ CObserverQmlComp::CObserverQmlComp()
 
 
 //protected methods
+
 void CObserverQmlComp::OnSettingsUpdated(const istd::IChangeable::ChangeSet &changeSet, const imtbase::CTreeItemModel *settingsModelPtr)
 {
 	imtbase::CTreeItemModel* model = const_cast<imtbase::CTreeItemModel*>(settingsModelPtr);
 	QList<imtgql::CGqlObject> params;
 
-	if (changeSet.GetChangeInfoMap().count() > 0){
+	if (!changeSet.GetChangeInfoMap().isEmpty()){
 		ApplyUrl();
-		m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, model);
+
+		if (m_mutationDataDelegateCompPtr.IsValid()){
+			m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, model);
+		}
 	}
 }
 
 
 void CObserverQmlComp::ApplyUrl() const
 {
+	if (!m_quickObjectComp.IsValid()){
+		return;
+	}
+
 	const imtbase::CTreeItemModel* pageModelPtr = GetPageModel("NetworkSettings");
 	if (pageModelPtr != nullptr){
 		imtbase::CTreeItemModel* elementsModelPtr = pageModelPtr->GetTreeItemModel("Elements");
-		if (elementsModelPtr != nullptr && m_quickObjectComp.IsValid()){
+		if (elementsModelPtr != nullptr){
 			if (elementsModelPtr->ContainsKey("Value")){
 				QString serverUrl = elementsModelPtr->GetData("Value").toString();
+
 				QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
+				Q_ASSERT(quickItem != nullptr);
+
 				QQmlEngine* engine = qmlEngine(quickItem);
+				Q_ASSERT(engine != nullptr);
+
 				engine->setBaseUrl(serverUrl + *m_prefixServer);
 			}
 		}
@@ -45,31 +58,36 @@ void CObserverQmlComp::ApplyUrl() const
 }
 
 
-// reimplemented (ilog::CLoggerComponentBase)
+// reimplemented (icomp::CComponentBase)
+
 void CObserverQmlComp::OnComponentCreated()
 {
-	ilog::CLoggerComponentBase::OnComponentCreated();
+	BaseClass::OnComponentCreated();
+
 	if (m_quickObjectComp.IsValid()){
-
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
-
 		if (quickItem != nullptr){
 			if (m_pagesDataProviderCompPtr.IsValid()){
 				QList<imtgql::CGqlObject> params;
-				imtgql::CGqlObject *inputParams = new imtgql::CGqlObject("input");
-				inputParams->InsertField("LanguageId", "ru_RU");
-				params.append(*inputParams);
+				imtgql::CGqlObject* inputParamsPtr = new imtgql::CGqlObject("input");
+
+				inputParamsPtr->InsertField("LanguageId", "ru_RU");
+				params.append(*inputParamsPtr);
+
 				QByteArrayList fields;
 				fields.append("NetworkSettings");
+
 				m_settingsModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);
 				if (m_settingsModelPtr != nullptr){
 					QVariant data = QVariant::fromValue(m_settingsModelPtr);
+
 					quickItem->setProperty("localSettings", data);
 				}
 
 				connect(quickItem, SIGNAL(settingsUpdate(QString)), this, SLOT(OnModelChanged(QString)));
 
 				ApplyUrl();
+
 				QMetaObject::invokeMethod(quickItem, "updateModels");
 			}
 		}
@@ -79,12 +97,15 @@ void CObserverQmlComp::OnComponentCreated()
 
 void CObserverQmlComp::OnComponentDestroyed()
 {
-	ilog::CLoggerComponentBase::OnComponentDestroyed();
 	m_settingsObserver.UnregisterAllObjects();
+
 	if (m_settingsModelPtr != nullptr){
 		delete m_settingsModelPtr;
+
 		m_settingsModelPtr = nullptr;
 	}
+
+	BaseClass::OnComponentDestroyed();
 }
 
 
@@ -92,6 +113,8 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 {
 	if (m_quickObjectComp.IsValid()){
 		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
+		Q_ASSERT(quickItem != nullptr);
+
 		quickItem->setProperty("sourceItem", "qrc:///qml/"+ src);
 	}
 }
@@ -108,7 +131,10 @@ void CObserverQmlComp::OnModelChanged(const QString& pageId)
 	const imtbase::CTreeItemModel* pageModelPtr = GetPageModel(pageId.toUtf8());
 	if (pageModelPtr != nullptr){
 		ApplyUrl();
-		m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, const_cast<imtbase::CTreeItemModel*>(pageModelPtr));
+
+		if (m_mutationDataDelegateCompPtr.IsValid()){
+			m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, const_cast<imtbase::CTreeItemModel*>(pageModelPtr));
+		}
 	}
 }
 
@@ -117,14 +143,17 @@ const imtbase::CTreeItemModel* CObserverQmlComp::GetPageModel(const QByteArray &
 {
 	imtbase::CTreeItemModel* pageModelPtr = nullptr;
 
-	for (int i = 0; i < m_settingsModelPtr->GetItemsCount(); i++){
-		if (m_settingsModelPtr->ContainsKey("Id", i)){
-			QByteArray currentPageId = m_settingsModelPtr->GetData("Id", i).toByteArray();
-			if (currentPageId == pageId){
-				pageModelPtr = new imtbase::CTreeItemModel();
-				int index = pageModelPtr->InsertNewItem();
-				m_settingsModelPtr->CopyItemDataToModel(i, pageModelPtr, index);
-				break;
+	if (m_settingsModelPtr != nullptr){
+		for (int i = 0; i < m_settingsModelPtr->GetItemsCount(); i++){
+			if (m_settingsModelPtr->ContainsKey("Id", i)){
+				QByteArray currentPageId = m_settingsModelPtr->GetData("Id", i).toByteArray();
+				if (currentPageId == pageId){
+					pageModelPtr = new imtbase::CTreeItemModel();
+					int index = pageModelPtr->InsertNewItem();
+
+					m_settingsModelPtr->CopyItemDataToModel(i, pageModelPtr, index);
+					break;
+				}
 			}
 		}
 	}
@@ -134,4 +163,5 @@ const imtbase::CTreeItemModel* CObserverQmlComp::GetPageModel(const QByteArray &
 
 
 } // namespace imtqml
+
 

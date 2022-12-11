@@ -1,9 +1,6 @@
 #pragma once
 
 
-// Qt includes
-#include <QtNetwork/QNetworkReply>
-
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlRequest.h>
@@ -23,6 +20,8 @@ class CGqlModel: public imtbase::CTreeItemModel
 	Q_OBJECT
 
 public:
+	typedef imtbase::CTreeItemModel BaseClass;
+
 	explicit CGqlModel(QObject* parent = nullptr);
 	~CGqlModel();
 
@@ -39,4 +38,7 @@ private:
 
 } // namespace imtqml
 
+
 Q_DECLARE_METATYPE(imtqml::CGqlModel*)
+
+

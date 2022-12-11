@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -10,12 +10,10 @@
     <PositionMap>
         <Element ComponentName="AuthorizationController" X="975" Y="200" Note=""/>
         <Element ComponentName="AuthorizationOptionsController" X="250" Y="175" Note=""/>
-        <Element ComponentName="AuthorizationOptionsController_2" X="425" Y="775" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
         <Element ComponentName="HashCalculator" X="675" Y="350" Note=""/>
         <Element ComponentName="UserMode" X="275" Y="325" Note=""/>
         <Element ComponentName="UserModeOptions" X="275" Y="475" Note=""/>
-        <Element ComponentName="UserModeProvider" X="100" Y="775" Note=""/>
         <Element ComponentName="UserSessionRepository" X="950" Y="350" Note=""/>
         <Element ComponentName="UsersSessionsDatabaseDelegate" X="975" Y="525" Note=""/>
     </PositionMap>

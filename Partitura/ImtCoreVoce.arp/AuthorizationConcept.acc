@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -50,25 +50,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UserModeParameter" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserMode"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="AuthorizationOptionsController_2" PackageId="ImtGuiGqlPck" ComponentId="PagesDataController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>GetUserMode</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserModeProvider"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PagesDataProviderCompPtr" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserModeProvider"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -124,24 +105,6 @@
                                 <Value>STRONG_USER_MANAGEMENT</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserModeProvider" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ComponentType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="3"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserMode"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="UserMode"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

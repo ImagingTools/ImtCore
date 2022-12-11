@@ -56,13 +56,14 @@ void CTreeItemModel::SetState(const QString &newState)
 
 void CTreeItemModel::SetParent(QObject* parent)
 {
-    this->setParent(parent);
+	BaseClass2::setParent(parent);
 }
 
 
 bool CTreeItemModel::Copy(CTreeItemModel* object)
 {
 	bool result = CopyFrom(*object);
+
 	return result;
 }
 
@@ -109,8 +110,8 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 	}
 
 	beginRemoveRows(QModelIndex(), index, index);
-	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 
+	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 	changeSet.SetChangeInfo("operation", "remove item");
 	changeSet.SetChangeInfo("index", index);
 
@@ -126,6 +127,7 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 	}
 
 	EndChanges(changeSet);
+
 	endRemoveRows();
 
 	return true;
@@ -556,7 +558,7 @@ bool CTreeItemModel::Serialize(iser::IArchive &archive)
 
 int CTreeItemModel::GetSupportedOperations() const
 {
-	return SO_COPY | SO_CLONE;
+	return SO_COPY;
 }
 
 
@@ -595,10 +597,9 @@ bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 }
 
 
-istd::IChangeable* CTreeItemModel::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CTreeItemModel::CloneMe(CompatibilityMode /*mode*/) const
 {
-
-    return NULL;
+	return NULL;
 }
 
 

@@ -2,12 +2,9 @@
 
 
 // Qt includes
-#include <QtQuick/QQuickItem>
 #include <QtQml/QQmlEngine>
 #include <QtNetwork/QNetworkAccessManager>
-
-// ACF includes
-#include <iser/CJsonStringReadArchive.h>
+#include <QtNetwork/QNetworkReply>
 
 
 namespace imtqml
@@ -18,7 +15,7 @@ QString CGqlModel::s_accessToken = QString();
 
 
 CGqlModel::CGqlModel(QObject *parent)
-	: imtbase::CTreeItemModel(parent)
+	:BaseClass(parent)
 {
 
 }

@@ -2,13 +2,12 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfoDataProvider" X="700" Y="250" Note=""/>
         <Element ComponentName="AutoPersistence" X="1075" Y="200" Note=""/>
         <Element ComponentName="CompactXmlFileSerializer" X="1075" Y="301.414213562" Note=""/>
         <Element ComponentName="Database" X="450" Y="250" Note=""/>

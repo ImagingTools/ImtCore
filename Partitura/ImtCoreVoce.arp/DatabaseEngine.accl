@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5026" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="PgSqlDatabaseEngine" X="600" Y="225" Note=""/>
-        <Element ComponentName="RelativeFileNameParam" X="425" Y="325" Note=""/>
-        <Element ComponentName="SystemLocation" X="725" Y="325" Note=""/>
+        <Element ComponentName="PgSqlDatabaseEngine" X="575" Y="100" Note=""/>
+        <Element ComponentName="RelativeFileNameParam" X="575" Y="300" Note=""/>
+        <Element ComponentName="SystemLocation" X="550" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

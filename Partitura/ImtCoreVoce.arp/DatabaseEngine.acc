@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5026" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -23,10 +23,13 @@
                         <Data IsEnabled="true" Value="QPSQL"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HostName" Type="Id" ExportId="PgHostName">
-                        <Data IsEnabled="true" Value="127.0.0.1"/>
+                        <Data IsEnabled="true" Value="localhost"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MaintainanceDatabase" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="postgres"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MigrationFolderPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RelativeFileNameParam"/>
