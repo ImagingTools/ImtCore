@@ -9,12 +9,11 @@ namespace imtgql
 
 imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
-
-	if(CheckPermissions(gqlRequest, errorMessage))
-	{
+	if(CheckPermissions(gqlRequest, errorMessage)){
 		return CreateInternalResponse(gqlRequest, errorMessage);
 	}
+
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
 	const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
 	QString userName = userInfoPtr->GetName();
@@ -24,8 +23,10 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateRespons
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
 	rootModelPtr->SetExternTreeModel("errors", errorsItemModelPtr);
 	errorsItemModelPtr->SetData("message", errorMessage);
+
 	return rootModelPtr;
 }
+
 
 QByteArrayList CGqlRepresentationDataControllerCompBase::GetModelIds() const
 {

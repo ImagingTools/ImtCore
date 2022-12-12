@@ -1,7 +1,11 @@
 #include <imtgql/CGqlDemultiplexerComp.h>
 
+
 namespace imtgql
 {
+
+
+// reimplemented (imtgql::IGqlRepresentationDataController)
 
 QByteArrayList CGqlDemultiplexerComp::GetModelIds() const
 {
@@ -13,6 +17,7 @@ QByteArrayList CGqlDemultiplexerComp::GetModelIds() const
 			modelIds.append(representationControllerPtr->GetModelIds());
 		}
 	}
+
 	return modelIds;
 }
 
@@ -27,13 +32,13 @@ QByteArrayList CGqlDemultiplexerComp::GetContextIds() const
 			contextIds.append(representationControllerPtr->GetContextIds());
 		}
 	}
+
 	return contextIds;
 }
 
 
 imtbase::CTreeItemModel *CGqlDemultiplexerComp::CreateResponse(const CGqlRequest &gqlRequest, QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* sourceItemModel = nullptr;
 	QByteArray gqlCommand = gqlRequest.GetCommandId();
 	QByteArrayList modelIds = GetModelIds();
 	int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
@@ -43,20 +48,19 @@ imtbase::CTreeItemModel *CGqlDemultiplexerComp::CreateResponse(const CGqlRequest
 			if (representationControllerPtr != nullptr){
 				QByteArrayList modelItemIds = representationControllerPtr->GetModelIds();
 				if (modelItemIds.contains(gqlCommand)){
-					sourceItemModel = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
-
-					if (sourceItemModel != nullptr){
-						return sourceItemModel;
+					imtbase::CTreeItemModel* sourceItemModelPtr = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
+					if (sourceItemModelPtr != nullptr){
+						return sourceItemModelPtr;
 					}
 				}
 			}
 		}
 	}
 
-	return sourceItemModel;
+	return nullptr;
 }
 
-}// namespace imtgql
 
+} // namespace imtgql
 
 

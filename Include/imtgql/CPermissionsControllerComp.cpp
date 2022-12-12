@@ -60,9 +60,9 @@ imtbase::CTreeItemModel* CPermissionsControllerComp::CreateResponse(const imtgql
 	}
 
 	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
+
 	return rootModelPtr;
 }
-
 
 
 } // namespace imtgql

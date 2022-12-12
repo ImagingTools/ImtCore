@@ -9,17 +9,18 @@ namespace imtgql
 
 CGqlEnum::CGqlEnum(QByteArray value) : m_value(value)
 {
-
 }
+
 
 QByteArray CGqlEnum::GetValue()
 {
-    return m_value;
+	return m_value;
 }
+
 
 CGqlEnum::operator QVariant() const
 {
-    return QVariant::fromValue(*this);
+	return QVariant::fromValue(*this);
 }
 
 

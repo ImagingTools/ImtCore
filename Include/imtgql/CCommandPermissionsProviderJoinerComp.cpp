@@ -27,8 +27,11 @@ QByteArrayList CCommandPermissionsProviderJoinerComp::GetCommandPermissions(cons
 	return retVal;
 }
 
+
 // protected methods
+
 // reimplemented (icomp::CComponentBase)
+
 void CCommandPermissionsProviderJoinerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
@@ -38,7 +41,9 @@ void CCommandPermissionsProviderJoinerComp::OnComponentCreated()
 	}
 }
 
+
 // private methods
+
 void CCommandPermissionsProviderJoinerComp::UpdatePermissionsCache()
 {
 	if(m_commandPermissionsProviderCompPtr.IsValid()){
@@ -47,17 +52,10 @@ void CCommandPermissionsProviderJoinerComp::UpdatePermissionsCache()
 			if(currentProviderPtr != nullptr){
 				const QByteArrayList currentProviderCommandIds = currentProviderPtr->GetCommandIds();
 				const QSet<QByteArray> currentProviderCommandIdsSet = QSet<QByteArray>(currentProviderCommandIds.begin(), currentProviderCommandIds.end());
-				for(const QByteArray &commandId: currentProviderCommandIdsSet)
-				{
-					const QByteArrayList permissionsId =currentProviderPtr->GetCommandPermissions(commandId);
+				for(const QByteArray &commandId: currentProviderCommandIdsSet){
+					const QByteArrayList permissionsId = currentProviderPtr->GetCommandPermissions(commandId);
+
 					m_permissionsCache.insert(commandId, permissionsId);
-//					const QByteArray commandId = currentProviderCommandIds[index];
-//					if(!m_permissionsCache.contains(commandId)){
-//						m_permissionsCache.insert(commandId, currentProviderPtr->GetCommandPermissions(commandId));
-//					}
-//					else{
-//						Q_ASSERT(false);
-//					}
 				}
 			}
 		}

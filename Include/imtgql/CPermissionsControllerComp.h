@@ -6,7 +6,6 @@
 #include <imtgql/ICommandPermissionsProvider.h>
 
 
-
 namespace imtgql
 {
 
@@ -23,10 +22,8 @@ public:
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
-
 private:
 	I_MULTIREF(imtgql::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
-
 };
 
 

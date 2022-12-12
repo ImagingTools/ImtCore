@@ -15,11 +15,11 @@ CSingleCommandPermissionsProviderComp::LogicalCheckMode CSingleCommandPermission
 
 QByteArrayList CSingleCommandPermissionsProviderComp::GetCommandIds() const
 {
-    QByteArrayList retVal;
+	QByteArrayList retVal;
 
-    retVal.push_back(*m_commandIdAttrPtr);
+	retVal.push_back(*m_commandIdAttrPtr);
 
-    return retVal;
+	return retVal;
 }
 
 
@@ -27,18 +27,14 @@ QByteArrayList CSingleCommandPermissionsProviderComp::GetCommandPermissions(cons
 {
 	QByteArrayList retVal;
 
-    if (m_commandPermissionsAttrPtr.IsValid()){
-        for (int i = 0; i < m_commandPermissionsAttrPtr.GetCount(); i++){
-            retVal << m_commandPermissionsAttrPtr[i];
+	if (m_commandPermissionsAttrPtr.IsValid()){
+		for (int i = 0; i < m_commandPermissionsAttrPtr.GetCount(); i++){
+			retVal << m_commandPermissionsAttrPtr[i];
 		}
 	}
 
 	return retVal;
 }
-
-
-
-
 
 
 } // namespace imtgql

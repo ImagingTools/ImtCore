@@ -13,7 +13,7 @@ namespace imtgql
 
 
 /**
-    Common interface for command permissions.
+	Common interface for command permissions.
 */
 class ICommandPermissionsProvider: virtual public istd::IChangeable
 {
@@ -25,9 +25,8 @@ public:
 	};
 
 	virtual LogicalCheckMode GetCommandPermissionCheckMode() const = 0;
-    virtual QByteArrayList GetCommandIds() const = 0;
-    virtual QByteArrayList GetCommandPermissions(const QByteArray& commandId) const = 0;
-
+	virtual QByteArrayList GetCommandIds() const = 0;
+	virtual QByteArrayList GetCommandPermissions(const QByteArray& commandId) const = 0;
 };
 
 
