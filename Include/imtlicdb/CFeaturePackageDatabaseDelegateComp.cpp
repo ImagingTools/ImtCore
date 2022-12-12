@@ -275,28 +275,20 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
 		const imtlic::IFeatureInfo *featureInfoPtr,
 		QByteArray &retVal) const
 {
-	imtlic::FeatureInfoList subFeatures = featureInfoPtr->GetSubFeatures();
+	const imtlic::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 
 	QByteArray parentFeatureId = featureInfoPtr->GetFeatureId();
 
 	QByteArray packageId = featurePackagePtr-> GetPackageId();
 
-	for (const imtlic::IFeatureInfo* featureInfo : subFeatures){
+	for (int i = 0; i < subFeatures.GetCount(); ++i){
+		const imtlic::IFeatureInfo* featureInfo = subFeatures.GetAt(i);
 		QByteArray featureId = featureInfo->GetFeatureId();
 		QString featureName = featureInfo->GetFeatureName();
 		bool isOptional = featureInfo->IsOptional();
 
 		QByteArray collectionId = featurePackagePtr->GetFeatureCollectionId(featureId);
 		QString featureDescription = featurePackagePtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-
-//		retVal += "\n" +
-//					QString("INSERT INTO \"Features\"(Id, Name, Description, PackageId, ParentId, Optional) VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
-//								.arg(qPrintable(featureId))
-//								.arg(featureName)
-//								.arg(featureDescription)
-//								.arg(qPrintable(packageId))
-//								.arg(qPrintable(parentFeatureId))
-//								.arg(isOptional).toLocal8Bit();
 
 		retVal += "\n" +
 					QString("INSERT INTO \"Features\"(Id, Name, Description, ParentId, Optional) VALUES('%1', '%2', '%3', '%4', '%5');")
@@ -309,9 +301,6 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
 		QByteArrayList featureDependencies = featurePackagePtr->GetFeatureDependencies(featureId);
 
 		if (!featureDependencies.isEmpty()){
-//			retVal += "\n" +
-//						QString("DELETE FROM \"FeatureDependencies\" WHERE FeatureId = '%1';").arg(qPrintable(featureId)).toLocal8Bit();
-
 			for (const QByteArray& dependencyFeatureId : featureDependencies){
 				retVal += "\n" +
 						QString("INSERT INTO \"FeatureDependencies\" (FeatureId, DependencyId) VALUES('%1', '%2');")

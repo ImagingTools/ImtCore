@@ -349,7 +349,9 @@ Item {
                 dataModelLocal = itemModel.GetData("data");
                 if(dataModelLocal.ContainsKey(commandsId + "Item")){
                     dataModelLocal = dataModelLocal.GetData(commandsId + "Item");
+
                     documentModel = dataModelLocal;
+
                     itemLoaded();
                 }
             }

@@ -542,7 +542,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, fields, gqlContext);
+		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetRepresentation(inputParams, fields, gqlContext);
 		if (headersModel != nullptr){
 			rootModel->SetExternTreeModel("data", headersModel);
 		}
@@ -588,7 +588,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
 	QByteArrayList fields;
 
 	if (m_objectViewProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* objectViewModelPtr = m_objectViewProviderCompPtr->GetTreeItemModel(inputParams, fields);
+		imtbase::CTreeItemModel* objectViewModelPtr = m_objectViewProviderCompPtr->GetRepresentation(inputParams, fields);
 		if (objectViewModelPtr != nullptr){
 			rootModel->SetExternTreeModel("data", objectViewModelPtr);
 		}

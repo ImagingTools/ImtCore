@@ -138,8 +138,6 @@ Item {
             }
         }
 
-
-
         AuxTable {
             id: tableInternal;
 

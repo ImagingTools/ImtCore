@@ -17,7 +17,7 @@
 #include <imtqml/CPageDataEnumProviderComp.h>
 #include <imtqml/CCommandDataEnumProviderComp.h>
 #include <imtqml/CMenuDataEnumProviderComp.h>
-#include <imtqml/CJoinDataProviderComp.h>
+#include <imtqml/CCompositeRepresentationComp.h>
 #include <imtqml/CHeadersDataProviderComp.h>
 #include <imtqml/CObserverQmlComp.h>
 #include <imtqml/CClientUserContextComp.h>
@@ -25,6 +25,11 @@
 #include <imtqml/CObjectViewDataProviderComp.h>
 #include <imtqml/CSettingsDatabasePageProviderComp.h>
 #include <imtqml/CCommandPermissionsFilterComp.h>
+#include <imtqml/CObjectRepresentationCompBase.h>
+#include <imtqml/CButtonRepresentationComp.h>
+#include <imtqml/CComboBoxRepresentationComp.h>
+#include <imtqml/CTextRepresentationComp.h>
+#include <imtqml/CDatabaseLoginSettingsRepresentationComp.h>
 
 
 /**
@@ -45,7 +50,7 @@ typedef imtqml::CApplicationDataEnumProviderComp ApplicationDataEnumProvider;
 typedef imtqml::CPageDataEnumProviderComp PageDataEnumProvider;
 typedef imtqml::CCommandDataEnumProviderComp CommandDataEnumProvider;
 typedef imtqml::CMenuDataEnumProviderComp MenuDataEnumProvider;
-typedef imtqml::CJoinDataProviderComp JoinDataProvider;
+typedef imtqml::CCompositeRepresentationComp CompositeRepresentation;
 typedef imtqml::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp Context;
@@ -53,6 +58,11 @@ typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
 typedef imtqml::CSettingsDatabasePageProviderComp SettingsDatabasePagesProvider;
 typedef imtqml::CCommandPermissionsFilterComp CommandPermissionsFilter;
+typedef imtqml::CObjectRepresentationCompBase ObjectRepresentation;
+typedef imtqml::CButtonRepresentationComp ButtonRepresentation;
+typedef imtqml::CComboBoxRepresentationComp ComboBoxRepresentation;
+typedef imtqml::CTextRepresentationComp TextRepresentation;
+typedef imtqml::CDatabaseLoginSettingsRepresentationComp DatabaseLoginSettingsRepresentation;
 
 
 } // namespace ImtQmlPck

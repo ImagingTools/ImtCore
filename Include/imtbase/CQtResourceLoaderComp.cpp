@@ -9,7 +9,6 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureContainer.h>
-#include <ifile/CCompactXmlFileReadArchive.h>
 
 
 namespace imtbase

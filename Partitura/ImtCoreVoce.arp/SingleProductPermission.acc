@@ -58,7 +58,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IItemBasedRepresentationDataProvider" ComponentId="ProductInfoProvider"/>
+        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="ProductInfoProvider"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

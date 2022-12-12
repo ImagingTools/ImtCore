@@ -8,9 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DesignParam" X="325" Y="450" Note=""/>
-        <Element ComponentName="GeneralPage" X="550" Y="225" Note=""/>
-        <Element ComponentName="LanguageParams" X="775" Y="450" Note=""/>
+        <Element ComponentName="GeneralPage" X="550" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

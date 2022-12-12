@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 
 
 namespace imtauthgql
@@ -26,7 +26,7 @@ protected:
 	virtual imtbase::CTreeItemModel* ListObjects(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, const imtgql::IGqlContext* gqlContext, QString& errorMessage) const override;
 
 protected:
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
 };
 
 

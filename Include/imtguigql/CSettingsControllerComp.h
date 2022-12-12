@@ -3,8 +3,8 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
-#include <imtgql/IGqlMutationDataControllerDelegate.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IGqlModelEditor.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 
@@ -19,8 +19,8 @@ public:
 	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSettingsControllerComp);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider)
-		I_REGISTER_INTERFACE(imtgql::IGqlMutationDataControllerDelegate)
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider)
+		I_REGISTER_INTERFACE(imtgql::IGqlModelEditor)
 		I_ASSIGN(m_settingsDataProviderCompPtr, "SettingsDataProvider", "Settings data provider", true, "");
 		I_ASSIGN(m_mutationDataControllerCompPtr, "MutationDataProvider", "Provides data to the controller for saving", true, "");
 //		I_ASSIGN_MULTI_0(m_mutationDataControllersCompPtr, "MutationDataControllers", "Mutation data controllers", false);
@@ -49,9 +49,9 @@ protected:
 			QString& errorMessage) const;
 
 private:
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_settingsDataProviderCompPtr);
-	I_REF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataControllerCompPtr);
-//	I_MULTIREF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataControllersCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_settingsDataProviderCompPtr);
+	I_REF(imtgql::IGqlModelEditor, m_mutationDataControllerCompPtr);
+//	I_MULTIREF(imtgql::IGqlModelEditor, m_mutationDataControllersCompPtr);
 };
 
 

@@ -11,7 +11,7 @@ QByteArray CCollectionProductInfoProviderComp::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel *CCollectionProductInfoProviderComp::GetTreeItemModel(const QList<imtgql::CGqlObject> &params, const QByteArrayList &fields, const imtgql::IGqlContext *gqlContext)
+imtbase::CTreeItemModel *CCollectionProductInfoProviderComp::GetRepresentation(const QList<imtgql::CGqlObject> &params, const QByteArrayList &fields, const imtgql::IGqlContext *gqlContext)
 {
 	if (!m_productCollectionCompPtr.IsValid()){
 		return nullptr;

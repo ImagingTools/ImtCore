@@ -8,7 +8,7 @@
 
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
 #include <imtauth/ICheckPermission.h>
 #include <imtbase/imtbase.h>
@@ -24,14 +24,14 @@ namespace imtqml
 */
 class CPageDataProviderCompBase:
 			public icomp::CComponentBase,
-			public imtbase::IItemBasedRepresentationDataProvider
+			public imtgql::IItemBasedRepresentationDataProvider
 {
 public:
 	typedef imtqml::CPageDataEnumProviderComp PageEnum;
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPageDataProviderCompBase);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
 		I_ASSIGN(m_pageIdAttrPtr, "PageId", "ID of the page", true, "");
 		I_ASSIGN_MULTI_0(m_permissionIdsAttrPtr, "PermissionIds", "List of permission-IDs for data provider", true);
 		I_ASSIGN(m_pageNameAttrPtr, "PageName", "Page name", false, "");
@@ -45,9 +45,9 @@ public:
 		I_ASSIGN(m_checkPermissionCompPtr, "CheckPermissions", "Check permissions", false, "CheckPermissions");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 
 private:
 	I_ATTR(QByteArray, m_pageIdAttrPtr);
@@ -58,7 +58,7 @@ private:
 	I_ATTR(QString, m_pageOffSelectedStatusIconAttrPtr);
 	I_ATTR(QString, m_pageSourceItemAttrPtr);
 	I_ATTR(QString, m_startSourceItemAttrPtr);
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_subPagesDataProviderCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_subPagesDataProviderCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 	I_REF(imtauth::ICheckPermission, m_checkPermissionCompPtr);
 };

@@ -151,7 +151,7 @@ void CQuickObjectCompBase::OnItemCreated()
 			QByteArray modelId = m_modelIdsAttrPtr[i];
 //			QByteArray modelQuery = m_modelQueriesAttrPtr[i];
 //			params.append(QPair<QByteArray,QByteArray>(modelId,modelName));
-//			imtbase::CTreeItemModel *itemModelPtr = m_dataProviderCompPtr->GetTreeItemModel(params);
+//			imtbase::CTreeItemModel *itemModelPtr = m_dataProviderCompPtr->GetRepresentation(params);
 			imtbase::CTreeItemModel *modelPtr = new imtbase::CTreeItemModel(this);
 			connect(modelPtr, SIGNAL(needsReload()), this, SLOT(OnModelNeedsReload()));
 			m_models.append(modelPtr);
@@ -188,7 +188,7 @@ void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel *itemModel
 //			QByteArray modelQuery = m_modelQueriesAttrPtr[index];
 //			imtrest::QueryParams queryParams = rootModelPtr->GetQueryParams();
 //			QList<QByteArray> query = modelQuery.split('/');
-//			imtbase::CTreeItemModel *sourceModelPtr = m_dataProviderCompPtr->GetTreeItemModel(query,queryParams);
+//			imtbase::CTreeItemModel *sourceModelPtr = m_dataProviderCompPtr->GetRepresentation(query,queryParams);
 //			if (sourceModelPtr != nullptr){
 //				QByteArray modelId = m_modelIdsAttrPtr[index];
 ////				rootModelPtr->SetState("Loading");

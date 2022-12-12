@@ -143,14 +143,10 @@ FocusScope {
 
     function updateSelection(){
         if (root.selection.contains(model)){
-            console.log("contains");
-
             root.selection.deselect(model);
             root.selectedIndex = null;
         }
         else{
-            console.log("not contains");
-
             root.selection.select(model);
             root.selectedIndex = modelIndex;
         }
@@ -168,24 +164,9 @@ FocusScope {
 
             updateSelection();
 
-//            if (root.selection.contains(model)){
-//                console.log("contains");
-
-//                root.selection.deselect(model);
-//                root.selectedIndex = null;
-//            }
-//            else{
-//                console.log("not contains");
-
-//                root.selection.select(model);
-//                root.selectedIndex = modelIndex;
-//            }
-
             delegate.clicked();
 
             rowBodyItem.forceActiveFocus();
-
-            root.focus = true;
         }
     }
 

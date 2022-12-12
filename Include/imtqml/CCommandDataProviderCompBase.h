@@ -6,7 +6,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtqml/CCommandDataEnumProviderComp.h>
 #include <imtbase/imtbase.h>
 
@@ -17,14 +17,14 @@ namespace imtqml
 
 class CCommandDataProviderCompBase:
 		public icomp::CComponentBase,
-		public imtbase::IItemBasedRepresentationDataProvider
+		public imtgql::IItemBasedRepresentationDataProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 	typedef imtqml::CCommandDataEnumProviderComp CommandEnum;
 
 	I_BEGIN_COMPONENT(CCommandDataProviderCompBase);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
 		I_ASSIGN(m_commandsModelIdAttrPtr, "CommandsModelId", "Command model-ID", true, "");
 		I_ASSIGN_MULTI_0(m_commandsIdsAttrPtr, "CommandsIds", "Commands Ids", true);
 		I_ASSIGN_MULTI_0(m_commandsNamesAttrPtr, "CommandsNames", "Commands names", true);
@@ -33,9 +33,9 @@ public:
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params, const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params, const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 
 private:
 	I_ATTR(QByteArray, m_commandsModelIdAttrPtr);

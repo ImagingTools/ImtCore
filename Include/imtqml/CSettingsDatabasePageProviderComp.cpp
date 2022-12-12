@@ -6,7 +6,6 @@
 
 // ACF includes
 #include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
 
 // ImtCore includes
 #include <imtauth/CUserSettings.h>
@@ -18,7 +17,7 @@ namespace imtqml
 
 // public methods
 
-// reimplemented (imtbase::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::IItemBasedRepresentationProvider)
 
 QByteArray CSettingsDatabasePageProviderComp::GetModelId() const
 {
@@ -26,7 +25,7 @@ QByteArray CSettingsDatabasePageProviderComp::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetTreeItemModel(
+imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetRepresentation(
 		const QList<imtgql::CGqlObject>& params,
 		const QByteArrayList& fields,
 		const imtgql::IGqlContext* gqlContext)
@@ -68,7 +67,7 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetTreeItemModel(
 
 	imtbase::CTreeItemModel* representationModelPtr = nullptr;
 	if (m_settingsDataProviderCompPtr.IsValid()){
-		representationModelPtr = m_settingsDataProviderCompPtr->GetTreeItemModel(params, fields, gqlContext);
+		representationModelPtr = m_settingsDataProviderCompPtr->GetRepresentation(params, fields, gqlContext);
 		if (representationModelPtr != nullptr){
 			imtbase::CTreeItemModel* elementsModelPtr = representationModelPtr->GetTreeItemModel("Elements");
 			if (elementsModelPtr != nullptr){
@@ -90,7 +89,7 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetTreeItemModel(
 }
 
 
-// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
+// reimplemented (imtgql::IGqlModelEditor)
 
 bool CSettingsDatabasePageProviderComp::UpdateModelFromRepresentation(
 		const QList<imtgql::CGqlObject>& params,

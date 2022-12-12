@@ -129,8 +129,7 @@ DocumentBase {
 
             let childModel = documentModel.GetData("ChildModel", i);
             if (childModel){
-                let childIndexes = []
-                childIndexes = childIndexes.concat(indexes.concat([i]))
+                let childIndexes = [].concat(indexes.concat([i]))
                 recursiveUpdateGui(childModel, childIndexes);
             }
         }
@@ -241,15 +240,15 @@ DocumentBase {
 
         onSelectedIndexChanged: {
             console.log("TableView Begin onSelectedIndexChanged");
-            let packageId = documentModel.GetData("Id");
-            console.log("packageId", packageId);
-            if (selectedIndex != null && selectedIndex.itemData.Id != "" && packageId != ""){
-                treeView.visible = true;
-                rightPanel.updateTreeViewGui();
-            }
-            else{
-                treeView.visible = false;
-            }
+//            let packageId = documentModel.GetData("Id");
+//            console.log("packageId", packageId);
+//            if (selectedIndex != null && selectedIndex.itemData.Id != "" && packageId != ""){
+//                treeView.visible = true;
+//                rightPanel.updateTreeViewGui();
+//            }
+//            else{
+//                treeView.visible = false;
+//            }
 
             console.log("TableView End onSelectedIndexChanged");
         }
@@ -357,7 +356,6 @@ DocumentBase {
             //Запрещаем зависимость от всех родителей
             let parentIds = getAllParents(tableView.selectedIndex);
             inactiveElements = inactiveElements.concat(parentIds)
-
 
             for (let i = 0; i < parentIds.length; i++){
                 let parentId = parentIds[i];
@@ -531,7 +529,11 @@ DocumentBase {
                 addColumn({"Id": "Name", "Name": "Name"});
 
                 rightPanel.updateTreeViewGui();
+
+                tableView.selectedIndexChanged.connect(rightPanel.selectedIndexChanged);
             }
+
+//            Component
 
             onRowModelDataChanged: {
                 console.log("onRowModelDataChanged", delegate, prop);
@@ -541,6 +543,17 @@ DocumentBase {
 
                     rightPanel.updateTreeViewGui();
                 }
+            }
+        }
+
+        function selectedIndexChanged(){
+            console.log("rightPanel selectedIndexChanged");
+
+            let result = tableView.selectedIndex != null && tableView.selectedIndex.itemData.Id != "" && itemId != "";
+            treeView.visible = result;
+
+            if (result){
+                rightPanel.updateTreeViewGui();
             }
         }
     }

@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -38,7 +38,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="JoinDataProvider" PackageId="ImtQmlPck" ComponentId="JoinDataProvider">
+        <Element Id="CompositeRepresentation" PackageId="ImtQmlPck" ComponentId="CompositeRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="RepresentationDataProvider" Type="Reference[]" ExportId="">
@@ -93,10 +93,10 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="MutationDataDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="JoinDataProvider"/>
+                        <Data IsEnabled="true" Value="CompositeRepresentation"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PagesDataProviderCompPtr" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="JoinDataProvider"/>
+                        <Data IsEnabled="true" Value="CompositeRepresentation"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

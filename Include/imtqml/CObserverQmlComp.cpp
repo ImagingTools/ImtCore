@@ -3,6 +3,14 @@
 // Qt includes
 #include <QtQml/QQmlEngine>
 
+// ACF includes
+#include <iprm/IParamsSet.h>
+#include <iprm/ISelectionParam.h>
+#include <iprm/IOptionsList.h>
+
+// ImtCore includes
+#include <imtgql/CGqlContext.h>
+
 
 namespace imtqml
 {
@@ -77,7 +85,26 @@ void CObserverQmlComp::OnComponentCreated()
 				QByteArrayList fields;
 				fields.append("NetworkSettings");
 
-				m_settingsModelPtr = m_pagesDataProviderCompPtr->GetTreeItemModel(params, fields);
+				istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
+				if (m_languageParameterCompPtr.IsValid()){
+					iprm::IParamsSet* languageParamSetPtr = dynamic_cast<iprm::IParamsSet*>(m_languageParameterCompPtr.GetPtr());
+					if (languageParamSetPtr != nullptr){
+						const iprm::ISelectionParam* languageParamPtr = dynamic_cast<const iprm::ISelectionParam*>(languageParamSetPtr->GetParameter("Language"));
+						if (languageParamPtr != nullptr){
+							const iprm::IOptionsList* optionList = languageParamPtr->GetSelectionConstraints();
+							int languageIndex = languageParamPtr->GetSelectedOptionIndex();
+
+							if (optionList != nullptr){
+								QByteArray languageId = optionList->GetOptionId(languageIndex);
+
+								gqlContextPtr->SetLanguageId(languageId);
+							}
+						}
+					}
+				}
+
+				m_settingsModelPtr = m_pagesDataProviderCompPtr->GetRepresentation(params, fields, gqlContextPtr.GetPtr());
+
 				if (m_settingsModelPtr != nullptr){
 					QVariant data = QVariant::fromValue(m_settingsModelPtr);
 

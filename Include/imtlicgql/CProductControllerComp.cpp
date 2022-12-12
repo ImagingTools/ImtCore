@@ -209,7 +209,7 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(
 	imtbase::IObjectCollection::DataPtr dataPtr;
 
 	if (m_headersProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
+		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetRepresentation(inputParams, QByteArrayList(), gqlContext);
 		imtbase::CTreeItemModel* headers = headersModel->GetTreeItemModel("Headers");
 		dataModel->SetExternTreeModel("Headers", headers);
 	}

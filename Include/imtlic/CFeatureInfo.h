@@ -4,7 +4,6 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureInfo.h>
-//#include <imtlic/CFeatureContainer.h>
 
 
 namespace imtlic
@@ -27,7 +26,7 @@ public:
 	virtual QString GetFeatureName() const override;
 	virtual bool IsOptional() const override;
 	virtual const IFeatureInfo* GetParentFeature() const override;
-	virtual FeatureInfoList GetSubFeatures() const override;
+	virtual const FeatureInfoList& GetSubFeatures() const override;
 	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
 	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
 

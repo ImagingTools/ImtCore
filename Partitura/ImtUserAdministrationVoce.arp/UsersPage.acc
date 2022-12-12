@@ -299,7 +299,7 @@
                     <AttributeInfo Id="SearchByFilterIds" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Username</Value>
+                                <Value>UserId</Value>
                                 <Value>Name</Value>
                                 <Value>Email</Value>
                             </Values>

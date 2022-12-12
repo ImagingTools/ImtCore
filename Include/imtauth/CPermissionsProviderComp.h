@@ -5,8 +5,8 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
-
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtlic/IFeatureInfo.h>
 
 namespace imtauth
 {
@@ -14,21 +14,24 @@ namespace imtauth
 
 class CPermissionsProviderComp:
 		public icomp::CComponentBase,
-		public imtbase::IItemBasedRepresentationDataProvider
+		public imtgql::IItemBasedRepresentationDataProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPermissionsProviderComp);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider)
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider)
 		I_REGISTER_INTERFACE(imtlic::IFeatureInfoProvider)
 		I_ASSIGN(m_modelIdAttrPtr, "ModelId", "ID of the model", true, "");
 		I_ASSIGN(m_featurePackageCompPtr, "FeaturePackage", "Feature package", true, "");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+
+protected:
+	void InsertSubFeaturesToModelFromData(const imtlic::FeatureInfoList& subFeaturesList, imtbase::CTreeItemModel& subFeaturesModel) const;
 
 protected:
 	I_ATTR(QByteArray, m_modelIdAttrPtr);

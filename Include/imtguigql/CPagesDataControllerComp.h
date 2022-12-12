@@ -4,8 +4,8 @@
 // ImtCore includes
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 
-#include <imtgql/IGqlMutationDataControllerDelegate.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IGqlModelEditor.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 
 
 namespace imtguigql
@@ -27,8 +27,8 @@ public:
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);
-	I_REF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);
+	I_REF(imtgql::IGqlModelEditor, m_mutationDataDelegateCompPtr);
 	I_TEXTATTR(m_decoratorSourceAttrPtr);
 };
 

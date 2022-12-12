@@ -7,7 +7,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/imtbase.h>
 
 
@@ -20,13 +20,13 @@ namespace imtqml
 */
 class CHeadersDataProviderComp:
 		public icomp::CComponentBase,
-		public imtbase::IItemBasedRepresentationDataProvider
+		public imtgql::IItemBasedRepresentationDataProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHeadersDataProviderComp);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
 		I_ASSIGN(m_headersModelIdAttrPtr, "HeadersModelId", "Headers model-ID", true, "");
 		I_ASSIGN_MULTI_0(m_headersIdsAttrPtr, "HeadersIds", "Headers Ids", true);
 		I_ASSIGN_MULTI_0(m_headersSearchByFilterAttrPtr, "SearchByFilterIds", "Search by filter", false);
@@ -34,9 +34,9 @@ public:
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 
 private:
 	I_ATTR(QByteArray, m_headersModelIdAttrPtr);

@@ -58,7 +58,7 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 	}
 	else if(gqlRequest.GetRequestType() == imtgql::IGqlRequest::RT_QUERY){
 		if(m_pagesDataProviderCompPtr.IsValid() && isSetResponce){
-			itemsModel = m_pagesDataProviderCompPtr->GetTreeItemModel(*paramList, fields, gqlRequest.GetGqlContext());
+			itemsModel = m_pagesDataProviderCompPtr->GetRepresentation(*paramList, fields, gqlRequest.GetGqlContext());
 			if (itemsModel == nullptr){
 				errorMessage = QObject::tr("Pages is empty").toUtf8();
 			}

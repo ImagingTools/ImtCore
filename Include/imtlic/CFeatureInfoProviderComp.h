@@ -5,6 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtlic/IFeatureInfoProvider.h>
 #include <imtlic/CFeatureInfo.h>
 
 

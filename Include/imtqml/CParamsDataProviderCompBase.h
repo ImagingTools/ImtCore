@@ -8,10 +8,9 @@
 
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
-#include <imtgql/IGqlMutationDataControllerDelegate.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IGqlModelEditor.h>
 #include <imtbase/imtbase.h>
-
 
 
 namespace imtqml
@@ -23,8 +22,8 @@ namespace imtqml
 */
 class CParamsDataProviderCompBase:
 			public icomp::CComponentBase,
-			public imtbase::IItemBasedRepresentationDataProvider,
-			public imtgql::IGqlMutationDataControllerDelegate
+			public imtgql::IItemBasedRepresentationDataProvider,
+			public imtgql::IGqlModelEditor
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -63,8 +62,8 @@ public:
 	};
 
 	I_BEGIN_COMPONENT(CParamsDataProviderCompBase);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-		I_REGISTER_INTERFACE(imtgql::IGqlMutationDataControllerDelegate);
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::IGqlModelEditor);
 		I_ASSIGN(m_paramIdAttrPtr, "ParamId", "ID of the param", true, "");
 		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the param", false, "");
 		I_ASSIGN(m_paramComponentTypeAttrPtr, "ComponentType", "Type of component\n0 - UNKNOWN\n1 - TEXT\n2 - INTEGER\n3 - COMBOBOX\n4 - BUTTON\n5 - TEXT LABEL", false, 0);
@@ -77,11 +76,11 @@ public:
 protected:
 	const imtbase::CTreeItemModel* GetElementModel(const QByteArray& elemementId, const imtbase::CTreeItemModel* elementsModelPtr) const;
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 
-	// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
+	// reimplemented (imtgql::IGqlModelEditor)
 	virtual bool UpdateModelFromRepresentation(
 			const QList<imtgql::CGqlObject>& params,
 			imtbase::CTreeItemModel* baseModel,
@@ -91,8 +90,8 @@ protected:
 	I_ATTR(QByteArray, m_paramIdAttrPtr);
 	I_TEXTATTR(m_paramNameAttrPtr);
 	I_ATTR(int, m_paramComponentTypeAttrPtr);
-	I_MULTIREF(imtbase::IItemBasedRepresentationDataProvider, m_paramSubElementsCompPtr);
-	I_MULTIREF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
+	I_MULTIREF(imtgql::IItemBasedRepresentationDataProvider, m_paramSubElementsCompPtr);
+	I_MULTIREF(imtgql::IGqlModelEditor, m_mutationDataDelegateCompPtr);
 	I_REF(iser::ISerializable, m_parameterCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };

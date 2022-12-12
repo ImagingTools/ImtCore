@@ -129,6 +129,10 @@ Item {
                 }
             }
 
+            Component.onDestruction: {
+                console.log("Item onDestruction");
+            }
+
             Loader {
                 id: dataLoader;
 
@@ -137,6 +141,10 @@ Item {
                 Component.onCompleted: {
                     console.log("DEBUG::dataLoader.source: ", model.Source);
                     dataLoader.source = model.Source;
+                }
+
+                Component.onDestruction: {
+                    console.log("Loader onDestruction");
                 }
 
                 onLoaded: {

@@ -6,6 +6,8 @@ import Acf 1.0
 Item {
     id: rolePermissionsContainer;
 
+//    anchors.fill: parent;
+
     property TreeItemModel documentModel: TreeItemModel {}
     property UndoRedoManager undoRedoManager: null;
 
@@ -21,6 +23,12 @@ Item {
             permissionsProvider.updateModel();
         }
     }
+
+//    Rectangle {
+//        anchors.fill: parent;
+
+//        color: "red";
+//    }
 
     PermissionsProvider {
         id: permissionsProvider;
@@ -50,22 +58,32 @@ Item {
         console.log("selectedPermissionsIds", selectedPermissionsIds);
 
         permissionsTable.rowModel.clear();
-        permissionsTable.height = permissionsTable.headerHeight;
+//        permissionsTable.height = permissionsTable.headerHeight;
 
-        for (let i = 0; i < permissionsProvider.model.GetItemsCount(); i++){
-            let permissionId = permissionsProvider.model.GetData("Id", i);
-            let permissionName = permissionsProvider.model.GetData("Name", i);
+        recursiveUpdateGui(permissionsProvider.model, [], selectedPermissionsIds);
+
+        blockUpdatingModel = false;
+    }
+
+    function recursiveUpdateGui(model, tableIndexes, selectedPermissions){
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let permissionId = model.GetData("Id", i);
+            let permissionName = model.GetData("Name", i);
 
             let row = {"Id": permissionId, "Name": permissionName, "CheckState": Qt.Unchecked};
 
-            if (selectedPermissionsIds.includes(permissionId)){
+            if (selectedPermissions.includes(permissionId)){
                 row["CheckState"] = Qt.Checked;
             }
 
-            permissionsTable.insertRow([i], row);
-        }
+            permissionsTable.insertRow(tableIndexes.concat([i]), row);
 
-        blockUpdatingModel = false;
+            let childModel = model.GetData("ChildModel", i);
+            if (childModel){
+                let childIndexes = [].concat(tableIndexes.concat([i]))
+                recursiveUpdateGui(childModel, childIndexes,selectedPermissions);
+            }
+        }
     }
 
     function updateModel(){
@@ -73,22 +91,32 @@ Item {
 
         let permissionsModel = documentModel.AddTreeModel("Permissions");
 
-        for (let i = 0; i < permissionsTable.rowCount; i++){
-            let rowObj = permissionsTable.rowModel.get(i);
+        recursiveUpdateModel(permissionsModel, permissionsTable.rowModel);
+
+        undoRedoManager.endChanges();
+    }
+
+    function recursiveUpdateModel(model, guiModel){
+        console.log("recursiveUpdateModel", model, guiModel);
+        for (let i = 0; i < guiModel.count; i++){
+            let rowObj = guiModel.get(i);
 
             let permissionId = rowObj["Id"];
             let permissionName = rowObj["Name"];
             let state = rowObj["CheckState"];
 
             if (state == Qt.Checked){
-                let index = permissionsModel.InsertNewItem();
+                let index = model.InsertNewItem();
 
-                permissionsModel.SetData("Id", permissionId, index);
-                permissionsModel.SetData("Name", permissionName, index);
+                model.SetData("Id", permissionId, index);
+                model.SetData("Name", permissionName, index);
+            }
+
+            let rowChildModel = rowObj["ChildModel"]
+            if (rowChildModel.count > 0){
+                recursiveUpdateModel(model, rowChildModel);
             }
         }
-
-        undoRedoManager.endChanges();
     }
 
     Rectangle {
@@ -97,44 +125,26 @@ Item {
         color: Style.backgroundColor;
     }
 
-    Flickable {
-//        width: 400;
-//        height: parent.height;
+    BasicTreeView {
+        id: permissionsTable;
 
-        anchors.fill: parent;
-        anchors.leftMargin: 20;
+        anchors.top: parent.top;
+        anchors.topMargin: 10;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
 
-        contentHeight: permissionsTable.height + 50;
-        contentWidth: permissionsTable.width;
+        tristate: true;
 
-        boundsBehavior: Flickable.StopAtBounds;
+        width: 400;
 
-        clip: true;
+        Component.onCompleted: {
+            permissionsTable.addColumn({"Id": "Name", "Name": "Name"});
+        }
 
-        BasicTableView {
-            id: permissionsTable;
-
-            anchors.top: parent.top;
-            anchors.topMargin: 10;
-
-            width: 400;
-            height: permissionsTable.headerHeight;
-
-            rowDelegate: TableRolePermissionsDelegate {
-                Component.onCompleted: {
-                    permissionsTable.height += height;
-                }
+        onRowModelDataChanged: {
+            if (!blockUpdatingModel){
+                updateModel();
             }
-
-            Component.onCompleted: {
-                permissionsTable.addColumn({"Id": "Name", "Name": "Name"});
-            }
-
-            onRowModelDataChanged: {
-                if (!blockUpdatingModel){
-                    updateModel();
-                }
-            }
-        }//BasicTableView
-    }//Flickable
+        }
+    }//BasicTableView
 }//Container

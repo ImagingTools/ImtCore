@@ -11,7 +11,7 @@ namespace imtqml
 
 // public methods
 
-// reimplemented (imtbase::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::IItemBasedRepresentationProvider)
 
 QByteArray CCommandPermissionsFilterComp::GetModelId() const
 {
@@ -19,7 +19,7 @@ QByteArray CCommandPermissionsFilterComp::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CCommandPermissionsFilterComp::GetTreeItemModel(
+imtbase::CTreeItemModel* CCommandPermissionsFilterComp::GetRepresentation(
 		const QList<imtgql::CGqlObject>& params,
 		const QByteArrayList& fields,
 		const imtgql::IGqlContext* gqlContext)
@@ -27,7 +27,7 @@ imtbase::CTreeItemModel* CCommandPermissionsFilterComp::GetTreeItemModel(
 	if(!m_commandsProviderCompPtr.IsValid()){
 		return nullptr;
 	}
-	imtbase::CTreeItemModel* commandsModelPtr = m_commandsProviderCompPtr->GetTreeItemModel(params, fields, gqlContext);
+	imtbase::CTreeItemModel* commandsModelPtr = m_commandsProviderCompPtr->GetRepresentation(params, fields, gqlContext);
 	imtbase::CTreeItemModel* filteredCommandsModelPtr =new imtbase::CTreeItemModel();
 
 	if (gqlContext != nullptr && commandsModelPtr != nullptr){

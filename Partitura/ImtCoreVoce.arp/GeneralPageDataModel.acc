@@ -114,6 +114,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Design" ComponentId="Design"/>
+        <Component ExportedId="General" ComponentId="General"/>
         <Component ExportedId="Language" ComponentId="Language"/>
     </ExportedComponents>
 </Acf>

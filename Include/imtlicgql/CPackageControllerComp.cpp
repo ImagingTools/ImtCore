@@ -199,8 +199,6 @@ bool CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 			}
 		}
 
-		imtlic::FeatureInfoList subFeatures = parentFeaturePtr->GetSubFeatures();
-
 		if (subFeaturesModelPtr->ContainsKey("ChildModel", i)){
 			imtbase::CTreeItemModel *subModelPtr = subFeaturesModelPtr->GetTreeItemModel("ChildModel", i);
 
@@ -221,9 +219,11 @@ void CPackageControllerComp::InsertSubFeaturesToModelFromData(
 		imtbase::CTreeItemModel* dependenciesModelPtr,
 		imtbase::CTreeItemModel *featuresModel) const
 {
-	imtlic::FeatureInfoList subFeatures = featurePtr->GetSubFeatures();
+	const imtlic::FeatureInfoList& subFeatures = featurePtr->GetSubFeatures();
 
-	for (const imtlic::IFeatureInfo* subFeatureInfoPtr : subFeatures){
+	for (int i = 0; i < subFeatures.GetCount(); i++){
+		const imtlic::IFeatureInfo* subFeatureInfoPtr = subFeatures.GetAt(i);
+
 		int index = featuresModel->InsertNewItem();
 
 		QByteArray featureId = subFeatureInfoPtr->GetFeatureId();
@@ -274,7 +274,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 	imtbase::IObjectCollection::DataPtr dataPtr;
 
 	if (m_headersProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* headersInfoModelPtr = m_headersProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList(), gqlContext);
+		imtbase::CTreeItemModel* headersInfoModelPtr = m_headersProviderCompPtr->GetRepresentation(inputParams, QByteArrayList(), gqlContext);
 		if (headersInfoModelPtr != nullptr){
 			imtbase::CTreeItemModel* headersModelPtr = headersInfoModelPtr->GetTreeItemModel("Headers");
 			dataModelPtr->SetExternTreeModel("Headers", headersModelPtr);

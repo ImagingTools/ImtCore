@@ -14,7 +14,7 @@ namespace imtgql
 /**
 	Base interface for representation data controllers
 */
-class IGqlMutationDataControllerDelegate: virtual public istd::IPolymorphic
+class IGqlModelEditor: virtual public istd::IPolymorphic
 {
 public:
 	virtual bool UpdateModelFromRepresentation(

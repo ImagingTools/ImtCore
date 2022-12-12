@@ -9,7 +9,7 @@
 // ImtCore includes
 #include <imtauth/IContactInfo.h>
 #include <imtrest/IRepresentationDataProvider.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtrest/ISuscriberEngine.h>
 #include <imtrest/ISubscriber.h>
 
@@ -44,7 +44,7 @@ public:
 	virtual void OnModelUpdate(QByteArray modelId, const istd::IChangeable::ChangeSet& changeSet) const override;
 
 private:
-//	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_itemBasedRepresentationDataProvider);
+//	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_itemBasedRepresentationDataProvider);
 
 	typedef istd::TPointerVector<ISubscriber> Suscribers;
 	Suscribers m_subscribers;

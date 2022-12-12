@@ -73,9 +73,9 @@ I_EXPORT_COMPONENT(
 			"Menu data enum provider");
 
 I_EXPORT_COMPONENT(
-			JoinDataProvider,
-			"Join data provider",
-			"Join data provider");
+			CompositeRepresentation,
+			"Composite Representation",
+			"Composite Representation");
 
 I_EXPORT_COMPONENT(
 			HeadersDataProvider,
@@ -110,8 +110,32 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 			CommandPermissionsFilter,
 			"Command Permissions Filter",
-			"Command Permissions Filter");
+			"Command permissions filter");
 
+I_EXPORT_COMPONENT(
+			ObjectRepresentation,
+			"Object Representation",
+			"Object Representation");
+
+I_EXPORT_COMPONENT(
+			ButtonRepresentation,
+			"ButtonRepresentation",
+			"Button Representation");
+
+I_EXPORT_COMPONENT(
+			ComboBoxRepresentation,
+			"ComboBox Adapter",
+			"ComboBox adapter");
+
+I_EXPORT_COMPONENT(
+			TextRepresentation,
+			"Text Representation",
+			"Text Representation");
+
+I_EXPORT_COMPONENT(
+			DatabaseLoginSettingsRepresentation,
+			"Database Login Settings Representation",
+			"Database Login Settings Representation");
 
 
 } // namespace ImtQmlPck

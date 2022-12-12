@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -10,24 +10,24 @@
     <PositionMap>
         <Element ComponentName="AdministrationPageDataController" X="950" Y="200" Note=""/>
         <Element ComponentName="AdministrationPages" X="600" Y="75" Note=""/>
-        <Element ComponentName="JoinDataProvider" X="275" Y="375" Note=""/>
+        <Element ComponentName="CompositeRepresentation" X="275" Y="375" Note=""/>
         <Element ComponentName="Pages" X="925" Y="375" Note=""/>
         <Element ComponentName="PagesDataController" X="275" Y="225" Note=""/>
         <Element ComponentName="Repositories" X="925" Y="525" Note=""/>
         <Element ComponentName="VisualStatus" X="175" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Pages">
-            <PositionMap>
-                <Element ComponentName="RolesPage" X="350" Y="400" Note=""/>
-                <Element ComponentName="UsersPage" X="825" Y="400" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="RoleRepository" X="600" Y="250" Note=""/>
                 <Element ComponentName="UserSqlRepository" X="600" Y="425" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Pages">
+            <PositionMap>
+                <Element ComponentName="RolesPage" X="350" Y="400" Note=""/>
+                <Element ComponentName="UsersPage" X="825" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

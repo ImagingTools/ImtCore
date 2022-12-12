@@ -5,7 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 
 
 namespace imtqml
@@ -17,20 +17,20 @@ namespace imtqml
 */
 class CObjectViewDataProviderComp:
 		public icomp::CComponentBase,
-		public imtbase::IItemBasedRepresentationDataProvider
+		public imtgql::IItemBasedRepresentationDataProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectViewDataProviderComp);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
 		I_ASSIGN(m_objectViewModelIdAttrPtr, "ObjectViewModelId", "Object view model ID", true, "");
 		I_ASSIGN(m_objectViewAttrPtr, "ObjectViewPath", "Object view path", true, "");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 
 private:
 	I_ATTR(QByteArray, m_objectViewModelIdAttrPtr);

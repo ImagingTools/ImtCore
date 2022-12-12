@@ -73,7 +73,7 @@ public:
 	/**
 		Get tree item model by key
 	*/
-	virtual imtbase::ITreeItemModel* GetTreeItemModel(const QByteArray &key, int index = 0) const = 0;
+	virtual imtbase::ITreeItemModel* GetRepresentation(const QByteArray &key, int index = 0) const = 0;
 
 	/**
 		Get items count for model

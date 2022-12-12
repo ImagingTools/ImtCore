@@ -16,6 +16,10 @@ DocumentBase {
         accountNameInput.focus = true;
     }
 
+    Component.onDestruction: {
+        console.log("AccountEditor onDestruction");
+    }
+
     onDocumentModelChanged: {
         updateGui();
         undoRedoManager.registerModel(documentModel);

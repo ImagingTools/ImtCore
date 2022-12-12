@@ -81,7 +81,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::GetSettings(
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
 	if (m_settingsDataProviderCompPtr.IsValid()){
-		dataModel =  m_settingsDataProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList(), gqlContext);
+		dataModel =  m_settingsDataProviderCompPtr->GetRepresentation(inputParams, QByteArrayList(), gqlContext);
 	}
 
 	rootModel->SetExternTreeModel("data", dataModel);

@@ -2,12 +2,19 @@
 
 
 // ACF includes
+#include <istd/TPointerVector.h>
+#include <istd/TDelPtr.h>
 #include <iser/ISerializable.h>
+
+//ImtCore includes
 #include <imtlic/IFeatureInfoProvider.h>
 
 
 namespace imtlic
 {
+
+
+//class IFeatureInfoProvider;
 
 
 /**
@@ -46,7 +53,7 @@ public:
 	/**
 		Get all sub features for this feature.
 	*/
-	virtual QVector<const IFeatureInfo*> GetSubFeatures() const  = 0;
+	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const  = 0;
 
 	/**
 		Insert sub feature.
@@ -60,7 +67,7 @@ public:
 };
 
 
-typedef QVector<const IFeatureInfo*> FeatureInfoList;
+typedef istd::TPointerVector<const IFeatureInfo> FeatureInfoList;
 
 
 } // namespace imtlic

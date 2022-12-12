@@ -14,7 +14,7 @@ namespace imtqml
 
 // public methods
 
-// reimplemented (imtbase::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::IItemBasedRepresentationProvider)
 
 QByteArray CPageDataProviderCompBase::GetModelId() const
 {
@@ -22,7 +22,7 @@ QByteArray CPageDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList<imtgql::CGqlObject>& params, const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext)
+imtbase::CTreeItemModel* CPageDataProviderCompBase::GetRepresentation(const QList<imtgql::CGqlObject>& params, const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext)
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
@@ -100,7 +100,7 @@ imtbase::CTreeItemModel* CPageDataProviderCompBase::GetTreeItemModel(const QList
 	}
 
 	if (m_subPagesDataProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* subPagesModel =  m_subPagesDataProviderCompPtr->GetTreeItemModel(params, fields);
+		imtbase::CTreeItemModel* subPagesModel =  m_subPagesDataProviderCompPtr->GetRepresentation(params, fields);
 		rootModelPtr->SetExternTreeModel("SubPages", subPagesModel);
 	}
 	rootModelPtr->SetData("isOpened", false);

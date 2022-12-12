@@ -30,10 +30,7 @@ TableViewItemDelegateBase {
         }
 
         updateSelection();
-    }
 
-    onClicked: {
-        console.log("packageTreeItemDelegate onCompleted", model.Name);
         rowBodyItem.forceActiveFocus();
     }
 

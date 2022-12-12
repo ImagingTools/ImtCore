@@ -20,7 +20,7 @@ namespace imtqml
 
 // public methods
 
-// reimplemented (imtbase::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::IItemBasedRepresentationProvider)
 
 QByteArray CDatabaseSettingsDataProviderComp::GetModelId() const
 {
@@ -28,7 +28,7 @@ QByteArray CDatabaseSettingsDataProviderComp::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
+imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetRepresentation(
 			const QList<imtgql::CGqlObject>& params,
 			const QByteArrayList& /*fields*/,
 			const imtgql::IGqlContext* gqlContext)
@@ -57,8 +57,6 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 	if (m_paramNameAttrPtr.IsValid()){
 		rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
 	}
-
-
 
 	rootModelPtr->SetData("ComponentType", "DatabaseSettingsInput");
 
@@ -138,7 +136,7 @@ imtbase::CTreeItemModel* CDatabaseSettingsDataProviderComp::GetTreeItemModel(
 }
 
 
-// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
+// reimplemented (imtgql::IGqlModelEditor)
 
 bool CDatabaseSettingsDataProviderComp::UpdateModelFromRepresentation(
 		const QList<imtgql::CGqlObject>& params,

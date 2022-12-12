@@ -6,8 +6,8 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
-#include <imtgql/IGqlMutationDataControllerDelegate.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IGqlModelEditor.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 #include <imtqml/CParamsDataProviderCompBase.h>
@@ -27,20 +27,20 @@ public:
 	typedef imtqml::CParamsDataProviderCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSettingsDatabasePageProviderComp);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-		I_REGISTER_INTERFACE(imtgql::IGqlMutationDataControllerDelegate);
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::IGqlModelEditor);
 		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", true, "UserSettingsCollection");
 		I_ASSIGN(m_settingsDataProviderCompPtr, "SettingsDataProvider", "Settings data provider", true, "");
 	I_END_COMPONENT;
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(
+	virtual imtbase::CTreeItemModel* GetRepresentation(
 				const QList<imtgql::CGqlObject>& params,
 				const QByteArrayList& fields,
 				const imtgql::IGqlContext* gqlContext) override;
 
-	// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
+	// reimplemented (imtgql::IGqlModelEditor)
 	virtual bool UpdateModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
 				imtbase::CTreeItemModel* baseModel,
@@ -48,7 +48,7 @@ public:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_settingsDataProviderCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_settingsDataProviderCompPtr);
 };
 
 

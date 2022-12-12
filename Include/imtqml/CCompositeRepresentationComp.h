@@ -6,9 +6,9 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtqml/CPageDataEnumProviderComp.h>
-#include <imtgql/IGqlMutationDataControllerDelegate.h>
+#include <imtgql/IGqlModelEditor.h>
 
 
 namespace imtqml
@@ -19,37 +19,37 @@ namespace imtqml
 	An implementation for a data model controller
 	that combines data from multiple models.
 */
-class CJoinDataProviderComp:
+class CCompositeRepresentationComp:
 		public icomp::CComponentBase,
-		public imtbase::IItemBasedRepresentationDataProvider,
-		public imtgql::IGqlMutationDataControllerDelegate
+		public imtgql::IItemBasedRepresentationDataProvider,
+		public imtgql::IGqlModelEditor
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef imtbase::IItemBasedRepresentationDataProvider BaseClass2;
+	typedef imtgql::IItemBasedRepresentationDataProvider BaseClass2;
 	typedef imtqml::CPageDataEnumProviderComp PageEnum;
 
-	I_BEGIN_COMPONENT(CJoinDataProviderComp);
-		I_REGISTER_INTERFACE(imtbase::IItemBasedRepresentationDataProvider);
-		I_REGISTER_INTERFACE(imtgql::IGqlMutationDataControllerDelegate);
+	I_BEGIN_COMPONENT(CCompositeRepresentationComp);
+		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::IGqlModelEditor);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "Command Id", true, "");
 		I_ASSIGN_MULTI_0(m_representationDataProviderCompPtr, "RepresentationDataProvider", "List of data providers for join", false);
 		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false);
 	I_END_COMPONENT;
 
-	CJoinDataProviderComp();
+	CCompositeRepresentationComp();
 
-	// reimplemented (imtbase::IItemBasedRepresentationProvider)
+	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetTreeItemModel(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 	virtual bool UpdateModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
 				imtbase::CTreeItemModel* baseModel,
 				const imtgql::IGqlContext* gqlContext) override;
 private:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
-	I_MULTIREF(imtbase::IItemBasedRepresentationDataProvider, m_representationDataProviderCompPtr);
-	I_MULTIREF(imtgql::IGqlMutationDataControllerDelegate, m_mutationDataDelegateCompPtr);
+	I_MULTIREF(imtgql::IItemBasedRepresentationDataProvider, m_representationDataProviderCompPtr);
+	I_MULTIREF(imtgql::IGqlModelEditor, m_mutationDataDelegateCompPtr);
 };
 
 

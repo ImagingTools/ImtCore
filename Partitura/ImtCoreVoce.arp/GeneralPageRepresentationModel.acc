@@ -10,72 +10,14 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="DesignParam" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ComponentType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="3"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Mode"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Mode"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Parameter" Type="Reference" ExportId="Design">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="GeneralPage" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>DesignParam</Value>
-                                <Value>LanguageParams</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="ParamId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="General"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParamName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="General"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamSubElements" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>DesignParam</Value>
-                                <Value>LanguageParams</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="LanguageParams" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ComponentType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="3"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Language"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Language"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Parameter" Type="Reference" ExportId="Language">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -86,10 +28,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IItemBasedRepresentationDataProvider" ComponentId="GeneralPage"/>
-        <Interface InterfaceId="imtgql::IGqlMutationDataControllerDelegate" ComponentId="GeneralPage"/>
+        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="GeneralPage"/>
+        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="GeneralPage"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="DesignParam" ComponentId="DesignParam"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>

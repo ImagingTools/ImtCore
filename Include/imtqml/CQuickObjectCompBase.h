@@ -7,7 +7,7 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <imtqml/IQuickObject.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/CTreeItemModel.h>
 
 
@@ -82,7 +82,7 @@ protected:
 	I_ATTR(QString, m_baseUrlAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_dataProviderCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_dataProviderCompPtr);
 
 	QQuickItem* m_quickItemPtr;
 	QList<imtbase::CTreeItemModel*> m_models;

@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 
 
 namespace imtlicgql
@@ -25,7 +25,7 @@ public:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
 };
 
 

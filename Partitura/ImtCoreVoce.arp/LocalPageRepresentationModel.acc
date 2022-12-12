@@ -82,8 +82,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtbase::IItemBasedRepresentationDataProvider" ComponentId="NetworkSettingsPage"/>
-        <Interface InterfaceId="imtgql::IGqlMutationDataControllerDelegate" ComponentId="NetworkSettingsPage"/>
+        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="NetworkSettingsPage"/>
+        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="NetworkSettingsPage"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

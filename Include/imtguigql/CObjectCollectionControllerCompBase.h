@@ -6,7 +6,7 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
-#include <imtbase/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 
@@ -23,11 +23,11 @@ public:
 	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
-	I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
-	I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
-	I_ASSIGN(m_objectViewProviderCompPtr, "ObjectViewProvider", "Object view provider", false, "ObjectViewProvider");
-	I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
-	I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
+		I_ASSIGN(m_objectViewProviderCompPtr, "ObjectViewProvider", "Object view provider", false, "ObjectViewProvider");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
+		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -103,8 +103,8 @@ protected:
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_headersProviderCompPtr);
-	I_REF(imtbase::IItemBasedRepresentationDataProvider, m_objectViewProviderCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_headersProviderCompPtr);
+	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_objectViewProviderCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 };

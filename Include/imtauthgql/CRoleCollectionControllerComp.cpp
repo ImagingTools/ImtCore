@@ -121,7 +121,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(
 	}
 	else{
 		dataModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* itemsModel = m_productProviderCompPtr->GetTreeItemModel(inputParams, QByteArrayList());
+		imtbase::CTreeItemModel* itemsModel = m_productProviderCompPtr->GetRepresentation(inputParams, QByteArrayList());
 		if (itemsModel != nullptr){
 			for (int i = 0; i < itemsModel->GetItemsCount(); i++){
 				QByteArray productId = itemsModel->GetData("Id", i).toByteArray();

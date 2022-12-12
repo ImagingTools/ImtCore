@@ -11,7 +11,7 @@ namespace imtqml
 
 // public methods
 
-// reimplemented (imtbase::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::IItemBasedRepresentationProvider)
 
 QByteArray CHeadersDataProviderComp::GetModelId() const
 {
@@ -20,7 +20,7 @@ QByteArray CHeadersDataProviderComp::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CHeadersDataProviderComp::GetTreeItemModel(
+imtbase::CTreeItemModel* CHeadersDataProviderComp::GetRepresentation(
 		const QList<imtgql::CGqlObject>& params,
 		const QByteArrayList& /*fields*/,
 		const imtgql::IGqlContext* gqlContext)

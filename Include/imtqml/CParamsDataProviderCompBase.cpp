@@ -31,7 +31,7 @@ const imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetElementModel(cons
 }
 
 
-// reimplemented (imtbase::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::IItemBasedRepresentationProvider)
 
 QByteArray CParamsDataProviderCompBase::GetModelId() const
 {
@@ -39,7 +39,7 @@ QByteArray CParamsDataProviderCompBase::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
+imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetRepresentation(
 			const QList<imtgql::CGqlObject>& params,
 			const QByteArrayList& fields,
 			const imtgql::IGqlContext* gqlContext)
@@ -105,7 +105,7 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 		imtbase::CTreeItemModel* externModel = new imtbase::CTreeItemModel();
 
 		for (int i = 0; i < m_paramSubElementsCompPtr.GetCount(); i++){
-			imtbase::CTreeItemModel* elementModel = m_paramSubElementsCompPtr[i]->GetTreeItemModel(params, fields);
+			imtbase::CTreeItemModel* elementModel = m_paramSubElementsCompPtr[i]->GetRepresentation(params, fields, gqlContext);
 			int externIndex = externModel->InsertNewItem();
 			externModel->CopyItemDataFromModel(externIndex, elementModel);
 		}
@@ -159,7 +159,7 @@ imtbase::CTreeItemModel* CParamsDataProviderCompBase::GetTreeItemModel(
 }
 
 
-// reimplemented (imtgql::IGqlMutationDataControllerDelegate)
+// reimplemented (imtgql::IGqlModelEditor)
 
 bool CParamsDataProviderCompBase::UpdateModelFromRepresentation(
 		const QList<imtgql::CGqlObject> &params,
