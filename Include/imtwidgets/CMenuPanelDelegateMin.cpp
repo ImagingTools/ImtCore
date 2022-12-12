@@ -98,22 +98,16 @@ void CMenuPanelDelegateMin::paint(QPainter* painter, const QStyleOptionViewItem&
 	}
 
 	int iconSize = m_iconHeight;
-	if (option.state & QStyle::State_MouseOver) {
-		const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
-		Q_ASSERT(modelPtr != nullptr);
 
-		if (modelPtr->itemFromIndex(index)->isEnabled()) {
+	const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
+	Q_ASSERT(modelPtr != nullptr);
+	if (modelPtr != nullptr && modelPtr->itemFromIndex(index)->isEnabled()) {
+		if (option.state & QStyle::State_MouseOver) {
 			iconSize = m_iconHeightHover;
 			iconMode = QIcon::Mode::Active;
 		}
-	}
 
-	if (option.state & QStyle::State_Selected){
-		const QStandardItemModel* modelPtr = dynamic_cast<const QStandardItemModel*>(index.model());
-		Q_ASSERT(modelPtr != nullptr);
-
-		if (modelPtr->itemFromIndex(index)->isEnabled()){
-			iconSize = m_iconHeightHover;
+		if (option.state & QStyle::State_Selected) {
 			iconMode = QIcon::Mode::Selected;
 		}
 	}
