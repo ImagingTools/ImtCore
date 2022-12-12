@@ -67,6 +67,8 @@ private:
 
 
 private:
+	QByteArray GetFileNameForState(const QByteArray& fileName, IDesignTokenFileParser::IconState iconState) const;
+
 	/**
 		sets new color in single image
 	*/

@@ -57,7 +57,7 @@ bool CDesignTokenFileParserComp::GetBasePalette(const QByteArray& designSchemaId
 
 
 // reimplemented (IDesignTokenFileParser)
-bool CDesignTokenFileParserComp::CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
+bool CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 {
 	bool retval = false;
 
@@ -275,57 +275,30 @@ QByteArray CDesignTokenFileParserComp::GetTemplateIconColor(const QByteArray&) c
 }
 
 
-QByteArray CDesignTokenFileParserComp::GetNormalColor(const QByteArray& styleName) const
+QByteArray CDesignTokenFileParserComp::GetIconColor(const QByteArray& styleName, IconState iconState) const
 {
-	return m_iconColors[styleName].toMap()["Normal"].toByteArray();
-}
+	switch (iconState) {
+	case IS_NORMAL:
+		return m_iconColors[styleName].toMap()["Normal"].toByteArray();
+	case IS_OFF_NORMAL:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offNormalColorParamName].toByteArray();
+	case IS_OFF_DISABLED:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offDisabledColorParamName].toByteArray();
+	case IS_OFF_ACTIVE:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offActiveColorParamName].toByteArray();
+	case IS_OFF_SELECTED:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offSelectedColorParamName].toByteArray();
+	case IS_ON_NORMAL:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onNormalColorParamName].toByteArray();
+	case IS_ON_DISABLED:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onDisabledColorParamName].toByteArray();
+	case IS_ON_ACTIVE:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onActiveColorParamName].toByteArray();
+	case IS_ON_SELECTED:
+		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onSelectedColorParamName].toByteArray();
+	}
 
-
-QByteArray CDesignTokenFileParserComp::GetOffNormalColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offNormalColorParamName].toByteArray();
-}
-
-
-QByteArray CDesignTokenFileParserComp::GetOffDisabledColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offDisabledColorParamName].toByteArray();
-}
-
-
-QByteArray CDesignTokenFileParserComp::GetOffActiveColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offActiveColorParamName].toByteArray();
-}
-
-
-QByteArray CDesignTokenFileParserComp::GetOffSelectedColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offSelectedColorParamName].toByteArray();
-}
-
-
-QByteArray CDesignTokenFileParserComp::GetOnNormalColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onNormalColorParamName].toByteArray();
-}
-
-
-QByteArray CDesignTokenFileParserComp::GetOnDisabledColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onDisabledColorParamName].toByteArray();
-}
-
-
-QByteArray CDesignTokenFileParserComp::GetOnActiveColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onActiveColorParamName].toByteArray();
-}
-
-
-QByteArray CDesignTokenFileParserComp::GetOnSelectedColor(const QByteArray& styleName) const
-{
-	return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onSelectedColorParamName].toByteArray();
+	QByteArray();
 }
 
 

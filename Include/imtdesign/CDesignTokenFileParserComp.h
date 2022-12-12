@@ -30,28 +30,20 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDesignTokenFileParser)
-	bool ParseFile() override;
-	bool SplitFile(const QString& outputDirPath, const QString& projectName) override;
-	bool SetFile(const QByteArray& filePath) override;
+	virtual bool ParseFile() override;
+	virtual bool SplitFile(const QString& outputDirPath, const QString& projectName) override;
+	virtual bool SetFile(const QByteArray& filePath) override;
 
-	QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;
-	bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
-	bool GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
+	virtual QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;
+	virtual bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
+	virtual bool GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
 
-	QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
-	QByteArray GetNormalColor(const QByteArray& styleName) const override;
-	QByteArray GetOffNormalColor(const QByteArray& styleName) const override;
-	QByteArray GetOffDisabledColor(const QByteArray& styleName) const override;
-	QByteArray GetOffActiveColor(const QByteArray& styleName) const override;
-	QByteArray GetOffSelectedColor(const QByteArray& styleName) const override;
-	QByteArray GetOnNormalColor(const QByteArray& styleName) const override;
-	QByteArray GetOnDisabledColor(const QByteArray& styleName) const override;
-	QByteArray GetOnActiveColor(const QByteArray& styleName) const override;
-	QByteArray GetOnSelectedColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
+	virtual QByteArray GetIconColor(const QByteArray& styleName, IconState iconState) const override;
 
 	// reimplemented (IColorPaletteProvider)
-	const imtbase::ICollectionInfo& GetDesignSchemaList() const override;
-	bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
+	virtual const imtbase::ICollectionInfo& GetDesignSchemaList() const override;
+	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
 
 	// reimplemented (IFontProvider)
 	virtual const imtbase::ICollectionInfo& GetFontList(const QByteArray& designSchemaId) const override;
