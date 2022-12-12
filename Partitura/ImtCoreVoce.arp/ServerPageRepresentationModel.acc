@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="DatabaseLoginSettingsRepresentation" PackageId="ImtQmlPck" ComponentId="DatabaseLoginSettingsRepresentation">
+        <Element Id="DatabaseLoginSettings" PackageId="ImtQmlPck" ComponentId="DatabaseLoginSettingsRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseLoginSettings" Type="Reference" ExportId="DatabaseLoginSettings">
@@ -25,35 +25,8 @@
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/DatabaseInput.qml"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="DatabaseName" PackageId="ImtQmlPck" ComponentId="TextRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="DatabaseName"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Database Name"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Host" PackageId="ImtQmlPck" ComponentId="TextRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Host"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Host"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -73,40 +46,13 @@
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Password" PackageId="ImtQmlPck" ComponentId="TextRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Password"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Password"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Port" PackageId="ImtQmlPck" ComponentId="TextRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Port"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Port"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ServerPage" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
+        <Element Id="ServerSettingsPage" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="MutationDataDelegate" Type="Reference[]" ExportId="">
@@ -122,7 +68,10 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ParamSubElements" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
-                            <Values/>
+                            <Values>
+                                <Value>InstanceMask</Value>
+                                <Value>DatabaseLoginSettings</Value>
+                            </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -131,26 +80,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Username" PackageId="ImtQmlPck" ComponentId="TextRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Username"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Username"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="ServerPage"/>
-        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="ServerPage"/>
+        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="ServerSettingsPage"/>
+        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="ServerSettingsPage"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

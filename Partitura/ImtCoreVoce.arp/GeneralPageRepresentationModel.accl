@@ -2,13 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GeneralPage" X="550" Y="175" Note=""/>
+        <Element ComponentName="Design" X="900" Y="350" Note=""/>
+        <Element ComponentName="GeneralPage" X="625" Y="175" Note=""/>
+        <Element ComponentName="Language" X="300" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

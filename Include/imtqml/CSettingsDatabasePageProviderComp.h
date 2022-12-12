@@ -10,7 +10,7 @@
 #include <imtgql/IGqlModelEditor.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtdb/IDatabaseLoginSettings.h>
-#include <imtqml/CParamsDataProviderCompBase.h>
+#include <imtqml/CObjectRepresentationCompBase.h>
 
 
 namespace imtqml
@@ -18,17 +18,14 @@ namespace imtqml
 
 
 /**
-	Server pages settings provider.
+    Database access settings representation provider.
 */
-class CSettingsDatabasePageProviderComp:
-		public imtqml::CParamsDataProviderCompBase
+class CSettingsDatabasePageProviderComp: public imtqml::CObjectRepresentationCompBase
 {
 public:
-	typedef imtqml::CParamsDataProviderCompBase BaseClass;
+    typedef imtqml::CObjectRepresentationCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSettingsDatabasePageProviderComp);
-		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
-		I_REGISTER_INTERFACE(imtgql::IGqlModelEditor);
 		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", true, "UserSettingsCollection");
 		I_ASSIGN(m_settingsDataProviderCompPtr, "SettingsDataProvider", "Settings data provider", true, "");
 	I_END_COMPONENT;

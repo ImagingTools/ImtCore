@@ -43,9 +43,9 @@ I_EXPORT_COMPONENT(
 			"Page item based data provider");
 
 I_EXPORT_COMPONENT(
-			ParamsDataProvider,
-			"Params data provider",
-			"Params data provider");
+            CompositeObjectRepresentation,
+            "Composite object representation",
+            "Representation Data Model Composite Combined Container");
 
 I_EXPORT_COMPONENT(
 			DatabaseSettingsDataProvider,

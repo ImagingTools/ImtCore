@@ -37,8 +37,6 @@ public:
 		I_ASSIGN_MULTI_0(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false);
 	I_END_COMPONENT;
 
-	CCompositeRepresentationComp();
-
 	// reimplemented (imtgql::IItemBasedRepresentationProvider)
 	virtual QByteArray GetModelId() const override;
 	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;

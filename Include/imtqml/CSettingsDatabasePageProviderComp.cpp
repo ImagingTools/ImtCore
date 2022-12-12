@@ -41,10 +41,6 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetRepresentation(
 			if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
 				iprm::IParamsSet* settingsParamSetPtr = nullptr;
 
-				if (m_parameterCompPtr.IsValid()){
-					settingsParamSetPtr = dynamic_cast<iprm::IParamsSet*>(m_parameterCompPtr.GetPtr());
-				}
-
 				const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(dataPtr.GetPtr());
 				if (userSettingsPtr != nullptr){
 					settingsParamSetPtr = userSettingsPtr->GetSettings();
@@ -124,26 +120,6 @@ bool CSettingsDatabasePageProviderComp::UpdateModelFromRepresentation(
 						}
 						else if (elementId == "Language"){
 							languageIndex = index;
-						}
-					}
-				}
-
-				if (m_parameterCompPtr.IsValid()){
-					iprm::IParamsSet* defaultParamSetPtr = dynamic_cast<iprm::IParamsSet*>(m_parameterCompPtr.GetPtr());
-					if (defaultParamSetPtr != nullptr){
-						iprm::IParamsSet* paramSetPtr = dynamic_cast<iprm::IParamsSet*>(defaultParamSetPtr->CloneMe());
-						if (paramSetPtr != nullptr){
-							iprm::ISelectionParam* designSchemeParamPtr = dynamic_cast<iprm::ISelectionParam*>(paramSetPtr->GetEditableParameter("DesignSchema"));
-							if (designSchemeParamPtr != nullptr){
-								designSchemeParamPtr->SetSelectedOptionIndex(designSchemeIndex);
-							}
-
-							iprm::ISelectionParam* languageParamPtr = dynamic_cast<iprm::ISelectionParam*>(paramSetPtr->GetEditableParameter("Language"));
-							if (languageParamPtr != nullptr){
-								languageParamPtr->SetSelectedOptionIndex(languageIndex);
-							}
-
-							userSettingsPtr->SetSettings(paramSetPtr);
 						}
 					}
 				}

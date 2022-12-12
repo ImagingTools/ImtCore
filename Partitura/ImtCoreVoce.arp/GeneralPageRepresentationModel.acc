@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="0" Number="5032" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -10,7 +10,25 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="GeneralPage" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
+        <Element Id="Design" PackageId="ImtQmlPck" ComponentId="ComboBoxRepresentation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="DesignSchema"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Design Schema"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Selection" Type="Reference" ExportId="DesignSchema">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GeneralPage" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ParamId" Type="Id" ExportId="">
@@ -18,6 +36,32 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ParamName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="General"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamSubElements" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Design</Value>
+                                <Value>Language</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Language" PackageId="ImtQmlPck" ComponentId="ComboBoxRepresentation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Language"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Language"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Selection" Type="Reference" ExportId="Language">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>

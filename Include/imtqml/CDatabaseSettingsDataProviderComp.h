@@ -2,7 +2,7 @@
 
 // ImtCore includes
 #include <imtdb/IDatabaseLoginSettings.h>
-#include <imtqml/CParamsDataProviderCompBase.h>
+#include <imtqml/CObjectRepresentationCompBase.h>
 
 // hairable component omly 41-st
 namespace imtqml
@@ -13,10 +13,10 @@ namespace imtqml
 	Basic implementation for the controller of the application page representation data model.
 */
 class CDatabaseSettingsDataProviderComp:
-		public imtqml::CParamsDataProviderCompBase
+        public imtqml::CObjectRepresentationCompBase
 {
 public:
-	typedef imtqml::CParamsDataProviderCompBase BaseClass;
+    typedef imtqml::CObjectRepresentationCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CDatabaseSettingsDataProviderComp);
 		I_ASSIGN(m_databaseSettingsCompPtr, "DatabaseParameter", "Parameter of database settings", false, "");

@@ -20,8 +20,9 @@ class CComboBoxRepresentationComp: public imtqml::CObjectRepresentationCompBase
 public:
 	typedef imtqml::CObjectRepresentationCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CComboBoxRepresentationComp);
-	I_END_COMPONENT;
+    I_BEGIN_COMPONENT(CComboBoxRepresentationComp);
+        I_ASSIGN(m_selectionParamCompPtr, "Selection", "Selection data model", true, "Selection");
+    I_END_COMPONENT;
 
 protected:
 	// reimplemented (imtgql::IItemBasedRepresentationProvider)
