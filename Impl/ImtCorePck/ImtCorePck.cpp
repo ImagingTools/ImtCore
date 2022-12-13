@@ -149,6 +149,11 @@ I_EXPORT_COMPONENT(
 			"Adapter from command line parameters to ParamSet",
 			"Adapter ParamSet Command Parameter");
 
+I_EXPORT_COMPONENT(
+			TransactionableUndoManager,
+			"Undo manager that supports merging notifications into transactions",
+			"Undo Manager Transaction");
+
 
 } // namespace ImtCorePck
 

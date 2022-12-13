@@ -34,6 +34,7 @@
 #include <imtbase/CMessageFilterComp.h>
 #include <imtbase/CLoginBasedEnablerComp.h>
 #include <imtbase/CCommandLineParamsAdapterComp.h>
+#include <imtbase/CTransactionableUndoManagerComp.h>
 
 
 /**
@@ -81,6 +82,7 @@ typedef icomp::TModelCompWrap<imtbase::CUrlParamComp> UrlParam;
 typedef imtbase::CMessageFilterComp MessageFilter;
 typedef icomp::TModelCompWrap<imtbase::CLoginBasedEnablerComp> LoginBasedEnabler;
 typedef icomp::TModelCompWrap<imtbase::CCommandLineParamsAdapterComp> CommandLineParamsAdapter;
+typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtbase::CTransactionableUndoManagerComp>> TransactionableUndoManager;
 
 
 } // namespace ImtCorePck
