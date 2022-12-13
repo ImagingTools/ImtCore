@@ -145,6 +145,9 @@ Rectangle {
                     if (passwordTextInput.text != "" && loginTextInput.text != ""){
                         loginButton.clicked();
                     }
+                    else if(loginTextInput.text != ""){
+                        passwordTextInput.forceActiveFocus();
+                    }
                 }
 
                 Loader{
