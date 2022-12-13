@@ -1,4 +1,4 @@
-#include <imtqml/CComboBoxRepresentationComp.h>
+#include <imtqml/CSelectionRepresentationComp.h>
 
 
 // Qt includes
@@ -16,7 +16,7 @@ namespace imtqml
 
 // reimplemented (imtgql::IItemBasedRepresentationProvider)
 
-imtbase::CTreeItemModel* CComboBoxRepresentationComp::GetRepresentation(
+imtbase::CTreeItemModel* CSelectionRepresentationComp::GetRepresentation(
 			const QList<imtgql::CGqlObject>& params,
 			const QByteArrayList& fields,
 			const imtgql::IGqlContext* gqlContext)
@@ -61,7 +61,7 @@ imtbase::CTreeItemModel* CComboBoxRepresentationComp::GetRepresentation(
 
 // reimplemented (imtgql::IGqlModelEditor)
 
-bool CComboBoxRepresentationComp::UpdateModelFromRepresentation(
+bool CSelectionRepresentationComp::UpdateModelFromRepresentation(
 		const QList<imtgql::CGqlObject> &params,
 		imtbase::CTreeItemModel *baseModel,
 		const imtgql::IGqlContext* gqlContext)

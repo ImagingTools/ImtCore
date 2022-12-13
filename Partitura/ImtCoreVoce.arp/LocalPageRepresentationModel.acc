@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ApplicationInfoDataProvider" PackageId="ImtQmlPck" ComponentId="ApplicationInfoDataProvider">
+        <Element Id="ApplicationInfo" PackageId="ImtQmlPck" ComponentId="ApplicationInfoDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
@@ -25,19 +25,9 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="NetworkSettingsPage" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
+        <Element Id="NetworkSettings" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ComponentType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="0"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ServerUrlParam</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
                     <AttributeInfo Id="ParamId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="NetworkSettings"/>
                     </AttributeInfo>
@@ -47,8 +37,8 @@
                     <AttributeInfo Id="ParamSubElements" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerUrlParam</Value>
-                                <Value>ApplicationInfoDataProvider</Value>
+                                <Value>ServerUrl</Value>
+                                <Value>ApplicationInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -58,11 +48,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrlParam" PackageId="ImtQmlPck" ComponentId="ParamsDataProvider">
+        <Element Id="ServerUrl" PackageId="ImtQmlPck" ComponentId="TextRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ComponentType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="1"/>
+                    <AttributeInfo Id="NameParameter" Type="Reference" ExportId="ServerUrl">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParamId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="ServerUrl"/>
@@ -70,11 +60,8 @@
                     <AttributeInfo Id="ParamName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Server Url"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Parameter" Type="Reference" ExportId="ServerUrl">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -82,8 +69,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="NetworkSettingsPage"/>
-        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="NetworkSettingsPage"/>
+        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="NetworkSettings"/>
+        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="NetworkSettings"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

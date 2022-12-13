@@ -119,13 +119,13 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			ButtonRepresentation,
-			"ButtonRepresentation",
+			"Button Representation",
 			"Button Representation");
 
 I_EXPORT_COMPONENT(
-			ComboBoxRepresentation,
-			"ComboBox Adapter",
-			"ComboBox adapter");
+			SelectionRepresentation,
+			"Selection Representation",
+			"Selection Representation Data Model");
 
 I_EXPORT_COMPONENT(
 			TextRepresentation,

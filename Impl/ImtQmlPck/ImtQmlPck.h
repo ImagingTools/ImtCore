@@ -26,7 +26,7 @@
 #include <imtqml/CCommandPermissionsFilterComp.h>
 #include <imtqml/CObjectRepresentationCompBase.h>
 #include <imtqml/CButtonRepresentationComp.h>
-#include <imtqml/CComboBoxRepresentationComp.h>
+#include <imtqml/CSelectionRepresentationComp.h>
 #include <imtqml/CTextRepresentationComp.h>
 #include <imtqml/CDatabaseLoginSettingsRepresentationComp.h>
 #include <imtqml/CCompositeObjectRepresentationComp.h>
@@ -60,7 +60,7 @@ typedef imtqml::CSettingsDatabasePageProviderComp SettingsDatabasePagesProvider;
 typedef imtqml::CCommandPermissionsFilterComp CommandPermissionsFilter;
 typedef imtqml::CObjectRepresentationCompBase ObjectRepresentation;
 typedef imtqml::CButtonRepresentationComp ButtonRepresentation;
-typedef imtqml::CComboBoxRepresentationComp ComboBoxRepresentation;
+typedef imtqml::CSelectionRepresentationComp SelectionRepresentation;
 typedef imtqml::CTextRepresentationComp TextRepresentation;
 typedef imtqml::CDatabaseLoginSettingsRepresentationComp DatabaseLoginSettingsRepresentation;
 

@@ -7,7 +7,6 @@
 
 // ImtCore includes
 #include <imtgql/IItemBasedRepresentationDataProvider.h>
-#include <imtqml/CPageDataEnumProviderComp.h>
 #include <imtgql/IGqlModelEditor.h>
 
 
@@ -27,7 +26,6 @@ class CCompositeRepresentationComp:
 public:
 	typedef icomp::CComponentBase BaseClass;
 	typedef imtgql::IItemBasedRepresentationDataProvider BaseClass2;
-	typedef imtqml::CPageDataEnumProviderComp PageEnum;
 
 	I_BEGIN_COMPONENT(CCompositeRepresentationComp);
 		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
