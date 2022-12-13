@@ -37,7 +37,7 @@ bool CGqlModel::SetGqlQuery(QString query)
 		QUrl requestUrl = engine->baseUrl();
 
         QString urlPath = requestUrl.path();
-        urlPath.append("graphql");
+        urlPath.append("/graphql");
         requestUrl.setPath(urlPath);
 
 		QNetworkRequest networkRequest = QNetworkRequest(requestUrl);
