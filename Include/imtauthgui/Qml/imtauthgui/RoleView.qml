@@ -19,6 +19,9 @@ DocumentBase {
     property string title;
     property string roleName: qsTr("New Role");
 
+    property int mainMargin: 0;
+    property int panelWidth: 150;
+
     onItemNameChanged: {
         if (documentModel.ContainsKey("Name")){
             let roleName = documentModel.GetData("Name");
@@ -76,9 +79,27 @@ DocumentBase {
         }
     }
 
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
+        }
+    }
+
     Rectangle {
+        id: background;
         anchors.fill: parent;
         color: Style.backgroundColor;
+        Loader{
+            id: backgroundDecoratorLoader;
+
+            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+            onLoaded: {
+                if(backgroundDecoratorLoader.item){
+                    backgroundDecoratorLoader.item.rootItem = background;
+                }
+            }
+        }
     }
 
     Row {
@@ -100,7 +121,7 @@ DocumentBase {
             id: closeButton;
 
             anchors.verticalCenter: parent.verticalCenter;
-
+            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
             width: 25;
             height: width;
 
@@ -122,6 +143,17 @@ DocumentBase {
             color: Style.titleColor;
 
             text: container.title + " / " + container.roleName;
+
+            Loader{
+                id: titleDecoratorLoader;
+
+                sourceComponent: Style.titleDecorator !==undefined ? Style.titleDecorator: emptyDecorator;
+                onLoaded: {
+                    if(titleDecoratorLoader.item){
+                        titleDecoratorLoader.item.rootItem = headerText;
+                    }
+                }
+            }
         }
     }
 
@@ -131,20 +163,58 @@ DocumentBase {
         anchors.top: header.bottom;
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
+        anchors.topMargin: container.mainMargin;
+        anchors.leftMargin: container.mainMargin;
 
-        width: 150;
+        width: container.panelWidth;
 
         color: Style.backgroundColor;
+
+        Loader{
+            id: mainPanelBackgroundDecoratorLoader;
+
+            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+            onLoaded: {
+                if(mainPanelBackgroundDecoratorLoader.item){
+                    mainPanelBackgroundDecoratorLoader.item.rootItem = mainPanelBackground;
+                }
+            }
+        }
+
+        Item{
+            id: columnContainer;
+            width: parent.width;
+            height: mainPanel.height + 2*mainPanel.anchors.topMargin;
+
+
+            Loader{
+                id: mainPanelFrameLoader;
+
+                anchors.fill: parent;
+
+                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+
+                onLoaded: {
+                    if(mainPanelFrameLoader.item){
+                        container.mainMargin = mainPanelFrameLoader.item.mainMargin;
+                        container.panelWidth = mainPanelFrameLoader.item.panelWidth;
+                    }
+                }
+            }
+
+        }
 
         Column {
             id: mainPanel;
 
-            anchors.fill: parent;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
             anchors.topMargin: 10;
 
             property int selectedIndex: -1;
 
-            spacing: 5;
+            spacing: 10;
 
             ListModel{
                 id: leftMenuModel
@@ -162,30 +232,33 @@ DocumentBase {
                 }
             }
 
+            Component{
+                id: defaultButtonDecorator;
+
+                CommonButtonDecorator{
+                    height: 35;
+                    color: Style.alternateBaseColor;
+                }
+            }
+
             Repeater {
                 id: mainPanelRepeater;
 
                 model: leftMenuModel;
 
-                delegate: AuxButton {
+                delegate:
+                    BaseButton{
+                    id: buttonContainer;
 
                     anchors.left: parent.left;
                     anchors.leftMargin: 10;
                     anchors.right: parent.right;
                     anchors.rightMargin: 10;
 
-                    height: 35;
+                    text:  model.Name;
+                    selected: mainPanel.selectedIndex == model.index;
 
-                    radius: 3;
-
-                    hasText: true;
-                    hasIcon: false;
-
-                    textButton: model.Name;
-
-                    backgroundColor: Style.alternateBaseColor;
-
-                    borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
+                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
                     Component.onCompleted: {
                         if (model.index === 0){
@@ -198,6 +271,7 @@ DocumentBase {
                             mainPanel.selectedIndex = model.index;
                         }
                     }
+
                 }
             }
         }
@@ -206,12 +280,15 @@ DocumentBase {
     Rectangle {
         id: bodyAdministration;
 
-        z: 5;
-
         anchors.left: mainPanelBackground.right;
         anchors.top: header.bottom;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
+        anchors.topMargin: container.mainMargin;
+        anchors.leftMargin: container.mainMargin;
+        anchors.rightMargin: container.mainMargin;
+
+        z: 5;
 
         Repeater {
             id: bodyRepeater;
@@ -228,4 +305,6 @@ DocumentBase {
             }
         }
     }
+
+
 }
