@@ -23,7 +23,9 @@ public:
 
 	I_BEGIN_COMPONENT(CUserSettingsComp);
 		I_REGISTER_INTERFACE(IUserSettings);
-		I_ASSIGN(m_settingsParamsSetCompPtr, "SettingsParamsSet", "Params set of the settings", true, "SettingsParamsSet");
+		I_REGISTER_INTERFACE(iser::IObject);
+		I_REGISTER_INTERFACE(iser::ISerializable);
+		I_ASSIGN(m_settingsFactCompPtr, "SettingsFactory", "Factory used for creation of the user related settings instance", true, "SettingsFactory");
 	I_END_COMPONENT;
 
 protected:
@@ -32,7 +34,7 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	I_REF(iprm::IParamsSet, m_settingsParamsSetCompPtr);
+	I_FACT(iprm::IParamsSet, m_settingsFactCompPtr);
 };
 
 

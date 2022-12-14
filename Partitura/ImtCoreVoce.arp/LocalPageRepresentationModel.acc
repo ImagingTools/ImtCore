@@ -28,6 +28,13 @@
         <Element Id="NetworkSettings" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="MutationDataDelegate" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ServerUrl</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="ParamId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="NetworkSettings"/>
                     </AttributeInfo>

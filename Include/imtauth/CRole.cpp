@@ -20,7 +20,7 @@ namespace imtauth
 
 CRole::CRole()
 	: m_permissionProviderPtr(nullptr),
-	  m_roleInfoProviderPtr(nullptr)
+	m_roleInfoProviderPtr(nullptr)
 {
 }
 

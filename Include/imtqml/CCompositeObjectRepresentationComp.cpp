@@ -28,7 +28,7 @@ imtbase::CTreeItemModel* CCompositeObjectRepresentationComp::GetRepresentation(
 		for (int i = 0; i < m_paramSubElementsCompPtr.GetCount(); i++){
 			imtgql::IItemBasedRepresentationDataProvider* subProviderPtr = m_paramSubElementsCompPtr[i];
 			if (subProviderPtr != nullptr){
-				imtbase::CTreeItemModel* subModelPtr = m_paramSubElementsCompPtr[i]->GetRepresentation(params, fields, gqlContext);
+				imtbase::CTreeItemModel* subModelPtr = subProviderPtr->GetRepresentation(params, fields, gqlContext);
 				if (subModelPtr != nullptr){
 					int elementIndex = elementListModelPtr->InsertNewItem();
 

@@ -27,9 +27,7 @@ Dialog {
 
         height: columnBody.height + 60;
 
-//        property string message;
         property alias inputValue: inputField.text;
-
 
         onFocusChanged: {
             if (focus){
@@ -79,9 +77,6 @@ Dialog {
                     inputDialogContainer.buttons.setButtonState("Ok", inputField.ok);
                 }
 
-                onTextChanged: {
-                }
-
                 onAccepted: {
                     if(inputField.ok){
                         inputDialogContainer.buttons.buttonClicked("Ok");
@@ -102,8 +97,6 @@ Dialog {
         }
     }
 
-
-
     Component{
         id: emptyDecorator;
         Item{
@@ -119,6 +112,7 @@ Dialog {
             if(messageDecoratorLoader.item){
                 messageDecoratorLoader.item.rootItem = inputDialogContainer;
             }
+
             inputDialogContainer.width = 300;
         }
     }

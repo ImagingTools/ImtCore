@@ -130,6 +130,8 @@ bool CSettingsDatabasePageProviderComp::UpdateModelFromRepresentation(
 
 				iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 
+				Q_ASSERT(paramSetPtr != nullptr);
+
 				iprm::ISelectionParam* designSchemeParamPtr = dynamic_cast<iprm::ISelectionParam*>(paramSetPtr->GetEditableParameter("DesignSchema"));
 				if (designSchemeParamPtr != nullptr){
 					designSchemeParamPtr->SetSelectedOptionIndex(designSchemeIndex);

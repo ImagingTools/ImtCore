@@ -64,6 +64,8 @@ bool CTextRepresentationComp::UpdateModelFromRepresentation(
 		return false;
 	}
 
+	Q_ASSERT(baseModelPtr != nullptr);
+
 	QByteArray parameterId = *m_paramIdAttrPtr;
 	const imtbase::CTreeItemModel* elementModelPtr = GetElementModel(parameterId, baseModelPtr);
 	if (elementModelPtr != nullptr){

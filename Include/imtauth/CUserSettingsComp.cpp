@@ -13,8 +13,8 @@ void CUserSettingsComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if(m_settingsParamsSetCompPtr.IsValid()){
-		BaseClass2::SetSettings(m_settingsParamsSetCompPtr.GetPtr());
+	if(m_settingsFactCompPtr.IsValid()){
+		m_settingsPtr = m_settingsFactCompPtr.CreateInstance();
 	}
 }
 
@@ -26,3 +26,5 @@ void CUserSettingsComp::OnComponentDestroyed()
 
 
 } // namespace imtauth
+
+

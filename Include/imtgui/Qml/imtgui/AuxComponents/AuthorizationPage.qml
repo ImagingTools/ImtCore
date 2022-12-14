@@ -36,8 +36,6 @@ Rectangle {
         }
     }
 
-
-
     MouseArea {
         anchors.fill: parent;
 
@@ -81,20 +79,6 @@ Rectangle {
 
                 text: qsTr("Welcome");
             }
-
-            //            Text{
-            //                id: loginText;
-
-            //                anchors.top: welcomeText.bottom;
-            //                anchors.topMargin: 20;
-            //                anchors.left: parent.left;
-            //                anchors.leftMargin: (parent.width-loginText.width)/2;
-
-            //                color: Style.textColor;
-            //                font.family: Style.fontFamily;
-            //                font.pixelSize: Style.fontSize_common;
-            //                text: qsTr("Please login");
-            //            }
         }
 
         Column {
@@ -268,60 +252,6 @@ Rectangle {
 
             }
 
-
-            //            Item {
-            //                id: remember;
-
-            //                width: parent.width;
-            //                height: 40;
-
-            //                CheckBox {
-            //                    id: checkRemember;
-
-            //                    anchors.verticalCenter: parent.verticalCenter;
-
-            //                    checkState: Qt.Unchecked;
-
-            //                    onClicked: {
-            //                        if (checkRemember.checkState == Qt.Unchecked){
-            //                            checkRemember.checkState = Qt.Checked
-            //                        }
-            //                        else{
-            //                           checkRemember.checkState = Qt.Unchecked
-            //                        }
-            //                    }
-            //                }
-
-            //                Text {
-            //                    id: rememberText;
-
-            //                    anchors.left: checkRemember.right;
-            //                    anchors.leftMargin: 7;
-            //                    anchors.verticalCenter: parent.verticalCenter;
-
-            //                    color: Style.textColor;
-            //                    font.family: Style.fontFamily;
-            //                    font.pixelSize: Style.fontSize_small;
-            //                    text: qsTr("Remember me");
-            //                }
-            //                Text{
-            //                    id: forgotText;
-
-            //                    anchors.top: parent.top;
-            //                    anchors.topMargin: 7;
-            //                    anchors.left: rememberText.right;
-            //                    anchors.leftMargin: 120;
-
-            //                    color: Style.textColor;
-            //                    font.family: Style.fontFamily;
-            //                    font.pixelSize: Style.fontSize_small;
-            //                    //            text: '<html><style type="text/css"></style><a href="http://google.com">Forgot password?</a></html>'
-            //                    onLinkActivated: {
-            //                        Qt.openUrlExternally(link)
-            //                    }
-            //                }
-            //            }
-
             Item {
                 id: buttonItem;
 
@@ -340,9 +270,7 @@ Rectangle {
                     onClicked: {
                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
                     }
-
                 }
-
             }//
         }
     }

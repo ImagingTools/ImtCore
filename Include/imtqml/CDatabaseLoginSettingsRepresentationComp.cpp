@@ -42,7 +42,10 @@ imtbase::CTreeItemModel* CDatabaseLoginSettingsRepresentationComp::GetRepresenta
 	parametersModelPtr->SetData("Id", "DatabaseName", index);
 	parametersModelPtr->SetData("Name", QT_TR_NOOP("Database Name"), index);
 	parametersModelPtr->SetData("Value", dbName, index);
-	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
+
+	if (m_dbNameQmlPathAttrPtr.IsValid()){
+		parametersModelPtr->SetData("Source", *m_dbNameQmlPathAttrPtr, index);
+	}
 
 	index = parametersModelPtr->InsertNewItem();
 
@@ -51,7 +54,10 @@ imtbase::CTreeItemModel* CDatabaseLoginSettingsRepresentationComp::GetRepresenta
 	parametersModelPtr->SetData("Id", "Host", index);
 	parametersModelPtr->SetData("Name", QT_TR_NOOP("Host"), index);
 	parametersModelPtr->SetData("Value", hostName, index);
-	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
+
+	if (m_hostQmlPathAttrPtr.IsValid()){
+		parametersModelPtr->SetData("Source", *m_hostQmlPathAttrPtr, index);
+	}
 
 	index = parametersModelPtr->InsertNewItem();
 
@@ -60,7 +66,10 @@ imtbase::CTreeItemModel* CDatabaseLoginSettingsRepresentationComp::GetRepresenta
 	parametersModelPtr->SetData("Id", "Password", index);
 	parametersModelPtr->SetData("Name", QT_TR_NOOP("Password"), index);
 	parametersModelPtr->SetData("Value", password, index);
-	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
+
+	if (m_passwordQmlPathAttrPtr.IsValid()){
+		parametersModelPtr->SetData("Source", *m_passwordQmlPathAttrPtr, index);
+	}
 
 	index = parametersModelPtr->InsertNewItem();
 
@@ -69,7 +78,10 @@ imtbase::CTreeItemModel* CDatabaseLoginSettingsRepresentationComp::GetRepresenta
 	parametersModelPtr->SetData("Id", "Port", index);
 	parametersModelPtr->SetData("Name", QT_TR_NOOP("Port"), index);
 	parametersModelPtr->SetData("Value", port, index);
-	parametersModelPtr->SetData("Source", "SettingsIntegerInput.qml", index);
+
+	if (m_portQmlPathAttrPtr.IsValid()){
+		parametersModelPtr->SetData("Source", *m_portQmlPathAttrPtr, index);
+	}
 
 	index = parametersModelPtr->InsertNewItem();
 
@@ -78,7 +90,10 @@ imtbase::CTreeItemModel* CDatabaseLoginSettingsRepresentationComp::GetRepresenta
 	parametersModelPtr->SetData("Id", "Username", index);
 	parametersModelPtr->SetData("Name", QT_TR_NOOP("Username"), index);
 	parametersModelPtr->SetData("Value", userName, index);
-	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
+
+	if (m_usernameQmlPathAttrPtr.IsValid()){
+		parametersModelPtr->SetData("Source", *m_usernameQmlPathAttrPtr, index);
+	}
 
 	return rootModelPtr;
 }

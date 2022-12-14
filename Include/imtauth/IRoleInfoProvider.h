@@ -15,6 +15,7 @@ class ICollectionInfo;
 namespace imtauth
 {
 
+
 class IRole;
 
 

@@ -18,10 +18,10 @@
         <Element Id="GeneralPageRepresentation" PackageId="ImtCoreVoce" ComponentId="GeneralPageRepresentationModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DesignSchema" Type="Reference" ExportId="">
+                    <AttributeInfo Id="DesignSchema" Type="Reference" ExportId="DesignSchema">
                         <Data IsEnabled="true" Value="GeneralPage/Design"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Language" Type="Reference" ExportId="">
+                    <AttributeInfo Id="Language" Type="Reference" ExportId="Language">
                         <Data IsEnabled="true" Value="GeneralPage/Language"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -56,11 +56,7 @@
         </Element>
         <Element Id="UserSettings" PackageId="ImtAuthPck" ComponentId="UserSettings">
             <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="SettingsParamsSet" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GeneralPage/General"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="UserSettingsDatabaseDelegate" PackageId="ImtCoreVoce" ComponentId="DatabaseUserSettings">

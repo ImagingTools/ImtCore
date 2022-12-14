@@ -50,7 +50,7 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 				return nullptr;
 			}
 
-			userSettingsPtr->SetSettings(paramSetPtr);
+//			userSettingsPtr->SetSettings(paramSetPtr);
 		}
 	}
 

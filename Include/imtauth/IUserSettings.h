@@ -10,8 +10,7 @@ namespace imtauth
 {
 
 
-class IUserSettings:
-		virtual public iser::IObject
+class IUserSettings: virtual public iser::IObject
 {
 public:
 	/**
@@ -25,14 +24,14 @@ public:
 	virtual void SetUserId(const QByteArray& id) = 0;
 
 	/**
-		Get params set settings of the user .
+		Get params set settings of the user.
 	*/
 	virtual iprm::IParamsSet* GetSettings() const = 0;
 
 	/**
-		Set params set settings of the user .
+		Set params set settings of the user.
 	*/
-	virtual void SetSettings(const iprm::IParamsSet* paramsSet) = 0;
+	virtual void SetSettings(const iprm::IParamsSet& settings) = 0;
 };
 
 

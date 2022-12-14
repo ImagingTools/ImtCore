@@ -11,7 +11,7 @@
         <Element ComponentName="GeneralPage" X="175" Y="625" Note=""/>
         <Element ComponentName="GeneralPageRepresentation" X="207.071067812" Y="151.414213562" Note=""/>
         <Element ComponentName="UserRelatedSettings" X="625" Y="150" Note=""/>
-        <Element ComponentName="UserSettings" X="616.514718626" Y="402.828427125" Note=""/>
+        <Element ComponentName="UserSettings" X="600" Y="375" Note=""/>
         <Element ComponentName="UserSettingsDatabaseDelegate" X="1000" Y="625" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
