@@ -58,7 +58,7 @@ Item {
                 id: buttonContainer;
 
                 enabled: model.Enabled;
-                isFocused: model.Active;
+                isFocused: model.Active !==undefined ? model.Active: false;
 
                 text: model.Name;
 
