@@ -23,11 +23,6 @@ Rectangle {
     property alias mainHeight: mainRec.height;
     property alias topPanelSource: loaderTopPanel.source;
 
-    property string settingsComboSource: "SettingsComboBox.qml";
-    property string settingsDataBaseInputSource: "DatabaseInput.qml";
-    property string settingsTextInputSource: "SettingsTextInput.qml";
-    property string settingsButtonSource: "SettingsButton.qml";
-    property string settingsTextLabelSource: "SettingsTextLabel.qml";
 
     property string backgroundColor: Style.backgroundColor;
     property string fontColor: Style.textColor;
@@ -246,7 +241,7 @@ Rectangle {
                 id: mainPanel;
 
                 anchors.fill: parent;
-                anchors.topMargin: 10;
+                //anchors.topMargin: 10;
 
                 property int selectedIndex: -1;
 
