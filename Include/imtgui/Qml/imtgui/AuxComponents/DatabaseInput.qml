@@ -9,7 +9,7 @@ Item {
     width: 225;
     height: databaseInputColumn.height;
 
-    property var parameters: null
+    property var parameters: null;
 
     onParametersChanged: {
         settingsDatabaseInputRepeater.model = settingsDatabaseInputContainer.parameters;
