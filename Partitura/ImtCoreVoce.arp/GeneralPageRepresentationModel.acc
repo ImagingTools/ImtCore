@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5037" Description="ACF"/>
+            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -19,8 +19,8 @@
                     <AttributeInfo Id="ParamName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Design Schema"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
+                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="DesignPathToQml">
+                        <Data IsEnabled="true" Value=":/NeoPro/SettingsComboBoxNeoPro.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Selection" Type="Reference" ExportId="DesignSchema">
                         <Data IsEnabled="false"/>
@@ -71,8 +71,8 @@
                     <AttributeInfo Id="ParamName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Language"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
+                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="LanguagePathToQml">
+                        <Data IsEnabled="true" Value=":/NeoPro/SettingsComboBoxNeoPro.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Selection" Type="Reference" ExportId="Language">
                         <Data IsEnabled="false"/>

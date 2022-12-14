@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5037" Description="ACF"/>
+            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,11 +18,17 @@
         <Element Id="GeneralPageRepresentation" PackageId="ImtCoreVoce" ComponentId="GeneralPageRepresentationModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DesignPathToQml" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/NeoPro/SettingsComboBoxNeoPro.qml"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DesignSchema" Type="Reference" ExportId="DesignSchema">
                         <Data IsEnabled="true" Value="GeneralPage/Design"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Language" Type="Reference" ExportId="Language">
                         <Data IsEnabled="true" Value="GeneralPage/Language"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguagePathToQml" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/NeoPro/SettingsComboBoxNeoPro.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
