@@ -36,7 +36,6 @@ Rectangle {
 
     property SettingsProvider settingsProvider;
 
-
     onVisibleChanged: {
         if (visible){
 
@@ -221,7 +220,6 @@ Rectangle {
             }
         }
 
-
         Rectangle {
             id: mainPanelBackground;
 
@@ -234,7 +232,6 @@ Rectangle {
             height: parent.height;
 
             color: Style.baseColor;
-
 
             Component{
                 id: defaultButtonDecorator;
@@ -258,7 +255,6 @@ Rectangle {
                 Repeater {
                     id: mainPanelRepeater;
 
-
                     delegate:
                         BaseButton{
 
@@ -279,23 +275,19 @@ Rectangle {
                                 clicked();
                             }
                         }
+
                         onClicked: {
                             if (mainPanel.selectedIndex !== model.index){
                                 bodyPanelRepeater.model = model.Elements;
                                 mainPanel.selectedIndex = model.index;
                             }
-
                         }
-
                     }//delegate
-
                 }
 
                 onSelectedIndexChanged: {}
             }
         }
-
-
 
         Flickable {
             anchors.top: loaderTopPanel.bottom;
@@ -309,7 +301,6 @@ Rectangle {
 
             clip: true;
 
-
             contentWidth: width;
             contentHeight: bodyPanel.height;
 
@@ -318,19 +309,9 @@ Rectangle {
             Column {
                 id: bodyPanel;
 
-                //                width: 200;
+                width: parent.width;
 
-                anchors.fill: parent;
-
-                //                anchors.top: topPanelDialog.bottom;
-                //                anchors.topMargin: 10;
-                //                anchors.left: mainPanelBackground.right;
-                //                anchors.leftMargin: 10;
-                //                anchors.right: parent.right;
-                //                anchors.rightMargin: 10;
-                //                anchors.bottom: parent.bottom;
-
-                //                height: parent.height;
+                spacing: 15;
 
                 Repeater {
                     id: bodyPanelRepeater;
@@ -338,7 +319,8 @@ Rectangle {
                     delegate: Item {
 
                         width: bodyPanel.width;
-                        height: 100;
+
+                        height: titleItem.height + rectSeparator.height + loader.height + 20;
 
                         Text {
                             id: titleItem;
@@ -369,32 +351,15 @@ Rectangle {
                             anchors.topMargin: 15;
 
                             Component.onCompleted: {
-                                var componentType = model.ComponentType;
+                                console.log("Loader onCompleted", model.Source);
 
-                                if (componentType === "ComboBox"){
-                                    loader.source = container.settingsComboSource;
-                                    loader.item.width = bodyPanel.width / 2;
-                                }
-                                else if (componentType === "DatabaseSettingsInput"){
-                                    loader.source = container.settingsDataBaseInputSource;
-                                    loader.item.width = bodyPanel.width;
-                                }
-                                else if (componentType === "TextInput"){
-                                    loader.source = container.settingsTextInputSource;
-                                    loader.item.width = bodyPanel.width;
-                                }
-                                else if (componentType === "Button"){
-                                    loader.source = container.settingsButtonSource;
-                                    loader.item.width = bodyPanel.width / 3;
-                                }
-                                else if (componentType === "TextLabel"){
-                                    loader.source = container.settingsTextLabelSource;
+                                loader.source = model.Source;
+                            }
 
-                                    loader.item.width = bodyPanel.width / 3;
-                                }
-
-                                if (loader.item.parameters){
-                                    loader.item.parameters = model.Parameters;
+                            onLoaded: {
+                                console.log("Loader onLoaded", item.parameters);
+                                if (item.parameters !== undefined){
+                                    item.parameters = model.Parameters;
                                 }
                             }
                         }

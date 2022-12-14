@@ -8,7 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfo" X="950" Y="400" Note=""/>
+        <Element ComponentName="ApplicationInfo" X="950" Y="398" Note=""/>
         <Element ComponentName="NetworkSettings" X="600" Y="175" Note=""/>
         <Element ComponentName="ServerUrl" X="250" Y="400" Note=""/>
     </PositionMap>

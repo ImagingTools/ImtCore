@@ -96,43 +96,30 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 		const imtgql::IGqlContext* gqlContext,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-
 	if (m_mutationDataControllerCompPtr.IsValid()){
 		if (inputParams.count() > 0){
 			QList<imtgql::CGqlObject> params;
 			QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 
 			if (!itemData.isEmpty()){
+				imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+
 				imtbase::CTreeItemModel settingsModel;
 				settingsModel.CreateFromJson(itemData);
 
-//				for (int i = 0; i < settingsModel.GetItemsCount(); i++){
-//					imtbase::CTreeItemModel pageModel;
-//					settingsModel.CopyItemDataToModel(i, &pageModel);
+				bool retVal = m_mutationDataControllerCompPtr->UpdateModelFromRepresentation(params, &settingsModel, gqlContext);
 
-//					QString pageId;
-//					if (pageModel.ContainsKey("Id")){
-//						pageId = pageModel.GetData("Id").toString();
-//					}
+				rootModel->SetData("SaveStatus", retVal);
 
-//					QList<imtgql::CGqlObject> params;
-//					imtgql::CGqlObject gqlObject;
-//					gqlObject.InsertField("Id", pageId);
-//					params << gqlObject;
-
-//					m_mutationDataControllersCompPtr[i]->UpdateBaseModelFromRepresentation(params, &pageModel, gqlContext);
-//				}
-				bool result = m_mutationDataControllerCompPtr->UpdateModelFromRepresentation(params, &settingsModel, gqlContext);
+				return rootModel;
 			}
 		}
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
-
-	return rootModel;
+	return nullptr;
 }
 
 
 } // namespace imtgql
+
+

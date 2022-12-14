@@ -61,7 +61,7 @@
                         <Data IsEnabled="true" Value="Server Url"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

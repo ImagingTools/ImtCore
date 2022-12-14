@@ -23,6 +23,7 @@
 #include <imtauth/CPermissionsProviderComp.h>
 #include <imtauth/CCollectionPermissionsProviderComp.h>
 #include <imtauth/CCheckPermissionOrComp.h>
+#include <imtauth/CUserSettingsComp.h>
 
 
 namespace ImtAuthPck
@@ -63,6 +64,7 @@ typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::CPermissionsProviderComp PermissionsProvider;
 typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
+typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
 
 
 } // namespace ImtAuthPck

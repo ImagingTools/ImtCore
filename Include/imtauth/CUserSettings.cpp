@@ -17,6 +17,11 @@ namespace imtauth
 
 // reimplemented (iser::IUserSettings)
 
+CUserSettings::CUserSettings() : m_settingsPtr(nullptr)
+{
+}
+
+
 QByteArray imtauth::CUserSettings::GetUserId() const
 {
 	return m_userId;
@@ -64,7 +69,6 @@ bool imtauth::CUserSettings::Serialize(iser::IArchive &archive)
 	static iser::CArchiveTag settingsTag("Settings", "Settings params set", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(settingsTag);
 	retVal = retVal && m_settingsPtr->Serialize(archive);
-//	retVal = retVal && archive.Process(m_settingsJson);
 	retVal = retVal && archive.EndTag(settingsTag);
 
 	return retVal;

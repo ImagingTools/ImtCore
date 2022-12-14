@@ -6,17 +6,19 @@ import imtauthgui 1.0
 Item {
     id: settingsDatabaseInputContainer;
 
+    width: 225;
     height: databaseInputColumn.height;
 
-    property var parameters: 1; // Start initialize
+    property var parameters: null
 
     onParametersChanged: {
         settingsDatabaseInputRepeater.model = settingsDatabaseInputContainer.parameters;
-        databaseInputColumn.width = width;
     }
 
     Column {
         id: databaseInputColumn;
+
+        width: settingsDatabaseInputContainer.width;
 
         Repeater {
             id: settingsDatabaseInputRepeater;
@@ -51,14 +53,11 @@ Item {
                     anchors.topMargin: 5;
 
                     Component.onCompleted: {
-                        var componentType = model.ComponentType;
+                        source = model.Source;
+                    }
 
-                        if (componentType === "TextInput"){
-                            settingsDatabaseInputLoader.source = "SettingsTextInput.qml";
-                        }
-                        else if (componentType === "IntegerInput"){
-                            settingsDatabaseInputLoader.source = "SettingsIntegerInput.qml";
-                        }
+                    onLoaded: {
+                        console.log("Loader onLoaded", source);
                     }
                 }
             }

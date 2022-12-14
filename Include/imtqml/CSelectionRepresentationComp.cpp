@@ -28,10 +28,12 @@ imtbase::CTreeItemModel* CSelectionRepresentationComp::GetRepresentation(
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
 	QByteArray paramId = *m_paramIdAttrPtr;
-	QString paramName = *m_paramNameAttrPtr;
+	QString paramName = *m_paramNameAttrPtr;\
+	QString sourceQml = *m_qmlPathAttrPtr;
 
 	rootModelPtr->SetData("Id", paramId);
 	rootModelPtr->SetData("Name", paramName);
+	rootModelPtr->SetData("Source", sourceQml);
 
 	const iprm::IOptionsList* optionListPtr = m_selectionParamCompPtr->GetSelectionConstraints();
 

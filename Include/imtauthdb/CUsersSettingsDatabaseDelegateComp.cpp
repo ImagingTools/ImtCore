@@ -22,11 +22,11 @@ namespace imtauthdb
 
 istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
 {
-	if (!m_databaseEngineCompPtr.IsValid()){
+	if (!m_databaseEngineCompPtr.IsValid() || !m_userSettingsInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtauth::CUserSettings> userSettingsPtr = new imtauth::CUserSettings();
+	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
 
 	QByteArray userId;
 	if (record.contains("UserId")){
@@ -37,11 +37,7 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 
 	QByteArray data;
 
-	if (!m_parameterCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	iprm::IParamsSet* paramSetPtr = dynamic_cast<iprm::IParamsSet*>(m_parameterCompPtr.GetPtr());
+	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	if (paramSetPtr != nullptr){
 		if (record.contains("Settings")){
 			data = record.value("Settings").toByteArray();
@@ -75,10 +71,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 	}
 
 	iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
+
+	if (settingsPtr == nullptr){
+		return NewObjectQuery();
+	}
+
 	QByteArray userId = userSettingsPtr->GetUserId();
 
 	QByteArray data;
-
 	{
 		iser::CMemoryWriteArchive archive(m_versionInfoCompPtr.GetPtr());
 
@@ -122,6 +122,9 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray userId = userSettingsPtr->GetUserId();
 
 	iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
+	if (settingsPtr == nullptr){
+		return QByteArray();
+	}
 
 	QByteArray data;
 	{

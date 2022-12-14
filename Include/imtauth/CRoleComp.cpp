@@ -14,7 +14,7 @@ void CRoleComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	if (m_parentRoleProviderCompPtr.IsValid()){
-		SetParentRoleProvider( m_parentRoleProviderCompPtr.GetPtr());
+		SetParentRoleProvider(m_parentRoleProviderCompPtr.GetPtr());
 	}
 }
 

@@ -47,12 +47,12 @@ imtbase::CTreeItemModel* CSettingsDatabasePageProviderComp::GetRepresentation(
 				}
 
 				if (settingsParamSetPtr != nullptr){
-					iprm::ISelectionParam* designSchemeParamPtr = dynamic_cast<iprm::ISelectionParam*>(settingsParamSetPtr->GetEditableParameter("DesignSchema"));
+					const iprm::ISelectionParam* designSchemeParamPtr = dynamic_cast<const iprm::ISelectionParam*>(settingsParamSetPtr->GetParameter("DesignSchema"));
 					if (designSchemeParamPtr != nullptr){
 						designSchemeIndex = designSchemeParamPtr->GetSelectedOptionIndex();
 					}
 
-					iprm::ISelectionParam* languageParamPtr = dynamic_cast<iprm::ISelectionParam*>(settingsParamSetPtr->GetEditableParameter("Language"));
+					const iprm::ISelectionParam* languageParamPtr = dynamic_cast<const iprm::ISelectionParam*>(settingsParamSetPtr->GetParameter("Language"));
 					if (languageParamPtr != nullptr){
 						languageIndex = languageParamPtr->GetSelectedOptionIndex();
 					}
@@ -92,6 +92,10 @@ bool CSettingsDatabasePageProviderComp::UpdateModelFromRepresentation(
 		imtbase::CTreeItemModel* baseModelPtr,
 		const imtgql::IGqlContext* gqlContext)
 {
+	if (!m_userSettingsInfoFactCompPtr.IsValid()){
+		return false;
+	}
+
 	Q_ASSERT(baseModelPtr != nullptr);
 
 	QByteArray parameterId = *m_paramIdAttrPtr;
@@ -101,7 +105,7 @@ bool CSettingsDatabasePageProviderComp::UpdateModelFromRepresentation(
 		if (m_userSettingsCollectionCompPtr.IsValid() && gqlContext != nullptr){
 			imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
 			if (userInfoPtr != nullptr){
-				istd::TDelPtr<imtauth::CUserSettings> userSettingsPtr = new imtauth::CUserSettings();
+				istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
 
 				QByteArray userId = userInfoPtr->GetUserId();
 				userSettingsPtr->SetUserId(userId);
@@ -115,7 +119,7 @@ bool CSettingsDatabasePageProviderComp::UpdateModelFromRepresentation(
 						QByteArray elementId = elementsModelPtr->GetData("Id", i).toByteArray();
 						int index = elementsModelPtr->GetData("Value", i).toInt();
 
-						if (elementId == "Mode"){
+						if (elementId == "DesignSchema"){
 							designSchemeIndex = index;
 						}
 						else if (elementId == "Language"){
@@ -124,12 +128,24 @@ bool CSettingsDatabasePageProviderComp::UpdateModelFromRepresentation(
 					}
 				}
 
+				iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
+
+				iprm::ISelectionParam* designSchemeParamPtr = dynamic_cast<iprm::ISelectionParam*>(paramSetPtr->GetEditableParameter("DesignSchema"));
+				if (designSchemeParamPtr != nullptr){
+					designSchemeParamPtr->SetSelectedOptionIndex(designSchemeIndex);
+				}
+
+				iprm::ISelectionParam* languageParamPtr = dynamic_cast<iprm::ISelectionParam*>(paramSetPtr->GetEditableParameter("Language"));
+				if (languageParamPtr != nullptr){
+					languageParamPtr->SetSelectedOptionIndex(languageIndex);
+				}
+
 				imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
 				if (collectionIds.contains(userId)){
 					m_userSettingsCollectionCompPtr->SetObjectData(userId, *userSettingsPtr);
 				}
 				else{
-					m_userSettingsCollectionCompPtr->InsertNewObject("", "", "", userSettingsPtr.PopPtr(), userId);
+					m_userSettingsCollectionCompPtr->InsertNewObject("", "", "", userSettingsPtr.GetPtr(), userId);
 				}
 
 				return true;

@@ -28,6 +28,7 @@ Item {
     signal clicked;
 
     onDecoratorSourceChanged: {
+        console.log("onDecoratorSourceChanged", decoratorSource);
         loaderDecorator.source = container.decoratorSource;
     }
 
@@ -78,6 +79,9 @@ Item {
 
                     container.contentWidth = loaderDecorator.item.width;
                     container.contentHeight = loaderDecorator.item.height;
+
+                    console.log("container.contentWidth", container.contentWidth);
+                    console.log("container.contentHeight", container.contentHeight);
                 }
             }
         }

@@ -38,23 +38,6 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 					imtbase::CTreeItemModel* productPermissionsModelPtr = productsModelPtr->GetTreeItemModel("Permissions", i);
 					if (productPermissionsModelPtr != nullptr){
 						rootModelPtr->SetExternTreeModel("data", productPermissionsModelPtr);
-
-//						for (int j = 0; j < productPermissionsModelPtr->GetItemsCount(); j++){
-//							QByteArray featureId;
-//							if (productPermissionsModelPtr->ContainsKey("Id", j)){
-//								featureId = productPermissionsModelPtr->GetData("Id", j).toByteArray();
-//							}
-
-//							QString featureName;
-//							if (productPermissionsModelPtr->ContainsKey("Name", j)){
-//								featureName = productPermissionsModelPtr->GetData("Name", j).toString();
-//							}
-
-//							int index = permissionsModel->InsertNewItem();
-
-//							permissionsModel->SetData("Id", featureId, index);
-//							permissionsModel->SetData("Name", featureName, index);
-//						}
 					}
 				}
 			}

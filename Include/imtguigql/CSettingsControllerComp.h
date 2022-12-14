@@ -23,7 +23,6 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IGqlModelEditor)
 		I_ASSIGN(m_settingsDataProviderCompPtr, "SettingsDataProvider", "Settings data provider", true, "");
 		I_ASSIGN(m_mutationDataControllerCompPtr, "MutationDataProvider", "Provides data to the controller for saving", true, "");
-//		I_ASSIGN_MULTI_0(m_mutationDataControllersCompPtr, "MutationDataControllers", "Mutation data controllers", false);
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -35,6 +34,7 @@ public:
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
 	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
 protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const;
 	virtual imtbase::CTreeItemModel* GetSettings(
@@ -51,7 +51,6 @@ protected:
 private:
 	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_settingsDataProviderCompPtr);
 	I_REF(imtgql::IGqlModelEditor, m_mutationDataControllerCompPtr);
-//	I_MULTIREF(imtgql::IGqlModelEditor, m_mutationDataControllersCompPtr);
 };
 
 

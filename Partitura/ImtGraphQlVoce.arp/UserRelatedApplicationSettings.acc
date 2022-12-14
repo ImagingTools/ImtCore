@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -48,6 +48,18 @@
                     <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSettingsDatabaseDelegate"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserSettings"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserSettings" PackageId="ImtAuthPck" ComponentId="UserSettings">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SettingsParamsSet" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GeneralPage/General"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -62,6 +74,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ModelDataParameter" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GeneralPage"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>

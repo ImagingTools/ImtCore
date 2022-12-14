@@ -6,28 +6,20 @@ import imtgui 1.0
 Item {
     id: settingsTextInputContainer;
 
-    signal textInputFocusChanged();
-
-    onWidthChanged: {
-        console.log("settingsTextInput onWidthChanged", width);
-    }
+    width: 270;
+    height: 30;
 
     CustomTextField {
         id: tfcTextInput;
 
-        width: settingsTextInputContainer.width;
-        height: 30;
+        anchors.fill: parent;
 
         text: model.Value;
 
         echoMode: model.Id === "Password" ? TextInput.Password: TextInput.Normal;
 
-        onTextChanged: {
+        onEditingFinished: {
             model.Value = tfcTextInput.text;
-        }
-
-        onTextInputFocusChanged: {
-            settingsTextInputContainer.textInputFocusChanged();
         }
     }
 }

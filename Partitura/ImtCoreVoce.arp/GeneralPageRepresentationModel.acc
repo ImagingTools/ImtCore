@@ -20,7 +20,7 @@
                         <Data IsEnabled="true" Value="Design Schema"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Selection" Type="Reference" ExportId="DesignSchema">
                         <Data IsEnabled="false"/>
@@ -72,7 +72,7 @@
                         <Data IsEnabled="true" Value="Language"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Selection" Type="Reference" ExportId="Language">
                         <Data IsEnabled="false"/>

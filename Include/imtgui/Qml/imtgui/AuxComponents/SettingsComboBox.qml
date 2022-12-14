@@ -5,13 +5,15 @@ import imtgui 1.0
 Item {
     id: settingsComboBoxContainer;
 
+    width: 150;
     height: 23;
 
-    property var parameters: 3;
+    property var parameters: null;
 
     property bool active: false;
 
     onParametersChanged: {
+        console.log("onParametersChanged", parameters);
         settingsComboBox.model = parameters;
         settingsComboBox.currentIndex = model.Value;
     }

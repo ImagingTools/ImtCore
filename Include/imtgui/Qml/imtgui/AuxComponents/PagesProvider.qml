@@ -3,7 +3,7 @@ import Acf 1.0
 import imtqml 1.0
 
 Item {
-    id: pagesProviderObj;
+    id: pagesProvider;
 
     property TreeItemModel pagesModel: TreeItemModel {};
 

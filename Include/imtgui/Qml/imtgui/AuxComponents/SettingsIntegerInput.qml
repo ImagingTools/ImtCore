@@ -5,6 +5,9 @@ import imtgui 1.0
 Item {
     id: settingsIntegerInputContainer;
 
+    width: 270;
+    height: 30;
+
     RegExpValidator {
         id: intValid;
 
@@ -14,15 +17,13 @@ Item {
     CustomTextField {
         id: tfcIntegerInput;
 
-        width: settingsIntegerInputContainer.width;
-        height: 30;
+        anchors.fill: parent;
 
         textInputValidator: intValid;
 
         text: model.Value;
 
-        onTextChanged: {
-            console.log("SettingsIntegerInput onInputTextChanged");
+        onEditingFinished: {
             model.Value = tfcIntegerInput.text;
         }
     }

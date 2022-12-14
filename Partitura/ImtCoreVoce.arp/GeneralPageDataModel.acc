@@ -110,6 +110,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="General"/>
         <Interface InterfaceId="iser::ISerializable" ComponentId="General"/>
     </ExportedInterfaces>
     <ExportedComponents>

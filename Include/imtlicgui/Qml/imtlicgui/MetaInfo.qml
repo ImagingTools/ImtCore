@@ -3,15 +3,10 @@ import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
 
-Flickable {
-    id: collectionMetaInfo;
+Rectangle {
+    id: container;
 
-    width: 200;
-
-    contentWidth: width;
-    contentHeight: height + 50;
-
-    boundsBehavior: Flickable.StopAtBounds;
+    color: Style.backgroundColor;
 
     property string gqlModelMetaInfo;
 
@@ -23,100 +18,105 @@ Flickable {
 
     property Item tableData;
 
-    Rectangle {
-        anchors.fill: parent;
-
-        color: Style.backgroundColor;
+    function getMetaInfo(){
+        metaInfo.getMetaInfo();
     }
 
-    Column {
-        id: column;
+    Flickable {
+        id: collectionMetaInfo;
 
         anchors.fill: parent;
-        anchors.rightMargin: 5;
-        anchors.leftMargin: 5;
-        anchors.topMargin: 5;
 
-        visible: collectionMetaInfo.contentVisible;
+        contentWidth: width;
+        contentHeight: column.height;
 
-        Repeater {
-            id: repeaterColumn;
+        boundsBehavior: Flickable.StopAtBounds;
 
-            model: collectionMetaInfo.modelData;
+        Column {
+            id: column;
 
-            delegate: Item {
-                id: repeaterTitle;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.rightMargin: 5;
+            anchors.leftMargin: 5;
 
-                width: collectionMetaInfo.width;
-                height: childColumn.height + nameTitle.height + collectionMetaInfo.elementHeight;
+            visible: container.contentVisible;
 
-                Component.onCompleted: {
-                    repeaterChilds.model = repeaterColumn.model.GetData("Children", model.index);
-                }
+            Repeater {
+                id: repeaterColumn;
 
-                Text {
-                    id: nameTitle;
+                model: container.modelData;
 
-                    width: column.width;
-
-                    anchors.left: parent.left;
-                    anchors.leftMargin: 10;
-                    anchors.horizontalCenter: parent.horizontalCenter;
-
-                    text: model.Name;
-
-                    font.pixelSize: Style.fontSize_common;
-                    font.family: Style.fontFamilyBold;
-                    font.bold: true;
-
-                    color: Style.lightBlueColor;
-                    elide: Text.ElideRight;
-                    wrapMode: Text.WrapAnywhere ;
-                }
-
-                Column {
-                    id: childColumn;
-
-                    anchors.top: nameTitle.bottom;
-                    anchors.topMargin: 5;
+                delegate: Item {
+                    id: repeaterTitle;
 
                     width: collectionMetaInfo.width;
+                    height: childColumn.height + nameTitle.height + container.elementHeight;
 
-                    Repeater {
-                        id: repeaterChilds;
+                    Component.onCompleted: {
+                        repeaterChilds.model = repeaterColumn.model.GetData("Children", model.index);
+                    }
+
+                    Text {
+                        id: nameTitle;
+
+                        width: column.width;
+
+                        anchors.left: parent.left;
+                        anchors.leftMargin: 10;
+                        anchors.horizontalCenter: parent.horizontalCenter;
+
+                        text: model.Name;
+
+                        font.pixelSize: Style.fontSize_common;
+                        font.family: Style.fontFamilyBold;
+                        font.bold: true;
+
+                        color: Style.lightBlueColor;
+                        elide: Text.ElideRight;
+                        wrapMode: Text.WrapAnywhere ;
+                    }
+
+                    Column {
+                        id: childColumn;
+
+                        anchors.top: nameTitle.bottom;
+                        anchors.topMargin: 5;
 
                         width: collectionMetaInfo.width;
 
-                        delegate: Rectangle {
+                        Repeater {
+                            id: repeaterChilds;
 
-                            height: collectionMetaInfo.elementHeight;
                             width: collectionMetaInfo.width;
 
-                            color: "transparent";
+                            delegate: Rectangle {
 
-                            Text {
-                                id: valueText;
+                                height: container.elementHeight;
+                                width: collectionMetaInfo.width;
 
-                                anchors.left: parent.left;
-                                anchors.leftMargin: 10;
+                                color: "transparent";
 
-                                text: model.Value;
+                                Text {
+                                    id: valueText;
 
-                                font.family: Style.fontFamily;
-                                font.pixelSize: Style.fontSize_small;
+                                    anchors.left: parent.left;
+                                    anchors.leftMargin: 10;
 
-                                color: Style.textColor;
-                                elide: Text.ElideRight;
+                                    text: model.Value;
+
+                                    font.family: Style.fontFamily;
+                                    font.pixelSize: Style.fontSize_small;
+
+                                    color: Style.textColor;
+                                    elide: Text.ElideRight;
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-    }//Column main
-
-    function getMetaInfo(){
-        metaInfo.getMetaInfo();
+        }//Column main
     }
 
     GqlModel {
@@ -124,10 +124,10 @@ Flickable {
 
         function getMetaInfo(){
             console.log( "CollectionView metaInfo getMetaInfo");
-            var query = Gql.GqlRequest("query", collectionMetaInfo.gqlModelMetaInfo);
+            var query = Gql.GqlRequest("query", container.gqlModelMetaInfo);
             var inputParams = Gql.GqlObject("input");
 
-            inputParams.InsertField("Id", collectionMetaInfo.tableData.getSelectedId());
+            inputParams.InsertField("Id", container.tableData.getSelectedId());
 
             var queryFields = Gql.GqlObject("metaInfo");
             query.AddParam(inputParams);
@@ -154,12 +154,12 @@ Flickable {
                 if (metaInfo.ContainsKey("data")){
                     dataModelLocal = metaInfo.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(collectionMetaInfo.gqlModelMetaInfo)){
-                        dataModelLocal = dataModelLocal.GetData(collectionMetaInfo.gqlModelMetaInfo);
+                    if (dataModelLocal.ContainsKey(container.gqlModelMetaInfo)){
+                        dataModelLocal = dataModelLocal.GetData(container.gqlModelMetaInfo);
 
                         if (dataModelLocal.ContainsKey("metaInfo")){
                             dataModelLocal = dataModelLocal.GetData("metaInfo");
-                            collectionMetaInfo.modelData = dataModelLocal;
+                            container.modelData = dataModelLocal;
                         }
                     }
                 }
@@ -167,3 +167,4 @@ Flickable {
         }
     }//MetaInfo
 }
+

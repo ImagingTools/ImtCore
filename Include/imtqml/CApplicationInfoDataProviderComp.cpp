@@ -22,13 +22,9 @@ imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::GetRepresentation(
 {
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
-	if (m_paramIdAttrPtr.IsValid()){
-		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
-	}
-
-	if (m_paramNameAttrPtr.IsValid()){
-		rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
-	}
+	rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
+	rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
+	rootModelPtr->SetData("Source", "SettingsTextLabel.qml");
 
 	if (m_applicationInfoCompPtr.IsValid()){
 		ibase::CApplicationInfoComp* applicationInfoPtr  = dynamic_cast<ibase::CApplicationInfoComp*>(m_applicationInfoCompPtr.GetPtr());
@@ -40,7 +36,6 @@ imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::GetRepresentation(
 			QString version = versionInfo.GetEncodedVersionName(1983, versionNumber);
 
 			rootModelPtr->SetData("Value", version);
-			rootModelPtr->SetData("ComponentType", "TextLabel");
 		}
 	}
 

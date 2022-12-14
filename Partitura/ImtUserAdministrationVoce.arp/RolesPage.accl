@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -11,7 +11,7 @@
         <Element ComponentName="Commands" X="550" Y="300" Note=""/>
         <Element ComponentName="Demultiplexer" X="570.757359313" Y="76.4142135624" Note=""/>
         <Element ComponentName="ObjectViewDataProvider" X="1025" Y="525" Note=""/>
-        <Element ComponentName="Role" X="100" Y="425" Note=""/>
+        <Element ComponentName="Role" X="100" Y="400" Note=""/>
         <Element ComponentName="RoleCollectionAdapter" X="125" Y="525" Note=""/>
         <Element ComponentName="RoleDataController" X="250" Y="300" Note=""/>
         <Element ComponentName="RoleEditCommandDataProvider" X="700" Y="525" Note=""/>

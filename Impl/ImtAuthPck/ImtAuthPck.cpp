@@ -94,6 +94,11 @@ I_EXPORT_COMPONENT(
 			"Check Permission Or",
 			"Check Permission Or");
 
+I_EXPORT_COMPONENT(
+			UserSettings,
+			"User Settings",
+			"User Settings");
+
 
 } // namespace ImtAuthPck
 

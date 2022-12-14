@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtlic/CFeaturePackage.h>
+#include <imtauth/IUserSettings.h>
 
 
 namespace imtauthdb
@@ -17,7 +18,7 @@ public:
 
 	I_BEGIN_COMPONENT(CUsersSettingsDatabaseDelegateComp)
 		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Provide information about archive versions", false, "VersionInfo");
-		I_ASSIGN(m_parameterCompPtr, "Parameter", "Parameter of params data", false, "");
+		I_ASSIGN(m_userSettingsInfoFactCompPtr, "UserSettingsFactory", "Factory used for creation of the new user settings instance", true, "UserSettingsFactory");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -48,7 +49,7 @@ public:
 
 protected:
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-	I_REF(iser::ISerializable, m_parameterCompPtr);
+	I_FACT(imtauth::IUserSettings, m_userSettingsInfoFactCompPtr);
 };
 
 

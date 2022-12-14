@@ -29,6 +29,7 @@ imtbase::CTreeItemModel* CDatabaseLoginSettingsRepresentationComp::GetRepresenta
 
 	rootModelPtr->SetData("Id", paramId);
 	rootModelPtr->SetData("Name", paramName);
+	rootModelPtr->SetData("Source", *m_qmlPathAttrPtr);
 
 	imtbase::CTreeItemModel* parametersModelPtr = rootModelPtr->AddTreeModel("Parameters");
 
@@ -37,6 +38,47 @@ imtbase::CTreeItemModel* CDatabaseLoginSettingsRepresentationComp::GetRepresenta
 	int index = parametersModelPtr->InsertNewItem();
 
 	QString dbName = m_databaseSettingsCompPtr->GetDatabaseName();
+
+	parametersModelPtr->SetData("Id", "DatabaseName", index);
+	parametersModelPtr->SetData("Name", QT_TR_NOOP("Database Name"), index);
+	parametersModelPtr->SetData("Value", dbName, index);
+	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
+
+	index = parametersModelPtr->InsertNewItem();
+
+	QString hostName = m_databaseSettingsCompPtr->GetHost();
+
+	parametersModelPtr->SetData("Id", "Host", index);
+	parametersModelPtr->SetData("Name", QT_TR_NOOP("Host"), index);
+	parametersModelPtr->SetData("Value", hostName, index);
+	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
+
+	index = parametersModelPtr->InsertNewItem();
+
+	QString password = m_databaseSettingsCompPtr->GetPassword();
+
+	parametersModelPtr->SetData("Id", "Password", index);
+	parametersModelPtr->SetData("Name", QT_TR_NOOP("Password"), index);
+	parametersModelPtr->SetData("Value", password, index);
+	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
+
+	index = parametersModelPtr->InsertNewItem();
+
+	int port = m_databaseSettingsCompPtr->GetPort();
+
+	parametersModelPtr->SetData("Id", "Port", index);
+	parametersModelPtr->SetData("Name", QT_TR_NOOP("Port"), index);
+	parametersModelPtr->SetData("Value", port, index);
+	parametersModelPtr->SetData("Source", "SettingsIntegerInput.qml", index);
+
+	index = parametersModelPtr->InsertNewItem();
+
+	QString userName = m_databaseSettingsCompPtr->GetUserName();
+
+	parametersModelPtr->SetData("Id", "Username", index);
+	parametersModelPtr->SetData("Name", QT_TR_NOOP("Username"), index);
+	parametersModelPtr->SetData("Value", userName, index);
+	parametersModelPtr->SetData("Source", "SettingsTextInput.qml", index);
 
 	return rootModelPtr;
 }

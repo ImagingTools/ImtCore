@@ -61,7 +61,6 @@ Item {
                 updateLocalModel();
                 applyDesignScheme();
 
-//                console.log("localModel", localModel.toJSON());
                 root.settingsUpdate(pageId);
             }
         }
@@ -87,7 +86,7 @@ Item {
 
                     for (let j = 0; j < elements.GetItemsCount(); j++){
                         let elementId = elements.GetData("Id", j);
-                        if (elementId == "Mode"){
+                        if (elementId == "DesignSchema"){
                             let elementValue = elements.GetData("Value", j);
                             let parameters = elements.GetData("Parameters", j);
 
@@ -179,10 +178,6 @@ Item {
 
         function getSettings() {
             var query = Gql.GqlRequest("query", "GetSettings");
-
-//            var inputParams = Gql.GqlObject("input");
-//            inputParams.InsertField ("LanguageId", Style.language);
-//            query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("Get");
             queryFields.InsertField("Id");
