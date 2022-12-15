@@ -13,6 +13,9 @@ Item {
 
     property bool blockUpdatingModel: false;
 
+    property int mainMargin: 0;
+    property int panelWidth: 400;
+
     onDocumentModelChanged: {
         console.log("RolePermissions onDocumentModelChanged");
         if (documentModel.ContainsKey("ProductId")){
@@ -24,11 +27,6 @@ Item {
         }
     }
 
-//    Rectangle {
-//        anchors.fill: parent;
-
-//        color: "red";
-//    }
 
     PermissionsProvider {
         id: permissionsProvider;
@@ -120,22 +118,55 @@ Item {
     }
 
     Rectangle {
+        id: background;
         anchors.fill: parent;
-
         color: Style.backgroundColor;
+
+        Loader{
+            id: backgroundDecoratorLoader;
+
+            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+            onLoaded: {
+                if(backgroundDecoratorLoader.item){
+                    backgroundDecoratorLoader.item.rootItem = background;
+                }
+            }
+        }
+
     }
+
+    Loader{
+        id: mainPanelFrameLoader;
+
+        anchors.top: parent.top;
+        anchors.topMargin: 2;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: rolePermissionsContainer.mainMargin;
+
+        width: 400 + 2*rolePermissionsContainer.mainMargin;
+
+        sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+
+        onLoaded: {
+            if(mainPanelFrameLoader.item){
+                rolePermissionsContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
+            }
+        }
+    }//Loader
 
     BasicTreeView {
         id: permissionsTable;
 
+        anchors.left: parent.left;
         anchors.top: parent.top;
-        anchors.topMargin: 10;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 10;
-
-        tristate: true;
+        anchors.topMargin: Math.max(10,rolePermissionsContainer.mainMargin);
+        anchors.bottomMargin: 10 + rolePermissionsContainer.mainMargin;
+        anchors.leftMargin: rolePermissionsContainer.mainMargin;
 
         width: 400;
+
+        tristate: true;
 
         Component.onCompleted: {
             permissionsTable.addColumn({"Id": "Name", "Name": "Name"});
