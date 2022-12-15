@@ -45,7 +45,7 @@
             </Data>
         </Element>
         <Element Id="General" PackageId="BasePck" ComponentId="ComposedParamsSet">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -109,10 +109,7 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces>
-        <Interface InterfaceId="iprm::IParamsSet" ComponentId="General"/>
-        <Interface InterfaceId="iser::ISerializable" ComponentId="General"/>
-    </ExportedInterfaces>
+    <ExportedInterfaces/>
     <ExportedComponents>
         <Component ExportedId="Design" ComponentId="Design"/>
         <Component ExportedId="General" ComponentId="General"/>

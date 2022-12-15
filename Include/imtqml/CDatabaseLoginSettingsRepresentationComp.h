@@ -38,7 +38,6 @@ protected:
 
 private:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseSettingsCompPtr);
-
 	I_TEXTATTR(m_dbNameQmlPathAttrPtr);
 	I_TEXTATTR(m_hostQmlPathAttrPtr);
 	I_TEXTATTR(m_passwordQmlPathAttrPtr);

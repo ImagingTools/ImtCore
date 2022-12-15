@@ -2,17 +2,22 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5037" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GeneralPage" X="175" Y="625" Note=""/>
-        <Element ComponentName="GeneralPageRepresentation" X="207.071067812" Y="151.414213562" Note=""/>
+        <Element ComponentName="Design" X="125" Y="425" Note=""/>
+        <Element ComponentName="DesignOptions" X="125" Y="500" Note=""/>
+        <Element ComponentName="General" X="575" Y="675" Note=""/>
+        <Element ComponentName="GeneralPageDataModel" X="125" Y="775" Note=""/>
+        <Element ComponentName="GeneralPageRepresentation" X="175" Y="150" Note=""/>
+        <Element ComponentName="Language" X="425" Y="425" Note=""/>
+        <Element ComponentName="LanguageOptions" X="425" Y="500" Note=""/>
         <Element ComponentName="UserRelatedSettings" X="625" Y="150" Note=""/>
-        <Element ComponentName="UserSettings" X="600" Y="375" Note=""/>
-        <Element ComponentName="UserSettingsDatabaseDelegate" X="1000" Y="625" Note=""/>
+        <Element ComponentName="UserSettings" X="750" Y="450" Note=""/>
+        <Element ComponentName="UserSettingsDatabaseDelegate" X="1000" Y="675" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

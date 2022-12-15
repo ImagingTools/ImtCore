@@ -12,6 +12,7 @@ CCommandPermissionsProviderJoinerComp::LogicalCheckMode CCommandPermissionsProvi
 	return CCommandPermissionsProviderJoinerComp::LogicalCheckMode::LCM_AND;
 }
 
+
 QByteArrayList CCommandPermissionsProviderJoinerComp::GetCommandIds() const
 {
 	return m_permissionsCache.keys();
@@ -51,18 +52,16 @@ void CCommandPermissionsProviderJoinerComp::UpdatePermissionsCache()
 			const ICommandPermissionsProvider* currentProviderPtr = m_commandPermissionsProviderCompPtr[providerIndex];
 			if(currentProviderPtr != nullptr){
 				const QByteArrayList currentProviderCommandIds = currentProviderPtr->GetCommandIds();
-				const QSet<QByteArray> currentProviderCommandIdsSet = QSet<QByteArray>(currentProviderCommandIds.begin(), currentProviderCommandIds.end());
-				for(const QByteArray &commandId: currentProviderCommandIdsSet){
+				for(const QByteArray &commandId: currentProviderCommandIds){
 					const QByteArrayList permissionsId = currentProviderPtr->GetCommandPermissions(commandId);
-
-					m_permissionsCache.insert(commandId, permissionsId);
+					if (!m_permissionsCache.contains(commandId)){
+						m_permissionsCache.insert(commandId, permissionsId);
+					}
 				}
 			}
 		}
 	}
 }
-
-
 
 
 } // namespace imtgql

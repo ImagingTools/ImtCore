@@ -33,7 +33,6 @@ Item {
         borderColor: settingsComboBoxContainer.active ? Style.iconColorOnSelected :
                                                         Style.alternateBaseColor;
 
-
         textCentered: false;
 
         onCurrentIndexChanged: {

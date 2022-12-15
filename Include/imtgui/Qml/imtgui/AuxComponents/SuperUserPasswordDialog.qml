@@ -25,7 +25,7 @@ Dialog {
     contentComp: Item {
         id: inputDialogBodyContainer;
 
-        height: columnBody.height + 60;
+        height: columnBody.height + 30;
 
         property alias inputValue: inputField.text;
 
@@ -45,6 +45,106 @@ Dialog {
             anchors.leftMargin: 10;
 
             spacing: 10;
+
+            Text {
+                width: columnBody.width;
+
+                text: qsTr("Database Settings");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+                elide: Text.ElideRight;
+
+                wrapMode: Text.WordWrap;
+            }
+
+            Rectangle {
+                id: databaseBlock;
+
+                width: parent.width;
+                height: databaseColumn.height + 25;
+
+                color: "transparent";
+
+                border.width: 1;
+                border.color: Style.borderColor;
+
+                Column {
+                    id: databaseColumn;
+
+                    anchors.horizontalCenter: databaseBlock.horizontalCenter;
+                    anchors.verticalCenter: databaseBlock.verticalCenter;
+
+                    width: parent.width - 20;
+
+                    spacing: 7;
+
+                    Text {
+                        id: databaseNameTitle;
+
+                        text: qsTr("Database Name");
+                        color: Style.textColor;
+
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: countryInput;
+
+                        height: 30;
+                        width: databaseColumn.width;
+
+                        onEditingFinished: {
+
+                        }
+                    }
+
+                    Text {
+                        id: usernameTitle;
+
+                        text: qsTr("Username");
+                        color: Style.textColor;
+
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: usernameInput;
+
+                        height: 30;
+                        width: databaseColumn.width;
+
+                        onEditingFinished: {
+
+                        }
+                    }
+
+                    Text {
+                        id: passwordTitle;
+
+                        text: qsTr("Password");
+                        color: Style.textColor;
+
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+                    }
+
+                    CustomTextField {
+                        id: passwordInput;
+
+                        height: 30;
+                        width: databaseColumn.width;
+
+                        echoMode: TextInput.Password;
+
+                        onEditingFinished: {
+
+                        }
+                    }
+                }
+            }
 
             Text {
                 id: message;

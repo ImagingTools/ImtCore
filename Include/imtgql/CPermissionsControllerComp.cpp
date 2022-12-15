@@ -24,12 +24,11 @@ imtbase::CTreeItemModel* CPermissionsControllerComp::CreateResponse(const imtgql
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetUserId();
 			if (!userInfoPtr->IsAdmin()){
-				if(m_commandPermissionsProviderCompPtr.IsValid())
-				{
+				if(m_commandPermissionsProviderCompPtr.IsValid()){
 					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
-					for(const QByteArray &permission: permissions)
-					{
+					for(const QByteArray &permission: permissions){
 						int index = userPermissionsModelPtr->InsertNewItem();
+
 						userPermissionsModelPtr->SetData("UserPermissionId", permission, index);
 					}
 				}
@@ -42,16 +41,22 @@ imtbase::CTreeItemModel* CPermissionsControllerComp::CreateResponse(const imtgql
 			const ICommandPermissionsProvider* currentProviderPtr = m_commandPermissionsProviderCompPtr[providerIndex];
 			if(currentProviderPtr != nullptr){
 				const QByteArrayList currentProviderCommandIds = currentProviderPtr->GetCommandIds();
-				const QSet<QByteArray> commandIdsSet = QSet<QByteArray>(currentProviderCommandIds.begin(), currentProviderCommandIds.end());
-				for(const QByteArray& commandId: commandIdsSet)
-				{
+
+				for(const QByteArray& commandId: currentProviderCommandIds){
 					int commandIndex = allPermissionsModelPtr->InsertNewItem();
+
 					allPermissionsModelPtr->SetData("CommandId", commandId, commandIndex);
+
 					imtbase::CTreeItemModel* commandPermissionsModelPtr = allPermissionsModelPtr->AddTreeModel("CommandPermissions", commandIndex);
+
+					Q_ASSERT(commandPermissionsModelPtr != nullptr);
+
 					const QByteArrayList permissionsIds = currentProviderPtr->GetCommandPermissions(commandId);
 					for(int permissionsIdx = 0; permissionsIdx < permissionsIds.count(); permissionsIdx++){
 						const QByteArray permissionsId = permissionsIds[permissionsIdx];
+
 						int permissionIndex = commandPermissionsModelPtr->InsertNewItem();
+
 						commandPermissionsModelPtr->SetData("PermissionsId", permissionsId, permissionIndex);
 					}
 				}

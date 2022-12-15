@@ -18,7 +18,7 @@ Item {
 
         echoMode: model.Id === "Password" ? TextInput.Password: TextInput.Normal;
 
-        onEditingFinished: {
+        onTextChanged: {
             model.Value = tfcTextInput.text;
         }
     }

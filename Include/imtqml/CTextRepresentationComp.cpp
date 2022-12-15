@@ -43,7 +43,9 @@ imtbase::CTreeItemModel* CTextRepresentationComp::GetRepresentation(
 		rootModelPtr->SetData("Name", paramName);
 	}
 
-	rootModelPtr->SetData("Source", *m_qmlPathAttrPtr);
+	if (m_qmlPathAttrPtr.IsValid()){
+		rootModelPtr->SetData("Source", *m_qmlPathAttrPtr);
+	}
 
 	QString value = m_nameParamCompPtr->GetText();
 
