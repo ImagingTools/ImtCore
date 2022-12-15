@@ -117,6 +117,13 @@ Item {
         }
     }
 
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
+        }
+    }
+
     Rectangle {
         id: background;
         anchors.fill: parent;
