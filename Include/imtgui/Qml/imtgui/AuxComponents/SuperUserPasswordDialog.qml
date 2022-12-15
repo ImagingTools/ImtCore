@@ -46,105 +46,105 @@ Dialog {
 
             spacing: 10;
 
-            Text {
-                width: columnBody.width;
+//            Text {
+//                width: columnBody.width;
 
-                text: qsTr("Database Settings");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-                elide: Text.ElideRight;
+//                text: qsTr("Database Settings");
+//                color: Style.textColor;
+//                font.family: Style.fontFamily;
+//                font.pixelSize: Style.fontSize_common;
+//                elide: Text.ElideRight;
 
-                wrapMode: Text.WordWrap;
-            }
+//                wrapMode: Text.WordWrap;
+//            }
 
-            Rectangle {
-                id: databaseBlock;
+//            Rectangle {
+//                id: databaseBlock;
 
-                width: parent.width;
-                height: databaseColumn.height + 25;
+//                width: parent.width;
+//                height: databaseColumn.height + 25;
 
-                color: "transparent";
+//                color: "transparent";
 
-                border.width: 1;
-                border.color: Style.borderColor;
+//                border.width: 1;
+//                border.color: Style.borderColor;
 
-                Column {
-                    id: databaseColumn;
+//                Column {
+//                    id: databaseColumn;
 
-                    anchors.horizontalCenter: databaseBlock.horizontalCenter;
-                    anchors.verticalCenter: databaseBlock.verticalCenter;
+//                    anchors.horizontalCenter: databaseBlock.horizontalCenter;
+//                    anchors.verticalCenter: databaseBlock.verticalCenter;
 
-                    width: parent.width - 20;
+//                    width: parent.width - 20;
 
-                    spacing: 7;
+//                    spacing: 7;
 
-                    Text {
-                        id: databaseNameTitle;
+//                    Text {
+//                        id: databaseNameTitle;
 
-                        text: qsTr("Database Name");
-                        color: Style.textColor;
+//                        text: qsTr("Database Name");
+//                        color: Style.textColor;
 
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-                    }
+//                        font.family: Style.fontFamily;
+//                        font.pixelSize: Style.fontSize_common;
+//                    }
 
-                    CustomTextField {
-                        id: countryInput;
+//                    CustomTextField {
+//                        id: countryInput;
 
-                        height: 30;
-                        width: databaseColumn.width;
+//                        height: 30;
+//                        width: databaseColumn.width;
 
-                        onEditingFinished: {
+//                        onEditingFinished: {
 
-                        }
-                    }
+//                        }
+//                    }
 
-                    Text {
-                        id: usernameTitle;
+//                    Text {
+//                        id: usernameTitle;
 
-                        text: qsTr("Username");
-                        color: Style.textColor;
+//                        text: qsTr("Username");
+//                        color: Style.textColor;
 
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-                    }
+//                        font.family: Style.fontFamily;
+//                        font.pixelSize: Style.fontSize_common;
+//                    }
 
-                    CustomTextField {
-                        id: usernameInput;
+//                    CustomTextField {
+//                        id: usernameInput;
 
-                        height: 30;
-                        width: databaseColumn.width;
+//                        height: 30;
+//                        width: databaseColumn.width;
 
-                        onEditingFinished: {
+//                        onEditingFinished: {
 
-                        }
-                    }
+//                        }
+//                    }
 
-                    Text {
-                        id: passwordTitle;
+//                    Text {
+//                        id: passwordTitle;
 
-                        text: qsTr("Password");
-                        color: Style.textColor;
+//                        text: qsTr("Password");
+//                        color: Style.textColor;
 
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-                    }
+//                        font.family: Style.fontFamily;
+//                        font.pixelSize: Style.fontSize_common;
+//                    }
 
-                    CustomTextField {
-                        id: passwordInput;
+//                    CustomTextField {
+//                        id: passwordInput;
 
-                        height: 30;
-                        width: databaseColumn.width;
+//                        height: 30;
+//                        width: databaseColumn.width;
 
-                        echoMode: TextInput.Password;
+//                        echoMode: TextInput.Password;
 
-                        onEditingFinished: {
+//                        onEditingFinished: {
 
-                        }
-                    }
-                }
-            }
+//                        }
+//                    }
+//                }
+//            }
 
             Text {
                 id: message;
