@@ -193,6 +193,33 @@ Dialog {
                         }
                     }
                 }
+
+                AuxButton {
+                    id: eyeButton;
+
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 4;
+
+                    height: Math.min(24, parent.height - 10);
+                    width: height;
+
+                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
+                    iconSource: inputField.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
+                                          inputField.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
+
+                    onClicked: {
+                        if(inputField.echoMode == TextInput.Password){
+                            inputField.echoMode = TextInput.Normal;
+                        }
+                        else if(inputField.echoMode == TextInput.Normal){
+                            inputField.echoMode = TextInput.Password;
+                        }
+                    }
+
+
+                }
             }
         }
     }
