@@ -11,6 +11,8 @@ Row {
     property int currentValue: 1;
     property int currentIndex: 0;
 
+    property alias pageCount: listModel.count;
+
     Component.onCompleted: {
         paginationContainer.refreshBtn();
     }
@@ -50,6 +52,7 @@ Row {
 
         hasIcon: true;
         hasText: false;
+        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
         enabled: listModel.count > 1;
 
@@ -75,6 +78,8 @@ Row {
 
             hasIcon: false;
             hasText: true;
+            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
 
             enabled: model.number !== -1;
             textButton: model.number === -1 ? "..." : model.number;
@@ -103,6 +108,7 @@ Row {
 
         hasIcon: true;
         hasText: false;
+        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
         enabled: listModel.count > 1;
 
