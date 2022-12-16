@@ -11,7 +11,7 @@ Item {
     property bool isActive: false;
     property bool isFocused: false;
     property bool isPressed: false;
-    property bool isHovered: containsMouse;
+    property bool isHovered: false;
     property bool isMainButton: false;
     property bool isHighlighted: false;
 
