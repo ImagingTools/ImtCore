@@ -41,7 +41,7 @@ Rectangle {
     onFocusChanged: {
         console.log("Dialog onFocusChanged", focus);
 
-        if (focus){
+        if (focus && loaderBodyDialog.item){
             loaderBodyDialog.item.focus = true;
         }
     }
