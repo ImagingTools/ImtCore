@@ -73,7 +73,7 @@ export class MouseArea extends Item {
     }
 
 	$cursorShapeChanged(){
-		this.dom.style.cursor = this.$p.cursorShape.val
+		this.dom.style.cursor = this.cursorShape
 	}
 
     $fillMouse(e){
@@ -184,7 +184,7 @@ export class MouseArea extends Item {
 		this.$mouseover(e, state)
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
-			
+
 			if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10)){
 				// console.log('CONSOLE::', this)
 				this.pressed = false
@@ -217,6 +217,7 @@ export class MouseArea extends Item {
 	$mouseover(e, state){
 		e.preventDefault()
 		if(this.$p.hoverEnabled.val && this.$p.enabled.val && !this.$p.containsMouse.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
+			
 			this.$fillMouse(e)
 			this.containsMouse = true
 			this.hover = true
@@ -227,6 +228,7 @@ export class MouseArea extends Item {
 		e.preventDefault()
 		// if(e.offsetX > this.width || e.offsetY > this.height || e.offsetX < 0 || e.offsetY < 0)
 		if(this.$p.hoverEnabled.val && this.$p.enabled.val && this.$p.containsMouse.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
+
 			//this.$fillMouse(e)
 			this.containsMouse = false
 			this.hover = false
@@ -287,7 +289,6 @@ export class MouseArea extends Item {
 		e.preventDefault()
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
-
 			if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10)){
 				// console.log('CONSOLE::', this)
 				this.pressed = false

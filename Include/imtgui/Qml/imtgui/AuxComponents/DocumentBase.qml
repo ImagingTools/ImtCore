@@ -121,7 +121,7 @@ FocusScope {
 
         onLoaded: {
             item.documentBase = documentBase;
-            commandsDelegateLoaded();
+            documentBase.commandsDelegateLoaded();
         }
     }
 }

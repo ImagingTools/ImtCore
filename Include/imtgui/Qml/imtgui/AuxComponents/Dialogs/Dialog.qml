@@ -31,7 +31,7 @@ Rectangle {
 
     property alias contentComp: loaderBodyDialog.sourceComponent;
     property alias topPanelComp: loaderTopPanel.sourceComponent;
-    readonly property alias contentItem: loaderBodyDialog.item;
+    property alias contentItem: loaderBodyDialog.item;
 
     property Component topPanelDefault: Component{
         TopPanelDialog{}

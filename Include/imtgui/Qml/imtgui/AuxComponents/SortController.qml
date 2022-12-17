@@ -5,6 +5,9 @@ import imtgui 1.0
 Item {
     id: container;
 
+    property var collectionView;
+    property var commands;
+
     TreeItemModel {
         id: sortModel;
     }
@@ -27,7 +30,7 @@ Item {
             order = "ASC";
         }
 
-        setHeaderSort(headerId, order);
-        baseCommands.updateItemsModel();
+        container.collectionView.setHeaderSort(headerId, order);
+        container.commands.updateItemsModel();
     }
 }

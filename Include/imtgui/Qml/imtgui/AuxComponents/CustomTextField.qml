@@ -76,7 +76,7 @@ FocusScope {
 
         anchors.fill: parent;
 
-        color: readOnly ? Style.alternateBaseColor : Style.baseColor;
+        color: containerTextField.readOnly ? Style.alternateBaseColor : Style.baseColor;
 
         radius: containerTextField.radius;
 
@@ -88,7 +88,7 @@ FocusScope {
         id: mouseArea;
 
         anchors.fill: textField;
-        cursorShape: readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
+        cursorShape: containerTextField.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
     }
 
     TextInput {
@@ -110,12 +110,12 @@ FocusScope {
         selectByMouse: true;
         clip: true;
 
-        onActiveFocusChanged: {
-            console.log("CustomTextField onActiveFocusChanged", activeFocus);
-            if (!activeFocus){
-                containerTextField.editingFinished();
-            }
-        }
+//        onActiveFocusChanged: {
+//            console.log("CustomTextField onActiveFocusChanged", activeFocus);
+//            if (!activeFocus){
+//                containerTextField.editingFinished();
+//            }
+//        }
 
         onAccepted: {
             console.log("CustomTextField onAccepted");

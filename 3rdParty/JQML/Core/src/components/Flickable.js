@@ -2,9 +2,6 @@ import {Item} from './Item'
 import {Signal} from '../utils/Signal'
 
 export class Flickable extends Item {
-    $contentWAuto = true
-    $contentHAuto = true
-
     static AutoFlickDirection = 0
     static AutoFlickIfNeeded = 1
     static HorizontalFlick = 2
@@ -12,6 +9,8 @@ export class Flickable extends Item {
     static HorizontalAndVerticalFlick = 4
 
     webScroll = false
+	$contentWidthAuto = true
+	$contentHeightAuto = true
 
     constructor(parent) {
         super(parent)
@@ -27,6 +26,7 @@ export class Flickable extends Item {
         this.$s.movementEnded = Signal()
         this.$s.movementStarted = Signal()
 
+		this.$childUpdater = null
     }
 
     $domCreate(){
@@ -38,9 +38,46 @@ export class Flickable extends Item {
         this.impl.style.position = 'absolute'
     }
 
+	$childChanged(){
+        clearTimeout(this.$childUpdater)
+        this.$childUpdater = setTimeout(()=>{
+            this.$updateGeometry()
+            this.$uP()
+        }, 100)
+    }
+
+    $updateGeometry(){
+		if(this.$contentHeightAuto)
+        this.$sP('contentHeight', ()=>{ 
+            let top = 0
+			let bottom = 0
+            if(this.children.length)
+            for(let child of this.children) {
+                let childTop = child.y
+                let childBottom = childTop + child.height
+                if(childTop < top) top = childTop
+                if(childBottom > bottom) bottom = childBottom
+            }
+            return bottom - top
+        })
+		if(this.$contentWidthAuto)
+        this.$sP('contentWidth', ()=>{ 
+            let left = 0
+			let right = 0
+            if(this.children.length)
+            for(let child of this.children) {
+                let childLeft = child.x
+                let childRight = childLeft + child.width
+                if(childLeft < left) left = childLeft
+                if(childRight > right) right = childRight
+            }
+            return right - left
+        })
+    }
+
     $flickableDirectionChanged(){
         this.dom.style.overflow = "hidden";
-        switch(this.$p.flickableDirection.val){
+        switch(this.flickableDirection){
             case Flickable.AutoFlickDirection:
                 this.dom.style.overflow = "auto";
                 break;
@@ -61,24 +98,24 @@ export class Flickable extends Item {
     }
 
     $contentWidthChanged(){
-        this.$contentWAuto = false
-        this.impl.style.width = `${this.$p.contentWidth.val}px`
+        // this.$contentWAuto = false
+        this.impl.style.width = `${this.contentWidth}px`
 
-		if(this.$p.contentX.val > this.$p.contentWidth.val - this.$p.width.val) this.contentX = this.$p.contentWidth.val - this.$p.width.val
+		if(this.contentX > this.contentWidth - this.width) this.contentX = this.contentWidth - this.width
     }
     $contentHeightChanged(){
-        this.$contentHAuto = false
-        this.impl.style.height = `${this.$p.contentHeight.val}px`
+        // this.$contentHAuto = false
+        this.impl.style.height = `${this.contentHeight}px`
 
-		if(this.$p.contentY.val > this.$p.contentHeight.val - this.$p.height.val) this.contentY = this.$p.contentHeight.val - this.$p.height.val
+		if(this.contentY > this.contentHeight - this.height) this.contentY = this.contentHeight - this.height
     }
     $contentXChanged(){
-        this.dom.scrollTo({left: this.$p.contentX.val, behavior: "auto"})
+        this.dom.scrollTo({left: this.contentX, behavior: "auto"})
 
         this.$flickTimerUpdate()
     }
     $contentYChanged(){
-        this.dom.scrollTo({top: this.$p.contentY.val, behavior: "auto"})
+        this.dom.scrollTo({top: this.contentY, behavior: "auto"})
         
         this.$flickTimerUpdate()
     }
@@ -98,44 +135,15 @@ export class Flickable extends Item {
         }, 100)
     }
 
-    $updateGeometry(){
-        if(this.$contentWAuto || this.$contentHAuto){
-            let left = 0
-            let top = 0
-            let right = 0
-            let bottom = 0
-            for(let child of this.children){
-                if(child.$p.x && child.$p.x.val < left) left = child.$p.x.val
-                if(child.$p.y && child.$p.y.val < top) top = child.$p.y.val
-                if(child.$p.x && child.$p.x.val + child.$p.width.val > right) right = child.$p.x.val + child.$p.width.val
-                if(child.$p.y && child.$p.y.val + child.$p.height.val > bottom) bottom = child.$p.y.val + child.$p.height.val
-            }
-            if(this.$contentWAuto) {
-				this.contentWidth = right - left
-				this.$contentWAuto = true
-                // this.$p.contentWidth.val = right - left
-                // this.impl.style.width = `${this.$p.contentWidth.val}px`
-            }
-            if(this.$contentHAuto) {
-				this.contentHeight = bottom - top
-				this.$contentHAuto = true
-                // this.$p.contentHeight.val = bottom - top
-                // this.impl.style.height = `${this.$p.contentHeight.val}px`
-            }
-        }
-
-        super.$updateGeometry()
-    }
-
     $mousewheel(e, state) {
 		e.preventDefault()
-		if(this.$p.interactive.val && this.$p.enabled.val){
+		if(this.interactive && this.enabled){
 			
 			let tempX = this.contentX
 			let tempY = this.contentY
 			this.$scroll(e.deltaX, e.deltaY)
 
-			if(tempX !== this.$p.contentX.val || tempY !== this.$p.contentY.val){
+			if(tempX !== this.contentX || tempY !== this.contentY){
 				state.blocked(this)
 			} else {
 				state.release()
@@ -146,13 +154,13 @@ export class Flickable extends Item {
 	$wheel(e, state) {
 		e.preventDefault()
 		
-		if(this.$p.interactive.val && this.$p.enabled.val){
+		if(this.interactive && this.enabled){
 			
-			let tempX = this.$p.contentX.val
-			let tempY = this.$p.contentY.val
+			let tempX = this.contentX
+			let tempY = this.contentY
 			this.$mousewheel(e, state)
 
-			if(tempX !== this.$p.contentX.val || tempY !== this.$p.contentY.val){
+			if(tempX !== this.contentX || tempY !== this.contentY){
 				state.blocked(this)
 			} else {
 				state.release()
@@ -165,12 +173,12 @@ export class Flickable extends Item {
 	$scroll(deltaX, deltaY){
 		
 
-		if(this.$p.flickableDirection.val !== Flickable.VerticalFlick){
+		if(this.flickableDirection !== Flickable.VerticalFlick){
 			if(deltaX > 0)
-			if(this.$p.contentX.val + deltaX <= this.$p.contentWidth.val - this.$p.width.val){
+			if(this.contentX + deltaX <= this.contentWidth - this.width){
 				this.contentX += deltaX
 			} else {
-				this.contentX = this.$p.contentWidth.val - this.$p.width.val
+				this.contentX = this.contentWidth - this.width
 			}
 			if(deltaX < 0)
 			if(this.contentX + deltaX >= 0){
@@ -180,15 +188,15 @@ export class Flickable extends Item {
 			}
 		}
 		
-		if(this.$p.flickableDirection.val !== Flickable.HorizontalFlick){
+		if(this.flickableDirection !== Flickable.HorizontalFlick){
 			if(deltaY > 0)
-			if(this.$p.contentY.val + deltaY <= this.$p.contentHeight.val - this.$p.height.val){
+			if(this.contentY + deltaY <= this.contentHeight - this.height){
 				this.contentY += deltaY
 			} else {
-				this.contentY = this.$p.contentHeight.val - this.$p.height.val
+				this.contentY = this.contentHeight - this.height
 			}
 			if(deltaY < 0)
-			if(this.$p.contentY.val + deltaY >= 0){
+			if(this.contentY + deltaY >= 0){
 				this.contentY += deltaY
 			} else {
 				this.contentY = 0
@@ -210,7 +218,7 @@ export class Flickable extends Item {
 	}
 	$mousedown(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val && this.$p.interactive.val){
+		if(this.enabled && this.interactive){
 			state.blocked(this)
 			this.$fillMouse(e)
 			this.$pressed = true
@@ -219,7 +227,7 @@ export class Flickable extends Item {
 	}
 	$mouseup(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val && this.$p.interactive.val){
+		if(this.enabled && this.interactive){
 			state.release()
 			this.$fillMouse(e)
 			this.$pressed = false
@@ -227,19 +235,19 @@ export class Flickable extends Item {
 	}
 	$mousemove(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val && this.$p.interactive.val && this.$pressed){
+		if(this.enabled && this.interactive && this.$pressed){
 			let deltaX = this.$mouseX
 			let deltaY = this.$mouseY
 			this.$fillMouse(e)
 			deltaX -= this.$mouseX
 			deltaY -= this.$mouseY
 
-			let tempContentX = this.$p.contentX.val
-			let tempContentY = this.$p.contentY.val
+			let tempContentX = this.contentX
+			let tempContentY = this.contentY
 
 			this.$scroll(deltaX, deltaY)
 
-			if(tempContentX === this.$p.contentX.val && tempContentY === this.$p.contentY.val){
+			if(tempContentX === this.contentX && tempContentY === this.contentY){
 				let parent = this.parent
 				let find = false
 				while(parent && !find){
@@ -258,7 +266,7 @@ export class Flickable extends Item {
 
 	$touchstart(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val && this.$p.interactive.val){
+		if(this.enabled && this.interactive){
 			state.blocked(this)
 			this.$fillMouse(e)
 			this.$pressed = true
@@ -267,7 +275,7 @@ export class Flickable extends Item {
 	}
 	$touchend(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val && this.$p.interactive.val){
+		if(this.enabled && this.interactive){
 			state.release()
 			this.$fillMouse(e)
 			this.$pressed = false
@@ -276,7 +284,7 @@ export class Flickable extends Item {
 	}
 	$touchmove(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val && this.$p.interactive.val && this.$pressed){
+		if(this.enabled && this.interactive && this.$pressed){
 			let deltaX = this.$mouseX
 			let deltaY = this.$mouseY
 			this.$fillMouse(e)
@@ -284,12 +292,12 @@ export class Flickable extends Item {
 			deltaY -= this.$mouseY
 
 			
-			let tempContentX = this.$p.contentX.val
-			let tempContentY = this.$p.contentY.val
+			let tempContentX = this.contentX
+			let tempContentY = this.contentY
 
 			this.$scroll(deltaX, deltaY)
 
-			if(tempContentX === this.$p.contentX.val && tempContentY === this.$p.contentY.val){
+			if(tempContentX === this.contentX && tempContentY === this.contentY){
 				let parent = this.parent
 				let find = false
 				while(parent && !find){
@@ -307,6 +315,7 @@ export class Flickable extends Item {
 
 	$destroy(){
 		clearTimeout(this.$flickTimer)
+		clearTimeout(this.$childUpdater)
 		super.$destroy()
 	}
 

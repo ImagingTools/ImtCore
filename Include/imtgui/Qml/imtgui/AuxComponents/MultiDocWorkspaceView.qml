@@ -19,13 +19,13 @@ Item {
     }
 
     function addDocument(document){
-        console.log("MultidocWorkspaceView addDocument", document)
-
         let itemId = document["Id"];
+        console.log("MultidocWorkspaceView addDocument", itemId, document["Source"])
 
         let pageIndex = this.getDocumentIndexById(itemId);
         if (pageIndex < 0){
             var index = documentsData.InsertNewItem();
+            console.log("MultidocWorkspaceView addDocument index:", index)
 
             //TODO -> Uuid
             documentsData.SetData("Id", itemId, index);
@@ -123,9 +123,11 @@ Item {
             visible: tabPanelInternal.selectedIndex === model.index;
 
             onVisibleChanged: {
-                if(docsDataDeleg.visible){
-                    activeItem = dataLoader.item;
-                    activeItem.forceActiveFocus();
+                if(docsDataDeleg.visible && dataLoader.item){
+                    console.log("MultidocWorkspaceView onVisibleChanged", dataLoader.item);
+
+                    documentManager.activeItem = dataLoader.item;
+                    documentManager.activeItem.forceActiveFocus();
                 }
             }
 
@@ -138,9 +140,10 @@ Item {
 
                 anchors.fill: parent;
 
+                source: model.Source;
+
                 Component.onCompleted: {
-                    console.log("DEBUG::dataLoader.source: ", model.Source);
-                    dataLoader.source = model.Source;
+                    console.log("Loader onCompleted", model.Source);
                 }
 
                 Component.onDestruction: {
@@ -148,6 +151,12 @@ Item {
                 }
 
                 onLoaded: {
+                    console.log("MultidocWorkspaceView onLoaded", model.CommandsId);
+
+                    if(docsDataDeleg.visible){
+                        documentManager.activeItem = dataLoader.item;
+                        documentManager.activeItem.forceActiveFocus();
+                    }
                     dataLoader.item.commandsId = model.CommandsId
 
                     documentsData.SetData("Item", dataLoader.item, model.index);

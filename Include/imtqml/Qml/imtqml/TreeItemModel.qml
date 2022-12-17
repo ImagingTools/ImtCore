@@ -57,6 +57,7 @@ JSONListModel {
             console.log("modelObject is null")
 
         modelObject[key] = value
+        this.dataChanged(row, row+1)
     }
 
     function Clear(){
@@ -184,7 +185,7 @@ JSONListModel {
     }
 
     //Parse from the extern json to the intern model
-    function Parse(jsonString){
+    function CreateFromJson(jsonString){
         container.clear();
         this.json = jsonString;
 
@@ -221,7 +222,9 @@ JSONListModel {
                 else if(typeof modelVal === 'string' || modelVal instanceof String){
                     retVal += "\"" + modelVal + "\""
                 }
-                else
+                else if(typeof modelVal === 'object'){
+                    retVal += JSON.stringify(modelVal)
+                }else
                     retVal += modelVal
             }
             if (this.isArray || this.count > 1)

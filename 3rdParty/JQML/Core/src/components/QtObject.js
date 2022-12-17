@@ -1,6 +1,7 @@
 import {Signal} from '../utils/Signal'
 
 
+
 var context = {
     backend: {
         window: window
@@ -30,6 +31,7 @@ export class QtObject {
     $p = {}
     $s = {}
     $ready = false
+    $completed = false
     $uL = {
         properties: [],
         aliases: [],
@@ -37,16 +39,23 @@ export class QtObject {
     context = {}
     ID = new Set()
     LVL = new Set()
+    
 
     constructor(parent) {
         this._context = context
         this.UID = UID++
         UIDList[this.UID] = this
         this.children = []
+        this.$treeChilds = []
+        this.$treeParent = null
+        this.$treeParent2 = null
         
         if(parent){
+            parent.$treeChilds.push(this)
             parent.children.push(this)
+            parent.$childChanged()
             this.parent = parent
+            this.$treeParent = parent
             for(let lvl of parent.LVL){
                 this.LVL.add(lvl)
             }
@@ -58,73 +67,194 @@ export class QtObject {
 
         // ReadyList.push(this)
         // console.log(this)
-
+        Object.defineProperty(this, 'model', {
+            get: ()=>{
+                if(this.$repeater){
+                    if(typeof this.$repeater.$p.model.val === 'number'){     
+                        return {
+                            'index': this.index
+                        }
+                    } else if (typeof this.$repeater.$p.model.val === 'object'){
+                        if(Array.isArray(this.$repeater.$p.model.val)){
+                            return this.$repeater.$p.model.val[this.index] ? this.$repeater.$p.model.val[this.index] : {}
+                        } else {
+                            return this.$repeater.$p.model.val.data[this.index] ? this.$repeater.$p.model.val.data[this.index] : {}
+                        }
+                    }
+                }
+                let parent = this.parent
+                while(parent){
+                    
+                    if(parent.$repeater){
+                        if(typeof parent.$repeater.$p.model.val === 'number'){     
+                            return {
+                                'index': this.index
+                            }
+                        } else if (typeof parent.$repeater.$p.model.val === 'object'){
+                            if(Array.isArray(parent.$repeater.$p.model.val)){
+                                return parent.$repeater.$p.model.val[this.index] ? parent.$repeater.$p.model.val[this.index] : {}
+                            } else {
+                                return parent.$repeater.$p.model.val.data[this.index] ? parent.$repeater.$p.model.val.data[this.index] : {}
+                            }
+                            
+                        }
+                    }
+                    if(parent.$useModel) {
+                        if(typeof parent.$p.model.val === 'number'){     
+                            return {
+                                'index': this.index
+                            }
+                        } else if (typeof parent.$p.model.val === 'object'){
+                            if(Array.isArray(parent.$p.model.val)){
+                                return parent.$p.model.val[this.index] ? parent.$p.model.val[this.index] : {}
+                            } else {
+                                return parent.$p.model.val.data[this.index] ? parent.$p.model.val.data[this.index] : {}
+                            }
+                            
+                        }
+                        
+                    }
+                    parent = parent.parent
+                }
+            },
+            configurable: true,
+        })
+    }
+    $childChanged(){
+        
     }
     $tryComplete(){
-        if(this.$uL.properties.length + this.$uL.aliases.length === 0) this.$s['Component.completed']()
-    }
-    $uP(){
-        let errors = new Set()
-        this.$ready = true
-        let updated = false
-        
+        if(!this.$completed){
+            this.$completed = true
+            this.$s['Component.completed']()
+        }
 
+        for(let i = this.children.length-1; i >= 0; i--){
+            this.children[i].$tryComplete()
+        }
+        // if(this.$uL.properties.length + this.$uL.aliases.length === 0) {
+        //     this.$s['Component.completed']()
+        //     this.$ready = true
+        //     this.$s['Component.completed'].connections = {}
+        // }
+    }
+    $uP(step = 0){
+        let errors = []
+        let errorsSignal = []
+        let queueSignals = []
+
+        for(let child of this.children){
+            child.$uP(step + 1)
+        }
+        
         while(this.$uL.properties.length){
-            updated = true
             let propName = this.$uL.properties.shift()
             try {
+                for(let s of this.$p[propName].depends){
+                    delete s[this.$p[propName].PID]
+                }
+                this.$p[propName].depends.clear()
+
                 let val = this.$p[propName].func()
                 if(this.$p[propName].val !== val){
                     this.$p[propName].val = val
-                    this.$p[propName].signal()
+                    if(queueSignals.indexOf(this.$p[propName].signal) < 0) queueSignals.push(this.$p[propName].signal)          
                 }
             } catch (error) {
-                if(!errors.has(propName)){
-                    this.$uL.properties.push(propName)
-                    errors.add(propName)
-                } else {
-                    setTimeout(()=>{
-                        let val = this.$p[propName].func()
-                        if(this.$p[propName].val !== val){
-                            this.$p[propName].val = val
-                            this.$p[propName].signal()
-                        }
-                    }, 500)
-                    //console.log(`DEBUG::${this.UID}-${propName}`, error)
-                }
-                
+                errors.push({
+                    obj: this,
+                    propName: propName,
+                })
+                console.error(`${propName}`, this)
             }
             
             
+            if(this.$uL.properties.length === 0){
+                while(queueSignals.length){
+                    let signal = queueSignals.shift()
+                    signal()
+                }
+            }
+            
         }
         
 
-        for(let child of this.children){
-            child.$uP()
-        }
+        
         
 
         while(this.$uL.aliases.length){
-            updated = true
             let propName = this.$uL.aliases.shift()
             caller = this.$p[propName]
             let val = caller.func()
             caller = null
             
             if(this.$p[propName].val !== val){
+                for(let s of this.$p[propName].depends){
+                    delete s[this.$p[propName].PID]
+                }
+                this.$p[propName].depends.clear()
+
                 this.$p[propName].val = val
                 if(this.$p[propName].getter() !== val){
                     this.$p[propName].setter(val)
                 }
-                
-                this.$p[propName].signal()
+                if(queueSignals.indexOf(this.$p[propName].signal) < 0) queueSignals.push(this.$p[propName].signal)     
+            }
+
+            if(this.$uL.aliases.length === 0){
+                while(queueSignals.length){
+                    let signal = queueSignals.shift()
+                    signal()
+                }
             }
             
         }
-        
-        if(updated){
-            this.$s['Component.completed']()// = Signal()
+
+
+
+        for(let error of errors){
+            let val = error.obj.$p[error.propName].func()
+            if(error.obj.$p[error.propName].val !== val){
+
+                for(let s of error.obj.$p[error.propName].depends){
+                    delete s[error.obj.$p[error.propName].PID]
+                }
+                this.$p[propName].depends.clear()
+
+                error.obj.$p[error.propName].val = val
+                if(queueSignals.indexOf(error.obj.$p[error.propName].signal) < 0) queueSignals.push(error.obj.$p[error.propName].signal)   
+
+            }
         }
+
+        while(queueSignals.length){
+            // try {
+                let signal = queueSignals.shift()
+                signal()
+            // } catch (error) {
+                
+            // }
+            
+        }
+        // for(let errorSignal of errorsSignal){
+        //     try {
+        //         errorSignal.obj.$p[errorSignal.propName].signal()
+        //     } catch {
+        //         console.log(`Signal for ${errorSignal.propName} property was called error`)
+        //     }
+            
+        // }
+
+        if(step === 0){
+            this.$tryComplete()
+        }
+        // Core.queueCompleted.push(this)
+        
+        // if(updated){
+        //     this.$s['Component.completed']()// = Signal()
+        // } else {
+            
+        // }
     }
 
     $createReadOnlyProperty(name, func){
@@ -154,7 +284,7 @@ export class QtObject {
             return this.$p[name].signal
         }
 
-        let signal = Signal()
+        let signal = this.$cS(`${name}Changed`)
         signal.debug = `${this.UID}-${name}`
         if(typeof val === 'function'){
             this.$p[name] = {
@@ -180,11 +310,11 @@ export class QtObject {
             }
         }
         
-        this.$s[`${name}Changed`] = signal
+        // this.$s[`${name}Changed`] = signal
         
         Object.defineProperty(this, name, {
             get: ()=>{ 
-                if(caller){
+                if(caller && caller !== this.$p[name]){
                     let _caller = caller
                     _caller.depends.add(signal)
                     signal.connections[_caller.PID] = ()=>{
@@ -216,10 +346,10 @@ export class QtObject {
         if(name in this.$p){
             return
         }
-        let signal = Signal()
+        let signal = this.$cS(`${name}Changed`)
         signal.debug = `${this.UID}-${name}`
 
-        this.$s[`${name}Changed`] = signal
+        // this.$s[`${name}Changed`] = signal
 
         this[name] = {
 
@@ -235,7 +365,7 @@ export class QtObject {
             }
             Object.defineProperty(this[name], name2, {
                 get: ()=>{ 
-                    if(caller){
+                    if(caller && caller !== this.$p[`${name}.${name2}`]){
                         let _caller = caller
                         _caller.depends.add(signal)
                         signal.connections[_caller.PID] = ()=>{
@@ -303,7 +433,7 @@ export class QtObject {
     }
 
     $cA(name, getter, setter){
-        let signal = Signal()
+        let signal = this.$cS(`${name}Changed`)
 
         this.$p[name] = {
             'val': '',
@@ -320,7 +450,7 @@ export class QtObject {
             },
             'PID': PID++
         }
-        this.$s[`${name}Changed`] = signal
+        //this.$s[`${name}Changed`] = signal
         
         Object.defineProperty(this, name, {
             get: ()=>{ 
@@ -380,8 +510,10 @@ export class QtObject {
 
     $cS(name, ...args){
         let signal = Signal(args)
+        
         this.$s[name] = signal
         this[name] = signal
+        return signal
     }
 
     $updateGeometry(){
@@ -403,6 +535,12 @@ export class QtObject {
     }
 
     $destroy(){
+        for(let child of this.children){
+            child.parent = null
+            child.$destroy()
+        }
+        
+        this.$s['Component.destruction']()
         delete UIDList[this.UID]
 
         this.$uL.properties = []
@@ -411,14 +549,14 @@ export class QtObject {
         if(this.ID.size){
             IDManager.remove(this)
         }
-        for(let child of this.children){
-            child.parent = null
-            child.$destroy()
-        }
+        
         this.children = []
         if(this.parent){
             let indx = this.parent.children.indexOf(this)
-            if(indx >= 0) this.parent.children.splice(indx, 1)
+            if(indx >= 0) {
+                this.parent.children.splice(indx, 1)
+                this.parent.$childChanged()
+            }
 
         }
         for(let propName in this.$p){
@@ -430,6 +568,7 @@ export class QtObject {
             this.$p[propName].depends.clear()
             this.$p[propName].signal.connections = {}      
         }
+        // if(this.$timer) clearTimeout(this.$timer)
         setTimeout(()=>{
             
             for(let sigName in this.$s){
@@ -441,9 +580,9 @@ export class QtObject {
             for(let key in this){
                 delete this[key]
             }
-        }, 500)
+        }, 100)
 
-        this.$s['Component.destruction']()
+        
     
         
         

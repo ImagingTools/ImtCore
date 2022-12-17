@@ -65,7 +65,7 @@ DocumentWorkspaceCommandsDelegateBase {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
-                    let elementsModel = documentModel.GetData("Items");
+                    let elementsModel = documentBase.documentModel.GetData("Items");
 
                     let selectedIndex = container.tableData.selectedIndex;
                     let removedId = elementsModel.GetData("Id", selectedIndex);

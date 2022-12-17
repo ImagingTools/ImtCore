@@ -5,7 +5,7 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-    commandsDelegateSourceComp: RoleViewCommandsDelegate {}
+    commandsDelegateSourceComp: roleViewCommandsDelegate;
 
     property TreeItemModel rolesModel; // Collection of the all roles
 
@@ -21,6 +21,11 @@ DocumentBase {
 
     property int mainMargin: 0;
     property int panelWidth: 150;
+
+    Component {
+        id: roleViewCommandsDelegate;
+        RoleViewCommandsDelegate {}
+    }
 
     onItemNameChanged: {
         if (documentModel.ContainsKey("Name")){

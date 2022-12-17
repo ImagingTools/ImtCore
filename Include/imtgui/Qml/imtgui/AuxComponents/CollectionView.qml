@@ -168,7 +168,7 @@ Item {
 
         onSelectedItem: {
             console.log("CollectionViewBase onItemSelected");
-            selectItem(id, name);
+            collectionViewContainer.selectItem(id, name);
         }
 
     }

@@ -13,19 +13,12 @@ export class Item extends QtObject {
     static Left = 7
     static Center = 8
 
-    $changedWidth = true
-    $changedHeight = true
-    
+    // $anchorsX = false
+    // $anchorsY = false
 
     constructor(parent) {
         super(parent)
 
-        // this.$createReadOnlyProperty('left', ()=>{return this.dom.getBoundingClientRect().left - (this.width*(1-this.scale)/2)})
-        // this.$createReadOnlyProperty('right', ()=>{return this.dom.getBoundingClientRect().right})
-        // this.$createReadOnlyProperty('top', ()=>{return this.dom.getBoundingClientRect().top - (this.height*(1-this.scale)/2)})
-        // this.$createReadOnlyProperty('bottom', ()=>{return this.dom.getBoundingClientRect().bottom})
-        // this.$createReadOnlyProperty('horizontalCenter', ()=>{return this.dom.getBoundingClientRect().left+this.width/2})
-        // this.$createReadOnlyProperty('verticalCenter', ()=>{return this.dom.getBoundingClientRect().top+this.height/2})
         this.$createReadOnlyProperty('implicitWidth', ()=>{
             let left = 0
             let right = this.width
@@ -48,27 +41,18 @@ export class Item extends QtObject {
             }
             return bottom - top
         })
-        // this.$cP('left', 0)
-        // this.$cP('right', 0)
-        // this.$cP('top', 0)
-        // this.$cP('bottom', 0)
-        // this.$cP('horizontalCenter', 0)
-        // this.$cP('verticalCenter', 0)
-        // this.$cP('implicitWidth', 'real', 0)
-        // this.$cP('implicitHeight', 'real', 0)
-
-        // this.$cP('left', ()=>{return this.x - (this.width*(1-this.scale)/2)})
-        // this.$cP('right', ()=>{return this.x + this.width - (this.width*(1-this.scale)/2)})
-        // this.$cP('top', ()=>{return this.y - (this.height*(1-this.scale)/2)})
-        // this.$cP('bottom', ()=>{return this.y + this.height - (this.height*(1-this.scale)/2)})
+        // this.$cP('left', ()=>{return this.x})
+        // this.$cP('right', ()=>{return this.x + this.width})
+        // this.$cP('top', ()=>{return this.y})
+        // this.$cP('bottom', ()=>{return this.y + this.height})
         // this.$cP('horizontalCenter', ()=>{return this.x+this.width/2})
         // this.$cP('verticalCenter', ()=>{return this.y+this.height/2})
-        this.$cP('left', ()=>{return this.dom.getBoundingClientRect().left - (this.width*(1-this.scale)/2)})
-        this.$cP('right', ()=>{return this.dom.getBoundingClientRect().left + this.width - (this.width*(1-this.scale)/2)})
-        this.$cP('top', ()=>{return this.dom.getBoundingClientRect().top - (this.height*(1-this.scale)/2)})
-        this.$cP('bottom', ()=>{return this.dom.getBoundingClientRect().top + this.height - (this.height*(1-this.scale)/2)})
-        this.$cP('horizontalCenter', ()=>{return this.dom.getBoundingClientRect().left+this.width/2})
-        this.$cP('verticalCenter', ()=>{return this.dom.getBoundingClientRect().top+this.height/2})
+        this.$cP('left', {'target': this, 'float': 'left'})
+        this.$cP('right', {'target': this, 'float': 'right'})
+        this.$cP('top', {'target': this, 'float': 'top'})
+        this.$cP('bottom', {'target': this, 'float': 'bottom'})
+        this.$cP('horizontalCenter', {'target': this, 'float': 'horizontalCenter'})
+        this.$cP('verticalCenter', {'target': this, 'float': 'verticalCenter'})
         this.$cP('childrenRect', ()=>{return {}})
 
 
@@ -87,21 +71,21 @@ export class Item extends QtObject {
         this.$cP('transformOrigin', Item.Center).connect(this.$transformChanged.bind(this))
 
         this.$cPC('anchors', {
-            // left: undefined,
-            // top: undefined,
-            // right: undefined,
-            // bottom: undefined,
-            // fill: undefined,
-            // centerIn: undefined,
-            // horizontalCenter: undefined,
-            // verticalCenter: undefined,
+            left: undefined,
+            top: undefined,
+            right: undefined,
+            bottom: undefined,
+            fill: undefined,
+            centerIn: undefined,
+            horizontalCenter: undefined,
+            verticalCenter: undefined,
             leftMargin: 0,
             rightMargin: 0,
             topMargin: 0,
             bottomMargin: 0,
             verticalCenterOffset: 0,
             horizontalCenterOffset: 0,
-        })//.connect(this.$anchorsChanged.bind(this))
+        }).connect(this.$anchorsChanged.bind(this))
 
         this.$s['Keys.asteriskPressed'] = Signal()
         this.$s['Keys.backPressed'] = Signal()
@@ -148,12 +132,15 @@ export class Item extends QtObject {
         super.$domCreate()
         this.dom = document.createElement("div")
 
-        if(this.parent) {
+        // if(this.UID !== 0)
+        // Core.root.dom.appendChild(this.dom)
+        if(this.parent){
             this.parent.dom.appendChild(this.dom)
         }
+        
         this.dom.style.position = 'absolute'
         this.dom.style.overflow = 'unset'
-        this.dom.style.zIndex = /*2147483646/2 + */this.$p.z.val
+        this.dom.style.zIndex = this.z
         this.dom.classList.add(this.constructor.name)
         this.dom.id = `el-${this.UID}`
 
@@ -171,59 +158,55 @@ export class Item extends QtObject {
     }
 
     $xChanged(){
-        this.dom.style.left = `${this.$p.x.val}px`
-        // this.$updateGeometry()
-        if(this.parent) this.parent.$updateChildrenRect()
-        this.$updateRect()
+        let x = this.x
+        // if(!this.$anchorsX){
+        //     let parent = this.parent
+        //     while(parent){
+        //         x += parent.x
+        //         parent = parent.parent
+        //     }
+        // }
+        this.dom.style.left = `${this.x}px`
     }
     $yChanged(){
-        this.dom.style.top = `${this.$p.y.val}px`
-        // this.$updateGeometry()
-        if(this.parent) this.parent.$updateChildrenRect()
-        this.$updateRect()    
+        let y = this.y
+        // if(!this.$anchorsY){
+        //     let parent = this.parent
+        //     while(parent){
+        //         y += parent.y
+        //         parent = parent.parent
+        //     }
+        // }
+        this.dom.style.top = `${this.y}px`
     }
     $zChanged(){
-        this.dom.style.zIndex = /*2147483646/2 + */this.$p.z.val
+        this.dom.style.zIndex = this.z
     }
     $widthChanged(){
-        this.$changedWidth = false
-        this.dom.style.width = `${this.$p.width.val}px`
-
-        if(this.parent) this.parent.$updateChildrenRect()
-        this.$updateRect()
-        this.$updateGeometry()
-        
-        if(this.parent && this.parent.dom && this.parent.$changedWidth && this.parent.width < this.width) this.parent.width = this.width
+        this.dom.style.width = `${this.width}px`
     }
     $heightChanged(){
-        this.$changedHeight = false
-        this.dom.style.height = `${this.$p.height.val}px`
-
-        if(this.parent) this.parent.$updateChildrenRect()
-        this.$updateRect()
-        this.$updateGeometry()
-        
-        if(this.parent && this.parent.dom && this.parent.$changedHeight && this.parent.height < this.height) this.parent.height = this.height
+        this.dom.style.height = `${this.height}px`
     }
     $visibleChanged(){
-        this.dom.style.opacity = this.$p.visible.val ? this.$p.opacity.val : 0
-        this.dom.style.visibility = this.$p.visible.val ? 'visible' : 'hidden'
-        this.dom.style.zIndex = this.$p.visible.val ? /*2147483646/2 +*/ this.$p.z.val : -1
+        this.dom.style.opacity = this.visible ? this.opacity : 0
+        this.dom.style.visibility = this.visible ? 'visible' : 'hidden'
+        this.dom.style.zIndex = this.visible ? /*2147483646/2 +*/ this.z : -1
     }
     $clipChanged(){
-        this.dom.style.overflow = this.$p.clip.val ? "hidden" : "unset"
+        this.dom.style.overflow = this.clip ? "hidden" : "unset"
     }
     $opacityChanged(){
-        this.dom.style.opacity = this.$p.opacity.val
+        this.dom.style.opacity = this.opacity
     }
     $enabledChanged(){
        
     }
     $focusChanged(){
-        this.dom.focus();
+        this.dom.focus()
     }
     $rotationAndScaleChanged(){
-        this.dom.style.transform = `scale(${this.$p.scale.val}) rotate(${this.$p.rotation.val}deg)`
+        this.dom.style.transform = `scale(${this.scale}) rotate(${this.rotation}deg)`
     }
     $transformChanged(){
         switch(this.transformOrigin){
@@ -242,118 +225,429 @@ export class Item extends QtObject {
     forceActiveFocus(){
         this.focus = true
     }
-    // $anchorsChanged(){
-        
-
-        // if(this.anchors.fill){
-        //     this.$sP('x', ()=>{
-        //         let offsetX = this.parent.left
-        //         let val = this.anchors.leftMargin - (offsetX - this.anchors.fill.left)
-        //         return val
-        //     })
-        //     this.$sP('y', ()=>{
-        //         let offsetY = this.parent.top
-        //         let val = this.anchors.topMargin - (offsetY - this.anchors.fill.top)
-        //         return val
-        //     })
-        //     this.$sP('width', ()=>{
-        //         let val = this.anchors.fill.width - this.anchors.rightMargin - this.anchors.leftMargin
-        //         return val
-        //     })
-        //     this.$sP('height', ()=>{
-        //         let val = this.anchors.fill.height - this.anchors.bottomMargin - this.anchors.topMargin
-        //         return val
-        //     })
-        // } else if(this.anchors.centerIn){
-        //     this.$sP('x', ()=>{
-        //         let offsetX = this.parent.left
-        //         let val = this.anchors.centerIn.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin - (offsetX - this.anchors.centerIn.left)
-        //         return val
-        //     })
-        //     this.$sP('y', ()=>{
-        //         let offsetY = this.parent.top
-        //         let val = this.anchors.centerIn.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin - (offsetY - this.anchors.centerIn.top)
-        //         return val
-        //     })
-        // } else {
-            // let offsetX = this.parent.left
-            // let offsetY = this.parent.top
-            // if(this.anchors.horizontalCenter !== undefined){
-            //     this.x = this.anchors.horizontalCenter - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin - offsetX + this.anchors.horizontalCenterOffset
-            // } else if(this.anchors.left !== undefined && this.anchors.right !== undefined){
-            //     this.x = this.anchors.left + this.anchors.leftMargin - offsetX
-            //     this.width = this.anchors.right - this.anchors.left - this.anchors.rightMargin
-            // } else {
-            //     if(this.anchors.left !== undefined){
-            //         this.x = this.anchors.left + this.anchors.leftMargin - offsetX
-            //     }
-            //     if(this.anchors.right !== undefined){
-            //         this.x = this.anchors.right - this.width - this.anchors.rightMargin - offsetX
-            //     }
-            // }
+    $anchorsChanged(){
+        if(this.anchors.fill){
+            if(this.anchors.fill === this.parent){
+                this.$sP('x', ()=>{
+                    return this.anchors.leftMargin
+                })
+                this.$sP('y', ()=>{
+                    return this.anchors.topMargin
+                })
+                this.$sP('width', ()=>{
+                    return this.anchors.fill.width - this.anchors.rightMargin - this.anchors.leftMargin
+                })
+                this.$sP('height', ()=>{
+                    return this.anchors.fill.height - this.anchors.bottomMargin - this.anchors.topMargin
+                })
+            } else if(this.parent === this.anchors.fill.parent ) {
+                this.$sP('x', ()=>{
+                    return this.anchors.fill.x + this.anchors.leftMargin
+                })
+                this.$sP('y', ()=>{
+                    return this.anchors.fill.y + this.anchors.topMargin
+                })
+                this.$sP('width', ()=>{
+                    return this.anchors.fill.width - this.anchors.rightMargin - this.anchors.leftMargin
+                })
+                this.$sP('height', ()=>{
+                    return this.anchors.fill.height - this.anchors.bottomMargin - this.anchors.topMargin
+                })
+            } else {
+                this.$sP('x', ()=>{
+                    return this.anchors.fill.x + this.anchors.leftMargin + (this.anchors.fill.parent.x - this.parent.x)
+                })
+                this.$sP('y', ()=>{
+                    return this.anchors.fill.y + this.anchors.topMargin + (this.anchors.fill.parent.y - this.parent.y)
+                })
+                this.$sP('width', ()=>{
+                    return this.anchors.fill.width - this.anchors.rightMargin - this.anchors.leftMargin
+                })
+                this.$sP('height', ()=>{
+                    return this.anchors.fill.height - this.anchors.bottomMargin - this.anchors.topMargin
+                })
+                // разные 
+            }
+        } else if(this.anchors.centerIn){
             
-            // if(this.anchors.verticalCenter !== undefined){
-            //     this.y = this.anchors.verticalCenter - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin - offsetY + this.anchors.verticalCenterOffset
-            // } else if(this.anchors.top !== undefined && this.anchors.bottom !== undefined){
-            //     this.y = this.anchors.top + this.anchors.topMargin - offsetY
-            //     this.height = this.anchors.bottom - this.anchors.top - this.anchors.bottomMargin
-            // } else {
-            //     if(this.anchors.top !== undefined){
-            //         this.y = this.anchors.top + this.anchors.topMargin - offsetY
-            //     }
-            //     if(this.anchors.bottom !== undefined){
-            //         this.y = this.anchors.bottom - this.height - this.anchors.bottomMargin - offsetY
-            //     }
-            // }
-        // }
-    // }
-
-    $updateGeometry(){
-        if(this.parent) this.parent.$updateGeometry()
-    }
-
-    $updateChildrenRect(){
-        let left = 99999999
-        let right = -99999999
-        let top = 99999999
-        let bottom = -99999999
-
-        for(let child of this.children){
-            if(child.dom){
-                let cRect = child.dom.getBoundingClientRect()
-                if(left > cRect.left) left = cRect.left
-                if(right < cRect.right) right = cRect.right
-                if(top > cRect.top) top = cRect.top
-                if(bottom < cRect.bottom) bottom = cRect.bottom
-
+            
+            if(this.anchors.centerIn === this.parent){
+                this.$sP('x', ()=>{
+                    return this.anchors.centerIn.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
+                })
+                this.$sP('y', ()=>{
+                    return this.anchors.centerIn.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
+                })
+            } else if(this.parent === this.anchors.centerIn.parent ) {
+                this.$sP('x', ()=>{
+                    return this.anchors.centerIn.x + this.anchors.centerIn.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
+                })
+                this.$sP('y', ()=>{
+                    return this.anchors.centerIn.y + this.anchors.centerIn.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
+                })
+            } else {
+                this.$sP('x', ()=>{
+                    return this.anchors.centerIn.x + this.anchors.centerIn.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin - (this.anchors.centerIn.parent.width/2 - this.parent.width/2)
+                })
+                this.$sP('y', ()=>{
+                    return this.anchors.centerIn.y + this.anchors.centerIn.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin - (this.anchors.centerIn.parent.height/2 - this.parent.height/2)
+                })
+                // разные 
+            }
+            
+        } else {
+            if(this.anchors.horizontalCenter !== undefined){
+                let horizontalCenterTarget = this.anchors.horizontalCenter.target
+                if(horizontalCenterTarget === this.parent){
+                    this.$sP('x', ()=>{
+                        return horizontalCenterTarget.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
+                    })
+                } else if(this.parent === horizontalCenterTarget.parent ) {
+                    this.$sP('x', ()=>{
+                        return horizontalCenterTarget.x + horizontalCenterTarget.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
+                    })
+                } else {
+                    this.$sP('x', ()=>{
+                        return horizontalCenterTarget.x + horizontalCenterTarget.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin - (horizontalCenterTarget.parent.width/2 - this.parent.width/2)
+                    })
+                    // разные 
+                }
+                // this.x = this.anchors.horizontalCenter - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin + this.anchors.horizontalCenterOffset
+            } else if(this.anchors.left !== undefined && this.anchors.right !== undefined){
+                let leftTarget = this.anchors.left.target
+                let rightTarget = this.anchors.right.target
+                if(leftTarget === this.parent){
+                    if(this.anchors.left.float === 'left'){
+                        this.$sP('x', ()=>{
+                            return this.anchors.leftMargin
+                        })
+                    } else if(this.anchors.left.float === 'right'){
+                        this.$sP('x', ()=>{
+                            return this.anchors.leftMargin + leftTarget.width
+                        })
+                    }
+                    
+                } else if(this.parent === leftTarget.parent ) {
+                    if(this.anchors.left.float === 'left'){
+                        this.$sP('x', ()=>{
+                            return leftTarget.x + this.anchors.leftMargin
+                        })
+                    } else if(this.anchors.left.float === 'right'){
+                        this.$sP('x', ()=>{
+                            return leftTarget.x + this.anchors.leftMargin + leftTarget.width
+                        })
+                    }
+                } else {
+                    if(this.anchors.left.float === 'left'){
+                        this.$sP('x', ()=>{
+                            return leftTarget.x + this.anchors.leftMargin + (leftTarget.parent.x - this.parent.x)
+                        })
+                    } else if(this.anchors.left.float === 'right'){
+                        this.$sP('x', ()=>{
+                            return leftTarget.x + this.anchors.leftMargin + leftTarget.width + (leftTarget.parent.x - this.parent.x)
+                        })
+                    }
+                    // разные 
+                }
+                if(rightTarget === this.parent){
+                    if(this.anchors.right.float === 'left'){
+                        this.$sP('width', ()=>{
+                            return this.anchors.rightMargin - this.x
+                        })
+                    } else if(this.anchors.right.float === 'right'){
+                        this.$sP('width', ()=>{
+                            return rightTarget.width - this.anchors.rightMargin - this.x
+                        })
+                    }
+                    
+                } else if(this.parent === rightTarget.parent ) {
+                    if(this.anchors.right.float === 'left'){
+                        this.$sP('width', ()=>{
+                            return rightTarget.x - this.anchors.rightMargin - this.x
+                        })
+                    } else if(this.anchors.right.float === 'right'){
+                        this.$sP('width', ()=>{
+                            return rightTarget.x + rightTarget.width - this.anchors.rightMargin - this.x
+                        })
+                    }
+                } else {
+                    if(this.anchors.right.float === 'left'){
+                        this.$sP('width', ()=>{
+                            return rightTarget.x - this.anchors.rightMargin - this.x + (rightTarget.parent.x - this.parent.x)
+                        })
+                    } else if(this.anchors.right.float === 'right'){
+                        this.$sP('width', ()=>{
+                            return rightTarget.x + rightTarget.width - this.anchors.rightMargin - this.x + (rightTarget.parent.x - this.parent.x)
+                        })
+                    }
+                    // разные 
+                }
+            } else {
+                if(this.anchors.left !== undefined){
+                    let leftTarget = this.anchors.left.target
+                    if(leftTarget === this.parent){
+                        if(this.anchors.left.float === 'left'){
+                            this.$sP('x', ()=>{
+                                return this.anchors.leftMargin
+                            })
+                        } else if(this.anchors.left.float === 'right'){
+                            this.$sP('x', ()=>{
+                                return this.anchors.leftMargin + leftTarget.width
+                            })
+                        }
+                        
+                    } else if(this.parent === leftTarget.parent ) {
+                        if(this.anchors.left.float === 'left'){
+                            this.$sP('x', ()=>{
+                                return leftTarget.x + this.anchors.leftMargin
+                            })
+                        } else if(this.anchors.left.float === 'right'){
+                            this.$sP('x', ()=>{
+                                return leftTarget.x + this.anchors.leftMargin + leftTarget.width
+                            })
+                        }
+                    } else {
+                        if(this.anchors.left.float === 'left'){
+                            this.$sP('x', ()=>{
+                                return leftTarget.x + this.anchors.leftMargin + (leftTarget.parent.x - this.parent.x)
+                            })
+                        } else if(this.anchors.left.float === 'right'){
+                            this.$sP('x', ()=>{
+                                return leftTarget.x + this.anchors.leftMargin + leftTarget.width + (leftTarget.parent.x - this.parent.x)
+                            })
+                        }
+                        // разные 
+                    }
+                    // this.x = this.anchors.left + this.anchors.leftMargin
+                }
+                if(this.anchors.right !== undefined){
+                    let rightTarget = this.anchors.right.target
+                    if(rightTarget === this.parent){
+                        if(this.anchors.right.float === 'left'){
+                            this.$sP('x', ()=>{
+                                return -(this.width + this.anchors.rightMargin)
+                            })
+                        } else if(this.anchors.right.float === 'right'){
+                            this.$sP('x', ()=>{
+                                return rightTarget.width - (this.width + this.anchors.rightMargin)
+                            })
+                        }
+                        
+                    } else if(this.parent === rightTarget.parent ) {
+                        if(this.anchors.right.float === 'left'){
+                            this.$sP('x', ()=>{
+                                return rightTarget.x - (this.width + this.anchors.rightMargin)
+                            })
+                        } else if(this.anchors.right.float === 'right'){
+                            this.$sP('x', ()=>{
+                                return rightTarget.x + rightTarget.width - (this.width + this.anchors.rightMargin)
+                            })
+                        }
+                    } else {
+                        if(this.anchors.right.float === 'left'){
+                            this.$sP('x', ()=>{
+                                return rightTarget.x - (this.width + this.anchors.rightMargin) + (rightTarget.parent.x - this.parent.x)
+                            })
+                        } else if(this.anchors.right.float === 'right'){
+                            this.$sP('x', ()=>{
+                                return rightTarget.x + rightTarget.width - (this.width + this.anchors.rightMargin) + (rightTarget.parent.x - this.parent.x)
+                            })
+                        }
+                        // разные 
+                    }
+                    // this.x = this.anchors.right - this.width - this.anchors.rightMargin
+                }
+            }
+            
+            if(this.anchors.verticalCenter !== undefined){
+                let verticalCenterTarget = this.anchors.verticalCenter.target
+                if(verticalCenterTarget === this.parent){
+                    this.$sP('y', ()=>{
+                        return verticalCenterTarget.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
+                    })
+                } else if(this.parent === verticalCenterTarget.parent ) {
+                    this.$sP('y', ()=>{
+                        return verticalCenterTarget.y + verticalCenterTarget.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
+                    })
+                } else {
+                    this.$sP('y', ()=>{
+                        return verticalCenterTarget.y + verticalCenterTarget.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin - (verticalCenterTarget.parent.height/2 - this.parent.height/2)
+                    })
+                    // разные 
+                }
+                // this.y = this.anchors.verticalCenter - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin + this.anchors.verticalCenterOffset
+            } else if(this.anchors.top !== undefined && this.anchors.bottom !== undefined){
+                let topTarget = this.anchors.top.target
+                let bottomTarget = this.anchors.bottom.target
+                if(topTarget === this.parent){
+                    if(this.anchors.top.float === 'top'){
+                        this.$sP('y', ()=>{
+                            return this.anchors.topMargin
+                        })
+                    } else if(this.anchors.top.float === 'bottom'){
+                        this.$sP('y', ()=>{
+                            return this.anchors.topMargin + topTarget.height
+                        })
+                    }
+                    
+                } else if(this.parent === topTarget.parent ) {
+                    if(this.anchors.top.float === 'top'){
+                        this.$sP('y', ()=>{
+                            return topTarget.y + this.anchors.topMargin
+                        })
+                    } else if(this.anchors.top.float === 'bottom'){
+                        this.$sP('y', ()=>{
+                            return topTarget.y + this.anchors.topMargin + topTarget.height
+                        })
+                    }
+                } else {
+                    
+                    if(this.anchors.top.float === 'top'){
+                        this.$sP('y', ()=>{
+                            return topTarget.y + this.anchors.topMargin + (topTarget.parent.y - this.parent.y)
+                        })
+                    } else if(this.anchors.top.float === 'bottom'){
+                        this.$sP('y', ()=>{
+                            return topTarget.y + this.anchors.topMargin + topTarget.height + (topTarget.parent.y - this.parent.y)
+                        })
+                    }
+                    // разные 
+                }
+                if(bottomTarget === this.parent){
+                    if(this.anchors.bottom.float === 'top'){
+                        this.$sP('height', ()=>{
+                            return this.anchors.bottomMargin - this.y
+                        })
+                    } else if(this.anchors.bottom.float === 'bottom'){
+                        this.$sP('height', ()=>{
+                            return bottomTarget.height - this.anchors.bottomMargin - this.y
+                        })
+                    }
+                    
+                } else if(this.parent === bottomTarget.parent ) {
+                    if(this.anchors.bottom.float === 'top'){
+                        this.$sP('height', ()=>{
+                            return bottomTarget.y - this.anchors.bottomMargin - this.y
+                        })
+                    } else if(this.anchors.bottom.float === 'bottom'){
+                        this.$sP('height', ()=>{
+                            return bottomTarget.y + bottomTarget.height - this.anchors.bottomMargin - this.y
+                        })
+                    }
+                } else {
+                    if(this.anchors.bottom.float === 'top'){
+                        this.$sP('height', ()=>{
+                            return bottomTarget.y - this.anchors.bottomMargin - this.y + (bottomTarget.parent.y - this.parent.y)
+                        })
+                    } else if(this.anchors.bottom.float === 'bottom'){
+                        this.$sP('height', ()=>{
+                            return bottomTarget.y + bottomTarget.height - this.anchors.bottomMargin - this.y + (bottomTarget.parent.y - this.parent.y)
+                        })
+                    }
+                    // разные 
+                }
+            } else {
+                if(this.anchors.top !== undefined){
+                    let topTarget = this.anchors.top.target
+                    if(topTarget === this.parent){
+                        if(this.anchors.top.float === 'top'){
+                            this.$sP('y', ()=>{
+                                return this.anchors.topMargin
+                            })
+                        } else if(this.anchors.top.float === 'bottom'){
+                            this.$sP('y', ()=>{
+                                return this.anchors.topMargin + topTarget.height
+                            })
+                        }
+                        
+                    } else if(this.parent === topTarget.parent ) {
+                        if(this.anchors.top.float === 'top'){
+                            this.$sP('y', ()=>{
+                                return topTarget.y + this.anchors.topMargin
+                            })
+                        } else if(this.anchors.top.float === 'bottom'){
+                            this.$sP('y', ()=>{
+                                return topTarget.y + this.anchors.topMargin + topTarget.height
+                            })
+                        }
+                    } else {
+                        if(this.anchors.top.float === 'top'){
+                            this.$sP('y', ()=>{
+                                return topTarget.y + this.anchors.topMargin + (topTarget.parent.y - this.parent.y)
+                            })
+                        } else if(this.anchors.top.float === 'bottom'){
+                            this.$sP('y', ()=>{
+                                return topTarget.y + this.anchors.topMargin + topTarget.height + (topTarget.parent.y - this.parent.y)
+                            })
+                        }
+                        // разные 
+                    }
+                    // this.y = this.anchors.top + this.anchors.topMargin
+                }
+                if(this.anchors.bottom !== undefined){
+                    let bottomTarget = this.anchors.bottom.target
+                    if(bottomTarget === this.parent){
+                        if(this.anchors.bottom.float === 'top'){
+                            this.$sP('y', ()=>{
+                                return -(this.height + this.anchors.bottomMargin)
+                            })
+                        } else if(this.anchors.bottom.float === 'bottom'){
+                            this.$sP('y', ()=>{
+                                return bottomTarget.height - (this.height + this.anchors.bottomMargin)
+                            })
+                        }
+                        
+                    } else if(this.parent === bottomTarget.parent ) {
+                        if(this.anchors.bottom.float === 'top'){
+                            this.$sP('y', ()=>{
+                                return bottomTarget.y - (this.height + this.anchors.bottomMargin)
+                            })
+                        } else if(this.anchors.bottom.float === 'bottom'){
+                            this.$sP('y', ()=>{
+                                return bottomTarget.y + bottomTarget.height - (this.height + this.anchors.bottomMargin)
+                            })
+                        }
+                    } else {
+                        if(this.anchors.bottom.float === 'top'){
+                            this.$sP('y', ()=>{
+                                return bottomTarget.y - (this.height + this.anchors.bottomMargin) + (bottomTarget.parent.y - this.parent.y)
+                            })
+                        } else if(this.anchors.bottom.float === 'bottom'){
+                            this.$sP('y', ()=>{
+                                return bottomTarget.y + bottomTarget.height - (this.height + this.anchors.bottomMargin) + (bottomTarget.parent.y - this.parent.y)
+                            })
+                        }
+                        // разные 
+                    }
+                    // this.y = this.anchors.bottom - this.height - this.anchors.bottomMargin
+                }
             }
         }
-        this.childrenRect = {
-            x: left,
-            y: top,
-            width: right - left,
-            height: bottom - top,
-        }
-    }
-    $updateRect(){
-        let rect = this.dom.getBoundingClientRect()
-        this.left = rect.left - (this.$p.width.val*(1-this.$p.scale.val)/2)
-        this.right = rect.right
-        this.top = rect.top - (this.$p.height.val*(1-this.$p.scale.val)/2)
-        this.bottom = rect.bottom
-        this.horizontalCenter = rect.left+this.$p.width.val/2
-        this.verticalCenter = rect.top+this.$p.height.val/2
-
-        for(let child of this.children){
-            if(child.dom) child.$updateRect()
-        }
-
-        
-        // if(this.$p['anchors.left'].val || this.$p['anchors.right'].val || this.$p['anchors.top'].val || this.$p['anchors.bottom'].val){
-        //     this.$anchorsChanged()
-        // }
     }
 
+    // $updateChildrenRect(){
+    //     let left = 99999999
+    //     let right = -99999999
+    //     let top = 99999999
+    //     let bottom = -99999999
+
+    //     for(let child of this.children){
+    //         if(child.dom){
+    //             let cRect = child.dom.getBoundingClientRect()
+    //             if(left > cRect.left) left = cRect.left
+    //             if(right < cRect.right) right = cRect.right
+    //             if(top > cRect.top) top = cRect.top
+    //             if(bottom < cRect.bottom) bottom = cRect.bottom
+
+    //         }
+    //     }
+    //     this.childrenRect = {
+    //         x: left,
+    //         y: top,
+    //         width: right - left,
+    //         height: bottom - top,
+    //     }
+    // }
 
     mapToItem(item, x, y){
 		let parent = this.parent

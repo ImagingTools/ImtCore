@@ -8,7 +8,7 @@ DocumentBase {
 
     anchors.fill: parent;
 
-    commandsDelegateSourceComp: AccountEditorCommandsDelegate {}
+    commandsDelegateSourceComp: accountEditorCommandsDelegate;
 
     property int textInputHeight: 30;
 
@@ -23,6 +23,11 @@ DocumentBase {
     onDocumentModelChanged: {
         updateGui();
         undoRedoManager.registerModel(documentModel);
+    }
+
+    Component {
+        id: accountEditorCommandsDelegate;
+        AccountEditorCommandsDelegate {}
     }
 
     UndoRedoManager {

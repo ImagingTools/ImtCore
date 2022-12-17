@@ -6,6 +6,7 @@ const QML = [
     'Shortcut',
     'QtObject',
     'Item',
+    'FocusScope',
     'MouseArea',
     'Rectangle',
     'Loader',
@@ -386,7 +387,12 @@ function qmlprop(m, instructions, file){
             if(!_meta[2]) throw 1
             let propertyInstructions = getBaseStructure()
             preCompile(_meta[2][1], _meta[2][3], _meta[2][2], propertyInstructions, file) 
-            instructions.propertiesQML[name] = propertyInstructions
+            if(name === 'sourceComponent' && instructions.class === 'Loader'){
+                instructions.propertiesSpecial[name] = propertyInstructions
+            } else {
+                instructions.propertiesQML[name] = propertyInstructions
+            }
+            
         } catch {
             let name = m[1]
             let val = m[3].trimStart().trimEnd()
@@ -531,7 +537,7 @@ function IDReplace(instructions){
         ]
 
         for(let name in instructions.propertiesLazy){
-            if(!(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
+            if(name === ID || !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
                 for(let n = 0; n < replaceList.length; n+=2){
                     instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(replaceList[n], replaceList[n+1])
                 }
@@ -546,7 +552,7 @@ function IDReplace(instructions){
             } 
         }
         for(let name in instructions.propertiesLazyNew){
-            if(!(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
+            if(name === ID || !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
                 // instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
                 for(let n = 0; n < replaceList.length; n+=2){
                     instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(replaceList[n], replaceList[n+1])
@@ -566,7 +572,7 @@ function IDReplace(instructions){
             
         }
         for(let name in instructions.propertiesAlias){
-            if(!(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
+            if(name === ID || !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
                 // instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
                 for(let n = 0; n < replaceList.length; n+=2){
                     instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(replaceList[n], replaceList[n+1])
@@ -600,7 +606,20 @@ function IDReplace(instructions){
             } 
         }
         for(let signal of instructions.connectionSignals){
-            if(!(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || 
+            let signalParams = []
+            if(QML.indexOf(instructions.class) < 0)
+            for(let path in compiledFiles){
+                if(path.indexOf(instructions.class) >= 0){
+                    if(compiledFiles[path].instructions.defineSignals[signal.name]){
+                        signalParams.push(...compiledFiles[path].instructions.defineSignals[signal.name])
+                    }
+                }
+            }
+            for(let i = 0; i < signalParams.length; i++){
+                signalParams[i] = signalParams[i].replaceAll('`', '')
+            }
+
+            if(signalParams.indexOf(ID) < 0 && !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || 
                 ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias || 
                 signal.source.indexOf(varTemp) >= 0 || signal.source.indexOf(letTemp) >= 0 || (instructions.defineSignals[signal.name] && instructions.defineSignals[signal.name].indexOf(ID) >= 0))) {
                     // signal.source = signal.source.replaceAll(keyDict[0], keyDict[2]).replaceAll(keyDict[1], keyDict[2]).replaceAll(keyDict2[0], keyDict2[1]).replaceAll(keyDict3[0], keyDict3[1]).replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
@@ -756,6 +775,17 @@ function anchorsReplace(instructions){
     //         instructions.propertiesLazy['y'] = `${target}.height/2 - height/2 + anchors.topMargin - anchors.bottomMargin - (parent.top - ${target}.top)`
     //     }
     // }
+    if(instructions.propertiesLazy['anchors.fill'] && (instructions.propertiesLazy['anchors.left'] || instructions.propertiesLazy['anchors.right'] || instructions.propertiesLazy['anchors.top'] || instructions.propertiesLazy['anchors.bottom'])){
+        let target = instructions.propertiesLazy['anchors.fill']
+        delete instructions.propertiesLazy['anchors.fill']
+
+        if(!instructions.propertiesLazy['anchors.left']) instructions.propertiesLazy['anchors.left'] = `${target}.left`
+        if(!instructions.propertiesLazy['anchors.right']) instructions.propertiesLazy['anchors.right'] = `${target}.right`
+        if(!instructions.propertiesLazy['anchors.top']) instructions.propertiesLazy['anchors.top'] = `${target}.top`
+        if(!instructions.propertiesLazy['anchors.bottom']) instructions.propertiesLazy['anchors.bottom'] = `${target}.bottom`
+    }
+
+
     if(instructions.propertiesLazy['anchors.fill']){
         delete instructions.properties['width']
         delete instructions.properties['height']
@@ -931,7 +961,7 @@ function anchorsReplace(instructions){
 
 
 for(file in compiledFiles){
-    anchorsReplace(compiledFiles[file].instructions)
+    // anchorsReplace(compiledFiles[file].instructions)
 
     let name = file.split('/').pop().replaceAll('.qml', '')
     if(compiledFiles[file].instructions.Singleton === true){
@@ -940,6 +970,7 @@ for(file in compiledFiles){
         IDList.add(name)
     }
     IDReplace(compiledFiles[file].instructions)
+    
     // ProxyReplace(compiledFiles[file].instructions)
     // PropertyReplace(compiledFiles[file].instructions)
 }
@@ -954,6 +985,84 @@ function compile(instructions, code, curr = '$root', prev = ''){
     } else {
         code.push(`let ${curr}=Core.cC(\`${instructions.class}\`, ${prev}, $LVL)`)
     }
+
+    if(instructions.class === 'Column' || instructions.class === 'Row'){
+        if(instructions.properties.width) code.push(`${curr}.$widthAuto=false`)
+        if(instructions.properties.height) code.push(`${curr}.$heightAuto=false`)
+        if(instructions.propertiesLazy.width) code.push(`${curr}.$widthAuto=false`)
+        if(instructions.propertiesLazy.height) code.push(`${curr}.$heightAuto=false`)
+
+        if(instructions.propertiesLazy['anchors.fill']) {
+            code.push(`${curr}.$widthAuto=false`)
+            code.push(`${curr}.$heightAuto=false`)
+        }
+        if(instructions.propertiesLazy['anchors.left'] && instructions.propertiesLazy['anchors.right']) {
+            code.push(`${curr}.$widthAuto=false`)
+        }
+        if(instructions.propertiesLazy['anchors.top'] && instructions.propertiesLazy['anchors.bottom']) {
+            code.push(`${curr}.$heightAuto=false`)
+        }
+        
+    }
+    if(instructions.class === 'Flickable' || instructions.class === 'ListView' || instructions.class === 'GridView'){
+        if(instructions.properties.contentWidth || instructions.propertiesLazy.contentWidth) code.push(`${curr}.$contentWidthAuto=false`)
+        if(instructions.properties.contentHeight || instructions.propertiesLazy.contentHeight) code.push(`${curr}.$contentHeightAuto=false`)
+    }
+    
+    if(instructions.class === 'Loader'){
+        let xOverride = false
+        let yOverride = false
+        let widthOverride = false
+        let heightOverride = false
+        let clipOverride = false
+
+        if(instructions.properties.x || instructions.propertiesLazy.x) xOverride = true
+        if(instructions.properties.y || instructions.propertiesLazy.y) yOverride = true
+        if(instructions.properties.width || instructions.propertiesLazy.width) widthOverride = true
+        if(instructions.properties.height || instructions.propertiesLazy.height) heightOverride = true
+        if(instructions.properties.clip || instructions.propertiesLazy.clip) clipOverride = true
+
+        if(instructions.propertiesLazy['anchors.fill']) {
+            xOverride = true
+            yOverride = true
+            widthOverride = true
+            heightOverride = true
+        }
+        if(instructions.propertiesLazy['anchors.centerIn']) {
+            xOverride = true
+            yOverride = true
+        }
+        if(instructions.propertiesLazy['anchors.left'] && instructions.propertiesLazy['anchors.right']) {
+            xOverride = true
+            widthOverride = true
+        }
+        if(instructions.propertiesLazy['anchors.top'] && instructions.propertiesLazy['anchors.bottom']) {
+            yOverride = true
+            heightOverride = true
+        }
+
+        if(!xOverride) code.push(`${curr}.$xOverride=false`)
+        if(!yOverride) code.push(`${curr}.$yOverride=false`)
+        if(!widthOverride) code.push(`${curr}.$widthOverride=false`)
+        if(!heightOverride) code.push(`${curr}.$heightOverride=false`)
+        if(!clipOverride) code.push(`${curr}.$clipOverride=false`)
+        // let overrideItemProperties = []
+        // for(let prop in instructions.properties){
+        //     overrideItemProperties.push(`\`${prop}\``)
+        // }
+        // for(let prop in instructions.propertiesNew){
+        //     overrideItemProperties.push(`\`${prop}\``)
+        // }
+        // for(let prop in instructions.propertiesLazy){
+        //     overrideItemProperties.push(`\`${prop}\``)
+        // }
+        // for(let prop in instructions.propertiesLazyNew){
+        //     overrideItemProperties.push(`\`${prop}\``)
+        // }
+
+        // code.push(`${curr}.$overrideItemProperties=[${overrideItemProperties}]`)
+    }
+    
     code.push(`${curr}._qmlName='${instructions._qmlName}'`)
 
     if(instructions.id.size > 0) code.push(`${curr}.$sID(${Array.from(instructions.id).join(',')})`)
@@ -989,7 +1098,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
         codeNew.push(`function($parent){`)
         codeNew.push(`let $LVL = Core.LVL++`)
         compile(instructions.propertiesSpecial[prop], codeNew)
-        codeNew.push(`$root.$tryComplete()`)
+        // codeNew.push(`$root.$tryComplete()`)
         codeNew.push(`return $root`)
         codeNew.push(`}`)
         let val = codeNew.join('\n')
@@ -1001,7 +1110,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
         codeNew.push(`function($parent){`)
         codeNew.push(`let $LVL = Core.LVL++`)
         compile(instructions.propertiesQML[prop], codeNew)
-        codeNew.push(`$root.$tryComplete()`)
+        // codeNew.push(`$root.$tryComplete()`)
         codeNew.push(`return $root`)
         codeNew.push(`}`)
         let val = codeNew.join('\n')
@@ -1012,7 +1121,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
         codeNew.push(`function($parent){`)
         codeNew.push(`let $LVL = Core.LVL++`)
         compile(instructions.propertiesQMLNew[prop], codeNew)
-        codeNew.push(`$root.$tryComplete()`)
+        // codeNew.push(`$root.$tryComplete()`)
         codeNew.push(`return $root`)
         codeNew.push(`}`)
         let val = codeNew.join('\n')
@@ -1020,7 +1129,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
     }
 
     for(let name in instructions.methods){
-        code.push(`${curr}.${name}=function(${instructions.methods[name].params.join(',')}){with(this)with(QML){${instructions.methods[name].source}}}.bind(${curr})`)
+        code.push(`${curr}.${name}=function(${instructions.methods[name].params.join(',')}){let $args = {${instructions.methods[name].params.join(',')}};with(this)with($args)with(QML){${instructions.methods[name].source}}}.bind(${curr})`)
     }
     for(let name in instructions.defineSignals){
         if(instructions.defineSignals[name].length){
@@ -1034,7 +1143,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
         code.push(`${curr}.$s['${signal.name}'].connect(function(){with(this)with(QML)with(this.$s['${signal.name}'].context){${signal.source}}}.bind(${curr}))`)
     }
     
-    code.push(`${curr}.$tryComplete()`)
+    // code.push(`${curr}.$tryComplete()`)
     let step = 0
     for(let child of instructions.children){
         compile(child, code, curr+'c'+step, curr)
@@ -1065,7 +1174,7 @@ for(file in compiledFiles){
     code.push(`let $LVL = Core.LVL++`)
     compile(instructions, code)
     // code.push(`PropertyManager.update()`)
-    code.push(`$root.$tryComplete()`)
+    // code.push(`$root.$tryComplete()`)
     code.push(`return $root`)
     code.push(`}`)
 

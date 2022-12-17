@@ -1,91 +1,75 @@
 import {Item} from './Item'
+import {ListModel} from './ListModel'
 import {Repeater} from './Repeater'
 
 export class Row extends Item {
-    $wAuto = true
-    $hAuto = true
-
+    $widthAuto = true
+    $heightAuto = true
     constructor(parent) {
         super(parent)
 
-        this.$cP('spacing', 0).connect(this.$spacingChanged.bind(this))
+        this.$cP('spacing', 0)
+        this.$childUpdater = null
     }
 
+    $childChanged(){
+        clearTimeout(this.$childUpdater)
+        this.$childUpdater = setTimeout(()=>{
+            this.$updateGeometry()
+            this.$updateChildren()
+            this.$uP()
+        }, 100)
+    }
+    $uP(){
+        this.$updateChildren()
+        super.$uP()
+    }
     $domCreate(){
         super.$domCreate()
 
     }
-
-    $spacingChanged(){
-        this.$updateGeometry()
-    }
-    $widthChanged(){
-        super.$widthChanged()
-        this.$wAuto = false
-    }
-    $heightChanged(){
-        super.$heightChanged()
-        this.$hAuto = false
-    }
     $updateGeometry(){
-        let dx = 0
-        let height = 0
-        let i = 0
-        for(let child of this.children){
-            
-            if(child instanceof Repeater){
-                let rDx = 0
-                let rHeight = 0
-                let k = 0
-                for(let rChild of child.children){
-                    rChild.x = k === 0 ? 0 : rDx + this.spacing
-                    rDx += rChild.width + (k === 0 ? 0 : this.spacing)
-                    if(rChild.height > rHeight) rHeight = rChild.height
-                    k++
-                }
+        if(this.$widthAuto)
+        this.$sP('width', ()=>{ return this.children.length ? this.children[this.children.length-1].x + this.children[this.children.length-1].width : 0})
 
-                if(child.width < rDx) child.width = rDx
-                if(child.height < rHeight) child.height = rHeight
-
-
+        if(this.$heightAuto)
+        this.$sP('height', ()=>{ 
+            let height = 0
+            if(this.children.length)
+            for(let child of this.children) {
+                let childHeight = child.height
+                if(childHeight > height) height = childHeight
             }
-
-            child.x = i === 0 ? 0 : dx + this.spacing
-            dx += child.width + (i === 0 ? 0 : this.spacing)
-            if(child.height > height) height = child.height
-            i++
+            return height
+        })
+    }
+    $updateChildren(){
+        let prevIndex = 0
+        for(let i = 0; i < this.children.length; i++){
+            if(!(this.children[i] instanceof ListModel || this.children[i] instanceof Repeater)){
+                this.$anchorsChild(i, prevIndex)
+                prevIndex = i
+            }
+            
         }
+    }
 
-        if(this.$wAuto || this.width < dx){
-            this.width = dx
-            this.$wAuto = true
-        }
-        
-        if(this.$hAuto){
-            // this.height = height
-            if(this.$p.height.func){
-                height = this.$p.height.func()
-                if(this.$p.height.val !== height){
-                    this.$p.height.val = height
-                    this.$p.height.signal()
-                }
-            } else {
-                if(this.$p.height.val !== height){
-                    this.$p.height.val = height
-                    this.$p.height.signal()
-                }
-            }     
-            this.$hAuto = true
-        }
+    $anchorsChild(index, prevIndex){
+        let child = this.children[index]
+        let prevChild = this.children[prevIndex]
 
-        for(let child of this.children){
-            if(child.$changedHeight){
-                child.height = this.$p.height.val
-                child.$changedHeight = true
-            } 
+        child.$sP('anchors.top', ()=>{ return this.top })
+        if(index === 0){
+            child.$sP('anchors.left', ()=>{ return this.left })
+        } else {
+            child.$sP('anchors.left', ()=>{ return prevChild.right })
+            child.$sP('anchors.leftMargin', ()=>{ return this.spacing })
         }
+    }
 
-        super.$updateGeometry()
+    $destroy(){
+        clearTimeout(this.$childUpdater)
+        super.$destroy()
     }
 }
 

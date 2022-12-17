@@ -10,10 +10,7 @@ Item {
 
     property string username: authorizationPage.tokenProvider.login;
     property bool enabled: authorizationPage.state == "authorized";
-
-    property alias username: usernameText.text;
     property alias iconSource: loginButton.iconSource;
-
     property bool isExitButton: false;
 
     Text {

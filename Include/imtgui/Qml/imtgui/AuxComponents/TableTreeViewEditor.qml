@@ -15,7 +15,7 @@ Item {
 
     property bool readOnly: false;
 
-    readonly property alias timer: timer;
+    property alias timer: timer;
 
     Timer {
         id: timer;

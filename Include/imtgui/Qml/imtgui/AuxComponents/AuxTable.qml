@@ -425,10 +425,10 @@ Item {
 
                 Rectangle{
                     id: mainRec;
-                    anchors.top: topBorder.height > 0 ? topBorder.bottom : parent.top;
-                    anchors.left: leftBorder.width > 0 ? leftBorder.right : parent.left;
-                    anchors.right: rightBorder.width > 0 ? rightBorder.left : parent.right;
-                    anchors.bottom: bottomBorder.height > 0 ? bottomBorder.top : parent.bottom;
+                    anchors.top: topBorder.bottom;
+                    anchors.left: leftBorder.right;
+                    anchors.right: rightBorder.left;
+                    anchors.bottom: bottomBorder.top;
                     color: tableContainer.emptyDecorHeader ? Style.baseColor :
                                                              headerDecorator.IsValidData("Color", model.index) ?
                                                                  headerDecorator.GetData("Color", model.index) :
@@ -662,7 +662,7 @@ Item {
 
         onClicked: {
             console.log("AuxButton iconFilter onClicked");
-            filterClicked();
+            tableContainer.filterClicked();
         }
     }
 

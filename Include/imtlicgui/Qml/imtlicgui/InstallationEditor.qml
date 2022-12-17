@@ -6,7 +6,7 @@ import Acf 1.0
 DocumentBase {
     id: installationEditorContainer;
 
-    commandsDelegateSourceComp: InstallationEditorCommandsDelegate {}
+    commandsDelegateSourceComp: installationEditorCommandsDelegate;
 
     property TreeItemModel accountsModel: TreeItemModel {}
     property TreeItemModel productsModel: TreeItemModel {}
@@ -15,6 +15,11 @@ DocumentBase {
 
     Component.onCompleted: {
         licensesProvider.updateModel();
+    }
+
+    Component {
+        id: installationEditorCommandsDelegate;
+        InstallationEditorCommandsDelegate {}
     }
 
     onDocumentModelChanged: {

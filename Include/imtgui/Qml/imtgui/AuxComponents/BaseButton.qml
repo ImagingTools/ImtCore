@@ -68,7 +68,9 @@ Item {
     onWidthChanged: {
         if(baseButton.width !== loader.width){
             loader.width = baseButton.width;
-            loader.item.width = baseButton.width;
+            if (loader.item){
+                loader.item.width = baseButton.width;
+            }
         }
 
     }
@@ -76,7 +78,9 @@ Item {
     onHeightChanged: {
         if(baseButton.height !== loader.height){
             loader.height = baseButton.height;
-            loader.item.height = baseButton.height;
+            if (loader.item){
+                loader.item.height = baseButton.height;
+            }
         }
     }
 

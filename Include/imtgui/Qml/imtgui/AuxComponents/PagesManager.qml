@@ -7,15 +7,10 @@ Item {
 
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem;
-    property int activePageIndex: menuPanel.activePageIndex;
+    property int activePageIndex;
 
     onActiveItemChanged: {
         console.log("onActiveItemChanged", activeItem);
-    }
-
-    onPageModelChanged: {
-        console.log("onPageModelChanged", pageModel);
-        pagesData.model = container.pageModel;
     }
 
     function updateModel(){
@@ -32,6 +27,7 @@ Item {
 
         onPagesModelChanged: {
             console.log("pagesProvider onPagesModelChanged");
+            pagesData.model = pagesProvider.pagesModel;
             container.pageModel = pagesProvider.pagesModel;
         }
     }
@@ -62,7 +58,7 @@ Item {
                         pagesLoader.source = source;
                     }
 
-                    activeItem = pagesLoader.item;
+                    container.activeItem = pagesLoader.item;
                 }
             }
 

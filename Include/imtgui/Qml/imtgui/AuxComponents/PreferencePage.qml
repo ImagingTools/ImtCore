@@ -389,9 +389,9 @@ Rectangle {
                     if (serverPageIds.length > 0){
                         let serverModelJson = serverModel.toJSON();
                         console.log("serverModelJson", serverModelJson)
-                        settingsProvider.serverModel.CreateFromJson(serverModelJson);
+                        container.settingsProvider.serverModel.CreateFromJson(serverModelJson);
 
-                        settingsProvider.saveServerModel(serverPageIds);
+                        container.settingsProvider.saveServerModel(serverPageIds);
                     }
 
                     let localPageIds = getDirtyPagesFromLocalModel();
@@ -399,9 +399,9 @@ Rectangle {
                     if (localPageIds.length > 0){
                         let localModelJson = localModel.toJSON();
                         console.log("localModelJson", localModelJson)
-                        settingsProvider.localModel.CreateFromJson(localModelJson);
+                        container.settingsProvider.localModel.CreateFromJson(localModelJson);
 
-                        settingsProvider.saveLocalModel(localPageIds);
+                        container.settingsProvider.saveLocalModel(localPageIds);
                     }
                 }
             }

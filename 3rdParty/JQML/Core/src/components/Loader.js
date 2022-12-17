@@ -1,5 +1,8 @@
 import { Item } from './Item'
 import { Signal } from '../utils/Signal'
+import { ListView } from './ListView'
+import { GridView } from './GridView'
+import { Repeater } from './Repeater'
 
 export class Loader extends Item {
     static Null = 0
@@ -7,8 +10,13 @@ export class Loader extends Item {
     static Loading = 2
     static Error = 3
 
-    $wAuto = true
-    $hAuto = true
+    $xOverride = true
+    $yOverride = true
+    $widthOverride = true
+    $heightOverride = true
+    $clipOverride = true
+    
+    $overrideItemProperties = []
 
     constructor(parent) {
         super(parent)
@@ -16,7 +24,7 @@ export class Loader extends Item {
         this.$cP('active', true).connect(this.$activeChanged.bind(this))
         this.$cP('status', Loader.Null).connect(this.$statusChanged.bind(this))
         this.$cP('progress', 0)
-        this.$cP('item', undefined)
+        this.$cP('item', undefined).connect(this.$itemChanged.bind(this))
         this.$cP('asynchronous', false)
         this.$cP('source', '').connect(this.$sourceChanged.bind(this))
         this.$cP('sourceComponent', undefined).connect(this.$sourceComponentChanged.bind(this))
@@ -35,6 +43,107 @@ export class Loader extends Item {
     $activeChanged(){
         if(!this.active) this.status = Loader.Null
     }
+    $itemChanged(){
+        if(this.item){
+            if(!this.$xOverride){
+                if(this.item.$uL.properties.indexOf('x') < 0 && this.item.$uL.properties.indexOf('anchors.fill') < 0 && this.item.$uL.properties.indexOf('anchors.centerIn') < 0 && this.item.$uL.properties.indexOf('anchors.left') < 0 && this.item.$uL.properties.indexOf('anchors.right') < 0) 
+                this.$xOverride = true
+            }
+            if(!this.$yOverride){
+                if(this.item.$uL.properties.indexOf('y') < 0 && this.item.$uL.properties.indexOf('anchors.fill') < 0 && this.item.$uL.properties.indexOf('anchors.centerIn') < 0 && this.item.$uL.properties.indexOf('anchors.top') < 0 && this.item.$uL.properties.indexOf('anchors.bottom') < 0) 
+                this.$yOverride = true
+            }
+            // if(!this.$widthOverride){
+            //     if(this.item.$uL.properties.indexOf('width') < 0 && this.item.$uL.properties.indexOf('anchors.fill') < 0 && this.item.$uL.properties.indexOf('anchors.left') < 0 && this.item.$uL.properties.indexOf('anchors.right') < 0) 
+            //     this.$widthOverride = true
+            // }
+            // if(!this.$heightOverride){
+            //     if(this.item.$uL.properties.indexOf('height') < 0 && this.item.$uL.properties.indexOf('anchors.fill') < 0 && this.item.$uL.properties.indexOf('anchors.top') < 0 && this.item.$uL.properties.indexOf('anchors.bottom') < 0) 
+            //     this.$heightOverride = true
+            // }
+            // if(!this.$clipOverride){
+            //     if(this.item.$uL.properties.indexOf('clip') < 0) 
+            //     this.$clipOverride = true
+            // }
+            this.$propertyOverride()
+
+        }
+    }
+    $propertyOverride(){
+        if(this.$xOverride){
+            this.item.x = 0
+        } else {
+            // this.$p.x.depends.add(this.item.$p.x.signal)
+            // this.item.$p.x.signal.connections[this.$p.x.PID] = ()=>{
+            //     this.x = this.item.x
+            // }
+            // this.$sP('x', ()=>{return this.$p.item.val.x})
+        }
+        if(this.$yOverride){
+            this.item.y = 0
+        } else {
+            // this.$sP('y', ()=>{return this.$p.item.val.y})
+            // this.$p.y.depends.add(this.item.$p.y.signal)
+            // this.item.$p.y.signal.connections[this.$p.y.PID] = ()=>{
+            //     this.y = this.item.y
+            // }
+        }
+
+        if(this.$widthOverride){
+            this.item.$sP('width', ()=>{return this.width})
+            // this.item.width = this.width
+            // this.$p.width.signal.connections[this.item.$p.width.PID] = ()=>{
+            //     this.$p.item.val.width = this.width
+            // }
+            // this.item.$p.width.depends.add(this.$p.width.signal)
+            // let i = 0
+            // while(i < this.item.$uL.properties.length){
+            //     if(this.item.$uL.properties[i] === 'width') this.item.$uL.properties.splice(i, 1); else i++
+            // }
+        } else {
+            this.$sP('width', ()=>{return this.$p.item.val.width})
+            // this.$p.width.depends.add(this.item.$p.width.signal)
+            // this.item.$p.width.signal.connections[this.$p.width.PID] = ()=>{
+            //     this.width = this.item.width
+            // }
+        }
+        if(this.$heightOverride){
+            this.item.$sP('height', ()=>{return this.height})
+            // this.item.height = this.height
+            // this.$p.height.signal.connections[this.item.$p.height.PID] = ()=>{
+            //     this.$p.item.val.height = this.height
+            // }
+            // this.item.$p.height.depends.add(this.$p.height.signal)
+            // let i = 0
+            // while(i < this.item.$uL.properties.length){
+            //     if(this.item.$uL.properties[i] === 'height') this.item.$uL.properties.splice(i, 1); else i++
+            // }
+        } else {
+            this.$sP('height', ()=>{return this.$p.item.val.height})
+            // this.$p.height.depends.add(this.item.$p.height.signal)
+            // this.item.$p.height.signal.connections[this.$p.height.PID] = ()=>{
+            //     this.height = this.item.height
+            // }
+        }
+        if(this.$clipOverride){
+            this.item.$sP('clip', ()=>{return this.clip})
+            // this.item.clip = this.clip
+            // this.$p.clip.signal.connections[this.item.$p.clip.PID] = ()=>{
+            //     this.$p.item.val.clip = this.clip
+            // }
+            // this.item.$p.clip.depends.add(this.$p.clip.signal)
+            // let i = 0
+            // while(i < this.item.$uL.properties.length){
+            //     if(this.item.$uL.properties[i] === 'clip') this.item.$uL.properties.splice(i, 1); else i++
+            // }
+        } else {
+            this.$sP('clip', ()=>{return this.$p.item.val.clip})
+            // this.$p.clip.depends.add(this.item.$p.clip.signal)
+            // this.item.$p.clip.signal.connections[this.$p.clip.PID] = ()=>{
+            //     this.clip = this.item.clip
+            // }
+        }
+    }
     $sourceComponentChanged(){
         this.status = Loader.Loading
 
@@ -42,8 +151,11 @@ export class Loader extends Item {
         this.children = []
         
         if(this.sourceComponent){
-            this.item = this.sourceComponent.component(this)
-            if(this.sourceComponent.parent) this.item.parent2 = this.sourceComponent.parent
+            this.item = this.sourceComponent.component ? this.sourceComponent.component(this) : this.sourceComponent(this)
+            if(this.sourceComponent.parent) {
+                this.item.parent2 = this.sourceComponent.parent
+                this.item.$treeParent2 = this.sourceComponent.parent
+            }
 
             let childLVL = (obj)=>{
                 for(let child of obj.children){
@@ -52,28 +164,24 @@ export class Loader extends Item {
                     }
                 }
             }
-            childLVL(this)
+            
+            if(this.sourceComponent.LVL) childLVL(this)
 
-            if(this.$p.model){
-                let childRecursive = (obj, model, index)=>{
-                    obj.$cP('model',model)
+            if(this.index !== undefined){
+                let childRecursive = (obj, index)=>{
                     obj.$cP('index',index)
-                    for(let child of obj.children){
-                        childRecursive(child, model, index)
+                    obj.index = index
+
+                    if(!obj.$useModel && !obj.$repeater)
+                    for(let child of obj.children){ 
+                        childRecursive(child, index)
                     }
                 }
-                childRecursive(this.$p.item.val, this.$p.model.val, this.$p.model.val.index)
+                childRecursive(this.item, this.index)
             }
-            
+
             this.item.$uP()
-            if(this.$wAuto){
-                this.width = this.$p.item.val.$p.width.val
-                this.$wAuto = true
-            }
-            if(this.$hAuto){
-                this.height = this.$p.item.val.$p.height.val
-                this.$hAuto = true
-            }
+            
         } else {
             this.item = undefined
             
@@ -92,54 +200,21 @@ export class Loader extends Item {
         this.children = []
         
         if(this.source){
-            // try {
-                // let path = []
-                //if(Core.hostPath !== '') path.push(Core.hostPath)
-                //if(Core.rootPath !== '') path.push(Core.rootPath)
-                // if(this.$basePath !== '') path.push(this.$basePath)
-                // path.push(this.source)
-
                 this.item = Core.cC(this.source, this, Core.LVL)
-                // this.$p.width.depends.add(this.$p.item.val.$p.width.signal)
-                // this.$p.item.val.$p.width.signal.connections[this.$p.width.PID] = ()=>{
-                //     // this.width = this.$p.item.val.$p.width.val
-                //     this.$p.width.val = this.$p.item.val.$p.width.val
-                //     this.dom.style.width = `${this.$p.item.val.$p.width.val}px`
-                // }
-                // this.$p.height.depends.add(this.$p.item.val.$p.height.signal)
-                // this.$p.item.val.$p.height.signal.connections[this.$p.height.PID] = ()=>{
-                //     // this.height = this.$p.item.val.$p.height.val
-                //     this.$p.height.val = this.$p.item.val.$p.height.val
-                //     this.dom.style.height = `${this.$p.item.val.$p.height.val}px`
-                // }
-                if(this.$p.model){
-                    let childRecursive = (obj, model, index)=>{
-                        obj.$cP('model',model)
+
+                if(this.index !== undefined){
+                    let childRecursive = (obj, index)=>{
                         obj.$cP('index',index)
+                        obj.index = index
+                        if(!obj.$useModel && !obj.$repeater)
                         for(let child of obj.children){
-                            childRecursive(child, model, index)
+                            childRecursive(child, index)
                         }
                     }
-                    childRecursive(this.$p.item.val, this.$p.model.val, this.$p.model.val.index)
+                    childRecursive(this.item, this.index)
                 }
+                
                 this.item.$uP()
-                if(this.$wAuto){
-                    this.width = this.$p.item.val.$p.width.val
-                    this.$wAuto = true
-                }
-                if(this.$hAuto){
-                    this.height = this.$p.item.val.$p.height.val
-                    this.$hAuto = true
-                }
-            // } catch (err) {
-            //     this.item = undefined
-            //     while(this.children.length > 0){
-            //         let child = this.children.pop()
-            //         child.$destroy()
-            //         Core.temp.lastAndRemove()
-            //     }
-            // } finally {
-            // }
   
         } else {
             this.item = undefined
@@ -162,38 +237,7 @@ export class Loader extends Item {
         this.$hAuto = false
     }
 
-    $updateGeometry(){
-        if(this.$p.item.val && this.$p.item.val.$p){
-            if(this.$wAuto || this.width < this.item.width){
-                this.width = this.$p.item.val.$p.width.val
-                
-                // this.$p.width.val = this.$p.item.val.$p.width.val
-                // this.dom.style.width = `${this.$p.item.val.$p.width.val}px`
-                // if(this.$p.x.func) this.$p.x.val = this.$p.x.func()
-                // this.$xChanged()
 
-                this.$wAuto = true
-                // this.$p.width.val = this.item.width
-                // this.dom.style.width = `${this.width}px`
-            }
-            if(this.$hAuto || this.height < this.item.height){
-                this.height = this.$p.item.val.$p.height.val
-                
-                // this.$p.height.val = this.$p.item.val.$p.height.val
-                // this.dom.style.height = `${this.$p.item.val.$p.height.val}px`
-                // if(this.$p.y.func) this.$p.y.val = this.$p.y.func()
-                // this.$yChanged()
-
-                this.$hAuto = true
-                // this.$p.height.val = this.item.height
-                // this.dom.style.height = `${this.height}px`
-            }
-            // this.width = this.item.width
-            // this.height = this.item.height
-        }
-
-        super.$updateGeometry()
-    }
 }
 
 QML.Loader = Loader

@@ -6,6 +6,7 @@ require('./components/Component')
 require('./components/Shortcut')
 require('./components/QtObject')
 require('./components/Item')
+require('./components/FocusScope')
 require('./components/MouseArea')
 require('./components/Rectangle')
 require('./components/Loader')
@@ -49,6 +50,7 @@ global.caller = null
 global.ReadyList = []
 
 
+
 let XMLProxy = XMLHttpRequest.prototype.open
 XMLHttpRequest.prototype.open = function() {  
     let opened = XMLProxy.apply(this, [].slice.call(arguments))
@@ -56,49 +58,95 @@ XMLHttpRequest.prototype.open = function() {
     return opened
 }
 
+// Array.prototype.changed = function(obj){
+//     obj.$childChanged()
+// }
+// let arrayPush = Array.prototype.push
+// Array.prototype.push = function() {  
+//     arrayPush.apply(this, [].slice.call(arguments))
+
+//     if(this.lengthChanged) this.lengthChanged()
+// }
+// let arrayPop = Array.prototype.pop
+// Array.prototype.pop = function() {  
+//     arrayPop.apply(this, [].slice.call(arguments))
+
+//     if(this.lengthChanged) this.lengthChanged()
+// }
+// let arrayShift = Array.prototype.shift
+// Array.prototype.push = function() {  
+//     arrayShift.apply(this, [].slice.call(arguments))
+
+//     if(this.lengthChanged) this.lengthChanged()
+// }
+// let arrayUnShift = Array.prototype.unshift
+// Array.prototype.push = function() {  
+//     arrayUnShift.apply(this, [].slice.call(arguments))
+
+//     if(this.lengthChanged) this.lengthChanged()
+// }
+
+
 
 global.IDManager = {
-    find: function(obj, ID, current, step = 1, ignore = null){
+    find: function(obj, ID, current, step = 1, ignore){
+        // console.log(obj, ID, current, step = 1)
         if(current.len < step) return
 
-        if(obj.parent && obj.parent !== ignore && obj.parent.ID.has(ID) && current.len > step) {
+        if(obj.$treeParent && !ignore.has(obj.$treeParent) && obj.$treeParent.ID.has(ID) && current.len > step) {
             current.len = step
-            current.obj = obj.parent     
+            current.obj = obj.$treeParent     
         }
-        if(obj.parent && obj.parent !== ignore) this.find(obj.parent, ID, current, step+1, obj)
+        if(obj.$treeParent && !ignore.has(obj.$treeParent)) {
+            ignore.add(obj)
+            this.find(obj.$treeParent, ID, current, step+1, ignore)
+        }
 
-        if(obj.parent2 && obj.parent2 !== ignore && obj.parent2.ID.has(ID) && current.len > step) {
+        if(obj.$treeParent2 && !ignore.has(obj.$treeParent2) && obj.$treeParent2.ID.has(ID) && current.len > step) {
             current.len = step
-            current.obj = obj.parent2     
+            current.obj = obj.$treeParent2     
         }
-        if(obj.parent2 && obj.parent2 !== ignore) this.find(obj.parent2, ID, current, step+1, obj)
+        if(obj.$treeParent2 && !ignore.has(obj.$treeParent2)) {
+            ignore.add(ignore)
+            this.find(obj.$treeParent2, ID, current, step+1, ignore)
+        }
         
-        if(!(obj instanceof ListView) && !(obj instanceof Repeater) && !(obj instanceof GridView) && !(obj instanceof ListModel))
-        for(let child of obj.children){
-            if(child !== ignore && child.ID.has(ID) && current.len > step){
-                current.len = step
-                current.obj = child
+        if(!(obj instanceof ListView) && !(obj instanceof Repeater) && !(obj instanceof GridView) && !(obj instanceof ListModel) && obj.$treeChilds)
+        for(let child of obj.$treeChilds){
+            if(child.ID){
+                if(!ignore.has(child) && child.ID.has(ID) && current.len > step){
+                    current.len = step
+                    current.obj = child
+                }
+                if(!ignore.has(child)) {
+                    ignore.add(obj)
+                    this.find(child, ID, current, step+1, ignore)
+                }
             }
-            if(child !== ignore) this.find(child, ID, current, step+1, obj)
+            
             
         }
 
         return current.obj
     },
     get: function(obj, ID){
-        if(obj.ID.has(ID)) return obj
+        if(obj[ID]) return obj[ID]
+        if(obj.ID && obj.ID.has(ID)) return obj
+        if(this.list[ID] && this.list[ID].length === 1) return this.list[ID][0]
         let current = {
             len: 99999999,
             obj: null,
         }
-        return this.find(obj, ID, current, 1, obj)
+        return this.find(obj, ID, current, 1, new Set([obj]))
     },
     get0: function(obj, ID){
+        if(obj[ID]) return obj[ID]
+        if(this.list[ID] && this.list[ID].length === 1) return this.list[ID][0]
         let current = {
             len: 99999999,
             obj: null,
         }
-        return this.find(obj, ID, current, 1, obj)
+        return this.find(obj, ID, current, 1, new Set([obj]))
     },
     list: {},
     set: function(obj, ID){
@@ -118,89 +166,7 @@ global.IDManager = {
     },
 }
 
-// global.IDManager = {
-//     list: {},
-//     set: function(obj, ID){
-//         if(this.list[ID]){
-//             if(this.list[ID].indexOf(obj) < 0) this.list[ID].push(obj)
-//         } else {
-//             this.list[ID] = [obj]
-//         }
-//     },
-//     get: function(obj, ID){
-//         if(this.list[ID]){
-//             let d = 9999999//Math.abs(obj.UID - this.list[ID][0].UID)
-//             let d2 = 9999999
-//             let res = null//this.list[ID][0]
-//             if(this.list[ID].length === 1) return this.list[ID][0]
-//             for(let i = 0; i < this.list[ID].length; i++){
-//                 if(Math.abs(obj.UID - this.list[ID][i].UID) < d && Math.abs(obj.LVL.size-this.list[ID][i].LVL.size) < d2){
 
-//                     let available = true
-//                     if(obj.LVL.size > this.list[ID][i].LVL.size){
-//                         for(let lvl of this.list[ID][i].LVL){
-//                             if(!obj.LVL.has(lvl)) available = false
-//                         }
-//                     } else {
-//                         for(let lvl of obj.LVL){
-//                             if(!this.list[ID][i].LVL.has(lvl)) available = false
-//                         }
-//                     }
-//                     if(available){
-//                         d = Math.abs(obj.UID - this.list[ID][i].UID)
-//                         d2 = Math.abs(obj.LVL.size-this.list[ID][i].LVL.size)
-//                         res = this.list[ID][i]
-//                     }
-                    
-//                 }
-//             }
-//             return res
-//         } else {
-//             return undefined
-//         }
-//     },
-//     get0: function(obj, ID){
-//         if(this.list[ID]){
-//             let d = 9999999//Math.abs(obj.UID - this.list[ID][0].UID)
-//             let d2 = 9999999
-//             let res = null//this.list[ID][0]
-//             if(this.list[ID].length === 1) return this.list[ID][0]
-//             for(let i = 0; i < this.list[ID].length; i++){
-//                 if(Math.abs(obj.UID - this.list[ID][i].UID) < d && Math.abs(obj.UID - this.list[ID][i].UID) > 0 && Math.abs(obj.LVL.size-this.list[ID][i].LVL.size) < d2){
-
-//                     let available = true
-//                     if(obj.LVL.size > this.list[ID][i].LVL.size){
-//                         for(let lvl of this.list[ID][i].LVL){
-//                             if(!obj.LVL.has(lvl)) available = false
-//                         }
-//                     } else {
-//                         for(let lvl of obj.LVL){
-//                             if(!this.list[ID][i].LVL.has(lvl)) available = false
-//                         }
-//                     }
-//                     if(available){
-//                         d = Math.abs(obj.UID - this.list[ID][i].UID)
-//                         d2 = Math.abs(obj.LVL.size-this.list[ID][i].LVL.size)
-//                         res = this.list[ID][i]
-//                     }
-                    
-//                 }
-//             }
-//             return res
-//         } else {
-//             return undefined
-//         }
-//     },
-//     remove: function(obj){
-//         for(let ID of obj.ID){
-//             if(this.list[ID]){
-//                 let pos = this.list[ID].indexOf(obj)
-//                 if(pos >= 0) this.list[ID].splice(pos, 1)
-//             }
-//         }
-//     }
-
-// }
 global.Core = {
     FPS: 60,
     exports: {},
@@ -208,6 +174,89 @@ global.Core = {
     components: {...QML},
     animations: {},
     LVL: 0,
+    queueCompleted: [],
+    proxy: function(obj, alt = {}){
+        let temp = {}
+        return new Proxy(obj, {
+            has(){
+                return true
+            },
+            get(target, name){
+                if(name in temp){
+                    return temp[name]
+                } else if(name in alt){
+                    return alt[name]
+                } else if(name in target){
+                    return target[name]
+                } else if(target.ID.has(name)) {
+                    return target
+                } else if(name === 'model') {
+                    let parent = target.parent
+                    while(parent){
+                        if(parent instanceof ListView || parent instanceof GridView || parent instanceof Repeater) return parent.model.data[target.index]
+                        parent = parent.parent
+                    }
+                } else {
+                    if(name in QML){
+                        return QML[name]
+                    }
+                    if(name in Core.Singletons){
+                        return IDManager.list[name][0]
+                    }
+                    if(name in window) return window[name]
+
+                    let parent = target.parent
+                    while(parent){
+                        if(name in parent) return parent[name]
+                        parent = parent.parent
+                    }
+                    
+                    let res = IDManager.find(target, name, {
+                        len: 99999999,
+                        obj: null,
+                    }, 1, [target])
+                    if(res) return res
+
+                    //return temp[name]
+                }
+            },
+            set(target, name, value){
+                if(name in alt){
+                    alt[name] = value
+                    return true
+                } else if(name in target){
+                    target[name] = value
+                } else {
+                    let parent = target.parent
+                    while(parent){
+                        if(name in parent) {
+                            parent[name] = value
+                            return true
+                        }
+                        parent = parent.parent
+                    }
+                
+                    temp[name] = value
+                    return true
+                }
+            },
+            // set(target, name, value){
+            //     if(name in target){
+            //         target[name] = value
+            //     }  else {
+            //         let find = false
+            //         let parent = target.parent
+            //         while(parent && !find){
+            //             if(name in parent) {
+            //                 find = true
+            //                 parent[name] = value
+            //             }
+            //             parent = parent.parent
+            //         }
+            //     }
+            // }
+        })
+    },
     cC: function(componentPath, parent, LVL){ // createComponent => CC
         if(componentPath[0] === '/') componentPath = componentPath.slice(1)
         let l = componentPath.lastIndexOf('/')
@@ -300,16 +349,18 @@ global.Core = {
 			root.dom.addEventListener(event, (e)=>{
                 if(root.$readyEvents){
 
-                
+                    
                     //e.preventDefault()
                     let path = []
                     if(e.type.indexOf('mouse')>=0 || e.type.indexOf('wheel')>=0 || e.type.indexOf('context')>=0 || e.type.indexOf('touch')>=0){
+                        
                         path = document.elementsFromPoint(e.type.indexOf('touch') >= 0 ? e.changedTouches[0].pageX : e.x, e.type.indexOf('touch') >= 0 ? e.changedTouches[0].pageY : e.y)
                         for(let indx in UIDList){
                             if(e.type === 'mousemove' && UIDList[indx].dom && path.indexOf(UIDList[indx].dom) < 0 && UIDList[indx].$mouseout){
                                 UIDList[indx].$mouseout(e)
                             }
                         }
+                        
                     } else {
                         path = [e. target]
                         let parent = e.target.parentNode
@@ -368,7 +419,9 @@ global.Core = {
         // if(fullImport) fullImport()
 
         for(let sing in this.Singletons){
-            this.Singletons[sing](root)
+            let obj = this.Singletons[sing](root)
+            IDManager.set(obj, sing)
+            obj.$tryComplete()
         }
 
         this.cC(document.body.dataset.qml, root, this.LVL++)
@@ -413,6 +466,28 @@ global.Core = {
         // document.body.addEventListener('mousemove', ()=>{
         //     root.$readyEvents = true
         // })
+        // setInterval(()=>{
+        //     let temp = []
+        //     while(this.queueCompleted.length){
+        //         let obj = this.queueCompleted.shift()
+            
+        //         if(obj && obj.UID){
+        //             let ready = true
+        //             let i = 0
+        //             while(i < obj.children && ready){
+        //                 if(!obj.children[i].$ready) ready = false
+        //             }
+        //             if(ready){
+        //                 obj.$tryComplete()
+        //             } else {
+        //                 temp.push(obj)
+        //             }
+        //         }
+        //     }
+        //     this.queueCompleted = temp
+            
+        //     //}
+        // }, 1000 / this.FPS)
         
         console.timeEnd('build')
     }

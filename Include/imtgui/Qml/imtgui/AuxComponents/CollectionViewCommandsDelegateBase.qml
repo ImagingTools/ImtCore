@@ -34,7 +34,9 @@ Item {
     property string gqlModelMetaInfo;
 
     onTableDataChanged: {
-        tableData.rightButtonMouseClicked.connect(openPopupMenu);
+        if (tableData){
+            tableData.rightButtonMouseClicked.connect(openPopupMenu);
+        }
     }
 
     //TODO -> onItemSelectionChanged
@@ -48,7 +50,9 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
-        tableData.rightButtonMouseClicked.disconnect(openPopupMenu);
+        if (tableData){
+            tableData.rightButtonMouseClicked.disconnect(openPopupMenu);
+        }
     }
 
     onCommandsIdChanged: {

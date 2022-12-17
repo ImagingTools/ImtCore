@@ -5,104 +5,106 @@ import imtgui  1.0
 TreeItemDelegate {
     id: treeItemDelegate;
 
-    itemDelegate: Rectangle {
-        id: body;
+    itemDelegate: Component {
+        Rectangle {
+            id: body;
 
-        anchors.top: treeItemDelegate.top;
-        anchors.right: treeItemDelegate.right;
+            anchors.top: treeItemDelegate.top;
+            anchors.right: treeItemDelegate.right;
 
-        width: parent.width;
-        height: parent.height;
+            width: parent.width;
+            height: parent.height;
 
-        visible: itemData.Visible;
+            visible: treeItemDelegate.itemData ? treeItemDelegate.itemData.Visible : false;
 
-        color: model.Selected ? Style.selectedColor : "transparent";
-
-        MouseArea {
-            anchors.fill: parent;
-
-            onClicked: {
-                treeItemDelegate.clicked(model, model.index);
-            }
-
-            onDoubleClicked: {
-                treeItemDelegate.doubleClicked();
-            }
-        }
-
-        Image {
-            id: iconArrow;
-
-            anchors.left: parent.left;
-            anchors.leftMargin: 10;
-            anchors.verticalCenter: parent.verticalCenter;
-
-            width: 10;
-            height: 10;
-
-            visible: childrenCount > 0;
-
-            source: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                     "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
-
-            sourceSize.height: height;
-            sourceSize.width: width;
+            color: model.Selected ? Style.selectedColor : "transparent";
 
             MouseArea {
-                id: mouseArea;
-
                 anchors.fill: parent;
 
                 onClicked: {
-                    console.log("iconArrow onClicked");
-                    model.Opened = !model.Opened;
+                    treeItemDelegate.clicked(model, model.index);
+                }
+
+                onDoubleClicked: {
+                    treeItemDelegate.doubleClicked();
                 }
             }
-        }
 
-        CheckBox {
-            id: checkBox;
+            Image {
+                id: iconArrow;
 
-            anchors.left: iconArrow.right;
-            anchors.leftMargin: 5;
-            anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+                anchors.leftMargin: 10;
+                anchors.verticalCenter: parent.verticalCenter;
 
-            checkState: model.State;
+                width: 10;
+                height: 10;
 
-            visible: model.Level >= 1;
+                visible: childrenCount > 0;
 
-            onClicked: {
-                if (!model.Active){
-                    return;
+                source: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
+                                       "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+
+                sourceSize.height: height;
+                sourceSize.width: width;
+
+                MouseArea {
+                    id: mouseArea;
+
+                    anchors.fill: parent;
+
+                    onClicked: {
+                        console.log("iconArrow onClicked");
+                        model.Opened = !model.Opened;
+                    }
                 }
-                console.log("onClicked", itemData.Id);
-
-                if (model.State == Qt.PartiallyChecked){
-                    model.State = Qt.Checked;
-                }
-                else{
-                    model.State = Qt.Checked - model.State;
-                }
-
-                treeView.itemsStateChanged(itemData);
-
-//                treeView.childrenStateChanged(itemData, model.State);
-//                treeView.parentStateChanged(itemData, model.State);
             }
-        }
 
-        Text {
-            id: title;
+            CheckBox {
+                id: checkBox;
 
-            anchors.left: checkBox.visible ? checkBox.right : iconArrow.right;
-            anchors.leftMargin: 10;
-            anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: iconArrow.right;
+                anchors.leftMargin: 5;
+                anchors.verticalCenter: parent.verticalCenter;
 
-            text: model.Name;
-            color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
+                checkState: model.State;
 
-            font.pixelSize: Style.fontSize_common;
-            font.family: Style.fontFamily;
+                visible: model.Level >= 1;
+
+                onClicked: {
+                    if (!model.Active){
+                        return;
+                    }
+                    console.log("onClicked", itemData.Id);
+
+                    if (model.State == Qt.PartiallyChecked){
+                        model.State = Qt.Checked;
+                    }
+                    else{
+                        model.State = Qt.Checked - model.State;
+                    }
+
+                    treeView.itemsStateChanged(itemData);
+
+                    //                treeView.childrenStateChanged(itemData, model.State);
+                    //                treeView.parentStateChanged(itemData, model.State);
+                }
+            }
+
+            Text {
+                id: title;
+
+                anchors.left: checkBox.visible ? checkBox.right : iconArrow.right;
+                anchors.leftMargin: 10;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                text: model.Name;
+                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
+
+                font.pixelSize: Style.fontSize_common;
+                font.family: Style.fontFamily;
+            }
         }
     }
 }

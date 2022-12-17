@@ -40,15 +40,21 @@ Item {
 
     onSelectedChanged: {
         console.log("onSelectedChanged", selected);
-        loaderDecorator.item.selected = container.selected;
+        if (loaderDecorator.item){
+            loaderDecorator.item.selected = container.selected;
+        }
     }
 
     onHighlightedChanged: {
-        loaderDecorator.item.highlighted = container.highlighted;
+        if (loaderDecorator.item){
+            loaderDecorator.item.highlighted = container.highlighted;
+        }
     }
 
     onImageSourceChanged: {
-        loaderDecorator.item.imageSource = container.imageSource;
+        if (loaderDecorator.item){
+            loaderDecorator.item.imageSource = container.imageSource;
+        }
     }
 
     Component.onCompleted: {
@@ -127,7 +133,9 @@ Item {
                 property bool selected: subPagesColumn.currentIndex == model.index;
 
                 onSelectedChanged: {
-                    subPagesDecorator.item.selected = subPageDelegate.selected;
+                    if (subPagesDecorator.item){
+                        subPagesDecorator.item.selected = subPageDelegate.selected;
+                    }
                 }
 
                 Loader {

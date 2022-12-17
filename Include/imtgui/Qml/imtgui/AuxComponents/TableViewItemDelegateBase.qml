@@ -21,24 +21,24 @@ FocusScope {
     property var itemData: model;
 
     property alias headerDelegate: headerDelegateLoader.sourceComponent;
-    readonly property alias headerItem: headerDelegateLoader.item;
+    property alias headerItem: headerDelegateLoader.item;
 
     property alias footerDelegate: footerDelegateLoader.sourceComponent;
-    readonly property alias footerItem: footerDelegateLoader.item;
+    property alias footerItem: footerDelegateLoader.item;
 
     property alias prefixRowDelegate: prefixRowLoader.sourceComponent;
-    readonly property alias prefixRowItem: prefixRowLoader.item;
+    property alias prefixRowItem: prefixRowLoader.item;
 
     property alias suffixRowDelegate: suffixRowLoader.sourceComponent;
-    readonly property alias suffixRowItem: suffixRowLoader.item;
+    property alias suffixRowItem: suffixRowLoader.item;
 
     property alias rowBodyDelegate: rowLoader.sourceComponent;
-    readonly property alias rowBodyItem: rowLoader.item;
+    property alias rowBodyItem: rowLoader.item;
 
     property alias highlightDelegate: highlightLoader.sourceComponent;
-    readonly property alias highlightItem: highlightLoader.item;
+    property alias highlightItem: highlightLoader.item;
 
-    readonly property alias prefixRowLoader: prefixRowLoader;
+    property alias prefixRowLoader: prefixRowLoader;
 
     property bool selected: model.Selected;
 

@@ -1,109 +1,75 @@
 import {Item} from './Item'
+import {ListModel} from './ListModel'
 import {Repeater} from './Repeater'
 
 export class Column extends Item {
-    $wAuto = true
-    $hAuto = true
-
+    $widthAuto = true
+    $heightAuto = true
     constructor(parent) {
         super(parent)
 
-        this.$cP('spacing', 0).connect(this.$spacingChanged.bind(this))
+        this.$cP('spacing', 0)
+
+        this.$childUpdater = null
+    }
+    $childChanged(){
+        clearTimeout(this.$childUpdater)
+        this.$childUpdater = setTimeout(()=>{
+            this.$updateGeometry()
+            this.$updateChildren()
+            this.$uP()
+        }, 100)
     }
     $uP(){
+        this.$updateChildren()
         super.$uP()
-        this.$updateGeometry()
     }
     $domCreate(){
         super.$domCreate()
 
     }
-    $spacingChanged(){
-        this.$updateGeometry()
-    }
-    $widthChanged(){
-        super.$widthChanged()
-        this.$wAuto = false
-
-        
-    }
-    $heightChanged(){
-        super.$heightChanged()
-        this.$hAuto = false
-    }
     $updateGeometry(){
-        let dy = 0
-        let width = 0
-        let i = 0
-        for(let child of this.children){
-            if(child instanceof Repeater){
-                let rDy = 0
-                let rWidth = 0
-                let k = 0
-                for(let rChild of child.children){
-                    rChild.y = k === 0 ? 0 : rDy + this.$p.spacing.val
-                    rDy += rChild.$p.height.val + (k === 0 ? 0 : this.$p.spacing.val)
-                    if(rChild.$p.width.val > rWidth) rWidth = rChild.$p.width.val
-                    k++
-                }
-                // child.height = rDy
-                // child.width = rWidth
-                if(child.$p.height.val < rDy){
-                    child.$p.height.val = rDy
-                    child.dom.style.height = `${child.$p.height.val}px`
-                }
+        if(this.$widthAuto)
+        this.$sP('height', ()=>{ return this.children.length ? this.children[this.children.length-1].y + this.children[this.children.length-1].height : 0})
 
-                if(child.$p.width.val < rWidth){
-                    child.$p.width.val = rWidth
-                    child.dom.style.width = `${child.$p.width.val}px`
-                }
-
-
+        if(this.$heightAuto)
+        this.$sP('width', ()=>{ 
+            let width = 0
+            if(this.children.length)
+            for(let child of this.children) {
+                let childWidth = child.width
+                if(childWidth > width) width = childWidth
             }
-
-            child.y = i === 0 ? 0 : dy + this.$p.spacing.val
-            dy += child.$p.height.val + (i === 0 ? 0 : this.$p.spacing.val)
-            if(child.$p.width.val > width) width = child.$p.width.val
+            return width
+        })
+    }
+    $updateChildren(){
+        let prevIndex = 0
+        for(let i = 0; i < this.children.length; i++){
+            if(!(this.children[i] instanceof ListModel || this.children[i] instanceof Repeater)){
+                this.$anchorsChild(i, prevIndex)
+                prevIndex = i
+            }
             
-            i++
         }
-        
-        if(this.$wAuto){
-            if(this.$p.width.func){
-                width = this.$p.width.func()
-                if(this.$p.width.val !== width){
-                    this.$p.width.val = width
-                    this.dom.style.width = `${this.$p.width.val}px`
-                    this.$xChanged()
-                    // this.$p.width.signal()
-                }
-            } else {
-                if(this.$p.width.val !== width){
-                    this.$p.width.val = width
-                    this.dom.style.width = `${this.$p.width.val}px`
-                    this.$xChanged()
-                    // this.$p.width.signal()
-                }
-            }        
-            
-            this.$wAuto = true
-        }
-        if(this.$hAuto || this.$p.height.val < dy){
-            // this.$p.height.val = dy
-            // this.dom.style.height = `${this.$p.height.val}px`
-            // this.$yChanged()
-            this.height = dy
-            this.$hAuto = true
-        }
+    }
 
-        for(let child of this.children){
-            if(child.$changedWidth){
-                child.width = this.$p.width.val
-                child.$changedWidth = true
-            } 
-        }
+    $anchorsChild(index, prevIndex){
+        let child = this.children[index]
+        let prevChild = this.children[prevIndex]
 
-        super.$updateGeometry()
+        child.$sP('anchors.left', ()=>{ return this.left })
+        if(index === 0){
+            child.$sP('anchors.top', ()=>{ return this.top })
+        } else {
+            child.$sP('anchors.top', ()=>{ return prevChild.bottom })
+            child.$sP('anchors.topMargin', ()=>{ return this.spacing })
+        }
+    }
+
+    $destroy(){
+        clearTimeout(this.$childUpdater)
+        super.$destroy()
     }
 }
 

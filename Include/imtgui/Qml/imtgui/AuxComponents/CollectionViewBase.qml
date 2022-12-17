@@ -180,6 +180,9 @@ Item {
     SortController {
         id: sortController;
 
+        collectionView: collectionViewContainer;
+        commands: baseCommands;
+
         Component.onCompleted: {
             tableInternal.headerClicked.connect(sortController.headerClicked);
         }

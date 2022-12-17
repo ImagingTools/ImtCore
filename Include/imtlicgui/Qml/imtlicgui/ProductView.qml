@@ -7,8 +7,10 @@ DocumentBase {
 
     property bool blockUpdatingModel: false;
 
-    commandsDelegateSourceComp: ProductViewCommandsDelegate {
-        tableData: tableView;
+    commandsDelegateSourceComp: Component {
+        ProductViewCommandsDelegate {
+            tableData: tableView;
+        }
     }
 
     onDocumentModelChanged: {

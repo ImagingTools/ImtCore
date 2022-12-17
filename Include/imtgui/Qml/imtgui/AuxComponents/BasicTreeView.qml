@@ -8,43 +8,45 @@ BasicTableView {
 
     property bool tristate: false;
 
-    rowDelegate: TreeViewItemDelegateBase {
-        width: root.width;
+    rowDelegate: Component {
+        TreeViewItemDelegateBase {
+            width: root.width;
 
-        onParentCheckStateChanged: {
-            console.log("onParentCheckedChanged")
+            onParentCheckStateChanged: {
+                console.log("onParentCheckedChanged")
 
-            model.CheckState = data.CheckState;
+                model.CheckState = data.CheckState;
 
-            for (let i = 0; i < childrenDelegates.length; i++){
-                childrenDelegates[i].parentCheckStateChanged(model);
-            }
-        }
-
-        onChildrenCheckStateChanged: {
-            console.log("onChildrenCheckedChanged")
-
-            let isAllChecked = root.__checkState(childrenDelegates, Qt.Checked);
-            let isAllUnchecked = root.__checkState(childrenDelegates, Qt.Unchecked);
-
-            if (isAllChecked){
-                if (model.CheckState != Qt.Checked){
-                    model.CheckState = Qt.Checked
-                }
-            }
-            else if (isAllUnchecked){
-                if (model.CheckState != Qt.Unchecked){
-                    model.CheckState = Qt.Unchecked
-                }
-            }
-            else if (!isAllChecked && !isAllUnchecked){
-                if (model.CheckState != Qt.PartiallyChecked){
-                    model.CheckState = Qt.PartiallyChecked
+                for (let i = 0; i < childrenDelegates.length; i++){
+                    childrenDelegates[i].parentCheckStateChanged(model);
                 }
             }
 
-            if (parentDelegate){
-                parentDelegate.childrenCheckStateChanged(model)
+            onChildrenCheckStateChanged: {
+                console.log("onChildrenCheckedChanged")
+
+                let isAllChecked = root.__checkState(childrenDelegates, Qt.Checked);
+                let isAllUnchecked = root.__checkState(childrenDelegates, Qt.Unchecked);
+
+                if (isAllChecked){
+                    if (model.CheckState != Qt.Checked){
+                        model.CheckState = Qt.Checked
+                    }
+                }
+                else if (isAllUnchecked){
+                    if (model.CheckState != Qt.Unchecked){
+                        model.CheckState = Qt.Unchecked
+                    }
+                }
+                else if (!isAllChecked && !isAllUnchecked){
+                    if (model.CheckState != Qt.PartiallyChecked){
+                        model.CheckState = Qt.PartiallyChecked
+                    }
+                }
+
+                if (parentDelegate){
+                    parentDelegate.childrenCheckStateChanged(model)
+                }
             }
         }
     }

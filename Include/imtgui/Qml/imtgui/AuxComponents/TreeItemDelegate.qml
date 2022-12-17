@@ -49,7 +49,7 @@ Item {
             width: parent.width;
             height: parent.height;
 
-            visible: itemData.Visible;
+            visible: treeItemDelegate.itemData ? treeItemDelegate.itemData.Visible : false;
 
             color: model.Selected ? Style.selectedColor : "transparent";
 
@@ -82,7 +82,7 @@ Item {
                 width: 10;
                 height: 10;
 
-                visible: childrenCount > 0;
+                visible: treeItemDelegate.childrenCount > 0;
 
                 source: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                          "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
@@ -117,7 +117,7 @@ Item {
                     if (!model.Active){
                         return;
                     }
-                    console.log("onClicked", itemData.Id);
+                    console.log("onClicked", treeItemDelegate.itemData.Id);
 //                    treeItemDelegate.stateChanged.connect(treeView.itemStateChanged);
 
                     if (model.State == Qt.PartiallyChecked){
@@ -127,7 +127,7 @@ Item {
                         model.State = Qt.Checked - model.State;
                     }
 
-                    treeView.itemsStateChanged(itemData);
+                    treeViewContainer.itemsStateChanged(treeItemDelegate.itemData);
 
 //                    treeView.childrenStateChanged(itemData, model.State);
 //                    treeView.parentStateChanged(itemData, model.State);
@@ -164,18 +164,18 @@ Item {
         Repeater {
             id: childModelRepeater;
 
-            delegate: treeView.itemDelegate;
+            delegate: treeViewContainer.itemDelegate;
 
             onItemAdded: {
                 console.log('Repeater onItemAdded', itemData.Level);
 
-                if (itemData.Level >= 1){
-                    item.itemData.Parent = itemData;
-                    if (!itemData.Children){
-                        itemData.Children = [item.itemData]
+                if (treeItemDelegate.itemData.Level >= 1){
+                    item.itemData.Parent = treeItemDelegate.itemData;
+                    if (!treeItemDelegate.itemData.Children){
+                        treeItemDelegate.itemData.Children = [item.itemData]
                     }
                     else{
-                        itemData.Children.push(item.itemData);
+                        treeItemDelegate.itemData.Children.push(item.itemData);
                     }
                 }
             }

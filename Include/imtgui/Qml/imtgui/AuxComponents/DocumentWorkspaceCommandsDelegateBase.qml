@@ -6,7 +6,7 @@ import imtgui 1.0
 Item {
     id: container;
 
-    property TreeItemModel objectModel: documentModel;
+    property TreeItemModel objectModel;
 
     property Item documentBase;
 
@@ -39,8 +39,12 @@ Item {
         interval: 0;
 
         onTriggered: {
-            itemModel.updateModel(itemModelInputParams)
+            container.itemModel.updateModel(itemModelInputParams)
         }
+    }
+
+    onDocumentBaseChanged: {
+        objectModel = documentBase.documentModel
     }
 
     Component.onCompleted: {
@@ -56,7 +60,7 @@ Item {
     onCommandsIdChanged: {
         console.log("DocumentCommands onCommandsIdChanged", container.commandsId);
 
-        if (documentBase.itemLoad){
+        if (documentBase && documentBase.itemLoad){
             Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
 
             if (autoUpdate){
@@ -242,13 +246,13 @@ Item {
             var query = Gql.GqlRequest("query", container.commandsId + container.gqlModelQueryType);
             var queryFields = Gql.GqlObject(container.gqlModelQueryTypeNotify);
 
-            let itemId = documentBase.itemId;
-            let itemName = documentBase.itemName;
+            let itemId = container.documentBase.itemId;
+            let itemName = container.documentBase.itemName;
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", itemId);
 
-            var jsonString = documentModel.toJSON();
+            var jsonString = container.documentBase.documentModel.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);
@@ -273,7 +277,7 @@ Item {
                     dataModelLocal = saveQuery.GetData("errors");
                     dataModelLocal = dataModelLocal.GetData(container.commandsId + container.gqlModelQueryType);
                     if (gqlModelQueryType == "Add"){
-                        documentBase.itemId = "";
+                        container.documentBase.itemId = "";
                     }
 
                     if (dataModelLocal.ContainsKey("message")){
@@ -295,7 +299,7 @@ Item {
                         let itemId = dataModelLocal.GetData("Id");
                         let itemName = dataModelLocal.GetData("Name");
 
-                        if (documentBase.itemLoad){
+                        if (container.documentBase.itemLoad){
                             documentSaved(itemId, itemName);
                         }
                     }
@@ -313,7 +317,7 @@ Item {
 
         function updateModel(externInputParams) {
             console.log("itemModel updateModel", externInputParams);
-            var query = Gql.GqlRequest("query", commandsId + "Item");
+            var query = Gql.GqlRequest("query", container.commandsId + "Item");
 
             var inputParams = Gql.GqlObject("input");
 
@@ -332,7 +336,7 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log(commandsId + " Item query ", gqlData);
+            console.log(container.commandsId + " Item query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
@@ -347,10 +351,10 @@ Item {
                 }
 
                 dataModelLocal = itemModel.GetData("data");
-                if(dataModelLocal.ContainsKey(commandsId + "Item")){
-                    dataModelLocal = dataModelLocal.GetData(commandsId + "Item");
+                if(dataModelLocal.ContainsKey(container.commandsId + "Item")){
+                    dataModelLocal = dataModelLocal.GetData(container.commandsId + "Item");
 
-                    documentModel = dataModelLocal;
+                    container.documentBase.documentModel = dataModelLocal;
 
                     itemLoaded();
                 }

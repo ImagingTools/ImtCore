@@ -9,6 +9,8 @@ export class ListView extends Flickable {
     static Center = 1
     static End = 2
 
+    $useModel = true
+    $childrenForUpdate = []
 
     constructor(parent) {
         super(parent)
@@ -26,20 +28,25 @@ export class ListView extends Flickable {
     }
 
     $orientationChanged(){
-        this.$updateChildren()
+
     }
 
     $modelChanged(){
+        if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
+        this.$model = this.model
         this.$updateView()
     }
     $delegateChanged(){
         this.$updateView()
     }
     $spacingChanged(){
-        this.$updateChildren()
+
     }
     $currentIndexChanged(){
         //this.currentItem = this.currentIndex > -1 && this.currentIndex < this.children.length ? this.children[this.currentIndex] : undefined
+    }
+    itemAtIndex(index){
+        return index >= 0 && index < this.children.length ? this.children[index] : undefined
     }
     positionViewAtBeginning(){
         this.contentX = 0
@@ -68,245 +75,130 @@ export class ListView extends Flickable {
         }
     }
 
+    $insert(index){
+        if(this.model && this.delegate){
+            let childRecursive = (obj, indx)=>{
+                
+                obj.$cP('index', indx)
+                obj.index = indx
+
+                for(let child of obj.children){
+                    if(!child.$useModel && !child.$repeater)
+                    childRecursive(child, indx)
+                }
+            }
+            let obj = this.delegate.component ? this.delegate.component(this) : this.delegate(this)
+            this.children.pop()
+            this.children.splice(index, 0, obj)
+
+            for(let i = 0; i < this.children.length; i++){
+                childRecursive(this.children[i], i)
+            }
+            
+            this.count = this.children.length
+            this.$anchorsChild(index)
+            obj.$uP()
+        }
+    }
+
+    $append(wait = false){
+        let index = this.children.length
+        if(this.model && this.delegate){
+            let childRecursive = (obj)=>{
+                
+                obj.$cP('index', index)
+                obj.index = index
+
+                for(let child of obj.children){
+                    if(!child.$useModel && !child.$repeater)
+                    childRecursive(child)
+                }
+            }
+            let obj = this.delegate.component ? this.delegate.component(this) : this.delegate(this)
+            childRecursive(obj)
+            this.count = this.children.length
+            this.$anchorsChild(index)
+
+            if(wait){
+                this.$childrenForUpdate.push(obj)
+            } else {
+                obj.$uP()
+            }
+        }
+    }
+    $remove(index, count){
+        let removed = this.children.splice(index, count)
+        for(let rem of removed){
+            rem.$destroy()
+        }
+        let childRecursive = (obj, index)=>{
+            obj.index = index
+            for(let child of obj.children){
+                childRecursive(child, index)
+            }
+        }
+        for(let i = 0; i < this.children.length; i++){
+            childRecursive(this.children[i], i)
+        }
+        this.count = this.children.length
+    }
+
     $updateView(){
         if(this.model && this.delegate){
-            
-            while(this.children.length){
-                this.children.pop().$destroy()
-            }
-            // for(let child of this.children){
-            //     child.$destroy()
-            // }
-            this.children = []
-
-            let childRecursive = (obj, model, index)=>{
-                // obj.$cPC('model', model)
-                obj.$cP('model',model)
-                obj.$cP('index',index)
-                for(let child of obj.children){
-                    childRecursive(child, model, index)
-                }
-            }
-
-            this.count = 0
-            if(typeof this.model === 'number'){     
-                for(let i = 0; i < this.model; i++){      
-                    let obj = this.delegate(this)
-
-                    childRecursive(obj, {
-                        index: i,
-                    }, i)
-                    this.count = i+1
-                }
-            } else if (typeof this.model === 'object'){
-                if(this.model && this.model.$deps) this.model.$deps[this.UID] = this
-
-                let data = this.model.$data
-
-                // if(Array.isArray(data)){
-                //     if(data.length === 1){
-                //         if(typeof data[0] === 'object' && data[0].$data === undefined){
-                //             data = data[0]
-                //         }
-                //     }
-                // }
-
-                if(Array.isArray(data) || data.$data === undefined){
-                    let i = 0
-                    for(let key in data){
-                        let obj = this.delegate(this)
-                        let tempModel = {
-                            'index': i
-                        }
-                        if(data[key].$data){
-                            for(let name in data[key].$data){
-                                tempModel[name] = data[key].$data[name]
-                            }
-                        } else {
-                            for(let name in data[key]){
-                                tempModel[name] = data[key][name]
-                            }
-                        }
-                        
-                        childRecursive(obj, tempModel, i)
-                        this.count = i+1
-                        i++
+            if(typeof this.model === 'number'){
+                if(this.model > this.children.length){
+                    let count = this.model - this.children.length
+                    for(let i = 0; i < count; i++){      
+                        this.$append()
                     }
                 } else {
-                    let obj = this.delegate(this)
-                    let tempModel = {
-                        'index': 0
-                    }
-                    for(let name in data){
-                        tempModel[name] = data[name]
-                    }
-                    childRecursive(obj, tempModel, 0)
-                    this.count = 1
-                }
-                // if(this.model.$data){
-                //     this.model.$deps[this.UID] = this
-
-                //     if(Array.isArray(this.model.$data)){
-                //         if(Array.isArray(this.model.$data[0])){
-                //             for(let i = 0; i < this.model.$data[0].length; i++){    
-                //                 let obj = this.delegate(this) 
-                //                 let tempModel = {
-                //                     'index': i
-                //                 } 
-                //                 if(this.model.$data[0][i].$data){
-                //                     if(Array.isArray(this.model.$data[0][i].$data)){
-                //                         for(let name in this.model.$data[0][i].$data[0]){
-                //                             tempModel[name] = this.model.$data[0][i].$data[0][name]
-                //                         }
-                //                     } else {
-                //                         for(let name in this.model.$data[0][i].$data){
-                //                             tempModel[name] = this.model.$data[0][i].$data[name]
-                //                         }
-                //                     }
-                                    
-                //                 } else if(this.model.$data[0][i].$p){
-                //                     for(let name in this.model.$data[0][i].$p){
-                //                         tempModel[name] = this.model.$data[0][i].$p[name].val
-                //                     }
-                //                 } else {
-                //                     for(let name in this.model.$data[0][i]){
-                //                         tempModel[name] = this.model.$data[0][i][name]
-                //                     }
-                //                 }
-                                
-                //                 // UID += UID - tempUID
-                //                 // obj.$cPC('model', {
-                //                 //     model: this.model.$data[i],
-                //                 //     index: i,
-                //                 // })
-                //                 obj.$cPC('model',tempModel)
-                //                 obj.$cP('index',i)
-                //                 childRecursive(obj, tempModel, i)
-                //                 this.count = i
-                //             }
-                //         } else {
-                //             let obj = this.delegate(this) 
-                //             let tempModel = {
-                //                 'index': i
-                //             } 
-                //             if(this.model.$data[0].$data){
-                //                 if(Array.isArray(this.model.$data[0].$data)){
-                //                     for(let name in this.model.$data[0].$data[0]){
-                //                         tempModel[name] = this.model.$data[0].$data[0][name]
-                //                     }
-                //                 } else {
-                //                     for(let name in this.model.$data[0].$data){
-                //                         tempModel[name] = this.model.$data[0].$data[name]
-                //                     }
-                //                 }
-                                
-                //             } else if(this.model.$data[0].$p){
-                //                 for(let name in this.model.$data[0].$p){
-                //                     tempModel[name] = this.model.$data[0].$p[name].val
-                //                 }
-                //             } else {
-                //                 for(let name in this.model.$data[0]){
-                //                     tempModel[name] = this.model.$data[0][name]
-                //                 }
-                //             }
-                            
-                //             // UID += UID - tempUID
-                //             // obj.$cPC('model', {
-                //             //     model: this.model.$data[i],
-                //             //     index: i,
-                //             // })
-                //             obj.$cPC('model',tempModel)
-                //             obj.$cP('index',0)
-                //             childRecursive(obj, tempModel, 0)
-                //             this.count = 1
-                //         }
-                        
-                //     } else {
-                //         for(let i = 0; i < this.model.$data.length; i++){    
-                //             let obj = this.delegate(this) 
-                //             let tempModel = {
-                //                 'index': i
-                //             } 
-                //             if(this.model.$data[i].$p){
-                //                 for(let name in this.model.$data[i].$p){
-                //                     tempModel[name] = this.model.$data[i].$p[name].val
-                //                 }
-                //             } else {
-                //                 for(let name in this.model.$data[i]){
-                //                     tempModel[name] = this.model.$data[i][name]
-                //                 }
-                //             }
-                            
-                //             // UID += UID - tempUID
-                //             // obj.$cPC('model', {
-                //             //     model: this.model.$data[i],
-                //             //     index: i,
-                //             // })
-                //             obj.$cPC('model',tempModel)
-                //             obj.$cP('index',i)
-                //             childRecursive(obj, tempModel, i)
-                //             this.count = i
-                //         }
-                //     }
-                    
-                // } else {
-                //     for(let i = 0; i < this.model.length; i++){
-                //         // let tempUID = UID   
-                //         let obj = this.delegate(this)  
-                //         // UID += UID - tempUID
-                //         obj.$cPC('model', {
-                //             index: i,
-                //         })
-                //         obj.$cP('index',i)
-                //         childRecursive(obj, {
-                //             index: i,
-                //         }, i)
-                //         this.count = i
-                //     }
-                // }
+                    this.$remove(3, this.children.length - this.model)
+                }  
                 
+            } else if (typeof this.model === 'object'){
+                while(this.children.length){
+                    this.children.pop().$destroy()
+                }
+                this.children = []
+                this.count = 0
 
+                
+                if(this.model.$deps) {
+                    this.model.$deps[this.UID] = this
+                    for(let i = 0; i < this.model.data.length; i++){
+                        this.$append(true)
+                    }
+                } else {
+                    for(let i = 0; i < this.model.length; i++){
+                        this.$append(true)
+                    }
+                }
+
+                while(this.$childrenForUpdate.length){
+                    this.$childrenForUpdate.shift().$uP()
+                }
+                
             } else {
 
             }
-            this.$uP()
-            this.$updateGeometry()
-            
- 
-
         }
     
     }
 
-    $updateGeometry(){
-        this.$updateChildren()
+    $anchorsChild(index){
+        let child = this.children[index]
 
-        super.$updateGeometry()
-    }
-
-    $updateChildren(){
-        if(this.orientation === ListView.Vertical) {
-            let dy = 0
-            for(let i = 0; i < this.children.length; i++){
-                let child = this.children[i]
-                child.x = 0
-                child.y = i === 0 ? 0 : dy + this.spacing
-                dy += child.height + (i === 0 ? 0 : this.spacing)
-            }
-        } else {
-            let dx = 0
-            for(let i = 0; i < this.children.length; i++){
-                let child = this.children[i]
-                child.y = 0
-                child.x = i === 0 ? 0 : dx + this.spacing
-                dx += child.width + (i === 0 ? 0 : this.spacing)
-            }
-
-        }
+        child.$sP('anchors.left', ()=>{ return this.left })
+        child.$sP('anchors.top', ()=>{ return this.top })
+        // child.anchors.left = 0
+        // child.anchors.top = 0
+        child.$sP('anchors.topMargin', ()=>{ return this.orientation === ListView.Vertical ? this.children[0].height * child.index + child.index * this.spacing : 0 })
+        child.$sP('anchors.leftMargin', ()=>{ return this.orientation === ListView.Horizontal ? this.children[0].width * child.index + child.index * this.spacing : 0 })
     }
 
     $destroy(){
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
+        if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
         this.impl.remove()
         super.$destroy()
     }

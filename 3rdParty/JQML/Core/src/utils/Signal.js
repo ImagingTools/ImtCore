@@ -1,6 +1,7 @@
 export function Signal(...args){
     let names = args
     let signal = (...args) => {
+
         for(let i = 0; i < names.length; i++){
             for(let k = 0; k < names[i].length && k < args.length; k++){
                 signal.context[names[i][k]] = args[k]
@@ -8,13 +9,13 @@ export function Signal(...args){
         }
         for(let key in signal.connections){
 
-            try {
+            // try {
                 if(signal.connections[key]) signal.connections[key](...args)
-            } catch (err1) {
-                signal.repeats[key] = setTimeout(()=>{
-                    signal.connections[key](...args)
-                }, 500)
-            }
+            // } catch (err1) {
+                // signal.repeats[key] = setTimeout(()=>{
+                //     signal.connections[key](...args)
+                // }, 500)
+            // }
             
             // let interval = setInterval(()=>{
             //     try{

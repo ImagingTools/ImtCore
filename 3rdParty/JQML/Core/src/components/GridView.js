@@ -13,6 +13,8 @@ export class GridView extends Flickable {
     $wAuto = false
     $hAuto = false
 
+    $useModel = true
+
     constructor(parent) {
         super(parent)
 

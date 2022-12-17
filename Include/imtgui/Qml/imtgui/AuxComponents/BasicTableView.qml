@@ -19,8 +19,8 @@ FocusScope {
     property alias background: backgroundLoader.sourceComponent;
     property alias boundsBehavior: listView.boundsBehavior;
 
-    readonly property int columnCount: columnModel.count;
-    readonly property int rowCount: rowModel.count;
+    property int columnCount: columnModel.count;
+    property int rowCount: rowModel.count;
 
     property int rowItemHeight: 30;
     property int headerHeight: 35;
@@ -60,95 +60,95 @@ FocusScope {
         }
     }
 
+    FocusScope {
+        id: headerItem;
+        height: visible ? tableViewRoot.headerHeight : 0;
+        width: listView.width;
+
+        visible: tableViewRoot.headerVisible;
+
+        property alias headerBackground: headerBackgroundLoader.sourceComponent;
+
+        onFocusChanged: {
+            console.log("headerItem onFocusChanged", focus);
+        }
+
+        MouseArea {
+            anchors.fill: parent;
+
+            onClicked: {
+                console.log("Headers onClicked");
+
+                headerItem.focus = true;
+            }
+        }
+
+        Loader {
+            id: headerBackgroundLoader;
+
+            anchors.fill: parent;
+
+            sourceComponent: Rectangle {
+                id: headerBackground;
+
+                color: Style.alternateBaseColor;
+
+                border.width: 1;
+                border.color: Style.imagingToolsGradient2;
+            }
+        }
+
+        Row {
+            id: headerRow;
+
+            focus: true;
+
+            Repeater {
+                id: repeater;
+
+                model: columnModel;
+
+                delegate: Item {
+                    id: repeaterItem;
+
+                    width: tableViewRoot.width / columnCount;
+                    height: tableViewRoot.headerHeight;
+
+                    Text {
+                        anchors.left: repeaterItem.left;
+                        anchors.leftMargin: 10;
+                        anchors.verticalCenter: repeaterItem.verticalCenter;
+
+                        text: model.Name;
+
+                        width: parent.width;
+
+                        font.pixelSize: Style.fontSize_common;
+                        font.family: Style.fontFamilyBold;
+                        font.bold: true;
+                        color: Style.textColor;
+
+                        wrapMode: Text.WordWrap;
+                        elide: Text.ElideRight;
+                    }
+                }
+            }
+        }
+    }
+
     ListView {
         id: listView;
 
-        anchors.fill: parent;
+        anchors.top: headerItem.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
 
         model: rowModel;
 
         boundsBehavior: Flickable.StopAtBounds;
 
         headerPositioning: ListView.OverlayHeader;
-
-        header: FocusScope {
-            id: headerItem;
-
-            z: 2;
-
-            height: visible ? tableViewRoot.headerHeight : 0;
-            width: listView.width;
-
-            visible: tableViewRoot.headerVisible;
-
-            property alias headerBackground: headerBackgroundLoader.sourceComponent;
-
-            onFocusChanged: {
-                console.log("headerItem onFocusChanged", focus);
-            }
-
-            MouseArea {
-                anchors.fill: parent;
-
-                onClicked: {
-                    console.log("Headers onClicked");
-
-                    headerItem.focus = true;
-                }
-            }
-
-            Loader {
-                id: headerBackgroundLoader;
-
-                anchors.fill: parent;
-
-                sourceComponent: Rectangle {
-                    id: headerBackground;
-
-                    color: Style.alternateBaseColor;
-
-                    border.width: 1;
-                    border.color: Style.imagingToolsGradient2;
-                }
-            }
-
-            Row {
-                id: headerRow;
-
-                focus: true;
-
-                Repeater {
-                    id: repeater;
-
-                    model: columnModel;
-
-                    delegate: Item {
-                        id: repeaterItem;
-
-                        width: tableViewRoot.width / columnCount;
-                        height: tableViewRoot.headerHeight;
-
-                        Text {
-                            anchors.left: repeaterItem.left;
-                            anchors.leftMargin: 10;
-                            anchors.verticalCenter: repeaterItem.verticalCenter;
-
-                            text: model.Name;
-
-                            width: parent.width;
-
-                            font.pixelSize: Style.fontSize_common;
-                            font.family: Style.fontFamilyBold;
-                            font.bold: true;
-                            color: Style.textColor;
-
-                            wrapMode: Text.WordWrap;
-                            elide: Text.ElideRight;
-                        }
-                    }
-                }
-            }
-        }
 
         delegate: TableViewItemDelegateBase {}
     }

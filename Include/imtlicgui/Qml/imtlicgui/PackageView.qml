@@ -5,11 +5,16 @@ import imtgui 1.0
 DocumentBase {
     id: packageViewContainer;
 
-    commandsDelegateSourceComp: PackageViewCommandsDelegate {}
+    commandsDelegateSourceComp: packageViewCommandsDelegate;
 
     property bool blockUpdatingModel: false;
 
     property TreeItemModel treeViewModel: TreeItemModel {}
+
+    Component {
+        id: packageViewCommandsDelegate;
+        PackageViewCommandsDelegate {}
+    }
 
     Component.onCompleted: {
         console.log("PackageView onCompleted");
@@ -236,7 +241,7 @@ DocumentBase {
 
         readOnly: false;
 
-        rowDelegate: PackageViewItemDelegate {}
+        rowDelegate: Component { PackageViewItemDelegate {} }
 
         onSelectedIndexChanged: {
             console.log("TableView Begin onSelectedIndexChanged");
@@ -288,12 +293,10 @@ DocumentBase {
                 return;
             }
 
-            if (splitter.x > packageViewContainer.width - titleHeader.width){
-                splitter.x = packageViewContainer.width - splitter.width;
-            }
-
-            if (splitter.x < 250){
+            if (splitter.x <= 250){
                 splitter.x = 250;
+            } else if (splitter.x > packageViewContainer.width - titleHeader.width){
+                splitter.x = packageViewContainer.width - splitter.width;
             }
         }
     }

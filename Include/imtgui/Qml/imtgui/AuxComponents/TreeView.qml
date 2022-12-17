@@ -224,7 +224,7 @@ Rectangle {
         boundsBehavior: Flickable.StopAtBounds;
         model: treeViewContainer.model;
 
-        delegate: itemDelegate;
+        delegate: treeViewContainer.itemDelegate;
     }
 
     function clearModel(){

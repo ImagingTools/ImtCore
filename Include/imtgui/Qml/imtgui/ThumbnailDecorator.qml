@@ -11,6 +11,7 @@ Rectangle {
 
     property bool serverIsConnection: true;
     property Item root;
+    property alias settingsProvider: preferenceDialog.settingsProvider;
 
     property int mainMargin: 0;
     property int mainRadius: 0;
@@ -127,9 +128,7 @@ Rectangle {
 
         anchors.fill: parent;
 
-        root: window;
-
-        settingsProvider: window.settingsProvider;
+        root: thumbnailDecoratorContainer.root;
 
         visible: false;
     }
