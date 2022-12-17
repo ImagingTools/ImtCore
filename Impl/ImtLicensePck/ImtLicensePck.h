@@ -24,6 +24,7 @@
 #include <imtlic/CProductInfoProviderComp.h>
 #include <imtlic/CCollectionProductInfoProviderComp.h>
 #include <imtlic/CFeatureInfoProviderComp.h>
+#include <imtlic/CFeatureDependenciesProviderComp.h>
 
 
 /**
@@ -75,6 +76,7 @@ typedef icomp::TModelCompWrap<
 typedef imtlic::CProductInfoProviderComp ProductInfoProvider;
 typedef imtlic::CCollectionProductInfoProviderComp CollectionProductInfoProvider;
 typedef imtlic::CFeatureInfoProviderComp FeatureInfoProvider;
+typedef imtlic::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 
 
 } // namespace ImtLicensePck

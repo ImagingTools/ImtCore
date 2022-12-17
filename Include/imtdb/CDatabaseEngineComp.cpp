@@ -376,12 +376,6 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 					return false;
 				}
 			}
-//			QVariantMap setValuesRevision;
-//			setValuesRevision.insert(":Revision", index);
-//			setValuesRevision.insert(":TableName", "revisions");
-//			if (TableExist("Revisions")){
-//				setValuesRevision.insert(":TableName", "Revisions");
-//			}
 
 			QFile sqlQueryFile(folder.filePath("SetRevision.sql"));
 			sqlQueryFile.open(QFile::ReadOnly);
@@ -523,10 +517,10 @@ bool CDatabaseEngineComp::IsDatabaseServerConnected() const
 QString CDatabaseEngineComp::GetDatabaseName() const
 {
 	if (m_databaseAccessSettingsCompPtr.IsValid()){
-        return m_databaseAccessSettingsCompPtr->GetDatabaseName();
+		return m_databaseAccessSettingsCompPtr->GetDatabaseName();
 	}
 
-    return *m_dbNameAttrPtr;
+	return *m_dbNameAttrPtr;
 }
 
 
@@ -686,3 +680,5 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 
 
 } // namespace imtdb
+
+

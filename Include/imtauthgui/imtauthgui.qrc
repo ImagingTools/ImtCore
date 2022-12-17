@@ -31,6 +31,7 @@
 	<file alias="imtauthgui/RolesDialogBody.qml">Qml/imtauthgui/RolesDialogBody.qml</file>
 	<file alias="imtauthgui/PermissionsProvider.qml">Qml/imtauthgui/PermissionsProvider.qml</file>
 	<file alias="imtauthgui/RolesProvider.qml">Qml/imtauthgui/RolesProvider.qml</file>
+	<file alias="imtauthgui/PermissionDependenciesProvider.qml">Qml/imtauthgui/PermissionDependenciesProvider.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

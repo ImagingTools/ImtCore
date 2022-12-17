@@ -13,21 +13,24 @@ QByteArray CProductInfoProviderComp::GetModelId() const
 
 imtbase::CTreeItemModel *CProductInfoProviderComp::GetRepresentation(const QList<imtgql::CGqlObject> &params, const QByteArrayList &fields, const imtgql::IGqlContext *gqlContext)
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 
 	for (int i = 0; i < m_productIdsAttrPtr.GetCount(); i++){
-		int index = rootModel->InsertNewItem();
+		int index = rootModelPtr->InsertNewItem();
 
-		rootModel->SetData("Id", m_productIdsAttrPtr[i], index);
-		rootModel->SetData("Name", m_productNamesAttrPtr[i], index);
+		rootModelPtr->SetData("Id", m_productIdsAttrPtr[i], index);
+		rootModelPtr->SetData("Name", m_productNamesAttrPtr[i], index);
 
-		if (m_permissionsProviderCompPtr.IsValid()){
-			imtbase::CTreeItemModel* permissionModel = m_permissionsProviderCompPtr[i]->GetRepresentation(params, fields);
-			rootModel->SetExternTreeModel("Permissions", permissionModel, i);
+		imtgql::IItemBasedRepresentationDataProvider* representationDataProvider = m_permissionsProviderCompPtr[i];
+		if (representationDataProvider != nullptr){
+			imtbase::CTreeItemModel* permissionsModel = representationDataProvider->GetRepresentation(params, fields);
+			if (permissionsModel != nullptr){
+				rootModelPtr->SetExternTreeModel("Permissions", permissionsModel, i);
+			}
 		}
 	}
 
-	return rootModel;
+	return rootModelPtr;
 }
 
 

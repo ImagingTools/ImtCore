@@ -51,9 +51,14 @@ public:
 	virtual const IFeatureInfo* GetParentFeature() const = 0;
 
 	/**
-		Get all sub features for this feature.
+		Get sub features for this feature.
 	*/
 	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const  = 0;
+
+	/**
+		Get all sub features ids.
+	*/
+	virtual const QByteArrayList GetAllSubFeatures() const  = 0;
 
 	/**
 		Insert sub feature.

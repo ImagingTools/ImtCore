@@ -7,6 +7,8 @@
 // ImtCore includes
 #include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtlic/IFeatureInfo.h>
+#include <imtlic/CFeaturePackage.h>
+
 
 namespace imtauth
 {
@@ -31,12 +33,18 @@ public:
 	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
 
 protected:
-	void InsertSubFeaturesToModelFromData(const imtlic::FeatureInfoList& subFeaturesList, imtbase::CTreeItemModel& subFeaturesModel) const;
+	void InsertSubFeaturesToModelFromData(
+			const imtlic::CFeaturePackage* packagePtr,
+			const imtlic::FeatureInfoList& subFeaturesList,
+			imtbase::CTreeItemModel& subFeaturesModel,
+			imtbase::CTreeItemModel& dependenciesModel) const;
 
 protected:
 	I_ATTR(QByteArray, m_modelIdAttrPtr);
-	I_REF(imtlic::IFeatureInfoProvider, m_featurePackageCompPtr);
+	I_REF(imtlic::IFeaturePackage, m_featurePackageCompPtr);
 };
 
 
 } // namespace imtauth
+
+

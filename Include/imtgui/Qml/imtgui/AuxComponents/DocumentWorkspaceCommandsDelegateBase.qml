@@ -6,7 +6,7 @@ import imtgui 1.0
 Item {
     id: container;
 
-    property TreeItemModel objectModel;
+    property TreeItemModel objectModel: documentBase ? container.documentBase.documentModel : null;
 
     property Item documentBase;
 
@@ -39,13 +39,13 @@ Item {
         interval: 0;
 
         onTriggered: {
-            container.itemModel.updateModel(itemModelInputParams)
+            itemModel.updateModel(itemModelInputParams)
         }
     }
 
-    onDocumentBaseChanged: {
-        objectModel = documentBase.documentModel
-    }
+//    onDocumentBaseChanged: {
+//        objectModel = documentBase.documentModel
+//    }
 
     Component.onCompleted: {
         console.log("DocumentCommands onCompleted");

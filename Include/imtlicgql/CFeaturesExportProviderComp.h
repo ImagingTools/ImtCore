@@ -11,6 +11,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtcrypt/IEncryptionKeysProvider.h>
 #include <imtlic/IFeatureInfoProvider.h>
+#include <imtlic/IFeatureDependenciesProvider.h>
 
 
 namespace imtlicgql
@@ -30,7 +31,7 @@ public:
 	I_BEGIN_COMPONENT(CFeaturesExportProviderComp);
 		I_REGISTER_INTERFACE(imtbase::IBinaryDataProvider);
 		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product collection", true, "ProductCollection");
-		I_ASSIGN(m_featureInfoProviderCompPtr, "FeatureInfoProvider", "Feature info provider", true, "FeatureInfoProvider");
+		I_ASSIGN(m_packageCollectionCompPtr, "PackageCollection", "Package collection", true, "PackageCollection");
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IBinaryDataProvider)
@@ -38,14 +39,10 @@ public:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
-	I_REF(imtlic::IFeatureInfoProvider, m_featureInfoProviderCompPtr);
+	I_REF(imtbase::IObjectCollection, m_packageCollectionCompPtr);
 };
 
 
 } // namespace imtqml
-
-
-
-
 
 

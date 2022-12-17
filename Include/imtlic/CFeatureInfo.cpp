@@ -99,6 +99,16 @@ const FeatureInfoList& CFeatureInfo::GetSubFeatures() const
 }
 
 
+const QByteArrayList CFeatureInfo::GetAllSubFeatures() const
+{
+	QByteArrayList retVal;
+
+	GetSubFeaturesRecursive(m_subFeatures, retVal);
+
+	return retVal;
+}
+
+
 bool CFeatureInfo::InsertSubFeature(const IFeatureInfo* subFeatureInfo)
 {
 	bool retVal = false;
@@ -233,7 +243,7 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 {
 	const imtlic::CFeatureInfo* sourcePtr = dynamic_cast<const imtlic::CFeatureInfo*>(&object);
 	if (sourcePtr != nullptr){
-		FeatureInfoList subFeatures = sourcePtr->GetSubFeatures();
+		const FeatureInfoList& subFeatures = sourcePtr->GetSubFeatures();
 
 		if (m_subFeatures.GetCount() != subFeatures.GetCount()){
 			return false;
@@ -278,6 +288,23 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 	m_parentFeaturePtr = nullptr;
 
 	return true;
+}
+
+
+void CFeatureInfo::GetSubFeaturesRecursive(const FeatureInfoList &subFeatures, QByteArrayList &featureList) const
+{
+	for (int i = 0; i < subFeatures.GetCount(); i++){
+		const IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+		if (featureInfoPtr != nullptr){
+			QByteArray featureId = featureInfoPtr->GetFeatureId();
+
+			featureList << featureId;
+
+			const FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
+
+			GetSubFeaturesRecursive(subFeatures, featureList);
+		}
+	}
 }
 
 

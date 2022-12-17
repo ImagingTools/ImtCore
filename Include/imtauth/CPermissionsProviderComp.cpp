@@ -1,8 +1,10 @@
 #include <imtauth/CPermissionsProviderComp.h>
 
+
 //ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 #include <imtlic/IFeatureInfo.h>
+#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtauth
@@ -15,38 +17,53 @@ QByteArray CPermissionsProviderComp::GetModelId() const
 }
 
 
-imtbase::CTreeItemModel *CPermissionsProviderComp::GetRepresentation(const QList<imtgql::CGqlObject> &params, const QByteArrayList &fields, const imtgql::IGqlContext *gqlContext)
+imtbase::CTreeItemModel *CPermissionsProviderComp::GetRepresentation(const QList<imtgql::CGqlObject>& params, const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext)
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* permissionsModelPtr = rootModelPtr->AddTreeModel("Permissions");
+	imtbase::CTreeItemModel* dependenciesModelPtr = rootModelPtr->AddTreeModel("Dependencies");
 
 	if (m_featurePackageCompPtr.IsValid()){
-		QByteArrayList featureCollectionIds = m_featurePackageCompPtr->GetFeatureList().GetElementIds().toList();
+		const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(m_featurePackageCompPtr.GetPtr());
+		if (packagePtr != nullptr){
+			QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 
-		for (const QByteArray& featureCollectionId : featureCollectionIds){
-			const imtlic::IFeatureInfo* featureInfoPtr = m_featurePackageCompPtr->GetFeatureInfo(featureCollectionId);
-			if (featureInfoPtr != nullptr){
-				int index = rootModel->InsertNewItem();
+			for (const QByteArray& featureCollectionId : featureCollectionIds){
+				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+				if (featureInfoPtr != nullptr){
+					int index = permissionsModelPtr->InsertNewItem();
 
-				QByteArray featureId = featureInfoPtr->GetFeatureId();
-				QString featureName = featureInfoPtr->GetFeatureName();
+					QByteArray featureId = featureInfoPtr->GetFeatureId();
+					QString featureName = featureInfoPtr->GetFeatureName();
 
-				rootModel->SetData("Id", featureId, index);
-				rootModel->SetData("Name", featureName, index);
+					permissionsModelPtr->SetData("Id", featureId, index);
+					permissionsModelPtr->SetData("Name", featureName, index);
 
-				const imtlic::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
-				if (subFeatures.GetCount() > 0){
-					imtbase::CTreeItemModel* childModel = rootModel->AddTreeModel("ChildModel", index);
-					InsertSubFeaturesToModelFromData(subFeatures, *childModel);
+					QByteArrayList featureDependenciesList = packagePtr->GetFeatureDependencies(featureId);
+					if (!featureDependenciesList.isEmpty()){
+						QByteArray dependencies = featureDependenciesList.join(';');
+						dependenciesModelPtr->SetData(featureId, dependencies);
+					}
+
+					const imtlic::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
+					if (subFeatures.GetCount() > 0){
+						imtbase::CTreeItemModel* childModelPtr = permissionsModelPtr->AddTreeModel("ChildModel", index);
+						InsertSubFeaturesToModelFromData(packagePtr, subFeatures, *childModelPtr, *dependenciesModelPtr);
+					}
 				}
 			}
 		}
 	}
 
-	return rootModel;
+	return rootModelPtr;
 }
 
 
-void CPermissionsProviderComp::InsertSubFeaturesToModelFromData(const imtlic::FeatureInfoList &subFeaturesList, imtbase::CTreeItemModel &subFeaturesModel) const
+void CPermissionsProviderComp::InsertSubFeaturesToModelFromData(
+			const imtlic::CFeaturePackage* packagePtr,
+			const imtlic::FeatureInfoList& subFeaturesList,
+			imtbase::CTreeItemModel& subFeaturesModel,
+			imtbase::CTreeItemModel& dependenciesModel) const
 {
 	for (int i = 0; i < subFeaturesList.GetCount(); ++i){
 		const imtlic::IFeatureInfo* featureInfoPtr = subFeaturesList.GetAt(i);
@@ -59,10 +76,17 @@ void CPermissionsProviderComp::InsertSubFeaturesToModelFromData(const imtlic::Fe
 			subFeaturesModel.SetData("Id", featureId, index);
 			subFeaturesModel.SetData("Name", featureName, index);
 
+			QByteArrayList featureDependenciesList = packagePtr->GetFeatureDependencies(featureId);
+			if (!featureDependenciesList.isEmpty()){
+				QByteArray dependencies = featureDependenciesList.join(';');
+				dependenciesModel.SetData(featureId, dependencies);
+			}
+
 			const imtlic::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
 			if (subFeatures.GetCount() > 0){
-				imtbase::CTreeItemModel* childModel = subFeaturesModel.AddTreeModel("ChildModel", index);
-				InsertSubFeaturesToModelFromData(subFeatures, *childModel);
+				imtbase::CTreeItemModel* childModelPtr = subFeaturesModel.AddTreeModel("ChildModel", index);
+
+				InsertSubFeaturesToModelFromData(packagePtr, subFeatures, *childModelPtr, dependenciesModel);
 			}
 		}
 	}
@@ -70,3 +94,5 @@ void CPermissionsProviderComp::InsertSubFeaturesToModelFromData(const imtlic::Fe
 
 
 } // namespace imtauth
+
+

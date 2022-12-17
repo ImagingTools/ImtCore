@@ -15,11 +15,16 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="FeaturePackage" PackageId="ImtLicensePck" ComponentId="FeaturePackage">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="PermissionsProvider" PackageId="ImtAuthPck" ComponentId="PermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="FeaturePackage" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeatureContainer"/>
+                        <Data IsEnabled="true" Value="FeaturePackage"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -50,7 +55,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TargetCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeatureContainer"/>
+                        <Data IsEnabled="true" Value="FeaturePackage"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

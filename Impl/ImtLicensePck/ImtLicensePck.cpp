@@ -99,6 +99,11 @@ I_EXPORT_COMPONENT(
 			"Feature info provider",
 			"Feature Info Provider");
 
+I_EXPORT_COMPONENT(
+			FeatureDependenciesProvider,
+			"Feature dependencies provider",
+			"Feature Dependencies Provider");
+
 
 } // namespace ImtLicensePck
 

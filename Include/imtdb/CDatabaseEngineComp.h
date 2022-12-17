@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtSql/QSqlDatabase>
 
+
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <ilog/TLoggerCompWrap.h>
@@ -17,6 +18,7 @@
 
 namespace imtdb
 {
+
 
 class CDatabaseEngineAttr: public ilog::CLoggerComponentBase
 {

@@ -26,9 +26,13 @@ namespace imtlicgql
 
 bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& dataId) const
 {
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_productCollectionCompPtr->GetObjectData(dataId, dataPtr)){
-		const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
+	if (!m_productCollectionCompPtr.IsValid() || !m_packageCollectionCompPtr.IsValid()){
+		return false;
+	}
+
+	imtbase::IObjectCollection::DataPtr productDataPtr;
+	if (m_productCollectionCompPtr->GetObjectData(dataId, productDataPtr)){
+		const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(productDataPtr.GetPtr());
 		const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
 		const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 
@@ -40,11 +44,33 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 				for (int i = 0; i < featureInfos.size(); i++){
 					QByteArray featureId = featureInfos[i].id;
 
-					if (m_featureInfoProviderCompPtr.IsValid()){
-						const imtlic::IFeatureInfo* featureInfoPtr = m_featureInfoProviderCompPtr->GetFeatureInfo(featureId);
-						if (featureInfoPtr != nullptr){
-							QString featureName = featureInfoPtr->GetFeatureName();
-							featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr);
+					const imtbase::IObjectCollectionInfo::Ids packageIds = m_packageCollectionCompPtr->GetElementIds();
+					for (imtbase::IObjectCollectionInfo::Id packageId : packageIds){
+						imtbase::IObjectCollection::DataPtr packageDataPtr;
+						if (m_packageCollectionCompPtr->GetObjectData(packageId, packageDataPtr)){
+							const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(packageDataPtr.GetPtr());
+							if (packagePtr != nullptr){
+								const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->FindFeatureById(featureId);
+								if (featureInfoPtr != nullptr){
+									QString featureName = featureInfoPtr->GetFeatureName();
+
+									featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr);
+
+									QByteArrayList featureDependencies = packagePtr->GetFeatureDependencies(featureId);
+									if (!featureDependencies.empty()){
+										featurePackagePtr->SetFeatureDependencies(featureId, featureDependencies);
+									}
+
+									QByteArrayList allSubFeaturesList = featureInfoPtr->GetAllSubFeatures();
+									for (const QByteArray& subFeatureId : allSubFeaturesList){
+										QByteArrayList subfeatureDependencies = packagePtr->GetFeatureDependencies(subFeatureId);
+
+										if (!subfeatureDependencies.empty()){
+											featurePackagePtr->SetFeatureDependencies(subFeatureId, subfeatureDependencies);
+										}
+									}
+								}
+							}
 						}
 					}
 				}

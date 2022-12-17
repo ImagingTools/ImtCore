@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import imtgui 1.0
 import imtqml 1.0
+import imtlicgui 1.0
 import Acf 1.0
 
 Item {
@@ -27,12 +28,19 @@ Item {
         }
     }
 
-
     PermissionsProvider {
         id: permissionsProvider;
 
         onModelChanged: {
             updateGui();
+        }
+    }
+
+    FeaturesDependenciesProvider {
+        id: dependenciesProvider;
+
+        Component.onCompleted: {
+            dependenciesProvider.updateModel();
         }
     }
 
@@ -53,10 +61,7 @@ Item {
             selectedPermissionsIds.push(permissionId);
         }
 
-        console.log("selectedPermissionsIds", selectedPermissionsIds);
-
         permissionsTable.rowModel.clear();
-//        permissionsTable.height = permissionsTable.headerHeight;
 
         recursiveUpdateGui(permissionsProvider.model, [], selectedPermissionsIds);
 
@@ -184,5 +189,75 @@ Item {
                 updateModel();
             }
         }
+
+        onSelectedIndexChanged: {
+            if (selectedIndex != null){
+                let selectedFeatureId = selectedIndex.itemData.Id;
+
+                let featureDependencies = dependenciesProvider.getAllDependencies(selectedFeatureId);
+
+                repeater.model = featureDependencies;
+            }
+        }
     }//BasicTableView
+
+    Item {
+        id: informationBlock;
+
+        anchors.left: permissionsTable.right;
+        anchors.leftMargin: 10;
+        anchors.top: parent.top;
+        anchors.topMargin: Math.max(10, rolePermissionsContainer.mainMargin);
+        anchors.bottom: parent.bottom;
+
+        width: 200;
+
+        Column {
+            id: informationColumn;
+
+            width: parent.width;
+
+            Text {
+                id: title;
+
+                width: informationColumn.width;
+
+                text: qsTr("Dependencies");
+
+                font.pixelSize: Style.fontSize_common;
+                font.family: Style.fontFamilyBold;
+                font.bold: true;
+
+                color: Style.lightBlueColor;
+                elide: Text.ElideRight;
+                wrapMode: Text.WrapAnywhere ;
+            }
+
+            Column {
+                id: childColumn;
+
+                anchors.top: title.bottom;
+                anchors.topMargin: 5;
+
+                width: parent.width;
+
+                Repeater {
+                    id: repeater;
+
+                    delegate: Text {
+                        width: 200;
+                        height: 20;
+
+                        text: modelData;
+
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_small;
+
+                        color: Style.textColor;
+                        elide: Text.ElideRight;
+                    }
+                }
+            }
+        }
+    }
 }//Container

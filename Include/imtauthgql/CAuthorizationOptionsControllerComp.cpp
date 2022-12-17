@@ -15,33 +15,34 @@ namespace imtauthgql
 
 imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_parameterCompPtr.IsValid()){
+	if (!m_userModeCompPtr.IsValid() || !m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
 	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
-	if (selectionParam != nullptr){
-		const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
+	const iprm::IOptionsList* optionList = m_userModeCompPtr->GetSelectionConstraints();
+	Q_ASSERT(optionList != nullptr);
 
-		Q_ASSERT(optionList != nullptr);
-
-		int defaultIndex = selectionParam->GetSelectedOptionIndex();
+	if (optionList != nullptr){
+		int defaultIndex = m_userModeCompPtr->GetSelectedOptionIndex();
 
 		QByteArray userModeId = optionList->GetOptionId(defaultIndex);
 
 		dataModelPtr->SetData("Value", userModeId);
 	}
 
-	if (m_userCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::DataPtr userDataPtr;
+	QSqlError sqlError;
+	QByteArray query = QString("SELECT * FROM \"Users\" WHERE UserId = '%1';").arg(qPrintable(*m_superuserLoginAttrPtr)).toLocal8Bit();
 
-		bool superUserExists = m_userCollectionCompPtr->GetObjectData("su", userDataPtr);
+	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 
-		dataModelPtr->SetData("SuperUserExists", superUserExists);
-	}
+	bool connectionState = sqlError.type() != QSqlError::ConnectionError;
+	dataModelPtr->SetData("DatabaseConnectionState", connectionState);
+
+	bool superUserExists = sqlError.type() == QSqlError::NoError;
+	dataModelPtr->SetData("SuperUserExists", superUserExists);
 
 	return rootModelPtr;
 }
