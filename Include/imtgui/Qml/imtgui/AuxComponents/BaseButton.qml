@@ -172,7 +172,7 @@ Item {
             loader.item.color = baseButton.color;
 
             loader.width = loader.item.width;
-            loader.width = loader.item.width;
+            loader.height = loader.item.height;
 
             loader.item.visible = baseButton.visible;
 

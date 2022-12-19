@@ -230,11 +230,23 @@ export class Loader extends Item {
 
     $widthChanged(){
         super.$widthChanged()
-        this.$wAuto = false
+        this.$widthOverride = true
     }
     $heightChanged(){
         super.$heightChanged()
-        this.$hAuto = false
+        this.$heightOverride = true
+    }
+    $xChanged(){
+        super.$xChanged()
+        this.$xOverride = true
+    }
+    $yChanged(){
+        super.$yChanged()
+        this.$yOverride = true
+    }
+    $clipChanged(){
+        super.$clipChanged()
+        this.$clipOverride = true
     }
 
 
