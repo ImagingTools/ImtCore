@@ -106,12 +106,12 @@ FocusScope {
             Repeater {
                 id: repeater;
 
-                model: columnModel;
+                model: tableViewRoot.columnModel;
 
                 delegate: Item {
                     id: repeaterItem;
 
-                    width: tableViewRoot.width / columnCount;
+                    width: tableViewRoot.width / tableViewRoot.columnCount;
                     height: tableViewRoot.headerHeight;
 
                     Text {
@@ -144,13 +144,13 @@ FocusScope {
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
 
-        model: rowModel;
+        model: tableViewRoot.rowModel;
 
         boundsBehavior: Flickable.StopAtBounds;
 
         headerPositioning: ListView.OverlayHeader;
 
-        delegate: TableViewItemDelegateBase {}
+        delegate: TableViewItemDelegateBase { root: tableViewRoot; }
     }
 
     function addRow(row){

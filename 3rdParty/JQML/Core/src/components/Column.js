@@ -44,7 +44,7 @@ export class Column extends Item {
         })
     }
     $updateChildren(){
-        let prevIndex = 0
+        let prevIndex = -1
         for(let i = 0; i < this.children.length; i++){
             if(!(this.children[i] instanceof ListModel || this.children[i] instanceof Repeater)){
                 this.$anchorsChild(i, prevIndex)
@@ -56,12 +56,12 @@ export class Column extends Item {
 
     $anchorsChild(index, prevIndex){
         let child = this.children[index]
-        let prevChild = this.children[prevIndex]
-
+        
         child.$sP('anchors.left', ()=>{ return this.left })
         if(index === 0){
             child.$sP('anchors.top', ()=>{ return this.top })
-        } else {
+        } else if(prevIndex >= 0) {
+            let prevChild = this.children[prevIndex]
             child.$sP('anchors.top', ()=>{ return prevChild.bottom })
             child.$sP('anchors.topMargin', ()=>{ return this.spacing })
         }

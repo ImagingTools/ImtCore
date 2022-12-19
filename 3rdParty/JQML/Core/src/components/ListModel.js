@@ -61,10 +61,11 @@ export class ListModel extends QtObject {
 		} else {
 			this.data.splice(index, 0, dict)
 		}
+        this.count = this.data.length
         for(let key in this.$deps){
             this.$deps[key].$insert(index)
         }
-        this.count = this.data.length
+        
         // this.$notify()
     }
     set(index, dict){

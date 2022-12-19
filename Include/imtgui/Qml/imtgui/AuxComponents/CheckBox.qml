@@ -47,7 +47,7 @@ Rectangle {
         sourceSize.height: height;
 
         visible: container.checkState != Qt.PartiallyChecked;
-        source: isActive ? container.checkState == Qt.Checked ? container.imageSourceActive : "" :
+        source: container.isActive ? container.checkState == Qt.Checked ? container.imageSourceActive : "" :
             container.checkState == Qt.Checked ? container.imageSourceNotActive : "";
     }
 
@@ -56,7 +56,7 @@ Rectangle {
 
         cursorShape: Qt.PointingHandCursor;
 
-        visible: isActive;
+        visible: container.isActive;
 
         onClicked: {
             container.clicked();

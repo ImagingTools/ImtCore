@@ -39,7 +39,7 @@ Item {
         interval: 0;
 
         onTriggered: {
-            itemModel.updateModel(itemModelInputParams)
+            itemModel.updateModel(container.itemModelInputParams)
         }
     }
 
@@ -80,15 +80,21 @@ Item {
     }
 
     onObjectModelChanged: {
-        objectModel.modelChanged.connect(modelChanged);
+        if(objectModel){
+            objectModel.modelChanged.connect(modelChanged);
+        }
     }
 
     function disconnectModelChanged(){
-        objectModel.modelChanged.disconnect(modelChanged);
+        if(objectModel){
+            objectModel.modelChanged.disconnect(modelChanged);
+        }
     }
 
     function connectModelChanged(){
-        objectModel.modelChanged.connect(modelChanged);
+        if(objectModel){
+            objectModel.modelChanged.connect(modelChanged);
+        }
     }
 
     function removeChanges(){
@@ -351,7 +357,7 @@ Item {
                 }
 
                 dataModelLocal = itemModel.GetData("data");
-                if(dataModelLocal.ContainsKey(container.commandsId + "Item")){
+                if(dataModelLocal && dataModelLocal.ContainsKey(container.commandsId + "Item")){
                     dataModelLocal = dataModelLocal.GetData(container.commandsId + "Item");
 
                     container.documentBase.documentModel = dataModelLocal;

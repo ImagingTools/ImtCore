@@ -12,6 +12,8 @@ BasicTableView {
         TreeViewItemDelegateBase {
             width: root.width;
 
+            root: treeViewRoot;
+
             onParentCheckStateChanged: {
                 console.log("onParentCheckedChanged")
 
@@ -52,6 +54,7 @@ BasicTableView {
     }
 
     function addRow(row){
+        console.log("addRow");
         insertRow([rowModel.count], row);
     }
 
@@ -97,23 +100,26 @@ BasicTableView {
             row["CheckBoxVisible"] = true;
         }
 
-        let model = rowModel;
+        let localModel = rowModel;
 
         for (let i = 0; i < indexes.length - 1; i++){
             let index = indexes[i]
-            if (model.count <= index){
+            if (localModel.count <= index){
                 console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes)
                 return;
             }
 
-            model = model.get(index).ChildModel
+            localModel = localModel.get(index).ChildModel
         }
 
         row["Level"] = indexes.length - 1;
 
         let lastIndex = indexes[indexes.length - 1];
 
-        model.insert(lastIndex, row)
+        console.log("localModel before insert:", localModel.count, lastIndex);
+
+        localModel.insert(lastIndex, row)
+        console.log("localModel after insert:", localModel.count);
 
         rowAdded();
     }
@@ -215,23 +221,23 @@ BasicTableView {
     function removeRow(indexes){
         console.log("removeRow", indexes)
 
-        let model = rowModel;
+        let localModel = rowModel;
 
         for (let i = 0; i < indexes.length - 1; i++){
             let index = indexes[i]
-            if (model.count <= index){
+            if (localModel.count <= index){
                 console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes)
                 return;
             }
 
-            model = model.get(index).ChildModel
+            localModel = localModel.get(index).ChildModel
         }
 
         let lastIndex = indexes[indexes.length - 1];
 
-        model.remove(lastIndex)
+        localModel.remove(lastIndex)
 
-        console.log("model", model)
+        console.log("localModel", localModel)
 
         rowRemoved();
     }

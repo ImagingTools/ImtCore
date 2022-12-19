@@ -6,13 +6,11 @@ TableViewItemDelegateBase {
 
     height: isOpen ? footerItem.height + root.rowItemHeight: root.rowItemHeight;
 
-    root: treeViewRoot;
-
     property bool isOpen: true;
 
     property int checkState: model.CheckState;
 
-    property bool tristate: prefixRowItem.visible;
+    property bool tristate: true; //prefixRowItem.visible;
 
     property var parentDelegate: null;
     property var childrenDelegates: []
@@ -31,7 +29,9 @@ TableViewItemDelegateBase {
 
         updateSelection();
 
-        rowBodyItem.forceActiveFocus();
+        if(rowBodyItem) {
+            rowBodyItem.forceActiveFocus();
+        }
     }
 
     prefixRowDelegate: Row {
@@ -60,11 +60,11 @@ TableViewItemDelegateBase {
 
                 visible: model.ChildModel ? model.ChildModel.count > 0 : false;
 
-                iconSource: isOpen ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
+                iconSource: treeDelegateBase.isOpen ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                      "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
                 onClicked: {
-                    isOpen = !isOpen;
+                    treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
                 }
             }
         }
@@ -107,10 +107,10 @@ TableViewItemDelegateBase {
         }
     }
 
-    footerDelegate: Column {
+    footerDelegate: Component { Column {
         id: childrenColumn;
 
-        visible: isOpen;
+        visible: treeDelegateBase.isOpen;
 
         Repeater {
             id: childModelRepeater;
@@ -150,5 +150,6 @@ TableViewItemDelegateBase {
                 childModelRepeater.model = childModel;
             }
         }
+    }
     }
 }

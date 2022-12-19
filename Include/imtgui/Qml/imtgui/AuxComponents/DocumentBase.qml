@@ -30,7 +30,7 @@ FocusScope {
     Shortcut {
         sequence: "Ctrl+S";
 
-        enabled: visible;
+        enabled: documentBase.visible;
 
         onActivated: {
             console.log("Ctrl+S onActivated");
@@ -41,7 +41,7 @@ FocusScope {
     Shortcut {
         sequence: "Ctrl+Z";
 
-        enabled: visible;
+        enabled: documentBase.visible;
 
         onActivated: {
             console.log("Ctrl+Z onActivated");
@@ -56,7 +56,7 @@ FocusScope {
     Shortcut {
         sequence: "Ctrl+Shift+Z";
 
-        enabled: visible;
+        enabled: documentBase.visible;
 
         onActivated: {
             console.log("Ctrl+Shift+Z onActivated");

@@ -4,7 +4,7 @@ import Acf 1.0
 FocusScope {
     id: delegate;
 
-    property var root: tableViewRoot;
+    property var root;
 
     property alias mouseArea: mouseAreaBase;
 
@@ -124,12 +124,14 @@ FocusScope {
             }
 
             Component.onCompleted: {
-                for (let i = 0; i < root.columnModel.count; i++){
-                    let id = root.columnModel.get(i).Id;
-                    values.push(model[id])
-                }
+                if(root.columnModel){
+                    for (let i = 0; i < root.columnModel.count; i++){
+                        let id = root.columnModel.get(i).Id;
+                        values.push(model[id])
+                    }
 
-                repeater.model = root.columnModel;
+                    repeater.model = root.columnModel;
+                }
             }
         }
     }

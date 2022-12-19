@@ -10,7 +10,7 @@ TreeViewItemDelegateBase {
     signal addButtonClicked();
     signal removeButtonClicked();
 
-    rowBodyDelegate: Row {
+    rowBodyDelegate: Component { Row {
         id: row;
 
         height: root.rowItemHeight;
@@ -298,5 +298,6 @@ TreeViewItemDelegateBase {
                 }
             }
         }
+    }
     }
 }

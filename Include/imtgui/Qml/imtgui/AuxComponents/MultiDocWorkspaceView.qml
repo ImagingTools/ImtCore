@@ -29,9 +29,9 @@ Item {
 
             //TODO -> Uuid
             documentsData.SetData("Id", itemId, index);
+            documentsData.SetData("CommandsId", document["CommandsId"], index);
             documentsData.SetData("Title", document["Name"], index);
             documentsData.SetData("Source", document["Source"], index);
-            documentsData.SetData("CommandsId", document["CommandsId"], index);
 
             pageIndex = index;
         }

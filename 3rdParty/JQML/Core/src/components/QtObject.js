@@ -535,6 +535,8 @@ export class QtObject {
     }
 
     $destroy(){
+        if(this.$repeater) this.$repeater.itemRemoved(this.index, this)
+
         for(let child of this.children){
             child.parent = null
             child.$destroy()

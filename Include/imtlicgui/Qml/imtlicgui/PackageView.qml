@@ -133,6 +133,8 @@ DocumentBase {
             tableView.insertRow(indexes.concat([i]), {"Id": rowId, "Name": rowName, "Description": description, "Optional": optional});
 
             let childModel = documentModel.GetData("ChildModel", i);
+            console.log("recursiveUpdateGui childModel:", childModel);
+
             if (childModel){
                 let childIndexes = [].concat(indexes.concat([i]))
                 recursiveUpdateGui(childModel, childIndexes);
@@ -370,11 +372,11 @@ DocumentBase {
                 findChildrenFeatureDependencies(parentId, childrenFeatureList);
             }
 
-            for (let i = 0; i < treeViewModel.GetItemsCount(); i++){
-                let id = treeViewModel.GetData("Id", i);
-                let name = treeViewModel.GetData("Name", i);
+            for (let i = 0; i < packageViewContainer.treeViewModel.GetItemsCount(); i++){
+                let id = packageViewContainer.treeViewModel.GetData("Id", i);
+                let name = packageViewContainer.treeViewModel.GetData("Name", i);
 
-                let childModel = treeViewModel.GetData("ChildModel", i);
+                let childModel = packageViewContainer.treeViewModel.GetData("ChildModel", i);
 
                 treeView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
                 console.log("insertRow");
@@ -409,7 +411,7 @@ DocumentBase {
                     //Список основных зависящих фич для selectedId
                     let dependenciesList = []
 
-                    let dependenciesModel = documentModel.GetData("DependenciesModel");
+                    let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
                     if (dependenciesModel && dependenciesModel.ContainsKey(selectedId)){
                         let dependencies = dependenciesModel.GetData(selectedId);
                         if (dependencies != ""){
@@ -465,7 +467,7 @@ DocumentBase {
 
         function findParentFeatureDependencies(featureId, retVal){
             console.log("findParentFeatureDependencies");
-            let dependenciesModel = documentModel.GetData("DependenciesModel");
+            let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
 
             if (!dependenciesModel){
                 return;
@@ -489,7 +491,7 @@ DocumentBase {
 
         function findChildrenFeatureDependencies(featureId, retVal){
             console.log("findChildrenFeatureDependencies");
-            let dependenciesModel = documentModel.GetData("DependenciesModel");
+            let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
 
             if (!dependenciesModel){
                 return;
@@ -552,7 +554,7 @@ DocumentBase {
         function selectedIndexChanged(){
             console.log("rightPanel selectedIndexChanged");
 
-            let result = tableView.selectedIndex != null && tableView.selectedIndex.itemData.Id != "" && itemId != "";
+            let result = tableView.selectedIndex != null && tableView.selectedIndex.itemData.Id != "" && packageViewContainer.itemId != "";
             treeView.visible = result;
 
             if (result){

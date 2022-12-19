@@ -13,6 +13,7 @@ export class Repeater extends Item {
         this.$cP('count', 0)
 
         this.$cS('itemAdded', 'index', 'item')
+        this.$cS('itemRemoved', 'index', 'item')
     }
     $destroy(){
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
@@ -56,6 +57,7 @@ export class Repeater extends Item {
             
             this.count = this.children.length
             obj.$uP()
+            this.itemAdded(obj.index, obj)
         }
     }
 
@@ -81,6 +83,7 @@ export class Repeater extends Item {
                 this.$childrenForUpdate.push(obj)
             } else {
                 obj.$uP()
+                this.itemAdded(obj.index, obj)
             }
         }
     }
@@ -132,7 +135,9 @@ export class Repeater extends Item {
                 }
 
                 while(this.$childrenForUpdate.length){
-                    this.$childrenForUpdate.shift().$uP()
+                    let obj = this.$childrenForUpdate.shift()
+                    obj.$uP()
+                    this.itemAdded(obj.index, obj)
                 }
             } else {
 

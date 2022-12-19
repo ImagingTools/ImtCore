@@ -20,7 +20,7 @@ TableViewItemDelegateBase {
         border.color: Style.imagingToolsGradient2;
     }
 
-    rowBodyDelegate: Row {
+    rowBodyDelegate: Component { Row {
         height: root.rowItemHeight;
         width: parent.width;
 
@@ -45,8 +45,9 @@ TableViewItemDelegateBase {
             }
         }
     }
+    }
 
-    footerDelegate: Column {
+    footerDelegate: Component { Column {
         id: rolesColumn;
 
         width: parent.width;
@@ -110,4 +111,5 @@ TableViewItemDelegateBase {
             }
         }
     }//Column
+    }
 }
