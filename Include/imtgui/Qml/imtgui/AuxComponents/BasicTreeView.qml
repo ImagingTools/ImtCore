@@ -62,6 +62,11 @@ BasicTableView {
 //        let count = rowModel.GetItemsCount();
 //        insertRow([count], row);
 //    }
+    Component {
+        id: modelComponent
+        ListModel {
+        }
+    }
 
     function insertRow(indexes, row){
         console.log("insertRow")
@@ -72,7 +77,7 @@ BasicTableView {
 
         let hasKey = "ChildModel" in row;
         if (!hasKey){
-            row["ChildModel"] = [];
+            row["ChildModel"] = modelComponent.createObject(treeViewRoot);
         }
 
         hasKey = "CheckState" in row;
