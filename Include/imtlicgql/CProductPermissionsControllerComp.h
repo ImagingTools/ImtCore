@@ -20,7 +20,7 @@ public:
 		I_ASSIGN(m_productProviderCompPtr, "ProductProvider", "Product provider", true, "ProductProvider");
 	I_END_COMPONENT;
 
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CHierarchicalItemModelPtr CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);

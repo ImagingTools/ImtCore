@@ -8,18 +8,18 @@ namespace imtlicgql
 {
 
 
-imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
+imtbase::CHierarchicalItemModelPtr CAccountControllerComp::GetObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	dataModel->SetData("Id", "");
@@ -39,7 +39,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(
 
 		if (accountInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		QString accountName = accountInfoPtr->GetAccountName();

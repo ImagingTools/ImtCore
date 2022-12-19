@@ -11,13 +11,13 @@ namespace imtlicgql
 {
 
 
-imtbase::CTreeItemModel* CProductControllerComp::ListObjects(
+imtbase::CHierarchicalItemModelPtr CProductControllerComp::ListObjects(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 
@@ -186,7 +186,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 }
 
 
-imtbase::CTreeItemModel* CProductControllerComp::GetObject(
+imtbase::CHierarchicalItemModelPtr CProductControllerComp::GetObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			const imtgql::IGqlContext* gqlContext,
@@ -195,10 +195,10 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();;
 
 	QByteArray productId = GetObjectIdFromInputParams(inputParams);
@@ -314,15 +314,15 @@ bool CProductControllerComp::GetOperationFromRequest(
 }
 
 
-imtbase::CTreeItemModel *CProductControllerComp::GetTreeItemModel(const QList<imtgql::CGqlObject> &inputParams, const imtgql::CGqlObject &gqlObject, QString &errorMessage) const
+imtbase::CHierarchicalItemModelPtr CProductControllerComp::GetTreeItemModel(const QList<imtgql::CGqlObject> &inputParams, const imtgql::CGqlObject &gqlObject, QString &errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();

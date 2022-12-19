@@ -10,7 +10,7 @@ namespace imtauthgql
 {
 
 
-imtbase::CTreeItemModel* CUserControllerComp::GetObject(
+imtbase::CHierarchicalItemModelPtr CUserControllerComp::GetObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		const imtgql::IGqlContext* gqlContext,
@@ -19,10 +19,10 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	dataModel->SetData("UserId", "");

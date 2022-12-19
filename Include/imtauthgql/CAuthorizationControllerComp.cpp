@@ -10,11 +10,11 @@ namespace imtauthgql
 {
 
 
-imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CAuthorizationControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
 
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
 	QByteArray login;
@@ -51,7 +51,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateResponse(const imtg
 				istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 
 				sessionInfoPtr->SetUserId(login);
-				sessionInfoPtr->SetToken(QUuid(tokenValue));
+				sessionInfoPtr->SetToken(tokenValue);
 
 				if (m_sessionCollectionCompPtr.IsValid()){
 					m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);

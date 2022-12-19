@@ -40,12 +40,12 @@ QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByte
 }
 
 
-imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
+imtbase::CHierarchicalItemModelPtr CInstallationCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
 	imtbase::CTreeItemModel* children = nullptr;
@@ -82,13 +82,13 @@ imtbase::CTreeItemModel* CInstallationCollectionControllerComp::GetMetaInfo(
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (!m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			errorMessage = QT_TR_NOOP("Unable to get an installation object data");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		const imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<const imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
 		if (productInstancePtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an installation info");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		QByteArray productId = productInstancePtr->GetProductId();

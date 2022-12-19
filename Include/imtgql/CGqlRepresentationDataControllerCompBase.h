@@ -32,12 +32,12 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CHierarchicalItemModelPtr CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QByteArrayList GetModelIds() const override;
 	virtual QByteArrayList GetContextIds() const override;
 
 protected:
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CHierarchicalItemModelPtr CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	I_MULTIATTR(QByteArray, m_modelIdsCompPtr);

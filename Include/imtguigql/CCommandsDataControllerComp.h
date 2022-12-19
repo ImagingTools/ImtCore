@@ -21,7 +21,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CHierarchicalItemModelPtr CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_MULTIREF(imtgql::IItemBasedRepresentationDataProvider, m_commandsDataProviderCompPtr);

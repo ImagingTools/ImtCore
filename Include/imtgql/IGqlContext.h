@@ -23,7 +23,7 @@ class IGqlContext: virtual public iser::IObject
 public:
 	virtual QByteArray GetLanguageId() const = 0;
 	virtual QByteArray GetDesignScheme() const = 0;
-	virtual QUuid GetToken() const = 0;
+	virtual QByteArray GetToken() const = 0;
 	virtual imtauth::IUserInfo* GetUserInfo() const = 0;
 };
 

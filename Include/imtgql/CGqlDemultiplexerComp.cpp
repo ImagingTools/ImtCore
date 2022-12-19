@@ -37,7 +37,7 @@ QByteArrayList CGqlDemultiplexerComp::GetContextIds() const
 }
 
 
-imtbase::CTreeItemModel *CGqlDemultiplexerComp::CreateResponse(const CGqlRequest &gqlRequest, QString &errorMessage) const
+imtbase::CHierarchicalItemModelPtr CGqlDemultiplexerComp::CreateResponse(const CGqlRequest &gqlRequest, QString &errorMessage) const
 {
 	QByteArray gqlCommand = gqlRequest.GetCommandId();
 	QByteArrayList modelIds = GetModelIds();
@@ -48,8 +48,8 @@ imtbase::CTreeItemModel *CGqlDemultiplexerComp::CreateResponse(const CGqlRequest
 			if (representationControllerPtr != nullptr){
 				QByteArrayList modelItemIds = representationControllerPtr->GetModelIds();
 				if (modelItemIds.contains(gqlCommand)){
-					imtbase::CTreeItemModel* sourceItemModelPtr = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
-					if (sourceItemModelPtr != nullptr){
+					imtbase::CHierarchicalItemModelPtr sourceItemModelPtr = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
+					if (sourceItemModelPtr.IsValid()){
 						return sourceItemModelPtr;
 					}
 				}
@@ -57,7 +57,7 @@ imtbase::CTreeItemModel *CGqlDemultiplexerComp::CreateResponse(const CGqlRequest
 		}
 	}
 
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 

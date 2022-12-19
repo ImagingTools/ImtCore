@@ -12,6 +12,7 @@
 // ACF includes
 #include <iser/ISerializable.h>
 #include <istd/TChangeDelegator.h>
+#include <istd/TSmartPtr.h>
 
 
 namespace imtbase
@@ -136,6 +137,9 @@ protected:
 	virtual bool ParseRecursive(const QJsonObject &jsonObject, int index = 0);
 	virtual void subModelChanged(const CTreeItemModel* model, istd::IChangeable::ChangeSet& changeSet);
 };
+
+
+typedef istd::TSmartPtr<imtbase::CTreeItemModel> CHierarchicalItemModelPtr;
 
 
 } // namespace imtbase

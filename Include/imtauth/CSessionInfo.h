@@ -17,8 +17,8 @@ class CSessionInfo: virtual public ISession
 
 public:
 	// reimplemented (iser::ISession)
-	virtual QUuid GetToken() const override;
-	virtual void SetToken(const QUuid &token) override;
+	virtual QByteArray GetToken() const override;
+	virtual void SetToken(const QByteArray &token) override;
 	virtual QByteArray GetUserId() const override;
 	virtual void SetUserId(const QByteArray &userId) override;
 
@@ -26,7 +26,7 @@ public:
 	virtual bool Serialize(iser::IArchive &archive) override;
 
 private:
-	QUuid m_token;
+	QByteArray m_token;
 	QByteArray m_userId;
 };
 

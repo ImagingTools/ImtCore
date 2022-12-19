@@ -7,10 +7,10 @@ namespace imtguigql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CPagesDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
@@ -18,7 +18,7 @@ imtbase::CTreeItemModel* CPagesDataControllerComp::CreateResponse(const imtgql::
 
 	int count = fieldList->count();
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	bool isSetResponce = false;

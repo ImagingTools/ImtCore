@@ -10,9 +10,9 @@ namespace imtgql
 {
 
 
-imtbase::CTreeItemModel* CPermissionsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CPermissionsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
 
 	imtbase::CTreeItemModel* userPermissionsModelPtr = dataModelPtr->AddTreeModel("UserPermissions");

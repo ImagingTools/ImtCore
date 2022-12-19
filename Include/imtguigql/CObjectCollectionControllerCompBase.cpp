@@ -28,12 +28,12 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::CreateInternalResponse(
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& errorMessage) const
 {
 	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	const QList<imtgql::CGqlObject>* inputParamsPtr = gqlRequest.GetParams();
@@ -42,7 +42,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 
 	int operationType = OT_UNKNOWN;
 	if (!GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	Q_ASSERT(operationType != OT_UNKNOWN);
@@ -76,7 +76,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return GetDependencies(*inputParamsPtr, gqlObject, errorMessage);
 	}
 
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 
@@ -168,22 +168,22 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::GetObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::InsertObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 	QByteArray newObjectId;
@@ -223,12 +223,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::UpdateObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
@@ -277,12 +277,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	return rootModel;
 }
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::UpdateCollection(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
@@ -326,7 +326,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 	return rootModel;
 }
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::RenameObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
@@ -334,7 +334,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 	QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QString newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
 	if (!objectId.isEmpty()){
@@ -354,7 +354,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescription(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::SetObjectDescription(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
@@ -362,7 +362,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 	QByteArray objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QString description = inputParams.at(0).GetFieldArgumentValue("Description").toString();
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
@@ -385,13 +385,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::ListObjects(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
@@ -470,7 +470,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			int itemIndex = itemsModel->InsertNewItem();
 			if (itemIndex >= 0){
 				if (!SetupGqlItem(gqlObject, *itemsModel, itemIndex, collectionId, errorMessage)){
-					return nullptr;
+					return imtbase::CHierarchicalItemModelPtr();
 				}
 			}
 		}
@@ -484,7 +484,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::DeleteObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
@@ -492,14 +492,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = "No collection component was set";
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	if (objectId.isEmpty()){
 		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	bool retVal = m_objectCollectionCompPtr->RemoveElement(objectId);
@@ -507,7 +507,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		errorMessage = QObject::tr("Can't remove object: %1").arg(QString(objectId));
 	}
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
@@ -527,13 +527,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::GetHeaders(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	QByteArrayList fields;
 
 	if (!m_headersProviderCompPtr.IsValid()){
@@ -552,39 +552,39 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetTreeItemModel(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::GetTreeItemModel(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDependencies(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::GetDependencies(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetMetaInfo(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 
-imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
+imtbase::CHierarchicalItemModelPtr CObjectCollectionControllerCompBase::GetObjectView(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	QByteArrayList fields;
 
 	if (m_objectViewProviderCompPtr.IsValid()){

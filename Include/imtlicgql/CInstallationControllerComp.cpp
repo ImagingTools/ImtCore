@@ -12,19 +12,19 @@ namespace imtlicgql
 {
 
 
-imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
+imtbase::CHierarchicalItemModelPtr CInstallationControllerComp::GetObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	dataModel->SetData("Id", "");
@@ -42,7 +42,7 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(
 
 		if (productInstancePtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an product instance");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		QByteArray instanceId = objectId;

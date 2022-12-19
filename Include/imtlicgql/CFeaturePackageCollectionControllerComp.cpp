@@ -33,12 +33,12 @@ QVariant CFeaturePackageCollectionControllerComp::GetObjectInformation(const QBy
 }
 
 
-imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
+imtbase::CHierarchicalItemModelPtr CFeaturePackageCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
 	imtbase::CTreeItemModel* children = nullptr;
@@ -71,13 +71,13 @@ imtbase::CTreeItemModel* CFeaturePackageCollectionControllerComp::GetMetaInfo(
 
 		if (!m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
 			errorMessage = QT_TR_NOOP("Unable to load an object data!");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
 		if (packagePtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an package info provider!");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();

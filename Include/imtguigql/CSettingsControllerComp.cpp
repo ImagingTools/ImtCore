@@ -11,10 +11,10 @@ namespace imtguigql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CSettingsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CSettingsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	const QList<imtgql::CGqlObject>* inputParamsPtr = gqlRequest.GetParams();
@@ -22,7 +22,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::CreateResponse(const imtgql::C
 
 	int operationType = OT_UNKNOWN;
 	if (!GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	Q_ASSERT(operationType != OT_UNKNOWN);
@@ -34,7 +34,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::CreateResponse(const imtgql::C
 		return SaveSettings(*inputParamsPtr, gqlObject, gqlRequest.GetGqlContext(),  errorMessage);
 	}
 
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 
@@ -71,13 +71,13 @@ bool CSettingsControllerComp::GetOperationFromRequest(
 }
 
 
-imtbase::CTreeItemModel* CSettingsControllerComp::GetSettings(
+imtbase::CHierarchicalItemModelPtr CSettingsControllerComp::GetSettings(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		const imtgql::IGqlContext* gqlContext,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
 	if (m_settingsDataProviderCompPtr.IsValid()){
@@ -90,7 +90,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::GetSettings(
 }
 
 
-imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
+imtbase::CHierarchicalItemModelPtr CSettingsControllerComp::SaveSettings(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		const imtgql::IGqlContext* gqlContext,
@@ -102,7 +102,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 			QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 
 			if (!itemData.isEmpty()){
-				imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+				imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 
 				imtbase::CTreeItemModel settingsModel;
 				settingsModel.CreateFromJson(itemData);
@@ -116,7 +116,7 @@ imtbase::CTreeItemModel* CSettingsControllerComp::SaveSettings(
 		}
 	}
 
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 

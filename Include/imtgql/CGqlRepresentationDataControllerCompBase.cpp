@@ -7,13 +7,13 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CGqlRepresentationDataControllerCompBase::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if(CheckPermissions(gqlRequest, errorMessage)){
 		return CreateInternalResponse(gqlRequest, errorMessage);
 	}
 
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 
 	const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
 	QString userName = userInfoPtr->GetName();
@@ -60,9 +60,9 @@ QByteArrayList CGqlRepresentationDataControllerCompBase::GetContextIds() const
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerCompBase)
 
-imtbase::CTreeItemModel* CGqlRepresentationDataControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CGqlRepresentationDataControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	return nullptr;
+	return imtbase::CHierarchicalItemModelPtr();
 }
 
 

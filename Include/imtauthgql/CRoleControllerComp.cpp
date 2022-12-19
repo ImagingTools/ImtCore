@@ -11,7 +11,7 @@ namespace imtauthgql
 {
 
 
-imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
+imtbase::CHierarchicalItemModelPtr CRoleControllerComp::GetObject(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		const imtgql::IGqlContext* gqlContext,
@@ -20,7 +20,7 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
@@ -46,7 +46,7 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		QByteArray roleId = roleInfoPtr->GetRoleId();
@@ -80,7 +80,7 @@ imtbase::CTreeItemModel *CRoleControllerComp::GetObject(
 		}
 	}
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	rootModel->SetExternTreeModel("data", dataModelPtr);
 
 	return rootModel;

@@ -20,13 +20,13 @@ namespace imtauthgql
 
 // reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
-imtbase::CTreeItemModel* CUserCollectionControllerComp::ListObjects(
+imtbase::CHierarchicalItemModelPtr CUserCollectionControllerComp::ListObjects(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		const imtgql::IGqlContext* gqlContext,
 		QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
@@ -125,7 +125,7 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::ListObjects(
 						int itemIndex = itemsModel->InsertNewItem();
 						if (itemIndex >= 0){
 							if (!SetupGqlItem(gqlObject, *itemsModel, itemIndex, collectionId, errorMessage)){
-								return nullptr;
+								return imtbase::CHierarchicalItemModelPtr();
 							}
 						}
 					}
@@ -166,12 +166,12 @@ QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &i
 }
 
 
-imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(
+imtbase::CHierarchicalItemModelPtr CUserCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* children = nullptr;

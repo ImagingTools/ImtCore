@@ -23,12 +23,12 @@ public:
 	/**
 		Get token of the session.
 	*/
-	virtual QUuid GetToken() const = 0;
+	virtual QByteArray GetToken() const = 0;
 
 	/**
 		Set token of the session.
 	*/
-	virtual void SetToken(const QUuid& token) = 0;
+	virtual void SetToken(const QByteArray& token) = 0;
 
 	/**
 		Get user-ID of the session.

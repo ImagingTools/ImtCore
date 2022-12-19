@@ -17,13 +17,13 @@ public:
 
 	void SetLanguageId(const QByteArray& languageId);
 	void SetDesignScheme(const QByteArray& designScheme);
-	void SetToken(const QUuid& token);
+	void SetToken(const QByteArray& token);
 	void SetUserInfo(const imtauth::IUserInfo* userInfoPtr);
 
 	// reimplemented (IGqlContext)
 	virtual QByteArray GetLanguageId() const override;
 	virtual QByteArray GetDesignScheme() const override;
-	virtual QUuid GetToken() const override;
+	virtual QByteArray GetToken() const override;
 	virtual imtauth::IUserInfo* GetUserInfo() const override;
 
 	// reimplemented (iser::ISerializable)
@@ -38,7 +38,7 @@ public:
 private:
 	QByteArray m_languageId;
 	QByteArray m_designScheme;
-	QUuid m_token;
+	QByteArray m_token;
 	imtauth::IUserInfo* m_userInfoPtr;
 };
 

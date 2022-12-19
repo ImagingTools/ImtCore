@@ -10,13 +10,13 @@ namespace imtauth
 
 // reimplemented (iser::ISession)
 
-QUuid CSessionInfo::GetToken() const
+QByteArray CSessionInfo::GetToken() const
 {
 	return m_token;
 }
 
 
-void CSessionInfo::SetToken(const QUuid &token)
+void CSessionInfo::SetToken(const QByteArray &token)
 {
 	if (m_token != token){
 		istd::CChangeNotifier changeNotifier(this);

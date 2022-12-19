@@ -20,10 +20,10 @@ namespace imtguigql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CGetStyleDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
@@ -31,7 +31,7 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateResponse(const imtgq
 
 	int count = fieldList->count();
 
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = nullptr;
 	imtbase::CTreeItemModel* sourceModelPtr = nullptr;
 	QByteArrayList fields;

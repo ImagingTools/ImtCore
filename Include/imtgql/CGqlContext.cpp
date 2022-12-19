@@ -36,7 +36,7 @@ QByteArray CGqlContext::GetDesignScheme() const
 }
 
 
-QUuid CGqlContext::GetToken() const
+QByteArray CGqlContext::GetToken() const
 {
 	return m_token;
 }
@@ -68,7 +68,7 @@ void CGqlContext::SetDesignScheme(const QByteArray &designScheme)
 }
 
 
-void CGqlContext::SetToken(const QUuid &token)
+void CGqlContext::SetToken(const QByteArray &token)
 {
 	if (m_token != token){
 		istd::CChangeNotifier changeNotifier(this);
@@ -105,8 +105,7 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 
 	static iser::CArchiveTag tokenTag("Token", "Token", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(tokenTag);
-	QByteArray token = m_token.toByteArray();
-	retVal = retVal && archive.Process(token);
+	retVal = retVal && archive.Process(m_token);
 	retVal = retVal && archive.EndTag(tokenTag);
 
 	static iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
@@ -159,7 +158,7 @@ bool CGqlContext::ResetData(CompatibilityMode mode)
 
 	m_languageId.clear();
 	m_designScheme.clear();
-	m_token = QUuid();
+	m_token.clear();
 	m_userInfoPtr = nullptr;
 
 	return true;

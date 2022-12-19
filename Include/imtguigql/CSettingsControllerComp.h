@@ -33,16 +33,16 @@ public:
 	};
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CHierarchicalItemModelPtr CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const;
-	virtual imtbase::CTreeItemModel* GetSettings(
+	virtual imtbase::CHierarchicalItemModelPtr GetSettings(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* SaveSettings(
+	virtual imtbase::CHierarchicalItemModelPtr SaveSettings(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			const imtgql::IGqlContext* gqlContext,

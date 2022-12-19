@@ -13,13 +13,13 @@ namespace imtauthgql
 {
 
 
-imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CAuthorizationOptionsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_userModeCompPtr.IsValid() || !m_databaseEngineCompPtr.IsValid()){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	const iprm::IOptionsList* optionList = m_userModeCompPtr->GetSelectionConstraints();

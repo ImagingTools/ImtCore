@@ -22,18 +22,18 @@ namespace imtgql
 // reimplemented (imtrest::IRequestServlet)
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
-			const QByteArray& commandId,
-			const imtrest::IRequest::CommandParams& commandParams,
-			const HeadersMap& headers,
-			const imtrest::CHttpRequest& request) const
+		const QByteArray& commandId,
+		const imtrest::IRequest::CommandParams& commandParams,
+		const HeadersMap& headers,
+		const imtrest::CHttpRequest& request) const
 {
 	imtgql::CGqlRequest gqlRequest;
 	int errorPosition = -1;
 
 	if (!gqlRequest.ParseQuery(request.GetBody(), errorPosition)){
 		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
-												.arg(qPrintable(request.GetBody()))
-												.arg(errorPosition);
+					   .arg(qPrintable(request.GetBody()))
+					   .arg(errorPosition);
 	}
 
 	QByteArray accessToken = headers.value("X-authentication-token");
@@ -78,65 +78,67 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					}
 				}
 
-				gqlContextPtr->SetToken(QUuid(accessToken));
+				gqlContextPtr->SetToken(accessToken);
 				gqlRequest.SetGqlContext(gqlContextPtr);
 			}
 		}
 	}
 
 	QByteArray representationData;
-	bool gqlError = false;
+	bool isSuccessful = false;
+	QString errorMessage;
+	QByteArray gqlCommand = gqlRequest.GetCommandId();
 
-	{
-		imtbase::CTreeItemModel rootModel;
-		rootModel.AddTreeModel("data");
+	int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
+	for (int index = 0; index < dataControllersCount; index++){
+		const imtgql::IGqlRepresentationDataController* representationControllerPtr = m_gqlRepresentationDataControllerCompPtr[index];
+		if (representationControllerPtr != nullptr){
+			QByteArrayList modelIds = representationControllerPtr->GetModelIds();
+			if (modelIds.contains(gqlCommand)){
+				imtbase::CHierarchicalItemModelPtr sourceItemModel = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
+				if(sourceItemModel.IsValid()){
+					imtbase::CTreeItemModel rootModel;
+					imtbase::CTreeItemModel* dataItemModel = rootModel.AddTreeModel("data");
+					dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));
 
-		QString errorMessage;
-		QByteArray gqlCommand = gqlRequest.GetCommandId();
-
-		int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
-		for (int index = 0; index < dataControllersCount; index++){
-			const imtgql::IGqlRepresentationDataController* representationControllerPtr = m_gqlRepresentationDataControllerCompPtr[index];
-			if (representationControllerPtr != nullptr){
-				QByteArrayList modelIds = representationControllerPtr->GetModelIds();
-				if (modelIds.contains(gqlCommand)){
-					imtbase::CTreeItemModel* sourceItemModel = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
-					if(sourceItemModel != nullptr){
-						imtbase::CTreeItemModel* dataItemModel = rootModel.GetTreeItemModel("data");
-						imtbase::CTreeItemModel* errorsSourceItemModel = sourceItemModel->GetTreeItemModel("errors");
-
-						dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));
-						if (errorsSourceItemModel != nullptr){
-							imtbase::CTreeItemModel* errorsItemModel = rootModel.GetTreeItemModel("errors");
-							if (errorsItemModel == nullptr){
-								errorsItemModel = rootModel.AddTreeModel("errors");
-							}
-							errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
-							gqlError = true;
+					imtbase::CTreeItemModel* errorsSourceItemModel = sourceItemModel->GetTreeItemModel("errors");
+					if (errorsSourceItemModel != nullptr){
+						imtbase::CTreeItemModel* errorsItemModel = rootModel.GetTreeItemModel("errors");
+						if (errorsItemModel == nullptr){
+							errorsItemModel = rootModel.AddTreeModel("errors");
 						}
+						errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
 					}
-					else{
-						qCritical() << __FILE__ << __LINE__ << "source itemo model is invalid";
+					isSuccessful = true;
+
+					iser::CJsonStringWriteArchive archive(representationData);
+					if (!rootModel.Serialize(archive)){
+						isSuccessful = false;
 					}
 				}
-			}
-			else{
-				qCritical() << __FILE__ << __LINE__ << "Representation controller component could not be resolved";
+				else{
+					QString servletErrorMessage = QString("Can not create response for command: '%1'. Info:'%2'").arg(qPrintable(gqlCommand)).arg(errorMessage);
+					SendErrorMessage(0, servletErrorMessage, "GraphQL - servlet");
+				}
+				break;
 			}
 		}
-
-		iser::CJsonStringWriteArchive archive(representationData);
-
-		bool retVal = rootModel.Serialize(archive);
+		else{
+			qCritical() << __FILE__ << __LINE__ << "Representation controller component could not be resolved";
+		}
 	}
 
-	if (gqlError == true){
+
+
+
+	if (!isSuccessful){
 		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_BAD_REQUEST, representationData, request);
 	}
-	else if (!representationData.isEmpty()){
-		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, representationData, request);
+	else {
+		if (!representationData.isEmpty()){
+			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, representationData, request);
+		}
 	}
-
 	return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR,"Request incorrected",request);
 }
 
@@ -144,19 +146,19 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 // private methods
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
-			const imtrest::IProtocolEngine::StatusCode& statusCode,
-			const QByteArray& payload,
-			const imtrest::IRequest& request,
-			const QByteArray& contentTypeId) const
+		const imtrest::IProtocolEngine::StatusCode& statusCode,
+		const QByteArray& payload,
+		const imtrest::IRequest& request,
+		const QByteArray& contentTypeId) const
 {
 	return imtrest::IRequestServlet::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
-			const imtrest::IProtocolEngine::StatusCode& errorCode,
-			const QString& errorString,
-			const imtrest::CHttpRequest& request) const
+		const imtrest::IProtocolEngine::StatusCode& errorCode,
+		const QString& errorString,
+		const imtrest::CHttpRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
@@ -167,10 +169,10 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateErro
 	QByteArray responseJson;
 	return imtrest::IRequestServlet::ConstResponsePtr(
 				engine.CreateResponse(
-							request,
-							errorCode,
-							responseJson,
-							QByteArray("application/json;charset=utf-8")));
+					request,
+					errorCode,
+					responseJson,
+					QByteArray("application/json;charset=utf-8")));
 }
 
 

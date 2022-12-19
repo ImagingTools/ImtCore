@@ -23,9 +23,9 @@ istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(co
 
 	istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 
-	QUuid token;
+	QByteArray token;
 	if (record.contains("AccessToken")){
-		token = record.value("AccessToken").toUuid();
+		token = record.value("AccessToken").toByteArray();
 		sessionInfoPtr->SetToken(token);
 	}
 
@@ -52,14 +52,14 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 		return NewObjectQuery();
 	}
 
-	QUuid token = sessionPtr->GetToken();
+	QByteArray token = sessionPtr->GetToken();
 
 	QByteArray userId = sessionPtr->GetUserId();;
 
 	NewObjectQuery retVal;
 
 	retVal.query += QString("\nINSERT INTO \"UsersSessions\" (AccessToken, UserId, LastActivity) VALUES ('%1', '%2', '%3');")
-			.arg(token.toString())
+			.arg(qPrintable(token))
 			.arg(qPrintable(userId))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate)).toLocal8Bit();
 

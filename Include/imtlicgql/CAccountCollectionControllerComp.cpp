@@ -39,12 +39,12 @@ QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray
 }
 
 
-imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
+imtbase::CHierarchicalItemModelPtr CAccountCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
 	imtbase::CTreeItemModel* children = nullptr;
@@ -81,7 +81,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 		if (!m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
 			errorMessage = QT_TR_NOOP("Unable to load an object data");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
@@ -93,7 +93,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 				errorMessage = QT_TR_NOOP("Unable to get an account info");
 			}
 
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
@@ -106,7 +106,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 				errorMessage = QT_TR_NOOP("Unable to get an account owner");
 			}
 
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		int index = metaInfoModel->InsertNewItem();

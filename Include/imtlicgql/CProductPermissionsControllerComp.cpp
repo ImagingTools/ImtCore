@@ -13,9 +13,9 @@ namespace imtlicgql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 //	imtbase::CTreeItemModel* permissionsModel = rootModelPtr->AddTreeModel("data");
 
 	const QList<imtgql::CGqlObject>* params = gqlRequest.GetParams();
@@ -26,7 +26,7 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 	}
 
 	if (productId.isEmpty()){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	if (m_productProviderCompPtr.IsValid()){

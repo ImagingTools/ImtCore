@@ -44,6 +44,16 @@ I_EXPORT_COMPONENT(
 			"PermissionsController",
 			"Permissions Controller");
 
+I_EXPORT_COMPONENT(
+			GraphQLRepresentationController,
+            "GraphQLDataProvider",
+            "GraphQL Data Provider");
+
+I_EXPORT_COMPONENT(
+			GraphQLClientEngine,
+			"GraphQLClientEngine",
+			"GraphQL Client Engine");
+
 
 
 } // namespace ImtGqlPck

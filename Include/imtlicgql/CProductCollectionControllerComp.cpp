@@ -34,12 +34,12 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(
 }
 
 
-imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
+imtbase::CHierarchicalItemModelPtr CProductCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* metaInfoModel = nullptr;
 	imtbase::CTreeItemModel* children = nullptr;
@@ -72,7 +72,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(
 
 		if (!m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
 			errorMessage = QT_TR_NOOP("Unable to get an product object data");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());

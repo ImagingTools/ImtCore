@@ -24,7 +24,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CHierarchicalItemModelPtr CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);

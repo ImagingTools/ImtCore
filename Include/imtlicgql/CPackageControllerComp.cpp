@@ -251,7 +251,7 @@ void CPackageControllerComp::InsertSubFeaturesToModelFromData(
 }
 
 
-imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
+imtbase::CHierarchicalItemModelPtr CPackageControllerComp::GetObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		const imtgql::IGqlContext* gqlContext,
@@ -260,10 +260,10 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();;
 
 	QByteArray packageId = GetObjectIdFromInputParams(inputParams);
@@ -339,16 +339,16 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(
 }
 
 
-imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
+imtbase::CHierarchicalItemModelPtr CPackageControllerComp::GetDependencies(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
@@ -390,12 +390,12 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(
 }
 
 
-imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(
+imtbase::CHierarchicalItemModelPtr CPackageControllerComp::GetTreeItemModel(
 		const QList<imtgql::CGqlObject>& inputParams,
 		const imtgql::CGqlObject& gqlObject,
 		QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* treeItemModel = nullptr;
 	imtbase::CTreeItemModel* dataModelPtr = nullptr;
 

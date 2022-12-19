@@ -35,12 +35,12 @@ QVariant CRoleCollectionControllerComp::GetObjectInformation(const QByteArray &i
 }
 
 
-imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
+imtbase::CHierarchicalItemModelPtr CRoleCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
 		const imtgql::CGqlObject &gqlObject,
 		QString &errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
 
@@ -52,7 +52,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
-			return nullptr;
+			return imtbase::CHierarchicalItemModelPtr();
 		}
 
 		QByteArray roleId = roleInfoPtr->GetRoleId();
@@ -102,13 +102,13 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(
 }
 
 
-imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(
+imtbase::CHierarchicalItemModelPtr CRoleCollectionControllerComp::ListObjects(
 			const QList<imtgql::CGqlObject>& inputParams,
 			const imtgql::CGqlObject& gqlObject,
 			const imtgql::IGqlContext* gqlContext,
 			QString& errorMessage) const
 {
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 
 	if (!m_objectCollectionCompPtr.IsValid() || !m_productProviderCompPtr.IsValid()){

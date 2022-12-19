@@ -29,7 +29,7 @@ public:
 	/**
 		Create representation data for a given GraphQL request.
 	*/
-	virtual imtbase::CTreeItemModel* CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
+	virtual imtbase::CHierarchicalItemModelPtr CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 };
 
 

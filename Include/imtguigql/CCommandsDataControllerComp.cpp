@@ -14,10 +14,10 @@ namespace imtguigql
 
 // reimplemented (imtgql::IGqlRepresentationDataController)
 
-imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CHierarchicalItemModelPtr CCommandsDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
 	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
@@ -56,10 +56,10 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateInternalResponse(con
 	}
 
 	if (!isSetResponce){
-		return nullptr;
+		return imtbase::CHierarchicalItemModelPtr();
 	}
 
-	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
