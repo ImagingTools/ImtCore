@@ -185,7 +185,7 @@ function qmlelem(m, instructions, file){
     // }
     preCompile(cls, m[3], m[2], childInstructions, file) 
     if(instructions.class === 'Component'){
-        instructions.propertiesSpecial.component = childInstructions
+        instructions.propertiesSpecial.createObject = childInstructions
     } else {
         instructions.children.push(childInstructions)
     }

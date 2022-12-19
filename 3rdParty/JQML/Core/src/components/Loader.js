@@ -151,7 +151,7 @@ export class Loader extends Item {
         this.children = []
         
         if(this.sourceComponent){
-            this.item = this.sourceComponent.component ? this.sourceComponent.component(this) : this.sourceComponent(this)
+            this.item = this.sourceComponent.createObject ? this.sourceComponent.createObject(this) : this.sourceComponent(this)
             if(this.sourceComponent.parent) {
                 this.item.parent2 = this.sourceComponent.parent
                 this.item.$treeParent2 = this.sourceComponent.parent

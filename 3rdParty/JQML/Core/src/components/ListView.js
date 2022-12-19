@@ -87,7 +87,7 @@ export class ListView extends Flickable {
                     childRecursive(child, indx)
                 }
             }
-            let obj = this.delegate.component ? this.delegate.component(this) : this.delegate(this)
+            let obj = this.delegate.createObject ? this.delegate.createObject(this) : this.delegate(this)
             this.children.pop()
             this.children.splice(index, 0, obj)
 
@@ -114,7 +114,7 @@ export class ListView extends Flickable {
                     childRecursive(child)
                 }
             }
-            let obj = this.delegate.component ? this.delegate.component(this) : this.delegate(this)
+            let obj = this.delegate.createObject ? this.delegate.createObject(this) : this.delegate(this)
             childRecursive(obj)
             this.count = this.children.length
             this.$anchorsChild(index)
