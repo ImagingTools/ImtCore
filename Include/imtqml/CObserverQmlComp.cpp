@@ -1,12 +1,13 @@
-#include "CObserverQmlComp.h"
+#include <imtqml/CObserverQmlComp.h>
+
 
 // Qt includes
 #include <QtQml/QQmlEngine>
 
 // ACF includes
-#include <iprm/IParamsSet.h>
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
+#include <iprm/TParamsPtr.h>
 
 // ImtCore includes
 #include <imtgql/CGqlContext.h>
@@ -17,43 +18,27 @@ namespace imtqml
 
 
 CObserverQmlComp::CObserverQmlComp()
-	:m_settingsModelPtr(nullptr),
-	m_settingsObserver(*this)
+    :m_settingsModelPtr(nullptr)
 {
 }
 
 
-//protected methods
-
-void CObserverQmlComp::OnSettingsUpdated(const istd::IChangeable::ChangeSet &changeSet, const imtbase::CTreeItemModel *settingsModelPtr)
-{
-	imtbase::CTreeItemModel* model = const_cast<imtbase::CTreeItemModel*>(settingsModelPtr);
-	QList<imtgql::CGqlObject> params;
-
-	if (!changeSet.GetChangeInfoMap().isEmpty()){
-		ApplyUrl();
-
-		if (m_mutationDataDelegateCompPtr.IsValid()){
-			m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, model);
-		}
-	}
-}
-
+// protected methods
 
 void CObserverQmlComp::ApplyUrl() const
 {
-	if (!m_quickObjectComp.IsValid()){
+    if (!m_quickObjectCompPtr.IsValid()){
 		return;
 	}
 
-	const imtbase::CTreeItemModel* pageModelPtr = GetPageModel("NetworkSettings");
-	if (pageModelPtr != nullptr){
+    imtbase::CHierarchicalItemModelPtr pageModelPtr = CreatePageModel("NetworkSettings");
+    if (pageModelPtr.IsValid()){
 		imtbase::CTreeItemModel* elementsModelPtr = pageModelPtr->GetTreeItemModel("Elements");
 		if (elementsModelPtr != nullptr){
 			if (elementsModelPtr->ContainsKey("Value")){
 				QString serverUrl = elementsModelPtr->GetData("Value").toString();
 
-				QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
+                QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 				Q_ASSERT(quickItem != nullptr);
 
 				QQmlEngine* engine = qmlEngine(quickItem);
@@ -72,44 +57,38 @@ void CObserverQmlComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_quickObjectComp.IsValid()){
-		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
-		if (quickItem != nullptr){
-			if (m_pagesDataProviderCompPtr.IsValid()){
-				QList<imtgql::CGqlObject> params;
-				imtgql::CGqlObject* inputParamsPtr = new imtgql::CGqlObject("input");
+    if (m_quickObjectCompPtr.IsValid()){
+        QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+        if (quickItem != nullptr){
+            if (m_pagesDataProviderCompPtr.IsValid()){
+                QList<imtgql::CGqlObject> params;
+                QByteArrayList fields;
 
-				inputParamsPtr->InsertField("LanguageId", "ru_RU");
-				params.append(*inputParamsPtr);
-
-				QByteArrayList fields;
-				fields.append("NetworkSettings");
+                fields.append("NetworkSettings");
 
 				istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
-				if (m_languageParameterCompPtr.IsValid()){
-					iprm::IParamsSet* languageParamSetPtr = dynamic_cast<iprm::IParamsSet*>(m_languageParameterCompPtr.GetPtr());
-					if (languageParamSetPtr != nullptr){
-						const iprm::ISelectionParam* languageParamPtr = dynamic_cast<const iprm::ISelectionParam*>(languageParamSetPtr->GetParameter("Language"));
-						if (languageParamPtr != nullptr){
-							const iprm::IOptionsList* optionList = languageParamPtr->GetSelectionConstraints();
-							int languageIndex = languageParamPtr->GetSelectedOptionIndex();
+                if (m_settingsCompPtr.IsValid()){
+                    iprm::TParamsPtr<iprm::ISelectionParam> selectedLanguagePtr(m_settingsCompPtr.GetPtr(), "Language");
+                    if (selectedLanguagePtr.IsValid()){
+                        int languageIndex = selectedLanguagePtr->GetSelectedOptionIndex();
+                        if (languageIndex >= 0){
+                            const iprm::IOptionsList* languageListPtr = selectedLanguagePtr->GetSelectionConstraints();
+                            if (languageListPtr != nullptr){
+                                QByteArray languageId = languageListPtr->GetOptionId(languageIndex);
 
-							if (optionList != nullptr){
-								QByteArray languageId = optionList->GetOptionId(languageIndex);
+                                gqlContextPtr->SetLanguageId(languageId);
+                            }
+                        }
+                    }
 
-								gqlContextPtr->SetLanguageId(languageId);
-							}
-						}
-					}
-				}
+                    m_settingsModelPtr = m_pagesDataProviderCompPtr->GetRepresentation(params, fields, gqlContextPtr.GetPtr());
+                    if (m_settingsModelPtr != nullptr){
+                        QVariant data = QVariant::fromValue(m_settingsModelPtr);
 
-				m_settingsModelPtr = m_pagesDataProviderCompPtr->GetRepresentation(params, fields, gqlContextPtr.GetPtr());
+                        quickItem->setProperty("localSettings", data);
+                    }
+                }
 
-				if (m_settingsModelPtr != nullptr){
-					QVariant data = QVariant::fromValue(m_settingsModelPtr);
-
-					quickItem->setProperty("localSettings", data);
-				}
 
 				connect(quickItem, SIGNAL(settingsUpdate(QString)), this, SLOT(OnModelChanged(QString)));
 
@@ -124,8 +103,6 @@ void CObserverQmlComp::OnComponentCreated()
 
 void CObserverQmlComp::OnComponentDestroyed()
 {
-	m_settingsObserver.UnregisterAllObjects();
-
 	if (m_settingsModelPtr != nullptr){
 		delete m_settingsModelPtr;
 
@@ -138,8 +115,8 @@ void CObserverQmlComp::OnComponentDestroyed()
 
 void CObserverQmlComp::OnChangeSourceItem(QString src)
 {
-	if (m_quickObjectComp.IsValid()){
-		QQuickItem* quickItem = m_quickObjectComp->GetQuickItem();
+    if (m_quickObjectCompPtr.IsValid()){
+        QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		Q_ASSERT(quickItem != nullptr);
 
 		quickItem->setProperty("sourceItem", "qrc:///qml/"+ src);
@@ -149,43 +126,42 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 
 void CObserverQmlComp::OnModelChanged(const QString& pageId)
 {
-	QList<imtgql::CGqlObject> params;
-
-	imtgql::CGqlObject gqlObject;
-	gqlObject.InsertField("Id", pageId);
-	params << gqlObject;
-
-	const imtbase::CTreeItemModel* pageModelPtr = GetPageModel(pageId.toUtf8());
-	if (pageModelPtr != nullptr){
+    imtbase::CHierarchicalItemModelPtr pageModelPtr = CreatePageModel(pageId.toUtf8());
+    if (pageModelPtr.IsValid()){
 		ApplyUrl();
 
-		if (m_mutationDataDelegateCompPtr.IsValid()){
-			m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, const_cast<imtbase::CTreeItemModel*>(pageModelPtr));
+        if (m_mutationDataDelegateCompPtr.IsValid()){
+            QList<imtgql::CGqlObject> params;
+            imtgql::CGqlObject gqlObject;
+            gqlObject.InsertField("Id", pageId);
+            params << gqlObject;
+
+            m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, pageModelPtr.GetPtr());
 		}
 	}
 }
 
 
-const imtbase::CTreeItemModel* CObserverQmlComp::GetPageModel(const QByteArray &pageId) const
+imtbase::CHierarchicalItemModelPtr CObserverQmlComp::CreatePageModel(const QByteArray& pageId) const
 {
-	imtbase::CTreeItemModel* pageModelPtr = nullptr;
+    imtbase::CHierarchicalItemModelPtr retVal;
 
 	if (m_settingsModelPtr != nullptr){
 		for (int i = 0; i < m_settingsModelPtr->GetItemsCount(); i++){
 			if (m_settingsModelPtr->ContainsKey("Id", i)){
 				QByteArray currentPageId = m_settingsModelPtr->GetData("Id", i).toByteArray();
-				if (currentPageId == pageId){
-					pageModelPtr = new imtbase::CTreeItemModel();
-					int index = pageModelPtr->InsertNewItem();
+                if (currentPageId == pageId){
+                    retVal.SetPtr(new imtbase::CTreeItemModel());
+                    int index = retVal->InsertNewItem();
 
-					m_settingsModelPtr->CopyItemDataToModel(i, pageModelPtr, index);
+                    m_settingsModelPtr->CopyItemDataToModel(i, retVal.GetPtr(), index);
 					break;
 				}
 			}
 		}
 	}
 
-	return pageModelPtr;
+    return retVal;
 }
 
 
