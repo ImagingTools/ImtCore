@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5037" Description="ACF"/>
+            <Version Id="0" Number="5040" Description="ACF"/>
             <Version Id="1" Number="2178" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -45,7 +45,7 @@
             </Data>
         </Element>
         <Element Id="General" PackageId="BasePck" ComponentId="ComposedParamsSet">
-            <Data IsEnabled="true" Flags="2">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -73,7 +73,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Constraints" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LanguageOptions"/>
+                        <Data IsEnabled="true" Value="LisaLocalization"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="0"/>
@@ -81,10 +81,10 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="LanguageOptions" PackageId="BasePck" ComponentId="SelectionConstraints">
+        <Element Id="LisaLocalization" PackageId="LisaVoce" ComponentId="LisaLocalization">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="OptionIds">
+                    <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>en_US</Value>
@@ -94,25 +94,28 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="OptionNames">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>English</Value>
-                                <Value>German</Value>
-                                <Value>Russian</Value>
-                                <Value>Polish</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="LanguageSelection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Language"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="General"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="General"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="General"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="General"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="General"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="General"/>
+    </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Design" ComponentId="Design"/>
-        <Component ExportedId="General" ComponentId="General"/>
         <Component ExportedId="Language" ComponentId="Language"/>
+        <Component ExportedId="LisaLocalization" ComponentId="LisaLocalization"/>
     </ExportedComponents>
 </Acf>

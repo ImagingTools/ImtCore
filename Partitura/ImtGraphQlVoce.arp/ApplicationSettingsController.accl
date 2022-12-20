@@ -8,11 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Design" X="350" Y="250" Note=""/>
-        <Element ComponentName="DesignOptions" X="350" Y="475" Note=""/>
-        <Element ComponentName="General" X="575" Y="75" Note=""/>
-        <Element ComponentName="Language" X="775" Y="250" Note=""/>
-        <Element ComponentName="LisaLocalization" X="975" Y="475" Note=""/>
+        <Element ComponentName="AllSettings" X="600" Y="350" Note=""/>
+        <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
+        <Element ComponentName="GetStyleDataController" X="200" Y="175" Note=""/>
+        <Element ComponentName="SettingsController" X="1075" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
