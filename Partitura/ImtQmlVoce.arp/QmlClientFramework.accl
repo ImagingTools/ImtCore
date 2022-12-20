@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5040" Description="ACF"/>
+            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationInfo" X="200" Y="225" Note=""/>
+        <Element ComponentName="Context" X="975" Y="375" Note=""/>
+        <Element ComponentName="MainWindow" X="600" Y="375" Note=""/>
+        <Element ComponentName="ObserverQml" X="600" Y="550" Note=""/>
+        <Element ComponentName="QuickApplication" X="600" Y="225" Note=""/>
+        <Element ComponentName="VersionInfo" X="200" Y="425" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

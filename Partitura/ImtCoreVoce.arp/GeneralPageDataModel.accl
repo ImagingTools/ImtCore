@@ -12,7 +12,6 @@
         <Element ComponentName="DesignOptions" X="350" Y="475" Note=""/>
         <Element ComponentName="General" X="575" Y="75" Note=""/>
         <Element ComponentName="Language" X="775" Y="250" Note=""/>
-        <Element ComponentName="LisaLocalization" X="975" Y="475" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

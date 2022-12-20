@@ -2,13 +2,13 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5030" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5040" Description="ACF"/>
+            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="FeaturePackage" X="550" Y="375" Note=""/>
+        <Element ComponentName="FeaturePackage" X="550" Y="350" Note=""/>
         <Element ComponentName="PermissionsProvider" X="550" Y="225" Note=""/>
         <Element ComponentName="ProductInfoProvider" X="550" Y="75" Note=""/>
         <Element ComponentName="QtResourceLoaderComp" X="550" Y="500" Note=""/>

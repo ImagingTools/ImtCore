@@ -25,8 +25,8 @@
                     <AttributeInfo Id="LanguagePathToQml" Type="Text" ExportId="LanguagePathToQml">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GeneralSettings/LisaLocalization"/>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -34,6 +34,9 @@
         <Element Id="GeneralSettings" PackageId="ImtCoreVoce" ComponentId="GeneralPageDataModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Languages" Type="Reference" ExportId="Languages">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -43,7 +46,7 @@
         <Element Id="GeneralSettingsFactory" PackageId="ImtCoreVoce" ComponentId="GeneralPageDataModel">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="Languages" Type="Reference" ExportId="Languages">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -61,8 +64,8 @@
                     <AttributeInfo Id="SettingsDataProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GeneralPageRepresentation"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GeneralSettings/LisaLocalization"/>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSettingsDatabaseDelegate"/>
@@ -112,7 +115,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="Design" ComponentId="GeneralSettings/Design"/>
-        <Component ExportedId="LisaLocalization" ComponentId="GeneralSettings/LisaLocalization"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsDatabaseDelegate/UserSettingsRepository"/>
     </ExportedComponents>
 </Acf>
