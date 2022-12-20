@@ -41,7 +41,9 @@ protected:
 
 protected:
 	I_ATTR(QByteArray, m_modelIdAttrPtr);
-	I_REF(imtlic::IFeaturePackage, m_featurePackageCompPtr);
+//	I_REF(imtlic::IFeaturePackage, m_featurePackageCompPtr);
+
+	I_REF(iser::ISerializable, m_featurePackageCompPtr);
 };
 
 

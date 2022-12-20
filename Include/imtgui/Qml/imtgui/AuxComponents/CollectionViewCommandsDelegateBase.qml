@@ -11,6 +11,8 @@ Item {
     */
     property Item tableData;
 
+    property Item collectionViewBase;
+
     /**
         The property for tracking changes to the selected item
     */
@@ -68,7 +70,7 @@ Item {
     function commandHandle(commandId){
         console.log("CollectionView commandHandle", commandId);
         if (commandId === "New"){
-//            baseCollectionView.selectedItem("", "<new item>");
+            collectionViewBase.selectedItem("", "<new item>");
         }
         else if (commandId === "Remove"){
             modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
@@ -76,7 +78,7 @@ Item {
         else if (commandId === "Edit"){
             let itemId = tableData.getSelectedId();
             let itemName = tableData.getSelectedName();
-//            baseCollectionView.selectedItem(itemId, itemName);
+            collectionViewBase.selectedItem(itemId, itemName);
         }
         else if (commandId === "Rename"){
             let selectedName = tableData.getSelectedName();

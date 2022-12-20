@@ -26,8 +26,9 @@ public:
 	virtual QString GetFeatureName() const override;
 	virtual bool IsOptional() const override;
 	virtual const IFeatureInfo* GetParentFeature() const override;
-	virtual const FeatureInfoList& GetSubFeatures() const override;
-	virtual const QByteArrayList GetAllSubFeatures() const  override;
+	virtual QByteArrayList GetSubFeatureIds(int maxDepth = -1) const override;
+	virtual const IFeatureInfo* GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const override;
+	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const override;
 	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
 	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
 
@@ -42,7 +43,8 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	void GetSubFeaturesRecursive(const FeatureInfoList& subFeatures, QByteArrayList& featureList) const;
+	void GetSubFeaturesRecursive(const FeatureInfoList& subFeatures, int maxDepth, int currentDepth, QByteArrayList& featureList) const;
+	const IFeatureInfo* GetSubFeatureRecursive(const FeatureInfoList& subFeatures, const QByteArray& subfeatureId, int maxDepth, int currentDepth = 1) const;
 
 protected:
 	const imtlic::IFeatureInfoProvider* m_packagePtr;
@@ -55,3 +57,5 @@ protected:
 
 
 } // namespace imtlic
+
+

@@ -41,7 +41,6 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("TreeModel");
 
                         provider.model = dataModelLocal;
-//                        Events.sendEvent("TreeViewModelUpdateFinished");
                     }
                 }
             }

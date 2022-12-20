@@ -93,19 +93,27 @@ const IFeatureInfo *CFeatureInfo::GetParentFeature() const
 }
 
 
-const FeatureInfoList& CFeatureInfo::GetSubFeatures() const
-{
-	return m_subFeatures;
-}
-
-
-const QByteArrayList CFeatureInfo::GetAllSubFeatures() const
+QByteArrayList CFeatureInfo::GetSubFeatureIds(int maxDepth) const
 {
 	QByteArrayList retVal;
 
-	GetSubFeaturesRecursive(m_subFeatures, retVal);
+	int currentDepth = 1;
+
+	GetSubFeaturesRecursive(m_subFeatures, maxDepth, currentDepth, retVal);
 
 	return retVal;
+}
+
+
+const IFeatureInfo *CFeatureInfo::GetSubFeature(const QByteArray &subfeatureId, int maxDepth) const
+{
+	return GetSubFeatureRecursive(m_subFeatures, subfeatureId, maxDepth);
+}
+
+
+const istd::TPointerVector<const IFeatureInfo> &CFeatureInfo::GetSubFeatures() const
+{
+	return m_subFeatures;
 }
 
 
@@ -291,8 +299,12 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-void CFeatureInfo::GetSubFeaturesRecursive(const FeatureInfoList &subFeatures, QByteArrayList &featureList) const
+void CFeatureInfo::GetSubFeaturesRecursive(const FeatureInfoList& subFeatures, int maxDepth, int currentDepth, QByteArrayList& featureList) const
 {
+	if (maxDepth != -1 && maxDepth < currentDepth){
+		return;
+	}
+
 	for (int i = 0; i < subFeatures.GetCount(); i++){
 		const IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
 		if (featureInfoPtr != nullptr){
@@ -300,9 +312,34 @@ void CFeatureInfo::GetSubFeaturesRecursive(const FeatureInfoList &subFeatures, Q
 
 			featureList << featureId;
 
-			const FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
+			const FeatureInfoList& subfeatureInfoList = featureInfoPtr->GetSubFeatures();
 
-			GetSubFeaturesRecursive(subFeatures, featureList);
+			if (!subfeatureInfoList.IsEmpty()){
+				GetSubFeaturesRecursive(subfeatureInfoList, maxDepth, currentDepth + 1, featureList);
+			}
+		}
+	}
+}
+
+
+const IFeatureInfo* CFeatureInfo::GetSubFeatureRecursive(const FeatureInfoList& subFeatures, const QByteArray& subfeatureId, int maxDepth, int currentDepth) const
+{
+	if (maxDepth != -1 && maxDepth < currentDepth){
+		return nullptr;
+	}
+
+	for (int i = 0; i < subFeatures.GetCount(); i++){
+		const IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+		QByteArray featureId = featureInfoPtr->GetFeatureId();
+
+		if (featureId == subfeatureId){
+			return featureInfoPtr;
+		}
+
+		const FeatureInfoList& subfeatureInfoList = featureInfoPtr->GetSubFeatures();
+		const IFeatureInfo* subFeatureInfoPtr = GetSubFeatureRecursive(subfeatureInfoList, subfeatureId, maxDepth, currentDepth + 1);
+		if (subFeatureInfoPtr != nullptr){
+			return subFeatureInfoPtr;
 		}
 	}
 }

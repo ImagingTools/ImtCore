@@ -16,7 +16,6 @@ namespace imtlicgql
 imtbase::CHierarchicalItemModelPtr CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
-//	imtbase::CTreeItemModel* permissionsModel = rootModelPtr->AddTreeModel("data");
 
 	const QList<imtgql::CGqlObject>* params = gqlRequest.GetParams();
 

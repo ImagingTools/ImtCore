@@ -61,7 +61,7 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 										featurePackagePtr->SetFeatureDependencies(featureId, featureDependencies);
 									}
 
-									QByteArrayList allSubFeaturesList = featureInfoPtr->GetAllSubFeatures();
+									QByteArrayList allSubFeaturesList = featureInfoPtr->GetSubFeatureIds();
 									for (const QByteArray& subFeatureId : allSubFeaturesList){
 										QByteArrayList subfeatureDependencies = packagePtr->GetFeatureDependencies(subFeatureId);
 

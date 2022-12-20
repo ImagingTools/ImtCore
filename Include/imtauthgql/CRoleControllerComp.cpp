@@ -25,7 +25,7 @@ imtbase::CHierarchicalItemModelPtr CRoleControllerComp::GetObject(
 
 	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* permissionsModelPtr = dataModelPtr->AddTreeModel("Permissions");
-	imtbase::CTreeItemModel* parentsModel = dataModelPtr->AddTreeModel("Parents");
+	imtbase::CTreeItemModel* parentsModelPtr = dataModelPtr->AddTreeModel("Parents");
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	QByteArray productId = inputParams.at(0).GetFieldArgumentValue("ProductId").toByteArray();
@@ -66,9 +66,9 @@ imtbase::CHierarchicalItemModelPtr CRoleControllerComp::GetObject(
 				if (role != nullptr){
 					QString parentRoleName = role->GetRoleName();
 
-					int index = parentsModel->InsertNewItem();
-					parentsModel->SetData("Id", parentRoleId, index);
-					parentsModel->SetData("Name", parentRoleName, index);
+					int index = parentsModelPtr->InsertNewItem();
+					parentsModelPtr->SetData("Id", parentRoleId, index);
+					parentsModelPtr->SetData("Name", parentRoleName, index);
 				}
 			}
 		}
@@ -149,10 +149,12 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 		}
 
 		if (itemModel.ContainsKey("Parents")){
-			imtbase::CTreeItemModel* parentsModel = itemModel.GetTreeItemModel("Parents");
+			imtbase::CTreeItemModel* parentsModelPtr = itemModel.GetTreeItemModel("Parents");
 
-			for(int index = 0; index < parentsModel->GetItemsCount(); index++){
-				QByteArray parentRoleId = parentsModel->GetData("Id", index).toByteArray();
+			Q_ASSERT(parentsModelPtr != nullptr);
+
+			for(int index = 0; index < parentsModelPtr->GetItemsCount(); index++){
+				QByteArray parentRoleId = parentsModelPtr->GetData("Id", index).toByteArray();
 				QString parentRoleIdStr = parentRoleId;
 				parentRoleId = parentRoleIdStr.split(*m_separatorObjectIdAttrPtr)[0].toUtf8();
 

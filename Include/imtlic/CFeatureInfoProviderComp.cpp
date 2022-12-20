@@ -1,5 +1,6 @@
 #include <imtlic/CFeatureInfoProviderComp.h>
 
+
 // ImtCore includes
 #include <imtlic/CFeaturePackage.h>
 
@@ -8,7 +9,7 @@ namespace imtlic
 {
 
 
-const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray &featureId) const
+const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& featureId) const
 {
 	if (!m_packageCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -20,10 +21,29 @@ const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray &f
 		if (m_packageCollectionCompPtr->GetObjectData(packageId, dataPtr)){
 			const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(dataPtr.GetPtr());
 			if (packagePtr != nullptr){
-				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->FindFeatureById(featureId);
-				if (featureInfoPtr != nullptr){
-					return dynamic_cast<const imtlic::IFeatureInfo*>(featureInfoPtr->CloneMe());
+				QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
+				for (const QByteArray& featureCollectionId : featureCollectionIds){
+					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+					if (featureInfoPtr != nullptr){
+						QByteArray currentFeatureId = featureInfoPtr->GetFeatureId();
+						if (currentFeatureId == featureId){
+							return dynamic_cast<const imtlic::IFeatureInfo*>(featureInfoPtr->CloneMe());
+						}
+
+						QByteArrayList subFeatureIds = featureInfoPtr->GetSubFeatureIds();
+						if (subFeatureIds.contains(featureId)){
+							const imtlic::IFeatureInfo* subfeatureInfoPtr = featureInfoPtr->GetSubFeature(featureId);
+							if (subfeatureInfoPtr != nullptr){
+								return dynamic_cast<const imtlic::IFeatureInfo*>(subfeatureInfoPtr->CloneMe());
+							}
+						}
+					}
 				}
+
+//				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->FindFeatureById(featureId);
+//				if (featureInfoPtr != nullptr){
+//					return dynamic_cast<const imtlic::IFeatureInfo*>(featureInfoPtr->CloneMe());
+//				}
 			}
 		}
 	}

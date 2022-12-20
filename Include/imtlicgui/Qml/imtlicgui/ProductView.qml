@@ -164,6 +164,9 @@ DocumentBase {
                 let optionalFeatureIds = getOptionalFeatures(featureModel);
                 let notOptionalFeatureIds = getNotOptionalFeatures(featureModel);
 
+                console.log("optionalFeatureIds", optionalFeatureIds);
+                console.log("notOptionalFeatureIds", notOptionalFeatureIds);
+
                 for (let j = 0; j < notOptionalFeatureIds.length; j++){
                     let featureId = notOptionalFeatureIds[j];
 
@@ -179,6 +182,8 @@ DocumentBase {
     function licenseFeaturesUpdateGui(licenseId, featureId, index, optionalFeatureIds){
         console.log("licenseFeaturesUpdateGui", licenseId);
         let model = featuresProvider.model;
+
+        console.log("featuresProvider.model", featuresProvider.model);
 
         for (let i = 0; i < model.GetItemsCount(); i++){
             let childModel = model.GetData("ChildModel", i);

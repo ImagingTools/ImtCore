@@ -41,6 +41,11 @@ imtbase::CHierarchicalItemModelPtr CAuthorizationOptionsControllerComp::CreateRe
 	if (sqlError.type() == QSqlError::NoError){
 		bool superUserExists = sqlQuery.size() > 0;
 		dataModelPtr->SetData("SuperUserExists", superUserExists);
+		dataModelPtr->SetData("DatabaseConnectionState", true);
+	}
+	else{
+		dataModelPtr->SetData("DatabaseConnectionState", false);
+		dataModelPtr->SetData("Message", sqlError.databaseText());
 	}
 
 	return rootModelPtr;

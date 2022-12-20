@@ -18,3 +18,5 @@ bool CCheckPermissionCompBase::CheckPermission(const IUserInfo::FeatureIds &user
 
 
 } // namespace imtauth
+
+

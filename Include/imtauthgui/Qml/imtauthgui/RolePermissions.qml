@@ -34,14 +34,14 @@ Item {
         onModelChanged: {
             updateGui();
         }
+
+        onDependenciesModelChanged: {
+            dependenciesProvider.model = dependenciesModel;
+        }
     }
 
     FeaturesDependenciesProvider {
         id: dependenciesProvider;
-
-        Component.onCompleted: {
-            dependenciesProvider.updateModel();
-        }
     }
 
     function updateGui(){

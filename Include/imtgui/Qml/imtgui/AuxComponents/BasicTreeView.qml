@@ -69,7 +69,7 @@ BasicTableView {
     }
 
     function insertRow(indexes, row){
-        console.log("insertRow")
+        console.log("insertRow", indexes, JSON.stringify(row))
         if (!indexes || indexes.length == 0){
             console.error("BasicTreeView::insertRow() - invalid indexes", indexes)
             return;

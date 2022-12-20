@@ -32,8 +32,9 @@ Rectangle {
     property SettingsProvider settingsProvider;
 
     onVisibleChanged: {
-        if (visible){
+        console.log("onVisibleChanged settingsProvider", settingsProvider);
 
+        if (visible){
             if (settingsProvider.localModel){
                 let localModelJson = settingsProvider.localModel.toJSON();
                 localModel.CreateFromJson(localModelJson);
@@ -41,11 +42,7 @@ Rectangle {
                 updateCommonModel(localModel);
             }
 
-            console.log("settingsProvider.serverModel", settingsProvider.serverModel.toJSON());
-
             if (settingsProvider.serverModel){
-
-                console.log("YES");
                 let serverModelJson = settingsProvider.serverModel.toJSON();
                 serverModel.CreateFromJson(serverModelJson);
 

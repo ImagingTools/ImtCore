@@ -180,7 +180,7 @@ Item {
     SortController {
         id: sortController;
 
-        collectionView: collectionViewContainer;
+        collectionView: collectionViewBaseContainer;
         commands: baseCommands;
 
         Component.onCompleted: {

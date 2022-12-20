@@ -14,9 +14,6 @@ namespace imtlic
 {
 
 
-//class IFeatureInfoProvider;
-
-
 /**
 	Common information about a feature.
 */
@@ -51,14 +48,21 @@ public:
 	virtual const IFeatureInfo* GetParentFeature() const = 0;
 
 	/**
+		Get IDs of subfeatures.
+		\param maxDepth	traversation depth for tree iteration. negative value means unlimited depth.
+	*/
+	virtual QByteArrayList GetSubFeatureIds(int maxDepth = -1) const = 0;
+
+	/**
+		Get sub feature for this feature.
+		\param maxDepth	traversation depth for tree iteration. negative value means unlimited depth.
+	*/
+	virtual const IFeatureInfo* GetSubFeature(const QByteArray& subfeatureId, int maxDepth = -1) const = 0;
+
+	/**
 		Get sub features for this feature.
 	*/
 	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const  = 0;
-
-	/**
-		Get all sub features ids.
-	*/
-	virtual const QByteArrayList GetAllSubFeatures() const  = 0;
 
 	/**
 		Insert sub feature.

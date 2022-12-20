@@ -10,11 +10,6 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="FeatureContainer" PackageId="ImtLicensePck" ComponentId="FeatureContainer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
         <Element Id="FeaturePackage" PackageId="ImtLicensePck" ComponentId="FeaturePackage">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>

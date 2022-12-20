@@ -101,7 +101,7 @@ Item {
                         container.userMode = value;
 
                         if (superUserExists == false){
-                            modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for system administration:")});
+                            modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for system administrator:")});
                         }
 
 //                        modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for superuser") + ":"});

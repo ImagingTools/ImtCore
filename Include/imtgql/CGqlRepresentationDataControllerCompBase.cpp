@@ -15,13 +15,18 @@ imtbase::CHierarchicalItemModelPtr CGqlRepresentationDataControllerCompBase::Cre
 
 	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
 
-	const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
-	QString userName = userInfoPtr->GetName();
+	QString userName;
+	if (gqlRequest.GetGqlContext() != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+
+		if (userInfoPtr != nullptr){
+			userName = userInfoPtr->GetName();
+		}
+	}
 
 	errorMessage = QT_TR_NOOP("Invalid permissions for " + userName);
 
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
-	rootModelPtr->SetExternTreeModel("errors", errorsItemModelPtr);
 	errorsItemModelPtr->SetData("message", errorMessage);
 
 	return rootModelPtr;
@@ -75,13 +80,11 @@ bool CGqlRepresentationDataControllerCompBase::CheckPermissions(const imtgql::CG
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetUserId();
 			if (!userInfoPtr->IsAdmin()){
-				if(m_commandPermissionsCompPtr.IsValid())
-				{
+				if(m_commandPermissionsCompPtr.IsValid()){
 					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
 					QByteArray gqlCommand = gqlRequest.GetCommandId();
 					QByteArrayList commandIds = m_commandPermissionsCompPtr->GetCommandIds();
-					if(commandIds.contains(gqlCommand))
-					{
+					if(commandIds.contains(gqlCommand)){
 						QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(gqlCommand);
 						if (m_checkPermissionCompPtr.IsValid()){
 							result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);

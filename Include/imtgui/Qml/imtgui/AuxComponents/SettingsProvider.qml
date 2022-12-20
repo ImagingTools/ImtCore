@@ -17,7 +17,7 @@ Item {
     }
 
     onLocalModelChanged: {
-        console.log("SettingsProvider onLocalModelChanged", localModel);
+        console.log("SettingsProvider onLocalModelChanged", localModel.toJSON());
         timer.start();
     }
 

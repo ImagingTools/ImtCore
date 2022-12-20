@@ -128,7 +128,7 @@ DocumentBase {
         anchors.fill: parent;
 
         contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height + 50;
+        contentHeight: bodyColumn.height;
 
         boundsBehavior: Flickable.StopAtBounds;
 

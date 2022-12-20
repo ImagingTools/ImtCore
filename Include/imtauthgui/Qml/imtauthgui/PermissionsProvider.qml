@@ -7,6 +7,7 @@ Item {
     id: permissionsProvider;
 
     property TreeItemModel model: TreeItemModel {};
+    property TreeItemModel dependenciesModel: TreeItemModel {};
 
     property string productId: "";
 
@@ -46,7 +47,16 @@ Item {
                     dataModelLocal = permissionModel.GetData("data");
                     if (dataModelLocal.ContainsKey("ProductPermissions")){
                         dataModelLocal = dataModelLocal.GetData("ProductPermissions");
-                        permissionsProvider.model = dataModelLocal;
+
+                        if (dataModelLocal.ContainsKey("Permissions")){
+                            permissionsProvider.model = dataModelLocal.GetData("Permissions");
+                        }
+
+                        if (dataModelLocal.ContainsKey("Dependencies")){
+
+                            console.log("ContainsKey Dependencies");
+                            permissionsProvider.dependenciesModel = dataModelLocal.GetData("Dependencies");
+                        }
                     }
                 }
             }

@@ -51,6 +51,8 @@ DocumentWorkspaceCommandsDelegateBase {
             let removedFeatureId = tableTreeViewEditor.selectedIndex.itemData.Id;
             let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
 
+            console.log("tableTreeViewEditor.selectedIndex", tableTreeViewEditor.selectedIndex);
+
             let removedFeaturesIds = []
             getAllRemovedFeatures(tableTreeViewEditor.selectedIndex, removedFeaturesIds);
 

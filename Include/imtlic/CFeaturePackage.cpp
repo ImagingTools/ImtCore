@@ -156,9 +156,9 @@ bool CFeaturePackage::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(dependenciesTag);
 
-	if (!archive.IsStoring()){
-		CleanupDependencies();
-	}
+//	if (!archive.IsStoring()){
+//		CleanupDependencies();
+//	}
 
 	static iser::CArchiveTag parentsTag("Parents", "Parent feature providers", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(parentsTag);

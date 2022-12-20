@@ -62,6 +62,9 @@ FocusScope {
 
     FocusScope {
         id: headerItem;
+
+        z: 5;
+
         height: visible ? tableViewRoot.headerHeight : 0;
         width: listView.width;
 
@@ -138,6 +141,7 @@ FocusScope {
 
     ListView {
         id: listView;
+
 
         anchors.top: headerItem.bottom;
         anchors.left: parent.left;

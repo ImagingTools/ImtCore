@@ -134,6 +134,8 @@ Item {
 
         onLoaded: {
             commandsLoader.item.tableData = collectionViewBase.table;
+
+            commandsLoader.item.collectionViewBase = collectionViewBase;
         }
     }
 

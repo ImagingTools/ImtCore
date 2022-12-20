@@ -370,7 +370,7 @@ imtbase::CHierarchicalItemModelPtr CPackageControllerComp::GetDependencies(
 							dataModelPtr->SetData(featureId, featureDependencies);
 						}
 
-						QByteArrayList subfeaturesList = featureInfoPtr->GetAllSubFeatures();
+						QByteArrayList subfeaturesList = featureInfoPtr->GetSubFeatureIds();
 
 						for (const QByteArray& subfeatureId : subfeaturesList){
 							QByteArrayList subfeatureDependenciesList = packagePtr->GetFeatureDependencies(subfeatureId);

@@ -74,7 +74,7 @@ DocumentBase {
         let accountId = documentModel.GetData("AccountId");
         let productId = documentModel.GetData("ProductId");
 
-//        customerCB.currentText = "";
+        //        customerCB.currentText = "";
         let customerModel = customerCB.model;
         for (let i = 0; i < customerModel.GetItemsCount(); i++){
             let id = customerModel.GetData("Id", i);
@@ -84,7 +84,7 @@ DocumentBase {
             }
         }
 
-//        productCB.currentText = "";
+        //        productCB.currentText = "";
         let productModel = productCB.model;
         for (let i = 0; i < productModel.GetItemsCount(); i++){
             let id = productModel.GetData("Id", i);
@@ -195,240 +195,178 @@ DocumentBase {
         color: Style.backgroundColor;
     }
 
-    Flickable {
-        anchors.fill: parent;
 
-        contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height + 50;
+    Column {
+        id: bodyColumn;
 
-        boundsBehavior: Flickable.StopAtBounds;
+        width: 500;
 
-        Column {
-            id: bodyColumn;
+        spacing: 7;
 
-            width: 500;
+        Text {
+            id: titleInstanceId;
 
-            spacing: 7;
+            text: qsTr("Instance-ID");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
 
-            Text {
-                id: titleInstanceId;
+        RegExpValidator {
+            id: regexValid;
 
-                text: qsTr("Instance-ID");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
+            Component.onCompleted: {
+                console.log("RegExpValidator onCompleted");
+                let regex = settingsProvider.getInstanceMask();
+                console.log("regex", regex);
 
-            RegExpValidator {
-                id: regexValid;
-
-                Component.onCompleted: {
-                    console.log("RegExpValidator onCompleted");
-                    let regex = settingsProvider.getInstanceMask();
-                    console.log("regex", regex);
-
-                    let re = new RegExp(regex)
-                    if (re){
-                        regexValid.regExp = re;
-                    }
+                let re = new RegExp(regex)
+                if (re){
+                    regexValid.regExp = re;
                 }
             }
+        }
 
-            CustomTextField {
-                id: helperInput;
-                visible: false;
-                textInputValidator: regexValid;
+        CustomTextField {
+            id: helperInput;
+            visible: false;
+            textInputValidator: regexValid;
 
-                onTextChanged: {
-                    console.log("acceptableInput", helperInput.text, acceptableInput);
-                    errorMessage.visible = !acceptableInput;
-                }
+            onTextChanged: {
+                console.log("acceptableInput", helperInput.text, acceptableInput);
+                errorMessage.visible = !acceptableInput;
+            }
+        }
+
+        CustomTextField {
+            id: instanceIdInput;
+
+            width: parent.width;
+            height: 30;
+
+            placeHolderText: qsTr("Enter the instance-ID");
+
+            borderColor: helperInput.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+
+            maximumLength: 17;
+
+            onTextChanged: {
+                helperInput.text = instanceIdInput.text;
             }
 
-            CustomTextField {
-                id: instanceIdInput;
-
-                width: parent.width;
-                height: 30;
-
-                placeHolderText: qsTr("Enter the instance-ID");
-
-                borderColor: helperInput.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
-
-                maximumLength: 17;
-
-                onTextChanged: {
-                    helperInput.text = instanceIdInput.text;
-                }
-
-                onEditingFinished: {
-                    let currentId = documentModel.GetData("Id");
-                    if (currentId != instanceIdInput.text){
-                        updateModel();
-                    }
+            onEditingFinished: {
+                let currentId = documentModel.GetData("Id");
+                if (currentId != instanceIdInput.text){
+                    updateModel();
                 }
             }
+        }
 
-            Text {
-                id: errorMessage;
+        Text {
+            id: errorMessage;
 
-                color: Style.errorTextColor;
+            color: Style.errorTextColor;
 
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
 
-                text: qsTr("Incorrect input instance-ID");
+            text: qsTr("Incorrect input instance-ID");
 
-                visible: false;
-            }
+            visible: false;
+        }
 
-//            Text {
-//                text: qsTr("Order-ID");
-//                color: Style.textColor;
-//                font.family: Style.fontFamily;
-//                font.pixelSize: Style.fontSize_common;
-//            }
+        Text {
+            id: titleCustomer;
 
-//            CustomTextField {
-//                id: orderIdInput;
+            text: qsTr("Customer");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
 
-//                width: parent.width;
-//                height: 30;
+        ComboBox {
+            id: customerCB;
 
-//                placeHolderText: qsTr("Enter the Order-ID");
+            width: parent.width;
+            height: 23;
 
-//                borderColor: helperInput.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+            radius: 3;
 
-
-//                onEditingFinished: {
-//                }
-//            }
-
-            Text {
-                id: titleCustomer;
-
-                text: qsTr("Customer");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
-
-            ComboBox {
-                id: customerCB;
-
-                width: parent.width;
-                height: 23;
-
-                radius: 3;
-
-                onCurrentIndexChanged: {
-//                    let selectedAccount = customerCB.model.GetData("Id", customerCB.currentIndex);
-//                    documentModel.SetData("AccountId", selectedAccount);
-
-                    if (!blockUpdatingModel){
-                        updateModel();
-                    }
-
-
+            onCurrentIndexChanged: {
+                if (!blockUpdatingModel){
+                    updateModel();
                 }
             }
+        }
 
-            Text {
-                id: titleProduct;
+        Text {
+            id: titleProduct;
 
-                text: qsTr("Product");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
+            text: qsTr("Product");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
 
-            ComboBox {
-                id: productCB;
+        ComboBox {
+            id: productCB;
 
-                width: parent.width;
-                height: 23;
+            width: parent.width;
+            height: 23;
 
-                radius: 3;
+            radius: 3;
 
-                onCurrentIndexChanged: {
-                    console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex);
+            onCurrentIndexChanged: {
+                console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex);
 
-                    if (!blockUpdatingModel){
-                        let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
+                if (!blockUpdatingModel){
+                    let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
 
-//                        commandsDelegate.updateLicenses(selectedProductId);
+                    //                        commandsDelegate.updateLicenses(selectedProductId);
 
-                        updateModel();
+                    updateModel();
 
-                        updateGui();
-                    }
+                    updateGui();
                 }
             }
+        }
 
-            Text {
-                id: titleLicenses;
+        Text {
+            id: titleLicenses;
 
-                text: qsTr("Licenses");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+            text: qsTr("Licenses");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
+    }//Column bodyColumn
+
+    BasicTableView {
+        id: licensesTable;
+
+        anchors.top: bodyColumn.bottom;
+        anchors.topMargin: 10;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+
+        width: bodyColumn.width;
+
+
+        rowDelegate: LicenseInstanceItemDelegate {}
+
+        Component.onCompleted: {
+            licensesTable.addColumn({"Id": "Name", "Name": "License Name"});
+            licensesTable.addColumn({"Id": "Expiration", "Name": "Expiration"});
+        }
+
+        onRowModelDataChanged: {
+            console.log("licensesTable onRowModelDataChanged");
+
+            if (!blockUpdatingModel){
+                updateModel();
             }
-
-            Rectangle {
-                id: licensesBlock;
-
-                anchors.horizontalCenter: bodyColumn.horizontalCenter;
-
-                width: bodyColumn.width;
-                height: 300;
-
-                color: Style.imagingToolsGradient1;
-
-                border.width: 1;
-                border.color: Style.borderColor;
-
-                TreeItemModel {
-                    id: headersModelLicenses;
-
-                    Component.onCompleted: {
-                        let index = headersModelLicenses.InsertNewItem();
-
-                        headersModelLicenses.SetData("Id", "License", index)
-                        headersModelLicenses.SetData("Name", "License", index)
-
-                        index = headersModelLicenses.InsertNewItem()
-
-                        headersModelLicenses.SetData("Id", "Expiration", index)
-                        headersModelLicenses.SetData("Name", "Expiration", index)
-                    }
-                }
-
-                InstallationLicensesController {
-                    id: licensesController;
-                }
-
-                BasicTableView {
-                    id: licensesTable;
-
-                    anchors.fill: parent;
-                    anchors.margins: 10;
-
-                    rowDelegate: LicenseInstanceItemDelegate {}
-
-                    Component.onCompleted: {
-                        licensesTable.addColumn({"Id": "Name", "Name": "License Name"});
-                        licensesTable.addColumn({"Id": "Expiration", "Name": "Expiration"});
-                    }
-
-                    onRowModelDataChanged: {
-                        console.log("licensesTable onRowModelDataChanged");
-
-                        if (!blockUpdatingModel){
-                            updateModel();
-                        }
-                    }
-                }
-            }//Rectangle licensesBlock
-        }//Column bodyColumn
-    }//Flickable
+        }
+    }
 }//Container
+
+
