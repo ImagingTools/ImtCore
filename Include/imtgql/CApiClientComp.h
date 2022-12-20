@@ -56,6 +56,7 @@ private:
 
 		istd::TSmartPtr<imtgql::IGqlRequest> requestPtr;
 		IGqlClient::ResponseHandler* responseHandlerPtr;
+		QByteArray uuid;
 	};
 
 	typedef QMap<QNetworkReply*, Response> RequestMap;

@@ -56,6 +56,10 @@ public:
 			if ((requestType == IGqlRequest::RT_QUERY) || (requestType == IGqlRequest::RT_MUTATION)){
 				QNetworkReply* replyPtr = networkManagerPtr->post(*networkRequestPtr, request.GetQuery());
 				if (replyPtr != nullptr){
+					QByteArray uuid = QUuid::createUuid().toByteArray();
+					QString message = "Send request with ID " + uuid + "\n" + request.GetQuery();
+					m_client.SendInfoMessage(0, message, "API client");
+
 					connect(replyPtr, &QNetworkReply::finished, this, &RequestSender::OnReply, Qt::DirectConnection);
 
 					{
@@ -65,6 +69,7 @@ public:
 
 						response.responseHandlerPtr = &responseHandler;
 						response.requestPtr.SetCastedOrRemove(request.CloneMe());
+						response.uuid = uuid;
 
 						Q_ASSERT(response.requestPtr.IsValid());
 
@@ -84,7 +89,8 @@ public:
 
 					// Check if the reply was failed:
 					if (replyPtr->error()){
-						m_client.SendErrorMessage(0, replyPtr->errorString(), "API client");
+						message = "Response for request ID " + uuid + "\n" + replyPtr->errorString();
+						m_client.SendErrorMessage(0, message, "API client");
 
 						retVal = false;
 					}
@@ -117,30 +123,43 @@ public:
 	{
 		QNetworkReply* replyPtr = dynamic_cast<QNetworkReply*>(sender());
 		if (replyPtr != nullptr){
-			QReadLocker mapLock(&m_client.m_requestMapMutex);
+			QString message;
+			istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::IC_NONE;
 
-			if (m_client.m_requestMap.contains(replyPtr)){
-				IGqlClient::ResponseHandler* responseHandlerPtr = m_client.m_requestMap[replyPtr].responseHandlerPtr;
-				Q_ASSERT(responseHandlerPtr != nullptr);
+			{
+				QReadLocker mapLock(&m_client.m_requestMapMutex);
 
-				IGqlRequest* requestPtr = m_client.m_requestMap[replyPtr].requestPtr.GetPtr();
-				Q_ASSERT(requestPtr != nullptr);
+				if (m_client.m_requestMap.contains(replyPtr)) {
+					IGqlClient::ResponseHandler* responseHandlerPtr = m_client.m_requestMap[replyPtr].responseHandlerPtr;
+					Q_ASSERT(responseHandlerPtr != nullptr);
 
-				mapLock.unlock();
+					IGqlRequest* requestPtr = m_client.m_requestMap[replyPtr].requestPtr.GetPtr();
+					Q_ASSERT(requestPtr != nullptr);
 
-				QByteArray payload = replyPtr->readAll();
+					mapLock.unlock();
 
-				if (replyPtr->error() == QNetworkReply::NoError){
-					responseHandlerPtr->OnReply(*requestPtr, payload);
+					QByteArray payload = replyPtr->readAll();
 
-					qDebug() << "*** SERVER RESPONSE: " << payload;
+					if (replyPtr->error() == QNetworkReply::NoError) {
+						responseHandlerPtr->OnReply(*requestPtr, payload);
+
+						category = istd::IInformationProvider::IC_INFO;
+						message = "Response for request ID " + m_client.m_requestMap[replyPtr].uuid + "\n" + payload;
+
+						qDebug() << "*** SERVER RESPONSE: " << payload;
+					}
+					else {
+						category = istd::IInformationProvider::IC_ERROR;
+						message = "Response for request ID " + m_client.m_requestMap[replyPtr].uuid + "\n" + replyPtr->errorString() + (payload.isEmpty() ? QString("") : QString("\n") + payload);
+
+						qDebug() << "*** NETWORK ERROR: " << replyPtr->errorString();
+						qDebug() << payload;
+					}
 				}
-				else{
-					m_client.SendErrorMessage(0, QString::fromLatin1(payload));
+			}
 
-					qDebug() << "*** NETWORK ERROR: " << replyPtr->errorString();
-					qDebug() << payload;
-				}
+			if (!message.isEmpty()) {
+				m_client.SendLogMessage(category, 0, message, "API client");
 			}
 		}
 
