@@ -72,6 +72,8 @@ DocumentBase {
 
         commandsId: container.commandsId;
 
+        commandsDelegate: container.commandsDelegate;
+
         onModelStateChanged: {
             updateGui();
         }

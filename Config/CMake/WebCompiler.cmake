@@ -149,6 +149,7 @@ function(jqml_compile_web)
 	add_custom_command(
 		OUTPUT ${QRC_CPP_WEB_FILE}
 		COMMAND  ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js  ${buildwebdir}/Resources/jqml.full.js
+		COMMAND  ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/Acf/core.js  ${buildwebdir}/Resources/core.js
 		COMMAND
 		Qt${QT_VERSION_MAJOR}::rcc
 		ARGS

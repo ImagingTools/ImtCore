@@ -69,6 +69,7 @@ DocumentBase {
         id: undoRedoManager;
 
         commandsId: packageViewContainer.commandsId;
+        commandsDelegate: packageViewContainer.commandsDelegate;
 
         onModelStateChanged: {
             console.log("UndoRedoManager onModelStateChanged");
@@ -263,21 +264,21 @@ DocumentBase {
         onRowModelDataChanged: {
             console.log("TableView onRowModelDataChanged", delegate, prop);
 
-            if (!blockUpdatingModel){
+            if (!packageViewContainer.blockUpdatingModel){
                 updateModel();
             }
         }
 
         onRowAdded: {
             console.log("onRowAdded");
-            if (!blockUpdatingModel){
+            if (!packageViewContainer.blockUpdatingModel){
                 updateModel();
             }
         }
 
         onRowRemoved: {
             console.log("onRowRemoved");
-            if (!blockUpdatingModel){
+            if (!packageViewContainer.blockUpdatingModel){
                 updateModel();
             }
         }

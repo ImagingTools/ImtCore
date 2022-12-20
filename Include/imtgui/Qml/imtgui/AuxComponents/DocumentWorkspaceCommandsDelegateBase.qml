@@ -362,7 +362,7 @@ Item {
 
                     container.documentBase.documentModel = dataModelLocal;
 
-                    itemLoaded();
+                    container.itemLoaded();
                 }
             }
         }

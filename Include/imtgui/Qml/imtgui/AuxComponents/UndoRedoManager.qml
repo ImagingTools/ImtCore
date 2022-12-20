@@ -5,6 +5,7 @@ Item {
     id: undoRedoManager;
 
     property string commandsId;
+    property var commandsDelegate;
 
     property TreeItemModel observedModel;
 
@@ -59,11 +60,11 @@ Item {
         interval: 10;
 
         onTriggered: {
-            let newModel = JSON.stringify(observedModel)
+            let newModel = JSON.stringify(undoRedoManager.observedModel)
 
             let startModel = undoRedo.undoStack[0];
             if (_.isEqual(newModel, startModel)){
-                commandsDelegate.removeChanges();
+                undoRedoManager.commandsDelegate.removeChanges();
             }
         }
     }
@@ -105,15 +106,15 @@ Item {
         id: undoRedo;
 
         onModelAdded: {
-            checkCommandMode();
+            undoRedoManager.checkCommandMode();
         }
 
         onUndoChanged: {
-            checkCommandMode();
+            undoRedoManager.checkCommandMode();
         }
 
         onRedoChanged: {
-            checkCommandMode();
+            undoRedoManager.checkCommandMode();
         }
     }
 
