@@ -26,9 +26,9 @@ public:
 
 	I_BEGIN_COMPONENT(CObserverQmlComp);
 		I_ASSIGN(m_pagesDataProviderCompPtr, "PagesDataProviderCompPtr", "List of pages providers for join", false, "");
-        I_ASSIGN(m_settingsCompPtr, "Settings", "Settings", false, "Settings");
+		I_ASSIGN(m_settingsCompPtr, "Settings", "Settings", false, "Settings");
 		I_ASSIGN(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", false, "");
-        I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
+		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
 		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/");
 	I_END_COMPONENT;
 
@@ -36,7 +36,7 @@ public:
 
 protected:
 	void ApplyUrl() const;
-    imtbase::CHierarchicalItemModelPtr CreatePageModel(const QByteArray& pageId) const;
+	imtbase::CHierarchicalItemModelPtr CreatePageModel(const QByteArray& pageId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -47,8 +47,8 @@ private Q_SLOTS:
 	void OnModelChanged(const QString& page);
 
 private:
-    I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
-    I_REF(iprm::IParamsSet, m_settingsCompPtr);
+	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
+	I_REF(iprm::IParamsSet, m_settingsCompPtr);
 	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);
 	I_REF(imtgql::IGqlModelEditor, m_mutationDataDelegateCompPtr);
 	I_ATTR(QByteArray, m_prefixServer);
