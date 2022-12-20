@@ -36,13 +36,12 @@ imtbase::CHierarchicalItemModelPtr CAuthorizationOptionsControllerComp::CreateRe
 	QSqlError sqlError;
 	QByteArray query = QString("SELECT * FROM \"Users\" WHERE UserId = '%1';").arg(qPrintable(*m_superuserLoginAttrPtr)).toLocal8Bit();
 
-	m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 
-	bool connectionState = sqlError.type() != QSqlError::ConnectionError;
-	dataModelPtr->SetData("DatabaseConnectionState", connectionState);
-
-	bool superUserExists = sqlError.type() == QSqlError::NoError;
-	dataModelPtr->SetData("SuperUserExists", superUserExists);
+	if (sqlError.type() == QSqlError::NoError){
+		bool superUserExists = sqlQuery.size() > 0;
+		dataModelPtr->SetData("SuperUserExists", superUserExists);
+	}
 
 	return rootModelPtr;
 }
