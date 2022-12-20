@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
+#include <QtCore/QUuid>
 
 
 namespace imtgql
