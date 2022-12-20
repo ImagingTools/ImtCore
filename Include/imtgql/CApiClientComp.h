@@ -1,14 +1,7 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QMap>
-#include <QtCore/QReadWriteLock>
-#include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkReply>
-
 // ACF includes
-#include <istd/TPointerVector.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
@@ -20,14 +13,10 @@ namespace imtgql
 {
 
 
-class RequestSender;
-
 class CApiClientComp:
-			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public IGqlClient
 {
-	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
@@ -47,28 +36,10 @@ protected:
 	virtual void OnComponentCreated();
 
 private:
-	struct Response
-	{
-		Response()
-			:responseHandlerPtr(nullptr)
-		{
-		}
-
-		istd::TSmartPtr<imtgql::IGqlRequest> requestPtr;
-		IGqlClient::ResponseHandler* responseHandlerPtr;
-		QByteArray uuid;
-	};
-
-	typedef QMap<QNetworkReply*, Response> RequestMap;
-	mutable RequestMap m_requestMap;
-	mutable QReadWriteLock m_requestMapMutex;
-
-	int m_timeout;
-
 	I_REF(IClientProtocolEngine, m_protocolEngineCompPtr);
 	I_ATTR(double, m_timeoutAttrPtr);
 
-	friend class RequestSender;
+	int m_timeout;
 };
 
 
