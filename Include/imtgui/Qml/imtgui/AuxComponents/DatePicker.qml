@@ -39,6 +39,7 @@ Item {
     property bool hasDayCombo: false;
     property bool hasMonthCombo: false;
     property bool hasYearCombo: false;
+    property int yearsCountCombo: 12;
 
     property bool openST: monthCombo.openST || yearCombo.openST;
 
@@ -98,7 +99,7 @@ Item {
         if(datePicker.hasYearCombo){
             var date = new Date();
             var currYear = Number(date.getFullYear());
-            var count = 12;
+            var count = datePicker.yearsCountCombo;
             for(let i = 0; i < count; i++){
                 let index = yearTreeModel.InsertNewItem();
                 yearTreeModel.SetData("Id", index, index);
@@ -237,7 +238,7 @@ Item {
 
                     titleTxt.color: "transparent";
                     compTextCentered: true;
-                    shownItemsCount: 12;
+                    shownItemsCount: datePicker.yearsCountCombo;
 
                     onCurrentIndexChanged:{
                         if(yearCombo.currentIndex >=0){
