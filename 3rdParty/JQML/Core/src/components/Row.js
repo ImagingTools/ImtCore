@@ -5,8 +5,8 @@ import {Repeater} from './Repeater'
 export class Row extends Item {
     $widthAuto = true
     $heightAuto = true
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('spacing', 0)
         this.$childUpdater = null

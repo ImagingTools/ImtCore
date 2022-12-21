@@ -1,8 +1,8 @@
 import {QtObject} from './QtObject'
 
 export class RegExpValidator extends QtObject  {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('regularExpression', undefined).connect(this.$regularExpressionChanged.bind(this))
         this.$cP('regExp', undefined).connect(this.$regularExpressionChanged.bind(this))

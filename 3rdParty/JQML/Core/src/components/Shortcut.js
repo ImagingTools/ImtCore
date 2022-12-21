@@ -2,8 +2,8 @@ import {QtObject} from './QtObject'
 import {Signal} from '../utils/Signal'
 
 export class Shortcut extends QtObject {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('autoRepeat', true)
         this.$cP('context', Qt.WindowShortcut)

@@ -2,8 +2,8 @@ import {Item} from './Item'
 import {Signal} from '../utils/Signal'
 
 export class FileDialog extends Item {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
         this.visible = false
 
         // visible: false;

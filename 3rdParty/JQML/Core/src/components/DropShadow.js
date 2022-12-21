@@ -2,8 +2,8 @@
 import {Item} from './Item'
 
 export class DropShadow extends Item {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('color', 'black').connect(this.$updateShadow.bind(this))
         this.$cP('horizontalOffset', 0).connect(this.$updateShadow.bind(this))

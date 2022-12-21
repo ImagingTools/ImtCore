@@ -3,8 +3,8 @@ import {Signal} from '../utils/Signal'
 
 export class Animation extends QtObject {
     $ready = true
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('loops', 1).connect(this.$loopsChanged.bind(this))
         this.$cP('paused', false).connect(this.$pausedChanged.bind(this))

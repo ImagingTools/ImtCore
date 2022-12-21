@@ -2,8 +2,8 @@ import {QtObject} from './QtObject'
 // import { Signal } from '../utils/Signal'
 
 export class ListModel extends QtObject {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
         this.$cP('count', 0).connect(this.$countChanged.bind(this))
         this.$cP('data', [])
 

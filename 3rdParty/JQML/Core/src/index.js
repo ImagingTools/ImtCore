@@ -257,7 +257,7 @@ global.Core = {
             // }
         })
     },
-    cC: function(componentPath, parent, LVL){ // createComponent => CC
+    cC: function(componentPath, args){ // createComponent => CC
         if(componentPath[0] === '/') componentPath = componentPath.slice(1)
         let l = componentPath.lastIndexOf('/')
         let r = componentPath.indexOf('.qml')
@@ -270,13 +270,13 @@ global.Core = {
         }
         
         if(this.components[componentName]){
-            let component = new this.components[componentName](parent)
-            component.LVL.add(LVL)
+            let component = new this.components[componentName](args)
+            // component.LVL.add(LVL)
             component.$domCreate()
             return component
         } else if(this.exports[componentName]){
-            let component = this.exports[componentName](parent)
-            component.LVL.add(LVL)
+            let component = this.exports[componentName](args)
+            // component.LVL.add(LVL)
             return component
         } else {
             return IDManager.list[componentName][0]
@@ -321,7 +321,7 @@ global.Core = {
         img{vertical-align:top;}
         h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;}
         </style>`)
-        let root = this.cC('Item', null, this.LVL++)
+        let root = this.cC('Item', {parent: null})
         Core.root = root
         let dom = document.createElement("div")
         dom.style.width = '100%'
@@ -419,12 +419,12 @@ global.Core = {
         // if(fullImport) fullImport()
 
         for(let sing in this.Singletons){
-            let obj = this.Singletons[sing](root)
+            let obj = this.Singletons[sing]({parent: root})
             IDManager.set(obj, sing)
             obj.$tryComplete()
         }
 
-        this.cC(document.body.dataset.qml, root, this.LVL++)
+        this.cC(document.body.dataset.qml, {parent: root})
     
 
         setInterval(() => {

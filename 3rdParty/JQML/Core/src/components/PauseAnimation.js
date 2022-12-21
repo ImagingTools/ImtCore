@@ -2,8 +2,8 @@ import {Animation} from './Animation'
 
 export class PauseAnimation extends Animation {
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('duration', 250).connect(this.$durationChanged.bind(this))
         

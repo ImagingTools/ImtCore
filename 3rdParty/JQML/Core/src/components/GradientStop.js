@@ -1,8 +1,8 @@
 import {QtObject} from './QtObject'
 
 export class GradientStop extends QtObject  {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('color', "'black'").connect(this.$gradientChanged.bind(this))
         this.$cP('position', 0).connect(this.$gradientChanged.bind(this))

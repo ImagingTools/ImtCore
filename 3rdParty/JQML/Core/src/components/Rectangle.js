@@ -3,8 +3,8 @@ import {Gradient} from './Gradient'
 import {Signal} from '../utils/Signal'
 
 export class Rectangle extends Item {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('color', 'white').connect(this.$colorChanged.bind(this))
         this.$cP('radius', 0).connect(this.$radiusChanged.bind(this))

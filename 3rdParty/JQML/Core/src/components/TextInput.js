@@ -25,8 +25,8 @@ export class TextInput extends Item {
     $contentWAuto = true
     $contentHAuto = true
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('text', '').connect(this.$textChanged.bind(this))
         this.$cP('color', 'black').connect(this.$colorChanged.bind(this))

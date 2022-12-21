@@ -41,7 +41,7 @@ export class QtObject {
     LVL = new Set()
     
 
-    constructor(parent) {
+    constructor(args) {
         this._context = context
         this.UID = UID++
         UIDList[this.UID] = this
@@ -50,16 +50,20 @@ export class QtObject {
         this.$treeParent = null
         this.$treeParent2 = null
         
-        if(parent){
-            parent.$treeChilds.push(this)
-            parent.children.push(this)
-            parent.$childChanged()
-            this.parent = parent
-            this.$treeParent = parent
-            for(let lvl of parent.LVL){
-                this.LVL.add(lvl)
+        if(args.index){
+            this.$cP('index', args.index)
+            this.index = args.index
+        }
+        if(args.parent){
+            if(args.index === undefined && args.parent.index){
+                this.$cP('index', args.parent.index)
+                this.index = args.parent.index
             }
-            
+            args.parent.$treeChilds.push(this)
+            args.parent.children.push(this)
+            args.parent.$childChanged()
+            this.parent = args.parent
+            this.$treeParent = args.parent 
         }
 
         this.$s['Component.completed'] = Signal()
@@ -591,7 +595,7 @@ export class QtObject {
     }
 
     createComponent(_componentPath, _parent){
-        return Core.cC(_componentPath, _parent)
+        return Core.cC(_componentPath, {parent: this, index: this.index})
     }
     
 }

@@ -16,8 +16,8 @@ export class Item extends QtObject {
     // $anchorsX = false
     // $anchorsY = false
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$createReadOnlyProperty('implicitWidth', ()=>{
             let left = 0

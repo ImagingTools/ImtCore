@@ -12,8 +12,8 @@ export class Flickable extends Item {
 	$contentWidthAuto = true
 	$contentHeightAuto = true
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
         this.$cP('contentHeight', 0).connect(this.$contentHeightChanged.bind(this))
         this.$cP('contentWidth', 0).connect(this.$contentWidthChanged.bind(this))
         this.$cP('contentX', 0).connect(this.$contentXChanged.bind(this))

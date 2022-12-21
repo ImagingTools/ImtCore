@@ -7,8 +7,8 @@ export class FontLoader extends QtObject {
     static Ready = 2
     static Error = 3
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('name', '')
         this.$cP('source', '').connect(this, this.$sourceChanged)

@@ -18,8 +18,8 @@ export class Loader extends Item {
     
     $overrideItemProperties = []
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('active', true).connect(this.$activeChanged.bind(this))
         this.$cP('status', Loader.Null).connect(this.$statusChanged.bind(this))
@@ -151,7 +151,7 @@ export class Loader extends Item {
         this.children = []
         
         if(this.sourceComponent){
-            this.item = this.sourceComponent.createObject ? this.sourceComponent.createObject(this) : this.sourceComponent(this)
+            this.item = this.sourceComponent.createObject ? this.sourceComponent.createObject({parent: this, index: this.index}) : this.sourceComponent({parent: this, index: this.index})
             if(this.sourceComponent.parent) {
                 this.item.parent2 = this.sourceComponent.parent
                 this.item.$treeParent2 = this.sourceComponent.parent
@@ -200,7 +200,7 @@ export class Loader extends Item {
         this.children = []
         
         if(this.source){
-                this.item = Core.cC(this.source, this, Core.LVL)
+                this.item = Core.cC(this.source, {parent: this, index: this.index})
 
                 if(this.index !== undefined){
                     let childRecursive = (obj, index)=>{

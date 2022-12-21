@@ -21,8 +21,8 @@ export class Image extends Item {
     $swAuto = true
     $shAuto = true
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('progress', 0).connect(this.$progressChanged.bind(this))
         this.$cP('fillMode', Image.Stretch).connect(this.$fillModeChanged.bind(this))

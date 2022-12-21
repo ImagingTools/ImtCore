@@ -5,8 +5,8 @@ import {GridView} from './GridView'
 export class Repeater extends Item {
     $useModel = true
     $childrenForUpdate = []
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('model', undefined).connect(this.$modelChanged.bind(this))
         this.$cP('delegate', undefined).connect(this.$delegateChanged.bind(this))
@@ -46,7 +46,7 @@ export class Repeater extends Item {
                     childRecursive(child, indx)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject(this.parent) : this.delegate(this.parent) //нужно поправить
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.parent, index: index}) : this.delegate({parent: this.parent, index: index}) //нужно поправить
             obj.$repeater = this
             this.children.pop()
             this.children.splice(index, 0, obj)
@@ -74,7 +74,7 @@ export class Repeater extends Item {
                     childRecursive(child)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject(this.parent) : this.delegate(this.parent)
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.parent, index: index}) : this.delegate({parent: this.parent, index: index})
             obj.$repeater = this
             this.children.push(obj)
             childRecursive(obj)

@@ -980,10 +980,10 @@ function compile(instructions, code, curr = '$root', prev = ''){
         code.push(`${instructions.js[file]}`)
     }
     if(!prev){
-        code.push(`let ${curr}=Core.cC(\`${instructions.class}\`, $parent, $LVL)`)
+        code.push(`let ${curr}=Core.cC(\`${instructions.class}\`, $args)`)
 
     } else {
-        code.push(`let ${curr}=Core.cC(\`${instructions.class}\`, ${prev}, $LVL)`)
+        code.push(`let ${curr}=Core.cC(\`${instructions.class}\`, {parent: ${prev}})`)
     }
 
     if(instructions.class === 'Column' || instructions.class === 'Row'){
@@ -1095,8 +1095,8 @@ function compile(instructions, code, curr = '$root', prev = ''){
     }
     for(let prop in instructions.propertiesSpecial){
         let codeNew = []
-        codeNew.push(`function($parent){`)
-        codeNew.push(`let $LVL = Core.LVL++`)
+        codeNew.push(`function($args){`)
+        // codeNew.push(`let $LVL = Core.LVL++`)
         compile(instructions.propertiesSpecial[prop], codeNew)
         // codeNew.push(`$root.$tryComplete()`)
         codeNew.push(`return $root`)
@@ -1107,25 +1107,25 @@ function compile(instructions, code, curr = '$root', prev = ''){
 
     for(let prop in instructions.propertiesQML){
         let codeNew = []
-        codeNew.push(`function($parent){`)
-        codeNew.push(`let $LVL = Core.LVL++`)
+        codeNew.push(`function($args){`)
+        // codeNew.push(`let $LVL = Core.LVL++`)
         compile(instructions.propertiesQML[prop], codeNew)
         // codeNew.push(`$root.$tryComplete()`)
         codeNew.push(`return $root`)
         codeNew.push(`}`)
         let val = codeNew.join('\n')
-        code.push(`${curr}.${prop}=${val}(${curr})`)
+        code.push(`${curr}.${prop}=${val}({parent: ${curr}})`)
     }
     for(let prop in instructions.propertiesQMLNew){
         let codeNew = []
-        codeNew.push(`function($parent){`)
-        codeNew.push(`let $LVL = Core.LVL++`)
+        codeNew.push(`function($args){`)
+        // codeNew.push(`let $LVL = Core.LVL++`)
         compile(instructions.propertiesQMLNew[prop], codeNew)
         // codeNew.push(`$root.$tryComplete()`)
         codeNew.push(`return $root`)
         codeNew.push(`}`)
         let val = codeNew.join('\n')
-        code.push(`${curr}.$cP(\`${prop}\`,${val}(${curr}))`)
+        code.push(`${curr}.$cP(\`${prop}\`,${val}({parent: ${curr}}))`)
     }
 
     for(let name in instructions.methods){
@@ -1165,13 +1165,13 @@ for(file in compiledFiles){
         jqmlExports.push(name)
     }
 
-    code.push(`function ${name}($parent){`)
+    code.push(`function ${name}($args){`)
     // for(let child of instructions.children){
     //     if(child.Singleton === true){
     //         code.push(`IDManager.list[\`${child.SingletonName}\`][0].$destroy()`)
     //     }
     // }
-    code.push(`let $LVL = Core.LVL++`)
+    // code.push(`let $LVL = Core.LVL++`)
     compile(instructions, code)
     // code.push(`PropertyManager.update()`)
     // code.push(`$root.$tryComplete()`)

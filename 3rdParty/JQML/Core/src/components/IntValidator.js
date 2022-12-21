@@ -1,8 +1,8 @@
 import {QtObject} from './QtObject'
 
 export class IntValidator extends QtObject  {
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('bottom', -2147483647)
         this.$cP('top', 2147483647)

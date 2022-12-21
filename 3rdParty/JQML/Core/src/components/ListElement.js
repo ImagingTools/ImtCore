@@ -1,9 +1,9 @@
 import {QtObject} from './QtObject'
 
 export class ListElement extends QtObject  {
-    constructor(parent) {
-        super(parent)
-        parent.append(this)
+    constructor(args) {
+        super(args)
+        args.parent.append(this)
     }
     $domCreate(){}
 }

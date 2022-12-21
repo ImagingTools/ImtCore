@@ -4,8 +4,8 @@ export class DoubleValidator extends QtObject  {
     static StandardNotation = 0
     static ScientificNotation = 1
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('bottom', -Infinity)
         this.$cP('top', Infinity)

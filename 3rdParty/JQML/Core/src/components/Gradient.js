@@ -4,8 +4,8 @@ export class Gradient extends QtObject  {
     static Vertical = 0
     static Horizontal = 1
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('orientation', Gradient.Vertical).connect(this.$gradientChanged.bind(this))
         this.$cP('stops', []).connect(this.$gradientChanged.bind(this))

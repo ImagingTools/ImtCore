@@ -25,8 +25,8 @@ export class MouseArea extends Item {
         x: 0,
         y: 0,
     }
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$s.clicked = Signal()
         this.$s.entered = Signal()

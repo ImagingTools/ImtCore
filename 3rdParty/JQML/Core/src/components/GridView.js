@@ -15,8 +15,8 @@ export class GridView extends Flickable {
 
     $useModel = true
 
-    constructor(parent) {
-        super(parent)
+    constructor(args) {
+        super(args)
 
         this.$cP('model', undefined).connect(this.$modelChanged.bind(this))
         this.$cP('delegate', undefined).connect(this.$delegateChanged.bind(this))
