@@ -9,6 +9,7 @@ JSONListModel {
     property bool isArray: false;
 
     signal modelChanged();
+    signal dataChanged();
 
     function GetItemsCount(){
         return this.count
