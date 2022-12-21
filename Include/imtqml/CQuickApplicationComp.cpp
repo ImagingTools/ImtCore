@@ -92,49 +92,49 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 	if (BaseClass::InitializeApplication(argc, argv)){
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_STARTING);
 
-		QQmlApplicationEngine *engine = new QQmlApplicationEngine(this);
+        if (m_mainQuickCompPtr.IsValid()){
+            QQmlApplicationEngine *engine = new QQmlApplicationEngine(this);
 
-		engine->addImportPath("qrc:/");
-		engine->addImportPath("qrc:/qml");
+            engine->addImportPath("qrc:/");
+            engine->addImportPath("qrc:/qml");
 
-		QQmlContext* roolContextPtr = engine->rootContext();
-		if (roolContextPtr != nullptr){
-			if (m_contextCompPtr.IsValid()){
-				imtqml::CClientUserContextComp* contextPtr = dynamic_cast<imtqml::CClientUserContextComp*>(m_contextCompPtr.GetPtr());
-				if (contextPtr != nullptr){
-					contextPtr->SetQmlEngine(engine);
+            QQmlContext* roolContextPtr = engine->rootContext();
+            if (roolContextPtr != nullptr){
+                if (m_contextCompPtr.IsValid()){
+                    imtqml::CClientUserContextComp* contextPtr = dynamic_cast<imtqml::CClientUserContextComp*>(m_contextCompPtr.GetPtr());
+                    if (contextPtr != nullptr){
+                        contextPtr->SetQmlEngine(engine);
 
-					roolContextPtr->setContextProperty("context", contextPtr);
-				}
-			}
-		}
+                        roolContextPtr->setContextProperty("context", contextPtr);
+                    }
+                }
+            }
 
-		engine->load(QUrl("qrc:/qml/MainWindow.qml"));
+            engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
-		if (m_mainQuickCompPtr.IsValid()){
-			imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
-			if (quickObjectPtr != nullptr){
+            imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
+            if (quickObjectPtr != nullptr){
 
-				QList<QObject*> rootObjects = engine->rootObjects();
-				if (!rootObjects.isEmpty()){
-					QObject* root = rootObjects[0];
-					Q_ASSERT(root != nullptr);
+                QList<QObject*> rootObjects = engine->rootObjects();
+                if (!rootObjects.isEmpty()){
+                    QObject* root = rootObjects[0];
+                    Q_ASSERT(root != nullptr);
 
-					QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
-					if (window != nullptr){
-						window->setIcon(QGuiApplication::windowIcon());
-						window->setTitle(QGuiApplication::applicationName());
-						QQuickItem* mainItem = window->contentItem();
-						if (mainItem != nullptr){
-							quickObjectPtr->CreateQuickItem(mainItem);
-						}
-					}
-				}
-			}
-			else{
-				return -1;
-			}
-		}
+                    QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
+                    if (window != nullptr){
+                        window->setIcon(QGuiApplication::windowIcon());
+                        window->setTitle(QGuiApplication::applicationName());
+                        QQuickItem* mainItem = window->contentItem();
+                        if (mainItem != nullptr){
+                            quickObjectPtr->CreateQuickItem(mainItem);
+                        }
+                    }
+                }
+            }
+            else{
+                return -1;
+            }
+        }
 
 		HideSplashScreen();
 
