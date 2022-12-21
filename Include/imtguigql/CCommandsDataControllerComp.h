@@ -11,6 +11,7 @@ namespace imtguigql
 
 
 class CCommandsDataControllerComp: public imtgql::CGqlRepresentationDataControllerCompBase
+
 {
 public:
 	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
