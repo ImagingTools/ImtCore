@@ -40,7 +40,7 @@ Item {
     property bool hasMonthCombo: false;
     property bool hasYearCombo: false;
 
-    property bool openST: monthCombo.openST;
+    property bool openST: monthCombo.openST || yearCombo.openST;
 
     //icons
     property int iconWidth: 12;
