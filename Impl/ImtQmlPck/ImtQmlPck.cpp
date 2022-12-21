@@ -88,9 +88,9 @@ I_EXPORT_COMPONENT(
 			"Observer qml quickobject");
 
 I_EXPORT_COMPONENT(
-			Context,
-			"Context",
-			"Context");
+			ClientUserContext,
+			"Client-specific context for control global properties of QML engine",
+			"Client Localization QML-Engine");
 
 I_EXPORT_COMPONENT(
 			ApplicationInfoDataProvider,

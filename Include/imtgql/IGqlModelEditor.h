@@ -11,15 +11,12 @@ namespace imtgql
 {
 
 
-/**
-	Base interface for representation data controllers
-*/
 class IGqlModelEditor: virtual public istd::IPolymorphic
 {
 public:
 	virtual bool UpdateModelFromRepresentation(
 				const QList<imtgql::CGqlObject>& params,
-				imtbase::CTreeItemModel* baseModel,
+				imtbase::CTreeItemModel* modelPtr,
 				const imtgql::IGqlContext* gqlContext = nullptr) = 0;
 };
 

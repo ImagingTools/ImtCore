@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5037" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -37,13 +37,13 @@
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="ProductName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Context" PackageId="ImtQmlPck" ComponentId="Context">
+        <Element Id="Context" PackageId="ImtQmlPck" ComponentId="ClientUserContext">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -59,17 +59,14 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QmlFilePath" Type="String" ExportId="MainQmlPath">
-                        <Data IsEnabled="true" Value=":/qml/LisaMain.qml"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="ObserverQml" PackageId="ImtQmlPck" ComponentId="ObserverQml">
-            <Data IsEnabled="true" Flags="1">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="LanguageParameter" Type="Reference" ExportId="LanguageParameter">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -82,8 +79,8 @@
                     <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="/Lisa"/>
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Settings" Type="Reference" ExportId="Settings">
                         <Data IsEnabled="false"/>
@@ -96,6 +93,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Context" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Context"/>
@@ -118,11 +118,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="VersionInfo" PackageId="LisaVoce" ComponentId="VersionInfo">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -130,7 +125,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Component ExportedId="ObserverQml" ComponentId="ObserverQml"/>
         <Component ExportedId="RuntimeStatus" ComponentId="QuickApplication/RuntimeStatus"/>
-        <Component ExportedId="VersionInfo" ComponentId="VersionInfo"/>
     </ExportedComponents>
 </Acf>

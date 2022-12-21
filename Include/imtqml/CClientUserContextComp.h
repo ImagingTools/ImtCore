@@ -1,5 +1,6 @@
 #pragma once
 
+
 //ACF includes
 #include <iqt/ITranslationManager.h>
 #include <icomp/CComponentBase.h>
@@ -21,24 +22,28 @@ class CClientUserContextComp: public QObject, public icomp::CComponentBase
 
 public:
 	typedef icomp::CComponentBase BaseClass;
-	explicit CClientUserContextComp(QQmlEngine* engine = nullptr, QObject *parent = 0);
+
 	I_BEGIN_COMPONENT(CClientUserContextComp);
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
-signals:
+	CClientUserContextComp();
+
+Q_SIGNALS:
 	void LanguageChanged();
 
 public:
 	void SetLanguage(QString translation);
-	void SetQmlEngine(QQmlEngine* m_engine);
+	void SetQmlEngine(QQmlEngine* m_enginePtr);
 	QString GetLanguage() const;
 
 private:
 	QString m_language;
-	QQmlEngine* m_engine;
+	QQmlEngine* m_enginePtr;
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 
 } // namespace imtqml
+
+

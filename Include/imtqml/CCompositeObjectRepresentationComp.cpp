@@ -46,8 +46,16 @@ imtbase::CTreeItemModel* CCompositeObjectRepresentationComp::GetRepresentation(
 }
 
 
-bool CCompositeObjectRepresentationComp::UpdateModelFromRepresentation(const QList<imtgql::CGqlObject> &params, imtbase::CTreeItemModel *baseModelPtr, const imtgql::IGqlContext *gqlContext)
+bool CCompositeObjectRepresentationComp::UpdateModelFromRepresentation(const QList<imtgql::CGqlObject>& params, imtbase::CTreeItemModel* baseModelPtr, const imtgql::IGqlContext* gqlContext)
 {
+	if (params.size() > 0){
+		QByteArray parameterId = params.at(0).GetFieldArgumentValue("Id").toByteArray();
+
+		if (parameterId != *m_paramIdAttrPtr){
+			return false;
+		}
+	}
+
 	bool retVal = true;
 
 	for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
@@ -55,7 +63,6 @@ bool CCompositeObjectRepresentationComp::UpdateModelFromRepresentation(const QLi
 		if (mutationDelegatePtr != nullptr){
 			retVal = retVal && m_mutationDataDelegateCompPtr[i]->UpdateModelFromRepresentation(params, baseModelPtr, gqlContext);
 		}
-
 	}
 
 	return retVal;

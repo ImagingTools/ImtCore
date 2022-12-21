@@ -104,10 +104,20 @@ imtbase::CHierarchicalItemModelPtr CSettingsControllerComp::SaveSettings(
 			if (!itemData.isEmpty()){
 				imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
 
+				bool retVal = false;
 				imtbase::CTreeItemModel settingsModel;
-				settingsModel.CreateFromJson(itemData);
+				if (settingsModel.CreateFromJson(itemData)){
 
-				bool retVal = m_mutationDataControllerCompPtr->UpdateModelFromRepresentation(params, &settingsModel, gqlContext);
+					for (int i = 0; i < settingsModel.GetItemsCount(); i++){
+						if (settingsModel.ContainsKey("Id", i)){
+							QByteArray paramId =  settingsModel.GetData("Id", i).toByteArray();
+						}
+					}
+
+					settingsModel.GetTreeItemModel("Elements");
+
+					retVal = m_mutationDataControllerCompPtr->UpdateModelFromRepresentation(params, &settingsModel, gqlContext);
+				}
 
 				rootModel->SetData("SaveStatus", retVal);
 

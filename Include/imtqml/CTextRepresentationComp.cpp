@@ -77,9 +77,11 @@ bool CTextRepresentationComp::UpdateModelFromRepresentation(
 		}
 
 		m_nameParamCompPtr->SetText(value);
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 

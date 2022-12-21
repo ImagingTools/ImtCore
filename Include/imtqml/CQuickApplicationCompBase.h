@@ -40,7 +40,6 @@ public:
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info used to set main window title", false, "ApplicationInfo");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_splashTimeAttrPtr, "SplashTime", "Minimal time splash screen will be shown", true, 2);
-		I_ASSIGN(m_styleSheetAttrPtr, "StyleSheet", "Style sheet for the GUI", false, "");
 		I_ASSIGN(m_iconPathAttrPtr, "IconPath", "file path for the application icon", true, ":/Icons/AcfLogo");
 		I_ASSIGN(m_titleFormatAttrPtr, "TitleFormat", "Describe format of title bar, tags:\n\t$(CompanyName) - name of company\n\t$(ProductName) - product name\n\t$(AppName) - application name\n\t$(AppSubName) - application sub name\n\t$(AppType) - type of application\n\t$(Version) - main application version", true, "$(AppName)");
 		I_ASSIGN_MULTI_0(m_componentsToInitializeCompPtr, "ComponentsToInitialize", "List of components to be initialized after creation of the application instance (QCoreApplication)", false);
@@ -57,7 +56,6 @@ protected:
 	bool TryShowSplashScreen();
 	void HideSplashScreen();
 	void InitializeComponentApplication();
-	void ApplyStyleSheet();
 	void InitializeComponents();
 
 	// reimplemented (icomp::CComponentBase)
@@ -93,7 +91,6 @@ private:
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 	I_ATTR(double, m_splashTimeAttrPtr);
-	I_ATTR(QString, m_styleSheetAttrPtr);
 	I_ATTR(QString, m_iconPathAttrPtr);
 	I_ATTR(QString, m_titleFormatAttrPtr);
 	I_MULTIREF(istd::IPolymorphic, m_componentsToInitializeCompPtr);
@@ -104,9 +101,6 @@ private:
 	istd::TDelPtr<QGuiApplication> m_applicationPtr;
 
 	QStringList m_applicationArguments;
-
-	QByteArray m_appStyle;
-	QString m_styleSheetFile;
 };
 
 

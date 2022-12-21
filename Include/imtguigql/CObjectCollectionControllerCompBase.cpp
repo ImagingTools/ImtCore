@@ -674,6 +674,7 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 	return nullptr;
 }
 
+
 void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const
 {
 

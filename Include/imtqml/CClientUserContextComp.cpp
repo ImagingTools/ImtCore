@@ -1,5 +1,6 @@
 #include "imtqml/CClientUserContextComp.h"
 
+
 // Qt includes
 #include <QtQml/QQmlEngine>
 
@@ -8,9 +9,7 @@ namespace imtqml
 {
 
 
-CClientUserContextComp::CClientUserContextComp(QQmlEngine* engine, QObject *parent) :
-	QObject(parent),
-	m_engine(engine)
+CClientUserContextComp::CClientUserContextComp()
 {
 }
 
@@ -23,8 +22,8 @@ void CClientUserContextComp::SetLanguage(QString translation)
 			if (languageIndex >= 0){
 				m_translationManagerCompPtr->SwitchLanguage(languageIndex);
 
-				if (m_engine != nullptr){
-					m_engine->retranslate();
+				if (m_enginePtr != nullptr){
+					m_enginePtr->retranslate();
 				}
 
 				emit LanguageChanged();
@@ -43,10 +42,11 @@ QString CClientUserContextComp::GetLanguage() const
 void CClientUserContextComp::SetQmlEngine(QQmlEngine *engine)
 {
 	if (engine != nullptr){
-		m_engine = engine;
+		m_enginePtr = engine;
 	}
 }
 
 
 } // namespace imtqml
+
 

@@ -215,4 +215,3 @@ void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel *itemModel
 } // namespace imtqml
 
 
-

@@ -61,11 +61,6 @@ void CObserverQmlComp::OnComponentCreated()
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		if (quickItem != nullptr){
 			if (m_pagesDataProviderCompPtr.IsValid()){
-				QList<imtgql::CGqlObject> params;
-				QByteArrayList fields;
-
-				fields.append("NetworkSettings");
-
 				istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
 				if (m_settingsCompPtr.IsValid()){
 					iprm::TParamsPtr<iprm::ISelectionParam> selectedLanguagePtr(m_settingsCompPtr.GetPtr(), "Language");
@@ -81,7 +76,7 @@ void CObserverQmlComp::OnComponentCreated()
 						}
 					}
 
-					m_settingsModelPtr = m_pagesDataProviderCompPtr->GetRepresentation(params, fields, gqlContextPtr.GetPtr());
+					m_settingsModelPtr = m_pagesDataProviderCompPtr->GetRepresentation(QList<imtgql::CGqlObject>(), QByteArrayList(), gqlContextPtr.GetPtr());
 					if (m_settingsModelPtr != nullptr){
 						QVariant data = QVariant::fromValue(m_settingsModelPtr);
 
@@ -135,7 +130,10 @@ void CObserverQmlComp::OnModelChanged(const QString& pageId)
 			gqlObject.InsertField("Id", pageId);
 			params << gqlObject;
 
-			m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, pageModelPtr.GetPtr());
+			imtbase::CTreeItemModel* elementsModelPtr = pageModelPtr->GetTreeItemModel("Elements");
+			if (elementsModelPtr != nullptr){
+				m_mutationDataDelegateCompPtr->UpdateModelFromRepresentation(params, elementsModelPtr);
+			}
 		}
 	}
 }

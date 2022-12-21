@@ -53,7 +53,7 @@ typedef imtqml::CMenuDataEnumProviderComp MenuDataEnumProvider;
 typedef imtqml::CCompositeRepresentationComp CompositeRepresentation;
 typedef imtqml::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtqml::CObserverQmlComp ObserverQml;
-typedef imtqml::CClientUserContextComp Context;
+typedef imtqml::CClientUserContextComp ClientUserContext;
 typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
 typedef imtqml::CSettingsDatabasePageProviderComp SettingsDatabasePagesProvider;

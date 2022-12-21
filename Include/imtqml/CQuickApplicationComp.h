@@ -23,13 +23,11 @@ namespace imtqml
 
 class CQuickApplicationComp:
 			public QObject,
-			public CQuickApplicationCompBase,
-			protected imod::TSingleModelObserverBase<iprm::IEnableableParam>
+			public CQuickApplicationCompBase
 {
 	Q_OBJECT
 public:
 	typedef imtqml::CQuickApplicationCompBase BaseClass;
-	typedef imod::TSingleModelObserverBase<iprm::IEnableableParam> BaseClass2;
 
 	I_BEGIN_COMPONENT(CQuickApplicationComp);
 		I_REGISTER_INTERFACE(ibase::IApplication);
@@ -44,7 +42,7 @@ public:
 		I_ASSIGN(m_useMenuIconsOnMacAttrPtr, "UseMenuIconsOnMac", "If enabled, the menu icons will be used in the application's menu bar on Mac OS", true, false);
 		I_ASSIGN(m_useTrayIconAttrPtr, "UseTrayIcon", "If enabled, the tray icon for the application will be used", true, false);
 		I_ASSIGN(m_useFullScreenBorderOnWindowsAttrPtr, "UseFullScreenBorderOnWindows", "If enabled, 1-pixel border will be created by Windows in full screen mode", true, false);
-		I_ASSIGN(m_contextCompPtr, "Context", "Context", false, "Context");
+		I_ASSIGN(m_contextCompPtr, "Context", "Client specific context", false, "Context");
 	I_END_COMPONENT;
 
 	CQuickApplicationComp();
@@ -58,9 +56,6 @@ public:
 	virtual QString GetHelpText() const;
 
 protected:
-	// reimplemented (imod::TSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
-
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentDestroyed();
 

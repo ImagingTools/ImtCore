@@ -39,24 +39,24 @@ imtbase::CTreeItemModel* CSelectionRepresentationComp::GetRepresentation(
 
 	const iprm::IOptionsList* optionListPtr = m_selectionParamCompPtr->GetSelectionConstraints();
 
-	Q_ASSERT(optionListPtr != nullptr);
+	if (optionListPtr != nullptr){
+		int defaultIndex = m_selectionParamCompPtr->GetSelectedOptionIndex();
 
-	int defaultIndex = m_selectionParamCompPtr->GetSelectedOptionIndex();
+		rootModelPtr->SetData("Value", defaultIndex);
 
-	rootModelPtr->SetData("Value", defaultIndex);
+		imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
 
-	imtbase::CTreeItemModel* parametersPtr = rootModelPtr->AddTreeModel("Parameters");
+		Q_ASSERT(parametersPtr != nullptr);
 
-	Q_ASSERT(parametersPtr != nullptr);
+		for (int i = 0; i < optionListPtr->GetOptionsCount(); i++){
+			QByteArray id = optionListPtr->GetOptionId(i);
+			QString name = optionListPtr->GetOptionName(i);
 
-	for (int i = 0; i < optionListPtr->GetOptionsCount(); i++){
-		QByteArray id = optionListPtr->GetOptionId(i);
-		QString name = optionListPtr->GetOptionName(i);
+			int index = parametersPtr->InsertNewItem();
 
-		int index = parametersPtr->InsertNewItem();
-
-		parametersPtr->SetData("Id", id, index);
-		parametersPtr->SetData("Name", name, index);
+			parametersPtr->SetData("Id", id, index);
+			parametersPtr->SetData("Name", name, index);
+		}
 	}
 
 	return rootModelPtr;

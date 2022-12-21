@@ -93,24 +93,23 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_STARTING);
 
 		QQmlApplicationEngine *engine = new QQmlApplicationEngine(this);
+
 		engine->addImportPath("qrc:/");
 		engine->addImportPath("qrc:/qml");
 
-		QQmlContext *ctxt = engine->rootContext();
+		QQmlContext* roolContextPtr = engine->rootContext();
+		if (roolContextPtr != nullptr){
+			if (m_contextCompPtr.IsValid()){
+				imtqml::CClientUserContextComp* contextPtr = dynamic_cast<imtqml::CClientUserContextComp*>(m_contextCompPtr.GetPtr());
+				if (contextPtr != nullptr){
+					contextPtr->SetQmlEngine(engine);
 
-		if (m_contextCompPtr.IsValid()){
-			imtqml::CClientUserContextComp* context = dynamic_cast<imtqml::CClientUserContextComp* >(m_contextCompPtr.GetPtr());
-			context->SetQmlEngine(engine);
-			if (context != nullptr){
-				ctxt->setContextProperty("context", context);
+					roolContextPtr->setContextProperty("context", contextPtr);
+				}
 			}
 		}
 
 		engine->load(QUrl("qrc:/qml/MainWindow.qml"));
-
-		if (m_allowApplicationCloseModelCompPtr.IsValid()){
-			m_allowApplicationCloseModelCompPtr->AttachObserver(this);
-		}
 
 		if (m_mainQuickCompPtr.IsValid()){
 			imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
@@ -194,19 +193,10 @@ QString CQuickApplicationComp::GetHelpText() const
 
 // protected methods
 
-// reimplemented (imod::TSingleModelObserverBase)
-
-void CQuickApplicationComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
-{
-}
-
-
 // reimplemented (icomp::CComponentBase)
 
 void CQuickApplicationComp::OnComponentDestroyed()
 {
-	BaseClass2::EnsureModelDetached();
-
 	BaseClass::OnComponentDestroyed();
 }
 

@@ -88,10 +88,11 @@ imtbase::CHierarchicalItemModelPtr CRoleControllerComp::GetObject(
 
 
 istd::IChangeable *CRoleControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject> &inputParams,
-		QByteArray &objectId, QString &name,
-		QString &description,
-		QString &errorMessage) const
+		const QList<imtgql::CGqlObject>& inputParams,
+		QByteArray& objectId,
+		QString& name,
+		QString& description,
+		QString& errorMessage) const
 {
 	if (!m_roleFactCompPtr.IsValid()){
 		errorMessage = QObject::tr("Can not create role: %1").arg(QString(objectId));

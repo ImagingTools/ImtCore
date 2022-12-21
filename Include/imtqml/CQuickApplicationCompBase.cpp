@@ -37,18 +37,6 @@ bool CQuickApplicationCompBase::InitializeApplication(int argc, char** argv)
 	for (int argIndex = 0; argIndex < argc; argIndex++){
 		QByteArray arg = argv[argIndex];
 
-		if (argIndex + 1 < argc){	// two argument parameters
-			if (arg == "-style"){
-				m_appStyle = argv[++argIndex];
-				continue;
-			}
-
-			if (arg == "-stylesheet"){
-				m_styleSheetFile = QString::fromLocal8Bit(argv[++argIndex]);
-				continue;
-			}
-		}
-
 		m_applicationArguments << QString::fromLocal8Bit(argv[argIndex]);
 
 		qDebug() << QString::fromLocal8Bit(argv[argIndex]);
@@ -95,7 +83,7 @@ bool CQuickApplicationCompBase::TryShowSplashScreen()
 		splashWidgetPtr->show();
 		splashWidgetPtr->raise();
 
-        QEventLoop loop;
+		QEventLoop loop;
 #ifdef Q_OS_LINUX
 		QTimer initSplashTimer;
 		QObject::connect(&initSplashTimer, SIGNAL(timeout()), &loop, SLOT(quit()), Qt::QueuedConnection);
@@ -137,16 +125,6 @@ void CQuickApplicationCompBase::InitializeComponentApplication()
 	Q_ASSERT(IsComponentActive());
 	Q_ASSERT(m_applicationPtr.IsValid());
 
-	if (m_styleSheetFile.isEmpty() && m_styleSheetAttrPtr.IsValid()){
-		m_styleSheetFile = *m_styleSheetAttrPtr;
-	}
-
-	if (!m_appStyle.isEmpty()){
-//		QApplication::setStyle(m_appStyle);
-	}
-
-	ApplyStyleSheet();
-
 	// set up application name
 	QString applicationFullName;
 	if (m_applicationInfoCompPtr.IsValid()){
@@ -162,6 +140,7 @@ void CQuickApplicationCompBase::InitializeComponentApplication()
 	else{
 		applicationFullName = QObject::tr("ACF application");
 	}
+
 	m_applicationPtr->setApplicationName(applicationFullName);
 
 	// set up icon
@@ -172,6 +151,7 @@ void CQuickApplicationCompBase::InitializeComponentApplication()
 	else{
 		icon.addFile(":/Icons/AcfLogo");
 	}
+
 	m_applicationPtr->setWindowIcon(icon);
 
 	if (m_applicationInfoCompPtr.IsValid()){
@@ -187,11 +167,6 @@ void CQuickApplicationCompBase::InitializeComponentApplication()
 	if (m_translationManagerCompPtr.IsValid() && (m_translationManagerCompPtr->GetCurrentLanguageIndex() < 0)){
 		m_translationManagerCompPtr->SetSystemLanguage();
 	}
-}
-
-
-void CQuickApplicationCompBase::ApplyStyleSheet()
-{
 }
 
 
@@ -243,6 +218,5 @@ ibase::IRuntimeStatusProvider::RuntimeStatus CQuickApplicationCompBase::RuntimeS
 
 
 } // namespace imtqml
-
 
 
