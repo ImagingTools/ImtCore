@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5040" Description="ACF"/>
+            <Version Id="0" Number="5037" Description="ACF"/>
             <Version Id="1" Number="2178" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -85,6 +85,9 @@
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="/Lisa"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Settings" Type="Reference" ExportId="Settings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -125,5 +128,9 @@
     <ExportedInterfaces>
         <Interface InterfaceId="ibase::IApplication" ComponentId="QuickApplication"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Component ExportedId="RuntimeStatus" ComponentId="QuickApplication/RuntimeStatus"/>
+        <Component ExportedId="VersionInfo" ComponentId="VersionInfo"/>
+    </ExportedComponents>
 </Acf>

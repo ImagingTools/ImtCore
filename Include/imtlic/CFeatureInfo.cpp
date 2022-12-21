@@ -342,6 +342,8 @@ const IFeatureInfo* CFeatureInfo::GetSubFeatureRecursive(const FeatureInfoList& 
 			return subFeatureInfoPtr;
 		}
 	}
+
+	return nullptr;
 }
 
 
