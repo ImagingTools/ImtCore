@@ -19,19 +19,24 @@ FocusScope {
     property bool textCentered: false;
     property bool menuVisible: false;
     property bool hiddenBackground: true;
+    property bool openST: false;
+    property bool compTextCentered:  false;
 
     property int dialogsCountPrev: 1000;
     property int dialogsCount: modalDialogManager.count;
-    property bool openST: false;
+    property int shownItemsCount: 5;
 
     property int radius: 5;
     property int currentIndex: -1;
+
+    property alias titleTxt: cbTitleTxt
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainer.width;
         height: comboBoxContainer.itemHeight;
         textSize: comboBoxContainer.textSize;
         fontColor: comboBoxContainer.fontColor;
+        textCentered: comboBoxContainer.compTextCentered;
         rootItem: comboBoxContainer;
        };
 
@@ -72,6 +77,7 @@ FocusScope {
             hiddenBackground: comboBoxContainer.hiddenBackground;
             textSize: comboBoxContainer.textSize;
             fontColor: comboBoxContainer.fontColor;
+            shownItemsCount: comboBoxContainer.shownItemsCount;
             onFinished: {
                 console.log("DEBUG::2022-11-13::onFinished", index)
                 comboBoxContainer.currentIndex = index;

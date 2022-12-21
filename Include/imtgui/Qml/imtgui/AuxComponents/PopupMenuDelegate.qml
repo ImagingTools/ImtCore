@@ -11,6 +11,7 @@ Item {
     property string fontColor: Style.textColor;
     property alias text: mainText.text;
     property Item rootItem;
+    property bool textCentered: false;
 
     signal clicked(string commandId, int index);
 
@@ -33,7 +34,8 @@ Item {
         anchors.leftMargin: 5;
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: icon2.source != "" ? 18 : 0;
+        visible: icon2.source != "";
+        width: icon2.source != "" ? 18 : 1;
         height: width;
 
         Image {
@@ -50,8 +52,8 @@ Item {
     Text {
         id: mainText;
 
-        anchors.left: iconItem2.right;
-        anchors.leftMargin: 10;
+        anchors.left: icon2.source != "" ? iconItem2.right : parent.left;
+        anchors.leftMargin: !popupMenuDelegate.textCentered ? 10 : (parent.width - width)/2;
         anchors.verticalCenter: parent.verticalCenter;
 
         text: model.Name;

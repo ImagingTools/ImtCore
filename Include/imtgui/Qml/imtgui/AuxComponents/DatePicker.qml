@@ -6,7 +6,7 @@ Item {
 
     height: 20;
     property var monthNames:
-    [
+        [
         qsTr("January"),
         qsTr("February"),
         qsTr("March"),
@@ -28,10 +28,19 @@ Item {
     property alias selectedDay: dayField.text;
 
     property alias currentDayButtonVisible: currentDate.visible;
+    property alias defaultWidth: mainRow.width;
 
     property bool completed: false;
 
     property bool startWithCurrentDay: true;
+    property bool startWithFirstDay: false;
+    property bool hasDay: true;
+
+    property bool hasDayCombo: false;
+    property bool hasMonthCombo: false;
+    property bool hasYearCombo: false;
+
+    property bool openST: monthCombo.openST;
 
     //icons
     property int iconWidth: 12;
@@ -64,14 +73,41 @@ Item {
     Component.onCompleted: {
         console.log("onCompleted");
 
-        if (startWithCurrentDay){
+        if (datePicker.startWithCurrentDay){
             let currentDate = new Date();
             yearField.text = currentDate.getFullYear();
             selectedIndexMonth = currentDate.getMonth();
             dayField.text = currentDate.getDate();
         }
+        if(datePicker.startWithFirstDay){
+            let currentDate = new Date();
+            yearField.text = currentDate.getFullYear();
+            selectedIndexMonth = currentDate.getMonth();
+            dayField.text = "1";
 
-        completed = true;
+        }
+
+        if(datePicker.hasMonthCombo){
+            for(var i = 0; i < datePicker.monthNames.length; i++){
+                var index = monthTreeModel.InsertNewItem();
+                monthTreeModel.SetData("Id", index, index);
+                monthTreeModel.SetData("Name",qsTr(datePicker.monthNames[i]),index);
+            }
+        }
+
+        if(datePicker.hasYearCombo){
+            var date = new Date();
+            var currYear = Number(date.getFullYear());
+            var count = 12;
+            for(let i = 0; i < count; i++){
+                let index = yearTreeModel.InsertNewItem();
+                yearTreeModel.SetData("Id", index, index);
+                yearTreeModel.SetData("Name", String(currYear - count + i + 1),index);
+            }
+
+        }
+
+        datePicker.completed = true;
     }
 
     onSelectedYearChanged: {
@@ -88,7 +124,7 @@ Item {
     }
 
     onSelectedIndexMonthChanged: {
-        if (completed){
+        if (datePicker.completed){
             dateChanged();
         }
     }
@@ -116,8 +152,8 @@ Item {
         let date = new Date(year, month, day);
 
         return date.getFullYear() == year &&
-               date.getMonth() == month &&
-               date.getDate() == day;
+                date.getMonth() == month &&
+                date.getDate() == day;
     }
 
     function setDate(year, month, day){
@@ -128,7 +164,20 @@ Item {
         }
     }
 
+    TreeItemModel {
+        id: yearTreeModel;
+    }
+
+    TreeItemModel {
+        id: monthTreeModel;
+    }
+
+    TreeItemModel {
+        id: dayTreeModel;
+    }
+
     Row {
+
         height: datePicker.height;
 
         spacing: 10;
@@ -167,6 +216,40 @@ Item {
                 Keys.onDownPressed: {
                     yearDownButton.clicked();
                 }
+
+                ComboBox {
+                    id: yearCombo;
+
+                    visible: datePicker.hasYearCombo;
+                    enabled: visible;
+                    model: yearTreeModel;
+                    anchors.fill: parent;
+
+                    image.source:  "../../../" + "Icons/" + Style.theme + "/" + "triangle" + "_On_Disabled.svg";
+                    image.width: 16;
+                    image.height: 16;
+                    image.rotation: openST ? 0 : 180;
+                    textSize: Style.fontSize_common;
+                    fontColor: yearField.fontColor;
+                    borderColor: "transparent";
+                    backgroundColor: "transparent";
+                    hiddenBackground: false;
+
+                    titleTxt.color: "transparent";
+                    compTextCentered: true;
+                    shownItemsCount: 12;
+
+                    onCurrentIndexChanged:{
+                        if(yearCombo.currentIndex >=0){
+                            let selectedYear = yearCombo.currentText;
+
+                            if (checkDate(selectedYear, selectedIndexMonth, Number(dayField.text))){
+                                yearField.text = selectedYear;
+                            }
+                        }
+
+                    }
+                }//yearCombo
             }
 
             Column {
@@ -251,6 +334,37 @@ Item {
                 Keys.onDownPressed: {
                     monthDownButton.clicked();
                 }
+
+                ComboBox {
+                    id: monthCombo;
+
+                    visible: datePicker.hasMonthCombo;
+                    enabled: visible;
+                    model: monthTreeModel;
+                    anchors.fill: parent;
+
+                    image.source:  "../../../" + "Icons/" + Style.theme + "/" + "triangle" + "_On_Disabled.svg";
+                    image.width: 16;
+                    image.height: 16;
+                    image.rotation: openST ? 0 : 180;
+                    textSize: Style.fontSize_common;
+                    fontColor: monthField.fontColor;
+                    borderColor: "transparent";
+                    backgroundColor: "transparent";
+                    hiddenBackground: false;
+
+                    titleTxt.color: "transparent";
+                    compTextCentered: true;
+                    shownItemsCount: 12;
+
+                    onCurrentIndexChanged:{
+                        if(monthCombo.currentIndex >= 0){
+                            if (checkDate(Number(yearField.text), monthCombo.currentIndex, Number(dayField.text))){
+                                selectedIndexMonth = monthCombo.currentIndex;
+                            }
+                        }
+                    }
+                }//monthCombo
             }
 
             Column {
@@ -326,6 +440,8 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
+                visible: datePicker.hasDay;
+
                 height: datePicker.textFieldHeight;
                 width: datePicker.textFieldWidthDay;
                 radius: datePicker.textFieldRadius;
@@ -351,6 +467,7 @@ Item {
                 id: dayButtons;
 
                 anchors.verticalCenter: parent.verticalCenter;
+                visible: datePicker.hasDay;
 
                 AuxButton {
                     id: dayUpButton;
@@ -372,7 +489,7 @@ Item {
                             let newDay = String(selectedDay + 1)
 
                             if (checkDate(Number(yearField.text), selectedIndexMonth, Number(newDay))){
-                                 dayField.text = newDay;
+                                dayField.text = newDay;
                             }
                         }
                     }
@@ -398,7 +515,7 @@ Item {
                             let newDay = String(selectedDay - 1);
 
                             if (checkDate(Number(yearField.text), selectedIndexMonth, Number(newDay))){
-                                 dayField.text = newDay;
+                                dayField.text = newDay;
                             }
                         }
                     }

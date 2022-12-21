@@ -59,8 +59,10 @@ Rectangle {
     }
 
     onTitleChanged: {
-        console.log("Dialog onTitleChanged", title);
-        loaderTopPanel.item.title = title;
+        if(loaderTopPanel.item){
+            console.log("Dialog onTitleChanged", title);
+            loaderTopPanel.item.title = title;
+        }
     }
 
     onBodySourceChanged: {
@@ -84,7 +86,7 @@ Rectangle {
         Loader {
             id: loaderTopPanel;
 
-//            sourceComponent: contentComp;
+            //            sourceComponent: contentComp;
             source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
             onLoaded:  {
                 loaderTopPanel.item.width = dialogContainer.width;

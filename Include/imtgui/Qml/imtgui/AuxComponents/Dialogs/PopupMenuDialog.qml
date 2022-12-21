@@ -15,6 +15,7 @@ Rectangle {
 
     property int itemWidth: 200;
     property int itemHeight: 26;
+    property int shownItemsCount: 5;
 
     property int textSize: Style.fontSize_common;
     property string fontColor: Style.textColor;
@@ -80,7 +81,7 @@ Rectangle {
 //            height: (parent.countVisibleItem == -1 || parent.countVisibleItem > popupMenuListView.count) ?
 //                        popupMenuListView.count * popupMenuContainer.itemHeight :
 //                        parent.countVisibleItem * popupMenuContainer.itemHeight;
-            height: Math.min(5 * popupMenuContainer.itemHeight, contentHeight);
+            height: Math.min(popupMenuContainer.shownItemsCount * popupMenuContainer.itemHeight, contentHeight);
 
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
