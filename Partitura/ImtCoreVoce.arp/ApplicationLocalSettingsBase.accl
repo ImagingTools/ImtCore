@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ClientPersistence" X="550" Y="775" Note=""/>
+        <Element ComponentName="CompositeRepresentation" X="550" Y="100" Note=""/>
+        <Element ComponentName="GeneralPageData" X="850" Y="425" Note=""/>
+        <Element ComponentName="GeneralPageRepresentation" X="875" Y="275" Note=""/>
+        <Element ComponentName="LocalPageData" X="275" Y="425" Note=""/>
+        <Element ComponentName="LocalPageRepresentation" X="250" Y="275" Note=""/>
+        <Element ComponentName="Preferences" X="550" Y="625" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
