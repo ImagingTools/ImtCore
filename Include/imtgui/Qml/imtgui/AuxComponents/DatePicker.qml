@@ -40,6 +40,8 @@ Item {
     property bool hasMonthCombo: false;
     property bool hasYearCombo: false;
     property int yearsCountCombo: 12;
+    property alias monthCombo: monthCombo;
+    property alias yearCombo: yearCombo;
 
     property bool openST: monthCombo.openST || yearCombo.openST;
 
@@ -226,11 +228,7 @@ Item {
                     model: yearTreeModel;
                     anchors.fill: parent;
 
-                    image.source:  "../../../" + "Icons/" + Style.theme + "/" + "triangle" + "_On_Disabled.svg";
-                    image.width: 16;
-                    image.height: 16;
-                    image.rotation: openST ? 0 : 180;
-                    textSize: Style.fontSize_common;
+                    textSize: datePicker.textSize;
                     fontColor: yearField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
@@ -344,11 +342,7 @@ Item {
                     model: monthTreeModel;
                     anchors.fill: parent;
 
-                    image.source:  "../../../" + "Icons/" + Style.theme + "/" + "triangle" + "_On_Disabled.svg";
-                    image.width: 16;
-                    image.height: 16;
-                    image.rotation: openST ? 0 : 180;
-                    textSize: Style.fontSize_common;
+                    textSize: datePicker.textSize;//Style.fontSize_common;
                     fontColor: monthField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
