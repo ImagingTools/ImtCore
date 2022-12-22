@@ -67,11 +67,13 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 								const iprm::ISelectionParam* languageParamPtr = dynamic_cast<const iprm::ISelectionParam*>(settingsPtr->GetParameter("Language"));
 								if (languageParamPtr != nullptr){
 									const iprm::IOptionsList* optionList = languageParamPtr->GetSelectionConstraints();
-									int index = languageParamPtr->GetSelectedOptionIndex();
+									if (optionList != nullptr){
+										int index = languageParamPtr->GetSelectedOptionIndex();
 
-									QByteArray languageId = optionList->GetOptionId(index);
+										QByteArray languageId = optionList->GetOptionId(index);
 
-									gqlContextPtr->SetLanguageId(languageId);
+										gqlContextPtr->SetLanguageId(languageId);
+									}
 								}
 							}
 						}
