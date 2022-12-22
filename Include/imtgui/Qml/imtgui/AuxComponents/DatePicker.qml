@@ -210,6 +210,8 @@ Item {
                 borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
+                horizontalAlignment: TextInput.AlignHCenter;
+
                 textInputValidator: yearValid;
 
                 Keys.onUpPressed: {
