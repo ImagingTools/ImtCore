@@ -10,13 +10,13 @@ TreeViewItemDelegateBase {
     rowBodyDelegate: Component{ Row {
         id: row;
 
-        height: root.rowItemHeight;
+        height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
         Item {
             id: nameItem;
 
-            width: root.width / root.columnCount - 20 * model.Level;
-            height: root.rowItemHeight;
+            width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * model.Level : 0;
+            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
             Text {
                 anchors.verticalCenter: nameItem.verticalCenter;
@@ -37,7 +37,7 @@ TreeViewItemDelegateBase {
 
                 cursorShape: Qt.IBeamCursor;
 
-                visible: !root.readOnly;
+                visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
 
                 onClicked: {
                     mouseArea.clicked(null);
@@ -78,7 +78,7 @@ TreeViewItemDelegateBase {
                             model.Id = id;
                         }
 
-                        root.rowModelDataChanged(packageTreeItemDelegate, "Name");
+                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Name");
                     }
                 }
             }
@@ -87,8 +87,8 @@ TreeViewItemDelegateBase {
         Item {
             id: idItem;
 
-            width: root.width / root.columnCount;
-            height: root.rowItemHeight;
+            width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
+            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
             Text {
                 anchors.verticalCenter: idItem.verticalCenter;
@@ -109,7 +109,7 @@ TreeViewItemDelegateBase {
 
                 cursorShape: Qt.IBeamCursor;
 
-                visible: !root.readOnly;
+                visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : 0;
 
                 onClicked: {
                     mouseArea.clicked(null);
@@ -146,7 +146,7 @@ TreeViewItemDelegateBase {
                         model.Id = inputId.text;
 
 
-                        root.rowModelDataChanged(packageTreeItemDelegate, "Id");
+                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Id");
                     }
                 }
             }
@@ -155,8 +155,8 @@ TreeViewItemDelegateBase {
         Item {
             id: descriptionItem;
 
-            width: root.width / root.columnCount;
-            height: root.rowItemHeight;
+            width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
+            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
             Text {
                 anchors.verticalCenter: descriptionItem.verticalCenter;
@@ -177,7 +177,7 @@ TreeViewItemDelegateBase {
 
                 cursorShape: Qt.IBeamCursor;
 
-                visible: !root.readOnly;
+                visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
 
                 onClicked: {
                     mouseArea.clicked(null);
@@ -212,7 +212,7 @@ TreeViewItemDelegateBase {
                     if (model.Description != inputDescription.text){
                         model.Description = inputDescription.text;
 
-                        root.rowModelDataChanged(packageTreeItemDelegate, "Description");
+                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Description");
                     }
                 }
             }
@@ -221,8 +221,8 @@ TreeViewItemDelegateBase {
         Item {
             id: optionalItem;
 
-            width: root.width / root.columnCount;
-            height: root.rowItemHeight;
+            width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
+            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
             CheckBox {
                 anchors.verticalCenter: parent.verticalCenter;
@@ -235,7 +235,7 @@ TreeViewItemDelegateBase {
                 onClicked: {
                     model.Optional = !model.Optional;
 
-                    root.rowModelDataChanged(packageTreeItemDelegate, "Optional");
+                    packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Optional");
                 }
             }
         }

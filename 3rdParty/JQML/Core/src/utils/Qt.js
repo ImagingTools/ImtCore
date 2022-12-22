@@ -35,6 +35,10 @@ export var Qt = {
 
     WindowShortcut: 0,
     ApplicationShortcut: 1,
+
+    Unchecked: 0,
+    PartiallyChecked: 1,
+    Checked: 2,
     
     openUrlExternally: function(url){
         return window.open(url, '_blank')

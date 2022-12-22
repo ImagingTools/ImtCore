@@ -265,21 +265,21 @@ DocumentBase {
             console.log("TableView onRowModelDataChanged", delegate, prop);
 
             if (!packageViewContainer.blockUpdatingModel){
-                updateModel();
+                packageViewContainer.updateModel();
             }
         }
 
         onRowAdded: {
             console.log("onRowAdded");
             if (!packageViewContainer.blockUpdatingModel){
-                updateModel();
+                packageViewContainer.updateModel();
             }
         }
 
         onRowRemoved: {
             console.log("onRowRemoved");
             if (!packageViewContainer.blockUpdatingModel){
-                updateModel();
+                packageViewContainer.updateModel();
             }
         }
     }
@@ -555,7 +555,7 @@ DocumentBase {
         function selectedIndexChanged(){
             console.log("rightPanel selectedIndexChanged");
 
-            let result = tableView.selectedIndex != null && tableView.selectedIndex.itemData.Id != "" && packageViewContainer.itemId != "";
+            let result = tableView.selectedIndex != null && tableView.selectedIndex.itemData && tableView.selectedIndex.itemData.Id != "" && packageViewContainer.itemId != "";
             treeView.visible = result;
 
             if (result){

@@ -164,11 +164,11 @@ FocusScope {
         onClicked: {
             console.log("onClicked");
 
-            updateSelection();
+            delegate.updateSelection();
 
             delegate.clicked();
 
-            rowBodyItem.forceActiveFocus();
+            delegate.rowBodyItem.forceActiveFocus();
         }
     }
 
