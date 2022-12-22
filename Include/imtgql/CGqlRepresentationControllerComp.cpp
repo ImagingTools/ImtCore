@@ -39,11 +39,17 @@ void CGqlRepresentationControllerComp::Response::OnReply(const IGqlRequest& requ
 	m_replyResultPtr.SetPtr(new imtbase::CTreeItemModel());
 	QJsonDocument document = QJsonDocument::fromJson(replyData);
 	if (document.isObject()){
-		QJsonValue jsonValue = document.object().value("data");
 		QJsonObject dataObject = document.object().value("data").toObject();
-		document.setObject(dataObject);
-		QByteArray parserData = document.toJson(QJsonDocument::Compact);
-		m_replyResultPtr->CreateFromJson(replyData);
+		if (!dataObject.isEmpty()){
+			QJsonObject bodyObject = dataObject.value(request.GetCommandId()).toObject();
+			if (!bodyObject.isEmpty()){
+				dataObject = QJsonObject();
+				dataObject.insert("data", bodyObject);
+				document.setObject(dataObject);
+				QByteArray parserData = document.toJson(QJsonDocument::Compact);
+				m_replyResultPtr->CreateFromJson(parserData);
+			}
+		}
 	}
 }
 

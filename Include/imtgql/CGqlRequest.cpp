@@ -513,26 +513,30 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 				isString = false;
 				isEnum = true;
 			}
-			if (isString) {
+			if (isString){
 				retVal += "\\\"";
 			}
 			if (isEnum){
 				retVal += value.value<imtgql::CGqlEnum>().GetValue();
 			}
 			else{
-				retVal += value.toByteArray();
+				QByteArray data = value.toByteArray();
+				if (isString){
+					data = data.replace("\"", "\\\\\\\"");
+				}
+				retVal += data;
 			}
-			if (isString) {
+			if (isString){
 				retVal += "\\\"";
 			}
 
 		}
-		if (i < fieldIds.count() - 1) {
+		if (i < fieldIds.count() - 1){
 			retVal += ", ";
 		}
 	}
 
-	if (objectId.isEmpty() == false) {
+	if (objectId.isEmpty() == false){
 		retVal += "}";
 	}
 
