@@ -176,7 +176,7 @@ Rectangle{
 
                     if(scrollContainer.targetItem.contentWidth > scrollContainer.targetItem.width){
 
-                        if(wheel.angleDelta.x > 0){
+                        if(wheel.angleDelta.y > 0){
                             if((scrollContainer.targetItem.contentX - scrollContainerMA.delta) >= 0){
                                 //scrollContainer.targetItem.contentX -= scrollContainerMA.delta;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
@@ -324,7 +324,7 @@ Rectangle{
 
                         if(scrollContainer.targetItem.contentWidth > scrollContainer.targetItem.width){
 
-                            if(wheel.angleDelta.x > 0){
+                            if(wheel.angleDelta.y > 0){
                                 if((scrollContainer.targetItem.contentX - scrollContainerMA.delta) >= 0){
                                     //scrollContainer.targetItem.contentX -= scrollContainerMA.delta;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
@@ -340,6 +340,7 @@ Rectangle{
                                 }
                             }
                             else{
+
                                 if((scrollContainer.targetItem.contentX + scrollContainerMA.delta)< (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)){
                                     //scrollContainer.targetItem.contentX += scrollContainerMA.delta;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
