@@ -58,9 +58,9 @@ Rectangle {
         return null;
     }
 
-     function _getItemDataRecursive(children, itemId){
-         if (children){
-             for (let child of children){
+     function _getItemDataRecursive(childModel, itemId){
+         if (childModel){
+             for (let child of childModel){
                  if (child.Id == itemId){
                      return child;
                  }

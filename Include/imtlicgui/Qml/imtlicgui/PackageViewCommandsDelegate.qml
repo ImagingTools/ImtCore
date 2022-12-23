@@ -36,7 +36,7 @@ DocumentWorkspaceCommandsDelegateBase {
             else {
                 let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
 
-                let childrenIndexes = tableTreeViewEditor.selectedIndex.children;
+                let childrenIndexes = tableTreeViewEditor.selectedIndex.childModel;
 
                 indexes.push(childrenIndexes.length)
 
@@ -148,11 +148,11 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }
 
-    function getAllRemovedFeatures(index, retVal){
-        console.log("getAllRemovedFeatures", index, retVal);
-        let children = index.children;
+    function getAllRemovedFeatures(indexModel, retVal){
+        console.log("getAllRemovedFeatures", indexModel, retVal);
+        let childModel = indexModel.childModel;
 
-        for (let child of children){
+        for (let child of childModel){
             let id = child.itemData.Id;
             retVal.push(id)
 

@@ -124,7 +124,7 @@ TableViewItemDelegateBase {
 
                 console.log("TableViewItemDelegate onItemAdded");
                 item.modelIndex.parentIndex = modelIndex;
-                modelIndex.children.push(item.modelIndex);
+                modelIndex.childModel.push(item.modelIndex);
             }
 
             onItemRemoved: {
@@ -134,9 +134,9 @@ TableViewItemDelegateBase {
                     treeDelegateBase.childrenDelegates.splice(index, 1);
                 }
 
-                index = modelIndex.children.indexOf(item.modelIndex);
+                index = modelIndex.childModel.indexOf(item.modelIndex);
                 if (index > -1) {
-                    modelIndex.children.splice(index, 1);
+                    modelIndex.childModel.splice(index, 1);
                 }
             }
         }

@@ -10,7 +10,7 @@ Item {
 
     property ModelIndex parentIndex: null; //Reference on the parent index model.
 
-    property var children: {[]}; //Reference on the all children index models.
+    property var childModel: []; //Reference on the all children index models.
 
     property int index: -1;
 

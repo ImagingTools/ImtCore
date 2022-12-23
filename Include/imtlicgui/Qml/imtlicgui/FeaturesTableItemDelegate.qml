@@ -182,7 +182,7 @@ Item {
                 console.log("onItemAdded", item);
 
                 item.modelIndex.parentIndex = modelIndex;
-                modelIndex.children.push(item.modelIndex);
+                modelIndex.childModel.push(item.modelIndex);
             }
         }
     }
