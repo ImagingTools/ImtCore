@@ -11,7 +11,7 @@ namespace imtgql
 
 
 /**
-	Interface for GrahpQL request data representation.
+	Common intreface for getting data model representation based on a GraphQL-request.
 */
 class IGqlRepresentationDataController: virtual public istd::IPolymorphic
 {
