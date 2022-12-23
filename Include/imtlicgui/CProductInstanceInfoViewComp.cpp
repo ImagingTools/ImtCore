@@ -56,6 +56,9 @@ void CProductInstanceInfoViewComp::OnGuiCreated()
 
 	LicenseManagementGroup->setVisible(*m_showLicenseControlPanelAttrPtr);
 
+	NewLicenseRequestButton->setVisible(*m_showLicenseRequestAttrPtr);
+	LicenseRequestDescriptionLabel->setVisible(*m_showLicenseRequestAttrPtr);
+
 	FeatureTree->header()->setSectionResizeMode(QHeaderView::Stretch);
 
 	m_importLicenseEnablerObserver.RegisterObject(m_importLicenseEnablerCompPtr.GetPtr(), &CProductInstanceInfoViewComp::OnImportLicenseEnabled);

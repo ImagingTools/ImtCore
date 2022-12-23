@@ -44,7 +44,8 @@ public:
 		I_ASSIGN(m_licenseStatusCompPtr, "LicenseStatus", "Status of the current license", true, "LicenseStatus");
 		I_ASSIGN(m_licenseRequestDescriptionTextAttrPtr, "LicenseRequestDescriptionText", "Description text for the request button", true, "");
 		I_ASSIGN(m_showLicenseControlPanelAttrPtr, "ShowLicenseControlPanel", "If enabled the license control panel will be shown", true, true);
-	I_END_COMPONENT;
+		I_ASSIGN(m_showLicenseRequestAttrPtr, "ShowLicenseRequestPanel", "If enabled the new license request panel will be shown", true, false);
+		I_END_COMPONENT;
 	
 	CProductInstanceInfoViewComp();
 
@@ -77,6 +78,7 @@ private:
 	I_REF(imtlic::ILicenseStatus, m_licenseStatusCompPtr);
 	I_TEXTATTR(m_licenseRequestDescriptionTextAttrPtr);
 	I_ATTR(bool, m_showLicenseControlPanelAttrPtr);
+	I_ATTR(bool, m_showLicenseRequestAttrPtr);
 
 	mutable imtbase::TModelUpdateBinder<iprm::IEnableableParam, CProductInstanceInfoViewComp> m_importLicenseEnablerObserver;
 	mutable imtbase::TModelUpdateBinder<iprm::IEnableableParam, CProductInstanceInfoViewComp> m_licenseRequestEnablerObserver;
