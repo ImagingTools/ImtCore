@@ -39,7 +39,6 @@ export class QtObject {
     context = {}
     ID = new Set()
     LVL = new Set()
-    
 
     constructor(args) {
         this._context = context
@@ -50,20 +49,24 @@ export class QtObject {
         this.$treeParent = null
         this.$treeParent2 = null
         
-        if(args.index){
-            this.$cP('index', args.index)
-            this.index = args.index
+        
+        if('repeater' in args){
+            this.$repeater = args.repeater
+            delete args['repeater']
         }
-        if(args.parent){
-            if(args.index === undefined && args.parent.index){
-                this.$cP('index', args.parent.index)
-                this.index = args.parent.index
-            }
+        if('parent' in args && args.parent !== null){
+            this.$cP('index', args.parent.index)
+            this.index = args.parent.index
+
             args.parent.$treeChilds.push(this)
             args.parent.children.push(this)
             args.parent.$childChanged()
             this.parent = args.parent
             this.$treeParent = args.parent 
+        }
+        if('index' in args){
+            this.$cP('index', args.index)
+            this.index = args.index
         }
 
         this.$s['Component.completed'] = Signal()
@@ -481,35 +484,6 @@ export class QtObject {
         this.$uL.aliases.push(name)
         return signal
 
-        // let signal = Signal()
-        // this.$p[name] = {
-        //     'signal': signal,
-        //     'depends': [],
-            
-        // }
-        // this.$s[`${name}Changed`] = signal
-        
-        // Object.defineProperty(this, name, {
-        //     get: ()=>{ 
-        //         caller.obj = this
-        //         caller.prop = name
-
-        //         this.$p[name].depend = []
-        //         let val = getter()
-
-        //         caller.obj = null
-        //         caller.prop = ''
-
-        //         return val
-        //     },
-        //     set: (newVal)=>{
-        //         let oldVal = getter()
-        //         if(oldVal !== newVal){
-        //             setter(newVal)
-        //             signal()
-        //         }              
-        //     },
-        // }) 
     }
 
     $cS(name, ...args){

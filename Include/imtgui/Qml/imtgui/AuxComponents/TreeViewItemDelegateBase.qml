@@ -4,7 +4,7 @@ import Acf 1.0
 TableViewItemDelegateBase {
     id: treeDelegateBase;
 
-    height: isOpen ? footerItem.height + root.rowItemHeight: root.rowItemHeight;
+    height: isOpen ? footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
 
     property bool isOpen: true;
 
@@ -21,10 +21,10 @@ TableViewItemDelegateBase {
     onSelectedChanged: {
         console.log("packageTreeItemDelegate onSelectedChanged", selected);
         if (selected){
-            root.selectedIndex = modelIndex;
+            treeDelegateBase.root.selectedIndex = modelIndex;
         }
         else{
-            root.selectedIndex = null;
+            treeDelegateBase.root.selectedIndex = null;
         }
 
         updateSelection();
@@ -37,7 +37,7 @@ TableViewItemDelegateBase {
     prefixRowDelegate: Row {
         id: prefixRow;
 
-        height: root.rowItemHeight;
+        height: treeDelegateBase.root ? treeDelegateBase.root.rowItemHeight : 0;
 
         spacing: 10;
 
@@ -83,7 +83,7 @@ TableViewItemDelegateBase {
 
                 isActive: model.Active;
 
-                visible: root.tristate && model.CheckBoxVisible;
+                visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && model.CheckBoxVisible : false;
 
                 onClicked: {
                     if (model.CheckState == Qt.PartiallyChecked){
@@ -101,7 +101,7 @@ TableViewItemDelegateBase {
                         treeDelegateBase.childrenDelegates[i].parentCheckStateChanged(treeDelegateBase.itemData);
                     }
 
-                    root.rowModelDataChanged(treeDelegateBase, "CheckState");
+                    treeDelegateBase.root.rowModelDataChanged(treeDelegateBase, "CheckState");
                 }
             }
         }
@@ -115,7 +115,7 @@ TableViewItemDelegateBase {
         Repeater {
             id: childModelRepeater;
 
-            delegate: root.rowDelegate;
+            delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
 
             onItemAdded: {
                 console.log("TableViewItemDelegate onItemAdded", item.itemData.Id);
@@ -123,8 +123,8 @@ TableViewItemDelegateBase {
                 treeDelegateBase.childrenDelegates.push(item)
 
                 console.log("TableViewItemDelegate onItemAdded");
-                item.modelIndex.parentIndex = modelIndex;
-                modelIndex.childModel.push(item.modelIndex);
+                item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
+                treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
             }
 
             onItemRemoved: {
@@ -134,9 +134,9 @@ TableViewItemDelegateBase {
                     treeDelegateBase.childrenDelegates.splice(index, 1);
                 }
 
-                index = modelIndex.childModel.indexOf(item.modelIndex);
+                index = treeDelegateBase.modelIndex.childModel.indexOf(item.modelIndex);
                 if (index > -1) {
-                    modelIndex.childModel.splice(index, 1);
+                    treeDelegateBase.modelIndex.childModel.splice(index, 1);
                 }
             }
         }
