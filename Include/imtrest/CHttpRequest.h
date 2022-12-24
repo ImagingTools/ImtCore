@@ -80,14 +80,13 @@ private:
 
 private:
 	http_parser m_httpParser;
-	QHostAddress m_remoteAddress;
-	QUrl m_url;
-	RequestState m_state;
-	QByteArray m_body;
-
-	const IRequestServlet& m_requestHandler;
-	const IProtocolEngine& m_engine;
-	QObject& m_socket;
+    QHostAddress m_remoteAddress;
+    QByteArray m_body;
+    QUrl m_url;
+    RequestState m_state;
+    QObject& m_socket;
+    const IRequestServlet& m_requestHandler;
+    const IProtocolEngine& m_engine;
 
 	typedef QMap<QByteArray, QByteArray> HeaderMap;
 	HeaderMap m_headers;
