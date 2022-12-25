@@ -44,11 +44,12 @@ DocumentBase {
 
         tableView.columnModel.clear();
         let headers = documentModel.GetData("Headers");
+        console.log("Headers:", headers)
 
         for (let i = 0; i < headers.GetItemsCount(); i++){
             let headerId = headers.GetData("Id", i);
             let headerName = headers.GetData("Name", i);
-
+            console.log("addColumn:", headerId, headerName)
             tableView.addColumn({"Id": headerId, "Name": headerName});
         }
 

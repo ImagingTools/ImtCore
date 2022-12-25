@@ -117,12 +117,18 @@ FocusScope {
                     width: tableViewRoot.width / tableViewRoot.columnCount;
                     height: tableViewRoot.headerHeight;
 
+
                     Text {
+                        id: headerText;
                         anchors.left: repeaterItem.left;
                         anchors.leftMargin: 10;
                         anchors.verticalCenter: repeaterItem.verticalCenter;
 
-                        text: model.Name;
+                        Component.onCompleted: {
+                            console.log("Header debug:", model.Name, index)
+                            headerText.text =  model.Name;
+                        }
+//                        text: model.Name;
 
                         width: parent.width;
 
