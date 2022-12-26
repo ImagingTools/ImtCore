@@ -29,6 +29,7 @@ Item {
 
     property alias currentDayButtonVisible: currentDate.visible;
     property alias defaultWidth: mainRow.width;
+    property alias moveToEndYear : yearCombo.moveToEnd;
 
     property bool completed: false;
 
@@ -102,7 +103,7 @@ Item {
             }
         }
 
-        if(datePicker.hasYearCombo){
+        if(datePicker.hasYearCombo && !yearCombo.model.GetItemsCount()){
             var date = new Date();
             var currYear = Number(date.getFullYear());
             var count = datePicker.yearsCountCombo;
@@ -331,7 +332,6 @@ Item {
                     titleTxt.color: "transparent";
                     compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
-                    moveToEnd: datePicker.hasYearCombo;
 
                     onCurrentIndexChanged:{
                         if(yearCombo.currentIndex >=0){
