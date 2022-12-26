@@ -48,7 +48,7 @@ export class Repeater extends Item {
             }
             let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.parent, index: index, repeater: this}) : this.delegate({parent: this.parent, index: index, repeater: this}) //нужно поправить
             obj.$repeater = this
-            this.children.pop()
+            // this.children.pop()
             this.children.splice(index, 0, obj)
 
             for(let i = 0; i < this.children.length; i++){
