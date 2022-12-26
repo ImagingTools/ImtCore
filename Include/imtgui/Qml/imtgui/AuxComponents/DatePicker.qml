@@ -331,7 +331,7 @@ Item {
                     titleTxt.color: "transparent";
                     compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
-                    moveToEnd: true;
+                    moveToEnd: datePicker.hasYearCombo;
 
                     onCurrentIndexChanged:{
                         if(yearCombo.currentIndex >=0){
