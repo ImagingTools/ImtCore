@@ -21,6 +21,7 @@ Rectangle {
     property string fontColor: Style.textColor;
 
     property bool hiddenBackground: true;
+    property bool moveToEnd: false;
 
     property Component delegate: PopupMenuDelegate{
 
@@ -46,6 +47,10 @@ Rectangle {
 
     onModelChanged: {
         popupMenuListView.model = model;
+
+        if(popupMenuContainer.moveToEnd){
+            popupMenuListView.positionViewAtEnd();
+        }
     }
 
     onRootChanged: {

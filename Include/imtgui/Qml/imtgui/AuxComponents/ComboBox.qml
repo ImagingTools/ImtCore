@@ -21,6 +21,8 @@ FocusScope {
     property bool hiddenBackground: true;
     property bool openST: false;
     property bool compTextCentered:  false;
+    property bool moveToEnd: false;
+
 
     property int dialogsCountPrev: 1000;
     property int dialogsCount: modalDialogManager.count;
@@ -78,6 +80,7 @@ FocusScope {
             textSize: comboBoxContainer.textSize;
             fontColor: comboBoxContainer.fontColor;
             shownItemsCount: comboBoxContainer.shownItemsCount;
+            moveToEnd: comboBoxContainer.moveToEnd;
             onFinished: {
                 console.log("DEBUG::2022-11-13::onFinished", index)
                 comboBoxContainer.currentIndex = index;

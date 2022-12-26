@@ -21,7 +21,7 @@ Item {
         qsTr("December")
     ];
 
-    property int selectedIndexMonth: new Date().getMonth();
+    property int selectedIndexMonth;
 
     property alias selectedYear: yearField.text;
     property alias selectedMonth: monthField.text;
@@ -40,10 +40,12 @@ Item {
     property bool hasMonthCombo: false;
     property bool hasYearCombo: false;
     property int yearsCountCombo: 12;
+    property int shownItemsCountCombo: 12;
     property alias monthCombo: monthCombo;
     property alias yearCombo: yearCombo;
+    property alias dayCombo: dayCombo;
 
-    property bool openST: monthCombo.openST || yearCombo.openST;
+    property bool openST: monthCombo.openST || yearCombo.openST || dayCombo.openST;
 
     //icons
     property int iconWidth: 12;
@@ -75,6 +77,8 @@ Item {
 
     Component.onCompleted: {
         console.log("onCompleted");
+
+        selectedIndexMonth = new Date().getMonth();
 
         if (datePicker.startWithCurrentDay){
             let currentDate = new Date();
@@ -110,18 +114,26 @@ Item {
 
         }
 
+        if(datePicker.hasDayCombo && datePicker.selectedYear !== ""){
+            fillDayModel();
+
+        }
+
         datePicker.completed = true;
     }
 
     onSelectedYearChanged: {
         console.log("onSelectedYearChanged");
-        if (completed){
+        if (datePicker.completed){
             dateChanged();
+        }
+        if(datePicker.hasDayCombo && datePicker.completed){
+            fillDayModel();
         }
     }
 
     onSelectedDayChanged: {
-        if (completed){
+        if (datePicker.completed){
             dateChanged();
         }
     }
@@ -129,6 +141,9 @@ Item {
     onSelectedIndexMonthChanged: {
         if (datePicker.completed){
             dateChanged();
+        }
+        if(datePicker.hasDayCombo && datePicker.completed){
+            fillDayModel();
         }
     }
 
@@ -165,6 +180,83 @@ Item {
             selectedIndexMonth = month;
             dayField.text = day;
         }
+    }
+
+    function fillDayModel(){
+        dayTreeModel.Clear();
+        var lastDay = getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
+        for(var i = 1; i <= lastDay; i++){
+            var index = dayTreeModel.InsertNewItem();
+            dayTreeModel.SetData("Id", i, index);
+            dayTreeModel.SetData("Name",i,index);
+
+        }
+
+    }
+
+    function getLastDayOfMonth(month){
+
+        var lastDay;
+
+        switch (month)
+        {
+        case 1 :lastDay = 31
+            break
+        case 2 :lastDay = 28
+            break
+        case 3 :lastDay = 31
+            break
+        case 4 :lastDay = 30
+            break
+        case 5 :lastDay = 31
+            break
+        case 6 :lastDay = 30
+            break
+        case 7 :lastDay = 31
+            break
+        case 8 : lastDay =31
+            break
+        case 9 : lastDay =30
+            break
+        case 10 :lastDay = 31
+            break
+        case 11 :lastDay = 30
+            break
+        case 12 :lastDay = 31
+            break
+        }
+
+        if(month === 2){
+            var isLeapYear = isLeapYearFun(Number(datePicker.selectedYear));
+
+            if(isLeapYear){
+                lastDay = 29;
+            }
+
+        }
+
+
+        return (lastDay);
+
+    }//
+
+    function isLeapYearFun(year){
+        var isLeapYear;
+
+        if(!(year % 400)){
+            isLeapYear = true;
+        }
+        else if(!(year % 100)){
+            isLeapYear = false;
+        }
+        else if(!(year % 4)){
+            isLeapYear = true;
+        }
+        else{
+            isLeapYear = false;
+        }
+
+        return isLeapYear;
     }
 
     TreeItemModel {
@@ -238,7 +330,8 @@ Item {
 
                     titleTxt.color: "transparent";
                     compTextCentered: true;
-                    shownItemsCount: datePicker.yearsCountCombo;
+                    shownItemsCount: datePicker.shownItemsCountCombo;
+                    moveToEnd: true;
 
                     onCurrentIndexChanged:{
                         if(yearCombo.currentIndex >=0){
@@ -458,6 +551,36 @@ Item {
                 Keys.onDownPressed: {
                     dayDownButton.clicked();
                 }
+
+                ComboBox {
+                    id: dayCombo;
+
+                    visible: datePicker.hasDayCombo;
+                    enabled: visible;
+                    model: dayTreeModel;
+                    anchors.fill: parent;
+
+                    textSize: datePicker.textSize;
+                    fontColor: dayField.fontColor;
+                    borderColor: "transparent";
+                    backgroundColor: "transparent";
+                    hiddenBackground: false;
+
+                    titleTxt.color: "transparent";
+                    compTextCentered: true;
+                    shownItemsCount: datePicker.shownItemsCountCombo;
+
+                    onCurrentIndexChanged:{
+                        if(dayCombo.currentIndex >=0){
+                            let selectedDay = dayCombo.currentText;
+
+                            if (checkDate(selectedYear, selectedIndexMonth, Number(selectedDay))){
+                                dayField.text = selectedDay;
+                            }
+                        }
+
+                    }
+                }//yearCombo
             }
 
             Column {
