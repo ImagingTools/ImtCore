@@ -46,8 +46,8 @@ export class Rectangle extends Item {
         this.dom.style.borderRadius = `${this.radius}px`
     }
     $borderChanged(){
-        this.dom.style.outline = `${this['border.width']}px solid ${this['border.color']}`
-        this.dom.style.outlineOffset = `-${this['border.width']}px`
+        this.dom.style.outline = `${this.border.width}px solid ${this.border.color}`
+        this.dom.style.outlineOffset = `-${this.border.width}px`
     }
 
     $destroy(){
