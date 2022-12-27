@@ -57,33 +57,13 @@ void CProductInstanceInfo::AddLicense(const QByteArray& licenseId, const QDateTi
 	if (m_productId.isEmpty()){
 		return;
 	}
+	LicenseInstancePtr licenseInstancePtr(new CLicenseInstance);
+	licenseInstancePtr->SetLicenseId(licenseId);
+	licenseInstancePtr->SetExpiration(expirationDate);
 
-	if (m_productCollectionPtr != nullptr){
-		imtbase::IObjectCollection::DataPtr dataPtr;
+	m_licenses[licenseId] = licenseInstancePtr;
 
-		QByteArray productCollectionId = m_productId;
-
-		if (m_productCollectionPtr->GetObjectData(productCollectionId, dataPtr)){
-			const imtlic::IProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
-			if (productLicensingInfoPtr != nullptr) {
-				const imtbase::ICollectionInfo& licenseList = productLicensingInfoPtr->GetLicenseList();
-				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
-				for ( const QByteArray& collectionId : licenseCollectionIds){
-					const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(collectionId);
-					if (licenseInfoPtr != nullptr && (licenseId == licenseInfoPtr->GetLicenseId())){
-						LicenseInstancePtr licenseInstancePtr(new CLicenseInstance);
-						if (licenseInstancePtr->CopyFrom(*licenseInfoPtr)){
-							licenseInstancePtr->SetExpiration(expirationDate);
-
-							m_licenses[licenseId] = licenseInstancePtr;
-
-							m_licenseContainerInfo.InsertItem(licenseId, "", "");
-						}
-					}
-				}
-			}
-		}
-	}
+	m_licenseContainerInfo.InsertItem(licenseId, "", "");
 }
 
 

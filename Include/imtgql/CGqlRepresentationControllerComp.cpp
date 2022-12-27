@@ -41,10 +41,11 @@ void CGqlRepresentationControllerComp::Response::OnReply(const IGqlRequest& requ
 	if (document.isObject()){
 		QJsonObject dataObject = document.object().value("data").toObject();
 		if (!dataObject.isEmpty()){
-			QJsonObject bodyObject = dataObject.value(request.GetCommandId()).toObject();
-			if (!bodyObject.isEmpty()){
+			QByteArray commandId = request.GetCommandId();
+			QJsonValue value = dataObject.value(commandId);
+			if (!value.isUndefined()){
 				dataObject = QJsonObject();
-				dataObject.insert("data", bodyObject);
+				dataObject.insert("data", value);
 				document.setObject(dataObject);
 				QByteArray parserData = document.toJson(QJsonDocument::Compact);
 				m_replyResultPtr->CreateFromJson(parserData);
