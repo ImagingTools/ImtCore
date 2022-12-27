@@ -215,9 +215,9 @@ Item {
             break
         case 7 :lastDay = 31
             break
-        case 8 : lastDay =31
+        case 8 : lastDay = 31
             break
-        case 9 : lastDay =30
+        case 9 : lastDay = 30
             break
         case 10 :lastDay = 31
             break
