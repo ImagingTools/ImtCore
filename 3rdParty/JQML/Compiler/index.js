@@ -1,6 +1,8 @@
 const fs = require('fs')
 const path = require('path')
 const parser = require('./parser')
+const crypto = require('crypto')
+
 const QML = [
     'Component',
     'Shortcut',
@@ -472,10 +474,45 @@ let compiledFiles = {}
 for(let file of files){
     let data = fs.readFileSync(file, {encoding:'utf8', flag:'r'})
 
+    let currentHash = crypto.createHash('md5').update(data).digest("hex")
+    let fileHash = file.replaceAll('.qml', '.hash')
+    let fileSave = file.replaceAll('.qml', '.js')
+
     compiledFiles[file] = {
         'instructions': {},
         'code': '',
+        'cache': false,
     }
+
+    if(fs.existsSync(fileHash)){
+        let savedHash = fs.readFileSync(fileHash, {encoding:'utf8', flag:'r'})
+
+        if(currentHash === savedHash){
+            let savedData = fs.readFileSync(fileSave, {encoding:'utf8', flag:'r'})
+
+            compiledFiles[file].code = savedData
+            compiledFiles[file].cache = true
+            let instructions = getBaseStructure()
+    
+            data = data.replaceAll(/((?<![:\/])\/\/(.*?)\n)|(\/\*(.*?)\*\/)/gms, '\n')
+            
+            parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
+            let meta = parser.parse(data)
+            if(meta[3]) qmlpragma(meta[3], instructions, file)
+            compiledFiles[file].instructions = instructions
+            continue
+        } else {
+            fs.writeFile(fileHash, currentHash, function(error){
+                if(error) throw error
+            })
+        }
+    } else {
+        fs.writeFile(fileHash, currentHash, function(error){
+            if(error) throw error
+        })
+    }
+
+    
     let instructions = getBaseStructure()
     
     data = data.replaceAll(/((?<![:\/])\/\/(.*?)\n)|(\/\*(.*?)\*\/)/gms, '\n')
@@ -961,14 +998,17 @@ function anchorsReplace(instructions){
 
 
 for(file in compiledFiles){
-    // anchorsReplace(compiledFiles[file].instructions)
-
     let name = file.split('/').pop().replaceAll('.qml', '')
     if(compiledFiles[file].instructions.Singleton === true){
         compiledFiles[file].instructions.id.add(`\`${name}\``)
         // compiledFiles[file].instructions.id = name
         IDList.add(name)
     }
+    
+    if(compiledFiles[file].cache === true) continue
+    // anchorsReplace(compiledFiles[file].instructions)
+
+    
     IDReplace(compiledFiles[file].instructions)
     
     // ProxyReplace(compiledFiles[file].instructions)
@@ -1157,7 +1197,6 @@ let jqmlExports = []
 let Singletons = []
 for(file in compiledFiles){
     let name = file.split('/').pop().replaceAll('.qml', '')
-    let code = []
     let instructions = compiledFiles[file].instructions
     if(instructions.Singleton === true && !ignoreSingletons.has(name)){
         Singletons.push(name)
@@ -1165,24 +1204,24 @@ for(file in compiledFiles){
         jqmlExports.push(name)
     }
 
-    code.push(`function ${name}($args){`)
-    // for(let child of instructions.children){
-    //     if(child.Singleton === true){
-    //         code.push(`IDManager.list[\`${child.SingletonName}\`][0].$destroy()`)
-    //     }
-    // }
-    // code.push(`let $LVL = Core.LVL++`)
-    compile(instructions, code)
-    // code.push(`PropertyManager.update()`)
-    // code.push(`$root.$tryComplete()`)
-    code.push(`return $root`)
-    code.push(`}`)
+    if(compiledFiles[file].cache === true) {
+        
+    } else {
+        let code = []
+        code.push(`function ${name}($args){`)
+        compile(instructions, code)
+        code.push(`return $root`)
+        code.push(`}`)
 
-    compiledFiles[file].code = code.join('\n')
+        compiledFiles[file].code = code.join('\n')
+        fs.writeFile(file.replaceAll('.qml', '.js'), compiledFiles[file].code, function(error){
+            if(error) throw error
+        })
+    }
+    
+    
     jqml.push(compiledFiles[file].code)
-    fs.writeFile(file.replaceAll('.qml', '.js'), compiledFiles[file].code, function(error){
-        if(error) throw error
-    })
+    
 }
 
 
