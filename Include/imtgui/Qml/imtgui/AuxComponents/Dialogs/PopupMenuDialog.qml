@@ -41,6 +41,10 @@ Rectangle {
 
     signal finished(string commandId, int index);
 
+    Component.onDestruction: {
+        root.backgroundItem.backgroundAreaItem.clicked.disconnect(root.closeDialog);
+    }
+
     onFinished: {
         root.closeDialog();
     }
@@ -83,9 +87,9 @@ Rectangle {
             id: popupMenuListView;
 
             width: popupMenuContainer.width;
-//            height: (parent.countVisibleItem == -1 || parent.countVisibleItem > popupMenuListView.count) ?
-//                        popupMenuListView.count * popupMenuContainer.itemHeight :
-//                        parent.countVisibleItem * popupMenuContainer.itemHeight;
+            //            height: (parent.countVisibleItem == -1 || parent.countVisibleItem > popupMenuListView.count) ?
+            //                        popupMenuListView.count * popupMenuContainer.itemHeight :
+            //                        parent.countVisibleItem * popupMenuContainer.itemHeight;
             height: Math.min(popupMenuContainer.shownItemsCount * popupMenuContainer.itemHeight, contentHeight);
 
             boundsBehavior: Flickable.StopAtBounds;
@@ -96,16 +100,16 @@ Rectangle {
     }//ItemListView
 
     DropShadow {
-       id: dropShadow;
+        id: dropShadow;
 
-       anchors.fill: itemBody;
+        anchors.fill: itemBody;
 
-       horizontalOffset: 2;
-       verticalOffset: 2;
+        horizontalOffset: 2;
+        verticalOffset: 2;
 
-       radius: 4;
-       color: Style.shadowColor;
+        radius: 4;
+        color: Style.shadowColor;
 
-       source: itemBody;
+        source: itemBody;
     }
 }

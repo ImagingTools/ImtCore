@@ -91,6 +91,11 @@ Rectangle {
         itemsModel.updateModel(0);
     }
 
+    Component.onDestruction: {
+        root.backgroundItem.backgroundAreaItem.clicked.disconnect(root.closeDialog);
+    }
+
+
     CustomTextField {
         id: filterField;
 
