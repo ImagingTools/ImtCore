@@ -47,6 +47,7 @@ FocusScope {
        };
 
     property alias image: cbArrowIcon;
+    property alias containsMouse: cbMouseArea.containsMouse;
 
     property int textSize: Style.fontSize_common;
     property int itemHeight: 26;
