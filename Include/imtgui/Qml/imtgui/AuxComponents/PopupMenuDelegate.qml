@@ -9,6 +9,9 @@ Item {
 
     property int textSize: Style.fontSize_common;
     property string fontColor: Style.textColor;
+    property string mainColor: "transparent";
+    property string selectedColor: Style.selectedColor;
+
     property alias text: mainText.text;
     property Item rootItem;
     property bool textCentered: false;
@@ -19,13 +22,20 @@ Item {
         console.log("DEBUG::", model.Id, model.index, width, height, visible, x, y, z, parent)
     }
 
+    Rectangle{
+        id: background;
 
+        anchors.fill: parent;
+        color: popupMenuDelegate.mainColor;
+    }
 
     Rectangle {
         anchors.fill: parent;
-        color: Style.selectedColor;
+        color: popupMenuDelegate.selectedColor;
         visible: mouseArea.containsMouse;
     }
+
+
 
     Item {
         id: iconItem2;

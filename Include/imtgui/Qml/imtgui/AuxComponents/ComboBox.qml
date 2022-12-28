@@ -21,6 +21,8 @@ FocusScope {
     property bool hiddenBackground: true;
     property bool openST: false;
     property bool compTextCentered:  false;
+    property string compMainColor: "transparent";
+    property string compSelectedColor: Style.selectedColor;
     property bool moveToEnd: false;
 
 
@@ -39,6 +41,8 @@ FocusScope {
         textSize: comboBoxContainer.textSize;
         fontColor: comboBoxContainer.fontColor;
         textCentered: comboBoxContainer.compTextCentered;
+        mainColor: comboBoxContainer.compMainColor;
+        selectedColor: comboBoxContainer.compSelectedColor;
         rootItem: comboBoxContainer;
        };
 
