@@ -9,6 +9,7 @@ const QML = [
     'QtObject',
     'Item',
     'FocusScope',
+    'Canvas',
     'MouseArea',
     'Rectangle',
     'Loader',
@@ -1004,7 +1005,7 @@ for(file in compiledFiles){
         // compiledFiles[file].instructions.id = name
         IDList.add(name)
     }
-    
+
     if(compiledFiles[file].cache === true) continue
     // anchorsReplace(compiledFiles[file].instructions)
 
