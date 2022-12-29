@@ -35,6 +35,7 @@ Item {
     property alias currentDayButtonVisible: currentDate.visible;
     property alias defaultWidth: mainRow.width;
     property alias moveToEndYear : yearCombo.moveToEnd;
+    property alias moveToIndexYear : yearCombo.moveToIndex;
 
     property bool completed: false;
 
