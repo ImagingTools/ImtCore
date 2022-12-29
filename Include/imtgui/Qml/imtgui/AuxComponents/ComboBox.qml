@@ -24,7 +24,7 @@ FocusScope {
     property string compMainColor: "transparent";
     property string compSelectedColor: Style.selectedColor;
     property bool moveToEnd: false;
-
+    property int moveToIndex: -1;
 
     property int dialogsCountPrev: 1000;
     property int dialogsCount: modalDialogManager.count;
@@ -89,6 +89,7 @@ FocusScope {
             fontColor: comboBoxContainer.fontColor;
             shownItemsCount: comboBoxContainer.shownItemsCount;
             moveToEnd: comboBoxContainer.moveToEnd;
+            moveToIndex: comboBoxContainer.moveToIndex;
             rootItem: comboBoxContainer;
             onFinished: {
                 console.log("DEBUG::2022-11-13::onFinished", index)
@@ -130,6 +131,10 @@ FocusScope {
                                                    "width": comboBoxContainer.width,
                                                    "countVisibleItem": 5 });
 
+    }
+
+    function closePopupMenu(){
+        modalDialogManager.closeDialog();
     }
 
     Rectangle {

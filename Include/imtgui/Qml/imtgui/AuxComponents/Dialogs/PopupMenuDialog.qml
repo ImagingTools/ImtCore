@@ -23,6 +23,7 @@ Rectangle {
 
     property bool hiddenBackground: true;
     property bool moveToEnd: false;
+    property int moveToIndex: -1;
 
     property alias contentY: popupMenuListView.contentY;
 
@@ -58,6 +59,9 @@ Rectangle {
 
         if(popupMenuContainer.moveToEnd){
             popupMenuListView.positionViewAtEnd();
+        }
+        if(popupMenuContainer.moveToIndex >= 0 && popupMenuContainer.moveToIndex < popupMenuListView.count){
+            popupMenuListView.positionViewAtIndex(popupMenuContainer.moveToIndex, ListView.Beginning);
         }
     }
 
