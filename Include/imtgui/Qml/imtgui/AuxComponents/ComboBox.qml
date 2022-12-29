@@ -33,7 +33,13 @@ FocusScope {
     property int radius: 5;
     property int currentIndex: -1;
 
-    property alias titleTxt: cbTitleTxt
+    property alias titleTxt: cbTitleTxt;
+
+    property real contentY;
+
+    onContentYChanged: {
+        console.log(contentY);
+    }
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainer.width;
@@ -86,6 +92,7 @@ FocusScope {
             fontColor: comboBoxContainer.fontColor;
             shownItemsCount: comboBoxContainer.shownItemsCount;
             moveToEnd: comboBoxContainer.moveToEnd;
+            rootItem: comboBoxContainer;
             onFinished: {
                 console.log("DEBUG::2022-11-13::onFinished", index)
                 comboBoxContainer.currentIndex = index;

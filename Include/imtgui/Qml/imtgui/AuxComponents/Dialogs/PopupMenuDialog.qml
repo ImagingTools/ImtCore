@@ -12,6 +12,7 @@ Rectangle {
 
     property var model;
     property Item root;
+    property Item rootItem;
 
     property int itemWidth: 200;
     property int itemHeight: 26;
@@ -23,6 +24,8 @@ Rectangle {
     property bool hiddenBackground: true;
     property bool moveToEnd: false;
 
+    property alias contentY: popupMenuListView.contentY;
+
     property Component delegate: PopupMenuDelegate{
 
         width: popupMenuContainer.width;
@@ -32,6 +35,7 @@ Rectangle {
 
         rootItem: popupMenuContainer;
     }
+
 
 
     /**
@@ -70,6 +74,10 @@ Rectangle {
             Close the dialog by clicking on the background
         */
         root.backgroundItem.backgroundAreaItem.clicked.connect(root.closeDialog);
+    }
+
+    onContentYChanged: {
+        popupMenuContainer.rootItem.contentY = popupMenuContainer.contentY;
     }
 
     Rectangle {
