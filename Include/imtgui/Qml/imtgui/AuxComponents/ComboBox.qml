@@ -37,9 +37,6 @@ FocusScope {
 
     property real contentY;
 
-    onContentYChanged: {
-        console.log(contentY);
-    }
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainer.width;
