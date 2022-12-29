@@ -21,6 +21,11 @@ Item {
         qsTr("December")
     ];
 
+    property int startYear: 1900;
+    property int lastYear: 2100;
+
+    property int todayYear;
+
     property int selectedIndexMonth;
 
     property alias selectedYear: yearField.text;
@@ -40,7 +45,6 @@ Item {
     property bool hasDayCombo: false;
     property bool hasMonthCombo: false;
     property bool hasYearCombo: false;
-    property int yearsCountCombo: 12;
     property int shownItemsCountCombo: 12;
     property alias monthCombo: monthCombo;
     property alias yearCombo: yearCombo;
@@ -79,7 +83,10 @@ Item {
     Component.onCompleted: {
         console.log("onCompleted");
 
-        selectedIndexMonth = new Date().getMonth();
+        var date_ = new Date();
+
+        datePicker.selectedIndexMonth = date_.getMonth();
+        datePicker.todayYear = date_.getFullYear();
 
         if (datePicker.startWithCurrentDay){
             let currentDate = new Date();
@@ -104,19 +111,30 @@ Item {
         }
 
         if(datePicker.hasYearCombo && !yearCombo.model.GetItemsCount()){
-            var date = new Date();
-            var currYear = Number(date.getFullYear());
-            var count = datePicker.yearsCountCombo;
-            for(let i = 0; i < count; i++){
+            if(datePicker.startYear < 1 || datePicker.lastYear < 1){
+                datePicker.startYear = 1900;
+                datePicker.lastYear = 2100;
+            }
+            if(datePicker.startYear > datePicker.todayYear || datePicker.lastYear < datePicker.todayYear){
+                datePicker.startYear = 1900;
+                datePicker.lastYear = 2100;
+            }
+
+            if(datePicker.startYear > datePicker.lastYear){
+                var temp = datePicker.startYear;
+                datePicker.startYear = datePicker.lastYear;
+                datePicker.lastYear = temp;
+            }
+            for(let i = datePicker.startYear; i <= datePicker.lastYear;i++){
                 let index = yearTreeModel.InsertNewItem();
                 yearTreeModel.SetData("Id", index, index);
-                yearTreeModel.SetData("Name", String(currYear - count + i + 1),index);
+                yearTreeModel.SetData("Name", String(i),index);
             }
 
         }
 
         if(datePicker.hasDayCombo && datePicker.selectedYear !== ""){
-            fillDayModel();
+            datePicker.fillDayModel();
 
         }
 
@@ -185,7 +203,7 @@ Item {
 
     function fillDayModel(){
         dayTreeModel.Clear();
-        var lastDay = getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
+        var lastDay = datePicker.getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
         for(var i = 1; i <= lastDay; i++){
             var index = dayTreeModel.InsertNewItem();
             dayTreeModel.SetData("Id", i, index);
@@ -194,6 +212,8 @@ Item {
         }
 
     }
+
+
 
     function getLastDayOfMonth(month){
 
@@ -228,7 +248,7 @@ Item {
         }
 
         if(month === 2){
-            var isLeapYear = isLeapYearFun(Number(datePicker.selectedYear));
+            var isLeapYear = datePicker.isLeapYearFun(Number(datePicker.selectedYear));
 
             if(isLeapYear){
                 lastDay = 29;
@@ -332,6 +352,8 @@ Item {
                     titleTxt.color: "transparent";
                     compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
+                    moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
+
 
                     onCurrentIndexChanged:{
                         if(yearCombo.currentIndex >=0){
