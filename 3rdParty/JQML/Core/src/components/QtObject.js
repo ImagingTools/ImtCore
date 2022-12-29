@@ -59,7 +59,11 @@ export class QtObject {
             this.index = args.parent.index
 
             args.parent.$treeChilds.push(this)
-            args.parent.children.push(this)
+            if('pos' in args){
+                args.parent.children.splice(args.pos, 0, this)
+            } else {
+                args.parent.children.push(this)
+            }
             args.parent.$childChanged()
             this.parent = args.parent
             this.$treeParent = args.parent 

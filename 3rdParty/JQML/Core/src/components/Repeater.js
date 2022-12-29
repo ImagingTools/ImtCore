@@ -35,6 +35,7 @@ export class Repeater extends Item {
     }
 
     $insert(index){
+        let pos = this.parent.children.indexOf(this)
         if(this.model && this.delegate){
             let childRecursive = (obj, indx)=>{
                 
@@ -46,7 +47,7 @@ export class Repeater extends Item {
                     childRecursive(child, indx)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.parent, index: index, repeater: this}) : this.delegate({parent: this.parent, index: index, repeater: this}) //нужно поправить
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.parent, index: index, repeater: this, pos: pos + index + 1}) : this.delegate({parent: this.parent, index: index, repeater: this, pos: pos + index + 1}) //нужно поправить
             obj.$repeater = this
             // this.children.pop()
             this.children.splice(index, 0, obj)
@@ -63,6 +64,7 @@ export class Repeater extends Item {
 
     $append(wait = false){
         let index = this.children.length
+        let pos = this.parent.children.indexOf(this)
         if(this.model && this.delegate){
             let childRecursive = (obj)=>{
                 
@@ -74,7 +76,7 @@ export class Repeater extends Item {
                     childRecursive(child)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.parent, index: index, repeater: this}) : this.delegate({parent: this.parent, index: index, repeater: this})
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.parent, index: index, repeater: this, pos: pos + index + 1}) : this.delegate({parent: this.parent, index: index, repeater: this, pos: pos + index + 1})
             obj.$repeater = this
             this.children.push(obj)
             childRecursive(obj)
