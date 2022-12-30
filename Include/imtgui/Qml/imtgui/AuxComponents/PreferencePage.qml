@@ -37,6 +37,7 @@ Rectangle {
         if (visible){
             if (settingsProvider.localModel){
                 let localModelJson = settingsProvider.localModel.toJSON();
+                console.log("localModelJson", localModelJson);
                 localModel.CreateFromJson(localModelJson);
 
                 updateCommonModel(localModel);
@@ -44,6 +45,7 @@ Rectangle {
 
             if (settingsProvider.serverModel){
                 let serverModelJson = settingsProvider.serverModel.toJSON();
+                console.log("serverModelJson", serverModelJson);
                 serverModel.CreateFromJson(serverModelJson);
 
                 updateCommonModel(serverModel);
@@ -69,20 +71,26 @@ Rectangle {
         mainPanelRepeater.model = commonModel;
 
         mainPanel.selectedIndex = 0;
-        bodyPanelRepeater.model = commonModel.GetData("Elements");
+        bodyPanelRepeater.model = commonModel.GetData("Parameters");
     }
 
     function updateCommonModel(externModel){
-        for (let i = 0; i < externModel.GetItemsCount(); i++){
-            let pageId = externModel.GetData("Id", i);
-            let index = getPageIndexByPageId(pageId)
+        console.log("Preferences updateCommonModel", externModel.toJSON());
+        if (externModel.ContainsKey("Parameters")){
+            let settingsModel = externModel.GetData("Parameters");
+            for (let i = 0; i < settingsModel.GetItemsCount(); i++){
+                let pageId = settingsModel.GetData("Id", i);
+                let index = getPageIndexByPageId(pageId)
 
-            if (index < 0){
-                index = commonModel.InsertNewItem();
+                if (index < 0){
+                    index = commonModel.InsertNewItem();
+                }
+
+                commonModel.CopyItemDataFromModel(index, settingsModel, i);
             }
-
-            commonModel.CopyItemDataFromModel(index, externModel, i);
         }
+
+        console.log("Preferences commonModel", commonModel.toJSON());
     }
 
     function getPageIndexByPageId(pageId, model){
@@ -270,7 +278,7 @@ Rectangle {
 
                         onClicked: {
                             if (mainPanel.selectedIndex !== model.index){
-                                bodyPanelRepeater.model = model.Elements;
+                                bodyPanelRepeater.model = model.Parameters;
                                 mainPanel.selectedIndex = model.index;
                             }
                         }

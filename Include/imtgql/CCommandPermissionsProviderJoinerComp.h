@@ -5,9 +5,7 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <icomp/CComponentBase.h>
 
-
 // ImtCore includes
-#include <imtgql/IGqlRepresentationDataController.h>
 #include <imtgql/ICommandPermissionsProvider.h>
 
 
@@ -21,7 +19,6 @@ class CCommandPermissionsProviderJoinerComp:
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-
 
 	I_BEGIN_COMPONENT(CCommandPermissionsProviderJoinerComp);
 		I_REGISTER_INTERFACE(imtgql::ICommandPermissionsProvider);
@@ -37,11 +34,12 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+private:
+	void UpdatePermissionsCache();
+
 protected:
 	I_MULTIREF(imtgql::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
 
-private:
-	void UpdatePermissionsCache();
 private:
 	QMap<QByteArray, QByteArrayList> m_permissionsCache;
 };

@@ -2,22 +2,17 @@
 
 
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
-#include <imtgql/IGqlContext.h>
-#include <imtgql/CGqlObject.h>
+#include <imtgql/IGqlRepresentationDataController.h>
 
 
 namespace imtgql
 {
 
 
-class IGqlModelEditor: virtual public istd::IPolymorphic
+class IGqlModelEditor: virtual public imtgql::CGqlRepresentationDataControllerComp
 {
 public:
-	virtual bool UpdateModelFromRepresentation(
-				const QList<imtgql::CGqlObject>& params,
-				imtbase::CTreeItemModel* modelPtr,
-				const imtgql::IGqlContext* gqlContext = nullptr) = 0;
+	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* modelPtr) = 0;
 };
 
 

@@ -1,5 +1,6 @@
 #include <imtlicgql/CAccountControllerComp.h>
 
+
 // ImtCore includes
 #include <imtauth/CAccountInfo.h>
 
@@ -7,20 +8,15 @@
 namespace imtlicgql
 {
 
-
-imtbase::CHierarchicalItemModelPtr CAccountControllerComp::GetObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			const imtgql::IGqlContext* gqlContext,
-			QString& errorMessage) const
+imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
-		return imtbase::CHierarchicalItemModelPtr();
+		return nullptr;
 	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	dataModel->SetData("Id", "");
 	dataModel->SetData("Name", "");
@@ -31,66 +27,62 @@ imtbase::CHierarchicalItemModelPtr CAccountControllerComp::GetObject(
 	dataModel->SetData("Email", "");
 	dataModel->SetData("BirthDay", "");
 
-	QByteArray accountId = GetObjectIdFromInputParams(inputParams);
+	QByteArray accountId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
 		const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
+		if (accountInfoPtr != nullptr){
+			QString accountName = accountInfoPtr->GetAccountName();
+			QString accountDescription = accountInfoPtr->GetAccountDescription();
 
-		if (accountInfoPtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get an account info");
-			return imtbase::CHierarchicalItemModelPtr();
-		}
+			QByteArray accountId = accountName.toUtf8();
 
-		QString accountName = accountInfoPtr->GetAccountName();
-		QString accountDescription = accountInfoPtr->GetAccountDescription();
+			QString mail;
+			QString lastName;
+			QString firstName;
+			QString nickName;
 
-		QByteArray accountId = accountName.toUtf8();
-
-		QString mail;
-		QString lastName;
-		QString firstName;
-		QString nickName;
-
-		const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
-		if (ownerPtr!= nullptr){
-			mail = ownerPtr->GetMail();
-			lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
-			firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
-			nickName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME);
-		}
-
-		dataModel->SetData("Id", accountId);
-		dataModel->SetData("Name", accountName);
-		dataModel->SetData("Description", accountDescription);
-		dataModel->SetData("FirstName", firstName);
-		dataModel->SetData("LastName", lastName);
-		dataModel->SetData("NickName", nickName);
-		dataModel->SetData("Email", mail);
-
-		imtbase::CTreeItemModel* addressesModel = new imtbase::CTreeItemModel();
-		addressesModel->SetIsArray(true);
-		const imtauth::IAddressProvider* addressesPtr = ownerPtr->GetAddresses();
-		if (addressesPtr != nullptr){
-			imtbase::ICollectionInfo::Ids ids = addressesPtr->GetAddressList().GetElementIds();
-			for (const QByteArray& id : ids){
-				const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
-				if (addressPtr != nullptr){
-					int index = addressesModel->InsertNewItem();
-					addressesModel->SetData("Country", addressPtr->GetCountry(), index);
-					addressesModel->SetData("City", addressPtr->GetCity(), index);
-					addressesModel->SetData("PostalCode", addressPtr->GetPostalCode(), index);
-					addressesModel->SetData("Street", addressPtr->GetStreet(), index);
-				}
+			const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
+			if (ownerPtr!= nullptr){
+				mail = ownerPtr->GetMail();
+				lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
+				firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
+				nickName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_NICKNAME);
 			}
 
-			dataModel->SetExternTreeModel("Addresses", addressesModel);
+			dataModel->SetData("Id", accountId);
+			dataModel->SetData("Name", accountName);
+			dataModel->SetData("Description", accountDescription);
+			dataModel->SetData("FirstName", firstName);
+			dataModel->SetData("LastName", lastName);
+			dataModel->SetData("NickName", nickName);
+			dataModel->SetData("Email", mail);
+
+			imtbase::CTreeItemModel* addressesModel = new imtbase::CTreeItemModel();
+			addressesModel->SetIsArray(true);
+			const imtauth::IAddressProvider* addressesPtr = ownerPtr->GetAddresses();
+			if (addressesPtr != nullptr){
+				imtbase::ICollectionInfo::Ids ids = addressesPtr->GetAddressList().GetElementIds();
+				for (const QByteArray& id : ids){
+					const imtauth::IAddress* addressPtr = addressesPtr->GetAddress(id);
+					if (addressPtr != nullptr){
+						int index = addressesModel->InsertNewItem();
+						addressesModel->SetData("Country", addressPtr->GetCountry(), index);
+						addressesModel->SetData("City", addressPtr->GetCity(), index);
+						addressesModel->SetData("PostalCode", addressPtr->GetPostalCode(), index);
+						addressesModel->SetData("Street", addressPtr->GetStreet(), index);
+					}
+				}
+
+				dataModel->SetExternTreeModel("Addresses", addressesModel);
+			}
 		}
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModelPtr->SetExternTreeModel("data", dataModel);
 
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

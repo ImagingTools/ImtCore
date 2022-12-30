@@ -12,8 +12,8 @@ Item {
 
     onServerModelChanged: {
         console.log("SettingsProvider onServerModelChanged", serverModel);
-        updateLocalModel();
-        applyDesignScheme();
+//        updateLocalModel();
+//        applyDesignScheme();
     }
 
     onLocalModelChanged: {
@@ -27,7 +27,7 @@ Item {
         interval: 100;
 
         onTriggered: {
-            container.applyDesignScheme();
+//            container.applyDesignScheme();
         }
     }
 
@@ -39,32 +39,13 @@ Item {
         settingsQuery.getSettings();
     }
 
-    function saveLocalModel(pageIds){
-        console.log("SettingsProvider saveLocalModel", pageIds);
-        for (let pageId of pageIds){
-            if (pageId == "General" && serverModel.GetItemsCount() == 0){
-                applyDesignScheme();
-                root.settingsUpdate(pageId);
-            }
-            else if (pageId == "General" && serverModel.GetItemsCount() > 0){
-                continue;
-            }
+    function saveLocalModel(){
+        console.log("SettingsProvider saveLocalModel");
 
-            root.settingsUpdate(pageId);
-        }
+        root.settingsUpdate();
     }
 
     function saveServerModel(pageIds){
-        console.log("SettingsProvider saveServerModel", pageIds);
-        for (let pageId of pageIds){
-            if (pageId == "General"){
-                updateLocalModel();
-                applyDesignScheme();
-
-                root.settingsUpdate(pageId);
-            }
-        }
-
         preferenceSaveQuery.save();
     }
 
@@ -72,82 +53,6 @@ Item {
         let design = getDesignScheme();
         if (design){
             Style.getDesignScheme(design);
-        }
-    }
-
-    function getDesignScheme(){
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
-
-            if (pageModel){
-                let pageId = pageModel.GetData("Id");
-                if (pageId == "General"){
-                    let elements = pageModel.GetData("Elements");
-
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
-                        if (elementId == "DesignSchema"){
-                            let elementValue = elements.GetData("Value", j);
-                            let parameters = elements.GetData("Parameters", j);
-
-                            let scheme = parameters.GetData("Id", elementValue);
-
-                            return scheme;
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function getSelectedLanguage(){
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageModel = localModel.GetModelFromItem(i);
-
-            if (pageModel){
-                let pageId = pageModel.GetData("Id");
-                if (pageId == "General"){
-                    let elements = pageModel.GetData("Elements");
-
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
-                        if (elementId == "Language"){
-                            let elementValue = elements.GetData("Value", j);
-                            let parameters = elements.GetData("Parameters", j);
-
-                            let scheme = parameters.GetData("Id", elementValue);
-
-                            return scheme;
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    function getInstanceMask(){
-        console.log("getInstanceMask");
-        for (let i = 0; i < serverModel.GetItemsCount(); i++){
-            let pageModel = serverModel.GetModelFromItem(i);
-
-            if (pageModel){
-                let pageId = pageModel.GetData("Id");
-                if (pageId == "Server"){
-                    let elements = pageModel.GetData("Elements");
-
-                    for (let j = 0; j < elements.GetItemsCount(); j++){
-                        let elementId = elements.GetData("Id", j);
-                        if (elementId == "InstanceMask"){
-                            let elementValue = elements.GetData("Value", j);
-                            return elementValue;
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -177,14 +82,14 @@ Item {
         id: settingsQuery;
 
         function getSettings() {
-            var query = Gql.GqlRequest("query", "GetSettings");
+            var query = Gql.GqlRequest("query", "Get");
 
-            var queryFields = Gql.GqlObject("Get");
-            queryFields.InsertField("Id");
+            var queryFields = Gql.GqlObject("ModelIds");
+            queryFields.InsertField("Settings");
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("PreferenceDialog GqlModel getSettings query ", gqlData);
+
             this.SetGqlQuery(gqlData);
         }
 
@@ -203,8 +108,8 @@ Item {
                 if (settingsQuery.ContainsKey("data")){
                     dataModelLocal = settingsQuery.GetData("data");
 
-                    if (dataModelLocal.ContainsKey("GetSettings")){
-                        dataModelLocal = dataModelLocal.GetData("GetSettings");
+                    if (dataModelLocal.ContainsKey("Get")){
+                        dataModelLocal = dataModelLocal.GetData("Get");
 
                         container.serverModel = dataModelLocal;
                     }

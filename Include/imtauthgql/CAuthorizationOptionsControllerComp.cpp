@@ -13,25 +13,25 @@ namespace imtauthgql
 {
 
 
-imtbase::CHierarchicalItemModelPtr CAuthorizationOptionsControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+// protected methods
+
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+
+imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_userModeCompPtr.IsValid() || !m_databaseEngineCompPtr.IsValid()){
-		return imtbase::CHierarchicalItemModelPtr();
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return nullptr;
 	}
 
-	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-	const iprm::IOptionsList* optionList = m_userModeCompPtr->GetSelectionConstraints();
-	Q_ASSERT(optionList != nullptr);
-
-	if (optionList != nullptr){
-		int defaultIndex = m_userModeCompPtr->GetSelectedOptionIndex();
-
-		QByteArray userModeId = optionList->GetOptionId(defaultIndex);
-
-		dataModelPtr->SetData("Value", userModeId);
+	rootModelPtr.SetPtr(BaseClass::CreateRepresentationFromRequest(gqlRequest, errorMessage));
+	if (!rootModelPtr.IsValid()){
+		return nullptr;
 	}
+
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->GetTreeItemModel("data");
+	Q_ASSERT(dataModelPtr != nullptr);
 
 	QSqlError sqlError;
 	QByteArray query = QString("SELECT * FROM \"Users\" WHERE UserId = '%1';").arg(qPrintable(*m_superuserLoginAttrPtr)).toLocal8Bit();
@@ -48,7 +48,7 @@ imtbase::CHierarchicalItemModelPtr CAuthorizationOptionsControllerComp::CreateRe
 		dataModelPtr->SetData("Message", sqlError.databaseText());
 	}
 
-	return rootModelPtr;
+	return rootModelPtr.PopPtr();
 }
 
 

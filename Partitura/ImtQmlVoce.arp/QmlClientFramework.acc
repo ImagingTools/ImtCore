@@ -70,14 +70,11 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference" ExportId="MutationDataDelegate">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PagesDataProviderCompPtr" Type="Reference" ExportId="PagesDataProviderCompPtr">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="RepresentationController">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
                         <Data IsEnabled="false"/>

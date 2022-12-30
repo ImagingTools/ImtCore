@@ -5,7 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtauth/ICheckPermission.h>
+#include <imtauth/IPermissionChecker.h>
 
 
 namespace imtauth
@@ -14,14 +14,14 @@ namespace imtauth
 
 class CCheckPermissionCompBase:
 		public icomp::CComponentBase,
-		virtual public imtauth::ICheckPermission
+		virtual public imtauth::IPermissionChecker
 {
 
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCheckPermissionCompBase);
-		I_REGISTER_INTERFACE(imtauth::ICheckPermission);
+		I_REGISTER_INTERFACE(imtauth::IPermissionChecker);
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ICheckPermission)

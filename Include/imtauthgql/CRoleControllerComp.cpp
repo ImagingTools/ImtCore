@@ -11,24 +11,21 @@ namespace imtauthgql
 {
 
 
-imtbase::CHierarchicalItemModelPtr CRoleControllerComp::GetObject(
-		const QList<imtgql::CGqlObject> &inputParams,
-		const imtgql::CGqlObject &gqlObject,
-		const imtgql::IGqlContext* gqlContext,
-		QString &errorMessage) const
+imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString &errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return imtbase::CHierarchicalItemModelPtr();
+		return nullptr;
 	}
 
 	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* permissionsModelPtr = dataModelPtr->AddTreeModel("Permissions");
 	imtbase::CTreeItemModel* parentsModelPtr = dataModelPtr->AddTreeModel("Parents");
 
-	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
-	QByteArray productId = inputParams.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
+	QByteArray objectId = GetObjectIdFromInputParams(*inputParams);
+	QByteArray productId = inputParams->at(0).GetFieldArgumentValue("ProductId").toByteArray();
 
 	QByteArray roleId;
 	if (m_separatorObjectIdAttrPtr.IsValid()){
@@ -46,7 +43,7 @@ imtbase::CHierarchicalItemModelPtr CRoleControllerComp::GetObject(
 		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
-			return imtbase::CHierarchicalItemModelPtr();
+			return nullptr;
 		}
 
 		QByteArray roleId = roleInfoPtr->GetRoleId();
@@ -80,10 +77,10 @@ imtbase::CHierarchicalItemModelPtr CRoleControllerComp::GetObject(
 		}
 	}
 
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	rootModel->SetExternTreeModel("data", dataModelPtr);
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
 
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

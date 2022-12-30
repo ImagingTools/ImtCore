@@ -20,38 +20,28 @@ namespace imtauthgql
 
 // reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
-imtbase::CHierarchicalItemModelPtr CUserCollectionControllerComp::ListObjects(
-		const QList<imtgql::CGqlObject>& inputParams,
-		const imtgql::CGqlObject& gqlObject,
-		const imtgql::IGqlContext* gqlContext,
-		QString& errorMessage) const
+imtbase::CTreeItemModel* CUserCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
-
-	imtauth::IUserInfo* contextUserInfoPtr = nullptr;
-	if (gqlContext != nullptr){
-		contextUserInfoPtr = gqlContext->GetUserInfo();
-	}
-
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		return nullptr;
 	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
+
+		const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		if (inputParams.size() > 0){
-			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+		if (inputParams->size() > 0){
+			viewParamsGql = inputParams->at(0).GetFieldArgumentObjectPtr("viewParams");
 		}
 
 		iprm::CParamsSet filterParams;
@@ -105,27 +95,32 @@ imtbase::CHierarchicalItemModelPtr CUserCollectionControllerComp::ListObjects(
 
 		notificationModel->SetData("PagesCount", pagesCount);
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-		for (const QByteArray& collectionId : collectionIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
-				if (userInfoPtr != nullptr){
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetGqlContext();
+		if (contextPtr != nullptr){
+			const imtauth::IUserInfo* contextUserInfoPtr = contextPtr->GetUserInfo();
+			if (contextUserInfoPtr != nullptr){
+				imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+				for (const QByteArray& collectionId : collectionIds){
+					imtbase::IObjectCollection::DataPtr dataPtr;
+					if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+						imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+						if (userInfoPtr != nullptr){
+							bool add = false;
 
-					bool add = false;
+							if (!userInfoPtr->IsAdmin()){
+								add = true;
+							}
+							else if (contextUserInfoPtr != nullptr){
+								add = contextUserInfoPtr->IsAdmin();
+							}
 
-					if (!userInfoPtr->IsAdmin()){
-						add = true;
-					}
-					else if (contextUserInfoPtr != nullptr){
-						add = contextUserInfoPtr->IsAdmin();
-					}
-
-					if (add){
-						int itemIndex = itemsModel->InsertNewItem();
-						if (itemIndex >= 0){
-							if (!SetupGqlItem(gqlObject, *itemsModel, itemIndex, collectionId, errorMessage)){
-								return imtbase::CHierarchicalItemModelPtr();
+							if (add){
+								int itemIndex = itemsModel->InsertNewItem();
+								if (itemIndex >= 0){
+									if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, collectionId, errorMessage)){
+										return nullptr;
+									}
+								}
 							}
 						}
 					}
@@ -137,9 +132,7 @@ imtbase::CHierarchicalItemModelPtr CUserCollectionControllerComp::ListObjects(
 		dataModel->SetExternTreeModel("notification", notificationModel);
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
-
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 
@@ -166,27 +159,28 @@ QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &i
 }
 
 
-imtbase::CHierarchicalItemModelPtr CUserCollectionControllerComp::GetMetaInfo(
-		const QList<imtgql::CGqlObject> &inputParams,
-		const imtgql::CGqlObject &gqlObject,
-		QString &errorMessage) const
+imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* children = nullptr;
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
 
-	QByteArray userId = GetObjectIdFromInputParams(inputParams);
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
+	QByteArray userId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
+		imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+		imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
 		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
 			imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles();
 
 			int index = metaInfoModel->InsertNewItem();
 			metaInfoModel->SetData("Name", "Roles", index);
-			children = metaInfoModel->AddTreeModel("Children", index);
+
+			imtbase::CTreeItemModel* children = metaInfoModel->AddTreeModel("Children", index);
 
 			for (const QByteArray& productRoleId : rolesIds){
 				QStringList data = QString(productRoleId).split(*m_separatorObjectIdAttrPtr);
@@ -204,9 +198,7 @@ imtbase::CHierarchicalItemModelPtr CUserCollectionControllerComp::GetMetaInfo(
 		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
-
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

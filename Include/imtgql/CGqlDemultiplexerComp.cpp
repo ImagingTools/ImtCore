@@ -5,59 +5,41 @@ namespace imtgql
 {
 
 
-// reimplemented (imtgql::IGqlRepresentationDataController)
+// protected methods
 
-QByteArrayList CGqlDemultiplexerComp::GetModelIds() const
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+
+bool CGqlDemultiplexerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
-	QByteArrayList modelIds;
-	int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
-	for (int index = 0; index < dataControllersCount; index++){
-		const imtgql::IGqlRepresentationDataController* representationControllerPtr = m_gqlRepresentationDataControllerCompPtr[index];
-		if (representationControllerPtr != nullptr){
-			modelIds.append(representationControllerPtr->GetModelIds());
-		}
-	}
-
-	return modelIds;
-}
-
-
-QByteArrayList CGqlDemultiplexerComp::GetContextIds() const
-{
-	QByteArrayList contextIds;
-	int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
-	for (int index = 0; index < dataControllersCount; index++){
-		const imtgql::IGqlRepresentationDataController* representationControllerPtr = m_gqlRepresentationDataControllerCompPtr[index];
-		if (representationControllerPtr != nullptr){
-			contextIds.append(representationControllerPtr->GetContextIds());
-		}
-	}
-
-	return contextIds;
-}
-
-
-imtbase::CHierarchicalItemModelPtr CGqlDemultiplexerComp::CreateResponse(const CGqlRequest &gqlRequest, QString &errorMessage) const
-{
-	QByteArray gqlCommand = gqlRequest.GetCommandId();
-	QByteArrayList modelIds = GetModelIds();
-	int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
-	if (modelIds.contains(gqlCommand)){
-		for (int index = 0; index < dataControllersCount; index++){
-			const imtgql::IGqlRepresentationDataController* representationControllerPtr = m_gqlRepresentationDataControllerCompPtr[index];
-			if (representationControllerPtr != nullptr){
-				QByteArrayList modelItemIds = representationControllerPtr->GetModelIds();
-				if (modelItemIds.contains(gqlCommand)){
-					imtbase::CHierarchicalItemModelPtr sourceItemModelPtr = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
-					if (sourceItemModelPtr.IsValid()){
-						return sourceItemModelPtr;
-					}
-				}
+	for (int i = 0; i < m_gqlRequestHandlersCompPtr.GetCount(); i++){
+		const imtgql::IGqlRequestHandler* gqlRequestHahdlerPtr = m_gqlRequestHandlersCompPtr[i];
+		if (gqlRequestHahdlerPtr != nullptr){
+			if (gqlRequestHahdlerPtr->IsRequestSupported(gqlRequest)){
+				return true;
 			}
 		}
 	}
 
-	return imtbase::CHierarchicalItemModelPtr();
+	return false;
+}
+
+
+// protected methods
+
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+
+imtbase::CTreeItemModel* CGqlDemultiplexerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	for (int i = 0; i < m_gqlRequestHandlersCompPtr.GetCount(); i++){
+		const imtgql::IGqlRequestHandler* gqlRequestHahdlerPtr = m_gqlRequestHandlersCompPtr[i];
+		if (gqlRequestHahdlerPtr != nullptr){
+			if (gqlRequestHahdlerPtr->IsRequestSupported(gqlRequest)){
+				return gqlRequestHahdlerPtr->CreateResponse(gqlRequest, errorMessage);
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 

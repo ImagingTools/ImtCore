@@ -80,9 +80,9 @@ I_EXPORT_COMPONENT(
 			"Check Permissions");
 
 I_EXPORT_COMPONENT(
-			PermissionsProvider,
-			"Permissions provider",
-			"Permissions Provider");
+			FeaturePackagePermissionsRepresentationProvider,
+			"Permissions representation based on feature package",
+			"Permissions Features User Administration Rights Authorization");
 
 I_EXPORT_COMPONENT(
 			CollectionPermissionsProvider,

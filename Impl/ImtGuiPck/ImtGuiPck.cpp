@@ -182,6 +182,16 @@ I_EXPORT_COMPONENT(
 			"Standard client area provider",
 			"Client Area Provider");
 
+I_EXPORT_COMPONENT(
+			PageBasedGuiModel,
+			"Page based gui model",
+			"Gui Model Page");
+
+I_EXPORT_COMPONENT(
+			VisualStatus,
+			"Visual status provider for based gui model",
+			"Visual Status Provider Gui Model");
+
 
 } // namespace ImtGuiPck
 

@@ -1,55 +1,49 @@
 #include <imtqml/CCommandPermissionsFilterComp.h>
 
 
-// Qt includes
-#include <QtCore/QTranslator>
-
-
 namespace imtqml
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-QByteArray CCommandPermissionsFilterComp::GetModelId() const
-{
-	return m_commandsProviderCompPtr->GetModelId();
-}
-
-
-imtbase::CTreeItemModel* CCommandPermissionsFilterComp::GetRepresentation(
-		const QList<imtgql::CGqlObject>& params,
-		const QByteArrayList& fields,
-		const imtgql::IGqlContext* gqlContext)
+imtbase::CTreeItemModel* CCommandPermissionsFilterComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if(!m_commandsProviderCompPtr.IsValid()){
 		return nullptr;
 	}
-	imtbase::CTreeItemModel* commandsModelPtr = m_commandsProviderCompPtr->GetRepresentation(params, fields, gqlContext);
-	imtbase::CTreeItemModel* filteredCommandsModelPtr =new imtbase::CTreeItemModel();
 
-	if (gqlContext != nullptr && commandsModelPtr != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = gqlContext->GetUserInfo();
-		if (userInfoPtr != nullptr){
-			const QByteArray userId = userInfoPtr->GetUserId();
-			if(m_commandPermissionsProviderCompPtr.IsValid()){
-				imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions();
-				for(int i = 0; i < commandsModelPtr->GetItemsCount(); i++){
-					const QByteArray commandId = commandsModelPtr->GetData("Id", i).toByteArray();
-					const QByteArrayList permissionIds = m_commandPermissionsProviderCompPtr->GetCommandPermissions(commandId);
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
+	if (gqlContextPtr != nullptr){
+		imtbase::CTreeItemModel* commandsModelPtr = m_commandsProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
+		if (commandsModelPtr != nullptr){
+			const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
+			if (userInfoPtr != nullptr){
+				const QByteArray userId = userInfoPtr->GetUserId();
+				if(m_commandPermissionsCompPtr.IsValid()){
+					imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions();
+					istd::TDelPtr<imtbase::CTreeItemModel> filteredCommandsModelPtr(new imtbase::CTreeItemModel());
 
-					if(userInfoPtr->IsAdmin() || m_checkPermissionCompPtr->CheckPermission(userPermissions, permissionIds)){
-						int index = filteredCommandsModelPtr->InsertNewItem();
-						commandsModelPtr->CopyItemDataToModel(i,filteredCommandsModelPtr, index);
+					for(int i = 0; i < commandsModelPtr->GetItemsCount(); i++){
+						const QByteArray commandId = commandsModelPtr->GetData("Id", i).toByteArray();
+						const QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(commandId);
+
+						if(userInfoPtr->IsAdmin() || m_checkPermissionCompPtr->CheckPermission(userPermissions, permissionIds)){
+							int index = filteredCommandsModelPtr->InsertNewItem();
+
+							commandsModelPtr->CopyItemDataToModel(i, filteredCommandsModelPtr.GetPtr(), index);
+						}
 					}
+
+					return filteredCommandsModelPtr.PopPtr();
 				}
 			}
 		}
 	}
 
-	return filteredCommandsModelPtr;
+	return nullptr;
 }
 
 

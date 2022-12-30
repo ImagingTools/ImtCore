@@ -9,23 +9,23 @@ namespace imtqml
 {
 
 
-class CCompositeObjectRepresentationComp: public CObjectRepresentationCompBase
+class CCompositeObjectRepresentationComp: public imtgql::CGqlRepresentationDataControllerComp
 {
 public:
-	typedef CObjectRepresentationCompBase BaseClass;
+	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCompositeObjectRepresentationComp);
-		I_ASSIGN_MULTI_0(m_paramSubElementsCompPtr, "ParamSubElements", "Subelements of the param", false);
+		I_REGISTER_INTERFACE(imtgql::CGqlRepresentationDataControllerComp);
+		I_ASSIGN_MULTI_0(m_representationDataControllersCompPtr, "RepresentationDataControllers", "Representation data controllers", false);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::IItemBasedRepresentationProvider)
-	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
 
-	// reimplemented (imtgql::IGqlModelEditor)
-	virtual bool UpdateModelFromRepresentation(const QList<imtgql::CGqlObject>& params, imtbase::CTreeItemModel* baseModel, const imtgql::IGqlContext* gqlContext) override;
 protected:
-	I_MULTIREF(imtgql::IItemBasedRepresentationDataProvider, m_paramSubElementsCompPtr);
+	I_MULTIREF(imtbase::IRepresentationController, m_representationDataControllersCompPtr);
 };
 
 

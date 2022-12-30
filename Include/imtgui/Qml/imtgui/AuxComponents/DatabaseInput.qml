@@ -15,6 +15,10 @@ Item {
         settingsDatabaseInputRepeater.model = settingsDatabaseInputContainer.parameters;
     }
 
+    Component.onCompleted: {
+        console.log("databaseInputDelegate onCompleted");
+    }
+
     Column {
         id: databaseInputColumn;
 

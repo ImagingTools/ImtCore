@@ -37,28 +37,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CompositeRepresentation" PackageId="ImtQmlPck" ComponentId="CompositeRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>LocalPageRepresentation</Value>
-                                <Value>GeneralPageRepresentation</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RepresentationDataProvider" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>LocalPageRepresentation</Value>
-                                <Value>GeneralPageRepresentation</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="GeneralPageData" PackageId="ImtCoreVoce" ComponentId="GeneralPageDataModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -70,23 +48,7 @@
         </Element>
         <Element Id="GeneralPageRepresentation" PackageId="ImtCoreVoce" ComponentId="GeneralPageRepresentationModel">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="DesignPathToQml" Type="Text" ExportId="DesignPathToQml">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DesignSchema" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GeneralPageData/Design"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Language" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GeneralPageData/Language"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LanguagePathToQml" Type="Text" ExportId="LanguagePathToQml">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
+                <AttributeInfoMap/>
             </Data>
         </Element>
         <Element Id="LocalPageData" PackageId="ImtCoreVoce" ComponentId="LocalPageDataModel">
@@ -97,15 +59,6 @@
         <Element Id="LocalPageRepresentation" PackageId="ImtCoreVoce" ComponentId="LocalPageRepresentationModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerUrl" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LocalPageData/ServerUrl"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerUrlPathToQml" Type="Text" ExportId="ServerUrlPathToQml">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -137,12 +90,23 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="PreferencesRepresentation" PackageId="ImtCorePck" ComponentId="ParamSetRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>LocalPageRepresentation</Value>
+                                <Value>GeneralPageRepresentation</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="CompositeRepresentation"/>
-        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="CompositeRepresentation"/>
-    </ExportedInterfaces>
+    <ExportedInterfaces/>
     <ExportedComponents>
         <Component ExportedId="GeneralPageData" ComponentId="GeneralPageData"/>
     </ExportedComponents>

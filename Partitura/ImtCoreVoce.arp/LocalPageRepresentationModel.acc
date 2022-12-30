@@ -2,76 +2,44 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5040" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ApplicationInfo" PackageId="ImtQmlPck" ComponentId="ApplicationInfoDataProvider">
+        <Element Id="NetworkSettings" PackageId="ImtCorePck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Version"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Client version"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="NetworkSettings" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>ServerUrl</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="NetworkSettings"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Network Settings"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParamSubElements" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
-                                <Value>ApplicationInfo</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrl" PackageId="ImtQmlPck" ComponentId="TextRepresentation">
+        <Element Id="ServerUrl" PackageId="ImtCorePck" ComponentId="TextParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="NameParameter" Type="Reference" ExportId="ServerUrl">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="ServerUrl"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Server Url"/>
+                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="ServerUrl"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="ServerUrlPathToQml">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -79,8 +47,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="NetworkSettings"/>
-        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="NetworkSettings"/>
+        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="NetworkSettings"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

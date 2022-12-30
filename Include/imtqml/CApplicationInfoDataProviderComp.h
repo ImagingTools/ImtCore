@@ -2,11 +2,10 @@
 
 
 // ACF includes
-#include <icomp/CComponentBase.h>
-#include <ibase/CApplicationInfoComp.h>
+#include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
-#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/CGqlRepresentationDataControllerComp.h>
 
 
 namespace imtqml
@@ -16,23 +15,21 @@ namespace imtqml
 /**
 	Application info data provider.
 */
-class CApplicationInfoDataProviderComp:
-			public icomp::CComponentBase,
-			public imtgql::IItemBasedRepresentationDataProvider
+class CApplicationInfoDataProviderComp: public imtgql::CGqlRepresentationDataControllerComp
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef imtgql::CGqlRepresentationDataControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CApplicationInfoDataProviderComp);
-		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
+		I_REGISTER_INTERFACE(imtgql::CGqlRepresentationDataControllerComp);
 		I_ASSIGN(m_paramIdAttrPtr, "ParamId", "ID of the param", true, "");
 		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the param", false, "");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application data info", false, "");
 	I_END_COMPONENT;
 
-	// reimplemented (imtgql::IItemBasedRepresentationProvider)
-	virtual QByteArray GetModelId() const override;
-	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
+protected:
+	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_ATTR(QByteArray, m_paramIdAttrPtr);

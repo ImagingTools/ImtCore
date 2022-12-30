@@ -24,14 +24,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::IItemBasedRepresentationProvider)
-	virtual imtbase::CTreeItemModel* GetRepresentation(const QList<imtgql::CGqlObject>& params,const QByteArrayList& fields, const imtgql::IGqlContext* gqlContext) override;
-
-	// reimplemented (imtgql::IGqlModelEditor)
-	virtual bool UpdateModelFromRepresentation(
-			const QList<imtgql::CGqlObject>& params,
-			imtbase::CTreeItemModel* baseModel,
-			const imtgql::IGqlContext* gqlContext) override;
+	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
 
 private:
 	I_REF(iprm::ITextParam, m_nameParamCompPtr);

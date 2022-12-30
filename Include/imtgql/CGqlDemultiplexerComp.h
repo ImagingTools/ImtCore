@@ -2,34 +2,32 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
+#include <imtgql/CGqlRepresentationControllerCompBase.h>
 
 
 namespace imtgql
 {
 
 
-class CGqlDemultiplexerComp:
-		public ilog::CLoggerComponentBase,
-		virtual public imtgql::IGqlRepresentationDataController
+class CGqlDemultiplexerComp: public imtgql::CGqlRepresentationControllerCompBase
 {
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlDemultiplexerComp);
-		I_REGISTER_INTERFACE(imtgql::IGqlRepresentationDataController);
-		I_ASSIGN_MULTI_0(m_gqlRepresentationDataControllerCompPtr, "GqlRepresentationDataController", "Gql representationDataController", true);
-		I_ASSIGN_MULTI_0(m_contextIdsCompPtr, "GqlContextIds", "Gql context Ids", false);
+		I_REGISTER_INTERFACE(imtgql::IGqlRequestHandler);
+		I_ASSIGN_MULTI_0(m_gqlRequestHandlersCompPtr, "GqlRequestHandlers", "Demultiplexer for GraphQL request", true)
 	I_END_COMPONENT;
 
-	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual QByteArrayList GetModelIds() const override;
-	virtual QByteArrayList GetContextIds() const override;
-	virtual imtbase::CHierarchicalItemModelPtr CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 
 protected:
-	I_MULTIREF(imtgql::IGqlRepresentationDataController, m_gqlRepresentationDataControllerCompPtr);
-	I_MULTIATTR(QByteArray, m_contextIdsCompPtr);
+	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	I_MULTIREF(imtgql::IGqlRequestHandler, m_gqlRequestHandlersCompPtr);
 };
 
 

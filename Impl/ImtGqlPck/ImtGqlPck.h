@@ -11,10 +11,9 @@
 #include <imtgql/CGqlDemultiplexerComp.h>
 #include <imtgql/CSingleCommandPermissionsProviderComp.h>
 #include <imtgql/CCommandPermissionsProviderJoinerComp.h>
-#include <imtgql/CPermissionsControllerComp.h>
-#include <imtgql/CGqlRepresentationControllerComp.h>
+#include <imtgql/CGqlRemoteRepresentationControllerComp.h>
 #include <imtgql/CGqlClientEngineComp.h>
-
+#include <imtgql/CGqlRepresentationDataControllerComp.h>
 
 
 /**
@@ -29,13 +28,11 @@ typedef imtgql::CHttpGraphQLServletComp GraphQLServlet;
 typedef imtgql::CGqlDemultiplexerComp GraphQLDemultiplexer;
 typedef imtgql::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
 typedef imtgql::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
-typedef imtgql::CPermissionsControllerComp PermissionsController;
-typedef imtgql::CGqlRepresentationControllerComp GraphQLRepresentationController;
+typedef imtgql::CGqlRemoteRepresentationControllerComp GraphQLRemoteRepresentationController;
 typedef imtgql::CGqlClientEngineComp GraphQLClientEngine;
-
+typedef imtgql::CGqlRepresentationDataControllerComp GqlRepresentationDataController;
 
 
 } // namespace ImtGqlPck
-
 
 

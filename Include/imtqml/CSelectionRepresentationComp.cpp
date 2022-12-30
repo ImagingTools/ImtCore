@@ -1,9 +1,6 @@
 #include <imtqml/CSelectionRepresentationComp.h>
 
 
-// Qt includes
-#include <QtCore/QTranslator>
-
 // ACF includes
 #include <iprm/IOptionsList.h>
 
@@ -12,14 +9,11 @@ namespace imtqml
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CSelectionRepresentationComp::GetRepresentation(
-			const QList<imtgql::CGqlObject>& params,
-			const QByteArrayList& fields,
-			const imtgql::IGqlContext* gqlContext)
+imtbase::CTreeItemModel* CSelectionRepresentationComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_selectionParamCompPtr.IsValid()){
 		return nullptr;
@@ -62,13 +56,7 @@ imtbase::CTreeItemModel* CSelectionRepresentationComp::GetRepresentation(
 	return rootModelPtr;
 }
 
-
-// reimplemented (imtgql::IGqlModelEditor)
-
-bool CSelectionRepresentationComp::UpdateModelFromRepresentation(
-		const QList<imtgql::CGqlObject> &params,
-		imtbase::CTreeItemModel *baseModel,
-		const imtgql::IGqlContext* gqlContext)
+bool CSelectionRepresentationComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_selectionParamCompPtr.IsValid()){
 		return false;
@@ -81,11 +69,10 @@ bool CSelectionRepresentationComp::UpdateModelFromRepresentation(
 	rootModelPtr->SetData("Id", parameterId);
 	rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
 
-	const imtbase::CTreeItemModel* elementModelPtr = GetElementModel(parameterId, baseModel);
-	if (elementModelPtr != nullptr){
+	if (representationPtr != nullptr){
 		int value = 0;
-		if (elementModelPtr->ContainsKey("Value")){
-			value = elementModelPtr->GetData("Value").toInt();
+		if (representationPtr->ContainsKey("Value")){
+			value = representationPtr->GetData("Value").toInt();
 		}
 
 		m_selectionParamCompPtr->SetSelectedOptionIndex(value);

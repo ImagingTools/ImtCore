@@ -12,6 +12,7 @@
 namespace imtauthgql
 {
 
+
 // protected methods
 
 // reimplemented (imtguigql::CObjectCollectionControllerCompBase)
@@ -35,16 +36,17 @@ QVariant CRoleCollectionControllerComp::GetObjectInformation(const QByteArray &i
 }
 
 
-imtbase::CHierarchicalItemModelPtr CRoleCollectionControllerComp::GetMetaInfo(
-		const QList<imtgql::CGqlObject> &inputParams,
-		const imtgql::CGqlObject &gqlObject,
-		QString &errorMessage) const
+imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
 
-	QByteArray roleId = GetObjectIdFromInputParams(inputParams);
+	QByteArray roleId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(roleId, dataPtr)){
@@ -52,7 +54,7 @@ imtbase::CHierarchicalItemModelPtr CRoleCollectionControllerComp::GetMetaInfo(
 
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
-			return imtbase::CHierarchicalItemModelPtr();
+			return nullptr;
 		}
 
 		QByteArray roleId = roleInfoPtr->GetRoleId();
@@ -94,68 +96,59 @@ imtbase::CHierarchicalItemModelPtr CRoleCollectionControllerComp::GetMetaInfo(
 			children->SetData("Value", permissionId, childrenIndex);
 		}
 
-		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
+		dataModelPtr->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
-	rootModel->SetExternTreeModel("data", dataModel);
 
-	return rootModel;
+	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
+
+	return rootModelPtr.PopPtr();
 }
 
 
-imtbase::CHierarchicalItemModelPtr CRoleCollectionControllerComp::ListObjects(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			const imtgql::IGqlContext* gqlContext,
-			QString& errorMessage) const
+imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-
 	if (!m_objectCollectionCompPtr.IsValid() || !m_productProviderCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		return nullptr;
 	}
 
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
-	}
-	else{
-		dataModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* itemsModel = m_productProviderCompPtr->GetRepresentation(inputParams, QByteArrayList());
-		if (itemsModel != nullptr){
-			for (int i = 0; i < itemsModel->GetItemsCount(); i++){
-				QByteArray productId = itemsModel->GetData("Id", i).toByteArray();
-				imtbase::CTreeItemModel* rolesModel = itemsModel->AddTreeModel("Roles", i);
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-				imtbase::ICollectionInfo::Ids rolesIds = m_objectCollectionCompPtr->GetElementIds();
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	Q_ASSERT(dataModelPtr != nullptr);
 
-				for (const imtbase::ICollectionInfo::Id& roleObjectId : rolesIds){
-					imtbase::IObjectCollection::DataPtr dataPtr;
-					if (m_objectCollectionCompPtr->GetObjectData(roleObjectId, dataPtr)){
-						const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+	imtbase::CTreeItemModel* itemsModelPtr = m_productProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
+	if (itemsModelPtr != nullptr){
+		for (int i = 0; i < itemsModelPtr->GetItemsCount(); i++){
+			QByteArray productId = itemsModelPtr->GetData("Id", i).toByteArray();
+			imtbase::CTreeItemModel* rolesModelPtr = itemsModelPtr->AddTreeModel("Roles", i);
+			Q_ASSERT(rolesModelPtr != nullptr);
 
+			imtbase::ICollectionInfo::Ids rolesIds = m_objectCollectionCompPtr->GetElementIds();
+			for (const imtbase::ICollectionInfo::Id& roleObjectId : rolesIds){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_objectCollectionCompPtr->GetObjectData(roleObjectId, dataPtr)){
+					const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+					if (roleInfoPtr != nullptr){
 						QByteArray roleId = roleInfoPtr->GetRoleId();
 						QByteArray roleProductId = roleInfoPtr->GetProductId();
 
 						if (productId == roleProductId){
-							int roleIndex = rolesModel->InsertNewItem();
+							int roleIndex = rolesModelPtr->InsertNewItem();
 
 							QByteArray objectId = roleInfoPtr->GetRoleId() + *m_separatorObjectIdAttrPtr + roleProductId;
 
-							rolesModel->SetData("Id", objectId, roleIndex);
-							rolesModel->SetData("Name", roleInfoPtr->GetRoleName(), roleIndex);
+							rolesModelPtr->SetData("Id", objectId, roleIndex);
+							rolesModelPtr->SetData("Name", roleInfoPtr->GetRoleName(), roleIndex);
 						}
 					}
 				}
 			}
 		}
-
-		dataModel->SetExternTreeModel("items", itemsModel);
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
+	dataModelPtr->SetExternTreeModel("items", itemsModelPtr);
 
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

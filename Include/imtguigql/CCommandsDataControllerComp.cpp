@@ -1,81 +1,48 @@
 #include <imtguigql/CCommandsDataControllerComp.h>
 
 
-// Qt includes
-#include <QtCore/QObject>
-
-// ImtCore includes
-#include <imtqml/CPageDataEnumProviderComp.h>
-
-
 namespace imtguigql
 {
 
 
-// reimplemented (imtgql::IGqlRepresentationDataController)
+// protected methods
 
-imtbase::CHierarchicalItemModelPtr CCommandsDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+
+imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
-		return imtbase::CHierarchicalItemModelPtr();
+	QByteArray commandId;
+
+	const QList<imtgql::CGqlObject>* paramsPtr = gqlRequest.GetParams();
+	if (!paramsPtr->isEmpty()){
+		commandId = paramsPtr->at(0).GetFieldArgumentValue("PageId").toByteArray();
 	}
 
-	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
-	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
+	if (commandId.isEmpty()){
+		errorMessage = QString("A command with an empty ID was requested");
 
-	int count = fieldList->count();
-
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-	bool isSetResponce = false;
-	QByteArrayList fields;
-	QByteArray commandsId;
-
-	for (int i = 0; i < count; i++){
-		if (fieldList->at(i).GetId() == "items"){
-			fields = fieldList->at(i).GetFieldIds();
-			if (paramList != nullptr && !paramList->isEmpty()){
-				commandsId = paramList->at(0).GetFieldArgumentValue(imtqml::CPageDataEnumProviderComp::ID).toByteArray();
-			}
-			isSetResponce = true;
-		}
+		return nullptr;
 	}
 
-	if(m_commandsDataProviderCompPtr.IsValid() && isSetResponce){
+	if(m_commandsDataProviderCompPtr.IsValid()){
 		for (int index = 0; index < m_commandsDataProviderCompPtr.GetCount(); index++){
-			if (m_commandsDataProviderCompPtr[index]->GetModelId() == commandsId){
-				itemsModel = m_commandsDataProviderCompPtr[index]->GetRepresentation(*paramList, fields, gqlRequest.GetGqlContext());
+			const imtgql::IGqlRequestHandler* gqlRequestHandlerPtr = m_commandsDataProviderCompPtr[index];
+			if (gqlRequestHandlerPtr != nullptr){
+				if (gqlRequestHandlerPtr->IsRequestSupported(gqlRequest)){
+					imtbase::CTreeItemModel* retVal = gqlRequestHandlerPtr->CreateResponse(gqlRequest, errorMessage);
+					if (retVal == nullptr){
+						QString decoratedErrorMessage = QString("Cannot create response for the command with ID: %1. The reason was: %2").arg(qPrintable(commandId)).arg(errorMessage);
+
+						errorMessage = decoratedErrorMessage;
+					}
+
+					return retVal;
+				}
 			}
 		}
-		if (itemsModel == nullptr){
-			isSetResponce = false;
-		}
-	}
-	else{
-		errorMessage = QObject::tr("Incorrect qyery").toUtf8();
 	}
 
-	if (!isSetResponce){
-		return imtbase::CHierarchicalItemModelPtr();
-	}
-
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
-	}
-	else {
-
-		dataModel = new imtbase::CTreeItemModel();
-		dataModel->SetExternTreeModel("items", itemsModel);
-		imtbase::CTreeItemModel* infoModel = new imtbase::CTreeItemModel();
-		infoModel->SetData("CommandsModelId", commandsId);
-		dataModel->SetExternTreeModel("information", infoModel);
-
-	}
-	rootModel->SetExternTreeModel("data", dataModel);
-	return rootModel;
+	return nullptr;
 }
 
 

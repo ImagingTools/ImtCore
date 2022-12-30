@@ -11,11 +11,11 @@ namespace imtlicgql
 
 // public methods
 
-// reimplemented (imtgql::IGqlRepresentationDataController)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CHierarchicalItemModelPtr CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	const QList<imtgql::CGqlObject>* params = gqlRequest.GetParams();
 
@@ -25,11 +25,11 @@ imtbase::CHierarchicalItemModelPtr CProductPermissionsControllerComp::CreateInte
 	}
 
 	if (productId.isEmpty()){
-		return imtbase::CHierarchicalItemModelPtr();
+		return nullptr;
 	}
 
 	if (m_productProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* productsModelPtr = m_productProviderCompPtr->GetRepresentation(*params, QByteArrayList());
+		imtbase::CTreeItemModel* productsModelPtr = m_productProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
 		if (productsModelPtr != nullptr){
 			for (int i = 0; i < productsModelPtr->GetItemsCount(); i++){
 				QByteArray currentProductId = productsModelPtr->GetData("Id", i).toByteArray();
@@ -43,7 +43,7 @@ imtbase::CHierarchicalItemModelPtr CProductPermissionsControllerComp::CreateInte
 		}
 	}
 
-	return rootModelPtr;
+	return rootModelPtr.PopPtr();
 }
 
 

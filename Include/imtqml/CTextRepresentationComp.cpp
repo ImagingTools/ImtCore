@@ -1,8 +1,8 @@
 #include <imtqml/CTextRepresentationComp.h>
 
 
-// Qt includes
-#include <QtCore/QTranslator>
+// ImtCore includes
+#include <imtbase/imtbase.h>
 
 
 namespace imtqml
@@ -11,12 +11,9 @@ namespace imtqml
 
 // public methods
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CTextRepresentationComp::GetRepresentation(
-			const QList<imtgql::CGqlObject>& params,
-			const QByteArrayList& fields,
-			const imtgql::IGqlContext* gqlContext)
+imtbase::CTreeItemModel* CTextRepresentationComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_nameParamCompPtr.IsValid()){
 		return nullptr;
@@ -29,12 +26,14 @@ imtbase::CTreeItemModel* CTextRepresentationComp::GetRepresentation(
 
 	rootModelPtr->SetData("Id", paramId);
 
-	if (m_translationManagerCompPtr.IsValid()){
-		QByteArray languageId;
-		if(gqlContext != nullptr){
-			languageId = gqlContext->GetLanguageId();
-		}
+	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();\
 
+	QByteArray languageId;
+	if(gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
+	if (m_translationManagerCompPtr.IsValid()){
 		QString paramNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), paramName.toUtf8(), languageId, "Attribute");
 
 		rootModelPtr->SetData("Name", paramNameTr);
@@ -55,25 +54,17 @@ imtbase::CTreeItemModel* CTextRepresentationComp::GetRepresentation(
 }
 
 
-// reimplemented (imtgql::IGqlModelEditor)
-
-bool CTextRepresentationComp::UpdateModelFromRepresentation(
-		const QList<imtgql::CGqlObject> &params,
-		imtbase::CTreeItemModel *baseModelPtr,
-		const imtgql::IGqlContext* gqlContext)
+bool CTextRepresentationComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_nameParamCompPtr.IsValid()){
 		return false;
 	}
 
-	Q_ASSERT(baseModelPtr != nullptr);
-
 	QByteArray parameterId = *m_paramIdAttrPtr;
-	const imtbase::CTreeItemModel* elementModelPtr = GetElementModel(parameterId, baseModelPtr);
-	if (elementModelPtr != nullptr){
+	if (representationPtr != nullptr){
 		QString value;
-		if (elementModelPtr->ContainsKey("Value")){
-			value = elementModelPtr->GetData("Value").toString();
+		if (representationPtr->ContainsKey("Value")){
+			value = representationPtr->GetData("Value").toString();
 		}
 
 		m_nameParamCompPtr->SetText(value);

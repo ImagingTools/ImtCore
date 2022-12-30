@@ -19,11 +19,11 @@ Item {
         id: pagesGqlModel;
 
         function updateModel(){
-            var query = Gql.GqlRequest("query", "PagesData") ;
+            var query = Gql.GqlRequest("query", "Get") ;
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("LanguageId", "ru_RU");
-            query.AddParam(inputParams);
+            var modelIdsFields = Gql.GqlObject("ModelIds");
+            modelIdsFields.InsertField("PagesData");
+            query.AddField(modelIdsFields);
 
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField("PageId");
@@ -46,14 +46,10 @@ Item {
                 if (this.ContainsKey("data")){
                     dataModelLocal = this.GetData("data");
 
-                    if(dataModelLocal.ContainsKey("PagesData")){
-                        dataModelLocal = dataModelLocal.GetData("PagesData");
+                    if(dataModelLocal.ContainsKey("Get")){
+                        dataModelLocal = dataModelLocal.GetData("Get");
 
-                        if (dataModelLocal.ContainsKey("items")){
-                            dataModelLocal = dataModelLocal.GetData("items");
-
-                            pagesProvider.pagesModel = dataModelLocal;
-                        }
+                        pagesProvider.pagesModel = dataModelLocal;
                     }
                 }
             }

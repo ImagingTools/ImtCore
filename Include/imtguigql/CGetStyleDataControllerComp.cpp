@@ -1,83 +1,55 @@
 #include <imtguigql/CGetStyleDataControllerComp.h>
 
+
 // ACF includes
-#include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
 
 // Qt includes
-#include <QtCore/QObject>
 #include <QtCore/QFile>
-
-// ImtCore includes
-#include <imtqml/CPageDataEnumProviderComp.h>
 
 
 namespace imtguigql
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtgql::IGqlRepresentationDataController)
+// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
-imtbase::CHierarchicalItemModelPtr CGetStyleDataControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (m_modelIdsCompPtr.FindValue(gqlRequest.GetCommandId()) == -1){
-		return imtbase::CHierarchicalItemModelPtr();
+	QString theme;
+
+	const QList<imtgql::CGqlObject>* paramsPtr = gqlRequest.GetParams();
+	if (!paramsPtr->isEmpty()){
+		theme = paramsPtr->at(0).GetFieldArgumentValue("theme").toString();
 	}
 
-	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
-	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
-
-	int count = fieldList->count();
-
-	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = nullptr;
-	imtbase::CTreeItemModel* sourceModelPtr = nullptr;
-	QByteArrayList fields;
-	QByteArray theme;
-
-	for (int i = 0; i < count; i++){
-		if (fieldList->at(i).GetId() == "style"){
-			fields = fieldList->at(i).GetFieldIds();
-
-			if (paramList != nullptr && !paramList->isEmpty()){
-				theme = paramList->at(0).GetFieldArgumentValue("theme").toByteArray();
-			}
-		}
-	}
-
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
-		Q_ASSERT(errorsItemModelPtr != nullptr);
-
-		errorsItemModelPtr->SetData("message", errorMessage);
-	}
-	else{
-		dataModelPtr = new imtbase::CTreeItemModel();
-		QString pathToTheme;
-		if (theme == ""){
-			if (m_parameterCompPtr.IsValid()){
-				iprm::ISelectionParam* selectionParam = dynamic_cast<iprm::ISelectionParam*>(m_parameterCompPtr.GetPtr());
-				if (selectionParam != nullptr){
-					const iprm::IOptionsList* optionList = selectionParam->GetSelectionConstraints();
-
-					if (optionList != nullptr){
-						int index = selectionParam->GetSelectedOptionIndex();
-
-						if (index >= 0){
-							theme = optionList->GetOptionName(index).toUtf8();
-						}
-					}
+	if(theme.isEmpty()){
+		if (m_selectionParamCompPtr.IsValid()){
+			const iprm::IOptionsList* optionList = m_selectionParamCompPtr->GetSelectionConstraints();
+			if (optionList != nullptr){
+				int index = m_selectionParamCompPtr->GetSelectedOptionIndex();
+				if (index >= 0){
+					theme = optionList->GetOptionName(index);
 				}
 			}
 		}
+	}
+
+	if(!theme.isEmpty()){
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 		dataModelPtr->SetData("theme", theme);
+
 		QString prefix;
+		QString pathToTheme;
+
 		if (m_prefixFileNameAttrPtr.IsValid() && !(*m_prefixFileNameAttrPtr).isEmpty()){
 			prefix = *m_prefixFileNameAttrPtr + '_';
 		}
+
 		if (theme == "Dark"){
 			pathToTheme = ":/Style/" + prefix + "dark.theme";
 		}
@@ -87,24 +59,28 @@ imtbase::CHierarchicalItemModelPtr CGetStyleDataControllerComp::CreateResponse(c
 
 		QFile resource(pathToTheme);
 		if (resource.open(QIODevice::ReadOnly)){
+			istd::TDelPtr<imtbase::CTreeItemModel> sourceModelPtr(new imtbase::CTreeItemModel());
+
 			QByteArray resources = resource.readAll();
-			sourceModelPtr = new imtbase::CTreeItemModel();
-			sourceModelPtr->CreateFromJson(resources);
-			dataModelPtr->SetExternTreeModel("source", sourceModelPtr);
+			if (sourceModelPtr->CreateFromJson(resources)){
+				dataModelPtr->SetExternTreeModel("source", sourceModelPtr.GetPtr());
+			}
 		}
 
 		QFile decorators(":/Decorators/" + prefix + "decorators.theme");
 		if (decorators.open(QIODevice::ReadOnly)){
-			imtbase::CTreeItemModel* decoratorsModelPtr = new imtbase::CTreeItemModel();
-			if (decoratorsModelPtr->CreateFromJson(decorators.readAll())){
-				dataModelPtr->SetExternTreeModel("decorators", decoratorsModelPtr);
+			istd::TDelPtr<imtbase::CTreeItemModel> decoratorsModelPtr(new imtbase::CTreeItemModel());
+
+			QByteArray decoratorsData = decorators.readAll();
+			if (decoratorsModelPtr->CreateFromJson(decoratorsData)){
+				dataModelPtr->SetExternTreeModel("decorators", decoratorsModelPtr.GetPtr());
 			}
 		}
+
+		return rootModelPtr.PopPtr();
 	}
 
-	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
-
-	return rootModelPtr;
+	return nullptr;
 }
 
 

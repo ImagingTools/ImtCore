@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
+#include <imtgql/CGqlRepresentationControllerCompBase.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtcrypt/IHashCalculator.h>
 
@@ -11,10 +11,10 @@ namespace imtauthgql
 {
 
 
-class CAuthorizationControllerComp: public imtgql::CGqlRepresentationDataControllerCompBase
+class CAuthorizationControllerComp: public imtgql::CGqlRepresentationControllerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
+	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationControllerComp);
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
@@ -22,8 +22,9 @@ public:
 		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator", true, "HashCalculator");
 	I_END_COMPONENT;
 
-	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual imtbase::CHierarchicalItemModelPtr CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+protected:
+	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);

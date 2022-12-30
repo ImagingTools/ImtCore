@@ -20,7 +20,7 @@
 #include <imtauth/CUserInfoComp.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
 #include <imtauth/CCheckPermissionCompBase.h>
-#include <imtauth/CPermissionsProviderComp.h>
+#include <imtauth/CFeaturePackagePermissionsRepresentationProviderComp.h>
 #include <imtauth/CCollectionPermissionsProviderComp.h>
 #include <imtauth/CCheckPermissionOrComp.h>
 #include <imtauth/CUserSettingsComp.h>
@@ -61,7 +61,7 @@ typedef icomp::TModelCompWrap<
 typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
-typedef imtauth::CPermissionsProviderComp PermissionsProvider;
+typedef imtauth::CFeaturePackagePermissionsRepresentationProviderComp FeaturePackagePermissionsRepresentationProvider;
 typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;

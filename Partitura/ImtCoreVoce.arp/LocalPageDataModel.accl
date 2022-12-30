@@ -8,7 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="LocalSettings" X="575" Y="200" Note=""/>
+        <Element ComponentName="Local" X="575" Y="200" Note=""/>
         <Element ComponentName="ServerUrl" X="575" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

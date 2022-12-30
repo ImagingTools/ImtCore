@@ -102,6 +102,8 @@
 	<file alias="imtgui/AuxComponents/TableViewSelection.qml">Qml/imtgui/AuxComponents/TableViewSelection.qml</file>
 	
 	<file alias="imtgui/AuxComponents/SuperUserPasswordDialog.qml">Qml/imtgui/AuxComponents/SuperUserPasswordDialog.qml</file>
+	<file alias="imtgui/AuxComponents/LanguageProvider.qml">Qml/imtgui/AuxComponents/LanguageProvider.qml</file>
+	<file alias="imtgui/AuxComponents/DesignSchemaProvider.qml">Qml/imtgui/AuxComponents/DesignSchemaProvider.qml</file>
 
     </qresource>
     <qresource prefix="/Fonts">

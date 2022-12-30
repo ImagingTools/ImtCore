@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5040" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,29 +15,19 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="PermissionsProvider" PackageId="ImtAuthPck" ComponentId="PermissionsProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="FeaturePackage" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeaturePackage"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ProductInfoProvider" PackageId="ImtLicensePck" ComponentId="ProductInfoProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="PermissionsProvider" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>PermissionsProvider</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FeaturePackage"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="RepresentationController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -58,7 +48,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="ProductInfoProvider"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ProductInfoProvider"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

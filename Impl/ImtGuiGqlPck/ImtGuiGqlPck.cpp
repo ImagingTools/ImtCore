@@ -30,11 +30,6 @@ I_EXPORT_COMPONENT(
 			"Controller providing application style in GraphQL representation",
 			"Style Data Controller" IM_AUTHOR("\"Viktor Shcherbina\""));
 
-I_EXPORT_COMPONENT(
-			SettingsController,
-			"Provider of GraphQL data respresentation for the application settings",
-			"Application Settings Controller" IM_TAG("Client GraphQL Server") IM_AUTHOR("\"Viktor Shcherbina\""));
-
 
 } // namespace ImtGuiGqlPck
 

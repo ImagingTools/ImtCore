@@ -2,30 +2,28 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
-#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/CGqlRepresentationControllerCompBase.h>
 
 
 namespace imtguigql
 {
 
 
-class CCommandsDataControllerComp: public imtgql::CGqlRepresentationDataControllerCompBase
-
+class CCommandsDataControllerComp: public imtgql::CGqlRepresentationControllerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
+	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCommandsDataControllerComp);
-		I_REGISTER_INTERFACE(imtgql::IItemBasedRepresentationDataProvider);
 		I_ASSIGN_MULTI_0(m_commandsDataProviderCompPtr, "CommandsDataProviderCompPtr", "List of commands providers", true);
 	I_END_COMPONENT;
 
-	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual imtbase::CHierarchicalItemModelPtr CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+protected:
+	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
-	I_MULTIREF(imtgql::IItemBasedRepresentationDataProvider, m_commandsDataProviderCompPtr);
+	I_MULTIREF(imtgql::IGqlRequestHandler, m_commandsDataProviderCompPtr);
 };
 
 

@@ -8,14 +8,15 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AuthorizationController" X="975" Y="200" Note=""/>
-        <Element ComponentName="AuthorizationOptionsController" X="250" Y="175" Note=""/>
+        <Element ComponentName="AuthorizationController" X="975" Y="250" Note=""/>
+        <Element ComponentName="AuthorizationOptionsController" X="175" Y="250" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
-        <Element ComponentName="HashCalculator" X="675" Y="350" Note=""/>
-        <Element ComponentName="UserMode" X="275" Y="325" Note=""/>
-        <Element ComponentName="UserModeOptions" X="275" Y="475" Note=""/>
-        <Element ComponentName="UserSessionRepository" X="950" Y="350" Note=""/>
-        <Element ComponentName="UsersSessionsDatabaseDelegate" X="975" Y="525" Note=""/>
+        <Element ComponentName="HashCalculator" X="725" Y="375" Note=""/>
+        <Element ComponentName="UserMode" X="100" Y="375" Note=""/>
+        <Element ComponentName="UserModeOptions" X="100" Y="525" Note=""/>
+        <Element ComponentName="UserModeRepresentation" X="400" Y="375" Note=""/>
+        <Element ComponentName="UserSessionRepository" X="1000" Y="375" Note=""/>
+        <Element ComponentName="UsersSessionsDatabaseDelegate" X="1000" Y="575" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

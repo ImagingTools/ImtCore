@@ -5,65 +5,48 @@ namespace imtqml
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CCompositeObjectRepresentationComp::GetRepresentation(
-		const QList<imtgql::CGqlObject>& params,
-		const QByteArrayList& fields,
-		const imtgql::IGqlContext* gqlContext)
+imtbase::CTreeItemModel* CCompositeObjectRepresentationComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (m_paramSubElementsCompPtr.IsValid()){
-		imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
+	if (m_representationDataControllersCompPtr.IsValid()){
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-		QByteArray paramId = *m_paramIdAttrPtr;
-		QString paramName = *m_paramNameAttrPtr;
+//		imtbase::CTreeItemModel* elementListModelPtr = new imtbase::CTreeItemModel();
 
-		rootModelPtr->SetData("Id", paramId);
-		rootModelPtr->SetData("Name", paramName);
+//		for (int i = 0; i < m_representationDataControllersCompPtr.GetCount(); i++){
+//			imtbase::IRepresentationController* subProviderPtr = m_representationDataControllersCompPtr[i];
+//			if (subProviderPtr != nullptr){
+//				imtbase::CTreeItemModel* subModelPtr = subProviderPtr->
+//				if (subModelPtr != nullptr){
+//					int elementIndex = rootModelPtr->InsertNewItem();
 
-		imtbase::CTreeItemModel* elementListModelPtr = new imtbase::CTreeItemModel();
+//					rootModelPtr->CopyItemDataFromModel(elementIndex, subModelPtr);
+//				}
+//			}
+//		}
 
-		for (int i = 0; i < m_paramSubElementsCompPtr.GetCount(); i++){
-			imtgql::IItemBasedRepresentationDataProvider* subProviderPtr = m_paramSubElementsCompPtr[i];
-			if (subProviderPtr != nullptr){
-				imtbase::CTreeItemModel* subModelPtr = subProviderPtr->GetRepresentation(params, fields, gqlContext);
-				if (subModelPtr != nullptr){
-					int elementIndex = elementListModelPtr->InsertNewItem();
+//		rootModelPtr->SetExternTreeModel("Elements", elementListModelPtr);
 
-					elementListModelPtr->CopyItemDataFromModel(elementIndex, subModelPtr);
-				}
-			}
-		}
-
-		rootModelPtr->SetExternTreeModel("Elements", elementListModelPtr);
-
-		return rootModelPtr;
+		return rootModelPtr.PopPtr();
 	}
 
 	return nullptr;
 }
 
 
-bool CCompositeObjectRepresentationComp::UpdateModelFromRepresentation(const QList<imtgql::CGqlObject>& params, imtbase::CTreeItemModel* baseModelPtr, const imtgql::IGqlContext* gqlContext)
+bool CCompositeObjectRepresentationComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
 {
-	if (params.size() > 0){
-		QByteArray parameterId = params.at(0).GetFieldArgumentValue("Id").toByteArray();
-
-		if (parameterId != *m_paramIdAttrPtr){
-			return false;
-		}
-	}
-
 	bool retVal = true;
 
-	for (int i = 0; i < m_mutationDataDelegateCompPtr.GetCount(); i++){
-		imtgql::IGqlModelEditor* mutationDelegatePtr = m_mutationDataDelegateCompPtr[i];
-		if (mutationDelegatePtr != nullptr){
-			retVal = retVal && m_mutationDataDelegateCompPtr[i]->UpdateModelFromRepresentation(params, baseModelPtr, gqlContext);
-		}
-	}
+//	for (int i = 0; i < m_representationDataControllersCompPtr.GetCount(); i++){
+//		imtgql::CGqlRepresentationDataControllerComp* subProviderPtr = m_representationDataControllersCompPtr[i];
+//		if (subProviderPtr != nullptr){
+//			retVal = retVal && subProviderPtr->UpdateModelFromRepresentation(request, representationPtr);
+//		}
+//	}
 
 	return retVal;
 }

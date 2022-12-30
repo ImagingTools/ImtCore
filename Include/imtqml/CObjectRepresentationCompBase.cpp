@@ -1,20 +1,11 @@
 #include <imtqml/CObjectRepresentationCompBase.h>
 
 
-// Qt includes
-#include <QtCore/QTranslator>
-
-// ACF includes
-#include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
-#include <iprm/ITextParam.h>
-
-
 namespace imtqml
 {
 
 
-// public methods
+// protected methods
 
 const imtbase::CTreeItemModel* CObjectRepresentationCompBase::GetElementModel(const QByteArray &elementId, const imtbase::CTreeItemModel* elementsModelPtr) const
 {
@@ -31,31 +22,11 @@ const imtbase::CTreeItemModel* CObjectRepresentationCompBase::GetElementModel(co
 }
 
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-QByteArray CObjectRepresentationCompBase::GetModelId() const
-{
-	return *m_paramIdAttrPtr;
-}
-
-
-imtbase::CTreeItemModel* CObjectRepresentationCompBase::GetRepresentation(
-			const QList<imtgql::CGqlObject>& params,
-			const QByteArrayList& fields,
-			const imtgql::IGqlContext* gqlContext)
+imtbase::CTreeItemModel *CObjectRepresentationCompBase::CreateRepresentationFromRequest(const imtgql::CGqlRequest &gqlRequest, QString &errorMessage) const
 {
 	return nullptr;
-}
-
-
-// reimplemented (imtgql::IGqlModelEditor)
-
-bool CObjectRepresentationCompBase::UpdateModelFromRepresentation(
-		const QList<imtgql::CGqlObject> &params,
-		imtbase::CTreeItemModel *baseModel,
-		const imtgql::IGqlContext* gqlContext)
-{
-	return true;
 }
 
 

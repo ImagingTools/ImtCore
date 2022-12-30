@@ -10,19 +10,15 @@ namespace imtauthgql
 {
 
 
-imtbase::CHierarchicalItemModelPtr CUserControllerComp::GetObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		const imtgql::CGqlObject& gqlObject,
-		const imtgql::IGqlContext* gqlContext,
-		QString& errorMessage) const
+imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return imtbase::CHierarchicalItemModelPtr();
+		return nullptr;
 	}
 
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	dataModel->SetData("UserId", "");
@@ -33,7 +29,7 @@ imtbase::CHierarchicalItemModelPtr CUserControllerComp::GetObject(
 
 	imtbase::CTreeItemModel* productsModel = dataModel->AddTreeModel("Products");
 
-	QByteArray userId = GetObjectIdFromInputParams(inputParams);
+	QByteArray userId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
@@ -93,9 +89,9 @@ imtbase::CHierarchicalItemModelPtr CUserControllerComp::GetObject(
 		}
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModelPtr->SetExternTreeModel("data", dataModel);
 
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

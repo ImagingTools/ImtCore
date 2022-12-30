@@ -10,75 +10,52 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="Design" PackageId="ImtQmlPck" ComponentId="SelectionRepresentation">
+        <Element Id="Design" PackageId="ImtCorePck" ComponentId="SelectionParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="DesignSchema"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Design Schema"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="DesignPathToQml">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Selection" Type="Reference" ExportId="DesignSchema">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GeneralPage" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
+        <Element Id="General" PackageId="ImtCorePck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Design</Value>
-                                <Value>Language</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="General"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="General"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParamSubElements" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Design</Value>
                                 <Value>Language</Value>
+                                <Value>Design</Value>
                             </Values>
                         </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Language" PackageId="ImtQmlPck" ComponentId="SelectionRepresentation">
+        <Element Id="Language" PackageId="ImtCorePck" ComponentId="SelectionParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Language"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                    <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Language"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="LanguagePathToQml">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Selection" Type="Reference" ExportId="Language">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -86,8 +63,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="GeneralPage"/>
-        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="GeneralPage"/>
+        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="General"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

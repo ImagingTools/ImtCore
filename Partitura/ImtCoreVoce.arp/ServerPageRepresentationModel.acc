@@ -84,7 +84,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlModelEditor" ComponentId="ServerSettingsPage"/>
-        <Interface InterfaceId="imtgql::IItemBasedRepresentationDataProvider" ComponentId="ServerSettingsPage"/>
+        <Interface InterfaceId="imtgql::IGqlRepresentationDataController" ComponentId="ServerSettingsPage"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

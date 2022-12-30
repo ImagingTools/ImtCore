@@ -30,9 +30,9 @@ I_EXPORT_COMPONENT(
 			"GraphQL Demultiplexer");
 
 I_EXPORT_COMPONENT(
-            SingleCommandPermissionsProvider,
-            "SingleCommandPermissionsProvider",
-            "Single Command Permissions Provider");
+			SingleCommandPermissionsProvider,
+			"SingleCommandPermissionsProvider",
+			"Single Command Permissions Provider");
 
 I_EXPORT_COMPONENT(
 			CommandPermissionsProviderJoiner,
@@ -40,20 +40,19 @@ I_EXPORT_COMPONENT(
 			"Command Permissions Provider Joiner Comp");
 
 I_EXPORT_COMPONENT(
-			PermissionsController,
-			"PermissionsController",
-			"Permissions Controller");
-
-I_EXPORT_COMPONENT(
-			GraphQLRepresentationController,
-            "GraphQLDataProvider",
-            "GraphQL Data Provider");
+			GraphQLRemoteRepresentationController,
+			"GraphQL remote representation controller",
+			"GraphQL Gql Api Client Controller User");
 
 I_EXPORT_COMPONENT(
 			GraphQLClientEngine,
 			"GraphQLClientEngine",
 			"GraphQL Client Engine");
 
+I_EXPORT_COMPONENT(
+			GqlRepresentationDataController,
+			"Gql representation data controller",
+			"GraphQL Representation Controller Model");
 
 
 } // namespace ImtGqlPck

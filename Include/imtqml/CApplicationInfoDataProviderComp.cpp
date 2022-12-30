@@ -5,41 +5,31 @@ namespace imtqml
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-QByteArray CApplicationInfoDataProviderComp::GetModelId() const
+imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	return *m_paramIdAttrPtr;
-}
-
-
-imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::GetRepresentation(
-			const QList<imtgql::CGqlObject>& params,
-			const QByteArrayList& fields,
-			const imtgql::IGqlContext* gqlContext)
-{
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel();
-
-	rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
-	rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
-	rootModelPtr->SetData("Source", "SettingsTextLabel.qml");
-
 	if (m_applicationInfoCompPtr.IsValid()){
-		ibase::CApplicationInfoComp* applicationInfoPtr  = dynamic_cast<ibase::CApplicationInfoComp*>(m_applicationInfoCompPtr.GetPtr());
-		if (applicationInfoPtr != nullptr){
-			const iser::IVersionInfo& versionInfo = applicationInfoPtr->GetVersionInfo();
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-			quint32 versionNumber;
-			versionInfo.GetVersionNumber(1983, versionNumber);
-			QString version = versionInfo.GetEncodedVersionName(1983, versionNumber);
+		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
+		rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
+		rootModelPtr->SetData("Source", "SettingsTextLabel.qml");
 
-			rootModelPtr->SetData("Value", version);
-		}
+		const iser::IVersionInfo& versionInfo =  m_applicationInfoCompPtr->GetVersionInfo();
+
+		quint32 versionNumber;
+		versionInfo.GetVersionNumber(1983, versionNumber);
+		QString version = versionInfo.GetEncodedVersionName(1983, versionNumber);
+
+		rootModelPtr->SetData("Value", version);
+
+		return rootModelPtr.PopPtr();
 	}
 
-	return rootModelPtr;
+	return nullptr;
 }
 
 

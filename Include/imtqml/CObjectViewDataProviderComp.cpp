@@ -5,31 +5,23 @@ namespace imtqml
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-QByteArray CObjectViewDataProviderComp::GetModelId() const
+imtbase::CTreeItemModel *CObjectViewDataProviderComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest &gqlRequest, QString &errorMessage) const
 {
-	QString str = *m_objectViewModelIdAttrPtr;
-	return str.toUtf8();
-}
-
-
-imtbase::CTreeItemModel* CObjectViewDataProviderComp::GetRepresentation(
-		const QList<imtgql::CGqlObject>& params,
-		const QByteArrayList& /*fields*/,
-		const imtgql::IGqlContext* gqlContext)
-{
-	imtbase::CTreeItemModel* treeModel = new imtbase::CTreeItemModel();
-
 	if (m_objectViewAttrPtr.IsValid()){
-		treeModel->SetData("Id", "ObjectViewProvider");
-		treeModel->SetData("Path", *m_objectViewAttrPtr);
-		treeModel->SetData("CommandsId", *m_objectViewModelIdAttrPtr);
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
+		rootModelPtr->SetData("Id", "ObjectViewProvider");
+		rootModelPtr->SetData("Path", *m_objectViewAttrPtr);
+		rootModelPtr->SetData("CommandsId", *m_objectViewModelIdAttrPtr);
+
+		return rootModelPtr.PopPtr();
 	}
 
-	return treeModel;
+	return nullptr;
 }
 
 

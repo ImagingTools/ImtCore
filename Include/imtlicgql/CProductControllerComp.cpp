@@ -11,29 +11,23 @@ namespace imtlicgql
 {
 
 
-imtbase::CHierarchicalItemModelPtr CProductControllerComp::ListObjects(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			const imtgql::IGqlContext* gqlContext,
-			QString& errorMessage) const
+imtbase::CTreeItemModel* CProductControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* itemsModel = nullptr;
-
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QT_TR_NOOP("Internal error");
+		return nullptr;
 	}
 
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		dataModel = new imtbase::CTreeItemModel();
-		itemsModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+		imtbase::CTreeItemModel* itemsModel = dataModel->AddTreeModel("items");
 
-		QByteArray productId = GetObjectIdFromInputParams(inputParams);
+		QByteArray productId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
@@ -53,13 +47,9 @@ imtbase::CHierarchicalItemModelPtr CProductControllerComp::ListObjects(
 				}
 			}
 		}
-
-		dataModel->SetExternTreeModel("items", itemsModel);
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
-
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 
@@ -186,22 +176,18 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 }
 
 
-imtbase::CHierarchicalItemModelPtr CProductControllerComp::GetObject(
-			const QList<imtgql::CGqlObject>& inputParams,
-			const imtgql::CGqlObject& gqlObject,
-			const imtgql::IGqlContext* gqlContext,
-			QString& errorMessage) const
+imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return imtbase::CHierarchicalItemModelPtr();
+		return nullptr;
 	}
 
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();;
 
-	QByteArray productId = GetObjectIdFromInputParams(inputParams);
+	QByteArray productId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	dataModel->SetData("Id", productId);
 	dataModel->SetData("Name", "");
@@ -209,7 +195,7 @@ imtbase::CHierarchicalItemModelPtr CProductControllerComp::GetObject(
 	imtbase::IObjectCollection::DataPtr dataPtr;
 
 	if (m_headersProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->GetRepresentation(inputParams, QByteArrayList(), gqlContext);
+		imtbase::CTreeItemModel* headersModel = m_headersProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
 		imtbase::CTreeItemModel* headers = headersModel->GetTreeItemModel("Headers");
 		dataModel->SetExternTreeModel("Headers", headers);
 	}
@@ -274,9 +260,9 @@ imtbase::CHierarchicalItemModelPtr CProductControllerComp::GetObject(
 
 	dataModel->SetExternTreeModel("Items", licensesModelPtr);
 
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModelPtr->SetExternTreeModel("data", dataModel);
 
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 
@@ -299,12 +285,6 @@ bool CProductControllerComp::GetOperationFromRequest(
 			return true;
 		}
 
-//		if (fieldList->at(i).GetId() == "Features"){
-//			gqlObject = fieldList->at(i);
-//			operationType = OT_USER_OPERATION + 2;
-//			return true;
-//		}
-
 		if (BaseClass::GetOperationFromRequest(gqlRequest, gqlObject, errorMessage, operationType)){
 			return true;
 		}
@@ -314,15 +294,15 @@ bool CProductControllerComp::GetOperationFromRequest(
 }
 
 
-imtbase::CHierarchicalItemModelPtr CProductControllerComp::GetTreeItemModel(const QList<imtgql::CGqlObject> &inputParams, const imtgql::CGqlObject &gqlObject, QString &errorMessage) const
+imtbase::CTreeItemModel* CProductControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString &errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
-		return imtbase::CHierarchicalItemModelPtr();
+		return nullptr;
 	}
 
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
@@ -358,9 +338,9 @@ imtbase::CHierarchicalItemModelPtr CProductControllerComp::GetTreeItemModel(cons
 		}
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModelPtr->SetExternTreeModel("data", dataModel);
 
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

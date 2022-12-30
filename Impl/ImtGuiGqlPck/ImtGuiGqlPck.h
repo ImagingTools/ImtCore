@@ -9,7 +9,6 @@
 #include <imtguigql/CPagesDataControllerComp.h>
 #include <imtguigql/CCommandsDataControllerComp.h>
 #include <imtguigql/CGetStyleDataControllerComp.h>
-#include <imtguigql/CSettingsControllerComp.h>
 
 
 /**
@@ -22,7 +21,6 @@ namespace ImtGuiGqlPck
 typedef imtguigql::CPagesDataControllerComp PagesDataController;
 typedef imtguigql::CCommandsDataControllerComp CommandsDataController;
 typedef imtguigql::CGetStyleDataControllerComp GetStyleDataController;
-typedef imtguigql::CSettingsControllerComp SettingsController;
 
 
 } // namespace ImtGuiGqlPck

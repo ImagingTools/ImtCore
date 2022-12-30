@@ -58,7 +58,7 @@ Item {
         id: modelCommands;
 
         function updateModel() {
-            console.log("modelCommands topPanel.activeCommandsModelId");
+            console.log("CommandsProvider updateModel", commandsProviderContainer.commandsId);
             var query = Gql.GqlRequest("query", "CommandsData");
 
             var inputParams = Gql.GqlObject("input");

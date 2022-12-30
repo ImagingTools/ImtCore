@@ -7,7 +7,6 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <imtqml/IQuickObject.h>
-#include <imtgql/IItemBasedRepresentationDataProvider.h>
 #include <imtbase/CTreeItemModel.h>
 
 
@@ -33,7 +32,6 @@ public:
 		I_ASSIGN(m_baseUrlAttrPtr, "BaseUrl", "BaseUrl for AccessManager", false, "");
 		I_ASSIGN_MULTI_0(m_modelIdsAttrPtr, "ModelIdsAttr", "If enabled, this Id's used for register models", false);
 		I_ASSIGN_MULTI_0(m_modelQueriesAttrPtr, "ModelQueries", "If enabled, this Queries used for get datas", false);
-		I_ASSIGN(m_dataProviderCompPtr, "DataProviderComp", "If enabled, this ref used for get datas", false, "");
 	I_END_COMPONENT;
 
 	CQuickObjectCompBase();
@@ -45,7 +43,7 @@ public:
 	virtual bool CreateQuickItem(QQuickItem* parentPtr) override;
 	virtual bool DestroyQuickItem() override;
 	virtual QQuickItem* GetQuickItem() const override;
-	virtual void SetBaseUrl(const QString& baseUrl) const;
+	virtual void SetBaseUrl(const QString& baseUrl) const override;
 	virtual void OnTryClose(bool* ignoredPtr = nullptr) override;
 
 protected:
@@ -82,7 +80,6 @@ protected:
 	I_ATTR(QString, m_baseUrlAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
-	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_dataProviderCompPtr);
 
 	QQuickItem* m_quickItemPtr;
 	QList<imtbase::CTreeItemModel*> m_models;
@@ -90,6 +87,5 @@ protected:
 
 
 } // namespace imtqml
-
 
 

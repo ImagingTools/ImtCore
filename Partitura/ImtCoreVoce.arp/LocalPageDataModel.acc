@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="LocalSettings" PackageId="BasePck" ComponentId="ComposedParamsSet">
+        <Element Id="Local" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
@@ -42,7 +42,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="iser::ISerializable" ComponentId="LocalSettings"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="Local"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ServerUrl" ComponentId="ServerUrl"/>

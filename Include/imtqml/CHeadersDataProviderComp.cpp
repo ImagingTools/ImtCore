@@ -1,54 +1,45 @@
 #include <imtqml/CHeadersDataProviderComp.h>
 
 
-// Qt includes
-#include <QtCore/QTranslator>
+// ImtCore includes
+#include <imtbase/imtbase.h>
 
 
 namespace imtqml
 {
 
 
-// public methods
+// protected methods
 
-// reimplemented (imtgql::IItemBasedRepresentationProvider)
+// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
-QByteArray CHeadersDataProviderComp::GetModelId() const
+imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	QString str = *m_headersModelIdAttrPtr;
-	return str.toUtf8();
-}
+	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("Headers");
 
+	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
 
-imtbase::CTreeItemModel* CHeadersDataProviderComp::GetRepresentation(
-		const QList<imtgql::CGqlObject>& params,
-		const QByteArrayList& /*fields*/,
-		const imtgql::IGqlContext* gqlContext)
-{
-	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
+	QByteArray languageId;
+	if(gqlContextPtr != nullptr){
+		languageId =  gqlContextPtr->GetLanguageId();
+	}
 
-	if (m_headersIdsAttrPtr.IsValid()){
-		QByteArray languageId;
-		imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("Headers");
-		for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); i++){
-			headersModelPtr->InsertNewItem();
-			headersModelPtr->SetData("Id", m_headersIdsAttrPtr[i], i);
+	for (int i = 0; i < m_headersIdsAttrPtr.GetCount(); i++){
+		headersModelPtr->InsertNewItem();
 
-			if (m_translationManagerCompPtr.IsValid()){
-				if(gqlContext != nullptr){
-					languageId =  gqlContext->GetLanguageId();
-				}
+		headersModelPtr->SetData("Id", m_headersIdsAttrPtr[i], i);
 
-				QByteArray context = "Attribute";
-				QString headerName = m_headersNamesAttrPtr[i];
-				QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId, context);
-				headersModelPtr->SetData("Name", headerNameTr, i);
-			}
-			else{
-				headersModelPtr->SetData("Name", m_headersNamesAttrPtr[i], i);
-			}
+		QString headerName = m_headersNamesAttrPtr[i];
+
+		if (m_translationManagerCompPtr.IsValid()){
+			QByteArray context = "Attribute";
+			QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId, context);
+
+			headerName = headerNameTr;
 		}
-//		dataModelPtr->SetData("LanguageId", languageId);
+
+		headersModelPtr->SetData("Name", headerName, i);
 	}
 
 	if (m_headersSearchByFilterAttrPtr.IsValid()){
@@ -59,9 +50,8 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::GetRepresentation(
 		}
 	}
 
-	return dataModelPtr;
+	return dataModelPtr.PopPtr();
 }
-
 
 
 } // namespace imtqml

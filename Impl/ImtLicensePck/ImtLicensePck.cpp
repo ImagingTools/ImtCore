@@ -90,11 +90,6 @@ I_EXPORT_COMPONENT(
 			"Product Info Provider");
 
 I_EXPORT_COMPONENT(
-			CollectionProductInfoProvider,
-			"Collection product info provider",
-			"Collection Product Info Provider");
-
-I_EXPORT_COMPONENT(
 			FeatureInfoProvider,
 			"Feature info provider",
 			"Feature Info Provider");

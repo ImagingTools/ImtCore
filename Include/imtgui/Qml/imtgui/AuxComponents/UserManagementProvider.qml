@@ -64,9 +64,7 @@ Item {
         id: userModeGqlModel;
 
         function getUserMode() {
-            var query = Gql.GqlRequest("query", "GetUserMode");
-
-            console.log("getUserMode GetUserMode");
+            var query = Gql.GqlRequest("query", "Get");
 
             var inputParams = Gql.GqlObject("input");
             query.AddParam(inputParams);
@@ -92,13 +90,18 @@ Item {
                 if (userModeGqlModel.ContainsKey("data")){
                     dataModelLocal = userModeGqlModel.GetData("data")
 
-                    if (dataModelLocal.ContainsKey("GetUserMode")){
-                        dataModelLocal = dataModelLocal.GetData("GetUserMode");
+                    if (dataModelLocal.ContainsKey("Get")){
+                        dataModelLocal = dataModelLocal.GetData("Get");
 
-                        let value = dataModelLocal.GetData("Value");
+                        let parameters = dataModelLocal.GetData("Parameters");
+                        if (parameters){
+                            let value = dataModelLocal.GetData("Value");
+                            if (value >= 0){
+                                container.userMode = parameters.GetData("Id", value);
+                            }
+                        }
+
                         let superUserExists = dataModelLocal.GetData("SuperUserExists");
-
-                        container.userMode = value;
 
                         if (superUserExists == false){
                             modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for system administrator:")});

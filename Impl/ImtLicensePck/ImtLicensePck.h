@@ -22,7 +22,6 @@
 #include <imtlic/CLicenseControllerComp.h>
 #include <imtlic/CFeatureContainer.h>
 #include <imtlic/CProductInfoProviderComp.h>
-#include <imtlic/CCollectionProductInfoProviderComp.h>
 #include <imtlic/CFeatureInfoProviderComp.h>
 #include <imtlic/CFeatureDependenciesProviderComp.h>
 
@@ -74,7 +73,6 @@ typedef icomp::TModelCompWrap<
 						imtbase::ICollectionInfo,
 						iser::ISerializable>> FeatureContainer;
 typedef imtlic::CProductInfoProviderComp ProductInfoProvider;
-typedef imtlic::CCollectionProductInfoProviderComp CollectionProductInfoProvider;
 typedef imtlic::CFeatureInfoProviderComp FeatureInfoProvider;
 typedef imtlic::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 

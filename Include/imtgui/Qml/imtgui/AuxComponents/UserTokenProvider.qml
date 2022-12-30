@@ -23,14 +23,16 @@ Item {
         id: authorizationGqlModel;
 
         function authorization(login, password) {
-            var query = Gql.GqlRequest("query", "UserAuthorization");
+            var query = Gql.GqlRequest("query", "Get");
 
             var inputParams = Gql.GqlObject("input");
-
             inputParams.InsertField ("Login", login);
             inputParams.InsertField ("Password", password);
-
             query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("items");
+            queryFields.InsertField("UserToken");
+            query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
 
@@ -55,8 +57,8 @@ Item {
                 if (authorizationGqlModel.ContainsKey("data")){
                     dataModelLocal = authorizationGqlModel.GetData("data")
 
-                    if (dataModelLocal.ContainsKey("UserAuthorization")){
-                        dataModelLocal = dataModelLocal.GetData("UserAuthorization")
+                    if (dataModelLocal.ContainsKey("Get")){
+                        dataModelLocal = dataModelLocal.GetData("Get")
 
                         if (dataModelLocal.ContainsKey("Token")){
                             let token = dataModelLocal.GetData("Token")

@@ -38,10 +38,10 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CompositeRepresentation" PackageId="ImtQmlPck" ComponentId="CompositeRepresentation">
+        <Element Id="CompositeObject" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="RepresentationDataProvider" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="RepresentationDataControllers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Pages/RolesPageVisualStatus</Value>
@@ -92,11 +92,8 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="MutationDataDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CompositeRepresentation"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="PagesDataProviderCompPtr" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="CompositeRepresentation"/>
+                        <Data IsEnabled="true" Value="CompositeObject"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

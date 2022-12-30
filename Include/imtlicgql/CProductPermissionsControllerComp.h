@@ -3,27 +3,28 @@
 
 // ImtCore includes
 #include <imtlic/IProductLicensingInfo.h>
-#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
-#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/CGqlRepresentationDataControllerComp.h>
+#include <imtgql/IGqlRequestHandler.h>
 
 
 namespace imtlicgql
 {
 
 
-class CProductPermissionsControllerComp: public imtgql::CGqlRepresentationDataControllerCompBase
+class CProductPermissionsControllerComp: public imtgql::CGqlRepresentationDataControllerComp
 {
 public:
-	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
+	typedef imtgql::CGqlRepresentationDataControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CProductPermissionsControllerComp);
 		I_ASSIGN(m_productProviderCompPtr, "ProductProvider", "Product provider", true, "ProductProvider");
 	I_END_COMPONENT;
 
-	virtual imtbase::CHierarchicalItemModelPtr CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
-	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_productProviderCompPtr);
+	I_REF(imtgql::IGqlRequestHandler, m_productProviderCompPtr);
 };
 
 

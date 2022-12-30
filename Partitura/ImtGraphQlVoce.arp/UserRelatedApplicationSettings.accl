@@ -8,12 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GeneralPageRepresentation" X="175" Y="150" Note=""/>
-        <Element ComponentName="GeneralSettings" X="175" Y="325" Note=""/>
-        <Element ComponentName="GeneralSettingsFactory" X="200" Y="675" Note=""/>
-        <Element ComponentName="UserRelatedSettings" X="625" Y="150" Note=""/>
-        <Element ComponentName="UserSettings" X="600" Y="400" Note=""/>
-        <Element ComponentName="UserSettingsDatabaseDelegate" X="1000" Y="675" Note=""/>
+        <Element ComponentName="GeneralSettingsFactory" X="250" Y="450" Note=""/>
+        <Element ComponentName="UserRelatedSettingsController" X="600" Y="175" Note=""/>
+        <Element ComponentName="UserSettings" X="600" Y="450" Note=""/>
+        <Element ComponentName="UserSettingsDatabaseDelegate" X="1000" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

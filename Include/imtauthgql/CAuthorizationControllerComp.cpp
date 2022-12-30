@@ -10,15 +10,18 @@ namespace imtauthgql
 {
 
 
-imtbase::CHierarchicalItemModelPtr CAuthorizationControllerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
+// protected methods
 
-	imtbase::CHierarchicalItemModelPtr rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
+// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+
+imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	QByteArray login;
 	QByteArray password;
+
+	const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
 
 	if (paramList->size() > 0){
 		if (paramList->at(0).GetFieldIds().contains("Login")){
@@ -41,7 +44,7 @@ imtbase::CHierarchicalItemModelPtr CAuthorizationControllerComp::CreateResponse(
 		if (userInfoPtr != nullptr){
 			QByteArray userPassword = userInfoPtr->GetPasswordHash();
 			if (userPassword == passwordHash){
-				dataModel = new imtbase::CTreeItemModel();
+				imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 				QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
@@ -59,7 +62,7 @@ imtbase::CHierarchicalItemModelPtr CAuthorizationControllerComp::CreateResponse(
 
 				rootModelPtr->SetExternTreeModel("data", dataModel);
 
-				return rootModelPtr;
+				return rootModelPtr.PopPtr();
 			}
 		}
 	}
@@ -70,7 +73,7 @@ imtbase::CHierarchicalItemModelPtr CAuthorizationControllerComp::CreateResponse(
 	rootModelPtr->SetExternTreeModel("errors", errorsItemModelPtr);
 	errorsItemModelPtr->SetData("message", errorMessage);
 
-	return rootModelPtr;
+	return rootModelPtr.PopPtr();
 }
 
 

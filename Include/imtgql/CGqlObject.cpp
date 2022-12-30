@@ -41,7 +41,6 @@ QVariant CGqlObject::GetFieldArgumentValue(const QByteArray &fieldId) const
 }
 
 
-
 CGqlObject *CGqlObject::CreateFieldObject(const QByteArray& fieldId)
 {
 	if (m_objectFields.contains(fieldId)){
@@ -69,6 +68,7 @@ const CGqlObject* CGqlObject::GetFieldArgumentObjectPtr(const QByteArray &fieldI
 	return retVal;
 }
 
+
 QList<const CGqlObject *> CGqlObject::GetFieldArgumentObjectPtrList(const QByteArray &fieldId) const
 {
 	QList<const CGqlObject*> retVal;
@@ -89,6 +89,7 @@ void CGqlObject::InsertField(const QByteArray &fieldId)
 		m_emptyFields.append(fieldId);
 	}
 }
+
 
 void CGqlObject::InsertField(const QByteArray &fieldId, const QVariant &value)
 {

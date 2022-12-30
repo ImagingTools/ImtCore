@@ -35,6 +35,11 @@
 #include <imtbase/CLoginBasedEnablerComp.h>
 #include <imtbase/CCommandLineParamsAdapterComp.h>
 #include <imtbase/CTransactionableUndoManagerComp.h>
+#include <imtbase/CParamSetRepresentationControllerComp.h>
+#include <imtbase/CSelectionParamRepresentationControllerComp.h>
+#include <imtbase/CTextParamRepresentationControllerComp.h>
+#include <imtbase/CDatabaseAccessSettingsRepresentationControllerComp.h>
+#include <imtbase/CPageBasedGuiRepresentationControllerComp.h>
 
 
 /**
@@ -83,6 +88,11 @@ typedef imtbase::CMessageFilterComp MessageFilter;
 typedef icomp::TModelCompWrap<imtbase::CLoginBasedEnablerComp> LoginBasedEnabler;
 typedef icomp::TModelCompWrap<imtbase::CCommandLineParamsAdapterComp> CommandLineParamsAdapter;
 typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtbase::CTransactionableUndoManagerComp>> TransactionableUndoManager;
+typedef imtbase::CParamSetRepresentationControllerComp ParamSetRepresentationController;
+typedef imtbase::CSelectionParamRepresentationControllerComp SelectionParamRepresentationController;
+typedef imtbase::CTextParamRepresentationControllerComp TextParamRepresentationController;
+typedef imtbase::CDatabaseAccessSettingsRepresentationControllerComp DatabaseAccessSettingsRepresentationController;
+typedef imtbase::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
 
 
 } // namespace ImtCorePck

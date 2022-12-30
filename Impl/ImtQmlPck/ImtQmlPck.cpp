@@ -43,39 +43,9 @@ I_EXPORT_COMPONENT(
 			"Page item based data provider");
 
 I_EXPORT_COMPONENT(
-            CompositeObjectRepresentation,
-            "Composite object representation",
-            "Representation Data Model Composite Combined Container");
-
-I_EXPORT_COMPONENT(
-			DatabaseSettingsDataProvider,
-			"Database settings data provider",
-			"Database settings data provider");
-
-I_EXPORT_COMPONENT(
-			ApplicationDataEnumProvider,
-			"Application data enum provider",
-			"Application data enum provider");
-
-I_EXPORT_COMPONENT(
-			PageDataEnumProvider,
-			"Page data enum provider",
-			"Page data enum provider");
-
-I_EXPORT_COMPONENT(
-			CommandDataEnumProvider,
-			"Command data enum provider",
-			"Command data enum provider");
-
-I_EXPORT_COMPONENT(
-			MenuDataEnumProvider,
-			"Menu data enum provider",
-			"Menu data enum provider");
-
-I_EXPORT_COMPONENT(
-			CompositeRepresentation,
-			"Composite Representation",
-			"Composite Representation");
+			CompositeObjectRepresentation,
+			"Composite object representation",
+			"Representation Data Model Composite Combined Container");
 
 I_EXPORT_COMPONENT(
 			HeadersDataProvider,
@@ -103,9 +73,9 @@ I_EXPORT_COMPONENT(
 			"Object view data provider");
 
 I_EXPORT_COMPONENT(
-			SettingsDatabasePagesProvider,
-			"Settings Database Pages Provider",
-			"Settings database pages provider");
+			UserRelatedSettingsController,
+			"User related settings controller",
+			"User Controller Client Settings Database");
 
 I_EXPORT_COMPONENT(
 			CommandPermissionsFilter,
@@ -118,11 +88,6 @@ I_EXPORT_COMPONENT(
 			"Object Representation");
 
 I_EXPORT_COMPONENT(
-			ButtonRepresentation,
-			"Button Representation",
-			"Button Representation");
-
-I_EXPORT_COMPONENT(
 			SelectionRepresentation,
 			"Selection Representation",
 			"Selection Representation Data Model");
@@ -131,11 +96,6 @@ I_EXPORT_COMPONENT(
 			TextRepresentation,
 			"Text Representation",
 			"Text Representation");
-
-I_EXPORT_COMPONENT(
-			DatabaseLoginSettingsRepresentation,
-			"Database Login Settings Representation",
-			"Database Login Settings Representation");
 
 
 } // namespace ImtQmlPck

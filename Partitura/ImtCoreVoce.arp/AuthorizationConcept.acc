@@ -22,7 +22,7 @@
                     <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserAuthorization</Value>
+                                <Value>UserToken</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -41,7 +41,7 @@
         <Element Id="AuthorizationOptionsController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationOptionsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ActiveUserMode" Type="Reference" ExportId="">
+                    <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserMode"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
@@ -53,9 +53,12 @@
                     <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>GetUserMode</Value>
+                                <Value>UserMode</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserModeRepresentation"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SuperuserLogin" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="su"/>
@@ -72,7 +75,7 @@
         <Element Id="Demultiplexer" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="GqlRepresentationDataController" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>AuthorizationOptionsController</Value>
@@ -127,6 +130,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="UserModeRepresentation" PackageId="ImtCorePck" ComponentId="SelectionParamRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="UserSessionRepository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -175,7 +183,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRepresentationDataController" ComponentId="Demultiplexer"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="Demultiplexer"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="UserSessionRepository" ComponentId="UserSessionRepository"/>

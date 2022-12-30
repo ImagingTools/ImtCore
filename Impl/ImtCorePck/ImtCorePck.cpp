@@ -154,6 +154,31 @@ I_EXPORT_COMPONENT(
 			"Undo manager that supports merging notifications into transactions",
 			"Undo Manager Transaction");
 
+I_EXPORT_COMPONENT(
+			ParamSetRepresentationController,
+			"ParamSet representation controller",
+			"ParamsSet Controller Parameter");
+
+I_EXPORT_COMPONENT(
+			TextParamRepresentationController,
+			"Text param representation controller",
+			"Text Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			SelectionParamRepresentationController,
+			"Selection param representation controller",
+			"Selection Param Representation Controller")
+
+I_EXPORT_COMPONENT(
+			DatabaseAccessSettingsRepresentationController,
+			"Database access settings representation controller",
+			"Settings Database Client Server Representation Controller")
+
+I_EXPORT_COMPONENT(
+			PageBasedGuiRepresentationController,
+			"Page based gui representation controller",
+			"Model Gui Representation Controller")
+
 
 } // namespace ImtCorePck
 

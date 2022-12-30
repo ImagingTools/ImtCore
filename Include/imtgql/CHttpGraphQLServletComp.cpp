@@ -86,19 +86,18 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-	QByteArray representationData;
+	QByteArray responseData;
 	bool isSuccessful = false;
 	QString errorMessage;
 	QByteArray gqlCommand = gqlRequest.GetCommandId();
 
-	int dataControllersCount = m_gqlRepresentationDataControllerCompPtr.GetCount();
+	int dataControllersCount = m_gqlRequestHandlerCompPtr.GetCount();
 	for (int index = 0; index < dataControllersCount; index++){
-		const imtgql::IGqlRepresentationDataController* representationControllerPtr = m_gqlRepresentationDataControllerCompPtr[index];
-		if (representationControllerPtr != nullptr){
-			QByteArrayList modelIds = representationControllerPtr->GetModelIds();
-			if (modelIds.contains(gqlCommand)){
-				imtbase::CHierarchicalItemModelPtr sourceItemModel = representationControllerPtr->CreateResponse(gqlRequest, errorMessage);
-				if(sourceItemModel.IsValid()){
+		const imtgql::IGqlRequestHandler* requestHandlerPtr = m_gqlRequestHandlerCompPtr[index];
+		if (requestHandlerPtr != nullptr){
+			if (requestHandlerPtr->IsRequestSupported(gqlRequest)){
+				imtbase::CTreeItemModel* sourceItemModel = requestHandlerPtr->CreateResponse(gqlRequest, errorMessage);
+				if(sourceItemModel != nullptr){
 					imtbase::CTreeItemModel rootModel;
 					imtbase::CTreeItemModel* dataItemModel = rootModel.AddTreeModel("data");
 					dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));
@@ -113,7 +112,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					}
 					isSuccessful = true;
 
-					iser::CJsonStringWriteArchive archive(representationData);
+					iser::CJsonStringWriteArchive archive(responseData);
 					if (!rootModel.Serialize(archive)){
 						isSuccessful = false;
 					}
@@ -130,15 +129,12 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-
-
-
 	if (!isSuccessful){
-		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_BAD_REQUEST, representationData, request);
+		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_BAD_REQUEST, responseData, request);
 	}
 	else {
-		if (!representationData.isEmpty()){
-			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, representationData, request);
+		if (!responseData.isEmpty()){
+			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, responseData, request);
 		}
 	}
 	return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR,"Request incorrected",request);

@@ -2,34 +2,27 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationDataControllerCompBase.h>
-
-#include <imtgql/IGqlModelEditor.h>
-#include <imtgql/IItemBasedRepresentationDataProvider.h>
+#include <imtgql/CGqlRepresentationDataControllerComp.h>
 
 
 namespace imtguigql
 {
 
 
-class CPagesDataControllerComp: public imtgql::CGqlRepresentationDataControllerCompBase
+class CPagesDataControllerComp: public imtgql::CGqlRepresentationDataControllerComp
 {
 public:
-	typedef imtgql::CGqlRepresentationDataControllerCompBase BaseClass;
+	typedef imtgql::CGqlRepresentationDataControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CPagesDataControllerComp);
-		I_ASSIGN(m_pagesDataProviderCompPtr, "PagesDataProviderCompPtr", "List of pages providers for join", true, "");
-		I_ASSIGN(m_mutationDataDelegateCompPtr, "MutationDataDelegate", "Mutation data delegate", true, "");
-		I_ASSIGN(m_decoratorSourceAttrPtr, "DecoratorSource", "Source of the decorator page", false, "");
+		I_ASSIGN(m_pagesDataProviderCompPtr, "PagesDataProvider", "List of pages providers for joining", true, "PagesDataProvider");
 	I_END_COMPONENT;
 
-	// reimplemented (imtgql::IGqlRepresentationDataController)
-	virtual imtbase::CHierarchicalItemModelPtr CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
-	I_REF(imtgql::IItemBasedRepresentationDataProvider, m_pagesDataProviderCompPtr);
-	I_REF(imtgql::IGqlModelEditor, m_mutationDataDelegateCompPtr);
-	I_TEXTATTR(m_decoratorSourceAttrPtr);
+	I_REF(imtgql::IGqlRequestHandler, m_pagesDataProviderCompPtr);
 };
 
 

@@ -40,6 +40,8 @@
 #include <imtgui/CPopupTestGuiComp.h>
 #include <imtgui/CStandardClientAreaProviderComp.h>
 #include <imtgui/TPopupControllerCompWrap.h>
+#include <imtgui/CPageBasedGuiModelComp.h>
+#include <imtgui/CVisualStatusComp.h>
 
 
 /**
@@ -83,6 +85,8 @@ typedef imtgui::CPopupControllerComp PopupController;
 typedef imtgui::CStandardPopupWidgetFactoryComp StandardPopupWidgetFactory;
 typedef imtgui::CPopupTestGuiComp PopupTestGui;
 typedef icomp::TModelCompWrap<imtgui::CStandardClientAreaProviderComp> StandardClientAreaProvider;
+typedef imtgui::CPageBasedGuiModelComp PageBasedGuiModel;
+typedef imtgui::CVisualStatusComp VisualStatus;
 
 
 } // namespace ImtGuiPck
