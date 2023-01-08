@@ -43,6 +43,10 @@ public:
 				const QSqlRecord& record,
 				idoc::MetaInfoPtr& objectMetaInfoPtr,
 				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const override;
+	virtual bool SetObjectMetaInfoFromRecord(
+				const QByteArray& metaInfoId,
+				const QSqlRecord& record,
+				idoc::MetaInfoPtr& objectMetaInfoPtr) const override;
 	virtual QByteArray CreateResetQuery(const imtbase::IObjectCollection& collection) const override;
 	virtual QByteArray CreateDataMetaInfoQuery(
 				const imtbase::IObjectCollection& collection,

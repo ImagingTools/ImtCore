@@ -498,6 +498,42 @@ bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 }
 
 
+bool CSqlDatabaseObjectCollectionComp::GetObjectsMetaInfos(ObgectsMetaInfos &obgectsMetaInfos,
+												const QList<QByteArray> &metaInfoIds,
+												int offset,
+												int count,
+												const iprm::IParamsSet *selectionParamsPtr,
+												const Id &parentId, int iterationFlags) const
+{
+	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+
+	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+		if (objectSelectionQuery.isEmpty()){
+			return false;
+		}
+
+		QSqlError sqlError;
+		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+
+		while (sqlQuery.next()){
+			idoc::MetaInfoPtr metainfoPtr(new idoc::CStandardDocumentMetaInfo);
+			for (QByteArray metoInfoId: metaInfoIds){
+				m_objectDelegateCompPtr->SetObjectMetaInfoFromRecord(metoInfoId, sqlQuery.record(), metainfoPtr);
+			}
+			obgectsMetaInfos.append(metainfoPtr);
+		}
+	}
+
+	return true;
+}
+
+bool CSqlDatabaseObjectCollectionComp::SetObjectsMetaInfos(ObgectsMetaInfos &obgectsMetaInfos, const QList<QByteArray> &metaInfoIds)
+{
+	return false;
+}
+
+
 // protected methods
 
 bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const
@@ -583,8 +619,9 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
 
-    BaseClass::OnComponentDestroyed();
+	BaseClass::OnComponentDestroyed();
 }
+
 
 } // namespace imtdb
 

@@ -120,6 +120,22 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
 }
 
 
+bool CSqlDatabaseObjectDelegateCompBase::SetObjectMetaInfoFromRecord(
+			const QByteArray& metaInfoId,
+			const QSqlRecord& record,
+			idoc::MetaInfoPtr& objectMetaInfoPtr) const
+{
+	if (objectMetaInfoPtr.IsValid() && record.contains(metaInfoId)){
+		QVariant value = record.value(QString(metaInfoId));
+		objectMetaInfoPtr->SetMetaInfo(metaInfoId, value);
+
+		return true;
+	}
+
+	return false;
+}
+
+
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(
 			const imtbase::IObjectCollection& collection) const
 {

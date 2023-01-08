@@ -34,6 +34,15 @@ public:
 				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const = 0;
 
 	/**
+		Set object single meta-information based on the SQL record.
+	*/
+	virtual bool SetObjectMetaInfoFromRecord(
+				const QByteArray& metaInfoId,
+				const QSqlRecord& record,
+				idoc::MetaInfoPtr& objectMetaInfoPtr) const = 0;
+
+
+	/**
 		Create a data object for the given SQL record.
 	*/
 	virtual istd::IChangeable* CreateObjectFromRecord(

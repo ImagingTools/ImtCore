@@ -18,6 +18,7 @@
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseLoginSettings.h>
+#include <imtbase/IObjectMetaInfo.h>
 
 
 namespace imtdb
@@ -111,10 +112,22 @@ public:
 	virtual bool SetElementDescription(const Id& objectId, const QString& description) override;
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
 
-
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	
+
+	typedef QList<idoc::MetaInfoPtr> ObgectsMetaInfos;
+	virtual bool GetObjectsMetaInfos(
+				ObgectsMetaInfos& obgectsMetaInfos,
+				const QList<QByteArray>& metaInfoIds,
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const;
+	virtual bool SetObjectsMetaInfos(
+				ObgectsMetaInfos& obgectsMetaInfos,
+				const QList<QByteArray>& metaInfoIds);
+
 protected:
 	struct ObjectInfo
 	{
