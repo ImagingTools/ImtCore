@@ -9,25 +9,16 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlRequestHandler)
 
-bool CGqlRepresentationControllerCompBase::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CGqlRepresentationControllerCompBase::IsRequestSupported(const CGqlRequest& gqlRequest) const
 {
 	const QList<CGqlObject>* fieldsPtr = gqlRequest.GetFields();
 	if (fieldsPtr == nullptr){
 		return false;
 	}
 
-	for (int i = 0; i < m_modelIdsAttrPtr.GetCount(); i++){
-		QByteArray modelId = m_modelIdsAttrPtr[i];
+	QByteArray commandId = gqlRequest.GetCommandId();
 
-		for (int j = 0; j < fieldsPtr->count(); j++){
-			QByteArrayList fieldsList = fieldsPtr->at(j).GetFieldIds();
-			if (fieldsList.contains(modelId)){
-				return true;
-			}
-		}
-	}
-
-	return false;
+	return m_commandIdsAttrPtr.FindValue(commandId) != -1;
 }
 
 

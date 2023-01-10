@@ -5,36 +5,6 @@ namespace imtgql
 {
 
 
-// public methods
-
-// reimplemented (imtgql::IGqlRequestHandler)
-
-bool CGqlRepresentationDataControllerComp::IsRequestSupported(const CGqlRequest& gqlRequest) const
-{
-	const QList<CGqlObject>* fieldsPtr = gqlRequest.GetFields();
-	if (fieldsPtr == nullptr){
-		return false;
-	}
-
-	QByteArray commandId = gqlRequest.GetCommandId();
-
-	if (commandId == *m_getCommandIdAttrPtr || commandId == *m_setCommandIdAttrPtr){
-		for (int i = 0; i < m_modelIdsAttrPtr.GetCount(); i++){
-			QByteArray modelId = m_modelIdsAttrPtr[i];
-
-			for (int j = 0; j < fieldsPtr->count(); j++){
-				QByteArrayList fieldIds = fieldsPtr->at(j).GetFieldIds();
-				if (fieldIds.contains(modelId)){
-					return true;
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
-
 // protected methods
 
 imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
@@ -88,10 +58,12 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 {
 	QByteArray commandId = gqlRequest.GetCommandId();
 
-	if (commandId == *m_getCommandIdAttrPtr){
+	imtgql::IGqlRequest::RequestType requestType = gqlRequest.GetRequestType();
+
+	if (requestType == imtgql::IGqlRequest::RT_QUERY){
 		return CreateRepresentationFromRequest(gqlRequest, errorMessage);
 	}
-	else if (commandId == *m_setCommandIdAttrPtr){
+	else if (requestType == imtgql::IGqlRequest::RT_MUTATION){
 		const QList<CGqlObject>* paramsPtr = gqlRequest.GetParams();
 		if (paramsPtr != nullptr){
 			QByteArray itemData = paramsPtr->at(0).GetFieldArgumentValue("Item").toByteArray();

@@ -16,18 +16,18 @@ namespace imtgql
 {
 
 
-class CGqlRepresentationControllerCompBase:
-		public ilog::CLoggerComponentBase,
-		virtual public imtgql::IGqlRequestHandler
+class CGqlRequestHandlerCompBase:
+			public ilog::CLoggerComponentBase,
+			virtual public imtgql::IGqlRequestHandler
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CGqlRepresentationControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestHandler);
-		I_ASSIGN_MULTI_0(m_modelIdsAttrPtr, "ModelIds", "List of model-IDs for GraphQL-response", true);
+		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of model-IDs for GraphQL-response", true);
 		I_ASSIGN(m_commandPermissionsCompPtr, "CommandPermissions", "Command Permissions", false, "Command Permissions");
-		I_ASSIGN(m_checkPermissionCompPtr, "CheckPermissions", "Check permissions", false, "CheckPermissions");
+		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
@@ -42,7 +42,7 @@ protected:
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 protected:
-	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
+	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
 	I_REF(imtgql::ICommandPermissionsProvider, m_commandPermissionsCompPtr);
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
