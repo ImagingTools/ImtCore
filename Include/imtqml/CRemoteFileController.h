@@ -22,6 +22,7 @@ class CRemoteFileController: public QObject
 	Q_PROPERTY(QString downloadedFileLocation READ downloadedFileLocation WRITE setDownloadedFileLocation NOTIFY downloadedFileLocationChanged)
 	Q_PROPERTY(QString downloadedFilePath READ downloadedFilePath WRITE setDownloadedFilePath NOTIFY downloadedFilePathChanged)
 	Q_PROPERTY(QByteArray json READ json WRITE setJson NOTIFY jsonChanged)
+	Q_PROPERTY(QString prefix READ prefix WRITE setPrefix NOTIFY prefixChanged)
 
 	QString m_state;
 
@@ -39,6 +40,8 @@ public:
 	void setDownloadedFileLocation(const QString& newDownloadedFileLocation);
 	const QByteArray& json() const;
 	void setJson(const QByteArray& newJson);
+	const QString& prefix() const;
+	void setPrefix(const QString& newPrefix);
 
 public Q_SLOTS:
 	bool DeleteFile(const QString& fileId);
@@ -66,6 +69,8 @@ signals:
     void fileDeleteFailed();
 	void fileDownloadFailed();
 
+	void prefixChanged();
+
 private:
 	/**
 		\brief Calculates openable url for the specific OS
@@ -90,6 +95,7 @@ private:
     qint64 m_bytesLoaded;
 	qint64 m_bytesTotal;
 	bool m_isAutoOpen;
+	QString m_prefix;
 };
 
 

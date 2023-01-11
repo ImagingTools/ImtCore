@@ -140,7 +140,7 @@ bool CRemoteFileController::DeleteFile(const QString& fileId)
 		QUrl requestUrl = engine->baseUrl();
 
 		QString path = requestUrl.path();
-		path.append("/files/").append(fileId);
+		path.append(m_prefix).append(fileId);
 		requestUrl.setPath(path);
 
 		QNetworkReply* reply = accessManager->deleteResource(QNetworkRequest(requestUrl));
@@ -162,7 +162,7 @@ bool CRemoteFileController::GetFile(const QString& fileId, const QString& fileNa
 		QUrl requestUrl = engine->baseUrl();
 
 		QString path = requestUrl.path();
-		path.append("/files/").append(fileName);
+		path.append(m_prefix).append(fileName);
 		requestUrl.setPath(path);
 
 		QUrlQuery urlQuery;
@@ -195,7 +195,7 @@ bool CRemoteFileController::SendFile(const QString& fileUrl)
 		uploadingFile.close();
 
 		QString path = requestUrl.path();
-		path.append("/files/").append(fileName);
+		path.append(m_prefix).append(fileName);
 		requestUrl.setPath(path);
 
 		QNetworkRequest request(requestUrl);
@@ -341,6 +341,21 @@ void CRemoteFileController::setJson(const QByteArray& newJson)
 		return;
 	m_json = newJson;
 	emit jsonChanged();
+}
+
+
+const QString& CRemoteFileController::prefix() const
+{
+	return m_prefix;
+}
+
+
+void CRemoteFileController::setPrefix(const QString& newPrefix)
+{
+	if (m_prefix == newPrefix)
+		return;
+	m_prefix = newPrefix;
+	emit prefixChanged();
 }
 
 

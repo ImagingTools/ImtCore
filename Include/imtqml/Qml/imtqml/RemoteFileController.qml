@@ -6,6 +6,7 @@ QtObject {
     property string downloadedFileLocation;
     property string downloadedFilePath;
     property string json;    
+    property string prefix;
 
     signal progress(real bytesLoaded, real bytesTotal);
     signal fileDeleted(var url);
@@ -23,7 +24,10 @@ QtObject {
         xhr.overrideMimeType('text/xml');
 
         reader.onload = function(){
-            xhr.open("POST", `../../files/${fileUrl.name}`);
+            if (this.prefix == ""){
+                this.prefix = "files"
+            }
+            xhr.open("POST", `../../` + this.prefix + `/${fileUrl.name}`);
             xhr.send(reader.result)
         }.bind(this)
 
@@ -47,13 +51,19 @@ QtObject {
     }
 
     function GetFile(fileHash, fileUrl) {
-        open(`../../files/${fileUrl.name}?FileId=${fileHash}`)
+        if (this.prefix == ""){
+            this.prefix = "files"
+        }
+        open(`../../` + this.prefix + `/${fileUrl.name}?FileId=${fileHash}`)
     }
 
     function DeleteFile(fileHash, fileUrl){
+        if (this.prefix == ""){
+            this.prefix = "files"
+        }
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
-        xhr.open("DELETE", `../../files/${fileHash}`);
+        xhr.open("DELETE", `../../` + this.prefix + `/${fileHash}`);
         xhr.send(fileHash)
 
         xhr.onreadystatechange = function(){
