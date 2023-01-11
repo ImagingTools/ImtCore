@@ -13,18 +13,18 @@
         <Element Id="AuthorizationController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="HashCalculator"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>UserToken</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="HashCalculator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SessionCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSessionRepository"/>
@@ -41,6 +41,13 @@
         <Element Id="AuthorizationOptionsController" PackageId="ImtAuthGqlPck" ComponentId="AuthorizationOptionsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserMode</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserMode"/>
                     </AttributeInfo>
@@ -49,13 +56,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>UserMode</Value>
-                            </Values>
-                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserModeRepresentation"/>

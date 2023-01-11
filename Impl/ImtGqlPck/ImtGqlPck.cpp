@@ -54,6 +54,21 @@ I_EXPORT_COMPONENT(
 			"Gql representation data controller",
 			"GraphQL Representation Controller Model");
 
+I_EXPORT_COMPONENT(
+			UserSettingsController,
+			"Client settings controller",
+			"GraphQL Gql Controller Model Client User");
+
+I_EXPORT_COMPONENT(
+			GqlRepresentationJoiner,
+			"Joiner for GraphQL representations",
+			"GraphQL Gql Joiner Representation");
+
+I_EXPORT_COMPONENT(
+			ApplicationInfoController,
+			"Application info controller for representation",
+			"Application Controller Representation");
+
 
 } // namespace ImtGqlPck
 

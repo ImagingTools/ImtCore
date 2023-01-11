@@ -9,14 +9,20 @@ namespace imtqml
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+bool CApplicationInfoDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return true;
+}
+
+
+imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_applicationInfoCompPtr.IsValid()){
 		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 		rootModelPtr->SetData("Id", *m_paramIdAttrPtr);
 		rootModelPtr->SetData("Name", *m_paramNameAttrPtr);
-		rootModelPtr->SetData("Source", "SettingsTextLabel.qml");
+		rootModelPtr->SetData("Source", *m_sourceAttrPtr);
 
 		const iser::IVersionInfo& versionInfo =  m_applicationInfoCompPtr->GetVersionInfo();
 

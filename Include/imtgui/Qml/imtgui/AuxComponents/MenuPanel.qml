@@ -67,9 +67,9 @@ Rectangle {
 
             onClicked: {
                 lvPages.currentIndex = model.index;
+                menuPanel.activePageIndex = model.index;
                 menuPanel.activePageName = model["Name"];
                 menuPanel.activeIcon = model["Icon"];
-                menuPanel.activePageIndex = model.index;
                 menuPanel.activePageId = model["PageId"];
 
                 lvPages.forceActiveFocus();

@@ -23,7 +23,7 @@ class CGqlRequestHandlerCompBase:
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CGqlRepresentationControllerCompBase);
+	I_BEGIN_BASE_COMPONENT(CGqlRequestHandlerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestHandler);
 		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of model-IDs for GraphQL-response", true);
 		I_ASSIGN(m_commandPermissionsCompPtr, "CommandPermissions", "Command Permissions", false, "Command Permissions");

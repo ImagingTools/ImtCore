@@ -8,7 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GeneralSettingsFactory" X="250" Y="450" Note=""/>
+        <Element ComponentName="GeneralSettingsFactory" X="225" Y="450" Note=""/>
         <Element ComponentName="UserRelatedSettingsController" X="600" Y="175" Note=""/>
         <Element ComponentName="UserSettings" X="600" Y="450" Note=""/>
         <Element ComponentName="UserSettingsDatabaseDelegate" X="1000" Y="450" Note=""/>

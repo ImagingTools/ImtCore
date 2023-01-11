@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtgql/CGqlRepresentationControllerCompBase.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 #undef GetObject
@@ -17,10 +17,10 @@ namespace imtguigql
 
 
 class CObjectCollectionControllerCompBase:
-			public imtgql::CGqlRepresentationControllerCompBase
+			public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");

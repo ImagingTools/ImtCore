@@ -64,14 +64,7 @@ Item {
         id: userModeGqlModel;
 
         function getUserMode() {
-            var query = Gql.GqlRequest("query", "Get");
-
-            var inputParams = Gql.GqlObject("input");
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("UserMode");
-            query.AddField(queryFields);
+            var query = Gql.GqlRequest("query", "UserMode");
 
             var gqlData = query.GetQuery();
 
@@ -90,8 +83,8 @@ Item {
                 if (userModeGqlModel.ContainsKey("data")){
                     dataModelLocal = userModeGqlModel.GetData("data")
 
-                    if (dataModelLocal.ContainsKey("Get")){
-                        dataModelLocal = dataModelLocal.GetData("Get");
+                    if (dataModelLocal.ContainsKey("UserMode")){
+                        dataModelLocal = dataModelLocal.GetData("UserMode");
 
                         let parameters = dataModelLocal.GetData("Parameters");
                         if (parameters){

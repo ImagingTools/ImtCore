@@ -24,7 +24,7 @@ bool CParamSetRepresentationControllerComp::IsModelSupported(const istd::IChange
 }
 
 
-bool CParamSetRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation) const
+bool CParamSetRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;
@@ -53,7 +53,7 @@ bool CParamSetRepresentationControllerComp::GetRepresentationFromDataModel(const
 				const IRepresentationController* subControllerPtr = FindSubController(paramId);
 				if (subControllerPtr != nullptr){
 					istd::TDelPtr<CTreeItemModel> parameterRepresentationPtr = new imtbase::CTreeItemModel();
-					if (subControllerPtr->GetRepresentationFromDataModel(*paramPtr, *parameterRepresentationPtr)){
+					if (subControllerPtr->GetRepresentationFromDataModel(*paramPtr, *parameterRepresentationPtr, paramsPtr)){
 						int index = parametersRepresentationPtr->InsertNewItem();
 
 						parametersRepresentationPtr->CopyItemDataFromModel(index, parameterRepresentationPtr.PopPtr());
@@ -89,13 +89,16 @@ bool CParamSetRepresentationControllerComp::GetDataModelFromRepresentation(const
 				}
 
 				if (!parameterId.isEmpty()){
-					istd::IChangeable* modelPtr = paramsSetPtr->GetEditableParameter(parameterId);
-					const CTreeItemModel* representationModelPtr = parametersModelPtr->GetModelFromItem(i);
+					const IRepresentationController* subControllerPtr = FindSubController(parameterId);
+					if (subControllerPtr != nullptr){
+						istd::IChangeable* modelPtr = paramsSetPtr->GetEditableParameter(parameterId);
+						const CTreeItemModel* representationModelPtr = parametersModelPtr->GetModelFromItem(i);
 
-					if (modelPtr != nullptr && representationModelPtr != nullptr){
-						const IRepresentationController* subControllerPtr = FindSubController(parameterId);
-						if (subControllerPtr != nullptr){
+						if (modelPtr != nullptr && representationModelPtr != nullptr){
 							bool result = subControllerPtr->GetDataModelFromRepresentation(*representationModelPtr, *modelPtr);
+							if (!result){
+								return false;
+							}
 						}
 					}
 				}
@@ -103,7 +106,7 @@ bool CParamSetRepresentationControllerComp::GetDataModelFromRepresentation(const
 		}
 	}
 
-	return false;
+	return true;
 }
 
 

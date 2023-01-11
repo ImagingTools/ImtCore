@@ -130,18 +130,18 @@ Item {
 
     function commandHandle(commandId){
         console.log("undoRedoManager commandHandle", commandId);
+
+        let isEnabled = commandsProvider.commandIsEnabled(commandId);
+        if (!isEnabled){
+            return;
+        }
+
         let result = null;
         if (commandId === "Undo"){
-            let undoMode = commandsProvider.getCommandMode("Undo");
-            if (undoMode == "Normal"){
-                result = undoRedo.undo();
-            }
+            result = undoRedo.undo();
         }
         else if (commandId === "Redo"){
-            let redoMode = commandsProvider.getCommandMode("Redo");
-            if (redoMode == "Normal"){
-                result = undoRedo.redo();
-            }
+            result = undoRedo.redo();
         }
 
         commandActivated(commandId);

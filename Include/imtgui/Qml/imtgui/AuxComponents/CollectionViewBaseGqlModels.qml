@@ -21,6 +21,7 @@ Item {
     property TreeItemModel items;
 
     function updateModels(){
+        console.log("CollectionView updateModels");
         headerInfoModel.updateModel();
 
         objectViewModel.getObjectView();
@@ -37,10 +38,6 @@ Item {
             console.log( "headerInfoModel update", gqlModelBaseContainer.gqlModelHeadersInfo);
 
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelHeadersInfo);
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("LanguageId", Style.language);
-            query.AddParam(inputParams);
 
             var queryHeaders = Gql.GqlObject("headers");
             queryHeaders.InsertField("Id");
@@ -91,7 +88,7 @@ Item {
         id: itemsInfoModel;
 
         function updateModel() {
-            //console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
+            console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
             let itemHeight = 35; // hack
             let height = collectionViewBaseContainer.height - pagination.height - itemHeight; //Убрать высоту от заголовка и меню пагинации
@@ -108,11 +105,6 @@ Item {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
-
-//            if (itemId){
-//                inputParams.InsertField("Id", itemId);
-//            }
-
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
@@ -124,7 +116,6 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("gqlModelBaseContainer query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
@@ -165,14 +156,10 @@ Item {
         function getObjectView(){
             console.log( "CollectionView objectView");
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelObjectView);
-            var inputParams = Gql.GqlObject("input");
+
             var queryFields = Gql.GqlObject("objectView");
-            query.AddParam(inputParams);
-
-
             queryFields.InsertField("Id");
             queryFields.InsertField("Name");
-
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();

@@ -157,14 +157,7 @@ bool CCollectionInfo::IsBranch(const Id& /*elementId*/) const
 
 QVariant CCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoType) const
 {
-	int objectIndex = -1;
-	for (int i = 0; i < m_items.count(); ++i){
-		if (m_items[i].id == elementId){
-			 objectIndex = i;
-			 break;
-		}
-	}
-
+	int objectIndex = GetItemIndex(elementId);
 	if (objectIndex >= 0){
 		switch (infoType){
 		case EIT_DESCRIPTION:
@@ -189,20 +182,53 @@ idoc::MetaInfoPtr CCollectionInfo::GetElementMetaInfo(const Id& /*elementId*/) c
 }
 
 
-bool CCollectionInfo::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+bool CCollectionInfo::SetElementName(const Id& elementId, const QString& name)
 {
+	Item* itemPtr = FindItemById(elementId);
+	if (itemPtr != nullptr){
+		if (itemPtr->name != name){
+			istd::CChangeNotifier changeNotifier(this);
+
+			itemPtr->name = name;
+		}
+
+		return true;
+	}
+
 	return false;
 }
 
 
-bool CCollectionInfo::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+bool CCollectionInfo::SetElementDescription(const Id& elementId, const QString& description)
 {
+	Item* itemPtr = FindItemById(elementId);
+	if (itemPtr != nullptr){
+		if (itemPtr->description != description){
+			istd::CChangeNotifier changeNotifier(this);
+
+			itemPtr->description = description;
+		}
+
+		return true;
+	}
+
 	return false;
 }
 
 
-bool CCollectionInfo::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CCollectionInfo::SetElementEnabled(const Id& elementId, bool isEnabled)
 {
+	Item* itemPtr = FindItemById(elementId);
+	if (itemPtr != nullptr){
+		if (itemPtr->isEnabled != isEnabled){
+			istd::CChangeNotifier changeNotifier(this);
+
+			itemPtr->isEnabled = isEnabled;
+		}
+
+		return true;
+	}
+
 	return false;
 }
 
@@ -325,6 +351,22 @@ bool CCollectionInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.EndTag(itemsTag);
 
 	return retVal;
+}
+
+
+// protected methods
+
+CCollectionInfo::Item* CCollectionInfo::FindItemById(const Id& elementId) const
+{
+	int index = GetItemIndex(elementId);
+
+	if (index >= 0){
+		Q_ASSERT(index < m_items.count());
+
+		return &(const_cast<CCollectionInfo*>(this))->m_items[index];
+	}
+
+	return nullptr;
 }
 
 

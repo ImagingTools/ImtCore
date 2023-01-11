@@ -10,25 +10,15 @@ Item {
     property TreeItemModel serverModel: TreeItemModel {}
     property TreeItemModel localModel: TreeItemModel {}
 
+    signal serverSettingsSaved();
+    signal localSettingsSaved();
+
     onServerModelChanged: {
         console.log("SettingsProvider onServerModelChanged", serverModel);
-//        updateLocalModel();
-//        applyDesignScheme();
-    }
 
-    onLocalModelChanged: {
-        console.log("SettingsProvider onLocalModelChanged", localModel.toJSON());
-        timer.start();
-    }
+        rewriteModel(serverModel, localModel);
 
-    Timer {
-        id: timer;
-
-        interval: 100;
-
-        onTriggered: {
-//            container.applyDesignScheme();
-        }
+        saveLocalModel();
     }
 
     function clearModel(){
@@ -40,32 +30,29 @@ Item {
     }
 
     function saveLocalModel(){
-        console.log("SettingsProvider saveLocalModel");
+        console.log("SettingsProvider saveLocalModel", localModel.toJSON());
 
         root.settingsUpdate();
+
+        localSettingsSaved();
     }
 
-    function saveServerModel(pageIds){
+    function saveServerModel(){
+        console.log("SettingsProvider saveServerModel", serverModel.toJSON());
+
         preferenceSaveQuery.save();
-    }
-
-    function applyDesignScheme(){
-        let design = getDesignScheme();
-        if (design){
-            Style.getDesignScheme(design);
-        }
     }
 
     /**
         The server model rewrite pages from the local model.
     */
-    function updateLocalModel(){
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageId = localModel.GetData("Id", i);
+    function rewriteModel(fromModel, toModel){
+        for (let i = 0; i < toModel.GetItemsCount(); i++){
+            let pageId = toModel.GetData("Id", i);
 
             let index = -1;
-            for (let j = 0; j < serverModel.GetItemsCount(); j++){
-                let id = serverModel.GetData("Id", j);
+            for (let j = 0; j < fromModel.GetItemsCount(); j++){
+                let id = fromModel.GetData("Id", j);
                 if (id == pageId){
                     index = j;
                     break;
@@ -73,7 +60,7 @@ Item {
             }
 
             if (index >= 0){
-                localModel.CopyItemDataFromModel(i, serverModel, index);
+                toModel.CopyItemDataFromModel(i, fromModel, index);
             }
         }
     }
@@ -82,11 +69,7 @@ Item {
         id: settingsQuery;
 
         function getSettings() {
-            var query = Gql.GqlRequest("query", "Get");
-
-            var queryFields = Gql.GqlObject("ModelIds");
-            queryFields.InsertField("Settings");
-            query.AddField(queryFields);
+            var query = Gql.GqlRequest("query", "GetSettings");
 
             var gqlData = query.GetQuery();
 
@@ -108,8 +91,8 @@ Item {
                 if (settingsQuery.ContainsKey("data")){
                     dataModelLocal = settingsQuery.GetData("data");
 
-                    if (dataModelLocal.ContainsKey("Get")){
-                        dataModelLocal = dataModelLocal.GetData("Get");
+                    if (dataModelLocal.ContainsKey("GetSettings")){
+                        dataModelLocal = dataModelLocal.GetData("GetSettings");
 
                         container.serverModel = dataModelLocal;
                     }
@@ -122,21 +105,17 @@ Item {
         id: preferenceSaveQuery;
 
         function save(){
-            var query = Gql.GqlRequest("mutation", "SaveSettings");
+            var query = Gql.GqlRequest("mutation", "SetSettings");
 
             var inputParams = Gql.GqlObject("input");
             var jsonString = container.serverModel.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            jsonString = jsonString.replace(/\"/g,"\\\\\\\"");
 
-            inputParams.InsertField ("Item", jsonString);
+            inputParams.InsertField("Item", jsonString);
             query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("Save");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
-
             var gqlData = query.GetQuery();
-            console.log("Preference GqlModel SaveSettings query ", gqlData);
+
             this.SetGqlQuery(gqlData);
         }
 
@@ -147,6 +126,8 @@ Item {
                 if (this.ContainsKey("errors")){
                     return;
                 }
+
+                container.serverSettingsSaved();
             }
         }
     }//SaveSettings

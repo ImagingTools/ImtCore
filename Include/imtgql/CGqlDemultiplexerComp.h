@@ -2,17 +2,17 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationControllerCompBase.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtgql
 {
 
 
-class CGqlDemultiplexerComp: public imtgql::CGqlRepresentationControllerCompBase
+class CGqlDemultiplexerComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlDemultiplexerComp);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestHandler);

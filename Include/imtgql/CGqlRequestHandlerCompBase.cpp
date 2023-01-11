@@ -1,4 +1,4 @@
-#include <imtgql/CGqlRepresentationControllerCompBase.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtgql
@@ -9,7 +9,7 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlRequestHandler)
 
-bool CGqlRepresentationControllerCompBase::IsRequestSupported(const CGqlRequest& gqlRequest) const
+bool CGqlRequestHandlerCompBase::IsRequestSupported(const CGqlRequest& gqlRequest) const
 {
 	const QList<CGqlObject>* fieldsPtr = gqlRequest.GetFields();
 	if (fieldsPtr == nullptr){
@@ -22,7 +22,7 @@ bool CGqlRepresentationControllerCompBase::IsRequestSupported(const CGqlRequest&
 }
 
 
-imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
@@ -56,7 +56,7 @@ imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateResponse(co
 
 // protected methods
 
-bool CGqlRepresentationControllerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	bool result = true;
 	if (gqlRequest.GetGqlContext() != nullptr){

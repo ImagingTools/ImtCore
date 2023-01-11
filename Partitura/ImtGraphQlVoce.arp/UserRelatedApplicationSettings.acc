@@ -22,11 +22,17 @@
         <Element Id="UserRelatedSettingsController" PackageId="ImtQmlPck" ComponentId="UserRelatedSettingsController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="General"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserSettingsDatabaseDelegate"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserSettingsFactory" Type="Factory" ExportId="UserSettingsFactory">
                         <Data IsEnabled="true" Value="UserSettings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsRepresentationController" Type="Reference" ExportId="UserSettingsRepresentationController">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -63,8 +69,11 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtbase::IRepresentationController" ComponentId="UserRelatedSettingsController"/>
+    </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="UserSettings" ComponentId="UserSettings"/>
         <Component ExportedId="UserSettingsRepository" ComponentId="UserSettingsDatabaseDelegate/UserSettingsRepository"/>
     </ExportedComponents>
 </Acf>

@@ -2,26 +2,25 @@
 
 
 // ImtCore includes
-#include <imtbase/CObjectRepresentationControllerCompBase.h>
+#include <imtbase/CGuiElementRepresentationControllerComp.h>
 
 
 namespace imtbase
 {
 
 
-class CPageBasedGuiRepresentationControllerComp: public imtbase::CObjectRepresentationControllerCompBase
+class CPageBasedGuiRepresentationControllerComp: public CGuiElementRepresentationControllerComp
 {
 public:
-	typedef imtbase::CObjectRepresentationControllerCompBase BaseClass;
+	typedef imtbase::CGuiElementRepresentationControllerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CPageBasedGuiRepresentationControllerComp)
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (IRepresentationController)
-	virtual bool IsModelSupported(const istd::IChangeable &dataModel) const override;
-	virtual bool GetRepresentationFromDataModel(const istd::IChangeable &dataModel, CTreeItemModel &representation) const override;
-	virtual bool GetDataModelFromRepresentation(const CTreeItemModel &representation, istd::IChangeable &dataModel) const override;
+	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
+	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 };
 
 

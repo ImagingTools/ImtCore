@@ -20,7 +20,7 @@ Item {
 
     function addDocument(document){
         let itemId = document["Id"];
-        console.log("MultidocWorkspaceView addDocument", itemId, document["Source"])
+        console.log("MultidocWorkspaceView addDocument", itemId, document["CommandsId"])
 
         let pageIndex = this.getDocumentIndexById(itemId);
         if (pageIndex < 0){

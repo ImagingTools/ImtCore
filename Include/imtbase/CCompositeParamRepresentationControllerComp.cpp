@@ -9,7 +9,7 @@ namespace imtbase
 
 // reimplemented (IRepresentationController)
 
-bool CCompositeParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation) const
+bool CCompositeParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!m_paramRepresentationControllersCompPtr.IsValid()){
 		return false;

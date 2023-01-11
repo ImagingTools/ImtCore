@@ -30,21 +30,21 @@
         <Element Id="GetStyleDataController" PackageId="ImtGuiGqlPck" ComponentId="GetStyleDataController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>GetStyle</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="Parameter" Type="Reference" ExportId="Design">
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Prefix" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="lisa"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SelectionParam" Type="Reference" ExportId="Design">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -52,20 +52,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="SettingsController" PackageId="ImtGqlPck" ComponentId="GqlRepresentationDataController">
+        <Element Id="SettingsController" PackageId="ImtGqlPck" ComponentId="GqlRepresentationJoiner">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DataModel" Type="Reference" ExportId="SettingsModel">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ModelIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Settings</Value>
+                                <Value>GetSettings</Value>
+                                <Value>SetSettings</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="SettingsRepresentationController">
+                    <AttributeInfo Id="RepresentsationControllers" Type="Reference[]" ExportId="RepresentsationControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

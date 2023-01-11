@@ -27,28 +27,13 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentat
 
 bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
 {
-	if (m_representationControllerCompPtr.IsValid() && m_dataModelCompPtr.IsValid()){
-		const QList<imtgql::CGqlObject>* inputParams = request.GetParams();
-		if (inputParams->count() > 0){
-			QByteArray itemData = inputParams->at(0).GetFieldArgumentValue("Item").toByteArray();
-			if (!itemData.isEmpty()){
-				imtbase::CTreeItemModel settingsModel;
-				if (settingsModel.CreateFromJson(itemData)){
-					istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-					bool result = m_representationControllerCompPtr->GetDataModelFromRepresentation(settingsModel, *m_dataModelCompPtr);
-					if (result){
-						rootModelPtr->SetData("SaveStatus", result);
-
-						rootModelPtr.PopPtr();
-
-						return true;
-					}
-				}
-			}
-		}
+	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
+		return false;
 	}
 
-	return false;
+	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(*representationPtr, *m_dataModelCompPtr);
+
+	return retVal;
 }
 
 

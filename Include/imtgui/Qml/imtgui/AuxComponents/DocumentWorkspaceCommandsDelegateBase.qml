@@ -51,6 +51,7 @@ Item {
         console.log("DocumentCommands onCompleted");
         let itemId = documentsData.GetData("Id", model.index);
         itemModelInputParams["Id"] = itemId;
+        console.log("itemId", itemId);
     }
 
     Component.onDestruction: {
@@ -104,9 +105,10 @@ Item {
 
     function commandHandle(commandId){
         console.log("DocumentCommandsBase commandHandle", documentBase.itemId, commandId);
+
         if (commandId == "Close"){
-            let saveMode = commandsProvider.getCommandMode("Save");
-            if (saveMode && saveMode == "Normal"){
+            let saveCommandIsEnabled = commandsProvider.commandIsEnabled("Save");
+            if (saveCommandIsEnabled){
                 modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
             }
             else{
@@ -114,23 +116,20 @@ Item {
             }
         }
         else if (commandId == "Save"){
-            let saveMode = commandsProvider.getCommandMode("Save");
-            if (saveMode == "Normal"){
-                let itemId = documentBase.itemId;
-                if (itemId === ""){
-                    container.gqlModelQueryType = "Add";
-                    container.gqlModelQueryTypeNotify = "addedNotification";
+            let itemId = documentBase.itemId;
+            if (itemId === ""){
+                container.gqlModelQueryType = "Add";
+                container.gqlModelQueryTypeNotify = "addedNotification";
 
-                    if (showInputIdDialog){
-                        modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
-                    }
-                    else{
-                        saveQuery.updateModel();
-                    }
+                if (showInputIdDialog){
+                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
                 }
                 else{
-                    saveObject();
+                    saveQuery.updateModel();
                 }
+            }
+            else{
+                saveObject();
             }
         }
 
@@ -325,21 +324,16 @@ Item {
             console.log("itemModel updateModel", externInputParams);
             var query = Gql.GqlRequest("query", container.commandsId + "Item");
 
-            var inputParams = Gql.GqlObject("input");
+            var queryFields = Gql.GqlObject("item");
+            queryFields.InsertField("Id");
+            query.AddField(queryFields);
 
+            var inputParams = Gql.GqlObject("input");
             let keys = Object.keys(externInputParams)
             for (let key of keys){
                 inputParams.InsertField(key, externInputParams[key]);
             }
-
             query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("item");
-
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-
-            query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
             console.log(container.commandsId + " Item query ", gqlData);

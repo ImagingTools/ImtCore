@@ -10,7 +10,7 @@
     <PositionMap>
         <Element ComponentName="Demultiplexer" X="550" Y="100" Note=""/>
         <Element ComponentName="GetStyleDataController" X="225" Y="275" Note=""/>
-        <Element ComponentName="SettingsController" X="900" Y="275" Note=""/>
+        <Element ComponentName="SettingsController" X="950" Y="300" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

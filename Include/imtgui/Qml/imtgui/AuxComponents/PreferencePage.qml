@@ -15,14 +15,12 @@ Rectangle {
 
     property TreeItemModel serverModel: TreeItemModel {}
     property TreeItemModel localModel: TreeItemModel {}
-
     property TreeItemModel commonModel: TreeItemModel {}
 
     property alias leftPanelWidth: mainPanelBackground.width;
     property alias mainWidth: mainRec.width;
     property alias mainHeight: mainRec.height;
     property alias topPanelSource: loaderTopPanel.source;
-
 
     property string backgroundColor: Style.backgroundColor;
     property string fontColor: Style.textColor;
@@ -33,11 +31,9 @@ Rectangle {
 
     onVisibleChanged: {
         console.log("onVisibleChanged settingsProvider", settingsProvider);
-
         if (visible){
             if (settingsProvider.localModel){
                 let localModelJson = settingsProvider.localModel.toJSON();
-                console.log("localModelJson", localModelJson);
                 localModel.CreateFromJson(localModelJson);
 
                 updateCommonModel(localModel);
@@ -45,11 +41,12 @@ Rectangle {
 
             if (settingsProvider.serverModel){
                 let serverModelJson = settingsProvider.serverModel.toJSON();
-                console.log("serverModelJson", serverModelJson);
                 serverModel.CreateFromJson(serverModelJson);
 
                 updateCommonModel(serverModel);
             }
+
+            settingsProvider.rewriteModel(serverModel, localModel);
 
             updateGui();
         }
@@ -71,31 +68,29 @@ Rectangle {
         mainPanelRepeater.model = commonModel;
 
         mainPanel.selectedIndex = 0;
-        bodyPanelRepeater.model = commonModel.GetData("Parameters");
+        let parametersModel = commonModel.GetData("Parameters")
+        bodyPanelRepeater.model = parametersModel
     }
 
     function updateCommonModel(externModel){
-        console.log("Preferences updateCommonModel", externModel.toJSON());
-        if (externModel.ContainsKey("Parameters")){
-            let settingsModel = externModel.GetData("Parameters");
-            for (let i = 0; i < settingsModel.GetItemsCount(); i++){
-                let pageId = settingsModel.GetData("Id", i);
+        if (externModel != undefined && externModel != null){
+            for (let i = 0; i < externModel.GetItemsCount(); i++){
+                let pageId = externModel.GetData("Id", i);
+                let pageName = externModel.GetData("Name", i);
+                let pageParameters = externModel.GetData("Parameters", i);
+
                 let index = getPageIndexByPageId(pageId)
 
                 if (index < 0){
                     index = commonModel.InsertNewItem();
                 }
 
-                commonModel.CopyItemDataFromModel(index, settingsModel, i);
+                commonModel.CopyItemDataFromModel(index, externModel, i);
             }
         }
-
-        console.log("Preferences commonModel", commonModel.toJSON());
     }
 
     function getPageIndexByPageId(pageId, model){
-        console.log("Preferences getPageIndexByPageId", pageId);
-
         if (!model){
             model = commonModel;
         }
@@ -112,48 +107,6 @@ Rectangle {
 
     function openFileDialog(){
         fileDialogSave.open();
-    }
-
-    function getDirtyPagesFromLocalModel(){
-        let pageIds = []
-
-        for (let i = 0; i < localModel.GetItemsCount(); i++){
-            let pageCopyModel = localModel.GetModelFromItem(i);
-            let pageModel = settingsProvider.localModel.GetModelFromItem(i);
-
-            let pageCopyModelJson = pageCopyModel.toJSON();
-            let pageModelJson = pageModel.toJSON();
-
-            if (_.isEqual(pageCopyModelJson, pageModelJson)){
-                console.log("EQUAL");
-            }
-            else{
-                console.log("NOT EQUAL");
-                let pageId = localModel.GetData("Id", i)
-                pageIds.push(pageId);
-            }
-        }
-
-        return pageIds;
-    }
-
-    function getDirtyPagesFromServerModel(){
-        let pageIds = []
-
-        for (let i = 0; i < serverModel.GetItemsCount(); i++){
-            let pageCopyModel = serverModel.GetModelFromItem(i);
-            let pageModel = settingsProvider.serverModel.GetModelFromItem(i);
-
-            let pageCopyModelJson = pageCopyModel.toJSON();
-            let pageModelJson = pageModel.toJSON();
-
-            if (!_.isEqual(pageCopyModelJson, pageModelJson)){
-                let pageId = serverModel.GetData("Id", i)
-                pageIds.push(pageId);
-            }
-        }
-
-        return pageIds;
     }
 
     function close(buttonId){
@@ -205,7 +158,6 @@ Rectangle {
 
         color: container.backgroundColor;
 
-
         Loader {
             id: loaderTopPanel;
 
@@ -246,7 +198,7 @@ Rectangle {
                 id: mainPanel;
 
                 anchors.fill: parent;
-                //anchors.topMargin: 10;
+                anchors.topMargin: 10;
 
                 property int selectedIndex: -1;
 
@@ -278,6 +230,7 @@ Rectangle {
 
                         onClicked: {
                             if (mainPanel.selectedIndex !== model.index){
+                                console.log("model.Parameters", model.Parameters.toJSON());
                                 bodyPanelRepeater.model = model.Parameters;
                                 mainPanel.selectedIndex = model.index;
                             }
@@ -296,8 +249,8 @@ Rectangle {
             anchors.leftMargin: 10;
             anchors.right: parent.right;
             anchors.rightMargin: 10;
-            anchors.bottom: buttonsDialog.bottom;
-            anchors.bottomMargin: 20;
+            anchors.bottom: buttonsDialog.top;
+            anchors.bottomMargin: 10;
 
             clip: true;
 
@@ -317,6 +270,13 @@ Rectangle {
                     id: bodyPanelRepeater;
 
                     delegate: Item {
+
+                        Component.onCompleted: {
+                            console.log("Item onCompleted", model.Id);
+                            console.log("model.Name", model.Name);
+                            console.log("model.Source", model.Source);
+                            console.log("model[Source]", model["Source"]);
+                        }
 
                         width: bodyPanel.width;
 
@@ -351,7 +311,7 @@ Rectangle {
                             anchors.topMargin: 15;
 
                             Component.onCompleted: {
-                                console.log("Loader onCompleted", model.Source);
+                                console.log("Loader onCompleted", model.Id, model.Source);
 
                                 loader.source = model.Source;
                             }
@@ -388,25 +348,18 @@ Rectangle {
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
-                    console.log("Apply")
-                    let serverPageIds = getDirtyPagesFromServerModel();
-
-                    if (serverPageIds.length > 0){
-                        let serverModelJson = serverModel.toJSON();
-                        console.log("serverModelJson", serverModelJson)
+                    if (!_.isEqual(JSON.stringify(container.serverModel), JSON.stringify(container.settingsProvider.serverModel))){
+                        let serverModelJson = container.serverModel.toJSON();
                         container.settingsProvider.serverModel.CreateFromJson(serverModelJson);
 
-                        container.settingsProvider.saveServerModel(serverPageIds);
+                        container.settingsProvider.saveServerModel();
                     }
 
-                    let localPageIds = getDirtyPagesFromLocalModel();
-
-                    if (localPageIds.length > 0){
-                        let localModelJson = localModel.toJSON();
-                        console.log("localModelJson", localModelJson)
+                    if (!_.isEqual(JSON.stringify(container.localModel), JSON.stringify(container.settingsProvider.localModel))){
+                        let localModelJson = container.localModel.toJSON();
                         container.settingsProvider.localModel.CreateFromJson(localModelJson);
 
-                        container.settingsProvider.saveLocalModel(localPageIds);
+                        container.settingsProvider.saveLocalModel();
                     }
                 }
             }

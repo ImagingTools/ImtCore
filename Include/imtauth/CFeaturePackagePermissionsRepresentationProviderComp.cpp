@@ -25,7 +25,7 @@ bool CFeaturePackagePermissionsRepresentationProviderComp::IsModelSupported(cons
 }
 
 
-bool CFeaturePackagePermissionsRepresentationProviderComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation) const
+bool CFeaturePackagePermissionsRepresentationProviderComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (m_featurePackageCompPtr.IsValid()){
 		imtbase::CTreeItemModel* permissionsModelPtr = representation.AddTreeModel("Permissions");

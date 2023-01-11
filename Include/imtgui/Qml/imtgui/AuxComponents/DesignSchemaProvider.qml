@@ -5,16 +5,31 @@ import imtqml 1.0
 Item {
     id: container;
 
-    property TreeItemModel model: TreeItemModel {}
+    property SettingsProvider settingsProvider: null;
+
+    function applyDesignSchema(design){
+        if (design == undefined){
+            design = getDesignSchema();
+        }
+
+        if (design != null){
+            Style.getDesignScheme(design);
+        }
+    }
 
     function getDesignSchema(){
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            let pageModel = model.GetModelFromItem(i);
+        if (settingsProvider == null){
+            return null;
+        }
+
+        let localModel = settingsProvider.localModel;
+        for (let i = 0; i < localModel.GetItemsCount(); i++){
+            let pageModel = localModel.GetModelFromItem(i);
 
             if (pageModel){
                 let pageId = pageModel.GetData("Id");
                 if (pageId == "General"){
-                    let elements = pageModel.GetData("Elements");
+                    let elements = pageModel.GetData("Parameters");
 
                     for (let j = 0; j < elements.GetItemsCount(); j++){
                         let elementId = elements.GetData("Id", j);

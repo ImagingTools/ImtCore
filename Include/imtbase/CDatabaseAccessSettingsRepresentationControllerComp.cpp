@@ -24,7 +24,7 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::IsModelSupported(const
 }
 
 
-bool CDatabaseAccessSettingsRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation) const
+bool CDatabaseAccessSettingsRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;
@@ -112,37 +112,39 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::GetDataModelFromRepres
 
 	imtdb::IDatabaseLoginSettings* databaseLoginSettingsPtr = dynamic_cast<imtdb::IDatabaseLoginSettings*>(&dataModel);
 	if (databaseLoginSettingsPtr != nullptr){
-		for (int i = 0; i < representation.GetItemsCount(); ++i){
-			QByteArray parameterId;
-			if (representation.ContainsKey("Id", i)){
-				parameterId = representation.GetData("Id", i).toByteArray();
+		CTreeItemModel* parametersPtr = representation.GetTreeItemModel("Parameters");
+		if (parametersPtr != nullptr){
+			for (int i = 0; i < parametersPtr->GetItemsCount(); ++i){
+				QByteArray parameterId;
+				if (parametersPtr->ContainsKey("Id", i)){
+					parameterId = parametersPtr->GetData("Id", i).toByteArray();
+				}
+
+				QString parameterValue;
+				if (parametersPtr->ContainsKey("Value", i)){
+					parameterValue = parametersPtr->GetData("Value", i).toString();
+				}
+
+				if (parameterId == "DatabaseName"){
+					databaseLoginSettingsPtr->SetDatabaseName(parameterValue);
+				}
+				else if (parameterId == "Host"){
+					databaseLoginSettingsPtr->SetHost(parameterValue);
+				}
+				else if (parameterId == "Password"){
+					databaseLoginSettingsPtr->SetPassword(parameterValue);
+				}
+				else if (parameterId == "Port"){
+					databaseLoginSettingsPtr->SetPort(parameterValue.toInt());
+				}
+				else if (parameterId == "Username"){
+					databaseLoginSettingsPtr->SetUserName(parameterValue);
+				}
 			}
 
-			QString parameterValue;
-			if (representation.ContainsKey("Value", i)){
-				parameterValue = representation.GetData("Value", i).toString();
-			}
-
-			if (parameterId == "DBName"){
-				databaseLoginSettingsPtr->SetDatabaseName(parameterValue);
-			}
-			else if (parameterId == "Host"){
-				databaseLoginSettingsPtr->SetHost(parameterValue);
-			}
-			else if (parameterId == "Password"){
-				databaseLoginSettingsPtr->SetPassword(parameterValue);
-			}
-			else if (parameterId == "Port"){
-				databaseLoginSettingsPtr->SetPort(parameterValue.toInt());
-			}
-			else if (parameterId == "Username"){
-				databaseLoginSettingsPtr->SetUserName(parameterValue);
-			}
+			return true;
 		}
-
-		return true;
 	}
-
 
 	return false;
 }

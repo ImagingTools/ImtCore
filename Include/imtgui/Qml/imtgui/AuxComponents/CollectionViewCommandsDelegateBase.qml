@@ -44,10 +44,11 @@ Item {
     //TODO -> onItemSelectionChanged
     onSelectedIndexChanged: {
         console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
-        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
+//        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
+        let isEnabled = containerBase.selectedIndex > -1;
 
-        commandsProvider.changeCommandMode("Remove", mode);
-        commandsProvider.changeCommandMode("Edit", mode);
+        commandsProvider.changeCommandMode("Remove", isEnabled);
+        commandsProvider.changeCommandMode("Edit", isEnabled);
     }
 
     Component.onDestruction: {

@@ -1,19 +1,21 @@
 #pragma once
 
 
-// ACF includes
-#include <iprm/IOptionsList.h>
-#include <iqtgui/IMultiVisualStatusProvider.h>
+// ImtCore includes
+#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtgui
 {
 
 
-class IGuiElementContainer: virtual public iprm::IOptionsList, virtual public iqtgui::IMultiVisualStatusProvider
+class IGuiElementContainer: virtual public istd::IChangeable
 {
 public:
 	virtual const IGuiElementContainer* GetElementCommands(const QByteArray& elementId) const = 0;
+	virtual QString GetElementItemPath(const QByteArray& elementId) const = 0;
+	virtual QString GetElementStatus(const QByteArray& elementId) const = 0;
+	virtual const imtbase::ICollectionInfo& GetElementList() const = 0;
 };
 
 

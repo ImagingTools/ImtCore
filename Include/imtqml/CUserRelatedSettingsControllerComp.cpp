@@ -14,12 +14,12 @@ namespace imtqml
 
 // protected methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp
 
-imtbase::CTreeItemModel* CUserRelatedSettingsControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+bool CUserRelatedSettingsControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
-	if (m_userSettingsCollectionCompPtr.IsValid()){
-		const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
+	if (paramsPtr != nullptr){
+		const imtgql::IGqlContext* gqlContextPtr = dynamic_cast<const imtgql::IGqlContext*>(paramsPtr->GetParameter("GqlContext"));
 		if (gqlContextPtr != nullptr){
 			imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 			if (userInfoPtr != nullptr){
@@ -31,46 +31,40 @@ imtbase::CTreeItemModel* CUserRelatedSettingsControllerComp::CreateRepresentatio
 						iprm::IParamsSet* settingsParamSetPtr = userSettingsPtr->GetSettings();
 						Q_ASSERT(settingsParamSetPtr != nullptr);
 
-						istd::TDelPtr<imtbase::CTreeItemModel> representationModelPtr = new imtbase::CTreeItemModel();
-						if (m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*settingsParamSetPtr, *representationModelPtr)){
-							return representationModelPtr.PopPtr();
-						}
+						return m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*settingsParamSetPtr, representation);
 					}
+				}
+				else{
+					return m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(dataModel, representation);
 				}
 			}
 		}
 	}
 
-	return nullptr;
+	return false;
 }
 
 
-bool CUserRelatedSettingsControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
+bool CUserRelatedSettingsControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
 {
 	if (!m_userSettingsInfoFactCompPtr.IsValid()){
 		return false;
 	}
 
-	// Get user-ID from client request
-	const imtgql::IGqlContext* gqlContextPtr = request.GetGqlContext();
 	QByteArray userId;
-	if (gqlContextPtr != nullptr){
-		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
-		if (userInfoPtr != nullptr){
-			userId = userInfoPtr->GetUserId();
-		}
+
+	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
+	userSettingsPtr->SetUserId(userId);
+
+	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
+	Q_ASSERT(paramSetPtr != nullptr);
+
+	if (paramSetPtr == nullptr){
+		return false;
 	}
 
-	QByteArray parameterId = *m_paramIdAttrPtr;
-	if (representationPtr != nullptr){
-		istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
-		userSettingsPtr->SetUserId(userId);
-
-		iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
-		Q_ASSERT(paramSetPtr != nullptr);
-
-		m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*representationPtr, *paramSetPtr);
-
+	bool result = m_userSettingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(representation, *paramSetPtr);
+	if (result){
 		imtbase::ICollectionInfo::Ids collectionIds = m_userSettingsCollectionCompPtr->GetElementIds();
 		if (collectionIds.contains(userId)){
 			m_userSettingsCollectionCompPtr->SetObjectData(userId, *userSettingsPtr);

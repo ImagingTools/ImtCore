@@ -13,6 +13,12 @@ namespace imtqml
 
 // reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
+bool CHeadersDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return true;
+}
+
+
 imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());

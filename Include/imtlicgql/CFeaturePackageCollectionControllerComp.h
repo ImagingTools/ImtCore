@@ -18,11 +18,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
-
 	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
-
-	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
-	virtual imtbase::CHierarchicalItemModelPtr GetMetaInfo(const QList<imtgql::CGqlObject>& inputParams, const imtgql::CGqlObject& gqlObject, QString& errorMessage) const;
+	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
+	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 };
 
 

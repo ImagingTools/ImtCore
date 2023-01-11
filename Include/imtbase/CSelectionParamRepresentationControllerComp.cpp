@@ -25,7 +25,7 @@ bool CSelectionParamRepresentationControllerComp::IsModelSupported(const istd::I
 }
 
 
-bool CSelectionParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation) const
+bool CSelectionParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;
@@ -86,9 +86,11 @@ bool CSelectionParamRepresentationControllerComp::GetDataModelFromRepresentation
 			selectedIndex = representation.GetData("Value").toInt();
 		}
 
-		selectionParamPtr->SetSelectedOptionIndex(selectedIndex);
+		if (selectedIndex >= 0){
+			selectionParamPtr->SetSelectedOptionIndex(selectedIndex);
 
-		return true;
+			return true;
+		}
 	}
 
 	return false;

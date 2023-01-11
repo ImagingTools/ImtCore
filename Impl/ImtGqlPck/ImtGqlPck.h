@@ -14,6 +14,9 @@
 #include <imtgql/CGqlRemoteRepresentationControllerComp.h>
 #include <imtgql/CGqlClientEngineComp.h>
 #include <imtgql/CGqlRepresentationDataControllerComp.h>
+#include <imtgql/CUserSettingsControllerComp.h>
+#include <imtgql/CGqlRepresentationJoinerComp.h>
+#include <imtgql/CApplicationInfoControllerComp.h>
 
 
 /**
@@ -31,6 +34,9 @@ typedef imtgql::CCommandPermissionsProviderJoinerComp CommandPermissionsProvider
 typedef imtgql::CGqlRemoteRepresentationControllerComp GraphQLRemoteRepresentationController;
 typedef imtgql::CGqlClientEngineComp GraphQLClientEngine;
 typedef imtgql::CGqlRepresentationDataControllerComp GqlRepresentationDataController;
+typedef imtgql::CUserSettingsControllerComp UserSettingsController;
+typedef imtgql::CGqlRepresentationJoinerComp GqlRepresentationJoiner;
+typedef imtgql::CApplicationInfoControllerComp ApplicationInfoController;
 
 
 } // namespace ImtGqlPck

@@ -32,9 +32,9 @@ void CObserverQmlComp::ApplyUrl() const
 	QQmlEngine* engine = qmlEngine(quickItem);
 	Q_ASSERT(engine != nullptr);
 
-	const istd::IChangeable* serverUrl = m_settingsCompPtr->GetParameter("NetworkSettings/ServerUrl");
-	if (serverUrl != nullptr){
-		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(serverUrl);
+	const istd::IChangeable* serverUrlDataPtr = m_settingsCompPtr->GetParameter("NetworkSettings/ServerUrl");
+	if (serverUrlDataPtr != nullptr){
+		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(serverUrlDataPtr);
 		if (textParamPtr != nullptr){
 			QString text = textParamPtr->GetText();
 
@@ -56,17 +56,19 @@ void CObserverQmlComp::OnComponentCreated()
 			if (m_representationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 				m_settingsModelPtr = new imtbase::CTreeItemModel();
 				bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
-
-				QString json = m_settingsModelPtr->toJSON();
-
 				if (result){
 					if (m_settingsModelPtr != nullptr){
-						QVariant data = QVariant::fromValue(m_settingsModelPtr);
+						if (m_settingsModelPtr->ContainsKey("Parameters")){
+							imtbase::CTreeItemModel* parametersPtr = m_settingsModelPtr->GetTreeItemModel("Parameters");
+							if (parametersPtr != nullptr){
+								QVariant data = QVariant::fromValue(parametersPtr);
 
-						quickItem->setProperty("localSettings", data);
+								quickItem->setProperty("localSettings", data);
+							}
+						}
 					}
 
-					connect(quickItem, SIGNAL(settingsUpdate(QString)), this, SLOT(OnModelChanged(QString)));
+					connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnModelChanged()));
 
 					ApplyUrl();
 
@@ -106,6 +108,14 @@ void CObserverQmlComp::OnModelChanged()
 	if (m_representationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 		if (m_settingsModelPtr != nullptr){
 			bool result = m_representationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
+			if (result){
+				if (m_quickObjectCompPtr.IsValid()){
+					QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+					if (quickItem != nullptr){
+						QMetaObject::invokeMethod(quickItem, "onLocalSettingsUpdated");
+					}
+				}
+			}
 		}
 	}
 }

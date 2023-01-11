@@ -125,16 +125,14 @@ Rectangle {
         function getMetaInfo(){
             console.log( "CollectionView metaInfo getMetaInfo");
             var query = Gql.GqlRequest("query", container.gqlModelMetaInfo);
+
             var inputParams = Gql.GqlObject("input");
-
             inputParams.InsertField("Id", container.tableData.getSelectedId());
-
-            var queryFields = Gql.GqlObject("metaInfo");
             query.AddParam(inputParams);
 
+            var queryFields = Gql.GqlObject("metaInfo");
             queryFields.InsertField("Id");
             queryFields.InsertField("Successed");
-
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -157,10 +155,7 @@ Rectangle {
                     if (dataModelLocal.ContainsKey(container.gqlModelMetaInfo)){
                         dataModelLocal = dataModelLocal.GetData(container.gqlModelMetaInfo);
 
-                        if (dataModelLocal.ContainsKey("metaInfo")){
-                            dataModelLocal = dataModelLocal.GetData("metaInfo");
-                            container.modelData = dataModelLocal;
-                        }
+                        container.modelData = dataModelLocal;
                     }
                 }
             }

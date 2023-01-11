@@ -47,6 +47,10 @@ Item {
 
             visible: container.activePageIndex === model.index;
 
+            Component.onCompleted: {
+                console.log("pagesDeleg onCompleted", model.Source);
+            }
+
             /**
                 The page will be loaded only by click if it hasn't loaded yet
             */
@@ -68,11 +72,12 @@ Item {
 
                 onItemChanged: {
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
+                    console.log("model.PageId", model.Id)
                     if (pagesLoader.item){
-                        pagesLoader.item.startPageObj = {"Id": model.PageId,
+                        pagesLoader.item.startPageObj = {"Id": model.Id,
                                                          "Name": model.Name,
                                                          "Source": model.StartItem,
-                                                         "CommandsId": model.PageId};
+                                                         "CommandsId": model.Id};
                     }
                 }
             }

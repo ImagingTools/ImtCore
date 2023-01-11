@@ -2,9 +2,9 @@
 
 
 // ImtCore includes
-#include <imtbase/IRepresentationController.h>
+#include <imtbase/CObjectRepresentationControllerCompBase.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtqml/CObjectRepresentationCompBase.h>
+#include <imtgql/CGqlRepresentationDataControllerComp.h>
 #include <imtauth/IUserSettings.h>
 
 
@@ -12,13 +12,10 @@ namespace imtqml
 {
 
 
-/**
-	Database access settings representation provider.
-*/
-class CUserRelatedSettingsControllerComp: public imtqml::CObjectRepresentationCompBase
+class CUserRelatedSettingsControllerComp: public imtbase::CObjectRepresentationControllerCompBase
 {
 public:
-	typedef imtqml::CObjectRepresentationCompBase BaseClass;
+	typedef imtbase::CObjectRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserRelatedSettingsControllerComp);
 		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", true, "UserSettingsCollection");
@@ -27,9 +24,9 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
-	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
+	// reimplemented (IRepresentationController)
+	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	virtual bool GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const override;
 
 private:
 	I_REF(imtbase::IRepresentationController, m_userSettingsRepresentationControllerCompPtr);

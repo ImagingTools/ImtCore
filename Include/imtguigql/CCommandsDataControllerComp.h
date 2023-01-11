@@ -2,17 +2,17 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationControllerCompBase.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtguigql
 {
 
 
-class CCommandsDataControllerComp: public imtgql::CGqlRepresentationControllerCompBase
+class CCommandsDataControllerComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCommandsDataControllerComp);
 		I_ASSIGN_MULTI_0(m_commandsDataProviderCompPtr, "CommandsDataProviderCompPtr", "List of commands providers", true);

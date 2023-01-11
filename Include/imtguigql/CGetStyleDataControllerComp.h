@@ -5,17 +5,17 @@
 #include <iprm/ISelectionParam.h>
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationControllerCompBase.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtguigql
 {
 
 
-class CGetStyleDataControllerComp: public imtgql::CGqlRepresentationControllerCompBase
+class CGetStyleDataControllerComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGetStyleDataControllerComp);
 		I_ASSIGN(m_selectionParamCompPtr, "SelectionParam", "Selection param for the get current design schema", false, "SelectionParam");

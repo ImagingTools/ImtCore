@@ -93,8 +93,9 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     function selectedIndexChanged(){
-        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
-        packageViewContainer.commandsProvider.changeCommandMode("Remove", mode);
+//        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
+        let isEnabled = tableTreeViewEditor.selectedIndex != null;
+        packageViewContainer.commandsProvider.changeCommandMode("Remove", isEnabled);
     }
 
     Component {

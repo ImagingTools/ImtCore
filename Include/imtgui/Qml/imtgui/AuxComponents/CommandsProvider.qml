@@ -7,7 +7,7 @@ Item {
 
     property string commandsId;
 
-    property TreeItemModel commandsModel;
+    property TreeItemModel commandsModel: TreeItemModel {};
 
     property bool localData: false; //The commands model is not loaded from the server
 
@@ -19,31 +19,39 @@ Item {
         modelCommands.updateModel();
     }
 
+    onCommandsModelChanged: {
+        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
+                                                  "CommandsId": commandsProviderContainer.commandsId});
+
+        commandsProviderContainer.modelLoaded();
+    }
+
     function changeCommandMode(commandId, mode){
+        console.log("changeCommandModecommandsProviderContainer onCommandsIdChanged", commandId, mode);
         if(commandsModel === undefined) return;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
-            if (m_commandId == commandId){
-                commandsProviderContainer.commandsModel.SetData("Mode", mode, i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            if (currentCommandId == commandId){
+                commandsProviderContainer.commandsModel.SetData("IsEnabled", mode, i);
                 commandModeChanged(commandId, mode);
             }
         }
     }
 
-    function getCommandMode(commandId){
+    function commandIsEnabled(commandId){
         if(commandsModel === undefined) return;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
-            let m_commandId = commandsProviderContainer.commandsModel.GetData("Id", i);
-            let m_mode = commandsProviderContainer.commandsModel.GetData("Mode", i);
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            let isEnabled = commandsProviderContainer.commandsModel.GetData("IsEnabled", i);
 
-            if (m_commandId == commandId){
-                return m_mode;
+            if (currentCommandId == commandId){
+                return isEnabled;
             }
         }
 
-        return null;
+        return false;
     }
 
     function mergeModelWith(externModel){
@@ -58,22 +66,11 @@ Item {
         id: modelCommands;
 
         function updateModel() {
-            console.log("CommandsProvider updateModel", commandsProviderContainer.commandsId);
-            var query = Gql.GqlRequest("query", "CommandsData");
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("PageId", commandsProviderContainer.commandsId);
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            queryFields.InsertField("Icon");
-            queryFields.InsertField("Mode");
-            queryFields.InsertField("Visible");
-            query.AddField(queryFields);
+            console.log("CommandsProvider updateModel", commandsProviderContainer.commandsId + "Commands");
+            var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
 
             var gqlData = query.GetQuery();
+
             this.SetGqlQuery(gqlData);
         }
 
@@ -89,17 +86,10 @@ Item {
 
                 if (modelCommands.ContainsKey("data")){
                     dataModelLocal = modelCommands.GetData("data")
-                    if(dataModelLocal.ContainsKey("CommandsData")){
-                        dataModelLocal = dataModelLocal.GetData("CommandsData");
+                    if(dataModelLocal.ContainsKey(commandsProviderContainer.commandsId + "Commands")){
+                        dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandsId + "Commands");
 
-                        if(dataModelLocal.ContainsKey("items")){
-                            dataModelLocal = dataModelLocal.GetData("items");
-                            commandsProviderContainer.commandsModel = dataModelLocal;
-                            Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-                                                                      "CommandsId": commandsProviderContainer.commandsId});
-
-                            commandsProviderContainer.modelLoaded();
-                        }
+                        commandsProviderContainer.commandsModel = dataModelLocal;
                     }
                 }
             }

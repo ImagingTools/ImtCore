@@ -179,6 +179,11 @@ I_EXPORT_COMPONENT(
 			"Page based gui representation controller",
 			"Model Gui Representation Controller")
 
+I_EXPORT_COMPONENT(
+			GuiElementRepresentationController,
+			"Gui element based representation controller",
+			"Model Gui Representation Controller Based")
+
 
 } // namespace ImtCorePck
 

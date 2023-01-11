@@ -20,7 +20,7 @@ public:
 
 protected:
 	// reimplemented (IRepresentationController)
-	virtual bool GetRepresentationFromDataModel(const istd::IChangeable &dataModel, CTreeItemModel &representation) const override;
+	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromRepresentation(const CTreeItemModel &representation, istd::IChangeable &dataModel) const override;
 
 protected:

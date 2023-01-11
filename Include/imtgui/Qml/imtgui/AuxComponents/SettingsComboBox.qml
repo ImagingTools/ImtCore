@@ -8,6 +8,8 @@ Item {
     width: 150;
     height: 23;
 
+    property var modelData: model;
+
     property var parameters: null;
 
     property bool active: false;
@@ -15,7 +17,7 @@ Item {
     onParametersChanged: {
         console.log("onParametersChanged", parameters);
         settingsComboBox.model = parameters;
-        settingsComboBox.currentIndex = model.Value;
+        settingsComboBox.currentIndex = modelData.Value;
     }
 
     ListModel {
@@ -36,11 +38,10 @@ Item {
         textCentered: false;
 
         onCurrentIndexChanged: {
-            parent.currentValueChanged();
-        }
-    }
+            console.log("onCurrentIndexChanged", settingsComboBox.currentIndex);
+            settingsComboBoxContainer.modelData.Value = settingsComboBox.currentIndex;
 
-    function currentValueChanged(){
-        model.Value = settingsComboBox.currentIndex;
+            console.log("model.Value", settingsComboBoxContainer.modelData.Value);
+        }
     }
 }

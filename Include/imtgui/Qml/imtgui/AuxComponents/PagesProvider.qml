@@ -19,11 +19,8 @@ Item {
         id: pagesGqlModel;
 
         function updateModel(){
-            var query = Gql.GqlRequest("query", "Get") ;
-
-            var modelIdsFields = Gql.GqlObject("ModelIds");
-            modelIdsFields.InsertField("PagesData");
-            query.AddField(modelIdsFields);
+            console.log("PagesProvider updateModel PagesData");
+            var query = Gql.GqlRequest("query", "PagesData");
 
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField("PageId");
@@ -32,6 +29,7 @@ Item {
             queryFields.InsertField("Source");
             queryFields.InsertField("StartItem");
             query.AddField(queryFields);
+
             var gqlData = query.GetQuery();
 
             this.SetGqlQuery(gqlData)
@@ -41,13 +39,11 @@ Item {
             console.log("State:",this.state, pagesGqlModel)
             if (this.state == "Ready"){
 
-                var dataModelLocal;
-
                 if (this.ContainsKey("data")){
-                    dataModelLocal = this.GetData("data");
+                    var dataModelLocal = this.GetData("data");
 
-                    if(dataModelLocal.ContainsKey("Get")){
-                        dataModelLocal = dataModelLocal.GetData("Get");
+                    if(dataModelLocal.ContainsKey("PagesData")){
+                        dataModelLocal = dataModelLocal.GetData("PagesData");
 
                         pagesProvider.pagesModel = dataModelLocal;
                     }

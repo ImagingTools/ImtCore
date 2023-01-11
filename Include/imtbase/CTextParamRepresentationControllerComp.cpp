@@ -24,7 +24,7 @@ bool CTextParamRepresentationControllerComp::IsModelSupported(const istd::IChang
 }
 
 
-bool CTextParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation) const
+bool CTextParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(&dataModel);
 	if (textParamPtr == nullptr) {

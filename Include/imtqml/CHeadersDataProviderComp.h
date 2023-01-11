@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationControllerCompBase.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtqml
@@ -12,13 +12,13 @@ namespace imtqml
 /**
 	Returns headers for a collection of objects.
 */
-class CHeadersDataProviderComp: public imtgql::CGqlRepresentationControllerCompBase
+class CHeadersDataProviderComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHeadersDataProviderComp);
-		I_REGISTER_INTERFACE(imtgql::CGqlRepresentationControllerCompBase);
+		I_REGISTER_INTERFACE(imtgql::IGqlRequestHandler);
 		I_ASSIGN(m_headersModelIdAttrPtr, "HeadersModelId", "Headers model-ID", true, "");
 		I_ASSIGN_MULTI_0(m_headersIdsAttrPtr, "HeadersIds", "Headers Ids", true);
 		I_ASSIGN_MULTI_0(m_headersSearchByFilterAttrPtr, "SearchByFilterIds", "Search by filter", false);
@@ -27,6 +27,7 @@ public:
 
 protected:
 	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:

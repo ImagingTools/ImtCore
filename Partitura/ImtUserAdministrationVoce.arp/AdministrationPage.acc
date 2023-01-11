@@ -7,7 +7,7 @@
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>ц2йц</Description>
+    <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
         <Element Id="AdministrationPageDataController" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
@@ -113,9 +113,6 @@
         <Element Id="VisualStatus" PackageId="ImtQmlPck" ComponentId="PageDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CheckPermissions" Type="Reference" ExportId="CheckPermissions">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="PageDefaultStatusIcon" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="LightSettings"/>
                     </AttributeInfo>

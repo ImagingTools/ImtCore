@@ -26,7 +26,7 @@ bool CObjectRepresentationControllerCompBase::IsModelSupported(const istd::IChan
 }
 
 
-bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation) const
+bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	return true;
 }

@@ -113,6 +113,9 @@ protected:
 	typedef QVector<Item> Items;
 
 protected:
+	Item* FindItemById(const Id& elementId) const;
+
+protected:
 	Items m_items;
 };
 

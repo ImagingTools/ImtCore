@@ -22,6 +22,7 @@
 #include <imtqml/CSelectionRepresentationComp.h>
 #include <imtqml/CTextRepresentationComp.h>
 #include <imtqml/CCompositeObjectRepresentationComp.h>
+#include <imtqml/CPageBasedGuiModelComp.h>
 
 
 /**
@@ -47,6 +48,7 @@ typedef imtqml::CCommandPermissionsFilterComp CommandPermissionsFilter;
 typedef imtqml::CObjectRepresentationCompBase ObjectRepresentation;
 typedef imtqml::CSelectionRepresentationComp SelectionRepresentation;
 typedef imtqml::CTextRepresentationComp TextRepresentation;
+typedef imtqml::CPageBasedGuiModelComp PageBasedModel;
 
 
 } // namespace ImtQmlPck

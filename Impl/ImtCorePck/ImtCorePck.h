@@ -39,6 +39,7 @@
 #include <imtbase/CSelectionParamRepresentationControllerComp.h>
 #include <imtbase/CTextParamRepresentationControllerComp.h>
 #include <imtbase/CDatabaseAccessSettingsRepresentationControllerComp.h>
+#include <imtbase/CGuiElementRepresentationControllerComp.h>
 #include <imtbase/CPageBasedGuiRepresentationControllerComp.h>
 
 
@@ -93,6 +94,7 @@ typedef imtbase::CSelectionParamRepresentationControllerComp SelectionParamRepre
 typedef imtbase::CTextParamRepresentationControllerComp TextParamRepresentationController;
 typedef imtbase::CDatabaseAccessSettingsRepresentationControllerComp DatabaseAccessSettingsRepresentationController;
 typedef imtbase::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
+typedef imtbase::CGuiElementRepresentationControllerComp GuiElementRepresentationController;
 
 
 } // namespace ImtCorePck

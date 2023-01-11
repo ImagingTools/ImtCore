@@ -97,6 +97,11 @@ I_EXPORT_COMPONENT(
 			"Text Representation",
 			"Text Representation");
 
+I_EXPORT_COMPONENT(
+			PageBasedModel,
+			"Page based model",
+			"Page Based Model");
+
 
 } // namespace ImtQmlPck
 

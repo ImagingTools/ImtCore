@@ -17,7 +17,7 @@ class CObjectRepresentationCompBase: public imtgql::CGqlRepresentationDataContro
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_BASE_COMPONENT(CObjectRepresentationCompBase);
+	I_BEGIN_COMPONENT(CObjectRepresentationCompBase);
 		I_ASSIGN(m_paramIdAttrPtr, "ParamId", "ID of the param", true, "");
 		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the param", false, "");
 		I_ASSIGN(m_qmlPathAttrPtr, "PathToQml", "Path to qml component", false, "");

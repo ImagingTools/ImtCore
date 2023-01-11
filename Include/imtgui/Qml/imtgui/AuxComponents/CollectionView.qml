@@ -51,7 +51,7 @@ Item {
     }
 
     onCommandsIdChanged: {
-        console.log("this onItemIdChanged", itemId);
+        console.log("this onItemIdChanged", commandsId);
 
         commandsProvider.commandsId = commandsId;
 

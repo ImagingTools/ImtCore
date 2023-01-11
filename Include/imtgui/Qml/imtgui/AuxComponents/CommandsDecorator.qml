@@ -51,9 +51,12 @@ Item {
                 id: topButtonDelegate;
 
                 decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
-                imageSource: "../../../../" + "Icons/" + Style.theme + "/" + model.Icon + "_" + "Off" + "_" + model.Mode + ".svg";
-                enabled:  model.Mode == "Normal";
-                visible: model.Visible;
+                imageSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
+                                       "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
+
+                enabled: model.IsEnabled;
+
+//                visible: model.Visible;
 
                 text: model.Name;
 

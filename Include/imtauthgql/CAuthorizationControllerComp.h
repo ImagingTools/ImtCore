@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationControllerCompBase.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtcrypt/IHashCalculator.h>
 
@@ -11,10 +11,10 @@ namespace imtauthgql
 {
 
 
-class CAuthorizationControllerComp: public imtgql::CGqlRepresentationControllerCompBase
+class CAuthorizationControllerComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationControllerCompBase BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CAuthorizationControllerComp);
 		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
