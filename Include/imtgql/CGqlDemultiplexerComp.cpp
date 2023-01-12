@@ -5,7 +5,7 @@ namespace imtgql
 {
 
 
-// protected methods
+// public methods
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 

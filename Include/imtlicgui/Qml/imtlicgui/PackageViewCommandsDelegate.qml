@@ -95,7 +95,7 @@ DocumentWorkspaceCommandsDelegateBase {
     function selectedIndexChanged(){
 //        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
         let isEnabled = tableTreeViewEditor.selectedIndex != null;
-        packageViewContainer.commandsProvider.changeCommandMode("Remove", isEnabled);
+        packageViewContainer.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
     }
 
     Component {

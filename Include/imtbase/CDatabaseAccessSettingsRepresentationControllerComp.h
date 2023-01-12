@@ -20,6 +20,8 @@ public:
 		I_ASSIGN(m_passwordPathAttrPtr, "PasswordSource", "Path to qml password component for representation data", false, "");
 		I_ASSIGN(m_portAttrPtr, "PortSource", "Path to qml port component for representation data", false, "");
 		I_ASSIGN(m_usernamePathAttrPtr, "UsernameSource", "Path to qml username component for representation data", false, "");
+		I_ASSIGN(m_paramNameAttrPtr, "ObjectName", "Object Name", false, "");
+		I_ASSIGN(m_qmlPathAttrPtr, "PathToQml", "Path to qml component for representation data", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -34,6 +36,8 @@ protected:
 	I_TEXTATTR(m_passwordPathAttrPtr);
 	I_TEXTATTR(m_portAttrPtr);
 	I_TEXTATTR(m_usernamePathAttrPtr);
+	I_TEXTATTR(m_paramNameAttrPtr);
+	I_TEXTATTR(m_qmlPathAttrPtr);
 };
 
 

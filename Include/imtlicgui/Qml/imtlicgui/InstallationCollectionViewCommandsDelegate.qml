@@ -9,9 +9,10 @@ CollectionViewCommandsDelegateBase {
     onSelectedIndexChanged: {
         console.log("InstallationCollectionViewContainer onSelectedIndexChanged");
 
-        let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
-        commandsProvider.changeCommandMode("Duplicate", mode);
-        commandsProvider.changeCommandMode("CreateLicense", mode);
+        let isEnabled = container.selectedIndex > -1;
+
+        commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
+        commandsProvider.setCommandIsEnabled("CreateLicense", isEnabled);
     }
 
     onCommandActivated: {

@@ -17,8 +17,7 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpFileControllerServletComp)
 		I_REGISTER_INTERFACE(IRequestServlet)
-        I_ASSIGN_MULTI_0(m_binaryDataControllersCompPtr, "BinaryDataControllers", "Binary data controllers", true);
-
+		I_ASSIGN_MULTI_0(m_binaryDataControllersCompPtr, "BinaryDataControllers", "Binary data controllers", false);
 	I_END_COMPONENT
 
 protected:

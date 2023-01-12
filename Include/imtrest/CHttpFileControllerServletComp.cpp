@@ -15,7 +15,6 @@ namespace imtrest
 
 // reimplemented (CHttpServletCompBase)
 
-
 CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 			const QByteArray& commandId,
 			const IRequest::CommandParams& commandParams,

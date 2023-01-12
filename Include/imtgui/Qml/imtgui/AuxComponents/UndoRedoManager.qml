@@ -119,11 +119,11 @@ Item {
     }
 
     function checkCommandMode(){
-        let state = undoRedo.undoStack.length > 1 ? "Normal" : "Disabled";
-        commandsProvider.changeCommandMode("Undo", state);
+        let isEnabled = undoRedo.undoStack.length > 1;
+        commandsProvider.setCommandIsEnabled("Undo", isEnabled);
 
-        state = undoRedo.redoStack.length > 0 ? "Normal" : "Disabled";
-        commandsProvider.changeCommandMode("Redo", state);
+        isEnabled = undoRedo.redoStack.length > 0;
+        commandsProvider.setCommandIsEnabled("Redo", isEnabled);
 
         timerCheckModel.start();
     }

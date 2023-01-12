@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5030" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CommandsJoiner" X="600" Y="300" Note=""/>
+        <Element ComponentName="Edit" X="1000" Y="500" Note=""/>
+        <Element ComponentName="New" X="200" Y="500" Note=""/>
+        <Element ComponentName="Remove" X="600" Y="501.414213562" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

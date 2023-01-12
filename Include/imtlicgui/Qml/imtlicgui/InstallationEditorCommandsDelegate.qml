@@ -30,7 +30,7 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("InstallationCommands onInstanceIdAcceptableChanged", instanceIdAcceptable);
 
         if (!instanceIdAcceptable){
-            commandsProvider.changeCommandMode("Save", "Disabled");
+            commandsProvider.setCommandIsEnabled("Save", false);
         }
     }
 
@@ -68,7 +68,7 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("InstallationCommands modelChanged", instanceIdAcceptable);
 
         if (instanceIdAcceptable){
-            commandsProvider.changeCommandMode("Save", "Normal");
+            commandsProvider.setCommandIsEnabled("Save", true);
 
             let suffix = "*";
             documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});

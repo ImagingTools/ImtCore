@@ -47,8 +47,8 @@ Item {
 //        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
         let isEnabled = containerBase.selectedIndex > -1;
 
-        commandsProvider.changeCommandMode("Remove", isEnabled);
-        commandsProvider.changeCommandMode("Edit", isEnabled);
+        commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+        commandsProvider.setCommandIsEnabled("Edit", isEnabled);
     }
 
     Component.onDestruction: {

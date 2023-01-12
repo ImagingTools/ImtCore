@@ -40,7 +40,7 @@ public:
 
 	QByteArray GetMimeType(QByteArray fileSuffix) const;
 
-// reimplemented (IRequestHandler)
+	// reimplemented (IRequestHandler)
 	virtual ConstResponsePtr OnGet(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
@@ -50,14 +50,11 @@ public:
 
 protected:
 	I_ATTR(QString, m_fileIdCommandParamAttrPtr);
-
 	I_MULTIREF(imtbase::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
-
 
 private:
 	QByteArray m_beginOfMessage;
 	QByteArray m_endOfMessage;
-
 };
 
 

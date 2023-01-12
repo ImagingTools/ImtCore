@@ -16,7 +16,7 @@ namespace imtbase
 bool CParamSetRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
 	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(&dataModel);
-	if (paramsSetPtr != nullptr) {
+	if (paramsSetPtr != nullptr){
 		return true;
 	}
 

@@ -21,9 +21,9 @@ DocumentWorkspaceCommandsDelegateBase {
 
     onSelectedIndexChanged: {
         console.log("RoleViewDelegate onSelectedIndexChanged", selectedIndex);
-        let mode = delegateContainer.selectedIndex != null ? "Normal" : "Disabled";
+        let isEnabled = delegateContainer.selectedIndex != null;
 
-        commandsProvider.changeCommandMode("Exclude", mode);
+        commandsProvider.setCommandIsEnabled("Exclude", isEnabled);
     }
 
     onCommandActivated: {

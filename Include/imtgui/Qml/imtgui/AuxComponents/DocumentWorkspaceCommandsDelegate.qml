@@ -21,10 +21,10 @@ DocumentWorkspaceCommandsDelegateBase {
 
     onSelectedIndexChanged: {
         console.log("CollectionViewCommands onSelectedIndexChanged", container.selectedIndex, container);
-        let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
+        let isEnabled = container.selectedIndex > -1;
 
-        commandsProvider.changeCommandMode("Remove", mode);
-        commandsProvider.changeCommandMode("Edit", mode);
+        commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+        commandsProvider.setCommandIsEnabled("Edit", isEnabled);
     }
 
     onCommandActivated: {

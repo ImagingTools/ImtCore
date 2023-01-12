@@ -16,7 +16,7 @@
         <Element ComponentName="UserModeOptions" X="100" Y="525" Note=""/>
         <Element ComponentName="UserModeRepresentation" X="400" Y="375" Note=""/>
         <Element ComponentName="UserSessionRepository" X="1000" Y="375" Note=""/>
-        <Element ComponentName="UsersSessionsDatabaseDelegate" X="1000" Y="575" Note=""/>
+        <Element ComponentName="UsersSessionsDatabaseDelegate" X="975" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

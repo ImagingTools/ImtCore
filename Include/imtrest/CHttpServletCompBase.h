@@ -99,8 +99,6 @@ protected:
 
 protected:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);
-
-
 };
 
 

@@ -99,7 +99,7 @@ Item {
     }
 
     function removeChanges(){
-        commandsProvider.changeCommandMode("Save", "Disabled");
+        commandsProvider.setCommandIsEnabled("Save", false);
         documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName});
     }
 
@@ -225,7 +225,7 @@ Item {
 
     function modelChanged(){
         console.log("DocumentsCommands modelChanged");
-        commandsProvider.changeCommandMode("Save", "Normal");
+        commandsProvider.setCommandIsEnabled("Save", "Normal");
 
         let suffix = "*";
         documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});

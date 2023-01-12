@@ -11,9 +11,9 @@ CollectionViewCommandsDelegateBase {
     onSelectedIndexChanged: {
         console.log("ProductCollectionViewCommands onSelectedIndexChanged");
 
-        let mode = container.selectedIndex > -1 ? "Normal" : "Disabled";
-        commandsProvider.changeCommandMode("Duplicate", mode);
-        commandsProvider.changeCommandMode("Export", mode);
+        let isEnabled = container.selectedIndex > -1;
+        commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
+        commandsProvider.setCommandIsEnabled("Export", isEnabled);
     }
 
     onCommandActivated: {

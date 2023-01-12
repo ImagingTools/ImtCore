@@ -38,20 +38,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CompositeObject" PackageId="ImtQmlPck" ComponentId="CompositeObjectRepresentation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="RepresentationDataControllers" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Pages/RolesPageVisualStatus</Value>
-                                <Value>Pages/UsersPageVisualStatus</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="Pages" PackageId="" ComponentId="Pages">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>

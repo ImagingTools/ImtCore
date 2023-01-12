@@ -16,18 +16,18 @@ DocumentWorkspaceCommandsDelegateBase {
 
     onSelectedIndexChanged: {
         console.log("CollectionViewCommands onSelectedIndexChanged");
-        let mode = "Disabled";
+        let isEnabled = false;
 
         if (container.selectedIndex != null){
             let level = container.selectedIndex.itemData.Level;
             if (level == 0){
-                mode = "Normal";
+                isEnabled = true;
             }
         }
 
-        commandsProvider.changeCommandMode("Remove", mode);
-        commandsProvider.changeCommandMode("Edit", mode);
-        commandsProvider.changeCommandMode("Duplicate", mode);
+        commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+        commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+        commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
     }
 
     onCommandActivated: {

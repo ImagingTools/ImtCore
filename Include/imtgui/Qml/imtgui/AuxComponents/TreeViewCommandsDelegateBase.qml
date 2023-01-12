@@ -21,10 +21,10 @@ Item {
 
     onSelectedCountChanged: {
         console.log("onSelectedCountChanged", treeViewDelegate.selectedCount);
-        let mode = treeViewDelegate.selectedCount > 0 ? "Normal" : "Disabled";
+        let isEnabled = treeViewDelegate.selectedCount > 0;
 
-        commandsProvider.changeCommandMode("New", mode);
-        commandsProvider.changeCommandMode("Remove", mode);
+        commandsProvider.setCommandIsEnabled("New", isEnabled);
+        commandsProvider.setCommandIsEnabled("Remove", isEnabled);
     }
 
     function insertNewItem(model){

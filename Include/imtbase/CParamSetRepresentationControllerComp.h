@@ -16,6 +16,8 @@ public:
 
 	I_BEGIN_COMPONENT(CParamSetRepresentationControllerComp)
 		I_ASSIGN_MULTI_0(m_paramRepresentationControllersCompPtr, "ParamRepresentationControllers", "Sub parameters representation controllers", false);
+		I_ASSIGN(m_paramNameAttrPtr, "ObjectName", "Object Name", false, "");
+		I_ASSIGN(m_qmlPathAttrPtr, "PathToQml", "Path to qml component for representation data", false, "");
 	I_END_COMPONENT;
 
 protected:
@@ -31,6 +33,9 @@ protected:
 		All needed sub-controllers according to the used data model types inside of the parameter set
 	*/
 	I_MULTIREF(IRepresentationController, m_paramRepresentationControllersCompPtr);
+
+	I_TEXTATTR(m_paramNameAttrPtr);
+	I_TEXTATTR(m_qmlPathAttrPtr);
 };
 
 

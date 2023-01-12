@@ -26,15 +26,18 @@ Item {
         commandsProviderContainer.modelLoaded();
     }
 
-    function changeCommandMode(commandId, mode){
-        console.log("changeCommandModecommandsProviderContainer onCommandsIdChanged", commandId, mode);
+    function setCommandIsEnabled(commandId, isEnabled){
         if(commandsModel === undefined) return;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             if (currentCommandId == commandId){
-                commandsProviderContainer.commandsModel.SetData("IsEnabled", mode, i);
-                commandModeChanged(commandId, mode);
+                let currentIsEnabled = commandsProviderContainer.commandsModel.GetData("IsEnabled", i);
+                if (currentIsEnabled != isEnabled){
+                    commandsProviderContainer.commandsModel.SetData("IsEnabled", isEnabled, i);
+
+                    commandModeChanged(commandId, isEnabled);
+                }
             }
         }
     }

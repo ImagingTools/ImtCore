@@ -43,11 +43,6 @@ I_EXPORT_COMPONENT(
 			"Page item based data provider");
 
 I_EXPORT_COMPONENT(
-			CompositeObjectRepresentation,
-			"Composite object representation",
-			"Representation Data Model Composite Combined Container");
-
-I_EXPORT_COMPONENT(
 			HeadersDataProvider,
 			"Headers data provider",
 			"Headers data provider");
@@ -73,29 +68,9 @@ I_EXPORT_COMPONENT(
 			"Object view data provider");
 
 I_EXPORT_COMPONENT(
-			UserRelatedSettingsController,
-			"User related settings controller",
-			"User Controller Client Settings Database");
-
-I_EXPORT_COMPONENT(
 			CommandPermissionsFilter,
 			"Command Permissions Filter",
 			"Command permissions filter");
-
-I_EXPORT_COMPONENT(
-			ObjectRepresentation,
-			"Object Representation",
-			"Object Representation");
-
-I_EXPORT_COMPONENT(
-			SelectionRepresentation,
-			"Selection Representation",
-			"Selection Representation Data Model");
-
-I_EXPORT_COMPONENT(
-			TextRepresentation,
-			"Text Representation",
-			"Text Representation");
 
 I_EXPORT_COMPONENT(
 			PageBasedModel,

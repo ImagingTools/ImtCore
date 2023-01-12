@@ -25,7 +25,7 @@ public:
 	I_BEGIN_COMPONENT(CHttpRootServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_commandIdsAttrPtr, "CommandIds", "List of command-IDs used with corresponded handlers", true);
-		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "List of request handlers for corresponding command-IDs", true);
+		I_ASSIGN_MULTI_0(m_requestHandlersCompPtr, "RequestHandlers", "List of request handlers for corresponding command-IDs", false);
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)

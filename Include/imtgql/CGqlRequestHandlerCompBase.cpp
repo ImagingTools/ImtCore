@@ -61,7 +61,7 @@ bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gql
 	bool result = true;
 	if (gqlRequest.GetGqlContext() != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
-
+		Q_ASSERT(userInfoPtr != nullptr);
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetUserId();
 			if (!userInfoPtr->IsAdmin()){

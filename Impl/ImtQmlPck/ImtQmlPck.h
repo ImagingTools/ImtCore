@@ -16,12 +16,7 @@
 #include <imtqml/CClientUserContextComp.h>
 #include <imtqml/CApplicationInfoDataProviderComp.h>
 #include <imtqml/CObjectViewDataProviderComp.h>
-#include <imtqml/CUserRelatedSettingsControllerComp.h>
 #include <imtqml/CCommandPermissionsFilterComp.h>
-#include <imtqml/CObjectRepresentationCompBase.h>
-#include <imtqml/CSelectionRepresentationComp.h>
-#include <imtqml/CTextRepresentationComp.h>
-#include <imtqml/CCompositeObjectRepresentationComp.h>
 #include <imtqml/CPageBasedGuiModelComp.h>
 
 
@@ -37,17 +32,12 @@ typedef imtqml::CQuickObjectCompBase QuickObject;
 typedef imtqml::CGuiQuickWrapComp GuiQuickWrap;
 typedef imtqml::CCommandDataProviderComp CommandDataProvider;
 typedef imtqml::CPageDataProviderComp PageDataProvider;
-typedef imtqml::CCompositeObjectRepresentationComp CompositeObjectRepresentation;
 typedef imtqml::CHeadersDataProviderComp HeadersDataProvider;
 typedef imtqml::CObserverQmlComp ObserverQml;
 typedef imtqml::CClientUserContextComp ClientUserContext;
 typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
-typedef imtqml::CUserRelatedSettingsControllerComp UserRelatedSettingsController;
 typedef imtqml::CCommandPermissionsFilterComp CommandPermissionsFilter;
-typedef imtqml::CObjectRepresentationCompBase ObjectRepresentation;
-typedef imtqml::CSelectionRepresentationComp SelectionRepresentation;
-typedef imtqml::CTextRepresentationComp TextRepresentation;
 typedef imtqml::CPageBasedGuiModelComp PageBasedModel;
 
 
