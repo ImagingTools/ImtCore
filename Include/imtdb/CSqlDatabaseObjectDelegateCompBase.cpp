@@ -127,7 +127,7 @@ bool CSqlDatabaseObjectDelegateCompBase::SetObjectMetaInfoFromRecord(
 {
 	if (objectMetaInfoPtr.IsValid() && record.contains(metaInfoId)){
 		QVariant value = record.value(QString(metaInfoId));
-		objectMetaInfoPtr->SetMetaInfo(metaInfoId, value);
+//		objectMetaInfoPtr->SetMetaInfo(metaInfoId, value);
 
 		return true;
 	}

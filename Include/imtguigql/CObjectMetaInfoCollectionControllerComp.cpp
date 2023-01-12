@@ -19,13 +19,9 @@ namespace imtguigql
 // protected methods
 
 
-imtbase::CHierarchicalItemModelPtr CObjectMetaInfoCollectionControllerComp::ListObjects(
-		const QList<imtgql::CGqlObject>& inputParams,
-		const imtgql::CGqlObject& gqlObject,
-		const imtgql::IGqlContext* gqlContext,
-		QString& errorMessage) const
+imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
@@ -35,7 +31,7 @@ imtbase::CHierarchicalItemModelPtr CObjectMetaInfoCollectionControllerComp::List
 	}
 
 	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
@@ -44,8 +40,9 @@ imtbase::CHierarchicalItemModelPtr CObjectMetaInfoCollectionControllerComp::List
 		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		if (inputParams.size() > 0){
-			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+		const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
+		if (inputParams->size() > 0){
+			viewParamsGql = inputParams->at(0).GetFieldArgumentObjectPtr("viewParams");
 		}
 
 		iprm::CParamsSet filterParams;
@@ -103,17 +100,17 @@ imtbase::CHierarchicalItemModelPtr CObjectMetaInfoCollectionControllerComp::List
 
 		if (sqlDatabaseObjectCollectionCompPtr != nullptr){
 			imtdb::CSqlDatabaseObjectCollectionComp::ObgectsMetaInfos objectMetaInfos;
-			QByteArrayList metaInfoIds = GetInformationIds(gqlObject);
+			QByteArrayList metaInfoIds = GetInformationIds(gqlRequest, "");
 			sqlDatabaseObjectCollectionCompPtr->GetObjectsMetaInfos(objectMetaInfos, metaInfoIds, offset, count, &filterParams);
 			for (idoc::MetaInfoPtr metaInfoPtr: objectMetaInfos){
 				int itemIndex = itemsModel->InsertNewItem();
 				if (itemIndex >= 0){
 					for (QByteArray metaInfoId: metaInfoIds){
-						QVariant elementInformation = metaInfoPtr->GetMetaInfo(metaInfoId);
-						if (metaInfoId == QByteArray("Added") || metaInfoId == QByteArray("LastModified")){
-							elementInformation = elementInformation.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-						}
-						itemsModel->SetData(metaInfoId, elementInformation, itemIndex);
+//						QVariant elementInformation = metaInfoPtr->GetMetaInfo(metaInfoId);
+//						if (metaInfoId == QByteArray("Added") || metaInfoId == QByteArray("LastModified")){
+//							elementInformation = elementInformation.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+//						}
+//						itemsModel->SetData(metaInfoId, elementInformation, itemIndex);
 					}
 
 				}
@@ -124,9 +121,9 @@ imtbase::CHierarchicalItemModelPtr CObjectMetaInfoCollectionControllerComp::List
 		dataModel->SetExternTreeModel("items", itemsModel);
 		dataModel->SetExternTreeModel("notification", notificationModel);
 	}
-	rootModel->SetExternTreeModel("data", dataModel);
+	rootModelPtr->SetExternTreeModel("data", dataModel);
 
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

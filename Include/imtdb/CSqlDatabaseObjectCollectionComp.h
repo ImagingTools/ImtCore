@@ -18,7 +18,6 @@
 #include <imtdb/IDatabaseEngine.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseLoginSettings.h>
-#include <imtbase/IObjectMetaInfo.h>
 
 
 namespace imtdb

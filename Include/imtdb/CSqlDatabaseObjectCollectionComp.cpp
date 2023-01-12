@@ -498,6 +498,7 @@ bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 }
 
 
+// from Viktor fo check
 bool CSqlDatabaseObjectCollectionComp::GetObjectsMetaInfos(ObgectsMetaInfos &obgectsMetaInfos,
 												const QList<QByteArray> &metaInfoIds,
 												int offset,
