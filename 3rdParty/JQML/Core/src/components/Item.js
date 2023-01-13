@@ -139,6 +139,8 @@ export class Item extends QtObject {
         }
         
         this.dom.style.position = 'absolute'
+        this.dom.style.left = '0'
+        this.dom.style.top = '0'
         this.dom.style.overflow = 'unset'
         this.dom.style.zIndex = this.z
         this.dom.classList.add(this.constructor.name)

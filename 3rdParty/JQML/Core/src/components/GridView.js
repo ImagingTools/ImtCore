@@ -7,13 +7,11 @@ export class GridView extends Flickable {
 
     static LeftToRight = 0
     static RightToLeft = 1
-    static BottomToTop = 2
+    static TopToBottom = 2
     static BottomToTop = 3
 
-    $wAuto = false
-    $hAuto = false
-
     $useModel = true
+    $childrenForUpdate = []
 
     constructor(args) {
         super(args)
@@ -31,23 +29,29 @@ export class GridView extends Flickable {
     }
     $domCreate(){
         super.$domCreate()
+        this.dom.style.display = 'flex'
+        this.dom.style.flexWrap = 'wrap'
     }
     $directionChanged(){
-        this.$updateChildren()
+        if(this.layoutDirection === GridView.LeftToRight) {
+            
+        } else {
+
+        }
+        if(this.verticalLayoutDirection === GridView.TopToBottom) {
+
+        } else {
+            
+        }
+        // this.$updateChildren()
     }
     $cellChanged(){
-        this.$updateChildren()
+        // this.$updateChildren()
     }
     $modelChanged(){
+        if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
+        this.$model = this.model
         this.$updateView()
-    }
-    $widthChanged(){
-        this.$wAuto = true
-        super.$widthChanged()
-    }
-    $heightChanged(){
-        this.$hAuto = true
-        super.$heightChanged()
     }
     $delegateChanged(){
         this.$updateView()
@@ -85,201 +89,144 @@ export class GridView extends Flickable {
         }
     }
 
+    $insert(index){
+        if(this.model && this.delegate){
+            let childRecursive = (obj, indx)=>{
+                
+                obj.$cP('index', indx)
+                obj.index = indx
+
+                for(let child of obj.children){
+                    if(!child.$useModel && !child.$repeater)
+                    childRecursive(child, indx)
+                }
+            }
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this, index: index}) : this.delegate({parent: this, index: index})
+            this.children.pop()
+            this.children.splice(index, 0, obj)
+
+            for(let i = 0; i < this.children.length; i++){
+                childRecursive(this.children[i], i)
+            }
+            
+            this.count = this.children.length
+            this.$updateChild(index)
+            obj.$uP()
+        }
+    }
+
+    $append(wait = false){
+        let index = this.children.length
+        if(this.model && this.delegate){
+            let childRecursive = (obj)=>{
+                
+                obj.$cP('index', index)
+                obj.index = index
+
+                for(let child of obj.children){
+                    if(!child.$useModel && !child.$repeater)
+                    childRecursive(child)
+                }
+            }
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this, index: index}) : this.delegate({parent: this, index: index})
+            childRecursive(obj)
+            this.count = this.children.length
+            this.$updateChild(index)
+
+            if(wait){
+                this.$childrenForUpdate.push(obj)
+            } else {
+                obj.$uP()
+            }
+        }
+    }
+    $remove(index, count){
+        let removed = this.children.splice(index, count)
+        for(let rem of removed){
+            rem.$destroy()
+        }
+        let childRecursive = (obj, index)=>{
+            obj.index = index
+            for(let child of obj.children){
+                childRecursive(child, index)
+            }
+        }
+        for(let i = 0; i < this.children.length; i++){
+            childRecursive(this.children[i], i)
+        }
+        this.count = this.children.length
+    }
+
     $updateView(){
         if(this.model && this.delegate){
-            
-            while(this.children.length){
-                this.children.pop().$destroy()
-            }
-            // for(let child of this.children){
-            //     child.$destroy()
-            // }
-            this.children = []
-
-            let childRecursive = (obj, model, index)=>{
-                // obj.$cPC('model', model)
-                obj.$cPC('model',model)
-                obj.$cP('index',index)
-                for(let child of obj.children){
-                    childRecursive(child, model, index)
-                }
-            }
-
-            this.count = 0
-            if(typeof this.model === 'number'){     
-                for(let i = 0; i < this.model; i++){    
-                    // let tempUID = UID     
-                    let obj = this.delegate(this)
-                    // UID += UID - tempUID
-                    
-                    obj.$cPC('model', {
-                        index: i,
-                    })
-                    obj.$cP('index',i)
-                    childRecursive(obj, {
-                        index: i,
-                    }, i)
-                    this.count = i
-                }
-            } else if (typeof this.model === 'object'){
-                // if(this.$model && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
-                if(this.model && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
-                if(this.model.$data){
-                    this.model.$deps[this.UID] = this
-
-                    if(Array.isArray(this.model.$data)){
-                        for(let i = 0; i < this.model.$data[0].length; i++){    
-                            let obj = this.delegate(this) 
-                            let tempModel = {
-                                'index': i
-                            } 
-                            if(this.model.$data[0][i].$data){
-                                if(Array.isArray(this.model.$data[0][i].$data)){
-                                    for(let name in this.model.$data[0][i].$data[0]){
-                                        tempModel[name] = this.model.$data[0][i].$data[0][name]
-                                    }
-                                } else {
-                                    for(let name in this.model.$data[0][i].$data){
-                                        tempModel[name] = this.model.$data[0][i].$data[name]
-                                    }
-                                }
-                                
-                            } else if(this.model.$data[0][i].$p){
-                                for(let name in this.model.$data[0][i].$p){
-                                    tempModel[name] = this.model.$data[0][i].$p[name].val
-                                }
-                            } else {
-                                for(let name in this.model.$data[0][i]){
-                                    tempModel[name] = this.model.$data[0][i][name]
-                                }
-                            }
-                            
-                            // UID += UID - tempUID
-                            // obj.$cPC('model', {
-                            //     model: this.model.$data[i],
-                            //     index: i,
-                            // })
-                            obj.$cPC('model',tempModel)
-                            obj.$cP('index',i)
-                            childRecursive(obj, tempModel, i)
-                            this.count = i
-                        }
-                    } else {
-                        for(let i = 0; i < this.model.$data.length; i++){    
-                            let obj = this.delegate(this) 
-                            let tempModel = {
-                                'index': i
-                            } 
-                            if(this.model.$data[i].$p){
-                                for(let name in this.model.$data[i].$p){
-                                    tempModel[name] = this.model.$data[i].$p[name].val
-                                }
-                            } else {
-                                for(let name in this.model.$data[i]){
-                                    tempModel[name] = this.model.$data[i][name]
-                                }
-                            }
-                            
-                            // UID += UID - tempUID
-                            // obj.$cPC('model', {
-                            //     model: this.model.$data[i],
-                            //     index: i,
-                            // })
-                            obj.$cPC('model',tempModel)
-                            obj.$cP('index',i)
-                            childRecursive(obj, tempModel, i)
-                            this.count = i
-                        }
+            if(typeof this.model === 'number'){
+                if(this.model > this.children.length){
+                    let count = this.model - this.children.length
+                    for(let i = 0; i < count; i++){      
+                        this.$append()
                     }
-                    
+                } else {
+                    this.$remove(3, this.children.length - this.model)
+                }  
+                
+            } else if (typeof this.model === 'object'){
+                while(this.children.length){
+                    this.children.pop().$destroy()
+                }
+                this.children = []
+                this.count = 0
+
+                
+                if(this.model.$deps) {
+                    this.model.$deps[this.UID] = this
+                    for(let i = 0; i < this.model.data.length; i++){
+                        this.$append(true)
+                    }
                 } else {
                     for(let i = 0; i < this.model.length; i++){
-                        // let tempUID = UID   
-                        let obj = this.delegate(this)  
-                        // UID += UID - tempUID
-                        obj.$cPC('model', {
-                            index: i,
-                        })
-                        obj.$cP('index',i)
-                        childRecursive(obj, {
-                            index: i,
-                        }, i)
-                        this.count = i
+                        this.$append(true)
                     }
+                }
+
+                while(this.$childrenForUpdate.length){
+                    this.$childrenForUpdate.shift().$uP()
                 }
                 
-
             } else {
 
             }
-            this.$uP()
-            this.$updateGeometry()
-            
- 
-
         }
+    
+    }
+    
+    $updateChild(index){
+        let child = this.children[index]
+        child.dom.style.position = 'relative'
+        child.$sP('width', ()=>{ return this.cellWidth })
+        child.$sP('height', ()=>{ return this.cellHeight })
     }
 
-    $updateGeometry(){
-        this.$updateChildren()
-
-        super.$updateGeometry()
-    }
-
-    $updateChildren(){
-        let maxWidth = this.$wAuto && this.$contentWAuto ? this.width : 9999999
-        let maxHeight = this.$hAuto && this.$contentHAuto ? this.height : 9999999
-
-        // console.log('maxWidth = ', maxWidth, 'maxHeight = ', maxHeight)
-
-        let dy = this.verticalLayoutDirection === GridView.TopToBottom ? 0 : maxHeight
-        let dx = this.layoutDirection === GridView.LeftToRight ? 0 : maxWidth
-
-        for(let i = 0; i < this.children.length; i++){
-            let child = this.children[i]
-            
-            if(this.layoutDirection === GridView.LeftToRight){
-                if(dx + this.cellWidth > maxWidth) {
-                    dx = 0
-                    if(this.verticalLayoutDirection === GridView.TopToBottom){
-                        dy += this.cellHeight
-                    } else {
-                        dy -= this.cellHeight
-                    }
-                }
-            } else {
-                if(dx < 0) {
-                    dx = maxWidth
-                    if(this.verticalLayoutDirection === GridView.TopToBottom){
-                        dy += this.cellHeight
-                    } else {
-                        dy -= this.cellHeight
-                    }
-                }
-            }
-            if(this.verticalLayoutDirection === GridView.TopToBottom){
-                if(dy + this.cellHeight > maxHeight) dy = 0
-            } else {
-                if(dy < 0) dy = maxHeight
-            }
-
-            child.x = dx
-            child.y = dy
-            // child.dom.style.zIndex = i
-
-            if(this.layoutDirection === GridView.LeftToRight){
-                dx += this.cellWidth
-            } else {
-                dx -= this.cellWidth
-            }
-            
-            // console.log('child.x = ', child.x, 'child.y = ', child.y)
-        }
-
-    }
+    // $anchorsChild(index){
+    //     let child = this.children[index]
+    //     if(index === 0){
+    //         child.$sP('anchors.left', ()=>{ return this.left })
+    //         child.$sP('anchors.top', ()=>{ return this.top })
+    //     } else {
+    //         if(this.orientation === GridView.layoutDirection){
+    //             child.$sP('anchors.left', ()=>{ return this.children[index-1].right })
+    //             child.$sP('anchors.leftMargin', ()=>{ return this.spacing })
+    //         } else {
+    //             child.$sP('anchors.top', ()=>{ return this.children[index-1].bottom })
+    //             child.$sP('anchors.topMargin', ()=>{ return this.spacing })
+    //         }
+    //     }
+        
+        
+    // }
 
     $destroy(){
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
+        if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
         this.impl.remove()
         super.$destroy()
     }

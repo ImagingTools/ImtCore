@@ -24,8 +24,11 @@ export class Text extends Item {
     static RichText = 3
     static MarkdownText = 4
 
-    $contentWAuto = true
-    $contentHAuto = true
+    $contentWidthAuto = true
+	$contentHeightAuto = true
+
+    $widthAuto = true
+	$heightAuto = true
 
     constructor(args) {
         super(args)
@@ -41,134 +44,227 @@ export class Text extends Item {
         this.$cPC('font', Font()).connect(this.$fontChanged.bind(this))
 
         this.$s.linkActivated = Signal()
+
+        this.$updateTimer = null
     }
 
     $domCreate(){
         super.$domCreate()
-        this.dom.style.display = "flex"
-        this.dom.style.width = `0px`
-        this.dom.style.height = `0px`
-        this.impl = document.createElement("div")
+        // this.dom.style.position = "relative";
+        // this.dom.style.display = "flex"
+        // this.dom.style.width = `0px`
+        // this.dom.style.height = `0px`
+        this.impl = document.createElement("span")
         this.dom.appendChild(this.impl);
         
         this.impl.style.textAlign = "inherit"
         this.impl.style.whiteSpace = "pre";
-        this.impl.style.width = "fit-content";
+        // this.impl.style.position = "absolute";
+        // this.impl.style.width = "fit-content";
         this.impl.innerHTML = ``
 
+        // this.$updateGeometry()
         //this.$observer = setInterval(this.$updateContentWH.bind(this), 100)
     }
     $show(){
         this.dom.style.display = 'flex'
     }
     $textChanged(){
-        this.impl.innerHTML = `${this.$p.text.val}`
+        this.impl.innerHTML = `${this.text}`
 
-        this.$calcWH()
+        this.$updateGeometry()
+        // this.$calcWH()
     }
-    $calcWH(){
-        let tempText = document.createElement("span")
-        let tempDom = document.createElement("div")
-        tempText.innerHTML = this.$p.text.val
+    $updateGeometry(){
+		// if(this.$contentHeightAuto)
+        // this.$sP('contentHeight', ()=>{ 
+        //     this.text
+        //     this.font.family
+        //     this.wrapMode
+        //     this.height
+        //     // this.$textChanged()
+        //     // this.$fontChanged()
+        //     // this.$wrapModeChanged()
 
-        tempText.style.fontFamily = this.impl.style.fontFamily
-        tempText.style.fontSize = this.impl.style.fontSize 
-        tempText.style.fontStyle = this.impl.style.fontStyle
-        tempText.style.fontWeight = this.impl.style.fontWeight
-        tempText.style.textDecoration = this.impl.style.textDecoration
-        tempText.style.whiteSpace = this.impl.style.whiteSpace
-        tempText.style.wordBreak = this.impl.style.wordBreak
-        if(!this.$contentWAuto){
-            tempDom.style.width = this.dom.style.width
-            // tempDom.style.maxWidth = this.dom.style.width
-        }
-        if(!this.$contentHAuto){
-            tempDom.style.height = this.dom.style.height
-            // tempDom.style.maxHeight = this.dom.style.height
-        }
+        //     // let rect = this.impl.getBoundingClientRect()
+        //     if(this.$heightAuto && this.$p.height.val !== this.impl.scrollHeight) {
+        //         this.$p.height.val = this.impl.scrollHeight
+        //         this.$p.height.signal()
+        //         this.$heightAuto = true
+        //         // this.dom.style.height = `${rect.height}px`
+        //     }
 
-        document.body.appendChild(tempDom);
-        tempDom.appendChild(tempText);
+        //     return this.impl.scrollHeight
+        // })
+		// if(this.$contentWidthAuto)
+        // this.$sP('contentWidth', ()=>{ 
+        //     this.text
+        //     this.font.family
+        //     this.wrapMode
+        //     this.width
+        //     // this.$textChanged()
+        //     // this.$fontChanged()
+        //     // this.$wrapModeChanged()
 
-        let rect = tempText.getBoundingClientRect()
-        this.contentWidth = rect.width
-        this.contentHeight = rect.height
-        tempDom.remove()
+        //     // let rect = this.impl.getBoundingClientRect()
+        //     if(this.$widthAuto && this.$p.width.val !== this.impl.scrollWidth) {
+        //         this.$p.width.val = this.impl.scrollWidth
+        //         this.$p.width.signal()
+        //         this.$widthAuto = true
+        //         // this.dom.style.width = `${rect.width}px`
+        //     }
 
-        // this.$updateGeometry()
+        //     return this.impl.scrollWidth
+        // })
+        clearTimeout(this.$updateTimer)
+        this.$updateTimer = setTimeout(()=>{
+            let rect = this.impl.getBoundingClientRect()
+            if(this.$contentHeightAuto){
+                if(this.$heightAuto && this.$p.height.val !== rect.height) {
+                    this.$p.height.val = rect.height
+                    this.$p.height.signal()
+                    this.$heightAuto = true
+                    // this.dom.style.height = `${rect.height}px`
+                }
+                this.contentHeight = rect.height
+            }
+            if(this.$contentWidthAuto){
+                if(this.$widthAuto && this.$p.width.val !== rect.width) {
+                    this.$p.width.val = rect.width
+                    this.$p.width.signal()
+                    this.$widthAuto = true
+                    // this.dom.style.width = `${rect.width}px`
+                }
+                this.contentWidth = rect.width
+            }
+        }, 1000 / Core.FPS)
+        
+
     }
+    // $calcWH(){
+    //     // let tempText = document.createElement("span")
+    //     // let tempDom = document.createElement("div")
+    //     // tempText.innerHTML = this.$p.text.val
+
+    //     // tempText.style.fontFamily = this.impl.style.fontFamily
+    //     // tempText.style.fontSize = this.impl.style.fontSize 
+    //     // tempText.style.fontStyle = this.impl.style.fontStyle
+    //     // tempText.style.fontWeight = this.impl.style.fontWeight
+    //     // tempText.style.textDecoration = this.impl.style.textDecoration
+    //     // tempText.style.whiteSpace = this.impl.style.whiteSpace
+    //     // tempText.style.wordBreak = this.impl.style.wordBreak
+    //     if(!this.$contentWAuto){
+    //         this.impl.style.width = this.dom.style.width
+    //         // tempDom.style.maxWidth = this.dom.style.width
+    //     }
+    //     if(!this.$contentHAuto){
+    //         this.impl.style.height = this.dom.style.height
+    //         // tempDom.style.maxHeight = this.dom.style.height
+    //     }
+
+    //     // document.body.appendChild(tempDom);
+    //     // tempDom.appendChild(tempText);
+
+    //     let rect = this.impl.getBoundingClientRect()
+    //     this.contentWidth = rect.width
+    //     this.contentHeight = rect.height
+    //     // tempDom.remove()
+
+    //     // this.$updateGeometry()
+    // }
     $colorChanged(){
         this.impl.style.color = `${this.$p.color.val}`
     }
     $contentWidthChanged(){
-        if(this.$contentWAuto || this.$p.width.val < this.$p.contentWidth.val){
-            if(this.$contentWAuto){
-                if(this.$p.width.val !== this.$p.contentWidth.val){
-                    this.width = this.$p.contentWidth.val
-                    // this.$widthChanged()
-                }
+        // this.impl.style.width = `${this.contentWidth}px`
+        // if(this.$contentWAuto || this.$p.width.val < this.$p.contentWidth.val){
+        //     if(this.$contentWAuto){
+        //         if(this.$p.width.val !== this.$p.contentWidth.val){
+        //             this.width = this.$p.contentWidth.val
+        //             // this.$widthChanged()
+        //         }
                 
-                this.$contentWAuto = true
-            } else {
-                this.$p.width.val = this.$p.contentWidth.val
-            }
-            this.$calcWH()
-            // this.$p.width.val = this.contentWidth
-            // this.dom.style.width = `${this.width}px`
-            // for(let i = 0; i < this.$p.width.depends.length; i++){
-            //     this.$p.width.depends[i]()
-            // }
-            // for(let i = 0; i < this.$p.x.depends.length; i++){
-            //     this.$p.x.depends[i]()
-            // }
-        }
+        //         this.$contentWAuto = true
+        //     } else {
+        //         this.$p.width.val = this.$p.contentWidth.val
+        //     }
+        //     this.$calcWH()
+        //     // this.$p.width.val = this.contentWidth
+        //     // this.dom.style.width = `${this.width}px`
+        //     // for(let i = 0; i < this.$p.width.depends.length; i++){
+        //     //     this.$p.width.depends[i]()
+        //     // }
+        //     // for(let i = 0; i < this.$p.x.depends.length; i++){
+        //     //     this.$p.x.depends[i]()
+        //     // }
+        // }
     }
     $contentHeightChanged(){
-        if(this.$contentHAuto){
-            // if(this.$contentHAuto){
-                if(this.$p.height.val !== this.$p.contentHeight.val){
-                    this.height = this.$p.contentHeight.val
-                    // this.$heightChanged()
-                }
+        // this.impl.style.height = `${this.contentHeight}px`
+        // if(this.$contentHAuto){
+        //     // if(this.$contentHAuto){
+        //         if(this.$p.height.val !== this.$p.contentHeight.val){
+        //             this.height = this.$p.contentHeight.val
+        //             // this.$heightChanged()
+        //         }
                 
-                this.$contentHAuto = true
-                this.$calcWH()
-            // } else {
-            //     this.height = this.contentHeight
-            // }
-            // this.$p.height.val = this.contentHeight
-            // this.dom.style.height = `${this.height}px`
-            // for(let i = 0; i < this.$p.height.depends.length; i++){
-            //     this.$p.height.depends[i]()
-            // }
-            // for(let i = 0; i < this.$p.y.depends.length; i++){
-            //     this.$p.y.depends[i]()
-            // }
-        }
+        //         this.$contentHAuto = true
+        //         this.$calcWH()
+        //     // } else {
+        //     //     this.height = this.contentHeight
+        //     // }
+        //     // this.$p.height.val = this.contentHeight
+        //     // this.dom.style.height = `${this.height}px`
+        //     // for(let i = 0; i < this.$p.height.depends.length; i++){
+        //     //     this.$p.height.depends[i]()
+        //     // }
+        //     // for(let i = 0; i < this.$p.y.depends.length; i++){
+        //     //     this.$p.y.depends[i]()
+        //     // }
+        // }
     }
     $widthChanged(){
         super.$widthChanged()
-        this.$contentWAuto = false
-        this.$calcWH()
+        this.$widthAuto = false
+        // this.$contentWAuto = false
+        // this.$calcWH()
+        this.$updateGeometry()
+        this.$horizontalAlignmentChanged()
     }
     $heightChanged(){
         super.$heightChanged()
-        this.$contentHAuto = false
-        this.$calcWH()
+        this.$heightAuto = false
+        // this.$contentHAuto = false
+        // this.$calcWH()
+        this.$updateGeometry()
+        this.$verticalAlignmentChanged()
     }
     $horizontalAlignmentChanged(){
+        // switch(this.$p.horizontalAlignment.val){
+        //     case Text.AlignLeft: this.dom.style.textAlign = 'left'; this.impl.style.margin = "0 auto 0 0"; break;
+        //     case Text.AlignRight: this.dom.style.textAlign = 'right'; this.impl.style.margin = "0 0 0 auto"; break;
+        //     case Text.AlignHCenter: this.dom.style.textAlign = 'center'; this.impl.style.margin = "0 auto 0 auto"; break;
+        //     case Text.AlignJustify: this.dom.style.textAlign = 'justify'; this.impl.style.margin = "0 0 0 0"; break;
+        // }
+        let realWidth = this.width + this.anchors.leftMargin + this.anchors.rightMargin
         switch(this.$p.horizontalAlignment.val){
-            case Text.AlignLeft: this.dom.style.textAlign = 'left'; this.impl.style.margin = "0 auto 0 0"; break;
-            case Text.AlignRight: this.dom.style.textAlign = 'right'; this.impl.style.margin = "0 0 0 auto"; break;
-            case Text.AlignHCenter: this.dom.style.textAlign = 'center'; this.impl.style.margin = "0 auto 0 auto"; break;
-            case Text.AlignJustify: this.dom.style.textAlign = 'justify'; this.impl.style.margin = "0 0 0 0"; break;
+            case Text.AlignLeft: this.dom.style.marginLeft = `0`; this.dom.style.marginRight = `${this.parent.width - realWidth - this.x}px`; this.dom.style.textAlign = 'left'; break;
+            case Text.AlignRight: this.dom.style.marginLeft = `${this.parent.width - realWidth - this.x}px`; this.dom.style.marginRight = "0"; this.dom.style.textAlign = 'right'; break;
+            case Text.AlignHCenter: this.dom.style.marginLeft = `${(this.parent.width - realWidth)/2 - this.x}px`; this.dom.style.marginRight = `${(this.parent.width - realWidth)/2 - this.x}px`; this.dom.style.textAlign = 'center'; break;
+            case Text.AlignJustify: this.dom.style.marginLeft = "0"; this.dom.style.marginRight = "0"; this.dom.style.textAlign = 'justify'; break;
         }
     }
     $verticalAlignmentChanged(){
+        // switch(this.$p.verticalAlignment.val){
+        //     case Text.AlignTop: this.dom.style.alignItems = 'flex-start'; break;
+        //     case Text.AlignBottom: this.dom.style.alignItems = 'flex-end'; break;
+        //     case Text.AlignVCenter: this.dom.style.alignItems = 'center'; break;
+        // }
+        let realHeight = this.height + this.anchors.topMargin + this.anchors.bottomMargin
         switch(this.$p.verticalAlignment.val){
-            case Text.AlignTop: this.dom.style.alignItems = 'flex-start'; break;
-            case Text.AlignBottom: this.dom.style.alignItems = 'flex-end'; break;
-            case Text.AlignVCenter: this.dom.style.alignItems = 'center'; break;
+            case Text.AlignTop: this.dom.style.marginTop = `0`; this.dom.style.marginBottom = `${this.parent.height - realHeight - this.y}px`; break;
+            case Text.AlignBottom: this.dom.style.marginTop = `${this.parent.height - realHeight - this.y}px`; this.dom.style.marginBottom = "0"; break;
+            case Text.AlignVCenter: this.dom.style.marginTop = `${(this.parent.height - realHeight)/2 - this.y}px`; this.dom.style.marginBottom = `${(this.parent.height - realHeight)/2 - this.y}px`; break;
         }
     }
     $wrapModeChanged(){
@@ -179,7 +275,8 @@ export class Text extends Item {
             case Text.Wrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "break-word"; break;
             case Text.WrapAtWordBoundaryOrAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; break;
         }
-        this.$calcWH()
+        // this.$calcWH()
+        this.$updateGeometry()
     }
 
     $fontChanged(){
@@ -193,16 +290,18 @@ export class Text extends Item {
         this.impl.style.fontStyle = this.$p['font.italic'].val ? 'italic' : 'normal';
         this.impl.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
         this.impl.style.textDecoration = this.$p['font.underline'].val ? 'underline' : 'unset';
-        this.$calcWH()
+        // this.$calcWH()
+        this.$updateGeometry()
 
         if(this.$p['font.family'].val && this.$p['font.pixelSize'].val){
             document.fonts.load(`${this.$p['font.pixelSize'].val}px ${this.$p['font.family'].val}`).then((fonts)=>{
-                if(fonts.length && this.$p) this.$calcWH()
+                if(fonts.length && this.$p) this.$updateGeometry()
             })
         }
     }
     $destroy(){
         //clearInterval(this.$observer)
+        clearTimeout(this.$updateTimer)
         this.impl.remove()
         super.$destroy()
     }

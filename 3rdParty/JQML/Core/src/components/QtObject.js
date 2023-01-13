@@ -38,7 +38,7 @@ export class QtObject {
     }
     context = {}
     ID = new Set()
-    LVL = new Set()
+    // LVL = new Set()
 
     constructor(args) {
         this._context = context

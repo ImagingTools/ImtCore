@@ -184,16 +184,24 @@ export class ListView extends Flickable {
         }
     
     }
+    
 
     $anchorsChild(index){
         let child = this.children[index]
-
-        child.$sP('anchors.left', ()=>{ return this.left })
-        child.$sP('anchors.top', ()=>{ return this.top })
-        // child.anchors.left = 0
-        // child.anchors.top = 0
-        child.$sP('anchors.topMargin', ()=>{ return this.orientation === ListView.Vertical ? this.children[0].height * child.index + child.index * this.spacing : 0 })
-        child.$sP('anchors.leftMargin', ()=>{ return this.orientation === ListView.Horizontal ? this.children[0].width * child.index + child.index * this.spacing : 0 })
+        if(index === 0){
+            child.$sP('anchors.left', ()=>{ return this.left })
+            child.$sP('anchors.top', ()=>{ return this.top })
+        } else {
+            if(this.orientation === ListView.Horizontal){
+                child.$sP('anchors.left', ()=>{ return this.children[index-1].right })
+                child.$sP('anchors.leftMargin', ()=>{ return this.spacing })
+            } else {
+                child.$sP('anchors.top', ()=>{ return this.children[index-1].bottom })
+                child.$sP('anchors.topMargin', ()=>{ return this.spacing })
+            }
+        }
+        
+        
     }
 
     $destroy(){

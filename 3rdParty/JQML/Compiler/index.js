@@ -59,7 +59,8 @@ function getFiles (dir, _files){
     return _files
 }
 
-if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
+if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
+// if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source
   
 let files = getFiles(source)
@@ -107,10 +108,16 @@ function qmlimport(m, instructions, file){
                 jsAs = imp[3]
                 let path = file.split('/')
                 path = path.slice(0, path.length-1).join('/') + '/' + jsName
-                let content = fs.readFileSync(path, encoding='utf-8')
-                let meta = parser.jsparse(content)
+
+                if(fs.existsSync(path)){
+                    let content = fs.readFileSync(path, encoding='utf-8')
+                    let meta = parser.jsparse(content)
+                    
+                    instructions.js[jsName] = meta.source.replaceAll(/(?<=[^\\])[`]/g, '\\`') + (jsAs ? `\r\nvar ${jsAs} = {${meta.exports.join(',')}}\r\n` : '')
+                } else {
+                    console.log(`WARNING ${path} does not exist`)
+                }
                 
-                instructions.js[jsName] = meta.source.replaceAll(/(?<=[^\\])[`]/g, '\\`') + (jsAs ? `\r\nvar ${jsAs} = {${meta.exports.join(',')}}\r\n` : '')
             } else {
                 qmlPath = imp[1]
                 qmlAs = imp[3]
@@ -1045,10 +1052,11 @@ function compile(instructions, code, curr = '$root', prev = ''){
         }
         
     }
-    if(instructions.class === 'Flickable' || instructions.class === 'ListView' || instructions.class === 'GridView'){
+    if(instructions.class === 'Flickable' || instructions.class === 'ListView' || instructions.class === 'GridView' || instructions.class === 'Text'){
         if(instructions.properties.contentWidth || instructions.propertiesLazy.contentWidth) code.push(`${curr}.$contentWidthAuto=false`)
         if(instructions.properties.contentHeight || instructions.propertiesLazy.contentHeight) code.push(`${curr}.$contentHeightAuto=false`)
     }
+    
     
     if(instructions.class === 'Loader'){
         let xOverride = false

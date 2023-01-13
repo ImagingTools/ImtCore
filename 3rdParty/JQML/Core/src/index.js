@@ -174,7 +174,7 @@ global.Core = {
     Singletons: {},
     components: {...QML},
     animations: {},
-    LVL: 0,
+    // LVL: 0,
     queueCompleted: [],
     proxy: function(obj, alt = {}){
         let temp = {}

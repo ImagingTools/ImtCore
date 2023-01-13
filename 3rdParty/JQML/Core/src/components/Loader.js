@@ -159,16 +159,6 @@ export class Loader extends Item {
                 this.item.$treeParent2 = this.sourceComponent.parent
             }
 
-            let childLVL = (obj)=>{
-                for(let child of obj.children){
-                    for(let lvl of this.sourceComponent.LVL){
-                        child.LVL.add(lvl)
-                    }
-                }
-            }
-            
-            if(this.sourceComponent.LVL) childLVL(this)
-
             if(this.index !== undefined){
                 let childRecursive = (obj, index)=>{
                     obj.$cP('index',index)
