@@ -76,17 +76,7 @@ FocusScope {
     onCommandsIdChanged: {
         console.log("documentBase onCommandsIdChanged", commandsId);
 
-        if (itemLoad){
-//            commandsProvider.commandsId = documentBase.commandsId;
-        }
-
         commandsDelegate.commandsId = documentBase.commandsId;
-    }
-
-    onDocumentModelChanged: {
-        console.log("documentBase onDocumentModelChanged");
-
-//        updateGui();
     }
 
     onVisibleChanged: {
@@ -95,7 +85,6 @@ FocusScope {
                                                       "CommandsId": commandsProvider.commandsId});
 
             documentBase.forceActiveFocus();
-//            documentBase.updateGui();
         }
     }
 

@@ -15,19 +15,41 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
+        <Element Id="FeaturePackageRepresentationController" PackageId="ImtAuthPck" ComponentId="FeaturePackageRepresentationController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="FeaturePackage"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PermissionsProvider" PackageId="ImtLicensePck" ComponentId="PermissionsProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FeaturePackage" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FeaturePackage"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PackageRepresentation" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FeaturePackageRepresentationController"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ProductInfoProvider" PackageId="ImtLicensePck" ComponentId="ProductInfoProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeaturePackage"/>
+                    <AttributeInfo Id="PermissionsProvider" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PermissionsProvider</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductIds" Type="Id[]" ExportId="ProductId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductNames" Type="String[]" ExportId="ProductName">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="RepresentationController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -49,6 +71,7 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ProductInfoProvider"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ProductInfoProvider"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

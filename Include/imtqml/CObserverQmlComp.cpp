@@ -53,9 +53,9 @@ void CObserverQmlComp::OnComponentCreated()
 	if (m_quickObjectCompPtr.IsValid()){
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		if (quickItem != nullptr){
-			if (m_representationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
+			if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 				m_settingsModelPtr = new imtbase::CTreeItemModel();
-				bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
+				bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
 				if (result){
 					if (m_settingsModelPtr != nullptr){
 						if (m_settingsModelPtr->ContainsKey("Parameters")){
@@ -68,7 +68,8 @@ void CObserverQmlComp::OnComponentCreated()
 						}
 					}
 
-					connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnModelChanged()));
+					bool isConnected = connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
+					Q_ASSERT(isConnected);
 
 					ApplyUrl();
 
@@ -103,19 +104,11 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 }
 
 
-void CObserverQmlComp::OnModelChanged()
+void CObserverQmlComp::OnGuiChanged()
 {
-	if (m_representationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
+	if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 		if (m_settingsModelPtr != nullptr){
-			bool result = m_representationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
-			if (result){
-				if (m_quickObjectCompPtr.IsValid()){
-					QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
-					if (quickItem != nullptr){
-						QMetaObject::invokeMethod(quickItem, "onLocalSettingsUpdated");
-					}
-				}
-			}
+			bool result = m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
 		}
 	}
 }

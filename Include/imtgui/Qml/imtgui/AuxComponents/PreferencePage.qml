@@ -15,6 +15,7 @@ Rectangle {
 
     property TreeItemModel serverModel: TreeItemModel {}
     property TreeItemModel localModel: TreeItemModel {}
+
     property TreeItemModel commonModel: TreeItemModel {}
 
     property alias leftPanelWidth: mainPanelBackground.width;
@@ -27,7 +28,11 @@ Rectangle {
 
     property int fontSize: Style.fontSize_common;
 
-    property SettingsProvider settingsProvider;
+    property SettingsProvider settingsProvider: null;
+
+    Component.onDestruction: {
+        commonModel.modelChanged.disconnect(container.modelChanged);
+    }
 
     onVisibleChanged: {
         console.log("onVisibleChanged settingsProvider", settingsProvider);
@@ -48,11 +53,24 @@ Rectangle {
 
             settingsProvider.rewriteModel(serverModel, localModel);
 
+            localModel.modelChanged.connect(container.modelChanged);
+            serverModel.modelChanged.connect(container.modelChanged);
+
             updateGui();
+
+            console.log("setButtonState Apply false");
+            buttonsDialog.setButtonState("Apply", false);
         }
         else{
             clearModels();
         }
+    }
+
+    function modelChanged(){
+        console.log("Preference modelChanged");
+
+        console.log("setButtonState Apply true");
+        buttonsDialog.setButtonState("Apply", true);
     }
 
     function clearModels(){
@@ -134,10 +152,44 @@ Rectangle {
 
             if (fileName == ""){
                 fileName = {};
-                fileName["name"] = "LisaServerLog.txt";
+                fileName["name"] = "ServerLog.txt";
             }
 
             remoteFileController.GetFile(id, fileName);
+        }
+    }
+
+    function compare(model1, model2){
+        let changeSet = []
+
+        compareRecursive(model1, model2, changeSet);
+
+        return changeSet;
+    }
+
+    function compareRecursive(model1, model2, changeSet){
+
+        for (let i = 0; i < model1.GetItemsCount(); i++){
+            let keys = model1.GetKeys(i);
+
+            for (let j = 0; j < keys.length; j++){
+                let key = keys[j];
+
+                if (model2.ContainsKey(key)){
+                    let model1Value = model1.GetData(key, i);
+                    let model2Value = model2.GetData(key, i);
+
+                    if(typeof model1Value === 'object' && typeof model2Value === 'object'){
+                        compareRecursive(model1Value, model2Value, changeSet);
+                    }
+                    else{
+                        if (model1Value != model2Value){
+                            let changeObj = {}
+                            changeSet[key] = model2Value;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -230,7 +282,6 @@ Rectangle {
 
                         onClicked: {
                             if (mainPanel.selectedIndex !== model.index){
-                                console.log("model.Parameters", model.Parameters.toJSON());
                                 bodyPanelRepeater.model = model.Parameters;
                                 mainPanel.selectedIndex = model.index;
                             }
@@ -270,14 +321,6 @@ Rectangle {
                     id: bodyPanelRepeater;
 
                     delegate: Item {
-
-                        Component.onCompleted: {
-                            console.log("Item onCompleted", model.Id);
-                            console.log("model.Name", model.Name);
-                            console.log("model.Source", model.Source);
-                            console.log("model[Source]", model["Source"]);
-                        }
-
                         width: bodyPanel.width;
 
                         height: titleItem.height + rectSeparator.height + loader.height + 20;
@@ -311,8 +354,6 @@ Rectangle {
                             anchors.topMargin: 15;
 
                             Component.onCompleted: {
-                                console.log("Loader onCompleted", model.Id, model.Source);
-
                                 loader.source = model.Source;
                             }
 
@@ -337,14 +378,14 @@ Rectangle {
             anchors.bottomMargin: 10;
 
             Component.onCompleted: {
-                addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": true});
-                addButton({"Id":"Cancel", "Name": qsTr("Cancel"), "Enabled": true});
+                addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": false});
+                addButton({"Id":"Close", "Name": qsTr("Close"), "Enabled": true});
             }
 
             onButtonClicked: {
                 console.log("ButtonsDialog onButtonClicked", buttonId);
 
-                if (buttonId == "Cancel"){
+                if (buttonId == "Close"){
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
@@ -361,6 +402,8 @@ Rectangle {
 
                         container.settingsProvider.saveLocalModel();
                     }
+
+                    buttonsDialog.setButtonState("Apply", false);
                 }
             }
         }

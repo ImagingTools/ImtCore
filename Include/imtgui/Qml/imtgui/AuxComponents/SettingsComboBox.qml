@@ -20,10 +20,6 @@ Item {
         settingsComboBox.currentIndex = modelData.Value;
     }
 
-    ListModel {
-        id: settingsComboBoxModelList;
-    }
-
     ComboBox {
         id: settingsComboBox;
 
@@ -38,10 +34,10 @@ Item {
         textCentered: false;
 
         onCurrentIndexChanged: {
-            console.log("onCurrentIndexChanged", settingsComboBox.currentIndex);
-            settingsComboBoxContainer.modelData.Value = settingsComboBox.currentIndex;
-
-            console.log("model.Value", settingsComboBoxContainer.modelData.Value);
+            let modelValue = settingsComboBoxContainer.modelData.Value;
+            if (modelValue != settingsComboBox.currentIndex){
+                settingsComboBoxContainer.modelData.Value = settingsComboBox.currentIndex;
+            }
         }
     }
 }

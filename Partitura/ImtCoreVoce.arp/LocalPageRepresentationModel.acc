@@ -36,7 +36,7 @@
                         <Data IsEnabled="true" Value="ServerUrl"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="ServerUrl"/>
+                        <Data IsEnabled="true" Value="Server Url"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>

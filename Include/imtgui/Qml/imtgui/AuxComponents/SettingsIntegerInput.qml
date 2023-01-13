@@ -24,7 +24,9 @@ Item {
         text: model.Value;
 
         onEditingFinished: {
-            model.Value = tfcIntegerInput.text;
+            if (model.Value != tfcIntegerInput.text){
+                model.Value = tfcIntegerInput.text;
+            }
         }
     }
 }

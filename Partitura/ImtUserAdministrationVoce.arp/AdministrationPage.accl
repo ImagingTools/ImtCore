@@ -8,12 +8,13 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AdministrationPageDataController" X="950" Y="225" Note=""/>
-        <Element ComponentName="AdministrationPages" X="600" Y="75" Note=""/>
-        <Element ComponentName="Pages" X="925" Y="375" Note=""/>
-        <Element ComponentName="PagesDataController" X="275" Y="225" Note=""/>
-        <Element ComponentName="Repositories" X="925" Y="525" Note=""/>
-        <Element ComponentName="VisualStatus" X="175" Y="75" Note=""/>
+        <Element ComponentName="AdministrationPageDataController" X="975" Y="225" Note=""/>
+        <Element ComponentName="AdministrationPages" X="675" Y="75" Note=""/>
+        <Element ComponentName="PageBasedModel" X="100" Y="450" Note=""/>
+        <Element ComponentName="Pages" X="975" Y="450" Note=""/>
+        <Element ComponentName="PagesRepresentation" X="600" Y="450" Note=""/>
+        <Element ComponentName="Repositories" X="975" Y="675" Note=""/>
+        <Element ComponentName="VisualStatus" X="325" Y="225" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="Pages">

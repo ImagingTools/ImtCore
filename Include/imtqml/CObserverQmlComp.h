@@ -22,7 +22,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObserverQmlComp);
-		I_ASSIGN(m_representationControllerCompPtr, "RepresentationController", "Controller for representation settings", true, "");
+		I_ASSIGN(m_settingsRepresentationControllerCompPtr, "SettingsRepresentationController", "Controller for representation settings", true, "");
 		I_ASSIGN(m_settingsCompPtr, "Settings", "Settings", false, "Settings");
 		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
 		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/");
@@ -39,12 +39,12 @@ protected:
 
 private Q_SLOTS:
 	void OnChangeSourceItem(QString src);
-	void OnModelChanged();
+	void OnGuiChanged();
 
 private:
 	I_ATTR(QByteArray, m_prefixServer);
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
-	I_REF(imtbase::IRepresentationController, m_representationControllerCompPtr);
+	I_REF(imtbase::IRepresentationController, m_settingsRepresentationControllerCompPtr);
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
 
 private:

@@ -75,3 +75,4 @@ TreeViewItemDelegateBase 1.0 ./AuxComponents/TreeViewItemDelegateBase.qml
 TableViewSelection 1.0 ./AuxComponents/TableViewSelection.qml
 
 DesignSchemaProvider 1.0 ./AuxComponents/DesignSchemaProvider.qml
+GqlDocumentDataController 1.0 ./AuxComponents/GqlDocumentDataController.qml

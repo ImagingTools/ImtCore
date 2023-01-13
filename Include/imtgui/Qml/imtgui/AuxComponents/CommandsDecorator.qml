@@ -56,12 +56,11 @@ Item {
 
                 enabled: model.IsEnabled;
 
-//                visible: model.Visible;
+                visible: model.Visible;
 
                 text: model.Name;
 
                 onClicked: {
-                    console.log("model.Visible", model.Visible);
                     Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
                 }
             }

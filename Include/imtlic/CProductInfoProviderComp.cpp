@@ -5,7 +5,17 @@ namespace imtlic
 {
 
 
-imtbase::CTreeItemModel* CProductInfoProviderComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+// protected methods
+
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+
+bool CProductInfoProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return true;
+}
+
+
+imtbase::CTreeItemModel* CProductInfoProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 

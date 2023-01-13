@@ -175,8 +175,7 @@ Item {
         anchors.topMargin: Math.max(10,rolePermissionsContainer.mainMargin);
         anchors.bottomMargin: 10 + rolePermissionsContainer.mainMargin;
         anchors.leftMargin: rolePermissionsContainer.mainMargin;
-
-        width: 400;
+        anchors.right: informationBlock.left;
 
         tristate: true;
 
@@ -204,23 +203,23 @@ Item {
     Item {
         id: informationBlock;
 
-        anchors.left: permissionsTable.right;
-        anchors.leftMargin: 10;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
         anchors.top: parent.top;
         anchors.topMargin: Math.max(10, rolePermissionsContainer.mainMargin);
         anchors.bottom: parent.bottom;
 
         width: 200;
 
-        Column {
-            id: informationColumn;
+        Item {
+            anchors.fill: parent;
 
-            width: parent.width;
+            anchors.rightMargin: 10;
+            anchors.leftMargin: 10;
+            anchors.bottomMargin: 10;
 
             Text {
                 id: title;
-
-                width: informationColumn.width;
 
                 text: qsTr("Dependencies");
 

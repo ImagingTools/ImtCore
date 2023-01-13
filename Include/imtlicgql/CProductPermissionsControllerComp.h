@@ -2,19 +2,17 @@
 
 
 // ImtCore includes
-#include <imtlic/IProductLicensingInfo.h>
-#include <imtgql/CGqlRepresentationDataControllerComp.h>
-#include <imtgql/IGqlRequestHandler.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CProductPermissionsControllerComp: public imtgql::CGqlRepresentationDataControllerComp
+class CProductPermissionsControllerComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationDataControllerComp BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductPermissionsControllerComp);
 		I_ASSIGN(m_productProviderCompPtr, "ProductProvider", "Product provider", true, "ProductProvider");

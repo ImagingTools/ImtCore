@@ -14,7 +14,7 @@ Item {
     property int mainMargin: 0;
     property int panelWidth: 400;
 
-    signal commandModeChanged(string commandId, string newMode);
+    signal commandModeChanged(string commandId, bool newMode);
 
     Component.onCompleted: {
         container.includedRolesTable = includesTable;
@@ -31,13 +31,20 @@ Item {
     }
 
     onCommandModeChanged: {
+        console.log("onCommandModeChanged", commandId, newMode);
+
+        console.log(typeof newMode);
+
         for (let i = 0; i < commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsModel.GetData("Id", i);
 
             if (currentCommandId == commandId){
-                commandsModel.SetData("Mode", newMode, i);
+                console.log("FIND", commandId, newMode);
+                commandsModel.SetData("IsEnabled", newMode, i);
             }
         }
+
+        console.log("commandsModel", commandsModel.toJSON());
     }
 
     onDocumentModelChanged: {
@@ -79,16 +86,16 @@ Item {
 
             commandsModel.SetData("Id", "Include", index);
             commandsModel.SetData("Name", "Include", index);
-            commandsModel.SetData("Mode", "Normal", index);
-            commandsModel.SetData("IconSource", "Add", index);
+            commandsModel.SetData("IsEnabled", true, index);
+            commandsModel.SetData("Icon", "Add", index);
             commandsModel.SetData("Visible", false, index);
 
             index = commandsModel.InsertNewItem();
 
             commandsModel.SetData("Id", "Exclude", index);
             commandsModel.SetData("Name", "Exclude", index);
-            commandsModel.SetData("Mode", "Disabled", index);
-            commandsModel.SetData("IconSource", "Delete", index);
+            commandsModel.SetData("IsEnabled", false, index);
+            commandsModel.SetData("Icon", "Delete", index);
             commandsModel.SetData("Visible", false, index);
 
             repeater.model = commandsModel;
@@ -231,7 +238,7 @@ Item {
                     width: parent.width;
                     height: 30;
 
-                    placeHolderText: qsTr("Enter the Role name");
+                    placeHolderText: qsTr("Enter the role name");
 
                     onEditingFinished: {
                         console.log("roleNameInput onEditingFinished");
@@ -399,9 +406,10 @@ Item {
                                     width: 18;
                                     height: width;
 
-                                    iconSource: "../../../../Icons/Light/" + model.IconSource +"_Off_" + model.Mode + ".svg";
+                                    iconSource: enabled ? "../../../../Icons/Light/" + model.Icon +"_Off_Normal.svg" :
+                                                                  "../../../../Icons/Light/" + model.Icon +"_Off_Disabled.svg";
 
-                                    enabled: model.Mode == "Normal";
+                                    enabled: model.IsEnabled;
 
                                     onClicked: {
                                         Events.sendEvent(commandsId + "CommandActivated", model.Id);
@@ -457,7 +465,5 @@ Item {
                 }
             }//Column bodyColumn
         }
-
-
     }//Flickable
 }//Container

@@ -1,10 +1,6 @@
 #include <imtlicgql/CProductPermissionsControllerComp.h>
 
 
-// ImtCore includes
-#include <imtbase/IObjectCollection.h>
-
-
 namespace imtlicgql
 {
 
@@ -15,29 +11,32 @@ namespace imtlicgql
 
 imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	if (!m_productProviderCompPtr.IsValid()){
+		return nullptr;
+	}
 
-	const QList<imtgql::CGqlObject>* params = gqlRequest.GetParams();
+	const QList<imtgql::CGqlObject>* paramsPtr = gqlRequest.GetParams();
+	Q_ASSERT(paramsPtr != nullptr);
 
 	QByteArray productId;
-	if (!params->empty()){
-		productId = params->at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	if (!paramsPtr->empty()){
+		productId = paramsPtr->at(0).GetFieldArgumentValue("ProductId").toByteArray();
 	}
 
 	if (productId.isEmpty()){
 		return nullptr;
 	}
 
-	if (m_productProviderCompPtr.IsValid()){
-		imtbase::CTreeItemModel* productsModelPtr = m_productProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
-		if (productsModelPtr != nullptr){
-			for (int i = 0; i < productsModelPtr->GetItemsCount(); i++){
-				QByteArray currentProductId = productsModelPtr->GetData("Id", i).toByteArray();
-				if (currentProductId == productId){
-					imtbase::CTreeItemModel* productPermissionsModelPtr = productsModelPtr->GetTreeItemModel("Permissions", i);
-					if (productPermissionsModelPtr != nullptr){
-						rootModelPtr->SetExternTreeModel("data", productPermissionsModelPtr);
-					}
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
+	imtbase::CTreeItemModel* productsModelPtr = m_productProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
+	if (productsModelPtr != nullptr){
+		for (int i = 0; i < productsModelPtr->GetItemsCount(); i++){
+			QByteArray currentProductId = productsModelPtr->GetData("Id", i).toByteArray();
+			if (currentProductId == productId){
+				imtbase::CTreeItemModel* productPermissionsModelPtr = productsModelPtr->GetTreeItemModel("Permissions", i);
+				if (productPermissionsModelPtr != nullptr){
+					rootModelPtr->SetExternTreeModel("data", productPermissionsModelPtr);
 				}
 			}
 		}

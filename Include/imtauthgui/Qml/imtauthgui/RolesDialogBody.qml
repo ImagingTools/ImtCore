@@ -13,10 +13,8 @@ Item {
     property alias tableView: table;
 
     onProductIdChanged: {
-        console.log("onProductIdChanged", productId, model.toJSON());
         for (let i = 0; i < model.GetItemsCount(); i++){
             let currentProductId = model.GetData("Id", i);
-            console.log("currentProductId", currentProductId);
             if (currentProductId == productId){
                 let roles = model.GetData("Roles", i);
 
@@ -55,6 +53,12 @@ Item {
 
             Component.onCompleted: {
                 table.addColumn({"Id": "Name", "Name": "Name"});
+            }
+
+            onSelectedIndexChanged: {
+                let isEnabled = selectedIndex != null;
+
+                buttons.setButtonState("Include", isEnabled)
             }
         }
     }//Column

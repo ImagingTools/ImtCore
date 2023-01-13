@@ -217,6 +217,7 @@ DocumentBase {
 
             let row = {"LicenseId": licenseId, "Id": rowId, "Name": rowName, "Description": description, "Optional": optional, "State": Qt.Unchecked};
             if (optionalFeatureIds.includes(rowId)){
+                console.log("optionalFeatureIds.includes(rowId)");
                 row["State"] = Qt.Checked;
             }
 

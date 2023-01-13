@@ -19,7 +19,9 @@ Item {
         echoMode: model.Id === "Password" ? TextInput.Password: TextInput.Normal;
 
         onTextChanged: {
-            model.Value = tfcTextInput.text;
+            if (model.Value != tfcTextInput.text){
+                model.Value = tfcTextInput.text;
+            }
         }
     }
 }

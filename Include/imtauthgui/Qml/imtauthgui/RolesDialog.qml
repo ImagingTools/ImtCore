@@ -33,7 +33,7 @@ Dialog {
     }
 
     Component.onCompleted: {
-        rolesDialog.buttons.addButton({"Id": "Include", "Name": "Include", "Enabled": true});
+        rolesDialog.buttons.addButton({"Id": "Include", "Name": "Include", "Enabled": false});
         rolesDialog.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
 
         rolesDialog.bodySource = "../../../imtauthgui/RolesDialogBody.qml";

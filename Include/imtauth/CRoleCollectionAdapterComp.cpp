@@ -27,12 +27,8 @@ const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray& roleId, const
 {
 	if (m_roleCollectionCompPtr.IsValid()){
 		QByteArray objectId = roleId + *m_separatorObjectIdAttrPtr + productId;
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_roleCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-			const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 
-			return dynamic_cast<const imtauth::IRole*>(rolePtr->CloneMe());
-		}
+		return GetRole(objectId);
 	}
 
 	return nullptr;
@@ -45,8 +41,9 @@ const IRole* CRoleCollectionAdapterComp::GetRole(const QByteArray &objectId) con
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_roleCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			const IRole* rolePtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-
-			return dynamic_cast<const imtauth::IRole*>(rolePtr->CloneMe());
+			if (rolePtr != nullptr){
+				return dynamic_cast<const imtauth::IRole*>(rolePtr->CloneMe());
+			}
 		}
 	}
 

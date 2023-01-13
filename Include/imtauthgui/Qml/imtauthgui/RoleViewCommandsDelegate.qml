@@ -116,44 +116,44 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }//GqlModel itemsModel
 
-    GqlModel {
-        id: permissionModel;
+//    GqlModel {
+//        id: permissionModel;
 
-        function updateModel(productId) {
-            var query = Gql.GqlRequest("query", "ProductFeatures");
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("ProductId", productId);
-            query.AddParam(inputParams);
+//        function updateModel(productId) {
+//            var query = Gql.GqlRequest("query", "ProductFeatures");
+//            var inputParams = Gql.GqlObject("input");
+//            inputParams.InsertField("ProductId", productId);
+//            query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("style");
-            queryFields.InsertField("theme");
-            queryFields.InsertField("source");
-            query.AddField(queryFields);
+//            var queryFields = Gql.GqlObject("style");
+//            queryFields.InsertField("theme");
+//            queryFields.InsertField("source");
+//            query.AddField(queryFields);
 
-            var gqlData = query.GetQuery();
-            console.log("permissionModel gqlData", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
+//            var gqlData = query.GetQuery();
+//            console.log("permissionModel gqlData", gqlData);
+//            this.SetGqlQuery(gqlData);
+//        }
 
-        onStateChanged: {
-            console.log("State:", this.state, permissionModel);
-            if (this.state === "Ready"){
-                let dataModelLocal;
+//        onStateChanged: {
+//            console.log("State:", this.state, permissionModel);
+//            if (this.state === "Ready"){
+//                let dataModelLocal;
 
-                if (permissionModel.ContainsKey("errors")){
+//                if (permissionModel.ContainsKey("errors")){
 
-                    return;
-                }
+//                    return;
+//                }
 
-                if (permissionModel.ContainsKey("data")){
-                    dataModelLocal = permissionModel.GetData("data");
-                    dataModelLocal = dataModelLocal.GetData("ProductFeatures");
+//                if (permissionModel.ContainsKey("data")){
+//                    dataModelLocal = permissionModel.GetData("data");
+//                    dataModelLocal = dataModelLocal.GetData("ProductFeatures");
 
-                    documentModel.SetData("Permissions", dataModelLocal);
+//                    documentModel.SetData("Permissions", dataModelLocal);
 
-                    container.updateGui();
-                }
-            }
-        }
-    }//GqlModel itemsModel
+//                    container.updateGui();
+//                }
+//            }
+//        }
+//    }//GqlModel itemsModel
 }

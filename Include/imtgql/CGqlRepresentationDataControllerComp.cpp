@@ -7,6 +7,8 @@ namespace imtgql
 
 // protected methods
 
+// reimplemented (imtgql::IGqlRepresentationController)
+
 imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (m_representationControllerCompPtr.IsValid() && m_dataModelCompPtr.IsValid()){
@@ -37,7 +39,7 @@ bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(const i
 }
 
 
-// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 
 imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const
 {

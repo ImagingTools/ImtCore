@@ -48,13 +48,11 @@ Item {
                     if (dataModelLocal.ContainsKey("ProductPermissions")){
                         dataModelLocal = dataModelLocal.GetData("ProductPermissions");
 
-                        if (dataModelLocal.ContainsKey("Permissions")){
-                            permissionsProvider.model = dataModelLocal.GetData("Permissions");
+                        if (dataModelLocal.ContainsKey("Features")){
+                            permissionsProvider.model = dataModelLocal.GetData("Features");
                         }
 
                         if (dataModelLocal.ContainsKey("Dependencies")){
-
-                            console.log("ContainsKey Dependencies");
                             permissionsProvider.dependenciesModel = dataModelLocal.GetData("Dependencies");
                         }
                     }

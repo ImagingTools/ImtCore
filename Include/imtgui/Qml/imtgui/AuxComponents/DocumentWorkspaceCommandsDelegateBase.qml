@@ -43,10 +43,6 @@ Item {
         }
     }
 
-//    onDocumentBaseChanged: {
-//        objectModel = documentBase.documentModel
-//    }
-
     Component.onCompleted: {
         console.log("DocumentCommands onCompleted");
         let itemId = documentsData.GetData("Id", model.index);
@@ -183,13 +179,6 @@ Item {
             }
         }
     }
-
-//    Shortcut {
-//        sequence: "Ctrl+S";
-//        onActivated: {
-//            commandActivated("Save");
-//        }
-//    }
 
     /**
         Обновляем данные только после получения результата с сервера, удостоверясь

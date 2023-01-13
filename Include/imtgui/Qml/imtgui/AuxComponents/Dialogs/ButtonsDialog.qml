@@ -72,11 +72,7 @@ Item {
                     console.log("Button onClicked", model.Id);
                     buttonsDialogContainer.buttonClicked(model.Id);
                 }
-
-
             }//delegate
-
-
         }
     }
 }

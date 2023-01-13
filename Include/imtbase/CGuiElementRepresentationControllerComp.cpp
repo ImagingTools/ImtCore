@@ -46,6 +46,7 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 			representation.SetData("Id", elementId, index);
 			representation.SetData("Name", name, index);
 			representation.SetData("IsEnabled", isEnabled, index);
+			representation.SetData("Visible", true, index);
 
 			representation.SetData("Icon", elementPath, index);
 			representation.SetData("Status", elementStatus, index);

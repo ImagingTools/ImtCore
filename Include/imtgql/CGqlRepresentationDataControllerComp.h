@@ -23,10 +23,11 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtgql::IGqlRepresentationController)
 	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
 
-	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
+	// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:

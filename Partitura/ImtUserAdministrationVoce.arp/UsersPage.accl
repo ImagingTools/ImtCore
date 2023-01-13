@@ -2,23 +2,42 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
+            <Version Id="0" Number="5030" Description="ACF"/>
             <Version Id="1" Number="2177" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Commands" X="550" Y="275" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
-        <Element ComponentName="HashCalculator" X="350" Y="475" Note=""/>
-        <Element ComponentName="ObjectViewDataProvider" X="1050" Y="75" Note=""/>
-        <Element ComponentName="UserDataController" X="200" Y="275" Note=""/>
-        <Element ComponentName="UserEditCommandDataProvider" X="350" Y="650" Note=""/>
-        <Element ComponentName="UserInfo" X="100" Y="450" Note=""/>
-        <Element ComponentName="UserListController" X="925" Y="275" Note=""/>
-        <Element ComponentName="UsersCommandDataProvider" X="775" Y="650" Note=""/>
-        <Element ComponentName="UsersHeadersDataProvider" X="950" Y="475" Note=""/>
-        <Element ComponentName="VisualStatus" X="125" Y="75" Note=""/>
+        <Element ComponentName="HashCalculator" X="400" Y="550" Note=""/>
+        <Element ComponentName="ObjectViewDataProvider" X="1050" Y="550" Note=""/>
+        <Element ComponentName="UserCommands" X="475" Y="350" Note=""/>
+        <Element ComponentName="UserDataController" X="225" Y="350" Note=""/>
+        <Element ComponentName="UserInfo" X="125" Y="550" Note=""/>
+        <Element ComponentName="UserListController" X="1000" Y="350" Note=""/>
+        <Element ComponentName="UsersCommands" X="725" Y="350" Note=""/>
+        <Element ComponentName="UsersHeadersDataProvider" X="775" Y="550" Note=""/>
     </PositionMap>
-    <EmbeddedRegistries/>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="UserCommands">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="250" Y="500" Note=""/>
+                <Element ComponentName="CommandsModel" X="925" Y="500" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="925" Y="300" Note=""/>
+                <Element ComponentName="UserCommandPermissions" X="250" Y="300" Note=""/>
+                <Element ComponentName="UserCommandsController" X="600" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="UsersCommands">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="250" Y="525" Note=""/>
+                <Element ComponentName="CommandsModel" X="925" Y="525" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="925" Y="250" Note=""/>
+                <Element ComponentName="UsersCommandPermissions" X="250" Y="250" Note=""/>
+                <Element ComponentName="UsersCommandsController" X="575" Y="375" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
 </Acf>

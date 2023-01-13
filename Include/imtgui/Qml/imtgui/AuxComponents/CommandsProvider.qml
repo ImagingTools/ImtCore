@@ -12,7 +12,7 @@ Item {
     property bool localData: false; //The commands model is not loaded from the server
 
     signal modelLoaded();
-    signal commandModeChanged(string commandId, string newMode);
+    signal commandModeChanged(string commandId, bool newMode);
 
     onCommandsIdChanged: {
         console.log("commandsProviderContainer onCommandsIdChanged", commandsProviderContainer.commandsId);
@@ -27,13 +27,15 @@ Item {
     }
 
     function setCommandIsEnabled(commandId, isEnabled){
+        console.log("commandsProviderContainer setCommandIsEnabled", commandId, isEnabled);
+
         if(commandsModel === undefined) return;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             if (currentCommandId == commandId){
                 let currentIsEnabled = commandsProviderContainer.commandsModel.GetData("IsEnabled", i);
-                if (currentIsEnabled != isEnabled){
+                if (currentIsEnabled !== isEnabled){
                     commandsProviderContainer.commandsModel.SetData("IsEnabled", isEnabled, i);
 
                     commandModeChanged(commandId, isEnabled);
