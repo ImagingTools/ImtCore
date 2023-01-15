@@ -24,7 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CParameterLinkControllerComp);
 		I_ASSIGN(m_selectionParamIdAttrPtr, "ReferenceParamId", "ID of the reference parameter in the parameter set", true, "Index");
-		I_ASSIGN(m_paramsManagerCompPtr, "SlaveManager", "Slave parameter set manager containing the references from the observer data model", true, "SlaveManager");
+		I_ASSIGN(m_paramsManagerCompPtr, "SlaveManager", "Slave parameter set manager containing the references from the observer data model", false, "SlaveManager");
 	I_END_COMPONENT;
 
 protected:
