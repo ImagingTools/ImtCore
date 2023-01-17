@@ -39,28 +39,28 @@ Item {
         interval: 0;
 
         onTriggered: {
-            itemModel.updateModel(container.itemModelInputParams)
+            itemModel.updateModel(container.itemModelInputParams);
         }
     }
 
     Component.onCompleted: {
         console.log("DocumentCommands onCompleted");
         let itemId = documentsData.GetData("Id", model.index);
-        itemModelInputParams["Id"] = itemId;
+        container.itemModelInputParams["Id"] = itemId;
         console.log("itemId", itemId);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle)
+        Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
     }
 
     onCommandsIdChanged: {
         console.log("DocumentCommands onCommandsIdChanged", container.commandsId);
 
-        if (documentBase && documentBase.itemLoad){
+        if (container.documentBase && container.documentBase.itemLoad){
             Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
 
-            if (autoUpdate){
+            if (container.autoUpdate){
                 timer.start();
             }
         }
@@ -68,39 +68,39 @@ Item {
 
     onVisibleChanged: {
         console.log("DocumentCommands onVisibleChanged");
-        if (visible){
-            Events.subscribeEvent(commandsId + "CommandActivated", commandHandle);
+        if (container.visible){
+            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
         }
         else{
-            Events.unSubscribeEvent(commandsId + "CommandActivated", commandHandle)
+            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
         }
     }
 
     onObjectModelChanged: {
-        if(objectModel){
-            objectModel.modelChanged.connect(modelChanged);
+        if(container.objectModel){
+            container.objectModel.modelChanged.connect(container.modelChanged);
         }
     }
 
     function disconnectModelChanged(){
-        if(objectModel){
-            objectModel.modelChanged.disconnect(modelChanged);
+        if(container.objectModel){
+            objectModel.modelChanged.disconnect(container.modelChanged);
         }
     }
 
     function connectModelChanged(){
-        if(objectModel){
-            objectModel.modelChanged.connect(modelChanged);
+        if(container.objectModel){
+            objectModel.modelChanged.connect(container.modelChanged);
         }
     }
 
     function removeChanges(){
         commandsProvider.setCommandIsEnabled("Save", false);
-        documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName});
+        documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName});
     }
 
     function commandHandle(commandId){
-        console.log("DocumentCommandsBase commandHandle", documentBase.itemId, commandId);
+        console.log("DocumentCommandsBase commandHandle", container.documentBase.itemId, commandId);
 
         if (commandId == "Close"){
             let saveCommandIsEnabled = commandsProvider.commandIsEnabled("Save");
@@ -108,7 +108,7 @@ Item {
                 modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
             }
             else{
-                documentClosed()
+                container.documentClosed();
             }
         }
         else if (commandId == "Save"){
@@ -117,7 +117,7 @@ Item {
                 container.gqlModelQueryType = "Add";
                 container.gqlModelQueryTypeNotify = "addedNotification";
 
-                if (showInputIdDialog){
+                if (container.showInputIdDialog){
                     modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
                 }
                 else{
@@ -125,11 +125,11 @@ Item {
                 }
             }
             else{
-                saveObject();
+                container.saveObject();
             }
         }
 
-        commandActivated(commandId);
+        container.commandActivated(commandId);
     }
 
     Component {
@@ -143,8 +143,8 @@ Item {
             onFinished: {
                 console.log("saveDialog onFinished", buttonId);
                 if (buttonId == "Yes"){
-                    closingFlag = true;
-                    commandHandle("Save");
+                    container.closingFlag = true;
+                    container.commandHandle("Save");
                 }
                 else if (buttonId == "No"){
                     container.documentClosed();
@@ -159,7 +159,7 @@ Item {
             onFinished: {
                 console.log("InputDialog result", buttonId, inputValue);
                 if (buttonId == "Ok"){
-                    entered(inputValue);
+                    container.entered(inputValue);
 
                     saveQuery.updateModel();
                 }
@@ -173,8 +173,8 @@ Item {
         MessageDialog {
             title: qsTr("Error");
             onFinished: {
-                if (closingFlag){
-                    closingFlag = false;
+                if (container.closingFlag){
+                    container.closingFlag = false;
                 }
             }
         }
@@ -187,27 +187,27 @@ Item {
     function documentSaved(itemId, itemName){
         console.log("DocumentsCommands documentSaved", itemId, itemName);
 
-        Events.sendEvent(commandsId + "CollectionUpdateGui");
+        Events.sendEvent(container.commandsId + "CollectionUpdateGui");
 
-        objectModel.modelChanged.disconnect(modelChanged);
+        objectModel.modelChanged.disconnect(container.modelChanged);
 
-        saved(itemId, itemName);
+        container.saved(itemId, itemName);
 
         documentBase.itemId = itemId;
         documentBase.itemName = itemName;
 
-        removeChanges();
+        container.removeChanges();
 
-        objectModel.modelChanged.connect(modelChanged);
+        objectModel.modelChanged.connect(container.modelChanged);
 
-        if (closingFlag){
-            documentClosed();
+        if (container.closingFlag){
+            container.documentClosed();
         }
     }
 
     function documentClosed(){
         console.log("documentClosed", documentBase.itemId);
-        closed();
+        container.closed();
 
         documentManager.closeDocument(documentBase.itemId);
     }
@@ -270,7 +270,7 @@ Item {
                 if (saveQuery.ContainsKey("errors")){
                     dataModelLocal = saveQuery.GetData("errors");
                     dataModelLocal = dataModelLocal.GetData(container.commandsId + container.gqlModelQueryType);
-                    if (gqlModelQueryType == "Add"){
+                    if (container.gqlModelQueryType == "Add"){
                         container.documentBase.itemId = "";
                     }
 
@@ -287,14 +287,14 @@ Item {
 
                     dataModelLocal = dataModelLocal.GetData(container.commandsId + container.gqlModelQueryType);
 
-                    if (dataModelLocal.ContainsKey(gqlModelQueryTypeNotify)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelQueryTypeNotify);
+                    if (dataModelLocal.ContainsKey(container.gqlModelQueryTypeNotify)){
+                        dataModelLocal = dataModelLocal.GetData(container.gqlModelQueryTypeNotify);
 
                         let itemId = dataModelLocal.GetData("Id");
                         let itemName = dataModelLocal.GetData("Name");
 
                         if (container.documentBase.itemLoad){
-                            documentSaved(itemId, itemName);
+                            container.documentSaved(itemId, itemName);
                         }
                     }
                 }
@@ -303,7 +303,7 @@ Item {
     }
 
     function updateModel(){
-        itemModel.updateModel(itemModelInputParams);
+        itemModel.updateModel(container.itemModelInputParams);
     }
 
     GqlModel {

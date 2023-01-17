@@ -16,7 +16,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
     onTableDataChanged: {
         console.log("DocumentView onTableDataChanged");
-        tableData.rightButtonMouseClicked.connect(openPopupMenu);
+        container.tableData.rightButtonMouseClicked.connect(container.openPopupMenu);
     }
 
     onSelectedIndexChanged: {
@@ -43,8 +43,8 @@ DocumentWorkspaceCommandsDelegateBase {
             modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
         }
         else if (commandId === "SetDescription"){
-            let elements = tableData.elements;
-            let selectedDescription = elements.GetData("Description", selectedIndex);
+            let elements = container.tableData.elements;
+            let selectedDescription = elements.GetData("Description", container.selectedIndex);
 
             if (!selectedDescription){
                 selectedDescription = ""
@@ -76,7 +76,7 @@ DocumentWorkspaceCommandsDelegateBase {
                         container.tableData.selectedIndex = -1;
                     }
 
-                    removed(removedId);
+                    container.removed(removedId);
                 }
             }
         }
@@ -88,7 +88,7 @@ DocumentWorkspaceCommandsDelegateBase {
             onFinished: {
                 if (buttonId == "Ok"){
                     let elements = container.tableData.elements;
-                    elements.SetData("Description", inputValue, selectedIndex);
+                    elements.SetData("Description", inputValue, container.selectedIndex);
 
                     documentBase.updateGui();
                 }
@@ -102,7 +102,7 @@ DocumentWorkspaceCommandsDelegateBase {
         PopupMenuDialog {
             onFinished: {
                 console.log("DocumentView PopupMenuDialog", commandId);
-                commandActivated(commandId);
+                container.commandActivated(commandId);
             }
         }
     }

@@ -27,6 +27,45 @@ FocusScope {
 
     signal commandsDelegateLoaded();
 
+
+    Component.onCompleted: {
+        commandsDelegate.documentBase = documentBase;
+
+        if (documentBase.itemLoad){
+            documentBase.itemId = documentsData.GetData("Id", model.index);
+            documentBase.itemName = documentsData.GetData("Title", model.index);
+        }
+    }
+
+    onCommandsIdChanged: {
+        console.log("documentBase onCommandsIdChanged", documentBase.commandsId);
+
+        commandsDelegate.commandsId = documentBase.commandsId;
+    }
+
+    onVisibleChanged: {
+        if (documentBase.visible){
+            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
+                                                      "CommandsId": commandsProvider.commandsId});
+
+            documentBase.forceActiveFocus();
+        }
+    }
+
+    onItemIdChanged: {
+        if (documentBase.itemLoad){
+            documentsData.SetData("Id", documentBase.itemId, model.index);
+        }
+    }
+
+    onItemNameChanged: {
+        if (itemLoad){
+            documentsData.SetData("Name", documentBase.itemName, model.index);
+        }
+    }
+
+    function updateGui(){}
+
     Shortcut {
         sequence: "Ctrl+S";
 
@@ -34,7 +73,7 @@ FocusScope {
 
         onActivated: {
             console.log("Ctrl+S onActivated");
-            Events.sendEvent(commandsId + "CommandActivated", "Save");
+            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Save");
         }
     }
 
@@ -45,7 +84,7 @@ FocusScope {
 
         onActivated: {
             console.log("Ctrl+Z onActivated");
-            Events.sendEvent(commandsId + "CommandActivated", "Undo");
+            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Undo");
         }
 
         onActivatedAmbiguously: {
@@ -60,47 +99,10 @@ FocusScope {
 
         onActivated: {
             console.log("Ctrl+Shift+Z onActivated");
-            Events.sendEvent(commandsId + "CommandActivated", "Redo");
+            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Redo");
         }
     }
 
-    Component.onCompleted: {
-        commandsDelegate.documentBase = documentBase;
-
-        if (itemLoad){
-            itemId = documentsData.GetData("Id", model.index);
-            itemName = documentsData.GetData("Title", model.index);
-        }
-    }
-
-    onCommandsIdChanged: {
-        console.log("documentBase onCommandsIdChanged", commandsId);
-
-        commandsDelegate.commandsId = documentBase.commandsId;
-    }
-
-    onVisibleChanged: {
-        if (visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
-
-            documentBase.forceActiveFocus();
-        }
-    }
-
-    onItemIdChanged: {
-        if (itemLoad){
-            documentsData.SetData("Id", itemId, model.index);
-        }
-    }
-
-    onItemNameChanged: {
-        if (itemLoad){
-            documentsData.SetData("Name", itemName, model.index);
-        }
-    }
-
-    function updateGui(){}
 
     Loader {
         id: commandsDelegateBase;
@@ -109,7 +111,7 @@ FocusScope {
         }
 
         onLoaded: {
-            item.documentBase = documentBase;
+            commandsDelegateBase.item.documentBase = documentBase;
             documentBase.commandsDelegateLoaded();
         }
     }
