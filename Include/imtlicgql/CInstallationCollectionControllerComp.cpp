@@ -23,7 +23,7 @@ QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByte
 			return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID);
 		}
 		else if (informationId == QByteArray("ProductId")){
-			return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_NAME);
+            return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_ID);
 		}
 		else if (informationId == QByteArray("AccountId")){
 			return metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME);

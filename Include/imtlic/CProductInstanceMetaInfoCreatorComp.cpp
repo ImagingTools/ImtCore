@@ -60,7 +60,7 @@ bool CProductInstanceMetaInfoCreatorComp::CreateMetaInfo(
 	metaInfoPtr->SetMetaInfo(IProductInstanceInfoProvider::MIT_LICENSE_INSTANCE_INFO_LIST, retVal);
 	metaInfoPtr->SetMetaInfo(IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID, productInstancePtr->GetProductInstanceId());
 	metaInfoPtr->SetMetaInfo(IProductInstanceInfo::MIT_CUSTOMER_NAME, productInstancePtr->GetCustomerId());
-	metaInfoPtr->SetMetaInfo(IProductInstanceInfo::MIT_PRODUCT_NAME, productInstancePtr->GetProductId());
+    metaInfoPtr->SetMetaInfo(IProductInstanceInfo::MIT_PRODUCT_ID, productInstancePtr->GetProductId());
 
 	return true;
 }
