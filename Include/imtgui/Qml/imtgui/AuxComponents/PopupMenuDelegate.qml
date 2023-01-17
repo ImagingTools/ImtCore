@@ -19,7 +19,7 @@ Item {
     signal clicked(string commandId, int index);
 
     Component.onCompleted: {
-        console.log("DEBUG::", model.Id, model.index, width, height, visible, x, y, z, parent)
+        console.log("DEBUG::", model.Id, model.index, popupMenuDelegate.width, popupMenuDelegate.height, popupMenuDelegate.visible, popupMenuDelegate.x, popupMenuDelegate.y, popupMenuDelegate.z, popupMenuDelegate.parent)
     }
 
     Rectangle{
@@ -66,10 +66,11 @@ Item {
         anchors.leftMargin: !popupMenuDelegate.textCentered ? 10 : (parent.width - width)/2;
         anchors.verticalCenter: parent.verticalCenter;
 
-        text: model.Name;
         color: popupMenuDelegate.fontColor;
         font.pixelSize: popupMenuDelegate.textSize;
         font.family: Style.fontFamily;
+
+        text: model.Name;
     }
 
     MouseArea {

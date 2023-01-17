@@ -31,38 +31,38 @@ Rectangle {
     property SettingsProvider settingsProvider: null;
 
     Component.onDestruction: {
-        commonModel.modelChanged.disconnect(container.modelChanged);
+        container.commonModel.modelChanged.disconnect(container.modelChanged);
     }
 
     onVisibleChanged: {
-        console.log("onVisibleChanged settingsProvider", settingsProvider);
-        if (visible){
-            if (settingsProvider.localModel){
-                let localModelJson = settingsProvider.localModel.toJSON();
-                localModel.CreateFromJson(localModelJson);
+        console.log("onVisibleChanged settingsProvider", container.settingsProvider);
+        if (container.visible){
+            if (container.settingsProvider.localModel){
+                let localModelJson = container.settingsProvider.localModel.toJSON();
+                container.localModel.CreateFromJson(localModelJson);
 
-                updateCommonModel(localModel);
+                container.updateCommonModel(container.localModel);
             }
 
             if (settingsProvider.serverModel){
-                let serverModelJson = settingsProvider.serverModel.toJSON();
-                serverModel.CreateFromJson(serverModelJson);
+                let serverModelJson = container.settingsProvider.serverModel.toJSON();
+                container.serverModel.CreateFromJson(serverModelJson);
 
-                updateCommonModel(serverModel);
+                container.updateCommonModel(container.serverModel);
             }
 
-            settingsProvider.rewriteModel(serverModel, localModel);
+            container.settingsProvider.rewriteModel(container.serverModel, container.localModel);
 
-            localModel.modelChanged.connect(container.modelChanged);
-            serverModel.modelChanged.connect(container.modelChanged);
+            container.localModel.modelChanged.connect(container.modelChanged);
+            container.serverModel.modelChanged.connect(container.modelChanged);
 
-            updateGui();
+            container.updateGui();
 
             console.log("setButtonState Apply false");
             buttonsDialog.setButtonState("Apply", false);
         }
         else{
-            clearModels();
+            container.clearModels();
         }
     }
 
@@ -74,20 +74,20 @@ Rectangle {
     }
 
     function clearModels(){
-        serverModel.Clear();
-        localModel.Clear();
-        commonModel.Clear();
+        container.serverModel.Clear();
+        container.localModel.Clear();
+        container.commonModel.Clear();
 
         mainPanelRepeater.model = 0;
         bodyPanelRepeater.model = 0;
     }
 
     function updateGui(){
-        mainPanelRepeater.model = commonModel;
+        mainPanelRepeater.model = container.commonModel;
 
         mainPanel.selectedIndex = 0;
-        let parametersModel = commonModel.GetData("Parameters")
-        bodyPanelRepeater.model = parametersModel
+        let parametersModel = container.commonModel.GetData("Parameters");
+        bodyPanelRepeater.model = parametersModel;
     }
 
     function updateCommonModel(externModel){
@@ -97,20 +97,20 @@ Rectangle {
                 let pageName = externModel.GetData("Name", i);
                 let pageParameters = externModel.GetData("Parameters", i);
 
-                let index = getPageIndexByPageId(pageId)
+                let index = container.getPageIndexByPageId(pageId);
 
                 if (index < 0){
-                    index = commonModel.InsertNewItem();
+                    index = container.commonModel.InsertNewItem();
                 }
 
-                commonModel.CopyItemDataFromModel(index, externModel, i);
+                container.commonModel.CopyItemDataFromModel(index, externModel, i);
             }
         }
     }
 
     function getPageIndexByPageId(pageId, model){
         if (!model){
-            model = commonModel;
+            model = container.commonModel;
         }
 
         for (let i = 0; i < model.GetItemsCount(); i++){
@@ -160,9 +160,9 @@ Rectangle {
     }
 
     function compare(model1, model2){
-        let changeList = []
+        let changeList = [];
 
-        compareRecursive(model1, model2, changeList);
+        container.compareRecursive(model1, model2, changeList);
 
         return changeList;
     }
@@ -180,18 +180,18 @@ Rectangle {
                     let model2Value = model2.GetData(key, i);
 
                     if(typeof model1Value === 'object' && typeof model2Value === 'object'){
-                        compareRecursive(model1Value, model2Value, changeList, globalKey);
+                        container.compareRecursive(model1Value, model2Value, changeList, globalKey);
                     }
                     else{
                         if (model1Value != model2Value){
-                            let changeObj = {}
+                            let changeObj = {};p
 
                             changeObj["operation"] = "change";
                             changeObj["key"] = globalKey;
                             changeObj["curVal"] = model1Value;
                             changeObj["newVal"] = model2Value;
 
-                            changeList.push(changeObj)
+                            changeList.push(changeObj);
                         }
                     }
                 }
@@ -240,7 +240,7 @@ Rectangle {
                 let model2Value = model2.GetData(key, i);
 
                 if(typeof model1Value === 'object' && typeof model2Value === 'object'){
-                    let result = structureIsEqual(model1Value, model2Value);
+                    let result = container.structureIsEqual(model1Value, model2Value);
                     if (!result){
                         return false;
                     }
@@ -334,7 +334,7 @@ Rectangle {
 
                         Component.onCompleted: {
                             if (model.index === 0){
-                                clicked();
+                                buttonContainer.clicked();
                             }
                         }
 
@@ -386,11 +386,11 @@ Rectangle {
                         Text {
                             id: titleItem;
 
-                            text: model.Name;
-
                             font.pixelSize: container.fontSize;
                             color: container.fontColor;
                             font.family: Style.fontFamily;
+
+                            text: model.Name;
                         }
 
                         Rectangle {
@@ -416,9 +416,9 @@ Rectangle {
                             }
 
                             onLoaded: {
-                                console.log("Loader onLoaded", item.parameters);
-                                if (item.parameters !== undefined){
-                                    item.parameters = model.Parameters;
+                                console.log("Loader onLoaded", loader.item.parameters);
+                                if (loader.item.parameters !== undefined){
+                                    loader.item.parameters = model.Parameters;
                                 }
                             }
                         }
@@ -436,8 +436,8 @@ Rectangle {
             anchors.bottomMargin: 10;
 
             Component.onCompleted: {
-                addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": false});
-                addButton({"Id":"Close", "Name": qsTr("Close"), "Enabled": true});
+                buttonsDialog.addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": false});
+                buttonsDialog.addButton({"Id":"Close", "Name": qsTr("Close"), "Enabled": true});
             }
 
             onButtonClicked: {

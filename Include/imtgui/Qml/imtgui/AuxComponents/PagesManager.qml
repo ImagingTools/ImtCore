@@ -10,7 +10,7 @@ Item {
     property int activePageIndex;
 
     onActiveItemChanged: {
-        console.log("onActiveItemChanged", activeItem);
+        console.log("onActiveItemChanged", container.activeItem);
     }
 
     function updateModel(){
