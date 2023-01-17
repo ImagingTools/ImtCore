@@ -110,8 +110,8 @@ FocusScope {
 
     onDialogsCountChanged: {
         comboBoxContainer.openST = comboBoxContainer.dialogsCount > comboBoxContainer.dialogsCountPrev;
-        if(!openST && dialogsCountPrev < 1000){
-            dialogsCountPrev = 1000;
+        if(!comboBoxContainer.openST && comboBoxContainer.dialogsCountPrev < 1000){
+            comboBoxContainer.dialogsCountPrev = 1000;
         }
     }
 

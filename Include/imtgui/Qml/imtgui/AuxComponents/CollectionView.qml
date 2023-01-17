@@ -31,40 +31,40 @@ Item {
     property alias metaInfo: collectionMetaInfo;
 
     Component.onCompleted: {
-        itemId = documentsData.GetData("Id", model.index);
-        itemName = documentsData.GetData("Title", model.index);
+        collectionViewContainer.itemId = documentsData.GetData("Id", model.index);
+        collectionViewContainer.itemName = documentsData.GetData("Title", model.index);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(commandUpdateGui, updateGui);
+        Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
     }
 
     onCommandUpdateGuiChanged: {
-        Events.subscribeEvent(commandUpdateGui, updateGui);
+        Events.subscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
     }
 
     onVisibleChanged: {
-        if (visible){
+        if (collectionViewContainer.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                                       "CommandsId": commandsProvider.commandsId});
         }
     }
 
     onCommandsIdChanged: {
-        console.log("this onItemIdChanged", commandsId);
+        console.log("this onItemIdChanged", collectionViewContainer.commandsId);
 
-        commandsProvider.commandsId = commandsId;
+        commandsProvider.commandsId = collectionViewContainer.commandsId;
 
-        collectionViewBase.commands.gqlModelObjectView = commandsId + "ObjectView";
-        collectionViewBase.commands.gqlModelHeadersInfo = commandsId + "Info";
-        collectionViewBase.commands.gqlModelItemsInfo = commandsId + "List";
+        collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandsId + "ObjectView";
+        collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandsId + "Info";
+        collectionViewBase.commands.gqlModelItemsInfo = collectionViewContainer.commandsId + "List";
 
-        collectionViewBase.commandsId = commandsId;
+        collectionViewBase.commandsId = collectionViewContainer.commandsId;
 
-        collectionMetaInfo.gqlModelMetaInfo = commandsId + "MetaInfo";
+        collectionMetaInfo.gqlModelMetaInfo = collectionViewContainer.commandsId + "MetaInfo";
 
         if (commandsLoader.item){
-            commandsLoader.item.commandsId = commandsId;
+            commandsLoader.item.commandsId = collectionViewContainer.commandsId;
 
             commandsLoader.item.gqlModelItem = commandsLoader.item.commandsId + "Item";
             commandsLoader.item.gqlModelRemove = commandsLoader.item.commandsId + "Remove";

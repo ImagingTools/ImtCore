@@ -36,8 +36,8 @@ Item {
     property string gqlModelMetaInfo;
 
     onTableDataChanged: {
-        if (tableData){
-            tableData.rightButtonMouseClicked.connect(openPopupMenu);
+        if (containerBase.tableData){
+            containerBase.tableData.rightButtonMouseClicked.connect(containerBase.openPopupMenu);
         }
     }
 
@@ -53,8 +53,8 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
-        if (tableData){
-            tableData.rightButtonMouseClicked.disconnect(openPopupMenu);
+        if (containerBase.tableData){
+            containerBase.tableData.rightButtonMouseClicked.disconnect(containerBase.openPopupMenu);
         }
     }
 
@@ -77,18 +77,18 @@ Item {
             modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
         }
         else if (commandId === "Edit"){
-            let itemId = tableData.getSelectedId();
-            let itemName = tableData.getSelectedName();
+            let itemId = containerBase.tableData.getSelectedId();
+            let itemName = containerBase.tableData.getSelectedName();
             collectionViewBase.selectedItem(itemId, itemName);
         }
         else if (commandId === "Rename"){
-            let selectedName = tableData.getSelectedName();
+            let selectedName = containerBase.tableData.getSelectedName();
             modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
         else if (commandId === "SetDescription"){
-            console.log("tableData", tableData);
-            let elements = tableData.elements;
-            let selectedDescription = elements.GetData("Description", selectedIndex);
+            console.log("tableData", containerBase.tableData);
+            let elements = containerBase.tableData.elements;
+            let selectedDescription = elements.GetData("Description", containerBase.selectedIndex);
 
             modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
         }
@@ -97,7 +97,7 @@ Item {
             documentManager.closeDocument(itemId);
         }
 
-        commandActivated(commandId);
+        containerBase.commandActivated(commandId);
     }
 
     onRenamed: {
@@ -127,7 +127,7 @@ Item {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
-                    let itemId = tableData.getSelectedId();
+                    let itemId = containerBase.tableData.getSelectedId();
                     removeModel.updateModel(itemId);
                 }
             }
@@ -162,7 +162,7 @@ Item {
         PopupMenuDialog {
             onFinished: {
                 console.log("CollectionView PopupMenuDialog", commandId);
-                commandHandle(commandId);
+                containerBase.commandHandle(commandId);
             }
         }
     }
@@ -233,12 +233,12 @@ Item {
                         if (dataModelLocal.ContainsKey("removedNotification")){
                             dataModelLocal = dataModelLocal.GetData("removedNotification");
 
-                            tableData.selectedIndex = -1;
+                            containerBase.tableData.selectedIndex = -1;
 
                             if (dataModelLocal.ContainsKey("Id")){
                                 var itemId = dataModelLocal.GetData("Id");
 
-                                removed(itemId);
+                                containerBase.removed(itemId);
                             }
                         }
                     }
@@ -258,7 +258,7 @@ Item {
             var inputParams = Gql.GqlObject("input");
 
             query = Gql.GqlRequest("query", containerBase.gqlModelRename);
-            inputParams.InsertField("Id", tableData.getSelectedId());
+            inputParams.InsertField("Id", containerBase.tableData.getSelectedId());
 
             inputParams.InsertField("NewName", newName);
 
@@ -307,7 +307,7 @@ Item {
                             let oldId = dataModelLocal.GetData("OldId");
                             let newName = dataModelLocal.GetData("NewName");
 
-                            renamed(oldId, newName);
+                            containerBase.renamed(oldId, newName);
                         }
                     }
                 }
@@ -326,7 +326,7 @@ Item {
             var inputParams = Gql.GqlObject("input");
 
             query = Gql.GqlRequest("query", containerBase.gqlModelSetDescription);
-            inputParams.InsertField("Id", tableData.getSelectedId());
+            inputParams.InsertField("Id", containerBase.tableData.getSelectedId());
 
             inputParams.InsertField("Description", description);
 
@@ -375,7 +375,7 @@ Item {
                             var id = dataModelLocal.GetData("Id");
                             var description = dataModelLocal.GetData("Description");
 
-                            descriptionSetted(id, description);
+                            containerBase.descriptionSetted(id, description);
                         }
                     }
                 }
