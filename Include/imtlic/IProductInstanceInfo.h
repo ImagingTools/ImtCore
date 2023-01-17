@@ -47,9 +47,14 @@ public:
 		MIT_CUSTOMER_NAME,
 
 		/**
-			Product name.
+			Product ID.
 		*/
-		MIT_PRODUCT_NAME
+		MIT_PRODUCT_ID,
+
+		/**
+			Product category.
+		*/
+		MIT_PRODUCT_CATEGORY_ID
 	};
 
 
@@ -96,6 +101,11 @@ public:
 		Get the unique-ID of this product instance.
 	*/
 	virtual QByteArray GetProductInstanceId() const = 0;
+
+	/**
+		Set the unique-ID of this product instance.
+	*/
+	virtual void SetProductInstanceId(const QByteArray& instanceId) = 0;
 
 	/**
 		Get related product-ID.

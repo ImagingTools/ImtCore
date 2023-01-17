@@ -97,6 +97,12 @@ QByteArray CProductInstanceInfo::GetProductInstanceId() const
 }
 
 
+void CProductInstanceInfo::SetProductInstanceId(const QByteArray &instanceId)
+{
+	m_instanceId = instanceId;
+}
+
+
 QByteArray CProductInstanceInfo::GetCustomerId() const
 {
 	return m_customerId;

@@ -33,6 +33,7 @@ public:
 	virtual void ClearLicenses() override;
 	virtual QByteArray GetProductId() const override;
 	virtual QByteArray GetProductInstanceId() const override;
+	virtual void SetProductInstanceId(const QByteArray& instanceId) override;
 	virtual QByteArray GetCustomerId() const override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
