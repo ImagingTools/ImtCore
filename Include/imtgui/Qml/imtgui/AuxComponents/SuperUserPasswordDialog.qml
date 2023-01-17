@@ -30,7 +30,7 @@ Dialog {
         property alias inputValue: inputField.text;
 
         onFocusChanged: {
-            if (focus){
+            if (inputDialogBodyContainer.focus){
                 inputField.focus = focus;
             }
         }
@@ -151,13 +151,14 @@ Dialog {
 
                 width: columnBody.width;
 
-                text: inputDialogContainer.message;
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
-                elide: Text.ElideRight;
 
+                elide: Text.ElideRight;
                 wrapMode: Text.WordWrap;
+
+                text: inputDialogContainer.message;
             }
 
             CustomTextField {

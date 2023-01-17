@@ -5,9 +5,6 @@ Item{
     id: tabDelegate;
 
     height: 40;
-//    width: 160;
-
-//    color: selected ? Style.baseColor : "transparent";
 
     property bool selected: false;
     property bool firstElement: false;
@@ -18,6 +15,7 @@ Item{
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
 
     property string decoratorSource;
+
     signal clicked;
     signal closeSignal;
 

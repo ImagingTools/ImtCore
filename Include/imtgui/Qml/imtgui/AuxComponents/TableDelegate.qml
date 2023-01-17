@@ -232,7 +232,7 @@ Rectangle {
                 maxVal = currVal;
             }
         }
-        tableDelegateContainer.height = Math.max(maxVal, minHeight);
+        tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
     }
 
 
@@ -240,7 +240,7 @@ Rectangle {
         id: pause;
         duration: 100;
         onFinished: {
-            setCellHeight();
+            tableDelegateContainer.setCellHeight();
         }
     }
 
@@ -303,13 +303,13 @@ Rectangle {
                 var widthFromModel = tableDelegateContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableDelegateContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
                 if(!tableDelegateContainer.widthDecoratorDynamic.GetItemsCount()){
-                    width = defaultWidth;
+                    deleg.width = defaultWidth;
                 }
                 else if(widthFromModel >= 0){
-                    width = widthFromModel;
+                    deleg.width = widthFromModel;
                 }
                 else{
-                    width = defaultWidth;
+                    deleg.width = defaultWidth;
                 }
 
             }
@@ -367,14 +367,14 @@ Rectangle {
                 anchors.right: rightBorder.left;
                 anchors.bottom: bottomBorder.top;
                 color: tableDelegateContainer.emptyDecorCell ? "transparent" :
-                                                               cellDecorator.IsValidData("Color", model.index) ?
-                                                                   cellDecorator.GetData("Color", model.index) :
+                                                               tableDelegateContainer.cellDecorator.IsValidData("Color", model.index) ?
+                                                                   tableDelegateContainer.cellDecorator.GetData("Color", model.index) :
                                                                    "transparent";
 
 
                 radius: tableDelegateContainer.emptyDecorCell ? 0 :
-                                                                cellDecorator.IsValidData("CellRadius", model.index) ?
-                                                                    cellDecorator.GetData("CellRadius", model.index) :0;
+                                                                tableDelegateContainer.cellDecorator.IsValidData("CellRadius", model.index) ?
+                                                                    tableDelegateContainer.cellDecorator.GetData("CellRadius", model.index) :0;
 
 
 
@@ -388,8 +388,8 @@ Rectangle {
                     height: parent.height/2;
                     color: parent.color;
                     visible: tableDelegateContainer.emptyDecorCell ? true :
-                                                                     cellDecorator.IsValidData("LeftTopRound", model.index) ?
-                                                                         !cellDecorator.GetData("LeftTopRound", model.index) :true;
+                                                                     tableDelegateContainer.cellDecorator.IsValidData("LeftTopRound", model.index) ?
+                                                                         !tableDelegateContainer.cellDecorator.GetData("LeftTopRound", model.index) :true;
                 }
 
                 Rectangle{
@@ -400,8 +400,8 @@ Rectangle {
                     height: parent.height/2;
                     color: parent.color;
                     visible: tableDelegateContainer.emptyDecorCell ? true :
-                                                                     cellDecorator.IsValidData("RightTopRound", model.index) ?
-                                                                         !cellDecorator.GetData("RightTopRound", model.index) :true;
+                                                                     tableDelegateContainer.cellDecorator.IsValidData("RightTopRound", model.index) ?
+                                                                         !tableDelegateContainer.cellDecorator.GetData("RightTopRound", model.index) :true;
 
 
                 }
@@ -414,8 +414,8 @@ Rectangle {
                     height: parent.height/2;
                     color: parent.color;
                     visible: tableDelegateContainer.emptyDecorCell ? true :
-                                                                     cellDecorator.IsValidData("LeftBottomRound", model.index) ?
-                                                                         !cellDecorator.GetData("LeftBottomRound", model.index) :true;
+                                                                     tableDelegateContainer.cellDecorator.IsValidData("LeftBottomRound", model.index) ?
+                                                                         !tableDelegateContainer.cellDecorator.GetData("LeftBottomRound", model.index) :true;
 
 
                 }
@@ -428,8 +428,8 @@ Rectangle {
                     height: parent.height/2;
                     color: parent.color;
                     visible: tableDelegateContainer.emptyDecorCell ? true :
-                                                                     cellDecorator.IsValidData("RightBottomRound", model.index) ?
-                                                                         !cellDecorator.GetData("RightBottomRound", model.index) :true;
+                                                                     tableDelegateContainer.cellDecorator.IsValidData("RightBottomRound", model.index) ?
+                                                                         !tableDelegateContainer.cellDecorator.GetData("RightBottomRound", model.index) :true;
 
                 }
 
@@ -469,30 +469,30 @@ Rectangle {
 
                 verticalAlignment: Text.AlignVCenter;
                 horizontalAlignment: tableDelegateContainer.emptyDecorCell ? Text.AlignLeft :
-                                                                             cellDecorator.IsValidData("TextPosition", model.index) ?
-                                                                                 cellDecorator.GetData("TextPosition", model.index) :
+                                                                             tableDelegateContainer.cellDecorator.IsValidData("TextPosition", model.index) ?
+                                                                                 tableDelegateContainer.cellDecorator.GetData("TextPosition", model.index) :
                                                                                  Text.AlignLeft;
 
 
 
 
                 font.pixelSize: tableDelegateContainer.emptyDecorCell ? Style.fontSize_common:
-                                                                        cellDecorator.IsValidData("FontSize", model.index) ?
-                                                                            cellDecorator.GetData("FontSize", model.index) :
+                                                                        tableDelegateContainer.cellDecorator.IsValidData("FontSize", model.index) ?
+                                                                            tableDelegateContainer.cellDecorator.GetData("FontSize", model.index) :
                                                                             Style.fontSize_common;
 
 
                 font.family: Style.fontFamily;
 
                 font.bold: tableDelegateContainer.emptyDecorCell ? true :
-                                                                   cellDecorator.IsValidData("FontBold", model.index) ?
-                                                                       cellDecorator.GetData("FontBold", model.index) :
+                                                                   tableDelegateContainer.cellDecorator.IsValidData("FontBold", model.index) ?
+                                                                       tableDelegateContainer.cellDecorator.GetData("FontBold", model.index) :
                                                                        true;
 
 
                 color: tableDelegateContainer.emptyDecorCell ? Style.textColor :
-                                                               cellDecorator.IsValidData("FontColor", model.index) ?
-                                                                   cellDecorator.GetData("FontColor", model.index) :
+                                                               tableDelegateContainer.cellDecorator.IsValidData("FontColor", model.index) ?
+                                                                   tableDelegateContainer.cellDecorator.GetData("FontColor", model.index) :
                                                                    Style.textColor;
 
                 elide: tableDelegateContainer.elideMode;

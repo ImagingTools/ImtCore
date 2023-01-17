@@ -10,10 +10,10 @@ Item {
 
     onStartPageObjChanged: {
         console.log("onStartPageObjChanged");
-        documentLoader.source = startPageObj["Source"];
+        documentLoader.source = documentManager.startPageObj["Source"];
 
         if (documentLoader.item){
-            documentLoader.item.commandsId = startPageObj["CommandsId"];
+            documentLoader.item.commandsId = documentManager.startPageObj["CommandsId"];
         }
     }
 
@@ -29,7 +29,7 @@ Item {
         visible: stackView.countPage == 0;
 
         onLoaded: {
-            console.log("onLoaded", source);
+            console.log("onLoaded", documentLoader.source);
         }
     }
 

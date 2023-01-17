@@ -12,12 +12,12 @@ Item {
     property string imageSource: "";
     property bool visibleMarker: false;
 
-    signal accepted(string text);
-    signal clicked();
-
     property bool highlighted;
     property bool selected: false;
     property string text;
+
+    signal accepted(string text);
+    signal clicked();
 
     Rectangle {
         id: marker;
@@ -40,9 +40,10 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
 
-        text: parent.title;
         color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
         font.pixelSize: container.fontSize;
         font.family: Style.fontFamily;
+
+        text: parent.title;
     }
 }
