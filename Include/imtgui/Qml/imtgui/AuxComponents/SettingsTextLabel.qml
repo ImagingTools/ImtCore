@@ -10,10 +10,10 @@ Item {
     Text {
         id: text;
 
-        text: model.Value;
-
         color: Style.textColor;
         font.family: Style.fontFamily;
         font.pixelSize: Style.fontSize_common;
+
+        text: model.Value;
     }
 }

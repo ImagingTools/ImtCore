@@ -14,15 +14,15 @@ Item {
     signal localSettingsSaved();
 
     onServerModelChanged: {
-        console.log("SettingsProvider onServerModelChanged", serverModel);
+        console.log("SettingsProvider onServerModelChanged", container.serverModel);
 
-        rewriteModel(serverModel, localModel);
+        container.rewriteModel(container.serverModel, container.localModel);
 
-        saveLocalModel();
+        container.saveLocalModel();
     }
 
     function clearModel(){
-        serverModel.Clear();
+        container.serverModel.Clear();
     }
 
     function updateModel(){
@@ -30,15 +30,15 @@ Item {
     }
 
     function saveLocalModel(){
-        console.log("SettingsProvider saveLocalModel", localModel.toJSON());
+        console.log("SettingsProvider saveLocalModel", container.localModel.toJSON());
 
-        root.settingsUpdate();
+        container.root.settingsUpdate();
 
-        localSettingsSaved();
+        container.localSettingsSaved();
     }
 
     function saveServerModel(){
-        console.log("SettingsProvider saveServerModel", serverModel.toJSON());
+        console.log("SettingsProvider saveServerModel", container.serverModel.toJSON());
 
         preferenceSaveQuery.save();
     }

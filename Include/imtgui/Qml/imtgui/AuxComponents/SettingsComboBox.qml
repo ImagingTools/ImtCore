@@ -15,8 +15,8 @@ Item {
     property bool active: false;
 
     onParametersChanged: {
-        console.log("onParametersChanged", parameters);
-        settingsComboBox.model = parameters;
+        console.log("onParametersChanged", settingsComboBoxContainer.parameters);
+        settingsComboBox.model = settingsComboBoxContainer.parameters;
         settingsComboBox.currentIndex = modelData.Value;
     }
 

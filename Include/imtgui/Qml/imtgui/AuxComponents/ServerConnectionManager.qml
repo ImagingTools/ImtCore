@@ -11,7 +11,7 @@ Item {
 
     function setConnectionState(state){
         console.log("ConnectionManager setInvalidConnection", state);
-        connection = state;
+        container.connection = state;
     }
 
     Rectangle {
@@ -49,10 +49,11 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter;
             anchors.verticalCenter: parent.verticalCenter;
 
-            text: qsTr("There is no connection to the server!");
             color: Style.textColor;
             font.pixelSize: Style.fontSize_title;
             font.family: Style.fontFamily;
+
+            text: qsTr("There is no connection to the server!");
         }
 
         AuxButton {
@@ -68,9 +69,10 @@ Item {
             hasText: true;
             hasIcon: false;
 
-            textButton: qsTr("Refresh");
             borderColor: (refreshButton.highlighted || refreshButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
             backgroundColor: Style.baseColor;
+
+            textButton: qsTr("Refresh");
 
             onClicked: {
                 window.updateModels();
