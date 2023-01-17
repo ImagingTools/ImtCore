@@ -30,7 +30,7 @@ Rectangle {
     function clearModels(){
         model.Clear();
         lvPages.model = 0;
-        activePageIndex = -1;
+        menuPanel.activePageIndex = -1;
     }
 
     onActivePageIndexChanged: {
@@ -38,9 +38,9 @@ Rectangle {
     }
 
     onModelChanged: {
-        console.log("MenuPanel onModelChanged", model);
+        console.log("MenuPanel onModelChanged", menuPanel.model);
 
-        lvPages.model = model;
+        lvPages.model = menuPanel.model;
     }
 
     ListView {

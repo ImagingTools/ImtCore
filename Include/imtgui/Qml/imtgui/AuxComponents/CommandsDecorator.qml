@@ -10,11 +10,11 @@ Item {
     property string commandsId;
 
     Component.onCompleted: {
-        Events.subscribeEvent("CommandsDecoratorClear", clearModel);
+        Events.subscribeEvent("CommandsDecoratorClear", commandsDecoratorContainer.clearModel);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("CommandsDecoratorClear", clearModel);
+        Events.unSubscribeEvent("CommandsDecoratorClear", commandsDecoratorContainer.clearModel);
     }
 
     function setCommandsModel(parameters){

@@ -35,15 +35,16 @@ Item {
 
                 Text {
                     id: settingsDatabaseInputTitle;
-                    text: model.Name;
 
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
                     font.family: Style.fontFamily;
+
+                    text: model.Name;
                 }
 
                 onWidthChanged: {
-                    console.log("databaseInputDelegate onWidthChanged", width);
+                    console.log("databaseInputDelegate onWidthChanged", databaseInputDelegate.width);
 
                     if (settingsDatabaseInputLoader.item){
                         settingsDatabaseInputLoader.item.width = databaseInputColumn.width;
@@ -57,11 +58,11 @@ Item {
                     anchors.topMargin: 5;
 
                     Component.onCompleted: {
-                        source = model.Source;
+                        settingsDatabaseInputLoader.source = model.Source;
                     }
 
                     onLoaded: {
-                        console.log("Loader onLoaded", source);
+                        console.log("Loader onLoaded", settingsDatabaseInputLoader.source);
                     }
                 }
             }

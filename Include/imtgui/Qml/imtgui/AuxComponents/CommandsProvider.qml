@@ -29,7 +29,7 @@ Item {
     function setCommandIsEnabled(commandId, isEnabled){
         console.log("commandsProviderContainer setCommandIsEnabled", commandId, isEnabled);
 
-        if(commandsModel === undefined) return;
+        if(commandsProviderContainer.commandsModel === undefined) return;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
@@ -38,14 +38,14 @@ Item {
                 if (currentIsEnabled !== isEnabled){
                     commandsProviderContainer.commandsModel.SetData("IsEnabled", isEnabled, i);
 
-                    commandModeChanged(commandId, isEnabled);
+                    commandsProviderContainer.commandModeChanged(commandId, isEnabled);
                 }
             }
         }
     }
 
     function commandIsEnabled(commandId){
-        if(commandsModel === undefined) return;
+        if(commandsProviderContainer.commandsModel === undefined) return;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
