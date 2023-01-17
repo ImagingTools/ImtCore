@@ -16,11 +16,11 @@ Dialog {
     }
 
     onMessageChanged: {
-        inputDialogContainer.bodyItem.message = message;
+        inputDialogContainer.bodyItem.message = inputDialogContainer.message;
     }
 
     onInputValueChanged: {
-        inputDialogContainer.bodyItem.inputValue = inputValue;
+        inputDialogContainer.bodyItem.inputValue = inputDialogContainer.inputValue;
     }
 
     Component.onCompleted: {

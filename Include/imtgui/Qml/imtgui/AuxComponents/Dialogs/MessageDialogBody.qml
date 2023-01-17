@@ -6,8 +6,8 @@ import imtauthgui 1.0
 Rectangle {
     id: inputDialogBodyContainer;
 
-    height: Style.size_minMessageHeight ==undefined ? columnBody.height + 40 :
-                                                      Math.max(Style.size_minMessageHeight,columnBody.height + 40);
+    height: Style.size_minMessageHeight == undefined ? columnBody.height + 40 :
+                                                      Math.max(Style.size_minMessageHeight, columnBody.height + 40);
     color: "transparent";
 
     property string message;
@@ -28,17 +28,17 @@ Rectangle {
         spacing: 5;
 
         Text {
-            id: message;
+            id: messageText;
 
             width: columnBody.width;
 
-            text: inputDialogBodyContainer.message;
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
             elide: Text.ElideRight;
-
             wrapMode: Text.WordWrap;
+
+            text: inputDialogBodyContainer.message;
         }
     }
 }

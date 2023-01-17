@@ -47,15 +47,15 @@ Rectangle {
     signal finished(string commandId, int index);
 
     Component.onDestruction: {
-        root.backgroundItem.backgroundAreaItem.clicked.disconnect(root.closeDialog);
+        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(root.closeDialog);
     }
 
     onFinished: {
-        root.closeDialog();
+        popupMenuContainer.root.closeDialog();
     }
 
     onModelChanged: {
-        popupMenuListView.model = model;
+        popupMenuListView.model = popupMenuContainer.model;
 
         if(popupMenuContainer.moveToEnd){
             popupMenuListView.positionViewAtEnd();
@@ -70,14 +70,14 @@ Rectangle {
             Opacity of the background = 0
         */
         if(popupMenuContainer.hiddenBackground){
-            root.backgroundItem.opacity = 0;
+            popupMenuContainer.root.backgroundItem.opacity = 0;
         }
 
 
         /**
             Close the dialog by clicking on the background
         */
-        root.backgroundItem.backgroundAreaItem.clicked.connect(root.closeDialog);
+        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.connect(popupMenuContainer.root.closeDialog);
     }
 
     onContentYChanged: {

@@ -51,21 +51,21 @@ Rectangle {
     signal textEdited();
 
     TreeItemModel{
-        id: modelFilter
+        id: modelFilter;
     }
 
     onFinished: {
         if(popupMenuContainer.canClose){
-            root.closeDialog();
+            popupMenuContainer.root.closeDialog();
         }
     }
 
     onModelChanged: {
-        popupMenuListView.model = model;
+        popupMenuListView.model = popupMenuContainer.model;
     }
     onPropertiesChanged: {
         for (var item = 0; item < properties.GetItemsCount(); item++){
-            modelFilter.SetData(properties.GetData("Id", item),  properties.GetData("Value", item));
+            modelFilter.SetData(properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
         }
         itemsModel.updateModel(0);
 //        root.closeDialog();
@@ -76,13 +76,13 @@ Rectangle {
             Opacity of the background = 0
         */
         if(popupMenuContainer.hiddenBackground){
-            root.backgroundItem.opacity = 0;
+            popupMenuContainer.root.backgroundItem.opacity = 0;
         }
 
         /**
             Close the dialog by clicking on the background
         */
-        root.backgroundItem.backgroundAreaItem.clicked.connect(root.closeDialog);
+        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.connect(popupMenuContainer.root.closeDialog);
     }
     Component.onCompleted: {
         modelFilter.AddTreeModel("FilterIds");
@@ -92,7 +92,7 @@ Rectangle {
     }
 
     Component.onDestruction: {
-        root.backgroundItem.backgroundAreaItem.clicked.disconnect(root.closeDialog);
+        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(popupMenuContainer.root.closeDialog);
     }
 
 
@@ -111,11 +111,11 @@ Rectangle {
         onTextEdited: {
             comboBoxContainerGql.currentIndex = -1;
             offset = 0;
-            modelFilter.SetData("TextFilter", filterText);
+            modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
             itemsModel.updateModel(0);
         }
         onAccepted: {
-            root.closeDialog();
+            popupMenuContainer.root.closeDialog();
             popupMenuContainer.close();
         }
 
@@ -136,39 +136,42 @@ Rectangle {
         border.color: Style.alternateBaseColor;
 
         Rectangle{
-            id: loadedRec
-            anchors.fill: parent
-            opacity: 0.5
+            id: loadedRec;
+
+            anchors.fill: parent;
+            opacity: 0.5;
             visible: false;
 
             Text {
 
                 anchors.centerIn: parent;
 
-                text: "Loaded..."
                 color: Style.textColor;
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
+
+                text: "Loaded..."
             }
         }
 
         ListView {
             id: popupMenuListView;
+
             width: popupMenuContainer.width;
-            height: (countVisibleItem == -1 || countVisibleItem > popupMenuListView.count) ?
+            height: (popupMenuContainer.countVisibleItem == -1 || popupMenuContainer.countVisibleItem > popupMenuListView.count) ?
                         popupMenuListView.count * popupMenuContainer.itemHeight :
-                        countVisibleItem * popupMenuContainer.itemHeight;
+                        popupMenuContainer.countVisibleItem * popupMenuContainer.itemHeight;
 
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
             onContentYChanged: {
                 if(contentHeight - contentY - popupMenuListView.height == 0){
-                    if(!endListStatus && itemsModel.state == "Ready"){
+                    if(!popupMenuContainer.endListStatus && itemsModel.state == "Ready"){
                         console.log("Create additional query")
                         loadedRec.visible = true;
-                        offset = offset + popupMenuContainer.count;
-                        console.log("Offset = ", offset);
-                        itemsModel.updateModel(offset);
+                        popupMenuContainer.offset = popupMenuContainer.offset + popupMenuContainer.count;
+                        console.log("Offset = ", popupMenuContainer.offset);
+                        itemsModel.updateModel(popupMenuContainer.offset);
                     }
                 }
             }
@@ -191,6 +194,7 @@ Rectangle {
 
        source: itemBody;
     }
+
     GqlModel {
         id: itemsModel;
 
@@ -201,7 +205,7 @@ Rectangle {
             query.AddParam(inputParams);
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset", offsetVar);
-            viewParams.InsertField("Count", count);
+            viewParams.InsertField("Count", popupMenuContainer.count);
             viewParams.InsertField("FilterModel");
             var jsonString = modelFilter.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
@@ -235,16 +239,16 @@ Rectangle {
                         dataModelLocal = dataModelLocal.GetData(commandId);
                         dataModelLocal = dataModelLocal.GetData("items");
                         console.log(commandId, " = ", dataModelLocal);
-                        if (offset == 0){
-                            model = dataModelLocal;
+                        if (popupMenuContainer.offset == 0){
+                            popupMenuContainer.model = dataModelLocal;
                             loadedRec.visible = false;
                         }
                         else{
                             console.log("count items = ", dataModelLocal.GetItemsCount())
                             if(dataModelLocal.GetItemsCount() > 0){
                                 for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                                    model.InsertNewItem()
-                                    dataModelLocal.CopyItemDataToModel(i, model, offset+i)
+                                    popupMenuContainer.model.InsertNewItem();
+                                    dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
                                 }
                             }
                             else{

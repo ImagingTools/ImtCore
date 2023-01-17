@@ -39,9 +39,9 @@ Rectangle {
 
 
     onFocusChanged: {
-        console.log("Dialog onFocusChanged", focus);
+        console.log("Dialog onFocusChanged", dialogContainer.focus);
 
-        if (focus && loaderBodyDialog.item){
+        if (dialogContainer.focus && loaderBodyDialog.item){
             loaderBodyDialog.item.focus = true;
         }
     }
@@ -51,17 +51,17 @@ Rectangle {
     }
 
     onFinished: {
-        if (root){
+        if (dialogContainer.root){
             if(dialogContainer.notClosingButtons.indexOf(buttonId) == -1){
-                root.closeDialog();
+                dialogContainer.root.closeDialog();
             }
         }
     }
 
     onTitleChanged: {
         if(loaderTopPanel.item){
-            console.log("Dialog onTitleChanged", title);
-            loaderTopPanel.item.title = title;
+            console.log("Dialog onTitleChanged", dialogContainer.title);
+            loaderTopPanel.item.title = dialogContainer.title;
         }
     }
 
@@ -102,7 +102,7 @@ Rectangle {
         Loader {
             id: loaderBodyDialog;
 
-            sourceComponent: contentComp;
+            sourceComponent: dialogContainer.contentComp;
 
             onLoaded: {
                 loaderBodyDialog.item.width = dialogContainer.width;

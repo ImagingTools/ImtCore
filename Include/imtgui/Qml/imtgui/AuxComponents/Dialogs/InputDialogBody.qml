@@ -13,8 +13,8 @@ Item {
     onFocusChanged: {
         console.log("InputBody onFocusChanged", focus);
 
-        if (focus){
-            inputField.focus = focus;
+        if (inputDialogBodyContainer.focus){
+            inputField.focus = inputDialogBodyContainer.focus;
         }
     }
 

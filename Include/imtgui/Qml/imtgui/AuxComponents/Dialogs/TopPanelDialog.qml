@@ -41,10 +41,11 @@ Rectangle {
         anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
         anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
 
-        text: topPanelDialogContainer.title;
         color: Style.textColor;
         font.family: Style.fontFamily;
         font.pixelSize: Style.fontSize_subtitle;
+
+        text: topPanelDialogContainer.title;
     }
 
     AuxButton {
