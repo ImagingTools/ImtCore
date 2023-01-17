@@ -357,7 +357,7 @@ global.Core = {
                         
                         path = document.elementsFromPoint(e.type.indexOf('touch') >= 0 ? e.changedTouches[0].pageX : e.x, e.type.indexOf('touch') >= 0 ? e.changedTouches[0].pageY : e.y)
                         for(let indx in UIDList){
-                            if(e.type === 'mousemove' && UIDList[indx].dom && path.indexOf(UIDList[indx].dom) < 0 && UIDList[indx].$mouseout){
+                            if(e.type === 'mousemove' && UIDList[indx].visible && UIDList[indx].enabled && UIDList[indx].dom && path.indexOf(UIDList[indx].dom) < 0 && UIDList[indx].$mouseout){
                                 UIDList[indx].$mouseout(e)
                             }
                         }
@@ -376,18 +376,18 @@ global.Core = {
                     root.eventState.view = null
                     for(let p of path){
                         let obj = UIDList[p.id.slice(3)]
-                        if(obj && obj.webScroll !== undefined && !find){
+                        if(obj && obj.visible && obj.enabled && obj.webScroll !== undefined && !find){
                             find = true
                             root.eventState.view = obj
                         }
                         
                     }
-                    if(root.eventState.target && root.eventState.target[`$${e.type}`]){
+                    if(root.eventState.target && root.eventState.target.visible && root.eventState.target.enabled &&  root.eventState.target[`$${e.type}`]){
                         root.eventState.target[`$${e.type}`](e, root.eventState)
                     } else {
                         for(let p of path){
                             let obj = UIDList[p.id.slice(3)]
-                            if(!root.eventState.target && obj && obj[`$${e.type}`]){
+                            if(!root.eventState.target && obj && obj[`$${e.type}`] && obj.visible && obj.enabled){
                                 obj[`$${e.type}`](e, root.eventState)
                             }
                         }

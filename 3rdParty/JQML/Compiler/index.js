@@ -62,7 +62,9 @@ function getFiles (dir, _files){
 if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source
-  
+
+if(!fs.existsSync(source + '/cache/')) fs.mkdirSync(source + '/cache/');
+
 let files = getFiles(source)
 
 let IDList = new Set()
@@ -423,6 +425,7 @@ function qmlprop(m, instructions, file){
                     instructions[name].add(`\`${val}\``)
                     // instructions.id= val
                     IDList.add(val)
+                    compiledFiles[file].IDList.add(val)
                 } else {
                     try {
                         let cval = eval(val.replaceAll('\n','\\\n'))
@@ -483,21 +486,26 @@ for(let file of files){
     let data = fs.readFileSync(file, {encoding:'utf8', flag:'r'})
 
     let currentHash = crypto.createHash('md5').update(data).digest("hex")
-    let fileHash = file.replaceAll('.qml', '.hash')
+    let fileHash = source + '/cache/' + crypto.createHash('md5').update(file).digest("hex")
     let fileSave = file.replaceAll('.qml', '.js')
 
     compiledFiles[file] = {
         'instructions': {},
         'code': '',
         'cache': false,
+        'IDList': new Set()
     }
 
     if(fs.existsSync(fileHash)){
-        let savedHash = fs.readFileSync(fileHash, {encoding:'utf8', flag:'r'})
+        let savedHash = fs.readFileSync(fileHash, {encoding:'utf8', flag:'r'}).split('\n')
 
-        if(currentHash === savedHash){
+        if(currentHash === savedHash[0]){
             let savedData = fs.readFileSync(fileSave, {encoding:'utf8', flag:'r'})
 
+            compiledFiles[file].IDList = new Set(savedData[1].split(','))
+            for(let id of compiledFiles[file].IDList){
+                IDList.add(id)
+            }
             compiledFiles[file].code = savedData
             compiledFiles[file].cache = true
             let instructions = getBaseStructure()
@@ -510,14 +518,16 @@ for(let file of files){
             compiledFiles[file].instructions = instructions
             continue
         } else {
-            fs.writeFile(fileHash, currentHash, function(error){
-                if(error) throw error
-            })
+            compiledFiles[file].currentHash = currentHash
+            // fs.writeFile(fileHash, currentHash, function(error){
+            //     if(error) throw error
+            // })
         }
     } else {
-        fs.writeFile(fileHash, currentHash, function(error){
-            if(error) throw error
-        })
+        compiledFiles[file].currentHash = currentHash
+        // fs.writeFile(fileHash, currentHash, function(error){
+        //     if(error) throw error
+        // })
     }
 
     
@@ -1011,6 +1021,7 @@ for(file in compiledFiles){
         compiledFiles[file].instructions.id.add(`\`${name}\``)
         // compiledFiles[file].instructions.id = name
         IDList.add(name)
+        compiledFiles[file].IDList.add(name)
     }
 
     if(compiledFiles[file].cache === true) continue
@@ -1224,6 +1235,15 @@ for(file in compiledFiles){
 
         compiledFiles[file].code = code.join('\n')
         fs.writeFile(file.replaceAll('.qml', '.js'), compiledFiles[file].code, function(error){
+            if(error) throw error
+        })
+
+        let tempIDList = []
+        for(let id of compiledFiles[file].IDList){
+            tempIDList.push(id)
+        }
+
+        fs.writeFile(source + '/cache/' + crypto.createHash('md5').update(file).digest("hex"), compiledFiles[file].currentHash + '\n' + tempIDList.join(','), function(error){
             if(error) throw error
         })
     }

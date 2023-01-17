@@ -215,7 +215,7 @@ export class MouseArea extends Item {
 	}
 
 	$mouseover(e, state){
-		e.preventDefault()
+		// e.preventDefault()
 		if(this.$p.hoverEnabled.val && this.$p.enabled.val && !this.$p.containsMouse.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
 			
 			this.$fillMouse(e)
@@ -225,7 +225,7 @@ export class MouseArea extends Item {
 		}
 	}
 	$mouseout(e, state){
-		e.preventDefault()
+		// e.preventDefault()
 		// if(e.offsetX > this.width || e.offsetY > this.height || e.offsetX < 0 || e.offsetY < 0)
 		if(this.$p.hoverEnabled.val && this.$p.enabled.val && this.$p.containsMouse.val && (Core.root.eventState.target === null || Core.root.eventState.target === this)){
 
