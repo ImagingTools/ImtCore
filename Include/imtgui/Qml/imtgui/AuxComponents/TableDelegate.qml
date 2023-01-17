@@ -24,6 +24,7 @@ Rectangle {
     property bool emptyDecorCell: true;
 
     property string selectedColor: Style.selectedColor;
+    property real selectedOpacity: 0.5;
 
     //
     property string borderColorHorizontal: "transparent";
@@ -434,76 +435,93 @@ Rectangle {
 
                 //cornerPatches
 
-                Text {
-                    id: name;
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-                    anchors.leftMargin: tableDelegateContainer.textMarginHor;
-                    anchors.rightMargin: tableDelegateContainer.textMarginHor;
-
-
-                    verticalAlignment: Text.AlignVCenter;
-                    horizontalAlignment: tableDelegateContainer.emptyDecorCell ? Text.AlignLeft :
-                                                                                 cellDecorator.IsValidData("TextPosition", model.index) ?
-                                                                                     cellDecorator.GetData("TextPosition", model.index) :
-                                                                                     Text.AlignLeft;
-
-
-
-
-                    font.pixelSize: tableDelegateContainer.emptyDecorCell ? Style.fontSize_common:
-                                                                            cellDecorator.IsValidData("FontSize", model.index) ?
-                                                                                cellDecorator.GetData("FontSize", model.index) :
-                                                                                Style.fontSize_common;
-
-
-                    font.family: Style.fontFamily;
-
-                    font.bold: tableDelegateContainer.emptyDecorCell ? true :
-                                                                       cellDecorator.IsValidData("FontBold", model.index) ?
-                                                                           cellDecorator.GetData("FontBold", model.index) :
-                                                                           true;
-
-
-                    color: tableDelegateContainer.emptyDecorCell ? Style.textColor :
-                                                                   cellDecorator.IsValidData("FontColor", model.index) ?
-                                                                       cellDecorator.GetData("FontColor", model.index) :
-                                                                       Style.textColor;
-
-                    elide: tableDelegateContainer.elideMode;
-
-                    wrapMode: tableDelegateContainer.wrapMode;
-
-                    onLinkActivated: {
-                        Qt.openUrlExternally(link);
-                    }
-
-                    text: tableDelegateContainer.bodyArray[model.index] == undefined ? "" :
-                                                                                      tableDelegateContainer.bodyArray[model.index];
-
-
-                    onHeightChanged: {
-                        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-                            if(model.index < heightModel.count){
-                                var height_ = name.height +
-                                        2*tableDelegateContainer.textMarginVer +
-                                        topBorder.height + bottomBorder.height;
-
-                                heightModel.setProperty(model.index, "cellHeight", height_);
-
-                            }
-                        }
-                    }
-
-
-                }
 
 
             }//mainRec
 
+            Rectangle {
+                id: selectionRec;
 
+                anchors.left: parent.left;
+                anchors.right: parent.right;
+                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
+                anchors.topMargin: topBorder.height;
+                anchors.bottomMargin: bottomBorder.height;
+
+                color: tableDelegateContainer.selectedColor;
+                opacity: tableDelegateContainer.selectedOpacity;
+
+                radius: mainRec.radius;
+                visible: tableDelegateContainer.selected && mainRec.color !== "transparent";
+            }
+
+            Text {
+                id: name;
+
+                anchors.verticalCenter: mainRec.verticalCenter;
+                anchors.left: mainRec.left;
+                anchors.right: mainRec.right;
+                anchors.leftMargin: tableDelegateContainer.textMarginHor;
+                anchors.rightMargin: tableDelegateContainer.textMarginHor;
+
+
+                verticalAlignment: Text.AlignVCenter;
+                horizontalAlignment: tableDelegateContainer.emptyDecorCell ? Text.AlignLeft :
+                                                                             cellDecorator.IsValidData("TextPosition", model.index) ?
+                                                                                 cellDecorator.GetData("TextPosition", model.index) :
+                                                                                 Text.AlignLeft;
+
+
+
+
+                font.pixelSize: tableDelegateContainer.emptyDecorCell ? Style.fontSize_common:
+                                                                        cellDecorator.IsValidData("FontSize", model.index) ?
+                                                                            cellDecorator.GetData("FontSize", model.index) :
+                                                                            Style.fontSize_common;
+
+
+                font.family: Style.fontFamily;
+
+                font.bold: tableDelegateContainer.emptyDecorCell ? true :
+                                                                   cellDecorator.IsValidData("FontBold", model.index) ?
+                                                                       cellDecorator.GetData("FontBold", model.index) :
+                                                                       true;
+
+
+                color: tableDelegateContainer.emptyDecorCell ? Style.textColor :
+                                                               cellDecorator.IsValidData("FontColor", model.index) ?
+                                                                   cellDecorator.GetData("FontColor", model.index) :
+                                                                   Style.textColor;
+
+                elide: tableDelegateContainer.elideMode;
+
+                wrapMode: tableDelegateContainer.wrapMode;
+
+                onLinkActivated: {
+                    Qt.openUrlExternally(link);
+                }
+
+                text: tableDelegateContainer.bodyArray[model.index] == undefined ? "" :
+                                                                                  tableDelegateContainer.bodyArray[model.index];
+
+
+                onHeightChanged: {
+                    if(tableDelegateContainer.wrapMode !== Text.NoWrap){
+                        if(model.index < heightModel.count){
+                            var height_ = name.height +
+                                    2*tableDelegateContainer.textMarginVer +
+                                    topBorder.height + bottomBorder.height;
+
+                            heightModel.setProperty(model.index, "cellHeight", height_);
+
+                        }
+                    }
+                }
+
+
+            }
 
         }//delegate
 

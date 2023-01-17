@@ -10,6 +10,8 @@ BasicTableView {
 
     rowDelegate: Component {
         TreeViewItemDelegateBase {
+            id: treeViewDeleg;
+
             width: root.width;
 
             root: treeViewRoot;
@@ -32,22 +34,22 @@ BasicTableView {
 
                 if (isAllChecked){
                     if (model.CheckState != Qt.Checked){
-                        model.CheckState = Qt.Checked
+                        model.CheckState = Qt.Checked;
                     }
                 }
                 else if (isAllUnchecked){
                     if (model.CheckState != Qt.Unchecked){
-                        model.CheckState = Qt.Unchecked
+                        model.CheckState = Qt.Unchecked;
                     }
                 }
                 else if (!isAllChecked && !isAllUnchecked){
                     if (model.CheckState != Qt.PartiallyChecked){
-                        model.CheckState = Qt.PartiallyChecked
+                        model.CheckState = Qt.PartiallyChecked;
                     }
                 }
 
-                if (parentDelegate){
-                    parentDelegate.childrenCheckStateChanged(model)
+                if (treeViewDeleg.parentDelegate){
+                    treeViewDeleg.parentDelegate.childrenCheckStateChanged(model);
                 }
             }
         }
@@ -55,7 +57,7 @@ BasicTableView {
 
     function addRow(row){
         console.log("addRow");
-        insertRow([rowModel.count], row);
+        treeViewRoot.insertRow([rowModel.count], row);
     }
 
 //    function addRow(row){
@@ -63,7 +65,7 @@ BasicTableView {
 //        insertRow([count], row);
 //    }
     Component {
-        id: modelComponent
+        id: modelComponent;
         ListModel {
         }
     }
@@ -108,13 +110,13 @@ BasicTableView {
         let localModel = rowModel;
 
         for (let i = 0; i < indexes.length - 1; i++){
-            let index = indexes[i]
+            let index = indexes[i];
             if (localModel.count <= index){
-                console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes)
+                console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes);
                 return;
             }
 
-            localModel = localModel.get(index).ChildModel
+            localModel = localModel.get(index).ChildModel;
         }
 
         row["Level"] = indexes.length - 1;
@@ -123,10 +125,10 @@ BasicTableView {
 
         console.log("localModel before insert:", localModel.count, lastIndex);
 
-        localModel.insert(lastIndex, row)
+        localModel.insert(lastIndex, row);
         console.log("localModel after insert:", localModel.count);
 
-        rowAdded();
+        treeViewRoot.rowAdded();
     }
 
 //    function insertRow(indexes, row){
@@ -229,22 +231,22 @@ BasicTableView {
         let localModel = rowModel;
 
         for (let i = 0; i < indexes.length - 1; i++){
-            let index = indexes[i]
+            let index = indexes[i];
             if (localModel.count <= index){
-                console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes)
+                console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes);
                 return;
             }
 
-            localModel = localModel.get(index).ChildModel
+            localModel = localModel.get(index).ChildModel;
         }
 
         let lastIndex = indexes[indexes.length - 1];
 
-        localModel.remove(lastIndex)
+        localModel.remove(lastIndex);
 
-        console.log("localModel", localModel)
+        console.log("localModel", localModel);
 
-        rowRemoved();
+        treeViewRoot.rowRemoved();
     }
 
     function printModel(rowModel){

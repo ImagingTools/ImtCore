@@ -145,45 +145,45 @@ Item {
     onSelectedYearChanged: {
         console.log("onSelectedYearChanged");
         if (datePicker.completed){
-            dateChanged();
+            datePicker.dateChanged();
         }
         if(datePicker.hasDayCombo && datePicker.completed){
-            fillDayModel();
+            datePicker.fillDayModel();
         }
     }
 
     onSelectedDayChanged: {
         if (datePicker.completed){
-            dateChanged();
+            datePicker.dateChanged();
         }
     }
 
     onSelectedIndexMonthChanged: {
         if (datePicker.completed){
-            dateChanged();
+            datePicker.dateChanged();
         }
         if(datePicker.hasDayCombo && datePicker.completed){
-            fillDayModel();
+            datePicker.fillDayModel();
         }
     }
 
     function getDate(){
-        let monthStr = String(selectedIndexMonth + 1)
+        let monthStr = String(datePicker.selectedIndexMonth + 1)
         if (monthStr.length == 1){
             monthStr = "0" + monthStr;
         }
 
-        let dayStr = String(selectedDay)
+        let dayStr = String(datePicker.selectedDay)
         if (dayStr.length == 1){
             dayStr = "0" + dayStr;
         }
 
-        return selectedYear + "-" + monthStr + "-" + dayStr;
+        return datePicker.selectedYear + "-" + monthStr + "-" + dayStr;
     }
 
     function setCurrentDay(){
         let date = new Date();
-        setDate(date.getFullYear(), date.getMonth(), date.getDate());
+        datePicker.setDate(date.getFullYear(), date.getMonth(), date.getDate());
     }
 
     function checkDate(year, month, day){
@@ -195,9 +195,9 @@ Item {
     }
 
     function setDate(year, month, day){
-        if (checkDate(year, month, day)){
+        if (datePicker.checkDate(year, month, day)){
             yearField.text = year;
-            selectedIndexMonth = month;
+            datePicker.selectedIndexMonth = month;
             dayField.text = day;
         }
     }
@@ -360,7 +360,7 @@ Item {
                         if(yearCombo.currentIndex >=0){
                             let selectedYear = yearCombo.currentText;
 
-                            if (checkDate(selectedYear, selectedIndexMonth, Number(dayField.text))){
+                            if (datePicker.checkDate(selectedYear, datePicker.selectedIndexMonth, Number(dayField.text))){
                                 yearField.text = selectedYear;
                             }
                         }
@@ -389,7 +389,7 @@ Item {
 
                         let newYear = String(selectedYear + 1);
 
-                        if (checkDate(newYear, selectedIndexMonth, Number(dayField.text))){
+                        if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
                             yearField.text = newYear;
                         }
                     }
@@ -418,7 +418,7 @@ Item {
 
                         let newYear = String(selectedYear - 1);
 
-                        if (checkDate(newYear, selectedIndexMonth, Number(dayField.text))){
+                        if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
                             yearField.text = newYear;
                         }
                     }
@@ -442,7 +442,7 @@ Item {
                 readOnly: true;
                 horizontalAlignment: TextInput.AlignHCenter;
 
-                text: monthNames[selectedIndexMonth];
+                text: datePicker.monthNames[datePicker.selectedIndexMonth];
 
                 Keys.onUpPressed: {
                     monthUpButton.clicked();
@@ -472,8 +472,8 @@ Item {
 
                     onCurrentIndexChanged:{
                         if(monthCombo.currentIndex >= 0){
-                            if (checkDate(Number(yearField.text), monthCombo.currentIndex, Number(dayField.text))){
-                                selectedIndexMonth = monthCombo.currentIndex;
+                            if (datePicker.checkDate(Number(yearField.text), monthCombo.currentIndex, Number(dayField.text))){
+                                datePicker.selectedIndexMonth = monthCombo.currentIndex;
                             }
                         }
                     }
@@ -499,15 +499,15 @@ Item {
                     onClicked: {
 
                         let index;
-                        if (selectedIndexMonth < 11){
-                            index = selectedIndexMonth + 1;
+                        if (datePicker.selectedIndexMonth < 11){
+                            index = datePicker.selectedIndexMonth + 1;
                         }
                         else{
                             index = 0;
                         }
 
-                        if (checkDate(Number(yearField.text), index, Number(dayField.text))){
-                            selectedIndexMonth = index;
+                        if (datePicker.checkDate(Number(yearField.text), index, Number(dayField.text))){
+                            datePicker.selectedIndexMonth = index;
                         }
                     }
                 }
@@ -528,15 +528,15 @@ Item {
 
                     onClicked: {
                         let index;
-                        if (selectedIndexMonth > 0){
-                            index = selectedIndexMonth - 1;
+                        if (datePicker.selectedIndexMonth > 0){
+                            index = datePicker.selectedIndexMonth - 1;
                         }
                         else{
                             index = 11;
                         }
 
-                        if (checkDate(Number(yearField.text), index, Number(dayField.text))){
-                            selectedIndexMonth = index;
+                        if (datePicker.checkDate(Number(yearField.text), index, Number(dayField.text))){
+                            datePicker.selectedIndexMonth = index;
                         }
                     }
                 }
@@ -597,7 +597,7 @@ Item {
                         if(dayCombo.currentIndex >=0){
                             let selectedDay = dayCombo.currentText;
 
-                            if (checkDate(selectedYear, selectedIndexMonth, Number(selectedDay))){
+                            if (datePicker.checkDate(datePicker.selectedYear, datePicker.selectedIndexMonth, Number(selectedDay))){
                                 dayField.text = selectedDay;
                             }
                         }
@@ -631,7 +631,7 @@ Item {
                         if (selectedDay < 31){
                             let newDay = String(selectedDay + 1)
 
-                            if (checkDate(Number(yearField.text), selectedIndexMonth, Number(newDay))){
+                            if (datePicker.checkDate(Number(yearField.text), datePicker.selectedIndexMonth, Number(newDay))){
                                 dayField.text = newDay;
                             }
                         }
@@ -657,7 +657,7 @@ Item {
                         if (selectedDay > 1){
                             let newDay = String(selectedDay - 1);
 
-                            if (checkDate(Number(yearField.text), selectedIndexMonth, Number(newDay))){
+                            if (datePicker.checkDate(Number(yearField.text), datePicker.selectedIndexMonth, Number(newDay))){
                                 dayField.text = newDay;
                             }
                         }
@@ -684,7 +684,7 @@ Item {
                 cursorShape: Qt.PointingHandCursor;
 
                 onClicked: {
-                    setCurrentDay();
+                    datePicker.setCurrentDay();
                 }
             }
         }

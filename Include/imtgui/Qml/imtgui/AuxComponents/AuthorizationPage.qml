@@ -19,11 +19,11 @@ Rectangle {
     property alias title: welcomeText.text;
 
     onVisibleChanged: {
-        if (visible){
+        if (authPageContainer.visible){
             authPageContainer.state = "unauthorized";
 
             passwordTextInput.text = "";
-            loginTextInput.text = ""
+            loginTextInput.text = "";
 
             loginTextInput.focus = true;
         }
@@ -71,7 +71,7 @@ Rectangle {
                 anchors.top: parent.top;
                 anchors.topMargin: 30;
                 anchors.left: parent.left;
-                anchors.leftMargin: (parent.width-welcomeText.width)/2;
+                anchors.leftMargin: (parent.width - welcomeText.width)/2;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -264,8 +264,9 @@ Rectangle {
                     anchors.centerIn: parent;
 
                     decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-                    text: qsTr("Login");
                     enabled: loginTextInput.text != "" && passwordTextInput.text != "";
+
+                    text: qsTr("Login");
 
                     onClicked: {
                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
@@ -277,6 +278,7 @@ Rectangle {
 
     Component{
         id: defaultButtonDecorator;
+
         CommonButtonDecorator{
             width: 100;
             height: 30;

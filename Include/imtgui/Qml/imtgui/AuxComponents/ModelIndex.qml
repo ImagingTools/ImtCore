@@ -21,7 +21,7 @@ Item {
             return false;
         }
 
-        return _equalRecursive(root, otherIndex);
+        return root._equalRecursive(root, otherIndex);
     }
 
     function _equalRecursive(modelIndex1, modelIndex2){
@@ -52,7 +52,7 @@ Item {
     function getIndexes(){
         console.log("getIndexes")
         let result = []
-        _recursiveIndexes(root, result);
+        root._recursiveIndexes(root, result);
 
         return result.reverse();
     }
@@ -64,7 +64,7 @@ Item {
         console.log("_recursiveIndexes")
         if (modelIndex){
             retval.push(modelIndex.index)
-            _recursiveIndexes(modelIndex.parentIndex, retval);
+            root._recursiveIndexes(modelIndex.parentIndex, retval);
         }
     }
 }

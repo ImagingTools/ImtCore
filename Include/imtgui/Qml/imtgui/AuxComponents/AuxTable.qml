@@ -105,8 +105,8 @@ Item {
         tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
         tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
 
-        tableContainer.emptyDecor = !tableDecorator.GetItemsCount();
-        tableContainer.emptyDecorHeader = !headerDecorator.GetItemsCount();
+        tableContainer.emptyDecor = !tableContainer.tableDecorator.GetItemsCount();
+        tableContainer.emptyDecorHeader = !tableContainer.headerDecorator.GetItemsCount();
 
         tableContainer.setBorderParams();
         tableContainer.setWidth();
@@ -124,7 +124,7 @@ Item {
     }
 
     onSelectedIndexChanged: {
-        if (selectedIndex > -1){
+        if (tableContainer.selectedIndex > -1){
             elementsList.forceActiveFocus();
         }
     }
@@ -153,7 +153,7 @@ Item {
         id: pause;
         duration: 100;
         onFinished: {
-            setCellHeight();
+            tableContainer.setCellHeight();
         }
     }
 
@@ -430,14 +430,14 @@ Item {
                     anchors.right: rightBorder.left;
                     anchors.bottom: bottomBorder.top;
                     color: tableContainer.emptyDecorHeader ? Style.baseColor :
-                                                             headerDecorator.IsValidData("Color", model.index) ?
-                                                                 headerDecorator.GetData("Color", model.index) :
+                                                             tableContainer.headerDecorator.IsValidData("Color", model.index) ?
+                                                                 tableContainer.headerDecorator.GetData("Color", model.index) :
                                                                  Style.baseColor;
 
 
                     radius: tableContainer.emptyDecorHeader ? 0 :
-                                                              headerDecorator.IsValidData("CellRadius", model.index) ?
-                                                                  headerDecorator.GetData("CellRadius", model.index) :0;
+                                                              tableContainer.headerDecorator.IsValidData("CellRadius", model.index) ?
+                                                                  tableContainer.headerDecorator.GetData("CellRadius", model.index) :0;
 
 
 
@@ -451,8 +451,8 @@ Item {
                         height: parent.height/2;
                         color: parent.color;
                         visible: tableContainer.emptyDecorHeader ? true :
-                                                                   headerDecorator.IsValidData("LeftTopRound", model.index) ?
-                                                                       !headerDecorator.GetData("LeftTopRound", model.index) :true;
+                                                                   tableContainer.headerDecorator.IsValidData("LeftTopRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("LeftTopRound", model.index) :true;
                     }
 
                     Rectangle{
@@ -463,8 +463,8 @@ Item {
                         height: parent.height/2;
                         color: parent.color;
                         visible: tableContainer.emptyDecorHeader ? true :
-                                                                   headerDecorator.IsValidData("RightTopRound", model.index) ?
-                                                                       !headerDecorator.GetData("RightTopRound", model.index) :true;
+                                                                   tableContainer.headerDecorator.IsValidData("RightTopRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("RightTopRound", model.index) :true;
 
 
                     }
@@ -477,8 +477,8 @@ Item {
                         height: parent.height/2;
                         color: parent.color;
                         visible: tableContainer.emptyDecorHeader ? true :
-                                                                   headerDecorator.IsValidData("LeftBottomRound", model.index) ?
-                                                                       !headerDecorator.GetData("LeftBottomRound", model.index) :true;
+                                                                   tableContainer.headerDecorator.IsValidData("LeftBottomRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("LeftBottomRound", model.index) :true;
 
 
                     }
@@ -491,8 +491,8 @@ Item {
                         height: parent.height/2;
                         color: parent.color;
                         visible: tableContainer.emptyDecorHeader ? true :
-                                                                   headerDecorator.IsValidData("RightBottomRound", model.index) ?
-                                                                       !headerDecorator.GetData("RightBottomRound", model.index) :true;
+                                                                   tableContainer.headerDecorator.IsValidData("RightBottomRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("RightBottomRound", model.index) :true;
 
                     }
                     //cornerPatches
@@ -508,28 +508,28 @@ Item {
 
                         verticalAlignment: Text.AlignVCenter;
                         horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
-                                                                               headerDecorator.IsValidData("TextPosition", model.index) ?
-                                                                                   headerDecorator.GetData("TextPosition", model.index) :
+                                                                               tableContainer.headerDecorator.IsValidData("TextPosition", model.index) ?
+                                                                                   tableContainer.headerDecorator.GetData("TextPosition", model.index) :
                                                                                    Text.AlignLeft;
 
 
                         font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
-                                                                          headerDecorator.IsValidData("FontSize", model.index) ?
-                                                                              headerDecorator.GetData("FontSize", model.index) :
+                                                                          tableContainer.headerDecorator.IsValidData("FontSize", model.index) ?
+                                                                              tableContainer.headerDecorator.GetData("FontSize", model.index) :
                                                                               Style.fontSize_common * deleg.scale;
 
 
                         font.family: Style.fontFamilyBold;
 
                         font.bold: tableContainer.emptyDecorHeader ? true :
-                                                                     headerDecorator.IsValidData("FontBold", model.index) ?
-                                                                         headerDecorator.GetData("FontBold", model.index) :
+                                                                     tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
+                                                                         tableContainer.headerDecorator.GetData("FontBold", model.index) :
                                                                          true;
 
 
                         color: tableContainer.emptyDecorHeader ? Style.textColor :
-                                                                 headerDecorator.IsValidData("FontColor", model.index) ?
-                                                                     headerDecorator.GetData("FontColor", model.index) :
+                                                                 tableContainer.headerDecorator.IsValidData("FontColor", model.index) ?
+                                                                     tableContainer.headerDecorator.GetData("FontColor", model.index) :
                                                                      Style.textColor;
                         elide: tableContainer.elideMode;
 
@@ -561,9 +561,6 @@ Item {
                                 }
                             }
                         }
-
-
-
 
                     }
 

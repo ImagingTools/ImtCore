@@ -10,7 +10,7 @@ Item {
     property string commandId;
 
     function updateModel(externInputParams){
-        if (commandId == ""){
+        if (container.commandId == ""){
             console.error( "ERROR: DocumentDataProvider commandId is empty!");
 
             return;
@@ -23,8 +23,8 @@ Item {
         id: itemModel;
 
         function updateModel(externInputParams) {
-            console.log("itemModel updateModel", commandId + "Item");
-            var query = Gql.GqlRequest("query", commandId + "Item");
+            console.log("itemModel updateModel", container.commandId + "Item");
+            var query = Gql.GqlRequest("query", container.commandId + "Item");
 
             var inputParams = Gql.GqlObject("input");
 
@@ -58,7 +58,7 @@ Item {
 
                 dataModelLocal = itemModel.GetData("data");
                 if(dataModelLocal.ContainsKey(commandId + "Item")){
-                    dataModelLocal = dataModelLocal.GetData(commandId + "Item");
+                    dataModelLocal = dataModelLocal.GetData(container.commandId + "Item");
                     documentModel = dataModelLocal;
                 }
             }

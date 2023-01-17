@@ -45,25 +45,25 @@ FocusScope {
     signal editingFinished();
 
     Keys.onPressed: {
-        if (activeFocus){
-            console.log("CustomTextField onPressed")
+        if (containerTextField.activeFocus){
+            console.log("CustomTextField onPressed");
 
             if (event.key == Qt.Key_Escape) {
-                console.log("Key_Escape")
-                cancelled();
+                console.log("Key_Escape");
+                containerTextField.cancelled();
             }
         }
     }
 
     function setFocus(value) {
-        textField.focus = value
+        textField.focus = value;
     }
 
     onFocusChanged: {
-        console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus)
+        console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus);
 
-        if (focus){
-            if (!readOnly){
+        if (containerTextField.focus){
+            if (!containerTextField.readOnly){
                 textField.selectAll();
             }
 
@@ -137,8 +137,6 @@ FocusScope {
             anchors.left: parent.left;
             anchors.verticalCenter: parent.verticalCenter;
 
-            text: containerTextField.placeHolderText;
-
             font.pixelSize: containerTextField.placeHolderTextSize;
             font.bold: containerTextField.fontBold;
             font.family: Style.fontFamily;
@@ -148,6 +146,8 @@ FocusScope {
             opacity: containerTextField.placeHolderOpacity;
 
             visible: textField.text == "";
+
+            text: containerTextField.placeHolderText;
         }
     }
 }

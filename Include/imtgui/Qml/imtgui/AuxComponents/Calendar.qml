@@ -46,7 +46,7 @@ Rectangle {
            // modelMonth.append({"name": Qt.locale().standaloneMonthName(i, Locale.LongFormat)})
 
 //            modelMonth.append({"id": calendarContainer.monthsNames[i]})
-            modelMonth.append({"name": calendarContainer.monthsNames[i]})
+            modelMonth.append({"name": calendarContainer.monthsNames[i]});
         }
 
         yearCB.currentText = calendarContainer.selectedDate.getFullYear();
@@ -55,7 +55,7 @@ Rectangle {
 
         for (i = 1; i <= 31; i++){
 //            modelDay.append({"id": i})
-            modelDay.append({"name": i})
+            modelDay.append({"name": i});
         }
     }
 
@@ -165,7 +165,7 @@ Rectangle {
                     }
                     else if (countDay === 29 && curCountDay === 28){
 //                        modelDay.append({"id": 29})
-                        modelDay.append({"name": 29})
+                        modelDay.append({"name": 29});
                     }
                 }
                 calendarContainer.selectedDate.setFullYear(year);
@@ -226,7 +226,7 @@ Rectangle {
                 modelDay.clear();
                 for (var i = 1; i <= newCountDay; i++){
 //                    modelDay.append({"id": i})
-                    modelDay.append({"name": i})
+                    modelDay.append({"name": i});
                 }
 
                 if (monthCB.flag){

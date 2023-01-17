@@ -62,10 +62,11 @@ Item {
 
             elide: Text.ElideRight;
 
-            text: leftPanelElement.title;
             color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
             font.pixelSize: container.fontSize;
             font.family: Style.fontFamily;
+
+            text: leftPanelElement.title;
         }
     }
 }

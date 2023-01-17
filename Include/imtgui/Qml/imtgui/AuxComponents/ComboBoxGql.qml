@@ -83,8 +83,8 @@ Item {
     onDialogsCountChanged: {
 
         comboBoxContainerGql.openST = comboBoxContainerGql.dialogsCount > comboBoxContainerGql.dialogsCountPrev;
-        if(!openST && dialogsCountPrev < 1000){
-            dialogsCountPrev = 1000;
+        if(!comboBoxContainerGql.openST && comboBoxContainerGql.dialogsCountPrev < 1000){
+            comboBoxContainerGql.dialogsCountPrev = 1000;
         }
     }
 
@@ -203,10 +203,11 @@ Item {
             anchors.leftMargin: 10;
 
             color: Style.textColor;
-            text: comboBoxContainerGql.currentText;
             font.family: Style.fontFamily;
             font.pixelSize: comboBoxContainerGql.textSize;
             visible: comboBoxContainerGql.backVisible;
+
+            text: comboBoxContainerGql.currentText;
         }
 
         Image {
@@ -234,7 +235,7 @@ Item {
 
             onClicked: {
                 console.log("ComboBox clicked !");
-                openPopupMenu();
+                comboBoxContainerGql.openPopupMenu();
                 comboBoxContainerGql.clicked();
 
 

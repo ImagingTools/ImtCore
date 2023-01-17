@@ -11,7 +11,7 @@ Rectangle {
 
     color: defaultColor;
 
-    property string defaultColor: /*!enabled ? Style.backgroundColor : */auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
+    property string defaultColor: auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
                                                                                                                                         auxButtonContainer.highlighted ? Style.selectedColor :
                                                                                                                                                                          backgroundColor;
     property string defaultFontColor: auxButtonContainer.enabled ? Style.buttonText : Style.inactive_buttonText;
@@ -73,9 +73,11 @@ Rectangle {
         font.pixelSize: auxButtonContainer.fontPixelSize;
         font.family: Style.fontFamily;
         font.bold: auxButtonContainer.fontBold;
-        text: auxButtonContainer.textButton;
 
         visible: auxButtonContainer.hasText;
+
+        text: auxButtonContainer.textButton;
+
     }
 
     MouseArea {

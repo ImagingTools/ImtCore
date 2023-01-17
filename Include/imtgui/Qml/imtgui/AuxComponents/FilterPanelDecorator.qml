@@ -10,7 +10,7 @@ Item {
     onVisibleChanged: {
         console.log("filterPanelDecorator", filterPanelDecorator.visible);
 
-        if (visible){
+        if (filterPanelDecorator.visible){
             animRect.start();
 
             tfc.focus = true;

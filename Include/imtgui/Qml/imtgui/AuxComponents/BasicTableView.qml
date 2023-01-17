@@ -25,12 +25,12 @@ FocusScope {
     property int rowItemHeight: 30;
     property int headerHeight: 35;
 
-    property ListModel rowModel: ListModel {}
-    property ListModel columnModel: ListModel {}
+    property ListModel rowModel: ListModel {};
+    property ListModel columnModel: ListModel {};
 
     property ModelIndex selectedIndex: null;
 
-    property TableViewSelection selection: TableViewSelection {}
+    property TableViewSelection selection: TableViewSelection {};
 
     property alias tableListView: listView;
 
@@ -45,7 +45,7 @@ FocusScope {
     Loader {
         id: backgroundLoader;
 
-        anchors.fill: parent
+        anchors.fill: parent;
 
         sourceComponent: Rectangle {
             color: Style.baseColor;
@@ -120,12 +120,13 @@ FocusScope {
 
                     Text {
                         id: headerText;
+
                         anchors.left: repeaterItem.left;
                         anchors.leftMargin: 10;
                         anchors.verticalCenter: repeaterItem.verticalCenter;
 
                         Component.onCompleted: {
-                            console.log("Header debug:", model.Name, index)
+                            console.log("Header debug:", model.Name, model.index);
                             headerText.text =  model.Name;
                         }
 //                        text: model.Name;
@@ -164,15 +165,15 @@ FocusScope {
     }
 
     function addRow(row){
-        return insertRow(rowModel.count, row)
+        return insertRow(rowModel.count, row);
     }
 
     function addColumn(column) {
-        return insertColumn(columnModel.count, column)
+        return tableViewRoot.insertColumn(columnModel.count, column);
     }
 
     function insertColumn(index, column){
-        columnModel.insert(index, column)
+        columnModel.insert(index, column);
     }
 
 //    function insertColumn(index, column){
@@ -232,7 +233,7 @@ FocusScope {
 
         rowModel.remove(index);
 
-        rowRemoved();
+        tableViewRoot.rowRemoved();
     }
 
     function __checkColumn(columnId){

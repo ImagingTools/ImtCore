@@ -41,9 +41,9 @@ Item {
     }
 
     onCommandsIdChanged: {
-        console.log("CollectionViewBase onCommandsIdChanged", loadData);
+        console.log("CollectionViewBase onCommandsIdChanged", collectionViewBaseContainer.loadData);
 
-        if (loadData){
+        if (collectionViewBaseContainer.loadData){
             baseCommands.updateModels();
         }
     }

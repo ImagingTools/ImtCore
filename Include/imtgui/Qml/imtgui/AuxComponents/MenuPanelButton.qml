@@ -28,7 +28,7 @@ Item {
     signal clicked;
 
     onDecoratorSourceChanged: {
-        console.log("onDecoratorSourceChanged", decoratorSource);
+        console.log("onDecoratorSourceChanged", container.decoratorSource);
         loaderDecorator.source = container.decoratorSource;
     }
 
@@ -39,7 +39,7 @@ Item {
     }
 
     onSelectedChanged: {
-        console.log("onSelectedChanged", selected);
+        console.log("onSelectedChanged", container.selected);
         if (loaderDecorator.item){
             loaderDecorator.item.selected = container.selected;
         }
