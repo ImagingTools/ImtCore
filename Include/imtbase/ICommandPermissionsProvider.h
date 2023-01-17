@@ -8,9 +8,8 @@
 #include <istd/IChangeable.h>
 
 
-namespace imtgql
+namespace imtbase
 {
-
 
 /**
 	Common interface for command permissions.
@@ -30,6 +29,6 @@ public:
 };
 
 
-} // namespace imtgql
+} // namespace imtbase
 
 

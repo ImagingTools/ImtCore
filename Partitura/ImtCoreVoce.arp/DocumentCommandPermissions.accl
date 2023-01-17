@@ -9,7 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="Close" X="1000" Y="400" Note=""/>
-        <Element ComponentName="CommandsJoiner" X="600" Y="300" Note=""/>
+        <Element ComponentName="CommandPermissionsProviderJoiner" X="600" Y="300" Note=""/>
         <Element ComponentName="New" X="600" Y="200" Note=""/>
         <Element ComponentName="Redo" X="200" Y="200" Note=""/>
         <Element ComponentName="Remove" X="600" Y="400" Note=""/>

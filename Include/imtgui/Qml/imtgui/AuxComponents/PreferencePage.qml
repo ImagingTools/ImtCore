@@ -160,37 +160,95 @@ Rectangle {
     }
 
     function compare(model1, model2){
-        let changeSet = []
+        let changeList = []
 
-        compareRecursive(model1, model2, changeSet);
+        compareRecursive(model1, model2, changeList);
 
-        return changeSet;
+        return changeList;
     }
 
-    function compareRecursive(model1, model2, changeSet){
-
+    function compareRecursive(model1, model2, changeList, parentKey){
         for (let i = 0; i < model1.GetItemsCount(); i++){
             let keys = model1.GetKeys(i);
 
             for (let j = 0; j < keys.length; j++){
                 let key = keys[j];
+                let globalKey = parentKey + '/' + key;
 
-                if (model2.ContainsKey(key)){
+                if (model1.ContainsKey(key) && model2.ContainsKey(key)){
                     let model1Value = model1.GetData(key, i);
                     let model2Value = model2.GetData(key, i);
 
                     if(typeof model1Value === 'object' && typeof model2Value === 'object'){
-                        compareRecursive(model1Value, model2Value, changeSet);
+                        compareRecursive(model1Value, model2Value, changeList, globalKey);
                     }
                     else{
                         if (model1Value != model2Value){
                             let changeObj = {}
-                            changeSet[key] = model2Value;
+
+                            changeObj["operation"] = "change";
+                            changeObj["key"] = globalKey;
+                            changeObj["curVal"] = model1Value;
+                            changeObj["newVal"] = model2Value;
+
+                            changeList.push(changeObj)
                         }
+                    }
+                }
+                else if (model1.ContainsKey(key) && !model2.ContainsKey(key)){
+                    let model1Value = model1.GetData(key, i);
+                    changeObj["operation"] = "remove";
+                    changeObj["key"] = globalKey;
+                    changeObj["curVal"] = model1Value;
+                    changeObj["index"] = i;
+                }
+                else if (!model1.ContainsKey(key) && model2.ContainsKey(key)){
+                    let model2Value = model2.GetData(key, i);
+                    changeObj["operation"] = "insert";
+                    changeObj["key"] = globalKey;
+                    changeObj["curVal"] = model2Value;
+                    changeObj["index"] = i;
+                }
+            }
+        }
+    }
+
+    function structureIsEqual(model1, model2){
+        let model1ItemsCount = model1.GetItemsCount();
+        let model2ItemsCount = model2.GetItemsCount();
+
+        if (model1ItemsCount != model2ItemsCount){
+            return false;
+        }
+
+        for (let i = 0; i < model1.GetItemsCount(); i++){
+            let model1keys = model1.GetKeys(i);
+            let model2keys = model2.GetKeys(i);
+
+            if (model1keys.length != model2keys.length){
+                return false;
+            }
+
+            for (let j = 0; j < keys.length; j++){
+                let key = keys[j];
+
+                if (!model2.ContainsKey(key)){
+                    return false;
+                }
+
+                let model1Value = model1.GetData(key, i);
+                let model2Value = model2.GetData(key, i);
+
+                if(typeof model1Value === 'object' && typeof model2Value === 'object'){
+                    let result = structureIsEqual(model1Value, model2Value);
+                    if (!result){
+                        return false;
                     }
                 }
             }
         }
+
+        return true;
     }
 
     MouseArea {

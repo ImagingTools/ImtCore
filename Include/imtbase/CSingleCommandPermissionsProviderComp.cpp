@@ -1,7 +1,7 @@
-#include <imtgql/CSingleCommandPermissionsProviderComp.h>
+#include <imtbase/CSingleCommandPermissionsProviderComp.h>
 
 
-namespace imtgql
+namespace imtbase
 {
 
 
@@ -37,6 +37,6 @@ QByteArrayList CSingleCommandPermissionsProviderComp::GetCommandPermissions(cons
 }
 
 
-} // namespace imtgql
+} // namespace imtbase
 
 

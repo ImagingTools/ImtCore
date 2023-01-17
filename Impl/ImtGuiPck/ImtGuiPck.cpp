@@ -187,6 +187,11 @@ I_EXPORT_COMPONENT(
 			"Based gui model",
 			"Gui Model");
 
+I_EXPORT_COMPONENT(
+			GuiElementContainer,
+			"Gui element container",
+			"Gui Model Container Joiner");
+
 
 } // namespace ImtGuiPck
 

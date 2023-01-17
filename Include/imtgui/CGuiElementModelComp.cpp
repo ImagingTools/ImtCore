@@ -7,72 +7,71 @@ namespace imtgui
 
 // public methods
 
-// reimplemented (icomp::CComponentBase)
-
-void CGuiElementModelComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	for (int i = 0; i < m_itemIdsAttrPtr.GetCount(); i++){
-		QByteArray itemId = m_itemIdsAttrPtr[i];
-		QString itemName = m_itemNamesAttrPtr[i];
-		bool isEnabled = m_itemModesAttrPtr[i];
-
-		m_collectionInfo.InsertItem(itemId, itemName, "");
-		m_collectionInfo.SetElementEnabled(itemId, isEnabled);
-	}
-}
-
-
-void CGuiElementModelComp::OnComponentDestroyed()
-{
-	m_collectionInfo.ResetData();
-
-	BaseClass::OnComponentDestroyed();
-}
-
-
 // reimplemented (imtgui::IGuiElementContainer)
 
-const IGuiElementContainer* CGuiElementModelComp::GetElementCommands(const QByteArray& elementId) const
+QByteArray CGuiElementModelComp::GetElementId() const
+{
+	if (m_elementIdAttrPtr.IsValid()){
+		return *m_elementIdAttrPtr;
+	}
+
+	return QByteArray();
+}
+
+
+QString CGuiElementModelComp::GetElementName() const
+{
+	if (m_elementNameAttrPtr.IsValid()){
+		return *m_elementNameAttrPtr;
+	}
+
+	return QString();
+}
+
+
+QString CGuiElementModelComp::GetElementDescription() const
+{
+	if (m_elementDescriptionAttrPtr.IsValid()){
+		return *m_elementDescriptionAttrPtr;
+	}
+
+	return QString();
+}
+
+
+QString CGuiElementModelComp::GetElementItemPath() const
+{
+	if (m_elementItemPathAttrPtr.IsValid()){
+		return *m_elementItemPathAttrPtr;
+	}
+
+	return QString();
+}
+
+
+QString CGuiElementModelComp::GetElementStatus() const
+{
+	if (m_elementStatusAttrPtr.IsValid()){
+		return *m_elementStatusAttrPtr;
+	}
+
+	return QString();
+}
+
+
+bool CGuiElementModelComp::IsEnabled() const
+{
+	if (m_enabledAttrPtr.IsValid()){
+		return *m_enabledAttrPtr;
+	}
+
+	return false;
+}
+
+
+const imtgui::IGuiElementModel* CGuiElementModelComp::GetSubElements() const
 {
 	return nullptr;
-}
-
-
-QString CGuiElementModelComp::GetElementItemPath(const QByteArray& elementId) const
-{
-	int index = m_itemIdsAttrPtr.FindValue(elementId);
-
-	if (index >= 0){
-		int count = m_elementItemPathAttrPtr.GetCount();
-		if (index < count){
-			return m_elementItemPathAttrPtr[index];
-		}
-	}
-
-	return QString();
-}
-
-
-QString CGuiElementModelComp::GetElementStatus(const QByteArray& elementId) const
-{
-	int index = m_itemIdsAttrPtr.FindValue(elementId);
-
-	if (index >= 0){
-		int count = m_elementItemStatusesAttrPtr.GetCount();
-		if (index < count){
-			return m_elementItemStatusesAttrPtr[index];
-		}
-	}
-
-	return QString();
-}
-
-
-const imtbase::ICollectionInfo& CGuiElementModelComp::GetElementList() const
-{
-	return m_collectionInfo;
 }
 
 

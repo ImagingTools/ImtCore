@@ -7,8 +7,8 @@
 
 // ImtCore includes
 #include <imtbase/IRepresentationController.h>
+#include <imtbase/ICommandPermissionsProvider.h>
 #include <imtgql/IGqlRequestHandler.h>
-#include <imtgql/ICommandPermissionsProvider.h>
 #include <imtauth/IPermissionChecker.h>
 
 
@@ -39,11 +39,12 @@ protected:
 	// Abstract methods
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
 
+	virtual iprm::IParamsSet* CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const;
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 protected:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
-	I_REF(imtgql::ICommandPermissionsProvider, m_commandPermissionsCompPtr);
+	I_REF(imtbase::ICommandPermissionsProvider, m_commandPermissionsCompPtr);
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };

@@ -6,22 +6,22 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtgql/ICommandPermissionsProvider.h>
+#include <imtbase/ICommandPermissionsProvider.h>
 
 
-namespace imtgql
+namespace imtbase
 {
 
 
 class CCommandPermissionsProviderJoinerComp:
 			public icomp::CComponentBase,
-			virtual public imtgql::ICommandPermissionsProvider
+			virtual public imtbase::ICommandPermissionsProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCommandPermissionsProviderJoinerComp);
-		I_REGISTER_INTERFACE(imtgql::ICommandPermissionsProvider);
+		I_REGISTER_INTERFACE(imtbase::ICommandPermissionsProvider);
 		I_ASSIGN_MULTI_0(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "List of command permission providers", true);
 	I_END_COMPONENT;
 
@@ -38,13 +38,13 @@ private:
 	void UpdatePermissionsCache();
 
 protected:
-	I_MULTIREF(imtgql::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
+	I_MULTIREF(imtbase::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
 
 private:
 	QMap<QByteArray, QByteArrayList> m_permissionsCache;
 };
 
 
-} // namespace imtgql
+} // namespace imtbase
 
 

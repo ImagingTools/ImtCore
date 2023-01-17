@@ -184,6 +184,16 @@ I_EXPORT_COMPONENT(
 			"Gui element based representation controller",
 			"Model Gui Representation Controller Based")
 
+I_EXPORT_COMPONENT(
+			SingleCommandPermissionsProvider,
+			"SingleCommandPermissionsProvider",
+			"Single Command Permissions Provider");
+
+I_EXPORT_COMPONENT(
+			CommandPermissionsProviderJoiner,
+			"CommandPermissionsProviderJoiner",
+			"Command Permissions Provider Joiner Comp");
+
 
 } // namespace ImtCorePck
 

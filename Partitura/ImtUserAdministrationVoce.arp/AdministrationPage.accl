@@ -10,13 +10,25 @@
     <PositionMap>
         <Element ComponentName="AdministrationPageDataController" X="975" Y="225" Note=""/>
         <Element ComponentName="AdministrationPages" X="675" Y="75" Note=""/>
-        <Element ComponentName="PageBasedModel" X="100" Y="450" Note=""/>
         <Element ComponentName="Pages" X="975" Y="450" Note=""/>
-        <Element ComponentName="PagesRepresentation" X="600" Y="450" Note=""/>
-        <Element ComponentName="Repositories" X="975" Y="675" Note=""/>
-        <Element ComponentName="VisualStatus" X="325" Y="225" Note=""/>
+        <Element ComponentName="PagesContainer" X="175" Y="450" Note=""/>
+        <Element ComponentName="PagesPermissions" X="675" Y="650" Note=""/>
+        <Element ComponentName="PagesRepresentation" X="700" Y="450" Note=""/>
+        <Element ComponentName="PermissionsChecker" X="425" Y="450" Note=""/>
+        <Element ComponentName="Repositories" X="1000" Y="650" Note=""/>
+        <Element ComponentName="RolesPage" X="100" Y="650" Note=""/>
+        <Element ComponentName="UsersPage" X="300" Y="650" Note=""/>
+        <Element ComponentName="VisualStatus" X="425" Y="225" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="PagesPermissions">
+            <PositionMap>
+                <Element ComponentName="CommandPermissionsProviderJoiner" X="575" Y="200" Note=""/>
+                <Element ComponentName="RolesPermissions" X="250" Y="400" Note=""/>
+                <Element ComponentName="UsersPermissions" X="875" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="Pages">
             <PositionMap>
                 <Element ComponentName="RolesPage" X="350" Y="400" Note=""/>

@@ -1,6 +1,12 @@
 #include <imtgql/CGqlRepresentationDataControllerComp.h>
 
 
+// ACF includer
+#include <istd/TDelPtr.h>
+#include <iprm/CParamsSet.h>
+#include <imod/TModelWrap.h>
+
+
 namespace imtgql
 {
 
@@ -17,7 +23,9 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentat
 		imtbase::CTreeItemModel* representationPtr = rootModelPtr->AddTreeModel("data");
 		Q_ASSERT(representationPtr != nullptr);
 
-		bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, *representationPtr);
+		istd::TDelPtr<iprm::IParamsSet> representationParamsPtr(CreateContextParams(gqlRequest));
+
+		bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, *representationPtr, representationParamsPtr.GetPtr());
 		if (result){
 			return rootModelPtr.PopPtr();
 		}
@@ -69,6 +77,26 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 	Q_ASSERT(false);
 
 	return nullptr;
+}
+
+
+iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
+{
+	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
+	if (gqlRequest.GetGqlContext() != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+		Q_ASSERT(userInfoPtr != nullptr);
+		if (userInfoPtr != nullptr){
+			istd::TDelPtr<imtauth::IUserInfo> userInfoParamPtr;
+
+			userInfoParamPtr.SetCastedOrRemove(userInfoPtr->CloneMe());
+			Q_ASSERT(userInfoParamPtr.IsValid());
+
+			paramsPtr->SetEditableParameter("UserInfo", userInfoParamPtr.PopPtr(), true);
+		}
+	}
+
+	return paramsPtr.PopPtr();
 }
 
 

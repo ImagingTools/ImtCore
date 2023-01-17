@@ -19,23 +19,30 @@
         <Element ComponentName="UsersHeadersDataProvider" X="775" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="UserCommands">
+        <EmbededRegistry Id="UsersCommands">
             <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="250" Y="500" Note=""/>
-                <Element ComponentName="CommandsModel" X="925" Y="500" Note=""/>
-                <Element ComponentName="CommandsRepresentation" X="925" Y="300" Note=""/>
-                <Element ComponentName="UserCommandPermissions" X="250" Y="300" Note=""/>
-                <Element ComponentName="UserCommandsController" X="600" Y="400" Note=""/>
+                <Element ComponentName="CheckPermissionOr" X="775" Y="400" Note=""/>
+                <Element ComponentName="Commands" X="275" Y="225" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1025" Y="225" Note=""/>
+                <Element ComponentName="Edit" X="525" Y="400" Note=""/>
+                <Element ComponentName="New" X="100" Y="400" Note=""/>
+                <Element ComponentName="Remove" X="300" Y="400" Note=""/>
+                <Element ComponentName="UsersCommandPermissions" X="1025" Y="400" Note=""/>
+                <Element ComponentName="UsersCommandsController" X="575" Y="50" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
-        <EmbededRegistry Id="UsersCommands">
+        <EmbededRegistry Id="UserCommands">
             <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="250" Y="525" Note=""/>
-                <Element ComponentName="CommandsModel" X="925" Y="525" Note=""/>
-                <Element ComponentName="CommandsRepresentation" X="925" Y="250" Note=""/>
-                <Element ComponentName="UsersCommandPermissions" X="250" Y="250" Note=""/>
-                <Element ComponentName="UsersCommandsController" X="575" Y="375" Note=""/>
+                <Element ComponentName="CheckPermissionOr" X="775" Y="425" Note=""/>
+                <Element ComponentName="Close" X="425" Y="600" Note=""/>
+                <Element ComponentName="Commands" X="275" Y="275" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1050" Y="275" Note=""/>
+                <Element ComponentName="Redo" X="425" Y="425" Note=""/>
+                <Element ComponentName="Save" X="125" Y="600" Note=""/>
+                <Element ComponentName="Undo" X="125" Y="425" Note=""/>
+                <Element ComponentName="UserCommandPermissions" X="1050" Y="425" Note=""/>
+                <Element ComponentName="UserCommandsController" X="575" Y="75" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

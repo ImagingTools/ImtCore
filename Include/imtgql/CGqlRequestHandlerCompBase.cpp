@@ -50,11 +50,17 @@ imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const CGqlRe
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
 	errorsItemModelPtr->SetData("message", errorMessage);
 
-	return errorsItemModelPtr;
+	return rootModelPtr.PopPtr();
 }
 
 
 // protected methods
+
+iprm::IParamsSet* CGqlRequestHandlerCompBase::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
+{
+	return nullptr;
+}
+
 
 bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {

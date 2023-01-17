@@ -9,7 +9,7 @@
 #include <imtguigql/CPagesDataControllerComp.h>
 #include <imtguigql/CCommandsDataControllerComp.h>
 #include <imtguigql/CGetStyleDataControllerComp.h>
-
+#include <imtguigql/CGetStyleDataControllerComp.h>
 
 /**
 	ImtGuiPck package

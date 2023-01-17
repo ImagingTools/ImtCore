@@ -41,6 +41,8 @@
 #include <imtbase/CDatabaseAccessSettingsRepresentationControllerComp.h>
 #include <imtbase/CGuiElementRepresentationControllerComp.h>
 #include <imtbase/CPageBasedGuiRepresentationControllerComp.h>
+#include <imtbase/CSingleCommandPermissionsProviderComp.h>
+#include <imtbase/CCommandPermissionsProviderJoinerComp.h>
 
 
 /**
@@ -95,6 +97,8 @@ typedef imtbase::CTextParamRepresentationControllerComp TextParamRepresentationC
 typedef imtbase::CDatabaseAccessSettingsRepresentationControllerComp DatabaseAccessSettingsRepresentationController;
 typedef imtbase::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
 typedef imtbase::CGuiElementRepresentationControllerComp GuiElementRepresentationController;
+typedef imtbase::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
+typedef imtbase::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
 
 
 } // namespace ImtCorePck

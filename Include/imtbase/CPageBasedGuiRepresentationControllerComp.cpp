@@ -1,8 +1,13 @@
 #include <imtbase/CPageBasedGuiRepresentationControllerComp.h>
 
 
+// ACF includes
+#include <iprm/TParamsPtr.h>
+
 // ImtCore includes
-#include <imtqml/IPageElementContainer.h>
+#include <imtauth/IUserInfo.h>
+#include <imtqml/IPageGuiElementModel.h>
+#include <imtgui/IGuiElementContainer.h>
 
 
 namespace imtbase
@@ -13,42 +18,59 @@ namespace imtbase
 
 // reimplemented (IRepresentationController)
 
-bool CPageBasedGuiRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
-{
-	const imtqml::IPageElementContainer* guiElementPtr = dynamic_cast<const imtqml::IPageElementContainer*>(&dataModel);
-	if (guiElementPtr != nullptr) {
-		return true;
-	}
-
-	return false;
-}
-
-
 bool CPageBasedGuiRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
+	if (!m_checkPermissionCompPtr.IsValid() || !m_commandPermissionsProviderCompPtr.IsValid()){
+		return false;
+	}
+
 	if (!IsModelSupported(dataModel)){
 		return false;
 	}
 
-	bool result = BaseClass::GetRepresentationFromDataModel(dataModel, representation);
-	if (result){
-		const imtqml::IPageElementContainer* guiElementPtr = dynamic_cast<const imtqml::IPageElementContainer*>(&dataModel);
-		if (guiElementPtr != nullptr){
-			const imtbase::ICollectionInfo& collectionInfo = guiElementPtr->GetElementList();
-			imtbase::ICollectionInfo::Ids elementIds = collectionInfo.GetElementIds();
-			int index = 0;
-			for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
-				QString pageSourceItem = guiElementPtr->GetPageSourceItem(elementId);
-				QString startSourceItem = guiElementPtr->GetStartSourceItem(elementId);
+	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
 
-				representation.SetData("Source", pageSourceItem, index);
-				representation.SetData("StartItem", startSourceItem, index);
+	imtauth::IUserInfo::FeatureIds userPermissions;
+	if (userInfoParamPtr.IsValid()){
+		userPermissions = userInfoParamPtr->GetPermissions();
+	}
 
-				index++;
+	bool isAdmin = userInfoParamPtr->IsAdmin();
+
+	BaseClass::GetRepresentationFromDataModel(dataModel, representation, paramsPtr);
+
+	const imtgui::IGuiElementContainer* guiElementContainerPtr = dynamic_cast<const imtgui::IGuiElementContainer*>(&dataModel);
+	if (guiElementContainerPtr != nullptr){
+		QByteArrayList elementIds = guiElementContainerPtr->GetElementIds();
+
+		int index = 0;
+		for (int i = 0; i < elementIds.count(); i++){
+			const QByteArray elementId = elementIds[i];
+			const imtgui::IGuiElementModel* guiElementPtr = guiElementContainerPtr->GetGuiElementModel(elementId);
+			if (guiElementPtr != nullptr){
+				if (!isAdmin){
+					QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
+
+					bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
+					if (!result){
+						continue;
+					}
+				}
+
+				const imtqml::IPageGuiElementModel* pageGuiElementPtr = dynamic_cast<const imtqml::IPageGuiElementModel*>(guiElementPtr);
+				if (pageGuiElementPtr != nullptr){
+					QString pageQmlItemFilePath = pageGuiElementPtr->GetPageQmlItemFilePath();
+					QString startSourceItem = pageGuiElementPtr->GetStartSourceItem();
+
+					representation.SetData("Source", pageQmlItemFilePath, index);
+					representation.SetData("StartItem", startSourceItem, index);
+
+					index++;
+				}
 			}
-
-			return true;
 		}
+
+		return true;
 	}
 
 	return false;

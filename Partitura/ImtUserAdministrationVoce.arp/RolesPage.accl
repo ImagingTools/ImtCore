@@ -21,21 +21,27 @@
     <EmbeddedRegistries>
         <EmbededRegistry Id="RolesCommands">
             <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="250" Y="525" Note=""/>
-                <Element ComponentName="CommandsModel" X="925" Y="525" Note=""/>
-                <Element ComponentName="CommandsRepresentation" X="925" Y="250" Note=""/>
-                <Element ComponentName="RolesCommandPermissions" X="250" Y="250" Note=""/>
-                <Element ComponentName="RolesCommandsController" X="575" Y="375" Note=""/>
+                <Element ComponentName="CheckPermissionOr" X="750" Y="450" Note=""/>
+                <Element ComponentName="Commands" X="275" Y="250" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1050" Y="250" Note=""/>
+                <Element ComponentName="Edit" X="475" Y="450" Note=""/>
+                <Element ComponentName="Remove" X="100" Y="450" Note=""/>
+                <Element ComponentName="RolesCommandPermissions" X="1050" Y="450" Note=""/>
+                <Element ComponentName="RolesCommandsController" X="600" Y="75" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>
         <EmbededRegistry Id="RoleCommands">
             <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="250" Y="500" Note=""/>
-                <Element ComponentName="CommandsModel" X="925" Y="500" Note=""/>
-                <Element ComponentName="CommandsRepresentation" X="925" Y="300" Note=""/>
-                <Element ComponentName="RoleCommandPermissions" X="250" Y="300" Note=""/>
-                <Element ComponentName="RoleCommandsController" X="600" Y="400" Note=""/>
+                <Element ComponentName="CheckPermissionOr" X="800" Y="500" Note=""/>
+                <Element ComponentName="Close" X="425" Y="650" Note=""/>
+                <Element ComponentName="Commands" X="300" Y="275" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1050" Y="275" Note=""/>
+                <Element ComponentName="Redo" X="425" Y="500" Note=""/>
+                <Element ComponentName="RoleCommandPermissions" X="1050" Y="500" Note=""/>
+                <Element ComponentName="RoleCommandsController" X="600" Y="75" Note=""/>
+                <Element ComponentName="Save" X="125" Y="650" Note=""/>
+                <Element ComponentName="Undo" X="125" Y="500" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

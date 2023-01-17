@@ -1,7 +1,7 @@
-#include <imtgql/CCommandPermissionsProviderJoinerComp.h>
+#include <imtbase/CCommandPermissionsProviderJoinerComp.h>
 
 
-namespace imtgql
+namespace imtbase
 {
 
 
@@ -64,6 +64,6 @@ void CCommandPermissionsProviderJoinerComp::UpdatePermissionsCache()
 }
 
 
-} // namespace imtgql
+} // namespace imtbase
 
 

@@ -21,7 +21,7 @@ Rectangle {
     property int activePageIndex: -1;
     property int pagesCount: lvPages.count;
 
-    property TreeItemModel model;
+    property TreeItemModel model: TreeItemModel {};
 
     property int spacing: 0;
 

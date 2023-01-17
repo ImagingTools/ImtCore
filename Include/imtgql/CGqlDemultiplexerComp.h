@@ -15,7 +15,6 @@ public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlDemultiplexerComp);
-		I_REGISTER_INTERFACE(imtgql::IGqlRequestHandler);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlersCompPtr, "GqlRequestHandlers", "Demultiplexer for GraphQL request", true)
 	I_END_COMPONENT;
 

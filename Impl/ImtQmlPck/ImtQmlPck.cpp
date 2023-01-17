@@ -73,7 +73,7 @@ I_EXPORT_COMPONENT(
 			"Command permissions filter");
 
 I_EXPORT_COMPONENT(
-			PageBasedModel,
+			PageGuiElementModel,
 			"Page based model",
 			"Page Based Model");
 

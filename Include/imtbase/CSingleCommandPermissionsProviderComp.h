@@ -5,22 +5,22 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtgql/ICommandPermissionsProvider.h>
+#include <imtbase/ICommandPermissionsProvider.h>
 
 
-namespace imtgql
+namespace imtbase
 {
 
 
 class CSingleCommandPermissionsProviderComp :
 			public ilog::CLoggerComponentBase,
-			virtual public imtgql::ICommandPermissionsProvider
+			virtual public imtbase::ICommandPermissionsProvider
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSingleCommandPermissionsProviderComp);
-		I_REGISTER_INTERFACE(imtgql::ICommandPermissionsProvider);
+		I_REGISTER_INTERFACE(imtbase::ICommandPermissionsProvider);
 		I_ASSIGN(m_commandIdAttrPtr, "CommandId", "ID of the command permission are requested for", true, "");
 		I_ASSIGN_MULTI_0(m_commandPermissionsAttrPtr, "CommandPermissions", "List of command permissons", true);
 	I_END_COMPONENT;
@@ -36,6 +36,6 @@ protected:
 };
 
 
-} // namespace imtgql
+} // namespace imtbase
 
 

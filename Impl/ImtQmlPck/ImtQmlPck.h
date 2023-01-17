@@ -17,7 +17,7 @@
 #include <imtqml/CApplicationInfoDataProviderComp.h>
 #include <imtqml/CObjectViewDataProviderComp.h>
 #include <imtqml/CCommandPermissionsFilterComp.h>
-#include <imtqml/CPageBasedGuiModelComp.h>
+#include <imtqml/CPageGuiElementModelComp.h>
 
 
 /**
@@ -38,7 +38,7 @@ typedef imtqml::CClientUserContextComp ClientUserContext;
 typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
 typedef imtqml::CCommandPermissionsFilterComp CommandPermissionsFilter;
-typedef imtqml::CPageBasedGuiModelComp PageBasedModel;
+typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
 
 
 } // namespace ImtQmlPck
