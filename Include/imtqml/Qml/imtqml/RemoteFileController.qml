@@ -50,11 +50,11 @@ QtObject {
 
     }
 
-    function GetFile(fileHash, fileUrl) {
+    function GetFile(fileHash, fileName) {
         if (this.prefix == ""){
             this.prefix = "files"
         }
-        open(`../../` + this.prefix + `/${fileUrl.name}?FileId=${fileHash}`)
+        open(`../../` + this.prefix + `/${fileName}?FileId=${fileHash}`)
     }
 
     function DeleteFile(fileHash, fileUrl){
