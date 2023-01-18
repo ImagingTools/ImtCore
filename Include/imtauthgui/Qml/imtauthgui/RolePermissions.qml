@@ -19,8 +19,8 @@ Item {
 
     onDocumentModelChanged: {
         console.log("RolePermissions onDocumentModelChanged");
-        if (documentModel.ContainsKey("ProductId")){
-            let productId = documentModel.GetData("ProductId");
+        if (rolePermissionsContainer.documentModel.ContainsKey("ProductId")){
+            let productId = rolePermissionsContainer.documentModel.GetData("ProductId");
 
             permissionsProvider.productId = productId;
 
@@ -32,11 +32,11 @@ Item {
         id: permissionsProvider;
 
         onModelChanged: {
-            updateGui();
+            rolePermissionsContainer.updateGui();
         }
 
         onDependenciesModelChanged: {
-            dependenciesProvider.model = dependenciesModel;
+            dependenciesProvider.model = permissionsProvider.dependenciesModel;
         }
     }
 
@@ -47,12 +47,12 @@ Item {
     function updateGui(){
         console.log("RolePermissions updateGui");
 
-        blockUpdatingModel = true;
+        rolePermissionsContainer.blockUpdatingModel = true;
 
         let selectedPermissionsIds = [];
-        let selectedPermissionsModel = documentModel.GetData("Permissions");
+        let selectedPermissionsModel = rolePermissionsContainer.documentModel.GetData("Permissions");
         if (!selectedPermissionsModel){
-            selectedPermissionsModel = documentModel.AddTreeModel("Permissions");
+            selectedPermissionsModel = rolePermissionsContainer.documentModel.AddTreeModel("Permissions");
         }
 
         for (let i = 0; i < selectedPermissionsModel.GetItemsCount(); i++){
@@ -63,9 +63,9 @@ Item {
 
         permissionsTable.rowModel.clear();
 
-        recursiveUpdateGui(permissionsProvider.model, [], selectedPermissionsIds);
+        rolePermissionsContainer.recursiveUpdateGui(permissionsProvider.model, [], selectedPermissionsIds);
 
-        blockUpdatingModel = false;
+        rolePermissionsContainer.blockUpdatingModel = false;
     }
 
     function recursiveUpdateGui(model, tableIndexes, selectedPermissions){
@@ -84,19 +84,19 @@ Item {
             let childModel = model.GetData("ChildModel", i);
             if (childModel){
                 let childIndexes = [].concat(tableIndexes.concat([i]))
-                recursiveUpdateGui(childModel, childIndexes,selectedPermissions);
+                rolePermissionsContainer.recursiveUpdateGui(childModel, childIndexes,selectedPermissions);
             }
         }
     }
 
     function updateModel(){
-        undoRedoManager.beginChanges();
+        rolePermissionsContainer.undoRedoManager.beginChanges();
 
-        let permissionsModel = documentModel.AddTreeModel("Permissions");
+        let permissionsModel = rolePermissionsContainer.documentModel.AddTreeModel("Permissions");
 
-        recursiveUpdateModel(permissionsModel, permissionsTable.rowModel);
+        rolePermissionsContainer.recursiveUpdateModel(permissionsModel, permissionsTable.rowModel);
 
-        undoRedoManager.endChanges();
+        rolePermissionsContainer.undoRedoManager.endChanges();
     }
 
     function recursiveUpdateModel(model, guiModel){
@@ -117,7 +117,7 @@ Item {
 
             let rowChildModel = rowObj["ChildModel"]
             if (rowChildModel.count > 0){
-                recursiveUpdateModel(model, rowChildModel);
+                rolePermissionsContainer.recursiveUpdateModel(model, rowChildModel);
             }
         }
     }
@@ -184,14 +184,14 @@ Item {
         }
 
         onRowModelDataChanged: {
-            if (!blockUpdatingModel){
-                updateModel();
+            if (!rolePermissionsContainer.blockUpdatingModel){
+                rolePermissionsContainer.updateModel();
             }
         }
 
         onSelectedIndexChanged: {
-            if (selectedIndex != null){
-                let selectedFeatureId = selectedIndex.itemData.Id;
+            if (permissionsTable.selectedIndex != null){
+                let selectedFeatureId = permissionsTable.selectedIndex.itemData.Id;
 
                 let featureDependencies = dependenciesProvider.getAllDependencies(selectedFeatureId);
 
@@ -221,8 +221,6 @@ Item {
             Text {
                 id: title;
 
-                text: qsTr("Dependencies");
-
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;
                 font.bold: true;
@@ -230,6 +228,8 @@ Item {
                 color: Style.lightBlueColor;
                 elide: Text.ElideRight;
                 wrapMode: Text.WrapAnywhere ;
+
+                text: qsTr("Dependencies");
             }
 
             Column {
@@ -247,13 +247,13 @@ Item {
                         width: 200;
                         height: 20;
 
-                        text: modelData;
-
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_small;
 
                         color: Style.textColor;
                         elide: Text.ElideRight;
+
+                        text: modelData;
                     }
                 }
             }

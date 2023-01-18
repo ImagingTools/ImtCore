@@ -19,15 +19,15 @@ Item {
     Component.onCompleted: {
         container.includedRolesTable = includesTable;
 
-        commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
-        commandsProvider.commandModeChanged.connect(commandModeChanged);
+        commandsProvider.modelLoaded.connect(roleEditorContainer.onCommandsModelLoaded);
+        commandsProvider.commandModeChanged.connect(roleEditorContainer.commandModeChanged);
 
         roleNameInput.focus = true;
     }
 
     Component.onDestruction: {
-        commandsProvider.modelLoaded.disconnect(onCommandsModelLoaded);
-        commandsProvider.commandModeChanged.disconnect(commandModeChanged);
+        commandsProvider.modelLoaded.disconnect(roleEditorContainer.onCommandsModelLoaded);
+        commandsProvider.commandModeChanged.disconnect(roleEditorContainer.commandModeChanged);
     }
 
     onCommandModeChanged: {
@@ -48,7 +48,7 @@ Item {
     }
 
     onDocumentModelChanged: {
-        updateGui();
+        roleEditorContainer.updateGui();
     }
 
     function onCommandsModelLoaded(){
@@ -64,6 +64,7 @@ Item {
 
     Rectangle {
         id: background;
+
         anchors.fill: parent;
         color: Style.backgroundColor;
         Loader{
@@ -103,25 +104,25 @@ Item {
     }
 
     function updateGui(){
-        console.log("RoleEditor updateGui", documentModel.toJSON());
+        console.log("RoleEditor updateGui", roleEditorContainer.documentModel.toJSON());
 
         blockUpdatingModel = true;
 
-        if (documentModel.ContainsKey("Id")){
-            roleIdInput.text = documentModel.GetData("Id");
+        if (roleEditorContainer.documentModel.ContainsKey("Id")){
+            roleIdInput.text = roleEditorContainer.documentModel.GetData("Id");
         }
 
-        if (documentModel.ContainsKey("Name")){
-            roleNameInput.text = documentModel.GetData("Name");
+        if (roleEditorContainer.documentModel.ContainsKey("Name")){
+            roleNameInput.text = roleEditorContainer.documentModel.GetData("Name");
         }
 
-        if (documentModel.ContainsKey("Description")){
-            descriptionInput.text = documentModel.GetData("Description");
+        if (roleEditorContainer.documentModel.ContainsKey("Description")){
+            descriptionInput.text = roleEditorContainer.documentModel.GetData("Description");
         }
 
-        let parents = documentModel.GetData("Parents");
+        let parents = roleEditorContainer.documentModel.GetData("Parents");
         if (!parents){
-            parents = documentModel.AddTreeModel("Parents");
+            parents = roleEditorContainer.documentModel.AddTreeModel("Parents");
         }
 
         includesTable.rowModel.clear();
@@ -136,18 +137,18 @@ Item {
             includesTable.addRow(row);
         }
 
-        blockUpdatingModel = false;
+        roleEditorContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("RoleEditor updateModel");
-        undoRedoManager.beginChanges();
+        roleEditorContainer.undoRedoManager.beginChanges();
 
-        documentModel.SetData("Id", roleIdInput.text);
-        documentModel.SetData("Name", roleNameInput.text);
-        documentModel.SetData("Description", descriptionInput.text);
+        roleEditorContainer.documentModel.SetData("Id", roleIdInput.text);
+        roleEditorContainer.documentModel.SetData("Name", roleNameInput.text);
+        roleEditorContainer.documentModel.SetData("Description", descriptionInput.text);
 
-        let parents = documentModel.AddTreeModel("Parents");
+        let parents = roleEditorContainer.documentModel.AddTreeModel("Parents");
 
         let rowModel = includesTable.rowModel;
 
@@ -160,7 +161,7 @@ Item {
             parents.SetData("Name", rowObj["Name"], index);
         }
 
-        undoRedoManager.endChanges();
+        roleEditorContainer.undoRedoManager.endChanges();
     }
 
     Flickable {
@@ -245,7 +246,7 @@ Item {
                         let oldText = documentModel.GetData("Name");
                         if (oldText != roleNameInput.text){
                             roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
-                            updateModel();
+                            roleEditorContainer.updateModel();
                         }
                     }
 
@@ -337,7 +338,7 @@ Item {
                     onEditingFinished: {
                         let oldText = documentModel.GetData("Description");
                         if (oldText != descriptionInput.text){
-                            updateModel();
+                            roleEditorContainer.updateModel();
                         }
                     }
 
@@ -451,14 +452,14 @@ Item {
                         }
 
                         onRowAdded: {
-                            if (!blockUpdatingModel){
-                                updateModel();
+                            if (!roleEditorContainer.blockUpdatingModel){
+                                roleEditorContainer.updateModel();
                             }
                         }
 
                         onRowRemoved: {
-                            if (!blockUpdatingModel){
-                                updateModel();
+                            if (!roleEditorContainer.blockUpdatingModel){
+                                roleEditorContainer.updateModel();
                             }
                         }
                     }

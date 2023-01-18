@@ -13,14 +13,14 @@ DocumentWorkspaceCommandsDelegateBase {
     Component.onCompleted: {
         console.log("RoleViewDelegate onCompleted");
 
-        itemModelInputParams["ProductId"] = documentsData.GetData("ProductId", model.index);
+        delegateContainer.itemModelInputParams["ProductId"] = documentsData.GetData("ProductId", model.index);
 
-        updateItemTimer = 100;
+        delegateContainer.updateItemTimer = 100;
         itemsModel.updateModel();
     }
 
     onSelectedIndexChanged: {
-        console.log("RoleViewDelegate onSelectedIndexChanged", selectedIndex);
+        console.log("RoleViewDelegate onSelectedIndexChanged", delegateContainer.selectedIndex);
         let isEnabled = delegateContainer.selectedIndex != null;
 
         commandsProvider.setCommandIsEnabled("Exclude", isEnabled);
@@ -33,7 +33,7 @@ DocumentWorkspaceCommandsDelegateBase {
             let productId = documentModel.GetData("ProductId");
 
             modalDialogManager.openDialog(rolesDialog, {"productId": productId,
-                                              "model":     rolesModel});
+                                              "model":     delegateContainer.rolesModel});
         }
         else if (commandId === "Exclude"){
             let indexes = includedRolesTable.selectedIndex.getIndexes();
@@ -51,8 +51,8 @@ DocumentWorkspaceCommandsDelegateBase {
             onFinished: {
                 if (buttonId == "Include"){
 
-                    let parentId = selectedIndex.itemData.Id;
-                    let parentName = selectedIndex.itemData.Name;
+                    let parentId = this.selectedIndex.itemData.Id;
+                    let parentName = this.selectedIndex.itemData.Name;
 
                     let row = {"Id": parentId, "Name": parentName};
 
@@ -109,7 +109,7 @@ DocumentWorkspaceCommandsDelegateBase {
                     if (dataModelLocal.ContainsKey("RolesList")){
                         dataModelLocal = dataModelLocal.GetData("RolesList");
                         dataModelLocal = dataModelLocal.GetData("items");
-                        rolesModel = dataModelLocal;
+                        delegateContainer.rolesModel = dataModelLocal;
                     }
                 }
             }

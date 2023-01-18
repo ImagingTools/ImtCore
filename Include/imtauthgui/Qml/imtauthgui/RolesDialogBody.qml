@@ -13,10 +13,10 @@ Item {
     property alias tableView: table;
 
     onProductIdChanged: {
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            let currentProductId = model.GetData("Id", i);
-            if (currentProductId == productId){
-                let roles = model.GetData("Roles", i);
+        for (let i = 0; i < container.model.GetItemsCount(); i++){
+            let currentProductId = container.model.GetData("Id", i);
+            if (currentProductId == container.productId){
+                let roles = container.model.GetData("Roles", i);
 
                 for (let j = 0; j < roles.GetItemsCount(); j++){
                     let roleId = roles.GetData("Id", j);
@@ -58,7 +58,7 @@ Item {
             onSelectedIndexChanged: {
                 let isEnabled = selectedIndex != null;
 
-                buttons.setButtonState("Include", isEnabled)
+                buttons.setButtonState("Include", isEnabled);
             }
         }
     }//Column

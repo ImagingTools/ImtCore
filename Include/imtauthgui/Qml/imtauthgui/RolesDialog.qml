@@ -23,13 +23,13 @@ Dialog {
     }
 
     onProductIdChanged: {
-        console.log("RolesDialog onProductIdChanged", productId);
-        contentItem.productId = productId;
+        console.log("RolesDialog onProductIdChanged", rolesDialog.productId);
+        contentItem.productId = rolesDialog.productId;
     }
 
     onModelChanged: {
-        console.log("RolesDialog onModelChanged", model);
-        contentItem.model = model;
+        console.log("RolesDialog onModelChanged", rolesDialog.model);
+        contentItem.model = rolesDialog.model;
     }
 
     Component.onCompleted: {
@@ -48,6 +48,13 @@ Dialog {
             if(messageDecoratorLoader.item){
                 messageDecoratorLoader.item.rootItem = rolesDialog;
             }
+        }
+    }
+
+    Component{
+        id: emptyDecorator;
+        Item{
+            property Item rootItem;
         }
     }
 }

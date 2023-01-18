@@ -22,14 +22,11 @@ DocumentBase {
     property int mainMargin: 0;
     property int panelWidth: 150;
 
-    Component {
-        id: roleViewCommandsDelegate;
-        RoleViewCommandsDelegate {}
-    }
+
 
     onItemNameChanged: {
-        if (documentModel.ContainsKey("Name")){
-            let roleName = documentModel.GetData("Name");
+        if (container.documentModel.ContainsKey("Name")){
+            let roleName = container.documentModel.GetData("Name");
 
             if (roleName != ""){
                 container.roleName = roleName;
@@ -38,33 +35,45 @@ DocumentBase {
     }
 
     onProductIdChanged: {
-        console.log("onProductIdChanged", productId);
-        title = container.productId + " / " + qsTr("Roles");
+        console.log("onProductIdChanged", container.productId);
+        container.title = container.productId + " / " + qsTr("Roles");
     }
 
     onDocumentModelChanged: {
-        console.log("onDocumentModelChanged", documentModel.toJSON());
+        console.log("onDocumentModelChanged", container.documentModel.toJSON());
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
-            loader.item.documentModel = documentModel;
+            loader.item.documentModel = container.documentModel;
             loader.item.undoRedoManager = undoRedoManager;
         }
 
-        if (documentModel.ContainsKey("Name")){
-            let roleName = documentModel.GetData("Name");
+        if (container.documentModel.ContainsKey("Name")){
+            let roleName = container.documentModel.GetData("Name");
 
             if (roleName != ""){
                 container.roleName = roleName;
             }
         }
 
-        if (documentModel.ContainsKey("ProductId")){
+        if (container.documentModel.ContainsKey("ProductId")){
 
-            container.productId = documentModel.GetData("ProductId")
-            console.log("productId", productId);
+            container.productId = container.documentModel.GetData("ProductId")
+            console.log("productId", container.productId);
         }
 
-        undoRedoManager.registerModel(documentModel);
+        undoRedoManager.registerModel(container.documentModel);
+    }
+
+    function updateGui(){
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            loader.item.updateGui();
+        }
+    }
+
+    Component {
+        id: roleViewCommandsDelegate;
+        RoleViewCommandsDelegate {}
     }
 
     UndoRedoManager {
@@ -75,16 +84,11 @@ DocumentBase {
         commandsDelegate: container.commandsDelegate;
 
         onModelStateChanged: {
-            updateGui();
+            container.updateGui();
         }
     }
 
-    function updateGui(){
-        for (let index = 0; index < leftMenuModel.count; index++){
-            let loader = bodyRepeater.itemAt(index);
-            loader.item.updateGui();
-        }
-    }
+
 
     Component{
         id: emptyDecorator;
@@ -312,6 +316,5 @@ DocumentBase {
             }
         }
     }
-
 
 }
