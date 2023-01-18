@@ -8,9 +8,9 @@ FocusScope {
     height: bodyColumn.height + 40;
 
     onFocusChanged: {
-        console.log("InputBody onFocusChanged", focus);
+        console.log("InputBody onFocusChanged", container.focus);
 
-        if (focus){
+        if (container.focus){
             inputName.focus = focus;
         }
     }
@@ -31,11 +31,11 @@ FocusScope {
         Text {
             id: titleName;
 
-            text: editDialogContainer.titleName;
-
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: editDialogContainer.titleName;
         }
 
         CustomTextField {
@@ -53,7 +53,7 @@ FocusScope {
             }
 
             onAccepted: {
-                if (checkValidId(inputId.text)){
+                if (container.checkValidId(inputId.text)){
                     editDialogContainer.buttons.buttonClicked('Ok')
                 }
             }
@@ -78,13 +78,13 @@ FocusScope {
             text: editDialogContainer.valueId;
 
             onTextInputFocusChanged: {
-                if (textInputFocus && inputId.text == ""){
-                    generateKey();
+                if (inputIdtextInputFocus && inputId.text == ""){
+                    container.generateKey();
                 }
             }
 
             onTextChanged: {
-                let flag = checkValidId(inputId.text);
+                let flag = container.checkValidId(inputId.text);
 
                 console.log("flag", flag);
 

@@ -8,7 +8,7 @@ Dialog {
     width: 300;
 
     property string titleId: qsTr("License-ID");
-    property string titleName: qsTr("License Name");;
+    property string titleName: qsTr("License Name");
 
     property string valueId: null;
     property string valueName: null;

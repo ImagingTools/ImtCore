@@ -10,10 +10,10 @@ FocusScope {
     property alias treeViewEditor: treeView;
 
     onFocusChanged: {
-        console.log("InputBody onFocusChanged", focus);
+        console.log("InputBody onFocusChanged", container.focus);
 
-        if (focus){
-            inputName.focus = focus;
+        if (container.focus){
+            inputName.focus = container.focus;
         }
     }
 
@@ -33,11 +33,11 @@ FocusScope {
         Text {
             id: titleName;
 
-            text: editDialogContainer.titleName;
-
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: editDialogContainer.titleName;
         }
 
         CustomTextField {
@@ -67,11 +67,11 @@ FocusScope {
         Text {
             anchors.topMargin: 10;
 
-            text: editDialogContainer.titleId;
-
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: editDialogContainer.titleId;
         }
 
         CustomTextField {
@@ -84,14 +84,14 @@ FocusScope {
 
             onTextInputFocusChanged: {
                 if (textInputFocus && inputId.text == ""){
-                    generateKey();
+                    container.generateKey();
                 }
             }
 
             onTextChanged: {
                 if (inputId.text != valueId){
 
-                    let state = checkValidId(inputId.text);
+                    let state = container.checkValidId(inputId.text);
                     if (state){
                         dialogModel.SetData("Id", inputId.text);
                     }
@@ -110,11 +110,11 @@ FocusScope {
         Text {
             anchors.topMargin: 10;
 
-            text: qsTr("Subfeatures");
-
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: qsTr("Subfeatures");
         }
 
         TableTreeViewEditor {

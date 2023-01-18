@@ -35,7 +35,7 @@ Dialog {
     function subFeaturesModelUpdated(){
         console.log("subFeaturesModelUpdated");
 
-        buttons.setButtonState('Ok', true);
+        editDialogContainer.buttons.setButtonState('Ok', true);
     }
 
     Component.onCompleted: {
@@ -46,33 +46,33 @@ Dialog {
     }
 
     Component.onDestruction: {
-        subFeaturesCopyModel.modelChanged.disconnect(subFeaturesModelUpdated);
+        subFeaturesCopyModel.modelChanged.disconnect(editDialogContainer.subFeaturesModelUpdated);
     }
 
     onFinished: {
         if (buttonId === "Ok"){
             console.log("onFinished", buttonId);
-            let subFeaturesModel = featuresModel.GetData("ChildModel", index);
+            let subFeaturesModel = editDialogContainer.featuresModel.GetData("ChildModel", editDialogContainer.index);
 
             let json = editDialogContainer.subFeaturesModel.toJSON();
             console.log("json", json);
 
             subFeaturesModel.CreateFromJson(json);
 
-            valueId = dialogModel.GetData("Id");
-            valueName = dialogModel.GetData("Name");
+            editDialogContainer.valueId = dialogModel.GetData("Id");
+            editDialogContainer.valueName = dialogModel.GetData("Name");
         }
     }
 
     onValueIdChanged: {
-        getSubFeaturesFromModel();
+        editDialogContainer.getSubFeaturesFromModel();
     }
 
     function getSubFeaturesFromModel(){
         console.log("getSubFeaturesFromModel");
-        let subFeaturesModel = featuresModel.GetData("ChildModel", index);
+        let subFeaturesModel = editDialogContainer.featuresModel.GetData("ChildModel", editDialogContainer.index);
         if (!subFeaturesModel){
-            subFeaturesModel = featuresModel.AddTreeModel("ChildModel", index);
+            subFeaturesModel = editDialogContainer.featuresModel.AddTreeModel("ChildModel", editDialogContainer.index);
         }
         else{
             let json = subFeaturesModel.toJSON();
@@ -85,6 +85,6 @@ Dialog {
             console.log("subFeaturesModel", editDialogContainer.subFeaturesModel.toJSON());
         }
 
-        subFeaturesCopyModel.modelChanged.connect(subFeaturesModelUpdated);
+        subFeaturesCopyModel.modelChanged.connect(editDialogContainer.subFeaturesModelUpdated);
     }
 }
