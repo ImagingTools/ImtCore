@@ -94,9 +94,9 @@ Item {
 //        autoRefresh: true;
 
         Component.onCompleted: {
-            usersCollectionView.gqlModelInfo = "UserInfo"
-            usersCollectionView.gqlModelItems = "UserList"
-            usersCollectionView.gqlModelRemove = "UserRemove"
+            usersCollectionView.gqlModelInfo = "UserInfo";
+            usersCollectionView.gqlModelItems = "UserList";
+            usersCollectionView.gqlModelRemove = "UserRemove";
         }
 
 //        onItemSelect: {

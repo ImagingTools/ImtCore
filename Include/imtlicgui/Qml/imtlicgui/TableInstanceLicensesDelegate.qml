@@ -75,13 +75,13 @@ Rectangle {
             anchors.left: checkBoxLicense.right;
             anchors.leftMargin: 10;
 
-            text: model.Name;
-
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
             color: Style.textColor;
             wrapMode: Text.WordWrap;
             elide: Text.ElideRight;
+
+            text: model.Name;
         }
     }
 
@@ -121,12 +121,13 @@ Rectangle {
             anchors.left: checkBoxExpiration.right;
             anchors.leftMargin: 5;
 
-            text: qsTr("Unlimited");
             visible: checkBoxExpiration.checkState === 0;
 
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
             color: Style.textColor;
+
+            text: qsTr("Unlimited");
         }
 
         RegExpValidator {
@@ -156,8 +157,8 @@ Rectangle {
             }
 
             onDateChanged: {
-                console.log("onDateChanged", getDate());
-                model.Expiration = getDate();
+                console.log("onDateChanged", datePicker.getDate());
+                model.Expiration = datePicker.getDate();
             }
         }
     }
