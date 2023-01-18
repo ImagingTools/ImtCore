@@ -21,8 +21,8 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
-        updateGui();
-        undoRedoManager.registerModel(documentModel);
+        accountEditorContainer.updateGui();
+        undoRedoManager.registerModel(accountEditorContainer.documentModel);
     }
 
     Component {
@@ -38,17 +38,17 @@ DocumentBase {
         commandsDelegate: accountEditorContainer.commandsDelegate;
 
         onModelStateChanged: {
-            updateGui();
+            accountEditorContainer.updateGui();
         }
     }
 
     function updateGui(){
         console.log("AccountEditor updateGui");
-        accountNameInput.text = documentModel.GetData("Name");
-        accountDescriptionInput.text = documentModel.GetData("Description");
+        accountNameInput.text = accountEditorContainer.documentModel.GetData("Name");
+        accountDescriptionInput.text = accountEditorContainer.documentModel.GetData("Description");
 
-        if (documentModel.ContainsKey("Addresses")){
-            let addressesModel = documentModel.GetData("Addresses");
+        if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
+            let addressesModel = accountEditorContainer.documentModel.GetData("Addresses");
 
             countryInput.text = addressesModel.GetData("Country");
             postalCodeInput.text = addressesModel.GetData("PostalCode");
@@ -56,20 +56,20 @@ DocumentBase {
             streetInput.text = addressesModel.GetData("Street");
         }
 
-        if (documentModel.ContainsKey("FirstName")){
-            firstNameInput.text = documentModel.GetData("FirstName");
+        if (accountEditorContainer.documentModel.ContainsKey("FirstName")){
+            firstNameInput.text = accountEditorContainer.documentModel.GetData("FirstName");
         }
-        if (documentModel.ContainsKey("LastName")){
-            lastNameInput.text = documentModel.GetData("LastName");
+        if (accountEditorContainer.documentModel.ContainsKey("LastName")){
+            lastNameInput.text = accountEditorContainer.documentModel.GetData("LastName");
         }
-        if (documentModel.ContainsKey("NickName")){
-            nickNameInput.text = documentModel.GetData("NickName");
+        if (accountEditorContainer.documentModel.ContainsKey("NickName")){
+            nickNameInput.text = accountEditorContainer.documentModel.GetData("NickName");
         }
-        if (documentModel.ContainsKey("Email")){
-            emailInput.text = documentModel.GetData("Email");
+        if (accountEditorContainer.documentModel.ContainsKey("Email")){
+            emailInput.text = accountEditorContainer.documentModel.GetData("Email");
         }
-        if (documentModel.ContainsKey("BirthDay")){
-            birthDayInput.text = documentModel.GetData("BirthDay");
+        if (accountEditorContainer.documentModel.ContainsKey("BirthDay")){
+            birthDayInput.text = accountEditorContainer.documentModel.GetData("BirthDay");
         }
     }
 
@@ -79,13 +79,13 @@ DocumentBase {
         undoRedoManager.beginChanges();
 
         let name = accountNameInput.text;
-        documentModel.SetData("Name", name)
+        accountEditorContainer.documentModel.SetData("Name", name)
 
         let description = accountDescriptionInput.text;
-        documentModel.SetData("Description", description)
+        accountEditorContainer.documentModel.SetData("Description", description)
 
-        if (documentModel.ContainsKey("Addresses")){
-            let adressesModel = documentModel.GetData("Addresses");
+        if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
+            let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
 
             let country = countryInput.text;
             adressesModel.SetData("Country", country)
@@ -101,19 +101,19 @@ DocumentBase {
         }
 
         let firstName = firstNameInput.text;
-        documentModel.SetData("FirstName", firstName)
+        accountEditorContainer.documentModel.SetData("FirstName", firstName)
 
         let lastName = lastNameInput.text;
-        documentModel.SetData("LastName", lastName)
+        accountEditorContainer.documentModel.SetData("LastName", lastName)
 
         let nickName = nickNameInput.text;
-        documentModel.SetData("NickName", nickName)
+        accountEditorContainer.documentModel.SetData("NickName", nickName)
 
         let email = emailInput.text;
-        documentModel.SetData("Email", email)
+        accountEditorContainer.documentModel.SetData("Email", email)
 
         let birthDay = birthDayInput.text;
-        documentModel.SetData("BirthDay", birthDay)
+        accountEditorContainer.documentModel.SetData("BirthDay", birthDay)
 
         undoRedoManager.endChanges();
     }
@@ -144,10 +144,12 @@ DocumentBase {
 
             Text {
                 id: titleAccountName;
-                text: qsTr("Account name");
+
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Account name");
             }
 
             CustomTextField {
@@ -157,9 +159,9 @@ DocumentBase {
                 width: bodyColumn.width;
 
                 onEditingFinished: {
-                    let oldText = documentModel.GetData("Name");
+                    let oldText = accountEditorContainer.documentModel.GetData("Name");
                     if (oldText != accountNameInput.text){
-                        updateModel();
+                        accountEditorContainer.updateModel();
                     }
                 }
 
@@ -168,10 +170,12 @@ DocumentBase {
 
             Text {
                 id: titleAccountDescription;
-                text: qsTr("Account description");
+
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Account description");
             }
 
             CustomTextField {
@@ -183,7 +187,7 @@ DocumentBase {
                 onEditingFinished: {
                     let oldText = documentModel.GetData("Description");
                     if (oldText != accountDescriptionInput.text){
-                        updateModel();
+                        accountEditorContainer.updateModel();
                     }
                 }
 
@@ -191,10 +195,11 @@ DocumentBase {
             }
 
             Text {
-                text: qsTr("Company address");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Company address");
             }
 
             Rectangle {
@@ -220,10 +225,12 @@ DocumentBase {
 
                     Text {
                         id: countryTitle;
-                        text: qsTr("Country");
+
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Country");
                     }
 
                     CustomTextField {
@@ -233,11 +240,11 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            if (documentModel.ContainsKey("Addresses")){
-                                let adressesModel = documentModel.GetData("Addresses");
+                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
+                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
                                 let oldText = adressesModel.GetData("Country");
                                 if (oldText != countryInput.text){
-                                    updateModel();
+                                    accountEditorContainer.updateModel();
                                 }
                             }
                         }
@@ -246,10 +253,11 @@ DocumentBase {
                     }
 
                     Text {
-                        text: qsTr("City");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("City");
                     }
 
                     CustomTextField {
@@ -259,11 +267,11 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            if (documentModel.ContainsKey("Addresses")){
-                                let adressesModel = documentModel.GetData("Addresses");
+                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
+                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
                                 let oldText = adressesModel.GetData("City");
                                 if (oldText != cityInput.text){
-                                    updateModel();
+                                    accountEditorContainer.updateModel();
                                 }
                             }
                         }
@@ -271,10 +279,11 @@ DocumentBase {
                     }
 
                     Text {
-                        text: qsTr("Postal Code");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Postal Code");
                     }
 
                     CustomTextField {
@@ -284,11 +293,11 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            if (documentModel.ContainsKey("Addresses")){
-                                let adressesModel = documentModel.GetData("Addresses");
+                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
+                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
                                 let oldText = adressesModel.GetData("PostalCode");
                                 if (oldText != postalCodeInput.text){
-                                    updateModel();
+                                    accountEditorContainer.updateModel();
                                 }
                             }
                         }
@@ -296,10 +305,11 @@ DocumentBase {
                     }
 
                     Text {
-                        text: qsTr("Street");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Street");
                     }
 
                     CustomTextField {
@@ -309,11 +319,11 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            if (documentModel.ContainsKey("Addresses")){
-                                let adressesModel = documentModel.GetData("Addresses");
+                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
+                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
                                 let oldText = adressesModel.GetData("Street");
                                 if (oldText != streetInput.text){
-                                    updateModel();
+                                    accountEditorContainer.updateModel();
                                 }
                             }
                         }
@@ -324,11 +334,12 @@ DocumentBase {
             }//Company address block borders
 
             Text {
-                text: qsTr("Account Owner");
                 color: Style.textColor;
 
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Account Owner");
             }
 
             Rectangle {
@@ -353,10 +364,11 @@ DocumentBase {
                     spacing: 7;
 
                     Text {
-                        text: qsTr("Email");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Email");
                     }
 
                     RegExpValidator {
@@ -374,9 +386,9 @@ DocumentBase {
                         textInputValidator: mailValid;
 
                         onEditingFinished: {
-                            let oldText = documentModel.GetData("Email");
+                            let oldText = accountEditorContainer.documentModel.GetData("Email");
                             if (oldText != emailInput.text){
-                                updateModel();
+                                accountEditorContainer.updateModel();
                             }
                         }
 
@@ -384,10 +396,11 @@ DocumentBase {
                     }
 
                     Text {
-                        text: qsTr("Birthday");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Birthday");
                     }
 
                     CustomTextField {
@@ -397,9 +410,9 @@ DocumentBase {
                         width: accountOwnerBlock.width;
 
                         onEditingFinished: {
-                            let oldText = documentModel.GetData("BirthDay");
+                            let oldText = accountEditorContainer.documentModel.GetData("BirthDay");
                             if (oldText != birthDayInput.text){
-                                updateModel();
+                                accountEditorContainer.updateModel();
                             }
                         }
 
@@ -407,10 +420,11 @@ DocumentBase {
                     }
 
                     Text {
-                        text: qsTr("First Name");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("First Name");
                     }
 
                     CustomTextField {
@@ -420,9 +434,9 @@ DocumentBase {
                         width: accountOwnerBlock.width;
 
                         onEditingFinished: {
-                            let oldText = documentModel.GetData("FirstName");
+                            let oldText = accountEditorContainer.documentModel.GetData("FirstName");
                             if (oldText != firstNameInput.text){
-                                updateModel();
+                                accountEditorContainer.updateModel();
                             }
                         }
 
@@ -430,22 +444,23 @@ DocumentBase {
                     }
 
                     Text {
-                        text: qsTr("Last Name");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Last Name");
                     }
 
                     CustomTextField {
                         id: lastNameInput;
 
-                        height: accountEditorContainer.textInputHeight;
                         width: accountOwnerBlock.width;
+                        height: accountEditorContainer.textInputHeight;
 
                         onEditingFinished: {
-                            let oldText = documentModel.GetData("LastName");
+                            let oldText = accountEditorContainer.documentModel.GetData("LastName");
                             if (oldText != lastNameInput.text){
-                                updateModel();
+                                accountEditorContainer.updateModel();
                             }
                         }
 
@@ -454,22 +469,23 @@ DocumentBase {
 
 
                     Text {
-                        text: qsTr("Nickname");
                         color: Style.textColor;
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Nickname");
                     }
 
                     CustomTextField {
                         id: nickNameInput;
 
-                        height: accountEditorContainer.textInputHeight;
                         width: accountOwnerBlock.width;
+                        height: accountEditorContainer.textInputHeight;
 
                         onEditingFinished: {
-                            let oldText = documentModel.GetData("NickName");
+                            let oldText = accountEditorContainer.documentModel.GetData("NickName");
                             if (oldText != nickNameInput.text){
-                                updateModel();
+                                accountEditorContainer.updateModel();
                             }
                         }
 

@@ -58,7 +58,7 @@ Rectangle {
             spacing: 5;
 
             onSelectedIndexChanged: {
-                 headerText.text = qsTr("Administration") + " / " + leftMenuModel.get(selectedIndex).Id;
+                 headerText.text = qsTr("Administration") + " / " + leftMenuModel.get(mainPanel.selectedIndex).Id;
             }
 
             ListModel{
@@ -148,7 +148,7 @@ Rectangle {
                 anchors.fill: parent;
 
                 onVisibleChanged: {
-                    if (visible){
+                    if (bodyLoader.visible){
                         if (!bodyLoader.item){
                             bodyLoader.source = model.Source;
                         }

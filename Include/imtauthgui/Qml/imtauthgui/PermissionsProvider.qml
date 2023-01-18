@@ -12,7 +12,7 @@ Item {
     property string productId: "";
 
     function updateModel(){
-        if (productId == ""){
+        if (permissionsProvider.productId == ""){
             console.error("Error::PermissionsProvider updateModel(): productId is empty!")
             return;
         }
@@ -27,7 +27,7 @@ Item {
             console.log("updateModel ProductPermissions");
             var query = Gql.GqlRequest("query", "ProductPermissions");
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("ProductId", productId);
+            inputParams.InsertField("ProductId", permissionsProvider.productId);
             query.AddParam(inputParams);
 
             var gqlData = query.GetQuery();
