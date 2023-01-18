@@ -16,7 +16,7 @@ Item {
     function getAllDependencies(featureId){
         console.log("getAllDependencies", featureId);
 
-        let result = []
+        let result = [];
 
         privateBlock.getAllDependenciesRecursive(featureId, provider.model, result);
 
@@ -27,9 +27,9 @@ Item {
 
     // Get dependencies for feature by id.
     function getDependencies(featureId){
-        let result = []
+        let result = [];
 
-        if (model.ContainsKey(featureId)){
+        if (provider.model.ContainsKey(featureId)){
             let dependencies = dependenciesModel.GetData(featureId);
             result =  dependencies.split(';');
         }
@@ -62,7 +62,7 @@ Item {
 
                     retVal.push(valueId)
 
-                    getAllDependenciesRecursive(valueId, dependenciesModel, retVal);
+                    privateBlock.getAllDependenciesRecursive(valueId, dependenciesModel, retVal);
                 }
             }
         }
@@ -75,11 +75,11 @@ Item {
 
                 let values = provider.model.GetData(key);
                 if (values != ""){
-                    let dependenciesList = values.split(';')
+                    let dependenciesList = values.split(';');
                     if (dependenciesList.includes(featureId)){
-                        retVal.push(key)
+                        retVal.push(key);
 
-                        getAllDependentFeaturesRecursive(key, retVal)
+                        provider.getAllDependentFeaturesRecursive(key, retVal);
                     }
                 }
             }

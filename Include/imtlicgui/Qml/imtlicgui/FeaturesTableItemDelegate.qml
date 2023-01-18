@@ -9,21 +9,21 @@ Item {
 
     property int itemHeight: 30;
 
-    signal clicked(string id, int index, var model);
-    signal doubleClicked();
-
-    signal buttonClicked();
-
     property int headersCount: 2;
 
     property TreeItemModel childModel: model.ChildModel ? model.ChildModel : null;
 
     property ModelIndex modelIndex: ModelIndex {};
 
+    signal clicked(string id, int index, var model);
+    signal doubleClicked();
+
+    signal buttonClicked();
+
     Component.onCompleted: {
         console.log("tableItemDelegate onCompleted", model.Id, model.Name);
-        modelIndex.itemData = model;
-        modelIndex.index = model.index;
+        tableItemDelegate.modelIndex.itemData = model;
+        tableItemDelegate.modelIndex.index = model.index;
     }
 
     onChildModelChanged: {
@@ -40,7 +40,7 @@ Item {
         width: parent.width;
         height: tableItemDelegate.itemHeight;
 
-        color: modelIndex.equal(tableTreeView.selectedIndex) ? Style.selectedColor : "transparent";
+        color: tableItemDelegate.modelIndex.equal(tableTreeView.selectedIndex) ? Style.selectedColor : "transparent";
 
         MouseArea {
             id: rowMouseArea;
@@ -61,7 +61,7 @@ Item {
 
             anchors.right: idRect.left;
 
-            width: parent.width / headersCount - model.Level * 10;
+            width: parent.width / tableItemDelegate.headersCount - model.Level * 10;
             height: parent.height;
 
             AuxButton {
@@ -93,7 +93,6 @@ Item {
 
                 width: parent.width - 10;
 
-                text: model.Name ? model.Name : "";
 //                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
                 color: Style.textColor;
 
@@ -101,6 +100,8 @@ Item {
                 font.family: Style.fontFamily;
 
                 elide: Text.ElideRight;
+
+                text: model.Name ? model.Name : "";
             }
         }
 
@@ -109,7 +110,7 @@ Item {
 
             anchors.right: parent.right;
 
-            width: parent.width / headersCount;
+            width: parent.width / tableItemDelegate.headersCount;
 
             height: parent.height;
 
@@ -122,13 +123,14 @@ Item {
 
                 width: parent.width - 10;
 
-                text: model.Id ? model.Id : "";
                 color: Style.textColor;
 
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
 
                 elide: Text.ElideRight;
+
+                text: model.Id ? model.Id : "";
             }
         }
 
@@ -168,7 +170,7 @@ Item {
         visible: model.Opened;
 
         onHeightChanged: {
-            console.log("childrenColumn onHeightChanged", height)
+            console.log("childrenColumn onHeightChanged", childrenColumn.height)
             console.log("model.Id", model.Id)
         }
 
@@ -181,8 +183,8 @@ Item {
 
                 console.log("onItemAdded", item);
 
-                item.modelIndex.parentIndex = modelIndex;
-                modelIndex.childModel.push(item.modelIndex);
+                item.modelIndex.parentIndex = tableItemDelegate.modelIndex;
+                tableItemDelegate.modelIndex.childModel.push(item.modelIndex);
             }
         }
     }

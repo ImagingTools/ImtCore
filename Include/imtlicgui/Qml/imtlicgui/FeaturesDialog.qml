@@ -11,17 +11,26 @@ Dialog {
 
     property ModelIndex selectedIndex: null;
 
+    Component.onCompleted: {
+        root.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
+        root.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
+
+        root.title = qsTr("Select features");
+
+        root.updateGui();
+    }
+
     onFinished: {
         if (buttonId == "Add"){
-            root.selectedIndex = contentItem.tableView.selectedIndex;
+            root.selectedIndex = root.contentItem.tableView.selectedIndex;
         }
     }
 
     function updateGui(){
-        contentItem.tableView.columnModel.clear();
-        contentItem.tableView.rowModel.clear();
+        root.contentItem.tableView.columnModel.clear();
+        root.contentItem.tableView.rowModel.clear();
 
-        contentItem.tableView.addColumn({"Id": "Name", "Name": "Feature Name"})
+        root.contentItem.tableView.addColumn({"Id": "Name", "Name": "Feature Name"})
 
         let model = featuresProvider.model;
 
@@ -29,7 +38,7 @@ Dialog {
             let id = model.GetData("Id", i);
             let name = model.GetData("Name", i);
 
-            contentItem.tableView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
+            root.contentItem.tableView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
 
             let childModel = model.GetData("ChildModel", i);
             if (childModel){
@@ -37,7 +46,7 @@ Dialog {
                     let featureId = childModel.GetData("Id", j);
                     let featureName = childModel.GetData("Name", j);
 
-                    contentItem.tableView.insertRow([i, j], {"Name": featureName, "Id": featureId, "CheckBoxVisible": false})
+                    root.contentItem.tableView.insertRow([i, j], {"Name": featureName, "Id": featureId, "CheckBoxVisible": false})
                 }
             }
         }
@@ -68,11 +77,11 @@ Dialog {
                 height: 300;
 
                 onSelectedIndexChanged: {
-                    console.log("onSelectedIndexChanged", selectedIndex);
+                    console.log("onSelectedIndexChanged", tableTreeView.selectedIndex);
 
-                    if (selectedIndex != null){
-                         console.log("selectedIndex.itemData.Level", selectedIndex.itemData.Level);
-                        let state = selectedIndex.itemData.Level == 1;
+                    if (tableTreeView.selectedIndex != null){
+                         console.log("selectedIndex.itemData.Level", tableTreeView.selectedIndex.itemData.Level);
+                        let state = tableTreeView.selectedIndex.itemData.Level == 1;
                         root.buttons.setButtonState("Add", state);
                     }
                 }
@@ -80,12 +89,5 @@ Dialog {
         }
     }
 
-    Component.onCompleted: {
-        root.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
-        root.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
 
-        root.title = qsTr("Select features");
-
-        updateGui();
-    }
 }
