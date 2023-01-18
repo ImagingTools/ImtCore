@@ -6,7 +6,7 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
-#include <imtcrypt/IHashCalculator.h>
+#include <imtcrypt/IHashGenerator.h>
 #include <imtcrypt/CMD5HashCalculator.h>
 #include <imtcrypt/CEncryption.h>
 #include <imtcrypt/CEncryptionBasedPersistenceComp.h>
@@ -22,7 +22,7 @@ typedef icomp::TMakeComponentWrap<
 			imtcrypt::IEncryption> Encryption;
 typedef imtcrypt::CEncryptionBasedPersistenceComp EncryptionBasePersistence;
 typedef icomp::TModelCompWrap<imtcrypt::CStaticEncryptionKeyProviderComp> StaticEncryptionKeyProvider;
-typedef icomp::TMakeComponentWrap<imtcrypt::CMD5HashCalculator, imtcrypt::IHashCalculator> HashCalculator;
+typedef icomp::TMakeComponentWrap<imtcrypt::CMD5HashCalculator, imtcrypt::IHashGenerator> HashCalculator;
 
 
 } // namespace ImtCryptPck

@@ -36,7 +36,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 
 		QByteArray passwordHash;
 		if (m_hashCalculatorCompPtr.IsValid()){
-			passwordHash = m_hashCalculatorCompPtr->Calculate(login + password);
+			passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password);
 		}
 
 		imtbase::IObjectCollection::DataPtr dataPtr;

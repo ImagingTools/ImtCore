@@ -155,7 +155,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 			if (calculate){
 				if (m_hashCalculatorCompPtr.IsValid()){
-					password = m_hashCalculatorCompPtr->Calculate(username + password);
+					password = m_hashCalculatorCompPtr->GenerateHash(username + password);
 				}
 			}
 

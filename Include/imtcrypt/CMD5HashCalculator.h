@@ -2,18 +2,19 @@
 
 
 // ImtCore includes
-#include <imtcrypt/IHashCalculator.h>
+#include <imtcrypt/IHashGenerator.h>
 
 
 namespace imtcrypt
 {
 
 
-class CMD5HashCalculator: virtual public IHashCalculator
+class CMD5HashCalculator: virtual public IHashGenerator
 {
 public:
-	// reimplemented (IHashCalculator)
-	virtual QByteArray Calculate(const QByteArray& input) const override;
+	// reimplemented (IHashGenerator)
+	virtual QByteArray GenerateHash(const QByteArray& input) const override;
+	bool ValidateHash(const QByteArray& inputData, const QByteArray& hashValue) const override;
 };
 
 

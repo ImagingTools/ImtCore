@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtgql/CGqlRequestHandlerCompBase.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtcrypt/IHashCalculator.h>
+#include <imtcrypt/IHashGenerator.h>
 
 
 namespace imtauthgql
@@ -29,7 +29,7 @@ protected:
 private:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
 	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
-	I_REF(imtcrypt::IHashCalculator, m_hashCalculatorCompPtr);
+	I_REF(imtcrypt::IHashGenerator, m_hashCalculatorCompPtr);
 };
 
 

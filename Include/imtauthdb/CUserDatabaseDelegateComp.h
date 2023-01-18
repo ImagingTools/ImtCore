@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 #include <imtauth/CUserInfo.h>
-#include <imtcrypt/IHashCalculator.h>
+#include <imtcrypt/IHashGenerator.h>
 
 
 namespace imtauthdb
