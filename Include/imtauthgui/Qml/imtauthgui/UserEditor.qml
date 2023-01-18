@@ -19,9 +19,9 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("UserEditor onDocumentModelChanged", documentModel);
+        console.log("UserEditor onDocumentModelChanged", userEditorContainer.documentModel);
 
-        updateGui();
+        userEditorContainer.updateGui();
     }
 
     onUndoRedoManagerChanged: {
@@ -31,38 +31,38 @@ Item {
     function updateGui(){
         console.log("UserEditor updateGui");
 
-        blockUpdatingModel = true;
+        userEditorContainer.blockUpdatingModel = true;
 
-        if (documentModel.ContainsKey("Username")){
-            usernameInput.text = documentModel.GetData("Username");
+        if (userEditorContainer.documentModel.ContainsKey("Username")){
+            usernameInput.text = userEditorContainer.documentModel.GetData("Username");
         }
 
-        if (documentModel.ContainsKey("Name")){
-            nameInput.text = documentModel.GetData("Name");
+        if (userEditorContainer.documentModel.ContainsKey("Name")){
+            nameInput.text = userEditorContainer.documentModel.GetData("Name");
         }
 
-        if (documentModel.ContainsKey("Email")){
-            mailInput.text = documentModel.GetData("Email");
+        if (userEditorContainer.documentModel.ContainsKey("Email")){
+            mailInput.text = userEditorContainer.documentModel.GetData("Email");
         }
 
-        if (documentModel.ContainsKey("Password")){
-            passwordInput.text = documentModel.GetData("Password");
+        if (userEditorContainer.documentModel.ContainsKey("Password")){
+            passwordInput.text = userEditorContainer.documentModel.GetData("Password");
         }
 
-        blockUpdatingModel = false;
+        userEditorContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("UserEditor updateModel");
 
-        undoRedoManager.beginChanges();
+        userEditorContainer.undoRedoManager.beginChanges();
 
-        documentModel.SetData("Username", usernameInput.text);
-        documentModel.SetData("Name", nameInput.text);
-        documentModel.SetData("Email", mailInput.text);
-        documentModel.SetData("Password", passwordInput.text);
+        userEditorContainer.documentModel.SetData("Username", usernameInput.text);
+        userEditorContainer.documentModel.SetData("Name", nameInput.text);
+        userEditorContainer.documentModel.SetData("Email", mailInput.text);
+        userEditorContainer.documentModel.SetData("Password", passwordInput.text);
 
-        undoRedoManager.endChanges();
+        userEditorContainer.undoRedoManager.endChanges();
     }
 
     Component{
@@ -74,7 +74,9 @@ Item {
 
     Rectangle {
         id: background;
+
         anchors.fill: parent;
+
         color: Style.backgroundColor;
         Loader{
             id: backgroundDecoratorLoader;
@@ -90,6 +92,7 @@ Item {
         //
         Item{
             id: columnContainer;
+
             width: userEditorContainer.panelWidth;
             height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
             Loader{
@@ -149,9 +152,9 @@ Item {
 
                     onEditingFinished: {
                         console.log("onEditingFinished Username");
-                        let oldText = documentModel.GetData("Username");
+                        let oldText = userEditorContainer.documentModel.GetData("Username");
                         if (oldText != usernameInput.text){
-                            updateModel();
+                            userEditorContainer.updateModel();
                         }
                     }
 
@@ -201,9 +204,9 @@ Item {
                     echoMode: TextInput.Password;
 
                     onEditingFinished: {
-                        let oldText = documentModel.GetData("Password");
+                        let oldText = userEditorContainer.documentModel.GetData("Password");
                         if (oldText != passwordInput.text){
-                            updateModel();
+                            userEditorContainer.updateModel();
                         }
                     }
 
@@ -241,9 +244,9 @@ Item {
                     placeHolderText: qsTr("Enter the name");
 
                     onEditingFinished: {
-                        let oldText = documentModel.GetData("Name");
+                        let oldText = userEditorContainer.documentModel.GetData("Name");
                         if (oldText != nameInput.text){
-                            updateModel();
+                            userEditorContainer.updateModel();
                         }
                     }
 
@@ -299,9 +302,9 @@ Item {
                     placeHolderText: qsTr("Enter the email");
 
                     onEditingFinished: {
-                        let oldText = documentModel.GetData("Email");
+                        let oldText = userEditorContainer.documentModel.GetData("Email");
                         if (oldText != mailInput.text){
-                            updateModel();
+                            userEditorContainer.updateModel();
                         }
                     }
 
@@ -323,6 +326,5 @@ Item {
         }//columnContainer
         //
     }
-
 
 }//Container

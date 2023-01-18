@@ -18,9 +18,9 @@ DocumentWorkspaceCommandsDelegate {
     }
 
     onEdited: {
-        let elementsModel = tableData.elements;
+        let elementsModel = container.tableData.elements;
         let oldUserId = itemId;
-        let newUserId = elementsModel.GetData("Id", selectedIndex);
+        let newUserId = elementsModel.GetData("Id", container.selectedIndex);
 
         if (oldUserId != newUserId){
             lisensesFeaturesModel.updateLicensesDependenciesAfterLicenseEditing(oldLicenseId, newLicenseId);

@@ -16,19 +16,19 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("UserRoles onDocumentModelChanged", documentModel);
+        console.log("UserRoles onDocumentModelChanged", userRolesContainer.documentModel);
 
-        updateGui();
+        userRolesContainer.updateGui();
     }
 
     function updateGui(){
         console.log("UserRoles updateGui");
-        blockUpdatingModel = true;
+        userRolesContainer.blockUpdatingModel = true;
 
         let selectedRolesList = []
-        let selectedRoles = documentModel.GetData("Products");
+        let selectedRoles = userRolesContainer.documentModel.GetData("Products");
         if (!selectedRoles){
-            selectedRoles = documentModel.AddTreeModel("Products");
+            selectedRoles = userRolesContainer.documentModel.AddTreeModel("Products");
         }
 
         for (let i = 0; i < selectedRoles.GetItemsCount(); i++){
@@ -82,15 +82,15 @@ Item {
 
         //Permissions update...
 
-        blockUpdatingModel = false;
+        userRolesContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("UserRoles updateModel");
 
-        undoRedoManager.beginChanges();
+        userRolesContainer.undoRedoManager.beginChanges();
 
-        let selectedRoles = documentModel.AddTreeModel("Products");
+        let selectedRoles = userRolesContainer.documentModel.AddTreeModel("Products");
 
         for (let i = 0; i < rolesTable.rowCount; i++){
             let rowObj = rolesTable.rowModel.get(i);
@@ -142,7 +142,7 @@ Item {
             }
         }
 
-        undoRedoManager.endChanges();
+        userRolesContainer.undoRedoManager.endChanges();
     }
 
     Component{
@@ -193,10 +193,11 @@ Item {
             Text {
                 id: titleRoles;
 
-                text: qsTr("Roles");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Roles");
             }
 
             BasicTableView {
@@ -218,8 +219,8 @@ Item {
 
                 onRowModelDataChanged: {
                     console.error("onRowModelDataChanged", prop)
-                    if (!blockUpdatingModel){
-                        updateModel();
+                    if (!userRolesContainer.blockUpdatingModel){
+                        userRolesContainer.updateModel();
                     }
                 }
             }
@@ -227,12 +228,13 @@ Item {
             Text {
                 id: titlePermissions;
 
-                text: qsTr("Permissions");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
 
                 visible: false;
+
+                text: qsTr("Permissions");
             }
 
             BasicTableView {

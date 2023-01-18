@@ -15,8 +15,8 @@ DocumentBase {
 
 
     onItemNameChanged: {
-        if (documentModel.ContainsKey("Name")){
-            let username = documentModel.GetData("Name");
+        if (container.documentModel.ContainsKey("Name")){
+            let username = container.documentModel.GetData("Name");
             if (username != ""){
                 container.username = username;
             }
@@ -24,10 +24,10 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
-        console.log("UserView onDocumentModelChanged", documentModel);
+        console.log("UserView onDocumentModelChanged", container.documentModel);
 
-        if (documentModel.ContainsKey("Name")){
-            let username = documentModel.GetData("Name");
+        if (container.documentModel.ContainsKey("Name")){
+            let username = container.documentModel.GetData("Name");
             if (username != ""){
                 container.username = username;
             }
@@ -36,10 +36,10 @@ DocumentBase {
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             loader.item.undoRedoManager = undoRedoManager;
-            loader.item.documentModel = documentModel;
+            loader.item.documentModel = container.documentModel;
         }
 
-        undoRedoManager.registerModel(documentModel);
+        undoRedoManager.registerModel(container.documentModel);
     }
 
 
@@ -50,7 +50,7 @@ DocumentBase {
         commandsId: container.commandsId;
 
         onModelStateChanged: {
-            updateGui();
+            container.updateGui();
         }
     }
 
@@ -144,7 +144,6 @@ DocumentBase {
         anchors.topMargin: container.mainMargin;
         anchors.leftMargin: container.mainMargin;
 
-
         width: container.panelWidth;
 
         color: Style.backgroundColor;
@@ -165,7 +164,6 @@ DocumentBase {
             width: parent.width;
             height: mainPanel.height + 2*mainPanel.anchors.topMargin;
 
-
             Loader{
                 id: mainPanelFrameLoader;
 
@@ -182,8 +180,6 @@ DocumentBase {
             }
 
         }
-
-
 
         Column {
             id: mainPanel;
@@ -290,6 +286,5 @@ DocumentBase {
             }
         }
     }
-
 
 }

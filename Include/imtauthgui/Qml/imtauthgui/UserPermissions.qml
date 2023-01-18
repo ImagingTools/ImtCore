@@ -38,10 +38,11 @@ Item {
             Text {
                 id: titlePermissions;
 
-                text: qsTr("Permissions");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Permissions");
             }
 
             Rectangle {
@@ -67,9 +68,9 @@ Item {
                     }
                 }
 
-                UserPermissionsController {
-                    id: permissionsController;
-                }
+//                UserPermissionsController {
+//                    id: permissionsController;
+//                }
 
                 AuxTable {
                     id: permissionsTable;
