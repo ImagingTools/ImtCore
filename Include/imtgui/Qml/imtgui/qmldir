@@ -46,6 +46,7 @@ PopupMenuDelegate 1.0 ./AuxComponents/PopupMenuDelegate.qml
 UserManagementProvider 1.0 ./AuxComponents/UserManagementProvider.qml
 UserTokenProvider 1.0 ./AuxComponents/UserTokenProvider.qml
 CustomScrollbar 1.0 ./AuxComponents/CustomScrollbar.qml
+SwitchCustom 1.0 ./AuxComponents/SwitchCustom.qml
 TopButtonDecorator 1.0 ./AuxComponents/TopButtonDecorator.qml
 CommonButtonDecorator 1.0 ./AuxComponents/CommonButtonDecorator.qml
 BaseButtonDecorator 1.0 ./AuxComponents/BaseButtonDecorator.qml
