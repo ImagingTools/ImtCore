@@ -4,10 +4,12 @@ import Acf 1.0;
 Item {
     id: container;
 
-    width: childrenRect.width;
+    width: container.text == "" ? checkRect.width : checkRect.width + checkBoxText.width + container.mainMargin;
     height: 13;
 
     property alias checkSize: checkRect.height;
+    property alias border: checkRect.border;
+    property alias color: checkRect.color;
 
     property bool isActive: true;
 
@@ -18,14 +20,23 @@ Item {
     property string imageSourceNotActive: "../../../Icons/" + Style.theme + "/Ok_On_Disabled.svg";
 
     property alias text: checkBoxText.text;
+    property alias textObj: checkBoxText;
 
     property int fontPixelSize: Style.fontSize_common;
     property bool fontBold: false;
+    property alias fontColor: checkBoxText.color;
+    property bool isLeftText: false;
+
+    property int mainMargin: 8;
 
     signal clicked();
 
     Rectangle {
         id: checkRect;
+
+
+        anchors.left: parent.left;
+        anchors.leftMargin: !container.isLeftText ? 0 : checkBoxText.width + container.mainMargin;
         anchors.verticalCenter: parent.verticalCenter;
 
         width: height;
@@ -56,7 +67,7 @@ Item {
     Rectangle {
         id: rect;
 
-        anchors.centerIn: parent;
+        anchors.centerIn: checkRect;
 
         height: checkRect.height - 4;
         width: height;
@@ -71,8 +82,8 @@ Item {
     Text {
         id: checkBoxText;
 
-        anchors.left: checkRect.right;
-        anchors.leftMargin: 4;
+        anchors.left: parent.left;
+        anchors.leftMargin: container.isLeftText ? 0 : checkRect.width + container.mainMargin;
         anchors.verticalCenter: container.verticalCenter;
 
         color: container.enabled ? Style.buttonText : Style.inactive_buttonText;
