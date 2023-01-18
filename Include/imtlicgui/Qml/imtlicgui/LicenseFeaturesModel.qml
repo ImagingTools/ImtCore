@@ -8,11 +8,11 @@ Item {
     property TreeItemModel modelLicenseFeatures;
 
     Component.onCompleted: {
-        Events.subscribeEvent("LicenseFeaturesUpdate", updateModel);
+        Events.subscribeEvent("LicenseFeaturesUpdate", licenseFeaturesModelContainer.updateModel);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("LicenseFeaturesUpdate", updateModel);
+        Events.unSubscribeEvent("LicenseFeaturesUpdate", licenseFeaturesModelContainer.updateModel);
     }
 
     onModelLicenseFeaturesChanged: {

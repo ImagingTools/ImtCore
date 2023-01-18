@@ -10,11 +10,12 @@ Rectangle {
     Text {
         anchors.centerIn: parent;
 
-        text: qsTr("Loading...");
         color: Style.textColor;
 
         font.pixelSize: Style.fontSize_title;
         font.family: Style.fontFamily;
+
+        text: qsTr("Loading...");
     }
 
     MouseArea {

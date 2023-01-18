@@ -13,7 +13,7 @@ DocumentWorkspaceCommandsDelegateBase {
     property bool instanceIdAcceptable: helperInput.acceptableInput;
 
     Component.onCompleted: {
-        updateItemTimer = 400;
+        container.updateItemTimer = 400;
 
         itemsModel.updateModel("AccountsList");
         itemsModel.updateModel("ProductsList");
@@ -23,13 +23,13 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onEntered: {
-        objectModel.SetData("Name", value);
+        container.objectModel.SetData("Name", value);
     }
 
     onInstanceIdAcceptableChanged: {
-        console.log("InstallationCommands onInstanceIdAcceptableChanged", instanceIdAcceptable);
+        console.log("InstallationCommands onInstanceIdAcceptableChanged", container.instanceIdAcceptable);
 
-        if (!instanceIdAcceptable){
+        if (!container.instanceIdAcceptable){
             commandsProvider.setCommandIsEnabled("Save", false);
         }
     }
@@ -49,7 +49,7 @@ DocumentWorkspaceCommandsDelegateBase {
         InputDialog {
             onFinished: {
                 if (buttonId == "Ok"){
-                    documentBase.itemName = inputValue;
+                    container.documentBase.itemName = inputValue;
                     saveQuery.updateModel();
                 }
             }
@@ -67,11 +67,11 @@ DocumentWorkspaceCommandsDelegateBase {
     function modelChanged(){
         console.log("InstallationCommands modelChanged", instanceIdAcceptable);
 
-        if (instanceIdAcceptable){
+        if (container.instanceIdAcceptable){
             commandsProvider.setCommandIsEnabled("Save", true);
 
             let suffix = "*";
-            documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
+            documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName + suffix});
         }
     }
 

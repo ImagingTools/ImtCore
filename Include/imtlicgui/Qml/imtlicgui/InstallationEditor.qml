@@ -23,24 +23,24 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
-        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
+        let activeLicensesModel = installationEditorContainer.documentModel.GetData("ActiveLicenses");
         if (!activeLicensesModel){
-            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
+            activeLicensesModel = installationEditorContainer.documentModel.AddTreeModel("ActiveLicenses");
         }
 
-        updateGui();
+        installationEditorContainer.updateGui();
 
-        undoRedoManager.registerModel(documentModel)
+        undoRedoManager.registerModel(installationEditorContainer.documentModel)
     }
 
     onAccountsModelChanged: {
-        console.log("onAccountsModelChanged", accountsModel);
-        customerCB.model = accountsModel;
+        console.log("onAccountsModelChanged", installationEditorContainer.accountsModel);
+        customerCB.model = installationEditorContainer.accountsModel;
     }
 
     onProductsModelChanged: {
-        console.log("onProductsModelChanged", productsModel);
-        productCB.model = productsModel;
+        console.log("onProductsModelChanged", installationEditorContainer.productsModel);
+        productCB.model = installationEditorContainer.productsModel;
     }
 
     UndoRedoManager {
@@ -49,7 +49,7 @@ DocumentBase {
         commandsId: installationEditorContainer.commandsId;
 
         onModelStateChanged: {
-            updateGui();
+            installationEditorContainer.updateGui();
         }
     }
 
@@ -67,12 +67,12 @@ DocumentBase {
 
     function updateGui(){
         console.log("Begin updateGui");
-        blockUpdatingModel = true;
+        installationEditorContainer.blockUpdatingModel = true;
 
-        instanceIdInput.text = documentModel.GetData("Id");
+        instanceIdInput.text = installationEditorContainer.documentModel.GetData("Id");
 
-        let accountId = documentModel.GetData("AccountId");
-        let productId = documentModel.GetData("ProductId");
+        let accountId = installationEditorContainer.documentModel.GetData("AccountId");
+        let productId = installationEditorContainer.documentModel.GetData("ProductId");
 
         //        customerCB.currentText = "";
         let customerModel = customerCB.model;
@@ -96,9 +96,9 @@ DocumentBase {
 
         licensesTable.rowModel.clear();
 
-        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
+        let activeLicensesModel = installationEditorContainer.documentModel.GetData("ActiveLicenses");
         if (!activeLicensesModel){
-            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
+            activeLicensesModel = installationEditorContainer.documentModel.AddTreeModel("ActiveLicenses");
         }
 
         let licensesModel;
@@ -117,7 +117,7 @@ DocumentBase {
                 let licenseId = licensesModel.GetData("Id", i);
                 let licenseName = licensesModel.GetData("Name", i);
 
-                let row = {"Id": licenseId, "Name": licenseName, "LicenseState": Qt.Unchecked, "ExpirationState": Qt.Unchecked, "Expiration": ""}
+                let row = {"Id": licenseId, "Name": licenseName, "LicenseState": Qt.Unchecked, "ExpirationState": Qt.Unchecked, "Expiration": ""};
 
                 for (let j = 0; j < activeLicensesModel.GetItemsCount(); j++){
                     let activeLicenseId = activeLicensesModel.GetData("Id", j);
@@ -140,7 +140,7 @@ DocumentBase {
             }
         }
 
-        blockUpdatingModel = false;
+        installationEditorContainer.blockUpdatingModel = false;
         console.log("End updateGui");
     }
 
@@ -148,15 +148,15 @@ DocumentBase {
         console.log("Begin updateModel");
         undoRedoManager.beginChanges();
 
-        documentModel.SetData("Id", instanceIdInput.text)
+        installationEditorContainer.documentModel.SetData("Id", instanceIdInput.text)
 
         let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
-        documentModel.SetData("ProductId", selectedProductId);
+        installationEditorContainer.documentModel.SetData("ProductId", selectedProductId);
 
         let selectedAccountId = customerCB.model.GetData("Id", customerCB.currentIndex);
-        documentModel.SetData("AccountId", selectedAccountId);
+        installationEditorContainer.documentModel.SetData("AccountId", selectedAccountId);
 
-        let activeLicenses = documentModel.AddTreeModel("ActiveLicenses");
+        let activeLicenses = installationEditorContainer.documentModel.AddTreeModel("ActiveLicenses");
 
         for (let i = 0; i < licensesTable.rowModel.count; i++){
             let rowObj = licensesTable.rowModel.get(i);
@@ -206,10 +206,11 @@ DocumentBase {
         Text {
             id: titleInstanceId;
 
-            text: qsTr("Instance-ID");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: qsTr("Instance-ID");
         }
 
         RegExpValidator {
@@ -229,12 +230,13 @@ DocumentBase {
 
         CustomTextField {
             id: helperInput;
+
             visible: false;
             textInputValidator: regexValid;
 
             onTextChanged: {
-                console.log("acceptableInput", helperInput.text, acceptableInput);
-                errorMessage.visible = !acceptableInput;
+                console.log("acceptableInput", helperInput.text, helperInput.acceptableInput);
+                errorMessage.visible = !helperInput.acceptableInput;
             }
         }
 
@@ -255,9 +257,9 @@ DocumentBase {
             }
 
             onEditingFinished: {
-                let currentId = documentModel.GetData("Id");
+                let currentId = installationEditorContainer.documentModel.GetData("Id");
                 if (currentId != instanceIdInput.text){
-                    updateModel();
+                    installationEditorContainer.updateModel();
                 }
             }
         }
@@ -270,18 +272,19 @@ DocumentBase {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
 
-            text: qsTr("Incorrect input instance-ID");
-
             visible: false;
+
+            text: qsTr("Incorrect input instance-ID");
         }
 
         Text {
             id: titleCustomer;
 
-            text: qsTr("Customer");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: qsTr("Customer");
         }
 
         ComboBox {
@@ -293,8 +296,8 @@ DocumentBase {
             radius: 3;
 
             onCurrentIndexChanged: {
-                if (!blockUpdatingModel){
-                    updateModel();
+                if (!installationEditorContainer.blockUpdatingModel){
+                    installationEditorContainer.updateModel();
                 }
             }
         }
@@ -302,10 +305,11 @@ DocumentBase {
         Text {
             id: titleProduct;
 
-            text: qsTr("Product");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: qsTr("Product");
         }
 
         ComboBox {
@@ -319,14 +323,14 @@ DocumentBase {
             onCurrentIndexChanged: {
                 console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex);
 
-                if (!blockUpdatingModel){
+                if (!installationEditorContainer.blockUpdatingModel){
                     let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
 
                     //                        commandsDelegate.updateLicenses(selectedProductId);
 
-                    updateModel();
+                    installationEditorContainer.updateModel();
 
-                    updateGui();
+                    installationEditorContainer.updateGui();
                 }
             }
         }
@@ -334,10 +338,11 @@ DocumentBase {
         Text {
             id: titleLicenses;
 
-            text: qsTr("Licenses");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+
+            text: qsTr("Licenses");
         }
     }//Column bodyColumn
 
@@ -362,8 +367,8 @@ DocumentBase {
         onRowModelDataChanged: {
             console.log("licensesTable onRowModelDataChanged");
 
-            if (!blockUpdatingModel){
-                updateModel();
+            if (!installationEditorContainer.blockUpdatingModel){
+                installationEditorContainer.updateModel();
             }
         }
     }

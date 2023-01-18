@@ -66,8 +66,6 @@ Rectangle {
                         anchors.leftMargin: 10;
                         anchors.horizontalCenter: parent.horizontalCenter;
 
-                        text: model.Name;
-
                         font.pixelSize: Style.fontSize_common;
                         font.family: Style.fontFamilyBold;
                         font.bold: true;
@@ -75,6 +73,8 @@ Rectangle {
                         color: Style.lightBlueColor;
                         elide: Text.ElideRight;
                         wrapMode: Text.WrapAnywhere ;
+
+                        text: model.Name;
                     }
 
                     Column {
@@ -103,13 +103,13 @@ Rectangle {
                                     anchors.left: parent.left;
                                     anchors.leftMargin: 10;
 
-                                    text: model.Value;
-
                                     font.family: Style.fontFamily;
                                     font.pixelSize: Style.fontSize_small;
 
                                     color: Style.textColor;
                                     elide: Text.ElideRight;
+
+                                    text: model.Value;
                                 }
                             }
                         }
