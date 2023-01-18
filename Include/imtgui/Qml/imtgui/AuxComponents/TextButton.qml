@@ -3,6 +3,7 @@ import Acf 1.0
 
 Item {
     id: textButton;
+
     width: legendText.width;
     height: legendText.height + activeIndicator.height + activeIndicator.anchors.topMargin;
     visible: true;
@@ -17,10 +18,13 @@ Item {
 
     Text {
         id: legendText;
+
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.top: parent.top;
+
         width: contentWidth;
         height: contentHeight;
+
         horizontalAlignment: Text.AlignLeft;
         verticalAlignment: Text.AlignTop;
         wrapMode: Text.NoWrap;
@@ -28,16 +32,20 @@ Item {
         font.bold: textButton.fontBold;
         font.family: textButton.fontFamily;
         color: textButton.active ? Style.color_text_titles : Style.color_text_notActive;
+
         text: textButton.legend;
     }
 
     Rectangle{
         id: activeIndicator;
+
         anchors.top: legendText.bottom;
         anchors.topMargin: 5;
         anchors.horizontalCenter: parent.horizontalCenter;
+
         width: legendText.width;
         height: 3;
+
         radius: 5;
         color: Style.color_text_titles;
         visible: textButton.active;
@@ -45,7 +53,9 @@ Item {
 
     MouseArea{
         id: ma;
+
         anchors.fill: parent;
+
         visible: textButton.visible;
         enabled: visible;
         hoverEnabled: enabled;

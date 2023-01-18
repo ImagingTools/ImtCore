@@ -97,11 +97,12 @@ BaseButtonDecorator {
         anchors.topMargin: 0;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        text: topButtonDecorator.text;
         color: topButtonDecorator.enabled ? topButtonDecorator.textColor : topButtonDecorator.textColorDisabled;
         font.pixelSize: topButtonDecorator.fontSize;
         visible: !topButtonDecorator.isEmpty;
 
         font.family: Style.fontFamily;
+
+        text: topButtonDecorator.text;
     }
 }

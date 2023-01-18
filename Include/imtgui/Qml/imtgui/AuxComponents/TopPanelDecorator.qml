@@ -65,7 +65,7 @@ Item {
         }
 
         onDecoratorSourceChanged: {
-            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath)
+            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath);
         }
     }
 }

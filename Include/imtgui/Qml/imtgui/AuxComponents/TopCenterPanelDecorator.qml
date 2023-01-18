@@ -16,7 +16,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter;
 
         onVisibleChanged: {
-            if (!visible){
+            if (!commandsDecorator.visible){
                 Events.unSubscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
             }
         }
