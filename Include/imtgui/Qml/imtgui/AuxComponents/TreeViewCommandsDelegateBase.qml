@@ -7,16 +7,17 @@ Item {
 
     property TreeItemModel treeViewModel;
 
-    signal commandActivated(string commandId);
 
     property int selectedCount: table.selectedElements.count;
 
+    signal commandActivated(string commandId);
+
     Component.onCompleted: {
-        Events.subscribeEvent(treeViewContainer.commandsId + "CommandActivated", commandHandle);
+        Events.subscribeEvent(treeViewContainer.commandsId + "CommandActivated", treeViewDelegate.commandHandle);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(treeViewContainer.commandsId + "CommandActivated", commandHandle)
+        Events.unSubscribeEvent(treeViewContainer.commandsId + "CommandActivated", treeViewDelegate.commandHandle)
     }
 
     onSelectedCountChanged: {
@@ -75,7 +76,7 @@ Item {
 
             let childModel = model.GetData("ChildModel", i);
             if (childModel){
-                let result = getSelectedItem(childModel);
+                let result = treeViewDelegate.getSelectedItem(childModel);
                 if (result){
                     return result;
                 }
@@ -108,8 +109,8 @@ Item {
 
         InputDialog {
             onFinished: {
-                let item = getSelectedItem(treeViewModel);
-                let index = getSelectedItemIndex(item);
+                let item = treeViewDelegate.getSelectedItem(treeViewDelegate.treeViewModel);
+                let index = treeViewDelegate.getSelectedItemIndex(item);
 
                 if (buttonId == "Ok"){
                     item.SetData("Name", inputValue, index);
@@ -122,16 +123,16 @@ Item {
         console.log("commandHandle", commandId);
 
         if (commandId == "NewRoot"){
-            let index = insertNewItem(treeViewModel);
+            let index = treeViewDelegate.insertNewItem(treeViewDelegate.treeViewModel);
 
-            treeViewModel.SetData("Id", "", index);
-            treeViewModel.SetData("Name", "Feature Name", index);
+            treeViewDelegate.treeViewModel.SetData("Id", "", index);
+            treeViewDelegate.treeViewModel.SetData("Name", "Feature Name", index);
 
-            treeViewModel.Refresh();
+            treeViewDelegate.treeViewModel.Refresh();
         }
         else if (commandId == "New"){
-            let item = getSelectedItem(treeViewModel);
-            let index = getSelectedItemIndex(item);
+            let item = treeViewDelegate.getSelectedItem(treeViewDelegate.treeViewModel);
+            let index = treeViewDelegate.getSelectedItemIndex(item);
 
             let childModel = item.GetData("ChildModel", index);
             if (!childModel){
@@ -143,17 +144,17 @@ Item {
             childModel.SetData("Id", "", childIndex);
             childModel.SetData("Name", "Feature Name", childIndex);
 
-            treeViewModel.Refresh();
+            treeViewDelegate.treeViewModel.Refresh();
         }
         else if (commandId == "Remove"){
 
-            let item = getSelectedItem(treeViewModel);
-            let index = getSelectedItemIndex(item);
+            let item = treeViewDelegate.getSelectedItem(treeViewDelegate.treeViewModel);
+            let index = treeViewDelegate.getSelectedItemIndex(item);
             item.RemoveItem(index);
 
         }
         else{
-            commandActivated(commandId);
+            treeViewDelegate.commandActivated(commandId);
         }
     }
 }

@@ -19,11 +19,11 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        Events.subscribeEvent("TreeViewModelUpdateFinished", refreshModel)
+        Events.subscribeEvent("TreeViewModelUpdateFinished", treeViewContainer.refreshModel);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("TreeViewModelUpdateFinished", refreshModel)
+        Events.unSubscribeEvent("TreeViewModelUpdateFinished", treeViewContainer.refreshModel);
     }
 
     function getItemDataById(itemId){
@@ -46,7 +46,7 @@ Rectangle {
                 }
 
                 if (itemData.Children){
-                    let result = _getItemDataRecursive(itemData.Children, itemId);
+                    let result = treeViewContainer._getItemDataRecursive(itemData.Children, itemId);
 
                     if (result != null){
                         return result;
@@ -66,7 +66,7 @@ Rectangle {
                  }
 
                  if (child.Children){
-                      let result = _getItemDataRecursive(child.Children, itemId);
+                      let result = treeViewContainer._getItemDataRecursive(child.Children, itemId);
                      if (result != null){
                          return result;
                      }
@@ -93,7 +93,7 @@ Rectangle {
 
             let childModel = model.GetData("ChildModel", i);
             if (childModel){
-                resetSelectedItem(childModel);
+                treeViewContainer.resetSelectedItem(childModel);
             }
         }
     }
@@ -108,7 +108,7 @@ Rectangle {
                     break;
                 }
 
-                result &= checkState(child, state);
+                result &= treeViewContainer.checkState(child, state);
             }
         }
 
@@ -129,9 +129,9 @@ Rectangle {
             undoRedoManager.beginChanges();
         }
 
-        itemStateChanged(itemData);
+        treeViewContainer.itemStateChanged(itemData);
 
-        childrenStateChanged(itemData, itemData.State);
+        treeViewContainer.childrenStateChanged(itemData, itemData.State);
         parentStateChanged(itemData, itemData.State);
 
         if (undoRedoManager){
@@ -144,8 +144,8 @@ Rectangle {
             for (let child of itemData.Children){
                 if (child.Active && child.State != state){
                     child.State = state;
-                    itemStateChanged(child);
-                    childrenStateChanged(child, state);
+                    treeViewContainer.itemStateChanged(child);
+                    treeViewContainer.childrenStateChanged(child, state);
                 }
             }
         }
@@ -155,8 +155,8 @@ Rectangle {
         console.log("parentStateChanged", itemData.Id, itemData.State);
         let parent = itemData.Parent;
         if (parent && parent.Active){
-            let isAllChecked = checkState(parent, Qt.Checked);
-            let isAllUnchecked = checkState(parent, Qt.Unchecked);
+            let isAllChecked = treeViewContainer.checkState(parent, Qt.Checked);
+            let isAllUnchecked = treeViewContainer.checkState(parent, Qt.Unchecked);
 
             if (isAllChecked){
                 if (parent.State != Qt.Checked){
@@ -174,8 +174,8 @@ Rectangle {
                 }
             }
 
-            parentStateChanged(parent, state);
-            itemStateChanged(parent);
+            treeViewContainer.parentStateChanged(parent, state);
+            treeViewContainer.itemStateChanged(parent);
         }
     }
 
@@ -186,7 +186,7 @@ Rectangle {
             width: treeViewContainer.width;
 
             onClicked: {
-                resetSelectedItem(modelItems);
+                treeViewContainer.resetSelectedItem(treeViewContainer.modelItems);
                 itemData.Selected = true;
             }
 

@@ -13,24 +13,24 @@ TableViewItemDelegateBase {
     property bool tristate: true; //prefixRowItem.visible;
 
     property var parentDelegate: null;
-    property var childrenDelegates: []
+    property var childrenDelegates: [];
 
     signal parentCheckStateChanged(var data);
     signal childrenCheckStateChanged(var data);
 
     onSelectedChanged: {
-        console.log("packageTreeItemDelegate onSelectedChanged", selected);
-        if (selected){
-            treeDelegateBase.root.selectedIndex = modelIndex;
+        console.log("packageTreeItemDelegate onSelectedChanged", treeDelegateBase.selected);
+        if (treeDelegateBase.selected){
+            treeDelegateBase.root.selectedIndex = treeDelegateBase.modelIndex;
         }
         else{
             treeDelegateBase.root.selectedIndex = null;
         }
 
-        updateSelection();
+        treeDelegateBase.updateSelection();
 
-        if(rowBodyItem) {
-            rowBodyItem.forceActiveFocus();
+        if(treeDelegateBase.rowBodyItem) {
+            treeDelegateBase.rowBodyItem.forceActiveFocus();
         }
     }
 
@@ -61,7 +61,7 @@ TableViewItemDelegateBase {
                 visible: model.ChildModel ? model.ChildModel.count > 0 : false;
 
                 iconSource: treeDelegateBase.isOpen ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                     "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+                                                      "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
                 onClicked: {
                     treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
@@ -108,48 +108,48 @@ TableViewItemDelegateBase {
     }
 
     footerDelegate: Component { Column {
-        id: childrenColumn;
+            id: childrenColumn;
 
-        visible: treeDelegateBase.isOpen;
+            visible: treeDelegateBase.isOpen;
 
-        Repeater {
-            id: childModelRepeater;
+            Repeater {
+                id: childModelRepeater;
 
-            delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
+                delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
 
-            onItemAdded: {
-                console.log("TableViewItemDelegate onItemAdded", item.itemData.Id);
-                item.parentDelegate = treeDelegateBase;
-                treeDelegateBase.childrenDelegates.push(item)
+                onItemAdded: {
+                    console.log("TableViewItemDelegate onItemAdded", item.itemData.Id);
+                    item.parentDelegate = treeDelegateBase;
+                    treeDelegateBase.childrenDelegates.push(item);
 
-                console.log("TableViewItemDelegate onItemAdded");
-                item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
-                treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
-            }
-
-            onItemRemoved: {
-                console.log("TreeViewItemDelegateBase onItemRemoved", item.itemData.Id);
-                let index = treeDelegateBase.childrenDelegates.indexOf(item);
-                if (index > -1) {
-                    treeDelegateBase.childrenDelegates.splice(index, 1);
+                    console.log("TableViewItemDelegate onItemAdded");
+                    item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
+                    treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
                 }
 
-                index = treeDelegateBase.modelIndex.childModel.indexOf(item.modelIndex);
-                if (index > -1) {
-                    treeDelegateBase.modelIndex.childModel.splice(index, 1);
+                onItemRemoved: {
+                    console.log("TreeViewItemDelegateBase onItemRemoved", item.itemData.Id);
+                    let index = treeDelegateBase.childrenDelegates.indexOf(item);
+                    if (index > -1) {
+                        treeDelegateBase.childrenDelegates.splice(index, 1);
+                    }
+
+                    index = treeDelegateBase.modelIndex.childModel.indexOf(item.modelIndex);
+                    if (index > -1) {
+                        treeDelegateBase.modelIndex.childModel.splice(index, 1);
+                    }
+                }
+            }
+
+            property ListModel childModel: model.ChildModel ? model.ChildModel: null;
+            //        property TreeItemModel childModel: model.ChildModel ? model.ChildModel: null;
+
+            onChildModelChanged: {
+                console.log("TreeViewItemDelegateBase onChildModelChanged", childModel);
+                if (childrenColumn.childModel){
+                    childModelRepeater.model = childrenColumn.childModel;
                 }
             }
         }
-
-        property ListModel childModel: model.ChildModel ? model.ChildModel: null;
-//        property TreeItemModel childModel: model.ChildModel ? model.ChildModel: null;
-
-        onChildModelChanged: {
-            console.log("TreeViewItemDelegateBase onChildModelChanged", childModel);
-            if (childModel){
-                childModelRepeater.model = childModel;
-            }
-        }
-    }
     }
 }

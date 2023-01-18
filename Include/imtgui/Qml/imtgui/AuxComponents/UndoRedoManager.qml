@@ -9,65 +9,11 @@ Item {
 
     property TreeItemModel observedModel;
 
-    signal modelStateChanged();
-    signal commandActivated(string commandId);
-
     property bool isDirty: false;
     property bool transaction: false;
 
-    function beginChanges(){
-        console.log("UndoRedoManager beginChanges");
-        if (isDirty){
-            console.assert(isDirty == true,  "beginChanges():: beginChanges isDirty == true");
-
-            return;
-        }
-
-        isDirty = true;
-
-        transaction = true;
-    }
-
-    function endChanges(){
-        console.log("UndoRedoManager endChanges");
-        if (!isDirty){
-            console.assert(isDirty == false,  "endChanges():: beginChanges isDirty = false");
-
-            return;
-        }
-        else{
-            isDirty = false;
-
-            modelUpdated();
-
-            transaction = false
-        }
-    }
-
-    function registerModel(model){
-        if (undoRedoManager.observedModel != model){
-            undoRedoManager.observedModel = model;
-
-            undoRedo.addModel(observedModel);
-
-            observedModel.modelChanged.connect(modelUpdated);
-        }
-    }
-
-    Timer {
-        id: timerCheckModel;
-
-        interval: 10;
-
-        onTriggered: {
-            let newModel = JSON.stringify(undoRedoManager.observedModel)
-
-            let startModel = undoRedo.undoStack[0];
-            if (_.isEqual(newModel, startModel)){
-                undoRedoManager.commandsDelegate.removeChanges();
-            }
-        }
-    }
+    signal modelStateChanged();
+    signal commandActivated(string commandId);
 
     onModelStateChanged: {
         if (undoRedo.undoStack.length == 1){
@@ -84,37 +30,61 @@ Item {
     }
 
     onVisibleChanged: {
-        console.log("undoRedoManager onVisibleChanged", visible);
+        console.log("undoRedoManager onVisibleChanged", undoRedoManager.visible);
         if (undoRedoManager.visible){
-            observedModel.modelChanged.connect(modelUpdated);
+            observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
             Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
         }
         else{
-            observedModel.modelChanged.disconnect(modelUpdated);
-            Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle)
+            observedModel.modelChanged.disconnect(undoRedoManager.modelUpdated);
+            Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
         }
     }
+
+    function beginChanges(){
+        console.log("UndoRedoManager beginChanges");
+        if (undoRedoManager.isDirty){
+            console.assert(undoRedoManager.isDirty == true,  "beginChanges():: beginChanges isDirty == true");
+
+            return;
+        }
+
+        undoRedoManager.isDirty = true;
+
+        undoRedoManager.transaction = true;
+    }
+
+    function endChanges(){
+        console.log("UndoRedoManager endChanges");
+        if (!undoRedoManager.isDirty){
+            console.assert(undoRedoManager.isDirty == false,  "endChanges():: beginChanges isDirty = false");
+
+            return;
+        }
+        else{
+            undoRedoManager.isDirty = false;
+
+            undoRedoManager.modelUpdated();
+
+            undoRedoManager.transaction = false;
+        }
+    }
+
+    function registerModel(model){
+        if (undoRedoManager.observedModel != model){
+            undoRedoManager.observedModel = model;
+
+            undoRedo.addModel(undoRedoManager.observedModel);
+
+            undoRedoManager.observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
+        }
+    }
+
 
     function modelUpdated(){
-        console.log("undoRedoManager modelUpdated", isDirty);
-        if (transaction &&!isDirty){
-            undoRedo.addModel(observedModel);
-        }
-    }
-
-    UndoRedo {
-        id: undoRedo;
-
-        onModelAdded: {
-            undoRedoManager.checkCommandMode();
-        }
-
-        onUndoChanged: {
-            undoRedoManager.checkCommandMode();
-        }
-
-        onRedoChanged: {
-            undoRedoManager.checkCommandMode();
+        console.log("undoRedoManager modelUpdated", undoRedoManager.isDirty);
+        if (undoRedoManager.transaction &&!undoRedoManager.isDirty){
+            undoRedo.addModel(undoRedoManager.observedModel);
         }
     }
 
@@ -144,25 +114,57 @@ Item {
             result = undoRedo.redo();
         }
 
-        commandActivated(commandId);
+        undoRedoManager.commandActivated(commandId);
 
         if (result !== null){
 
-            createModel(result);
+            undoRedoManager.createModel(result);
 
-            modelStateChanged();
+            undoRedoManager.modelStateChanged();
         }
     }
 
     function createModel(json){
-        observedModel.modelChanged.disconnect(modelUpdated);
+        undoRedoManager.observedModel.modelChanged.disconnect(undoRedoManager.modelUpdated);
         console.log("createModel", json);
 
         json = json.replace(/\\/g, '');
         json = json.slice(1, json.length - 1);
 
-        observedModel.CreateFromJson(json);
+        undoRedoManager.observedModel.CreateFromJson(json);
 
-        observedModel.modelChanged.connect(modelUpdated);
+        undoRedoManager.observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
     }
+
+    Timer {
+        id: timerCheckModel;
+
+        interval: 10;
+
+        onTriggered: {
+            let newModel = JSON.stringify(undoRedoManager.observedModel)
+
+            let startModel = undoRedo.undoStack[0];
+            if (_.isEqual(newModel, startModel)){
+                undoRedoManager.commandsDelegate.removeChanges();
+            }
+        }
+    }
+
+    UndoRedo {
+        id: undoRedo;
+
+        onModelAdded: {
+            undoRedoManager.checkCommandMode();
+        }
+
+        onUndoChanged: {
+            undoRedoManager.checkCommandMode();
+        }
+
+        onRedoChanged: {
+            undoRedoManager.checkCommandMode();
+        }
+    }
+
 }

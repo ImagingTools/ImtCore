@@ -142,11 +142,12 @@ Item {
                 anchors.leftMargin: 10;
                 anchors.verticalCenter: parent.verticalCenter;
 
-                text: model.Name;
                 color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
 
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
+
+                text: model.Name;
             }
         }
     }
@@ -172,7 +173,7 @@ Item {
                 if (treeItemDelegate.itemData.Level >= 1){
                     item.itemData.Parent = treeItemDelegate.itemData;
                     if (!treeItemDelegate.itemData.Children){
-                        treeItemDelegate.itemData.Children = [item.itemData]
+                        treeItemDelegate.itemData.Children = [item.itemData];
                     }
                     else{
                         treeItemDelegate.itemData.Children.push(item.itemData);
