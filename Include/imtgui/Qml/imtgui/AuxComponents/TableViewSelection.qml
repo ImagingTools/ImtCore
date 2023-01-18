@@ -1,10 +1,13 @@
 import QtQuick 2.12
 
 QtObject {
-    property int count: items.length;
-    signal selectionChanged();
+    id: tableViewSelection;
 
-    property var items: []
+    property int count: items.length;
+
+    property var items: [];
+
+    signal selectionChanged();
 
 //    property var selectionMode: SelectionMode.SM_SINGLE_SELECTION;
 
@@ -20,15 +23,15 @@ QtObject {
 //            items = []
 //        }
 
-        updateSelection();
+        tableViewSelection.updateSelection();
 
         item.Selected = true;
 
-        items.push(item)
+        tableViewSelection.items.push(item)
 
         console.log("items", items);
 
-        selectionChanged();
+        tableViewSelection.selectionChanged();
     }
 
     function deselect(item){
@@ -36,30 +39,30 @@ QtObject {
 
         item.Selected = false;
 
-        console.log("items 1 ", items);
+        console.log("items 1 ", tableViewSelection.items);
 
-        let pos = items.indexOf(item)
+        let pos = tableViewSelection.items.indexOf(item)
         console.log("pos", pos);
 
         if (pos >= 0){
-            items.splice(pos, 1)
+            tableViewSelection.items.splice(pos, 1)
         }
 
-        console.log("items 2 ", items);
+        console.log("items 2 ", tableViewSelection.items);
 
-        selectionChanged();
+        tableViewSelection.selectionChanged();
     }
 
     function contains(item){
         console.log("Selection contains", item);
-        return items.includes(item);
+        return tableViewSelection.items.includes(item);
     }
 
     function updateSelection(){
-        for (let i = 0; i < items.length; i++){
-            items[i].Selected = false;
+        for (let i = 0; i < tableViewSelection.items.length; i++){
+            tableViewSelection.items[i].Selected = false;
         }
 
-        items = []
+        tableViewSelection.items = [];
     }
 }

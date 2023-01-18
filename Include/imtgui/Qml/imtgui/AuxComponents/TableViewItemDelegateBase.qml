@@ -4,14 +4,15 @@ import Acf 1.0
 FocusScope {
     id: delegate;
 
-    property var root;
-
-    property alias mouseArea: mouseAreaBase;
 
     width: root.width;
     height: root.rowItemHeight;
 
     visible: model.Visible;
+
+    property var root;
+
+    property alias mouseArea: mouseAreaBase;
 
     property ModelIndex modelIndex: ModelIndex {
         itemData: model;
@@ -101,9 +102,9 @@ FocusScope {
                     height: root.rowItemHeight;
 
                     Text {
-                        anchors.verticalCenter: repeaterItem.verticalCenter;
+                        id: text_;
 
-                        text: row.values[model.index]
+                        anchors.verticalCenter: repeaterItem.verticalCenter;
 
                         width: parent.width;
 
@@ -113,11 +114,13 @@ FocusScope {
 
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
+
+                        text: row.values[model.index]
                     }
 
                     Component.onCompleted: {
                         if (model.index == 0){
-                            width = root.width / root.columnCount - root.shiftLevel * model.Level;
+                            text_.width = root.width / root.columnCount - root.shiftLevel * model.Level;
                         }
                     }
                 }
@@ -127,7 +130,7 @@ FocusScope {
                 if(root.columnModel){
                     for (let i = 0; i < root.columnModel.count; i++){
                         let id = root.columnModel.get(i).Id;
-                        values.push(model[id])
+                        row.values.push(model[id])
                     }
 
                     repeater.model = root.columnModel;
@@ -150,7 +153,7 @@ FocusScope {
         }
         else{
             root.selection.select(model);
-            root.selectedIndex = modelIndex;
+            root.selectedIndex = delegate.modelIndex;
         }
     }
 

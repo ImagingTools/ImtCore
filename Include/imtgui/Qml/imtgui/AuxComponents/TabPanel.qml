@@ -35,9 +35,9 @@ Rectangle {
         clip: true;
         orientation: ListView.Horizontal;
 
-        spacing: 0;
-
         boundsBehavior: Flickable.StopAtBounds;
+
+        spacing: 0;
 
         delegate: TabDelegate {
             height: list.height;

@@ -72,11 +72,11 @@ Item {
 
             anchors.centerIn: parent;
 
-            text: tabDelegate.text;
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
             //elide: Text.ElideRight;
+            text: tabDelegate.text;
         }
     }
 }
