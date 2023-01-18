@@ -9,12 +9,12 @@ Item {
 
     property string commandsId;
 
-    signal clicked(int index);
-    signal doubleClicked(string id, string name);
-
     property int index: model.index;
 
     property int selectedIndex: -1;
+
+    signal clicked(int index);
+    signal doubleClicked(string id, string name);
 
     Component.onCompleted: {
         console.log("productRolesDelegate onCompleted", model.Roles);
@@ -24,7 +24,7 @@ Item {
     }
 
     onSelectedIndexChanged: {
-        if (selectedIndex != index){
+        if (productRolesDelegate.selectedIndex != productRolesDelegate.index){
             rolesRepeater.selectedIndex = -1;
         }
     }
@@ -75,8 +75,6 @@ Item {
             anchors.left: parent.left;
             anchors.leftMargin: 10;
 
-            text: model.Name;
-
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamilyBold;
             font.bold: true;
@@ -84,6 +82,8 @@ Item {
             color: Style.textColor;
             wrapMode: Text.WordWrap;
             elide: Text.ElideRight;
+
+            text: model.Name;
         }
 
         AuxButton {
@@ -100,7 +100,7 @@ Item {
 
             onClicked: {
                 productRolesDelegate.clicked(productRolesDelegate.index);
-                Events.sendEvent(commandsId + "CommandActivated", "New");
+                Events.sendEvent(productRolesDelegate.commandsId + "CommandActivated", "New");
             }
         }
     }
@@ -132,8 +132,8 @@ Item {
                 property int selectedIndex: -1;
 
                 onSelectedIndexChanged: {
-                    if (productRolesDelegate.selectedIndex == index){
-                        baseCollectionView.selectedIndexChanged(selectedIndex);
+                    if (productRolesDelegate.selectedIndex == model.index){
+                        baseCollectionView.selectedIndexChanged(rolesRepeater.selectedIndex);
                     }
                 }
 
@@ -148,13 +148,13 @@ Item {
                         anchors.left: parent.left;
                         anchors.leftMargin: 10;
 
-                        text: model.Name;
-
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
                         color: Style.textColor;
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
+
+                        text: model.Name;
                     }
 
                     MouseArea {
