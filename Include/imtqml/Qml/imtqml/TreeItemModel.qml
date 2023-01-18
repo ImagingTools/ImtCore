@@ -61,6 +61,20 @@ JSONListModel {
         this.dataChanged(row, row+1)
     }
 
+    function RemoveData(key, row){
+        if(row === undefined)
+            row = 0
+        if(row === null)
+            row = 0
+
+        var modelObject = this.get(row)
+
+        if (modelObject === null)
+            console.log("modelObject is null")
+
+        delete modelObject[key]
+    }
+
     function Clear(){
         this.clear();
         console.log("ccleared", this)
