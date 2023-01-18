@@ -15,7 +15,7 @@ Item {
     }
 
     function authorization(loginF, passwordF){
-        console.log('DEBUG::authorization', loginF, passwordF)
+        console.log('DEBUG::authorization', loginF, passwordF);
         authorizationGqlModel.authorization(loginF, passwordF);
     }
 
@@ -51,18 +51,18 @@ Item {
                 }
 
                 if (authorizationGqlModel.ContainsKey("data")){
-                    dataModelLocal = authorizationGqlModel.GetData("data")
+                    dataModelLocal = authorizationGqlModel.GetData("data");
 
                     if (dataModelLocal.ContainsKey("UserToken")){
-                        dataModelLocal = dataModelLocal.GetData("UserToken")
+                        dataModelLocal = dataModelLocal.GetData("UserToken");
 
                         if (dataModelLocal.ContainsKey("Token")){
-                            let token = dataModelLocal.GetData("Token")
+                            let token = dataModelLocal.GetData("Token");
                             container.token = token;
 
                             this.SetGlobalAccessToken(token);
 
-                            let login = dataModelLocal.GetData("Login")
+                            let login = dataModelLocal.GetData("Login");
                             container.login = login;
 
                             container.accepted();

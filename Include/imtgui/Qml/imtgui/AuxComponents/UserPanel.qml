@@ -20,11 +20,11 @@ Item {
         anchors.right: loginButton.left;
         anchors.rightMargin: 5;
 
-        text: root.username;
-
         color: Style.textColor;
         font.family: Style.fontFamily;
         font.pixelSize: Style.fontSize_common;
+
+        text: root.username;
     }
 
     AuxButton {
