@@ -17,7 +17,7 @@ Item {
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
 
         onClicked: {
-            console.log("Preference button clicked !", thumbnailDecoratorContainer.localSettings);
+            console.log("Preference button clicked !");
 //            var source = "AuxComponents/PreferenceDialog.qml";
 //            var parameters = {};
 //            parameters["localSettings"] = thumbnailDecoratorContainer.localSettings;
