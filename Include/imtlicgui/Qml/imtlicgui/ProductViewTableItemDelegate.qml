@@ -9,13 +9,6 @@ Item {
 
     property int itemHeight: 30;
 
-    signal clicked(string id, int index, var model);
-    signal doubleClicked();
-
-    signal buttonClicked();
-
-    signal itemRemoved(var itemData);
-
     property int level: model.Level == null ? 0 : model.Level;
 
     property int headersCount: 3;
@@ -24,10 +17,17 @@ Item {
 
     property ModelIndex modelIndex: ModelIndex {};
 
+    signal clicked(string id, int index, var model);
+    signal doubleClicked();
+
+    signal buttonClicked();
+
+    signal itemRemoved(var itemData);
+
     Component.onCompleted: {
         console.log("TreeItemDelegate onCompleted");
-        modelIndex.itemData = model;
-        modelIndex.index = model.index;
+        treeItemDelegate.modelIndex.itemData = model;
+        treeItemDelegate.modelIndex.index = model.index;
     }
 
     onChildModelChanged: {
@@ -52,7 +52,7 @@ Item {
         width: parent.width;
         height: treeItemDelegate.itemHeight;
 
-        color: modelIndex.equal(collectionView.selectedIndex) ? Style.selectedColor : "transparent";
+        color: treeItemDelegate.modelIndex.equal(collectionView.selectedIndex) ? Style.selectedColor : "transparent";
 
         MouseArea {
             id: rowMouseArea;
@@ -73,7 +73,7 @@ Item {
 
             anchors.right: parent.right;
 
-            width: parent.width / headersCount;
+            width: parent.width / treeItemDelegate.headersCount;
             height: parent.height;
 
             Text {
@@ -85,15 +85,17 @@ Item {
 
                 width: parent.width - 10;
 
-                text: model.Description ? model.Description : "";
-//                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
-
                 color: Style.textColor;
 
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
 
                 elide: Text.ElideRight;
+
+
+                text: model.Description ? model.Description : "";
+                //                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
+
 
                 MouseArea {
                     anchors.fill: parent;
@@ -131,13 +133,13 @@ Item {
                 }
 
                 onTextInputFocusChanged: {
-                    if (!textInputFocus){
-                        visible = false;
+                    if (!inputDescription.textInputFocus){
+                        inputDescription.visible = false;
                     }
                 }
 
                 onAccepted: {
-                    visible = false;
+                    inputDescription.visible = false;
                 }
             }
         }
@@ -147,7 +149,7 @@ Item {
 
             anchors.right: idRect.left;
 
-            width: parent.width / headersCount - model.Level * 10;
+            width: parent.width / treeItemDelegate.headersCount - model.Level * 10;
             height: parent.height;
 
             AuxButton {
@@ -160,7 +162,7 @@ Item {
                 height: width;
 
                 iconSource: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                       "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+                                           "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
                 visible: childModelRepeater.count > 0;
 
@@ -178,8 +180,6 @@ Item {
 
                 width: parent.width - 10;
 
-                text: model.Name ? model.Name : "";
-//                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
                 color: Style.textColor;
 
                 font.pixelSize: Style.fontSize_common;
@@ -188,6 +188,9 @@ Item {
                 visible: !inputName.visible;
 
                 elide: Text.ElideRight;
+
+                text: model.Name ? model.Name : "";
+                //                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
 
                 MouseArea {
                     anchors.fill: parent;
@@ -227,13 +230,13 @@ Item {
                 }
 
                 onTextInputFocusChanged: {
-                    if (!textInputFocus){
-                        visible = false;
+                    if (!inputName.textInputFocus){
+                        inputName.visible = false;
                     }
                 }
 
                 onAccepted: {
-                    visible = false;
+                    inputName.visible = false;
 
                     if (model.Id == ""){
                         let id = model.Name.replace(/\s+/g, '');
@@ -248,7 +251,7 @@ Item {
 
             anchors.right: descriptionRect.left;
 
-            width: parent.width / headersCount;
+            width: parent.width / treeItemDelegate.headersCount;
 
             height: parent.height;
 
@@ -261,8 +264,6 @@ Item {
 
                 width: parent.width - 10;
 
-                text: model.Id ? model.Id : "";
-//                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
                 color: Style.textColor;
 
                 font.pixelSize: Style.fontSize_common;
@@ -271,6 +272,9 @@ Item {
                 visible: !inputId.visible;
 
                 elide: Text.ElideRight;
+
+                text: model.Id ? model.Id : "";
+                //                color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
 
                 MouseArea {
                     anchors.fill: parent;
@@ -308,13 +312,13 @@ Item {
                 }
 
                 onTextInputFocusChanged: {
-                    if (!textInputFocus){
-                        visible = false;
+                    if (!inputId.textInputFocus){
+                        inputId.visible = false;
                     }
                 }
 
                 onAccepted: {
-                    visible = false;
+                    inputId.visible = false;
                 }
             }
         }
@@ -360,8 +364,8 @@ Item {
             delegate: collectionView.delegateComp;
 
             onItemAdded: {
-                item.modelIndex.parentIndex = modelIndex;
-                modelIndex.childModel.push(item.modelIndex);
+                item.modelIndex.parentIndex = treeItemDelegate.modelIndex;
+                treeItemDelegate.modelIndex.childModel.push(item.modelIndex);
             }
         }
     }

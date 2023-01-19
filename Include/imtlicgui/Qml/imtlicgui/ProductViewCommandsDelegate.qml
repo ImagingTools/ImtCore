@@ -34,20 +34,20 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("ProductsCommands onCommandActivated", commandId);
 
         if (commandId === "New"){
-            tableData.insertRow([tableData.rowCount], {"Id": "", "Name": "License Name", "Description": "", "Selected": true});
+            container.tableData.insertRow([container.tableData.rowCount], {"Id": "", "Name": "License Name", "Description": "", "Selected": true});
         }
         else if (commandId === "Remove"){
 //            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
 
             let selectedIndex = container.tableData.selectedIndex;
 
-            tableData.removeRow([selectedIndex.index]);
+            container.tableData.removeRow([selectedIndex.index]);
         }
     }
 
     onEntered: {
-        objectModel.SetData("Id", value);
-        objectModel.SetData("Name", value);
+        container.objectModel.SetData("Id", value);
+        container.objectModel.SetData("Name", value);
     }
 
     Component {
@@ -57,7 +57,7 @@ DocumentWorkspaceCommandsDelegateBase {
                 if (buttonId == "Yes"){
                     let selectedIndex = container.tableData.selectedIndex;
 
-                    tableData.removeRow([selectedIndex.index]);
+                    container.tableData.removeRow([selectedIndex.index]);
                 }
             }
         }
@@ -69,9 +69,9 @@ DocumentWorkspaceCommandsDelegateBase {
             onFinished: {
                 if (buttonId == "Ok"){
                     let elements = container.tableData.elements;
-                    elements.SetData("Description", inputValue, selectedIndex);
+                    elements.SetData("Description", inputValue, container.selectedIndex);
 
-                    documentBase.updateGui();
+                    container.documentBase.updateGui();
                 }
             }
         }
@@ -83,7 +83,7 @@ DocumentWorkspaceCommandsDelegateBase {
         PopupMenuDialog {
             onFinished: {
                 console.log("DocumentView PopupMenuDialog", commandId);
-                commandActivated(commandId);
+                container.commandActivated(commandId);
             }
         }
     }
@@ -95,15 +95,15 @@ DocumentWorkspaceCommandsDelegateBase {
                 if (buttonId == "Ok"){
                     let elementsModel = documentModel.GetData("Items");
 
-                    let oldId = elementsModel.GetData("Id", selectedIndex);
-                    let oldName = elementsModel.GetData("Name", selectedIndex);
+                    let oldId = elementsModel.GetData("Id", container.selectedIndex);
+                    let oldName = elementsModel.GetData("Name", container.selectedIndex);
 
                     elementsModel.SetData("Name", valueName, container.selectedIndex);
                     elementsModel.SetData("Id", valueId, container.selectedIndex);
 
-                    edited(oldId, oldName);
+                    container.edited(oldId, oldName);
 
-                    documentBase.updateGui();
+                    container.documentBase.updateGui();
                 }
             }
         }
