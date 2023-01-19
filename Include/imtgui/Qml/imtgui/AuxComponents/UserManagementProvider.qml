@@ -8,8 +8,10 @@ Item {
 
     property string userMode;
 
+    property alias userModeGqlModel: userModeModel;
+
     function updateModel(){
-        userModeGqlModel.getUserMode();
+        userModeModel.getUserMode();
     }
 
     Component {
@@ -61,9 +63,10 @@ Item {
     }
 
     GqlModel{
-        id: userModeGqlModel;
+        id: userModeModel;
 
         function getUserMode() {
+            console.log("getUserMode UserMode");
             var query = Gql.GqlRequest("query", "UserMode");
 
             var gqlData = query.GetQuery();
@@ -72,16 +75,16 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, userModeGqlModel);
+            console.log("State:", this.state, userModeModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (userModeGqlModel.ContainsKey("errors")){
+                if (userModeModel.ContainsKey("errors")){
                     return;
                 }
 
-                if (userModeGqlModel.ContainsKey("data")){
-                    dataModelLocal = userModeGqlModel.GetData("data")
+                if (userModeModel.ContainsKey("data")){
+                    dataModelLocal = userModeModel.GetData("data")
 
                     if (dataModelLocal.ContainsKey("UserMode")){
                         dataModelLocal = dataModelLocal.GetData("UserMode");
@@ -95,12 +98,9 @@ Item {
                         }
 
                         let superUserExists = dataModelLocal.GetData("SuperUserExists");
-
                         if (superUserExists == false){
                             modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for system administrator:")});
                         }
-
-//                        modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for superuser") + ":"});
                     }
                 }
             }

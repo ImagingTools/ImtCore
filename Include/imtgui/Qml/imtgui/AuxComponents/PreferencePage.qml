@@ -31,38 +31,37 @@ Rectangle {
     property SettingsProvider settingsProvider: null;
 
     Component.onDestruction: {
-        container.commonModel.modelChanged.disconnect(container.modelChanged);
+        commonModel.modelChanged.disconnect(container.modelChanged);
     }
 
     onVisibleChanged: {
-        console.log("onVisibleChanged settingsProvider", container.settingsProvider);
-        if (container.visible){
-            if (container.settingsProvider.localModel){
-                let localModelJson = container.settingsProvider.localModel.toJSON();
-                container.localModel.CreateFromJson(localModelJson);
+        console.log("onVisibleChanged settingsProvider", settingsProvider);
+        if (visible){
+            if (settingsProvider.localModel){
+                let localModelJson = settingsProvider.localModel.toJSON();
+                localModel.CreateFromJson(localModelJson);
 
-                container.updateCommonModel(container.localModel);
+                updateCommonModel(localModel);
             }
 
             if (settingsProvider.serverModel){
-                let serverModelJson = container.settingsProvider.serverModel.toJSON();
-                container.serverModel.CreateFromJson(serverModelJson);
+                let serverModelJson = settingsProvider.serverModel.toJSON();
+                serverModel.CreateFromJson(serverModelJson);
 
-                container.updateCommonModel(container.serverModel);
+                updateCommonModel(serverModel);
             }
 
-            container.settingsProvider.rewriteModel(container.serverModel, container.localModel);
+            settingsProvider.rewriteModel(serverModel, localModel);
 
-            container.localModel.modelChanged.connect(container.modelChanged);
-            container.serverModel.modelChanged.connect(container.modelChanged);
+            localModel.modelChanged.connect(container.modelChanged);
+            serverModel.modelChanged.connect(container.modelChanged);
 
-            container.updateGui();
+            updateGui();
 
-            console.log("setButtonState Apply false");
             buttonsDialog.setButtonState("Apply", false);
         }
         else{
-            container.clearModels();
+            clearModels();
         }
     }
 
@@ -74,20 +73,20 @@ Rectangle {
     }
 
     function clearModels(){
-        container.serverModel.Clear();
-        container.localModel.Clear();
-        container.commonModel.Clear();
+        serverModel.Clear();
+        localModel.Clear();
+        commonModel.Clear();
 
         mainPanelRepeater.model = 0;
         bodyPanelRepeater.model = 0;
     }
 
     function updateGui(){
-        mainPanelRepeater.model = container.commonModel;
+        mainPanelRepeater.model = commonModel;
 
         mainPanel.selectedIndex = 0;
-        let parametersModel = container.commonModel.GetData("Parameters");
-        bodyPanelRepeater.model = parametersModel;
+        let parametersModel = commonModel.GetData("Parameters")
+        bodyPanelRepeater.model = parametersModel
     }
 
     function updateCommonModel(externModel){
@@ -97,20 +96,20 @@ Rectangle {
                 let pageName = externModel.GetData("Name", i);
                 let pageParameters = externModel.GetData("Parameters", i);
 
-                let index = container.getPageIndexByPageId(pageId);
+                let index = getPageIndexByPageId(pageId)
 
                 if (index < 0){
-                    index = container.commonModel.InsertNewItem();
+                    index = commonModel.InsertNewItem();
                 }
 
-                container.commonModel.CopyItemDataFromModel(index, externModel, i);
+                commonModel.CopyItemDataFromModel(index, externModel, i);
             }
         }
     }
 
     function getPageIndexByPageId(pageId, model){
         if (!model){
-            model = container.commonModel;
+            model = commonModel;
         }
 
         for (let i = 0; i < model.GetItemsCount(); i++){
@@ -159,98 +158,6 @@ Rectangle {
         }
     }
 
-    function compare(model1, model2){
-        let changeList = [];
-
-        container.compareRecursive(model1, model2, changeList);
-
-        return changeList;
-    }
-
-    function compareRecursive(model1, model2, changeList, parentKey){
-        for (let i = 0; i < model1.GetItemsCount(); i++){
-            let keys = model1.GetKeys(i);
-
-            for (let j = 0; j < keys.length; j++){
-                let key = keys[j];
-                let globalKey = parentKey + '/' + key;
-
-                if (model1.ContainsKey(key) && model2.ContainsKey(key)){
-                    let model1Value = model1.GetData(key, i);
-                    let model2Value = model2.GetData(key, i);
-
-                    if(typeof model1Value === 'object' && typeof model2Value === 'object'){
-                        container.compareRecursive(model1Value, model2Value, changeList, globalKey);
-                    }
-                    else{
-                        if (model1Value != model2Value){
-                            let changeObj = {};p
-
-                            changeObj["operation"] = "change";
-                            changeObj["key"] = globalKey;
-                            changeObj["curVal"] = model1Value;
-                            changeObj["newVal"] = model2Value;
-
-                            changeList.push(changeObj);
-                        }
-                    }
-                }
-                else if (model1.ContainsKey(key) && !model2.ContainsKey(key)){
-                    let model1Value = model1.GetData(key, i);
-                    changeObj["operation"] = "remove";
-                    changeObj["key"] = globalKey;
-                    changeObj["curVal"] = model1Value;
-                    changeObj["index"] = i;
-                }
-                else if (!model1.ContainsKey(key) && model2.ContainsKey(key)){
-                    let model2Value = model2.GetData(key, i);
-                    changeObj["operation"] = "insert";
-                    changeObj["key"] = globalKey;
-                    changeObj["curVal"] = model2Value;
-                    changeObj["index"] = i;
-                }
-            }
-        }
-    }
-
-    function structureIsEqual(model1, model2){
-        let model1ItemsCount = model1.GetItemsCount();
-        let model2ItemsCount = model2.GetItemsCount();
-
-        if (model1ItemsCount != model2ItemsCount){
-            return false;
-        }
-
-        for (let i = 0; i < model1.GetItemsCount(); i++){
-            let model1keys = model1.GetKeys(i);
-            let model2keys = model2.GetKeys(i);
-
-            if (model1keys.length != model2keys.length){
-                return false;
-            }
-
-            for (let j = 0; j < keys.length; j++){
-                let key = keys[j];
-
-                if (!model2.ContainsKey(key)){
-                    return false;
-                }
-
-                let model1Value = model1.GetData(key, i);
-                let model2Value = model2.GetData(key, i);
-
-                if(typeof model1Value === 'object' && typeof model2Value === 'object'){
-                    let result = container.structureIsEqual(model1Value, model2Value);
-                    if (!result){
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
-    }
-
     MouseArea {
         anchors.fill: parent;
     }
@@ -274,11 +181,11 @@ Rectangle {
             width: parent.width;
             source: "../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
             onLoaded:  {
-                loaderTopPanel.item.title = "Preferences";
+                loaderTopPanel.item.title = qsTr("Preferences");
                 loaderTopPanel.item.closeButtonClicked.connect(container.close);
             }
             onSourceChanged: {
-                loaderTopPanel.item.title = "Preferences";
+                loaderTopPanel.item.title = qsTr("Preferences");
             }
         }
 
@@ -334,7 +241,7 @@ Rectangle {
 
                         Component.onCompleted: {
                             if (model.index === 0){
-                                buttonContainer.clicked();
+                                clicked();
                             }
                         }
 
@@ -386,11 +293,11 @@ Rectangle {
                         Text {
                             id: titleItem;
 
+                            text: model.Name;
+
                             font.pixelSize: container.fontSize;
                             color: container.fontColor;
                             font.family: Style.fontFamily;
-
-                            text: model.Name;
                         }
 
                         Rectangle {
@@ -416,9 +323,9 @@ Rectangle {
                             }
 
                             onLoaded: {
-                                console.log("Loader onLoaded", loader.item.parameters);
-                                if (loader.item.parameters !== undefined){
-                                    loader.item.parameters = model.Parameters;
+                                console.log("Loader onLoaded", item.parameters);
+                                if (item.parameters !== undefined){
+                                    item.parameters = model.Parameters;
                                 }
                             }
                         }
@@ -436,8 +343,8 @@ Rectangle {
             anchors.bottomMargin: 10;
 
             Component.onCompleted: {
-                buttonsDialog.addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": false});
-                buttonsDialog.addButton({"Id":"Close", "Name": qsTr("Close"), "Enabled": true});
+                addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": false});
+                addButton({"Id":"Close", "Name": qsTr("Close"), "Enabled": true});
             }
 
             onButtonClicked: {
@@ -448,8 +355,10 @@ Rectangle {
                 }
                 else if (buttonId == "Apply"){
                     if (!_.isEqual(JSON.stringify(container.serverModel), JSON.stringify(container.settingsProvider.serverModel))){
-                        let serverModelJson = container.serverModel.toJSON();
-                        container.settingsProvider.serverModel.CreateFromJson(serverModelJson);
+//                        let serverModelJson = container.serverModel.toJSON();
+//                        container.settingsProvider.serverModel.CreateFromJson(serverModelJson);
+
+                        container.settingsProvider.serverModel.Copy(container.serverModel);
 
                         container.settingsProvider.saveServerModel();
                     }

@@ -62,13 +62,19 @@ void CGqlModel::replyFinished()
 	if(reply){
 		QByteArray representationData = reply->readAll();
 		qDebug() << representationData;
-		CreateFromJson(representationData);
 
-		if (State() == "Ready"){
-			SetState("Loading");
+		bool result = CreateFromJson(representationData);
+		if (result){
+			if (State() == "Ready"){
+				SetState("Loading");
+			}
+
+			SetState("Ready");
+		}
+		else{
+			SetState("Error");
 		}
 
-		SetState("Ready");
 		reply->deleteLater();
 	}
 }

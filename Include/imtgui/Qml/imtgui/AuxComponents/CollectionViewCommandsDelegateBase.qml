@@ -13,6 +13,8 @@ Item {
 
     property Item collectionViewBase;
 
+    property CommandsProvider commandsProvider: null;
+
     /**
         The property for tracking changes to the selected item
     */
@@ -37,18 +39,18 @@ Item {
 
     onTableDataChanged: {
         if (containerBase.tableData){
-            containerBase.tableData.rightButtonMouseClicked.connect(containerBase.openPopupMenu);
+            containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
         }
     }
 
     //TODO -> onItemSelectionChanged
     onSelectedIndexChanged: {
         console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
-//        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
+        //        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
         let isEnabled = containerBase.selectedIndex > -1;
 
-        commandsProvider.setCommandIsEnabled("Remove", isEnabled);
-        commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+        containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+        containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
     }
 
     Component.onDestruction: {
@@ -70,34 +72,44 @@ Item {
 
     function commandHandle(commandId){
         console.log("CollectionView commandHandle", commandId);
-        if (commandId === "New"){
-            collectionViewBase.selectedItem("", "<new item>");
-        }
-        else if (commandId === "Remove"){
-            modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
-        }
-        else if (commandId === "Edit"){
-            let itemId = containerBase.tableData.getSelectedId();
-            let itemName = containerBase.tableData.getSelectedName();
-            collectionViewBase.selectedItem(itemId, itemName);
-        }
-        else if (commandId === "Rename"){
-            let selectedName = containerBase.tableData.getSelectedName();
-            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
-        }
-        else if (commandId === "SetDescription"){
-            console.log("tableData", containerBase.tableData);
-            let elements = containerBase.tableData.elements;
-            let selectedDescription = elements.GetData("Description", containerBase.selectedIndex);
-
-            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
+        if (containerBase.commandsProvider == null){
+            return;
         }
 
-        else if (commandId === "Close"){
+        let commandIsEnabled = containerBase.commandsProvider.commandIsEnabled(commandId);
+        if (commandIsEnabled){
+            if (commandId === "New"){
+                containerBase.collectionViewBase.selectItem("", "<new item>");
+            }
+            else if (commandId === "Remove"){
+                modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
+            }
+            else if (commandId === "Edit"){
+                let itemId = containerBase.tableData.getSelectedId();
+                let itemName = containerBase.tableData.getSelectedName();
+                containerBase.collectionViewBase.selectItem(itemId, itemName);
+            }
+        }
+
+        let editIsEnabled = containerBase.commandsProvider.commandIsEnabled("Edit");
+        if (editIsEnabled){
+            if (commandId === "Rename"){
+                let selectedName = containerBase.tableData.getSelectedName();
+                modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+            }
+            else if (commandId === "SetDescription"){
+                let elements = containerBase.tableData.elements;
+                let selectedDescription = elements.GetData("Description", selectedIndex);
+
+                modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
+            }
+        }
+
+        if (commandId === "Close"){
             documentManager.closeDocument(itemId);
         }
 
-        containerBase.commandActivated(commandId);
+        commandActivated(commandId);
     }
 
     onRenamed: {

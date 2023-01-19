@@ -44,7 +44,6 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
 
 	QByteArray roleId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
@@ -61,9 +60,9 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 		QString roleName = roleInfoPtr->GetRoleName();
 		QByteArray roleProductId = roleInfoPtr->GetProductId();
 
-		int index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Included Roles", index);
-		imtbase::CTreeItemModel* children = metaInfoModel->AddTreeModel("Children", index);
+		int index = dataModelPtr->InsertNewItem();
+		dataModelPtr->SetData("Name", "Included Roles", index);
+		imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("Children", index);
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
@@ -83,10 +82,10 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 			}
 		}
 
-		index = metaInfoModel->InsertNewItem();
+		index = dataModelPtr->InsertNewItem();
 
-		metaInfoModel->SetData("Name", "Permissions", index);
-		children = metaInfoModel->AddTreeModel("Children", index);
+		dataModelPtr->SetData("Name", "Permissions", index);
+		children = dataModelPtr->AddTreeModel("Children", index);
 
 		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetLocalPermissions();
 
@@ -95,8 +94,6 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 
 			children->SetData("Value", permissionId, childrenIndex);
 		}
-
-		dataModelPtr->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
 
 	rootModelPtr->SetExternTreeModel("data", dataModelPtr);

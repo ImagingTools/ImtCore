@@ -19,32 +19,25 @@ Item {
     Component.onCompleted: {
         container.includedRolesTable = includesTable;
 
-        commandsProvider.modelLoaded.connect(roleEditorContainer.onCommandsModelLoaded);
-        commandsProvider.commandModeChanged.connect(roleEditorContainer.commandModeChanged);
+        commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
+        commandsProvider.commandModeChanged.connect(commandModeChanged);
 
         roleNameInput.focus = true;
     }
 
     Component.onDestruction: {
-        commandsProvider.modelLoaded.disconnect(roleEditorContainer.onCommandsModelLoaded);
-        commandsProvider.commandModeChanged.disconnect(roleEditorContainer.commandModeChanged);
+        commandsProvider.modelLoaded.disconnect(onCommandsModelLoaded);
+        commandsProvider.commandModeChanged.disconnect(commandModeChanged);
     }
 
     onCommandModeChanged: {
-        console.log("onCommandModeChanged", commandId, newMode);
-
-        console.log(typeof newMode);
 
         for (let i = 0; i < commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsModel.GetData("Id", i);
-
             if (currentCommandId == commandId){
-                console.log("FIND", commandId, newMode);
                 commandsModel.SetData("IsEnabled", newMode, i);
             }
         }
-
-        console.log("commandsModel", commandsModel.toJSON());
     }
 
     onDocumentModelChanged: {
@@ -64,7 +57,6 @@ Item {
 
     Rectangle {
         id: background;
-
         anchors.fill: parent;
         color: Style.backgroundColor;
         Loader{
@@ -104,37 +96,36 @@ Item {
     }
 
     function updateGui(){
-        console.log("RoleEditor updateGui", roleEditorContainer.documentModel.toJSON());
+        console.log("RoleEditor updateGui", documentModel.toJSON());
 
-        blockUpdatingModel = true;
+        roleEditorContainer.blockUpdatingModel = true;
 
         if (roleEditorContainer.documentModel.ContainsKey("Id")){
-            roleIdInput.text = roleEditorContainer.documentModel.GetData("Id");
+            roleIdInput.text = documentModel.GetData("Id");
         }
 
         if (roleEditorContainer.documentModel.ContainsKey("Name")){
-            roleNameInput.text = roleEditorContainer.documentModel.GetData("Name");
+            roleNameInput.text = documentModel.GetData("Name");
         }
 
         if (roleEditorContainer.documentModel.ContainsKey("Description")){
-            descriptionInput.text = roleEditorContainer.documentModel.GetData("Description");
-        }
-
-        let parents = roleEditorContainer.documentModel.GetData("Parents");
-        if (!parents){
-            parents = roleEditorContainer.documentModel.AddTreeModel("Parents");
+            descriptionInput.text = documentModel.GetData("Description");
         }
 
         includesTable.rowModel.clear();
         includesTable.height = includesTable.headerHeight + includesTable.rowItemHeight;
 
-        for (let i = 0; i < parents.GetItemsCount(); i++){
-            let parentId = parents.GetData("Id", i);
-            let parentName = parents.GetData("Name", i);
+        if (documentModel.ContainsKey("Parents")){
+            let parents = documentModel.AddTreeModel("Parents");
 
-            let row = {"Id": parentId, "Name": parentName}
+            for (let i = 0; i < parents.GetItemsCount(); i++){
+                let parentId = parents.GetData("Id", i);
+                let parentName = parents.GetData("Name", i);
 
-            includesTable.addRow(row);
+                let row = {"Id": parentId, "Name": parentName}
+
+                includesTable.addRow(row);
+            }
         }
 
         roleEditorContainer.blockUpdatingModel = false;
@@ -243,7 +234,7 @@ Item {
 
                     onEditingFinished: {
                         console.log("roleNameInput onEditingFinished");
-                        let oldText = documentModel.GetData("Name");
+                        let oldText = roleEditorContainer.documentModel.GetData("Name");
                         if (oldText != roleNameInput.text){
                             roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
                             roleEditorContainer.updateModel();
@@ -336,7 +327,7 @@ Item {
                     placeHolderText: qsTr("Enter the description");
 
                     onEditingFinished: {
-                        let oldText = documentModel.GetData("Description");
+                        let oldText = roleEditorContainer.documentModel.GetData("Description");
                         if (oldText != descriptionInput.text){
                             roleEditorContainer.updateModel();
                         }

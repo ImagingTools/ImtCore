@@ -16,9 +16,9 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("UserRoles onDocumentModelChanged", userRolesContainer.documentModel);
+        console.log("UserRoles onDocumentModelChanged", documentModel);
 
-        userRolesContainer.updateGui();
+        rolesProvider.updateModel();
     }
 
     function updateGui(){
@@ -26,21 +26,20 @@ Item {
         userRolesContainer.blockUpdatingModel = true;
 
         let selectedRolesList = []
-        let selectedRoles = userRolesContainer.documentModel.GetData("Products");
-        if (!selectedRoles){
-            selectedRoles = userRolesContainer.documentModel.AddTreeModel("Products");
-        }
+        if (documentModel.ContainsKey("Products")){
+            let selectedRoles = documentModel.GetData("Products");
 
-        for (let i = 0; i < selectedRoles.GetItemsCount(); i++){
-            let productId = selectedRoles.GetData("Id", i);
-            let rolesModel = selectedRoles.GetData("Roles", i);
-            if (rolesModel){
-                for (let j = 0; j < rolesModel.GetItemsCount(); j++){
-                    let roleId = rolesModel.GetData("Id", j);
+            for (let i = 0; i < selectedRoles.GetItemsCount(); i++){
+                let productId = selectedRoles.GetData("Id", i);
+                let rolesModel = selectedRoles.GetData("Roles", i);
+                if (rolesModel){
+                    for (let j = 0; j < rolesModel.GetItemsCount(); j++){
+                        let roleId = rolesModel.GetData("Id", j);
 
-                    let value = productId + ';' + roleId;
+                        let value = productId + ';' + roleId;
 
-                    selectedRolesList.push(value)
+                        selectedRolesList.push(value)
+                    }
                 }
             }
         }
@@ -90,7 +89,7 @@ Item {
 
         userRolesContainer.undoRedoManager.beginChanges();
 
-        let selectedRoles = userRolesContainer.documentModel.AddTreeModel("Products");
+        let selectedRoles = documentModel.AddTreeModel("Products");
 
         for (let i = 0; i < rolesTable.rowCount; i++){
             let rowObj = rolesTable.rowModel.get(i);
@@ -154,6 +153,10 @@ Item {
 
     RolesProvider {
         id: rolesProvider;
+
+        onModelChanged: {
+            userRolesContainer.updateGui();
+        }
     }
 
     Rectangle {
@@ -193,11 +196,10 @@ Item {
             Text {
                 id: titleRoles;
 
+                text: qsTr("Roles");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
-
-                text: qsTr("Roles");
             }
 
             BasicTableView {
@@ -228,13 +230,12 @@ Item {
             Text {
                 id: titlePermissions;
 
+                text: qsTr("Permissions");
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
 
                 visible: false;
-
-                text: qsTr("Permissions");
             }
 
             BasicTableView {

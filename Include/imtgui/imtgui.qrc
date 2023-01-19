@@ -64,7 +64,7 @@
         <file alias="imtgui/AuxComponents/Dialogs/ModalDialogManager.qml">Qml/imtgui/AuxComponents/Dialogs/ModalDialogManager.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/MessageDialogBody.qml">Qml/imtgui/AuxComponents/Dialogs/MessageDialogBody.qml</file>
         <file alias="imtgui/AuxComponents/UndoRedoManager.qml">Qml/imtgui/AuxComponents/UndoRedoManager.qml</file>
-        <file alias="imtgui/AuxComponents/ServerConnectionManager.qml">Qml/imtgui/AuxComponents/ServerConnectionManager.qml</file>
+        <file alias="imtgui/AuxComponents/ServerNoConnectionView.qml">Qml/imtgui/AuxComponents/ServerNoConnectionView.qml</file>
         <file alias="imtgui/AuxComponents/PagesManager.qml">Qml/imtgui/AuxComponents/PagesManager.qml</file>
         <file alias="imtgui/AuxComponents/SortController.qml">Qml/imtgui/AuxComponents/SortController.qml</file>
         <file alias="imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml">Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml</file>
@@ -105,7 +105,9 @@
 	<file alias="imtgui/AuxComponents/LanguageProvider.qml">Qml/imtgui/AuxComponents/LanguageProvider.qml</file>
 	<file alias="imtgui/AuxComponents/DesignSchemaProvider.qml">Qml/imtgui/AuxComponents/DesignSchemaProvider.qml</file>
 	<file alias="imtgui/AuxComponents/GqlDocumentDataController.qml">Qml/imtgui/AuxComponents/GqlDocumentDataController.qml</file>
-
+	<file alias="imtgui/AuxComponents/ServerSettingsModelObserver.qml">Qml/imtgui/AuxComponents/ServerSettingsModelObserver.qml</file>
+	<file alias="imtgui/AuxComponents/GqlModelObserver.qml">Qml/imtgui/AuxComponents/GqlModelObserver.qml</file>
+	<file alias="imtgui/AuxComponents/TreeItemModelObserver.qml">Qml/imtgui/AuxComponents/TreeItemModelObserver.qml</file>
         <file alias="imtgui/AuxComponents/SwitchCustom.qml">Qml/imtgui/AuxComponents/SwitchCustom.qml</file>
 
     </qresource>

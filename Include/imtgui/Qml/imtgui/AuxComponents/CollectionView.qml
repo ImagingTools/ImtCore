@@ -135,7 +135,8 @@ Item {
         onLoaded: {
             commandsLoader.item.tableData = collectionViewBase.table;
 
-            commandsLoader.item.collectionViewBase = collectionViewBase;
+            commandsLoader.item.collectionViewBase = collectionViewContainer;
+            commandsLoader.item.commandsProvider = commandsProvider;
         }
     }
 
@@ -170,9 +171,15 @@ Item {
 
         onSelectedItem: {
             console.log("CollectionViewBase onItemSelected");
-            collectionViewContainer.selectItem(id, name);
-        }
+//            collectionViewContainer.selectItem(id, name);
 
+            if (id == ""){
+                commandsLoader.item.commandHandle("New");
+            }
+            else{
+                commandsLoader.item.commandHandle("Edit");
+            }
+        }
     }
 
     CommandsProvider {

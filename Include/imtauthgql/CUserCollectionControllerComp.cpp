@@ -172,15 +172,14 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
 		imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
-		imtbase::CTreeItemModel* metaInfoModel = new imtbase::CTreeItemModel();
 		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
 			imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles();
 
-			int index = metaInfoModel->InsertNewItem();
-			metaInfoModel->SetData("Name", "Roles", index);
+			int index = dataModel->InsertNewItem();
+			dataModel->SetData("Name", "Roles", index);
 
-			imtbase::CTreeItemModel* children = metaInfoModel->AddTreeModel("Children", index);
+			imtbase::CTreeItemModel* children = dataModel->AddTreeModel("Children", index);
 
 			for (const QByteArray& productRoleId : rolesIds){
 				QStringList data = QString(productRoleId).split(*m_separatorObjectIdAttrPtr);
@@ -194,8 +193,6 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 				}
 			}
 		}
-
-		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
 	}
 
 	return rootModelPtr.PopPtr();

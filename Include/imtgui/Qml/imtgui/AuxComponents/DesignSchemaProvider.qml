@@ -22,7 +22,16 @@ Item {
             return null;
         }
 
-        let localModel = settingsProvider.localModel;
+        let localModel = settingsProvider.serverModel;
+
+        if (localModel == null){
+            localModel = settingsProvider.localModel;
+        }
+
+        if (localModel == null){
+            return null;
+        }
+
         for (let i = 0; i < localModel.GetItemsCount(); i++){
             let pageModel = localModel.GetModelFromItem(i);
 

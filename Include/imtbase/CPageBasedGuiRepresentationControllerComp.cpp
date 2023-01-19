@@ -20,10 +20,6 @@ namespace imtbase
 
 bool CPageBasedGuiRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
-	if (!m_checkPermissionCompPtr.IsValid() || !m_commandPermissionsProviderCompPtr.IsValid()){
-		return false;
-	}
-
 	if (!IsModelSupported(dataModel)){
 		return false;
 	}
@@ -49,11 +45,14 @@ bool CPageBasedGuiRepresentationControllerComp::GetRepresentationFromDataModel(c
 			const imtgui::IGuiElementModel* guiElementPtr = guiElementContainerPtr->GetGuiElementModel(elementId);
 			if (guiElementPtr != nullptr){
 				if (!isAdmin){
-					QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
-
-					bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
-					if (!result){
-						continue;
+					if (m_commandPermissionsProviderCompPtr.IsValid()){
+						QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
+						if (m_checkPermissionCompPtr.IsValid()){
+							bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
+							if (!result){
+								continue;
+							}
+						}
 					}
 				}
 

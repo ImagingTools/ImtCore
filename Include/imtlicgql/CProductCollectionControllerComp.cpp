@@ -2,19 +2,16 @@
 
 
 // ACF includes
-#include <idoc/CStandardDocumentMetaInfo.h>
 #include <idoc/IDocumentMetaInfo.h>
-// ImtCore includes
-//#include <imtbase/IObjectCollectionInfo.h>
-//#include <imtlic/IProductInfo.h>
-
-#include <imtlic/CProductLicensingInfo.h>
-#include <imtlic/CLicenseInfo.h>
 
 
 namespace imtlicgql
 {
 
+
+// protected methods
+
+// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
 QVariant CProductCollectionControllerComp::GetObjectInformation(
 		const QByteArray &informationId,
@@ -34,66 +31,53 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(
 }
 
 
-imtbase::CHierarchicalItemModelPtr CProductCollectionControllerComp::GetMetaInfo(
-		const QList<imtgql::CGqlObject> &inputParams,
-		const imtgql::CGqlObject &gqlObject,
-		QString &errorMessage) const
+imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* metaInfoModel = nullptr;
-	imtbase::CTreeItemModel* children = nullptr;
-
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QT_TR_NOOP("Internal error");
+		errorMessage = QObject::tr("Internal error").toUtf8();
+
+		return nullptr;
 	}
 
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel);
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
+	QByteArray packageId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+
+	int index = dataModelPtr->InsertNewItem();
+	dataModelPtr->SetData("Name", QT_TR_NOOP("Modification Time"), index);
+	imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("Children", index);
+
+	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(packageId);
+	if (metaInfo.IsValid()){
+		QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+		children->SetData("Value", date);
 	}
-	else{
-		dataModel = new imtbase::CTreeItemModel();
-		metaInfoModel = new imtbase::CTreeItemModel();
 
-		QByteArray productId = GetObjectIdFromInputParams(inputParams);
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (!m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
+		errorMessage = QT_TR_NOOP("Unable to load an object data");
 
-		int index = metaInfoModel->InsertNewItem();
-		metaInfoModel->SetData("Name", "Modification Time", index);
-		children = metaInfoModel->AddTreeModel("Children", index);
-
-		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(productId);
-		if (metaInfo.IsValid()){
-			QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-			children->SetData("Value", date);
-		}
-
-		imtbase::IObjectCollection::DataPtr dataPtr;
-
-		if (!m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
-			errorMessage = QT_TR_NOOP("Unable to get an product object data");
-			return imtbase::CHierarchicalItemModelPtr();
-		}
-
-		imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
-		if (licensePtr != nullptr){
-			QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
-			index = metaInfoModel->InsertNewItem();
-			metaInfoModel->SetData("Name", "Licenses", index);
-			children = metaInfoModel->AddTreeModel("Children", index);
-			int childIndex;
-			for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-				childIndex = children->InsertNewItem();
-				QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-				QString value = licenseName + " (" + licenseCollectionId + ")";
-				children->SetData("Value", value, childIndex);
-			}
-		}
-		dataModel->SetExternTreeModel("metaInfo", metaInfoModel);
+		return nullptr;
 	}
-	rootModel->SetExternTreeModel("data", dataModel);
 
-	return rootModel;
+	imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
+	if (licensePtr != nullptr){
+		QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
+		index = dataModelPtr->InsertNewItem();
+
+		dataModelPtr->SetData("Name", "Licenses", index);
+		children = dataModelPtr->AddTreeModel("Children", index);
+		int childIndex;
+		for (const QByteArray& licenseCollectionId : licenseCollectionIds){
+			childIndex = children->InsertNewItem();
+			QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			QString value = licenseName + " (" + licenseCollectionId + ")";
+			children->SetData("Value", value, childIndex);
+		}
+	}
+
+	return rootModelPtr.PopPtr();
 }
 
 

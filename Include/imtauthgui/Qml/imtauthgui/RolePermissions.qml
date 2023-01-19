@@ -36,7 +36,7 @@ Item {
         }
 
         onDependenciesModelChanged: {
-            dependenciesProvider.model = permissionsProvider.dependenciesModel;
+            dependenciesProvider.model = dependenciesModel;
         }
     }
 
@@ -50,20 +50,18 @@ Item {
         rolePermissionsContainer.blockUpdatingModel = true;
 
         let selectedPermissionsIds = [];
-        let selectedPermissionsModel = rolePermissionsContainer.documentModel.GetData("Permissions");
-        if (!selectedPermissionsModel){
-            selectedPermissionsModel = rolePermissionsContainer.documentModel.AddTreeModel("Permissions");
+        if (rolePermissionsContainer.documentModel.ContainsKey("Permissions")){
+            let selectedPermissionsModel = rolePermissionsContainer.documentModel.GetData("Permissions");
+
+            for (let i = 0; i < selectedPermissionsModel.GetItemsCount(); i++){
+                let permissionId = selectedPermissionsModel.GetData("Id", i);
+
+                selectedPermissionsIds.push(permissionId);
+            }
         }
-
-        for (let i = 0; i < selectedPermissionsModel.GetItemsCount(); i++){
-            let permissionId = selectedPermissionsModel.GetData("Id", i);
-
-            selectedPermissionsIds.push(permissionId);
-        }
-
         permissionsTable.rowModel.clear();
 
-        rolePermissionsContainer.recursiveUpdateGui(permissionsProvider.model, [], selectedPermissionsIds);
+        recursiveUpdateGui(permissionsProvider.model, [], selectedPermissionsIds);
 
         rolePermissionsContainer.blockUpdatingModel = false;
     }
@@ -190,8 +188,8 @@ Item {
         }
 
         onSelectedIndexChanged: {
-            if (permissionsTable.selectedIndex != null){
-                let selectedFeatureId = permissionsTable.selectedIndex.itemData.Id;
+            if (selectedIndex != null){
+                let selectedFeatureId = selectedIndex.itemData.Id;
 
                 let featureDependencies = dependenciesProvider.getAllDependencies(selectedFeatureId);
 
@@ -221,6 +219,8 @@ Item {
             Text {
                 id: title;
 
+                text: qsTr("Dependencies");
+
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;
                 font.bold: true;
@@ -228,8 +228,6 @@ Item {
                 color: Style.lightBlueColor;
                 elide: Text.ElideRight;
                 wrapMode: Text.WrapAnywhere ;
-
-                text: qsTr("Dependencies");
             }
 
             Column {
@@ -247,13 +245,13 @@ Item {
                         width: 200;
                         height: 20;
 
+                        text: modelData;
+
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_small;
 
                         color: Style.textColor;
                         elide: Text.ElideRight;
-
-                        text: modelData;
                     }
                 }
             }

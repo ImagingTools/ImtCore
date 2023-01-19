@@ -9,7 +9,6 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property bool serverIsConnection: true;
     property Item root;
     property alias settingsProvider: preferenceDialog.settingsProvider;
 
@@ -21,14 +20,10 @@ Rectangle {
     property alias userManagementProvider: userManagement;
 
     function updateModels() {
-        console.log("ThumbnailDecorator updateModels()");
-
         pagesManager.updateModel();
     }
 
     function clearModels(){
-        console.log("ThumbnailDecorator clearModels()");
-
         menuPanel.clearModels();
         pagesManager.clearModels();
 
@@ -95,12 +90,18 @@ Rectangle {
         height: 60;
     }
 
-    ServerConnectionManager {
-        id: serverConnectionManager;
+    ServerNoConnectionView {
+        id: serverNoConnectionView;
 
         z: 5;
 
         anchors.fill: parent;
+
+        visible: false;
+
+        onRefresh: {
+            userManagement.updateModel();
+        }
     }
 
     function setPreferencesVisible(visible){
@@ -115,10 +116,6 @@ Rectangle {
         windows: thumbnailDecoratorContainer.root;
 
         visible: false;
-    }
-
-    PermissionsProvider {
-        id: permissionsProvider;
     }
 
     PreferencePage {
@@ -141,11 +138,16 @@ Rectangle {
         anchors.fill: parent;
     }
 
+    GqlModelObserver {
+        observedModel: userManagement.userModeGqlModel;
+
+        noConnectionView: serverNoConnectionView;
+    }
+
     UserManagementProvider {
         id: userManagement;
 
         onUserModeChanged: {
-            console.log('DEBUG::userManagementProvider')
             if (userMode == "NO_USER_MANAGEMENT"){
                 updateAllModels();
             }

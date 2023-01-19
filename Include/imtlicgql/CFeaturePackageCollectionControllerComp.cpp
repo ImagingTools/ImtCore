@@ -1,10 +1,9 @@
 #include <imtlicgql/CFeaturePackageCollectionControllerComp.h>
 
 
-// ACF includes
-#include <idoc/CStandardDocumentMetaInfo.h>
+// ImtCore includes
 #include <imtlic/CFeatureInfo.h>
-#include <imtlic/CFeaturePackage.h>
+
 
 namespace imtlicgql
 {

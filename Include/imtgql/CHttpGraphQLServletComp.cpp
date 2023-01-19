@@ -57,6 +57,8 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					}
 				}
 
+				gqlContextPtr->SetLanguageId("en_US");
+
 				if (m_settingsCollectionCompPtr.IsValid()){
 					imtbase::IObjectCollection::DataPtr settingsDataPtr;
 					if (m_settingsCollectionCompPtr->GetObjectData(userId, settingsDataPtr)){
@@ -98,9 +100,6 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			if (requestHandlerPtr->IsRequestSupported(gqlRequest)){
 				imtbase::CTreeItemModel* sourceItemModel = requestHandlerPtr->CreateResponse(gqlRequest, errorMessage);
 				if(sourceItemModel != nullptr){
-
-					QString json = sourceItemModel->toJSON();
-
 					imtbase::CTreeItemModel rootModel;
 					imtbase::CTreeItemModel* dataItemModel = rootModel.AddTreeModel("data");
 					dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));

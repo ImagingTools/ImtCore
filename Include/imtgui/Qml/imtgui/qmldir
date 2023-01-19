@@ -40,7 +40,7 @@ UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
 LoginButton 1.0 ./AuxComponents/LoginButton.qml
 PagesManager 1.0 ./AuxComponents/PagesManager.qml
 PreferencePage 1.0 ./AuxComponents/PreferencePage.qml
-ServerConnectionManager 1.0 ./AuxComponents/ServerConnectionManager.qml
+ServerNoConnectionView 1.0 ./AuxComponents/ServerNoConnectionView.qml
 ComboBoxGql 1.0 ./AuxComponents/ComboBoxGql.qml
 PopupMenuDelegate 1.0 ./AuxComponents/PopupMenuDelegate.qml
 UserManagementProvider 1.0 ./AuxComponents/UserManagementProvider.qml
@@ -77,3 +77,5 @@ TableViewSelection 1.0 ./AuxComponents/TableViewSelection.qml
 
 DesignSchemaProvider 1.0 ./AuxComponents/DesignSchemaProvider.qml
 GqlDocumentDataController 1.0 ./AuxComponents/GqlDocumentDataController.qml
+ServerSettingsModelObserver 1.0 ./AuxComponents/ServerSettingsModelObserver.qml
+TreeItemModelObserver 1.0 ./AuxComponents/TreeItemModelObserver.qml

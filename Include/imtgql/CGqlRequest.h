@@ -14,6 +14,7 @@ class CGqlRequest: virtual public IGqlRequest
 {
 public:
 	CGqlRequest(RequestType requestType = RT_QUERY, const QByteArray& commandId = QByteArray());
+	~CGqlRequest();
 
 	void AddParam(const CGqlObject& param);
 	void AddField(const CGqlObject& field);

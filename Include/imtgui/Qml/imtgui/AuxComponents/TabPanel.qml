@@ -14,8 +14,6 @@ Rectangle {
 
     property string firstElementImageSource;
 
-//    property var headersArray: [];
-
     property alias model: list.model;
 
     signal closeItem(int index);

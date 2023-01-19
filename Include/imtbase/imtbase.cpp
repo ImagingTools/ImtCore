@@ -31,13 +31,13 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 						return phrase;
 					}
 				}
-				else
-				{
+				else{
 					return phraseTr.toUtf8();
 				}
 			}
 		}
 	}
+
 	return phrase;
 }
 

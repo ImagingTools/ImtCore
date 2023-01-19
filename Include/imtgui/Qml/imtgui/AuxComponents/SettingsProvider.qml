@@ -7,8 +7,8 @@ Item {
 
     property Item root;
 
-    property TreeItemModel serverModel: TreeItemModel {}
-    property TreeItemModel localModel: TreeItemModel {}
+    property TreeItemModel serverModel: null;
+    property TreeItemModel localModel: null;
 
     signal serverSettingsSaved();
     signal localSettingsSaved();

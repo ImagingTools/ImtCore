@@ -24,6 +24,15 @@ imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& comm
 }
 
 
+imtgql::CGqlRequest::~CGqlRequest()
+{
+	delete m_gqlContextPtr;
+	delete m_activeGqlObjectPtr;
+
+	ResetData();
+}
+
+
 void CGqlRequest::AddParam(const CGqlObject &param)
 {
 	m_params.append(param);

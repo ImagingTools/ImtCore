@@ -34,6 +34,8 @@ CollectionViewCommandsDelegateBase {
 
     RemoteFileController {
         id: remoteFileController;
+
+        prefix: "/files";
     }
 
     FileDialog {
@@ -51,7 +53,6 @@ CollectionViewCommandsDelegateBase {
             var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
 
             let id = container.tableData.getSelectedId();
-
             if (fileName == ""){
                 fileName = {};
                 fileName["name"] = id + ".xml";

@@ -13,10 +13,9 @@ DocumentBase {
     property int mainMargin: 0;
     property int panelWidth: 150;
 
-
     onItemNameChanged: {
         if (container.documentModel.ContainsKey("Name")){
-            let username = container.documentModel.GetData("Name");
+            let username = documentModel.GetData("Name");
             if (username != ""){
                 container.username = username;
             }
@@ -24,10 +23,8 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
-        console.log("UserView onDocumentModelChanged", container.documentModel);
-
         if (container.documentModel.ContainsKey("Name")){
-            let username = container.documentModel.GetData("Name");
+            let username = documentModel.GetData("Name");
             if (username != ""){
                 container.username = username;
             }
@@ -36,13 +33,11 @@ DocumentBase {
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             loader.item.undoRedoManager = undoRedoManager;
-            loader.item.documentModel = container.documentModel;
+            loader.item.documentModel = documentModel;
         }
 
-        undoRedoManager.registerModel(container.documentModel);
+        undoRedoManager.registerModel(documentModel);
     }
-
-
 
     UndoRedoManager {
         id: undoRedoManager;
@@ -144,6 +139,7 @@ DocumentBase {
         anchors.topMargin: container.mainMargin;
         anchors.leftMargin: container.mainMargin;
 
+
         width: container.panelWidth;
 
         color: Style.backgroundColor;
@@ -163,6 +159,7 @@ DocumentBase {
             id: columnContainer;
             width: parent.width;
             height: mainPanel.height + 2*mainPanel.anchors.topMargin;
+
 
             Loader{
                 id: mainPanelFrameLoader;
@@ -219,7 +216,6 @@ DocumentBase {
                 }
             }
 
-
             Repeater {
                 id: mainPanelRepeater;
 
@@ -251,11 +247,8 @@ DocumentBase {
                             mainPanel.selectedIndex = model.index;
                         }
                     }
-
                 }
-
             }//Repeater
-
         }
     }
 
@@ -286,5 +279,4 @@ DocumentBase {
             }
         }
     }
-
 }

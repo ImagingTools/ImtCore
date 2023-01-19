@@ -419,6 +419,18 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 						.arg(qPrintable(dependFeatureId))
 						.toLocal8Bit();
 			}
+
+			QByteArrayList subFeatureIds = featureInfoPtr->GetSubFeatureIds();
+			for (const QByteArray& subFeatureId : subFeatureIds){
+				QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(subFeatureId);
+				for (const QByteArray& dependFeatureId : dependsIds){
+					retVal += "\n" +
+							QString("INSERT INTO \"FeatureDependencies\" (featureid, dependencyid) VALUES('%1', '%2');")
+							.arg(qPrintable(subFeatureId))
+							.arg(qPrintable(dependFeatureId))
+							.toLocal8Bit();
+				}
+			}
 		}
 	}
 

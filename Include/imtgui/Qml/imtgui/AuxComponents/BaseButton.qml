@@ -25,8 +25,6 @@ Item {
     property bool selected: false;
     property string color: "";
 
-
-
     signal clicked();
     signal doubleClicked();
     signal pressed();
@@ -35,8 +33,6 @@ Item {
     signal exited();
 
     signal loaded();
-
-
 
     onPressed: {
         //baseButton.isPressed = !baseButton.isPressed;
