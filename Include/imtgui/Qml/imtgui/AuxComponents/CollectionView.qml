@@ -15,8 +15,6 @@ Item {
     property bool isUsedDocumentManager: true;
     property bool visibleMetaInfo: true;
 
-    property alias hasPagination: baseCollectionView.hasPagination;
-
     property string commandsId;
     property string editorPath;
     property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
