@@ -18,8 +18,8 @@ CollectionViewCommandsDelegateBase {
 
     onCommandActivated: {
         if (commandId === "Duplicate"){
-            let itemId = tableData.getSelectedId();
-            let itemName = tableData.getSelectedName();
+            let itemId = container.tableData.getSelectedId();
+            let itemName = container.tableData.getSelectedName();
 
             let copyStr = qsTr("Copy of ");
             documentManager.addDocument({"Id":         itemId,
@@ -50,7 +50,7 @@ CollectionViewCommandsDelegateBase {
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
 
-            let id = tableData.getSelectedId();
+            let id = container.tableData.getSelectedId();
 
             if (fileName == ""){
                 fileName = {};

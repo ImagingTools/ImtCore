@@ -14,7 +14,7 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
-        let headers = documentModel.GetData("Headers");
+        let headers = container.documentModel.GetData("Headers");
         tableView.columnModel.clear();
         for (let i = 0; i < headers.GetItemsCount(); i++){
             let headerId = headers.GetData("Id", i);
@@ -23,23 +23,23 @@ DocumentBase {
             tableView.addColumn({"Id": headerId, "Name": headerName});
         }
 
-        let items = documentModel.GetData("Items");
+        let items = container.documentModel.GetData("Items");
         if (!items){
-            items = documentModel.AddTreeModel("Items");
+            items = container.documentModel.AddTreeModel("Items");
         }
 
-        let dependencies = documentModel.GetData("Features");
+        let dependencies = container.documentModel.GetData("Features");
         if (!dependencies){
-            dependencies = documentModel.AddTreeModel("Features");
+            dependencies = container.documentModel.AddTreeModel("Features");
         }
 
-        updateGui();
+        container.updateGui();
 
         undoRedoManager.registerModel(documentModel);
     }
 
     onCommandsDelegateLoaded: {
-        commandsDelegate.tableData = tableView;
+        container.commandsDelegate.tableData = tableView;
     }
 
     UndoRedoManager {
@@ -51,7 +51,7 @@ DocumentBase {
         onModelStateChanged: {
             console.log("UndoRedoManager onModelStateChanged");
 
-            updateGui();
+            container.updateGui();
         }
     }
 
@@ -59,8 +59,8 @@ DocumentBase {
         console.log("Begin updateModel");
         undoRedoManager.beginChanges();
 
-        let items = documentModel.AddTreeModel("Items");
-        let featuresModel = documentModel.AddTreeModel("Features");
+        let items = container.documentModel.AddTreeModel("Items");
+        let featuresModel = container.documentModel.AddTreeModel("Features");
 
         for (let i = 0; i < tableView.rowModel.count; i++){
             let rowObj = tableView.rowModel.get(i);
@@ -73,7 +73,7 @@ DocumentBase {
 
             let rowChildModel = rowObj["ChildModel"]
             if (rowChildModel.count > 0){
-                licenseFeaturesUpdateModel(rowObj["Id"], rowChildModel, featuresModel);
+                container.licenseFeaturesUpdateModel(rowObj["Id"], rowChildModel, featuresModel);
             }
         }
 
@@ -104,7 +104,7 @@ DocumentBase {
 
             let rowChildModel = rowObj["ChildModel"]
             if (rowChildModel.count > 0){
-                recursiveLicenseFeaturesUpdateModel(rowChildModel, featureModel);
+                container.recursiveLicenseFeaturesUpdateModel(rowChildModel, featureModel);
             }
         }
     }
@@ -131,25 +131,25 @@ DocumentBase {
 
             let rowChildModel = rowObj["ChildModel"]
             if (rowChildModel.count > 0){
-                recursiveLicenseFeaturesUpdateModel(rowChildModel, featureModel);
+                container.recursiveLicenseFeaturesUpdateModel(rowChildModel, featureModel);
             }
         }
     }
 
     function updateGui(){
         console.log("begin updateGui");
-        blockUpdatingModel = true;
+        container.blockUpdatingModel = true;
 
         tableView.rowModel.clear();
 
-        let items = documentModel.GetData("Items");
+        let items = container.documentModel.GetData("Items");
         if (!items){
-            items = documentModel.AddTreeModel("Items");
+            items = container.documentModel.AddTreeModel("Items");
         }
 
-        let featuresModel = documentModel.GetData("Features");
+        let featuresModel = container.documentModel.GetData("Features");
         if (!featuresModel){
-            featuresModel = documentModel.AddTreeModel("Features");
+            featuresModel = container.documentModel.AddTreeModel("Features");
         }
 
         for (let i = 0; i < items.GetItemsCount(); i++){
@@ -161,8 +161,8 @@ DocumentBase {
 
             if (featuresModel.ContainsKey(licenseId)){
                 let featureModel = featuresModel.GetData(licenseId);
-                let optionalFeatureIds = getOptionalFeatures(featureModel);
-                let notOptionalFeatureIds = getNotOptionalFeatures(featureModel);
+                let optionalFeatureIds = container.getOptionalFeatures(featureModel);
+                let notOptionalFeatureIds = container.getNotOptionalFeatures(featureModel);
 
                 console.log("optionalFeatureIds", optionalFeatureIds);
                 console.log("notOptionalFeatureIds", notOptionalFeatureIds);
@@ -170,12 +170,12 @@ DocumentBase {
                 for (let j = 0; j < notOptionalFeatureIds.length; j++){
                     let featureId = notOptionalFeatureIds[j];
 
-                    licenseFeaturesUpdateGui(licenseId, featureId, i, optionalFeatureIds);
+                    container.licenseFeaturesUpdateGui(licenseId, featureId, i, optionalFeatureIds);
                 }
             }
         }
 
-        blockUpdatingModel = false;
+        container.blockUpdatingModel = false;
         console.log("End updateGui");
     }
 
@@ -199,7 +199,7 @@ DocumentBase {
 
                         let subFeaturesModel = childModel.GetData("ChildModel", j);
                         if (subFeaturesModel){
-                            licenseFeaturesRecursiveUpdateGui(subFeaturesModel, [index, 0], optionalFeatureIds, licenseId);
+                            container.licenseFeaturesRecursiveUpdateGui(subFeaturesModel, [index, 0], optionalFeatureIds, licenseId);
                         }
                     }
                 }
@@ -227,7 +227,7 @@ DocumentBase {
             if (childModel){
                 let childIndexes = []
                 childIndexes = childIndexes.concat(indexes.concat([i]))
-                licenseFeaturesRecursiveUpdateGui(childModel, childIndexes, optionalFeatureIds, licenseId);
+                container.licenseFeaturesRecursiveUpdateGui(childModel, childIndexes, optionalFeatureIds, licenseId);
             }
         }
     }
@@ -342,22 +342,22 @@ DocumentBase {
 
         onRowAdded: {
             console.log("onRowAdded");
-            if (!blockUpdatingModel){
-               updateModel();
+            if (!container.blockUpdatingModel){
+               container.updateModel();
             }
         }
 
         onRowRemoved: {
             console.log("onRowRemoved");
-            if (!blockUpdatingModel){
-                updateModel();
+            if (!container.blockUpdatingModel){
+                container.updateModel();
             }
         }
 
         onRowModelDataChanged: {
             console.log("onRowModelDataChanged", prop);
-            if (!blockUpdatingModel){
-                updateModel();
+            if (!container.blockUpdatingModel){
+                container.updateModel();
             }
         }
     }

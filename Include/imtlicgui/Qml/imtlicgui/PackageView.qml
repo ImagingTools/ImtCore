@@ -18,32 +18,32 @@ DocumentBase {
 
     Component.onCompleted: {
         console.log("PackageView onCompleted");
-        updateTreeViewModel();
+        packageViewContainer.updateTreeViewModel();
 
-        featuresProvider.modelChanged.connect(updateTreeViewModel);
+        featuresProvider.modelChanged.connect(packageViewContainer.updateTreeViewModel);
 
         commandsDelegate.tableTreeViewEditor = tableView;
     }
 
     Component.onDestruction: {
-        featuresProvider.modelChanged.disconnect(updateTreeViewModel);
+        featuresProvider.modelChanged.disconnect(packageViewContainer.updateTreeViewModel);
     }
 
     onDocumentModelChanged: {
         console.log("documentBase onDocumentModelChanged");
 
-        let items = documentModel.GetData("Items");
+        let items = packageViewContainer.documentModel.GetData("Items");
         if (!items){
-            documentModel.AddTreeModel("Items");
+            packageViewContainer.documentModel.AddTreeModel("Items");
         }
 
-        let dependenciesModel = documentModel.GetData("DependenciesModel");
+        let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
         if (!dependenciesModel){
-            documentModel.AddTreeModel("DependenciesModel");
+            packageViewContainer.documentModel.AddTreeModel("DependenciesModel");
         }
 
         tableView.columnModel.clear();
-        let headers = documentModel.GetData("Headers");
+        let headers = packageViewContainer.documentModel.GetData("Headers");
         console.log("Headers:", headers)
 
         for (let i = 0; i < headers.GetItemsCount(); i++){
@@ -53,11 +53,11 @@ DocumentBase {
             tableView.addColumn({"Id": headerId, "Name": headerName});
         }
 
-        syncronise();
+        packageViewContainer.syncronise();
 
-        updateGui();
+        packageViewContainer.updateGui();
 
-        undoRedoManager.registerModel(documentModel);
+        undoRedoManager.registerModel(packageViewContainer.documentModel);
     }
 
     onWidthChanged: {
@@ -74,22 +74,22 @@ DocumentBase {
 
         onModelStateChanged: {
             console.log("UndoRedoManager onModelStateChanged");
-            syncronise();
+            packageViewContainer.syncronise();
 
-            updateGui();
+            packageViewContainer.updateGui();
         }
     }
 
     //Обновить модель для TreeView
     function updateTreeViewModel(){
         let treeViewModelJson = featuresProvider.model.toJSON();
-        treeViewModel.CreateFromJson(treeViewModelJson);
+        packageViewContainer.treeViewModel.CreateFromJson(treeViewModelJson);
     }
 
     //Синхронизация фич в package и treeView
     function syncronise(){
         console.log("syncronise");
-        let items = documentModel.GetData("Items");
+        let items = packageViewContainer.documentModel.GetData("Items");
 
         let packageIndex = -1;
         for (let i = 0; i < packageViewContainer.treeViewModel.GetItemsCount(); i++){
@@ -107,20 +107,20 @@ DocumentBase {
 
     function updateGui(){
         console.log("Begin updateGui");
-        blockUpdatingModel = true;
+        packageViewContainer.blockUpdatingModel = true;
 
         tableView.rowModel.clear();
 
-        let items = documentModel.GetData("Items");
+        let items = packageViewContainer.documentModel.GetData("Items");
         if (!items){
-            items = documentModel.AddTreeModel("Items");
+            items = packageViewContainer.documentModel.AddTreeModel("Items");
         }
 
         if (items.GetItemsCount() > 0){
-            recursiveUpdateGui(items, []);
+            packageViewContainer.recursiveUpdateGui(items, []);
         }
 
-        blockUpdatingModel = false;
+        packageViewContainer.blockUpdatingModel = false;
         console.log("End updateGui");
     }
 
@@ -139,7 +139,7 @@ DocumentBase {
 
             if (childModel){
                 let childIndexes = [].concat(indexes.concat([i]))
-                recursiveUpdateGui(childModel, childIndexes);
+                packageViewContainer.recursiveUpdateGui(childModel, childIndexes);
             }
         }
     }
@@ -148,12 +148,12 @@ DocumentBase {
         console.log("updateModel");
         undoRedoManager.beginChanges();
 
-        let items = documentModel.AddTreeModel("Items")
-        recursiveUpdateModel(tableView.rowModel, items);
+        let items = packageViewContainer.documentModel.AddTreeModel("Items")
+        packageViewContainer.recursiveUpdateModel(tableView.rowModel, items);
 
-        syncronise();
+        packageViewContainer.syncronise();
 
-        console.log("documentModel", documentModel.toJSON());
+        console.log("documentModel", packageViewContainer.documentModel.toJSON());
 
         undoRedoManager.endChanges();
     }
@@ -180,7 +180,7 @@ DocumentBase {
 
             if (rowChildModel.count > 0){
                 let documentChildModel = documentModel.AddTreeModel("ChildModel", index);
-                recursiveUpdateModel(rowChildModel, documentChildModel);
+                packageViewContainer.recursiveUpdateModel(rowChildModel, documentChildModel);
             }
         }
     }
@@ -189,10 +189,10 @@ DocumentBase {
         console.log("updateDependenciesModel");
         undoRedoManager.beginChanges();
 
-        let dependenciesModel = documentModel.GetData("DependenciesModel");
+        let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
 
         if (!dependenciesModel){
-            dependenciesModel = documentModel.AddTreeModel("DependenciesModel");
+            dependenciesModel = packageViewContainer.documentModel.AddTreeModel("DependenciesModel");
         }
 
         let selectedId = tableView.selectedIndex.itemData.Id;
@@ -331,11 +331,12 @@ DocumentBase {
                 anchors.left: headerTreeView.left;
                 anchors.leftMargin: 10;
 
-                text: qsTr("Dependencies");
                 color: Style.textColor;
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamilyBold;
                 font.bold: true;
+
+                text: qsTr("Dependencies");
             }
         }
 
@@ -353,12 +354,12 @@ DocumentBase {
             let selectedId = tableView.selectedIndex.itemData.Id;
 
             //Список всех зависящих фич для selectedId
-            let childrenFeatureList = []
-            findChildrenFeatureDependencies(selectedId, childrenFeatureList);
+            let childrenFeatureList = [];
+            rightPanel.findChildrenFeatureDependencies(selectedId, childrenFeatureList);
 
             //Список всех зависящих фич от selectedId
-            let inactiveElements = []
-            findParentFeatureDependencies(selectedId, inactiveElements)
+            let inactiveElements = [];
+            rightPanel.findParentFeatureDependencies(selectedId, inactiveElements);
 
             //Запрещаем зависимость от всех родителей
             let parentIds = getAllParents(tableView.selectedIndex);
@@ -368,10 +369,10 @@ DocumentBase {
                 let parentId = parentIds[i];
 
                 //Запрещаем зависимость для всех фич которые зависят от родителей
-                findParentFeatureDependencies(parentId, inactiveElements)
+                rightPanel.findParentFeatureDependencies(parentId, inactiveElements);
 
                 //Автоматом выбираем фичи от которых зависят родители
-                findChildrenFeatureDependencies(parentId, childrenFeatureList);
+                rightPanel.findChildrenFeatureDependencies(parentId, childrenFeatureList);
             }
 
             for (let i = 0; i < packageViewContainer.treeViewModel.GetItemsCount(); i++){
@@ -384,7 +385,7 @@ DocumentBase {
                 console.log("insertRow");
 
                 if (childModel){
-                    rightPanel.recursiveUpdateGui(childModel, [i], inactiveElements, childrenFeatureList)
+                    rightPanel.recursiveUpdateGui(childModel, [i], inactiveElements, childrenFeatureList);
                 }
             }
             console.log("End updateTreeViewGui");
@@ -396,7 +397,7 @@ DocumentBase {
                 let name = model.GetData("Name", i);
                 let id = model.GetData("Id", i);
 
-                let rowObj = {"Name": name, "Id": id}
+                let rowObj = {"Name": name, "Id": id};
 
                 if (tableView.selectedIndex != null){
 
@@ -485,7 +486,7 @@ DocumentBase {
                     let dependenciesList = values.split(';')
                     if (dependenciesList.includes(featureId)){
                         retVal.push(key)
-                        findParentFeatureDependencies(key, retVal)
+                        rightPanel.findParentFeatureDependencies(key, retVal)
                     }
                 }
             }
@@ -512,7 +513,7 @@ DocumentBase {
 
                         retVal.push(value)
 
-                        findChildrenFeatureDependencies(value, retVal);
+                        rightPanel.findChildrenFeatureDependencies(value, retVal);
                     }
                 }
             }
@@ -533,7 +534,7 @@ DocumentBase {
             visible: false;
 
             Component.onCompleted: {
-                addColumn({"Id": "Name", "Name": "Name"});
+                treeView.addColumn({"Id": "Name", "Name": "Name"});
 
                 rightPanel.updateTreeViewGui();
 
@@ -546,7 +547,7 @@ DocumentBase {
                 console.log("onRowModelDataChanged", delegate, prop);
 
                 if (prop == "CheckState"){
-                    updateDependenciesModel(delegate.itemData.Id, delegate.itemData.CheckState);
+                    packageViewContainer.updateDependenciesModel(delegate.itemData.Id, delegate.itemData.CheckState);
 
                     rightPanel.updateTreeViewGui();
                 }

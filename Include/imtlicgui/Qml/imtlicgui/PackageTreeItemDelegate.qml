@@ -41,7 +41,7 @@ TreeItemDelegate {
                 width: 10;
                 height: 10;
 
-                visible: childrenCount > 0;
+                visible: treeItemDelegate.childrenCount > 0;
 
                 source: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                        "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
@@ -76,7 +76,7 @@ TreeItemDelegate {
                     if (!model.Active){
                         return;
                     }
-                    console.log("onClicked", itemData.Id);
+                    console.log("onClicked", treeItemDelegate.itemData.Id);
 
                     if (model.State == Qt.PartiallyChecked){
                         model.State = Qt.Checked;
@@ -85,7 +85,7 @@ TreeItemDelegate {
                         model.State = Qt.Checked - model.State;
                     }
 
-                    treeView.itemsStateChanged(itemData);
+                    treeView.itemsStateChanged(treeItemDelegate.itemData);
 
                     //                treeView.childrenStateChanged(itemData, model.State);
                     //                treeView.parentStateChanged(itemData, model.State);
@@ -99,11 +99,12 @@ TreeItemDelegate {
                 anchors.leftMargin: 10;
                 anchors.verticalCenter: parent.verticalCenter;
 
-                text: model.Name;
                 color: model.Active ? Style.textColor : Style.disabledInActiveTextColor;
 
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
+
+                text: model.Name;
             }
         }
     }

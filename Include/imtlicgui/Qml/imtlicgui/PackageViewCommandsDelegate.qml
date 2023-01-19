@@ -10,7 +10,7 @@ DocumentWorkspaceCommandsDelegateBase {
     property Item tableTreeViewEditor;
 
     Component.onDestruction: {
-        tableTreeViewEditor.selectedIndexChanged.disconnect(selectedIndexChanged);
+        container.tableTreeViewEditor.selectedIndexChanged.disconnect(container.selectedIndexChanged);
     }
 
     onEntered: {
@@ -19,7 +19,7 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onTableTreeViewEditorChanged: {
-        tableTreeViewEditor.selectedIndexChanged.connect(selectedIndexChanged)
+        container.tableTreeViewEditor.selectedIndexChanged.connect(container.selectedIndexChanged);
     }
 
     onSaved: {
@@ -30,35 +30,35 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("PackageViewCommands onCommandActivated", commandId);
         if (commandId === "New"){
             let insertIndexes = []
-            if (tableTreeViewEditor.selectedIndex == null){
-                insertIndexes.push(tableTreeViewEditor.rowCount);
+            if (container.tableTreeViewEditor.selectedIndex == null){
+                insertIndexes.push(container.tableTreeViewEditor.rowCount);
             }
             else {
-                let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
+                let indexes = container.tableTreeViewEditor.selectedIndex.getIndexes();
 
-                let childrenIndexes = tableTreeViewEditor.selectedIndex.childModel;
+                let childrenIndexes = container.tableTreeViewEditor.selectedIndex.childModel;
 
-                indexes.push(childrenIndexes.length)
+                indexes.push(childrenIndexes.length);
 
                 insertIndexes = indexes;
             }
 
-            tableTreeViewEditor.insertRow(insertIndexes, {"Id": "", "Name": "Feature Name", "Description": "", "Optional": false, "Selected": true});
+            container.tableTreeViewEditor.insertRow(insertIndexes, {"Id": "", "Name": "Feature Name", "Description": "", "Optional": false, "Selected": true});
         }
         else if (commandId === "Remove"){
 //            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected feature from the package ?")});
 
-            let removedFeatureId = tableTreeViewEditor.selectedIndex.itemData.Id;
-            let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
+            let removedFeatureId = container.tableTreeViewEditor.selectedIndex.itemData.Id;
+            let indexes = container.tableTreeViewEditor.selectedIndex.getIndexes();
 
-            console.log("tableTreeViewEditor.selectedIndex", tableTreeViewEditor.selectedIndex);
+            console.log("tableTreeViewEditor.selectedIndex", container.tableTreeViewEditor.selectedIndex);
 
             let removedFeaturesIds = []
-            getAllRemovedFeatures(tableTreeViewEditor.selectedIndex, removedFeaturesIds);
+            getAllRemovedFeatures(container.tableTreeViewEditor.selectedIndex, removedFeaturesIds);
 
             console.log("Remove indexes", indexes);
 
-            tableTreeViewEditor.removeRow(indexes);
+            container.tableTreeViewEditor.removeRow(indexes);
 
             //Удаление всех зависимостей от этой фичи
             let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
@@ -76,10 +76,10 @@ DocumentWorkspaceCommandsDelegateBase {
                         let values = dependenciesModel.GetData(key);
 
                         if (values != ""){
-                            let dependenciesList = values.split(';')
+                            let dependenciesList = values.split(';');
 
                             if (dependenciesList.includes(removedFeatureId)){
-                                let pos = dependenciesList.indexOf(removedFeatureId)
+                                let pos = dependenciesList.indexOf(removedFeatureId);
                                 dependenciesList.splice(pos, 1);
 
                                 let newDependencies = dependenciesList.join(';');
@@ -94,7 +94,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
     function selectedIndexChanged(){
 //        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
-        let isEnabled = tableTreeViewEditor.selectedIndex != null;
+        let isEnabled = container.tableTreeViewEditor.selectedIndex != null;
         packageViewContainer.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
     }
 
@@ -105,15 +105,15 @@ DocumentWorkspaceCommandsDelegateBase {
             onFinished: {
                 if (buttonId == "Yes"){
 
-                    let removedFeatureId = tableTreeViewEditor.selectedIndex.itemData.Id;
-                    let indexes = tableTreeViewEditor.selectedIndex.getIndexes();
+                    let removedFeatureId = container.tableTreeViewEditor.selectedIndex.itemData.Id;
+                    let indexes = container.tableTreeViewEditor.selectedIndex.getIndexes();
 
-                    let removedFeaturesIds = []
-                    getAllRemovedFeatures(tableTreeViewEditor.selectedIndex, removedFeaturesIds);
+                    let removedFeaturesIds = [];
+                    container.getAllRemovedFeatures(container.tableTreeViewEditor.selectedIndex, removedFeaturesIds);
 
                     console.log("Remove indexes", indexes);
 
-                    tableTreeViewEditor.removeRow(indexes);
+                    container.tableTreeViewEditor.removeRow(indexes);
 
                     //Удаление всех зависимостей от этой фичи
                     let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
@@ -157,7 +157,7 @@ DocumentWorkspaceCommandsDelegateBase {
             let id = child.itemData.Id;
             retVal.push(id)
 
-            getAllRemovedFeatures(child, retVal)
+            container.getAllRemovedFeatures(child, retVal)
         }
     }
 }
