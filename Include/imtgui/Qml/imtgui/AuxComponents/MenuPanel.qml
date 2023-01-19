@@ -16,7 +16,7 @@ Rectangle {
     property string activePageId;
     property string activePageName;
     property string activeIcon;
-    property string firstElementImageSources: [];
+    property string firstElementImageSources: "";
 
     property int activePageIndex: -1;
     property int pagesCount: lvPages.count;
@@ -70,7 +70,7 @@ Rectangle {
                 menuPanel.activePageIndex = model.index;
                 menuPanel.activePageName = model["Name"];
                 menuPanel.activeIcon = model["Icon"];
-                menuPanel.activePageId = model["PageId"];
+                menuPanel.activePageId = model["Id"];
 
                 lvPages.forceActiveFocus();
             }

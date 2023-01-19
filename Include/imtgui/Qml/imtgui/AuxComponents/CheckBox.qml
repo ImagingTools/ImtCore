@@ -10,6 +10,7 @@ Item {
     property alias checkSize: checkRect.height;
     property alias border: checkRect.border;
     property alias color: checkRect.color;
+    property alias radius: checkRect.radius;
 
     property bool isActive: true;
 
