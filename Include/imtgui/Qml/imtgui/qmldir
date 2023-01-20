@@ -20,6 +20,7 @@ AuxButton 1.0 ./AuxComponents/AuxButton.qml
 PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
 TextButton 1.0 ./AuxComponents/TextButton.qml
 CustomTextField 1.0 ./AuxComponents/CustomTextField.qml
+CustomTextEdit 1.0 ./AuxComponents/CustomTextEdit.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
 TreeItemDelegate 1.0 ./AuxComponents/TreeItemDelegate.qml
 TreeViewEditor 1.0 ./AuxComponents/TreeViewEditor.qml
