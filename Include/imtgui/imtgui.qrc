@@ -113,6 +113,7 @@
         <file alias="imtgui/AuxComponents/SwitchCustom.qml">Qml/imtgui/AuxComponents/SwitchCustom.qml</file>
         <file alias="imtgui/AuxComponents/CustomTooltip.qml">Qml/imtgui/AuxComponents/CustomTooltip.qml</file>
         <file alias="imtgui/AuxComponents/CustomTextEdit.qml">Qml/imtgui/AuxComponents/CustomTextEdit.qml</file>
+        <file alias="imtgui/AuxComponents/RoundButton.qml">Qml/imtgui/AuxComponents/RoundButton.qml</file>
 
 
     </qresource>

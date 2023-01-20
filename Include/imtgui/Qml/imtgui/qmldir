@@ -54,6 +54,7 @@ TopButtonDecorator 1.0 ./AuxComponents/TopButtonDecorator.qml
 CommonButtonDecorator 1.0 ./AuxComponents/CommonButtonDecorator.qml
 BaseButtonDecorator 1.0 ./AuxComponents/BaseButtonDecorator.qml
 BaseButton 1.0 ./AuxComponents/BaseButton.qml
+RoundButton 1.0 ./AuxComponents/RoundButton.qml
 UserPanel 1.0 ./AuxComponents/UserPanel.qml
 SuperUserPasswordDialog 1.0 ./AuxComponents/SuperUserPasswordDialog.qml
 
