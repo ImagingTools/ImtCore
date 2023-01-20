@@ -130,11 +130,12 @@ FocusScope {
             wrapMode: TextEdit.WordWrap;
             clip: true;
 
-            onCursorRectangleChanged: {
-                if(!containerTextEdit.isDinamicHeight){
-                    flick.ensureVisible(textEdit.cursorRectangle);
-                }
-            }
+            //for web, do not remove!!!
+//            onCursorRectangleChanged: {
+//                if(!containerTextEdit.isDinamicHeight){
+//                    flick.ensureVisible(textEdit.cursorRectangle);
+//                }
+//            }
 
             onHeightChanged: {
                 if(containerTextEdit.isDinamicHeight){
