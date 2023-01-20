@@ -13,6 +13,7 @@ MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
 ComboBox 1.0 ./AuxComponents/ComboBox.qml
 CheckBox 1.0 ./AuxComponents/CheckBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
+FilterMenu 1.0 ./AuxComponents/FilterMenu.qml
 TableDelegate 1.0 ./AuxComponents/TableDelegate.qml
 DatePicker 1.0 ./AuxComponents/DatePicker.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
@@ -75,7 +76,7 @@ BasicTreeView 1.0 ./AuxComponents/BasicTreeView.qml
 TableViewItemDelegateBase 1.0 ./AuxComponents/TableViewItemDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./AuxComponents/TreeViewItemDelegateBase.qml
 TableViewSelection 1.0 ./AuxComponents/TableViewSelection.qml
-
+TabPanel 1.0 ./AuxComponents/TabPanel.qml
 DesignSchemaProvider 1.0 ./AuxComponents/DesignSchemaProvider.qml
 GqlDocumentDataController 1.0 ./AuxComponents/GqlDocumentDataController.qml
 ServerSettingsModelObserver 1.0 ./AuxComponents/ServerSettingsModelObserver.qml

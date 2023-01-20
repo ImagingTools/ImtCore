@@ -10,6 +10,7 @@ Item{
     property bool firstElement: false;
     property bool lastElement: false;
     property bool autoWidth: true;
+    property bool isCloseEnable: true;
 
     property string text: "no name";
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
@@ -59,7 +60,7 @@ Item{
         height: parent.height * 0.3;
         width: height;
 
-        visible: !parent.firstElement;
+        visible: !parent.firstElement && tabDelegate.isCloseEnable;
 
         Image {
             id: closeImage;

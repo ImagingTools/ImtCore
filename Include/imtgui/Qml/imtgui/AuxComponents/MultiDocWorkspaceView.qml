@@ -10,6 +10,8 @@ Item {
 
     property Item activeItem;
 
+    property alias isCloseEnable: tabPanelInternal.isCloseEnable;
+
     property alias pagesCount: docsData.count;
 
     property string operation;
@@ -23,6 +25,7 @@ Item {
         console.log("MultidocWorkspaceView addDocument", itemId, document["CommandsId"])
 
         let pageIndex = this.getDocumentIndexById(itemId);
+        console.log("MultidocWorkspaceView pageIndex", pageIndex)
         if (pageIndex < 0){
             var index = documentsData.InsertNewItem();
             console.log("MultidocWorkspaceView addDocument index:", index)

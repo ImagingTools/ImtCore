@@ -17,6 +17,8 @@ QString CProductInstanceMetaInfo::GetMetaInfoName(int metaInfoType) const
 		return QObject::tr("Licenses");
 	case imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID:
 		return QObject::tr("Instance-ID");
+	case imtlic::IProductInstanceInfo::MIT_PRODUCT_CATEGORY_ID:
+		return QObject::tr("Category-ID");
 	}
 
 	return BaseClass::GetMetaInfoName(metaInfoType);

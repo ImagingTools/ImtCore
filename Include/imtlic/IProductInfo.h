@@ -33,6 +33,16 @@ public:
 		Set product-ID.
 	*/
 	virtual void SetProductId(const QByteArray& productId) = 0;
+
+	/**
+		Get a category ID of this product.
+	*/
+	virtual QByteArray GetCategoryId() const = 0;
+
+	/**
+		Set category-ID.
+	*/
+	virtual void SetCategoryId(const QByteArray& categoryId) = 0;
 };
 
 

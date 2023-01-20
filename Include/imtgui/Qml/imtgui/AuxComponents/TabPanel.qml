@@ -13,6 +13,7 @@ Rectangle {
     property int count: 0;
 
     property string firstElementImageSource;
+    property bool isCloseEnable: true;
 
     property alias model: list.model;
 
@@ -45,6 +46,7 @@ Rectangle {
             lastElement: model.index === list.count - 1;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
+            isCloseEnable: tabPanel.isCloseEnable;
 
             decoratorSource: Style.tabPanelDecoratorPath;
 

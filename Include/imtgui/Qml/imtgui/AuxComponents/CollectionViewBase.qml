@@ -24,6 +24,10 @@ Item {
     property bool hasFilter: true;
     property bool hasSort: true;
 
+    property alias filterMenu: filterMenuLocal.sourceComponent;
+    property alias filterMenuVisible: filterMenuLocal.visible;
+    property alias modelFilter: modelFilter;
+
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
     signal elementsChanged();
@@ -52,37 +56,40 @@ Item {
         sequence: "Ctrl+F";
         onActivated: {
             console.log("onActivated Ctrl+F");
-            filterMenu.visible = !filterMenu.visible;
+            filterMenuLocal.visible = !filterMenuLocal.visible;
         }
 
         context: Qt.ApplicationShortcut;
     }
 
-    FilterMenu {
-        id: filterMenu;
-
+    Loader {
+        id: filterMenuLocal;
         anchors.top: collectionViewBaseContainer.top;
-
         width: parent.width;
-
-        decoratorSource: Style.filterPanelDecoratorPath;
-
         visible: false;
 
-        onTextFilterChanged: {
-            modelFilter.SetData("TextFilter", text);
-            baseCommands.updateModels();
-        }
+        sourceComponent: Component {
+            FilterMenu {
+                decoratorSource: Style.filterPanelDecoratorPath;
 
-        onClosed: {
-            filterMenu.visible = false;
+                onTextFilterChanged: {
+                    modelFilter.SetData("TextFilter", text);
+                    baseCommands.updateModels();
+                }
+
+                onClosed: {
+                    filterMenuLocal.visible = false;
+                }
+            }
         }
     }
+
+
 
     Rectangle {
         id: backgroundTable;
 
-        anchors.top: filterMenu.visible ? filterMenu.bottom: parent.top;
+        anchors.top: filterMenuLocal.visible ? filterMenuLocal.bottom: parent.top;
         anchors.left: parent.left;
         width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 
@@ -172,7 +179,8 @@ Item {
             }
 
             onFilterClicked: {
-                filterMenu.visible = !filterMenu.visible;
+                console.log("onFilterClicked")
+                filterMenuLocal.visible = !filterMenuLocal.visible;
             }
         }
     }

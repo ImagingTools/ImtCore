@@ -3,15 +3,20 @@ import imtgui 1.0
 import imtqml 1.0
 import Acf 1.0
 
-DocumentBase {
+Item {
     id: installationEditorContainer;
 
-    commandsDelegateSourceComp: installationEditorCommandsDelegate;
+//    commandsDelegateSourceComp: installationEditorCommandsDelegate;
 
-    property TreeItemModel accountsModel: TreeItemModel {}
+
     property TreeItemModel productsModel: TreeItemModel {}
 
     property bool blockUpdatingModel: false;
+    property bool centered: true;
+
+    width: 550;
+    height: 800;
+
 
     Component.onCompleted: {
         licensesProvider.updateModel();
@@ -22,25 +27,26 @@ DocumentBase {
         InstallationEditorCommandsDelegate {}
     }
 
-    onDocumentModelChanged: {
-        let activeLicensesModel = installationEditorContainer.documentModel.GetData("ActiveLicenses");
-        if (!activeLicensesModel){
-            activeLicensesModel = installationEditorContainer.documentModel.AddTreeModel("ActiveLicenses");
-        }
+//    onDocumentModelChanged: {
+//        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
+//        if (!activeLicensesModel){
+//            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
+//        }
 
-        installationEditorContainer.updateGui();
+//        updateGui();
 
-        undoRedoManager.registerModel(installationEditorContainer.documentModel)
-    }
+//        undoRedoManager.registerModel(documentModel)
+//    }
 
-    onAccountsModelChanged: {
-        console.log("onAccountsModelChanged", installationEditorContainer.accountsModel);
-        customerCB.model = installationEditorContainer.accountsModel;
-    }
 
     onProductsModelChanged: {
-        console.log("onProductsModelChanged", installationEditorContainer.productsModel);
-        productCB.model = installationEditorContainer.productsModel;
+        console.log("onProductsModelChanged", productsModel);
+        productCB.model = productsModel;
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+        color: "white";
     }
 
     UndoRedoManager {
@@ -49,7 +55,7 @@ DocumentBase {
         commandsId: installationEditorContainer.commandsId;
 
         onModelStateChanged: {
-            installationEditorContainer.updateGui();
+            updateGui();
         }
     }
 
@@ -67,12 +73,12 @@ DocumentBase {
 
     function updateGui(){
         console.log("Begin updateGui");
-        installationEditorContainer.blockUpdatingModel = true;
+        blockUpdatingModel = true;
 
-        instanceIdInput.text = installationEditorContainer.documentModel.GetData("Id");
+        instanceIdInput.text = documentModel.GetData("Id");
 
-        let accountId = installationEditorContainer.documentModel.GetData("AccountId");
-        let productId = installationEditorContainer.documentModel.GetData("ProductId");
+        let accountId = documentModel.GetData("AccountId");
+        let productId = documentModel.GetData("ProductId");
 
         //        customerCB.currentText = "";
         let customerModel = customerCB.model;
@@ -96,9 +102,9 @@ DocumentBase {
 
         licensesTable.rowModel.clear();
 
-        let activeLicensesModel = installationEditorContainer.documentModel.GetData("ActiveLicenses");
+        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
         if (!activeLicensesModel){
-            activeLicensesModel = installationEditorContainer.documentModel.AddTreeModel("ActiveLicenses");
+            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
         }
 
         let licensesModel;
@@ -117,7 +123,7 @@ DocumentBase {
                 let licenseId = licensesModel.GetData("Id", i);
                 let licenseName = licensesModel.GetData("Name", i);
 
-                let row = {"Id": licenseId, "Name": licenseName, "LicenseState": Qt.Unchecked, "ExpirationState": Qt.Unchecked, "Expiration": ""};
+                let row = {"Id": licenseId, "Name": licenseName, "LicenseState": Qt.Unchecked, "ExpirationState": Qt.Unchecked, "Expiration": ""}
 
                 for (let j = 0; j < activeLicensesModel.GetItemsCount(); j++){
                     let activeLicenseId = activeLicensesModel.GetData("Id", j);
@@ -140,7 +146,7 @@ DocumentBase {
             }
         }
 
-        installationEditorContainer.blockUpdatingModel = false;
+        blockUpdatingModel = false;
         console.log("End updateGui");
     }
 
@@ -148,15 +154,15 @@ DocumentBase {
         console.log("Begin updateModel");
         undoRedoManager.beginChanges();
 
-        installationEditorContainer.documentModel.SetData("Id", instanceIdInput.text)
+ //       documentModel.SetData("Id", instanceIdInput.text)
 
         let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
-        installationEditorContainer.documentModel.SetData("ProductId", selectedProductId);
+        documentModel.SetData("ProductId", selectedProductId);
 
         let selectedAccountId = customerCB.model.GetData("Id", customerCB.currentIndex);
-        installationEditorContainer.documentModel.SetData("AccountId", selectedAccountId);
+        documentModel.SetData("AccountId", selectedAccountId);
 
-        let activeLicenses = installationEditorContainer.documentModel.AddTreeModel("ActiveLicenses");
+        let activeLicenses = documentModel.AddTreeModel("ActiveLicenses");
 
         for (let i = 0; i < licensesTable.rowModel.count; i++){
             let rowObj = licensesTable.rowModel.get(i);
@@ -203,113 +209,14 @@ DocumentBase {
 
         spacing: 7;
 
-        Text {
-            id: titleInstanceId;
-
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-
-            text: qsTr("Instance-ID");
-        }
-
-        RegExpValidator {
-            id: regexValid;
-
-            Component.onCompleted: {
-                console.log("RegExpValidator onCompleted");
-                let regex = settingsProvider.getInstanceMask();
-                console.log("regex", regex);
-
-                let re = new RegExp(regex)
-                if (re){
-                    regexValid.regExp = re;
-                }
-            }
-        }
-
-        CustomTextField {
-            id: helperInput;
-
-            visible: false;
-            textInputValidator: regexValid;
-
-            onTextChanged: {
-                console.log("acceptableInput", helperInput.text, helperInput.acceptableInput);
-                errorMessage.visible = !helperInput.acceptableInput;
-            }
-        }
-
-        CustomTextField {
-            id: instanceIdInput;
-
-            width: parent.width;
-            height: 30;
-
-            placeHolderText: qsTr("Enter the instance-ID");
-
-            borderColor: helperInput.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
-
-            maximumLength: 17;
-
-            onTextChanged: {
-                helperInput.text = instanceIdInput.text;
-            }
-
-            onEditingFinished: {
-                let currentId = installationEditorContainer.documentModel.GetData("Id");
-                if (currentId != instanceIdInput.text){
-                    installationEditorContainer.updateModel();
-                }
-            }
-        }
-
-        Text {
-            id: errorMessage;
-
-            color: Style.errorTextColor;
-
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-
-            visible: false;
-
-            text: qsTr("Incorrect input instance-ID");
-        }
-
-        Text {
-            id: titleCustomer;
-
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-
-            text: qsTr("Customer");
-        }
-
-        ComboBox {
-            id: customerCB;
-
-            width: parent.width;
-            height: 23;
-
-            radius: 3;
-
-            onCurrentIndexChanged: {
-                if (!installationEditorContainer.blockUpdatingModel){
-                    installationEditorContainer.updateModel();
-                }
-            }
-        }
 
         Text {
             id: titleProduct;
 
+            text: qsTr("Product");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
-
-            text: qsTr("Product");
         }
 
         ComboBox {
@@ -323,26 +230,56 @@ DocumentBase {
             onCurrentIndexChanged: {
                 console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex);
 
-                if (!installationEditorContainer.blockUpdatingModel){
+                if (!blockUpdatingModel){
                     let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
 
                     //                        commandsDelegate.updateLicenses(selectedProductId);
 
-                    installationEditorContainer.updateModel();
+                    updateModel();
 
-                    installationEditorContainer.updateGui();
+                    updateGui();
                 }
+            }
+        }
+
+        Text {
+            id: titleDependency;
+
+            text: qsTr("Dependency");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
+
+        ComboBox {
+            id: dependencyComboBox;
+
+            width: parent.width;
+            height: 23;
+
+            radius: 3;
+
+            currentText: "RTVision.3d Sensor";
+
+            model: ListModel {
+                id: modelCategogy;
+                ListElement {
+                    Name: "RTVision.3d Sensor"
+                }
+            }
+
+            onCurrentIndexChanged: {
+
             }
         }
 
         Text {
             id: titleLicenses;
 
+            text: qsTr("Licenses");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
-
-            text: qsTr("Licenses");
         }
     }//Column bodyColumn
 
@@ -367,8 +304,8 @@ DocumentBase {
         onRowModelDataChanged: {
             console.log("licensesTable onRowModelDataChanged");
 
-            if (!installationEditorContainer.blockUpdatingModel){
-                installationEditorContainer.updateModel();
+            if (!blockUpdatingModel){
+                updateModel();
             }
         }
     }

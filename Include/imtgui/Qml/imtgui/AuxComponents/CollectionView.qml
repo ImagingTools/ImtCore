@@ -30,6 +30,10 @@ Item {
     property alias tableItemHeight: collectionViewBase.tableItemHeight;
     property alias metaInfo: collectionMetaInfo;
 
+    property alias filterMenu: collectionViewBase.filterMenu;
+    property alias filterMenuVisible: collectionViewBase.filterMenuVisible;
+    property alias modelFilter: collectionViewBase.modelFilter;
+
     Component.onCompleted: {
         collectionViewContainer.itemId = documentsData.GetData("Id", model.index);
         collectionViewContainer.itemName = documentsData.GetData("Title", model.index);

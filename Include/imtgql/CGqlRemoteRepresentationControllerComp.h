@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRepresentationDataControllerComp.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 #include <imtgql/CApiClientComp.h>
 
 
@@ -11,10 +11,10 @@ namespace imtgql
 
 
 class CGqlRemoteRepresentationControllerComp:
-		public imtgql::CGqlRepresentationDataControllerComp
+		public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtgql::CGqlRepresentationDataControllerComp BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlRemoteRepresentationControllerComp)
 		I_ASSIGN(m_apiClientCompPtr, "ApiClient", "Api Client", true, "ApiClient");
