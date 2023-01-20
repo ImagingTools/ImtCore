@@ -30,6 +30,8 @@ public:
 	virtual const IProductInfo* GetProductFamilyInfo() const override;
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
+	virtual QByteArray GetCategoryId() const override;
+	virtual void SetCategoryId(const QByteArray& categoryId) override;
 
 	// reimplemented (iprm::INameParam)
 	virtual const QString& GetName() const override;
@@ -50,6 +52,7 @@ protected:
 
 	QString m_productName;
 	QByteArray m_productId;
+	QByteArray m_categoryId;
 };
 
 

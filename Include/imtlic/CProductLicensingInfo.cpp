@@ -52,6 +52,21 @@ void CProductLicensingInfo::SetProductId(const QByteArray& productId)
 }
 
 
+QByteArray CProductLicensingInfo::GetCategoryId() const
+{
+	return m_categoryId;
+}
+
+
+void CProductLicensingInfo::SetCategoryId(const QByteArray& categoryId)
+{
+	if (m_categoryId != categoryId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_categoryId = categoryId;
+	}
+}
+
 // reimplemented (iprm::INameParam)
 
 const QString& CProductLicensingInfo::GetName() const

@@ -17,6 +17,7 @@ public:
 
 	I_BEGIN_COMPONENT(CProductsDatabaseDelegateComp)
 		I_ASSIGN(m_productFactCompPtr, "ProductFactory", "Factory used for creation of the new product instance", true, "ProductFactory");
+		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta information creator for the product instance", true, "MetaInfoCreator");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -44,6 +45,11 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
+
+	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
+	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+
 protected:
 	void GenerateDifferences(
 				const imtlic::IProductLicensingInfo* currentProductPtr,
@@ -58,6 +64,7 @@ protected:
 				QByteArrayList& removedFeatures) const;
 private:
 	I_FACT(imtlic::IProductLicensingInfo, m_productFactCompPtr);
+	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 };
 
 

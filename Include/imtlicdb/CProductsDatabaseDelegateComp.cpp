@@ -1,9 +1,12 @@
 #include <imtlicdb/CProductsDatabaseDelegateComp.h>
 
+// ACF includes
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtlic/IFeaturePackage.h>
 #include <imtlic/CLicenseInfo.h>
+#include <imtlic/CProductLicensingMetaInfo.h>
 #include <imtlic/CFeaturePackageCollectionUtility.h>
 
 
@@ -49,6 +52,13 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(
 		productName = record.value("Name").toString();
 
 		productPtr->SetName(productName);
+	}
+
+	QByteArray categoryId;
+	if (record.contains("CategoryId")){
+		categoryId = record.value("CategoryId").toByteArray();
+
+		productPtr->SetCategoryId(categoryId);
 	}
 
 	QByteArray selectProductLicenses = QString("SELECT * from \"ProductLicenses\" WHERE ProductId = '%1'").arg(qPrintable(productId)).toUtf8();
@@ -142,6 +152,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 		productId = objectName.toLocal8Bit();
 	}
 
+	QByteArray categoryId = productPtr->GetCategoryId();
+
 	if (productId.isEmpty()){
 		return NewObjectQuery();
 	}
@@ -152,8 +164,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 	}
 
 	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"Products\" (Id, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5');")
+	retVal.query = QString("INSERT INTO \"Products\" (Id, CategoryId, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5', '%6');")
 				.arg(qPrintable(productId))
+				.arg(qPrintable(categoryId))
 				.arg(productName)
 				.arg(objectDescription)
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
@@ -408,6 +421,31 @@ QByteArray CProductsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 	return retVal;
 }
 
+
+// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
+
+idoc::MetaInfoPtr CProductsDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+{
+	return idoc::MetaInfoPtr(new imod::TModelWrap<imtlic::CProductLicensingMetaInfo>);
+}
+
+
+bool CProductsDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
+	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
+		idoc::MetaInfoPtr retVal;
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductInfo", retVal)){
+			Q_ASSERT(retVal.IsValid());
+
+			return metaInfo.CopyFrom(*retVal);
+		}
+	}
+
+	return false;
+}
+
+// protected methods
 
 void CProductsDatabaseDelegateComp::GenerateDifferences(
 			const imtlic::IProductLicensingInfo* currentProductPtr,
