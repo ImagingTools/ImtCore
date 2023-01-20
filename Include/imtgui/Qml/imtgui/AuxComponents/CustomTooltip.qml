@@ -9,7 +9,7 @@ Item {
 
     property int componentWidth: 200;
     property int componentMinHeight: 40;
-    property int componentMargin: 8;
+    property int componentMargin: 12;
 
     property bool fitToTextWidth: false;
 
