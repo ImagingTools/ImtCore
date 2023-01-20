@@ -3,12 +3,10 @@ import Acf 1.0
 import imtgui 1.0
 import imtlicgui 1.0
 
-FocusScope {
+Item {
     id: documentBase;
 
     anchors.fill: parent;
-
-    focus: true;
 
     property string itemId;
     property string itemName;
@@ -18,6 +16,8 @@ FocusScope {
 
     property bool itemLoad: true;
 
+    property bool isDirty: false;
+
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
@@ -26,7 +26,6 @@ FocusScope {
     }
 
     signal commandsDelegateLoaded();
-
 
     Component.onCompleted: {
         commandsDelegate.documentBase = documentBase;
@@ -61,6 +60,13 @@ FocusScope {
     onItemNameChanged: {
         if (itemLoad){
             documentsData.SetData("Name", documentBase.itemName, model.index);
+        }
+    }
+
+    onIsDirtyChanged: {
+        if (isDirty){
+            console.log("onIsDirtyChanged");
+            documentBase.commandsProvider.setCommandIsEnabled("Save", true);
         }
     }
 
@@ -103,7 +109,6 @@ FocusScope {
         }
     }
 
-
     Loader {
         id: commandsDelegateBase;
 
@@ -114,5 +119,13 @@ FocusScope {
             commandsDelegateBase.item.documentBase = documentBase;
             documentBase.commandsDelegateLoaded();
         }
+    }
+
+    function close(){
+        documentBase.commandsDelegate.commandHandle("Close");
+    }
+
+    function save(){
+        documentBase.commandsDelegate.commandHandle("Save");
     }
 }

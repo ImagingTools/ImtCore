@@ -82,18 +82,6 @@ Item {
         }
     }
 
-    function disconnectModelChanged(){
-        if(container.objectModel){
-            objectModel.modelChanged.disconnect(container.modelChanged);
-        }
-    }
-
-    function connectModelChanged(){
-        if(container.objectModel){
-            objectModel.modelChanged.connect(container.modelChanged);
-        }
-    }
-
     function removeChanges(){
         commandsProvider.setCommandIsEnabled("Save", false);
         documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName});

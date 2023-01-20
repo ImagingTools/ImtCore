@@ -28,7 +28,7 @@ BaseButtonDecorator {
 
             anchors.centerIn: parent;
 
-            color: commonButtonDecorator.enabled ? Style.buttonText : Style.inactive_buttonText;
+            color: commonButtonDecorator.enabled ? Style.textColor : Style.inactive_textColor;
 
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamily;

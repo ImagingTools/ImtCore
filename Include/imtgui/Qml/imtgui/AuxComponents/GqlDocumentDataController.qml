@@ -13,7 +13,11 @@ Item {
 
     property TreeItemModel documentModel: TreeItemModel {}
 
+    signal documentModelSaved();
+
     function getData(documentId, inputParams){
+
+        console.log("getData", documentId, getCommandId);
         getModel.get(documentId, inputParams);
     }
 
@@ -36,6 +40,7 @@ Item {
             query.AddField(queryFields);
 
             var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("Id", modelId);
             let keys = Object.keys(externInputParams)
             for (let key of keys){
                 inputParams.InsertField(key, externInputParams[key]);
@@ -43,6 +48,9 @@ Item {
             query.AddParam(inputParams);
 
             var gqlData = query.GetQuery();
+
+
+            console.log("PackageItem", gqlData)
 
             this.SetGqlQuery(gqlData);
         }
@@ -56,7 +64,7 @@ Item {
                     return;
                 }
 
-                dataModelLocal = itemModel.GetData("data");
+                dataModelLocal = getModel.GetData("data");
                 if(dataModelLocal && dataModelLocal.ContainsKey(container.getCommandId)){
                     dataModelLocal = dataModelLocal.GetData(container.getCommandId);
 
@@ -85,6 +93,8 @@ Item {
 
             var gqlData = query.GetQuery();
 
+            console.log("PackageUpdate", gqlData)
+
             this.SetGqlQuery(gqlData);
         }
 
@@ -106,6 +116,8 @@ Item {
                 if (setModel.ContainsKey("data")){
                     dataModelLocal = setModel.GetData("data");
                 }
+
+                container.documentModelSaved();
             }
         }
     }

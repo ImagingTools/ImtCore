@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 
 Item {
-    id: documentManager;
+    id: workspaceView;
 
     anchors.fill: parent;
 
@@ -16,9 +16,27 @@ Item {
 
     property string operation;
 
-    TreeItemModel {
-        id: documentsData;
-    }
+    property TreeItemModel documentsData: TreeItemModel {}
+
+//    property var openedDocuments: []
+
+//    function openDocument(document){
+//        const comp = Qt.createComponent("SingleDocumentData.qml");
+//        if (comp.status === Component.Ready){
+//            let documentData = comp.createObject(workspaceView, { documentId: document["Id"], commandId: document["CommandsId"]});
+
+//            workspaceView.openedDocuments.push(documentData);
+
+//            var index = documentsData.InsertNewItem();
+
+//            documentsData.SetData("Id", document["Id"], index);
+//            documentsData.SetData("CommandsId", document["CommandsId"], index);
+//            documentsData.SetData("Title", document["Name"], index);
+//            documentsData.SetData("Source", document["Source"], index);
+
+//            tabPanelInternal.selectedIndex = index;
+//        }
+//    }
 
     function addDocument(document){
         let itemId = document["Id"];
@@ -30,7 +48,6 @@ Item {
             var index = documentsData.InsertNewItem();
             console.log("MultidocWorkspaceView addDocument index:", index)
 
-            //TODO -> Uuid
             documentsData.SetData("Id", itemId, index);
             documentsData.SetData("CommandsId", document["CommandsId"], index);
             documentsData.SetData("Title", document["Name"], index);
@@ -41,6 +58,24 @@ Item {
 
         tabPanelInternal.selectedIndex = pageIndex;
     }
+
+//    function closeDocument(documentKey){
+//        for (let i = 0; i < openedDocuments.length; i++){
+//            let documentData = openedDocuments[i]
+
+//            if (documentData.key === documentKey){
+//                openedDocuments.splice(i, 1);
+
+//                documentsData.RemoveItem(i + 1);
+
+//                if (tabPanelInternal.selectedIndex >= i + 1 && i + 1 > 0){
+//                    tabPanelInternal.selectedIndex--;
+//                }
+
+//                break;
+//            }
+//        }
+//    }
 
     function closeDocument(itemId){
          let index = this.getDocumentIndexById(itemId);;
@@ -53,6 +88,10 @@ Item {
          }
      }
 
+    function saveOpenedDocuments(){
+
+    }
+
     function setDocumentTitle(parameters){
         let itemId = parameters["Id"];
         let newTitle = parameters["Title"];
@@ -62,6 +101,18 @@ Item {
             documentsData.SetData("Title", newTitle, index);
         }
     }
+
+//    function getDocumentIndexById(documentId){
+//        for (let i = 0; i < openedDocuments.length; i++){
+//            let documentData = openedDocuments[i]
+
+//            if (documentData.documentId === documentId){
+//                return i;
+//            }
+//        }
+
+//        return -1;
+//    }
 
     function getDocumentIndexById(documentId){
         for (var i = 1; i < documentsData.GetItemsCount(); i++){
@@ -129,8 +180,8 @@ Item {
                 if(docsDataDeleg.visible && dataLoader.item){
                     console.log("MultidocWorkspaceView onVisibleChanged", dataLoader.item);
 
-                    documentManager.activeItem = dataLoader.item;
-                    documentManager.activeItem.forceActiveFocus();
+                    workspaceView.activeItem = dataLoader.item;
+                    workspaceView.activeItem.forceActiveFocus();
                 }
             }
 
@@ -145,21 +196,14 @@ Item {
 
                 source: model.Source;
 
-                Component.onCompleted: {
-                    console.log("Loader onCompleted", model.Source);
-                }
-
-                Component.onDestruction: {
-                    console.log("Loader onDestruction");
-                }
-
                 onLoaded: {
                     console.log("MultidocWorkspaceView onLoaded", model.CommandsId);
 
                     if(docsDataDeleg.visible){
-                        documentManager.activeItem = dataLoader.item;
-                        documentManager.activeItem.forceActiveFocus();
+                        workspaceView.activeItem = dataLoader.item;
+                        workspaceView.activeItem.forceActiveFocus();
                     }
+
                     dataLoader.item.commandsId = model.CommandsId
 
                     documentsData.SetData("Item", dataLoader.item, model.index);

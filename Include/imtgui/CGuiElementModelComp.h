@@ -24,7 +24,7 @@ public:
 		I_ASSIGN(m_elementIdAttrPtr, "Id", "Element ID", false, "");
 		I_ASSIGN(m_elementNameAttrPtr, "Name", "Element name", false, "");
 		I_ASSIGN(m_elementDescriptionAttrPtr, "Description", "Element description", false, "");
-		I_ASSIGN(m_elementItemPathAttrPtr, "ItemPath", "Element item path", false, "");
+		I_ASSIGN(m_elementItemPathAttrPtr, "IconPath", "Path to icon", false, "");
 		I_ASSIGN(m_elementStatusAttrPtr, "Status", "Element status", false, "");
 		I_ASSIGN(m_enabledAttrPtr, "IsEnabled", "Element is enabled", false, true);
 	I_END_COMPONENT;

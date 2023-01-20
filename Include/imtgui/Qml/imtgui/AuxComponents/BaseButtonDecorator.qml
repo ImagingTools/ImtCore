@@ -8,6 +8,7 @@ Item {
     property string text: "";
     property string imageSource: "";
 
+    property bool enabled: false;
     property bool isActive: false;
     property bool isFocused: false;
     property bool isPressed: false;

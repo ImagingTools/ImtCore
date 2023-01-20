@@ -105,12 +105,15 @@
 	<file alias="imtgui/AuxComponents/LanguageProvider.qml">Qml/imtgui/AuxComponents/LanguageProvider.qml</file>
 	<file alias="imtgui/AuxComponents/DesignSchemaProvider.qml">Qml/imtgui/AuxComponents/DesignSchemaProvider.qml</file>
 	<file alias="imtgui/AuxComponents/GqlDocumentDataController.qml">Qml/imtgui/AuxComponents/GqlDocumentDataController.qml</file>
+
+	<file alias="imtgui/AuxComponents/LocalSettingsModelObserver.qml">Qml/imtgui/AuxComponents/LocalSettingsModelObserver.qml</file>
 	<file alias="imtgui/AuxComponents/ServerSettingsModelObserver.qml">Qml/imtgui/AuxComponents/ServerSettingsModelObserver.qml</file>
 	<file alias="imtgui/AuxComponents/GqlModelObserver.qml">Qml/imtgui/AuxComponents/GqlModelObserver.qml</file>
 	<file alias="imtgui/AuxComponents/TreeItemModelObserver.qml">Qml/imtgui/AuxComponents/TreeItemModelObserver.qml</file>
         <file alias="imtgui/AuxComponents/SwitchCustom.qml">Qml/imtgui/AuxComponents/SwitchCustom.qml</file>
         <file alias="imtgui/AuxComponents/CustomTooltip.qml">Qml/imtgui/AuxComponents/CustomTooltip.qml</file>
         <file alias="imtgui/AuxComponents/CustomTextEdit.qml">Qml/imtgui/AuxComponents/CustomTextEdit.qml</file>
+
 
     </qresource>
     <qresource prefix="/Fonts">

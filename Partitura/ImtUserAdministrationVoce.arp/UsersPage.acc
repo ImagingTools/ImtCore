@@ -196,14 +196,14 @@
                     <Element Id="Close" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Close"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Close"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ItemPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Close"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Close"/>
@@ -256,14 +256,14 @@
                     <Element Id="Redo" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Redo"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Redo"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ItemPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Redo"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Redo"/>
@@ -274,14 +274,14 @@
                     <Element Id="Save" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Save"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Save"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ItemPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Save"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Save"/>
@@ -292,14 +292,14 @@
                     <Element Id="Undo" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Undo"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Undo"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ItemPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Undo"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Undo"/>
@@ -431,14 +431,14 @@
                     <Element Id="Edit" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Edit"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Edit"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ItemPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Edit"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Edit"/>
@@ -449,14 +449,14 @@
                     <Element Id="New" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Add"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="New"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="true"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ItemPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Add"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Create new user"/>
@@ -467,14 +467,14 @@
                     <Element Id="Remove" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Delete"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Remove"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ItemPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Delete"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
                                     <Data IsEnabled="true" Value="Remove"/>

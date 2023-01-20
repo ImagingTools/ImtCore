@@ -26,6 +26,11 @@ Item {
         commandsProviderContainer.modelLoaded();
     }
 
+    function updateModel(){
+        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
+                                                  "CommandsId": commandsProviderContainer.documentKey});
+    }
+
     function setCommandIsEnabled(commandId, isEnabled){
         console.log("commandsProviderContainer setCommandIsEnabled", commandId, isEnabled);
 

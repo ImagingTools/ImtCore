@@ -354,20 +354,21 @@ Rectangle {
                     container.visible = false;
                 }
                 else if (buttonId == "Apply"){
-                    if (!_.isEqual(JSON.stringify(container.serverModel), JSON.stringify(container.settingsProvider.serverModel))){
-//                        let serverModelJson = container.serverModel.toJSON();
-//                        container.settingsProvider.serverModel.CreateFromJson(serverModelJson);
 
-                        container.settingsProvider.serverModel.Copy(container.serverModel);
+                    if (container.settingsProvider.serverModel != null){
+                        if (!_.isEqual(JSON.stringify(container.serverModel), JSON.stringify(container.settingsProvider.serverModel))){
+                            container.settingsProvider.serverModel.Copy(container.serverModel);
 
-                        container.settingsProvider.saveServerModel();
+                            container.settingsProvider.saveServerModel();
+                        }
                     }
 
-                    if (!_.isEqual(JSON.stringify(container.localModel), JSON.stringify(container.settingsProvider.localModel))){
-                        let localModelJson = container.localModel.toJSON();
-                        container.settingsProvider.localModel.CreateFromJson(localModelJson);
+                    if (container.settingsProvider.localModel != null){
+                        if (!_.isEqual(JSON.stringify(container.localModel), JSON.stringify(container.settingsProvider.localModel))){
+                            container.settingsProvider.localModel.Copy(container.localModel);
 
-                        container.settingsProvider.saveLocalModel();
+                            container.settingsProvider.saveLocalModel();
+                        }
                     }
 
                     buttonsDialog.setButtonState("Apply", false);

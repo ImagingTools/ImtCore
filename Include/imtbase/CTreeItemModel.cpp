@@ -586,32 +586,6 @@ bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 
 		Clear();
 
-//		for (int i = 0; i < sourcePtr->GetItemsCount(); i++){
-//			int index = InsertNewItem();
-
-//			QStringList keys = sourcePtr->GetKeys(i);
-
-//			for (int j = 0; j < keys.count(); j++){
-//				QByteArray key = keys[j].toUtf8();
-//				QVariant value = sourcePtr->GetData(key, i);
-
-//				CTreeItemModel* treeItemModelPtr = nullptr;
-//				if (value.isValid()){
-//					treeItemModelPtr = value.value<CTreeItemModel*>();
-//				}
-
-//				if (treeItemModelPtr != nullptr){
-//					imtbase::CTreeItemModel* subModelPtr = AddTreeModel(key, i);
-//					if (subModelPtr != nullptr){
-//						subModelPtr->CopyFrom(*treeItemModelPtr);
-//					}
-//				}
-//				else{
-//					SetData(key, value, i);
-//				}
-//			}
-//		}
-
 		for (int i = 0; i < sourcePtr->m_items.count(); i++){
 			Item* item = new Item();
 			Item* sourceItem = sourcePtr->m_items[i];
