@@ -205,10 +205,11 @@ Item {
     Column {
         id: bodyColumn;
 
-        width: 500;
-
+        anchors.left: installationEditorContainer.left;
+        anchors.leftMargin: 10;
+        anchors.right: installationEditorContainer.right;
+        anchors.rightMargin: 10;
         spacing: 7;
-
 
         Text {
             id: titleProduct;
@@ -281,34 +282,139 @@ Item {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
         }
-    }//Column bodyColumn
 
-    BasicTableView {
-        id: licensesTable;
+        ComboBox {
+            id: licenseComboBox;
 
-        anchors.top: bodyColumn.bottom;
-        anchors.topMargin: 10;
-        anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 10;
+            width: parent.width;
+            height: 23;
 
-        width: bodyColumn.width;
+            radius: 3;
 
+            onCurrentIndexChanged: {
 
-        rowDelegate: LicenseInstanceItemDelegate {}
-
-        Component.onCompleted: {
-            licensesTable.addColumn({"Id": "Name", "Name": "License Name"});
-            licensesTable.addColumn({"Id": "Expiration", "Name": "Expiration"});
-        }
-
-        onRowModelDataChanged: {
-            console.log("licensesTable onRowModelDataChanged");
-
-            if (!blockUpdatingModel){
-                updateModel();
             }
         }
-    }
+
+        Item {
+            id: rightPart;
+
+            width: parent.width;
+            height: 100;
+            property int expirationState: 0;
+            property string expirationDate;
+
+//            visible: checkBoxLicense.checkState === 2;
+
+            CheckBox {
+                id: checkBoxExpiration;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: rightPart.left;
+
+                checkState: rightPart.expirationState;
+
+                onClicked: {
+                    console.log("checkBoxExpiration onClicked");
+                    rightPart.expirationState = Qt.Checked - checkBoxExpiration.checkState;
+
+                    if (model.ExpirationState == Qt.Checked){
+                        datePicker.setCurrentDay();
+                    }
+                    console.log("checkBoxExpiration state", state);
+                    //root.rowModelDataChanged(packageTreeItemDelegate, "ExpirationState");
+                }
+            }
+
+            Text {
+                id: textUnlimited;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: checkBoxExpiration.right;
+                anchors.leftMargin: 5;
+
+                visible: checkBoxExpiration.checkState === 0;
+
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+                color: Style.textColor;
+
+                text: qsTr("Unlimited");
+            }
+
+            DatePicker {
+                id: datePicker;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: checkBoxExpiration.right;
+                anchors.leftMargin: 5;
+
+                visible: checkBoxExpiration.checkState === 2;
+
+                width: 100;
+                height: 20;
+
+                currentDayButtonVisible: false;
+                startWithCurrentDay: false;
+
+                property string expirationDate: rightPart.expirationDate;
+
+                onExpirationDateChanged: {
+                    console.log("onExpirationDateChanged", datePicker.expirationDate);
+
+                    let date = rightPart.expirationDate;
+                    let data = date.split("-");
+                    datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
+                }
+
+                //                Component.onCompleted: {
+                //                    console.log("onCompleted");
+                //                    let date = model.Expiration;
+                //                    let data = date.split("-");
+                //                    datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
+                //                }
+
+                onDateChanged: {
+                    console.log("onDateChanged", datePicker.getDate());
+                    rightPart.expirationDate = datePicker.getDate();
+
+                    console.log("model.Expiration", datePicker.expirationDate);
+
+//                    root.rowModelDataChanged(packageTreeItemDelegate, "Expiration");
+                }
+            }
+        }
+
+    }//Column bodyColumn
+
+//    BasicTableView {
+//        id: licensesTable;
+
+//        anchors.top: bodyColumn.bottom;
+//        anchors.topMargin: 10;
+//        anchors.bottom: parent.bottom;
+//        anchors.bottomMargin: 10;
+//        anchors.left: parent.left;
+//        anchors.leftMargin: 10;
+
+//        width: bodyColumn.width;
+
+
+//        rowDelegate: LicenseInstanceItemDelegate {}
+
+//        Component.onCompleted: {
+//            licensesTable.addColumn({"Id": "Name", "Name": "License Name"});
+//            licensesTable.addColumn({"Id": "Expiration", "Name": "Expiration"});
+//        }
+
+//        onRowModelDataChanged: {
+//            console.log("licensesTable onRowModelDataChanged");
+
+//            if (!blockUpdatingModel){
+//                updateModel();
+//            }
+//        }
+//    }
 }//Container
 
 
