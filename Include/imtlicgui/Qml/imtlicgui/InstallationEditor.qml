@@ -16,6 +16,7 @@ Item {
     width: 550;
     height: 800;
 
+
     Component.onCompleted: {
         licensesProvider.updateModel();
     }
@@ -29,33 +30,14 @@ Item {
         }
     }
 
-//    Component {
-//        id: installationEditorCommandsDelegate;
-//        InstallationEditorCommandsDelegate {
-//            onProductsModelChanged: {
-//                console.log("onProductsModelChanged", productsModel);
-//                productCB.model = productsModel;
-//            }
-//        }
 
-//    }
 
     onDocumentModelChanged: {
-//        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
-//        if (!activeLicensesModel){
-//            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
-//        }
 
         updateGui();
 
         undoRedoManager.registerModel(documentModel)
     }
-
-
-//    onProductsModelChanged: {
-//        console.log("onProductsModelChanged", productsModel);
-//        productCB.model = productsModel;
-//    }
 
     Rectangle {
         anchors.fill: parent;
@@ -114,10 +96,7 @@ Item {
 //            }
 //        }
 
-        let activeLicenseModel = documentModel.GetData("ActiveLicense");
-        if (!activeLicenseModel){
-            activeLicenseModel = documentModel.AddTreeModel("ActiveLicense");
-        }
+
 
         let licensesModel;
         if (licensesProvider.model){
@@ -133,26 +112,31 @@ Item {
         if (licensesModel){
             console.log("licensesModel", licensesModel.toJSON());
             licenseCB.model = licensesModel;
-            console.log("activeLicenseModel", activeLicenseModel.toJSON());
-            for (let i = 0; i < licensesModel.GetItemsCount(); i++){
-                let licenseId = licensesModel.GetData("Id", i);
-                let licenseName = licensesModel.GetData("Name", i);
-                let activeLicenseId = activeLicenseModel.GetData("Id");
-                let expiration = activeLicenseModel.GetData("Expiration");
-                if (licenseId == activeLicenseId){
 
-                    if (expiration == ""){
-                        rightPart.expirationState = Qt.Unchecked;
-                    }
-                    else{
-                        rightPart.expirationState = Qt.Checked;
-                        rightPart.expirationData = expiration;
-                    }
+            let licenseId = documentModel.GetData("LicenseId");
+            let expiration = activeLicenseModel.GetData("Expiration");
+
+            if (expiration == ""){
+                rightPart.expirationState = Qt.Unchecked;
+            }
+            else{
+                rightPart.expirationState = Qt.Checked;
+                rightPart.expirationData = expiration;
+            }
+
+            for (let i = 0; i < licensesModel.GetItemsCount(); i++){
+                let id = licensesModel.GetData("Id", i);
+                if (id === licenseId){
+                    licenseCB.currentIndex = i;
+                    break;
                 }
             }
 
+
         }
 
+        serialNumberInput.text = documentModel.GetData("SerialNumber");
+        macAddressInput.text = documentModel.GetData("MacAddress");
 
         blockUpdatingModel = false;
         console.log("End updateGui");
@@ -178,14 +162,16 @@ Item {
         if( licenseCB.currentIndex >= 0){
              licenseId = licenseCB.model.GetData("Id", licenseCB.currentIndex);
         }
-        activeLicense.SetData("Id", licenseId);
+        documentModel.SetData("licenseId", licenseId);
 
         if (expirationState == Qt.Checked){
-            activeLicense.SetData("Expiration", expiration);
+            documentModel.SetData("Expiration", expiration);
         }
         else{
-            activeLicense.SetData("Expiration", "");
+            documentModel.SetData("Expiration", "");
         }
+        documentModel.SetData("SerialNumber", serialNumberInput.text);
+        documentModel.SetData("MacAddress", macAddressInput.text);
 
         undoRedoManager.endChanges();
         console.log("End updateModel");
@@ -206,6 +192,7 @@ Item {
         anchors.right: installationEditorContainer.right;
         anchors.rightMargin: 10;
         spacing: 7;
+        property string productCategory;
 
         Text {
             id: titleProduct;
@@ -227,7 +214,8 @@ Item {
           //  commandId: "Products"
 
             onCurrentIndexChanged: {
-                console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex);
+                bodyColumn.productCategory = productCB.model.GetData("CategoryId", productCB.currentIndex);
+                console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, bodyColumn.productCategory);
 
                 if (!blockUpdatingModel){
                     installationEditorContainer.updateModel();
@@ -268,12 +256,63 @@ Item {
         }
 
         Text {
+            id: titleMacAddress;
+
+            text: qsTr("MAC address");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+            visible: bodyColumn.productCategory == "Hardware"
+        }
+
+        CustomTextField {
+            id: macAddressInput;
+
+            width: parent.width;
+            height: 30;
+            placeHolderText: qsTr("Enter the MAC address");
+            borderColor: Style.iconColorOnSelected;
+            maximumLength: 17;
+            visible: bodyColumn.productCategory == "Hardware"
+
+            onEditingFinished: {
+                updateModel();
+            }
+        }
+
+        Text {
+            id: titleSerialNumber;
+
+            text: qsTr("Serial number");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+            visible: bodyColumn.productCategory == "Hardware"
+        }
+
+        CustomTextField {
+            id: serialNumberInput;
+
+            width: parent.width;
+            height: 30;
+            placeHolderText: qsTr("Enter the serial namber");
+            borderColor: Style.iconColorOnSelected;
+            maximumLength: 17;
+            visible: bodyColumn.productCategory == "Hardware"
+
+            onEditingFinished: {
+                updateModel();
+            }
+        }
+
+        Text {
             id: titleLicenses;
 
             text: qsTr("Licenses");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
+            visible: bodyColumn.productCategory == "Software";
         }
 
         ComboBox {
@@ -283,6 +322,8 @@ Item {
             height: 23;
 
             radius: 3;
+
+            visible: bodyColumn.productCategory == "Software";
 
             onCurrentIndexChanged: {
                 console.log("InstallationEditor onCurrentIndexChanged",licenseCB.currentIndex);
@@ -301,7 +342,7 @@ Item {
             property int expirationState: 0;
             property string expirationDate;
 
-            visible: licenseCB.currentIndex > -1;
+            visible: bodyColumn.productCategory == "Software" && licenseCB.currentIndex > -1;
 
             Text {
                 id: titleExpiration;
@@ -391,6 +432,7 @@ Item {
                 }
             }
         }
+
 
     }//Column bodyColumn
 
