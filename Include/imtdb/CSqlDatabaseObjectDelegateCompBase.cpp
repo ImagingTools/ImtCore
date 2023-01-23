@@ -1,6 +1,9 @@
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
 
+// Qt includes
+#include <QtSql/QSqlRecord>
+
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
@@ -14,6 +17,44 @@ namespace imtdb
 // public methods
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+
+const iprm::IOptionsList* CSqlDatabaseObjectDelegateCompBase::GetObjectTypeInfos() const
+{
+	return m_typesCompPtr.GetPtr();
+}
+
+
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArray& objectId) const
+{
+	if (!objectId.isEmpty()){
+		QByteArray objectSelectionQuery = GetSelectionQuery(objectId, -1, -1, nullptr);
+		if (!objectSelectionQuery.isEmpty()){
+			QSqlError sqlError;
+			QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError);
+			if (sqlError.type() == QSqlError::NoError){
+				if (sqlQuery.last()){
+					QString columnId = qPrintable(*m_objectTypeIdColumnAttrPtr);
+
+					QSqlRecord record = sqlQuery.record();
+					if (record.contains(columnId)){
+						return record.value(columnId).toByteArray();
+					}
+					else{
+						// Fallback:
+						if (m_typesCompPtr.IsValid()){
+							if (m_typesCompPtr->GetOptionsCount() == 1){
+								return m_typesCompPtr->GetOptionId(0);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return QByteArray();
+}
+
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
@@ -80,12 +121,12 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 }
 
 
-QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QSqlRecord& record) const
 {
-	QString keyId = qPrintable(*m_objectIdColumnAttrPtr);
+	QString columnId = qPrintable(*m_objectIdColumnAttrPtr);
 
-	if (record.contains(keyId)){
-		return record.value(keyId).toByteArray();
+	if (record.contains(columnId)){
+		return record.value(columnId).toByteArray();
 	}
 
 	return QByteArray();
@@ -93,11 +134,11 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetObjectIdFromRecord(const QByte
 
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
-			const QByteArray& typeId,
 			const QSqlRecord& record,
 			idoc::MetaInfoPtr& objectMetaInfoPtr,
 			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
 {
+	QByteArray typeId = GetObjectIdFromRecord(record);
 	objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
 	if (objectMetaInfoPtr.IsValid()){
 		if (!SetObjectMetaInfoFromRecord(record, *objectMetaInfoPtr)){
@@ -120,24 +161,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::SetObjectMetaInfoFromRecord(
-			const QByteArray& metaInfoId,
-			const QSqlRecord& record,
-			idoc::MetaInfoPtr& objectMetaInfoPtr) const
-{
-	if (objectMetaInfoPtr.IsValid() && record.contains(metaInfoId)){
-		QVariant value = record.value(QString(metaInfoId));
-//		objectMetaInfoPtr->SetMetaInfo(metaInfoId, value);
-
-		return true;
-	}
-
-	return false;
-}
-
-
-QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(
-			const imtbase::IObjectCollection& collection) const
+QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
 	QByteArray retVal = QString("DELETE FROM \"%1\";").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
 
@@ -146,9 +170,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateDataMetaInfoQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const idoc::IDocumentMetaInfo* dataMetaInfoPtr) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/) const
 {
 	QByteArray retVal;
 
@@ -157,9 +181,9 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateDataMetaInfoQuery(
 
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/) const
 {
 	QByteArray retVal;
 
@@ -198,14 +222,14 @@ bool CSqlDatabaseObjectDelegateCompBase::SetCollectionItemMetaInfoFromRecord(con
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, insertionTime);
 	}
 
-	if (record.contains("LastModified")) {
+	if (record.contains("LastModified")){
 		QDateTime lastModificationTime = record.value("LastModified").toDateTime();
 
 		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
 		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModificationTime);
 	}
 
-	if (record.contains("RevisionNumber")) {
+	if (record.contains("RevisionNumber")){
 		qlonglong revisionNumber = record.value("RevisionNumber").toLongLong();
 
 		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION, revisionNumber);
@@ -273,13 +297,17 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(const iprm::IParamsSet& /*filterParams*/, QString& /*filterQuery*/) const
+bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
+			const iprm::IParamsSet& /*filterParams*/,
+			QString& /*filterQuery*/) const
 {
 	return true;
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const
+bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(
+			const imtbase::ICollectionFilter& collectionFilter,
+			QString& textFilterQuery) const
 {
 	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
 	if (filteringColumnIds.isEmpty()){
@@ -301,7 +329,9 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateTextFilterQuery(const imtbase::IC
 }
 
 
-bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
+bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
+			const imtbase::ICollectionFilter& collectionFilter,
+			QString& sortQuery) const
 {
 	QByteArray columnId;
 	QByteArray sortOrder;

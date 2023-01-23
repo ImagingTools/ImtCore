@@ -21,7 +21,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CObjectMetaInfoCreatorCompBase);
 		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
-		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID of the object supported by this meta info creator", true, "ObjectTypeId");
+		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "Type-ID of the object supported by this meta info creator", true, "");
 	I_END_COMPONENT;
 
 protected:
@@ -33,6 +33,6 @@ protected:
 };
 
 
-} // namespace imtlic
+} // namespace imtbase
 
 

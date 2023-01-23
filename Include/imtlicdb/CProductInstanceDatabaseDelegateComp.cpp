@@ -20,9 +20,7 @@ namespace imtlicdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(
-			const QByteArray& /*typeId*/,
-			const QSqlRecord& record) const
+istd::IChangeable* CProductInstanceDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -400,7 +398,7 @@ QByteArray CProductInstanceDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-QByteArray CProductInstanceDatabaseDelegateComp::GetObjectIdFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+QByteArray CProductInstanceDatabaseDelegateComp::GetObjectIdFromRecord(const QSqlRecord& record) const
 {
 	QByteArray objectId;
 
@@ -547,7 +545,7 @@ idoc::MetaInfoPtr CProductInstanceDatabaseDelegateComp::CreateObjectMetaInfo(con
 
 bool CProductInstanceDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(record);
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
 		idoc::MetaInfoPtr retVal;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductInstanceInfo", retVal)){

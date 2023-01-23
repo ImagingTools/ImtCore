@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5010" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Basic UI setup for the application preferences</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ComposedGui" PackageId="QtGuiPck" ComponentId="ComposedGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultStartPageIndex" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Guis" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>PageList</Value>
+                                <Value>Settings</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SupressPageTitle" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseHorizontalLayout" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MenuDialog" PackageId="QtGuiPck" ComponentId="DialogGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DialogButtons" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="2097152"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DialogIconPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value=":/Icons/Settings"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DialogSize" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="0.5"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DialogTitle" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Preferences"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Gui" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ComposedGui"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MenuName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Preferences"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PageList" PackageId="QtGuiPck" ComponentId="OptionsListEditor">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Settings/PageModel"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FixedWidth" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="250"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Settings" PackageId="QtGuiPck" ComponentId="ExtComposedParamsSetGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="Settings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultStartPageIndex" Type="Integer" ExportId="DefaultStartPageIndex">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DesignType" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="4"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Editors" Type="Reference[]" ExportId="Pages">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GuiVisualInfos" Type="Reference[]" ExportId="PageVisualInfos">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Guis" Type="Reference[]" ExportId="Pages">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Ids" Type="Id[]" ExportId="ParameterIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LazyPagesInitialization" Type="Boolean" ExportId="LazyPagesInitialization">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Names" Type="Text[]" ExportId="PageNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageActivators" Type="Reference[]" ExportId="PageActivators">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageIds" Type="Id[]" ExportId="PageIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageVisibilityActivators" Type="Reference[]" ExportId="PageVisibilityActivators">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsKey" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="Preferences"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SupressPageTitle" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModelEditor" ComponentId="Settings"/>
+        <Interface InterfaceId="imod::IObserver" ComponentId="Settings"/>
+        <Interface InterfaceId="iqtgui::IDialog" ComponentId="MenuDialog"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="Settings"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Settings"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="Command" ComponentId="MenuDialog/Command"/>
+        <Component ExportedId="PageModel" ComponentId="Settings/PageModel"/>
+        <Component ExportedId="VisualStatus" ComponentId="Settings/VisualStatus"/>
+    </ExportedComponents>
+</Acf>

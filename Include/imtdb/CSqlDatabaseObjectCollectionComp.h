@@ -25,7 +25,7 @@ namespace imtdb
 
 
 /**
-	Basic implementation of a Database based model.
+	Component implementation of a SQL-database collection.
 */
 class CSqlDatabaseObjectCollectionComp:
 			public QObject,
@@ -40,10 +40,6 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IObjectCollection);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
-		I_ASSIGN(m_objectFactoryCompPtr, "ObjectFactory", "List of factories used for object creation", false, "ObjectFactory");
-        I_ASSIGN(m_objectCollectionFactoryCompPtr, "ObjectCollectionFactory", "Factory used for object collection creation", false, "ObjectCollectionFactory");
-		I_ASSIGN(m_typeIdAttrPtr, "TypeId", "Type-ID corresponding to the registered factory", true, "Default");
-		I_ASSIGN(m_typeNameAttrPtr, "TypeName", "Type name corresponding to the registered factory", true, "Default");
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
@@ -77,7 +73,7 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-    virtual imtbase::IObjectCollection* CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr, const Id& parentId = Id(), int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual imtbase::IObjectCollection* CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr, const Id& parentId = Id(), int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
@@ -86,15 +82,15 @@ public:
 
 	// reimplemented (ICollectionInfo)
 	virtual int GetElementsCount(
-		const iprm::IParamsSet* selectionParamPtr = nullptr,
-		const Id& parentId = Id(),
-		int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	virtual Ids GetElementIds(
-		int offset = 0,
-		int count = -1,
-		const iprm::IParamsSet* selectionParamsPtr = nullptr,
-		const Id& parentId = Id(),
-		int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	virtual bool GetSubsetInfo(
 				imtbase::ICollectionInfo& subsetInfo,
 				int offset = 0,
@@ -114,29 +110,6 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-	typedef QList<idoc::MetaInfoPtr> ObgectsMetaInfos;
-	virtual bool GetObjectsMetaInfos(
-				ObgectsMetaInfos& obgectsMetaInfos,
-				const QList<QByteArray>& metaInfoIds,
-				int offset = 0,
-				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const;
-	virtual bool SetObjectsMetaInfos(
-				ObgectsMetaInfos& obgectsMetaInfos,
-				const QList<QByteArray>& metaInfoIds);
-
-protected:
-	struct ObjectInfo
-	{
-		QByteArray typeId;
-		idoc::MetaInfoPtr metaInfoPtr;
-		idoc::MetaInfoPtr collectionMetaInfoPtr;
-	};
-
-	typedef QMap<QByteArray, ObjectInfo> ObjectInfoMap;
-
 protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	QSqlRecord GetObjectRecord(const QByteArray& objectId) const;
@@ -152,17 +125,11 @@ protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
 
 private:
-	I_FACT(istd::IChangeable, m_objectFactoryCompPtr);
-    I_FACT(imtbase::IObjectCollection, m_objectCollectionFactoryCompPtr);
 	I_REF(ISqlDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
-	I_ATTR(QByteArray, m_typeIdAttrPtr);
-	I_TEXTATTR(m_typeNameAttrPtr);
 	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
-
-	iprm::COptionsManager m_typesInfo;
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CSqlDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CSqlDatabaseObjectCollectionComp> m_databaseAccessObserver;

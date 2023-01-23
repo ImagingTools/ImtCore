@@ -21,9 +21,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeable* CreateObjectFromRecord(
-				const QByteArray& typeId,
-				const QSqlRecord& record) const override;
+	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
@@ -45,9 +43,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
-	virtual QByteArray GetObjectIdFromRecord(
-				const QByteArray& typeId,
-				const QSqlRecord& record) const override;
+	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& record) const override;
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,

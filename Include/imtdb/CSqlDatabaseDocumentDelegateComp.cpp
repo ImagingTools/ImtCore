@@ -35,19 +35,19 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(const QByteArray&
 }
 
 
-istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(
-			const QByteArray& /*typeId*/,
-			const QSqlRecord& record) const
+istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	if (!m_documentFactCompPtr.IsValid()){
+	if (!m_documentFactoriesCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	istd::TDelPtr<istd::IChangeable> documentPtr = m_documentFactCompPtr.CreateInstance();
+	QByteArray typeId = GetObjectTypeId(GetObjectIdFromRecord(record));
+
+	istd::TDelPtr<istd::IChangeable> documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
 		return nullptr;
 	}
@@ -80,9 +80,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		workingDocumentPtr.SetPtr(valuePtr, false);
 	}
 	else{
-		if (m_documentFactCompPtr.IsValid()){
-			workingDocumentPtr.SetPtr(m_documentFactCompPtr.CreateInstance());
-		}
+		workingDocumentPtr.SetPtr(CreateObject(typeId));
 	}
 
 	if (workingDocumentPtr.IsValid()){
@@ -227,9 +225,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& newObjectName) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/) const
 {
 	QByteArray retVal;
 
@@ -238,9 +236,9 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& description) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/) const
 {
 	QByteArray retVal;
 
@@ -249,6 +247,25 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 
 
 // protected methods
+
+istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObject(const QByteArray& typeId) const
+{
+	if (!m_typesCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	Q_ASSERT_X(m_documentFactoriesCompPtr.GetCount() == m_typesCompPtr->GetOptionsCount(), __FILE__, "Number of factories and resource types doesn't match");
+
+	for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i){
+		if (i < m_documentFactoriesCompPtr.GetCount()){
+			if (typeId == m_typesCompPtr->GetOptionId(i)){
+				return m_documentFactoriesCompPtr.CreateInstance(i);
+			}
+		}
+	}
+	return nullptr;
+}
+
 
 bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable& object, QByteArray& data) const
 {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5010" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ComposedGui" X="625" Y="175" Note=""/>
+        <Element ComponentName="MenuDialog" X="625" Y="50" Note=""/>
+        <Element ComponentName="PageList" X="175" Y="175" Note=""/>
+        <Element ComponentName="Settings" X="400" Y="375" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

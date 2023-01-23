@@ -49,7 +49,12 @@ int CSqlDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*obje
 }
 
 
-imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::InsertNewBranch(const Id& /*parentId*/, const QString& /*name*/, const QString& /*description*/, const Id& /*proposedElementId*/, const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
+imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::InsertNewBranch(
+			const Id& /*parentId*/,
+			const QString& /*name*/,
+			const QString& /*description*/,
+			const Id& /*proposedElementId*/,
+			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
 {
 	return Id();
 }
@@ -131,7 +136,7 @@ bool CSqlDatabaseObjectCollectionComp::RemoveElement(const Id& elementId)
 	if (ExecuteTransaction(query)){
 		return true;
 	}
-	else {
+	else{
 		changeNotifier.Abort();
 	}
 
@@ -168,11 +173,11 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
-	if (!sqlQuery.next()){
+	if (!sqlQuery.last()){
 		return false;
 	}
 
-	istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
+	istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
 	dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
 		return dataObjPtr;
 	});
@@ -216,11 +221,12 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollection(
 			int offset,
 			int count,
-			const iprm::IParamsSet *selectionParamsPtr,
-			const Id &parentId, int iterationFlags) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
-    imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
-    imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
+	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
 	if (m_objectDelegateCompPtr.IsValid()) {
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
@@ -232,29 +238,43 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
 
 		while (sqlQuery.next()) {
-			istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
+			istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
 			DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr]() {
 				return dataObjPtr;
 				});
-            QByteArray idObject = m_objectDelegateCompPtr->GetObjectIdFromRecord(m_typeIdAttrPtr->GetValue(), sqlQuery.record());
-            collectionPtr->InsertNewObject(m_typeIdAttrPtr->GetValue(), "", "", dataPtr, idObject);
+
+			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(sqlQuery.record());
+
+			QByteArray typeId = m_objectDelegateCompPtr->GetObjectTypeId(objectId);
+
+			collectionPtr->InsertNewObject(typeId, "", "", dataPtr);
 		}
 	}
 	return collectionPtr;
 }
 
 
+
+
 // reimplemented (IObjectCollectionInfo)
 
 const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo() const
 {
-	return &m_typesInfo;
+	if (m_objectDelegateCompPtr.IsValid()){
+		return m_objectDelegateCompPtr->GetObjectTypeInfos();
+	}
+
+	return nullptr;
 }
 
 
-imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
+imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& objectId) const
 {
-	return *m_typeIdAttrPtr;
+	if (m_objectDelegateCompPtr.IsValid()){
+		return m_objectDelegateCompPtr->GetObjectTypeId(objectId);
+	}
+
+	return QByteArray();
 }
 
 
@@ -266,7 +286,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& ob
 			idoc::MetaInfoPtr objectMetaInfoPtr;
 			idoc::MetaInfoPtr collectionMetaInfoPtr;
 
-			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr);
 
 			return objectMetaInfoPtr;
 		}
@@ -330,7 +350,7 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
 
 		while (sqlQuery.next()){
-			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(*m_typeIdAttrPtr, sqlQuery.record());
+			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(sqlQuery.record());
 			Q_ASSERT(!objectId.isEmpty());
 
 			retVal.push_back(objectId);
@@ -341,7 +361,13 @@ imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(imtbase::ICollectionInfo& subsetInfo, int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
+			imtbase::ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return false;
 }
@@ -372,7 +398,7 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 		if (!record.isEmpty()){
 			idoc::MetaInfoPtr objectMetaInfoPtr;
 			idoc::MetaInfoPtr collectionMetaInfoPtr;
-			bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+			bool isOk = m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr);
 			if (isOk){
 				switch (infoType){
 				case EIT_NAME:
@@ -397,7 +423,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id&
 			idoc::MetaInfoPtr objectMetaInfoPtr;
 			idoc::MetaInfoPtr collectionMetaInfoPtr;
 
-			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(*m_typeIdAttrPtr, record, objectMetaInfoPtr, collectionMetaInfoPtr);
+			m_objectDelegateCompPtr->CreateObjectInfoFromRecord(record, objectMetaInfoPtr, collectionMetaInfoPtr);
 
 			return collectionMetaInfoPtr;
 		}
@@ -498,43 +524,6 @@ bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-// from Viktor fo check
-bool CSqlDatabaseObjectCollectionComp::GetObjectsMetaInfos(ObgectsMetaInfos &obgectsMetaInfos,
-												const QList<QByteArray> &metaInfoIds,
-												int offset,
-												int count,
-												const iprm::IParamsSet *selectionParamsPtr,
-												const Id &parentId, int iterationFlags) const
-{
-	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
-
-	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
-		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
-		if (objectSelectionQuery.isEmpty()){
-			return false;
-		}
-
-		QSqlError sqlError;
-		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
-
-		while (sqlQuery.next()){
-			idoc::MetaInfoPtr metainfoPtr(new idoc::CStandardDocumentMetaInfo);
-			for (QByteArray metoInfoId: metaInfoIds){
-				m_objectDelegateCompPtr->SetObjectMetaInfoFromRecord(metoInfoId, sqlQuery.record(), metainfoPtr);
-			}
-			obgectsMetaInfos.append(metainfoPtr);
-		}
-	}
-
-	return true;
-}
-
-bool CSqlDatabaseObjectCollectionComp::SetObjectsMetaInfos(ObgectsMetaInfos &obgectsMetaInfos, const QList<QByteArray> &metaInfoIds)
-{
-	return false;
-}
-
-
 // protected methods
 
 bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const
@@ -604,8 +593,6 @@ void CSqlDatabaseObjectCollectionComp::OnComponentCreated()
 	m_dbEngineCompPtr.EnsureInitialized();
 	m_objectDelegateCompPtr.EnsureInitialized();
 
-	m_typesInfo.InsertOption(*m_typeNameAttrPtr, *m_typeIdAttrPtr);
-
 	m_isInitialized = false;
 
 	m_filterParamsObserver.RegisterObject(m_filterParamsCompPtr.GetPtr(), &CSqlDatabaseObjectCollectionComp::OnFilterParamsChanged);
@@ -620,9 +607,8 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
 
-	BaseClass::OnComponentDestroyed();
+    BaseClass::OnComponentDestroyed();
 }
-
 
 } // namespace imtdb
 

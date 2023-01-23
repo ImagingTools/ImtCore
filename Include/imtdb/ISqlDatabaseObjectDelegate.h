@@ -22,33 +22,20 @@ public:
 	/**
 		Get ID of the object in the database from the SQL record.
 	*/
-	virtual QByteArray GetObjectIdFromRecord(const QByteArray& typeId, const QSqlRecord& record) const = 0;
+	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& record) const = 0;
 
 	/**
 		Create object meta-informations based on the SQL record.
 	*/
 	virtual bool CreateObjectInfoFromRecord(
-				const QByteArray& typeId,
 				const QSqlRecord& record,
 				idoc::MetaInfoPtr& objectMetaInfoPtr,
 				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const = 0;
 
 	/**
-		Set object single meta-information based on the SQL record.
-	*/
-	virtual bool SetObjectMetaInfoFromRecord(
-				const QByteArray& metaInfoId,
-				const QSqlRecord& record,
-				idoc::MetaInfoPtr& objectMetaInfoPtr) const = 0;
-
-
-	/**
 		Create a data object for the given SQL record.
 	*/
-	virtual istd::IChangeable* CreateObjectFromRecord(
-				const QByteArray& typeId,
-				const QSqlRecord& record) const = 0;
-
+	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const = 0;
 };
 
 

@@ -3,7 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
-#include <iprm/ITextParam.h>
+#include <iprm/IOptionsList.h>
 
 // ImtCore includes
 #include <imtbase/ICollectionFilter.h>
@@ -24,29 +24,28 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CSqlDatabaseObjectDelegateCompBase)
 		I_REGISTER_INTERFACE(imtdb::ISqlDatabaseObjectDelegate);
+		I_ASSIGN(m_typesCompPtr, "ObjectTypes", "List of object types supported by the related database collection", false, "ObjectTypes");
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for SQL queries", true, "DatabaseEngine");
 		I_ASSIGN(m_tableNameAttrPtr, "TableName", "Name of the object table", true, "");
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Name of the column containing ID of the object", true, "Id");
+		I_ASSIGN(m_objectTypeIdColumnAttrPtr, "ObjectTypeIdColumn", "Name of the column containing type-ID of the object", true, "TypeId");
 		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "SeparatorObjectId");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override;
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual QByteArray GetCountQuery(const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-	virtual QByteArray GetObjectIdFromRecord(const QByteArray& typeId, const QSqlRecord& record) const override;
+	virtual QByteArray GetObjectIdFromRecord(const QSqlRecord& record) const override;
 	virtual bool CreateObjectInfoFromRecord(
-				const QByteArray& typeId,
 				const QSqlRecord& record,
 				idoc::MetaInfoPtr& objectMetaInfoPtr,
 				idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const override;
-	virtual bool SetObjectMetaInfoFromRecord(
-				const QByteArray& metaInfoId,
-				const QSqlRecord& record,
-				idoc::MetaInfoPtr& objectMetaInfoPtr) const override;
 	virtual QByteArray CreateResetQuery(const imtbase::IObjectCollection& collection) const override;
 	virtual QByteArray CreateDataMetaInfoQuery(
 				const imtbase::IObjectCollection& collection,
@@ -70,9 +69,11 @@ protected:
 
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
+	I_REF(iprm::IOptionsList, m_typesCompPtr);
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
+	I_ATTR(QByteArray, m_objectTypeIdColumnAttrPtr);
 };
 
 

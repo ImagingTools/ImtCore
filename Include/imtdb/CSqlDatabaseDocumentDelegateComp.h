@@ -19,7 +19,7 @@ public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
-		I_ASSIGN(m_documentFactCompPtr, "DocumentFactory", "Factory used for creation of the new document instance", true, "DocumentFactory");
+		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN(m_documentPersistenceCompPtr, "DocumentPersistence", "Persistence for the document", true, "DocumentPersistence");
 		I_ASSIGN(m_metaInfoTableDelegateCompPtr, "MetaInfoTableDelegate", "Delegate for the table containing meta-informations for the document type", false, "MetaInfoTableDelegate");
 		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumntContentColumnId", "ID of the column in the table containing document content", true, "Document");
@@ -33,9 +33,7 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-	virtual istd::IChangeable* CreateObjectFromRecord(
-				const QByteArray& typeId,
-				const QSqlRecord& record) const override;
+	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
@@ -58,6 +56,7 @@ public:
 				const QByteArray& objectId,
 				const QString& description) const override;
 protected:
+	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const istd::IChangeable& object, QByteArray& data) const;
 	virtual bool ReadDataFromMemory(const QByteArray& data, istd::IChangeable& object) const;
 
@@ -71,8 +70,8 @@ protected:
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
-protected:
-	I_FACT(istd::IChangeable, m_documentFactCompPtr);
+private:
+	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_REF(ifile::IFilePersistence, m_documentPersistenceCompPtr);
 	I_REF(IMetaInfoTableDelegate, m_metaInfoTableDelegateCompPtr);
 	I_ATTR(QByteArray, m_documentContentColumnIdAttrPtr);

@@ -572,12 +572,14 @@ void CObjectCollectionViewComp::EnsureColumnsSettingsSynchronized() const
 
 	for (int i = 0; i < ids.count(); i++){
 		int columndIndex = ItemList->header()->logicalIndex(i);
-		int fieldIndex = columndIndex;
+		if (columndIndex >= 0){
+			int fieldIndex = columndIndex;
 
-		ColumnSettings settings;
-		settings["FieldId"] = QString(ids[fieldIndex]);
-		settings["Width"] = (double)ItemList->columnWidth(columndIndex) / totalWidth;
-		columnsList.append(settings);
+			ColumnSettings settings;
+			settings["FieldId"] = QString(ids[fieldIndex]);
+			settings["Width"] = (double)ItemList->columnWidth(columndIndex) / totalWidth;
+			columnsList.append(settings);
+		}
 	}
 
 	m_typeIdColumnsSettings[m_currentTypeId] = columnsList;
@@ -590,7 +592,11 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 
 	// Restore visual column position by model
 	for (int i = 0; i < m_tableModel.columnCount(); i++){
-		ItemList->header()->moveSection(ItemList->header()->visualIndex(i), i);
+		int visualIndex = ItemList->header()->visualIndex(i);
+
+		if (visualIndex >= 0){
+			ItemList->header()->moveSection(visualIndex, i);
+		}
 	}
 
 	QVector<QByteArray> tempFieldIds = GetMetaInfoIds(m_currentTypeId);
@@ -679,7 +685,10 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			}
 
 			int logicIndex = fieldIds.indexOf(fieldId);
-			ItemList->header()->moveSection(ItemList->header()->visualIndex(logicIndex), currentIndex);
+			int visualIndex = ItemList->header()->visualIndex(logicIndex);
+			Q_ASSERT(visualIndex >= 0);
+
+			ItemList->header()->moveSection(visualIndex, currentIndex);
 			fieldSet.remove(fieldId);
 
 			if (ok){
@@ -1556,8 +1565,11 @@ QVariant CObjectCollectionViewComp::TableModel::headerData(int section, Qt::Orie
 
 	if (orientation == Qt::Horizontal){
 		switch (role){
-		case Qt::DisplayRole:
-			return m_parent.GetMetaInfoHeaders(m_parent.m_currentTypeId)[section];
+		case Qt::DisplayRole: {
+			const QStringList headers = m_parent.GetMetaInfoHeaders(m_parent.m_currentTypeId);
+			if (section < headers.size())
+				return headers[section];
+		}
 		}
 	}
 

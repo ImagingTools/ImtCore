@@ -32,6 +32,15 @@ public:
 		QString objectName;
 	};
 
+	/**
+		Get information about supported object types.
+	*/
+	virtual const iprm::IOptionsList* GetObjectTypeInfos() const = 0;
+
+	/**
+		Get type-ID of the object.
+	*/
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const = 0;
 
 	/**
 		Get query for getting of count of objects in the collection, optionaly filtered by some criteria.

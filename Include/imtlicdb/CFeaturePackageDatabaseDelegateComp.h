@@ -19,9 +19,7 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeable* CreateObjectFromRecord(
-				const QByteArray& typeId,
-				const QSqlRecord& record) const override;
+	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
 	virtual NewObjectQuery CreateNewObjectQuery(
 				const QByteArray& typeId,
 				const QByteArray& proposedObjectId,
@@ -52,8 +50,8 @@ protected:
 				QByteArrayList& removedFeatures,
 				QByteArrayList& updatedFeatures) const;
 
-	void CreateSubFeaturesFromRecord(imtlic::CFeaturePackage* featurePackagePtr, imtlic::IFeatureInfo* subFeatureInfoPtr, const QByteArray& subFeaturesQuery) const;
-	void CreateInsertSubFeaturesQuery(const imtlic::CFeaturePackage* featurePackagePtr, const imtlic::IFeatureInfo* featureInfoPtr, QByteArray &retVal) const;
+	void CreateSubFeaturesFromRecord(imtlic::IFeatureInfo* subFeatureInfoPtr, const QByteArray& subFeaturesQuery) const;
+	void CreateInsertSubFeaturesQuery(const imtlic::IFeatureInfo* featureInfoPtr, QByteArray &retVal) const;
 
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
