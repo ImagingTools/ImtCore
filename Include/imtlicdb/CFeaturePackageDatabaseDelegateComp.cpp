@@ -215,24 +215,27 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
 }
 
 
-void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(const imtlic::IFeatureInfo *featureInfoPtr, QByteArray &retVal) const
+void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(const imtlic::IFeatureInfo* featureInfoPtr, QByteArray& retVal) const
 {
-	QList<const imtlic::IFeatureInfo*> subFeatures = featureInfoPtr->GetSubFeatures();
+	const istd::TPointerVector<const imtlic::IFeatureInfo>& subFeatures = featureInfoPtr->GetSubFeatures();
 
 	QByteArray parentFeatureId = featureInfoPtr->GetFeatureId();
 
-	for (const imtlic::IFeatureInfo* featureInfo : subFeatures){
-		QByteArray featureId = featureInfo->GetFeatureId();
-		QString featureName = featureInfo->GetFeatureName();
+	for (int i = 0; i < subFeatures.GetCount(); i++){
+		const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+		if (featureInfoPtr != nullptr){
+			QByteArray featureId = featureInfoPtr->GetFeatureId();
+			QString featureName = featureInfoPtr->GetFeatureName();
 
-		retVal += "\n" +
-					QString("INSERT INTO \"Features\"(Id, Name, Description, ParentId) VALUES('%1', '%2', '%3', '%4');")
-								.arg(qPrintable(featureId))
-								.arg(featureName)
-								.arg("")
-								.arg(qPrintable(parentFeatureId)).toLocal8Bit();
+			retVal += "\n" +
+						QString("INSERT INTO \"Features\"(Id, Name, Description, ParentId) VALUES('%1', '%2', '%3', '%4');")
+									.arg(qPrintable(featureId))
+									.arg(featureName)
+									.arg("")
+									.arg(qPrintable(parentFeatureId)).toLocal8Bit();
 
-		CreateInsertSubFeaturesQuery(featureInfo, retVal);
+			CreateInsertSubFeaturesQuery(featureInfoPtr, retVal);
+		}
 	}
 }
 

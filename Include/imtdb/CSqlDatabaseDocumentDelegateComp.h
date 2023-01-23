@@ -70,7 +70,7 @@ protected:
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
-private:
+protected:
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_REF(ifile::IFilePersistence, m_documentPersistenceCompPtr);
 	I_REF(IMetaInfoTableDelegate, m_metaInfoTableDelegateCompPtr);

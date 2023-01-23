@@ -15,7 +15,7 @@ namespace imtauthdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;

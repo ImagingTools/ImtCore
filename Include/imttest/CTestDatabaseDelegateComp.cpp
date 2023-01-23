@@ -17,9 +17,7 @@ namespace imttest
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CTestDatabaseDelegateComp::CreateObjectFromRecord(
-			const QByteArray& /*typeId*/,
-			const QSqlRecord& record) const
+istd::IChangeable* CTestDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;

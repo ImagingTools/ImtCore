@@ -16,7 +16,7 @@ namespace imtauthdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -365,7 +365,7 @@ idoc::MetaInfoPtr CUserDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArr
 
 bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(record);
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
 		idoc::MetaInfoPtr retVal;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "UserInfo", retVal)){

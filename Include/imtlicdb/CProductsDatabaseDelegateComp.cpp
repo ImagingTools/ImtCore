@@ -416,7 +416,7 @@ idoc::MetaInfoPtr CProductsDatabaseDelegateComp::CreateObjectMetaInfo(const QByt
 
 bool CProductsDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(record);
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
 		idoc::MetaInfoPtr retVal;
 		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductLicensingInfo", retVal)){

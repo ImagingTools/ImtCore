@@ -12,7 +12,7 @@ namespace imtauthdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return nullptr;
@@ -395,7 +395,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateDescriptionObjectQuery(
 }
 
 
-QByteArray CRoleDatabaseDelegateComp::GetObjectIdFromRecord(const QByteArray& /*typeId*/, const QSqlRecord& record) const
+QByteArray CRoleDatabaseDelegateComp::GetObjectIdFromRecord(const QSqlRecord& record) const
 {
 	QByteArray objectId;
 
