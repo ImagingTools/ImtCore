@@ -92,7 +92,8 @@ Item {
 //            }
 //        }
 
-
+        serialNumberInput.text = documentModel.GetData("SerialNumber");
+        macAddressInput.text = documentModel.GetData("MacAddress");
 
         let licensesModel;
         if (licensesProvider.model){
@@ -107,32 +108,33 @@ Item {
 
         if (licensesModel){
             console.log("licensesModel", licensesModel.toJSON());
-            licenseCB.model = licensesModel;
-
-            let licenseId = documentModel.GetData("LicenseId");
-            let expiration = activeLicenseModel.GetData("Expiration");
-
-            if (expiration == ""){
-                rightPart.expirationState = Qt.Unchecked;
-            }
-            else{
-                rightPart.expirationState = Qt.Checked;
-                rightPart.expirationData = expiration;
-            }
-
+            console.log("activeLicensesModel", activeLicensesModel.toJSON());
             for (let i = 0; i < licensesModel.GetItemsCount(); i++){
-                let id = licensesModel.GetData("Id", i);
-                if (id === licenseId){
-                    licenseCB.currentIndex = i;
-                    break;
+                let licenseId = licensesModel.GetData("Id", i);
+                let licenseName = licensesModel.GetData("Name", i);
+
+                let row = {"Id": licenseId, "Name": licenseName, "LicenseState": Qt.Unchecked, "ExpirationState": Qt.Unchecked, "Expiration": ""}
+
+                for (let j = 0; j < activeLicensesModel.GetItemsCount(); j++){
+                    let activeLicenseId = activeLicensesModel.GetData("Id", j);
+                    let expiration = activeLicensesModel.GetData("Expiration", j);
+                    if (licenseId == activeLicenseId){
+                        row["LicenseState"] = Qt.Checked;
+
+                        if (expiration == ""){
+                            row["ExpirationState"] = Qt.Unchecked;
+                        }
+                        else{
+                            row["ExpirationState"] = Qt.Checked;
+                            row["Expiration"] = expiration;
+                        }
+                    }
                 }
+
+                console.log("row addRow", JSON.stringify(row));
+                licensesTable.addRow(row);
             }
-
-
         }
-
-        serialNumberInput.text = documentModel.GetData("SerialNumber");
-        macAddressInput.text = documentModel.GetData("MacAddress");
 
         blockUpdatingModel = false;
         console.log("End updateGui");
@@ -150,24 +152,37 @@ Item {
         let selectedPairId = customerCB.model.GetData("Id", dependencyCB.currentIndex);
         documentModel.SetData("PairId", selectedPairId);
 
-        let activeLicense = documentModel.AddTreeModel("ActiveLicense");
-        let licenseId;
-        let expirationState  = rightPart.expirationState;
-        let expiration  = rightPart.expirationDate;
-
-        if( licenseCB.currentIndex >= 0){
-             licenseId = licenseCB.model.GetData("Id", licenseCB.currentIndex);
-        }
-        documentModel.SetData("licenseId", licenseId);
-
-        if (expirationState == Qt.Checked){
-            documentModel.SetData("Expiration", expiration);
-        }
-        else{
-            documentModel.SetData("Expiration", "");
-        }
         documentModel.SetData("SerialNumber", serialNumberInput.text);
         documentModel.SetData("MacAddress", macAddressInput.text);
+
+        let activeLicenses = documentModel.AddTreeModel("ActiveLicenses");
+
+        for (let i = 0; i < licensesTable.rowModel.count; i++){
+            let rowObj = licensesTable.rowModel.get(i);
+
+            let licenseId = rowObj["Id"];
+            let licenseName = rowObj["Name"];
+            let expirationState  = rowObj["ExpirationState"];
+            let expiration  = rowObj["Expiration"];
+            let state = rowObj["LicenseState"];
+
+            console.log("rowObj", JSON.stringify(rowObj));
+
+            if (state == Qt.Checked){
+
+                let index = activeLicenses.InsertNewItem();
+
+                activeLicenses.SetData("Id", licenseId, index);
+                activeLicenses.SetData("Name", licenseName, index);
+
+                if (expirationState == Qt.Checked){
+                    activeLicenses.SetData("Expiration", expiration, index);
+                }
+                else{
+                    activeLicenses.SetData("Expiration", "", index);
+                }
+            }
+        }
 
         undoRedoManager.endChanges();
         console.log("End updateModel");
@@ -182,9 +197,9 @@ Item {
     Column {
         id: bodyColumn;
 
-        anchors.left: installationEditorContainer.left;
+        anchors.left: parent.left;
         anchors.leftMargin: 10;
-        anchors.right: installationEditorContainer.right;
+        anchors.right: parent.right;
         anchors.rightMargin: 10;
         spacing: 7;
         property string productCategory;
@@ -306,137 +321,48 @@ Item {
             }
         }
 
-        Text {
-            id: titleLicenses;
-
-            text: qsTr("Licenses");
-            color: Style.textColor;
-            font.family: Style.fontFamily;
-            font.pixelSize: Style.fontSize_common;
-            visible: bodyColumn.productCategory == "Software";
-        }
-
-        ComboBox {
-            id: licenseCB;
-
-            width: parent.width;
-            height: 23;
-
-            radius: 3;
-
-            visible: bodyColumn.productCategory == "Software";
-
-            onCurrentIndexChanged: {
-                console.log("InstallationEditor onCurrentIndexChanged",licenseCB.currentIndex);
-
-                if (!blockUpdatingModel){
-                    installationEditorContainer.licenseId = licenseCB.model.GetData("Id", licenseCB.currentIndex);
-                }
-            }
-        }
-
-        Item {
-            id: rightPart;
-
-            width: parent.width;
-            height: 100;
-            property int expirationState: 0;
-            property string expirationDate;
-
-            visible: bodyColumn.productCategory == "Software" && licenseCB.currentIndex > -1;
-
-            Text {
-                id: titleExpiration;
-
-                text: qsTr("Date of expiration");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
-
-            CheckBox {
-                id: checkBoxExpiration;
-
-                anchors.top: titleExpiration.bottom;
-                anchors.topMargin: 7
-                anchors.left: rightPart.left;
-
-                checkState: rightPart.expirationState;
-
-                onClicked: {
-                    console.log("checkBoxExpiration onClicked");
-                    rightPart.expirationState = Qt.Checked - checkBoxExpiration.checkState;
-
-                    if (rightPart.expirationState == Qt.Checked){
-                        datePicker.setCurrentDay();
-                    }
-                    console.log("checkBoxExpiration state", state);
-                    //root.rowModelDataChanged(packageTreeItemDelegate, "ExpirationState");
-                }
-            }
-
-            Text {
-                id: textUnlimited;
-
-                anchors.verticalCenter: checkBoxExpiration.verticalCenter;
-                anchors.left: checkBoxExpiration.right;
-                anchors.leftMargin: 5;
-
-                visible: checkBoxExpiration.checkState === 0;
-
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-                color: Style.textColor;
-
-                text: qsTr("Unlimited");
-            }
-
-            DatePicker {
-                id: datePicker;
-
-                anchors.verticalCenter: checkBoxExpiration.verticalCenter;
-                anchors.left: checkBoxExpiration.right;
-                anchors.leftMargin: 5;
-
-                visible: checkBoxExpiration.checkState === 2;
-
-                width: 100;
-                height: 20;
-
-                currentDayButtonVisible: false;
-                startWithCurrentDay: false;
-
-                property string expirationDate: rightPart.expirationDate;
-
-                onExpirationDateChanged: {
-                    console.log("onExpirationDateChanged", datePicker.expirationDate);
-
-                    let date = rightPart.expirationDate;
-                    let data = date.split("-");
-                    datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
-                }
-
-                //                Component.onCompleted: {
-                //                    console.log("onCompleted");
-                //                    let date = model.Expiration;
-                //                    let data = date.split("-");
-                //                    datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
-                //                }
-
-                onDateChanged: {
-                    console.log("onDateChanged", datePicker.getDate());
-                    rightPart.expirationDate = datePicker.getDate();
-
-                    console.log("model.Expiration", datePicker.expirationDate);
-
-//                    root.rowModelDataChanged(packageTreeItemDelegate, "Expiration");
-                }
-            }
-        }
-
-
     }//Column bodyColumn
 
+    Text {
+        id: titleLicenses;
+        anchors.top: bodyColumn.bottom;
+        anchors.topMargin: 10;
+
+        text: qsTr("Licenses");
+        color: Style.textColor;
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_common;
+        visible: bodyColumn.productCategory == "Software";
+    }
+
+    BasicTableView {
+        id: licensesTable;
+
+        anchors.top: titleLicenses.bottom;
+        anchors.topMargin: 10;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+        anchors.left: bodyColumn.left;
+
+        width: bodyColumn.width;
+        visible: titleLicenses.visible;
+
+
+        rowDelegate: LicenseInstanceItemDelegate {}
+
+        Component.onCompleted: {
+            licensesTable.addColumn({"Id": "Name", "Name": "License Name"});
+            licensesTable.addColumn({"Id": "Expiration", "Name": "Expiration"});
+        }
+
+        onRowModelDataChanged: {
+            console.log("licensesTable onRowModelDataChanged");
+
+            if (!blockUpdatingModel){
+                updateModel();
+            }
+        }
+    }
 
 }//Container
 
