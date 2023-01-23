@@ -26,8 +26,6 @@ Item {
         if (modalDialogModels.count > 0){
             modalDialogModels.remove(modalDialogModels.count - 1);
         }
-
-
     }
 
     Rectangle {

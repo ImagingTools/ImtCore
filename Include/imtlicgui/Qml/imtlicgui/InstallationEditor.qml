@@ -16,7 +16,6 @@ Item {
     width: 550;
     height: 800;
 
-
     Component.onCompleted: {
         licensesProvider.updateModel();
     }
@@ -30,10 +29,7 @@ Item {
         }
     }
 
-
-
     onDocumentModelChanged: {
-
         updateGui();
 
         undoRedoManager.registerModel(documentModel)
@@ -183,7 +179,6 @@ Item {
         color: Style.backgroundColor;
     }
 
-
     Column {
         id: bodyColumn;
 
@@ -210,8 +205,6 @@ Item {
             height: 23;
 
             radius: 3;
-
-          //  commandId: "Products"
 
             onCurrentIndexChanged: {
                 bodyColumn.productCategory = productCB.model.GetData("CategoryId", productCB.currentIndex);
@@ -265,6 +258,12 @@ Item {
             visible: bodyColumn.productCategory == "Hardware"
         }
 
+        RegExpValidator {
+            id: macAddressRegExp;
+
+            regExp: /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/;
+        }
+
         CustomTextField {
             id: macAddressInput;
 
@@ -274,6 +273,8 @@ Item {
             borderColor: Style.iconColorOnSelected;
             maximumLength: 17;
             visible: bodyColumn.productCategory == "Hardware"
+
+            textInputValidator: macAddressRegExp;
 
             onEditingFinished: {
                 updateModel();
@@ -295,7 +296,7 @@ Item {
 
             width: parent.width;
             height: 30;
-            placeHolderText: qsTr("Enter the serial namber");
+            placeHolderText: qsTr("Enter the serial number");
             borderColor: Style.iconColorOnSelected;
             maximumLength: 17;
             visible: bodyColumn.productCategory == "Hardware"
