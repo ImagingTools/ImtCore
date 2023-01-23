@@ -317,10 +317,138 @@ DocumentBase {
         }
     }
 
+    Rectangle {
+        id: headerPanel;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        height: 130;
+        color: "white"; //Style.backgroundColor;
+
+
+        Text {
+            id: categoryLable;
+
+            anchors.top: parent.top;
+            anchors.topMargin: 5;
+            anchors.left: parent.left;
+            anchors.leftMargin: 5
+
+//                color: auxButtonContainer.enabled ? Style.buttonText : Style.inactive_buttonText;
+            color: Style.buttonText;
+
+            font.pixelSize: auxButtonContainer.fontPixelSize;
+            font.family: Style.fontFamily;
+            font.bold: auxButtonContainer.fontBold;
+            text: qsTr("Categories");
+        }
+
+        ComboBox {
+            id: categoryComboBox;
+            anchors.top: categoryLable.bottom;
+            anchors.topMargin: 5;
+            anchors.left: parent.left;
+            anchors.leftMargin: 10
+            height: 25;
+            width: 140;
+
+            backgroundColor: Style.baseColor;
+            currentText: "Software";
+            radius: 0;
+
+            model: ListModel {
+                id: modelCategogy;
+                ListElement {
+                    Name: "Software"
+                }
+
+                ListElement {
+                    Name: "Hardware"
+                }
+            }
+        }
+
+        Text {
+            id: compatibilityLable;
+
+            anchors.top: categoryComboBox.bottom;
+            anchors.topMargin: 10;
+            anchors.left: parent.left;
+            anchors.leftMargin: 5
+
+//                color: auxButtonContainer.enabled ? Style.buttonText : Style.inactive_buttonText;
+            color: Style.buttonText;
+
+            font.pixelSize: auxButtonContainer.fontPixelSize;
+            font.family: Style.fontFamily;
+//            font.bold: auxButtonContainer.fontBold;
+            text: qsTr("Сompatibility");
+        }
+
+        Row {
+            id: compatibilityRow;
+            anchors.top: compatibilityLable.bottom;
+            anchors.topMargin: 5;
+            anchors.left: parent.left;
+            anchors.leftMargin: 10;
+            spacing: 5;
+            Repeater {
+                model: ListModel{
+                    ListElement {
+                        Name: "RTVision.3d Sensor"
+                    }
+
+//                    ListElement {
+//                        Name: "+"
+//                    }
+                }
+                delegate: Rectangle{
+                    height: dependenciesText.height + 5;
+//                    width: dependenciesText.width + 20;
+                    width: 140;
+                    color: Style.imagingToolsGradient1;
+                    radius: 2;
+
+                    Text {
+                        id: dependenciesText;
+                        anchors.centerIn: parent;
+                        font.pixelSize: auxButtonContainer.fontPixelSize;
+                        font.family: Style.fontFamily;
+                        color: Style.buttonText;
+
+                        text: model.Name;
+                    }
+                }
+            }
+
+
+        }
+
+        Text {
+            id: addText;
+            anchors.left: dependenciesRow.right;
+            anchors.leftMargin: 10;
+            anchors.verticalCenter: dependenciesRow.verticalCenter;
+            font.pixelSize: 25;
+            font.family: Style.fontFamily;
+            font.bold: true;
+            color: Style.buttonText;
+
+            text: "+";
+        }
+
+
+        Rectangle {
+            anchors.bottom: parent.bottom;
+            height: 1;
+            width: parent.width;
+            color: Style.backgroundColor;
+        }
+    }
+
     BasicTreeView {
         id: tableView;
 
-        anchors.top: parent.top
+        anchors.top: headerPanel.bottom
         anchors.left: parent.left;
         anchors.right: parent.right;
 
