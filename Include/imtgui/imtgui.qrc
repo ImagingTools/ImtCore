@@ -114,6 +114,8 @@
         <file alias="imtgui/AuxComponents/CustomTooltip.qml">Qml/imtgui/AuxComponents/CustomTooltip.qml</file>
         <file alias="imtgui/AuxComponents/CustomTextEdit.qml">Qml/imtgui/AuxComponents/CustomTextEdit.qml</file>
         <file alias="imtgui/AuxComponents/RoundButton.qml">Qml/imtgui/AuxComponents/RoundButton.qml</file>
+        <file alias="imtgui/AuxComponents/CustomRadioButton.qml">Qml/imtgui/AuxComponents/CustomRadioButton.qml</file>
+        <file alias="imtgui/AuxComponents/RadioBox.qml">Qml/imtgui/AuxComponents/RadioBox.qml</file>
 	
 	<file alias="imtgui/AuxComponents/SimpleCommandsDecorator.qml">Qml/imtgui/AuxComponents/SimpleCommandsDecorator.qml</file>
     </qresource>
