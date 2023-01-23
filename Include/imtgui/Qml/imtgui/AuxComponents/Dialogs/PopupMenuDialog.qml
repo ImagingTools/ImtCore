@@ -37,8 +37,6 @@ Rectangle {
         rootItem: popupMenuContainer;
     }
 
-
-
     /**
         Count of the visible item, if value = -1 then count unlimited
     */
@@ -66,13 +64,13 @@ Rectangle {
     }
 
     onRootChanged: {
+        console.log("PopupMenu onRootChanged", root)
         /**
             Opacity of the background = 0
         */
         if(popupMenuContainer.hiddenBackground){
             popupMenuContainer.root.backgroundItem.opacity = 0;
         }
-
 
         /**
             Close the dialog by clicking on the background

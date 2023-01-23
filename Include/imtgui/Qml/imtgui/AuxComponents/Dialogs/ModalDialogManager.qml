@@ -3,9 +3,8 @@ import QtQuick 2.12
 Item {
     id: container;
 
-    property alias backgroundItem: background;
+    property var backgroundItem: null;
     property alias count: modalDialogModels.count;
-
 
     Component.onDestruction: {
         modalDialogModels.clear();
@@ -28,25 +27,6 @@ Item {
         }
     }
 
-    Rectangle {
-        id: background;
-
-        anchors.fill: parent;
-
-        //TODO: Style.backgroundColor
-        color: "gray";
-        visible: modalDialogs.visible;
-
-        property alias backgroundAreaItem: backgroundArea;
-        MouseArea {
-            id: backgroundArea;
-            anchors.fill: parent;
-            hoverEnabled: true;
-
-            onWheel: {}
-        }
-    }
-
     Repeater {
         id: modalDialogs;
 
@@ -61,13 +41,32 @@ Item {
 
             anchors.fill: modalDialogs;
 
+            Rectangle {
+                id: background;
+
+                anchors.fill: parent;
+
+                color: "gray";
+//                color: "transparent";
+                visible: modalDialogs.visible;
+
+                property alias backgroundAreaItem: backgroundArea;
+                MouseArea {
+                    id: backgroundArea;
+                    anchors.fill: parent;
+                    hoverEnabled: true;
+
+                    onWheel: {}
+                }
+            }
+
             Loader {
                 id: dialogLoader;
 
                 sourceComponent: model.Component;
 
                 onLoaded: {
-                    console.log("DEBUG::", model)
+                    container.backgroundItem = background;
                     dialogLoader.item["root"] = container;
                     for (let key in model.Parameters) {
                         console.log("DEBUG::key", key, model.Parameters[key]);
@@ -76,8 +75,7 @@ Item {
                     if (dialogLoader.item.centered){
                         dialogLoader.anchors.centerIn = dialogDelegate;
                     }
-
-                    dialogLoader.item.forceActiveFocus();
+                   // dialogLoader.item.forceActiveFocus();
                 }
             }
         }
