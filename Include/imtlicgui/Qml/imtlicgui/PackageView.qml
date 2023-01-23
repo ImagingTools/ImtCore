@@ -31,7 +31,6 @@ DocumentBase {
 
     onDocumentModelChanged: {
         console.log("documentBase onDocumentModelChanged");
-
         let items = packageViewContainer.documentModel.GetData("Items");
         if (!items){
             packageViewContainer.documentModel.AddTreeModel("Items");
@@ -76,7 +75,7 @@ DocumentBase {
             console.log("UndoRedoManager onModelStateChanged");
             packageViewContainer.syncronise();
 
-            packageViewContainer.updateGui();
+//            packageViewContainer.updateGui();
         }
     }
 
@@ -146,6 +145,7 @@ DocumentBase {
 
     function updateModel(){
         console.log("updateModel");
+
         undoRedoManager.beginChanges();
 
         let items = packageViewContainer.documentModel.AddTreeModel("Items")
@@ -536,9 +536,9 @@ DocumentBase {
             Component.onCompleted: {
                 treeView.addColumn({"Id": "Name", "Name": "Name"});
 
-                rightPanel.updateTreeViewGui();
+//                rightPanel.updateTreeViewGui();
 
-                tableView.selectedIndexChanged.connect(rightPanel.selectedIndexChanged);
+//                tableView.selectedIndexChanged.connect(rightPanel.selectedIndexChanged);
             }
 
 //            Component

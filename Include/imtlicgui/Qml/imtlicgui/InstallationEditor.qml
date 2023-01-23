@@ -16,7 +16,6 @@ Item {
     width: 550;
     height: 800;
 
-
     Component.onCompleted: {
         licensesProvider.updateModel();
     }

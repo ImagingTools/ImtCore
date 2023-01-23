@@ -11,7 +11,10 @@ CollectionView {
     filterMenu: Component {
         Rectangle {
             id: filterPanel;
-            height: 65;
+            height: 0;
+
+            visible: false;
+
             color: "white"; //Style.backgroundColor;
 
             function applyFilter(){

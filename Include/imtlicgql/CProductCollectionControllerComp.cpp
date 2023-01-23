@@ -19,7 +19,10 @@ QVariant CProductCollectionControllerComp::GetObjectInformation(
 {
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	if (metaInfo.IsValid()){
-		if (informationId == QByteArray("Added")){
+		if (informationId == QByteArray("CategoryId")){
+			return metaInfo->GetMetaInfo(imtlic::IProductLicensingInfo::MIT_PRODUCT_CATEGORY_ID);
+		}
+		else if (informationId == QByteArray("Added")){
 			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
 		}
 		else if (informationId == QByteArray("LastModified")){

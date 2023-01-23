@@ -254,11 +254,14 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QString oldProductName = oldProductPtr->GetName();
 	QString newProductName = newProductPtr->GetName();
 
-	QByteArray retVal = QString("UPDATE \"Products\" SET Id ='%1', Name = '%2', LastModified = '%3' WHERE Id ='%4';")
+	QByteArray categoryId = newProductPtr->GetCategoryId();
+
+	QByteArray retVal = QString("UPDATE \"Products\" SET Id ='%1', Name = '%2', CategoryId = '%5', LastModified = '%3' WHERE Id ='%4';")
 			.arg(qPrintable(newProductId))
 			.arg(qPrintable(newProductName))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(oldProductId)).toLocal8Bit();
+			.arg(qPrintable(oldProductId))
+			.arg(qPrintable(categoryId)).toLocal8Bit();
 
 	QByteArrayList addedLicenses;
 	QByteArrayList removedLicenses;
@@ -435,7 +438,7 @@ bool CProductsDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord
 	const istd::IChangeable* instancePtr = CreateObjectFromRecord(QByteArray(), record);
 	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
 		idoc::MetaInfoPtr retVal;
-		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductInfo", retVal)){
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "ProductLicensingInfo", retVal)){
 			Q_ASSERT(retVal.IsValid());
 
 			return metaInfo.CopyFrom(*retVal);

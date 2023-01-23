@@ -97,6 +97,11 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 			productPtr->SetProductId(objectId);
 		}
 
+		if (itemModel.ContainsKey("CategoryId")){
+			QByteArray categoryId = itemModel.GetData("CategoryId").toByteArray();
+			productPtr->SetCategoryId(categoryId);
+		}
+
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
 			productPtr->SetName(name);
@@ -206,6 +211,8 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 	if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
 		const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 		if (productPtr != nullptr){
+			QByteArray categoryId = productPtr->GetCategoryId();
+			dataModel->SetData("CategoryId", categoryId);
 
 			QString name = m_objectCollectionCompPtr->GetElementInfo(productId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			dataModel->SetData("Name", name);

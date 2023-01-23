@@ -51,6 +51,8 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 	retVal.chop(1);
 
 	metaInfoPtr->SetMetaInfo(IProductLicensingInfoProvider::MIT_LICENSES_INFO_LIST, retVal);
+	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_NAME, productLicensingInfoPtr->GetName());
+	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_CATEGORY_ID, productLicensingInfoPtr->GetCategoryId());
 
 	return true;
 }

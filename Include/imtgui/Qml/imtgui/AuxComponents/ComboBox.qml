@@ -66,7 +66,9 @@ FocusScope {
     }
 
     onCurrentIndexChanged: {
+        console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (comboBoxContainer.currentIndex > -1){
+            console.log("model", JSON.stringify(model));
             let name = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
             console.log("name", name);
             comboBoxContainer.currentText = name;
