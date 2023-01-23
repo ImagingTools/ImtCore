@@ -6,10 +6,9 @@ import Acf 1.0
 Item {
     id: installationEditorContainer;
 
+    property TreeItemModel documentModel: TreeItemModel{}
+
 //    commandsDelegateSourceComp: installationEditorCommandsDelegate;
-
-
-    property TreeItemModel productsModel: TreeItemModel {}
 
     property bool blockUpdatingModel: false;
     property bool centered: true;
@@ -22,27 +21,42 @@ Item {
         licensesProvider.updateModel();
     }
 
-    Component {
-        id: installationEditorCommandsDelegate;
-        InstallationEditorCommandsDelegate {}
+    InstallationEditorCommandsDelegate {
+        onProductsModelChanged: {
+            console.log("onProductsModelChanged", productsModel);
+            productCB.model = productsModel;
+
+            installationEditorContainer.updateModel();
+        }
     }
 
-//    onDocumentModelChanged: {
+//    Component {
+//        id: installationEditorCommandsDelegate;
+//        InstallationEditorCommandsDelegate {
+//            onProductsModelChanged: {
+//                console.log("onProductsModelChanged", productsModel);
+//                productCB.model = productsModel;
+//            }
+//        }
+
+//    }
+
+    onDocumentModelChanged: {
 //        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
 //        if (!activeLicensesModel){
 //            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
 //        }
 
-//        updateGui();
+        updateGui();
 
-//        undoRedoManager.registerModel(documentModel)
-//    }
-
-
-    onProductsModelChanged: {
-        console.log("onProductsModelChanged", productsModel);
-        productCB.model = productsModel;
+        undoRedoManager.registerModel(documentModel)
     }
+
+
+//    onProductsModelChanged: {
+//        console.log("onProductsModelChanged", productsModel);
+//        productCB.model = productsModel;
+//    }
 
     Rectangle {
         anchors.fill: parent;
@@ -75,20 +89,11 @@ Item {
         console.log("Begin updateGui");
         blockUpdatingModel = true;
 
-        instanceIdInput.text = documentModel.GetData("Id");
+  //      instanceIdInput.text = documentModel.GetData("Id");
 
-        let accountId = documentModel.GetData("AccountId");
         let productId = documentModel.GetData("ProductId");
+        let pairId = documentModel.GetData("PairId");
 
-        //        customerCB.currentText = "";
-        let customerModel = customerCB.model;
-        for (let i = 0; i < customerModel.GetItemsCount(); i++){
-            let id = customerModel.GetData("Id", i);
-            if (id === accountId){
-                customerCB.currentIndex = i;
-                break;
-            }
-        }
 
         //        productCB.currentText = "";
         let productModel = productCB.model;
@@ -100,51 +105,55 @@ Item {
             }
         }
 
-        licensesTable.rowModel.clear();
+        //        customerCB.currentText = "";
+//        let dependencyModel = dependencyCB.model;
+//        for (let i = 0; i < dependencyModel.GetItemsCount(); i++){
+//            let id = dependencyModel.GetData("Id", i);
+//            if (id === pairId){
+//                dependencyCB.currentIndex = i;
+//                break;
+//            }
+//        }
 
-        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
-        if (!activeLicensesModel){
-            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
+        let activeLicenseModel = documentModel.GetData("ActiveLicense");
+        if (!activeLicenseModel){
+            activeLicenseModel = documentModel.AddTreeModel("ActiveLicense");
         }
 
         let licensesModel;
-        for (let i = 0; i < licensesProvider.model.GetItemsCount(); i++){
-            let id = licensesProvider.model.GetData("Id", i);
-            if (id === productId){
-                let productLicensesModel = licensesProvider.model.GetData("Licenses", i);
-                licensesModel = productLicensesModel;
+        if (licensesProvider.model){
+            for (let i = 0; i < licensesProvider.model.GetItemsCount(); i++){
+                let id = licensesProvider.model.GetData("Id", i);
+                if (id === productId){
+                    let productLicensesModel = licensesProvider.model.GetData("Licenses", i);
+                    licensesModel = productLicensesModel;
+                }
             }
         }
 
         if (licensesModel){
             console.log("licensesModel", licensesModel.toJSON());
-            console.log("activeLicensesModel", activeLicensesModel.toJSON());
+            licenseCB.model = licensesModel;
+            console.log("activeLicenseModel", activeLicenseModel.toJSON());
             for (let i = 0; i < licensesModel.GetItemsCount(); i++){
                 let licenseId = licensesModel.GetData("Id", i);
                 let licenseName = licensesModel.GetData("Name", i);
+                let activeLicenseId = activeLicenseModel.GetData("Id");
+                let expiration = activeLicenseModel.GetData("Expiration");
+                if (licenseId == activeLicenseId){
 
-                let row = {"Id": licenseId, "Name": licenseName, "LicenseState": Qt.Unchecked, "ExpirationState": Qt.Unchecked, "Expiration": ""}
-
-                for (let j = 0; j < activeLicensesModel.GetItemsCount(); j++){
-                    let activeLicenseId = activeLicensesModel.GetData("Id", j);
-                    let expiration = activeLicensesModel.GetData("Expiration", j);
-                    if (licenseId == activeLicenseId){
-                        row["LicenseState"] = Qt.Checked;
-
-                        if (expiration == ""){
-                            row["ExpirationState"] = Qt.Unchecked;
-                        }
-                        else{
-                            row["ExpirationState"] = Qt.Checked;
-                            row["Expiration"] = expiration;
-                        }
+                    if (expiration == ""){
+                        rightPart.expirationState = Qt.Unchecked;
+                    }
+                    else{
+                        rightPart.expirationState = Qt.Checked;
+                        rightPart.expirationData = expiration;
                     }
                 }
-
-                console.log("row addRow", JSON.stringify(row));
-                licensesTable.addRow(row);
             }
+
         }
+
 
         blockUpdatingModel = false;
         console.log("End updateGui");
@@ -159,36 +168,24 @@ Item {
         let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
         documentModel.SetData("ProductId", selectedProductId);
 
-        let selectedAccountId = customerCB.model.GetData("Id", customerCB.currentIndex);
-        documentModel.SetData("AccountId", selectedAccountId);
+        let selectedPairId = customerCB.model.GetData("Id", dependencyCB.currentIndex);
+        documentModel.SetData("PairId", selectedPairId);
 
-        let activeLicenses = documentModel.AddTreeModel("ActiveLicenses");
+        let activeLicense = documentModel.AddTreeModel("ActiveLicense");
+        let licenseId;
+        let expirationState  = rightPart.expirationState;
+        let expiration  = rightPart.expirationDate;
 
-        for (let i = 0; i < licensesTable.rowModel.count; i++){
-            let rowObj = licensesTable.rowModel.get(i);
+        if( licenseCB.currentIndex >= 0){
+             licenseId = licenseCB.model.GetData("Id", licenseCB.currentIndex);
+        }
+        activeLicense.SetData("Id", licenseId);
 
-            let licenseId = rowObj["Id"];
-            let licenseName = rowObj["Name"];
-            let expirationState  = rowObj["ExpirationState"];
-            let expiration  = rowObj["Expiration"];
-            let state = rowObj["LicenseState"];
-
-            console.log("rowObj", JSON.stringify(rowObj));
-
-            if (state == Qt.Checked){
-
-                let index = activeLicenses.InsertNewItem();
-
-                activeLicenses.SetData("Id", licenseId, index);
-                activeLicenses.SetData("Name", licenseName, index);
-
-                if (expirationState == Qt.Checked){
-                    activeLicenses.SetData("Expiration", expiration, index);
-                }
-                else{
-                    activeLicenses.SetData("Expiration", "", index);
-                }
-            }
+        if (expirationState == Qt.Checked){
+            activeLicense.SetData("Expiration", expiration);
+        }
+        else{
+            activeLicense.SetData("Expiration", "");
         }
 
         undoRedoManager.endChanges();
@@ -228,17 +225,14 @@ Item {
 
             radius: 3;
 
+          //  commandId: "Products"
+
             onCurrentIndexChanged: {
                 console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex);
 
                 if (!blockUpdatingModel){
-                    let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
-
-                    //                        commandsDelegate.updateLicenses(selectedProductId);
-
-                    updateModel();
-
-                    updateGui();
+                    installationEditorContainer.updateModel();
+                    installationEditorContainer.updateGui();
                 }
             }
         }
@@ -246,14 +240,14 @@ Item {
         Text {
             id: titleDependency;
 
-            text: qsTr("Dependency");
+            text: qsTr("Pair link");
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
         }
 
         ComboBox {
-            id: dependencyComboBox;
+            id: dependencyCB;
 
             width: parent.width;
             height: 23;
@@ -284,7 +278,7 @@ Item {
         }
 
         ComboBox {
-            id: licenseComboBox;
+            id: licenseCB;
 
             width: parent.width;
             height: 23;
@@ -292,7 +286,11 @@ Item {
             radius: 3;
 
             onCurrentIndexChanged: {
+                console.log("InstallationEditor onCurrentIndexChanged",licenseCB.currentIndex);
 
+                if (!blockUpdatingModel){
+                    installationEditorContainer.licenseId = licenseCB.model.GetData("Id", licenseCB.currentIndex);
+                }
             }
         }
 
@@ -304,12 +302,22 @@ Item {
             property int expirationState: 0;
             property string expirationDate;
 
-//            visible: checkBoxLicense.checkState === 2;
+            visible: licenseCB.currentIndex > -1;
+
+            Text {
+                id: titleExpiration;
+
+                text: qsTr("Date of expiration");
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+            }
 
             CheckBox {
                 id: checkBoxExpiration;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.top: titleExpiration.bottom;
+                anchors.topMargin: 7
                 anchors.left: rightPart.left;
 
                 checkState: rightPart.expirationState;
@@ -318,7 +326,7 @@ Item {
                     console.log("checkBoxExpiration onClicked");
                     rightPart.expirationState = Qt.Checked - checkBoxExpiration.checkState;
 
-                    if (model.ExpirationState == Qt.Checked){
+                    if (rightPart.expirationState == Qt.Checked){
                         datePicker.setCurrentDay();
                     }
                     console.log("checkBoxExpiration state", state);
@@ -329,7 +337,7 @@ Item {
             Text {
                 id: textUnlimited;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: checkBoxExpiration.verticalCenter;
                 anchors.left: checkBoxExpiration.right;
                 anchors.leftMargin: 5;
 
@@ -345,7 +353,7 @@ Item {
             DatePicker {
                 id: datePicker;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: checkBoxExpiration.verticalCenter;
                 anchors.left: checkBoxExpiration.right;
                 anchors.leftMargin: 5;
 
@@ -387,34 +395,7 @@ Item {
 
     }//Column bodyColumn
 
-//    BasicTableView {
-//        id: licensesTable;
 
-//        anchors.top: bodyColumn.bottom;
-//        anchors.topMargin: 10;
-//        anchors.bottom: parent.bottom;
-//        anchors.bottomMargin: 10;
-//        anchors.left: parent.left;
-//        anchors.leftMargin: 10;
-
-//        width: bodyColumn.width;
-
-
-//        rowDelegate: LicenseInstanceItemDelegate {}
-
-//        Component.onCompleted: {
-//            licensesTable.addColumn({"Id": "Name", "Name": "License Name"});
-//            licensesTable.addColumn({"Id": "Expiration", "Name": "Expiration"});
-//        }
-
-//        onRowModelDataChanged: {
-//            console.log("licensesTable onRowModelDataChanged");
-
-//            if (!blockUpdatingModel){
-//                updateModel();
-//            }
-//        }
-//    }
 }//Container
 
 

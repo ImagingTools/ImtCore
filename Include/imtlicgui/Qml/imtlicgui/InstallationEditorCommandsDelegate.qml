@@ -12,10 +12,13 @@ DocumentWorkspaceCommandsDelegateBase {
 
     property bool instanceIdAcceptable: helperInput.acceptableInput;
 
+    property TreeItemModel productsModel;
+//    property TreeItemModel accountsModel;
+
     Component.onCompleted: {
         container.updateItemTimer = 400;
 
-        itemsModel.updateModel("AccountsList");
+//        itemsModel.updateModel("AccountsList");
         itemsModel.updateModel("ProductsList");
 
 
@@ -126,13 +129,13 @@ DocumentWorkspaceCommandsDelegateBase {
                     }
                     else if (dataModelLocal.ContainsKey("ProductsList")){
 
-                        console.log("ProductsList");
                         dataModelLocal = dataModelLocal.GetData("ProductsList");
+                        console.log("ProductsList", dataModelLocal.toJSON());
 
                         dataModelLocal = dataModelLocal.GetData("items");
-                        console.log("items");
+                        console.log("items", dataModelLocal);
 
-                        installationEditorContainer.productsModel = dataModelLocal;
+                        container.productsModel = dataModelLocal;
 
 //                        container.updateModel();
                     }

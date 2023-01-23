@@ -184,22 +184,21 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 	for (QByteArray key : keys){
 		QVariant value = externTreeModel->GetData(key, externIndex);
 
-//		CTreeItemModel* treeItemModelPtr = nullptr;
-//		if (value.isValid()){
-//			treeItemModelPtr = value.value<CTreeItemModel*>();
-//		}
-//		if (treeItemModelPtr != nullptr){
-//			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
+		CTreeItemModel* treeItemModelPtr = nullptr;
+		if (value.isValid()){
+			treeItemModelPtr = value.value<CTreeItemModel*>();
+		}
+		if (treeItemModelPtr != nullptr){
+			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
 
-//			for (int i = 0; i < treeItemModelPtr->GetItemsCount(); i++){
-//				int childIndex = childModelPtr->InsertNewItem();
-//				childModelPtr->CopyItemDataFromModel(childIndex, treeItemModelPtr, i);
-//			}
-
-//			continue;
-//		}
-
-		retVal = SetData(key, value, index);
+			for (int i = 0; i < treeItemModelPtr->GetItemsCount(); i++){
+				int childIndex = childModelPtr->InsertNewItem();
+				retVal = childModelPtr->CopyItemDataFromModel(childIndex, treeItemModelPtr, i);
+			}
+		}
+		else{
+			retVal = SetData(key, value, index);
+		}
 		if (retVal == false){
 			break;
 		}

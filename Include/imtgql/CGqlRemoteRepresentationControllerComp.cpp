@@ -9,7 +9,14 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlClient::ResponseHandler)
 
-imtbase::CHierarchicalItemModelPtr CGqlRemoteRepresentationControllerComp::Response::GetResult()
+CGqlRemoteRepresentationControllerComp::Response::Response()
+			: m_replyResultPtr(nullptr)
+{
+
+}
+
+
+imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::Response::GetResult()
 {
 	return m_replyResultPtr;
 }
@@ -17,14 +24,20 @@ imtbase::CHierarchicalItemModelPtr CGqlRemoteRepresentationControllerComp::Respo
 
 void CGqlRemoteRepresentationControllerComp::Response::OnReply(const IGqlRequest& request, const QByteArray& replyData)
 {
-	m_replyResultPtr.SetPtr(new imtbase::CTreeItemModel());
+	m_replyResultPtr = new imtbase::CTreeItemModel();
 	QJsonDocument document = QJsonDocument::fromJson(replyData);
 	if (document.isObject()){
-		QJsonValue jsonValue = document.object().value("data");
 		QJsonObject dataObject = document.object().value("data").toObject();
-		document.setObject(dataObject);
-		QByteArray parserData = document.toJson(QJsonDocument::Compact);
-		m_replyResultPtr->CreateFromJson(replyData);
+		if (!dataObject.isEmpty()){
+			QJsonValue bodyValue = dataObject.value(request.GetCommandId());
+			if (!bodyValue.isNull()){
+				dataObject = QJsonObject();
+				dataObject.insert("data", bodyValue);
+				document.setObject(dataObject);
+				QByteArray parserData = document.toJson(QJsonDocument::Compact);
+				m_replyResultPtr->CreateFromJson(parserData);
+			}
+		}
 	}
 }
 
@@ -42,7 +55,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 	Response responseHandler;
 	bool retVal = m_apiClientCompPtr->SendRequest(gqlRequest, responseHandler);
 	if (retVal){
-		return responseHandler.GetResult().GetPtr();
+		return responseHandler.GetResult();
 	}
 
 	return nullptr;

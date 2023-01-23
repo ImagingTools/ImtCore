@@ -23,13 +23,14 @@ public:
 	class Response: virtual public imtgql::IGqlClient::ResponseHandler
 	{
 	public:
-		virtual imtbase::CHierarchicalItemModelPtr GetResult();
+		Response();
+		virtual imtbase::CTreeItemModel* GetResult();
 
 		// reimplemented (imtgql::IGqlClient::ResponseHandler)
 		virtual void OnReply(const IGqlRequest& request, const QByteArray& replyData) override;
 
 	private:
-		imtbase::CHierarchicalItemModelPtr m_replyResultPtr;
+		imtbase::CTreeItemModel* m_replyResultPtr;
 	};
 
 protected:
