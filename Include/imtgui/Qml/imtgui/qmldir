@@ -95,3 +95,4 @@ CommandsDelegateBase 1.0 ./AuxComponents/CommandsDelegateBase.qml
 DocumentCommandsDelegate 1.0 ./AuxComponents/DocumentCommandsDelegate.qml
 
 SimpleCommandsDecorator 1.0 ./AuxComponents/SimpleCommandsDecorator.qml
+CollectionDataProvider 1.0 ./AuxComponents/CollectionDataProvider.qml

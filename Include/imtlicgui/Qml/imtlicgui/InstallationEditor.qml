@@ -8,8 +8,6 @@ Item {
 
     property TreeItemModel documentModel: TreeItemModel{}
 
-//    commandsDelegateSourceComp: installationEditorCommandsDelegate;
-
     property bool blockUpdatingModel: false;
     property bool centered: true;
 
@@ -18,36 +16,29 @@ Item {
 
     Component.onCompleted: {
         licensesProvider.updateModel();
-    }
 
-    InstallationEditorCommandsDelegate {
-        onProductsModelChanged: {
-            console.log("onProductsModelChanged", productsModel);
-            productCB.model = productsModel;
-
-            installationEditorContainer.updateModel();
-        }
+        dataProvider.updateModel({}, ["Id", "Name", "CategoryId"]);
     }
 
     onDocumentModelChanged: {
-        updateGui();
+        console.log("InstallationEditor onDocumentModelChanged", documentModel.toJSON());
+    }
 
-        undoRedoManager.registerModel(documentModel)
+    CollectionDataProvider {
+        id: dataProvider;
+
+        commandId: "Products";
+
+        onCollectionModelChanged: {
+            productCB.model = dataProvider.collectionModel;
+
+            installationEditorContainer.updateGui();
+        }
     }
 
     Rectangle {
         anchors.fill: parent;
         color: "white";
-    }
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        commandsId: installationEditorContainer.commandsId;
-
-        onModelStateChanged: {
-            updateGui();
-        }
     }
 
     LicensesProvider {
@@ -63,16 +54,11 @@ Item {
     }
 
     function updateGui(){
-        console.log("Begin updateGui");
         blockUpdatingModel = true;
-
-  //      instanceIdInput.text = documentModel.GetData("Id");
 
         let productId = documentModel.GetData("ProductId");
         let pairId = documentModel.GetData("PairId");
 
-
-        //        productCB.currentText = "";
         let productModel = productCB.model;
         for (let i = 0; i < productModel.GetItemsCount(); i++){
             let id = productModel.GetData("Id", i);
@@ -81,16 +67,6 @@ Item {
                 break;
             }
         }
-
-        //        customerCB.currentText = "";
-//        let dependencyModel = dependencyCB.model;
-//        for (let i = 0; i < dependencyModel.GetItemsCount(); i++){
-//            let id = dependencyModel.GetData("Id", i);
-//            if (id === pairId){
-//                dependencyCB.currentIndex = i;
-//                break;
-//            }
-//        }
 
         serialNumberInput.text = documentModel.GetData("SerialNumber");
         macAddressInput.text = documentModel.GetData("MacAddress");
@@ -107,8 +83,6 @@ Item {
         }
 
         if (licensesModel){
-            console.log("licensesModel", licensesModel.toJSON());
-            console.log("activeLicensesModel", activeLicensesModel.toJSON());
             for (let i = 0; i < licensesModel.GetItemsCount(); i++){
                 let licenseId = licensesModel.GetData("Id", i);
                 let licenseName = licensesModel.GetData("Name", i);
@@ -131,20 +105,14 @@ Item {
                     }
                 }
 
-                console.log("row addRow", JSON.stringify(row));
                 licensesTable.addRow(row);
             }
         }
 
         blockUpdatingModel = false;
-        console.log("End updateGui");
     }
 
     function updateModel(){
-        console.log("Begin updateModel");
-        undoRedoManager.beginChanges();
-
- //       documentModel.SetData("Id", instanceIdInput.text)
 
         let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
         documentModel.SetData("ProductId", selectedProductId);
@@ -183,9 +151,6 @@ Item {
                 }
             }
         }
-
-        undoRedoManager.endChanges();
-        console.log("End updateModel");
     }
 
     Rectangle {

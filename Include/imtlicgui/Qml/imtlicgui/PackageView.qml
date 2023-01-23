@@ -75,7 +75,7 @@ DocumentBase {
             console.log("UndoRedoManager onModelStateChanged");
             packageViewContainer.syncronise();
 
-//            packageViewContainer.updateGui();
+            packageViewContainer.updateGui();
         }
     }
 
@@ -536,12 +536,10 @@ DocumentBase {
             Component.onCompleted: {
                 treeView.addColumn({"Id": "Name", "Name": "Name"});
 
-//                rightPanel.updateTreeViewGui();
+                rightPanel.updateTreeViewGui();
 
-//                tableView.selectedIndexChanged.connect(rightPanel.selectedIndexChanged);
+                tableView.selectedIndexChanged.connect(rightPanel.selectedIndexChanged);
             }
-
-//            Component
 
             onRowModelDataChanged: {
                 console.log("onRowModelDataChanged", delegate, prop);

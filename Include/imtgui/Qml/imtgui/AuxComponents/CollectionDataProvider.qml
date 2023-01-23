@@ -5,34 +5,38 @@ import imtqml 1.0
 Item {
     id: container;
 
-    property TreeItemModel collectionModel: TreeItemModel {};
+    property TreeItemModel collectionModel: null;;
 
     property string commandId;
 
-    function updateModel(){
+    function updateModel(inputParams, fields){
         if (commandId == ""){
             console.log( "ERROR: CollectionDataProvider commandId is empty!");
 
             return;
         }
 
-        itemsInfoModel.updateModel();
+        itemsInfoModel.updateModel(inputParams, fields);
     }
 
     GqlModel {
         id: itemsInfoModel;
 
-        function updateModel() {
+        function updateModel(externInputParams, fields) {
             console.log( "gqlModelBaseContainer updateModel", commandId + "List");
             var query = Gql.GqlRequest("query", commandId + "List");
 
             var inputParams = Gql.GqlObject("input");
-
+            let keys = Object.keys(externInputParams)
+            for (let key of keys){
+                inputParams.InsertField(key, externInputParams[key]);
+            }
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
+            for (let key of fields){
+                queryFields.InsertField(key);
+            }
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
@@ -53,7 +57,7 @@ Item {
                     if (dataModelLocal.ContainsKey(commandId + "List")){
                         dataModelLocal = dataModelLocal.GetData(commandId + "List");
                         if (dataModelLocal.ContainsKey("items")){
-                            collectionModel = dataModelLocal.GetData("items");
+                            container.collectionModel = dataModelLocal.GetData("items");
                         }
 
                         if (dataModelLocal.ContainsKey("notification")){

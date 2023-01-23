@@ -25,38 +25,39 @@ bool CKeyDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId) c
 
 	m_productInstanceId = dataId;
 
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(dataId, dataPtr)){
-		imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+	data = "Test create license file!";
 
-		if (productInstancePtr == nullptr){
-			return false;
-		}
+//	imtbase::IObjectCollection::DataPtr dataPtr;
+//	if (m_objectCollectionCompPtr->GetObjectData(dataId, dataPtr)){
+//		imtlic::IProductInstanceInfo* productInstancePtr = dynamic_cast<imtlic::IProductInstanceInfo*>(dataPtr.GetPtr());
+//		if (productInstancePtr == nullptr){
+//			return false;
+//		}
 
-		if (m_licensePersistenceCompPtr.IsValid()){
-			QTemporaryDir tempDir;
-			QString filePathTmp = tempDir.path() + "/"  + QUuid::createUuid().toString() + ".xml";
+//		if (m_licensePersistenceCompPtr.IsValid()){
+//			QTemporaryDir tempDir;
+//			QString filePathTmp = tempDir.path() + "/"  + QUuid::createUuid().toString() + ".xml";
 			
-			int state = m_licensePersistenceCompPtr->SaveToFile(*productInstancePtr, filePathTmp);
-			if (state != ifile::IFilePersistence::OS_OK){
-				SendErrorMessage(0, "License file could not be saved", "Server data provider");
+//			int state = m_licensePersistenceCompPtr->SaveToFile(*productInstancePtr, filePathTmp);
+//			if (state != ifile::IFilePersistence::OS_OK){
+//				SendErrorMessage(0, "License file could not be saved", "Server data provider");
 
-				return false;
-			}
+//				return false;
+//			}
 
-			QFile file(filePathTmp);
+//			QFile file(filePathTmp);
 
-			if (!file.open(QIODevice::ReadOnly )){
-				SendErrorMessage(0, "License file could not be opened", "Server data provider");
+//			if (!file.open(QIODevice::ReadOnly )){
+//				SendErrorMessage(0, "License file could not be opened", "Server data provider");
 
-				return false;
-			}
+//				return false;
+//			}
 
-			data = file.readAll();
+//			data = file.readAll();
 
-			file.close();
-		}
-	}
+//			file.close();
+//		}
+//	}
 
 	return true;
 }

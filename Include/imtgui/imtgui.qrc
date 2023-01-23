@@ -118,6 +118,7 @@
         <file alias="imtgui/AuxComponents/RadioBox.qml">Qml/imtgui/AuxComponents/RadioBox.qml</file>
 	
 	<file alias="imtgui/AuxComponents/SimpleCommandsDecorator.qml">Qml/imtgui/AuxComponents/SimpleCommandsDecorator.qml</file>
+	<file alias="imtgui/AuxComponents/CollectionDataProvider.qml">Qml/imtgui/AuxComponents/CollectionDataProvider.qml</file>	
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
