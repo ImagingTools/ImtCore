@@ -99,6 +99,7 @@ Item {
         Item {
             id: content;
             property Item root;
+            property Item rootItem:collectionViewContainer;
             property bool centered: true;
             property string contentId;
             property string contentName;
@@ -110,6 +111,10 @@ Item {
             onRootChanged: {
                 contentLoader.item.root = content.root;
             }
+            onRootItemChanged: {
+                contentLoader.item.rootItem = content.rootItem;
+
+            }
 
             Loader {
                 id: contentLoader;
@@ -117,6 +122,7 @@ Item {
                 source: content.contentSource;
                 onLoaded: {
                     contentLoader.item.root = content.root;
+                    contentLoader.item.rootItem = content.rootItem;
                     contentLoader.width = item.width;
                     contentLoader.height = item.height;
                     contentLoader.item.itemId = content.contentId;

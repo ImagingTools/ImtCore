@@ -19,6 +19,7 @@ Rectangle {
     property bool hasIcon: true;
 
     property Item root;
+    property Item rootItem;
     property Item bodyItem: loaderBodyDialog.item;
 
     property alias topPanel: loaderTopPanel.item;
