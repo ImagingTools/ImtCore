@@ -30,6 +30,11 @@ Item {
         commandId: "Products";
 
         onCollectionModelChanged: {
+            if (!documentModel.ContainsKey("Id")){
+                let uuid = uuidGenerator.generateUUID();
+                documentModel.SetData("Id", uuid);
+            }
+
             productCB.model = dataProvider.collectionModel;
 
             installationEditorContainer.updateGui();

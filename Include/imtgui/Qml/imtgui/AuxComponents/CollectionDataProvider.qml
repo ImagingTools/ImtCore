@@ -5,7 +5,7 @@ import imtqml 1.0
 Item {
     id: container;
 
-    property TreeItemModel collectionModel: null;;
+    property TreeItemModel collectionModel: null;
 
     property string commandId;
 

@@ -96,3 +96,4 @@ DocumentCommandsDelegate 1.0 ./AuxComponents/DocumentCommandsDelegate.qml
 
 SimpleCommandsDecorator 1.0 ./AuxComponents/SimpleCommandsDecorator.qml
 CollectionDataProvider 1.0 ./AuxComponents/CollectionDataProvider.qml
+UuidGenerator 1.0 ./AuxComponents/UuidGenerator.qml
