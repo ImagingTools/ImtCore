@@ -152,7 +152,7 @@ Item {
         let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
         documentModel.SetData("ProductId", selectedProductId);
 
-        documentModel.SetData("ProductCategory",  bodyColumn.productCategory);
+        documentModel.SetData("CategoryId",  bodyColumn.productCategory);
 
         let selectedPairId = dependencyCB.model.GetData("Id", dependencyCB.currentIndex);
         documentModel.SetData("PairId", selectedPairId);
