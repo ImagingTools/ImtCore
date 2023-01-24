@@ -9,11 +9,13 @@ Item {
     property TreeItemModel documentModel: TreeItemModel{}
     property TreeItemModel licensesModel: TreeItemModel{}
     property TreeItemModel productsModel: TreeItemModel{}
+    property TreeItemModel orderProductsModel: TreeItemModel{}
     property TreeItemModel softwareModel: TreeItemModel{}
     property TreeItemModel hardwareModel: TreeItemModel{}
 
     property bool blockUpdatingModel: false;
     property bool centered: true;
+
 
     width: 550;
     height: 800;
@@ -29,6 +31,10 @@ Item {
         updateCategoryProducts("Hardware");
 
         generateId();
+    }
+
+    function started(){
+
     }
 
     function generateId(){
@@ -50,6 +56,7 @@ Item {
 
         for (let i = 0; i < productModel.GetItemsCount(); i++){
             let modelCategory = productModel.GetData("CategoryId", i);
+            let pairId = productModel.GetData("PairId", i);
             if (category === modelCategory){
                 let resultIndex = resultModel.InsertNewItem();
                 resultModel.SetData("Id", productModel.GetData("Id", resultIndex));
@@ -260,7 +267,10 @@ Item {
             radius: 3;
 
             onCurrentIndexChanged: {
-
+                if (!blockUpdatingModel){
+                    installationEditorContainer.updateModel();
+                    installationEditorContainer.updateGui();
+                }
             }
         }
 
