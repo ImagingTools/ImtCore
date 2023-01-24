@@ -29,6 +29,7 @@ Rectangle {
     property string notClosingButtons: "";
 
     signal finished(string buttonId);
+    signal started();
 
     property alias contentComp: loaderBodyDialog.sourceComponent;
     property alias topPanelComp: loaderTopPanel.sourceComponent;

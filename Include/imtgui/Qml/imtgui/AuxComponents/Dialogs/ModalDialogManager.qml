@@ -75,6 +75,7 @@ Item {
                     if (dialogLoader.item.centered){
                         dialogLoader.anchors.centerIn = dialogDelegate;
                     }
+                    dialogLoader.item.started()
                    // dialogLoader.item.forceActiveFocus();
                 }
             }
