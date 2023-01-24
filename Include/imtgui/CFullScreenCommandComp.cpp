@@ -13,6 +13,26 @@ CFullScreenCommandComp::CFullScreenCommandComp()
 }
 
 
+// reimplemented (QObject)
+
+bool CFullScreenCommandComp::eventFilter(QObject* watchedPtr, QEvent* eventPtr)
+{
+	QWidget* mainWidgetPtr = GetMainWidget();
+	const bool isFullScreen = CheckIsFullScreen();
+	if (watchedPtr == mainWidgetPtr){
+		if (eventPtr->type() == QEvent::WindowStateChange){
+			const Qt::WindowStates windowStates = mainWidgetPtr->windowState();
+			if (!windowStates.testFlag(Qt::WindowState::WindowFullScreen)){
+				m_mainWidgetLastState = windowStates;
+			}
+			UpdateVisualStatus();
+		}
+	}
+
+	return BaseClass2::eventFilter(watchedPtr, eventPtr);
+}
+
+
 // reimpemented (ibase::ICommandsProvider)
 
 const ibase::IHierarchicalCommand* CFullScreenCommandComp::GetCommands() const
@@ -36,41 +56,61 @@ void CFullScreenCommandComp::OnComponentCreated()
 
 	EnableLocalization(true);
 
+	QWidget* mainWidgetPtr = GetMainWidget();
+	if(mainWidgetPtr != nullptr){
+		mainWidgetPtr->installEventFilter(this);
+	}
 }
 
 
 // protected methods
 
-bool CFullScreenCommandComp::CheckIsFullScreen()
+bool CFullScreenCommandComp::CheckIsFullScreen() const
 {
-	if (!m_guiObjectCompPtr.IsValid()){
+	QWidget* mainWidgetPtr = GetMainWidget();
+
+	if(mainWidgetPtr == nullptr){
 		return false;
 	}
 
-	if (!m_guiObjectCompPtr->IsGuiCreated()){
-		return false;
-	}
-
-	bool retVal = true;
-
-	QWidget* mainWidgetPtr = m_guiObjectCompPtr->GetWidget();
-	Q_ASSERT(mainWidgetPtr != nullptr);
-
-	while (mainWidgetPtr->parentWidget() != nullptr){
-		mainWidgetPtr = mainWidgetPtr->parentWidget();
-	}
-
-	if (mainWidgetPtr->isFullScreen() == false){
-		retVal = false;
-	}
+	const bool retVal = mainWidgetPtr->isFullScreen();
 
 	return retVal;
 }
 
 
-// reimpemented (iqtgui::TDesignSchemaHandlerWrap)
+QWidget* CFullScreenCommandComp::GetMainWidget(QWidget* fromWidgetPtr) const
+{
+	// can the main widget change during execution?
+	if(!m_mainWidgetPtr.isNull()){
+		return m_mainWidgetPtr;
+	}
 
-void CFullScreenCommandComp::OnDesignSchemaChanged()
+	if(fromWidgetPtr == nullptr){
+		if (!m_guiObjectCompPtr.IsValid()){
+			return nullptr;
+		}
+
+		if (!m_guiObjectCompPtr->IsGuiCreated()){
+			return nullptr;
+		}
+		m_mainWidgetPtr = m_guiObjectCompPtr->GetWidget();
+	}
+	else {
+		m_mainWidgetPtr = fromWidgetPtr;
+	}
+
+	Q_ASSERT(m_mainWidgetPtr != nullptr);
+
+	while (m_mainWidgetPtr->parentWidget() != nullptr){
+		m_mainWidgetPtr = m_mainWidgetPtr->parentWidget();
+	}
+
+	return m_mainWidgetPtr;
+}
+
+
+void CFullScreenCommandComp::UpdateVisualStatus()
 {
 	bool isFullScreen = CheckIsFullScreen();
 	if (isFullScreen){
@@ -79,6 +119,14 @@ void CFullScreenCommandComp::OnDesignSchemaChanged()
 	else {
 		m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, GetIcon(*m_actionIconScreenOnAttrPtr));
 	}
+}
+
+
+// reimpemented (iqtgui::TDesignSchemaHandlerWrap)
+
+void CFullScreenCommandComp::OnDesignSchemaChanged()
+{
+	UpdateVisualStatus();
 }
 
 
@@ -94,24 +142,17 @@ void CFullScreenCommandComp::OnLanguageChanged()
 
 void CFullScreenCommandComp::OnCommandActivated()
 {
-	QWidget* mainWidgetPtr = m_guiObjectCompPtr->GetWidget();
+	QWidget* mainWidgetPtr = GetMainWidget();
 	Q_ASSERT(mainWidgetPtr != nullptr);
 
-	while (mainWidgetPtr->parentWidget() != nullptr){
-		mainWidgetPtr = mainWidgetPtr->parentWidget();
-	}
+	const bool isFullScreen = CheckIsFullScreen();
+	if (isFullScreen){
+		Q_ASSERT(!m_mainWidgetLastState.testFlag(Qt::WindowState::WindowFullScreen));
 
-	if (mainWidgetPtr->isFullScreen()){
-		mainWidgetPtr->showMaximized();
-		if (m_actionIconScreenOnAttrPtr.IsValid()){
-			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOnAttrPtr, GetIcon(*m_actionIconScreenOnAttrPtr));
-		}
+		mainWidgetPtr->setWindowState(m_mainWidgetLastState);
 	}
 	else{
 		mainWidgetPtr->showFullScreen();
-		if (m_actionIconScreenOnAttrPtr.IsValid()){
-			m_switchCommand.SetVisuals(*m_menuNameAttrPtr, *m_menuNameAttrPtr, *m_menuDescriptionOffAttrPtr, GetIcon(*m_actionIconScreenOffAttrPtr));
-		}
 	}
 }
 

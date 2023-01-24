@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QProcess>
+#include <QtCore/QPointer>
 
 // ACF includes
 #include <imod/TSingleModelObserverBase.h>
@@ -32,6 +33,7 @@ class CFullScreenCommandComp:
 	Q_OBJECT
 public:
 	typedef iqtgui::TMakeIconProviderCompWrap<iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<icomp::CComponentBase>>> BaseClass;
+	typedef QObject BaseClass2;
 	
 	I_BEGIN_COMPONENT(CFullScreenCommandComp);
 		I_REGISTER_INTERFACE(ibase::ICommandsProvider);
@@ -46,14 +48,19 @@ public:
 
 	CFullScreenCommandComp();
 
+	// reimplemented (QObject)
+	virtual bool eventFilter(QObject* watchedPtr, QEvent* eventPtr) override;
+
 	// reimpemented (ibase::ICommandsProvider)
-	virtual const ibase::IHierarchicalCommand* GetCommands() const;
+	virtual const ibase::IHierarchicalCommand* GetCommands() const override;
 
 	// reimpemented (icomp::IComponent)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 protected:
-	virtual bool CheckIsFullScreen();
+	Q_REQUIRED_RESULT virtual bool CheckIsFullScreen() const;
+	Q_REQUIRED_RESULT virtual QWidget* GetMainWidget(QWidget* fromWidgetPtr = nullptr) const;
+	virtual void UpdateVisualStatus();
 
 	// reimpemented (iqtgui::TDesignSchemaHandlerWrap)
 	virtual void OnDesignSchemaChanged() override;
@@ -76,6 +83,10 @@ protected:
 	iqtgui::CHierarchicalCommand m_rootMenuCommand;
 	iqtgui::CHierarchicalCommand m_mainMenuCommand;
 	iqtgui::CHierarchicalCommand m_switchCommand;
+
+	mutable QPointer<QWidget> m_mainWidgetPtr;
+
+	Qt::WindowStates m_mainWidgetLastState;
 
 };
 
