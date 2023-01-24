@@ -12,6 +12,7 @@ Rectangle {
 
     property var model;
     property Item root;
+    property Item rootItem;
 
     property int itemWidth: 200;
     property int itemHeight: 26;
@@ -109,8 +110,8 @@ Rectangle {
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
         onTextEdited: {
-            comboBoxContainerGql.currentIndex = -1;
-            offset = 0;
+            popupMenuContainer.rootItem.currentIndex = -1;
+            popupMenuContainer.offset = 0;
             modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
             itemsModel.updateModel(0);
         }
@@ -123,6 +124,7 @@ Rectangle {
 
     Rectangle {
         id: itemBody;
+
         anchors.top: filterField.bottom
         anchors.left: parent.left
 
@@ -257,7 +259,7 @@ Rectangle {
                             loadedRec.visible = false;
                         }
                     }
-                    dataModelLocal.Refresh()
+                    dataModelLocal.Refresh();
                 }
             }
         }

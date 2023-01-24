@@ -94,6 +94,7 @@ Item {
         PopupMenuDialogGql {
             id: popup;
 
+            rootItem: comboBoxContainerGql;
             offset: comboBoxContainerGql.offset;
             count: comboBoxContainerGql.count;
             commandId: comboBoxContainerGql.commandId;
