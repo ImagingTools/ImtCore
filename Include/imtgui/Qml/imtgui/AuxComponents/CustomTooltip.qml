@@ -27,40 +27,45 @@ Item {
     property int borderWidth: 1;
     property string borderColor: "lightgray";
 
+    property bool openST: false;
+    property int waitingDuration: 500;
+
+
     function openTooltip(xX, yY){
-        console.log("openTooltip", xX, yY);
+        if(!customTooltip.openST){
+            console.log("openTooltip", xX, yY);
 
-        var point = mapToItem(thumbnailDecoratorContainer, xX, yY);
-        if(point.x > thumbnailDecoratorContainer.width*2/3){
-            point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin;
-        }
-        else{
-            point.x = point.x + customTooltip.componentMargin;
-        }
+            var point = mapToItem(thumbnailDecoratorContainer, xX, yY);
+            if(point.x > thumbnailDecoratorContainer.width*2/3){
+                point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin;
+            }
+            else{
+                point.x = point.x + customTooltip.componentMargin;
+            }
 
-        if(point.y > thumbnailDecoratorContainer.height*2/3){
-            point.y = point.y - customTooltip.componentHeight - customTooltip.componentMargin;
-        }
-        else{
-            point.y = point.y + customTooltip.componentMargin;
-        }
+            if(point.y > thumbnailDecoratorContainer.height*2/3){
+                point.y = point.y - customTooltip.componentHeight - customTooltip.componentMargin;
+            }
+            else{
+                point.y = point.y + customTooltip.componentMargin;
+            }
 
-        modalDialogManager.openDialog(hint, {"x": point.x, "y": point.y});
+            modalDialogManager.openDialog(hint, {"x": point.x, "y": point.y});
 
-        if(modalDialogManager.count == 1){
-            modalDialogManager.backgroundItem.opacity = 0;
-            modalDialogManager.backgroundItem.backgroundAreaItem.visible = false;
+            modalDialogManager.backgroundItem.visible = false;
+
+            customTooltip.openST = true;
         }
     }
 
     function closeTooltip(){
+        if(customTooltip.openST){
+            console.log("closeTooltip");
 
-        console.log("closeTooltip");
-        if(modalDialogManager.count == 1){
-            modalDialogManager.backgroundItem.opacity = 1;
-            modalDialogManager.backgroundItem.backgroundAreaItem.visible = true;
+            modalDialogManager.closeDialog();
+
+            customTooltip.openST = false;
         }
-        modalDialogManager.closeDialog();
 
     }
 
@@ -140,36 +145,5 @@ Item {
             }
         }
     }
-
-    //////////////////example///////////////////////////////////
-
-//    Rectangle{
-//        id: rec;
-//        x: 100;
-//        y: 700;
-//        width: 100;
-//        height: width;
-//        color:"red";
-
-//        CustomTooltip{
-//            id: tooltip;
-//            text: "tooltip tooltip tooltip tooltip tooltip tooltip";
-//            fitToTextWidth: false;
-//            horizontalAlignment: Text.AlignHCenter;
-//        }
-
-//        MouseArea{
-//            anchors.fill: parent;
-//            cursorShape: Qt.PointingHandCursor;
-//            hoverEnabled: true;
-//            onEntered: {
-//                tooltip.openTooltip(mouseX, mouseY);
-//            }
-//            onExited: {
-//                tooltip.closeTooltip();
-//            }
-//        }
-//    }
-
 
 }

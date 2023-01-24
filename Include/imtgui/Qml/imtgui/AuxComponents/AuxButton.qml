@@ -35,6 +35,9 @@ Rectangle {
     property alias iconSource: image.source;
     property alias fontColor: text.color;
 
+    property alias tooltipText: tooltip.text;
+    property alias tooltip: tooltip;
+
     signal clicked;
 
     onFocusChanged: {
@@ -91,15 +94,46 @@ Rectangle {
         visible: auxButtonContainer.enabled;
 
         onClicked: {
+
             auxButtonContainer.clicked();
         }
 
         onPressed: {
+            tooltip.closeTooltip();
             auxButtonContainer.pressed = true;
         }
 
         onReleased: {
             auxButtonContainer.pressed = false;
+        }
+
+        onEntered: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                pauseTooltip.start();
+
+            }
+
+        }
+
+        onExited: {
+            if(tooltip.text !== "" && tooltip.openST){
+                pauseTooltip.stop();
+                tooltip.closeTooltip();
+            }
+        }
+    }
+
+    CustomTooltip{
+        id: tooltip;
+    }
+
+    PauseAnimation {
+        id: pauseTooltip;
+
+        duration: tooltip.waitingDuration;
+        onFinished: {
+            tooltip.openTooltip(ma.mouseX, ma.mouseY);
         }
     }
 }
