@@ -117,7 +117,7 @@ Rectangle {
         }
 
         onExited: {
-            if(tooltip.text !== "" && tooltip.openST){
+            if(tooltip.text !== ""){
                 pauseTooltip.stop();
                 tooltip.closeTooltip();
             }
