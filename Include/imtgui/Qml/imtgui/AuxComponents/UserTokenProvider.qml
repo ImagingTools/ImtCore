@@ -9,6 +9,10 @@ Item {
     property string login: "";
 
     signal accepted();
+    signal errorSignal(string message);
+    onErrorSignal: {
+        console.log("ERROR: ",message);
+    }
 
     function updateModel(){
         userModeGqlModel.getUserMode();
@@ -45,7 +49,8 @@ Item {
                      dataModelLocal = dataModelLocal.GetData("UserAuthorization")
 
                     let message = dataModelLocal.GetData("message");
-                    errorMessage.text = message;
+                    //errorMessage.text = message;
+                    container.errorSignal(message);
 
                     return;
                 }

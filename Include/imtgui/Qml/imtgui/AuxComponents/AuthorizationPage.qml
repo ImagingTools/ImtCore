@@ -242,6 +242,7 @@ Rectangle {
                     id: errorMessage;
 
                     anchors.verticalCenter: parent.verticalCenter;
+                    anchors.horizontalCenter: parent.horizontalCenter;
 
                     color:  Style.errorTextColor;
                     font.family: Style.fontFamily;
@@ -296,5 +297,10 @@ Rectangle {
             pageContainer.updateAllModels();
             authPageContainer.visible = false;
         }
+        onErrorSignal: {
+            errorMessage.text = message;
+        }
     }
+
+
 }
