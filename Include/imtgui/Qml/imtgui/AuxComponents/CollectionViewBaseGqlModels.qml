@@ -109,6 +109,7 @@ Item {
 
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField("Id");
+            queryFields.InsertField("Name");
             for(var i = 0; i < gqlModelBaseContainer.headers.GetItemsCount(); i++){
                 queryFields.InsertField(gqlModelBaseContainer.headers.GetData("Id", i));
             }

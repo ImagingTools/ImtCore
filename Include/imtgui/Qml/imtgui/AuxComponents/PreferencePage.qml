@@ -97,24 +97,21 @@ Rectangle {
                 let pageParameters = externModel.GetData("Parameters", i);
 
                 let index = getPageIndexByPageId(pageId)
-
                 if (index < 0){
                     index = commonModel.InsertNewItem();
                 }
 
-                commonModel.CopyItemDataFromModel(index, externModel, i);
+                commonModel.SetData("Id", pageId, index);
+                commonModel.SetData("Name", pageName, index);
+                commonModel.SetData("Parameters", pageParameters, index);
             }
         }
     }
 
-    function getPageIndexByPageId(pageId, model){
-        if (!model){
-            model = commonModel;
-        }
-
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            let id = model.GetData("Id", i);
-            if (id == pageId){
+    function getPageIndexByPageId(pageId){
+        for (let i = 0; i < commonModel.GetItemsCount(); i++){
+            let id = commonModel.GetData("Id", i);
+            if (id === pageId){
                 return i;
             }
         }

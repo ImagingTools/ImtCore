@@ -18,20 +18,24 @@ Item {
     width: 550;
     height: 800;
 
-//    UuidGenerator {
-//        id: uuidGenerator;
-//    }
+    UuidGenerator {
+        id: uuidGenerator;
+    }
 
     Component.onCompleted: {
-//        if (!documentModel.ContainsKey("Id")){
-//            let uuid = uuidGenerator.generateUUID();
-//            documentModel.SetData("Id", uuid);
-//        }
-
         productCB.model = installationEditorContainer.productsModel;
 
         updateCategoryProducts("Software");
         updateCategoryProducts("Hardware");
+
+        generateId();
+    }
+
+    function generateId(){
+        if (!documentModel.ContainsKey("Id")){
+            let uuid = uuidGenerator.generateUUID();
+            documentModel.SetData("Id", uuid);
+        }
     }
 
     function updateCategoryProducts(category){
@@ -56,6 +60,8 @@ Item {
 
     onDocumentModelChanged: {
         console.log("InstallationEditor onDocumentModelChanged", documentModel.toJSON());
+        generateId();
+
         updateGui();
     }
 
