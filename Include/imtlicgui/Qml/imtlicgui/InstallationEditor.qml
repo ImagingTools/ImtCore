@@ -7,6 +7,10 @@ Item {
     id: installationEditorContainer;
 
     property TreeItemModel documentModel: TreeItemModel{}
+    property TreeItemModel licensesModel: TreeItemModel{}
+    property TreeItemModel productsModel: TreeItemModel{}
+    property TreeItemModel softwareModel: TreeItemModel{}
+    property TreeItemModel hardwareModel: TreeItemModel{}
 
     property bool blockUpdatingModel: false;
     property bool centered: true;
@@ -15,48 +19,47 @@ Item {
     height: 800;
 
     Component.onCompleted: {
-        licensesProvider.updateModel();
+//        if (!documentModel.ContainsKey("Id")){
+//            let uuid = uuidGenerator.generateUUID();
+//            documentModel.SetData("Id", uuid);
+//        }
 
-        dataProvider.updateModel({}, ["Id", "Name", "CategoryId"]);
+        productCB.model = installationEditorContainer.productsModel;
+
+        updateCategoryProducts("Software");
+        updateCategoryProducts("Hardware");
+    }
+
+    function updateCategoryProducts(category){
+        let productModel = installationEditorContainer.productsModel;
+        let resultModel;
+        if (category == "Hardware"){
+            resultModel = installationEditorContainer.hardwareModel;
+        }
+        else{
+            resultModel = installationEditorContainer.softwareModel;
+        }
+
+        for (let i = 0; i < productModel.GetItemsCount(); i++){
+            let modelCategory = productModel.GetData("CategoryId", i);
+            if (category === modelCategory){
+                let resultIndex = resultModel.InsertNewItem();
+                resultModel.SetData("Id", productModel.GetData("Id", resultIndex));
+                resultModel.SetData("Name", productModel.GetData("Name", resultIndex));
+            }
+        }
     }
 
     onDocumentModelChanged: {
         console.log("InstallationEditor onDocumentModelChanged", documentModel.toJSON());
+        updateGui();
     }
 
-    CollectionDataProvider {
-        id: dataProvider;
+//    Rectangle {
+//        anchors.fill: parent;
+//        color: "white";
+//    }
 
-        commandId: "Products";
-
-        onCollectionModelChanged: {
-            if (!documentModel.ContainsKey("Id")){
-                let uuid = uuidGenerator.generateUUID();
-                documentModel.SetData("Id", uuid);
-            }
-
-            productCB.model = dataProvider.collectionModel;
-
-            installationEditorContainer.updateGui();
-        }
-    }
-
-    Rectangle {
-        anchors.fill: parent;
-        color: "white";
-    }
-
-    LicensesProvider {
-        id: licensesProvider;
-    }
-
-    MouseArea {
-        anchors.fill: parent;
-
-        onClicked: {
-            installationEditorContainer.forceActiveFocus();
-        }
-    }
 
     function updateGui(){
 //        console.log("updateGui start", blockUpdatingModel, documentModel.toJSON())
@@ -90,17 +93,17 @@ Item {
         }
 
         let licensesModel;
-        if (licensesProvider.model){
-            for (let i = 0; i < licensesProvider.model.GetItemsCount(); i++){
-                let id = licensesProvider.model.GetData("Id", i);
+        if (installationEditorContainer.licensesModel){
+            for (let i = 0; i < installationEditorContainer.licensesModel.GetItemsCount(); i++){
+                let id = installationEditorContainer.licensesModel.GetData("Id", i);
                 if (id === productId){
-                    let productLicensesModel = licensesProvider.model.GetData("Licenses", i);
+                    let productLicensesModel = installationEditorContainer.licensesModel.GetData("Licenses", i);
                     licensesModel = productLicensesModel;
                 }
             }
         }
 
-        console.log("licensesProvider", licensesProvider.model.toJSON());
+        console.log("licensesProvider", installationEditorContainer.licensesModel.toJSON());
 
         if (licensesModel){
             console.log("licensesModel", licensesModel.toJSON());
@@ -141,7 +144,7 @@ Item {
 
         documentModel.SetData("ProductCategory",  bodyColumn.productCategory);
 
-        let selectedPairId = customerCB.model.GetData("Id", dependencyCB.currentIndex);
+        let selectedPairId = dependencyCB.model.GetData("Id", dependencyCB.currentIndex);
         documentModel.SetData("PairId", selectedPairId);
 
         documentModel.SetData("SerialNumber", serialNumberInput.text);
@@ -214,6 +217,14 @@ Item {
                 bodyColumn.productCategory = productCB.model.GetData("CategoryId", productCB.currentIndex);
                 console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, bodyColumn.productCategory);
 
+                if (bodyColumn.productCategory == "Software"){
+                    dependencyCB.model = installationEditorContainer.hardwareModel;
+                }
+                else{
+                    dependencyCB.model = installationEditorContainer.softwareModel;
+                }
+
+
                 if (!blockUpdatingModel){
                     installationEditorContainer.updateModel();
                     installationEditorContainer.updateGui();
@@ -237,15 +248,6 @@ Item {
             height: 23;
 
             radius: 3;
-
-            currentText: "RTVision.3d Sensor";
-
-            model: ListModel {
-                id: modelCategogy;
-                ListElement {
-                    Name: "RTVision.3d Sensor"
-                }
-            }
 
             onCurrentIndexChanged: {
 
@@ -303,7 +305,7 @@ Item {
             placeHolderText: qsTr("Enter the serial number");
             borderColor: Style.iconColorOnSelected;
             maximumLength: 17;
-            visible: bodyColumn.productCategory == "Hardware"
+            visible: bodyColumn.productCategory == "Hardware";
 
             onEditingFinished: {
                 updateModel();
@@ -348,7 +350,7 @@ Item {
             console.log("licensesTable onRowModelDataChanged");
 
             if (!blockUpdatingModel){
-                updateModel();
+                installationEditorContainer.updateModel();
             }
         }
     }
