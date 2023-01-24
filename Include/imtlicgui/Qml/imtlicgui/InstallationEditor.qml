@@ -18,6 +18,10 @@ Item {
     width: 550;
     height: 800;
 
+//    UuidGenerator {
+//        id: uuidGenerator;
+//    }
+
     Component.onCompleted: {
 //        if (!documentModel.ContainsKey("Id")){
 //            let uuid = uuidGenerator.generateUUID();

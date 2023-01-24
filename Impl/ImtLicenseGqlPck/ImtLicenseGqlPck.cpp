@@ -64,12 +64,6 @@ I_EXPORT_COMPONENT(
 
 
 I_EXPORT_COMPONENT(
-		KeyDataProvider,
-		"KeyDataProvider",
-		"Key data provider");
-
-
-I_EXPORT_COMPONENT(
 		FeaturesExportProvider,
 		"FeaturesExportProvider",
 		"Features Export Provider");

@@ -14,7 +14,6 @@
 #include <imtlicgql/CPackageControllerComp.h>
 #include <imtlicgql/CProductControllerComp.h>
 #include <imtlicgql/CAccountControllerComp.h>
-#include <imtlicgql/CKeyDataProviderComp.h>
 #include <imtlicgql/CFeaturesExportProviderComp.h>
 #include <imtlicgql/CProductPermissionsControllerComp.h>
 
@@ -34,7 +33,6 @@ typedef imtlicgql::CAccountCollectionControllerComp AccountCollectionController;
 typedef imtlicgql::CAccountControllerComp AccountController;
 typedef imtlicgql::CInstallationCollectionControllerComp InstallationCollectionController;
 typedef imtlicgql::CInstallationControllerComp InstallationController;
-typedef imtlicgql::CKeyDataProviderComp KeyDataProvider;
 typedef imtlicgql::CFeaturesExportProviderComp FeaturesExportProvider;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
 
