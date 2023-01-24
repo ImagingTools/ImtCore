@@ -54,6 +54,7 @@ Item {
     }
 
     function updateGui(){
+//        console.log("updateGui start", blockUpdatingModel, documentModel.toJSON())
         blockUpdatingModel = true;
 
         let productId = documentModel.GetData("ProductId");
@@ -68,8 +69,20 @@ Item {
             }
         }
 
-        serialNumberInput.text = documentModel.GetData("SerialNumber");
-        macAddressInput.text = documentModel.GetData("MacAddress");
+        if (documentModel.ContainsKey("SerialNumber")){
+            serialNumberInput.text = documentModel.GetData("SerialNumber");
+        }
+
+        if (documentModel.ContainsKey("MacAddress")){
+            macAddressInput.text = documentModel.GetData("MacAddress");
+        }
+
+        licensesTable.rowModel.clear();
+
+        let activeLicensesModel = documentModel.GetData("ActiveLicenses");
+        if (!activeLicensesModel){
+            activeLicensesModel = documentModel.AddTreeModel("ActiveLicenses");
+        }
 
         let licensesModel;
         if (licensesProvider.model){
@@ -82,7 +95,10 @@ Item {
             }
         }
 
+        console.log("licensesProvider", licensesProvider.model.toJSON());
+
         if (licensesModel){
+            console.log("licensesModel", licensesModel.toJSON());
             for (let i = 0; i < licensesModel.GetItemsCount(); i++){
                 let licenseId = licensesModel.GetData("Id", i);
                 let licenseName = licensesModel.GetData("Name", i);
@@ -108,6 +124,7 @@ Item {
                 licensesTable.addRow(row);
             }
         }
+//        console.log("updateGui finish", blockUpdatingModel)
 
         blockUpdatingModel = false;
     }
@@ -116,6 +133,8 @@ Item {
 
         let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
         documentModel.SetData("ProductId", selectedProductId);
+
+        documentModel.SetData("ProductCategory",  bodyColumn.productCategory);
 
         let selectedPairId = customerCB.model.GetData("Id", dependencyCB.currentIndex);
         documentModel.SetData("PairId", selectedPairId);

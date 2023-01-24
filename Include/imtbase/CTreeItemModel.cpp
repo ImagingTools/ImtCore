@@ -191,9 +191,17 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 		if (treeItemModelPtr != nullptr){
 			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
 
-			for (int i = 0; i < treeItemModelPtr->GetItemsCount(); i++){
+			int itemsCount = treeItemModelPtr->GetItemsCount();
+			if (itemsCount == 0){
+				retVal = true;
+			}
+
+			for (int i = 0; i < itemsCount; i++){
 				int childIndex = childModelPtr->InsertNewItem();
 				retVal = childModelPtr->CopyItemDataFromModel(childIndex, treeItemModelPtr, i);
+				if (retVal == false){
+					break;
+				}
 			}
 		}
 		else{
