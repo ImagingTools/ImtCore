@@ -36,7 +36,7 @@ Rectangle {
     property alias fontColor: text.color;
 
     property alias tooltipText: tooltip.text;
-    property alias tooltip: tooltip;
+    property alias tooltipItem: tooltip;
 
     signal clicked;
 

@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 
 Rectangle {
     id: roundButton;
@@ -19,6 +19,9 @@ Rectangle {
     property real imageDecrease_vertical: imageDecrease;
     property int verticalOffset: 0;
     property bool enabled:  true;
+
+    property alias tooltipText: tooltip.text;
+    property alias tooltipItem: tooltip;
 
     signal clicked();
 
@@ -46,12 +49,46 @@ Rectangle {
         enabled: visible;
         hoverEnabled: enabled;
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-        onClicked: {roundButton.clicked()}
-        onPressed: {roundButton.scale = 0.95}
-        onReleased: {roundButton.scale = 1}
-        onEntered: {roundButton.containsMouse = true}
-        onExited: {roundButton.containsMouse = false}
+        onClicked: {
+            roundButton.clicked();
+        }
+        onPressed: {
+            roundButton.scale = 0.95;
+            tooltip.closeTooltip();
+
+        }
+        onReleased: {
+            roundButton.scale = 1;
+        }
+        onEntered: {
+            roundButton.containsMouse = true;
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                pauseTooltip.start();
+
+            }
+        }
+        onExited: {
+            roundButton.containsMouse = false;
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                tooltip.closeTooltip();
+            }
+        }
         onDoubleClicked: {}
+    }
+
+    CustomTooltip{
+        id: tooltip;
+    }
+
+    PauseAnimation {
+        id: pauseTooltip;
+
+        duration: tooltip.waitingDuration;
+        onFinished: {
+            tooltip.openTooltip(ma.mouseX, ma.mouseY);
+        }
     }
 
 }

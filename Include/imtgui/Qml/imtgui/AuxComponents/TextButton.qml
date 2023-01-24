@@ -14,6 +14,10 @@ Item {
     property bool fontBold: false;
     property alias indicatorHeight: activeIndicator.height;
 
+    property alias tooltipText: tooltip.text;
+    property alias tooltipItem: tooltip;
+
+
     signal clicked();
 
     Text {
@@ -62,6 +66,38 @@ Item {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
         onClicked: {
             textButton.clicked();
+        }
+        onPressed: {
+            tooltip.closeTooltip();
+        }
+        onEntered: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                pauseTooltip.start();
+
+            }
+
+        }
+
+        onExited: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                tooltip.closeTooltip();
+            }
+        }
+
+    }
+
+    CustomTooltip{
+        id: tooltip;
+    }
+
+    PauseAnimation {
+        id: pauseTooltip;
+
+        duration: tooltip.waitingDuration;
+        onFinished: {
+            tooltip.openTooltip(ma.mouseX, ma.mouseY);
         }
     }
 }

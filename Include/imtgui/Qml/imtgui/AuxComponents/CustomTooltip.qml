@@ -37,7 +37,13 @@ Item {
 
             var point = mapToItem(thumbnailDecoratorContainer, xX, yY);
             if(point.x > thumbnailDecoratorContainer.width*2/3){
-                point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin;
+                if(customTooltip.fitToTextWidth){
+                    point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin;
+
+                }
+                else{
+                    point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin;
+                }
             }
             else{
                 point.x = point.x + customTooltip.componentMargin;
@@ -134,7 +140,7 @@ Item {
                 font.bold: customTooltip.fontBold;
                 color: customTooltip.fontColor;
 
-                horizontalAlignment: customTooltip.horizontalAlignment;
+                horizontalAlignment: customTooltip.fitToTextWidth ? Text.AlignLeft: customTooltip.horizontalAlignment;
                 verticalAlignment: Text.AlignVCenter;
 
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
