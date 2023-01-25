@@ -112,7 +112,9 @@ Item {
         }
 
         onPressed: {
-            tooltip.closeTooltip();
+            if(tooltip.text !== ""){
+                tooltip.closeTooltip();
+            }
         }
 
         onEntered: {

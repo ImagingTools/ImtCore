@@ -68,7 +68,9 @@ Item {
             textButton.clicked();
         }
         onPressed: {
-            tooltip.closeTooltip();
+            if(tooltip.text !== ""){
+                tooltip.closeTooltip();
+            }
         }
         onEntered: {
             if(tooltip.text !== ""){

@@ -99,8 +99,10 @@ Rectangle {
         }
 
         onPressed: {
-            tooltip.closeTooltip();
             auxButtonContainer.pressed = true;
+            if(tooltip.text !== ""){
+                tooltip.closeTooltip();
+            }
         }
 
         onReleased: {

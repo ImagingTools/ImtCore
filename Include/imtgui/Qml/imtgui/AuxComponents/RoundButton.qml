@@ -54,7 +54,9 @@ Rectangle {
         }
         onPressed: {
             roundButton.scale = 0.95;
-            tooltip.closeTooltip();
+            if(tooltip.text !== ""){
+                tooltip.closeTooltip();
+            }
 
         }
         onReleased: {

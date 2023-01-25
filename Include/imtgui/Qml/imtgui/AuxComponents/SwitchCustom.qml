@@ -1,9 +1,8 @@
 import QtQuick 2.12
 
-
-
 Rectangle {
     id: switchCustom;
+
     width: 72;
     height: 40;
 
@@ -16,6 +15,9 @@ Rectangle {
     property real backgroundOpacity: 1.;
 
     property bool checked: false;
+
+    property alias tooltipText: tooltip.text;
+    property alias tooltipItem: tooltip;
 
     function setChecked(checkedVal){
         switchCustom.checked = checkedVal;
@@ -66,6 +68,9 @@ Rectangle {
 //        }
         onPressed: {
             ma.canDrag = true;
+            if(tooltip.text !== ""){
+                tooltip.closeTooltip();
+            }
 
         }
         onReleased: {
@@ -93,6 +98,35 @@ Rectangle {
                 }
             }
 
+        }
+
+        onEntered: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                pauseTooltip.start();
+
+            }
+
+        }
+
+        onExited: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                tooltip.closeTooltip();
+            }
+        }
+    }
+
+    CustomTooltip{
+        id: tooltip;
+    }
+
+    PauseAnimation {
+        id: pauseTooltip;
+
+        duration: tooltip.waitingDuration;
+        onFinished: {
+            tooltip.openTooltip(ma.mouseX, ma.mouseY);
         }
     }
 
