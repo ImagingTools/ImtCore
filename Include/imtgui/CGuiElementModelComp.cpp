@@ -69,6 +69,16 @@ bool CGuiElementModelComp::IsEnabled() const
 }
 
 
+bool CGuiElementModelComp::IsVisible() const
+{
+	if (m_visibleAttrPtr.IsValid()){
+		return *m_visibleAttrPtr;
+	}
+
+	return true;
+}
+
+
 const imtgui::IGuiElementModel* CGuiElementModelComp::GetSubElements() const
 {
 	return nullptr;

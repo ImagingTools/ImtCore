@@ -64,6 +64,19 @@ Item {
         return false;
     }
 
+    function commandExists(commandId){
+        if(commandsProviderContainer.commandsModel === undefined) return false;
+
+        for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            if (currentCommandId === commandId){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function mergeModelWith(externModel){
         for (let i = 0; i < externModel.GetItemsCount(); i++){
 

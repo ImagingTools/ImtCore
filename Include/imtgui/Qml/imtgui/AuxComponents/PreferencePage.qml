@@ -296,7 +296,7 @@ Rectangle {
 
                             font.pixelSize: container.fontSize;
                             color: container.fontColor;
-                            font.family: Style.fontFamily;
+                            font.family: Style.fontFamilyBold;
                         }
 
                         Rectangle {

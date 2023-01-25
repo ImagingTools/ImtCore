@@ -27,6 +27,7 @@ public:
 		I_ASSIGN(m_elementItemPathAttrPtr, "IconPath", "Path to icon", false, "");
 		I_ASSIGN(m_elementStatusAttrPtr, "Status", "Element status", false, "");
 		I_ASSIGN(m_enabledAttrPtr, "IsEnabled", "Element is enabled", false, true);
+		I_ASSIGN(m_visibleAttrPtr, "IsVisible", "Element visibility", false, true);
 	I_END_COMPONENT;
 
 	// reimplemented (imtgui::IGuiElementContainer)
@@ -36,6 +37,7 @@ public:
 	virtual QString GetElementItemPath() const override;
 	virtual QString GetElementStatus() const override;
 	virtual bool IsEnabled() const override;
+	virtual bool IsVisible() const override;
 	virtual const IGuiElementModel* GetSubElements() const override;
 
 protected:
@@ -45,6 +47,7 @@ protected:
 	I_TEXTATTR(m_elementItemPathAttrPtr);
 	I_TEXTATTR(m_elementStatusAttrPtr);
 	I_ATTR(bool, m_enabledAttrPtr);
+	I_ATTR(bool, m_visibleAttrPtr);
 	I_MULTIREF(imtgui::IGuiElementModel, m_subElementsCompPtr);
 };
 

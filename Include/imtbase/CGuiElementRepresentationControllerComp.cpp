@@ -71,12 +71,13 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 				QString elementPath = guiElementPtr->GetElementItemPath();
 				QString elementStatus = guiElementPtr->GetElementStatus();
 				bool isEnabled = guiElementPtr->IsEnabled();
+				bool isVisible = guiElementPtr->IsVisible();
 
 				representation.SetData("Id", elementId, index);
 				representation.SetData("Name", elementName, index);
 				representation.SetData("Description", elementDescription, index);
 				representation.SetData("IsEnabled", isEnabled, index);
-				representation.SetData("Visible", true, index);
+				representation.SetData("Visible", isVisible, index);
 				representation.SetData("Icon", elementPath, index);
 				representation.SetData("Status", elementStatus, index);
 			}

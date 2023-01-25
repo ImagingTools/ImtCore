@@ -43,6 +43,7 @@ Rectangle {
     property int countVisibleItem: -1;
 
     signal finished(string commandId, int index);
+    signal started();
 
     Component.onDestruction: {
         popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(root.closeDialog);

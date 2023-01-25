@@ -8,11 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfo" X="300" Y="275" Note=""/>
-        <Element ComponentName="Context" X="925" Y="275" Note=""/>
-        <Element ComponentName="MainWindow" X="600" Y="500" Note=""/>
-        <Element ComponentName="ObserverQml" X="300" Y="500" Note=""/>
-        <Element ComponentName="QuickApplication" X="600" Y="275" Note=""/>
+        <Element ComponentName="ApiClient" X="550" Y="300" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="550" Y="450" Note=""/>
+        <Element ComponentName="GraphQLRepresentationController" X="550" Y="150" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

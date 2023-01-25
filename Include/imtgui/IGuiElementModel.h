@@ -18,6 +18,7 @@ public:
 	virtual QString GetElementItemPath() const = 0;
 	virtual QString GetElementStatus() const = 0;
 	virtual bool IsEnabled() const = 0;
+	virtual bool IsVisible() const = 0;
 	virtual const IGuiElementModel* GetSubElements() const = 0;
 };
 

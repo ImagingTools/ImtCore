@@ -3,8 +3,8 @@ import QtQuick.Window 2.1
 
 Window
 {
-    height: 480;
-    width: 740;
+    height: 600;
+    width: 800;
 
     minimumHeight: 480;
     minimumWidth: 740;
