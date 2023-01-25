@@ -225,7 +225,7 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 			const Id& /*parentId*/,
 			int /*iterationFlags*/) const
 {
-	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
+	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
 	if (m_objectDelegateCompPtr.IsValid()) {
