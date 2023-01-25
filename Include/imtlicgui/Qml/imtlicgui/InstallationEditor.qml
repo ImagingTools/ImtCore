@@ -25,44 +25,64 @@ Item {
     }
 
     Component.onCompleted: {
+
+    }
+
+    function started(){
         productCB.model = installationEditorContainer.productsModel;
 
         updateCategoryProducts("Software");
         updateCategoryProducts("Hardware");
 
+        console.log("installationEditorContainer.hardwareModel", installationEditorContainer.hardwareModel.toJSON())
+        console.log("installationEditorContainer.softwareModel", installationEditorContainer.softwareModel.toJSON())
+
         generateId();
-    }
-
-    function started(){
-
+        updateGui();
     }
 
     function generateId(){
-        if (!documentModel.ContainsKey("Id")){
+        if (!documentModel.ContainsKey("ID")){
             let uuid = uuidGenerator.generateUUID();
-            documentModel.SetData("Id", uuid);
+            documentModel.SetData("ID", uuid);
         }
     }
 
-    function updateCategoryProducts(category){
+    function getProductName(productId){
         let productModel = installationEditorContainer.productsModel;
+        let retVal = "";
+        for (let i = 0; i < productsModel.GetItemsCount(); i++){
+            let id = productsModel.GetData("Id", i);
+            if (id === productId){
+                retVal = productsModel.GetData("Name", i);
+                break;
+            }
+        }
+        return retVal;
+    }
+
+    function updateCategoryProducts(category){
+        let productModel = installationEditorContainer.orderProductsModel;
         let resultModel;
-        if (category == "Hardware"){
+        if (category === "Hardware"){
             resultModel = installationEditorContainer.hardwareModel;
         }
         else{
             resultModel = installationEditorContainer.softwareModel;
         }
-
+        resultModel.Clear();
+        console.log("updateCategoryProducts", resultModel.toJSON())
         for (let i = 0; i < productModel.GetItemsCount(); i++){
             let modelCategory = productModel.GetData("CategoryId", i);
             let pairId = productModel.GetData("PairId", i);
-            if (category === modelCategory){
+            if (category === modelCategory && pairId != ""){
                 let resultIndex = resultModel.InsertNewItem();
-                resultModel.SetData("Id", productModel.GetData("Id", resultIndex));
-                resultModel.SetData("Name", productModel.GetData("Name", resultIndex));
+                let productId = productModel.GetData("ProductId", i);
+                resultModel.SetData("Id", productId, resultIndex);
+                resultModel.SetData("Name", getProductName(productId), resultIndex);
             }
         }
+        console.log("updateCategoryProducts2", resultModel.toJSON())
     }
 
     onDocumentModelChanged: {
@@ -86,11 +106,13 @@ Item {
         let pairId = documentModel.GetData("PairId");
 
         let productModel = productCB.model;
-        for (let i = 0; i < productModel.GetItemsCount(); i++){
-            let id = productModel.GetData("Id", i);
-            if (id === productId){
-                productCB.currentIndex = i;
-                break;
+        if (productModel){
+            for (let i = 0; i < productModel.GetItemsCount(); i++){
+                let id = productModel.GetData("Id", i);
+                if (id === productId){
+                    productCB.currentIndex = i;
+                    break;
+                }
             }
         }
 
@@ -232,7 +254,7 @@ Item {
 
             onCurrentIndexChanged: {
                 bodyColumn.productCategory = productCB.model.GetData("CategoryId", productCB.currentIndex);
-                console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, bodyColumn.productCategory);
+//                console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, bodyColumn.productCategory);
 
                 if (bodyColumn.productCategory == "Software"){
                     dependencyCB.model = installationEditorContainer.hardwareModel;
@@ -241,6 +263,7 @@ Item {
                     dependencyCB.model = installationEditorContainer.softwareModel;
                 }
 
+                console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, dependencyCB.model.toJSON());
 
                 if (!blockUpdatingModel){
                     installationEditorContainer.updateModel();
@@ -338,6 +361,7 @@ Item {
         id: titleLicenses;
         anchors.top: bodyColumn.bottom;
         anchors.topMargin: 10;
+        anchors.left: bodyColumn.left;
 
         text: qsTr("Licenses");
         color: Style.textColor;
