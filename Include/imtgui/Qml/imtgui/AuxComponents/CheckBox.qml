@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import Acf 1.0;
 
 Item {
@@ -29,6 +29,9 @@ Item {
     property bool isLeftText: false;
 
     property int mainMargin: 8;
+
+    property alias tooltipText: tooltip.text;
+    property alias tooltipItem: tooltip;
 
     signal clicked();
 
@@ -95,7 +98,10 @@ Item {
     }
 
     MouseArea {
+        id: ma;
+
         anchors.fill: parent;
+        hoverEnabled: true;
 
         cursorShape: Qt.PointingHandCursor;
 
@@ -103,6 +109,39 @@ Item {
 
         onClicked: {
             container.clicked();
+        }
+
+        onPressed: {
+            tooltip.closeTooltip();
+        }
+
+        onEntered: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                pauseTooltip.start();
+
+            }
+
+        }
+
+        onExited: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                tooltip.closeTooltip();
+            }
+        }
+    }
+
+    CustomTooltip{
+        id: tooltip;
+    }
+
+    PauseAnimation {
+        id: pauseTooltip;
+
+        duration: tooltip.waitingDuration;
+        onFinished: {
+            tooltip.openTooltip(ma.mouseX, ma.mouseY);
         }
     }
 }
