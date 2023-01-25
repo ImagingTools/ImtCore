@@ -348,7 +348,7 @@ Item {
                     fontColor: yearField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
-                    hiddenBackground: false;
+                    //hiddenBackground: false;
 
                     titleTxt.color: "transparent";
                     compTextCentered: true;
@@ -464,7 +464,7 @@ Item {
                     fontColor: monthField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
-                    hiddenBackground: false;
+                    //hiddenBackground: false;
 
                     titleTxt.color: "transparent";
                     compTextCentered: true;
@@ -587,7 +587,7 @@ Item {
                     fontColor: dayField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
-                    hiddenBackground: false;
+                    //hiddenBackground: false;
 
                     titleTxt.color: "transparent";
                     compTextCentered: true;
