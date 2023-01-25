@@ -57,8 +57,6 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					}
 				}
 
-				gqlContextPtr->SetLanguageId("en_US");
-
 				if (m_settingsCollectionCompPtr.IsValid()){
 					imtbase::IObjectCollection::DataPtr settingsDataPtr;
 					if (m_settingsCollectionCompPtr->GetObjectData(userId, settingsDataPtr)){
@@ -72,9 +70,11 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 									if (optionList != nullptr){
 										int index = languageParamPtr->GetSelectedOptionIndex();
 
-										QByteArray languageId = optionList->GetOptionId(index);
+										if (index >= 0){
+											QByteArray languageId = optionList->GetOptionId(index);
 
-										gqlContextPtr->SetLanguageId(languageId);
+											gqlContextPtr->SetLanguageId(languageId);
+										}
 									}
 								}
 							}

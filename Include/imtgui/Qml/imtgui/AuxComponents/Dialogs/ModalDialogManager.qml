@@ -69,14 +69,13 @@ Item {
                     container.backgroundItem = background;
                     dialogLoader.item["root"] = container;
                     for (let key in model.Parameters) {
-                        console.log("DEBUG::key", key, model.Parameters[key]);
                         dialogLoader.item[key] = model.Parameters[key];
                     }
                     if (dialogLoader.item.centered){
                         dialogLoader.anchors.centerIn = dialogDelegate;
                     }
                     dialogLoader.item.started()
-                   // dialogLoader.item.forceActiveFocus();
+                    dialogLoader.item.forceActiveFocus();
                 }
             }
         }

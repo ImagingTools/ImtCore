@@ -256,6 +256,8 @@ Rectangle {
         }
 
         Flickable {
+            id: flickable;
+
             anchors.top: loaderTopPanel.bottom;
             anchors.topMargin: 10;
             anchors.left: mainPanelBackground.right;

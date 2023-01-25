@@ -25,6 +25,7 @@ public:
 		I_ASSIGN(m_paramIdAttrPtr, "ParamId", "ID of the param", true, "");
 		I_ASSIGN(m_paramNameAttrPtr, "ParamName", "Name of the param", false, "");
 		I_ASSIGN(m_sourceAttrPtr, "Source", "Source for component representation", false, "");
+		I_ASSIGN(m_applicationVersionIdAttrPtr, "VersionId", "Application version ID", true, 1024);
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application data info", false, "");
 	I_END_COMPONENT;
 
@@ -37,6 +38,7 @@ private:
 	I_ATTR(QByteArray, m_paramIdAttrPtr);
 	I_TEXTATTR(m_paramNameAttrPtr);
 	I_TEXTATTR(m_sourceAttrPtr);
+	I_ATTR(int, m_applicationVersionIdAttrPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 };
 

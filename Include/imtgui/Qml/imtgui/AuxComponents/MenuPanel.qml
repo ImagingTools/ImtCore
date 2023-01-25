@@ -28,7 +28,7 @@ Rectangle {
     signal activePageChanged;
 
     function clearModels(){
-        model.Clear();
+
         lvPages.model = 0;
         menuPanel.activePageIndex = -1;
     }
@@ -39,6 +39,7 @@ Rectangle {
 
     onModelChanged: {
         console.log("MenuPanel onModelChanged", menuPanel.model);
+        clearModels();
 
         lvPages.model = menuPanel.model;
     }

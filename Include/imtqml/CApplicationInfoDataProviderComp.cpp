@@ -27,8 +27,9 @@ imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::CreateInternalRespons
 		const iser::IVersionInfo& versionInfo =  m_applicationInfoCompPtr->GetVersionInfo();
 
 		quint32 versionNumber;
-		versionInfo.GetVersionNumber(1983, versionNumber);
-		QString version = versionInfo.GetEncodedVersionName(1983, versionNumber);
+
+		versionInfo.GetVersionNumber(*m_applicationVersionIdAttrPtr, versionNumber);
+		QString version = versionInfo.GetEncodedVersionName(*m_applicationVersionIdAttrPtr, versionNumber);
 
 		rootModelPtr->SetData("Value", version);
 

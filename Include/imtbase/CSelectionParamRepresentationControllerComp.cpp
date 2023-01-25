@@ -64,9 +64,11 @@ bool CSelectionParamRepresentationControllerComp::GetRepresentationFromDataModel
 		}
 
 		int selectedIndex = selectionParamPtr->GetSelectedOptionIndex();
-		if (selectedIndex >= 0){
-			representation.SetData("Value", selectedIndex);
+		if (selectedIndex < 0){
+			selectedIndex = 0;
 		}
+
+		representation.SetData("Value", selectedIndex);
 	}
 
 	return true;

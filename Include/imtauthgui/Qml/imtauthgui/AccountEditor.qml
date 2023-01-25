@@ -12,6 +12,8 @@ DocumentBase {
 
     property int textInputHeight: 30;
 
+    property bool blockUpdatingModel: false;
+
     Component.onCompleted: {
         accountNameInput.focus = true;
     }
@@ -44,6 +46,8 @@ DocumentBase {
 
     function updateGui(){
         console.log("AccountEditor updateGui");
+        accountEditorContainer.blockUpdatingModel = true;
+
         accountNameInput.text = accountEditorContainer.documentModel.GetData("Name");
         accountDescriptionInput.text = accountEditorContainer.documentModel.GetData("Description");
 
@@ -71,10 +75,16 @@ DocumentBase {
         if (accountEditorContainer.documentModel.ContainsKey("BirthDay")){
             birthDayInput.text = accountEditorContainer.documentModel.GetData("BirthDay");
         }
+
+        accountEditorContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("updateModel");
+
+        if (accountEditorContainer.blockUpdatingModel){
+            return;
+        }
 
         undoRedoManager.beginChanges();
 

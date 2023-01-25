@@ -19,7 +19,7 @@ Rectangle {
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
 
-    function updateModels() {
+    function updateModels(){
         pagesManager.updateModel();
     }
 
