@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
@@ -55,6 +55,9 @@ FocusScope {
     property int textSize: Style.fontSize_common;
     property int itemHeight: 26;
     property string fontColor: Style.textColor;
+
+    property alias tooltipText: tooltip.text;
+    property alias tooltipItem: tooltip;
 
     signal clicked();
     signal finished(string commandId, int index);
@@ -182,12 +185,48 @@ FocusScope {
             id: cbMouseArea;
 
             anchors.fill: parent;
+            hoverEnabled: true;
 
             cursorShape: Qt.PointingHandCursor;
 
             onClicked: {
                 comboBoxContainer.openPopupMenu();
                 comboBoxContainer.clicked();
+            }
+
+            onPressed: {
+                if(tooltip.text !== ""){
+                    tooltip.closeTooltip();
+                }
+            }
+
+            onEntered: {
+                if(tooltip.text !== ""){
+                    pauseTooltip.stop();
+                    pauseTooltip.start();
+
+                }
+
+            }
+
+            onExited: {
+                if(tooltip.text !== ""){
+                    pauseTooltip.stop();
+                    tooltip.closeTooltip();
+                }
+            }
+        }
+
+        CustomTooltip{
+            id: tooltip;
+        }
+
+        PauseAnimation {
+            id: pauseTooltip;
+
+            duration: tooltip.waitingDuration;
+            onFinished: {
+                tooltip.openTooltip(cbMouseArea.mouseX, cbMouseArea.mouseY);
             }
         }
     }

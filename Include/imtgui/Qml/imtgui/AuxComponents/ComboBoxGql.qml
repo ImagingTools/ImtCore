@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
@@ -60,6 +60,8 @@ Item {
 
     property alias image: cbArrowIcon;
 
+    property alias tooltipText: tooltip.text;
+    property alias tooltipItem: tooltip;
 
     signal setCurrentText(var modelll, int index);
 
@@ -231,6 +233,7 @@ Item {
             id: cbMouseArea;
 
             anchors.fill: parent;
+            hoverEnabled: true;
 
             cursorShape: Qt.PointingHandCursor;
 
@@ -239,7 +242,41 @@ Item {
                 comboBoxContainerGql.openPopupMenu();
                 comboBoxContainerGql.clicked();
 
+            }
 
+            onPressed: {
+                if(tooltip.text !== ""){
+                    tooltip.closeTooltip();
+                }
+            }
+
+            onEntered: {
+                if(tooltip.text !== ""){
+                    pauseTooltip.stop();
+                    pauseTooltip.start();
+
+                }
+
+            }
+
+            onExited: {
+                if(tooltip.text !== ""){
+                    pauseTooltip.stop();
+                    tooltip.closeTooltip();
+                }
+            }
+        }
+
+        CustomTooltip{
+            id: tooltip;
+        }
+
+        PauseAnimation {
+            id: pauseTooltip;
+
+            duration: tooltip.waitingDuration;
+            onFinished: {
+                tooltip.openTooltip(cbMouseArea.mouseX, cbMouseArea.mouseY);
             }
         }
     }
