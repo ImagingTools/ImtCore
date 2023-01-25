@@ -652,16 +652,32 @@ export class Item extends QtObject {
     // }
 
     mapToItem(item, x, y){
+        let dx = 0
+        let dy = 0
+
+        if(item){
+            let itemParent = item.parent
+            while(itemParent)
+            {
+                dx -= itemParent.x
+                dy -= itemParent.y
+                itemParent = itemParent.parent
+            }
+            dx += x + this.x - item.x
+		    dy += y + this.y - item.y
+        } else {
+            
+            dx += x + this.x
+		    dy += y + this.y
+        }
+
 		let parent = this.parent
-		let dx = item.x + x + this.x
-		let dy = item.y + y + this.y
 		
-		while(parent)
+		
+		while(parent && parent !== item)
 		{
-			if(parent != item){
-				dx += parent.x
-				dy += parent.y
-			}
+			dx += parent.x
+			dy += parent.y
 			parent = parent.parent
 		}
 		return {
