@@ -142,6 +142,10 @@ Item {
         interval: 10;
 
         onTriggered: {
+            if (!undoRedoManager.commandsDelegate){
+                return;
+            }
+
             let newModel = JSON.stringify(undoRedoManager.observedModel)
 
             let startModel = undoRedo.undoStack[0];

@@ -17,7 +17,6 @@ Item {
     signal doubleClicked(string id, string name);
 
     Component.onCompleted: {
-        console.log("productRolesDelegate onCompleted", model.Roles);
         if (model.Roles){
             rolesRepeater.model = model.Roles;
         }
@@ -132,7 +131,7 @@ Item {
                 property int selectedIndex: -1;
 
                 onSelectedIndexChanged: {
-                    if (productRolesDelegate.selectedIndex == model.index){
+                    if (productRolesDelegate.selectedIndex == productRolesDelegate.index){
                         baseCollectionView.selectedIndexChanged(rolesRepeater.selectedIndex);
                     }
                 }
@@ -169,7 +168,6 @@ Item {
                         }
 
                         onDoubleClicked: {
-                            console.log("onDoubleClicked");
                             productRolesDelegate.doubleClicked(model.Id, model.Name);
                         }
                     }

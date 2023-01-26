@@ -368,11 +368,9 @@ DocumentBase {
             anchors.leftMargin: 10;
 
             color: Style.buttonText;
+            font.family: Style.fontFamilyBold;
 
-            font.pixelSize: auxButtonContainer.fontPixelSize;
-            font.family: Style.fontFamily;
-            font.bold: auxButtonContainer.fontBold;
-            text: qsTr("Categories");
+            text: qsTr("Category");
         }
 
         ComboBox {

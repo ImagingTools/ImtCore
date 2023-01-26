@@ -17,8 +17,8 @@ public:
 	typedef imtbase::CObjectRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGuiElementRepresentationControllerComp)
-		I_ASSIGN(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "Command permissions provider", false, "CommandPermissionsProvider");
-		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
+//		I_ASSIGN(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "Command permissions provider", false, "CommandPermissionsProvider");
+//		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 	I_END_COMPONENT;
 
 protected:
@@ -28,8 +28,8 @@ protected:
 	virtual bool GetDataModelFromRepresentation(const CTreeItemModel& representation, istd::IChangeable& dataModel) const override;
 
 protected:
-	I_REF(imtbase::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
-	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
+//	I_REF(imtbase::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
+//	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
 };
 
 

@@ -92,10 +92,6 @@ Item {
             console.log("Ctrl+Z onActivated");
             Events.sendEvent(documentBase.commandsId + "CommandActivated", "Undo");
         }
-
-        onActivatedAmbiguously: {
-            console.log("Ctrl+Z onActivatedAmbiguously");
-        }
     }
 
     Shortcut {

@@ -117,6 +117,9 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
+
+            console.log("gqlData", gqlData);
+
             this.SetGqlQuery(gqlData);
         }
 

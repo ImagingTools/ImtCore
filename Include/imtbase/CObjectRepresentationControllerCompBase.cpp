@@ -15,6 +15,21 @@ QByteArray CObjectRepresentationControllerCompBase::GetModelId() const
 }
 
 
+bool CObjectRepresentationControllerCompBase::CheckPermissions(imtauth::IUserInfo::FeatureIds userPermissions, const QByteArray& paramId) const
+{
+	if (m_commandPermissionsProviderCompPtr.IsValid()){
+		QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(paramId);
+
+		if (m_checkPermissionCompPtr.IsValid()){
+			bool result = m_checkPermissionCompPtr->CheckPermission(userPermissions, elementPermissions);
+			return result;
+		}
+	}
+
+	return true;
+}
+
+
 } // namespace imtbase
 
 

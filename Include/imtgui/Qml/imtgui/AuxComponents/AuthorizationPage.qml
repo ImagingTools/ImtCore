@@ -93,7 +93,7 @@ Rectangle {
                 id: titleLogin;
 
                 color: Style.textColor;
-                font.family: Style.fontFamily;
+                font.family: Style.fontFamilyBold;
                 font.pixelSize: Style.fontSize_common;
 
                 text: qsTr("Login");
@@ -150,7 +150,7 @@ Rectangle {
                 id: titlePassword;
 
                 color: Style.textColor;
-                font.family: Style.fontFamily;
+                font.family: Style.fontFamilyBold;
                 font.pixelSize: Style.fontSize_common;
 
                 text: qsTr("Password");

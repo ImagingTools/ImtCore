@@ -11,7 +11,9 @@ Item {
     signal modelChanged(var changeList);
 
     Component.onDestruction: {
-        container.observedModel.modelChanged.disconnect(container.observedModelDataChanged);
+        if (container.observedModel != null){
+            container.observedModel.modelChanged.disconnect(container.observedModelDataChanged);
+        }
     }
 
     function registerModel(model){

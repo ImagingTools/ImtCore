@@ -2,7 +2,11 @@
 
 
 // ACF includes
+#include <iprm/TParamsPtr.h>
 #include <iprm/IParamsSet.h>
+
+// ImtCore includes
+#include <imtauth/IUserInfo.h>
 
 
 namespace imtbase
@@ -30,6 +34,22 @@ bool CParamSetRepresentationControllerComp::GetRepresentationFromDataModel(const
 		return false;
 	}
 
+	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
+
+	bool isAdmin = true;
+	imtauth::IUserInfo::FeatureIds userPermissions;
+	if (userInfoParamPtr.IsValid()){
+		userPermissions = userInfoParamPtr->GetPermissions();
+
+		isAdmin = userInfoParamPtr->IsAdmin();
+		if (!isAdmin){
+			bool result = CheckPermissions(userPermissions, *m_paramIdAttrPtr);
+			if (!result){
+				return false;
+			}
+		}
+	}
+
 	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(&dataModel);
 	if (paramsSetPtr != nullptr){
 		representation.SetData("Id", *m_paramIdAttrPtr);
@@ -47,6 +67,13 @@ bool CParamSetRepresentationControllerComp::GetRepresentationFromDataModel(const
 		int index = 0;
 		for (const QByteArray& paramId : parameterIds){
 			if (!paramId.contains('/')){
+				if (!isAdmin){
+					bool result = CheckPermissions(userPermissions, paramId);
+					if (!result){
+						continue;
+					}
+				}
+
 				const iser::ISerializable* paramPtr = paramsSetPtr->GetParameter(paramId);
 				Q_ASSERT(paramPtr != nullptr);
 

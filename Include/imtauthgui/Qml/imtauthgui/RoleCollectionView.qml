@@ -19,6 +19,7 @@ CollectionView {
         }
 
         onClicked: {
+            console.log("onClicked", model.index);
             baseCollectionView.table.selectedIndex = index;
         }
     }
