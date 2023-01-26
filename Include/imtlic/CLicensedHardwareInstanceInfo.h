@@ -41,6 +41,9 @@ public:
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
+	// reimplemented (istd::IChangeable)
+	virtual QByteArray GetFactoryId() const override;
+
 private:
 	QByteArray m_serialNumber;
 	QByteArray m_softwareId;

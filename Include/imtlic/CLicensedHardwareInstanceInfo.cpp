@@ -137,6 +137,11 @@ bool CLicensedHardwareInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	return BaseClass::ResetData();
 }
 
+QByteArray CLicensedHardwareInstanceInfo::GetFactoryId() const
+{
+	return "Hardware";
+}
+
 
 
 } // namespace imtlic

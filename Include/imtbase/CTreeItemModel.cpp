@@ -182,8 +182,13 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 	return true;
 }
 
-
 bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex)
+{
+	const CTreeItemModel* constExternTreeModel = externTreeModel;
+	return CopyItemDataFromModel(index, constExternTreeModel, externIndex);
+}
+
+bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex)
 {
 	bool retVal = false;
 	QList<QByteArray> keys;
@@ -199,9 +204,6 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
 
 			int itemsCount = treeItemModelPtr->GetItemsCount();
-//			if (itemsCount == 0){
-//				retVal = true;
-//			}
 
 			for (int i = 0; i < itemsCount; i++){
 				int childIndex = childModelPtr->InsertNewItem();
@@ -393,7 +395,8 @@ CTreeItemModel *CTreeItemModel::GetModelFromItem(int itemIndex) const
 
 	CTreeItemModel* modelPtr = new CTreeItemModel();
 
-	CopyItemDataToModel(itemIndex, modelPtr);
+//	CopyItemDataToModel(itemIndex, modelPtr);
+	modelPtr->CopyItemDataFromModel(0, this, itemIndex);
 
 	return modelPtr;
 }

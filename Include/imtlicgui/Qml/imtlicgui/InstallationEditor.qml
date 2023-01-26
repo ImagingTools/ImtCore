@@ -211,6 +211,7 @@ Item {
         documentModel.SetData("MacAddress", macAddressInput.text);
 
         let activeLicenses = documentModel.AddTreeModel("ActiveLicenses");
+        activeLicenses.Clear();
 
         for (let i = 0; i < licensesTable.rowModel.count; i++){
             let rowObj = licensesTable.rowModel.get(i);
