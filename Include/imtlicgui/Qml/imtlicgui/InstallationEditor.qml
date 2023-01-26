@@ -39,12 +39,13 @@ Item {
 
         generateId();
         updateGui();
+        console.log("started", documentModel.toJSON());
     }
 
     function generateId(){
-        if (!documentModel.ContainsKey("ID")){
+        if (!documentModel.ContainsKey("Id")){
             let uuid = uuidGenerator.generateUUID();
-            documentModel.SetData("ID", uuid);
+            documentModel.SetData("Id", uuid);
         }
     }
 
@@ -78,7 +79,9 @@ Item {
             if (category === modelCategory && pairId != ""){
                 let resultIndex = resultModel.InsertNewItem();
                 let productId = productModel.GetData("ProductId", i);
-                resultModel.SetData("Id", productId, resultIndex);
+                let uuidId = productModel.GetData("Id", i);
+                resultModel.SetData("ProductId", productId, resultIndex);
+                resultModel.SetData("UuidId", uuidId, resultIndex);
                 resultModel.SetData("Name", getProductName(productId), resultIndex);
             }
         }
@@ -104,6 +107,7 @@ Item {
 
         let productId = documentModel.GetData("ProductId");
         let pairId = documentModel.GetData("PairId");
+        let categoryId = documentModel.GetData("CategoryId");
 
         let productModel = productCB.model;
         if (productModel){
@@ -111,6 +115,23 @@ Item {
                 let id = productModel.GetData("Id", i);
                 if (id === productId){
                     productCB.currentIndex = i;
+                    break;
+                }
+            }
+        }
+
+        if (categoryId == "Software"){
+            dependencyCB.model = installationEditorContainer.hardwareModel;
+        }
+        else{
+            dependencyCB.model = installationEditorContainer.softwareModel;
+        }
+        productModel = dependencyCB.model;
+        if (productModel){
+            for (let i = 0; i < productModel.GetItemsCount(); i++){
+                let uuidId = productModel.GetData("UuidId", i);
+                if (uuidId === pairId){
+                    dependencyCB.currentIndex = i;
                     break;
                 }
             }
@@ -183,7 +204,7 @@ Item {
 
         documentModel.SetData("CategoryId",  bodyColumn.productCategory);
 
-        let selectedPairId = dependencyCB.model.GetData("Id", dependencyCB.currentIndex);
+        let selectedPairId = dependencyCB.model.GetData("UuidId", dependencyCB.currentIndex);
         documentModel.SetData("PairId", selectedPairId);
 
         documentModel.SetData("SerialNumber", serialNumberInput.text);
@@ -217,6 +238,8 @@ Item {
                 }
             }
         }
+        console.log("updateModel finish", documentModel.toJSON())
+
     }
 
     Rectangle {

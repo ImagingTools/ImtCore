@@ -144,11 +144,18 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int
 		return nullptr;
 	}
 
-	CTreeItemModel* retVal = new CTreeItemModel(this);
+	CTreeItemModel* retVal = GetTreeItemModel(key, index);
 
-	QVariant v = QVariant::fromValue(retVal);
+	if (retVal == nullptr){
+		retVal = new CTreeItemModel(this);
 
-	SetData(key, v, index);
+		QVariant v = QVariant::fromValue(retVal);
+
+		SetData(key, v, index);
+	}
+	else{
+		retVal->Clear();
+	}
 
 	return retVal;
 }
@@ -192,9 +199,9 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
 
 			int itemsCount = treeItemModelPtr->GetItemsCount();
-			if (itemsCount == 0){
-				retVal = true;
-			}
+//			if (itemsCount == 0){
+//				retVal = true;
+//			}
 
 			for (int i = 0; i < itemsCount; i++){
 				int childIndex = childModelPtr->InsertNewItem();
