@@ -247,7 +247,7 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 
 			QByteArray typeId = m_objectDelegateCompPtr->GetObjectTypeId(objectId);
 
-			collectionPtr->InsertNewObject(typeId, "", "", dataPtr);
+			collectionPtr->InsertNewObject(typeId, "", "", dataPtr, objectId);
 		}
 	}
 	return collectionPtr;
