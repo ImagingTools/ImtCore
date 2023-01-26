@@ -20,9 +20,7 @@ Item {
         console.log("PreferenceObserver registerModel");
 
         container.observedModel = model;
-
         container.observedModel.modelChanged.connect(container.observedModelDataChanged);
-
         container.beginModel.Copy(container.observedModel);
     }
 
@@ -30,17 +28,13 @@ Item {
         console.log("PreferenceObserver observedModelDataChanged");
 
         let changeList = compare(container.beginModel, container.observedModel);
-
         container.modelChanged(changeList);
-
         container.beginModel.Copy(container.observedModel);
     }
 
     function compare(model1, model2){
         let changeList = []
-
         compareRecursive(model1, model2, changeList, "");
-
         return changeList;
     }
 
@@ -49,7 +43,6 @@ Item {
             let dataId = model1.GetData("Id", i);
 
             let keys = model1.GetKeys(i);
-
             for (let j = 0; j < keys.length; j++){
                 let key = keys[j];
 
