@@ -69,6 +69,8 @@ Item {
         id: settingsQuery;
 
         function getSettings() {
+            console.log("getSettings");
+
             var query = Gql.GqlRequest("query", "GetSettings");
 
             var gqlData = query.GetQuery();

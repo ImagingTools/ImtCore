@@ -149,7 +149,7 @@ Rectangle {
 
         onUserModeChanged: {
             if (userMode == "NO_USER_MANAGEMENT"){
-                updateAllModels();
+                thumbnailDecoratorContainer.root.updateAllModels();
             }
             else if (userMode == "STRONG_USER_MANAGEMENT"){
                 authorizationPage.visible = true;

@@ -71,7 +71,7 @@ Rectangle {
         anchors.horizontalCenter: auxButtonContainer.horizontalCenter;
         anchors.verticalCenter: auxButtonContainer.verticalCenter;
 
-        color: auxButtonContainer.enabled ? Style.buttonText : Style.inactive_buttonText;
+        color: auxButtonContainer.enabled ? Style.textColor : Style.inactive_textColor;
 
         font.pixelSize: auxButtonContainer.fontPixelSize;
         font.family: Style.fontFamily;

@@ -7,7 +7,7 @@ Row {
     height: 20;
     spacing: 10;
 
-    property int pagesSize;
+    property int pagesSize: 1;
     property int currentValue: 1;
     property int currentIndex: 0;
 
@@ -54,7 +54,7 @@ Row {
         hasText: false;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        enabled: listModel.count > 1;
+        enabled: listModel.count > 1 && paginationContainer.currentValue != 1;
 
         iconSource: buttonDecr.enabled ? "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg":
                                          "../../../" + "Icons/" + Style.theme + "/Left_Off_Disabled.svg";
@@ -81,7 +81,7 @@ Row {
             highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
 
-            enabled: model.number !== -1;
+            enabled: model.number !== -1 && paginationContainer.currentValue != model.number;
             textButton: model.number === -1 ? "..." : model.number;
             onClicked: {
                 paginationContainer.currentIndex = model.index;
@@ -110,7 +110,7 @@ Row {
         hasText: false;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        enabled: listModel.count > 1;
+        enabled: listModel.count > 1 && paginationContainer.currentValue != paginationContainer.pageCount;
 
         iconSource: buttonIncr.enabled ? "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg":
                                          "../../../" + "Icons/" + Style.theme + "/Right_Off_Disabled.svg";

@@ -8,6 +8,7 @@ Item {
     property SettingsProvider settingsProvider: null;
 
     function applyDesignSchema(design){
+        console.log("applyDesignSchema");
         if (design == undefined){
             design = getDesignSchema();
         }

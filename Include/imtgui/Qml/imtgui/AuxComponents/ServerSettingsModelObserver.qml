@@ -10,11 +10,13 @@ TreeItemModelObserver {
     property Item root;
 
     onModelChanged: {
+        console.log("SettingsModelObserver onModelChanged");
         for (let i = 0; i < changeList.length; i++){
             let changeObj = changeList[i]
             let changeId = changeObj["id"];
 
             let ids = changeId.split('/')
+            console.log("ids", ids);
 
             if (ids.includes("Language")){
                 container.root.updateAllModels();

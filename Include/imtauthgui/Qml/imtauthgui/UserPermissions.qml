@@ -68,10 +68,6 @@ Item {
                     }
                 }
 
-//                UserPermissionsController {
-//                    id: permissionsController;
-//                }
-
                 AuxTable {
                     id: permissionsTable;
 

@@ -295,6 +295,7 @@ Rectangle {
             authPageContainer.state = "authorized";
             var pageContainer =  authPageContainer.windows;
             pageContainer.updateAllModels();
+            pageContainer.updateServerSettings();
             authPageContainer.visible = false;
         }
         onErrorSignal: {

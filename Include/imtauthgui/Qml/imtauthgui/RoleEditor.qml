@@ -116,7 +116,7 @@ Item {
         includesTable.height = includesTable.headerHeight + includesTable.rowItemHeight;
 
         if (documentModel.ContainsKey("Parents")){
-            let parents = documentModel.AddTreeModel("Parents");
+            let parents = documentModel.GetData("Parents");
 
             for (let i = 0; i < parents.GetItemsCount(); i++){
                 let parentId = parents.GetData("Id", i);
