@@ -9,6 +9,7 @@ Item {
 
     property string message;
     property string inputValue: "";
+    property Item rootItem;
 
     onFocusChanged: {
         console.log("InputBody onFocusChanged", focus);
@@ -58,7 +59,8 @@ Item {
             }
 
             onAccepted: {
-                buttonsDialog.buttonClicked("Ok");
+                inputDialogBodyContainer.rootItem.buttons.buttonClicked("Ok");
+                //buttonsDialog.buttonClicked("Ok");
             }
         }
     }

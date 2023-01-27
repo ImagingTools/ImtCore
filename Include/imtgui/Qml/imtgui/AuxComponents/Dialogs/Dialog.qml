@@ -108,6 +108,9 @@ Rectangle {
 
             onLoaded: {
                 loaderBodyDialog.item.width = dialogContainer.width;
+                if(loaderBodyDialog.item.rootItem !== undefined){
+                    loaderBodyDialog.item.rootItem = dialogContainer;
+                }
             }
         }
 

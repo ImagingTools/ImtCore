@@ -12,6 +12,8 @@ Item {
 
     property alias tableView: table;
 
+    property Item rootItem;
+
     onProductIdChanged: {
         for (let i = 0; i < container.model.GetItemsCount(); i++){
             let currentProductId = container.model.GetData("Id", i);
@@ -56,9 +58,9 @@ Item {
             }
 
             onSelectedIndexChanged: {
-                let isEnabled = selectedIndex != null;
-
-                buttons.setButtonState("Include", isEnabled);
+                let isEnabled = table.selectedIndex != null;
+                container.rootItem.setButtonState("Include", isEnabled);
+                //buttons.setButtonState("Include", isEnabled);
             }
         }
     }//Column
