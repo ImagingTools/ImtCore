@@ -121,13 +121,6 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		objectId = name.toUtf8();
 
-		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-		if (elementIds.contains(objectId)){
-			errorMessage = QT_TR_NOOP("Account with this name already exists");
-
-			return nullptr;
-		}
-
 		accountInfoPtr->SetAccountName(name);
 
 		if (itemModel.ContainsKey("Description")){

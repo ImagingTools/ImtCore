@@ -95,13 +95,6 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 			return nullptr;
 		}
 
-		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-		if (elementIds.contains(objectId)){
-			errorMessage = QT_TR_NOOP("Product with this ID already exists");
-
-			return nullptr;
-		}
-
 		productPtr->SetProductId(objectId);
 
 		if (itemModel.ContainsKey("CategoryId")){

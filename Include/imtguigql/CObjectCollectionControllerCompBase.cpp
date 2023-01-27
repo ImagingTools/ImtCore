@@ -189,7 +189,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 		istd::IChangeable* newObject = CreateObject(*inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
-			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
+			imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+			if (elementIds.contains(objectId)){
+				errorMessage = QT_TR_NOOP("Object with this ID already exists");
+			}
+			else{
+				newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
+			}
 		}
 
 		if (errorMessage.isEmpty() && newObjectId.isEmpty()){
@@ -244,13 +250,19 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::IChangeable* savedObject = CreateObject(*inputParams, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){
-		if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
-			errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
+		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+		if (elementIds.contains(newObjectId)){
+			errorMessage = QT_TR_NOOP("Object with this ID already exists");
+		}
+		else{
+			if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
+				errorMessage = QObject::tr("Can not update object: %1").arg(qPrintable(oldObjectId));
+			}
 		}
 	}
 	else {
 		if (errorMessage.isEmpty()){
-			errorMessage = QObject::tr("Can not create object for update: %1").arg(splitObjectId);
+			errorMessage = QObject::tr("Can not create object for update: %1").arg(qPrintable(oldObjectId));
 		}
 	}
 

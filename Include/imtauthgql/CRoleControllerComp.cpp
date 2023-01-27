@@ -146,13 +146,6 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 			objectId = roleId + *m_separatorObjectIdAttrPtr + productId;
 		}
 
-		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-		if (elementIds.contains(objectId)){
-			errorMessage = QT_TR_NOOP("Role with this ID already exists");
-
-			return nullptr;
-		}
-
 		if (itemModel.ContainsKey("Parents")){
 			imtbase::CTreeItemModel* parentsModelPtr = itemModel.GetTreeItemModel("Parents");
 

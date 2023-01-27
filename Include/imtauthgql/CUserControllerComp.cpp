@@ -134,13 +134,6 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			userInfoPtr->SetUserId(username);
 		}
 
-		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-		if (elementIds.contains(objectId)){
-			errorMessage = QT_TR_NOOP("User with this ID already exists");
-
-			return nullptr;
-		}
-
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
 			userInfoPtr->SetName(name);

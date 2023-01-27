@@ -54,13 +54,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			return nullptr;
 		}
 
-		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-		if (elementIds.contains(objectId)){
-			errorMessage = QT_TR_NOOP("Package with this ID already exists");
-
-			return nullptr;
-		}
-
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
 		}

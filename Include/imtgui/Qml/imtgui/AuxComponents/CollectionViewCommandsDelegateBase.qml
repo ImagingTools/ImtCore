@@ -99,7 +99,11 @@ Item {
             }
             else if (commandId === "SetDescription"){
                 let elements = containerBase.tableData.elements;
-                let selectedDescription = elements.GetData("Description", selectedIndex);
+                let selectedDescription = "";
+
+                if (elements.ContainsKey("Description", selectedIndex)){
+                    selectedDescription = elements.GetData("Description", selectedIndex);
+                }
 
                 modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
             }
