@@ -64,24 +64,24 @@ Item {
 
     function updateCategoryProducts(category){
         let productModel = installationEditorContainer.orderProductsModel;
-        let resultModel;
-        if (category === "Hardware"){
-            resultModel = installationEditorContainer.hardwareModel;
-        }
-        else{
-            resultModel = installationEditorContainer.softwareModel;
-        }
-        resultModel.Clear();
+        let resultModel = dependencyCB.model;
+//        if (category === "Hardware"){
+//            resultModel = installationEditorContainer.hardwareModel;
+//        }
+//        else{
+//            resultModel = installationEditorContainer.softwareModel;
+//        }
+//        resultModel.Clear();
         console.log("updateCategoryProducts", resultModel.toJSON())
         for (let i = 0; i < productModel.GetItemsCount(); i++){
             let modelCategory = productModel.GetData("CategoryId", i);
             let pairId = productModel.GetData("PairId", i);
-            if (category === modelCategory && pairId != ""){
+            if (category === modelCategory && pairId === ""){
                 let resultIndex = resultModel.InsertNewItem();
                 let productId = productModel.GetData("ProductId", i);
-                let uuidId = productModel.GetData("Id", i);
                 resultModel.SetData("ProductId", productId, resultIndex);
-                resultModel.SetData("UuidId", uuidId, resultIndex);
+                resultModel.SetData("UuidId", productModel.GetData("Id", i), resultIndex);
+                resultModel.SetData("MacAddress", productModel.GetData("MacAddress", i), resultIndex);
                 resultModel.SetData("Name", getProductName(productId), resultIndex);
             }
         }
@@ -108,6 +108,7 @@ Item {
         let productId = documentModel.GetData("ProductId");
         let pairId = documentModel.GetData("PairId");
         let categoryId = documentModel.GetData("CategoryId");
+        let macAddress = documentModel.GetData("MacAddress");
 
         let productModel = productCB.model;
         if (productModel){
@@ -120,20 +121,34 @@ Item {
             }
         }
 
-        if (categoryId == "Software"){
-            dependencyCB.model = installationEditorContainer.hardwareModel;
-        }
-        else{
-            dependencyCB.model = installationEditorContainer.softwareModel;
-        }
-        productModel = dependencyCB.model;
-        if (productModel){
+//        if (categoryId == "Software"){
+//            dependencyCB.model = installationEditorContainer.hardwareModel;
+//        }
+//        else{
+//            dependencyCB.model = installationEditorContainer.softwareModel;
+//        }
+        dependencyCB.currentIndex = -1;
+        dependencyCB.model.Clear();
+        productModel = installationEditorContainer.orderProductsModel;
+        if (productModel && macAddress != ""){
             for (let i = 0; i < productModel.GetItemsCount(); i++){
-                let uuidId = productModel.GetData("UuidId", i);
-                if (uuidId === pairId){
-                    dependencyCB.currentIndex = i;
+                let modelMacAddress = productModel.GetData("MacAddress", i);
+                if (macAddress === modelMacAddress && categoryId != productModel.GetData("CategoryId", i)){
+                    dependencyCB.model.SetData("ProductId", productModel.GetData("ProductId", i), 0);
+                    dependencyCB.model.SetData("UuidId", productModel.GetData("Id", i), 0);
+                    dependencyCB.model.SetData("MacAddress", productModel.GetData("MacAddress", i), 0);
+                    dependencyCB.model.SetData("Name", getProductName(productModel.GetData("ProductId", i)), 0);
+                    dependencyCB.currentIndex = 0;
                     break;
                 }
+            }
+        }
+        if (dependencyCB.currentIndex == -1){
+            if (categoryId == "Software"){
+                updateCategoryProducts("Hardware")
+            }
+            else{
+                updateCategoryProducts("Software")
             }
         }
 
@@ -280,12 +295,12 @@ Item {
                 bodyColumn.productCategory = productCB.model.GetData("CategoryId", productCB.currentIndex);
 //                console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, bodyColumn.productCategory);
 
-                if (bodyColumn.productCategory == "Software"){
-                    dependencyCB.model = installationEditorContainer.hardwareModel;
-                }
-                else{
-                    dependencyCB.model = installationEditorContainer.softwareModel;
-                }
+//                if (bodyColumn.productCategory == "Software"){
+//                    dependencyCB.model = installationEditorContainer.hardwareModel;
+//                }
+//                else{
+//                    dependencyCB.model = installationEditorContainer.softwareModel;
+//                }
 
                 console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, dependencyCB.model.toJSON());
 
@@ -310,6 +325,8 @@ Item {
 
             width: parent.width;
             height: 23;
+
+            model: TreeItemModel{}
 
             radius: 3;
 
