@@ -123,7 +123,8 @@ FocusScope {
 
     function openPopupMenu(){
         comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
-        var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
+        //var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
+        var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
                                                    "model": comboBoxContainer.model,

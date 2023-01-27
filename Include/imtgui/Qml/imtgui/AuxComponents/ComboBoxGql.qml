@@ -170,7 +170,8 @@ Item {
 
     function openPopupMenu(){
         comboBoxContainerGql.dialogsCountPrev = modalDialogManager.count;
-        var point = comboBoxContainerGql.mapToItem(thumbnailDecoratorContainer, 0, 0);
+        //var point = comboBoxContainerGql.mapToItem(thumbnailDecoratorContainer, 0, 0);
+        var point = comboBoxContainerGql.mapToItem(null, 0, 0);
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
                                                    "model": comboBoxContainerGql.model,

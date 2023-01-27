@@ -97,8 +97,8 @@ Item {
 
         color: Style.baseColor;
 
-        radius: thumbnailDecoratorContainer.mainRadius;
-
+        radius: Style.size_mainCornerRadius !== undefined ? Style.size_mainCornerRadius: 0;
+        //radius: thumbnailDecoratorContainer.mainRadius;
         TreeItemModel{
             id: tableDecoratorModel;
 
@@ -151,8 +151,8 @@ Item {
             anchors.fill: parent;
 
             anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
-            anchors.margins: thumbnailDecoratorContainer.mainMargin;
-
+            anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
+            //anchors.margins: thumbnailDecoratorContainer.mainMargin;
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;
 

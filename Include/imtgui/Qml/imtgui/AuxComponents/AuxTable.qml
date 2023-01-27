@@ -751,13 +751,15 @@ Item {
 
             onRightButtonMouseClicked: {
                 console.log("AuxTable onRightButtonMouseClicked", mX, mY);
-                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                //var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                var point = mapToItem(null, mX, mY);
                 tableContainer.rightButtonMouseClicked(point.x, point.y);
             }
 
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
-                var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                //var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+                var point = mapToItem(null, mX, mY);
                 tableContainer.doubleClicked(point.x, point.y)
                 tableContainer.selectItem(model.Id, model.Name);
 

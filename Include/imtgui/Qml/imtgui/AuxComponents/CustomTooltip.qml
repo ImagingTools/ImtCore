@@ -35,7 +35,8 @@ Item {
         if(!customTooltip.openST){
             console.log("openTooltip", xX, yY);
 
-            var point = mapToItem(thumbnailDecoratorContainer, xX, yY);
+            //var point = mapToItem(thumbnailDecoratorContainer, xX, yY);
+            var point = mapToItem(null, xX, yY);
             if(point.x > thumbnailDecoratorContainer.width*2/3){
                 if(customTooltip.fitToTextWidth){
                     point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin;
