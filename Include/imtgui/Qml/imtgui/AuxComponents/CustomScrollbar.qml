@@ -8,8 +8,12 @@ Rectangle{
     color: backgroundColor;
     radius: 4;
 
+    visible: hideNotUsed ? !notUsed : true;
+
     property var targetItem;
+
     property bool vertical: true;
+
     property real minSize: 30;
     property real secondSize: 20;
     property int indicatorRadius: 4;
@@ -22,6 +26,8 @@ Rectangle{
     property int pauseDuration: 300;
     property int indicatorMargin: 0;
 
+    property bool notUsed: targetItem.contentHeight <= targetItem.height;
+    property bool hideNotUsed: true;
 
     property real koeff: vertical ? (scrollIndicator.height > scrollContainer.minSize ? 1 :(targetItem.height - scrollContainer.minSize)/(targetItem.contentHeight - targetItem.height)):
                                     (scrollIndicator.width > scrollContainer.minSize ? 1 :(targetItem.width - scrollContainer.minSize)/(targetItem.contentWidth - targetItem.width));
@@ -101,7 +107,9 @@ Rectangle{
         id:scrollContainerMA;
 
         anchors.fill: parent;
-        enabled: scrollContainer.visible;
+
+        visible: scrollContainer.visible && !scrollContainer.notUsed;
+        enabled: visible;
         hoverEnabled: enabled;
         property int delta: 40;
         //cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
@@ -270,10 +278,13 @@ Rectangle{
             id:scrollMA;
 
             anchors.fill: parent;
+
+            visible: parent.visible && !scrollContainer.notUsed;
+            enabled: visible;
+            hoverEnabled: enabled;
+
             property bool dragEnabled: false;
             property var coord :mapToItem(scrollContainer,0,0);
-            enabled: parent.visible;
-            hoverEnabled: enabled;
             //cursorShape: containsMouse ? Qt.PointingHandCursor: Qt.ArrowCursor;
             onWheel: {
 
