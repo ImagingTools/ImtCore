@@ -250,14 +250,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::IChangeable* savedObject = CreateObject(*inputParams, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){
-		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-		if (elementIds.contains(newObjectId)){
-			errorMessage = QT_TR_NOOP("Object with this ID already exists");
-		}
-		else{
-			if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
-				errorMessage = QObject::tr("Can not update object: %1").arg(qPrintable(oldObjectId));
-			}
+		if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
+			errorMessage = QObject::tr("Can not update object: %1").arg(qPrintable(oldObjectId));
 		}
 	}
 	else {
