@@ -43,7 +43,8 @@ Item {
             id: pagesDeleg;
 
             anchors.fill: parent;
-            anchors.margins: thumbnailDecoratorContainer.mainMargin;
+            //anchors.margins: thumbnailDecoratorContainer.mainMargin;
+            anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
 
             visible: container.activePageIndex === model.index;
 

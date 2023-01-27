@@ -47,7 +47,8 @@ Item {
                 panelDelegate.logout();
             }
             else{
-                var point = mapToItem(thumbnailDecoratorContainer, x - width, y + height);
+                //var point = mapToItem(thumbnailDecoratorContainer, x - width, y + height);
+                var point = mapToItem(null, x - width, y + height);
                 point.x = point.x - 200;
                 modalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
             }
