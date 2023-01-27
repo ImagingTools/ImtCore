@@ -24,7 +24,7 @@ TreeViewItemDelegateBase {
 
                     anchors.verticalCenter: parent.verticalCenter;
 
-                    visible: model.Optional ? model.Optional : false;
+                    visible: model.Optional ? model.Optional && model.Level != 1 : false;
 
                     checkState: model.State;
 

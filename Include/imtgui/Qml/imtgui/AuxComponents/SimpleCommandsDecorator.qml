@@ -10,10 +10,21 @@ Item {
     property alias color: commands.color;
 
     signal commandActivated(string commandId);
+    signal commandAdded(int index, string commandId);
 
     onCommandModelChanged: {
         if (container.commandModel != null){
             repeater.model = container.commandModel;
+        }
+    }
+
+    function setCommandVisible(commandId, visible){
+        for (let i = 0; i < container.commandModel.GetItemsCount(); i++){
+            let id = container.commandModel.GetData("Id", i);
+            if (id == commandId){
+                container.commandModel.SetData("Visible", visible, i);
+                break;
+            }
         }
     }
 
@@ -45,9 +56,15 @@ Item {
 
                     enabled: model.IsEnabled;
 
+                    property string commandId: model.Id;
+
                     onClicked: {
                         container.commandActivated(model.Id);
                     }
+                }
+
+                onItemAdded: {
+                    container.commandAdded(index, item.commandId)
                 }
             }
         }

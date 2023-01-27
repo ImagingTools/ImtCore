@@ -20,6 +20,11 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		QString& description,
 		QString& errorMessage) const
 {
+	if (!m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT(false);
+		return nullptr;
+	}
+
 	if (inputParams.isEmpty()){
 		errorMessage = QObject::tr("Can not create package: %1").arg(QString(objectId));
 		return nullptr;
@@ -46,6 +51,13 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 		if (objectId.isEmpty()){
 			errorMessage = QT_TR_NOOP("Package-ID can not be empty!");
+			return nullptr;
+		}
+
+		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+		if (elementIds.contains(objectId)){
+			errorMessage = QT_TR_NOOP("Package with this ID already exists");
+
 			return nullptr;
 		}
 

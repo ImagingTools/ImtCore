@@ -60,17 +60,17 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		QString& description,
 		QString &errorMessage) const
 {
+	if (!m_productFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT(false);
+		return nullptr;
+	}
+
 	if (inputParams.isEmpty()){
 		return nullptr;
 	}
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		if (!m_productFactCompPtr.IsValid()){
-			errorMessage = QObject::tr("Can not create product: %1").arg(QString(objectId));
-			return nullptr;
-		}
-
 		istd::TDelPtr<imtlic::IProductLicensingInfo> productPtr = m_productFactCompPtr.CreateInstance();
 		if (!productPtr.IsValid()){
 			errorMessage = QT_TR_NOOP("Unable to get an product pointer");
@@ -88,14 +88,21 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Id")){
 			objectId = itemModel.GetData("Id").toByteArray();
-
-			if (objectId.isEmpty()){
-				errorMessage = QT_TR_NOOP("Product-ID cannot be empty!");
-				return nullptr;
-			}
-
-			productPtr->SetProductId(objectId);
 		}
+
+		if (objectId.isEmpty()){
+			errorMessage = QT_TR_NOOP("Product-ID cannot be empty");
+			return nullptr;
+		}
+
+		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+		if (elementIds.contains(objectId)){
+			errorMessage = QT_TR_NOOP("Product with this ID already exists");
+
+			return nullptr;
+		}
+
+		productPtr->SetProductId(objectId);
 
 		if (itemModel.ContainsKey("CategoryId")){
 			QByteArray categoryId = itemModel.GetData("CategoryId").toByteArray();
@@ -252,7 +259,10 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 
 								QByteArray featureId = featureInfoPtr->GetFeatureId();
 								QString featureName = featureInfoPtr->GetFeatureName();
-								bool isOptional = featureInfoPtr->IsOptional();
+								bool isOptional = false;
+								if (featureInfoPtr->GetParentFeature() != nullptr){
+									isOptional = featureInfoPtr->IsOptional();
+								}
 
 								featureModelPtr->SetData("Id", featureId, index);
 								featureModelPtr->SetData("Name", featureName, index);

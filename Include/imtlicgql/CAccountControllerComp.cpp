@@ -93,8 +93,8 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			QString &description,
 			QString& errorMessage) const
 {
-	if (!m_accountInfoFactCompPtr.IsValid()){
-		errorMessage = QObject::tr("Can not create account: %1").arg(QString(objectId));
+	if (!m_accountInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT(false);
 		return nullptr;
 	}
 
@@ -112,14 +112,23 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
-			accountInfoPtr->SetAccountName(name);
-			objectId = name.toUtf8();
-
-			if (objectId.isEmpty()){
-				errorMessage = QT_TR_NOOP("Account name can't be empty!");
-				return nullptr;
-			}
 		}
+
+		if (name.isEmpty()){
+			errorMessage = QT_TR_NOOP("Account name can't be empty");
+			return nullptr;
+		}
+
+		objectId = name.toUtf8();
+
+		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+		if (elementIds.contains(objectId)){
+			errorMessage = QT_TR_NOOP("Account with this name already exists");
+
+			return nullptr;
+		}
+
+		accountInfoPtr->SetAccountName(name);
 
 		if (itemModel.ContainsKey("Description")){
 			description = itemModel.GetData("Description").toString();

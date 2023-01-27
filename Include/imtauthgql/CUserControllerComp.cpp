@@ -102,8 +102,9 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		QString &description,
 		QString& errorMessage) const
 {
-	if (!m_userInfoFactCompPtr.IsValid()){
-		errorMessage = QObject::tr("Can not create User: %1").arg(QString(objectId));
+
+	if (!m_userInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT(false);
 		return nullptr;
 	}
 
@@ -131,6 +132,13 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			objectId = username;
 
 			userInfoPtr->SetUserId(username);
+		}
+
+		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+		if (elementIds.contains(objectId)){
+			errorMessage = QT_TR_NOOP("User with this ID already exists");
+
+			return nullptr;
 		}
 
 		if (itemModel.ContainsKey("Name")){

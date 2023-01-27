@@ -136,6 +136,7 @@ void CFeaturePackageDatabaseDelegateComp::CreateSubFeaturesFromRecord(
 		subFeatureInfoPtr->SetFeatureName(subFeatureName);
 		subFeatureInfoPtr->SetOptional(isOptional);
 
+		subFeatureInfoPtr->SetParentFeature(featureInfoPtr);
 		featureInfoPtr->InsertSubFeature(subFeatureInfoPtr);
 
 		QByteArray parentFeatureId;
@@ -287,23 +288,6 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
 				.arg(featureDescription)
 				.arg(qPrintable(parentFeatureId))
 				.arg(isOptional).toLocal8Bit();
-
-//		QByteArrayList featureDependencies = featurePackagePtr->GetFeatureDependencies(featureId);
-
-//		if (!featureDependencies.isEmpty()){
-//			retVal += "\n" +
-//					QString("DELETE FROM \"FeatureDependencies\" WHERE FeatureId = '%1';")
-//					.arg(qPrintable(featureId))
-//					.toLocal8Bit();
-
-//			for (const QByteArray& dependencyFeatureId : featureDependencies){
-//				retVal += "\n" +
-//						QString("INSERT INTO \"FeatureDependencies\" (FeatureId, DependencyId) VALUES('%1', '%2');")
-//						.arg(qPrintable(featureId))
-//						.arg(qPrintable(dependencyFeatureId))
-//						.toLocal8Bit();
-//			}
-//		}
 
 		CreateInsertSubFeaturesQuery(featurePackagePtr, featureInfo, retVal);
 	}

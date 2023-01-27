@@ -255,6 +255,18 @@ Rectangle {
             }
         }
 
+        CustomScrollbar {
+            id: scrollbar;
+
+            z: 100;
+
+            anchors.right: parent.right;
+            anchors.bottom: buttonsDialog.top;
+
+            secondSize: 10;
+            targetItem: flickable;
+        }
+
         Flickable {
             id: flickable;
 

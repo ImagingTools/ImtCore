@@ -91,8 +91,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 		QString& description,
 		QString& errorMessage) const
 {
-	if (!m_roleFactCompPtr.IsValid()){
-		errorMessage = QObject::tr("Can not create role: %1").arg(QString(objectId));
+	if (!m_roleFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
+		Q_ASSERT(false);
 		return nullptr;
 	}
 
@@ -144,6 +144,13 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 
 		if (m_separatorObjectIdAttrPtr.IsValid()){
 			objectId = roleId + *m_separatorObjectIdAttrPtr + productId;
+		}
+
+		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+		if (elementIds.contains(objectId)){
+			errorMessage = QT_TR_NOOP("Role with this ID already exists");
+
+			return nullptr;
 		}
 
 		if (itemModel.ContainsKey("Parents")){
