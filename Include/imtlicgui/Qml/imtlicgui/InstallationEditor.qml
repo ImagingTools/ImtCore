@@ -16,6 +16,7 @@ Item {
     property bool blockUpdatingModel: false;
     property bool centered: true;
 
+    property string selectedPairId: "";
 
     width: 550;
     height: 800;
@@ -31,15 +32,60 @@ Item {
     function started(){
         productCB.model = installationEditorContainer.productsModel;
 
-        updateCategoryProducts("Software");
-        updateCategoryProducts("Hardware");
+        let productId = documentModel.GetData("ProductId");
+        let id = documentModel.GetData("Id");
+        let pairId = documentModel.GetData("PairId");
+        let categoryId = documentModel.GetData("CategoryId");
+        let productModel = installationEditorContainer.orderProductsModel;
 
-        console.log("installationEditorContainer.hardwareModel", installationEditorContainer.hardwareModel.toJSON())
-        console.log("installationEditorContainer.softwareModel", installationEditorContainer.softwareModel.toJSON())
+        selectedPairId = "";
+        dependencyCB.currentIndex = -1;
+        dependencyCB.model.Clear();
+        let isPairFinded = false;
+        if (productModel){
+            for (let i = 0; i < productModel.GetItemsCount(); i++){
+                //  let modelMacAddress = productModel.GetData("PairId", i);
+                if (categoryId == "Hardware" && productModel.GetData("CategoryId", i) == "Software"
+                        && findHardwarePair(productModel.GetData("Id", i)) !== ""){
+                    isPairFinded = true;
+                }
+                if (categoryId == "Software" && id === productModel.GetData("PairId", i) && productModel.GetData("CategoryId", i) == "Hardware"){
+                    isPairFinded = true;
+                }
+                if (isPairFinded){
+                    let dependencyModel = dependencyCB.model;
+                    dependencyModel.SetData("ProductId", productModel.GetData("ProductId", i), 0);
+                    dependencyModel.SetData("Id", productModel.GetData("Id", i), 0);
+                    dependencyModel.SetData("MacAddress", productModel.GetData("MacAddress", i), 0);
+                    dependencyModel.SetData("Name", getProductName(productModel.GetData("ProductId", i)), 0);
+                    let index = dependencyModel.InsertNewItem();
+                    dependencyModel.SetData("ProductId", "", index);
+                    dependencyModel.SetData("Id","", index);
+                    dependencyModel.SetData("MacAddress", "", index);
+                    dependencyModel.SetData("Name", qsTr("None"), index);
+                    break;
+                }
+            }
+        }
+        //        }
+        if (!isPairFinded){
+            if (categoryId == "Software"){
+                updateHardwareCategoryProducts()
+            }
+            else{
+                updateSoftwareCategoryProducts()
+            }
+        }
 
         generateId();
         updateGui();
-        console.log("started", documentModel.toJSON());
+        if (isPairFinded){
+            dependencyCB.currentIndex = 0;
+        }
+
+        console.log("started documentModel", documentModel.toJSON());
+        console.log("started licensesModel", licensesModel.toJSON());
+
     }
 
     function generateId(){
@@ -62,37 +108,78 @@ Item {
         return retVal;
     }
 
-    function updateCategoryProducts(category){
+//    function updateCategoryProducts(category){
+//        let productModel = installationEditorContainer.orderProductsModel;
+//        let resultModel = dependencyCB.model;
+//        console.log("updateCategoryProducts", resultModel.toJSON())
+//        for (let i = 0; i < productModel.GetItemsCount(); i++){
+//            let modelCategory = productModel.GetData("CategoryId", i);
+//            let pairId = productModel.GetData("PairId", i);
+//            if (category === modelCategory && pairId === ""){
+//                let resultIndex = resultModel.InsertNewItem();
+//                let productId = productModel.GetData("ProductId", i);
+//                resultModel.SetData("ProductId", productId, resultIndex);
+//                resultModel.SetData("Id", productModel.GetData("Id", i), resultIndex);
+//                resultModel.SetData("MacAddress", productModel.GetData("MacAddress", i), resultIndex);
+//                resultModel.SetData("Name", getProductName(productId), resultIndex);
+//            }
+//        }
+//        console.log("updateCategoryProducts2", resultModel.toJSON())
+//    }
+    function updateHardwareCategoryProducts(){
         let productModel = installationEditorContainer.orderProductsModel;
         let resultModel = dependencyCB.model;
-//        if (category === "Hardware"){
-//            resultModel = installationEditorContainer.hardwareModel;
-//        }
-//        else{
-//            resultModel = installationEditorContainer.softwareModel;
-//        }
-//        resultModel.Clear();
-        console.log("updateCategoryProducts", resultModel.toJSON())
         for (let i = 0; i < productModel.GetItemsCount(); i++){
-            let modelCategory = productModel.GetData("CategoryId", i);
             let pairId = productModel.GetData("PairId", i);
-            if (category === modelCategory && pairId === ""){
+            if (productModel.GetData("CategoryId", i) === "Hardware" && pairId === ""){
                 let resultIndex = resultModel.InsertNewItem();
                 let productId = productModel.GetData("ProductId", i);
                 resultModel.SetData("ProductId", productId, resultIndex);
-                resultModel.SetData("UuidId", productModel.GetData("Id", i), resultIndex);
+                resultModel.SetData("Id", productModel.GetData("Id", i), resultIndex);
                 resultModel.SetData("MacAddress", productModel.GetData("MacAddress", i), resultIndex);
                 resultModel.SetData("Name", getProductName(productId), resultIndex);
             }
         }
-        console.log("updateCategoryProducts2", resultModel.toJSON())
+        console.log("updateHardwareCategoryProducts", resultModel.toJSON())
+    }
+
+    function findHardwarePair(id){
+        let retVal = ""
+        let productModel = installationEditorContainer.orderProductsModel;
+        for (let i = 0; i < productModel.GetItemsCount(); i++){
+            let pairId = productModel.GetData("PairId", i)
+            if (productModel.GetData("CategoryId", i) === "Hardware"
+                    && pairId === id){
+                retVal = productModel.GetData("Id", i)
+                break
+            }
+
+        }
+
+        return retVal
+    }
+
+    function updateSoftwareCategoryProducts(){
+        let productModel = installationEditorContainer.orderProductsModel;
+        let resultModel = dependencyCB.model;
+        for (let i = 0; i < productModel.GetItemsCount(); i++){
+            if (productModel.GetData("CategoryId", i) === "Software"){
+                let hardwareId = findHardwarePair(productModel.GetData("Id", i));
+                if (hardwareId == ""){
+                    let productId = productModel.GetData("ProductId", i);
+                    let resultIndex = resultModel.InsertNewItem();
+                    resultModel.SetData("ProductId", productId, resultIndex);
+                    resultModel.SetData("Id", productModel.GetData("Id", i), resultIndex);
+                    resultModel.SetData("MacAddress", productModel.GetData("MacAddress", i), resultIndex);
+                    resultModel.SetData("Name", getProductName(productId), resultIndex);
+                }
+            }
+        }
+        console.log("updateSoftwareCategoryProducts", resultModel.toJSON())
     }
 
     onDocumentModelChanged: {
         console.log("InstallationEditor onDocumentModelChanged", documentModel.toJSON());
-        generateId();
-
-        updateGui();
     }
 
 //    Rectangle {
@@ -102,10 +189,10 @@ Item {
 
 
     function updateGui(){
-//        console.log("updateGui start", blockUpdatingModel, documentModel.toJSON())
         blockUpdatingModel = true;
 
         let productId = documentModel.GetData("ProductId");
+        let id = documentModel.GetData("Id");
         let pairId = documentModel.GetData("PairId");
         let categoryId = documentModel.GetData("CategoryId");
         let macAddress = documentModel.GetData("MacAddress");
@@ -121,36 +208,6 @@ Item {
             }
         }
 
-//        if (categoryId == "Software"){
-//            dependencyCB.model = installationEditorContainer.hardwareModel;
-//        }
-//        else{
-//            dependencyCB.model = installationEditorContainer.softwareModel;
-//        }
-        dependencyCB.currentIndex = -1;
-        dependencyCB.model.Clear();
-        productModel = installationEditorContainer.orderProductsModel;
-        if (productModel && macAddress != ""){
-            for (let i = 0; i < productModel.GetItemsCount(); i++){
-                let modelMacAddress = productModel.GetData("MacAddress", i);
-                if (macAddress === modelMacAddress && categoryId != productModel.GetData("CategoryId", i)){
-                    dependencyCB.model.SetData("ProductId", productModel.GetData("ProductId", i), 0);
-                    dependencyCB.model.SetData("UuidId", productModel.GetData("Id", i), 0);
-                    dependencyCB.model.SetData("MacAddress", productModel.GetData("MacAddress", i), 0);
-                    dependencyCB.model.SetData("Name", getProductName(productModel.GetData("ProductId", i)), 0);
-                    dependencyCB.currentIndex = 0;
-                    break;
-                }
-            }
-        }
-        if (dependencyCB.currentIndex == -1){
-            if (categoryId == "Software"){
-                updateCategoryProducts("Hardware")
-            }
-            else{
-                updateCategoryProducts("Software")
-            }
-        }
 
         if (documentModel.ContainsKey("SerialNumber")){
             serialNumberInput.text = documentModel.GetData("SerialNumber");
@@ -178,11 +235,8 @@ Item {
             }
         }
 
-        console.log("licensesProvider", installationEditorContainer.licensesModel.toJSON());
-
         if (licensesModel){
-            console.log("licensesModel", licensesModel.toJSON());
-            for (let i = 0; i < licensesModel.GetItemsCount(); i++){
+             for (let i = 0; i < licensesModel.GetItemsCount(); i++){
                 let licenseId = licensesModel.GetData("Id", i);
                 let licenseName = licensesModel.GetData("Name", i);
 
@@ -207,7 +261,6 @@ Item {
                 licensesTable.addRow(row);
             }
         }
-//        console.log("updateGui finish", blockUpdatingModel)
 
         blockUpdatingModel = false;
     }
@@ -215,19 +268,23 @@ Item {
     function updateModel(){
 
         let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
-        documentModel.SetData("ProductId", selectedProductId);
+        if (selectedProductId){
+            documentModel.SetData("ProductId", selectedProductId);
+        }
 
         documentModel.SetData("CategoryId",  bodyColumn.productCategory);
 
-        let selectedPairId = dependencyCB.model.GetData("UuidId", dependencyCB.currentIndex);
-        documentModel.SetData("PairId", selectedPairId);
+        selectedPairId = "";
+        let pairId = dependencyCB.model.GetData("Id", dependencyCB.currentIndex);
+        if (pairId){
+            selectedPairId = pairId;
+        }
 
         documentModel.SetData("SerialNumber", serialNumberInput.text);
         documentModel.SetData("MacAddress", macAddressInput.text);
 
         let activeLicenses = documentModel.AddTreeModel("ActiveLicenses");
         activeLicenses.Clear();
-
         for (let i = 0; i < licensesTable.rowModel.count; i++){
             let rowObj = licensesTable.rowModel.get(i);
 
