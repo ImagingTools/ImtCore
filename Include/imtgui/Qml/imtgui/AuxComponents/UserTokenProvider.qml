@@ -46,10 +46,9 @@ Item {
 
                 if (authorizationGqlModel.ContainsKey("errors")){
                     dataModelLocal = authorizationGqlModel.GetData("errors")
-                     dataModelLocal = dataModelLocal.GetData("UserAuthorization")
+                    dataModelLocal = dataModelLocal.GetData("UserToken")
 
                     let message = dataModelLocal.GetData("message");
-                    //errorMessage.text = message;
                     container.errorSignal(message);
 
                     return;

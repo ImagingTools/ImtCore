@@ -163,6 +163,7 @@ Item {
         id: background;
         anchors.fill: parent;
         color: Style.backgroundColor;
+
         Loader{
             id: backgroundDecoratorLoader;
 
@@ -208,6 +209,7 @@ Item {
                 width: bodyColumn.width;
 
                 headerVisible: false;
+                withoutSelection: true;
 
                 rowDelegate: TableUserRolesDelegate {
                     Component.onCompleted: {

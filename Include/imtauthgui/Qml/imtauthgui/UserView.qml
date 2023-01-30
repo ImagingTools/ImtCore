@@ -56,6 +56,13 @@ DocumentBase {
         }
     }
 
+    function updateModel(){
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            loader.item.updateModel();
+        }
+    }
+
     Component{
         id: emptyDecorator;
         Item{

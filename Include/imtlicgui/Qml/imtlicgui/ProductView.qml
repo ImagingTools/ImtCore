@@ -337,10 +337,12 @@ DocumentBase {
         }
     }
 
-    Item {
+    Rectangle {
         id: headerPanel;
 
         width: parent.width;
+
+        color: Style.backgroundColor;
 
         height: 50;
 

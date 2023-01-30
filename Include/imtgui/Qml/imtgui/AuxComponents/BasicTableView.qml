@@ -11,6 +11,7 @@ FocusScope {
 
     property bool headerVisible: true;
     property bool readOnly: true;
+    property bool withoutSelection: false;
 
     property alias headerDelegate: listView.header;
     property alias rowDelegate: listView.delegate;
@@ -37,10 +38,6 @@ FocusScope {
     signal rowModelDataChanged(var delegate, var prop);
     signal rowAdded();
     signal rowRemoved();
-
-    Keys.onPressed: {
-        console.log("TableView onPressed");
-    }
 
     Loader {
         id: backgroundLoader;

@@ -5,27 +5,18 @@ import imtqml 1.0
 Dialog {
     id: messageDialog;
 
-    title: qsTr("Message");
-
+    title: qsTr("Error");
 
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     property string message;
 
-
-    function addButton(){
-        buttons.addButton();
-    }
-
-    onMessageChanged: {
-        messageDialog.bodyItem.message = messageDialog.message;
-    }
-
     Component.onCompleted: {
-        messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes", "Enabled": true});
-        messageDialog.buttons.addButton({"Id":"No", "Name":"No", "Enabled": true});
+        messageDialog.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": true});
+    }
 
-        messageDialog.bodySource = "MessageDialogBody.qml";
+    contentComp: MessageDialogBody {
+        message: messageDialog.message;
     }
 
     Component{
@@ -45,6 +36,4 @@ Dialog {
             }
         }
     }
-
-
 }

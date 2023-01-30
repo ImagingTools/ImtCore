@@ -63,6 +63,7 @@ SuperUserPasswordDialog 1.0 ./AuxComponents/SuperUserPasswordDialog.qml
 LoginDialog 1.0 ./AuxComponents/Dialogs/LoginDialog.qml
 PopupMenuDialog 1.0 ./AuxComponents/Dialogs/PopupMenuDialog.qml
 MessageDialog 1.0 ./AuxComponents/Dialogs/MessageDialog.qml
+ErrorDialog 1.0 ./AuxComponents/Dialogs/ErrorDialog.qml
 InputDialog 1.0 ./AuxComponents/Dialogs/InputDialog.qml
 Dialog 1.0 ./AuxComponents/Dialogs/Dialog.qml
 ModalDialogManager 1.0 ./AuxComponents/Dialogs/ModalDialogManager.qml

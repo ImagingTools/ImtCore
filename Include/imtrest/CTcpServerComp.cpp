@@ -40,7 +40,11 @@ void CTcpServerComp::OnComponentCreated()
 
 	if (m_protocolEngineCompPtr.IsValid() && m_requestHandlerCompPtr.IsValid()){
 		if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
-			if (m_serverAddressAttrPtr.IsValid() && m_serverPortAttrPtr.IsValid()){
+			if (m_serverAddressAttrPtr.IsValid() && m_serverPortCompPtr.IsValid()){
+				QString port = m_serverPortCompPtr->GetText();
+				StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), port.toInt());
+			}
+			else if (m_serverAddressAttrPtr.IsValid() && m_serverPortAttrPtr.IsValid()){
 				StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), *m_serverPortAttrPtr);
 			}
 			else{

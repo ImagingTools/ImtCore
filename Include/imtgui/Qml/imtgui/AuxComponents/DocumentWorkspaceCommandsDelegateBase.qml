@@ -100,6 +100,7 @@ Item {
             }
         }
         else if (commandId == "Save"){
+            documentBase.updateModel();
             let itemId = documentBase.itemId;
             if (itemId === ""){
                 container.gqlModelQueryType = "Add";
@@ -158,8 +159,7 @@ Item {
     Component {
         id: errorDialog;
 
-        MessageDialog {
-            title: qsTr("Error");
+        ErrorDialog {
             onFinished: {
                 if (container.closingFlag){
                     container.closingFlag = false;

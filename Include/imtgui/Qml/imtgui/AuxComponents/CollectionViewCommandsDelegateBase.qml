@@ -134,7 +134,7 @@ Item {
 
     Component {
         id: errorDialog;
-        MessageDialog {
+        ErrorDialog {
         }
     }
 

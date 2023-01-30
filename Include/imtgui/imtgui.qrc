@@ -25,6 +25,7 @@
         <file alias="imtgui/AuxComponents/CollectionView.qml">Qml/imtgui/AuxComponents/CollectionView.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/PopupMenuDialog.qml">Qml/imtgui/AuxComponents/Dialogs/PopupMenuDialog.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/MessageDialog.qml">Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml</file>
+	<file alias="imtgui/AuxComponents/Dialogs/ErrorDialog.qml">Qml/imtgui/AuxComponents/Dialogs/ErrorDialog.qml</file>
         <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/InputDialog.qml">Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml</file>
         <file alias="imtgui/AuxComponents/PreferencePage.qml">Qml/imtgui/AuxComponents/PreferencePage.qml</file>

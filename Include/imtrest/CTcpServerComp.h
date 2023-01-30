@@ -8,6 +8,7 @@
 // ACF includes
 #include <istd/TPointerVector.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
@@ -20,13 +21,13 @@ namespace imtrest
 
 
 /**
-    TCP-based communication server.
-    The server uses the underlaying protocol engine for creation of requests and responses.
+	TCP-based communication server.
+	The server uses the underlaying protocol engine for creation of requests and responses.
 */
 class CTcpServerComp:
-	public QObject,
-	public ilog::CLoggerComponentBase,
-	virtual public IRequestServlet
+			public QObject,
+			public ilog::CLoggerComponentBase,
+			virtual public IRequestServlet
 {
 	Q_OBJECT
 public:
@@ -38,6 +39,7 @@ public:
 		I_ASSIGN(m_serverAddressAttrPtr, "ServerAddress", "Server address to be listened", false, "ServerAddress");
 		I_ASSIGN(m_serverPortAttrPtr, "ServerPort", "Server port to be listened", false, 0);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
+		I_ASSIGN(m_serverPortCompPtr, "ServerPortParam", "Parameter providing the server port to be listened", false, "ServerPortParam");
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
@@ -61,6 +63,7 @@ private:
 	I_ATTR(QByteArray, m_serverAddressAttrPtr);
 	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
+	I_REF(iprm::ITextParam, m_serverPortCompPtr);
 
 	typedef QVector<QTcpServer*> Servers;
 

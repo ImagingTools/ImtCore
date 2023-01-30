@@ -17,7 +17,7 @@ namespace imtrest
 
 IRequestServlet::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRequest& request) const
 {
-    ConstResponsePtr retVal;
+	ConstResponsePtr retVal;
 
 	if (m_requestHandlerCompPtr.IsValid()){
 		retVal = m_requestHandlerCompPtr->ProcessRequest(request);
@@ -26,7 +26,7 @@ IRequestServlet::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRe
 		}
 	}
 
-    return retVal;
+	return retVal;
 }
 
 
@@ -36,18 +36,22 @@ IRequestServlet::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRe
 
 void CWebSocketServerComp::OnComponentCreated()
 {
-    BaseClass::OnComponentCreated();
+	BaseClass::OnComponentCreated();
 
-    if (m_protocolEngineCompPtr.IsValid() && m_requestHandlerCompPtr.IsValid()){
-	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
-	    if (m_serverAddressAttrPtr.IsValid() && m_serverPortAttrPtr.IsValid()){
-		StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), *m_serverPortAttrPtr);
-	    }
-	    else{
-		StartListening();
-	    }
+	if (m_protocolEngineCompPtr.IsValid() && m_requestHandlerCompPtr.IsValid()){
+		if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
+			if (m_serverAddressAttrPtr.IsValid() && m_webSocketServerPortCompPtr.IsValid()){
+				QString port = m_webSocketServerPortCompPtr->GetText();
+				StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), port.toInt());
+			}
+			else if (m_serverAddressAttrPtr.IsValid() && m_serverPortAttrPtr.IsValid()){
+				StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), *m_serverPortAttrPtr);
+			}
+			else{
+				StartListening();
+			}
+		}
 	}
-    }
 }
 
 
@@ -55,23 +59,23 @@ void CWebSocketServerComp::OnComponentCreated()
 
 bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
-    if (!m_protocolEngineCompPtr.IsValid()){
-	return false;
-    }
+	if (!m_protocolEngineCompPtr.IsValid()){
+		return false;
+	}
 
 	istd::TDelPtr<QWebSocketServer> webSocketServerPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
 	if (webSocketServerPtr->listen(address, port)){
-	connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections, Qt::UniqueConnection);
+		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections, Qt::UniqueConnection);
 
-	m_servers.push_back(webSocketServerPtr.PopPtr());
+		m_servers.push_back(webSocketServerPtr.PopPtr());
 
-	return true;
-    }
-    else{
-	SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
-    }
+		return true;
+	}
+	else{
+		SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
+	}
 
-    return false;
+	return false;
 }
 
 
@@ -93,39 +97,39 @@ void CWebSocketServerComp::HandleNewConnections()
 
 			QObject::connect(socketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
 		}
-    }
+	}
 }
 
 
 void CWebSocketServerComp::OnSocketDisconnected()
 {
-    QObject* socketObjectPtr = sender();
-    Q_ASSERT(socketObjectPtr != nullptr);
+	QObject* socketObjectPtr = sender();
+	Q_ASSERT(socketObjectPtr != nullptr);
 
 	if (m_subscriberEngineCompPtr.IsValid()){
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-    for (int i = 0; i < m_requests.GetCount(); ++i){
-	IRequest* requestPtr = m_requests.GetAt(i);
-	Q_ASSERT(requestPtr != nullptr);
+	for (int i = 0; i < m_requests.GetCount(); ++i){
+		IRequest* requestPtr = m_requests.GetAt(i);
+		Q_ASSERT(requestPtr != nullptr);
 
-	if (&requestPtr->GetSocketObject() == socketObjectPtr){
-	    m_requests.RemoveAt(i);
+		if (&requestPtr->GetSocketObject() == socketObjectPtr){
+			m_requests.RemoveAt(i);
 
-	    qDebug("Request deleted");
+			qDebug("Request deleted");
 
-	    break;
+			break;
+		}
 	}
-    }
 
-    socketObjectPtr->deleteLater();
+	socketObjectPtr->deleteLater();
 }
 
 
 QByteArray CWebSocketServerComp::GetSupportedCommandId() const
 {
-    return QByteArray();
+	return QByteArray();
 }
 
 

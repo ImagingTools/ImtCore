@@ -4,7 +4,6 @@ import Acf 1.0
 FocusScope {
     id: delegate;
 
-
     width: root.width;
     height: root.rowItemHeight;
 
@@ -167,7 +166,9 @@ FocusScope {
         onClicked: {
             console.log("onClicked");
 
-            delegate.updateSelection();
+            if (!root.withoutSelection){
+                delegate.updateSelection();
+            }
 
             delegate.clicked();
 

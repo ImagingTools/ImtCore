@@ -68,15 +68,22 @@ TableViewItemDelegateBase {
             //            border.color: Style.imagingToolsGradient2;
             //        }
 
-            Repeater {
+            ListView {
                 id: rolesRepeater;
+
+                width: parent.width;
+                height: rolesRepeater.count * root.rowItemHeight;
+
+                spacing: -1;
 
                 delegate: Rectangle {
                     width: productRolesDelegate.width;
                     height: root.rowItemHeight;
 
                     border.width: 1;
-                    border.color: "transparent";
+                    border.color: Style.borderColor;
+
+                    color: Style.baseColor;
 
                     CheckBox {
                         id: checkBoxRole;
@@ -110,6 +117,51 @@ TableViewItemDelegateBase {
                     }
                 }
             }
+
+//            Repeater {
+//                id: rolesRepeater;
+
+//                delegate: Rectangle {
+//                    width: productRolesDelegate.width;
+//                    height: root.rowItemHeight;
+
+//                    border.width: 1;
+//                    border.color: Style.borderColor;
+
+//                    color: Style.baseColor;
+
+//                    CheckBox {
+//                        id: checkBoxRole;
+
+//                        anchors.verticalCenter: parent.verticalCenter;
+//                        anchors.left: parent.left;
+//                        anchors.leftMargin: 10;
+
+//                        checkState: model.CheckState;
+
+//                        onClicked: {
+//                            console.log("checkBoxRole onClicked", model.CheckState)
+//                            model.CheckState = Qt.Checked - model.CheckState;
+
+//                            root.rowModelDataChanged(productRolesDelegate, "CheckState");
+//                        }
+//                    }
+
+//                    Text {
+//                        anchors.verticalCenter: parent.verticalCenter;
+//                        anchors.left: checkBoxRole.right;
+//                        anchors.leftMargin: 10;
+
+//                        font.family: Style.fontFamily;
+//                        font.pixelSize: Style.fontSize_common;
+//                        color: Style.textColor;
+//                        wrapMode: Text.WordWrap;
+//                        elide: Text.ElideRight;
+
+//                        text: model.Name;
+//                    }
+//                }
+//            }
         }//Column
     }
 }
