@@ -48,9 +48,17 @@ Item {
         console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
         //        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
         let isEnabled = containerBase.selectedIndex > -1;
-
-        containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
-        containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+        if(commandsProvider){
+            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+        }
+    }
+    onCommandsProviderChanged: {
+        if(commandsProvider){
+            let isEnabled = containerBase.selectedIndex > -1;
+            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+        }
     }
 
     Component.onDestruction: {
