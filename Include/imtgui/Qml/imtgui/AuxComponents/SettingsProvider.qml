@@ -10,15 +10,20 @@ Item {
     property TreeItemModel serverModel: null;
     property TreeItemModel localModel: null;
 
+    property bool modelsCompleted: serverModel && localModel;
+
     signal serverSettingsSaved();
     signal localSettingsSaved();
 
     onServerModelChanged: {
         console.log("SettingsProvider onServerModelChanged", container.serverModel);
 
-        container.rewriteModel(container.serverModel, container.localModel);
-
-        container.saveLocalModel();
+    }
+    onModelsCompletedChanged: {
+        if(container.modelsCompleted){
+            container.rewriteModel(container.serverModel, container.localModel);
+            container.saveLocalModel();
+        }
     }
 
     function clearModel(){

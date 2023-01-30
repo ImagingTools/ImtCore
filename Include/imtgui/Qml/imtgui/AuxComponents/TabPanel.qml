@@ -46,12 +46,12 @@ Rectangle {
             lastElement: model.index === list.count - 1;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title;
-            isCloseEnable: tabPanel.isCloseEnable;
+            isCloseEnable: tabPanelContainer.isCloseEnable;
 
             decoratorSource: Style.tabPanelDecoratorPath;
 
             onClicked: {
-                console.log("TabDelegate onClicked", list.model)
+                console.log("TabDelegate onClicked", list.model);
                 tabPanelContainer.selectedIndex = model.index;
             }
 

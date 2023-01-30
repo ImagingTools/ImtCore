@@ -255,17 +255,17 @@ Rectangle {
             }
         }
 
-        CustomScrollbar {
-            id: scrollbar;
+//        CustomScrollbar {
+//            id: scrollbar;
 
-            z: 100;
+//            z: 100;
 
-            anchors.right: parent.right;
-            anchors.bottom: buttonsDialog.top;
+//            anchors.right: parent.right;
+//            anchors.bottom: buttonsDialog.top;
 
-            secondSize: 10;
-            targetItem: flickable;
-        }
+//            secondSize: 10;
+//            targetItem: flickable;
+//        }
 
         Flickable {
             id: flickable;

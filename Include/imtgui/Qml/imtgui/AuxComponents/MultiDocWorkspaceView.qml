@@ -80,7 +80,7 @@ Item {
     function closeDocument(itemId){
          let index = this.getDocumentIndexById(itemId);;
          if (index >= 0){
-             documentsData.RemoveItem(index);
+             workspaceView.documentsData.RemoveItem(index);
 
              if (tabPanelInternal.selectedIndex >= index && index > 0){
                  tabPanelInternal.selectedIndex--;
@@ -98,7 +98,7 @@ Item {
 
         let index = this.getDocumentIndexById(itemId);
         if (index >= 0){
-            documentsData.SetData("Title", newTitle, index);
+            workspaceView.documentsData.SetData("Title", newTitle, index);
         }
     }
 
@@ -132,15 +132,15 @@ Item {
         anchors.right: parent.right;
 
         visible: true;
-        model: documentsData;
+        model: workspaceView.documentsData;
 
         onCloseItem: {
-            let item = documentsData.GetData("Item", index);
+            let item = workspaceView.documentsData.GetData("Item", index);
             item.commandsDelegate.commandHandle("Close");
         }
 
         onRightClicked: {
-            if (tabPanelInternal.selectedIndex < documentsData.GetItemsCount() - 1) {
+            if (tabPanelInternal.selectedIndex < workspaceView.documentsData.GetItemsCount() - 1) {
                 tabPanelInternal.selectedIndex++;
                 tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
             }
@@ -166,7 +166,7 @@ Item {
         clip: true;
         boundsBehavior: Flickable.StopAtBounds;
         orientation: ListView.Horizontal;
-        model: documentsData;
+        model: workspaceView.documentsData;
 
         delegate: Item {
             id: docsDataDeleg;
@@ -204,9 +204,13 @@ Item {
                         workspaceView.activeItem.forceActiveFocus();
                     }
 
+                    if(dataLoader.item.documentsData !==undefined){
+                        dataLoader.item.documentsData = workspaceView.documentsData;
+                    }
+
                     dataLoader.item.commandsId = model.CommandsId
 
-                    documentsData.SetData("Item", dataLoader.item, model.index);
+                    workspaceView.documentsData.SetData("Item", dataLoader.item, model.index);
                 }
             }
         }

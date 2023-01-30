@@ -10,13 +10,13 @@ Item {
     property Item noConnectionView: null;
 
     Component.onDestruction: {
-        if (container.observedModel != null){
+        if (container.observedModel){
             container.observedModel.stateChanged.disconnect(container.observedModelStateChanged);
         }
     }
 
     onObservedModelChanged: {
-        if (container.observedModel != null){
+        if (container.observedModel){
             container.observedModel.stateChanged.connect(container.observedModelStateChanged);
         }
     }

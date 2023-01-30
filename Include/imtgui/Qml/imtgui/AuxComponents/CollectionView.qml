@@ -34,6 +34,9 @@ Item {
     property alias filterMenuVisible: collectionViewBase.filterMenuVisible;
     property alias modelFilter: collectionViewBase.modelFilter;
 
+    property TreeItemModel documentsData: TreeItemModel {}
+
+
     Component.onCompleted: {
         collectionViewContainer.itemId = documentsData.GetData("Id", model.index);
         collectionViewContainer.itemName = documentsData.GetData("Title", model.index);
