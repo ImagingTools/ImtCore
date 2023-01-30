@@ -39,22 +39,17 @@ public:
 		I_ASSIGN(m_urlPrePathAttrPtr, "UrlPrePath", "The clarifying information about the location of the resource; depends on the protocol. places BEFORE the path of the request", false, "");
 		I_ASSIGN(m_urlSchemeAttrPtr, "UrlScheme", "The scheme of circulation of a resource; in most cases this refers to the network Protocol", false, "");
 		I_ASSIGN(m_urlUserNameAttrPtr, "UrlUserName", "The user name used to access the resource", false, "");
-
 		I_ASSIGN(m_objectCollectionCompPtr, "HttpRequestsCollection", "Comment", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
-
 	I_END_COMPONENT
-
 
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
-
 
 private:
 	I_ATTR(QString, m_urlAttrPtr);
@@ -72,9 +67,6 @@ private:
 
 	QNetworkAccessManager m_networkAccessManager;
 	QUrl m_baseUrl;
-
-
-
 };
 
 
