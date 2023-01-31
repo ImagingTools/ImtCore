@@ -759,6 +759,9 @@ Item {
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
                 //var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
+
+                tableContainer.selectedIndex = model.index;
+
                 var point = mapToItem(null, mX, mY);
                 tableContainer.doubleClicked(point.x, point.y)
                 tableContainer.selectItem(model.Id, model.Name);
