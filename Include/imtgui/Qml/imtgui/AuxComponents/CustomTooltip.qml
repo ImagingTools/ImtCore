@@ -37,7 +37,7 @@ Item {
 
             //var point = mapToItem(thumbnailDecoratorContainer, xX, yY);
             var point = mapToItem(null, xX, yY);
-            if(point.x > thumbnailDecoratorContainer.width*2/3){
+            if(point.x > modalDialogManager.width*2/3){
                 if(customTooltip.fitToTextWidth){
                     point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin;
 
@@ -50,7 +50,7 @@ Item {
                 point.x = point.x + customTooltip.componentMargin;
             }
 
-            if(point.y > thumbnailDecoratorContainer.height*2/3){
+            if(point.y > modalDialogManager.height*2/3){
                 point.y = point.y - customTooltip.componentHeight - customTooltip.componentMargin;
             }
             else{
