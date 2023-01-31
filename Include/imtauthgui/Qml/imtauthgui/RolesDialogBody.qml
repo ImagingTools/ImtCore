@@ -12,7 +12,7 @@ Item {
 
     property alias tableView: table;
 
-    property Item rootItem;
+    property Item rootItem: null;
 
     onProductIdChanged: {
         for (let i = 0; i < container.model.GetItemsCount(); i++){

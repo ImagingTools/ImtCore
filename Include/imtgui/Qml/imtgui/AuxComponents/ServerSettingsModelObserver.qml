@@ -7,7 +7,7 @@ TreeItemModelObserver {
 
     property DesignSchemaProvider designProvider: null;
 
-    property Item root;
+    property Item root: null;
 
     onModelChanged: {
         console.log("SettingsModelObserver onModelChanged");
