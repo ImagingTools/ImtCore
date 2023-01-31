@@ -66,14 +66,8 @@ DocumentBase {
         if (accountEditorContainer.documentModel.ContainsKey("LastName")){
             lastNameInput.text = accountEditorContainer.documentModel.GetData("LastName");
         }
-        if (accountEditorContainer.documentModel.ContainsKey("NickName")){
-            nickNameInput.text = accountEditorContainer.documentModel.GetData("NickName");
-        }
         if (accountEditorContainer.documentModel.ContainsKey("Email")){
             emailInput.text = accountEditorContainer.documentModel.GetData("Email");
-        }
-        if (accountEditorContainer.documentModel.ContainsKey("BirthDay")){
-            birthDayInput.text = accountEditorContainer.documentModel.GetData("BirthDay");
         }
 
         accountEditorContainer.blockUpdatingModel = false;
@@ -116,14 +110,8 @@ DocumentBase {
         let lastName = lastNameInput.text;
         accountEditorContainer.documentModel.SetData("LastName", lastName)
 
-        let nickName = nickNameInput.text;
-        accountEditorContainer.documentModel.SetData("NickName", nickName)
-
         let email = emailInput.text;
         accountEditorContainer.documentModel.SetData("Email", email)
-
-        let birthDay = birthDayInput.text;
-        accountEditorContainer.documentModel.SetData("BirthDay", birthDay)
 
         undoRedoManager.endChanges();
     }
@@ -134,9 +122,27 @@ DocumentBase {
         color: Style.backgroundColor;
     }
 
-    Flickable {
-        anchors.fill: parent;
+    CustomScrollbar {
+        id: scrollbar;
+        z: 100;
 
+        anchors.left: flickable.right;
+        anchors.leftMargin: 5;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+
+        secondSize: 10;
+        targetItem: flickable;
+    }
+
+    Flickable {
+        id: flickable;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.leftMargin: 20;
+
+        width: 450;
         contentWidth: bodyColumn.width;
         contentHeight: bodyColumn.height;
 
@@ -145,10 +151,7 @@ DocumentBase {
         Column {
             id: bodyColumn;
 
-            anchors.left: parent.left;
-            anchors.leftMargin: 20;
-
-            width: 450;
+            width: flickable.width;
 
             spacing: 7;
 
@@ -402,32 +405,10 @@ DocumentBase {
                             }
                         }
 
-                        KeyNavigation.tab: birthDayInput;
-                    }
-
-                    Text {
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-
-                        text: qsTr("Birthday");
-                    }
-
-                    CustomTextField {
-                        id: birthDayInput;
-
-                        height: accountEditorContainer.textInputHeight;
-                        width: accountOwnerBlock.width;
-
-                        onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("BirthDay");
-                            if (oldText != birthDayInput.text){
-                                accountEditorContainer.updateModel();
-                            }
-                        }
-
                         KeyNavigation.tab: firstNameInput;
                     }
+
+
 
                     Text {
                         color: Style.textColor;
@@ -470,31 +451,6 @@ DocumentBase {
                         onEditingFinished: {
                             let oldText = accountEditorContainer.documentModel.GetData("LastName");
                             if (oldText != lastNameInput.text){
-                                accountEditorContainer.updateModel();
-                            }
-                        }
-
-                        KeyNavigation.tab: nickNameInput;
-                    }
-
-
-                    Text {
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-
-                        text: qsTr("Nickname");
-                    }
-
-                    CustomTextField {
-                        id: nickNameInput;
-
-                        width: accountOwnerBlock.width;
-                        height: accountEditorContainer.textInputHeight;
-
-                        onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("NickName");
-                            if (oldText != nickNameInput.text){
                                 accountEditorContainer.updateModel();
                             }
                         }
