@@ -37,8 +37,8 @@ Item {
     property TreeItemModel documentsData: TreeItemModel {}
     property Item documentManager: null;
 
-
-    Component.onCompleted: {
+    onDocumentsDataChanged: {
+        console.log("CollectionView onDocumentsDataChanged");
         collectionViewContainer.itemId = documentsData.GetData("Id", model.index);
         collectionViewContainer.itemName = documentsData.GetData("Title", model.index);
     }
