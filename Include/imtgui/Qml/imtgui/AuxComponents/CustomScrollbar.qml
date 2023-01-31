@@ -26,7 +26,8 @@ Rectangle{
     property int pauseDuration: 300;
     property int indicatorMargin: 0;
 
-    property bool notUsed: targetItem.contentHeight <= targetItem.height;
+    property bool notUsed: vertical ? targetItem.contentHeight <= targetItem.height:
+                                      targetItem.contentWidth <= targetItem.width;
     property bool hideNotUsed: true;
 
     property real koeff: vertical ? (scrollIndicator.height > scrollContainer.minSize ? 1 :(targetItem.height - scrollContainer.minSize)/(targetItem.contentHeight - targetItem.height)):
