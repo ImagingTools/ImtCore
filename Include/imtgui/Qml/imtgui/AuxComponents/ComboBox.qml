@@ -76,6 +76,9 @@ FocusScope {
             console.log("name", name);
             comboBoxContainer.currentText = name;
         }
+        else{
+            comboBoxContainer.currentText = "";
+        }
     }
 
     Component {

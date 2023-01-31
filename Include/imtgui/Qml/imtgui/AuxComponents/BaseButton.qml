@@ -154,6 +154,10 @@ Item {
         id: loader;
 
         visible: baseButton.visible;
+        sourceComponent: Component{
+            CommonButtonDecorator{
+            }
+        }
 
         onLoaded: {
 

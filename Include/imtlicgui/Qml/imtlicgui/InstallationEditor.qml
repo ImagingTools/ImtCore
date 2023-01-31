@@ -360,8 +360,8 @@ Item {
                 let selectedProductId = productCB.model.GetData("Id", productCB.currentIndex);
                 if (selectedProductId){
                     orderProductsModel.SetData("ProductId", selectedProductId, activeProductIndex);
-                    orderProductsModel.SetData("CategoryId",  bodyColumn.productCategory, activeProductIndex);
                     bodyColumn.productCategory = productCB.model.GetData("CategoryId", productCB.currentIndex);
+                    orderProductsModel.SetData("CategoryId",  bodyColumn.productCategory, activeProductIndex);
                 }
 
                 updatePairMadel();
