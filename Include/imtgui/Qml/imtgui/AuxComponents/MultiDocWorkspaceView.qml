@@ -208,9 +208,9 @@ Item {
                         dataLoader.item.documentsData = workspaceView.documentsData;
                     }
 
-                    if(dataLoader.item.documentManager !==undefined){
-                        dataLoader.item.documentManager = workspaceView;
-                    }
+//                    if(dataLoader.item.documentManager !==undefined){
+//                        dataLoader.item.documentManager = workspaceView;
+//                    }
 
                     dataLoader.item.commandsId = model.CommandsId
 
