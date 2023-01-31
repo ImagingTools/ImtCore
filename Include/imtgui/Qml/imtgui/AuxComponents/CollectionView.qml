@@ -35,6 +35,7 @@ Item {
     property alias modelFilter: collectionViewBase.modelFilter;
 
     property TreeItemModel documentsData: TreeItemModel {}
+    property Item documentManager;
 
 
     Component.onCompleted: {
