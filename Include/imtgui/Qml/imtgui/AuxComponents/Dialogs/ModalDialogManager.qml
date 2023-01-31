@@ -47,7 +47,6 @@ Item {
                 anchors.fill: parent;
 
                 color: "gray";
-//                color: "transparent";
                 visible: modalDialogs.visible;
 
                 property alias backgroundAreaItem: backgroundArea;
@@ -57,6 +56,12 @@ Item {
                     hoverEnabled: true;
 
                     onWheel: {}
+                    onClicked: {}
+                    onDoubleClicked: {}
+                    onReleased: {}
+                    onPressAndHold: {}
+                    onPressed: {}
+                    onPositionChanged: {}
                 }
             }
 

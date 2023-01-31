@@ -30,6 +30,15 @@ Item {
         }
     }
 
+    Component {
+        id: errorDialog;
+
+        ErrorDialog {
+            onFinished: {
+            }
+        }
+    }
+
     GqlModel {
         id: saveQuery;
 
@@ -88,6 +97,16 @@ Item {
 
                     if (dataModelLocal.ContainsKey("UserMode")){
                         dataModelLocal = dataModelLocal.GetData("UserMode");
+
+                        let databaseState = dataModelLocal.GetData("DatabaseConnectionState");
+                        if (databaseState == false){
+                            let message = dataModelLocal.GetData("Message");
+
+                            message += '. ' + 'Please сheck the data to connect to the database'
+                            modalDialogManager.openDialog(errorDialog, {"message": message});
+
+                            return;
+                        }
 
                         let parameters = dataModelLocal.GetData("Parameters");
                         if (parameters){

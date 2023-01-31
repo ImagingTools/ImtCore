@@ -7,13 +7,15 @@ Dialog {
 
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
-
     property TreeItemModel model;
+
     property string productId;
+    property string currentRoleId: "";
 
     property var selectedIndex;
 
     contentComp: RolesDialogBody {
+        rootItem: rolesDialog;
     }
 
     onFinished: {

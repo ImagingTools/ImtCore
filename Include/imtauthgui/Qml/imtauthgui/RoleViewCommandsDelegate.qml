@@ -32,8 +32,9 @@ DocumentWorkspaceCommandsDelegateBase {
         if (commandId === "Include"){
             let productId = documentModel.GetData("ProductId");
 
-            modalDialogManager.openDialog(rolesDialog, {"productId": productId,
-                                              "model":     delegateContainer.rolesModel});
+            modalDialogManager.openDialog(rolesDialog, {"currentRoleId": container.itemId,
+                                                        "productId": productId,
+                                                        "model":     delegateContainer.rolesModel});
         }
         else if (commandId === "Exclude"){
             let indexes = includedRolesTable.selectedIndex.getIndexes();

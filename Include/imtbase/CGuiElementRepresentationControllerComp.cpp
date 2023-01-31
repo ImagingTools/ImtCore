@@ -37,11 +37,11 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
 
 	imtauth::IUserInfo::FeatureIds userPermissions;
+	bool isAdmin = true;
 	if (userInfoParamPtr.IsValid()){
 		userPermissions = userInfoParamPtr->GetPermissions();
+		isAdmin = userInfoParamPtr->IsAdmin();
 	}
-
-	bool isAdmin = userInfoParamPtr->IsAdmin();
 
 	const imtgui::IGuiElementContainer* guiElementContainerPtr = dynamic_cast<const imtgui::IGuiElementContainer*>(&dataModel);
 	if (guiElementContainerPtr != nullptr){

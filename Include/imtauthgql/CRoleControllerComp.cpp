@@ -148,8 +148,10 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Parents")){
 			imtbase::CTreeItemModel* parentsModelPtr = itemModel.GetTreeItemModel("Parents");
-
 			Q_ASSERT(parentsModelPtr != nullptr);
+			if (parentsModelPtr == nullptr){
+				return nullptr;
+			}
 
 			for(int index = 0; index < parentsModelPtr->GetItemsCount(); index++){
 				QByteArray parentRoleId = parentsModelPtr->GetData("Id", index).toByteArray();
@@ -157,6 +159,10 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 				parentRoleId = parentRoleIdStr.split(*m_separatorObjectIdAttrPtr)[0].toUtf8();
 
 				if (!roleInfoPtr->IncludeRole(parentRoleId)){
+					errorMessage = QT_TR_NOOP(QString("Unable include role %1 to the role %2. Check the dependencies between them.")
+												.arg(qPrintable(parentRoleId))
+												.arg(qPrintable(roleId)));
+
 					return nullptr;
 				}
 			}

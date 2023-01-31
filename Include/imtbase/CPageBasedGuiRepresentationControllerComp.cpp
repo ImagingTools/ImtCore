@@ -27,11 +27,12 @@ bool CPageBasedGuiRepresentationControllerComp::GetRepresentationFromDataModel(c
 	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
 
 	imtauth::IUserInfo::FeatureIds userPermissions;
+	bool isAdmin = true;
 	if (userInfoParamPtr.IsValid()){
 		userPermissions = userInfoParamPtr->GetPermissions();
-	}
 
-	bool isAdmin = userInfoParamPtr->IsAdmin();
+		isAdmin = userInfoParamPtr->IsAdmin();
+	}
 
 	BaseClass::GetRepresentationFromDataModel(dataModel, representation, paramsPtr);
 

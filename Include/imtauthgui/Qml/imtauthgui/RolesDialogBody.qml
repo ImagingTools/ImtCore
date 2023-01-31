@@ -22,6 +22,11 @@ Item {
 
                 for (let j = 0; j < roles.GetItemsCount(); j++){
                     let roleId = roles.GetData("Id", j);
+
+                    if (roleId == rootItem.currentRoleId){
+                        continue;
+                    }
+
                     let roleName = roles.GetData("Name", j);
 
                     console.log("roleId", roleId);
@@ -59,8 +64,7 @@ Item {
 
             onSelectedIndexChanged: {
                 let isEnabled = table.selectedIndex != null;
-                container.rootItem.setButtonState("Include", isEnabled);
-                //buttons.setButtonState("Include", isEnabled);
+                container.rootItem.buttons.setButtonState("Include", isEnabled);
             }
         }
     }//Column

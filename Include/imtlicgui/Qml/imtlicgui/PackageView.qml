@@ -16,6 +16,12 @@ DocumentBase {
         PackageViewCommandsDelegate {}
     }
 
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.backgroundColor;
+    }
+
     Component.onCompleted: {
         console.log("PackageView onCompleted");
         packageViewContainer.updateTreeViewModel();

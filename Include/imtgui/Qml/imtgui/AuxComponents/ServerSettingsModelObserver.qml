@@ -26,6 +26,9 @@ TreeItemModelObserver {
                     container.designProvider.applyDesignSchema();
                 }
             }
+            else if (ids.includes("Database")){
+                container.root.updateAllModels();
+            }
         }
     }
 }
