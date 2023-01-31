@@ -1,67 +1,75 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
+import imtgui 1.0
+import imtlicgui 1.0
 
 Item {
-    id: container;
+    id: documentDataProvider;
 
-    property TreeItemModel documentModel: TreeItemModel {};
+    anchors.fill: parent;
 
-    property string commandId;
+    property string itemId;
+    property string itemName;
+    property string commandsId;
 
-    function updateModel(externInputParams){
-        if (container.commandId == ""){
-            console.error( "ERROR: DocumentDataProvider commandId is empty!");
+    property TreeItemModel documentModel:TreeItemModel{};
 
-            return;
-        }
+    property bool itemLoad: true;
 
-        itemModel.updateModel(externInputParams);
+    property alias commandsProvider: commandsProviderBase.item;
+    property alias commandsProviderSourceCompr: commandsProviderBase.sourceComponent;
+
+    property alias commandsDelegate: commandsDelegateBase.item;
+    property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
+
+    signal commandsDelegateLoaded();
+
+    Component.onCompleted: {
+        commandsDelegate.documentBase = documentDataProvider;
     }
 
-    GqlModel {
-        id: itemModel;
+    onCommandsIdChanged: {
+        console.log("documentBase onCommandsIdChanged", documentDataProvider.commandsId);
 
-        function updateModel(externInputParams) {
-            console.log("itemModel updateModel", container.commandId + "Item");
-            var query = Gql.GqlRequest("query", container.commandId + "Item");
+        commandsDelegateBase.item.commandsId = documentBase.commandsId;
+    }
 
-            var inputParams = Gql.GqlObject("input");
+    onDocumentModelChanged: {
+        console.log("documentBase onDocumentModelChanged");
 
-            let keys = Object.keys(externInputParams)
-            for (let key of keys){
-                inputParams.InsertField(key, externInputParams[key]);
-            }
+        documentDataProvider.updateGui();
+    }
 
-            query.AddParam(inputParams);
+    onVisibleChanged: {
+        if (visible){
+            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
+                                                      "CommandsId": commandsProvider.commandsId});
 
-            var queryFields = Gql.GqlObject("item");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            query.AddField(queryFields);
+            documentDataProvider.updateGui();
+        }
+    }
 
-            var gqlData = query.GetQuery();
+    function updateGui(){}
 
-            console.log("itemModel gqlData", gqlData);
-            this.SetGqlQuery(gqlData);
+    Loader {
+        id: commandsProviderBase;
+
+        sourceComponent: CommandsProvider {
         }
 
-        onStateChanged: {
-            console.log("State:", this.state, itemModel);
-            if (this.state === "Ready"){
-                var dataModelLocal;
-
-                if (itemModel.ContainsKey("errors")){
-//                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the installation:")});
-                    return;
-                }
-
-                dataModelLocal = itemModel.GetData("data");
-                if(dataModelLocal.ContainsKey(commandId + "Item")){
-                    dataModelLocal = dataModelLocal.GetData(container.commandId + "Item");
-                    documentModel = dataModelLocal;
-                }
-            }
+        onLoaded: {
         }
-    }//GqlModel itemModel
+    }
+
+    Loader {
+        id: commandsDelegateBase;
+
+        sourceComponent: DocumentWorkspaceCommandsDelegateBase {
+        }
+
+        onLoaded: {
+            item.documentBase = documentDataProvider;
+            commandsDelegateLoaded();
+        }
+    }
 }
