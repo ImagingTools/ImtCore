@@ -6,7 +6,8 @@ Item {
 
     function logout(){
         authorizationPage.tokenProvider.login = "";
-        thumbnailDecoratorContainer.clearModels();
+        //thumbnailDecoratorContainer.clearModels();
+        Events.sendEvent("clearModels");
         authorizationPage.visible = true;
     }
 }

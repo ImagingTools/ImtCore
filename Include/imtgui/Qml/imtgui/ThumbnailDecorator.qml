@@ -19,6 +19,13 @@ Rectangle {
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("setPreferencesVisible", thumbnailDecoratorContainer.setPreferencesVisible);
+        Events.subscribeEvent("clearModels", thumbnailDecoratorContainer.clearModels);
+
+    }
+
+
     function updateModels(){
         pagesManager.updateModel();
     }

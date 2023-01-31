@@ -22,7 +22,8 @@ Item {
 //            var parameters = {};
 //            parameters["localSettings"] = thumbnailDecoratorContainer.localSettings;
 //            thumbnailDecoratorContainer.openDialog(source, parameters);
-            thumbnailDecoratorContainer.setPreferencesVisible(true);
+            //thumbnailDecoratorContainer.setPreferencesVisible(true);
+            Events.sendEvent("setPreferencesVisible", {"visible": true});
         }
     }
 }
