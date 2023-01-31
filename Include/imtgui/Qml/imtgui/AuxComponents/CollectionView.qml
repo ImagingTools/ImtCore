@@ -102,7 +102,7 @@ Item {
         id: contentDialog;
         Item {
             id: content;
-            property Item root;
+            property Item root: null;
             property Item rootItem:collectionViewContainer;
             property bool centered: true;
             property string contentId;

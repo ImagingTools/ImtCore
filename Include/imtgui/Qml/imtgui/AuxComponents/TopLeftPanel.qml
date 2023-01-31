@@ -4,7 +4,7 @@ import imtqml 1.0
 
 Rectangle {
     id: topLeftPanel;
-    property Item topPanel;
+    property Item topPanel: null;
 
     property string decoratorSource;
     onDecoratorSourceChanged: {

@@ -9,7 +9,7 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property Item root;
+    property Item root: null;
     property alias settingsProvider: preferenceDialog.settingsProvider;
 
     property int mainMargin: 0;

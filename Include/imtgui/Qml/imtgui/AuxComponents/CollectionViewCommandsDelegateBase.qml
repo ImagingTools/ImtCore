@@ -9,9 +9,9 @@ Item {
     /**
         The table inside collection view
     */
-    property Item tableData;
+    property Item tableData: null;
 
-    property Item collectionViewBase;
+    property Item collectionViewBase: null;
 
     property CommandsProvider commandsProvider: null;
 

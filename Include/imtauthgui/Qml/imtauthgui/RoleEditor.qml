@@ -51,7 +51,7 @@ Item {
     Component{
         id: emptyDecorator;
         Item{
-            property Item rootItem;
+            property Item rootItem: null;
         }
     }
 

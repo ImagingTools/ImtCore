@@ -19,7 +19,7 @@ Rectangle {
     property real backgroundOpacity: 0.3;
     property bool centered: true;
 
-    property Item root;
+    property Item root: null;
 
     property TreeItemModel localSettings;
     property TreeItemModel serverSettings;

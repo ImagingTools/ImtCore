@@ -11,8 +11,8 @@ Rectangle {
     height: popupMenuListView.height;
 
     property var model;
-    property Item root;
-    property Item rootItem;
+    property Item root: null;
+    property Item rootItem: null;
 
     property int itemWidth: 200;
     property int itemHeight: 26;

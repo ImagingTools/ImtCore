@@ -8,7 +8,7 @@ Item {
     height: 60;
 
     property Item centerPanel: topCenterPanel;
-    property Item topPanel;
+    property Item topPanel: null;
 
     Component.onCompleted: {
         console.log("topPanelDecorator onCompleted")

@@ -125,7 +125,7 @@ Item {
             border.width: customTooltip.borderWidth;
             radius: customTooltip.radius;
 
-            property Item root;
+            property Item root: null;
 
             Text{
                 id: compText;

@@ -16,7 +16,7 @@ Rectangle {
 
     property bool contentVisible: true;
 
-    property Item tableData;
+    property Item tableData: null;
 
     function getMetaInfo(){
         metaInfo.getMetaInfo();

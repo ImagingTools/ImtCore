@@ -8,7 +8,7 @@ Item {
 
     property TreeItemModel objectModel: documentBase ? container.documentBase.documentModel : null;
 
-    property Item documentBase;
+    property Item documentBase: null;
 
     property bool closingFlag: false;
     property bool showInputIdDialog: false;

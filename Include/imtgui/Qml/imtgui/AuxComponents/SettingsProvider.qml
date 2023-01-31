@@ -5,7 +5,7 @@ import imtqml 1.0
 Item {
     id: container;
 
-    property Item root;
+    property Item root: null;
 
     property TreeItemModel serverModel: null;
     property TreeItemModel localModel: null;

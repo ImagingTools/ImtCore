@@ -8,7 +8,7 @@ Item {
 
     property TabPanel tabPanel: tabPanelInternal;
 
-    property Item activeItem;
+    property Item activeItem: null;
 
     property alias isCloseEnable: tabPanelInternal.isCloseEnable;
 

@@ -11,7 +11,7 @@ Rectangle {
     color: Style.dialogBackgroundColor;
     radius: 3;
 
-    property Item root;
+    property Item root: null;
 
     property TreeItemModel serverModel: TreeItemModel {}
     property TreeItemModel localModel: TreeItemModel {}

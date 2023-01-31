@@ -7,7 +7,7 @@ Rectangle {
 
     clip: true;
 
-    property Item topPanel;
+    property Item topPanel: null;
 
     property string decoratorSource;
 //    property Component decorator: TopCenterPanelDecorator {};

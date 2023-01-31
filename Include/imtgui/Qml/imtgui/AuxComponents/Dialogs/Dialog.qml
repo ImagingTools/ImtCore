@@ -18,8 +18,8 @@ Rectangle {
     property bool centered: true;
     property bool hasIcon: true;
 
-    property Item root;
-    property Item rootItem;
+    property Item root: null;
+    property Item rootItem: null;
     property Item bodyItem: loaderBodyDialog.item;
 
     property alias topPanel: loaderTopPanel.item;

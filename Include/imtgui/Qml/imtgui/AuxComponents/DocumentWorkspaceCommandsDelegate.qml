@@ -7,7 +7,7 @@ import imtlicgui 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
-    property Item tableData;
+    property Item tableData: null;
 
     property int selectedIndex: container.tableData.selectedIndex;
 

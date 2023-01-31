@@ -9,7 +9,7 @@ Item {
 
     property string message;
     property string inputValue: "";
-    property Item rootItem;
+    property Item rootItem: null;
 
     onFocusChanged: {
         console.log("InputBody onFocusChanged", focus);

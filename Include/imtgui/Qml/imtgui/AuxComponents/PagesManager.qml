@@ -6,7 +6,7 @@ Item {
     id: container;
 
     property TreeItemModel pageModel: TreeItemModel {};
-    property Item activeItem;
+    property Item activeItem: null;
     property int activePageIndex;
 
     onActiveItemChanged: {

@@ -13,7 +13,7 @@ Item {
     property string selectedColor: Style.selectedColor;
 
     property alias text: mainText.text;
-    property Item rootItem;
+    property Item rootItem: null;
     property bool textCentered: false;
 
     signal clicked(string commandId, int index);

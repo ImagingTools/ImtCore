@@ -7,7 +7,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
     showInputIdDialog: true;
 
-    property Item tableTreeViewEditor;
+    property Item tableTreeViewEditor: null;
 
     Component.onDestruction: {
         container.tableTreeViewEditor.selectedIndexChanged.disconnect(container.selectedIndexChanged);
