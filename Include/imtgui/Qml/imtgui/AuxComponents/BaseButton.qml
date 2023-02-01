@@ -7,14 +7,8 @@ Item {
     height: loader.height;
 
     property alias decoratorSource: loader.source;
-    //property alias decorator: loader.sourceComponent;
+    property alias decorator: loader.sourceComponent;
 
-    property Component decorator;
-    onDecoratorChanged: {
-        loader.sourceComponent = decorator;
-        console.log("__________BUTTON DECORATOR CHANGED__________",decorator, loader.sourceComponent);
-
-    }
 
     //required parameters in every decorator
     property string text: "";
@@ -42,10 +36,6 @@ Item {
     signal exited();
 
     signal loaded();
-
-    Component.onCompleted: {
-        console.log("__________BUTTON_COMPLETED_______________");
-    }
 
     onPressed: {
         //baseButton.isPressed = !baseButton.isPressed;
@@ -166,7 +156,6 @@ Item {
 
         CommonButtonDecorator{
         }
-
     }
 
     Loader{
@@ -174,20 +163,9 @@ Item {
 
         visible: baseButton.visible;
         sourceComponent: commonButtonDecorator;
-//        sourceComponent: Component{
-//            id: commonButtonDecorator;
 
-//            CommonButtonDecorator{
-//            }
-//        }
-
-        Component.onCompleted: {
-            console.log("__________LOADER_COMPLETED_______________");
-        }
 
         onLoaded: {
-
-            console.log("____________BUTTON LOADED____________");
 
             loader.item.text = baseButton.text;
             loader.item.imageSource = baseButton.imageSource;
@@ -207,8 +185,6 @@ Item {
             loader.item.visible = baseButton.visible;
 
             baseButton.loaded();
-
-
 
         }
 
