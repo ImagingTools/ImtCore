@@ -19,8 +19,8 @@ Rectangle {
     property alias title: welcomeText.text;
 
     function logout(){
-        authPageContainer.visible = true;
         authPageContainer.tokenProvider.login = "";
+        authPageContainer.visible = true;
     }
 
     Component.onCompleted: {
