@@ -7,6 +7,7 @@ Item {
     id: container;
 
     property TreeItemModel objectModel: documentBase ? container.documentBase.documentModel : null;
+    property TreeItemModel documentsData: TreeItemModel{};
 
     property Item documentBase: null;
 
@@ -45,10 +46,18 @@ Item {
 
     Component.onCompleted: {
         console.log("DocumentCommands onCompleted");
+//        let itemId = documentsData.GetData("Id", model.index);
+//        container.itemModelInputParams["Id"] = itemId;
+//        console.log("itemId", itemId);
+    }
+
+    onDocumentsDataChanged: {
         let itemId = documentsData.GetData("Id", model.index);
         container.itemModelInputParams["Id"] = itemId;
         console.log("itemId", itemId);
+
     }
+
 
     Component.onDestruction: {
         Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);

@@ -13,6 +13,8 @@ Item {
     property string commandsId;
 
     property TreeItemModel documentModel: TreeItemModel{};
+    property TreeItemModel documentsData: TreeItemModel{};
+    property Item documentManager: null;
 
     property bool itemLoad: true;
 
@@ -36,6 +38,16 @@ Item {
     Component.onCompleted: {
         commandsDelegate.documentBase = documentBase;
 
+        //        if (documentBase.itemLoad){
+        //            documentBase.itemId = documentsData.GetData("Id", model.index);
+        //            documentBase.itemName = documentsData.GetData("Title", model.index);
+        //        }
+    }
+
+    onDocumentsDataChanged: {
+        if(commandsDelegateBase.item && commandsDelegateBase.item.documentsData !==undefined){
+            commandsDelegateBase.item.documentsData = documentBase.documentsData;
+        }
         if (documentBase.itemLoad){
             documentBase.itemId = documentsData.GetData("Id", model.index);
             documentBase.itemName = documentsData.GetData("Title", model.index);
@@ -51,7 +63,7 @@ Item {
     onVisibleChanged: {
         if (documentBase.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
+                                 "CommandsId": commandsProvider.commandsId});
 
             documentBase.forceActiveFocus();
         }
@@ -59,13 +71,13 @@ Item {
 
     onItemIdChanged: {
         if (documentBase.itemLoad){
-            documentsData.SetData("Id", documentBase.itemId, model.index);
+            documentBase.documentsData.SetData("Id", documentBase.itemId, model.index);
         }
     }
 
     onItemNameChanged: {
         if (itemLoad){
-            documentsData.SetData("Name", documentBase.itemName, model.index);
+            documentBase.documentsData.SetData("Name", documentBase.itemName, model.index);
         }
     }
 
@@ -119,6 +131,10 @@ Item {
 
         onLoaded: {
             commandsDelegateBase.item.documentBase = documentBase;
+            if(commandsDelegateBase.item.documentsData !==undefined){
+                commandsDelegateBase.item.documentsData = documentBase.documentsData;
+            }
+
             documentBase.commandsDelegateLoaded();
         }
     }

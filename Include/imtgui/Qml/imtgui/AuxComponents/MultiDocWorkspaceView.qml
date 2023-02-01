@@ -18,6 +18,13 @@ Item {
 
     property TreeItemModel documentsData: TreeItemModel {}
 
+    onDocumentsDataChanged: {
+        if(dataLoader.item && dataLoader.item.documentsData !==undefined){
+            dataLoader.item.documentsData = workspaceView.documentsData;
+        }
+
+    }
+
 //    property var openedDocuments: []
 
 //    function openDocument(document){
