@@ -1,7 +1,7 @@
 import QtQuick 2.12
 
 QtObject {
-    id: tableViewSelection;
+    id: root;
 
     property int count: items.length;
 
@@ -9,29 +9,93 @@ QtObject {
 
     signal selectionChanged();
 
-//    property var selectionMode: SelectionMode.SM_SINGLE_SELECTION;
+    property ModelIndex selectedIndex: null;
 
-//    enum SelectionMode {
-//        SM_UNKNOWN,
-//        SM_SINGLE_SELECTION,
-//        SM_MULTI_SELECTION
-//    }
+    onSelectedIndexChanged: {
+        console.log("TableViewSelection onSelectedIndexChanged");
+    }
+
+    function tableKeyPressed(event){
+        console.log("TableViewSelection tableKeyPressed", event.key);
+        if (tableViewRoot.selectedIndex == null){
+            return;
+        }
+
+        if (event.key == Qt.Key_Up) {
+            console.log("Key_Up");
+            let currentIndex = tableViewRoot.selectedIndex;
+            let prevIndex = currentIndex.prevIndex;
+            if (prevIndex == null){
+                let parentIndex = currentIndex.parentIndex;
+
+                prevIndex = parentIndex;
+            }
+            else{
+                while (prevIndex.childModel.length > 0){
+                    prevIndex = prevIndex.childModel[prevIndex.childModel.length - 1];
+                }
+            }
+
+            if (prevIndex != null){
+                root.select(prevIndex.itemData);
+            }
+        }
+        else if (event.key == Qt.Key_Down) {
+            let currentIndex = tableViewRoot.selectedIndex;
+            if (currentIndex != null){
+                let nextIndex;
+                // Если есть дочерние индексы => переходим к ним
+                if (currentIndex.childModel.length > 0){
+                    nextIndex = currentIndex.childModel[0];
+                }
+                else{
+                    nextIndex = tableViewRoot.selectedIndex.nextIndex;
+                }
+
+                // Если следующего нет => берем следующий у parent
+                if (nextIndex == null){
+                    let parentIndex = currentIndex.parentIndex;
+
+                    while (parentIndex != null){
+                        nextIndex = parentIndex.nextIndex;
+                        if (nextIndex != null){
+                            break;
+                        }
+
+                        parentIndex = parentIndex.parentIndex;
+                    }
+                }
+
+                if (nextIndex != null){
+                    root.select(nextIndex.itemData);
+                }
+            }
+        }
+    }
+
+    //    property var selectionMode: SelectionMode.SM_SINGLE_SELECTION;
+
+    //    enum SelectionMode {
+    //        SM_UNKNOWN,
+    //        SM_SINGLE_SELECTION,
+    //        SM_MULTI_SELECTION
+    //    }
 
     function select(item){
         console.log("select", item);
-//        if (selectionMode == SelectionMode.SM_SINGLE_SELECTION){
-//            items = []
-//        }
+        //        if (selectionMode == SelectionMode.SM_SINGLE_SELECTION){
+        //            items = []
+        //        }
 
-        tableViewSelection.updateSelection();
+        root.updateSelection();
 
         item.Selected = true;
 
-        tableViewSelection.items.push(item)
+        root.items.push(item)
 
         console.log("items", items);
 
-        tableViewSelection.selectionChanged();
+        root.selectionChanged();
     }
 
     function deselect(item){
@@ -39,30 +103,30 @@ QtObject {
 
         item.Selected = false;
 
-        console.log("items 1 ", tableViewSelection.items);
+        console.log("items 1 ", root.items);
 
-        let pos = tableViewSelection.items.indexOf(item)
+        let pos = root.items.indexOf(item)
         console.log("pos", pos);
 
         if (pos >= 0){
-            tableViewSelection.items.splice(pos, 1)
+            root.items.splice(pos, 1)
         }
 
-        console.log("items 2 ", tableViewSelection.items);
+        console.log("items 2 ", root.items);
 
-        tableViewSelection.selectionChanged();
+        root.selectionChanged();
     }
 
     function contains(item){
         console.log("Selection contains", item);
-        return tableViewSelection.items.includes(item);
+        return root.items.includes(item);
     }
 
     function updateSelection(){
-        for (let i = 0; i < tableViewSelection.items.length; i++){
-            tableViewSelection.items[i].Selected = false;
+        for (let i = 0; i < root.items.length; i++){
+            root.items[i].Selected = false;
         }
 
-        tableViewSelection.items = [];
+        root.items = [];
     }
 }

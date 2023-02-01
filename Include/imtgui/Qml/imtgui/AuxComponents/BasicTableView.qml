@@ -6,9 +6,6 @@ FocusScope {
 
     clip: true;
 
-    //    property bool sortIndicatorVisible: false
-    //    property int sortIndicatorOrder: Qt.AscendingOrder
-
     property bool headerVisible: true;
     property bool readOnly: true;
     property bool withoutSelection: false;
@@ -38,6 +35,20 @@ FocusScope {
     signal rowModelDataChanged(var delegate, var prop);
     signal rowAdded();
     signal rowRemoved();
+
+    Component.onCompleted: {
+        tableViewRoot.Keys.onPressed.connect(tableViewRoot.selection.tableKeyPressed);
+
+        tableViewRoot.selection.selectedIndex = tableViewRoot.selectedIndex;
+    }
+
+    Component.onDestruction: {
+        tableViewRoot.Keys.onPressed.disconnect(tableViewRoot.selection.tableKeyPressed);
+    }
+
+    Keys.onPressed: {
+        console.log("TableView Keys.onPressed");
+    }
 
     Loader {
         id: backgroundLoader;
@@ -158,7 +169,13 @@ FocusScope {
 
         headerPositioning: ListView.OverlayHeader;
 
-        delegate: TableViewItemDelegateBase { root: tableViewRoot; }
+        delegate: TableViewItemDelegateBase {
+            root: tableViewRoot;
+
+            Component.onCompleted: {
+
+            }
+        }
     }
 
     function addRow(row){

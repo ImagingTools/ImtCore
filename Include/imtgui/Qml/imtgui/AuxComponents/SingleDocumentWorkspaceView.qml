@@ -9,11 +9,17 @@ Item {
     property var startPageObj;
 
     onStartPageObjChanged: {
-        console.log("onStartPageObjChanged");
+        console.log("onStartPageObjChanged", documentManager.startPageObj["Source"]);
         documentLoader.source = documentManager.startPageObj["Source"];
 
-        if (documentLoader.item){
-            documentLoader.item.commandsId = documentManager.startPageObj["CommandsId"];
+//        if (documentLoader.item){
+//            documentLoader.item.commandsId = documentManager.startPageObj["CommandsId"];
+//        }
+
+//        console.log("documentLoader.item", documentLoader.item);
+        if(documentLoader.item.documentManager !==undefined){
+            documentLoader.item.documentManager = documentManager;
+            console.log("documentLoader.item.documentManager", documentLoader.item.documentManager);
         }
     }
 

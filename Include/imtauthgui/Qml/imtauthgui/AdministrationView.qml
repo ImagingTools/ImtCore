@@ -9,8 +9,19 @@ Rectangle {
 
     color: Style.backgroundColor;
 
+    property Item documentManager: null;
+
     function addHeader(header){
         headerText.text += "/ " + header;
+    }
+
+    onDocumentManagerChanged: {
+        if (container.documentManager != null){
+            for (let i = 0; i < bodyRepeater.count; i++){
+                let item = bodyRepeater.itemAt(i);
+                item.item.documentManager = container.documentManager;
+            }
+        }
     }
 
     Row {
@@ -149,6 +160,7 @@ Rectangle {
 
                 onVisibleChanged: {
                     if (bodyLoader.visible){
+                        console.log("onVisibleChanged model.Source", model.Source);
                         if (!bodyLoader.item){
                             bodyLoader.source = model.Source;
                         }
@@ -158,7 +170,12 @@ Rectangle {
                 visible: mainPanel.selectedIndex == model.index;
 
                 onLoaded: {
+                    console.log("bodyRepeater onLoaded", model.Source);
                     bodyLoader.item.commandsId = model.Id;
+
+                    if (container.documentManager != null && bodyLoader.item.documentManager !== undefined){
+                        bodyLoader.item.documentManager = container.documentManager;
+                    }
                 }
             }
         }

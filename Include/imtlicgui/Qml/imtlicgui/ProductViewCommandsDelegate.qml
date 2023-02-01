@@ -37,8 +37,6 @@ DocumentWorkspaceCommandsDelegateBase {
             container.tableData.insertRow([container.tableData.rowCount], {"Id": "", "Name": "License Name", "Description": "", "Selected": true});
         }
         else if (commandId === "Remove"){
-//            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected item from the document ?")});
-
             let selectedIndex = container.tableData.selectedIndex;
 
             container.tableData.removeRow([selectedIndex.index]);

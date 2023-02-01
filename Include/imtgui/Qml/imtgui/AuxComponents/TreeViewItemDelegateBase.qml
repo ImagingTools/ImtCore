@@ -125,6 +125,13 @@ TableViewItemDelegateBase {
                     console.log("TableViewItemDelegate onItemAdded");
                     item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
                     treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
+
+                    // Связываем modelIndex соседних элементов
+                    if (index > 0){
+                        let prevItem = childModelRepeater.itemAt(index - 1);
+                        item.modelIndex.prevIndex = prevItem.modelIndex;
+                        prevItem.modelIndex.nextIndex =item.modelIndex;
+                    }
                 }
 
                 onItemRemoved: {

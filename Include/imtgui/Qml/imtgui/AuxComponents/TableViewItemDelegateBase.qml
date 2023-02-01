@@ -44,6 +44,14 @@ FocusScope {
 
     signal clicked();
 
+    Component.onCompleted: {
+        if (model.index > 0 && model.Level == 0){
+            let prevItem = root.tableListView.itemAtIndex(model.index - 1);
+            delegate.modelIndex.prevIndex = prevItem.modelIndex;
+            prevItem.modelIndex.nextIndex = delegate.modelIndex;
+        }
+    }
+
     Loader {
         id: headerDelegateLoader;
 

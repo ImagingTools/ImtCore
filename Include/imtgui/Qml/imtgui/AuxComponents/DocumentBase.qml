@@ -27,6 +27,12 @@ Item {
 
     signal commandsDelegateLoaded();
 
+    Keys.onPressed: {
+        if (event.key == Qt.Key_Delete){
+            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Remove");
+        }
+    }
+
     Component.onCompleted: {
         commandsDelegate.documentBase = documentBase;
 

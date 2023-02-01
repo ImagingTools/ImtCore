@@ -37,6 +37,12 @@ Item {
     property TreeItemModel documentsData: TreeItemModel {}
     property Item documentManager: null;
 
+    Keys.onPressed: {
+        if (event.key == Qt.Key_Delete){
+            commandsLoader.item.commandHandle("Remove");
+        }
+    }
+
     onDocumentsDataChanged: {
         console.log("CollectionView onDocumentsDataChanged");
         collectionViewContainer.itemId = documentsData.GetData("Id", model.index);

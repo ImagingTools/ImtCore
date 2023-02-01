@@ -475,7 +475,6 @@ Item {
                     clearPairLink();
                     pairCB.currentIndex = -1;
                     pairCB.model.Clear();
-                    updatePairMadel();
                     if (bodyColumn.productCategory == "Software"){
                         updateHardwareCategoryProducts()
                     }

@@ -10,6 +10,9 @@ Item {
 
     property ModelIndex parentIndex: null; //Reference on the parent index model.
 
+    property ModelIndex nextIndex: null; //Reference to the next index.
+    property ModelIndex prevIndex: null; //Reference to the prev index.
+
     property var childModel: []; //Reference on the all children index models.
 
     property int index: -1;
