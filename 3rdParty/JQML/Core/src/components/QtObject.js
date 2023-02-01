@@ -154,9 +154,7 @@ export class QtObject {
         let errorsSignal = []
         let queueSignals = []
 
-        for(let child of this.children){
-            child.$uP(step + 1)
-        }
+        
         
         while(this.$uL.properties.length){
             let propName = this.$uL.properties.shift()
@@ -219,6 +217,10 @@ export class QtObject {
                 }
             }
             
+        }
+
+        for(let child of this.children){
+            child.$uP(step + 1)
         }
 
 
@@ -340,6 +342,13 @@ export class QtObject {
                 return this.$p[name].val
             },
             set: (newVal)=>{
+                while(this.$uL.properties.indexOf(name) >= 0){
+                    this.$uL.properties.splice(this.$uL.properties.indexOf(name), 1)
+                }
+                while(this.$uL.aliases.indexOf(name) >= 0){
+                    this.$uL.aliases.splice(this.$uL.aliases.indexOf(name), 1)
+                }
+
                 if(this.$p[name].val !== newVal){
                     for(let s of this.$p[name].depends){
                         delete s[this.$p[name].PID]
@@ -391,6 +400,12 @@ export class QtObject {
                     return this.$p[`${name}.${name2}`].val
                 },
                 set: (newVal)=>{
+                    while(this.$uL.properties.indexOf(`${name}.${name2}`) >= 0){
+                        this.$uL.properties.splice(this.$uL.properties.indexOf(`${name}.${name2}`), 1)
+                    }
+                    while(this.$uL.aliases.indexOf(`${name}.${name2}`) >= 0){
+                        this.$uL.aliases.splice(this.$uL.aliases.indexOf(`${name}.${name2}`), 1)
+                    }
                     if(this.$p[`${name}.${name2}`].val !== newVal){
                         for(let s of this.$p[`${name}.${name2}`].depends){
                             delete s[this.$p[`${name}.${name2}`].PID]
