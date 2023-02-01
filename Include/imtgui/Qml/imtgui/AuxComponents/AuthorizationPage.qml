@@ -18,6 +18,15 @@ Rectangle {
 
     property alias title: welcomeText.text;
 
+    function logout(){
+        authPageContainer.visible = true;
+        authPageContainer.tokenProvider.login = "";
+    }
+
+    Component.onCompleted: {
+        Events.subscribeEvent("logout", authPageContainer.logout);
+    }
+
     onVisibleChanged: {
         if (authPageContainer.visible){
             authPageContainer.state = "unauthorized";
