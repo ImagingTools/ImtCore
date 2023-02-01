@@ -16,10 +16,10 @@ export class Image extends Item {
     static Loading = 2
     static Error = 3
 
-    $wAuto = true
-    $hAuto = true
-    $swAuto = true
-    $shAuto = true
+    $widthAuto = true
+    $heightAuto = true
+    $sizeWidthAuto = true
+    $sizeHeightAuto = true
 
     constructor(args) {
         super(args)
@@ -35,24 +35,15 @@ export class Image extends Item {
 
         this.$img = new window.Image();
         this.$imgLoad = function(){
-            if(this.$swAuto){
-                // this.sourceSize.width = this.$img.naturalWidth
-                if(this.$p['sourceSize.width'].val !== this.$p['sourceSize.width'].val){
-                    this.$p['sourceSize.width'].val = this.$p['sourceSize.width'].val
-                    this.$sourceChanged()
-                }
-                
-                this.$swAuto = true
+            if(this.$sizeWidthAuto){
+                this.sourceSize.width = this.$img.naturalWidth
+                this.$sizeWidthAuto = true
             }
-            if(this.$shAuto){
-                // this.sourceSize.height = this.$img.naturalHeight;
-                if(this.$p['sourceSize.height'].val !== this.$p['sourceSize.height'].val){
-                    this.$p['sourceSize.height'].val = this.$p['sourceSize.height'].val
-                    this.$sourceChanged()
-                }
-                
-                this.$shAuto = true
+            if(this.$sizeHeightAuto){
+                this.sourceSize.height = this.$img.naturalHeight
+                this.$sizeHeightAuto = true
             }
+
             this.dom.style.backgroundImage = `url("${this.$img.src}")`
 
             this.progress = 1;
@@ -71,41 +62,8 @@ export class Image extends Item {
         this.dom.style.backgroundRepeat = "no-repeat";
         this.dom.style.backgroundPosition = "center";
     }
-    $widthChanged(){
-        super.$widthChanged()
-        this.$wAuto = false
-    }
-    $heightChanged(){
-        super.$heightChanged()
-        this.$hAuto = false
-    }
     $sourceSizeChanged(){
-        // this.width = this.sourceSize.width
-        // this.height = this.sourceSize.height
-        if(this.$wAuto){
-            // this.width = this.sourceSize.width
-            if(this.$p.width.val !== this.$p['sourceSize.width'].val){
-                this.$p.width.val = this.$p['sourceSize.width'].val
-                this.$widthChanged()
-            }
-            
-            this.$wAuto = true
-            // this.$p.width.val = this.sourceSize.width
-            // this.dom.style.width = `${this.width}px`
-        }
-        if(this.$hAuto){
-            // this.height = this.sourceSize.height
-            if(this.$p.height.val !== this.$p['sourceSize.height'].val){
-                this.$p.height.val = this.$p['sourceSize.height'].val
-                this.$heightChanged()
-            }
-            
-            this.$hAuto = true
-            // this.$p.height.val = this.sourceSize.height
-            // this.dom.style.height = `${this.height}px`
-        }
-        this.$swAuto = false
-        this.$shAuto = false
+  
         this.$fillModeChanged()
     }
     $progressChanged(){
@@ -115,12 +73,12 @@ export class Image extends Item {
         switch (this.fillMode) {
             case Image.Stretch:
                 this.dom.style.backgroundRepeat = "no-repeat";
-                this.dom.style.backgroundSize = `${this.$p['sourceSize.width'].val}px ${this.$p['sourceSize.height'].val}px`;
+                this.dom.style.backgroundSize = `${this.sourceSize.width}px ${this.sourceSize.height}px`;
                 this.dom.style.backgroundPosition = "center";
                 break;
             case Image.Tile:
                 this.dom.style.backgroundRepeat = "repeat";
-                this.dom.style.backgroundSize = `${this.$p['sourceSize.width'].val}px ${this.$p['sourceSize.height'].val}px`;
+                this.dom.style.backgroundSize = `${this.sourceSize.width}px ${this.sourceSize.height}px`;
                 this.dom.style.backgroundPosition = "top left";
                 break;
             case Image.PreserveAspectFit:
@@ -135,12 +93,12 @@ export class Image extends Item {
                 break;
             case Image.TileVertically:
                 this.dom.style.backgroundRepeat = "repeat-y";
-                this.dom.style.backgroundSize = `${this.$p['sourceSize.width'].val}px ${this.$p['sourceSize.height'].val}px`;
+                this.dom.style.backgroundSize = `${this.sourceSize.width}px ${this.sourceSize.height}px`;
                 this.dom.style.backgroundPosition = "auto";
                 break;
             case Image.TileHorizontally:
                 this.dom.style.backgroundRepeat = "repeat-x";
-                this.dom.style.backgroundSize = `${this.$p['sourceSize.width'].val}px ${this.$p['sourceSize.height'].val}px`;
+                this.dom.style.backgroundSize = `${this.sourceSize.width}px ${this.sourceSize.height}px`;
                 this.dom.style.backgroundPosition = "auto";
                 break;
         }

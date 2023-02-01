@@ -1045,7 +1045,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
         code.push(`let ${curr}=Core.cC(\`${instructions.class}\`, {parent: ${prev}})`)
     }
 
-    if(instructions.class === 'Column' || instructions.class === 'Row'){
+    if(instructions.class === 'Column' || instructions.class === 'Row' || instructions.class === 'Image'){
         if(instructions.properties.width) code.push(`${curr}.$widthAuto=false`)
         if(instructions.properties.height) code.push(`${curr}.$heightAuto=false`)
         if(instructions.propertiesLazy.width) code.push(`${curr}.$widthAuto=false`)
@@ -1062,6 +1062,14 @@ function compile(instructions, code, curr = '$root', prev = ''){
             code.push(`${curr}.$heightAuto=false`)
         }
         
+    }
+    if(instructions.class === 'Image'){
+        if(instructions.propertiesLazy['sourceSize.width']) {
+            code.push(`${curr}.$sizeWidthAuto=false`)
+        }
+        if(instructions.propertiesLazy['sourceSize.height']) {
+            code.push(`${curr}.$sizeHeightAuto=false`)
+        }
     }
     if(instructions.class === 'Flickable' || instructions.class === 'ListView' || instructions.class === 'GridView' || instructions.class === 'Text'){
         if(instructions.properties.contentWidth || instructions.propertiesLazy.contentWidth) code.push(`${curr}.$contentWidthAuto=false`)
