@@ -6,11 +6,13 @@ Item {
     id: tabPanelDecorator;
 
     width: texttabDelegate.width + imagetabDelegate.width + 30;
+    property Item rootItem: null;
 
 
     Rectangle {
         anchors.fill: parent;
-        color:  tabDelegate.selected ? Style.baseColor: "transparent";
+        //color:  tabDelegate.selected ? Style.baseColor: "transparent";
+        color: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.selected ? Style.baseColor: "transparent": "transparent";
     }
 
     Rectangle{
@@ -23,7 +25,9 @@ Item {
         height: 2;
 
         color: Style.tabSelectedColor;
-        visible: tabDelegate.selected;
+        //visible: tabDelegate.selected;
+        visible: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.selected: false;
+
     }
 
     Item {
@@ -32,7 +36,8 @@ Item {
         height: parent.height;
         width: visible ? height : 1;
 
-        visible: tabDelegate.firstElement;
+        //visible: tabDelegate.firstElement;
+        visible: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElement: false;
 
         Image {
             id: firsElementImage;
@@ -46,7 +51,8 @@ Item {
             sourceSize.height: height;
 
             fillMode: Image.PreserveAspectFit;
-            source:  "../../../Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
+            //source:  "../../../Icons/" + Style.theme + "/" + tabDelegate.firstElementImageSource + "_On_Normal.svg";
+            source: tabPanelDecorator.rootItem ?  "../../../Icons/" + Style.theme + "/" + tabPanelDecorator.rootItem.firstElementImageSource + "_On_Normal.svg": "";
         }
     }
 
@@ -56,14 +62,18 @@ Item {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: imagetabDelegate.right;
-        anchors.leftMargin: tabDelegate.firstElement ? 0 :10;
+        //anchors.leftMargin: tabDelegate.firstElement ? 0 :10;
+        anchors.leftMargin: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElement ? 0 :10 : 0;
 
 //        width: text.width + tabDelegate.height;
         width: text.width;
 
         onWidthChanged: {
-            if (tabDelegate.autoWidth){
-                tabDelegate.width = tabPanelDecorator.width;
+//            if (tabDelegate.autoWidth){
+//                tabDelegate.width = tabPanelDecorator.width;
+//            }
+            if (tabPanelDecorator.rootItem && tabPanelDecorator.rootItem.autoWidth){
+                tabPanelDecorator.rootItem.width = tabPanelDecorator.width;
             }
         }
 
@@ -76,7 +86,8 @@ Item {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
             //elide: Text.ElideRight;
-            text: tabDelegate.text;
+            //text: tabDelegate.text;
+            text: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.text : "";
         }
     }
 }

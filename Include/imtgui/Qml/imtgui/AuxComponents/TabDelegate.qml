@@ -30,7 +30,12 @@ Item{
 
         onItemChanged: {
             tabDelegate.width = loaderDecorator.item.width;
+            if(loaderDecorator.item.rootItem !== undefined){
+                loaderDecorator.item.rootItem = tabDelegate;
+            }
         }
+
+
 
         onWidthChanged: {
             if (loaderDecorator.item){
