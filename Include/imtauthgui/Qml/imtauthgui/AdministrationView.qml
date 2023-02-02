@@ -16,6 +16,7 @@ Rectangle {
     }
 
     onDocumentManagerChanged: {
+
         if (container.documentManager != null){
             for (let i = 0; i < bodyRepeater.count; i++){
                 let item = bodyRepeater.itemAt(i);

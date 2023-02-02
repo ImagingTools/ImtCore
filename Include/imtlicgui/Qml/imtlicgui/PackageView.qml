@@ -76,7 +76,7 @@ DocumentBase {
 
         commandsId: packageViewContainer.commandsId;
         commandsDelegate: packageViewContainer.commandsDelegate;
-
+        documentBase: packageViewContainer;
         onModelStateChanged: {
             console.log("UndoRedoManager onModelStateChanged");
             packageViewContainer.syncronise();

@@ -59,6 +59,7 @@ Item {
     }
 
 
+
     Component.onDestruction: {
         Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
     }
@@ -92,15 +93,15 @@ Item {
     }
 
     function removeChanges(){
-        commandsProvider.setCommandIsEnabled("Save", false);
-        documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName});
+        container.documentBase.commandsProvider.setCommandIsEnabled("Save", false);
+        container.documentBase.documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName});
     }
 
     function commandHandle(commandId){
         console.log("DocumentCommandsBase commandHandle", container.documentBase.itemId, commandId);
 
         if (commandId == "Close"){
-            let saveCommandIsEnabled = commandsProvider.commandIsEnabled("Save");
+            let saveCommandIsEnabled = container.documentBase.commandsProvider.commandIsEnabled("Save");
             if (saveCommandIsEnabled){
                 modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
             }
@@ -206,15 +207,15 @@ Item {
         console.log("documentClosed", documentBase.itemId);
         container.closed();
 
-        documentManager.closeDocument(documentBase.itemId);
+        container.documentBase.documentManager.closeDocument(documentBase.itemId);
     }
 
     function modelChanged(){
         console.log("DocumentsCommands modelChanged");
-        commandsProvider.setCommandIsEnabled("Save", "Normal");
+        container.documentBase.commandsProvider.setCommandIsEnabled("Save", "Normal");
 
         let suffix = "*";
-        documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
+        container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
     }
 
     function saveObject(){

@@ -77,7 +77,6 @@
         <file alias="imtgui/AuxComponents/ComboBoxGql.qml">Qml/imtgui/AuxComponents/ComboBoxGql.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/PopupMenuDialogGql.qml">Qml/imtgui/AuxComponents/Dialogs/PopupMenuDialogGql.qml</file>
         <file alias="imtgui/AuxComponents/PopupMenuDelegate.qml">Qml/imtgui/AuxComponents/PopupMenuDelegate.qml</file>
-        <file alias="imtgui/AuxComponents/TreeViewCommandsDelegateBase.qml">Qml/imtgui/AuxComponents/TreeViewCommandsDelegateBase.qml</file>
         <file alias="imtgui/AuxComponents/TableTreeItemDelegate.qml">Qml/imtgui/AuxComponents/TableTreeItemDelegate.qml</file>
         <file alias="imtgui/AuxComponents/ModelIndex.qml">Qml/imtgui/AuxComponents/ModelIndex.qml</file>
         <file alias="imtgui/AuxComponents/UserPanel.qml">Qml/imtgui/AuxComponents/UserPanel.qml</file>

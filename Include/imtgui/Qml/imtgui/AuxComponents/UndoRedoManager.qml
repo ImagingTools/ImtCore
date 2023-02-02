@@ -9,6 +9,9 @@ Item {
 
     property TreeItemModel observedModel;
 
+    property Item documentBase: null;
+
+
     property bool isDirty: false;
     property bool transaction: false;
 
@@ -90,10 +93,10 @@ Item {
 
     function checkCommandMode(){
         let isEnabled = undoRedo.undoStack.length > 1;
-        commandsProvider.setCommandIsEnabled("Undo", isEnabled);
+        undoRedoManager.documentBase.commandsProvider.setCommandIsEnabled("Undo", isEnabled);
 
         isEnabled = undoRedo.redoStack.length > 0;
-        commandsProvider.setCommandIsEnabled("Redo", isEnabled);
+        undoRedoManager.documentBase.commandsProvider.setCommandIsEnabled("Redo", isEnabled);
 
         timerCheckModel.start();
     }
@@ -101,7 +104,7 @@ Item {
     function commandHandle(commandId){
         console.log("undoRedoManager commandHandle", commandId);
 
-        let isEnabled = commandsProvider.commandIsEnabled(commandId);
+        let isEnabled = undoRedoManager.documentBase.commandsProvider.commandIsEnabled(commandId);
         if (!isEnabled){
             return;
         }

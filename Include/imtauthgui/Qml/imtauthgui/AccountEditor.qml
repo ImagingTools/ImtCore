@@ -38,6 +38,7 @@ DocumentBase {
         commandsId: accountEditorContainer.commandsId;
 
         commandsDelegate: accountEditorContainer.commandsDelegate;
+        documentBase: accountEditorContainer;
 
         onModelStateChanged: {
             accountEditorContainer.updateGui();

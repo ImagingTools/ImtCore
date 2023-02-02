@@ -54,6 +54,12 @@ Item {
         }
     }
 
+    onDocumentManagerChanged: {
+        if(commandsDelegateBase.item){
+            commandsDelegateBase.item.documentBase = documentBase;
+        }
+    }
+
     onCommandsIdChanged: {
         console.log("documentBase onCommandsIdChanged", documentBase.commandsId);
 
@@ -131,6 +137,7 @@ Item {
 
         onLoaded: {
             commandsDelegateBase.item.documentBase = documentBase;
+
             if(commandsDelegateBase.item.documentsData !==undefined){
                 commandsDelegateBase.item.documentsData = documentBase.documentsData;
             }

@@ -47,7 +47,7 @@ DocumentBase {
 
         commandsId: container.commandsId;
         commandsDelegate: container.commandsDelegate;
-
+        documentBase: container;
         onModelStateChanged: {
             console.log("UndoRedoManager onModelStateChanged");
 

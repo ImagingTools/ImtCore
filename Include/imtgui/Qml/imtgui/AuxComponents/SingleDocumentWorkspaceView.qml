@@ -36,11 +36,17 @@ Item {
 
         onLoaded: {
             console.log("onLoaded", documentLoader.source);
+            if(documentLoader.item){
+                if(documentLoader.item.documentManager !==undefined){
+                    documentLoader.item.documentManager = documentManager;
+                }
+            }
         }
     }
 
     function addDocument(document){
         let keys = Object.keys(document);
+        document["documentManager"] = documentManager;
 
         for (let key of keys){
             documentsData.SetData(key, document[key]);

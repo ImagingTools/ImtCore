@@ -8,6 +8,7 @@ Item {
 
     property TreeItemModel documentModel: TreeItemModel {}
     property UndoRedoManager undoRedoManager: null;
+    property Item documentBase: null;
 
     property bool blockUpdatingModel: false;
 
@@ -19,15 +20,15 @@ Item {
     Component.onCompleted: {
         container.includedRolesTable = includesTable;
 
-        commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
-        commandsProvider.commandModeChanged.connect(commandModeChanged);
+        roleEditorContainer.documentBase.commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
+        roleEditorContainer.documentBase.commandsProvider.commandModeChanged.connect(commandModeChanged);
 
         roleNameInput.focus = true;
     }
 
     Component.onDestruction: {
-        commandsProvider.modelLoaded.disconnect(onCommandsModelLoaded);
-        commandsProvider.commandModeChanged.disconnect(commandModeChanged);
+        roleEditorContainer.documentBase.commandsProvider.modelLoaded.disconnect(onCommandsModelLoaded);
+        roleEditorContainer.documentBase.commandsProvider.commandModeChanged.disconnect(commandModeChanged);
     }
 
     onCommandModeChanged: {
@@ -44,8 +45,10 @@ Item {
         roleEditorContainer.updateGui();
     }
 
+
+
     function onCommandsModelLoaded(){
-        commandsProvider.mergeModelWith(commandsModel);
+        roleEditorContainer.documentBase.commandsProvider.mergeModelWith(commandsModel);
     }
 
     Component{

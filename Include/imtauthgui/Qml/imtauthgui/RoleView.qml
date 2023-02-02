@@ -45,6 +45,9 @@ DocumentBase {
             let loader = bodyRepeater.itemAt(index);
             loader.item.documentModel = container.documentModel;
             loader.item.undoRedoManager = undoRedoManager;
+            if(loader.item.documentBase !==undefined){
+                loader.item.documentBase = container;
+            }
         }
 
         if (container.documentModel.ContainsKey("Name")){
@@ -87,7 +90,7 @@ DocumentBase {
         id: undoRedoManager;
 
         commandsId: container.commandsId;
-
+        documentBase: container;
         commandsDelegate: container.commandsDelegate;
 
         onModelStateChanged: {

@@ -43,7 +43,7 @@ DocumentBase {
         id: undoRedoManager;
 
         commandsId: container.commandsId;
-
+        documentBase: container;
         onModelStateChanged: {
             container.updateGui();
         }
