@@ -43,7 +43,8 @@ Item {
 
                     if(dataModelLocal.ContainsKey("GetPermissions")){
                         dataModelLocal = dataModelLocal.GetData("PagesData");
-                        pagesProvider.pagesModel = dataModelLocal;
+
+                        //pagesProvider.pagesModel = dataModelLocal;
                     }
                 }
             }

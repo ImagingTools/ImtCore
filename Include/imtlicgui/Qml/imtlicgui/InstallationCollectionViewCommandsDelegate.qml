@@ -23,7 +23,7 @@ CollectionViewCommandsDelegateBase {
 
             let copyStr = qsTr("Copy of ");
 
-            documentManager.addDocument({"Id":         itemId,
+            container.documentManager.addDocument({"Id":         itemId,
                                       "Name":       copyStr + itemName,
                                       "Source":     baseCollectionView.commands.objectViewEditorPath,
                                       "CommandsId": baseCollectionView.commands.objectViewEditorCommandsId});

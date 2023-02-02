@@ -13,6 +13,9 @@ Item {
 
     property Item collectionViewBase: null;
 
+    property Item documentManager: null;
+
+
     property CommandsProvider commandsProvider: null;
 
     /**
@@ -118,20 +121,20 @@ Item {
         }
 
         if (commandId === "Close"){
-            documentManager.closeDocument(itemId);
+            containerBase.documentManager.closeDocument(itemId);
         }
 
         commandActivated(commandId);
     }
 
     onRenamed: {
-        documentManager.setDocumentTitle({"Id": id, "Title": newName});
+        containerBase.documentManager.setDocumentTitle({"Id": id, "Title": newName});
 
         updateGui();
     }
 
     onRemoved: {
-        documentManager.closeDocument(id);
+        containerBase.documentManager.closeDocument(id);
 
         updateGui();
     }

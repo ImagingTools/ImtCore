@@ -157,6 +157,7 @@ Item {
 
             commandsLoader.item.collectionViewBase = collectionViewContainer;
             commandsLoader.item.commandsProvider = commandsProvider;
+            commandsLoader.item.documentManager = documentManager;
         }
     }
 
