@@ -183,7 +183,7 @@ Rectangle {
                 height: 30;
 
                 placeHolderText: qsTr("Enter the password");
-                echoMode: TextInput.Password
+                echoMode: TextInput.Password;
 
                 KeyNavigation.tab: loginTextInput;
 
@@ -225,7 +225,8 @@ Rectangle {
 
                     iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
                                           passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
-
+                    //iconSource: "../../../Icons/" + Style.theme + "/HiddenPassword.svg";
+                    //iconSource: "../../../Icons/" + Style.theme + "/ShownPassword.svg" ;
                     onClicked: {
                         if(passwordTextInput.echoMode == TextInput.Password){
                             passwordTextInput.echoMode = TextInput.Normal;

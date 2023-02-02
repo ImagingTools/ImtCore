@@ -12,8 +12,8 @@ Rectangle {
     color: defaultColor;
 
     property string defaultColor: auxButtonContainer.pressed && auxButtonContainer.highlighted ? Style.hover :
-                                                                                                                                        auxButtonContainer.highlighted ? Style.selectedColor :
-                                                                                                                                                                         backgroundColor;
+                                                                                                 auxButtonContainer.highlighted ? Style.selectedColor :
+                                                                                                                                  backgroundColor;
     property string defaultFontColor: auxButtonContainer.enabled ? Style.buttonText : Style.inactive_buttonText;
     property bool highlighted: ma.containsMouse;
     property bool containsMouse: ma.containsMouse;
@@ -49,7 +49,7 @@ Rectangle {
         if (event.key === Qt.Key_Return){
             auxButtonContainer.clicked();
         }
-     }
+    }
 
     Image {
         id: image;
@@ -85,6 +85,7 @@ Rectangle {
 
     MouseArea {
         id: ma;
+
         anchors.fill: parent;
 
         hoverEnabled: true;
