@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
-#include <imtcom/IInternetConnectionStatusProvider.h>
+#include <imtcom/IConnectionStatusProvider.h>
 
 
 namespace imtcom
@@ -20,14 +20,14 @@ namespace imtcom
 class CInternetConnectionCheckerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public IInternetConnectionStatusProvider
+			virtual public IConnectionStatusProvider
 {
 	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CInternetConnectionCheckerComp);
-		I_REGISTER_INTERFACE(IInternetConnectionStatusProvider);
+		I_REGISTER_INTERFACE(IConnectionStatusProvider);
 		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "URL Param", false, "UrlParam");
 		I_ASSIGN(m_urlAttrPtr, "Url", "URL to check availability, if UrlParam is invalid", true, "https://google.com");
 		I_ASSIGN(m_requestTimeoutAttrPtr, "RequestTimeout", "Request timeout", true, 1000)
@@ -37,8 +37,8 @@ public:
 
 	CInternetConnectionCheckerComp();
 
-	// reimplemented (IInternetConnectionStatusProvider)
-	virtual InternetConnectionStatus GetIntenetConnectionStatus() const override;
+	// reimplemented (IConnectionStatusProvider)
+	virtual ConnectionStatus GetConnectionStatus() const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -59,7 +59,7 @@ private:
 	I_ATTR(int, m_requestDelayAttrPtr);
 	I_ATTR(int, m_retryCountAttrPtr);
 
-	InternetConnectionStatus m_status;
+	ConnectionStatus m_status;
 	QTimer m_timer;
 	QNetworkAccessManager* m_managerPtr;
 

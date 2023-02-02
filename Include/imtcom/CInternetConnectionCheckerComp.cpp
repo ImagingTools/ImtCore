@@ -12,7 +12,7 @@ namespace imtcom
 // public methods
 
 CInternetConnectionCheckerComp::CInternetConnectionCheckerComp()
-	:m_status(ICS_UNKNOWN),
+	:m_status(CS_UNKNOWN),
 	m_managerPtr(nullptr),
 	m_requestTimeout(1000),
 	m_requestDelay(1000),
@@ -23,7 +23,7 @@ CInternetConnectionCheckerComp::CInternetConnectionCheckerComp()
 
 // reimplemented (IInternetConnectionStatusProvider)
 
-imtcom::IInternetConnectionStatusProvider::InternetConnectionStatus CInternetConnectionCheckerComp::GetIntenetConnectionStatus() const
+IConnectionStatusProvider::ConnectionStatus CInternetConnectionCheckerComp::GetConnectionStatus() const
 {
 	return m_status;
 }
@@ -93,10 +93,10 @@ void CInternetConnectionCheckerComp::OnRequestFinished()
 		replyPtr->deleteLater();
 
 		if (result){
-			if (m_status != ICS_ONLINE){
+			if (m_status != CS_CONNECTED){
 				istd::CChangeNotifier notifier(this);
 
-				m_status = ICS_ONLINE;
+				m_status = CS_CONNECTED;
 				SendVerboseMessage("Internet connection available");
 			}
 		}
@@ -108,10 +108,10 @@ void CInternetConnectionCheckerComp::OnRequestFinished()
 				return;
 			}
 			else{
-				if (m_status != ICS_OFFLINE){
+				if (m_status != CS_DISCONNECTED){
 					istd::CChangeNotifier notifier(this);
 
-					m_status = ICS_OFFLINE;
+					m_status = CS_DISCONNECTED;
 					SendVerboseMessage("No internet connection");
 				}
 			}

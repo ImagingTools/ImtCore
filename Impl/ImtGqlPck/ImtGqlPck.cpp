@@ -59,6 +59,11 @@ I_EXPORT_COMPONENT(
 			"Application info controller for representation",
 			"Application Controller Representation");
 
+I_EXPORT_COMPONENT(
+			GqlObjectCollection,
+			"GraphQl based object collection",
+			"GraphQl Gql Object Collection");
+
 
 } // namespace ImtGqlPck
 
