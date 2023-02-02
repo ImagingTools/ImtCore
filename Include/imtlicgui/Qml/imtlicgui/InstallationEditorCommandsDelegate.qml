@@ -74,7 +74,7 @@ DocumentWorkspaceCommandsDelegateBase {
             container.documentBase.commandsProvider.setCommandIsEnabled("Save", true);
 
             let suffix = "*";
-            documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName + suffix});
+            container.documentBase.documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName + suffix});
         }
     }
 
