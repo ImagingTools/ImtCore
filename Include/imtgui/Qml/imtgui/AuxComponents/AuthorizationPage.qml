@@ -225,8 +225,6 @@ Rectangle {
 
                     iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
                                           passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
-                    //iconSource: "../../../Icons/" + Style.theme + "/HiddenPassword.svg";
-                    //iconSource: "../../../Icons/" + Style.theme + "/ShownPassword.svg" ;
                     onClicked: {
                         if(passwordTextInput.echoMode == TextInput.Password){
                             passwordTextInput.echoMode = TextInput.Normal;
