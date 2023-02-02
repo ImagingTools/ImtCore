@@ -60,7 +60,7 @@ Item {
         anchors.left: imagetabDelegate.right;
         anchors.leftMargin: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElement ? 0 :10 : 0;
 
-//        width: tabPanelDecorator.rootItem ? text.width + tabDelegate.height;
+//        width:  text.width + tabDelegate.height;
         width: text.width;
 
         onWidthChanged: {
