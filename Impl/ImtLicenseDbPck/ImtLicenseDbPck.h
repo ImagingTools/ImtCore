@@ -10,7 +10,7 @@
 #include <imtlicdb/CProductsDatabaseDelegateComp.h>
 #include <imtlicdb/CProductInstanceDatabaseDelegateComp.h>
 #include <imtlicdb/CAccountDatabaseDelegateComp.h>
-
+#include <imtlicdb/CCompanyDatabaseDelegateComp.h>
 
 /**
 	ImtLicenseDbPck package
@@ -23,6 +23,7 @@ typedef imtlicdb::CFeaturePackageDatabaseDelegateComp FeaturePackageDatabaseDele
 typedef imtlicdb::CProductsDatabaseDelegateComp ProductDatabaseDelegate;
 typedef imtlicdb::CAccountDatabaseDelegateComp AccountDatabaseDelegate;
 typedef imtlicdb::CProductInstanceDatabaseDelegateComp ProductInstanceDatabaseDelegate;
+typedef imtlicdb::CCompanyDatabaseDelegateComp CompanyDatabaseDelegate;
 
 
 } // namespace ImtLicenseDbPck

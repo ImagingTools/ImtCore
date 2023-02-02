@@ -9,6 +9,7 @@
 #include <imtauth/CContactInfo.h>
 #include <imtauth/CAddress.h>
 #include <imtauth/CAccountInfo.h>
+#include <imtauth/CCompanyInfo.h>
 #include <imtauth/CContactInfoMetaInfoCreatorComp.h>
 #include <imtauth/CAddressMetaInfoCreatorComp.h>
 #include <imtauth/CAccountInfoMetaInfoCreatorComp.h>
@@ -46,6 +47,14 @@ typedef icomp::TModelCompWrap<
 						iser::IObject,
 						iser::ISerializable,
 						istd::IChangeable>> AccountInfo;
+typedef icomp::TModelCompWrap<
+            icomp::TMakeComponentWrap<
+                        imtauth::CCompanyInfo,
+                        imtauth::IAccountBaseInfo,
+                        imtauth::ICompanyInfo,
+                        iser::IObject,
+                        iser::ISerializable,
+                        istd::IChangeable>> CompanyInfo;
 typedef imtauth::CContactInfoMetaInfoCreatorComp ContactInfoMetaInfoCreator;
 typedef imtauth::CAddressMetaInfoCreatorComp AddressMetaInfoCreator;
 typedef imtauth::CAccountInfoMetaInfoCreatorComp AccountInfoMetaInfoCreator;

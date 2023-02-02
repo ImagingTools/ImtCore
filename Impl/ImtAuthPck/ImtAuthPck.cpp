@@ -30,6 +30,11 @@ I_EXPORT_COMPONENT(
 			"Account Information Authority");
 
 I_EXPORT_COMPONENT(
+            CompanyInfo,
+            "Account company information",
+            "Account company Information");
+
+I_EXPORT_COMPONENT(
 			ContactInfoMetaInfoCreator,
 			"Contact info metainfo creator",
 			"Contact Metainfo Creator");

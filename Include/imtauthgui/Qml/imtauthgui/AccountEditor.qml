@@ -61,12 +61,10 @@ DocumentBase {
             streetInput.text = addressesModel.GetData("Street");
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("FirstName")){
-            firstNameInput.text = accountEditorContainer.documentModel.GetData("FirstName");
+        if (accountEditorContainer.documentModel.ContainsKey("CompanyName")){
+            companyNameInput.text = accountEditorContainer.documentModel.GetData("CompanyName");
         }
-        if (accountEditorContainer.documentModel.ContainsKey("LastName")){
-            lastNameInput.text = accountEditorContainer.documentModel.GetData("LastName");
-        }
+
         if (accountEditorContainer.documentModel.ContainsKey("Email")){
             emailInput.text = accountEditorContainer.documentModel.GetData("Email");
         }
@@ -89,27 +87,21 @@ DocumentBase {
         let description = accountDescriptionInput.text;
         accountEditorContainer.documentModel.SetData("Description", description)
 
-        if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
-            let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
+        let adressesModel = accountEditorContainer.documentModel.AddTreeModel("Addresses");
+        let country = countryInput.text;
+        adressesModel.SetData("Country", country)
 
-            let country = countryInput.text;
-            adressesModel.SetData("Country", country)
+        let postalCode = postalCodeInput.text;
+        adressesModel.SetData("PostalCode", postalCode)
 
-            let postalCode = postalCodeInput.text;
-            adressesModel.SetData("PostalCode", postalCode)
+        let city = cityInput.text;
+        adressesModel.SetData("City", city)
 
-            let city = cityInput.text;
-            adressesModel.SetData("City", city)
+        let street = streetInput.text;
+        adressesModel.SetData("Street", street)
 
-            let street = streetInput.text;
-            adressesModel.SetData("Street", street)
-        }
-
-        let firstName = firstNameInput.text;
-        accountEditorContainer.documentModel.SetData("FirstName", firstName)
-
-        let lastName = lastNameInput.text;
-        accountEditorContainer.documentModel.SetData("LastName", lastName)
+        let companyName = companyNameInput.text;
+        accountEditorContainer.documentModel.SetData("CompanyName", companyName)
 
         let email = emailInput.text;
         accountEditorContainer.documentModel.SetData("Email", email)
@@ -205,147 +197,8 @@ DocumentBase {
                     }
                 }
 
-                KeyNavigation.tab: countryInput;
+                KeyNavigation.tab: emailInput;
             }
-
-            Text {
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-
-                text: qsTr("Company address");
-            }
-
-            Rectangle {
-                id: companyAddressBlockBorders;
-
-                width: parent.width;
-                height: companyAddressBlock.height + 25;
-
-                color: "transparent";
-
-                border.width: 1;
-                border.color: Style.borderColor;
-
-                Column {
-                    id: companyAddressBlock;
-
-                    anchors.horizontalCenter: companyAddressBlockBorders.horizontalCenter;
-                    anchors.verticalCenter: companyAddressBlockBorders.verticalCenter;
-
-                    width: parent.width - 20;
-
-                    spacing: 7;
-
-                    Text {
-                        id: countryTitle;
-
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-
-                        text: qsTr("Country");
-                    }
-
-                    CustomTextField {
-                        id: countryInput;
-
-                        height: accountEditorContainer.textInputHeight;
-                        width: companyAddressBlock.width;
-
-                        onEditingFinished: {
-                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
-                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
-                                let oldText = adressesModel.GetData("Country");
-                                if (oldText != countryInput.text){
-                                    accountEditorContainer.updateModel();
-                                }
-                            }
-                        }
-
-                        KeyNavigation.tab: cityInput;
-                    }
-
-                    Text {
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-
-                        text: qsTr("City");
-                    }
-
-                    CustomTextField {
-                        id: cityInput;
-
-                        height: accountEditorContainer.textInputHeight;
-                        width: companyAddressBlock.width;
-
-                        onEditingFinished: {
-                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
-                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
-                                let oldText = adressesModel.GetData("City");
-                                if (oldText != cityInput.text){
-                                    accountEditorContainer.updateModel();
-                                }
-                            }
-                        }
-                        KeyNavigation.tab: postalCodeInput;
-                    }
-
-                    Text {
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-
-                        text: qsTr("Postal Code");
-                    }
-
-                    CustomTextField {
-                        id: postalCodeInput;
-
-                        height: accountEditorContainer.textInputHeight;
-                        width: companyAddressBlock.width;
-
-                        onEditingFinished: {
-                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
-                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
-                                let oldText = adressesModel.GetData("PostalCode");
-                                if (oldText != postalCodeInput.text){
-                                    accountEditorContainer.updateModel();
-                                }
-                            }
-                        }
-                        KeyNavigation.tab: streetInput;
-                    }
-
-                    Text {
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-
-                        text: qsTr("Street");
-                    }
-
-                    CustomTextField {
-                        id: streetInput;
-
-                        height: accountEditorContainer.textInputHeight;
-                        width: companyAddressBlock.width;
-
-                        onEditingFinished: {
-                            if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
-                                let adressesModel = accountEditorContainer.documentModel.GetData("Addresses");
-                                let oldText = adressesModel.GetData("Street");
-                                if (oldText != streetInput.text){
-                                    accountEditorContainer.updateModel();
-                                }
-                            }
-                        }
-
-                        KeyNavigation.tab: emailInput;
-                    }
-                }// Company address block
-            }//Company address block borders
 
             Text {
                 color: Style.textColor;
@@ -353,7 +206,7 @@ DocumentBase {
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
 
-                text: qsTr("Account Owner");
+                text: qsTr("Additional information");
             }
 
             Rectangle {
@@ -406,7 +259,7 @@ DocumentBase {
                             }
                         }
 
-                        KeyNavigation.tab: firstNameInput;
+                        KeyNavigation.tab: companyNameInput;
                     }
 
 
@@ -416,23 +269,78 @@ DocumentBase {
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
 
-                        text: qsTr("First Name");
+                        text: qsTr("Company Name");
                     }
 
                     CustomTextField {
-                        id: firstNameInput;
+                        id: companyNameInput;
 
                         height: accountEditorContainer.textInputHeight;
                         width: accountOwnerBlock.width;
 
                         onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("FirstName");
-                            if (oldText != firstNameInput.text){
+                            let oldText = accountEditorContainer.documentModel.GetData("CompanyName");
+                            if (oldText != companyNameInput.text){
                                 accountEditorContainer.updateModel();
                             }
                         }
 
-                        KeyNavigation.tab: lastNameInput;
+                        KeyNavigation.tab: countryInput;
+                    }
+
+                } // Account owner block
+            } //Account owner borders
+
+            Text {
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Company address");
+            }
+
+            Rectangle {
+                id: companyAddressBlockBorders;
+
+                width: parent.width;
+                height: companyAddressBlock.height + 25;
+
+                color: "transparent";
+
+                border.width: 1;
+                border.color: Style.borderColor;
+
+                Column {
+                    id: companyAddressBlock;
+
+                    anchors.horizontalCenter: companyAddressBlockBorders.horizontalCenter;
+                    anchors.verticalCenter: companyAddressBlockBorders.verticalCenter;
+
+                    width: parent.width - 20;
+
+                    spacing: 7;
+
+                    Text {
+                        id: countryTitle;
+
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Country");
+                    }
+
+                    CustomTextField {
+                        id: countryInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
+
+                        onEditingFinished: {
+                             accountEditorContainer.updateModel();
+                        }
+
+                        KeyNavigation.tab: cityInput;
                     }
 
                     Text {
@@ -440,26 +348,63 @@ DocumentBase {
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
 
-                        text: qsTr("Last Name");
+                        text: qsTr("City");
                     }
 
                     CustomTextField {
-                        id: lastNameInput;
+                        id: cityInput;
 
-                        width: accountOwnerBlock.width;
                         height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("LastName");
-                            if (oldText != lastNameInput.text){
-                                accountEditorContainer.updateModel();
-                            }
+                            accountEditorContainer.updateModel();
+                        }
+                        KeyNavigation.tab: postalCodeInput;
+                    }
+
+                    Text {
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Postal Code");
+                    }
+
+                    CustomTextField {
+                        id: postalCodeInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
+
+                        onEditingFinished: {
+                            accountEditorContainer.updateModel();
+                        }
+                        KeyNavigation.tab: streetInput;
+                    }
+
+                    Text {
+                        color: Style.textColor;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: Style.fontSize_common;
+
+                        text: qsTr("Street");
+                    }
+
+                    CustomTextField {
+                        id: streetInput;
+
+                        height: accountEditorContainer.textInputHeight;
+                        width: companyAddressBlock.width;
+
+                        onEditingFinished: {
+                            accountEditorContainer.updateModel();
                         }
 
                         KeyNavigation.tab: accountNameInput;
                     }
-                } // Account owner block
-            } //Account owner borders
+                }// Company address block
+            }//Company address block borders
         }//Body column
     }//Flickable
 }// Account Editor container
