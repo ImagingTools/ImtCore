@@ -13,6 +13,8 @@ Item {
 
     property int selectedIndex: -1;
 
+    property Item baseCollectionView: null;
+
     signal clicked(int index);
     signal doubleClicked(string id, string name);
 
@@ -132,7 +134,7 @@ Item {
 
                 onSelectedIndexChanged: {
                     if (productRolesDelegate.selectedIndex == productRolesDelegate.index){
-                        baseCollectionView.selectedIndexChanged(rolesRepeater.selectedIndex);
+                        productRolesDelegate.baseCollectionView.selectedIndexChanged(rolesRepeater.selectedIndex);
                     }
                 }
 

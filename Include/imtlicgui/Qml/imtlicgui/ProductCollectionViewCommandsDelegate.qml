@@ -24,8 +24,8 @@ CollectionViewCommandsDelegateBase {
             let copyStr = qsTr("Copy of ");
             container.documentManager.addDocument({"Id":         itemId,
                                       "Name":       copyStr + itemName,
-                                      "Source":     baseCollectionView.commands.objectViewEditorPath,
-                                      "CommandsId": baseCollectionView.commands.objectViewEditorCommandsId});
+                                      "Source":     container.collectionViewBase.baseCollectionView.commands.objectViewEditorPath,
+                                      "CommandsId": container.collectionViewBase.baseCollectionView.commands.objectViewEditorCommandsId});
         }
         else if (commandId === "Export"){
             fileDialogSave.open();

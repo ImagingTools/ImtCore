@@ -130,17 +130,17 @@ Item {
     onRenamed: {
         containerBase.documentManager.setDocumentTitle({"Id": id, "Title": newName});
 
-        updateGui();
+        containerBase.collectionViewBase.updateGui();
     }
 
     onRemoved: {
         containerBase.documentManager.closeDocument(id);
 
-        updateGui();
+        containerBase.collectionViewBase.updateGui();
     }
 
     onDescriptionSetted: {
-        updateGui();
+        containerBase.collectionViewBase.updateGui();
     }
 
     Component {

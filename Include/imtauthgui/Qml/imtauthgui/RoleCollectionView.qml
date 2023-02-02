@@ -14,6 +14,8 @@ CollectionView {
 
         commandsId: roleCollectionViewContainer.commandsId;
 
+        baseCollectionView: roleCollectionViewContainer.baseCollectionView;
+
         onDoubleClicked: {
             baseCollectionView.table.selectItem(id, name);
         }

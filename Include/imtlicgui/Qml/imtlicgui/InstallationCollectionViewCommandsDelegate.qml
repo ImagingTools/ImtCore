@@ -18,15 +18,15 @@ CollectionViewCommandsDelegateBase {
     onCommandActivated: {
         console.log("InstallationCollectionViewContainer commandActivated", commandId);
         if (commandId === "Duplicate"){
-            let itemId = baseCollectionView.table.getSelectedId();
-            let itemName = baseCollectionView.table.getSelectedName();
+            let itemId = container.collectionViewBase.baseCollectionView.table.getSelectedId();
+            let itemName = container.collectionViewBase.baseCollectionView.table.getSelectedName();
 
             let copyStr = qsTr("Copy of ");
 
             container.documentManager.addDocument({"Id":         itemId,
                                       "Name":       copyStr + itemName,
-                                      "Source":     baseCollectionView.commands.objectViewEditorPath,
-                                      "CommandsId": baseCollectionView.commands.objectViewEditorCommandsId});
+                                      "Source":     container.collectionViewBase.baseCollectionView.commands.objectViewEditorPath,
+                                      "CommandsId": container.collectionViewBase.baseCollectionView.commands.objectViewEditorCommandsId});
 
         }
         else if (commandId === "CreateLicense"){
