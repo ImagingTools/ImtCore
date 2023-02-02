@@ -172,7 +172,9 @@ export class Loader extends Item {
                 childRecursive(this.item, this.index)
             }
 
-            this.item.$uP()
+            if(Core.root.$completed){
+                this.item.$uP()
+            }
             
         } else {
             this.item = undefined
@@ -206,7 +208,9 @@ export class Loader extends Item {
                     childRecursive(this.item, this.index)
                 }
                 
-                this.item.$uP()
+                if(Core.root.$completed){
+                    this.item.$uP()
+                }
   
         } else {
             this.item = undefined

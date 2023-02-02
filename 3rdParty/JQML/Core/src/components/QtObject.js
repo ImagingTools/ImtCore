@@ -41,6 +41,7 @@ export class QtObject {
     // LVL = new Set()
 
     constructor(args) {
+        this.$qmlClassName = this.constructor.name
         this._context = context
         this.UID = UID++
         UIDList[this.UID] = this
@@ -261,6 +262,9 @@ export class QtObject {
         if(step === 0){
             this.$tryComplete()
         }
+        // for(let loader of Core.queueLoader){
+        //     if(loader.UID) loader.$uP()
+        // }
         // Core.queueCompleted.push(this)
         
         // if(updated){
@@ -335,6 +339,9 @@ export class QtObject {
                         if(_caller.val !== val){
                             _caller.val = val
                             _caller.signal()
+                            // if(_caller.type === 'alias'){
+                            //     _caller.setter(val)
+                            // }
                         }
                     }
                 }
@@ -393,6 +400,10 @@ export class QtObject {
                             if(_caller.val !== val){
                                 _caller.val = val
                                 _caller.signal()
+                                // if(_caller.type === 'alias'){
+                                //     _caller.setter(val)
+                                // }
+
                             }
                         }
                     }
@@ -488,6 +499,9 @@ export class QtObject {
                         if(_caller.val !== val){
                             _caller.val = val
                             _caller.signal()
+                            // if(_caller.type === 'alias'){
+                            //     _caller.setter(val)
+                            // }
                         }
                     }
                 }
