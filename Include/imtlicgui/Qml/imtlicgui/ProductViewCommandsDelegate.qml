@@ -25,9 +25,9 @@ DocumentWorkspaceCommandsDelegateBase {
             }
         }
 
-        commandsProvider.setCommandIsEnabled("Remove", isEnabled);
-        commandsProvider.setCommandIsEnabled("Edit", isEnabled);
-        commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
+        container.documentBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+        container.documentBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+        container.documentBase.commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
     }
 
     onCommandActivated: {

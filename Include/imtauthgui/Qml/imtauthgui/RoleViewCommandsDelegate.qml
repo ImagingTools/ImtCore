@@ -31,7 +31,7 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("RoleViewDelegate onSelectedIndexChanged", delegateContainer.selectedIndex);
         let isEnabled = delegateContainer.selectedIndex != null;
 
-        commandsProvider.setCommandIsEnabled("Exclude", isEnabled);
+        delegateContainer.documentBase.commandsProvider.setCommandIsEnabled("Exclude", isEnabled);
     }
 
     onCommandActivated: {
