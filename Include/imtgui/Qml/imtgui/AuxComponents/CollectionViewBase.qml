@@ -27,6 +27,7 @@ Item {
     property alias filterMenu: filterMenuLocal.sourceComponent;
     property alias filterMenuVisible: filterMenuLocal.visible;
     property alias modelFilter: modelFilter;
+    property alias pagination: pagination;
 
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
@@ -240,6 +241,7 @@ Item {
         table: collectionViewBaseContainer.table;
 
         commandsId: collectionViewBaseContainer.commandsId;
+        rootItem: collectionViewBaseContainer;
 
         onHeadersChanged: {
             tableInternal.headers = baseCommands.headers;

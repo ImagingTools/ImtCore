@@ -20,6 +20,8 @@ Item {
     property TreeItemModel headers;
     property TreeItemModel items;
 
+    property Item rootItem: null;
+
     function updateModels(){
         console.log("CollectionView updateModels");
         headerInfoModel.updateModel();
@@ -69,7 +71,7 @@ Item {
 
                         if (dataModelLocal.ContainsKey("FilterSearch")){
                             let filterSearchModel = dataModelLocal.GetData("FilterSearch")
-                            modelFilter.SetData("FilterIds", filterSearchModel);
+                            gqlModelBaseContainer.rootItem.modelFilter.SetData("FilterIds", filterSearchModel);
                         }
 
                         if(dataModelLocal.ContainsKey("Headers")){
@@ -91,15 +93,15 @@ Item {
             console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
             let itemHeight = 35; // hack
-            let height = collectionViewBaseContainer.height - pagination.height - itemHeight; //Убрать высоту от заголовка и меню пагинации
+            let height = gqlModelBaseContainer.rootItem.height - gqlModelBaseContainer.rootItem.pagination.height - itemHeight; //Убрать высоту от заголовка и меню пагинации
             let count = Math.floor(height / itemHeight);
-            let offset = (pagination.currentValue - 1) * count;
+            let offset = (gqlModelBaseContainer.rootItem.pagination.currentValue - 1) * count;
 
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset", offset);
             viewParams.InsertField("Count", count);
             viewParams.InsertField("FilterModel");
-            var jsonString = modelFilter.toJSON();
+            var jsonString = gqlModelBaseContainer.rootItem.modelFilter.toJSON();
             jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             viewParams.InsertField("FilterModel", jsonString);
 
@@ -145,7 +147,7 @@ Item {
                             if (dataModelLocal.ContainsKey("PagesCount")){
                                 dataModelLocal = dataModelLocal.GetData("PagesCount");
 
-                                pagination.pagesSize = dataModelLocal;
+                                gqlModelBaseContainer.rootItem.pagination.pagesSize = dataModelLocal;
                             }
                         }
                     }
