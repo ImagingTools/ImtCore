@@ -17,8 +17,8 @@ Item {
 
     signal commandModeChanged(string commandId, bool newMode);
 
-    Component.onCompleted: {
-        container.includedRolesTable = includesTable;
+    onDocumentBaseChanged:  {
+         roleEditorContainer.documentBase.includedRolesTable = includesTable;
 
         roleEditorContainer.documentBase.commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
         roleEditorContainer.documentBase.commandsProvider.commandModeChanged.connect(commandModeChanged);
@@ -396,7 +396,6 @@ Item {
                                 id: repeater;
 
                                 delegate: AuxButton {
-                                    anchors.verticalCenter: rowCommands.verticalCenter;
 
                                     width: 18;
                                     height: width;
@@ -407,7 +406,7 @@ Item {
                                     enabled: model.IsEnabled;
 
                                     onClicked: {
-                                        Events.sendEvent(commandsId + "CommandActivated", model.Id);
+                                        Events.sendEvent(roleEditorContainer.documentBase.commandsId + "CommandActivated", model.Id);
                                     }
                                 }
                             }
