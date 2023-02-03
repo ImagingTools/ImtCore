@@ -23,14 +23,17 @@ FocusScope {
     property int rowItemHeight: 30;
     property int headerHeight: 35;
 
-    property ListModel rowModel: ListModel {};
-    property ListModel columnModel: ListModel {};
+    property var rowModel: ListModel {};
+    property var columnModel: ListModel {};
 
     property ModelIndex selectedIndex: null;
 
     property TableViewSelection selection: TableViewSelection {};
 
     property alias tableListView: listView;
+
+    // For subscribing unique events
+    property string commandId: "";
 
     signal rowModelDataChanged(var delegate, var prop);
     signal rowAdded();
@@ -48,6 +51,20 @@ FocusScope {
 
     Keys.onPressed: {
         console.log("TableView Keys.onPressed");
+
+        if (tableViewRoot.selectedIndex == null){
+            return;
+        }
+
+        let itemData = tableViewRoot.selectedIndex.itemData;
+
+        if (event.key == Qt.Key_Left){
+            itemData.IsOpen = false;
+        }
+        else if (event.key == Qt.Key_Right){
+            console.log("Qt.Key_Right");
+            itemData.IsOpen = true;
+        }
     }
 
     Loader {
@@ -137,7 +154,6 @@ FocusScope {
                             console.log("Header debug:", model.Name, model.index);
                             headerText.text =  model.Name;
                         }
-//                        text: model.Name;
 
                         width: parent.width;
 
@@ -157,7 +173,6 @@ FocusScope {
     ListView {
         id: listView;
 
-
         anchors.top: headerItem.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -175,6 +190,10 @@ FocusScope {
             Component.onCompleted: {
 
             }
+        }
+
+        onHeightChanged: {
+            console.log("listView onHeightChanged", listView.height);
         }
     }
 

@@ -14,7 +14,7 @@ Item {
         if(key in this.events){
             for(var i = 0; i < this.events[key].length; i++){
                 console.log("key i", key, i, this.events[key][i]);
-                if (parameters){
+                if (parameters !== undefined){
                     this.events[key][i](parameters)
                 }
                 else{

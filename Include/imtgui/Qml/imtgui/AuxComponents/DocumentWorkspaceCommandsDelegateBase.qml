@@ -7,7 +7,7 @@ Item {
     id: container;
 
     property TreeItemModel objectModel: documentBase ? container.documentBase.documentModel : null;
-    property TreeItemModel documentsData: TreeItemModel{};
+    property TreeItemModel documentsData: null;
 
     property Item documentBase: null;
 
@@ -44,21 +44,29 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        console.log("DocumentCommands onCompleted");
+//    onDocumentBaseChanged: {
+//        console.log("DocumentCommands onDocumentBaseChanged", container.documentBase.documentsData);
+
+//        let itemId = container.documentBase.documentsData.GetData("Id", model.index);
+//        container.itemModelInputParams["Id"] = itemId;
+//        console.log("itemId", itemId);
+//    }
+
+//    Component.onCompleted: {
+//        console.log("DocumentCommands onCompleted");
 //        let itemId = documentsData.GetData("Id", model.index);
 //        container.itemModelInputParams["Id"] = itemId;
 //        console.log("itemId", itemId);
-    }
+//    }
 
     onDocumentsDataChanged: {
-        let itemId = documentsData.GetData("Id", model.index);
-        container.itemModelInputParams["Id"] = itemId;
-        console.log("itemId", itemId);
-
+        if (container.documentsData != null){
+            console.log("onDocumentsDataChanged", documentsData.toJSON());
+            let itemId = documentsData.GetData("Id", model.index);
+            container.itemModelInputParams["Id"] = itemId;
+            console.log("itemId", itemId);
+        }
     }
-
-
 
     Component.onDestruction: {
         Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);

@@ -35,5 +35,6 @@
         <file alias="imtlicgui/PackageViewItemDelegate.qml">Qml/imtlicgui/PackageViewItemDelegate.qml</file>
         <file alias="imtlicgui/ProductViewItemDelegate.qml">Qml/imtlicgui/ProductViewItemDelegate.qml</file>
         <file alias="imtlicgui/LicenseInstanceItemDelegate.qml">Qml/imtlicgui/LicenseInstanceItemDelegate.qml</file>
+	<file alias="imtlicgui/TreeViewDependencies.qml">Qml/imtlicgui/TreeViewDependencies.qml</file>
     </qresource>
 </RCC>

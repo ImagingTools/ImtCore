@@ -51,6 +51,8 @@ Rectangle {
         anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
 
         model: pagesManager.pageModel;
+
+        color: Style.imagingToolsGradient1;
     }
 
     Item {

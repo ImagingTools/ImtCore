@@ -41,6 +41,7 @@ Item {
             if (currentCommandId == commandId){
                 let currentIsEnabled = commandsProviderContainer.commandsModel.GetData("IsEnabled", i);
                 if (currentIsEnabled !== isEnabled){
+                    console.log("SetData setCommandIsEnabled", commandId, isEnabled);
                     commandsProviderContainer.commandsModel.SetData("IsEnabled", isEnabled, i);
 
                     commandsProviderContainer.commandModeChanged(commandId, isEnabled);

@@ -10,22 +10,23 @@ DocumentWorkspaceCommandsDelegateBase {
 
     property TreeItemModel rolesModel: TreeItemModel {};
 
-    Component.onCompleted: {
-        console.log("RoleViewDelegate onCompleted");
+//    Component.onCompleted: {
+//        console.log("RoleViewDelegate onCompleted", documentsData.GetData("ProductId", model.index));
 
-//        delegateContainer.itemModelInputParams["ProductId"] = delegateContainer.documentBase.documentsData.GetData("ProductId", model.index);
+//        delegateContainer.itemModelInputParams["ProductId"] = documentsData.GetData("ProductId", model.index);
 
 //        delegateContainer.updateItemTimer = 100;
 //        itemsModel.updateModel();
-    }
+//    }
 
     onDocumentsDataChanged: {
-        delegateContainer.itemModelInputParams["ProductId"] = delegateContainer.documentBase.documentsData.GetData("ProductId", model.index);
+        console.log("RoleViewDelegate onDocumentsDataChanged", documentsData.GetData("ProductId", model.index));
+
+        delegateContainer.itemModelInputParams["ProductId"] = documentsData.GetData("ProductId", model.index);
 
         delegateContainer.updateItemTimer = 100;
         itemsModel.updateModel();
     }
-
 
     onSelectedIndexChanged: {
         console.log("RoleViewDelegate onSelectedIndexChanged", delegateContainer.selectedIndex);
@@ -36,13 +37,12 @@ DocumentWorkspaceCommandsDelegateBase {
 
     onCommandActivated: {
         console.log("DocumentCommands onCommandActivated", delegateContainer.documentBase.itemId, commandId);
-
         if (commandId === "Include"){
             let productId = delegateContainer.documentBase.documentModel.GetData("ProductId");
 
             modalDialogManager.openDialog(rolesDialog, {"currentRoleId": delegateContainer.documentBase.itemId,
-                                              "productId": productId,
-                                              "model":     delegateContainer.rolesModel});
+                                                        "productId": productId,
+                                                        "model":     delegateContainer.rolesModel});
         }
         else if (commandId === "Exclude"){
             let indexes = delegateContainer.documentBase.includedRolesTable.selectedIndex.getIndexes();
@@ -65,8 +65,8 @@ DocumentWorkspaceCommandsDelegateBase {
 
                     let row = {"Id": parentId, "Name": parentName};
 
-                    for (let i = 0; i < delegateContainer.documentBase.includedRolesTable.rowCount; i++){
-                        let rowObj = delegateContainer.documentBase.includedRolesTable.rowModel.get(i);
+                    for (let i = 0; i < includedRolesTable.rowCount; i++){
+                        let rowObj = includedRolesTable.rowModel.get(i);
                         let rowId = rowObj["Id"];
 
                         if (parentId == rowId){
@@ -76,7 +76,7 @@ DocumentWorkspaceCommandsDelegateBase {
                         }
                     }
 
-                    delegateContainer.documentBase.includedRolesTable.addRow(row);
+                    includedRolesTable.addRow(row);
                 }
             }
         }
@@ -124,45 +124,4 @@ DocumentWorkspaceCommandsDelegateBase {
             }
         }
     }//GqlModel itemsModel
-
-    //    GqlModel {
-    //        id: permissionModel;
-
-    //        function updateModel(productId) {
-    //            var query = Gql.GqlRequest("query", "ProductFeatures");
-    //            var inputParams = Gql.GqlObject("input");
-    //            inputParams.InsertField("ProductId", productId);
-    //            query.AddParam(inputParams);
-
-    //            var queryFields = Gql.GqlObject("style");
-    //            queryFields.InsertField("theme");
-    //            queryFields.InsertField("source");
-    //            query.AddField(queryFields);
-
-    //            var gqlData = query.GetQuery();
-    //            console.log("permissionModel gqlData", gqlData);
-    //            this.SetGqlQuery(gqlData);
-    //        }
-
-    //        onStateChanged: {
-    //            console.log("State:", this.state, permissionModel);
-    //            if (this.state === "Ready"){
-    //                let dataModelLocal;
-
-    //                if (permissionModel.ContainsKey("errors")){
-
-    //                    return;
-    //                }
-
-    //                if (permissionModel.ContainsKey("data")){
-    //                    dataModelLocal = permissionModel.GetData("data");
-    //                    dataModelLocal = dataModelLocal.GetData("ProductFeatures");
-
-    //                    delegateContainer.documentBase.documentModel.SetData("Permissions", dataModelLocal);
-
-    //                    container.updateGui();
-    //                }
-    //            }
-    //        }
-    //    }//GqlModel itemsModel
 }

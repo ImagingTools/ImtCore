@@ -30,9 +30,13 @@ QtObject {
 
                 prevIndex = parentIndex;
             }
-            else{
+            else if (prevIndex != null && prevIndex.itemData.IsOpen){
+                // Если есть предыдущий смотрим его childModel
                 while (prevIndex.childModel.length > 0){
                     prevIndex = prevIndex.childModel[prevIndex.childModel.length - 1];
+                    if (!prevIndex.itemData.IsOpen){
+                        break;
+                    }
                 }
             }
 
@@ -44,8 +48,8 @@ QtObject {
             let currentIndex = tableViewRoot.selectedIndex;
             if (currentIndex != null){
                 let nextIndex;
-                // Если есть дочерние индексы => переходим к ним
-                if (currentIndex.childModel.length > 0){
+                // Если есть дочерние индексы и элемент раскрыт => переходим к ним
+                if (currentIndex.childModel.length > 0 && currentIndex.itemData.IsOpen){
                     nextIndex = currentIndex.childModel[0];
                 }
                 else{
@@ -54,15 +58,15 @@ QtObject {
 
                 // Если следующего нет => берем следующий у parent
                 if (nextIndex == null){
-                    let parentIndex = currentIndex.parentIndex;
+                    let parent = currentIndex.parentIndex;
 
-                    while (parentIndex != null){
-                        nextIndex = parentIndex.nextIndex;
+                    while (parent != null){
+                        nextIndex = parent.nextIndex;
                         if (nextIndex != null){
                             break;
                         }
 
-                        parentIndex = parentIndex.parentIndex;
+                        parent = parent.parentIndex;
                     }
                 }
 

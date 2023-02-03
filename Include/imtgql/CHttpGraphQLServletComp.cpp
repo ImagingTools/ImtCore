@@ -57,6 +57,8 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					}
 				}
 
+				gqlContextPtr->SetLanguageId("en_US");
+
 				if (m_settingsCollectionCompPtr.IsValid()){
 					imtbase::IObjectCollection::DataPtr settingsDataPtr;
 					if (m_settingsCollectionCompPtr->GetObjectData(userId, settingsDataPtr)){

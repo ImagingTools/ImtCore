@@ -7,6 +7,12 @@ Item {
 
     property TreeItemModel model: TreeItemModel {}
 
+    onModelChanged: {
+        if (model){
+            Events.sendEvent("FeaturesUpdated");
+        }
+    }
+
     function updateModel(){
         featuresModel.updateModel();
     }

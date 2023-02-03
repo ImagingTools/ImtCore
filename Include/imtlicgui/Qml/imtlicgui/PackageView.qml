@@ -49,12 +49,9 @@ DocumentBase {
 
         tableView.columnModel.clear();
         let headers = packageViewContainer.documentModel.GetData("Headers");
-        console.log("Headers:", headers)
-
         for (let i = 0; i < headers.GetItemsCount(); i++){
             let headerId = headers.GetData("Id", i);
             let headerName = headers.GetData("Name", i);
-            console.log("addColumn:", headerId, headerName)
             tableView.addColumn({"Id": headerId, "Name": headerName});
         }
 
@@ -244,28 +241,19 @@ DocumentBase {
     BasicTreeView {
         id: tableView;
 
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+
         anchors.left: parent.left;
         anchors.right: splitter.left;
 
-        height: parent.height;
-
         readOnly: false;
 
-        rowDelegate: Component { PackageViewItemDelegate {root: tableView} }
+        commandId: packageViewContainer.commandsId;
+
+        rowDelegate: Component { PackageViewItemDelegate { root: tableView; } }
 
         onSelectedIndexChanged: {
-            console.log("TableView Begin onSelectedIndexChanged");
-//            let packageId = documentModel.GetData("Id");
-//            console.log("packageId", packageId);
-//            if (selectedIndex != null && selectedIndex.itemData.Id != "" && packageId != ""){
-//                treeView.visible = true;
-//                rightPanel.updateTreeViewGui();
-//            }
-//            else{
-//                treeView.visible = false;
-//            }
-
-            console.log("TableView End onSelectedIndexChanged");
         }
 
         onRowModelDataChanged: {
@@ -315,9 +303,10 @@ DocumentBase {
         id: rightPanel;
 
         anchors.left: splitter.right;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
 
         width: packageViewContainer.width > 0 ? packageViewContainer.width - tableView.width : 250;
-        height: parent.height;
 
         Rectangle {
             id: headerTreeView;
@@ -525,10 +514,23 @@ DocumentBase {
             }
         }
 
+//        TreeViewDependencies {
+//            id: treeView;
+
+//            height: packageViewContainer.height;
+//            width: parent.width;
+
+//            documentModel: packageViewContainer.documentModel;
+
+//            featuresTableView: tableView;
+//        }
+
         BasicTreeView {
             id: treeView;
 
-            height: packageViewContainer.height;
+            anchors.top: headerTreeView.bottom;
+            anchors.bottom: parent.bottom;
+
             width: parent.width;
 
             clip: true;

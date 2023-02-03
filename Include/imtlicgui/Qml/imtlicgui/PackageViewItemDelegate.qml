@@ -15,12 +15,12 @@ TreeViewItemDelegateBase {
             Item {
                 id: nameItem;
 
-                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * model.Level : 0;
+//                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * model.Level : 0;
+                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * packageTreeItemDelegate.level : 0;
                 height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
                 Text {
                     anchors.verticalCenter: nameItem.verticalCenter;
-
 
                     width: parent.width;
 

@@ -17,13 +17,18 @@ Item {
 
     signal commandModeChanged(string commandId, bool newMode);
 
-    onDocumentBaseChanged:  {
+    Component.onCompleted: {
          roleEditorContainer.documentBase.includedRolesTable = includesTable;
 
-        roleEditorContainer.documentBase.commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
-        roleEditorContainer.documentBase.commandsProvider.commandModeChanged.connect(commandModeChanged);
-
         roleNameInput.focus = true;
+    }
+
+    onDocumentBaseChanged: {
+        console.log("onDocumentBaseChanged", roleEditorContainer.documentBase);
+        if (roleEditorContainer.documentBase != null){
+            roleEditorContainer.documentBase.commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
+            roleEditorContainer.documentBase.commandsProvider.commandModeChanged.connect(commandModeChanged);
+        }
     }
 
     Component.onDestruction: {
@@ -32,7 +37,6 @@ Item {
     }
 
     onCommandModeChanged: {
-
         for (let i = 0; i < commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsModel.GetData("Id", i);
             if (currentCommandId == commandId){
@@ -48,6 +52,7 @@ Item {
 
 
     function onCommandsModelLoaded(){
+        console.log("onCommandsModelLoaded");
         roleEditorContainer.documentBase.commandsProvider.mergeModelWith(commandsModel);
     }
 
@@ -90,7 +95,7 @@ Item {
 
             commandsModel.SetData("Id", "Exclude", index);
             commandsModel.SetData("Name", "Exclude", index);
-            commandsModel.SetData("IsEnabled", false, index);
+            commandsModel.SetData("IsEnabled", true, index);
             commandsModel.SetData("Icon", "Delete", index);
             commandsModel.SetData("Visible", false, index);
 

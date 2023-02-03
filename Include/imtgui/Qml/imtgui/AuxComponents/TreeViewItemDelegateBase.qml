@@ -6,7 +6,7 @@ TableViewItemDelegateBase {
 
     height: isOpen ? footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
 
-    property bool isOpen: true;
+    property bool isOpen: model.IsOpen;
 
     property int checkState: model.CheckState;
 
@@ -15,8 +15,54 @@ TableViewItemDelegateBase {
     property var parentDelegate: null;
     property var childrenDelegates: [];
 
+    level: treeDelegateBase.parentDelegate == null ? 0 : treeDelegateBase.parentDelegate.level + 1;
+
+    onLevelChanged: {
+        console.log("onLevelChanged", model.Id, level);
+    }
+
+    onHeightChanged: {
+        console.log("onHeightChanged", model.Id, height);
+    }
+
     signal parentCheckStateChanged(var data);
     signal childrenCheckStateChanged(var data);
+
+    Component.onCompleted: {
+        let prefix = treeDelegateBase.root.commandId + model.Id;
+        Events.subscribeEvent(treeDelegateBase.root.commandId + "ClearAllTreeView", treeDelegateBase.clear);
+        Events.subscribeEvent(prefix + "SetState", treeDelegateBase.setState);
+        Events.subscribeEvent(prefix + "SetActive", treeDelegateBase.setActive);
+        Events.subscribeEvent(prefix + "SetVisible", treeDelegateBase.setVisible);
+    }
+
+    Component.onDestruction: {
+        let prefix = treeDelegateBase.root.commandId + model.Id;
+        Events.unSubscribeEvent(treeDelegateBase.root.commandId + "ClearAllTreeView", treeDelegateBase.clear);
+        Events.unSubscribeEvent(prefix + "SetState", treeDelegateBase.setState);
+        Events.unSubscribeEvent(prefix + "SetActive", treeDelegateBase.setActive);
+        Events.unSubscribeEvent(prefix + "SetVisible", treeDelegateBase.setVisible);
+    }
+
+    function clear(){
+        model.CheckState = Qt.Unchecked;
+        model.Active = true;
+        model.Visible = true;
+    }
+
+    function setState(state){
+        console.log( model.Id, "setState", state);
+        model.CheckState = state;
+    }
+
+    function setActive(active){
+        console.log( model.Id, "setActive", active);
+        model.Active = active;
+    }
+
+    function setVisible(visible){
+        model.Visible = visible;
+    }
 
     onSelectedChanged: {
         console.log("packageTreeItemDelegate onSelectedChanged", treeDelegateBase.selected);
@@ -64,7 +110,9 @@ TableViewItemDelegateBase {
                                                       "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
                 onClicked: {
-                    treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
+//                    treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
+
+                    model.IsOpen = !model.IsOpen;
                 }
             }
         }

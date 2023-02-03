@@ -15,7 +15,7 @@ DocumentBase {
     property bool blockUpdatingModel: false;
 
     Component.onCompleted: {
-        accountNameInput.focus = true;
+        //accountNameInput.focus = true;
     }
 
     Component.onDestruction: {
@@ -23,8 +23,11 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
+        console.log("AccountEditor onDocumentModelChanged");
         accountEditorContainer.updateGui();
         undoRedoManager.registerModel(accountEditorContainer.documentModel);
+
+        accountNameInput.focus = true;
     }
 
     Component {
@@ -191,6 +194,7 @@ DocumentBase {
                 width: bodyColumn.width;
 
                 onEditingFinished: {
+                    console.log("accountDescriptionInput");
                     let oldText = documentModel.GetData("Description");
                     if (oldText != accountDescriptionInput.text){
                         accountEditorContainer.updateModel();
@@ -253,6 +257,7 @@ DocumentBase {
                         textInputValidator: mailValid;
 
                         onEditingFinished: {
+                            console.log("emailInput");
                             let oldText = accountEditorContainer.documentModel.GetData("Email");
                             if (oldText != emailInput.text){
                                 accountEditorContainer.updateModel();
@@ -279,6 +284,7 @@ DocumentBase {
                         width: accountOwnerBlock.width;
 
                         onEditingFinished: {
+                            console.log("companyNameInput");
                             let oldText = accountEditorContainer.documentModel.GetData("CompanyName");
                             if (oldText != companyNameInput.text){
                                 accountEditorContainer.updateModel();
@@ -337,7 +343,11 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                             accountEditorContainer.updateModel();
+                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
+                            let oldText = addresses.GetData("Country");
+                            if (oldText != countryInput.text){
+                                accountEditorContainer.updateModel();
+                            }
                         }
 
                         KeyNavigation.tab: cityInput;
@@ -358,8 +368,13 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            accountEditorContainer.updateModel();
+                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
+                            let oldText = addresses.GetData("City");
+                            if (oldText != cityInput.text){
+                                accountEditorContainer.updateModel();
+                            }
                         }
+
                         KeyNavigation.tab: postalCodeInput;
                     }
 
@@ -378,7 +393,11 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            accountEditorContainer.updateModel();
+                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
+                            let oldText = addresses.GetData("PostalCode");
+                            if (oldText != postalCodeInput.text){
+                                accountEditorContainer.updateModel();
+                            }
                         }
                         KeyNavigation.tab: streetInput;
                     }
@@ -398,7 +417,11 @@ DocumentBase {
                         width: companyAddressBlock.width;
 
                         onEditingFinished: {
-                            accountEditorContainer.updateModel();
+                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
+                            let oldText = addresses.GetData("Street");
+                            if (oldText != streetInput.text){
+                                accountEditorContainer.updateModel();
+                            }
                         }
 
                         KeyNavigation.tab: accountNameInput;

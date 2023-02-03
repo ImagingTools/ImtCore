@@ -46,6 +46,8 @@ Item {
 
     function addDocument(document){
         let keys = Object.keys(document);
+
+        document["documentsData"] = documentsData;
         document["documentManager"] = documentManager;
 
         for (let key of keys){

@@ -107,6 +107,11 @@ BasicTableView {
             row["CheckBoxVisible"] = true;
         }
 
+        hasKey = "IsOpen" in row;
+        if (!hasKey){
+            row["IsOpen"] = true;
+        }
+
         let localModel = rowModel;
 
         for (let i = 0; i < indexes.length - 1; i++){

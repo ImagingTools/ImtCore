@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtauth/CAccountInfo.h>
+#include <imtauth/ICompanyInfo.h>
 
 
 namespace imtlicgql
@@ -50,75 +51,50 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel);
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	QByteArray packageId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray accountId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	int index = dataModelPtr->InsertNewItem();
 
 	dataModelPtr->SetData("Name", QT_TR_NOOP("Modification Time"), index);
 	imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("Children", index);
 
-	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(packageId);
+	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(accountId);
 	if (metaInfo.IsValid()){
 		QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 		children->SetData("Value", date);
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (!m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
+	if (!m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
 		errorMessage = QT_TR_NOOP("Unable to load an object data");
 
 		return nullptr;
 	}
 
-	imtbase::IObjectCollection* licensePtr = dynamic_cast<imtbase::IObjectCollection*>(dataPtr.GetPtr());
-	if (licensePtr != nullptr){
-		QByteArrayList licenseCollectionIds = licensePtr->GetElementIds().toList();
-		index = dataModelPtr->InsertNewItem();
-
-		dataModelPtr->SetData("Name", "Licenses", index);
-		children = dataModelPtr->AddTreeModel("Children", index);
-		int childIndex;
-		for (const QByteArray& licenseCollectionId : licenseCollectionIds){
-			childIndex = children->InsertNewItem();
-			QString licenseName = licensePtr->GetElementInfo(licenseCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			QString value = licenseName + " (" + licenseCollectionId + ")";
-			children->SetData("Value", value, childIndex);
-		}
-	}
-
-	const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(dataPtr.GetPtr());
-	if (accountInfoPtr == nullptr){
+	const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(dataPtr.GetPtr());
+	if (companyInfoPtr == nullptr){
 		return nullptr;
 	}
-
-	const imtauth::IContactInfo* ownerPtr = accountInfoPtr->GetAccountOwner();
-	if (ownerPtr == nullptr){
-		return nullptr;
-	}
-
-	children = dataModelPtr->AddTreeModel("Children", index);
-	QString lastName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME);
-	children->SetData("Value", lastName);
 
 	index = dataModelPtr->InsertNewItem();
-	dataModelPtr->SetData("Name", QT_TR_NOOP("First Name"), index);
+	dataModelPtr->SetData("Name", QT_TR_NOOP("Company Name"), index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString firstName = ownerPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME);
-	children->SetData("Value", firstName);
+	QString companyName = companyInfoPtr->GetCompanyName();
+	children->SetData("Value", companyName);
 
 	index = dataModelPtr->InsertNewItem();
 	dataModelPtr->SetData("Name", QT_TR_NOOP("Email"), index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString mail = ownerPtr->GetMail();
+	QString mail = companyInfoPtr->GetMail();
 	children->SetData("Value", mail);
 
 	index = dataModelPtr->InsertNewItem();
 	dataModelPtr->SetData("Name", QT_TR_NOOP("Description"), index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString description = accountInfoPtr->GetAccountDescription();
+	QString description = companyInfoPtr->GetAccountDescription();
 
 	children->SetData("Value", description);
 
@@ -127,7 +103,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString name = accountInfoPtr->GetAccountName();
+	QString name = companyInfoPtr->GetAccountName();
 
 	children->SetData("Value", name);
 

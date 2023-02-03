@@ -7,6 +7,49 @@ DocumentBase {
 
     property bool blockUpdatingModel: false;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("FeaturesUpdated", container.onFeaturesUpdated);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("FeaturesUpdated", container.onFeaturesUpdated);
+    }
+
+    property bool featuresUpdated: false;
+
+    function onFeaturesUpdated(){
+        console.log( "ProductView onFeaturesUpdated", container.featuresUpdated);
+        container.featuresUpdated = true;
+    }
+
+    onVisibleChanged: {
+        console.log( "ProductView onVisibleChanged", container.featuresUpdated);
+
+        if (container.visible){
+            if (container.featuresUpdated){
+                if (container.isDirty){
+                    modalDialogManager.openDialog(messageDialog, {"message": qsTr("The features have been changed. Update the data (The current changes will be lost)?")});
+                }
+                else{
+                    container.updateGui();
+                }
+
+                container.featuresUpdated = false;
+            }
+        }
+    }
+
+    Component {
+        id: messageDialog;
+        MessageDialog {
+            onFinished: {
+                if (buttonId == "Yes"){
+                    container.updateGui();
+                }
+            }
+        }
+    }
+
     commandsDelegateSourceComp: Component {
         ProductViewCommandsDelegate {
             tableData: tableView;
@@ -389,8 +432,7 @@ DocumentBase {
         anchors.top: headerPanel.bottom
         anchors.left: parent.left;
         anchors.right: parent.right;
-
-        height: parent.height;
+        anchors.bottom: parent.bottom
 
         readOnly: false;
 

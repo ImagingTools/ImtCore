@@ -72,7 +72,7 @@ TableViewItemDelegateBase {
                 id: rolesRepeater;
 
                 width: parent.width;
-                height: productRolesDelegate.root ? lesRepeater.count * productRolesDelegate.root.rowItemHeight : 0;
+                height: productRolesDelegate.root ? rolesRepeater.count * productRolesDelegate.root.rowItemHeight : 0;
 
                 spacing: -1;
 

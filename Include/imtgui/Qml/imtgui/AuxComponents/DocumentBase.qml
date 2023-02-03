@@ -87,13 +87,6 @@ Item {
         }
     }
 
-    onIsDirtyChanged: {
-        if (isDirty){
-            console.log("onIsDirtyChanged");
-            documentBase.commandsProvider.setCommandIsEnabled("Save", true);
-        }
-    }
-
     function updateGui(){}
 
     Shortcut {

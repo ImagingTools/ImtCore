@@ -514,7 +514,6 @@ Item {
             height: 30;
             placeHolderText: qsTr("Enter the serial number");
             borderColor: Style.iconColorOnSelected;
-            maximumLength: 17;
             visible: bodyColumn.productCategory == "Hardware";
 
             onEditingFinished: {

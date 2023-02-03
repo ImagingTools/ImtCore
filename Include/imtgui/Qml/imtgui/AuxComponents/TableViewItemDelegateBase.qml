@@ -18,6 +18,8 @@ FocusScope {
         index: model.index;
     };
 
+    property int level: 0;
+
     property var itemData: model;
 
     property alias headerDelegate: headerDelegateLoader.sourceComponent;
@@ -79,7 +81,7 @@ FocusScope {
         id: prefixRowLoader;
 
         anchors.left: delegate.left;
-        anchors.leftMargin: model.Level * 20;
+        anchors.leftMargin: delegate.level * 20;
         anchors.top: headerDelegateLoader.bottom;
     }
 

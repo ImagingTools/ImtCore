@@ -134,7 +134,9 @@ Item {
     }
 
     onRemoved: {
-        containerBase.documentManager.closeDocument(id);
+        if (containerBase.documentManager){
+            containerBase.documentManager.closeDocument(id);
+        }
 
         containerBase.collectionViewBase.updateGui();
     }
