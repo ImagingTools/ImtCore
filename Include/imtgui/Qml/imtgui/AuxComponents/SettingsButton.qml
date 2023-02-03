@@ -7,6 +7,8 @@ Item {
 
     height: 25;
 
+    property Item rootItem: null;
+
     AuxButton {
         id: button;
 
@@ -21,7 +23,7 @@ Item {
         backgroundColor: Style.imagingToolsGradient1;
 
         onClicked: {
-            container.openFileDialog();
+            settingsButtonContainer.rootItem.openFileDialog();
         }
     }
 }

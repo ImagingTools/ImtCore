@@ -335,8 +335,11 @@ Rectangle {
 
                             onLoaded: {
                                 console.log("Loader onLoaded", item.parameters);
-                                if (item.parameters !== undefined){
-                                    item.parameters = model.Parameters;
+                                if (loader.item.parameters !== undefined){
+                                    loader.item.parameters = model.Parameters;
+                                }
+                                if (loader.item.rootItem !== undefined){
+                                    loader.item.rootItem = container;
                                 }
                             }
                         }
