@@ -5,7 +5,7 @@ import imtgui  1.0
 TreeViewItemDelegateBase {
     id: packageTreeItemDelegate;
 
-    root: tableView;
+    //root: tableView;
 
     rowBodyDelegate: Component{ Row {
             id: row;

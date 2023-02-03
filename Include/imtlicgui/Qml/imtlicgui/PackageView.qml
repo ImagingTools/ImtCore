@@ -251,7 +251,7 @@ DocumentBase {
 
         readOnly: false;
 
-        rowDelegate: Component { PackageViewItemDelegate {} }
+        rowDelegate: Component { PackageViewItemDelegate {root: tableView} }
 
         onSelectedIndexChanged: {
             console.log("TableView Begin onSelectedIndexChanged");

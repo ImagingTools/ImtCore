@@ -5,7 +5,7 @@ import imtgui  1.0
 TreeViewItemDelegateBase {
     id: productTreeItemDelegate;
 
-    root: tableView;
+    //root: tableView;
 
     signal addButtonClicked();
     signal removeButtonClicked();
@@ -13,11 +13,11 @@ TreeViewItemDelegateBase {
     rowBodyDelegate: Component { Row {
             id: row;
 
-            height: root.rowItemHeight;
+            height: productTreeItemDelegate.root ? root.rowItemHeight : 0;
 
             Item {
                 width: checkBox.visible ? 20 : 0;
-                height: productTreeItemDelegate.root.rowItemHeight;
+                height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
                 CheckBox {
                     id: checkBox;
@@ -38,8 +38,8 @@ TreeViewItemDelegateBase {
             Item {
                 id: nameItem;
 
-                width: productTreeItemDelegate.root.width / productTreeItemDelegate.root.columnCount - 20 * model.Level;
-                height: productTreeItemDelegate.root.rowItemHeight;
+                width: productTreeItemDelegate.root ? productTreeItemDelegate.root.width / productTreeItemDelegate.root.columnCount - 20 * model.Level : 0;
+                height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
                 Text {
                     anchors.verticalCenter: nameItem.verticalCenter;
@@ -60,7 +60,7 @@ TreeViewItemDelegateBase {
 
                     cursorShape: Qt.IBeamCursor;
 
-                    visible: !productTreeItemDelegate.root.readOnly && model.Level == 0;
+                    visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                     onClicked: {
                         mouseArea.clicked(null);
@@ -108,8 +108,8 @@ TreeViewItemDelegateBase {
             Item {
                 id: idItem;
 
-                width: productTreeItemDelegate.root.width / (productTreeItemDelegate.root.columnCount + 1);
-                height: productTreeItemDelegate.root.rowItemHeight;
+                width: productTreeItemDelegate.root ? productTreeItemDelegate.root.width / (productTreeItemDelegate.root.columnCount + 1) : 0;
+                height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
                 Item {
                     width: parent.width;
@@ -136,7 +136,7 @@ TreeViewItemDelegateBase {
 
                         cursorShape: Qt.IBeamCursor;
 
-                        visible: !productTreeItemDelegate.root.readOnly && model.Level == 0;
+                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                         onClicked: {
                             mouseArea.clicked(null);
@@ -180,8 +180,8 @@ TreeViewItemDelegateBase {
             Item {
                 id: descriptionItem;
 
-                width: productTreeItemDelegate.root.width / (productTreeItemDelegate.root.columnCount + 1);
-                height: productTreeItemDelegate.root.rowItemHeight;
+                width: productTreeItemDelegate.root ? productTreeItemDelegate.root.width / (productTreeItemDelegate.root.columnCount + 1) : 0;
+                height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
                 Item {
                     width: parent.width;
@@ -208,7 +208,7 @@ TreeViewItemDelegateBase {
 
                         cursorShape: Qt.IBeamCursor;
 
-                        visible: !productTreeItemDelegate.root.readOnly && model.Level == 0;
+                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                         onClicked: {
                             mouseArea.clicked(null);
@@ -253,7 +253,7 @@ TreeViewItemDelegateBase {
                 id: addButtonRect;
 
                 width: 18;
-                height: productTreeItemDelegate.root.rowItemHeight;
+                height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
                 visible: model.Level == 0;
 
@@ -278,7 +278,7 @@ TreeViewItemDelegateBase {
                 id: removeButtonRect;
 
                 width: 18;
-                height: productTreeItemDelegate.root.rowItemHeight;
+                height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
                 visible: model.Level == 1;
 

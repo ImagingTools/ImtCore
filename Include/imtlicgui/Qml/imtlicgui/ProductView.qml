@@ -395,6 +395,7 @@ DocumentBase {
         readOnly: false;
 
         rowDelegate: ProductViewItemDelegate {
+            root: tableView;
             onAddButtonClicked: {
                 tableView.selectedIndex = modelIndex;
                 console.log("ProductViewItemDelegate onButtonClicked");
