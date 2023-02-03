@@ -9,7 +9,7 @@ FocusScope {
 
     visible: model.Visible;
 
-    property var root;
+    property Item root: null;
 
     property alias mouseArea: mouseAreaBase;
 

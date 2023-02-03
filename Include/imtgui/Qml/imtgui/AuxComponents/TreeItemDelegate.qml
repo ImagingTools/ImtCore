@@ -10,6 +10,8 @@ Item {
 
     property TreeItemModel childModel: model.ChildModel ? model.ChildModel : null;
 
+    property Item rootItem: null;
+
     property int state: model.State;
     property string itemId: model.Id;
 
@@ -127,7 +129,7 @@ Item {
                         model.State = Qt.Checked - model.State;
                     }
 
-                    treeViewContainer.itemsStateChanged(treeItemDelegate.itemData);
+                    treeItemDelegate.rootItem.itemsStateChanged(treeItemDelegate.itemData);
 
 //                    treeView.childrenStateChanged(itemData, model.State);
 //                    treeView.parentStateChanged(itemData, model.State);
@@ -152,6 +154,7 @@ Item {
         }
     }
 
+
     Column {
         id: childrenColumn;
 
@@ -165,7 +168,9 @@ Item {
         Repeater {
             id: childModelRepeater;
 
-            delegate: treeViewContainer.itemDelegate;
+            //delegate: treeViewContainer.itemDelegate;
+            delegate: treeItemDelegate.rootItem.itemDelegate;
+
 
             onItemAdded: {
                 console.log('Repeater onItemAdded', itemData.Level);

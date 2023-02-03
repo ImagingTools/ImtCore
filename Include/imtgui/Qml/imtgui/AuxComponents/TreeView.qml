@@ -8,11 +8,12 @@ Rectangle {
 
     property TreeItemModel model: modelItems;
 
-    signal itemStateChanged(var itemData);
 
     property alias itemDelegate: delegateLoader.sourceComponent;
 
     property UndoRedoManager undoRedoManager;
+
+    signal itemStateChanged(var itemData);
 
     TreeItemModel {
         id: modelItems;
@@ -181,6 +182,12 @@ Rectangle {
 
     Loader {
         id: delegateLoader;
+
+        onLoaded:{
+            if(delegateLoader.item.rootItem !==undefined){
+                delegateLoader.item.rootItem = treeViewContainer;
+            }
+        }
 
         sourceComponent: TreeItemDelegate {
             width: treeViewContainer.width;
