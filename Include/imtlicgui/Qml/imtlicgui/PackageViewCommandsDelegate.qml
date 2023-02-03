@@ -61,7 +61,7 @@ DocumentWorkspaceCommandsDelegateBase {
             container.tableTreeViewEditor.removeRow(indexes);
 
             //Удаление всех зависимостей от этой фичи
-            let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
+            let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
             if (dependenciesModel){
 
                 for (let removedFeatureId of removedFeaturesIds){
@@ -95,7 +95,7 @@ DocumentWorkspaceCommandsDelegateBase {
     function selectedIndexChanged(){
 //        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
         let isEnabled = container.tableTreeViewEditor.selectedIndex != null;
-        packageViewContainer.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+        container.documentBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
     }
 
     Component {
@@ -116,7 +116,7 @@ DocumentWorkspaceCommandsDelegateBase {
                     container.tableTreeViewEditor.removeRow(indexes);
 
                     //Удаление всех зависимостей от этой фичи
-                    let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
+                    let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
                     if (dependenciesModel){
 
                         for (let removedFeatureId of removedFeaturesIds){
