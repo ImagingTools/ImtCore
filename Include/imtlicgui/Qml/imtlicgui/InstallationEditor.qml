@@ -550,7 +550,7 @@ Item {
         visible: titleLicenses.visible;
 
 
-        rowDelegate: LicenseInstanceItemDelegate {}
+        rowDelegate: LicenseInstanceItemDelegate {root: licensesTable;}
 
         Component.onCompleted: {
             licensesTable.addColumn({"Id": "Name", "Name": "License Name"});
