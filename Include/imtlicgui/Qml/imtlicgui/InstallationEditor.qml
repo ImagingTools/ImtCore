@@ -36,41 +36,19 @@ Item {
             productCB.enabled = false;
         }
 
-        let productId = orderProductsModel.GetData("ProductId", activeProductIndex);
-        let id = orderProductsModel.GetData("Id", activeProductIndex);
-        let pairId = orderProductsModel.GetData("PairId", activeProductIndex);
-        let categoryId = orderProductsModel.GetData("CategoryId", activeProductIndex);
-        let productModel = orderProductsModel;
 
-     //   selectedPairId = "";
-
-
-//        updatePairMadel();
-
-//        if (categoryId == "Software"){
-//            updateHardwareCategoryProducts()
-//        }
-//        else{
-//            updateSoftwareCategoryProducts()
-//        }
         if (installationEditorContainer.activeProductIndex == -1){
             installationEditorContainer.activeProductIndex = orderProductsModel.InsertNewItem();
+            if (!orderProductsModel.ContainsKey("Id", activeProductIndex)){
+                let uuid = uuidGenerator.generateUUID();
+                orderProductsModel.SetData("Id", uuid, activeProductIndex);
+            }
         }
 
-        generateId();
         updateGui();
-
-
-  //      console.log("started licensesModel", licensesModel.toJSON());
-
     }
 
-    function generateId(){
-        if (!orderProductsModel.ContainsKey("Id", activeProductIndex)){
-            let uuid = uuidGenerator.generateUUID();
-            orderProductsModel.SetData("Id", uuid, activeProductIndex);
-        }
-    }
+
 
     function getProductName(productId){
         let productModel = installationEditorContainer.productsModel;
@@ -85,7 +63,7 @@ Item {
         return retVal;
     }
 
-    function updatePairMadel(){
+    function updatePairModel(){
         let categoryId = orderProductsModel.GetData("CategoryId", activeProductIndex)
         let id = orderProductsModel.GetData("Id", activeProductIndex)
         let isPairFinded = false;
@@ -188,7 +166,6 @@ Item {
         let id = orderProductsModel.GetData("Id", activeProductIndex);
         let pairId = orderProductsModel.GetData("PairId", activeProductIndex);
         let categoryId = orderProductsModel.GetData("CategoryId", activeProductIndex);
-        let macAddress = orderProductsModel.GetData("MacAddress", activeProductIndex);
 
         let productModel = productCB.model;
         if (productModel){
@@ -364,7 +341,7 @@ Item {
                     orderProductsModel.SetData("CategoryId",  bodyColumn.productCategory, activeProductIndex);
                 }
 
-                updatePairMadel();
+                updatePairModel();
                 if (bodyColumn.productCategory == "Software"){
                     updateHardwareCategoryProducts()
                 }
@@ -475,6 +452,7 @@ Item {
                     clearPairLink();
                     pairCB.currentIndex = -1;
                     pairCB.model.Clear();
+                    //updatePairModel();
                     if (bodyColumn.productCategory == "Software"){
                         updateHardwareCategoryProducts()
                     }
