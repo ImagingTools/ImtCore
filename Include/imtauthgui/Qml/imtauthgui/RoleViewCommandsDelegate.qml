@@ -6,7 +6,7 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: delegateContainer;
 
-    property var selectedIndex: includedRolesTable.selectedIndex;
+    property var selectedIndex: delegateContainer.documentBase ? delegateContainer.documentBase.includedRolesTable.selectedIndex : 0;
 
     property TreeItemModel rolesModel: TreeItemModel {};
 
@@ -35,21 +35,21 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onCommandActivated: {
-        console.log("DocumentCommands onCommandActivated", container.itemId, commandId);
+        console.log("DocumentCommands onCommandActivated", delegateContainer.documentBase.itemId, commandId);
 
         if (commandId === "Include"){
             let productId = delegateContainer.documentBase.documentModel.GetData("ProductId");
 
-            modalDialogManager.openDialog(rolesDialog, {"currentRoleId": container.itemId,
+            modalDialogManager.openDialog(rolesDialog, {"currentRoleId": delegateContainer.documentBase.itemId,
                                               "productId": productId,
                                               "model":     delegateContainer.rolesModel});
         }
         else if (commandId === "Exclude"){
-            let indexes = includedRolesTable.selectedIndex.getIndexes();
+            let indexes = delegateContainer.documentBase.includedRolesTable.selectedIndex.getIndexes();
 
-            includedRolesTable.removeRow(indexes);
+            delegateContainer.documentBase.includedRolesTable.removeRow(indexes);
 
-            includedRolesTable.selectedIndex = null;
+            delegateContainer.documentBase.includedRolesTable.selectedIndex = null;
         }
     }
 
@@ -65,8 +65,8 @@ DocumentWorkspaceCommandsDelegateBase {
 
                     let row = {"Id": parentId, "Name": parentName};
 
-                    for (let i = 0; i < includedRolesTable.rowCount; i++){
-                        let rowObj = includedRolesTable.rowModel.get(i);
+                    for (let i = 0; i < delegateContainer.documentBase.includedRolesTable.rowCount; i++){
+                        let rowObj = delegateContainer.documentBase.includedRolesTable.rowModel.get(i);
                         let rowId = rowObj["Id"];
 
                         if (parentId == rowId){
@@ -76,7 +76,7 @@ DocumentWorkspaceCommandsDelegateBase {
                         }
                     }
 
-                    includedRolesTable.addRow(row);
+                    delegateContainer.documentBase.includedRolesTable.addRow(row);
                 }
             }
         }
