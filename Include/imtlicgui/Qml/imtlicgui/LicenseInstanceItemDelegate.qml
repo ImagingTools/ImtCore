@@ -5,12 +5,12 @@ import imtgui  1.0
 TableViewItemDelegateBase {
     id: packageTreeItemDelegate;
 
-    root: licensesTable;
+    //root: licensesTable;
 
     rowBodyDelegate: Component { Row {
             id: row;
 
-            height: root.rowItemHeight;
+            height: packageTreeItemDelegate.root ? root.rowItemHeight :0;
 
             Item {
                 id: leftPart;
