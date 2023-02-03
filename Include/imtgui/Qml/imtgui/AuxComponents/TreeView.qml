@@ -79,8 +79,8 @@ Rectangle {
      }
 
     function refreshModel(){
-        treeViewContainer.model = 0;
-        treeViewContainer.model = treeViewModel.modelTreeView;
+//        treeViewContainer.model = 0;
+//        treeViewContainer.model = treeViewModel.modelTreeView;
     }
 
     function resetSelectedItem(model){

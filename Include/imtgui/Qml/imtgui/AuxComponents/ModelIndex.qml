@@ -20,9 +20,6 @@ Item {
     function equal(otherIndex){
 
         console.log("equal")
-        if (!otherIndex || level != otherIndex.level){
-            return false;
-        }
 
         return root._equalRecursive(root, otherIndex);
     }

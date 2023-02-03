@@ -14,9 +14,7 @@ Item {
         console.log("ERROR: ",message);
     }
 
-    function updateModel(){
-        userModeGqlModel.getUserMode();
-    }
+
 
     function authorization(loginF, passwordF){
         console.log('DEBUG::authorization', loginF, passwordF);
