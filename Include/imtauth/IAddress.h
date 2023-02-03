@@ -36,7 +36,7 @@ public:
 		MIT_POSTAL_CODE,
 
 		/**
-			Streer given as QString.
+            Street given as QString.
 		*/
 		MIT_STREET
 	};
