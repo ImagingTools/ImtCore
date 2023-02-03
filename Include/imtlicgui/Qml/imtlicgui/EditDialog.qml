@@ -17,11 +17,14 @@ Dialog {
 
     property TreeItemModel featuresModel;
     property alias subFeaturesModel: subFeaturesCopyModel;
+    property alias dialogModel: dialogModel;
 
     property int index: -1;
 
     contentComp: EditDialogBody {
         id: dialogBody;
+
+        rootItem: editDialogContainer;
     }
 
     TreeItemModel {

@@ -9,6 +9,8 @@ FocusScope {
 
     property alias treeViewEditor: treeView;
 
+    property Item rootItem: null;
+
     onFocusChanged: {
         console.log("InputBody onFocusChanged", container.focus);
 
@@ -37,7 +39,7 @@ FocusScope {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
 
-            text: editDialogContainer.titleName;
+            text: container.rootItem ? container.rootItem.titleName : "";
         }
 
         CustomTextField {
@@ -46,21 +48,21 @@ FocusScope {
             width: bodyColumn.width;
             height: 30;
 
-            text: editDialogContainer.valueName;
+            text: container.rootItem ? container.rootItem.valueName : "";
 
             KeyNavigation.tab: inputId;
 
             onTextChanged: {
 //                editDialogContainer.valueName = inputName.text;
 
-                dialogModel.SetData("Name", inputName.text);
+                container.rootItem.dialogModel.SetData("Name", inputName.text);
             }
 
             onAccepted: {
 //                if (checkValidId(inputId.text)){
 //                    editDialogContainer.buttons.buttonClicked('Ok')
 //                }
-                editDialogContainer.buttons.buttonClicked('Ok')
+                container.rootItem.buttons.buttonClicked('Ok');
             }
         }
 
@@ -71,7 +73,7 @@ FocusScope {
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
 
-            text: editDialogContainer.titleId;
+            text: container.rootItem ? container.rootItem.titleId : "";
         }
 
         CustomTextField {
@@ -80,7 +82,7 @@ FocusScope {
             width: bodyColumn.width;
             height: 30;
 
-            text: editDialogContainer.valueId;
+            text: container.rootItem ? container.rootItem.valueId : "";
 
             onTextInputFocusChanged: {
                 if (textInputFocus && inputId.text == ""){
@@ -89,19 +91,19 @@ FocusScope {
             }
 
             onTextChanged: {
-                if (inputId.text != valueId){
+                if (container.rootItem && inputId.text != container.rootItem.valueId){
 
                     let state = container.checkValidId(inputId.text);
                     if (state){
-                        dialogModel.SetData("Id", inputId.text);
+                        container.rootItem.dialogModel.SetData("Id", inputId.text);
                     }
 
-                    editDialogContainer.buttons.setButtonState('Ok', state)
+                    container.rootItem.buttons.setButtonState('Ok', state)
                 }
             }
 
             onAccepted: {
-                editDialogContainer.buttons.buttonClicked('Ok')
+                container.rootItem.buttons.buttonClicked('Ok')
             }
 
             KeyNavigation.tab: inputName;
@@ -134,8 +136,8 @@ FocusScope {
             return false
         }
 
-        for (let i = 0; i < featuresModel.GetItemsCount(); i++){
-            let id = featuresModel.GetData("Id", i);
+        for (let i = 0; i < container.rootItem.featuresModel.GetItemsCount(); i++){
+            let id = container.rootItem.featuresModel.GetData("Id", i);
             if (id === inputId){
                 return false;
             }
