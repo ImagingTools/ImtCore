@@ -73,11 +73,12 @@ Item {
         if (orderProductsModel){
             for (let i = 0; i < orderProductsModel.GetItemsCount(); i++){
                 //  let modelMacAddress = productModel.GetData("PairId", i);
-                if (categoryId == "Hardware" && orderProductsModel.GetData("CategoryId", i) == "Software"
-                        && findHardwarePair(orderProductsModel.GetData("Id", i)) !== ""){
+                if (categoryId == "Hardware" && orderProductsModel.GetData("PairId", activeProductIndex) === orderProductsModel.GetData("Id", i)
+                        && orderProductsModel.GetData("CategoryId", i) == "Software"){
                     isPairFinded = true;
                 }
-                if (categoryId == "Software" && id === orderProductsModel.GetData("PairId", i) && orderProductsModel.GetData("CategoryId", i) == "Hardware"){
+                if (categoryId == "Software" && id === orderProductsModel.GetData("PairId", i)
+                        && orderProductsModel.GetData("CategoryId", i) == "Hardware"){
                     isPairFinded = true;
                 }
                 if (isPairFinded){
@@ -352,7 +353,7 @@ Item {
                 console.log("InstallationEditor onCurrentIndexChanged",productCB.currentIndex, pairCB.model.toJSON());
 
                 if (!blockUpdatingModel){
-                    installationEditorContainer.updateModel();
+                 //   installationEditorContainer.updateModel();
                     installationEditorContainer.updateGui();
                 }
             }
