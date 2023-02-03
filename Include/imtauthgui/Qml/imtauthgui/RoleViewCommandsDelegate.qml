@@ -38,7 +38,7 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("DocumentCommands onCommandActivated", container.itemId, commandId);
 
         if (commandId === "Include"){
-            let productId = documentModel.GetData("ProductId");
+            let productId = delegateContainer.documentBase.documentModel.GetData("ProductId");
 
             modalDialogManager.openDialog(rolesDialog, {"currentRoleId": container.itemId,
                                               "productId": productId,
@@ -158,7 +158,7 @@ DocumentWorkspaceCommandsDelegateBase {
     //                    dataModelLocal = permissionModel.GetData("data");
     //                    dataModelLocal = dataModelLocal.GetData("ProductFeatures");
 
-    //                    documentModel.SetData("Permissions", dataModelLocal);
+    //                    delegateContainer.documentBase.documentModel.SetData("Permissions", dataModelLocal);
 
     //                    container.updateGui();
     //                }

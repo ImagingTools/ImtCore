@@ -91,7 +91,7 @@ DocumentWorkspaceCommandsDelegateBase {
         EditLicenseDialog {
             onFinished: {
                 if (buttonId == "Ok"){
-                    let elementsModel = documentModel.GetData("Items");
+                    let elementsModel = container.documentBase.documentModel.GetData("Items");
 
                     let oldId = elementsModel.GetData("Id", container.selectedIndex);
                     let oldName = elementsModel.GetData("Name", container.selectedIndex);
