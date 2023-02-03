@@ -339,9 +339,6 @@ export class QtObject {
                         if(_caller.val !== val){
                             _caller.val = val
                             _caller.signal()
-                            // if(_caller.type === 'alias'){
-                            //     _caller.setter(val)
-                            // }
                         }
                     }
                 }
@@ -400,10 +397,6 @@ export class QtObject {
                             if(_caller.val !== val){
                                 _caller.val = val
                                 _caller.signal()
-                                // if(_caller.type === 'alias'){
-                                //     _caller.setter(val)
-                                // }
-
                             }
                         }
                     }
@@ -499,9 +492,6 @@ export class QtObject {
                         if(_caller.val !== val){
                             _caller.val = val
                             _caller.signal()
-                            // if(_caller.type === 'alias'){
-                            //     _caller.setter(val)
-                            // }
                         }
                     }
                 }

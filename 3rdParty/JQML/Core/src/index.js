@@ -131,7 +131,7 @@ global.IDManager = {
         return current.obj
     },
     get: function(obj, ID){
-        if(obj[ID]) return obj[ID]
+        if(obj.ID.has(ID)) return obj
         if(obj.ID && obj.ID.has(ID)) return obj
         if(this.list[ID] && this.list[ID].length === 1) return this.list[ID][0]
         let current = {
@@ -141,7 +141,7 @@ global.IDManager = {
         return this.find(obj, ID, current, 1, new Set([obj]))
     },
     get0: function(obj, ID){
-        if(obj[ID]) return obj[ID]
+        // if(obj.ID.has(ID)) return obj
         if(this.list[ID] && this.list[ID].length === 1) return this.list[ID][0]
         let current = {
             len: 99999999,

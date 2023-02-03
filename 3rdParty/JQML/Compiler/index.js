@@ -1071,7 +1071,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
             code.push(`${curr}.$sizeHeightAuto=false`)
         }
     }
-    if(instructions.class === 'Flickable' || instructions.class === 'ListView' || instructions.class === 'GridView' || instructions.class === 'Text'){
+    if(instructions.class === 'Flickable' || instructions.class === 'ListView' || instructions.class === 'GridView' || instructions.class === 'Text' || instructions.class === 'TextInput'){
         if(instructions.properties.contentWidth || instructions.propertiesLazy.contentWidth) code.push(`${curr}.$contentWidthAuto=false`)
         if(instructions.properties.contentHeight || instructions.propertiesLazy.contentHeight) code.push(`${curr}.$contentHeightAuto=false`)
     }
