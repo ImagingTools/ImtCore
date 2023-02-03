@@ -212,6 +212,7 @@ Item {
                 withoutSelection: true;
 
                 rowDelegate: TableUserRolesDelegate {
+                    root: rolesTable;
                     Component.onCompleted: {
                         rolesTable.height += height;
                     }

@@ -7,7 +7,7 @@ TableViewItemDelegateBase {
 
     height: root.rowItemHeight + footerItem.height;
 
-    root: rolesTable;
+    //root: rolesTable;
 
     highlightDelegate: Rectangle {
         id: highlight;
@@ -21,11 +21,11 @@ TableViewItemDelegateBase {
     }
 
     rowBodyDelegate: Component { Row {
-            height: root.rowItemHeight;
+            height: productRolesDelegate.root ? productRolesDelegate.root.rowItemHeight : 0;
             width: parent.width;
 
             Item {
-                height: root.rowItemHeight;
+                height: productRolesDelegate.root ? productRolesDelegate.root.rowItemHeight : 0;
                 width: parent.width;
 
                 Text {
@@ -72,13 +72,13 @@ TableViewItemDelegateBase {
                 id: rolesRepeater;
 
                 width: parent.width;
-                height: rolesRepeater.count * root.rowItemHeight;
+                height: productRolesDelegate.root ? lesRepeater.count * productRolesDelegate.root.rowItemHeight : 0;
 
                 spacing: -1;
 
                 delegate: Rectangle {
                     width: productRolesDelegate.width;
-                    height: root.rowItemHeight;
+                    height: productRolesDelegate.root ? productRolesDelegate.root.rowItemHeight : 0;
 
                     border.width: 1;
                     border.color: Style.borderColor;
@@ -98,7 +98,7 @@ TableViewItemDelegateBase {
                             console.log("checkBoxRole onClicked", model.CheckState)
                             model.CheckState = Qt.Checked - model.CheckState;
 
-                            root.rowModelDataChanged(productRolesDelegate, "CheckState");
+                            productRolesDelegate.root.rowModelDataChanged(productRolesDelegate, "CheckState");
                         }
                     }
 
@@ -123,7 +123,7 @@ TableViewItemDelegateBase {
 
 //                delegate: Rectangle {
 //                    width: productRolesDelegate.width;
-//                    height: root.rowItemHeight;
+//                    height: productRolesDelegate.root ? productRolesDelegateroot.rowItemHeight : 0;
 
 //                    border.width: 1;
 //                    border.color: Style.borderColor;
@@ -143,7 +143,7 @@ TableViewItemDelegateBase {
 //                            console.log("checkBoxRole onClicked", model.CheckState)
 //                            model.CheckState = Qt.Checked - model.CheckState;
 
-//                            root.rowModelDataChanged(productRolesDelegate, "CheckState");
+//                            productRolesDelegate.root.rowModelDataChanged(productRolesDelegate, "CheckState");
 //                        }
 //                    }
 
