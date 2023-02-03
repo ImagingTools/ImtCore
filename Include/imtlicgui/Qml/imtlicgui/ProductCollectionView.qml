@@ -108,7 +108,7 @@ CollectionView {
                 placeHolderText: qsTr("Filter text");
 
                 onTextChanged: {
-                    loaderDecorator.textChanged(model.index, tfc.text);
+                    productCollectionViewContainer.filterMenu.loaderDecorator.textChanged(model.index, tfc.text);
                 }
 
                 AuxButton {

@@ -7,6 +7,8 @@ Item {
 
     height: 30;
 
+    property Item rootLoader: null;
+
     onVisibleChanged: {
         console.log("filterPanelDecorator", filterPanelDecorator.visible);
 
@@ -46,7 +48,7 @@ Item {
             placeHolderText: qsTr("Enter some text to filter the item list");
 
             onTextChanged: {
-                loaderDecorator.textChanged(model.index, tfc.text);
+                filterPanelDecorator.rootLoader.textChanged(model.index, tfc.text);
             }
 
             AuxButton {
@@ -81,7 +83,7 @@ Item {
 
             onClicked: {
                 tfc.text = "";
-                loaderDecorator.onClosed();
+                filterPanelDecorator.rootLoader.onClosed();
             }
         }
     }

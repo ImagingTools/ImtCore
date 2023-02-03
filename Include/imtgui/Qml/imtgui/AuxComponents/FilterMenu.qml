@@ -8,10 +8,12 @@ Rectangle {
 
     color: Style.backgroundColor;
 
+    property alias loaderDecorator: loaderDecorator;
+    property string decoratorSource;
+
     signal textFilterChanged(int index, string text);
     signal closed();
 
-    property string decoratorSource;
 
     onDecoratorSourceChanged: {
         console.log("loaderDecorator.source", filterContainer.decoratorSource);
@@ -35,6 +37,9 @@ Rectangle {
             if (loaderDecorator.item){
                 loaderDecorator.item.width = filterContainer.width;
                 filterContainer.height = loaderDecorator.item.height;
+                if(loaderDecorator.item.rootLoader !==undefined){
+                    loaderDecorator.item.rootLoader = loaderDecorator;
+                }
             }
         }
     }
