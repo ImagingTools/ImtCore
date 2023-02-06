@@ -22,7 +22,9 @@ DocumentBase {
     property int mainMargin: 0;
     property int panelWidth: 150;
 
-
+    onIncludedRolesTableChanged: {
+        console.log("onIncludedRolesTableChanged", container.includedRolesTable);
+    }
 
     onItemNameChanged: {
         if (container.documentModel.ContainsKey("Name")){

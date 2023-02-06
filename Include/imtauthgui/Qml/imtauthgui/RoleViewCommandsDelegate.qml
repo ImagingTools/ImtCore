@@ -65,8 +65,8 @@ DocumentWorkspaceCommandsDelegateBase {
 
                     let row = {"Id": parentId, "Name": parentName};
 
-                    for (let i = 0; i < includedRolesTable.rowCount; i++){
-                        let rowObj = includedRolesTable.rowModel.get(i);
+                    for (let i = 0; i < delegateContainer.documentBase.includedRolesTable.rowCount; i++){
+                        let rowObj = delegateContainer.documentBase.includedRolesTable.rowModel.get(i);
                         let rowId = rowObj["Id"];
 
                         if (parentId == rowId){
@@ -76,7 +76,7 @@ DocumentWorkspaceCommandsDelegateBase {
                         }
                     }
 
-                    includedRolesTable.addRow(row);
+                    delegateContainer.documentBase.includedRolesTable.addRow(row);
                 }
             }
         }

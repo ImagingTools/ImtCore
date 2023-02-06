@@ -33,9 +33,9 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
-
 		if (featurePackagePtr == nullptr){
-			errorMessage = QT_TR_NOOP("Unable to get an feature package");
+			SendErrorMessage(0, "Unable to get a feature package", "Package Controller");
+
 			return nullptr;
 		}
 

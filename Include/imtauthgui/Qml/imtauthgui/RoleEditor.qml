@@ -18,14 +18,13 @@ Item {
     signal commandModeChanged(string commandId, bool newMode);
 
     Component.onCompleted: {
-         roleEditorContainer.documentBase.includedRolesTable = includesTable;
-
         roleNameInput.focus = true;
     }
 
     onDocumentBaseChanged: {
         console.log("onDocumentBaseChanged", roleEditorContainer.documentBase);
         if (roleEditorContainer.documentBase != null){
+            roleEditorContainer.documentBase.includedRolesTable = includesTable;
             roleEditorContainer.documentBase.commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
             roleEditorContainer.documentBase.commandsProvider.commandModeChanged.connect(commandModeChanged);
         }
