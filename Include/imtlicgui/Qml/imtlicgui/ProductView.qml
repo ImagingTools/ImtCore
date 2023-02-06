@@ -426,6 +426,18 @@ DocumentBase {
         }
     }
 
+    CustomScrollbar {
+        id: scrollbar;
+
+        z: 100;
+
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+
+        secondSize: 10;
+        targetItem: tableView.tableListView;
+    }
+
     BasicTreeView {
         id: tableView;
 

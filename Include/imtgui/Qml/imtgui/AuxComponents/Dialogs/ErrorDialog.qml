@@ -11,6 +11,12 @@ Dialog {
 
     property string message;
 
+    Keys.onPressed: {
+        if (event.key == Qt.Key_Enter){
+            messageDialog.finished("Ok");
+        }
+    }
+
     Component.onCompleted: {
         messageDialog.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": true});
     }

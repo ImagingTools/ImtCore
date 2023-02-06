@@ -9,6 +9,12 @@ Dialog {
     property string message;
     property string inputValue;
 
+    Keys.onPressed: {
+        if (event.key == Qt.Key_Enter){
+            inputDialogContainer.finished("Ok");
+        }
+    }
+
     onFinished: {
         if (buttonId === "Ok"){
             inputDialogContainer.inputValue = inputDialogContainer.bodyItem.inputValue;

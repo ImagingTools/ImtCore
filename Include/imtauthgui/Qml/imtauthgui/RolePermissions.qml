@@ -164,6 +164,18 @@ Item {
         }
     }//Loader
 
+    CustomScrollbar {
+        id: scrollbar;
+
+        z: 100;
+
+        anchors.right: permissionsTable.right;
+        anchors.bottom: permissionsTable.bottom;
+
+        secondSize: 10;
+        targetItem: permissionsTable.tableListView;
+    }
+
     BasicTreeView {
         id: permissionsTable;
 

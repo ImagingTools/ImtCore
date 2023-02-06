@@ -39,6 +39,12 @@ Rectangle {
         TopPanelDialog{}
     }
 
+    Keys.onPressed: {
+        if (event.key == Qt.Key_Escape){
+            dialogContainer.root.closeDialog();
+        }
+    }
+
 
     onFocusChanged: {
         console.log("Dialog onFocusChanged", dialogContainer.focus);
