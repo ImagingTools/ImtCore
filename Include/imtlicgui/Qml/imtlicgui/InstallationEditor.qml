@@ -88,7 +88,7 @@ Item {
                     dependencyModel.SetData("Id", orderProductsModel.GetData("Id", i), 0);
 //                    dependencyModel.SetData("MacAddress", orderProductsModel.GetData("MacAddress", i), index);
                     let productId = orderProductsModel.GetData("ProductId", i);
-                    dependencyModel.SetData("Name", getProductName(productId), index);
+                    dependencyModel.SetData("Name", "#" + (i + 1) + " " + getProductName(productId), index);
                     pairCB.currentIndex = 0;
                     break;
                 }
@@ -110,8 +110,7 @@ Item {
                 let productId = productModel.GetData("ProductId", i);
                 resultModel.SetData("ProductId", productId, resultIndex);
                 resultModel.SetData("Id", productModel.GetData("Id", i), resultIndex);
-//                resultModel.SetData("MacAddress", productModel.GetData("MacAddress", i), resultIndex);
-                resultModel.SetData("Name", getProductName(productId), resultIndex);
+                resultModel.SetData("Name", "#" + (i + 1) + " " + getProductName(productId), resultIndex);
             }
         }
         console.log("updateHardwareCategoryProducts", resultModel.toJSON())
@@ -151,7 +150,7 @@ Item {
                     resultModel.SetData("ProductId", productId, resultIndex);
                     resultModel.SetData("Id", productModel.GetData("Id", i), resultIndex);
                     resultModel.SetData("MacAddress", productModel.GetData("MacAddress", i), resultIndex);
-                    resultModel.SetData("Name", getProductName(productId), resultIndex);
+                    resultModel.SetData("Name", "#" + (i + 1) + " " + getProductName(productId), resultIndex);
                 }
             }
         }
