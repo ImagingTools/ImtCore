@@ -8,6 +8,9 @@ import QtQuick.Dialogs 1.3
 CollectionViewCommandsDelegateBase {
     id: container;
 
+    removeDialogTitle: qsTr("Deleting a product");
+    removeMessage: qsTr("Delete the selected product ?");
+
     onSelectedIndexChanged: {
         console.log("ProductCollectionViewCommands onSelectedIndexChanged");
 

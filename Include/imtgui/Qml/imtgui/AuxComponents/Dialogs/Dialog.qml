@@ -40,6 +40,8 @@ Rectangle {
     }
 
     Keys.onPressed: {
+        console.log("Dialog onPressed", event.key);
+
         if (event.key == Qt.Key_Escape){
             dialogContainer.root.closeDialog();
         }

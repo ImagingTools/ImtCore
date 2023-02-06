@@ -172,6 +172,8 @@ Item {
         anchors.right: permissionsTable.right;
         anchors.bottom: permissionsTable.bottom;
 
+        backgroundColor: Style.baseColor;
+
         secondSize: 10;
         targetItem: permissionsTable.tableListView;
     }

@@ -12,8 +12,6 @@ Rectangle {
 
     property string message;
 
-
-
     Column {
         id: columnBody;
 

@@ -5,13 +5,10 @@ import imtgui 1.0
 CollectionViewCommandsDelegateBase {
     id: container;
 
-    Component.onCompleted: {
-//        collectionViewBase.commands.onItemsChanged.connect(updateTreeView);
-    }
+    removeDialogTitle: qsTr("Deleting a feature package");
+    removeMessage: qsTr("Delete the selected package ?");
 
     onRemoved: {
-//        Events.sendEvent("TreeViewModelUpdate");
-
         featuresProvider.updateModel();
     }
 }

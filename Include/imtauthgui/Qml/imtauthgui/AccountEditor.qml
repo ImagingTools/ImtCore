@@ -127,6 +127,8 @@ DocumentBase {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
 
+        backgroundColor: Style.baseColor;
+
         secondSize: 10;
         targetItem: flickable;
     }

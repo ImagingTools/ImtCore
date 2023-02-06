@@ -174,22 +174,23 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 		imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
-			imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles();
+			if (m_roleInfoProviderCompPtr.IsValid()){
+				int index = dataModel->InsertNewItem();
+				dataModel->SetData("Name", "Roles", index);
 
-			int index = dataModel->InsertNewItem();
-			dataModel->SetData("Name", "Roles", index);
+				imtbase::CTreeItemModel* children = dataModel->AddTreeModel("Children", index);
 
-			imtbase::CTreeItemModel* children = dataModel->AddTreeModel("Children", index);
+				imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles();
+				for (const QByteArray& productRoleId : rolesIds){
+					const imtauth::IRole* rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
+					if (rolePtr != nullptr){
+						QByteArray roleId = rolePtr->GetRoleId();
+						QString roleName = rolePtr->GetRoleName();
+						QByteArray productId = rolePtr->GetProductId();
 
-			for (const QByteArray& productRoleId : rolesIds){
-				QStringList data = QString(productRoleId).split(*m_separatorObjectIdAttrPtr);
-
-				if (data.size() == 2){
-					QByteArray roleId = data[0].toUtf8();
-					QByteArray productId = data[1].toUtf8();
-
-					int childrenIndex = children->InsertNewItem();
-					children->SetData("Value", roleId + " (" + productId + ")", childrenIndex);
+						int childrenIndex = children->InsertNewItem();
+						children->SetData("Value", roleName + " (" + productId + ")", childrenIndex);
+					}
 				}
 			}
 		}

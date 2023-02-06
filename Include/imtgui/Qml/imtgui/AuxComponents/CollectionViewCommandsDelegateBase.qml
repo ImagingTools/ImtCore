@@ -31,6 +31,9 @@ Item {
     signal descriptionSetted(string id, string description);
     signal removed(string id);
 
+    property string removeDialogTitle: qsTr("Deleting a selected element");
+    property string removeMessage: qsTr("Remove selected item from the collection ?");
+
     /**
         Requests IDs for GQL models
     */
@@ -93,7 +96,7 @@ Item {
                 containerBase.collectionViewBase.selectItem("", "<new item>");
             }
             else if (commandId === "Remove"){
-                modalDialogManager.openDialog(removeDialog, {"message": qsTr("Remove selected item from the collection ?")});
+                modalDialogManager.openDialog(removeDialog, {});
             }
             else if (commandId === "Edit"){
                 let itemId = containerBase.tableData.getSelectedId();
@@ -154,6 +157,8 @@ Item {
     Component {
         id: removeDialog;
         MessageDialog {
+            message: containerBase.removeMessage;
+            title: containerBase.removeDialogTitle;
             onFinished: {
                 if (buttonId == "Yes"){
                     let itemId = containerBase.tableData.getSelectedId();
@@ -166,6 +171,7 @@ Item {
     Component {
         id: renameDialog;
         InputDialog {
+            title: qsTr("Rename document");
             onFinished: {
                 if (buttonId == "Ok"){
                     renameQuery.rename(inputValue);
@@ -177,6 +183,7 @@ Item {
     Component {
         id: setDescriptionDialog;
         InputDialog {
+            title: qsTr("Set description");
             onFinished: {
                 if (buttonId == "Ok"){
                     setDescriptionQuery.setDescription(inputValue);

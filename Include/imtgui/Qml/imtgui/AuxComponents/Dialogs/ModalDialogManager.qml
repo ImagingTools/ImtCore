@@ -80,7 +80,9 @@ Item {
                         dialogLoader.anchors.centerIn = dialogDelegate;
                     }
                     dialogLoader.item.started()
-                    dialogLoader.item.forceActiveFocus();
+
+                    dialogLoader.item.focus = true;
+//                    dialogLoader.item.forceActiveFocus();
                 }
             }
         }

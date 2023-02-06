@@ -18,6 +18,7 @@ Row {
     }
 
     onPagesSizeChanged: {
+        console.log("ProductCollectionViewCommands onSelectedIndexChanged");
         paginationContainer.refreshBtn();
     }
 
@@ -41,7 +42,7 @@ Row {
             listModel.append({number: paginationContainer.currentValue + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentValue === paginationContainer.pagesSize - 2});
             [paginationContainer.pagesSize - 1, paginationContainer.pagesSize].map(function(v){listModel.append({number: v, selected: paginationContainer.currentValue === v})});
         }
-        repeaterPagination.model = listModel
+        repeaterPagination.model = listModel;
     }
 
     AuxButton {

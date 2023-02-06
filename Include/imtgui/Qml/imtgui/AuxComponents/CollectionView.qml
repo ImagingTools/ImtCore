@@ -64,6 +64,14 @@ Item {
         }
     }
 
+    onDocumentManagerChanged: {
+        if (collectionViewContainer.documentManager != null){
+            if (commandsLoader.item && commandsLoader.item.documentManager !== undefined){
+                commandsLoader.item.documentManager = collectionViewContainer.documentManager;
+            }
+        }
+    }
+
     onCommandsIdChanged: {
         console.log("this onItemIdChanged", collectionViewContainer.commandsId);
 

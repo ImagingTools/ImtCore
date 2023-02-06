@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
+#include <imtlic/CFeaturePackage.h>
 #include <imtauth/CRole.h>
 
 
@@ -82,17 +83,27 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 			}
 		}
 
-		index = dataModelPtr->InsertNewItem();
+		if (m_featureInfoProviderCompPtr.IsValid()){
+			imtlic::CFeaturePackage* featurePackagePtr = dynamic_cast<imtlic::CFeaturePackage*>(m_featureInfoProviderCompPtr.GetPtr());
+			if (featurePackagePtr != nullptr){
+				index = dataModelPtr->InsertNewItem();
 
-		dataModelPtr->SetData("Name", "Permissions", index);
-		children = dataModelPtr->AddTreeModel("Children", index);
+				dataModelPtr->SetData("Name", "Permissions", index);
+				children = dataModelPtr->AddTreeModel("Children", index);
 
-		imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetLocalPermissions();
+				imtauth::IRole::FeatureIds permissionsIds = roleInfoPtr->GetLocalPermissions();
 
-		for (const QByteArray& permissionId : permissionsIds){
-			int childrenIndex = children->InsertNewItem();
+				for (const QByteArray& permissionId : permissionsIds){
+					const imtlic::IFeatureInfo* featureInfoPtr = featurePackagePtr->FindFeatureById(permissionId);
+					if (featureInfoPtr != nullptr){
+						QString featureName = featureInfoPtr->GetFeatureName();
 
-			children->SetData("Value", permissionId, childrenIndex);
+						int childrenIndex = children->InsertNewItem();
+
+						children->SetData("Value", featureName, childrenIndex);
+					}
+				}
+			}
 		}
 	}
 

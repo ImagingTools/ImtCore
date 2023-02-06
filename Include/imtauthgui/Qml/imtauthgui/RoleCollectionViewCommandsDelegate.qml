@@ -5,6 +5,9 @@ import imtgui 1.0
 CollectionViewCommandsDelegateBase {
     id: container;
 
+    removeDialogTitle: qsTr("Deleting a role");
+    removeMessage: qsTr("Delete the selected role ?");
+
     onCommandsProviderChanged: {
         commandsProvider.modelLoaded.connect(container.updateCommands);
     }

@@ -21,14 +21,6 @@
         <Element ComponentName="VisualStatus" X="425" Y="225" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="PagesPermissions">
-            <PositionMap>
-                <Element ComponentName="CommandPermissionsProviderJoiner" X="575" Y="200" Note=""/>
-                <Element ComponentName="RolesPermissions" X="250" Y="400" Note=""/>
-                <Element ComponentName="UsersPermissions" X="875" Y="400" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="RoleRepository" X="600" Y="250" Note=""/>
@@ -40,6 +32,14 @@
             <PositionMap>
                 <Element ComponentName="RolesPage" X="350" Y="400" Note=""/>
                 <Element ComponentName="UsersPage" X="825" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="PagesPermissions">
+            <PositionMap>
+                <Element ComponentName="CommandPermissionsProviderJoiner" X="575" Y="200" Note=""/>
+                <Element ComponentName="RolesPermissions" X="250" Y="400" Note=""/>
+                <Element ComponentName="UsersPermissions" X="875" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

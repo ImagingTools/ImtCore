@@ -244,7 +244,9 @@ DocumentBase {
         z: 100;
 
         anchors.right: tableView.right;
-        anchors.bottom: parent.bottom;
+        anchors.bottom: tableView.bottom;
+
+        backgroundColor: Style.baseColor;
 
         secondSize: 10;
         targetItem: tableView.tableListView;
@@ -537,15 +539,17 @@ DocumentBase {
 //            featuresTableView: tableView;
 //        }
 
-        CustomScrollbar {
-            z: 100;
+//        CustomScrollbar {
+//            z: 100;
 
-            anchors.right: treeView.right;
-            anchors.bottom: treeView.bottom;
+//            anchors.right: treeView.right;
+//            anchors.bottom: treeView.bottom;
 
-            secondSize: 10;
-            targetItem: treeView.tableListView;
-        }
+//            backgroundColor: Style.baseColor;
+
+//            secondSize: 10;
+//            targetItem: treeView.tableListView;
+//        }
 
         BasicTreeView {
             id: treeView;

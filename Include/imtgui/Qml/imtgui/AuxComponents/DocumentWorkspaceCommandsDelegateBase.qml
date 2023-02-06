@@ -103,6 +103,8 @@ Item {
     function removeChanges(){
         container.documentBase.commandsProvider.setCommandIsEnabled("Save", false);
         container.documentBase.documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName});
+
+        container.documentBase.isDirty = false;
     }
 
     function commandHandle(commandId){
@@ -125,7 +127,7 @@ Item {
                 container.gqlModelQueryTypeNotify = "addedNotification";
 
                 if (container.showInputIdDialog){
-                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the item: ")});
+                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the document:")});
                 }
                 else{
                     saveQuery.updateModel();
@@ -163,6 +165,7 @@ Item {
     Component {
         id: inputDialog;
         InputDialog {
+            title: qsTr("Entering a name");
             onFinished: {
                 console.log("InputDialog result", buttonId, inputValue);
                 if (buttonId == "Ok"){
@@ -220,10 +223,14 @@ Item {
 
     function modelChanged(){
         console.log("DocumentsCommands modelChanged");
-        container.documentBase.commandsProvider.setCommandIsEnabled("Save", "Normal");
+        if (!container.documentBase.isDirty){
+            container.documentBase.commandsProvider.setCommandIsEnabled("Save", true);
 
-        let suffix = "*";
-        container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
+            let suffix = "*";
+            container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
+
+            container.documentBase.isDirty = true;
+        }
     }
 
     function saveObject(){

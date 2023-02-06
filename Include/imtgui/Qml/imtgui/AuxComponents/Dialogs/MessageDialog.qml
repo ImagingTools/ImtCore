@@ -13,24 +13,20 @@ Dialog {
     property string message;
 
     Keys.onPressed: {
-        if (event.key == Qt.Key_Enter){
-            messageDialog.finished("Yes");
+        console.log("MessageDialog onPressed", event.key);
+
+        if (event.key == Qt.Key_Return){
+             messageDialog.finished("Yes");
         }
     }
 
-    function addButton(){
-        buttons.addButton();
-    }
-
-    onMessageChanged: {
-        messageDialog.bodyItem.message = messageDialog.message;
+    contentComp: MessageDialogBody {
+        message: messageDialog.message;
     }
 
     Component.onCompleted: {
         messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes", "Enabled": true});
         messageDialog.buttons.addButton({"Id":"No", "Name":"No", "Enabled": true});
-
-        messageDialog.bodySource = "MessageDialogBody.qml";
     }
 
     Component{

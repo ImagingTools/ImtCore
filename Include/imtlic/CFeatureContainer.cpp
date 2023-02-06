@@ -34,6 +34,11 @@ const IFeatureInfo* CFeatureContainer::FindFeatureById(const QByteArray& feature
 			if (featurePtr->GetFeatureId() == featureId){
 				return featurePtr;
 			}
+
+			QByteArrayList subfeaturesIds = featurePtr->GetSubFeatureIds();
+			if (subfeaturesIds.contains(featureId)){
+				return featurePtr->GetSubFeature(featureId);
+			}
 		}
 	}
 

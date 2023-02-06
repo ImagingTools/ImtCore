@@ -1,12 +1,6 @@
 #include <imtauth/CFeaturePackageRepresentationControllerComp.h>
 
 
-//ImtCore includes
-#include <imtbase/ICollectionInfo.h>
-#include <imtlic/IFeatureInfo.h>
-#include <imtlic/CFeaturePackage.h>
-
-
 namespace imtauth
 {
 

@@ -5,4 +5,6 @@ import imtgui 1.0
 CollectionViewCommandsDelegateBase {
     id: container;
 
+    removeDialogTitle: qsTr("Deleting an user");
+    removeMessage: qsTr("Delete the selected user ?");
 }

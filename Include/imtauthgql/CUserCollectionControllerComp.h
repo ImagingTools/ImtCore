@@ -15,6 +15,7 @@ public:
 	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserCollectionControllerComp);
+		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider", true, "RoleInfoProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -22,6 +23,9 @@ protected:
 	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
 };
 
 

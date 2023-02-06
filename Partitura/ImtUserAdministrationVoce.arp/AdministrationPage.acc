@@ -47,6 +47,9 @@
         <Element Id="Pages" PackageId="" ComponentId="Pages">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="FeatureInfoProvider" Type="Reference" ExportId="FeatureInfoProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="ProductProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -180,6 +183,9 @@
                     <Element Id="RolesPage" PackageId="ImtUserAdministrationVoce" ComponentId="RolesPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="FeatureInfoProvider" Type="Reference" ExportId="FeatureInfoProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -200,6 +206,9 @@
                             <AttributeInfoMap>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RolesPage/RoleCollectionAdapter"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                                     <Data IsEnabled="false"/>
