@@ -9,7 +9,7 @@ namespace imtauth
 {
 
 
-class ILoginStatus: virtual public istd::IChangeable
+class ILoginStatusProvider: virtual public istd::IChangeable
 {
 public:
 	enum LoginStatusFlags
