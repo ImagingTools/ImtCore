@@ -184,12 +184,16 @@ global.Core = {
             if(name in target){
                 return target[name]
             } else {
+                if(target.ID.has(name)){
+                    return target
+                }
                 if(name in QML){
                     return QML[name]
                 }
                 if(name in Core.Singletons){
                     return IDManager.list[name][0]
                 }
+                
                 let res = IDManager.find(target, name, {
                     len: 99999999,
                     obj: null,
