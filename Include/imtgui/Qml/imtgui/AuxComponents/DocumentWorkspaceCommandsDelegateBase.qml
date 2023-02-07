@@ -107,6 +107,14 @@ Item {
         container.documentBase.isDirty = false;
     }
 
+    function setIsDirty(){
+        container.documentBase.commandsProvider.setCommandIsEnabled("Save", true);
+
+        let suffix = "*";
+        container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
+
+    }
+
     function commandHandle(commandId){
         console.log("DocumentCommandsBase commandHandle", container.documentBase.itemId, commandId);
 
@@ -224,10 +232,12 @@ Item {
     function modelChanged(){
         console.log("DocumentsCommands modelChanged");
         if (!container.documentBase.isDirty){
-            container.documentBase.commandsProvider.setCommandIsEnabled("Save", true);
 
-            let suffix = "*";
-            container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
+            container.setIsDirty();
+//            container.documentBase.commandsProvider.setCommandIsEnabled("Save", true);
+
+//            let suffix = "*";
+//            container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
 
             container.documentBase.isDirty = true;
         }

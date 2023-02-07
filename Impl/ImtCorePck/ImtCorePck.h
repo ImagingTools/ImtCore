@@ -43,6 +43,7 @@
 #include <imtbase/CPageBasedGuiRepresentationControllerComp.h>
 #include <imtbase/CSingleCommandPermissionsProviderComp.h>
 #include <imtbase/CCommandPermissionsProviderJoinerComp.h>
+#include <imtbase/CApplicationInfoRepresentationComp.h>
 
 
 /**
@@ -99,6 +100,7 @@ typedef imtbase::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresent
 typedef imtbase::CGuiElementRepresentationControllerComp GuiElementRepresentationController;
 typedef imtbase::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
 typedef imtbase::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
+typedef imtbase::CApplicationInfoRepresentationComp ApplicationInfoRepresentation;
 
 
 } // namespace ImtCorePck

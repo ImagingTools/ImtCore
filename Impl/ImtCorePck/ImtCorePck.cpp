@@ -194,6 +194,11 @@ I_EXPORT_COMPONENT(
 			"CommandPermissionsProviderJoiner",
 			"Command Permissions Provider Joiner Comp");
 
+I_EXPORT_COMPONENT(
+			ApplicationInfoRepresentation,
+			"Application info representation",
+			"ApplicationInfo Application Representation Client");
+
 
 } // namespace ImtCorePck
 

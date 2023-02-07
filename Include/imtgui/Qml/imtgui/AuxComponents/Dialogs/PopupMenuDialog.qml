@@ -94,6 +94,20 @@ Rectangle {
         border.width: 1;
         border.color: Style.alternateBaseColor;
 
+        CustomScrollbar {
+            id: scrollbar;
+
+            z: 100;
+
+            anchors.right: itemBody.right;
+            anchors.bottom: itemBody.bottom;
+
+            backgroundColor: Style.baseColor;
+
+            secondSize: 10;
+            targetItem: popupMenuListView;
+        }
+
         ListView {
             id: popupMenuListView;
 

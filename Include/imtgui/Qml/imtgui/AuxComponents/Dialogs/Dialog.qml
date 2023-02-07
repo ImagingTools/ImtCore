@@ -43,7 +43,7 @@ Rectangle {
         console.log("Dialog onPressed", event.key);
 
         if (event.key == Qt.Key_Escape){
-            dialogContainer.root.closeDialog();
+            dialogContainer.finished("Close")
         }
     }
 

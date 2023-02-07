@@ -164,6 +164,8 @@ Item {
                     let itemId = containerBase.tableData.getSelectedId();
                     removeModel.updateModel(itemId);
                 }
+
+                tableData.forceActiveFocus();
             }
         }
     }
@@ -176,6 +178,8 @@ Item {
                 if (buttonId == "Ok"){
                     renameQuery.rename(inputValue);
                 }
+
+                tableData.forceActiveFocus();
             }
         }
     }
@@ -188,6 +192,8 @@ Item {
                 if (buttonId == "Ok"){
                     setDescriptionQuery.setDescription(inputValue);
                 }
+
+                tableData.forceActiveFocus();
             }
         }
     }

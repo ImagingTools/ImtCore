@@ -81,8 +81,9 @@ Item {
                     }
                     dialogLoader.item.started()
 
-                    dialogLoader.item.focus = true;
-//                    dialogLoader.item.forceActiveFocus();
+                    console.log("dialogLoader.item.parent", dialogLoader.item.parent);
+
+                    dialogLoader.item.forceActiveFocus();
                 }
             }
         }

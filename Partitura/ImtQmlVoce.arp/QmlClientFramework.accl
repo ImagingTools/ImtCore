@@ -9,6 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationInfo" X="300" Y="275" Note=""/>
+        <Element ComponentName="ApplicationInfoRepresentation" X="325" Y="675" Note=""/>
         <Element ComponentName="Context" X="925" Y="275" Note=""/>
         <Element ComponentName="MainWindow" X="600" Y="500" Note=""/>
         <Element ComponentName="ObserverQml" X="300" Y="500" Note=""/>

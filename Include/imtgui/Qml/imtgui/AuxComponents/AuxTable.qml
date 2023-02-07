@@ -99,6 +99,12 @@ Item {
     }
 
 
+    onFocusChanged: {
+        if (tableContainer.focus){
+            elementsList.forceActiveFocus();
+        }
+    }
+
     onTableDecoratorChanged: {
 
         tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
@@ -118,14 +124,6 @@ Item {
             tableContainer.heightRecalc();
             pause.stop();
             pause.start();
-        }
-
-
-    }
-
-    onSelectedIndexChanged: {
-        if (tableContainer.selectedIndex > -1){
-            elementsList.forceActiveFocus();
         }
     }
 
@@ -747,6 +745,7 @@ Item {
             onClicked: {
                 tableContainer.selectedIndex = model.index;
 
+                elementsList.forceActiveFocus();
             }
 
             onRightButtonMouseClicked: {

@@ -39,6 +39,11 @@ DocumentWorkspaceCommandsDelegateBase {
         else if (commandId === "Remove"){
             let selectedIndex = container.tableData.selectedIndex;
 
+            let indexes = selectedIndex.getIndexes();
+            if (indexes.length > 1){
+                return;
+            }
+
             container.tableData.removeRow([selectedIndex.index]);
         }
     }

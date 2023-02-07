@@ -20,6 +20,8 @@ Item {
 
     property bool isDirty: false;
 
+    property bool saveIsBlocked: false;
+
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
@@ -71,7 +73,7 @@ Item {
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                  "CommandsId": commandsProvider.commandsId});
 
-            documentBase.forceActiveFocus();
+//            documentBase.forceActiveFocus();
         }
     }
 

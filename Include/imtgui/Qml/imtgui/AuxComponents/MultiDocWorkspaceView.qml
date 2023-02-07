@@ -188,7 +188,7 @@ Item {
                     console.log("MultidocWorkspaceView onVisibleChanged", dataLoader.item);
 
                     workspaceView.activeItem = dataLoader.item;
-                    workspaceView.activeItem.forceActiveFocus();
+//                    workspaceView.activeItem.forceActiveFocus();
                 }
             }
 
@@ -208,7 +208,6 @@ Item {
 
                     if(docsDataDeleg.visible){
                         workspaceView.activeItem = dataLoader.item;
-                        workspaceView.activeItem.forceActiveFocus();
                     }
 
                     if(dataLoader.item.documentsData !==undefined){

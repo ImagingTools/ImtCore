@@ -34,7 +34,7 @@ Rectangle {
     }
 
     onActivePageIndexChanged: {
-        lvPages.currentIndex = menuPanel.activePageIndex;
+        //lvPages.currentIndex = menuPanel.activePageIndex;
     }
 
     onModelChanged: {
@@ -50,6 +50,23 @@ Rectangle {
         anchors.fill: parent;
 
         boundsBehavior: Flickable.StopAtBounds;
+
+        Keys.onPressed: {
+            console.log("MenuPanel onPressed");
+
+            console.log("menuPanel.activePageIndex");
+            if (event.key == Qt.Key_Up){
+                if (menuPanel.activePageIndex >= 1){
+                    menuPanel.activePageIndex--;
+                }
+            }
+
+            if (event.key == Qt.Key_Down){
+                if (menuPanel.activePageIndex < lvPages.count - 1){
+                    menuPanel.activePageIndex++;
+                }
+            }
+        }
 
         delegate: MenuPanelButton {
             Component.onCompleted: {

@@ -12,7 +12,7 @@ Item {
     property bool blockUpdatingModel: false;
 
     property int mainMargin: 0;
-    property int panelWidth: 400;
+    property int panelWidth: 400; 
 
     Component.onCompleted: {
         usernameInput.focus = true;
@@ -306,6 +306,14 @@ Item {
                         if (oldText != mailInput.text){
                             userEditorContainer.updateModel();
                         }
+                    }
+
+                    onTextEdited: {
+                        console.log("onTextEdited");
+                    }
+
+                    onTextChanged: {
+                        console.log("onTextChanged");
                     }
 
                     KeyNavigation.tab: usernameInput;

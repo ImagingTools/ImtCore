@@ -57,6 +57,15 @@ void CObserverQmlComp::OnComponentCreated()
 				m_settingsModelPtr = new imtbase::CTreeItemModel();
 				bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
 				if (result){
+					if (m_applicationInfoCompPtr.IsValid() && m_applicationInfoRepresentationCompPtr.IsValid()){
+						imtbase::CTreeItemModel applicationInfoRepresentationPtr;
+						if (m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, applicationInfoRepresentationPtr)){
+							QString json = applicationInfoRepresentationPtr.toJSON();
+
+							qDebug() << json;
+						}
+					}
+
 					if (m_settingsModelPtr != nullptr){
 						if (m_settingsModelPtr->ContainsKey("Parameters")){
 							imtbase::CTreeItemModel* parametersPtr = m_settingsModelPtr->GetTreeItemModel("Parameters");

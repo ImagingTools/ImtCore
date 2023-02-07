@@ -6,6 +6,7 @@
 #include <iprm/IParamsSet.h>
 
 // ImtCore includes
+#include <imtbase/IApplicationInfoRepresentation.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/IRepresentationController.h>
 #include <imtqml/IQuickObject.h>
@@ -26,6 +27,8 @@ public:
 		I_ASSIGN(m_settingsCompPtr, "Settings", "Settings", false, "Settings");
 		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
 		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/");
+		I_ASSIGN(m_applicationInfoRepresentationCompPtr, "ApplicationInfoRepresentation", "Application info representation", true, "ApplicationInfoRepresentation");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
 	I_END_COMPONENT;
 
 	CObserverQmlComp();
@@ -46,6 +49,8 @@ private:
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
 	I_REF(imtbase::IRepresentationController, m_settingsRepresentationControllerCompPtr);
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
+	I_REF(imtbase::IApplicationInfoRepresentation, m_applicationInfoRepresentationCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 
 private:
 	imtbase::CTreeItemModel* m_settingsModelPtr;

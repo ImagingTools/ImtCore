@@ -43,6 +43,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="Context" PackageId="ImtQmlPck" ComponentId="ClientUserContext">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -67,6 +72,12 @@
         <Element Id="ObserverQml" PackageId="ImtQmlPck" ComponentId="ObserverQml">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

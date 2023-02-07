@@ -7,6 +7,8 @@ DocumentBase {
 
     anchors.fill: parent;
 
+    saveIsBlocked: true;
+
     property string title: qsTr("Users");
     property string username: qsTr("New User");
 
