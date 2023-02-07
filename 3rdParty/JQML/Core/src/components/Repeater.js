@@ -34,6 +34,9 @@ export class Repeater extends Item {
         this.$updateView()
     }
 
+    itemAt(index){
+        return index >= 0 && index < this.children.length ? this.children[index] : undefined
+    }
     $insert(index){
         let pos = this.parent.children.indexOf(this)
         if(this.model && this.delegate){

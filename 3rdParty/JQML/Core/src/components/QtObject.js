@@ -41,6 +41,7 @@ export class QtObject {
     // LVL = new Set()
 
     constructor(args) {
+        this.$P = new Proxy(this, Core.proxyHandler)
         this.$qmlClassName = this.constructor.name
         this._context = context
         this.UID = UID++
@@ -190,6 +191,7 @@ export class QtObject {
         
 
         
+
         
 
         while(this.$uL.aliases.length){
@@ -219,11 +221,11 @@ export class QtObject {
             }
             
         }
-
         for(let child of this.children){
             child.$uP(step + 1)
         }
 
+        
 
 
         for(let error of errors){
@@ -305,6 +307,7 @@ export class QtObject {
         signal.debug = `${this.UID}-${name}`
         if(typeof val === 'function'){
             this.$p[name] = {
+                'name': name,
                 'val': undefined,
                 'signal': signal,
                 'depends': new Set(),
@@ -320,6 +323,7 @@ export class QtObject {
             this.$uL.properties.push(name)
         } else {
             this.$p[name] = {
+                'name': name,
                 'val': val,
                 'signal': signal,
                 'depends': new Set(),
@@ -339,6 +343,14 @@ export class QtObject {
                         if(_caller.val !== val){
                             _caller.val = val
                             _caller.signal()
+                            if(_caller.type === 'alias') {
+                                try {
+                                    _caller.setter(val)
+                                } catch (error) {
+                                    
+                                }
+                                
+                            }
                         }
                     }
                 }
@@ -382,6 +394,7 @@ export class QtObject {
         for(let name2 in props){
             
             this.$p[`${name}.${name2}`] = {
+                'name': `${name}.${name2}`,
                 'val': props[name2],
                 'signal': signal,
                 'depends': new Set(),
@@ -397,6 +410,14 @@ export class QtObject {
                             if(_caller.val !== val){
                                 _caller.val = val
                                 _caller.signal()
+                                if(_caller.type === 'alias') {
+                                    try {
+                                        _caller.setter(val)
+                                    } catch (error) {
+                                        
+                                    }
+                                    
+                                }
                             }
                         }
                     }
@@ -466,6 +487,7 @@ export class QtObject {
         let signal = this.$cS(`${name}Changed`)
 
         this.$p[name] = {
+            'name': name,
             'val': '',
             'signal': signal,
             'type': 'alias',
@@ -492,14 +514,26 @@ export class QtObject {
                         if(_caller.val !== val){
                             _caller.val = val
                             _caller.signal()
+                            if(_caller.type === 'alias') {
+                                try {
+                                    _caller.setter(val)
+                                } catch (error) {
+                                    
+                                }
+                                
+                            }
                         }
                     }
                 }
-                
-                return this.$p[name].val
+                this.$currentAlias = this.$p[name]
+                let res = getter()
+                this.$currentAlias = null
+                return res//this.$p[name].val
             },
             set: (newVal)=>{
-                setter(newVal)           
+                this.$currentAlias = this.$p[name]
+                setter(newVal) 
+                this.$currentAlias = null          
             },
         })
 

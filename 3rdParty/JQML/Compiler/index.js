@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const parser = require('./parser')
 const crypto = require('crypto')
+const esprima = require('./esprima')
 
 const QML = [
     'Component',
@@ -68,6 +69,79 @@ if(!fs.existsSync(source + '/cache/')) fs.mkdirSync(source + '/cache/');
 let files = getFiles(source)
 
 let IDList = new Set()
+
+function proxyJS(sourceOrig, instruction, ignoreList = []){
+    let source = sourceOrig
+    ignoreList.push('of')
+    const ignore = new Set(ignoreList)
+    const script = esprima.parseScript(source, { tokens: true, range: true }, (node)=>{
+        if(node.type === 'VariableDeclarator' || node.type === 'FunctionExpression'){
+
+            if(node.id){
+                ignore.add(node.id.name)
+            }
+            if(node.init && node.init.params){
+                for(let param of node.init.params){
+                    ignore.add(param.name)
+                }
+            }
+            if(node.params){
+                for(let param of node.params){
+                    ignore.add(param.name)
+                }
+            }
+        }
+        
+    })
+    const tokens = script.tokens
+    const declarationsAll = script.body.filter(x => x.type === 'VariableDeclaration')
+    
+    const markers = tokens.sort((a, b) => { return b.range[0] - a.range[0] })
+    
+    for(let declarationAll of declarationsAll){
+        for(declaration of declarationAll.declarations){
+            if(declaration.type === 'VariableDeclarator' && declaration.id.type === 'Identifier'){
+                ignore.add(declaration.id.name)
+            }
+        }
+    }
+    for(let i = 0; i < markers.length; i++){
+        if(markers[i].type === 'Identifier'){
+            try {
+                if(eval(markers[i].value)) continue
+            } catch (error) {
+                
+            }
+            
+            if(ignore.has(markers[i].value)) continue
+            if(i + 1 < markers.length) {
+                if(markers[i+1].type === 'Punctuator' && markers[i+1].value === '.') continue
+                if(markers[i+1].type === 'Keyword' && (markers[i+1].value === 'var' || markers[i+1].value === 'let')) {
+                    ignore.add(markers[i].value)
+                    continue
+                }
+            }
+            if(i - 1 > 0) {
+                if(markers[i-1].type === 'Punctuator' && markers[i-1].value === ':' && markers[i+1].type === 'Punctuator' && (markers[i+1].value === ',' || markers[i+1].value === '{' )) continue
+                // if(markers[i+1].type === 'Keyword' && (markers[i+1].value === 'var' || markers[i+1].value === 'let')) continue
+            }
+
+            let id = `this.$P.${markers[i].value}`
+            // if(instruction.properties[markers[i].value] || instruction.propertiesNew[markers[i].value] || instruction.propertiesLazy[markers[i].value] ||
+            //     instruction.propertiesLazyNew[markers[i].value] || instruction.propertiesQML[markers[i].value] || instruction.propertiesQMLNew[markers[i].value] ||
+            //     instruction.propertiesAlias[markers[i].value] || instruction.propertiesSpecial[markers[i].value]) {
+            //         id = `this.${markers[i].value}`
+            //     }
+            if(instruction.id.has(`\`${markers[i].value}\``)) id = `this`
+            //const id = `this.$P.${markers[i].value}`
+            const start = markers[i].range[0]
+            const end = markers[i].range[1]
+            source = source.slice(0, start) + id + source.slice(end)
+        }
+    }
+    return source
+    // console.log(source)
+}
 
 function getBaseStructure(){
     return {
@@ -222,7 +296,8 @@ function qmlmethod(m, instructions){
     
     instructions.methods[name] = {
         params: params,
-        source: src
+        source: src,
+        sourceFull: `let $compileTemp=function(${params.join(',')}){${src}}`,
     }
 }
 function qmlaliasdef(m, instructions){
@@ -291,7 +366,8 @@ function qmlprop(m, instructions, file){
             if(lpos >= 0 && rpos >= 0) src = src.slice(lpos+1, rpos)
             instructions.connectionSignals.push({
                 name: signalName,
-                source: src
+                source: src,
+                sourceFull: `let $compileTemp=function(){with(this.$s['${signalName}'].context){${src}}}`,
             })
         } else {
             let signalCall = m[1]
@@ -304,7 +380,8 @@ function qmlprop(m, instructions, file){
             if(lpos >= 0 && rpos >= 0) src = src.slice(lpos+1, rpos)
             instructions.connectionSignals.push({
                 name: signalName,
-                source: src
+                source: src,
+                sourceFull: `let $compileTemp=function(){with(this.$s['${signalName}'].context){${src}}}`,
             })
         } 
     } else if (m[1][0] === "dot"){
@@ -418,7 +495,8 @@ function qmlprop(m, instructions, file){
                 let src = val
                 instructions.connectionSignals.push({
                     name: signalName,
-                    source: src
+                    source: src,
+                    sourceFull: `let $compileTemp=function(){with(this.$s['${signalName}'].context){${src}}}`,
                 })
             } else {
                 if(name === 'id'){
@@ -548,469 +626,49 @@ for(let file of files){
 }
 
 
-function IDReplace(instructions){
-    for(let ID of IDList){
-        // let reg = RegExp(`((?<=\\W)${ID}(?=\\W))|(^${ID}(?=\\W))|((?<=\\W)${ID}$)|(^${ID}$)`, 'gm')
-        let reg = RegExp(`((?<!\\w)${ID}(?!\\w))`, 'gm')
-        let varTemp = `var ${ID}`
-        let letTemp = `let ${ID}`
-        // let dotTemp = [`.${ID}`, `_dotTemp_`]
-        // let pathTemp = [`./${ID}`, `_pathTemp_`]
-        // let keyDict = [`${ID}:`, `${ID} :`, `_keyDict_`]
-        // let keyDict2 = [`'${ID}'`, `_keyDict2_`]
-        // let keyDict3 = [`"${ID}"`, `_keyDict3_`]
-        
-        let replaceList = [
-            RegExp(`\\.${ID}(?!\\w)`, 'g'),`_dotTemp_`,
-            `./${ID}`,`_pathTemp_`,
-            RegExp(`(?<!\\?\\s+)${ID}\\s:`, 'g'),`_keyDict_`,
-            RegExp(`(?<!\\?\\s+)${ID}:`, 'g'),`_keyDict_`,
-            `'${ID}'`,`_keyDict2_`,
-            `"${ID}"`,`_keyDict3_`,
-            `'${ID}`,`_upTemp_`,
-            `${ID}'`,`_upTemp2_`,
-            `"${ID}`,`_upUpTemp_`,
-            `${ID}"`,`_upUpTemp2_`,
-            `?${ID}`,`_questionTemp_`,
-            `${ID}.png`,`_pngTemp_`,
-            `${ID}.svg`,`_svgTemp_`
-        ]
-        let replaceListR = [
-            `.${ID}`,`_dotTemp_`,
-            `./${ID}`,`_pathTemp_`,
-            `${ID} :`,`_keyDict_`,
-            `${ID}:`,`_keyDict_`,
-            `'${ID}'`,`_keyDict2_`,
-            `"${ID}"`,`_keyDict3_`,
-            `'${ID}`,`_upTemp_`,
-            `${ID}'`,`_upTemp2_`,
-            `"${ID}`,`_upUpTemp_`,
-            `${ID}"`,`_upUpTemp2_`,
-            `?${ID}`,`_questionTemp_`,
-            `${ID}.png`,`_pngTemp_`,
-            `${ID}.svg`,`_svgTemp_`
-        ]
-
-        for(let name in instructions.propertiesLazy){
-            if(name === ID || !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
-                for(let n = 0; n < replaceList.length; n+=2){
-                    instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(replaceList[n], replaceList[n+1])
-                }
-                //instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
-                if(instructions.id.has(`\`${ID}\``))
-                instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(reg, `IDManager.get(this,\`${ID}\`)`); else
-                instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(reg, `IDManager.get0(this,\`${ID}\`)`)
-                for(let n = 0; n < replaceListR.length; n+=2){
-                    instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(replaceListR[n+1], replaceListR[n])
-                }
-                //instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(dotTemp[1], dotTemp[0]).replaceAll(pathTemp[1], pathTemp[0])
-            } 
-        }
-        for(let name in instructions.propertiesLazyNew){
-            if(name === ID || !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
-                // instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
-                for(let n = 0; n < replaceList.length; n+=2){
-                    instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(replaceList[n], replaceList[n+1])
-                }
-                if(instructions.id.has(`\`${ID}\``))
-                instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(reg, `IDManager.get(this,\`${ID}\`)`); else
-                instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(reg, `IDManager.get0(this,\`${ID}\`)`)
-
-                // if(ID === 'organizationSubmenuModel' && name === 'submodel'){
-                //     console.log(instructions.propertiesLazyNew[name])
-                // }
-                // instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(dotTemp[1], dotTemp[0]).replaceAll(pathTemp[1], pathTemp[0])
-                for(let n = 0; n < replaceListR.length; n+=2){
-                    instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(replaceListR[n+1], replaceListR[n])
-                }
-            } 
-            
-        }
-        for(let name in instructions.propertiesAlias){
-            if(name === ID || !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias)) {
-                // instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
-                for(let n = 0; n < replaceList.length; n+=2){
-                    instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(replaceList[n], replaceList[n+1])
-                }
-                if(instructions.id.has(`\`${ID}\``))
-                instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(reg, `IDManager.get(this,\`${ID}\`)`); else
-                instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(reg, `IDManager.get0(this,\`${ID}\`)`)
-                // instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(dotTemp[1], dotTemp[0]).replaceAll(pathTemp[1], pathTemp[0])
-                for(let n = 0; n < replaceListR.length; n+=2){
-                    instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(replaceListR[n+1], replaceListR[n])
-                }
-            } 
-        }
-        
-        for(let name in instructions.methods){
-            if(!(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || 
-                ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias || 
-                instructions.methods[name].source.indexOf(varTemp) >= 0 || instructions.methods[name].source.indexOf(letTemp) >= 0 || instructions.methods[name].params.indexOf(ID) >= 0)) {
-                // instructions.methods[name].source = instructions.methods[name].source.replaceAll(keyDict[0], keyDict[2]).replaceAll(keyDict[1], keyDict[2]).replaceAll(keyDict2[0], keyDict2[1]).replaceAll(keyDict3[0], keyDict3[1]).replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
-                for(let n = 0; n < replaceList.length; n+=2){
-                    instructions.methods[name].source = instructions.methods[name].source.replaceAll(replaceList[n], replaceList[n+1])
-                }
-                if(instructions.id.has(`\`${ID}\``))
-                instructions.methods[name].source = instructions.methods[name].source.replaceAll(reg, `IDManager.get(this,\`${ID}\`)`); else
-                instructions.methods[name].source = instructions.methods[name].source.replaceAll(reg, `IDManager.get0(this,\`${ID}\`)`)
-                
-                // instructions.methods[name].source = instructions.methods[name].source.replaceAll(keyDict[2], keyDict[0]).replaceAll(keyDict2[1], keyDict2[0]).replaceAll(keyDict3[1], keyDict3[0]).replaceAll(dotTemp[1], dotTemp[0]).replaceAll(pathTemp[1], pathTemp[0])
-                for(let n = 0; n < replaceListR.length; n+=2){
-                    instructions.methods[name].source = instructions.methods[name].source.replaceAll(replaceListR[n+1], replaceListR[n])
-                }
-            } 
-        }
-        for(let signal of instructions.connectionSignals){
-            let signalParams = []
-            if(QML.indexOf(instructions.class) < 0)
-            for(let path in compiledFiles){
-                if(path.indexOf(instructions.class) >= 0){
-                    if(compiledFiles[path].instructions.defineSignals[signal.name]){
-                        signalParams.push(...compiledFiles[path].instructions.defineSignals[signal.name])
-                    }
-                }
-            }
-            for(let i = 0; i < signalParams.length; i++){
-                signalParams[i] = signalParams[i].replaceAll('`', '')
-            }
-
-            if(signalParams.indexOf(ID) < 0 && !(ID in instructions.properties || ID in instructions.propertiesNew || ID in instructions.propertiesLazy || ID in instructions.propertiesLazyNew || 
-                ID in instructions.propertiesQML || ID in instructions.propertiesQMLNew || ID in instructions.propertiesSpecial || ID in instructions.propertiesAlias || 
-                signal.source.indexOf(varTemp) >= 0 || signal.source.indexOf(letTemp) >= 0 || (instructions.defineSignals[signal.name] && instructions.defineSignals[signal.name].indexOf(ID) >= 0))) {
-                    // signal.source = signal.source.replaceAll(keyDict[0], keyDict[2]).replaceAll(keyDict[1], keyDict[2]).replaceAll(keyDict2[0], keyDict2[1]).replaceAll(keyDict3[0], keyDict3[1]).replaceAll(dotTemp[0], dotTemp[1]).replaceAll(pathTemp[0], pathTemp[1])
-                    for(let n = 0; n < replaceList.length; n+=2){
-                        signal.source = signal.source.replaceAll(replaceList[n], replaceList[n+1])
-                    }
-                    if(instructions.id.has(`\`${ID}\``))
-                    signal.source = signal.source.replaceAll(reg, `IDManager.get(this,\`${ID}\`)`); else
-                    signal.source = signal.source.replaceAll(reg, `IDManager.get0(this,\`${ID}\`)`)
-                    // signal.source = signal.source.replaceAll(keyDict[0], keyDict[2]).replaceAll(keyDict[2], keyDict[0]).replaceAll(keyDict2[1], keyDict2[0]).replaceAll(keyDict3[1], keyDict3[0]).replaceAll(dotTemp[1], dotTemp[0]).replaceAll(pathTemp[1], pathTemp[0])
-                    for(let n = 0; n < replaceListR.length; n+=2){
-                        signal.source = signal.source.replaceAll(replaceListR[n+1], replaceListR[n])
-                    }
-            } 
-        }
-    }
-    for(let name in instructions.propertiesQML){
-        IDReplace(instructions.propertiesQML[name])
-    }
-    for(let name in instructions.propertiesQMLNew){
-        IDReplace(instructions.propertiesQMLNew[name])
-    }
-    for(let name in instructions.propertiesSpecial){
-        IDReplace(instructions.propertiesSpecial[name])
-    }
-    for(let child of instructions.children){
-        IDReplace(child)
-    }
-}
-
-function ProxyReplace(instructions){
-    let reserved = [
-        'if',
-        'else',
-        'for',
-        'while',
-        'in',
-        'typeof',
-        'instanceof',
-        'console.log',
-        'new',
-        'function',
-        'Function',
-        'eval',
-        'try',
-        'catch',
-        'let',
-        'var',
-        'return',
-    ]
-    let simbols = '1234567890'
-    let reg = /[\+\-\*\/\?\:\!\(\)\%\=\,\<\>\{\}\;\'\"\`\[\]\n ]+/g
-
+function proxyReplace(instructions){
+    
     for(let name in instructions.propertiesLazy){
-        let parts = instructions.propertiesLazy[name].split(reg)
-        for(let part of parts){
-            if(part !== '' && reserved.indexOf(part) < 0 && simbols.indexOf(part[0]) < 0 && '"`\''.indexOf(part[part.length-1]) < 0 && part.indexOf('this') < 0 && part.indexOf('IDManager') < 0){
-                let p = part.split('.')
-                if(QML.indexOf(p[0]) < 0 && p[0] !== 'parent'){
-                    instructions.propertiesLazy[name] = instructions.propertiesLazy[name].replaceAll(RegExp(`(?<![\'\"\`])${p[0]}(?![\'\"\`])`, 'g'), `$Proxy('${p[0]}')`)
-                }
-                
-            }
-        }
+        instructions.propertiesLazy[name] = proxyJS(instructions.propertiesLazy[name], instructions)
     }
     for(let name in instructions.propertiesLazyNew){
-        let parts = instructions.propertiesLazyNew[name].split(reg)
-        for(let part of parts){
-            if(part !== '' && reserved.indexOf(part) < 0 && simbols.indexOf(part[0]) < 0 && '"`\''.indexOf(part[part.length-1]) < 0 && part.indexOf('this') < 0 && part.indexOf('IDManager') < 0){
-                let p = part.split('.')
-                if(QML.indexOf(p[0]) < 0 && p[0] !== 'parent'){
-                    instructions.propertiesLazyNew[name] = instructions.propertiesLazyNew[name].replaceAll(RegExp(`(?<![\'\"\`])${p[0]}(?![\'\"\`])`, 'g'), `$Proxy('${p[0]}')`)
-                }
-                
-            }
-        }
+        instructions.propertiesLazyNew[name] = proxyJS(instructions.propertiesLazyNew[name], instructions)
     }
     for(let name in instructions.propertiesAlias){
-        let parts = instructions.propertiesAlias[name].split(reg)
-        for(let part of parts){
-            if(part !== '' && reserved.indexOf(part) < 0 && simbols.indexOf(part[0]) < 0 && '"`\''.indexOf(part[part.length-1]) < 0 && part.indexOf('this') < 0 && part.indexOf('IDManager') < 0){
-                let p = part.split('.')
-                if(QML.indexOf(p[0]) < 0 && p[0] !== 'parent'){
-                    instructions.propertiesAlias[name] = instructions.propertiesAlias[name].replaceAll(RegExp(`(?<![\'\"\`])${p[0]}(?![\'\"\`])`, 'g'), `$Proxy('${p[0]}')`)
-                }
-                
-            }
-        }
+        instructions.propertiesAlias[name] = proxyJS(instructions.propertiesAlias[name], instructions)
     }
     
     for(let name in instructions.methods){
-        let parts = instructions.methods[name].source.split(reg)
-        for(let part of parts){
-            if(part !== '' && reserved.indexOf(part) < 0 && simbols.indexOf(part[0]) < 0 && '"`\''.indexOf(part[part.length-1]) < 0 && instructions.methods[name].params.indexOf(part) < 0 && part.indexOf('this') < 0 && part.indexOf('IDManager') < 0){
-                let p = part.split('.')
-                if(QML.indexOf(p[0]) < 0 && p[0] !== 'parent' && instructions.methods[name].source.indexOf(`var ${p[0]}`) < 0 && instructions.methods[name].source.indexOf(`let ${p[0]}`) < 0){
-                    instructions.methods[name].source = instructions.methods[name].source.replaceAll(RegExp(`(?<![\'\"\`])${p[0]}(?![\'\"\`])`, 'g'), `$Proxy('${p[0]}')`)
-                }
-                
-            }
-        }
+        // let temp = eval(instructions.methods[name].sourceFull)
+        instructions.methods[name].sourceFull = proxyJS(instructions.methods[name].sourceFull, instructions, instructions.methods[name].params).replaceAll('let $compileTemp=', '')
     }
     for(let signal of instructions.connectionSignals){
-        let parts = signal.source.split(reg)
-        for(let part of parts){
-            if(part !== '' && reserved.indexOf(part) < 0 && simbols.indexOf(part[0]) < 0 && '"`\''.indexOf(part[part.length-1]) < 0 && part.indexOf('this') < 0 && part.indexOf('IDManager') < 0){
-                let p = part.split('.')
-                if(QML.indexOf(p[0]) < 0 && p[0] !== 'parent' && signal.source.indexOf(`var ${p[0]}`) < 0 && signal.source.indexOf(`let ${p[0]}`) < 0){
-                    signal.source = signal.source.replaceAll(RegExp(`(?<![\'\"\`])${p[0]}(?![\'\"\`])`, 'g'), `$Proxy('${p[0]}')`)
+        let signalParams = []
+        if(QML.indexOf(instructions.class) < 0)
+        for(let path in compiledFiles){
+            if(path.indexOf(instructions.class) >= 0){
+                if(compiledFiles[path].instructions.defineSignals[signal.name]){
+                    signalParams.push(...compiledFiles[path].instructions.defineSignals[signal.name])
                 }
-                
             }
         }
+        for(let i = 0; i < signalParams.length; i++){
+            signalParams[i] = signalParams[i].replaceAll('`', '')
+        }
+
+        signal.sourceFull = proxyJS(signal.sourceFull, instructions, signalParams).replaceAll('let $compileTemp=', '')
     }
-    
     for(let name in instructions.propertiesQML){
-        ProxyReplace(instructions.propertiesQML[name])
+        proxyReplace(instructions.propertiesQML[name])
     }
     for(let name in instructions.propertiesQMLNew){
-        ProxyReplace(instructions.propertiesQMLNew[name])
+        proxyReplace(instructions.propertiesQMLNew[name])
     }
     for(let name in instructions.propertiesSpecial){
-        ProxyReplace(instructions.propertiesSpecial[name])
+        proxyReplace(instructions.propertiesSpecial[name])
     }
     for(let child of instructions.children){
-        ProxyReplace(child)
-    }
-}
-
-function anchorsReplace(instructions){
-    // for(let name in instructions.propertiesLazy){
-    //     if(name === 'anchors.fill'){
-    //         delete instructions.properties['width']
-    //         delete instructions.properties['height']
-    //         delete instructions.properties['x']
-    //         delete instructions.properties['y']
-
-    //         let target = instructions.propertiesLazy[name]
-    //         delete instructions.propertiesLazy[name]
-
-    //         instructions.propertiesLazy['x'] = `anchors.leftMargin - (parent.left - ${target}.left)`
-    //         instructions.propertiesLazy['y'] = `anchors.topMargin - (parent.top - ${target}.top)`
-    //         instructions.propertiesLazy['width'] = `${target}.width - anchors.rightMargin - anchors.leftMargin`
-    //         instructions.propertiesLazy['height'] = `${target}.height - anchors.bottomMargin - anchors.topMargin`
-    //     } else if(name === 'anchors.centerIn'){
-    //         delete instructions.properties['x']
-    //         delete instructions.properties['y']
-
-    //         let target = instructions.propertiesLazy[name]
-    //         delete instructions.propertiesLazy[name]
-
-    //         instructions.propertiesLazy['x'] = `${target}.width/2 - width/2 + anchors.leftMargin - anchors.rightMargin - (parent.left - ${target}.left)`
-    //         instructions.propertiesLazy['y'] = `${target}.height/2 - height/2 + anchors.topMargin - anchors.bottomMargin - (parent.top - ${target}.top)`
-    //     }
-    // }
-    if(instructions.propertiesLazy['anchors.fill'] && (instructions.propertiesLazy['anchors.left'] || instructions.propertiesLazy['anchors.right'] || instructions.propertiesLazy['anchors.top'] || instructions.propertiesLazy['anchors.bottom'])){
-        let target = instructions.propertiesLazy['anchors.fill']
-        delete instructions.propertiesLazy['anchors.fill']
-
-        if(!instructions.propertiesLazy['anchors.left']) instructions.propertiesLazy['anchors.left'] = `${target}.left`
-        if(!instructions.propertiesLazy['anchors.right']) instructions.propertiesLazy['anchors.right'] = `${target}.right`
-        if(!instructions.propertiesLazy['anchors.top']) instructions.propertiesLazy['anchors.top'] = `${target}.top`
-        if(!instructions.propertiesLazy['anchors.bottom']) instructions.propertiesLazy['anchors.bottom'] = `${target}.bottom`
-    }
-
-
-    if(instructions.propertiesLazy['anchors.fill']){
-        delete instructions.properties['width']
-        delete instructions.properties['height']
-        delete instructions.properties['x']
-        delete instructions.properties['y']
-
-        let target = instructions.propertiesLazy['anchors.fill']
-        delete instructions.propertiesLazy['anchors.fill']
-
-        instructions.propertiesLazy['x'] = `anchors.leftMargin - (parent.left - ${target}.left)`
-        instructions.propertiesLazy['y'] = `anchors.topMargin - (parent.top - ${target}.top)`
-        instructions.propertiesLazy['width'] = `${target}.width - anchors.rightMargin - anchors.leftMargin`
-        instructions.propertiesLazy['height'] = `${target}.height - anchors.bottomMargin - anchors.topMargin`
-    } else if(instructions.propertiesLazy['anchors.centerIn']){
-        delete instructions.properties['x']
-        delete instructions.properties['y']
-
-        let target = instructions.propertiesLazy['anchors.centerIn']
-        delete instructions.propertiesLazy['anchors.centerIn']
-
-        instructions.propertiesLazy['x'] = `${target}.width/2 - width/2 + anchors.leftMargin - anchors.rightMargin - (parent.left - ${target}.left)`
-        instructions.propertiesLazy['y'] = `${target}.height/2 - height/2 + anchors.topMargin - anchors.bottomMargin - (parent.top - ${target}.top)`
-    } else {
-        if(instructions.propertiesLazy['anchors.horizontalCenter']){
-            delete instructions.properties['x']
-
-            let target = instructions.propertiesLazy['anchors.horizontalCenter']
-            delete instructions.propertiesLazy['anchors.horizontalCenter']
-
-            instructions.propertiesLazy['x'] = `${target} - width/2 + anchors.leftMargin - anchors.rightMargin - parent.left + anchors.horizontalCenterOffset`
-        } else if(instructions.propertiesLazy['anchors.left'] && instructions.propertiesLazy['anchors.right']){
-            delete instructions.properties['x']
-            delete instructions.properties['width']
-
-            let leftTarget = instructions.propertiesLazy['anchors.left']
-            delete instructions.propertiesLazy['anchors.left']
-            let rightTarget = instructions.propertiesLazy['anchors.right']
-            delete instructions.propertiesLazy['anchors.right']
-
-            instructions.propertiesLazy['x'] = `${leftTarget} + anchors.leftMargin - parent.left`
-            instructions.propertiesLazy['width'] = `${rightTarget} - ${leftTarget} - anchors.rightMargin - anchors.leftMargin`
-        } else {
-            if(instructions.propertiesLazy['anchors.left']){
-                delete instructions.properties['x']
-
-                let target = instructions.propertiesLazy['anchors.left']
-                delete instructions.propertiesLazy['anchors.left']
-
-                let splitTarget = target.split(':')
-                if(splitTarget.length > 1){
-                    for(let i = 0; i < splitTarget.length; i++){
-                        splitTarget[i] += '+ anchors.leftMargin - parent.left'
-                    }
-                    instructions.propertiesLazy['x'] = splitTarget.join(':')
-                } else {
-                    instructions.propertiesLazy['x'] = `${target} + anchors.leftMargin - parent.left`
-                }
-                //if(target.indexOf('parent') >= 0){
-                    
-                // } else {
-                //     let obj = target.replaceAll('.left', '').replaceAll('.right', '')
-                //     instructions.propertiesLazy['x'] = `${target} + anchors.leftMargin - (parent.left - (${obj}.parent.left))`
-                // }
-                
-            }
-            if(instructions.propertiesLazy['anchors.right']){
-                delete instructions.properties['x']
-
-                let target = instructions.propertiesLazy['anchors.right']
-                delete instructions.propertiesLazy['anchors.right']
-
-                let splitTarget = target.split(':')
-                if(splitTarget.length > 1){
-                    for(let i = 0; i < splitTarget.length; i++){
-                        splitTarget[i] += '- width - anchors.rightMargin - parent.left'
-                    }
-                    instructions.propertiesLazy['x'] = splitTarget.join(':')
-                } else {
-                    instructions.propertiesLazy['x'] = `${target} - width - anchors.rightMargin - parent.left`
-                }
-                //if(target.indexOf('parent') >= 0){
-                    
-                // } else {
-                //     let obj = target.replaceAll('.left', '').replaceAll('.right', '')
-                //     instructions.propertiesLazy['x'] = `${target} - width - anchors.rightMargin - (parent.left - (${obj}.parent.left))`
-                // }
-                
-            }
-        }
-
-        if(instructions.propertiesLazy['anchors.verticalCenter']){
-            delete instructions.properties['y']
-
-            let target = instructions.propertiesLazy['anchors.verticalCenter']
-            delete instructions.propertiesLazy['anchors.verticalCenter']
-
-            instructions.propertiesLazy['y'] = `${target} - height/2 + anchors.topMargin - anchors.bottomMargin - parent.top + anchors.verticalCenterOffset`
-        } else if(instructions.propertiesLazy['anchors.top'] && instructions.propertiesLazy['anchors.bottom']){
-            delete instructions.properties['y']
-            delete instructions.properties['height']
-
-            let topTarget = instructions.propertiesLazy['anchors.top']
-            delete instructions.propertiesLazy['anchors.top']
-            let bottomTarget = instructions.propertiesLazy['anchors.bottom']
-            delete instructions.propertiesLazy['anchors.bottom']
-
-            instructions.propertiesLazy['y'] = `${topTarget} + anchors.topMargin - parent.top`
-            instructions.propertiesLazy['height'] = `${bottomTarget} - ${topTarget} - anchors.bottomMargin - anchors.topMargin`
-        } else {
-            if(instructions.propertiesLazy['anchors.top']){
-                delete instructions.properties['y']
-
-                let target = instructions.propertiesLazy['anchors.top']
-                delete instructions.propertiesLazy['anchors.top']
-
-                let splitTarget = target.split(':')
-                if(splitTarget.length > 1){
-                    for(let i = 0; i < splitTarget.length; i++){
-                        splitTarget[i] += '+ anchors.topMargin - parent.top'
-                    }
-                    instructions.propertiesLazy['y'] = splitTarget.join(':')
-                } else {
-                    instructions.propertiesLazy['y'] = `${target} + anchors.topMargin - parent.top`
-                }
-                //if(target.indexOf('parent') >= 0){
-                    
-                // } else {
-                //     let obj = target.replaceAll('.top', '').replaceAll('.bottom', '')
-                //     instructions.propertiesLazy['y'] = `${target} + anchors.topMargin - (parent.top - (${obj}.parent.top))`
-                // }
-                
-            }
-            if(instructions.propertiesLazy['anchors.bottom']){
-                delete instructions.properties['y']
-
-                let target = instructions.propertiesLazy['anchors.bottom']
-                delete instructions.propertiesLazy['anchors.bottom']
-
-                let splitTarget = target.split(':')
-                if(splitTarget.length > 1){
-                    for(let i = 0; i < splitTarget.length; i++){
-                        splitTarget[i] += '- height - anchors.bottomMargin - parent.top'
-                    }
-                    instructions.propertiesLazy['y'] = splitTarget.join(':')
-                } else {
-                    instructions.propertiesLazy['y'] = `${target} - height - anchors.bottomMargin - parent.top`
-                }
-                //if(target.indexOf('parent') >= 0){
-                    
-                // } else {
-                //     let obj = target.replaceAll('.top', '').replaceAll('.bottom', '')
-                //     instructions.propertiesLazy['y'] = `${target} - height - anchors.bottomMargin - (parent.top - (${obj}.parent.top))`
-                // }
-                
-            }
-        }
-    }
-
-
-    for(let name in instructions.propertiesQML){
-        anchorsReplace(instructions.propertiesQML[name])
-    }
-    for(let name in instructions.propertiesQMLNew){
-        anchorsReplace(instructions.propertiesQMLNew[name])
-    }
-    for(let name in instructions.propertiesSpecial){
-        anchorsReplace(instructions.propertiesSpecial[name])
-    }
-    for(let child of instructions.children){
-        anchorsReplace(child)
+        proxyReplace(child)
     }
 }
 
@@ -1028,7 +686,7 @@ for(file in compiledFiles){
     // anchorsReplace(compiledFiles[file].instructions)
 
     
-    IDReplace(compiledFiles[file].instructions)
+    proxyReplace(compiledFiles[file].instructions)
     
     // ProxyReplace(compiledFiles[file].instructions)
     // PropertyReplace(compiledFiles[file].instructions)
@@ -1147,7 +805,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
     }
     for(let prop in instructions.propertiesLazy){
         let val = instructions.propertiesLazy[prop]
-        code.push(`${curr}.$sP(\`${prop}\`, function(){with(this)with(QML){return ${val}}}.bind(${curr}))`)
+        code.push(`${curr}.$sP(\`${prop}\`, function(){return ${val}}.bind(${curr}))`)
     }
     for(let prop in instructions.propertiesNew){
         let val = instructions.propertiesNew[prop]
@@ -1155,11 +813,11 @@ function compile(instructions, code, curr = '$root', prev = ''){
     }
     for(let prop in instructions.propertiesLazyNew){
         let val = instructions.propertiesLazyNew[prop]
-        code.push(`${curr}.$cP(\`${prop}\`,function(){with(this)with(QML){return ${val}}}.bind(${curr}))`)
+        code.push(`${curr}.$cP(\`${prop}\`,function(){return ${val}}.bind(${curr}))`)
     }
     for(let prop in instructions.propertiesAlias){
         let val = instructions.propertiesAlias[prop]
-        code.push(`${curr}.$cA(\`${prop}\`,function(){with(this)with(QML){return ${val}}}.bind(${curr}),function(nVal){with(this)with(QML){${val}=nVal}}.bind(${curr}))`)
+        code.push(`${curr}.$cA(\`${prop}\`,function(){return ${val}}.bind(${curr}),function(nVal){${val}=nVal}.bind(${curr}))`)
     }
     for(let prop in instructions.propertiesSpecial){
         let codeNew = []
@@ -1197,7 +855,8 @@ function compile(instructions, code, curr = '$root', prev = ''){
     }
 
     for(let name in instructions.methods){
-        code.push(`${curr}.${name}=function(${instructions.methods[name].params.join(',')}){let $args = {${instructions.methods[name].params.join(',')}};with(this)with($args)with(QML){${instructions.methods[name].source}}}.bind(${curr})`)
+        //code.push(`${curr}.${name}=function(${instructions.methods[name].params.join(',')}){let $args = {${instructions.methods[name].params.join(',')}};with(this)with($args)with(QML){${instructions.methods[name].source}}}.bind(${curr})`)
+        code.push(`${curr}.${name}=${instructions.methods[name].sourceFull}.bind(${curr})`)
     }
     for(let name in instructions.defineSignals){
         if(instructions.defineSignals[name].length){
@@ -1208,7 +867,8 @@ function compile(instructions, code, curr = '$root', prev = ''){
         
     }
     for(let signal of instructions.connectionSignals){
-        code.push(`${curr}.$s['${signal.name}'].connect(function(){with(this)with(QML)with(this.$s['${signal.name}'].context){${signal.source}}}.bind(${curr}))`)
+        //code.push(`${curr}.$s['${signal.name}'].connect(function(){with(this)with(QML)with(this.$s['${signal.name}'].context){${signal.source}}}.bind(${curr}))`)
+        code.push(`${curr}.$s['${signal.name}'].connect(${signal.sourceFull}.bind(${curr}))`)
     }
     
     // code.push(`${curr}.$tryComplete()`)
@@ -1251,7 +911,7 @@ for(file in compiledFiles){
             tempIDList.push(id)
         }
 
-        fs.writeFile(source + '/cache/' + crypto.createHash('md5').update(file).digest("hex"), compiledFiles[file].currentHash + '\n' + tempIDList.join(','), function(error){
+        fs.writeFile(source + '/cache/' + crypto.createHash('md5').update(file).digest("hex"), compiledFiles[file].currentHash /*+ '\n' + tempIDList.join(',')*/, function(error){
             if(error) throw error
         })
     }

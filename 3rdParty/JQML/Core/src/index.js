@@ -131,7 +131,7 @@ global.IDManager = {
         return current.obj
     },
     get: function(obj, ID){
-        if(obj.ID.has(ID)) return obj
+        // if(obj[ID]) return obj[ID]
         if(obj.ID && obj.ID.has(ID)) return obj
         if(this.list[ID] && this.list[ID].length === 1) return this.list[ID][0]
         let current = {
@@ -141,7 +141,7 @@ global.IDManager = {
         return this.find(obj, ID, current, 1, new Set([obj]))
     },
     get0: function(obj, ID){
-        // if(obj.ID.has(ID)) return obj
+        // if(obj[ID]) return obj[ID]
         if(this.list[ID] && this.list[ID].length === 1) return this.list[ID][0]
         let current = {
             len: 99999999,
@@ -176,87 +176,39 @@ global.Core = {
     animations: {},
     // LVL: 0,
     queueCompleted: [],
-    proxy: function(obj, alt = {}){
-        let temp = {}
-        return new Proxy(obj, {
-            has(){
+    proxyHandler: {
+        has(){
+            return true
+        },
+        get(target, name){
+            if(name in target && (!target.$currentAlias || (target.$currentAlias && target.$currentAlias.name !== name))){
+                return target[name]
+            } else {
+                if(name in QML){
+                    return QML[name]
+                }
+                if(name in Core.Singletons){
+                    return IDManager.list[name][0]
+                }
+                let res = IDManager.find(target, name, {
+                    len: 99999999,
+                    obj: null,
+                }, 1, new Set([target]))
+                if(res) return res
+
+                if(name in window) return window[name]
+
+                return undefined
+            }
+        },
+        set(target, name, value){
+            if(name in target){
+                target[name] = value
                 return true
-            },
-            get(target, name){
-                if(name in temp){
-                    return temp[name]
-                } else if(name in alt){
-                    return alt[name]
-                } else if(name in target){
-                    return target[name]
-                } else if(target.ID.has(name)) {
-                    return target
-                } else if(name === 'model') {
-                    let parent = target.parent
-                    while(parent){
-                        if(parent instanceof ListView || parent instanceof GridView || parent instanceof Repeater) return parent.model.data[target.index]
-                        parent = parent.parent
-                    }
-                } else {
-                    if(name in QML){
-                        return QML[name]
-                    }
-                    if(name in Core.Singletons){
-                        return IDManager.list[name][0]
-                    }
-                    if(name in window) return window[name]
-
-                    let parent = target.parent
-                    while(parent){
-                        if(name in parent) return parent[name]
-                        parent = parent.parent
-                    }
-                    
-                    let res = IDManager.find(target, name, {
-                        len: 99999999,
-                        obj: null,
-                    }, 1, [target])
-                    if(res) return res
-
-                    //return temp[name]
-                }
-            },
-            set(target, name, value){
-                if(name in alt){
-                    alt[name] = value
-                    return true
-                } else if(name in target){
-                    target[name] = value
-                } else {
-                    let parent = target.parent
-                    while(parent){
-                        if(name in parent) {
-                            parent[name] = value
-                            return true
-                        }
-                        parent = parent.parent
-                    }
-                
-                    temp[name] = value
-                    return true
-                }
-            },
-            // set(target, name, value){
-            //     if(name in target){
-            //         target[name] = value
-            //     }  else {
-            //         let find = false
-            //         let parent = target.parent
-            //         while(parent && !find){
-            //             if(name in parent) {
-            //                 find = true
-            //                 parent[name] = value
-            //             }
-            //             parent = parent.parent
-            //         }
-            //     }
-            // }
-        })
+            } else {
+                return false
+            }
+        },
     },
     cC: function(componentPath, args){ // createComponent => CC
         if(componentPath[0] === '/') componentPath = componentPath.slice(1)
