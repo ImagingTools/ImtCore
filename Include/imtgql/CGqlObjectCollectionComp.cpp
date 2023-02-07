@@ -13,6 +13,7 @@
 // ImtCore includes
 #include <imtbase/CTempDir.h>
 #include <imtcom/CRequestSender.h>
+#include <imtgql/CGqlRequest.h>
 
 
 namespace imtgql
@@ -73,14 +74,14 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
 			const Id& parentId)
 {
+	QByteArray documentId;
+
 	if (m_gqlClientCompPtr.IsValid()){
 		IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
 		if (delegatePtr != nullptr){
 			const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 			if (persistencePtr != nullptr){
 				if (defaultValuePtr.IsValid()){
-					QByteArray documentId;
-
 					imtcom::IFileTransfer* fileTransferPtr = delegatePtr->GetFileTransfer();
 					if (fileTransferPtr != nullptr){
 						imtbase::CTempDir tempDir;
@@ -108,7 +109,14 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 												IGqlObjectCollectionDelegate::InsertObjectResponsePtr saveDocumentResponsePtr = delegatePtr->CreateInsertObjectResponsePtr();
 												if (m_gqlClientCompPtr->SendRequest(*uploadDocumentRequestPtr, *saveDocumentResponsePtr)){
 													documentId = saveDocumentResponsePtr->GetObjectId();
-													if (documentId.isEmpty()){
+													if (!documentId.isEmpty()){
+														istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+														imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+														insertInfo.elementId = documentId;
+														changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+														istd::CChangeNotifier notifier(this, &changeSet);
+													}
+													else{
 														SendErrorMessage(0, saveDocumentResponsePtr->GetMessage(0), "Document Cloud Controller");
 													}
 												}
@@ -132,19 +140,19 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 							}
 						}
 					}
-
-					return documentId;
 				}
 			}
 		}
 	}
 
-	return QByteArray();
+	return documentId;
 }
 
 
 bool CGqlObjectCollectionComp::RemoveElement(const Id& elementId)
 {
+	bool retVal = false;
+
 	if (m_gqlClientCompPtr.IsValid()){
 		QByteArray typeId = GetObjectTypeId(elementId);
 
@@ -154,12 +162,19 @@ bool CGqlObjectCollectionComp::RemoveElement(const Id& elementId)
 
 			istd::TDelPtr<imtgql::IGqlRequest> queryPtr(delegatePtr->CreateRemoveElementRequest(elementId));
 			if (m_gqlClientCompPtr->SendRequest(*queryPtr, *responsePtr)){
-				return responsePtr->Result();
+				retVal = responsePtr->Result();
+				if (retVal){
+					istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+					imtbase::ICollectionInfo::ElementRemoveInfo removeInfo;
+					removeInfo.elementId = elementId;
+					changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED, QVariant::fromValue(removeInfo));
+					istd::CChangeNotifier notifier(this, &changeSet);
+				}
 			}
 		}
 	}
 
-	return false;
+	return retVal;
 }
 
 
@@ -241,13 +256,17 @@ bool CGqlObjectCollectionComp::SetObjectData(
 								if (replyPtr != nullptr){
 									if (!replyPtr->error()){
 										istd::TDelPtr<imtgql::IGqlRequest> updateDocumentRequestPtr(delegatePtr->CreateUpdateObjectContentRequest(m_items[objectId].parentId + "/" + objectId, object, nullptr, nullptr, version, uploadUrl));
-										if (!updateDocumentRequestPtr.IsValid()){
-											retVal = false;
-										}
-										else{
+										if (updateDocumentRequestPtr.IsValid()){
 											IGqlObjectCollectionDelegate::UpdateObjectContentResponsePtr responsePtr = delegatePtr->CreateUpdateObjectContentResponsePtr();
 											if (m_gqlClientCompPtr->SendRequest(*updateDocumentRequestPtr, *responsePtr)){
 												retVal = responsePtr->Result();
+												if (retVal){
+													istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+													imtbase::ICollectionInfo::ElementUpdateInfo updateInfo;
+													updateInfo.elementId = objectId;
+													changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED, QVariant::fromValue(updateInfo));
+													istd::CChangeNotifier notifier(this, &changeSet);
+												}
 											}
 										}
 									}
@@ -586,30 +605,6 @@ bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString
 
 bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
 {
-	//if (m_gqlClientCompPtr.IsValid()){
-	//	QByteArray typeId = GetObjectTypeId(elementId);
-	//	gmgaws::IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-	//	if (delegatePtr != nullptr){
-	//		IGqlObjectCollectionDelegate::ElementInfoResponsePtr responsePtr  = delegatePtr->CreateElementInfoResponsePtr();
-	//		istd::TDelPtr<imtgql::IGqlRequest> infoRequestPtr(delegatePtr->CreateElementInfoRequest(elementId));
-	//		if (m_gqlClientCompPtr->SendRequest(*infoRequestPtr, *responsePtr)){
-	//			int version = responsePtr->GetElementInfo().version;
-
-	//			IGqlObjectCollectionDelegate::ElementDescription elementDescription;
-	//			elementDescription.name = responsePtr->GetElementInfo().name;
-	//			elementDescription.description = description;
-
-	//			istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateUpdateElementDescriptionRequest(elementId, elementDescription, version));
-	//			if (requestPtr.IsValid()){
-	//				SetElementNameResponse response(*const_cast<CGqlObjectCollectionComp*>(this), typeId);
-	//				if (m_gqlClientCompPtr->SendRequest(*requestPtr, response)){
-	//					return response.GetStatus();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
 	return false;
 }
 
@@ -665,6 +660,8 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 			const QString& sourceFilePath,
 			const ICollectionInfo::Id& parentId) const
 {
+	return QByteArray();
+
 	if (&collection != this){
 		return QByteArray();
 	}
@@ -703,7 +700,14 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 										IGqlObjectCollectionDelegate::InsertObjectResponsePtr saveDocumentResponsePtr = delegatePtr->CreateInsertObjectResponsePtr();
 										if (m_gqlClientCompPtr->SendRequest(*uploadDocumentRequestPtr, *saveDocumentResponsePtr)){
 											documentId = saveDocumentResponsePtr->GetObjectId();
-											if (documentId.isEmpty()){
+											if (!documentId.isEmpty()){
+												//istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+												//imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+												//insertInfo.elementId = documentId;
+												//changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+												//istd::CChangeNotifier notifier(this, &changeSet);
+											}
+											else{
 												SendErrorMessage(0, saveDocumentResponsePtr->GetMessage(0), "Document Cloud Controller");
 											}
 										}
@@ -722,6 +726,22 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 	}
 
 	return QByteArray();
+}
+
+
+// reimplemented (gmgaws::ISubscriptionClient)
+
+void CGqlObjectCollectionComp::OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData)
+{
+	istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+	imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+	changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+	istd::CChangeNotifier notifier(this, &changeSet);
+}
+
+
+void CGqlObjectCollectionComp::OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message)
+{
 }
 
 
@@ -775,11 +795,25 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 		m_typesInfo.InsertOption(typeName, typeId);
 	}
+
+	if (m_subscriptionManagerCompPtr.IsValid()){
+		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, "onAddMeasurement");
+		imtgql::CGqlObject subscriptionField("data");
+		subscriptionField.InsertField("id");
+		subscriptionField.InsertField("name");
+		subscriptionField.InsertField("metadata");
+		//	subscriptionField.InsertField("folderId");
+		subscriptionField.InsertField("createdOn");
+		//	subscriptionField.InsertField("version");
+		gqlRequest.AddField(subscriptionField);
+		m_addMeasurementSubsriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
+	}
 }
 
 
 void CGqlObjectCollectionComp::OnComponentDestroyed()
 {
+	m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
 	m_delegatesMap.clear();
 
 	BaseClass::OnComponentDestroyed();

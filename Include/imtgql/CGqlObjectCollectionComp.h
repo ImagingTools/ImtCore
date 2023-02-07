@@ -9,6 +9,8 @@
 // ImtCore includes
 #include <imtgql/IClientProtocolEngine.h>
 #include <imtgql/IGqlObjectCollectionDelegate.h>
+#include <imtgql/IGqlSubscriptionManager.h>
+#include <imtgql/IGqlClient.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IObjectCollection.h>
@@ -28,7 +30,8 @@ class CGqlObjectCollectionComp:
 			public QObject,
 			public ilog::TLoggerCompWrap<icomp::CComponentBase>,
 			virtual public imtbase::IObjectCollection,
-			virtual public imtbase::ICollectionDataController
+			virtual public imtbase::ICollectionDataController,
+			virtual public IGqlSubscriptionClient
 {
 	Q_OBJECT
 public:
@@ -40,6 +43,7 @@ public:
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_ASSIGN(m_gqlClientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
+		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "GraphQL subscription manager", true, "SubscriptionManager");
 		I_ASSIGN_MULTI_0(m_gqlDatabaseDelegatesCompPtr, "GqlDatabaseDelegates", "GraphQL-based document delegate for database CRUD oeprations", true);
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
@@ -123,6 +127,10 @@ public:
 				const QString& sourceFilePath = QString(),
 				const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const override;
 
+	// reimplemented (imtgql::IGqlSubscriptionClient)
+	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData);
+	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message);
+
 protected:
 	DataPtr CreateObjectInstance(const QByteArray& typeId) const;
 
@@ -139,6 +147,7 @@ private:
 
 private:
 	I_REF(imtgql::IGqlClient, m_gqlClientCompPtr);
+	I_REF(imtgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
 	I_MULTIREF(IGqlObjectCollectionDelegate, m_gqlDatabaseDelegatesCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 	I_MULTITEXTATTR(m_typeNamesAttrPtr);
@@ -158,6 +167,7 @@ private:
 		int version;
 	};
 	mutable QMap<QByteArray, Item> m_items;
+	QByteArray m_addMeasurementSubsriptionId;
 };
 
 
