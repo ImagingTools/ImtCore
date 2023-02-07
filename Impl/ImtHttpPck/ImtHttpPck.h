@@ -6,13 +6,16 @@
 #include <icomp/TModelCompWrap.h>
 
 // ImtCore includes
+#include <imthttp/CHttpFileTransfer.h>
 
 
-namespace ImtCryptPck
+namespace ImtHttpPck
 {
 
 
+typedef icomp::TMakeComponentWrap<imthttp::CHttpFileTransfer, imtcom::IFileTransfer> HttpFileTransfer;
 
-} // namespace ImtCryptPck
+
+} // namespace ImtHttpPck
 
 

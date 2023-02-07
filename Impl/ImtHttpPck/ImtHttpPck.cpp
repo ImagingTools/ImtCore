@@ -14,6 +14,11 @@ I_EXPORT_PACKAGE(
 			"Http component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
+I_EXPORT_COMPONENT(
+			HttpFileTransfer,
+			"Component for transfering files over http",
+			"File Http Transfer");
+
 
 } // namespace ImtHttpPck
 
