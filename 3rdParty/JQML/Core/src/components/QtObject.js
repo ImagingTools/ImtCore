@@ -42,6 +42,7 @@ export class QtObject {
 
     constructor(args) {
         this.$P = new Proxy(this, Core.proxyHandler)
+        this.$P0 = new Proxy(this, Core.proxyHandler0)
         this.$qmlClassName = this.constructor.name
         this._context = context
         this.UID = UID++
@@ -307,7 +308,6 @@ export class QtObject {
         signal.debug = `${this.UID}-${name}`
         if(typeof val === 'function'){
             this.$p[name] = {
-                'name': name,
                 'val': undefined,
                 'signal': signal,
                 'depends': new Set(),
@@ -323,7 +323,6 @@ export class QtObject {
             this.$uL.properties.push(name)
         } else {
             this.$p[name] = {
-                'name': name,
                 'val': val,
                 'signal': signal,
                 'depends': new Set(),
@@ -394,7 +393,6 @@ export class QtObject {
         for(let name2 in props){
             
             this.$p[`${name}.${name2}`] = {
-                'name': `${name}.${name2}`,
                 'val': props[name2],
                 'signal': signal,
                 'depends': new Set(),
@@ -487,7 +485,6 @@ export class QtObject {
         let signal = this.$cS(`${name}Changed`)
 
         this.$p[name] = {
-            'name': name,
             'val': '',
             'signal': signal,
             'type': 'alias',
@@ -525,15 +522,11 @@ export class QtObject {
                         }
                     }
                 }
-                this.$currentAlias = this.$p[name]
-                let res = getter()
-                this.$currentAlias = null
-                return res//this.$p[name].val
+                
+                return getter()//this.$p[name].val
             },
             set: (newVal)=>{
-                this.$currentAlias = this.$p[name]
-                setter(newVal) 
-                this.$currentAlias = null          
+                setter(newVal)           
             },
         })
 

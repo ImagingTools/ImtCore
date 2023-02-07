@@ -70,7 +70,7 @@ let files = getFiles(source)
 
 let IDList = new Set()
 
-function proxyJS(sourceOrig, instruction, ignoreList = []){
+function proxyJS(sourceOrig, currentName, instruction, ignoreList = []){
     let source = sourceOrig
     ignoreList.push('of')
     const ignore = new Set(ignoreList)
@@ -127,11 +127,13 @@ function proxyJS(sourceOrig, instruction, ignoreList = []){
             }
 
             let id = `this.$P.${markers[i].value}`
-            // if(instruction.properties[markers[i].value] || instruction.propertiesNew[markers[i].value] || instruction.propertiesLazy[markers[i].value] ||
-            //     instruction.propertiesLazyNew[markers[i].value] || instruction.propertiesQML[markers[i].value] || instruction.propertiesQMLNew[markers[i].value] ||
-            //     instruction.propertiesAlias[markers[i].value] || instruction.propertiesSpecial[markers[i].value]) {
-            //         id = `this.${markers[i].value}`
-            //     }
+            if(instruction.properties[markers[i].value] || instruction.propertiesNew[markers[i].value] || instruction.propertiesLazy[markers[i].value] ||
+                instruction.propertiesLazyNew[markers[i].value] || instruction.propertiesQML[markers[i].value] || instruction.propertiesQMLNew[markers[i].value] || instruction.propertiesSpecial[markers[i].value]) {
+                    id = `this.${markers[i].value}`
+                }
+            if(instruction.propertiesAlias[markers[i].value] && currentName === markers[i].value) {
+                    id = `this.$P0.${markers[i].value}`
+                }
             if(instruction.id.has(`\`${markers[i].value}\``)) id = `this`
             //const id = `this.$P.${markers[i].value}`
             const start = markers[i].range[0]
@@ -629,18 +631,18 @@ for(let file of files){
 function proxyReplace(instructions){
     
     for(let name in instructions.propertiesLazy){
-        instructions.propertiesLazy[name] = proxyJS(instructions.propertiesLazy[name], instructions)
+        instructions.propertiesLazy[name] = proxyJS(instructions.propertiesLazy[name], name, instructions)
     }
     for(let name in instructions.propertiesLazyNew){
-        instructions.propertiesLazyNew[name] = proxyJS(instructions.propertiesLazyNew[name], instructions)
+        instructions.propertiesLazyNew[name] = proxyJS(instructions.propertiesLazyNew[name], name, instructions)
     }
     for(let name in instructions.propertiesAlias){
-        instructions.propertiesAlias[name] = proxyJS(instructions.propertiesAlias[name], instructions)
+        instructions.propertiesAlias[name] = proxyJS(instructions.propertiesAlias[name], name, instructions)
     }
     
     for(let name in instructions.methods){
         // let temp = eval(instructions.methods[name].sourceFull)
-        instructions.methods[name].sourceFull = proxyJS(instructions.methods[name].sourceFull, instructions, instructions.methods[name].params).replaceAll('let $compileTemp=', '')
+        instructions.methods[name].sourceFull = proxyJS(instructions.methods[name].sourceFull, name, instructions, instructions.methods[name].params).replaceAll('let $compileTemp=', '')
     }
     for(let signal of instructions.connectionSignals){
         let signalParams = []
@@ -656,7 +658,7 @@ function proxyReplace(instructions){
             signalParams[i] = signalParams[i].replaceAll('`', '')
         }
 
-        signal.sourceFull = proxyJS(signal.sourceFull, instructions, signalParams).replaceAll('let $compileTemp=', '')
+        signal.sourceFull = proxyJS(signal.sourceFull, signal.name, instructions, signalParams).replaceAll('let $compileTemp=', '')
     }
     for(let name in instructions.propertiesQML){
         proxyReplace(instructions.propertiesQML[name])
