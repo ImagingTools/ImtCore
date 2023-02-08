@@ -15,7 +15,7 @@ Rectangle {
     property int mainMargin: 0;
     property int mainRadius: 0;
 
-    property alias authorizationPage: authorizationPage;
+    property alias authorizationPageAlias: authorizationPage;
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
 
