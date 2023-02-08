@@ -42,6 +42,11 @@ Item {
                 parameters.CopyItemDataFromModel(index, applicationInfoProvider.serverApplicationInfo)
             }
 
+            index = parameters.InsertNewItem();
+            parameters.SetData("Id", "ServerLog", index);
+            parameters.SetData("Name", "Server Log", index);
+            parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
+
             console.log("pageModel", pageModel.toJSON());
         }
     }

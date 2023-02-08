@@ -19,6 +19,10 @@ Item {
         }
     }
 
+    onFocusChanged: {
+        tfc.focus = filterPanelDecorator.focus;
+    }
+
     NumberAnimation {
         id: animRect;
         target: tfc;
@@ -42,7 +46,7 @@ Item {
             id: tfc;
             anchors.verticalCenter: parent.verticalCenter;
 
-            width: 435;
+            width: 300;
             height: 25;
 
             placeHolderText: qsTr("Enter some text to filter the item list");

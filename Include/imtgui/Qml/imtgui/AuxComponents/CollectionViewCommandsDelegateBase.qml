@@ -15,7 +15,6 @@ Item {
 
     property Item documentManager: null;
 
-
     property CommandsProvider commandsProvider: null;
 
     /**
@@ -77,6 +76,10 @@ Item {
     onCommandsIdChanged: {
         console.log("CollectionCommands onCommandsIdChanged", containerBase.commandsId);
         Events.subscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
+    }
+
+    CollectionViewCommandsObserver {
+        commandsProvider: containerBase.commandsProvider;
     }
 
     function openPopupMenu(x, y){

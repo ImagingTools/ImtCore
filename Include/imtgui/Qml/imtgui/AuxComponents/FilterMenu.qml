@@ -14,10 +14,21 @@ Rectangle {
     signal textFilterChanged(int index, string text);
     signal closed();
 
-
     onDecoratorSourceChanged: {
         console.log("loaderDecorator.source", filterContainer.decoratorSource);
         loaderDecoratorObj.source = filterContainer.decoratorSource;
+    }
+
+    onVisibleChanged: {
+        filterContainer.focus = filterContainer.visible;
+        loaderDecoratorObj.item.focus = filterContainer.visible;
+    }
+
+    Keys.onPressed: {
+        console.log("Filter onPressed");
+        if (event.key === Qt.Key_Escape){
+            filterContainer.parent.visible = false;
+        }
     }
 
     Loader {

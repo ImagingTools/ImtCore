@@ -37,6 +37,10 @@ Item {
     property TreeItemModel documentsData: TreeItemModel {}
     property Item documentManager: null;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+    }
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Delete){
             commandsLoader.item.commandHandle("Remove");
@@ -61,6 +65,11 @@ Item {
         if (collectionViewContainer.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                                       "CommandsId": commandsProvider.commandsId});
+
+            Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+        }
+        else{
+            Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
         }
     }
 
@@ -70,6 +79,10 @@ Item {
                 commandsLoader.item.documentManager = collectionViewContainer.documentManager;
             }
         }
+    }
+
+    function filterMenuActivate(){
+        collectionViewContainer.filterMenuVisible = !collectionViewContainer.filterMenuVisible;
     }
 
     onCommandsIdChanged: {

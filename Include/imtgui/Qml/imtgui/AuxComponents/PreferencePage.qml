@@ -135,41 +135,41 @@ Rectangle {
         return -1;
     }
 
-    function openFileDialog(){
-        fileDialogSave.open();
-    }
+//    function openFileDialog(){
+//        fileDialogSave.open();
+//    }
 
     function close(buttonId){
         container.visible = false;
     }
 
-    RemoteFileController {
-        id: remoteFileController;
-    }
+//    RemoteFileController {
+//        id: remoteFileController;
+//    }
 
-    FileDialog {
-        id: fileDialogSave;
+//    FileDialog {
+//        id: fileDialogSave;
 
-        title: qsTr("Save file");
-        selectExisting: false;
-        folder: shortcuts.home;
+//        title: qsTr("Save file");
+//        selectExisting: false;
+//        folder: shortcuts.home;
 
-        nameFilters: ["Text files (*.txt)", "All files (*)"];
+//        nameFilters: ["Text files (*.txt)", "All files (*)"];
 
-        onAccepted: {
-            var pathDir = fileDialogSave.folder.toString();
-            remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
-            var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
-            var id = "";
+//        onAccepted: {
+//            var pathDir = fileDialogSave.folder.toString();
+//            remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
+//            var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
+//            var id = "";
 
-            if (fileName == ""){
-                fileName = {};
-                fileName["name"] = "ServerLog.txt";
-            }
+//            if (fileName == ""){
+//                fileName = {};
+//                fileName["name"] = "ServerLog.txt";
+//            }
 
-            remoteFileController.GetFile(id, fileName);
-        }
-    }
+//            remoteFileController.GetFile(id, fileName);
+//        }
+//    }
 
     MouseArea {
         anchors.fill: parent;

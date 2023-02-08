@@ -645,7 +645,7 @@ Item {
 
         anchors.verticalCenter: headersPanel.verticalCenter;
         anchors.right: headersPanel.right;
-        anchors.rightMargin: -width;
+        //anchors.rightMargin: -width;
 
         visible: tableContainer.hasFilter && tableContainer.showHeaders;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;

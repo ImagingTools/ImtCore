@@ -53,21 +53,15 @@ Item {
         }
     }
 
-    Shortcut {
-        sequence: "Ctrl+F";
-        onActivated: {
-            console.log("onActivated Ctrl+F");
-            filterMenuLocal.visible = !filterMenuLocal.visible;
-        }
-
-        context: Qt.ApplicationShortcut;
-    }
-
     Loader {
         id: filterMenuLocal;
         anchors.top: collectionViewBaseContainer.top;
         width: parent.width;
         visible: false;
+
+        onVisibleChanged: {
+            console.log('filterMenuLocal onVisibleChanged', visible)
+        }
 
         sourceComponent: Component {
             FilterMenu {
