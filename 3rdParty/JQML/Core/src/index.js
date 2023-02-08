@@ -184,16 +184,15 @@ global.Core = {
             if(name in target){
                 return target[name]
             } else {
-                if(target.ID.has(name)){
-                    return target
-                }
                 if(name in QML){
                     return QML[name]
                 }
                 if(name in Core.Singletons){
                     return IDManager.list[name][0]
                 }
-                
+                if(target.ID.has(name)){
+                    return target
+                }
                 let res = IDManager.find(target, name, {
                     len: 99999999,
                     obj: null,
@@ -219,21 +218,28 @@ global.Core = {
             return true
         },
         get(target, name){
-            if(name in QML){
-                return QML[name]
-            }
-            if(name in Core.Singletons){
-                return IDManager.list[name][0]
-            }
-            let res = IDManager.find(target, name, {
-                len: 99999999,
-                obj: null,
-            }, 1, new Set([target]))
-            if(res) return res
+            if(name in target){
+                return target[name]
+            } else {
+                if(name in QML){
+                    return QML[name]
+                }
+                if(name in Core.Singletons){
+                    return IDManager.list[name][0]
+                }
+                // if(target.ID.has(name)){
+                //     return target
+                // }
+                let res = IDManager.find(target, name, {
+                    len: 99999999,
+                    obj: null,
+                }, 1, new Set([target]))
+                if(res) return res
 
-            if(name in window) return window[name]
+                if(name in window) return window[name]
 
-            return undefined
+                return undefined
+            }
             
         },
         set(target, name, value){

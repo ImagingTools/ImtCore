@@ -126,14 +126,15 @@ function proxyJS(sourceOrig, currentName, instruction, ignoreList = []){
                 // if(markers[i+1].type === 'Keyword' && (markers[i+1].value === 'var' || markers[i+1].value === 'let')) continue
             }
 
-            let id = `this.$P.${markers[i].value}`
+            let id = `this.$P0.${markers[i].value}`
             if(instruction.properties[markers[i].value] || instruction.propertiesNew[markers[i].value] || instruction.propertiesLazy[markers[i].value] ||
-                instruction.propertiesLazyNew[markers[i].value] || instruction.propertiesQML[markers[i].value] || instruction.propertiesQMLNew[markers[i].value] || instruction.propertiesSpecial[markers[i].value]) {
+                instruction.propertiesLazyNew[markers[i].value] || instruction.propertiesQML[markers[i].value] || instruction.propertiesQMLNew[markers[i].value] || 
+                instruction.propertiesAlias[markers[i].value] || instruction.propertiesSpecial[markers[i].value]) {
                     id = `this.${markers[i].value}`
                 }
-            if(instruction.propertiesAlias[markers[i].value] && currentName === markers[i].value) {
-                    id = `this.$P0.${markers[i].value}`
-                }
+            // if(instruction.propertiesAlias[markers[i].value] && currentName === markers[i].value) {
+            //         id = `this.$P0.${markers[i].value}`
+            //     }
             if(instruction.id.has(`\`${markers[i].value}\``)) id = `this`
             //const id = `this.$P.${markers[i].value}`
             const start = markers[i].range[0]

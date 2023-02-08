@@ -39,6 +39,10 @@ export var Qt = {
     Unchecked: 0,
     PartiallyChecked: 1,
     Checked: 2,
+
+    point: function(x, y){
+        return {}
+    },
     
     openUrlExternally: function(url){
         return window.open(url, '_blank')

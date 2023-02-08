@@ -102,6 +102,9 @@ export class ListModel extends QtObject {
         // }, 100)
         
     }
+    toJSON(){
+        return ''
+    }
 
     // $destroy(){
     //     this.clear()
