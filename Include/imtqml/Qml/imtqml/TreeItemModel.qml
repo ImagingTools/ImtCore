@@ -237,7 +237,7 @@ JSONListModel {
                 else if(typeof modelVal === 'string' || modelVal instanceof String){
                     retVal += "\"" + modelVal + "\""
                 }
-                else if(typeof modelVal === 'object'){
+                else if(typeof modelVal === 'object' && !modelVal.$qmlClassName){
                     retVal += JSON.stringify(modelVal)
                 }else
                     retVal += modelVal
