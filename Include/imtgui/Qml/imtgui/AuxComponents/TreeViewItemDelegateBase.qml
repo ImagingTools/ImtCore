@@ -80,76 +80,78 @@ TableViewItemDelegateBase {
         }
     }
 
-    prefixRowDelegate: Row {
-        id: prefixRow;
+    prefixRowDelegate: Component {
+        Row {
+            id: prefixRow;
 
-        height: treeDelegateBase.root ? treeDelegateBase.root.rowItemHeight : 0;
+            height: treeDelegateBase.root ? treeDelegateBase.root.rowItemHeight : 0;
 
-        spacing: 10;
+            spacing: 10;
 
-        function click(){
-            checkBox.clicked();
-        }
+            function click(){
+                checkBox.clicked();
+            }
 
-        Item {
-            width: 15;
-            height: prefixRow.height;
-
-            AuxButton {
-                id: arrowButton;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.horizontalCenter: parent.horizontalCenter;
-
+            Item {
                 width: 15;
-                height: width;
+                height: prefixRow.height;
 
-                visible: model.ChildModel ? model.ChildModel.count > 0 : false;
+                AuxButton {
+                    id: arrowButton;
 
-                iconSource: treeDelegateBase.isOpen ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                                      "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.horizontalCenter: parent.horizontalCenter;
 
-                onClicked: {
-//                    treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
+                    width: 15;
+                    height: width;
 
-                    model.IsOpen = !model.IsOpen;
+                    visible: model.ChildModel ? model.ChildModel.count > 0 : false;
+
+                    iconSource: treeDelegateBase.isOpen ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
+                                                          "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+
+                    onClicked: {
+    //                    treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
+
+                        model.IsOpen = !model.IsOpen;
+                    }
                 }
             }
-        }
 
-        Item {
-            width: checkBox.visible ? 15 : 0;
-            height: prefixRow.height;
+            Item {
+                width: checkBox.visible ? 15 : 0;
+                height: prefixRow.height;
 
-            CheckBox {
-                id: checkBox;
+                CheckBox {
+                    id: checkBox;
 
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.horizontalCenter: parent.horizontalCenter;
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.horizontalCenter: parent.horizontalCenter;
 
-                checkState: model.CheckState;
+                    checkState: model.CheckState;
 
-                isActive: model.Active;
+                    isActive: model.Active;
 
-                visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && model.CheckBoxVisible : false;
+                    visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && model.CheckBoxVisible : false;
 
-                onClicked: {
-                    if (model.CheckState == Qt.PartiallyChecked){
-                        model.CheckState = Qt.Checked;
+                    onClicked: {
+                        if (model.CheckState == Qt.PartiallyChecked){
+                            model.CheckState = Qt.Checked;
+                        }
+                        else{
+                            model.CheckState = Qt.Checked - model.CheckState;
+                        }
+
+                        if (treeDelegateBase.parentDelegate){
+                            treeDelegateBase.parentDelegate.childrenCheckStateChanged(treeDelegateBase.itemData);
+                        }
+
+                        for (let i = 0; i < treeDelegateBase.childrenDelegates.length; i++){
+                            treeDelegateBase.childrenDelegates[i].parentCheckStateChanged(treeDelegateBase.itemData);
+                        }
+
+                        treeDelegateBase.root.rowModelDataChanged(treeDelegateBase, "CheckState");
                     }
-                    else{
-                        model.CheckState = Qt.Checked - model.CheckState;
-                    }
-
-                    if (treeDelegateBase.parentDelegate){
-                        treeDelegateBase.parentDelegate.childrenCheckStateChanged(treeDelegateBase.itemData);
-                    }
-
-                    for (let i = 0; i < treeDelegateBase.childrenDelegates.length; i++){
-                        treeDelegateBase.childrenDelegates[i].parentCheckStateChanged(treeDelegateBase.itemData);
-                    }
-
-                    treeDelegateBase.root.rowModelDataChanged(treeDelegateBase, "CheckState");
                 }
             }
         }
