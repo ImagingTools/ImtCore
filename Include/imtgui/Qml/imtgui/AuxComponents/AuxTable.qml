@@ -14,7 +14,7 @@ Item {
 
     property bool showHeaders: true;
 
-    property TreeItemModel headers; //: elementsList.model;
+    property TreeItemModel headers; //: elementsListObj.model;
 
     property TreeItemModel tableDecorator : TreeItemModel{};
 
@@ -23,9 +23,9 @@ Item {
     property TreeItemModel widthDecorator : TreeItemModel{};
     property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
 
-    property alias delegate: elementsList.delegate;
-    property alias elements: elementsList.model;
-    property alias elementsList: elementsList;
+    property alias delegate: elementsListObj.delegate;
+    property alias elements: elementsListObj.model;
+    property alias elementsList: elementsListObj;
 
     property alias headerDelegate: headersList.delegate;
     property real headerElementWidth: (headersList.width)/headersList.count;
@@ -101,7 +101,7 @@ Item {
 
     onFocusChanged: {
         if (tableContainer.focus){
-            elementsList.forceActiveFocus();
+            elementsListObj.forceActiveFocus();
         }
     }
 
@@ -271,7 +271,7 @@ Item {
     function getSelectedId(){
         console.log("getSelectedId");
         if (tableContainer.selectedIndex > -1){
-            let item = elementsList.itemAtIndex(tableContainer.selectedIndex);
+            let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
             return item.getSelectedId();
         }
 
@@ -280,7 +280,7 @@ Item {
 
     function getSelectedName(){
         if (tableContainer.selectedIndex > -1){
-            let item = elementsList.itemAtIndex(tableContainer.selectedIndex);
+            let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
             return item.getSelectedName();
         }
 
@@ -289,7 +289,7 @@ Item {
 
     function getSelectedItemData(){
         if (tableContainer.selectedIndex > -1){
-            let item = elementsList.itemAtIndex(tableContainer.selectedIndex);
+            let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
             return item.getItemData();
         }
 
@@ -664,7 +664,7 @@ Item {
     Rectangle {
         id: elementsBg;
 
-        anchors.fill: elementsList;
+        anchors.fill: elementsListObj;
         color: Style.baseColor;
         radius: tableContainer.radius;
     }
@@ -672,7 +672,7 @@ Item {
 
 
     ListView {
-        id: elementsList;
+        id: elementsListObj;
 
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -687,12 +687,12 @@ Item {
                 tableContainer.selectedIndex--;
             }
             else{
-                tableContainer.selectedIndex = elementsList.count - 1;
+                tableContainer.selectedIndex = elementsListObj.count - 1;
             }
         }
 
         Keys.onDownPressed: {
-            if (tableContainer.selectedIndex < elementsList.count - 1){
+            if (tableContainer.selectedIndex < elementsListObj.count - 1){
                 tableContainer.selectedIndex++;
             }
             else{
@@ -708,7 +708,7 @@ Item {
             id: tableDelegate;
 
             height: tableContainer.itemHeight;
-            width: elementsList.width;
+            width: elementsListObj.width;
             minHeight: tableContainer.itemHeight;
 
             selected: tableContainer.selectedIndex === model.index;
@@ -745,7 +745,7 @@ Item {
             onClicked: {
                 tableContainer.selectedIndex = model.index;
 
-                elementsList.forceActiveFocus();
+                elementsListObj.forceActiveFocus();
             }
 
             onRightButtonMouseClicked: {

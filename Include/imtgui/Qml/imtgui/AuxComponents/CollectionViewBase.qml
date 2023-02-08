@@ -26,8 +26,8 @@ Item {
 
     property alias filterMenu: filterMenuLocal.sourceComponent;
     property alias filterMenuVisible: filterMenuLocal.visible;
-    property alias modelFilter: modelFilter;
-    property alias pagination: pagination;
+    property alias modelFilter: modelFilterObj;
+    property alias pagination: paginationObj;
 
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
@@ -74,7 +74,7 @@ Item {
                 decoratorSource: Style.filterPanelDecoratorPath;
 
                 onTextFilterChanged: {
-                    modelFilter.SetData("TextFilter", text);
+                    modelFilterObj.SetData("TextFilter", text);
                     baseCommands.updateModels();
                 }
 
@@ -151,7 +151,7 @@ Item {
 
             anchors.fill: parent;
 
-            anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
+            anchors.bottom: paginationObj.visible ? paginationObj.top : parent.bottom;
             anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
             //anchors.margins: thumbnailDecoratorContainer.mainMargin;
             hasFilter: collectionViewBaseContainer.hasFilter;
@@ -172,7 +172,7 @@ Item {
             }
 
             onTextFilterChanged: {
-                modelFilter.SetData("TextFilter", text);
+                modelFilterObj.SetData("TextFilter", text);
             }
 
             onElementsChanged: {
@@ -202,22 +202,22 @@ Item {
     }
 
     function setHeaderSort(headerId, sortOrder){
-        var filterLocal = modelFilter.GetData("Sort");
+        var filterLocal = modelFilterObj.GetData("Sort");
         filterLocal.SetData("HeaderId", headerId);
         filterLocal.SetData("SortOrder", sortOrder);
     }
 
     TreeItemModel {
-        id: modelFilter;
+        id: modelFilterObj;
 
         Component.onCompleted: {
-            modelFilter.AddTreeModel("FilterIds");
-            modelFilter.AddTreeModel("Sort");
+            modelFilterObj.AddTreeModel("FilterIds");
+            modelFilterObj.AddTreeModel("Sort");
         }
     }
 
     Pagination {
-        id: pagination;
+        id: paginationObj;
 
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
@@ -228,7 +228,7 @@ Item {
         visible: collectionViewBaseContainer.hasPagination;
 
         onCurrentValueChanged: {
-            console.log("Pagination onCurrentValueChanged", pagination.currentValue);
+            console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
             tableInternal.selectedIndex = -1;
             baseCommands.updateModels();
         }

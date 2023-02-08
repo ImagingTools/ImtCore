@@ -17,7 +17,7 @@ Dialog {
 
     property TreeItemModel featuresModel;
     property alias subFeaturesModel: subFeaturesCopyModel;
-    property alias dialogModel: dialogModel;
+    property alias dialogModel: dialogModelObj;
 
     property int index: -1;
 
@@ -28,7 +28,7 @@ Dialog {
     }
 
     TreeItemModel {
-        id: dialogModel;
+        id: dialogModelObj;
     }
 
     TreeItemModel {
@@ -62,8 +62,8 @@ Dialog {
 
             subFeaturesModel.CreateFromJson(json);
 
-            editDialogContainer.valueId = dialogModel.GetData("Id");
-            editDialogContainer.valueName = dialogModel.GetData("Name");
+            editDialogContainer.valueId = dialogModelObj.GetData("Id");
+            editDialogContainer.valueName = dialogModelObj.GetData("Name");
         }
     }
 

@@ -28,8 +28,8 @@ FocusScope {
     property alias footerDelegate: footerDelegateLoader.sourceComponent;
     property alias footerItem: footerDelegateLoader.item;
 
-    property alias prefixRowDelegate: prefixRowLoader.sourceComponent;
-    property alias prefixRowItem: prefixRowLoader.item;
+    property alias prefixRowDelegate: prefixRowLoaderObj.sourceComponent;
+    property alias prefixRowItem: prefixRowLoaderObj.item;
 
     property alias suffixRowDelegate: suffixRowLoader.sourceComponent;
     property alias suffixRowItem: suffixRowLoader.item;
@@ -40,7 +40,7 @@ FocusScope {
     property alias highlightDelegate: highlightLoader.sourceComponent;
     property alias highlightItem: highlightLoader.item;
 
-    property alias prefixRowLoader: prefixRowLoader;
+    property alias prefixRowLoader: prefixRowLoaderObj;
 
     property bool selected: model.Selected;
 
@@ -78,7 +78,7 @@ FocusScope {
     }
 
     Loader {
-        id: prefixRowLoader;
+        id: prefixRowLoaderObj;
 
         anchors.left: delegate.left;
         anchors.leftMargin: delegate.level * 20;
@@ -88,7 +88,7 @@ FocusScope {
     Loader {
         id: rowLoader;
 
-        anchors.left: prefixRowLoader.right;
+        anchors.left: prefixRowLoaderObj.right;
         anchors.leftMargin: 10;
         anchors.top: headerDelegateLoader.bottom;
 

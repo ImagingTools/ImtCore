@@ -8,7 +8,7 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property alias loaderDecorator: loaderDecorator;
+    property alias loaderDecorator: loaderDecoratorObj;
     property string decoratorSource;
 
     signal textFilterChanged(int index, string text);
@@ -17,11 +17,11 @@ Rectangle {
 
     onDecoratorSourceChanged: {
         console.log("loaderDecorator.source", filterContainer.decoratorSource);
-        loaderDecorator.source = filterContainer.decoratorSource;
+        loaderDecoratorObj.source = filterContainer.decoratorSource;
     }
 
     Loader {
-        id: loaderDecorator;
+        id: loaderDecoratorObj;
 
         anchors.fill: parent;
 
@@ -34,11 +34,11 @@ Rectangle {
         }
 
         onItemChanged: {
-            if (loaderDecorator.item){
-                loaderDecorator.item.width = filterContainer.width;
-                filterContainer.height = loaderDecorator.item.height;
-                if(loaderDecorator.item.rootLoader !==undefined){
-                    loaderDecorator.item.rootLoader = loaderDecorator;
+            if (loaderDecoratorObj.item){
+                loaderDecoratorObj.item.width = filterContainer.width;
+                filterContainer.height = loaderDecoratorObj.item.height;
+                if(loaderDecoratorObj.item.rootLoader !==undefined){
+                    loaderDecoratorObj.item.rootLoader = loaderDecoratorObj;
                 }
             }
         }

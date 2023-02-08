@@ -34,8 +34,8 @@ Item {
 
     property alias currentDayButtonVisible: currentDate.visible;
     property alias defaultWidth: mainRow.width;
-    property alias moveToEndYear : yearCombo.moveToEnd;
-    property alias moveToIndexYear : yearCombo.moveToIndex;
+    property alias moveToEndYear : yearComboObj.moveToEnd;
+    property alias moveToIndexYear : yearComboObj.moveToIndex;
 
     property bool completed: false;
 
@@ -47,11 +47,11 @@ Item {
     property bool hasMonthCombo: false;
     property bool hasYearCombo: false;
     property int shownItemsCountCombo: 12;
-    property alias monthCombo: monthCombo;
-    property alias yearCombo: yearCombo;
-    property alias dayCombo: dayCombo;
+    property alias monthCombo: monthComboObj;
+    property alias yearCombo: yearComboObj;
+    property alias dayCombo: dayComboObj;
 
-    property bool openST: monthCombo.openST || yearCombo.openST || dayCombo.openST;
+    property bool openST: monthComboObj.openST || yearComboObj.openST || dayComboObj.openST;
 
     //icons
     property int iconWidth: 12;
@@ -111,7 +111,7 @@ Item {
             }
         }
 
-        if(datePicker.hasYearCombo && !yearCombo.model.GetItemsCount()){
+        if(datePicker.hasYearCombo && !yearComboObj.model.GetItemsCount()){
             if(datePicker.startYear < 1 || datePicker.lastYear < 1){
                 datePicker.startYear = 1900;
                 datePicker.lastYear = 2100;
@@ -337,7 +337,7 @@ Item {
                 }
 
                 ComboBox {
-                    id: yearCombo;
+                    id: yearComboObj;
 
                     visible: datePicker.hasYearCombo;
                     enabled: visible;
@@ -357,8 +357,8 @@ Item {
 
 
                     onCurrentIndexChanged:{
-                        if(yearCombo.currentIndex >=0){
-                            let selectedYear = yearCombo.currentText;
+                        if(yearComboObj.currentIndex >=0){
+                            let selectedYear = yearComboObj.currentText;
 
                             if (datePicker.checkDate(selectedYear, datePicker.selectedIndexMonth, Number(dayField.text))){
                                 yearField.text = selectedYear;
@@ -366,7 +366,7 @@ Item {
                         }
 
                     }
-                }//yearCombo
+                }//yearComboObj
             }
 
             Column {
@@ -453,7 +453,7 @@ Item {
                 }
 
                 ComboBox {
-                    id: monthCombo;
+                    id: monthComboObj;
 
                     visible: datePicker.hasMonthCombo;
                     enabled: visible;
@@ -471,13 +471,13 @@ Item {
                     shownItemsCount: 12;
 
                     onCurrentIndexChanged:{
-                        if(monthCombo.currentIndex >= 0){
-                            if (datePicker.checkDate(Number(yearField.text), monthCombo.currentIndex, Number(dayField.text))){
-                                datePicker.selectedIndexMonth = monthCombo.currentIndex;
+                        if(monthComboObj.currentIndex >= 0){
+                            if (datePicker.checkDate(Number(yearField.text), monthComboObj.currentIndex, Number(dayField.text))){
+                                datePicker.selectedIndexMonth = monthComboObj.currentIndex;
                             }
                         }
                     }
-                }//monthCombo
+                }//monthComboObj
             }
 
             Column {
@@ -576,7 +576,7 @@ Item {
                 }
 
                 ComboBox {
-                    id: dayCombo;
+                    id: dayComboObj;
 
                     visible: datePicker.hasDayCombo;
                     enabled: visible;
@@ -594,8 +594,8 @@ Item {
                     shownItemsCount: datePicker.shownItemsCountCombo;
 
                     onCurrentIndexChanged:{
-                        if(dayCombo.currentIndex >=0){
-                            let selectedDay = dayCombo.currentText;
+                        if(dayComboObj.currentIndex >=0){
+                            let selectedDay = dayComboObj.currentText;
 
                             if (datePicker.checkDate(datePicker.selectedYear, datePicker.selectedIndexMonth, Number(selectedDay))){
                                 dayField.text = selectedDay;
@@ -603,7 +603,7 @@ Item {
                         }
 
                     }
-                }//yearCombo
+                }//dayComboObj
             }
 
             Column {
