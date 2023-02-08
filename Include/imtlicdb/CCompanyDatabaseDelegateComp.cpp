@@ -1,10 +1,13 @@
 #include <imtlicdb/CCompanyDatabaseDelegateComp.h>
 
 
+// ACF includes
+#include <imod/TModelWrap.h>
+
 // ImtCore includes
 #include <imtauth/CCompanyInfo.h>
 #include <imtauth/CAccountInfoMetaInfo.h>
-#include <imod/TModelWrap.h>
+
 
 
 namespace imtlicdb
@@ -21,12 +24,12 @@ istd::IChangeable* CCompanyDatabaseDelegateComp::CreateObjectFromRecord(const QS
 		return nullptr;
 	}
 
-    if (!m_companyInfoFactCompPtr.IsValid()){
+	if (!m_companyInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
 
-    istd::TDelPtr<imtauth::ICompanyInfo> companyInfoPtr = m_companyInfoFactCompPtr.CreateInstance();
-    if (!companyInfoPtr.IsValid()){
+	istd::TDelPtr<imtauth::ICompanyInfo> companyInfoPtr = m_companyInfoFactCompPtr.CreateInstance();
+	if (!companyInfoPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -38,115 +41,115 @@ istd::IChangeable* CCompanyDatabaseDelegateComp::CreateObjectFromRecord(const QS
 	if (record.contains("Name")){
 		QString accountName = record.value("Name").toString();
 
-        companyInfoPtr->SetAccountName(accountName);
+		companyInfoPtr->SetAccountName(accountName);
 	}
 
 	if (record.contains("Description")){
 		QString accountDescription = record.value("Description").toString();
 
-        companyInfoPtr->SetAccountDescription(accountDescription);
+		companyInfoPtr->SetAccountDescription(accountDescription);
 	}
 
-    if (record.contains("Mail")){
-        QString mail = record.value("Mail").toString();
+	if (record.contains("Mail")){
+		QString mail = record.value("Mail").toString();
 
-        companyInfoPtr->SetMail(mail);
-    }
+		companyInfoPtr->SetMail(mail);
+	}
 
-    if (record.contains("CompanyName")){
-        QString companyName = record.value("CompanyName").toString();
+	if (record.contains("CompanyName")){
+		QString companyName = record.value("CompanyName").toString();
 
-        companyInfoPtr->SetCompanyName(companyName);
-    }
+		companyInfoPtr->SetCompanyName(companyName);
+	}
 
-    // SetAddress
-    imtauth::CAddress address;
-    if (record.contains("Country")){
-        address.SetCountry(record.value("Country").toString());
-    }
+	// SetAddress
+	imtauth::CAddress address;
+	if (record.contains("Country")){
+		address.SetCountry(record.value("Country").toString());
+	}
 
-    if (record.contains("City")){
-        address.SetCity(record.value("City").toString());
-    }
+	if (record.contains("City")){
+		address.SetCity(record.value("City").toString());
+	}
 
-    if (record.contains("PostalCode")){
-        address.SetPostalCode(record.value("PostalCode").toInt());
-    }
+	if (record.contains("PostalCode")){
+		address.SetPostalCode(record.value("PostalCode").toInt());
+	}
 
-    if (record.contains("Street")){
-        address.SetStreet(record.value("Street").toString());
-    }
+	if (record.contains("Street")){
+		address.SetStreet(record.value("Street").toString());
+	}
 
-    companyInfoPtr->SetAddress(address);
+	companyInfoPtr->SetAddress(address);
 
-    return companyInfoPtr.PopPtr();
+	return companyInfoPtr.PopPtr();
 }
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CCompanyDatabaseDelegateComp::CreateNewObjectQuery(
-			const QByteArray& /*typeId*/,
-			const QByteArray& /*proposedObjectId*/,
-			const QString& objectName,
-			const QString& /*objectDescription*/,
-			const istd::IChangeable* valuePtr) const
+		const QByteArray& /*typeId*/,
+		const QByteArray& /*proposedObjectId*/,
+		const QString& objectName,
+		const QString& /*objectDescription*/,
+		const istd::IChangeable* valuePtr) const
 {
-    const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(valuePtr);
-    if (companyInfoPtr == nullptr){
+	const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(valuePtr);
+	if (companyInfoPtr == nullptr){
 		return NewObjectQuery();
 	}
 
-    QString accountName = companyInfoPtr->GetAccountName();
-    if (accountName.isEmpty()){
-        accountName = objectName;
+	QString accountName = companyInfoPtr->GetAccountName();
+	if (accountName.isEmpty()){
+		accountName = objectName;
 	}
 
-    if (accountName.isEmpty()){
+	if (accountName.isEmpty()){
 		return NewObjectQuery();
 	}
 
-    QByteArray accountId = accountName.toUtf8();
+	QByteArray accountId = accountName.toUtf8();
 
-    QString companyDescription = companyInfoPtr->GetAccountDescription();
+	QString companyDescription = companyInfoPtr->GetAccountDescription();
 
-    QString mail = companyInfoPtr->GetMail();
+	QString mail = companyInfoPtr->GetMail();
 
-    QString companyName = companyInfoPtr->GetCompanyName();
+	QString companyName = companyInfoPtr->GetCompanyName();
 
-    imtauth::CAddress address = companyInfoPtr->GetAddress();
+	imtauth::CAddress address = companyInfoPtr->GetAddress();
 
-    QString country = address.GetCountry();
-    QString city = address.GetCity();
-    int postalCode = address.GetPostalCode();
-    QString street = address.GetStreet();
+	QString country = address.GetCountry();
+	QString city = address.GetCity();
+	int postalCode = address.GetPostalCode();
+	QString street = address.GetStreet();
 
 	NewObjectQuery retVal;
 
-    retVal.query = QString("INSERT INTO \"Accounts\" (Id, Name, Description, Mail, CompanyName, Country, City, PostalCode, Street) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9');")
-							.arg(qPrintable(accountId))
-                            .arg(accountName)
-                            .arg(companyDescription)
-                            .arg(mail)
-                            .arg(companyName)
-                            .arg(country)
-                            .arg(city)
-                            .arg(postalCode)
-                            .arg(street)
-							.toLocal8Bit();
+	retVal.query = QString("INSERT INTO \"Accounts\" (Id, Name, Description, Mail, CompanyName, Country, City, PostalCode, Street) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9');")
+			.arg(qPrintable(accountId))
+			.arg(accountName)
+			.arg(companyDescription)
+			.arg(mail)
+			.arg(companyName)
+			.arg(country)
+			.arg(city)
+			.arg(postalCode)
+			.arg(street)
+			.toLocal8Bit();
 
-    retVal.objectName = companyName;
+	retVal.objectName = companyName;
 
 	return retVal;
 }
 
 
 QByteArray CCompanyDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId) const
 {
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-        const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(objectPtr.GetPtr());
-        if (companyInfoPtr == nullptr){
+		const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(objectPtr.GetPtr());
+		if (companyInfoPtr == nullptr){
 			return QByteArray();
 		}
 
@@ -160,16 +163,16 @@ QByteArray CCompanyDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CCompanyDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+		const imtbase::IObjectCollection& /*collection*/,
+		const QByteArray& objectId,
+		const istd::IChangeable& object) const
 {
-    const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(&object);
-    if (companyInfoPtr == nullptr){
+	const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(&object);
+	if (companyInfoPtr == nullptr){
 		return QByteArray();
 	}
 
-    QString accountName = companyInfoPtr->GetAccountName();
+	QString accountName = companyInfoPtr->GetAccountName();
 
 	if (accountName.isEmpty()){
 		return QByteArray();
@@ -177,48 +180,48 @@ QByteArray CCompanyDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray accountId = accountName.toUtf8();
 
-    QString accountDescription = companyInfoPtr->GetAccountDescription();
+	QString accountDescription = companyInfoPtr->GetAccountDescription();
 
-    QString mail = companyInfoPtr->GetMail();
+	QString mail = companyInfoPtr->GetMail();
 
-    QString companyName = companyInfoPtr->GetCompanyName();
+	QString companyName = companyInfoPtr->GetCompanyName();
 
-    imtauth::CAddress address = companyInfoPtr->GetAddress();
+	imtauth::CAddress address = companyInfoPtr->GetAddress();
 
-    QString country = address.GetCountry();
-    QString city = address.GetCity();
-    int postalCode = address.GetPostalCode();
-    QString street = address.GetStreet();
+	QString country = address.GetCountry();
+	QString city = address.GetCity();
+	int postalCode = address.GetPostalCode();
+	QString street = address.GetStreet();
 
-    QByteArray retVal = QString("UPDATE \"Accounts\" SET Id ='%1', Name = '%2', Description = '%3', Mail = '%4', CompanyName = '%5', Country = '%6', City = '%7', PostalCode = '%8', Street = '%9' WHERE Id ='%10';")
-							.arg(qPrintable(accountId))
-							.arg(accountName)
-							.arg(accountDescription)
-                            .arg(mail)
-                            .arg(companyName)
-                            .arg(country)
-                            .arg(city)
-                            .arg(postalCode)
-                            .arg(street)
-							.arg(qPrintable(objectId))
-							.toLocal8Bit();
+	QByteArray retVal = QString("UPDATE \"Accounts\" SET Id ='%1', Name = '%2', Description = '%3', Mail = '%4', CompanyName = '%5', Country = '%6', City = '%7', PostalCode = '%8', Street = '%9' WHERE Id ='%10';")
+			.arg(qPrintable(accountId))
+			.arg(accountName)
+			.arg(accountDescription)
+			.arg(mail)
+			.arg(companyName)
+			.arg(country)
+			.arg(city)
+			.arg(postalCode)
+			.arg(street)
+			.arg(qPrintable(objectId))
+			.toLocal8Bit();
 
 	return retVal;
 }
 
 
 QByteArray CCompanyDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& newObjectName) const
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId,
+		const QString& newObjectName) const
 {
-    const imtauth::ICompanyInfo* companyInfoPtr = nullptr;
+	const imtauth::ICompanyInfo* companyInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-        companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(objectPtr.GetPtr());
+		companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(objectPtr.GetPtr());
 	}
 
-    if (companyInfoPtr == nullptr){
+	if (companyInfoPtr == nullptr){
 		return QByteArray();
 	}
 
@@ -237,17 +240,17 @@ QByteArray CCompanyDatabaseDelegateComp::CreateRenameObjectQuery(
 
 
 QByteArray CCompanyDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& description) const
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId,
+		const QString& description) const
 {
-    const imtauth::ICompanyInfo* companyInfoPtr = nullptr;
+	const imtauth::ICompanyInfo* companyInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-        companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(objectPtr.GetPtr());
+		companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(objectPtr.GetPtr());
 	}
 
-    if (companyInfoPtr == nullptr){
+	if (companyInfoPtr == nullptr){
 		return QByteArray();
 	}
 
@@ -263,61 +266,73 @@ QByteArray CCompanyDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 idoc::MetaInfoPtr CCompanyDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
 {
-    return idoc::MetaInfoPtr(new imod::TModelWrap<imtauth::CAccountInfoMetaInfo>);
+	return idoc::MetaInfoPtr(new imod::TModelWrap<imtauth::CAccountInfoMetaInfo>);
 }
 
 
 bool CCompanyDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-	if (record.contains("Name")){
-		QString accountName = record.value("Name").toString();
+	const istd::IChangeable* instancePtr = CreateObjectFromRecord(record);
+	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
+		idoc::MetaInfoPtr retVal;
+		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "CompanyInfo", retVal)){
+			Q_ASSERT(retVal.IsValid());
 
-        metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME, accountName);
+			return metaInfo.CopyFrom(*retVal);
+		}
 	}
 
-	if (record.contains("Description")){
-		QString accountDescription = record.value("Description").toString();
+	return false;
 
-        metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION, accountDescription);
-	}
+//	if (record.contains("Name")){
+//		QString accountName = record.value("Name").toString();
 
-    if (record.contains("Mail")){
-        QString mail = record.value("Mail").toString();
+//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME, accountName);
+//	}
 
-        metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL, mail);
-	}
+//	if (record.contains("Description")){
+//		QString accountDescription = record.value("Description").toString();
 
-    if (record.contains("CompanyName")){
-        QString companyName = record.value("CompanyName").toString();
+//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION, accountDescription);
+//	}
 
-        metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_COMPANY_NAME, companyName);
-	}
+//	if (record.contains("Mail")){
+//		QString mail = record.value("Mail").toString();
 
-    if (record.contains("Country")){
-        QString companyName = record.value("Country").toString();
+//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL, mail);
+//	}
 
-        metaInfo.SetMetaInfo(imtauth::IAddress::MIT_COUNTRY, companyName);
-    }
+//	if (record.contains("CompanyName")){
+//		QString companyName = record.value("CompanyName").toString();
 
-    if (record.contains("City")){
-        QString companyName = record.value("City").toString();
+//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_COMPANY_NAME, companyName);
+//	}
 
-        metaInfo.SetMetaInfo(imtauth::IAddress::MIT_CITY, companyName);
-    }
+//	if (record.contains("Country")){
+//		QString companyName = record.value("Country").toString();
 
-    if (record.contains("PostalCode")){
-        QString companyName = record.value("PostalCode").toString();
+//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_COUNTRY, companyName);
+//	}
 
-        metaInfo.SetMetaInfo(imtauth::IAddress::MIT_POSTAL_CODE, companyName);
-    }
+//	if (record.contains("City")){
+//		QString city = record.value("City").toString();
 
-    if (record.contains("Street")){
-        QString companyName = record.value("Street").toString();
+//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_CITY, city);
+//	}
 
-        metaInfo.SetMetaInfo(imtauth::IAddress::MIT_STREET, companyName);
-    }
+//	if (record.contains("PostalCode")){
+//		QString postalCode = record.value("PostalCode").toString();
 
-	return true;
+//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_POSTAL_CODE, postalCode);
+//	}
+
+//	if (record.contains("Street")){
+//		QString street = record.value("Street").toString();
+
+//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_STREET, street);
+//	}
+
+//	return true;
 }
 
 

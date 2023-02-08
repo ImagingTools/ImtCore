@@ -57,12 +57,12 @@ void CObserverQmlComp::OnComponentCreated()
 				m_settingsModelPtr = new imtbase::CTreeItemModel();
 				bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
 				if (result){
+					m_applicationInfoModelPtr = new imtbase::CTreeItemModel();
 					if (m_applicationInfoCompPtr.IsValid() && m_applicationInfoRepresentationCompPtr.IsValid()){
-						imtbase::CTreeItemModel applicationInfoRepresentationPtr;
-						if (m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, applicationInfoRepresentationPtr)){
-							QString json = applicationInfoRepresentationPtr.toJSON();
+						if (m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, *m_applicationInfoModelPtr)){
+							QVariant data = QVariant::fromValue(m_applicationInfoModelPtr);
 
-							qDebug() << json;
+							quickItem->setProperty("applicationInfo", data);
 						}
 					}
 
@@ -70,6 +70,11 @@ void CObserverQmlComp::OnComponentCreated()
 						if (m_settingsModelPtr->ContainsKey("Parameters")){
 							imtbase::CTreeItemModel* parametersPtr = m_settingsModelPtr->GetTreeItemModel("Parameters");
 							if (parametersPtr != nullptr){
+
+								for (int i = 0; i < parametersPtr->GetItemsCount(); i++){
+									imtbase::CTreeItemModel* paramPtr = parametersPtr->GetTreeItemModel("Parameters", i);
+								}
+
 								QVariant data = QVariant::fromValue(parametersPtr);
 
 								quickItem->setProperty("localSettings", data);

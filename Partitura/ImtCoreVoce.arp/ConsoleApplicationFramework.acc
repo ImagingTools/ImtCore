@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5048" Description="ACF"/>
+            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -39,6 +39,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CompanyName" Type="Text" ExportId="CompanyName">
                         <Data IsEnabled="true" Value="ImagingTools GmbH"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="MainVersionId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductEdition" Type="Text" ExportId="ProductEdition">
                         <Data IsEnabled="false"/>

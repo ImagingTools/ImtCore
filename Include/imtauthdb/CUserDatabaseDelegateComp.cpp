@@ -376,7 +376,6 @@ bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& re
 	}
 
 	return false;
-
 }
 
 

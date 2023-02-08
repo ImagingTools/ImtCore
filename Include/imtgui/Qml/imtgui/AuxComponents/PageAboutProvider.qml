@@ -1,0 +1,52 @@
+import QtQuick 2.15
+import Acf 1.0
+import imtqml 1.0
+
+Item {
+    id: root;
+
+    property TreeItemModel pageModel: TreeItemModel {};
+    property ApplicationInfoProvider applicationInfoProvider: null;
+
+    Component.onCompleted: {
+        root.applicationInfoProvider.updated.connect(root.createRepresentationModel);
+    }
+
+    Component.onDestruction: {
+        root.applicationInfoProvider.updated.disconnect(root.createRepresentationModel);
+    }
+
+    property string pageId: "About";
+    property string pageName: qsTr("About");
+
+    onApplicationInfoProviderChanged: {
+        console.log("onApplicationInfoProviderChanged");
+        root.createRepresentationModel();
+    }
+
+    function createRepresentationModel(){
+        if (root.applicationInfoProvider != null){
+            root.pageModel.SetData("Id", root.pageId);
+            root.pageModel.SetData("Name", root.pageName);
+
+            let parameters = root.pageModel.AddTreeModel("Parameters");
+
+            let index;
+            if (root.applicationInfoProvider.clientApplicationInfo != null){
+                index = parameters.InsertNewItem();
+                parameters.CopyItemDataFromModel(index, applicationInfoProvider.clientApplicationInfo)
+            }
+
+            if (root.applicationInfoProvider.serverApplicationInfo != null){
+                index = parameters.InsertNewItem();
+                parameters.CopyItemDataFromModel(index, applicationInfoProvider.serverApplicationInfo)
+            }
+
+            console.log("pageModel", pageModel.toJSON());
+        }
+    }
+
+    function getRepresentation(){
+        return pageModel;
+    }
+}

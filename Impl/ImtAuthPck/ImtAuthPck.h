@@ -13,6 +13,7 @@
 #include <imtauth/CContactInfoMetaInfoCreatorComp.h>
 #include <imtauth/CAddressMetaInfoCreatorComp.h>
 #include <imtauth/CAccountInfoMetaInfoCreatorComp.h>
+#include <imtauth/CCompanyInfoMetaInfoCreatorComp.h>
 #include <imtauth/CRoleComp.h>
 #include <imtauth/CRoleMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfo.h>
@@ -48,16 +49,17 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable,
 						istd::IChangeable>> AccountInfo;
 typedef icomp::TModelCompWrap<
-            icomp::TMakeComponentWrap<
-                        imtauth::CCompanyInfo,
-                        imtauth::IAccountBaseInfo,
-                        imtauth::ICompanyInfo,
-                        iser::IObject,
-                        iser::ISerializable,
-                        istd::IChangeable>> CompanyInfo;
+			icomp::TMakeComponentWrap<
+						imtauth::CCompanyInfo,
+						imtauth::IAccountBaseInfo,
+						imtauth::ICompanyInfo,
+						iser::IObject,
+						iser::ISerializable,
+						istd::IChangeable>> CompanyInfo;
 typedef imtauth::CContactInfoMetaInfoCreatorComp ContactInfoMetaInfoCreator;
 typedef imtauth::CAddressMetaInfoCreatorComp AddressMetaInfoCreator;
 typedef imtauth::CAccountInfoMetaInfoCreatorComp AccountInfoMetaInfoCreator;
+typedef imtauth::CCompanyInfoMetaInfoCreatorComp CompanyInfoMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;

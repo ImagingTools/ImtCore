@@ -121,6 +121,8 @@
 	<file alias="imtgui/AuxComponents/SimpleCommandsDecorator.qml">Qml/imtgui/AuxComponents/SimpleCommandsDecorator.qml</file>
 	<file alias="imtgui/AuxComponents/CollectionDataProvider.qml">Qml/imtgui/AuxComponents/CollectionDataProvider.qml</file>	
 	<file alias="imtgui/AuxComponents/UuidGenerator.qml">Qml/imtgui/AuxComponents/UuidGenerator.qml</file>
+	<file alias="imtgui/AuxComponents/ApplicationInfoProvider.qml">Qml/imtgui/AuxComponents/ApplicationInfoProvider.qml</file>
+	<file alias="imtgui/AuxComponents/PageAboutProvider.qml">Qml/imtgui/AuxComponents/PageAboutProvider.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

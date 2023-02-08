@@ -39,6 +39,10 @@ Item {
     }
 
     function compareRecursive(model1, model2, changeList, parentKey){
+        if (!model1 || !model2){
+            return;
+        }
+
         for (let i = 0; i < model1.GetItemsCount(); i++){
             let dataId = model1.GetData("Id", i);
 

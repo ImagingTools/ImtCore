@@ -54,6 +54,7 @@ private:
 
 private:
 	imtbase::CTreeItemModel* m_settingsModelPtr;
+	imtbase::CTreeItemModel* m_applicationInfoModelPtr;
 };
 
 

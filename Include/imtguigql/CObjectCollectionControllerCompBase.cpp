@@ -632,7 +632,6 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 {
 	bool retVal = true;
 
-	gqlRequest.GetFields();
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
 
 	if (!informationIds.isEmpty()){
@@ -649,7 +648,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 				elementInformation = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
 			}
 			else{
-				idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);;
+				idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
 				if (elementMetaInfo.IsValid()){
 					if (informationId == QByteArray("Added")){
 						elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)

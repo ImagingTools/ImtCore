@@ -50,6 +50,11 @@ I_EXPORT_COMPONENT(
 			"Account Metainfo Creator");
 
 I_EXPORT_COMPONENT(
+			CompanyInfoMetaInfoCreator,
+			"Company info metainfo creator",
+			"Company Metainfo Creator");
+
+I_EXPORT_COMPONENT(
 			Role,
 			"Role",
 			"Role");

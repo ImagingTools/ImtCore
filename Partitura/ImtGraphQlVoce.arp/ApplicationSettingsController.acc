@@ -10,6 +10,52 @@
     <Description>Settings controller for entire application</Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="ApplicationInfoController" PackageId="ImtGqlPck" ComponentId="ApplicationInfoController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>GetApplicationInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ServerVersion"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Server Version"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Source" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextLabel.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Demultiplexer" PackageId="ImtGqlPck" ComponentId="GraphQLDemultiplexer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -18,6 +64,7 @@
                             <Values>
                                 <Value>GetStyleDataController</Value>
                                 <Value>SettingsController</Value>
+                                <Value>ApplicationInfoController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

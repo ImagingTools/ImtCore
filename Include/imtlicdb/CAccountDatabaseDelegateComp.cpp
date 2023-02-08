@@ -296,8 +296,8 @@ bool CAccountDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord&
 		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION, accountDescription);
 	}
 
-	if (record.contains("OwnerMail")){
-		QString mail = record.value("OwnerMail").toString();
+	if (record.contains("Mail")){
+		QString mail = record.value("Mail").toString();
 
 		metaInfo.SetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL, mail);
 	}

@@ -30,8 +30,20 @@ Rectangle {
 
     property SettingsProvider settingsProvider: null;
 
+    property alias applicationInfoProvider: aboutApplicationProvider.applicationInfoProvider;
+
+    PageAboutProvider {
+        id: aboutApplicationProvider;
+    }
+
     Component.onDestruction: {
         commonModel.modelChanged.disconnect(container.modelChanged);
+    }
+
+    onApplicationInfoProviderChanged: {
+        if (container.applicationInfoProvider != null){
+
+        }
     }
 
     onVisibleChanged: {
@@ -50,6 +62,8 @@ Rectangle {
 
                 updateCommonModel(serverModel);
             }
+
+            updateCommonModel(aboutApplicationProvider.pageModel);
 
             settingsProvider.rewriteModel(serverModel, localModel);
 

@@ -45,7 +45,20 @@
         </Element>
         <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ClientVersion"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Client Version"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Source" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextLabel.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="Context" PackageId="ImtQmlPck" ComponentId="ClientUserContext">

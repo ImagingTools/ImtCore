@@ -15,29 +15,16 @@ namespace imtgql
 
 imtbase::CTreeItemModel* CApplicationInfoControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_applicationInfoProviderCompPtr.IsValid()){
-		return nullptr;
+	if (m_applicationInfoCompPtr.IsValid() && m_applicationInfoRepresentationCompPtr.IsValid()){
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+		Q_ASSERT(dataModelPtr != nullptr);
+		if (m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, *dataModelPtr)){
+			return rootModelPtr.PopPtr();
+		}
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-	Q_ASSERT(dataModelPtr != nullptr);
-
-	dataModelPtr->SetData("Id", "About");
-	dataModelPtr->SetData("Name", "About");
-
-	imtbase::CTreeItemModel* representationPtr = m_applicationInfoProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
-	if (representationPtr != nullptr){
-		dataModelPtr->SetExternTreeModel("Parameters", representationPtr);
-	}
-
-	return rootModelPtr.PopPtr();
-}
-
-
-bool CApplicationInfoControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
-{
-	return true;
+	return nullptr;
 }
 
 

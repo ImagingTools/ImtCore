@@ -20,11 +20,11 @@ bool CApplicationInfoRepresentationComp::GetRepresentationFromApplicationInfo(co
 	}
 
 	if(m_paramNameAttrPtr.IsValid()){
-		representation.SetData("Id", *m_paramNameAttrPtr);
+		representation.SetData("Name", *m_paramNameAttrPtr);
 	}
 
 	if(m_sourceAttrPtr.IsValid()){
-		representation.SetData("Id", *m_sourceAttrPtr);
+		representation.SetData("Source", *m_sourceAttrPtr);
 	}
 
 	const iser::IVersionInfo& versionInfo =  applicationInfo.GetVersionInfo();

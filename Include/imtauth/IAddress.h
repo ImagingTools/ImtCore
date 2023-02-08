@@ -10,7 +10,6 @@ namespace imtauth
 {
 
 
-
 /**
 	Interface descibing location of an object.
 	\ingroup Authentification
@@ -23,7 +22,7 @@ public:
 		/**
 			Country given as QString.
 		*/
-		MIT_COUNTRY,
+		MIT_COUNTRY = 1024,
 
 		/**
 			City given as QString.
@@ -36,7 +35,7 @@ public:
 		MIT_POSTAL_CODE,
 
 		/**
-            Street given as QString.
+			Street given as QString.
 		*/
 		MIT_STREET
 	};

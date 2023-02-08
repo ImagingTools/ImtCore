@@ -1,10 +1,8 @@
 #pragma once
 
 
-// ACF includes
-#include <ibase/IApplicationInfo.h>
-
 // ImtCore includes
+#include <imtbase/IApplicationInfoRepresentation.h>
 #include <imtgql/CGqlRepresentationDataControllerCompBase.h>
 
 
@@ -18,16 +16,17 @@ public:
 	typedef CGqlRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CApplicationInfoControllerComp);
-		I_ASSIGN(m_applicationInfoProviderCompPtr, "ApplicationInfoProvider", "Provider for application info", true, "ApplicationInfoProvider");
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application data info", false, "");
+		I_ASSIGN(m_applicationInfoRepresentationCompPtr, "ApplicationInfoRepresentation", "Application info representation", true, "ApplicationInfoRepresentation");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const override;
 
 protected:
-	I_REF(imtgql::IGqlRequestHandler, m_applicationInfoProviderCompPtr);
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+	I_REF(imtbase::IApplicationInfoRepresentation, m_applicationInfoRepresentationCompPtr);
 };
 
 

@@ -15,8 +15,9 @@ class CCompanyDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateComp
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
-    I_BEGIN_COMPONENT(CCompanyDatabaseDelegateComp)
-        I_ASSIGN(m_companyInfoFactCompPtr, "CompanyInfo", "Factory used for creation of the new account instance", true, "CompanyInfo");
+	I_BEGIN_COMPONENT(CCompanyDatabaseDelegateComp)
+		I_ASSIGN(m_companyInfoFactCompPtr, "CompanyInfo", "Factory used for creation of the new account instance", true, "CompanyInfo");
+		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta information creator for the user", true, "MetaInfoCreator");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -48,7 +49,8 @@ protected:
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
 
 private:
-    I_FACT(imtauth::ICompanyInfo, m_companyInfoFactCompPtr);
+	I_FACT(imtauth::ICompanyInfo, m_companyInfoFactCompPtr);
+	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 };
 
 

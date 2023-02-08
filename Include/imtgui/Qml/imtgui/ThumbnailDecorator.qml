@@ -11,6 +11,7 @@ Rectangle {
 
     property Item root: null;
     property alias settingsProvider: preferenceDialog.settingsProvider;
+    property alias applicationInfoProvider: preferenceDialog.applicationInfoProvider;
 
     property int mainMargin: 0;
     property int mainRadius: 0;

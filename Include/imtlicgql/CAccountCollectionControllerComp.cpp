@@ -20,19 +20,18 @@ namespace imtlicgql
 QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
 	idoc::MetaInfoPtr metaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
-
 	if (metaInfoPtr.IsValid()){
-		if (informationId == QByteArray("AccountName")){
-			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME);
+		if (informationId == QByteArray("Name")){
+			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME);
 		}
-		else if (informationId == QByteArray("OwnerMail")){
-			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL);
+		else if (informationId == QByteArray("Mail")){
+			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL);
 		}
 		else if (informationId == QByteArray("AccountType")){
 			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE);
 		}
-		else if (informationId == QByteArray("AccountDescription")){
-			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION);
+		else if (informationId == QByteArray("Description")){
+			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION);
 		}
 	}
 

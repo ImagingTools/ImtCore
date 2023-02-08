@@ -8,9 +8,11 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="ApplicationInfoController" X="550" Y="275" Note=""/>
+        <Element ComponentName="ApplicationInfoRepresentation" X="575" Y="475" Note=""/>
         <Element ComponentName="Demultiplexer" X="550" Y="100" Note=""/>
         <Element ComponentName="GetStyleDataController" X="225" Y="275" Note=""/>
-        <Element ComponentName="SettingsController" X="950" Y="275" Note=""/>
+        <Element ComponentName="SettingsController" X="925" Y="275" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
