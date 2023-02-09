@@ -8,8 +8,16 @@ Item {
     property TreeItemModel pageModel: TreeItemModel {};
     property ApplicationInfoProvider applicationInfoProvider: null;
 
-    Component.onCompleted: {
+
+
+//    Component.onCompleted: {
+//        root.applicationInfoProvider.updated.connect(root.createRepresentationModel);
+//    }
+
+    onApplicationInfoProviderChanged: {
+        console.log("onApplicationInfoProviderChanged");
         root.applicationInfoProvider.updated.connect(root.createRepresentationModel);
+        root.createRepresentationModel();
     }
 
     Component.onDestruction: {
@@ -19,10 +27,7 @@ Item {
     property string pageId: "About";
     property string pageName: qsTr("About");
 
-    onApplicationInfoProviderChanged: {
-        console.log("onApplicationInfoProviderChanged");
-        root.createRepresentationModel();
-    }
+
 
     function createRepresentationModel(){
         if (root.applicationInfoProvider != null){
