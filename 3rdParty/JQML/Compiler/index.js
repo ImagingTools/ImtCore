@@ -797,15 +797,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
     if(instructions.id.size > 0) code.push(`${curr}.$sID(${Array.from(instructions.id).join(',')})`)
     // if(instructions.id) code.push(`${curr}.$sID('${instructions.id}')`)
 
-    for(let prop in instructions.properties){
-        let val = instructions.properties[prop]
-        if(instructions.class === 'ListElement'){
-            code.push(`${curr}.$cP(\`${prop}\`,${val})`)
-        } else {
-            code.push(`${curr}.${prop}=${val}`)
-        }
-        
-    }
+    
     for(let prop in instructions.propertiesLazy){
         let val = instructions.propertiesLazy[prop]
         code.push(`${curr}.$sP(\`${prop}\`, function(){return ${val}}.bind(${curr}))`)
@@ -872,6 +864,16 @@ function compile(instructions, code, curr = '$root', prev = ''){
     for(let signal of instructions.connectionSignals){
         //code.push(`${curr}.$s['${signal.name}'].connect(function(){with(this)with(QML)with(this.$s['${signal.name}'].context){${signal.source}}}.bind(${curr}))`)
         code.push(`${curr}.$s['${signal.name}'].connect(${signal.sourceFull}.bind(${curr}))`)
+    }
+
+    for(let prop in instructions.properties){
+        let val = instructions.properties[prop]
+        if(instructions.class === 'ListElement'){
+            code.push(`${curr}.$cP(\`${prop}\`,${val})`)
+        } else {
+            code.push(`${curr}.${prop}=${val}`)
+        }
+        
     }
     
     // code.push(`${curr}.$tryComplete()`)
