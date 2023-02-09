@@ -116,9 +116,8 @@ Rectangle {
                 }
 
                 commonModel.SetData("Id", pageId, index);
-                if(pageName != null){
-                    commonModel.SetData("Name", pageName, index);
-                }
+                commonModel.SetData("Name", pageName, index);
+
                 if(pageParameters != null){
                     commonModel.SetData("Parameters", pageParameters, index);
                 }
