@@ -41,7 +41,7 @@ export class QtObject {
     // LVL = new Set()
 
     constructor(args) {
-        // this.$P = new Proxy(this, Core.proxyHandler)
+        this.$PI = new Proxy(this, Core.proxyHandlerID)
         this.$P0 = new Proxy(this, Core.proxyHandler0)
         this.$qmlClassName = this.constructor.name
         this._context = context

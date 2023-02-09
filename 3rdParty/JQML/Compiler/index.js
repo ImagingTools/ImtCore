@@ -60,7 +60,8 @@ function getFiles (dir, _files){
     return _files
 }
 
-if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
+if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
+// if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source
 
@@ -132,9 +133,9 @@ function proxyJS(sourceOrig, currentName, instruction, ignoreList = []){
                 instruction.propertiesAlias[markers[i].value] || instruction.propertiesSpecial[markers[i].value]) {
                     id = `this.${markers[i].value}`
                 }
-            // if(instruction.propertiesAlias[markers[i].value] && currentName === markers[i].value) {
-            //         id = `this.$P0.${markers[i].value}`
-            //     }
+            if(instruction.propertiesAlias[markers[i].value] && currentName === markers[i].value) {
+                    id = `this.$PI.${markers[i].value}`
+                }
             if(instruction.id.has(`\`${markers[i].value}\``)) id = `this`
             //const id = `this.$P.${markers[i].value}`
             const start = markers[i].range[0]

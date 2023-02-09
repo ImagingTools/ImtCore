@@ -213,6 +213,38 @@ global.Core = {
             }
         },
     },
+    proxyHandlerID: {
+        has(){
+            return true
+        },
+        get(target, name){
+            if(name in QML){
+                return QML[name]
+            }
+            if(name in Core.Singletons){
+                return IDManager.list[name][0]
+            }
+        
+            let res = IDManager.find(target, name, {
+                len: 99999999,
+                obj: null,
+            }, 1, new Set([target]))
+            if(res) return res
+
+            if(name in window) return window[name]
+
+            return undefined
+        
+        },
+        set(target, name, value){
+            if(name in target){
+                target[name] = value
+                return true
+            } else {
+                return false
+            }
+        },
+    },
     proxyHandler0: {
         has(){
             return true
