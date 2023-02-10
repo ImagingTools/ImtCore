@@ -4,7 +4,7 @@ import Acf 1.0
 TableViewItemDelegateBase {
     id: treeDelegateBase;
 
-    height: isOpen ? footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
+    height: !root ? 0 : isOpen ? footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
 
     property bool isOpen: model.IsOpen;
 
