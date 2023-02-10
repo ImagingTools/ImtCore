@@ -59,6 +59,7 @@ JSONListModel {
 
         modelObject[key] = value
         this.dataChanged(row, row+1)
+        this.modelChanged()
     }
 
     function RemoveData(key, row){
@@ -73,6 +74,7 @@ JSONListModel {
             console.log("modelObject is null")
 
         delete modelObject[key]
+        this.modelChanged()
     }
 
     function Clear(){
@@ -189,6 +191,7 @@ JSONListModel {
 
     function RemoveItem(index){
         this.remove(index)
+        this.modelChanged()
     }
 
 
