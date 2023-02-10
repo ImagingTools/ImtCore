@@ -57,7 +57,7 @@ Item {
         id: filterMenuLocal;
         anchors.top: collectionViewBaseContainer.top;
         width: parent.width;
-        visible: false;
+        visible: tableInternal ? false : false;//for web, do not remove!!!
 
         onVisibleChanged: {
             if (!filterMenuLocal.visible){
