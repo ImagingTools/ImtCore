@@ -867,6 +867,12 @@ function compile(instructions, code, curr = '$root', prev = ''){
         code.push(`${curr}.$s['${signal.name}'].connect(${signal.sourceFull}.bind(${curr}))`)
     }
 
+    let step = 0
+    for(let child of instructions.children){
+        compile(child, code, curr+'c'+step, curr)
+        step++
+    }
+
     for(let prop in instructions.properties){
         let val = instructions.properties[prop]
         if(instructions.class === 'ListElement'){
@@ -876,14 +882,6 @@ function compile(instructions, code, curr = '$root', prev = ''){
         }
         
     }
-    
-    // code.push(`${curr}.$tryComplete()`)
-    let step = 0
-    for(let child of instructions.children){
-        compile(child, code, curr+'c'+step, curr)
-        step++
-    }
-
 }
 
 let jqml = []
