@@ -48,7 +48,7 @@ FocusScope {
 
     Component.onCompleted: {
         if (model.index > 0 && model.Level == 0){
-            let prevItem = root.tableListView.itemAtIndex(model.index - 1);
+            let prevItem = delegate.root.tableListView.itemAtIndex(model.index - 1);
             delegate.modelIndex.prevIndex = prevItem.modelIndex;
             prevItem.modelIndex.nextIndex = delegate.modelIndex;
         }
@@ -66,7 +66,7 @@ FocusScope {
         id: highlightLoader;
 
         width: parent.width;
-        height: root.rowItemHeight;
+        height: delegate.root.rowItemHeight;
 
         visible: delegate.selected;
 
@@ -97,7 +97,7 @@ FocusScope {
         sourceComponent: Row {
             id: row;
 
-            height: root.rowItemHeight;
+            height: delegate.root.rowItemHeight;
 
             property var values: [];
 
@@ -107,8 +107,8 @@ FocusScope {
                 delegate: Item {
                     id: repeaterItem;
 
-                    width: root.width / root.columnCount;
-                    height: root.rowItemHeight;
+                    width: delegate.root.width / delegate.root.columnCount;
+                    height: delegate.root.rowItemHeight;
 
                     Text {
                         id: text_;
@@ -129,20 +129,20 @@ FocusScope {
 
                     Component.onCompleted: {
                         if (model.index == 0){
-                            text_.width = root.width / root.columnCount - root.shiftLevel * model.Level;
+                            text_.width = delegate.root.width / delegate.root.columnCount - delegate.root.shiftLevel * model.Level;
                         }
                     }
                 }
             }
 
             Component.onCompleted: {
-                if(root.columnModel){
-                    for (let i = 0; i < root.columnModel.count; i++){
-                        let id = root.columnModel.get(i).Id;
+                if(delegate.root.columnModel){
+                    for (let i = 0; i < delegate.root.columnModel.count; i++){
+                        let id = delegate.root.columnModel.get(i).Id;
                         row.values.push(model[id])
                     }
 
-                    repeater.model = root.columnModel;
+                    repeater.model = delegate.root.columnModel;
                 }
             }
         }
@@ -156,13 +156,13 @@ FocusScope {
     }
 
     function updateSelection(){
-        if (root.selection.contains(model)){
-            root.selection.deselect(model);
-            root.selectedIndex = null;
+        if (delegate.root.selection.contains(model)){
+            delegate.root.selection.deselect(model);
+            delegate.root.selectedIndex = null;
         }
         else{
-            root.selection.select(model);
-            root.selectedIndex = delegate.modelIndex;
+            delegate.root.selection.select(model);
+            delegate.root.selectedIndex = delegate.modelIndex;
         }
     }
 
@@ -176,7 +176,7 @@ FocusScope {
         onClicked: {
             console.log("onClicked");
 
-            if (!root.withoutSelection){
+            if (!delegate.root.withoutSelection){
                 delegate.updateSelection();
             }
 

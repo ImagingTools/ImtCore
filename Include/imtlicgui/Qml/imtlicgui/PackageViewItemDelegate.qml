@@ -41,7 +41,7 @@ TreeViewItemDelegateBase {
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
 
                     onClicked: {
-                        mouseArea.clicked(null);
+                        packageTreeItemDelegate.mouseArea.clicked(null);
                     }
 
                     onDoubleClicked: {
@@ -114,7 +114,7 @@ TreeViewItemDelegateBase {
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : 0;
 
                     onClicked: {
-                        mouseArea.clicked(null);
+                        packageTreeItemDelegate.mouseArea.clicked(null);
                     }
 
                     onDoubleClicked: {
@@ -182,7 +182,7 @@ TreeViewItemDelegateBase {
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
 
                     onClicked: {
-                        mouseArea.clicked(null);
+                        packageTreeItemDelegate.mouseArea.clicked(null);
                     }
 
                     onDoubleClicked: {
