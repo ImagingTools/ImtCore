@@ -21,7 +21,10 @@ Rectangle {
 
     onVisibleChanged: {
         filterContainer.focus = filterContainer.visible;
-        loaderDecoratorObj.item.focus = filterContainer.visible;
+        if (filterContainer.visible){
+            console.log("loaderDecoratorObj.item.focus = true");
+            loaderDecoratorObj.item.focus = true;
+        }
     }
 
     Keys.onPressed: {

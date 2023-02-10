@@ -46,7 +46,6 @@ Item {
 
     function updateGui(){
         console.log("RolePermissions updateGui");
-
         rolePermissionsContainer.blockUpdatingModel = true;
 
         let selectedPermissionsIds = [];

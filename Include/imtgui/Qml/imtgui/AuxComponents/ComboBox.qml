@@ -10,7 +10,7 @@ FocusScope {
 
     property var model;
 
-    property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
+    property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.borderColor;
 
     property color backgroundColor: Style.baseColor;
 

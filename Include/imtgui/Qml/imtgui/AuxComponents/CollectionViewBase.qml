@@ -60,7 +60,9 @@ Item {
         visible: false;
 
         onVisibleChanged: {
-            console.log('filterMenuLocal onVisibleChanged', visible)
+            if (!filterMenuLocal.visible){
+                tableInternal.forceActiveFocus();
+            }
         }
 
         sourceComponent: Component {
@@ -219,7 +221,7 @@ Item {
 
         pagesSize: 1;
 
-        visible: collectionViewBaseContainer.hasPagination;
+        visible: collectionViewBaseContainer.hasPagination && paginationObj.pagesSize != 1;
 
         onCurrentValueChanged: {
             console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);

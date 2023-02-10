@@ -6,8 +6,6 @@ FocusScope {
 
     height: 40;
 
-   // focus: textField.activeFocus;
-
     property alias text: textField.text;
     property alias acceptableInput: textField.acceptableInput;
     property alias textInputFocus: textField.focus;
@@ -109,13 +107,6 @@ FocusScope {
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
-
-//        onActiveFocusChanged: {
-//            console.log("CustomTextField onActiveFocusChanged", activeFocus);
-//            if (!activeFocus){
-//                containerTextField.editingFinished();
-//            }
-//        }
 
         onAccepted: {
             console.log("CustomTextField onAccepted");

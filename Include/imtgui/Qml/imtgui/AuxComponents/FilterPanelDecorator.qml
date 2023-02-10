@@ -14,13 +14,18 @@ Item {
 
         if (filterPanelDecorator.visible){
             animRect.start();
-
-            tfc.focus = true;
         }
     }
 
     onFocusChanged: {
-        tfc.focus = filterPanelDecorator.focus;
+        if (filterPanelDecorator.focus){
+            console.log("filterPanelDecorator.focus", filterPanelDecorator.focus);
+            console.log("tfc.focus1", tfc.focus);
+          //  tfc.focus = filterPanelDecorator.focus;
+
+            tfc.forceActiveFocus();
+            console.log("tfc.focus2", tfc.focus);
+        }
     }
 
     NumberAnimation {
