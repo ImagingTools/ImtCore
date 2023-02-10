@@ -9,7 +9,7 @@ TreeViewItemDelegateBase {
 
     prefixRowDelegate: Item {
         width: checkBox.visible ? 25 : 0;
-        height: root.rowItemHeight;
+        height: tableViewDelegate.root ? tableViewDelegate.root.rowItemHeight: 0;
 
         CheckBox {
             id: checkBox;
@@ -22,7 +22,7 @@ TreeViewItemDelegateBase {
             onClicked: {
                 model.CheckState = Qt.Checked - model.CheckState;
 
-                root.rowModelDataChanged(tableViewDelegate, "CheckState");
+                tableViewDelegate.root.rowModelDataChanged(tableViewDelegate, "CheckState");
             }
         }
     }

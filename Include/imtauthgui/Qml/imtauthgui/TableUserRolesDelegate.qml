@@ -5,7 +5,7 @@ import Acf 1.0
 TableViewItemDelegateBase {
     id: productRolesDelegate;
 
-    height: root.rowItemHeight + footerItem.height;
+    height: root ? root.rowItemHeight + footerItem.height : 0;
 
     //root: rolesTable;
 

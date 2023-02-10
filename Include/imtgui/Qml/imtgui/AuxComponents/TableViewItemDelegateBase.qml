@@ -4,8 +4,8 @@ import Acf 1.0
 FocusScope {
     id: delegate;
 
-    width: root.width;
-    height: root.rowItemHeight;
+    width: root ? root.width : 0;
+    height: root ? root.rowItemHeight : 0;
 
     visible: model.Visible;
 
@@ -66,7 +66,7 @@ FocusScope {
         id: highlightLoader;
 
         width: parent.width;
-        height: delegate.root.rowItemHeight;
+        height: delegate.root ? delegate.root.rowItemHeight : 0;
 
         visible: delegate.selected;
 
@@ -97,7 +97,7 @@ FocusScope {
         sourceComponent: Row {
             id: row;
 
-            height: delegate.root.rowItemHeight;
+            height: delegate.root ? delegate.root.rowItemHeight : 0;
 
             property var values: [];
 
@@ -107,8 +107,8 @@ FocusScope {
                 delegate: Item {
                     id: repeaterItem;
 
-                    width: delegate.root.width / delegate.root.columnCount;
-                    height: delegate.root.rowItemHeight;
+                    width: delegate.root ? delegate.root.width / delegate.root.columnCount : 0;
+                    height: delegate.root ? delegate.root.rowItemHeight :0;
 
                     Text {
                         id: text_;

@@ -10,7 +10,7 @@ TableViewItemDelegateBase {
     rowBodyDelegate: Component { Row {
             id: row;
 
-            height: packageTreeItemDelegate.root ? root.rowItemHeight :0;
+            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight :0;
 
             Item {
                 id: leftPart;
@@ -33,7 +33,7 @@ TableViewItemDelegateBase {
                         console.log("TableInstanceLicensesDelegate CheckBox onClicked");
                         model.LicenseState = 2 - checkBoxLicense.checkState;
 
-                        root.rowModelDataChanged(packageTreeItemDelegate, "LicenseState");
+                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "LicenseState");
                     }
                 }
 
@@ -78,7 +78,7 @@ TableViewItemDelegateBase {
                             datePicker.setCurrentDay();
                         }
 
-                        root.rowModelDataChanged(packageTreeItemDelegate, "ExpirationState");
+                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "ExpirationState");
                     }
                 }
 
@@ -136,7 +136,7 @@ TableViewItemDelegateBase {
 
                         console.log("model.Expiration", model.Expiration);
 
-                        root.rowModelDataChanged(packageTreeItemDelegate, "Expiration");
+                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Expiration");
                     }
                 }
             }
