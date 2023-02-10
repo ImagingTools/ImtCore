@@ -17,8 +17,8 @@ FocusScope {
     property alias background: backgroundLoader.sourceComponent;
     property alias boundsBehavior: listView.boundsBehavior;
 
-    property int columnCount: columnModel.count;
-    property int rowCount: rowModel.count;
+    property int columnCount:repeater.count;
+    property int rowCount: listView.count;
 
     property int rowItemHeight: 30;
     property int headerHeight: 35;

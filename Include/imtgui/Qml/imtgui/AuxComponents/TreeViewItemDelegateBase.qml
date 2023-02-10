@@ -167,6 +167,8 @@ TableViewItemDelegateBase {
 
                 delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
 
+                model: childrenColumn.childModel;
+
                 onItemAdded: {
                     console.log("TableViewItemDelegate onItemAdded", item.itemData.Id);
                     item.parentDelegate = treeDelegateBase;
@@ -198,15 +200,16 @@ TableViewItemDelegateBase {
                 }
             }
 
-            property ListModel childModel: model.ChildModel ? model.ChildModel: null;
-            //        property TreeItemModel childModel: model.ChildModel ? model.ChildModel: null;
-
-            onChildModelChanged: {
-                console.log("TreeViewItemDelegateBase onChildModelChanged", childModel);
-                if (childrenColumn.childModel){
-                    childModelRepeater.model = childrenColumn.childModel;
-                }
-            }
+            property ListModel childModel: model.ChildModel ? model.ChildModel: 0;
+//            onChildModelChanged: {
+//                console.log("TreeViewItemDelegateBase onChildModelChanged", childModel);
+//                console.log("childModelRepeater.model", childModelRepeater.model);
+//                if (childrenColumn.childModel){
+//                    console.log("childModelRepeater.model1", childModelRepeater.model);
+//                    childModelRepeater.model = childrenColumn.childModel;
+//                    console.log("childModelRepeater.model2", childModelRepeater.model);
+//                }
+//            }
         }
     }
 }
