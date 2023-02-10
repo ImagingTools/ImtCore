@@ -83,16 +83,41 @@ export class QtObject {
         // console.log(this)
         Object.defineProperty(this, 'model', {
             get: ()=>{
+                let handler = {
+                    // parent: this,
+                    has(){
+                        return true
+                    },
+                    get(target, name){
+                        return target[name]
+                    },
+                    set(target, name, value){
+                        target[name] = value
+                        // console.log('DEBUG::handler-set', this.parent, name, value)
+                        this.model.$modelChanged()
+                        return true
+                    },
+                }
                 if(this.$repeater){
                     if(typeof this.$repeater.$p.model.val === 'number'){     
-                        return {
+                        return new Proxy({
                             'index': this.index
-                        }
+                        }, handler)
                     } else if (typeof this.$repeater.$p.model.val === 'object'){
                         if(Array.isArray(this.$repeater.$p.model.val)){
-                            return this.$repeater.$p.model.val[this.index] ? this.$repeater.$p.model.val[this.index] : {}
+                            let target = {}
+                            if(this.$repeater.$p.model.val[this.index]){
+                                target = this.$repeater.$p.model.val[this.index]
+                                handler.model = this.$repeater.$p.model.val
+                            }
+                            return new Proxy(target, handler)
                         } else {
-                            return this.$repeater.$p.model.val.data[this.index] ? this.$repeater.$p.model.val.data[this.index] : {}
+                            let target = {}
+                            if(this.$repeater.$p.model.val.data[this.index]){
+                                target = this.$repeater.$p.model.val.data[this.index]
+                                handler.model = this.$repeater.$p.model.val
+                            }
+                            return new Proxy(target, handler)
                         }
                     }
                 }
@@ -101,28 +126,48 @@ export class QtObject {
                     
                     if(parent.$repeater){
                         if(typeof parent.$repeater.$p.model.val === 'number'){     
-                            return {
+                            return new Proxy({
                                 'index': this.index
-                            }
+                            }, handler)
                         } else if (typeof parent.$repeater.$p.model.val === 'object'){
                             if(Array.isArray(parent.$repeater.$p.model.val)){
-                                return parent.$repeater.$p.model.val[this.index] ? parent.$repeater.$p.model.val[this.index] : {}
+                                let target = {}
+                                if(parent.$repeater.$p.model.val[this.index]){
+                                    target = parent.$repeater.$p.model.val[this.index]
+                                    handler.model = parent.$repeater.$p.model.val
+                                }
+                                return new Proxy(target, handler)
                             } else {
-                                return parent.$repeater.$p.model.val.data[this.index] ? parent.$repeater.$p.model.val.data[this.index] : {}
+                                let target = {}
+                                if(parent.$repeater.$p.model.val.data[this.index]){
+                                    target = parent.$repeater.$p.model.val.data[this.index]
+                                    handler.model = parent.$repeater.$p.model.val
+                                }
+                                return new Proxy(target, handler)
                             }
                             
                         }
                     }
                     if(parent.$useModel) {
                         if(typeof parent.$p.model.val === 'number'){     
-                            return {
+                            return new Proxy({
                                 'index': this.index
-                            }
+                            }, handler)
                         } else if (typeof parent.$p.model.val === 'object'){
                             if(Array.isArray(parent.$p.model.val)){
-                                return parent.$p.model.val[this.index] ? parent.$p.model.val[this.index] : {}
+                                let target = {}
+                                if(parent.$p.model.val[this.index]){
+                                    target = parent.$p.model.val[this.index]
+                                    handler.model = parent.$p.model.val
+                                }
+                                return new Proxy(target, handler)
                             } else {
-                                return parent.$p.model.val.data[this.index] ? parent.$p.model.val.data[this.index] : {}
+                                let target = {}
+                                if(parent.$p.model.val.data[this.index]){
+                                    target = parent.$p.model.val.data[this.index]
+                                    handler.model = parent.$p.model.val
+                                }
+                                return new Proxy(target, handler)
                             }
                             
                         }

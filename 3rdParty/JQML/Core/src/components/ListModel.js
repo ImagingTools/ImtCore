@@ -28,13 +28,43 @@ export class ListModel extends QtObject {
         this.$p.data.signal()
         // console.log('DEBUG::dataChanged', topLeft, bottomRight, keyRoles)
     }
+    $modelChanged(ignore = []){
+        ignore.push(this)
+        let parent = this.parent
+        if(parent && ignore.indexOf(parent) < 0 && parent.$modelChanged){
+            parent.$modelChanged(ignore)
+        }
+        
+        if(this.modelChanged) this.modelChanged()
+
+        for(let child of this.children){
+            if(child && ignore.indexOf(child) < 0 && child.$modelChanged){
+                child.$modelChanged(ignore)
+            }
+        }
+    }
     append(dict){
+        let handler = {
+            model: this,
+            has(){
+                return true
+            },
+            get(target, name){
+                return target[name]
+            },
+            set(target, name, value){
+                target[name] = value
+                // console.log('DEBUG::handler-set', this.parent, name, value)
+                this.model.$modelChanged()
+                return true
+            },
+        }
         if (Array.isArray(dict)) {
 			if (dict.length === 0)
 				return
-			Array.prototype.push.apply(this.data, dict)
+			Array.prototype.push.apply(this.data, new Proxy(dict, handler))
 		} else {
-			this.data.push(dict)
+			this.data.push(new Proxy(dict, handler))
 		}
         this.count = this.data.length
 
