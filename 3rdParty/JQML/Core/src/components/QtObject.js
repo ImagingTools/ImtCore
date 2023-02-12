@@ -243,6 +243,7 @@ export class QtObject {
         while(this.$uL.aliases.length){
             let propName = this.$uL.aliases.shift()
             caller = this.$p[propName]
+            this.$p[propName].getter()
             let val = caller.func()
             caller = null
             
@@ -381,19 +382,26 @@ export class QtObject {
             get: ()=>{ 
                 if(caller && caller !== this.$p[name]){
                     let _caller = caller
-                    _caller.depends.add(signal)
-                    signal.connections[_caller.PID] = ()=>{
-                        let val = _caller.func()
-                        if(_caller.val !== val){
-                            _caller.val = val
-                            _caller.signal()
-                            if(_caller.type === 'alias') {
-                                try {
-                                    _caller.setter(val)
-                                } catch (error) {
-                                    
-                                }
-                                
+                    if(_caller.type === 'alias'){
+                        signal.connections[_caller.PID] = ()=>{
+                            let val1 = _caller.func()
+                            let val2 = _caller.getter()
+                            if(val1 !== _caller.val){
+                                _caller.val = val1
+                                _caller.setter(_caller.val)
+                                _caller.signal()
+                            } else if (val2 !== _caller.val) {
+                                _caller.val = val2
+                                _caller.signal()
+                            }
+                        }
+                    } else {
+                        _caller.depends.add(signal)
+                        signal.connections[_caller.PID] = ()=>{
+                            let val = _caller.func()
+                            if(_caller.val !== val){
+                                _caller.val = val
+                                _caller.signal()
                             }
                         }
                     }
@@ -447,19 +455,26 @@ export class QtObject {
                 get: ()=>{ 
                     if(caller && caller !== this.$p[`${name}.${name2}`]){
                         let _caller = caller
-                        _caller.depends.add(signal)
-                        signal.connections[_caller.PID] = ()=>{
-                            let val = _caller.func()
-                            if(_caller.val !== val){
-                                _caller.val = val
-                                _caller.signal()
-                                if(_caller.type === 'alias') {
-                                    try {
-                                        _caller.setter(val)
-                                    } catch (error) {
-                                        
-                                    }
-                                    
+                        if(_caller.type === 'alias'){
+                            signal.connections[_caller.PID] = ()=>{
+                                let val1 = _caller.func()
+                                let val2 = _caller.getter()
+                                if(val1 !== _caller.val){
+                                    _caller.val = val1
+                                    _caller.setter(_caller.val)
+                                    _caller.signal()
+                                } else if (val2 !== _caller.val) {
+                                    _caller.val = val2
+                                    _caller.signal()
+                                }
+                            }
+                        } else {
+                            _caller.depends.add(signal)
+                            signal.connections[_caller.PID] = ()=>{
+                                let val = _caller.func()
+                                if(_caller.val !== val){
+                                    _caller.val = val
+                                    _caller.signal()
                                 }
                             }
                         }
@@ -527,58 +542,134 @@ export class QtObject {
     }
 
     $cA(name, getter, setter){
+        // let signal = this.$cS(`${name}Changed`)
+
+        // this.$p[name] = {
+        //     'val': '',
+        //     'signal': signal,
+        //     'type': 'alias',
+        //     'setter': setter,
+        //     'getter': getter,
+        //     'depends': new Set(),
+        //     'func': ()=>{
+        //         caller = this.$p[name]
+        //         let res = getter()
+        //         caller = null
+        //         return res
+        //     },
+        //     'PID': PID++
+        // }
+        // //this.$s[`${name}Changed`] = signal
+        
+        // Object.defineProperty(this, name, {
+        //     get: ()=>{ 
+        //         if(caller){
+        //             let _caller = caller
+        //             if(_caller.type === 'alias'){
+        //                 signal.connections[_caller.PID] = ()=>{
+        //                     let val = _caller.func()
+        //                     if(val !== _caller.getter()){
+        //                         _caller.setter(val)
+        //                     } else {
+        //                         _caller.signal()
+        //                     }
+                            
+        //                 }
+        //             } else {
+        //                 _caller.depends.add(signal)
+        //                 signal.connections[_caller.PID] = ()=>{
+        //                     let val = _caller.func()
+        //                     if(_caller.val !== val){
+        //                         _caller.val = val
+        //                         _caller.signal()
+        //                     }
+        //                 }
+        //             }
+                    
+        //         }
+                
+        //         return this.$p[name].val
+        //     },
+        //     set: (newVal)=>{
+        //         setter(newVal)          
+        //     },
+        // })
+
+        // // PropertyManager.add(this.$p[name])
+        // this.$uL.aliases.push(name)
+        // return signal
+
         let signal = this.$cS(`${name}Changed`)
+        signal.debug = `${this.UID}-${name}`
 
         this.$p[name] = {
-            'val': '',
+            'val': undefined,
             'signal': signal,
-            'type': 'alias',
-            'setter': setter,
-            'getter': getter,
             'depends': new Set(),
+            'type': 'alias',
             'func': ()=>{
                 caller = this.$p[name]
                 let res = getter()
                 caller = null
                 return res
             },
+            'getter': getter,
+            'setter': setter,
             'PID': PID++
         }
-        //this.$s[`${name}Changed`] = signal
-        
+
         Object.defineProperty(this, name, {
             get: ()=>{ 
-                if(caller){
+                if(caller && caller !== this.$p[name]){
                     let _caller = caller
-                    _caller.depends.add(signal)
-                    signal.connections[_caller.PID] = ()=>{
-                        let val = _caller.func()
-                        if(_caller.val !== val){
-                            _caller.val = val
-                            _caller.signal()
-                            if(_caller.type === 'alias') {
-                                try {
-                                    _caller.setter(val)
-                                } catch (error) {
-                                    
-                                }
-                                
+                    if(_caller.type === 'alias'){
+                        signal.connections[_caller.PID] = ()=>{
+                            let val1 = _caller.func()
+                            let val2 = _caller.getter()
+                            if(val1 !== _caller.val){
+                                _caller.val = val1
+                                _caller.setter(_caller.val)
+                                _caller.signal()
+                            } else if (val2 !== _caller.val) {
+                                _caller.val = val2
+                                _caller.signal()
+                            }
+                        }
+                    } else {
+                        _caller.depends.add(signal)
+                        signal.connections[_caller.PID] = ()=>{
+                            let val = _caller.func()
+                            if(_caller.val !== val){
+                                _caller.val = val
+                                _caller.signal()
                             }
                         }
                     }
                 }
                 
-                return getter()//this.$p[name].val
+                return this.$p[name].val
             },
             set: (newVal)=>{
-                setter(newVal)           
+                while(this.$uL.properties.indexOf(name) >= 0){
+                    this.$uL.properties.splice(this.$uL.properties.indexOf(name), 1)
+                }
+                while(this.$uL.aliases.indexOf(name) >= 0){
+                    this.$uL.aliases.splice(this.$uL.aliases.indexOf(name), 1)
+                }
+
+                if(this.$p[name].val !== newVal){
+                    for(let s of this.$p[name].depends){
+                        delete s[this.$p[name].PID]
+                    }
+                    this.$p[name].depends.clear()
+                    this.$p[name].val = newVal
+                    setter(newVal)
+                    signal()
+                }              
             },
         })
-
-        // PropertyManager.add(this.$p[name])
         this.$uL.aliases.push(name)
         return signal
-
     }
 
     $cS(name, ...args){

@@ -71,9 +71,25 @@ let files = getFiles(source)
 
 let IDList = new Set()
 
+function fillSignalParamsFromDefaultClass(name, params, className){
+    if(className === 'Repeater') {
+        if(name === 'itemAdded') params.push('item')
+        if(name === 'itemRemoved') params.push('item')
+    }
+    if(className === 'ListModel') { 
+        if(name === 'dataChanged') {
+            params.push('topLeft')
+            params.push('bottomRight')
+            params.push('keyRoles')
+        }
+
+    }
+}
+
 function proxyJS(sourceOrig, currentName, instruction, ignoreList = []){
     let source = sourceOrig
     ignoreList.push('of')
+
     const ignore = new Set(ignoreList)
     const script = esprima.parseScript(source, { tokens: true, range: true }, (node)=>{
         if(node.type === 'VariableDeclarator' || node.type === 'FunctionExpression'){
@@ -644,6 +660,7 @@ function proxyReplace(instructions){
     
     for(let name in instructions.methods){
         // let temp = eval(instructions.methods[name].sourceFull)
+        // fillMethodParamsFromDefaultClass(signalParams, instructions.class)
         instructions.methods[name].sourceFull = proxyJS(instructions.methods[name].sourceFull, name, instructions, instructions.methods[name].params).replaceAll('let $compileTemp=', '')
     }
     for(let signal of instructions.connectionSignals){
@@ -659,7 +676,7 @@ function proxyReplace(instructions){
         for(let i = 0; i < signalParams.length; i++){
             signalParams[i] = signalParams[i].replaceAll('`', '')
         }
-
+        fillSignalParamsFromDefaultClass(signal.name, signalParams, instructions.class)
         signal.sourceFull = proxyJS(signal.sourceFull, signal.name, instructions, signalParams).replaceAll('let $compileTemp=', '')
     }
     for(let name in instructions.propertiesQML){
