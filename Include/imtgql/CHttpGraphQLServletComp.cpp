@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <iser/CJsonStringWriteArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
 #include <iprm/ISelectionParam.h>
 #include <iprm/IOptionsList.h>
 
@@ -114,7 +114,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					}
 					isSuccessful = true;
 
-					iser::CJsonStringWriteArchive archive(responseData);
+					iser::CJsonMemWriteArchive archive(responseData);
 					if (!rootModel.Serialize(archive)){
 						isSuccessful = false;
 					}

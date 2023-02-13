@@ -9,7 +9,7 @@
 // ACF includes
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <iser/CJsonStringWriteArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
 #include <istd/CChangeNotifier.h>
 #include <istd/TSmartPtr.h>
 #include <imod/CModelUpdateBridge.h>
@@ -525,7 +525,7 @@ QString CTreeItemModel::toJSON()
 	QByteArray representationData;
 
 	{
-		iser::CJsonStringWriteArchive archive(representationData);
+		iser::CJsonMemWriteArchive archive(representationData);
 
 		Serialize(archive);
 	}
@@ -726,12 +726,8 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 					bool boolVal = value.toBool();
 					retVal = retVal && archive.Process(boolVal);
 				}
-				else if (value.type() == QVariant::String){
+				else if (value.type() == QVariant::String || value.type() == QVariant::ByteArray){
 					QString strVal = value.toString();
-					retVal = retVal && archive.Process(strVal);
-				}
-				else if (value.type() == QVariant::ByteArray){
-					QString strVal = value.toByteArray();
 					retVal = retVal && archive.Process(strVal);
 				}
 				else {

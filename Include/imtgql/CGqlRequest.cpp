@@ -531,7 +531,11 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 			else{
 				QByteArray data = value.toByteArray();
 				if (isString){
+					data = data.replace("\\", "\\\\\\\\");
 					data = data.replace("\"", "\\\\\\\"");
+					data = data.replace("\n", "\\\\\\\n");
+					data = data.replace("\r", "\\\\\\\r");
+					data = data.replace("\t", "\\\\\\\t");
 				}
 				retVal += data;
 			}
