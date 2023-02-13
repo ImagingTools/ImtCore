@@ -522,7 +522,15 @@ export class QtObject {
                     caller = this.$p[name]
                     let res = func()
                     caller = null
-                    return res
+                    if(typeof res === 'number'){
+                        if(!isNaN(res)){
+                            return res
+                        } else {
+                            return this.$p[name].val
+                        }
+                    } else {
+                        return res
+                    }
                 }
                 this.$uL.aliases.push(name)
             } else {
@@ -530,7 +538,15 @@ export class QtObject {
                     caller = this.$p[name]
                     let res = func()
                     caller = null
-                    return res
+                    if(typeof res === 'number'){
+                        if(!isNaN(res)){
+                            return res
+                        } else {
+                            return this.$p[name].val
+                        }
+                    } else {
+                        return res
+                    }
                 }
                 this.$uL.properties.push(name)
             }
