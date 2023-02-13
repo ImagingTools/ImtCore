@@ -44,10 +44,10 @@ public:
 	void setPrefix(const QString& newPrefix);
 
 public Q_SLOTS:
-	bool DeleteFile(const QString& fileId);
-	bool GetFile(const QString& fileId, const QString& fileName);
-	bool SendFile(const QString& fileUrl);
-    bool OpenFile(const QString& filePath = QString()) const;
+	virtual bool DeleteFile(const QString& fileId);
+	virtual bool GetFile(const QString& fileId, const QString& fileName);
+	virtual bool SendFile(const QString& fileUrl);
+	virtual bool OpenFile(const QString& filePath = QString()) const;
 
 
 private Q_SLOTS:
