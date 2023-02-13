@@ -270,7 +270,7 @@ Item {
             inputParams.InsertField("Id", itemId);
 
             var jsonString = container.documentBase.documentModel.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);
 

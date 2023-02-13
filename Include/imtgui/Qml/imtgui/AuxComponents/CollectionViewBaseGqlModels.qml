@@ -102,7 +102,8 @@ Item {
             viewParams.InsertField("Count", count);
             viewParams.InsertField("FilterModel");
             var jsonString = gqlModelBaseContainer.rootItem.modelFilter.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            console.log("updateModel jsonString", jsonString)
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");

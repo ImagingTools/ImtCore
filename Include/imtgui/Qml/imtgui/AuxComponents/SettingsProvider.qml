@@ -116,7 +116,7 @@ Item {
 
             var inputParams = Gql.GqlObject("input");
             var jsonString = container.serverModel.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"");
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"");
 
             inputParams.InsertField("Item", jsonString);
             query.AddParam(inputParams);

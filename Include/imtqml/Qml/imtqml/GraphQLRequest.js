@@ -136,6 +136,10 @@ var GqlRequest = function(requestType, commandId){
                     var value = gqlObject.GetFieldArgumentValue(fieldId)
                     var isString = (typeof value === 'string' || value instanceof String)
                     if (isString) {
+                        value = value.replace(/\\/g,"\\\\\\\\")
+                        value = value.replace(/\"/g,"\\\\\\\"")
+                        value = value.replace(/\r/g,"\\\\\\\\r")
+                        value = value.replace(/\n/g,"\\\\\\\\n")
                         retVal += "\\\""
                     }
                     retVal += value

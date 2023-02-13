@@ -210,7 +210,7 @@ Rectangle {
             viewParams.InsertField("Count", popupMenuContainer.count);
             viewParams.InsertField("FilterModel");
             var jsonString = modelFilter.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             viewParams.InsertField("FilterModel", jsonString);
             inputParams.InsertFieldObject(viewParams);
             var queryFields = Gql.GqlObject("items");

@@ -83,7 +83,7 @@ Item {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
             var jsonString = data.toJSON();
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             inputParams.InsertField ("Item", jsonString);
             query.AddParam(inputParams);
 

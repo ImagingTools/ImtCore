@@ -54,7 +54,7 @@ Item {
             let obj = {"Username": "su", "UserId": "su", "Password": password, "Name": "superuser"}
 
             var jsonString = JSON.stringify(obj);
-            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);
 
