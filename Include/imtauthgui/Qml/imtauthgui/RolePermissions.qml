@@ -87,6 +87,7 @@ Item {
     }
 
     function updateModel(){
+        console.log("documentModel1", documentModel.toJSON());
         rolePermissionsContainer.undoRedoManager.beginChanges();
 
         let permissionsModel = rolePermissionsContainer.documentModel.AddTreeModel("Permissions");
@@ -94,6 +95,8 @@ Item {
         rolePermissionsContainer.recursiveUpdateModel(permissionsModel, permissionsTable.rowModel);
 
         rolePermissionsContainer.undoRedoManager.endChanges();
+
+        console.log("documentModel2", documentModel.toJSON());
     }
 
     function recursiveUpdateModel(model, guiModel){

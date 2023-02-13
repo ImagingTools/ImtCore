@@ -14,24 +14,18 @@
         <file alias="imtauthgui/UserCollectionView.qml">Qml/imtauthgui/UserCollectionView.qml</file>
         <file alias="imtauthgui/UserCollectionViewCommandsDelegate.qml">Qml/imtauthgui/UserCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserEditor.qml">Qml/imtauthgui/UserEditor.qml</file>
-        <file alias="imtauthgui/UserEditorCommandsDelegate.qml">Qml/imtauthgui/UserEditorCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserView.qml">Qml/imtauthgui/UserView.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml</file>
-        <file alias="imtauthgui/RoleEditorCommandsDelegate.qml">Qml/imtauthgui/RoleEditorCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserViewCommandsDelegate.qml">Qml/imtauthgui/UserViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/TableUserRolesDelegate.qml">Qml/imtauthgui/TableUserRolesDelegate.qml</file>
         <file alias="imtauthgui/UserRoles.qml">Qml/imtauthgui/UserRoles.qml</file>
-        <file alias="imtauthgui/TableUserPermissionsDelegate.qml">Qml/imtauthgui/TableUserPermissionsDelegate.qml</file>
-        <file alias="imtauthgui/UserPermissions.qml">Qml/imtauthgui/UserPermissions.qml</file>
         <file alias="imtauthgui/RolePermissions.qml">Qml/imtauthgui/RolePermissions.qml</file>
         <file alias="imtauthgui/RoleViewCommandsDelegate.qml">Qml/imtauthgui/RoleViewCommandsDelegate.qml</file>
-        <file alias="imtauthgui/TableRolePermissionsDelegate.qml">Qml/imtauthgui/TableRolePermissionsDelegate.qml</file>
         <file alias="imtauthgui/TableProductRolesDelegate.qml">Qml/imtauthgui/TableProductRolesDelegate.qml</file>
         <file alias="imtauthgui/RolesDialog.qml">Qml/imtauthgui/RolesDialog.qml</file>
-	<file alias="imtauthgui/RolesDialogBody.qml">Qml/imtauthgui/RolesDialogBody.qml</file>
-	<file alias="imtauthgui/PermissionsProvider.qml">Qml/imtauthgui/PermissionsProvider.qml</file>
-	<file alias="imtauthgui/RolesProvider.qml">Qml/imtauthgui/RolesProvider.qml</file>
-	<file alias="imtauthgui/PermissionDependenciesProvider.qml">Qml/imtauthgui/PermissionDependenciesProvider.qml</file>
+        <file alias="imtauthgui/RolesDialogBody.qml">Qml/imtauthgui/RolesDialogBody.qml</file>
+        <file alias="imtauthgui/PermissionsProvider.qml">Qml/imtauthgui/PermissionsProvider.qml</file>
+        <file alias="imtauthgui/RolesProvider.qml">Qml/imtauthgui/RolesProvider.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

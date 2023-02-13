@@ -5,20 +5,15 @@
         <file alias="imtlicgui/ProductView.qml">Qml/imtlicgui/ProductView.qml</file>
         <file alias="imtlicgui/ProductCollectionView.qml">Qml/imtlicgui/ProductCollectionView.qml</file>
         <file alias="imtlicgui/PackageCollectionView.qml">Qml/imtlicgui/PackageCollectionView.qml</file>
-
         <file alias="imtlicgui/PackageView.qml">Qml/imtlicgui/PackageView.qml</file>
-
         <file alias="imtlicgui/EditDialog.qml">Qml/imtlicgui/EditDialog.qml</file>
         <file alias="imtlicgui/EditLicenseDialog.qml">Qml/imtlicgui/EditLicenseDialog.qml</file>
         <file alias="imtlicgui/InstallationEditor.qml">Qml/imtlicgui/InstallationEditor.qml</file>
-        <file alias="imtlicgui/FeaturesTreeView.qml">Qml/imtlicgui/FeaturesTreeView.qml</file>
         <file alias="imtlicgui/FeaturesProvider.qml">Qml/imtlicgui/FeaturesProvider.qml</file>
         <file alias="imtlicgui/LicensesProvider.qml">Qml/imtlicgui/LicensesProvider.qml</file>
         <file alias="imtlicgui/FeaturesDependenciesProvider.qml">Qml/imtlicgui/FeaturesDependenciesProvider.qml</file>
-        <file alias="imtlicgui/LicenseFeaturesModel.qml">Qml/imtlicgui/LicenseFeaturesModel.qml</file>
         <file alias="imtlicgui/TableInstanceLicensesDelegate.qml">Qml/imtlicgui/TableInstanceLicensesDelegate.qml</file>
         <file alias="imtlicgui/MetaInfo.qml">Qml/imtlicgui/MetaInfo.qml</file>
-        <file alias="imtlicgui/LoadingPage.qml">Qml/imtlicgui/LoadingPage.qml</file>
         <file alias="imtlicgui/ProductCollectionViewCommandsDelegate.qml">Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/PackageCollectionViewCommandsDelegate.qml">Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/InstallationCollectionViewCommandsDelegate.qml">Qml/imtlicgui/InstallationCollectionViewCommandsDelegate.qml</file>
@@ -35,6 +30,6 @@
         <file alias="imtlicgui/PackageViewItemDelegate.qml">Qml/imtlicgui/PackageViewItemDelegate.qml</file>
         <file alias="imtlicgui/ProductViewItemDelegate.qml">Qml/imtlicgui/ProductViewItemDelegate.qml</file>
         <file alias="imtlicgui/LicenseInstanceItemDelegate.qml">Qml/imtlicgui/LicenseInstanceItemDelegate.qml</file>
-	<file alias="imtlicgui/TreeViewDependencies.qml">Qml/imtlicgui/TreeViewDependencies.qml</file>
+        <file alias="imtlicgui/TreeViewDependencies.qml">Qml/imtlicgui/TreeViewDependencies.qml</file>
     </qresource>
 </RCC>

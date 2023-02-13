@@ -154,6 +154,8 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int
 		SetData(key, v, index);
 	}
 	else{
+		istd::CChangeNotifier changeNotifier(this);
+
 		retVal->Clear();
 	}
 

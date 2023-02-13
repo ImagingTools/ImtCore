@@ -46,19 +46,19 @@ Item {
         return roleName;
     }
 
-    MouseArea {
-        id: ma;
+//    MouseArea {
+//        id: ma;
 
-        anchors.fill: parent;
+//        anchors.fill: parent;
 
-        onClicked: {
-            productRolesDelegate.clicked(productRolesDelegate.index);
-        }
+//        onClicked: {
+//            productRolesDelegate.clicked(productRolesDelegate.index);
+//        }
 
-        onDoubleClicked: {
-            productRolesDelegate.doubleClicked();
-        }
-    }
+//        onDoubleClicked: {
+//            productRolesDelegate.doubleClicked();
+//        }
+//    }
 
     Rectangle {
         id: body;
@@ -170,6 +170,8 @@ Item {
                         }
 
                         onDoubleClicked: {
+                            rolesRepeater.selectedIndex = model.index;
+
                             productRolesDelegate.doubleClicked(model.Id, model.Name);
                         }
                     }
