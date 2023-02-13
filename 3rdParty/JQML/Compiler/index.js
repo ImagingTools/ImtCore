@@ -153,6 +153,7 @@ function proxyJS(sourceOrig, currentName, instruction, ignoreList = []){
                     id = `this.$PI.${markers[i].value}`
                 }
             if(instruction.id.has(`\`${markers[i].value}\``)) id = `this`
+            if(markers[i].value === 'XMLHttpRequest') id = 'XMLHttpRequest'
             //const id = `this.$P.${markers[i].value}`
             const start = markers[i].range[0]
             const end = markers[i].range[1]
