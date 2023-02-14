@@ -9,7 +9,7 @@ Item {
 //    property TreeItemModel documentModel: TreeItemModel{}
     property TreeItemModel licensesModel: TreeItemModel{}
     property TreeItemModel productsModel: TreeItemModel{}
-    property TreeItemModel orderProductsModel: TreeItemModel{}
+    property TreeItemModel orderProductsModel: TreeItemModel {}
     property TreeItemModel softwareModel: TreeItemModel{}
     property TreeItemModel hardwareModel: TreeItemModel{}
 

@@ -39,11 +39,6 @@ Item {
 
     Component.onCompleted: {
         commandsDelegate.documentBase = documentBase;
-
-        //        if (documentBase.itemLoad){
-        //            documentBase.itemId = documentsData.GetData("Id", model.index);
-        //            documentBase.itemName = documentsData.GetData("Title", model.index);
-        //        }
     }
 
     onDocumentsDataChanged: {
@@ -72,8 +67,6 @@ Item {
         if (documentBase.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
                                  "CommandsId": commandsProvider.commandsId});
-
-//            documentBase.forceActiveFocus();
         }
     }
 

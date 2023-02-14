@@ -403,10 +403,9 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 
 
 bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
-			const QByteArray& typeId,
-			const QSqlRecord& record,
-			idoc::MetaInfoPtr& objectMetaInfoPtr,
-			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
+		const QSqlRecord& record,
+		idoc::MetaInfoPtr& objectMetaInfoPtr,
+		idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return false;
@@ -424,7 +423,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 	if (metaInfoQuery.next()){
 		QSqlRecord metaInfoRecord = metaInfoQuery.record();
 
-		objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
+		objectMetaInfoPtr = CreateObjectMetaInfo(QByteArray());
 		if (objectMetaInfoPtr.IsValid()){
 			if (!SetObjectMetaInfoFromRecord(metaInfoRecord, *objectMetaInfoPtr)){
 				objectMetaInfoPtr.Reset();
@@ -434,7 +433,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 		}
 	}
 
-	collectionItemMetaInfoPtr.SetPtr(CreateCollectionItemMetaInfo(typeId));
+	collectionItemMetaInfoPtr.SetPtr(CreateCollectionItemMetaInfo(QByteArray()));
 	if (collectionItemMetaInfoPtr.IsValid()){
 		if (!SetCollectionItemMetaInfoFromRecord(record, *collectionItemMetaInfoPtr)){
 			collectionItemMetaInfoPtr.Reset();

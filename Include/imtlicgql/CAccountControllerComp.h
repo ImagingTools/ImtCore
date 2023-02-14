@@ -20,11 +20,12 @@ public:
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const override;
 
 private:
-    I_FACT(imtauth::IAccountBaseInfo, m_accountInfoFactCompPtr);
+	I_FACT(imtauth::IAccountBaseInfo, m_accountInfoFactCompPtr);
 };
 
 

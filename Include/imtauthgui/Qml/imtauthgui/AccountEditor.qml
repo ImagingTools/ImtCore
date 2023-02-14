@@ -14,14 +14,6 @@ DocumentBase {
 
     property bool blockUpdatingModel: false;
 
-    Component.onCompleted: {
-        //accountNameInput.focus = true;
-    }
-
-    Component.onDestruction: {
-        console.log("AccountEditor onDestruction");
-    }
-
     onDocumentModelChanged: {
         console.log("AccountEditor onDocumentModelChanged");
         accountEditorContainer.updateGui();
