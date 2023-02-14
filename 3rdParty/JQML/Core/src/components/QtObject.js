@@ -95,6 +95,7 @@ export class QtObject {
                         target[name] = value
                         // console.log('DEBUG::handler-set', this.parent, name, value)
                         this.model.$modelChanged()
+                        this.model.$dataChanged()
                         return true
                     },
                 }
