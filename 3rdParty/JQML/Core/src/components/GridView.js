@@ -111,7 +111,11 @@ export class GridView extends Flickable {
             
             this.count = this.children.length
             this.$updateChild(index)
-            obj.$uP()
+            try {
+                obj.$uP()
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 
@@ -136,7 +140,11 @@ export class GridView extends Flickable {
             if(wait){
                 this.$childrenForUpdate.push(obj)
             } else {
-                obj.$uP()
+                try {
+                    obj.$uP()
+                } catch (error) {
+                    console.error(error)
+                }
             }
         }
     }

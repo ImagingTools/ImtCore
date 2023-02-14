@@ -60,7 +60,11 @@ export class Repeater extends Item {
             }
             
             this.count = this.children.length
-            obj.$uP()
+            try {
+                obj.$uP()
+            } catch (error) {
+                console.error(error)
+            }
             this.itemAdded(obj.index, obj)
         }
     }
@@ -87,7 +91,11 @@ export class Repeater extends Item {
             if(wait){
                 this.$childrenForUpdate.push(obj)
             } else {
-                obj.$uP()
+                try {
+                    obj.$uP()
+                } catch (error) {
+                    console.error(error)
+                }
                 this.itemAdded(obj.index, obj)
             }
         }

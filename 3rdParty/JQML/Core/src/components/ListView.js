@@ -97,7 +97,11 @@ export class ListView extends Flickable {
             
             this.count = this.children.length
             this.$anchorsChild(index)
-            obj.$uP()
+            try {
+                obj.$uP()
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 
@@ -122,7 +126,12 @@ export class ListView extends Flickable {
             if(wait){
                 this.$childrenForUpdate.push(obj)
             } else {
-                obj.$uP()
+                // obj.$uP()
+                try {
+                    obj.$uP()
+                } catch (error) {
+                    console.error(error)
+                }
             }
         }
     }
