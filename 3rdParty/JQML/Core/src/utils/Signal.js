@@ -9,13 +9,13 @@ export function Signal(...args){
         }
         for(let key in signal.connections){
 
-            // try {
+            try {
                 if(signal.connections[key]) signal.connections[key](...args)
-            // } catch (err1) {
+            } catch (err1) {
                 // signal.repeats[key] = setTimeout(()=>{
                 //     signal.connections[key](...args)
                 // }, 500)
-            // }
+            }
             
             // let interval = setInterval(()=>{
             //     try{

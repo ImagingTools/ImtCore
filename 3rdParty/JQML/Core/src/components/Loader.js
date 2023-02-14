@@ -153,7 +153,8 @@ export class Loader extends Item {
         if(this.sourceComponent){
             // this.$cP('index', this.parent.index)
             // this.index = this.parent.index
-            this.item = this.sourceComponent.createObject ? this.sourceComponent.createObject({parent: this, index: this.index}) : this.sourceComponent({parent: this, index: this.index})
+            this.$p.item.val = this.sourceComponent.createObject ? this.sourceComponent.createObject({parent: this, index: this.index}) : this.sourceComponent({parent: this, index: this.index})
+            
             if(this.sourceComponent.parent) {
                 this.item.parent2 = this.sourceComponent.parent
                 this.item.$treeParent2 = this.sourceComponent.parent
@@ -172,9 +173,10 @@ export class Loader extends Item {
                 childRecursive(this.item, this.index)
             }
 
-            if(Core.root.$completed){
+            // if(Core.root.$completed){
                 this.item.$uP()
-            }
+            // }
+            this.$p.item.signal()
             
         } else {
             this.item = undefined
@@ -194,7 +196,7 @@ export class Loader extends Item {
         this.children = []
         
         if(this.source){
-                this.item = Core.cC(this.source, {parent: this, index: this.index})
+                this.$p.item.val = Core.cC(this.source, {parent: this, index: this.index})
 
                 if(this.index !== undefined){
                     let childRecursive = (obj, index)=>{
@@ -208,9 +210,10 @@ export class Loader extends Item {
                     childRecursive(this.item, this.index)
                 }
                 
-                if(Core.root.$completed){
+                // if(Core.root.$completed){
                     this.item.$uP()
-                }
+                // }
+                this.$p.item.signal()
   
         } else {
             this.item = undefined

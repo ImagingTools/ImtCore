@@ -222,7 +222,7 @@ export class QtObject {
                     obj: this,
                     propName: propName,
                 })
-                console.error(`${propName}`, this)
+                // console.error(`${propName}`, this)
             }
             
             
@@ -410,7 +410,7 @@ export class QtObject {
                 return this.$p[name].val
             },
             set: (newVal)=>{
-                while(this.$uL.properties.indexOf(name) >= 0){
+                while(this.$uL &&this.$uL.properties.indexOf(name) >= 0){
                     this.$uL.properties.splice(this.$uL.properties.indexOf(name), 1)
                 }
                 while(this.$uL.aliases.indexOf(name) >= 0){
