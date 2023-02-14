@@ -12,6 +12,7 @@ export function Signal(...args){
             try {
                 if(signal.connections[key]) signal.connections[key](...args)
             } catch (err1) {
+                console.error(err1)
                 // signal.repeats[key] = setTimeout(()=>{
                 //     signal.connections[key](...args)
                 // }, 500)

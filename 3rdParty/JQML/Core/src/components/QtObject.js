@@ -222,7 +222,7 @@ export class QtObject {
                     obj: this,
                     propName: propName,
                 })
-                // console.error(`${propName}`, this)
+                console.error(`${propName}`, this)
             }
             
             
