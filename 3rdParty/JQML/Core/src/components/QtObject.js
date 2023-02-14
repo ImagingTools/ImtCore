@@ -346,6 +346,16 @@ export class QtObject {
     }
 
     $cP(name, val){
+        if(typeof val === 'number'){
+            if(isNaN(val)){
+                val = 0
+            }
+            if(val === Infinity){
+                val = -2147483648
+            }
+
+        }
+
         if(name in this.$p){
             return this.$p[name].signal
         }
@@ -361,7 +371,19 @@ export class QtObject {
                     caller = this.$p[name]
                     let res = val()
                     caller = null
-                    return res
+                    if(typeof res === 'number'){
+                        if(!isNaN(res)){
+                            return res
+                        } else {
+                            if(res === Infinity){
+                                return -2147483648
+                            } else {
+                                return 0
+                            }
+                        }
+                    } else {
+                        return res
+                    }
                 },
                 'PID': PID++
             }
@@ -526,7 +548,11 @@ export class QtObject {
                         if(!isNaN(res)){
                             return res
                         } else {
-                            return this.$p[name].val
+                            if(res === Infinity){
+                                return -2147483648
+                            } else {
+                                return 0
+                            }
                         }
                     } else {
                         return res
@@ -542,7 +568,11 @@ export class QtObject {
                         if(!isNaN(res)){
                             return res
                         } else {
-                            return this.$p[name].val
+                            if(res === Infinity){
+                                return -2147483648
+                            } else {
+                                return 0
+                            }
                         }
                     } else {
                         return res
@@ -615,6 +645,15 @@ export class QtObject {
         // this.$uL.aliases.push(name)
         // return signal
 
+        if(typeof val === 'number'){
+            if(isNaN(val)){
+                val = 0
+            }
+            if(val === Infinity){
+                val = -2147483648
+            }
+
+        }
         let signal = this.$cS(`${name}Changed`)
         signal.debug = `${this.UID}-${name}`
 
@@ -627,7 +666,19 @@ export class QtObject {
                 caller = this.$p[name]
                 let res = getter()
                 caller = null
-                return res
+                if(typeof res === 'number'){
+                    if(!isNaN(res)){
+                        return res
+                    } else {
+                        if(res === Infinity){
+                            return -2147483648
+                        } else {
+                            return 0
+                        }
+                    }
+                } else {
+                    return res
+                }
             },
             'getter': getter,
             'setter': setter,
