@@ -17,24 +17,24 @@ Rectangle {
         headerText.text += "/ " + header;
     }
 
-    onDocumentManagerChanged: {
+//    onDocumentManagerChanged: {
 
-        if (container.documentManager != null){
-            for (let i = 0; i < bodyRepeater.count; i++){
-                let item = bodyRepeater.itemAt(i);
-                item.item.documentManager = container.documentManager;
-            }
-        }
-    }
+//        if (container.documentManager != null){
+//            for (let i = 0; i < bodyRepeater.count; i++){
+//                let item = bodyRepeater.itemAt(i);
+//                item.item.documentManager = container.documentManager;
+//            }
+//        }
+//    }
 
-    onDocumentsDataChanged: {
-        if (container.documentsData != null){
-            for (let i = 0; i < bodyRepeater.count; i++){
-                let item = bodyRepeater.itemAt(i);
-                item.item.documentsData = container.documentsData;
-            }
-        }
-    }
+//    onDocumentsDataChanged: {
+//        if (container.documentsData != null){
+//            for (let i = 0; i < bodyRepeater.count; i++){
+//                let item = bodyRepeater.itemAt(i);
+//                item.item.documentsData = container.documentsData;
+//            }
+//        }
+//    }
 
     Row {
         id: header;
@@ -87,17 +87,22 @@ Rectangle {
             ListModel{
                 id: leftMenuModel;
 
-                ListElement{
-                    Id: "Roles";
-                    Name: qsTr("Roles");
-                    Source: "RoleCollectionView.qml";
+                Component.onCompleted: {
+                    leftMenuModel.append({Id: "Roles",  Name: qsTr("Roles"), Source: "RoleCollectionView.qml"})
+                    leftMenuModel.append({Id: "Users",  Name: qsTr("Users"), Source: "UserCollectionView.qml"})
                 }
 
-                ListElement{
-                    Id: "Users";
-                    Name: qsTr("Users");
-                    Source: "UserCollectionView.qml";
-                }
+//                ListElement{
+//                    Id: "Roles";
+//                    Name: qsTr("Roles");
+//                    Source: "RoleCollectionView.qml";
+//                }
+
+//                ListElement{
+//                    Id: "Users";
+//                    Name: qsTr("Users");
+//                    Source: "UserCollectionView.qml";
+//                }
             }
 
             Repeater {
@@ -132,6 +137,7 @@ Rectangle {
                     }
 
                     onClicked: {
+                        console.log("onClicked", model)
                         if (mainPanel.selectedIndex !== model.index){
                             mainPanel.selectedIndex = model.index;
                         }
@@ -170,6 +176,21 @@ Rectangle {
 
                 anchors.fill: parent;
 
+                property Item documentManager: container.documentManager;
+
+                onDocumentManagerChanged: {
+                    if (bodyLoader.item){
+                        bodyLoader.item.documentManager = documentManager;
+                    }
+                }
+
+                property TreeItemModel documentsData: container.documentsData;
+                onDocumentsDataChanged: {
+                    if (bodyLoader.item){
+                        bodyLoader.item.documentsData = documentsData;
+                    }
+                }
+
                 onVisibleChanged: {
                     if (bodyLoader.visible){
                         console.log("onVisibleChanged model.Source", model.Source);
@@ -185,8 +206,12 @@ Rectangle {
                     console.log("bodyRepeater onLoaded", model.Source);
                     bodyLoader.item.commandsId = model.Id;
 
-                    if (container.documentManager != null && bodyLoader.item.documentManager !== undefined){
-                        bodyLoader.item.documentManager = container.documentManager;
+                    if (documentManager != null && bodyLoader.item.documentManager === undefined){
+                        bodyLoader.item.documentManager = documentManager;
+                    }
+
+                    if (documentsData != null && bodyLoader.item.documentsData === undefined){
+                        bodyLoader.item.documentsData = documentsData;
                     }
                 }
             }

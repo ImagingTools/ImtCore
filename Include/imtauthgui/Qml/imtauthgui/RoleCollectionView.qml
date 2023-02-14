@@ -7,7 +7,7 @@ CollectionView {
 
     contentMargins: 10;
 
-    tableElementsDelegate: TableProductRolesDelegate {
+    tableElementsDelegate: Component { TableProductRolesDelegate {
         width: parent.width;
 
         selectedIndex: baseCollectionView.table.selectedIndex;
@@ -24,7 +24,7 @@ CollectionView {
             console.log("onClicked", model.index);
             baseCollectionView.table.selectedIndex = index;
         }
-    }
+    } }
 
     Component.onCompleted: {
         console.log("RoleCollection onCompleted", model.index);
