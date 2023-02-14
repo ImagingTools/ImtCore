@@ -101,7 +101,7 @@ export class Loader extends Item {
             //     if(this.item.$uL.properties[i] === 'width') this.item.$uL.properties.splice(i, 1); else i++
             // }
         } else {
-            this.$sP('width', ()=>{return this.$p.item.val.width})
+            this.$sP('width', ()=>{return this.item.width})
             // this.$p.width.depends.add(this.item.$p.width.signal)
             // this.item.$p.width.signal.connections[this.$p.width.PID] = ()=>{
             //     this.width = this.item.width
@@ -119,7 +119,7 @@ export class Loader extends Item {
             //     if(this.item.$uL.properties[i] === 'height') this.item.$uL.properties.splice(i, 1); else i++
             // }
         } else {
-            this.$sP('height', ()=>{return this.$p.item.val.height})
+            this.$sP('height', ()=>{return this.item.height})
             // this.$p.height.depends.add(this.item.$p.height.signal)
             // this.item.$p.height.signal.connections[this.$p.height.PID] = ()=>{
             //     this.height = this.item.height
@@ -137,7 +137,7 @@ export class Loader extends Item {
             //     if(this.item.$uL.properties[i] === 'clip') this.item.$uL.properties.splice(i, 1); else i++
             // }
         } else {
-            this.$sP('clip', ()=>{return this.$p.item.val.clip})
+            this.$sP('clip', ()=>{return this.item.clip})
             // this.$p.clip.depends.add(this.item.$p.clip.signal)
             // this.item.$p.clip.signal.connections[this.$p.clip.PID] = ()=>{
             //     this.clip = this.item.clip
@@ -174,9 +174,14 @@ export class Loader extends Item {
             }
 
             // if(Core.root.$completed){
-                this.item.$uP()
+                try {
+                    this.item.$uP()
+                } catch (error) {
+                    console.error(error)
+                }
             // }
             this.$p.item.signal()
+            if(this.$uL.properties.length) this.$uP()
             
         } else {
             this.item = undefined
@@ -211,9 +216,15 @@ export class Loader extends Item {
                 }
                 
                 // if(Core.root.$completed){
-                    this.item.$uP()
+                    try {
+                        this.item.$uP()
+                    } catch (error) {
+                        console.error(error)
+                    }
+                    
                 // }
                 this.$p.item.signal()
+                if(this.$uL.properties.length) this.$uP()
   
         } else {
             this.item = undefined
