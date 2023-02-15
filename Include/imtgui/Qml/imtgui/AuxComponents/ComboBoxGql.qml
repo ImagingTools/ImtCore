@@ -46,6 +46,9 @@ Item {
     property string filterText: "";
     property string fontColor: Style.textColor;//
 
+    // ID for display in combo box delegates
+    property string nameId: "Name";
+
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainerGql.width;
         height: comboBoxContainerGql.itemHeight;

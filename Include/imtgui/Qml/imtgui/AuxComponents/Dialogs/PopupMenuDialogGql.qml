@@ -29,6 +29,9 @@ Rectangle {
     property bool hiddenBackground: true;
     property bool canClose: true;
 
+    // ID for display in combo box delegates
+    property string nameId: "Name";
+
     property Component delegate: PopupMenuDelegate{
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;

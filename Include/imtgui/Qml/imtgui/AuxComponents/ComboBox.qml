@@ -37,6 +37,8 @@ FocusScope {
 
     property real contentY;
 
+    // ID for display in combo box delegates
+    property string nameId: "Name";
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainer.width;

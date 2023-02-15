@@ -35,8 +35,6 @@ Item {
         visible: mouseArea.containsMouse;
     }
 
-
-
     Item {
         id: iconItem2;
 
@@ -70,7 +68,9 @@ Item {
         font.pixelSize: popupMenuDelegate.textSize;
         font.family: Style.fontFamily;
 
-        text: model.Name;
+//        text: model.Name;
+
+        text: model[popupMenuDelegate.rootItem.nameId];
     }
 
     MouseArea {

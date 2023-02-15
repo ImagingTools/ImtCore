@@ -10,7 +10,7 @@ Item {
     property string commandId;
 
     function updateModel(inputParams, fields){
-        if (commandId == ""){
+        if (container.commandId == ""){
             console.log( "ERROR: CollectionDataProvider commandId is empty!");
 
             return;
@@ -23,8 +23,8 @@ Item {
         id: itemsInfoModel;
 
         function updateModel(externInputParams, fields) {
-            console.log( "gqlModelBaseContainer updateModel", commandId + "List");
-            var query = Gql.GqlRequest("query", commandId + "List");
+            console.log( "gqlModelBaseContainer updateModel", container.commandId + "List");
+            var query = Gql.GqlRequest("query", container.commandId + "List");
 
             var inputParams = Gql.GqlObject("input");
             let keys = Object.keys(externInputParams)
@@ -54,8 +54,8 @@ Item {
 
                 if (itemsInfoModel.ContainsKey("data")){
                     dataModelLocal = itemsInfoModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(commandId + "List")){
-                        dataModelLocal = dataModelLocal.GetData(commandId + "List");
+                    if (dataModelLocal.ContainsKey(container.commandId + "List")){
+                        dataModelLocal = dataModelLocal.GetData(container.commandId + "List");
                         if (dataModelLocal.ContainsKey("items")){
                             container.collectionModel = dataModelLocal.GetData("items");
                         }
