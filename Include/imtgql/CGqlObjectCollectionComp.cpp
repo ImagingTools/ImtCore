@@ -420,9 +420,7 @@ imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 					imtbase::ICollectionInfo::Ids ids;
 					for (IGqlObjectCollectionDelegate::ElementInfo& element : elementList){
 						// TODO: remove after api changed
-						if (!m_items.contains(element.id)){
-							m_items[element.id] = {parentId, element.isBranch, element.name, element.version};
-						}
+						m_items[element.id] = {parentId, element.isBranch, element.name, element.version};
 
 						if (element.isBranch && !element.id.isEmpty() && (iterationFlags & imtbase::ICollectionInfo::IF_BRANCH_ONLY)) {
 							ids.append(element.id);
