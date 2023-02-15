@@ -453,7 +453,12 @@ function qmlprop(m, instructions, file){
             if(typeof cval === 'string') {
                 instructions.properties[name] = val
             } else {
-                instructions.properties[name] = val
+                if((cval === undefined && val.indexOf('undefined') < 0) || isNaN(cval)){
+                    instructions.propertiesLazy[name] = val
+                } else {
+                    instructions.properties[name] = val
+                }
+                
             }
         } catch (error) {
             instructions.propertiesLazy[name] = val
