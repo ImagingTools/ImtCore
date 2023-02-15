@@ -96,7 +96,8 @@ Rectangle {
     }
 
     Component.onDestruction: {
-        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(popupMenuContainer.root.closeDialog);
+        if(popupMenuContainer.root.backgroundItem.backgroundAreaItem)
+            popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(popupMenuContainer.root.closeDialog);
     }
 
 
