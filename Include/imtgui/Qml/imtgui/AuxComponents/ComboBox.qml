@@ -66,7 +66,7 @@ FocusScope {
 
     onModelChanged: {
         if (comboBoxContainer.currentIndex > -1){
-            comboBoxContainer.currentText = comboBoxContainer.model.GetData("Name");
+            comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId);
         }
     }
 
@@ -74,7 +74,7 @@ FocusScope {
         console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (comboBoxContainer.currentIndex > -1){
             console.log("model", JSON.stringify(model));
-            let name = comboBoxContainer.model.GetData("Name", comboBoxContainer.currentIndex);
+            let name = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
             console.log("name", name);
             comboBoxContainer.currentText = name;
         }
