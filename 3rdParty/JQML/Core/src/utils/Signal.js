@@ -11,22 +11,10 @@ export function Signal(...args){
 
             try {
                 if(signal.connections[key]) signal.connections[key](...args)
-            } catch (err1) {
-                console.error(err1)
-                // signal.repeats[key] = setTimeout(()=>{
-                //     signal.connections[key](...args)
-                // }, 500)
+            } catch (error) {
+                console.error(`skip::signal::`,error)
             }
-            
-            // let interval = setInterval(()=>{
-            //     try{
-            //         signal.connections[key](...args)
-            //         clearInterval(interval)
-            //     } catch {
-            //         console.log('ERROR::', key, signal.connections[key])
-            //         // signal.connections[key](...args)
-            //     }
-            // }, 30)  
+
         }
     }
     signal.repeats = {}

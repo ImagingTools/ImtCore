@@ -223,7 +223,7 @@ export class QtObject {
                     obj: this,
                     propName: propName,
                 })
-                console.error(`${propName}`, this)
+                console.error(`${this.UID}::skip::property::${propName}`)
             }
             
             
@@ -277,18 +277,23 @@ export class QtObject {
 
 
         for(let error of errors){
-            let val = error.obj.$p[error.propName].func()
-            if(error.obj.$p[error.propName].val !== val){
+            try {
+                let val = error.obj.$p[error.propName].func()
+                if(error.obj.$p[error.propName].val !== val){
 
-                for(let s of error.obj.$p[error.propName].depends){
-                    delete s[error.obj.$p[error.propName].PID]
+                    for(let s of error.obj.$p[error.propName].depends){
+                        delete s[error.obj.$p[error.propName].PID]
+                    }
+                    this.$p[propName].depends.clear()
+
+                    error.obj.$p[error.propName].val = val
+                    if(queueSignals.indexOf(error.obj.$p[error.propName].signal) < 0) queueSignals.push(error.obj.$p[error.propName].signal)   
+
                 }
-                this.$p[propName].depends.clear()
-
-                error.obj.$p[error.propName].val = val
-                if(queueSignals.indexOf(error.obj.$p[error.propName].signal) < 0) queueSignals.push(error.obj.$p[error.propName].signal)   
-
+            } catch {
+                console.error(`${this.UID}::skip::property::${error.propName}`)
             }
+            
         }
 
         while(queueSignals.length){

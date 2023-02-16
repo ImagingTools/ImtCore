@@ -29,10 +29,10 @@ export class Column extends Item {
 
     }
     $updateGeometry(){
-        if(this.$widthAuto)
+        if(this.$heightAuto)
         this.$sP('height', ()=>{ return this.children.length ? this.children[this.children.length-1].y + this.children[this.children.length-1].height : 0})
 
-        if(this.$heightAuto)
+        if(this.$widthAuto)
         this.$sP('width', ()=>{ 
             let width = 0
             if(this.children.length)
