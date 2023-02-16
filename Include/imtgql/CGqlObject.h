@@ -29,7 +29,6 @@ public:
 	CGqlObject* GetParentObject() const;
 	void InsertField(const QByteArray& fieldId);
 	void InsertField(const QByteArray& fieldId, const QVariant& value);
-	void InsertField(const QByteArray& fieldId, const QVariantList& value);
 	void InsertField(const QByteArray& fieldId, const imtgql::CGqlEnum& value);
 	void InsertField(const QByteArray& fieldId, const CGqlObject& object);
 	void InsertField(const QByteArray& fieldId, const QList<CGqlObject> objectList);

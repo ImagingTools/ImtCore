@@ -46,6 +46,8 @@ DocumentBase {
 
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
+            if (!loader.item)
+                continue;
             loader.item.documentModel = container.documentModel;
             loader.item.undoRedoManager = undoRedoManager;
             if(loader.item.documentBase !==undefined){
@@ -75,14 +77,18 @@ DocumentBase {
     function updateGui(){
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
-            loader.item.updateGui();
+            if (loader.item){
+                loader.item.updateGui();
+            }
         }
     }
 
     function updateModel(){
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
-            loader.item.updateModel();
+            if (loader.item){
+                loader.item.updateModel();
+            }
         }
     }
 
@@ -220,8 +226,8 @@ DocumentBase {
 
                 onLoaded: {
                     if(mainPanelFrameLoader.item){
-                        container.mainMargin = mainPanelFrameLoader.item.mainMargin;
-                        container.panelWidth = mainPanelFrameLoader.item.panelWidth;
+//                        container.mainMargin = mainPanelFrameLoader.item.mainMargin;
+//                        container.panelWidth = mainPanelFrameLoader.item.panelWidth;
                     }
                 }
             }

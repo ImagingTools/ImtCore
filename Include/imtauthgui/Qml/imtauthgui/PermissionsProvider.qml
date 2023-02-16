@@ -6,7 +6,7 @@ import Acf 1.0
 Item {
     id: permissionsProvider;
 
-    property TreeItemModel model: TreeItemModel {};
+    property TreeItemModel dataModel: TreeItemModel {};
     property TreeItemModel dependenciesModel: TreeItemModel {};
 
     property string productId: "";
@@ -49,7 +49,7 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("ProductPermissions");
 
                         if (dataModelLocal.ContainsKey("Features")){
-                            permissionsProvider.model = dataModelLocal.GetData("Features");
+                            permissionsProvider.dataModel = dataModelLocal.GetData("Features");
                         }
 
                         if (dataModelLocal.ContainsKey("Dependencies")){
