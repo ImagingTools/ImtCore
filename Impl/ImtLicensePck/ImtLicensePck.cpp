@@ -75,6 +75,11 @@ I_EXPORT_COMPONENT(
 			"License Product Instance Metainfo Creator");
 
 I_EXPORT_COMPONENT(
+			ProductMetaInfoCreator,
+			"Product metainfo creator",
+			"License Product Metainfo Creator");
+
+I_EXPORT_COMPONENT(
 			LicenseController,
 			"Client-side license controller",
 			"License Product Instance Controller");

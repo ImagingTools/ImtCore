@@ -193,7 +193,7 @@ Item {
 
                 onLoaded: {
                     if(mainPanelFrameLoader.item){
-                        roleEditorContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
+                     //   roleEditorContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
                     }
                 }
             }

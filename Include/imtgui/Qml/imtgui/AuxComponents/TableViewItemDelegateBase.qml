@@ -127,7 +127,7 @@ FocusScope {
 
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
-                        color: itemData.Active ? Style.textColor : Style.disabledInActiveTextColor;
+                        color: delegate.itemData.Active ? Style.textColor : Style.disabledInActiveTextColor;
 
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
@@ -143,7 +143,9 @@ FocusScope {
                 }
             }
 
-            Component.onCompleted: {
+            property var columnModel: delegate.root.columnModel
+
+            onColumnModelChanged: {
                 if(delegate.root.columnModel){
                     for (let i = 0; i < delegate.root.columnModel.count; i++){
                         let id = delegate.root.columnModel.get(i).Id;
