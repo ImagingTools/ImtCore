@@ -206,11 +206,11 @@ Rectangle {
                     console.log("bodyRepeater onLoaded", model.Source);
                     bodyLoader.item.commandsId = model.Id;
 
-                    if (documentManager != null && bodyLoader.item.documentManager === undefined){
+                    if (documentManager != null && bodyLoader.item.documentManager !== undefined){
                         bodyLoader.item.documentManager = documentManager;
                     }
 
-                    if (documentsData != null && bodyLoader.item.documentsData === undefined){
+                    if (documentsData != null && bodyLoader.item.documentsData !== undefined){
                         bodyLoader.item.documentsData = documentsData;
                     }
                 }

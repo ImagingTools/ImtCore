@@ -53,7 +53,7 @@ Item {
         console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
         //        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
         let isEnabled = containerBase.selectedIndex > -1;
-        if(commandsProvider){
+        if(containerBase.commandsProvider){
             containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
             containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
         }

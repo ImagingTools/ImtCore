@@ -43,14 +43,6 @@ DocumentBase {
 
     onDocumentModelChanged: {
         console.log("onDocumentModelChanged", container.documentModel.toJSON());
-        for (let index = 0; index < leftMenuModel.count; index++){
-            let loader = bodyRepeater.itemAt(index);
-            loader.item.documentModel = container.documentModel;
-            loader.item.undoRedoManager = undoRedoManager;
-            if(loader.item.documentBase !==undefined){
-                loader.item.documentBase = container;
-            }
-        }
 
         if (container.documentModel.ContainsKey("Name")){
             let roleName = container.documentModel.GetData("Name");
@@ -239,18 +231,22 @@ DocumentBase {
 
             ListModel{
                 id: leftMenuModel
-
-                ListElement{
-                    Id: "General";
-                    Name: "General";
-                    Source: "qrc:/qml/imtauthgui/RoleEditor.qml"
+                Component.onCompleted: {
+                    leftMenuModel.append({Id: "General", Name: "General", Source: "qrc:/qml/imtauthgui/RoleEditor.qml"})
+                    leftMenuModel.append({Id: "Permissions", Name: "Permissions", Source: "qrc:/qml/imtauthgui/RolePermissions.qml"})
                 }
 
-                ListElement{
-                    Id: "Permissions";
-                    Name: "Permissions";
-                    Source: "qrc:/qml/imtauthgui/RolePermissions.qml"
-                }
+//                ListElement{
+//                    Id: "General";
+//                    Name: "General";
+//                    Source: "qrc:/qml/imtauthgui/RoleEditor.qml"
+//                }
+
+//                ListElement{
+//                    Id: "Permissions";
+//                    Name: "Permissions";
+//                    Source: "qrc:/qml/imtauthgui/RolePermissions.qml"
+//                }
             }
 
             Component{
@@ -323,6 +319,15 @@ DocumentBase {
 
                 source: model.Source;
                 visible: mainPanel.selectedIndex == model.index;
+                onLoaded: {
+                    if (item){
+                        item.documentModel = container.documentModel;
+                        undoRedoManager = undoRedoManager;
+                        if(item.documentBase !==undefined){
+                            item.documentBase = container;
+                        }
+                    }
+                }
             }
         }
     }

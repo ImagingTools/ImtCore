@@ -201,18 +201,11 @@ DocumentBase {
 
             ListModel{
                 id: leftMenuModel
-
-                ListElement{
-                    Id: "General";
-                    Name: "General";
-                    Source: "qrc:/qml/imtauthgui/UserEditor.qml"
+                Component.onCompleted: {
+                    leftMenuModel.append({Id: "General",  Name: "General", Source: "qrc:/qml/imtauthgui/UserEditor.qml"})
+                    leftMenuModel.append({Id: "Roles",  Name: "Roles", Source: "qrc:/qml/imtauthgui/UserRoles.qml"})
                 }
 
-                ListElement{
-                    Id: "Roles";
-                    Name: "Roles";
-                    Source: "qrc:/qml/imtauthgui/UserRoles.qml"
-                }
             }
 
 

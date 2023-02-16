@@ -37,7 +37,7 @@ Item {
         onLoaded: {
             console.log("onLoaded", documentLoader.source);
             if(documentLoader.item){
-                if(documentLoader.item.documentManager !==undefined){
+                if(documentLoader.item.documentManager !== undefined){
                     documentLoader.item.documentManager = documentManager;
                 }
             }

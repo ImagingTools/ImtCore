@@ -5,11 +5,11 @@ import Acf 1.0
 TableViewItemDelegateBase {
     id: productRolesDelegate;
 
-    height: root ? root.rowItemHeight + footerItem.height : 0;
+    height: root && footerItem ? root.rowItemHeight + footerItem.height : 0;
 
     //root: rolesTable;
 
-    highlightDelegate: Rectangle {
+    highlightDelegate: Component { Rectangle {
         id: highlight;
 
         width: parent.width;
@@ -18,7 +18,7 @@ TableViewItemDelegateBase {
 
         border.width: 1;
         border.color: Style.imagingToolsGradient2;
-    }
+    } }
 
     rowBodyDelegate: Component { Row {
             height: productRolesDelegate.root ? productRolesDelegate.root.rowItemHeight : 0;

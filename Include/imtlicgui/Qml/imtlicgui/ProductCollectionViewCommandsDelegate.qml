@@ -12,11 +12,13 @@ CollectionViewCommandsDelegateBase {
     removeMessage: qsTr("Delete the selected product ?");
 
     onSelectedIndexChanged: {
-        console.log("ProductCollectionViewCommands onSelectedIndexChanged");
+        console.log("ProductCollectionViewCommands onSelectedIndexChanged", container.selectedIndex);
 
         let isEnabled = container.selectedIndex > -1;
-        commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
-        commandsProvider.setCommandIsEnabled("Export", isEnabled);
+        if (container.commandsProvider){
+            commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
+            commandsProvider.setCommandIsEnabled("Export", isEnabled);
+        }
     }
 
     onCommandActivated: {

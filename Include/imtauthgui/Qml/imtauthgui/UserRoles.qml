@@ -211,12 +211,12 @@ Item {
                 headerVisible: false;
                 withoutSelection: true;
 
-                rowDelegate: TableUserRolesDelegate {
+                rowDelegate: Component { TableUserRolesDelegate {
                     root: rolesTable;
                     Component.onCompleted: {
                         rolesTable.height += height;
                     }
-                }
+                } }
 
                 Component.onCompleted: {
                     rolesTable.addColumn({"Id": "Name", "Name": "Name"})
@@ -249,11 +249,11 @@ Item {
 
                 visible: false;
 
-                rowDelegate: TableViewItemDelegateBase {
+                rowDelegate: Component { TableViewItemDelegateBase {
                     Component.onCompleted: {
                         permissionsTable.height += height;
                     }
-                }
+                } }
 
                 Component.onCompleted: {
                     permissionsTable.addColumn({"Id": "Name", "Name": "Name"})
