@@ -44,6 +44,15 @@ DocumentBase {
     onDocumentModelChanged: {
         console.log("onDocumentModelChanged", container.documentModel.toJSON());
 
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            loader.item.documentModel = container.documentModel;
+            loader.item.undoRedoManager = undoRedoManager;
+            if(loader.item.documentBase !==undefined){
+                loader.item.documentBase = container;
+            }
+        }
+
         if (container.documentModel.ContainsKey("Name")){
             let roleName = container.documentModel.GetData("Name");
 
@@ -59,6 +68,8 @@ DocumentBase {
         }
 
         undoRedoManager.registerModel(container.documentModel);
+
+        container.updateGui();
     }
 
     function updateGui(){
@@ -322,7 +333,7 @@ DocumentBase {
                 onLoaded: {
                     if (item){
                         item.documentModel = container.documentModel;
-                        undoRedoManager = undoRedoManager;
+                        item.undoRedoManager = undoRedoManager;
                         if(item.documentBase !==undefined){
                             item.documentBase = container;
                         }
