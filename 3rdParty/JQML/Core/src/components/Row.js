@@ -46,7 +46,7 @@ export class Row extends Item {
     $updateChildren(){
         let prevIndex = -1
         for(let i = 0; i < this.children.length; i++){
-            if(!(this.children[i] instanceof ListModel || this.children[i] instanceof Repeater)){
+            if(this.children[i].dom && !(this.children[i] instanceof ListModel || this.children[i] instanceof Repeater)){
                 this.$anchorsChild(i, prevIndex)
                 prevIndex = i
             }
