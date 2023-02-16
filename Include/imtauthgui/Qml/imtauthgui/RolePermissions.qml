@@ -31,12 +31,12 @@ Item {
     PermissionsProvider {
         id: permissionsProvider;
 
-        onDataModelChanged: {
+        onModelChanged: {
             rolePermissionsContainer.updateGui();
         }
 
         onDependenciesModelChanged: {
-            dependenciesProvider.dataModel = dependenciesModel;
+            dependenciesProvider.model = dependenciesModel;
         }
     }
 
@@ -60,15 +60,15 @@ Item {
         }
         permissionsTable.rowModel.clear();
 
-        recursiveUpdateGui(permissionsProvider.dataModel, [], selectedPermissionsIds);
+        recursiveUpdateGui(permissionsProvider.model, [], selectedPermissionsIds);
 
         rolePermissionsContainer.blockUpdatingModel = false;
     }
 
-    function recursiveUpdateGui(dataModel, tableIndexes, selectedPermissions){
-        for (let i = 0; i < dataModel.GetItemsCount(); i++){
-            let permissionId = dataModel.GetData("Id", i);
-            let permissionName = dataModel.GetData("Name", i);
+    function recursiveUpdateGui(model, tableIndexes, selectedPermissions){
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let permissionId = model.GetData("Id", i);
+            let permissionName = model.GetData("Name", i);
 
             let row = {"Id": permissionId, "Name": permissionName, "CheckState": Qt.Unchecked};
 
@@ -78,7 +78,7 @@ Item {
 
             permissionsTable.insertRow(tableIndexes.concat([i]), row);
 
-            let childModel = dataModel.GetData("ChildModel", i);
+            let childModel = model.GetData("ChildModel", i);
             if (childModel){
                 let childIndexes = [].concat(tableIndexes.concat([i]))
                 rolePermissionsContainer.recursiveUpdateGui(childModel, childIndexes,selectedPermissions);
@@ -99,8 +99,8 @@ Item {
         console.log("documentModel2", documentModel.toJSON());
     }
 
-    function recursiveUpdateModel(dataModel, guiModel){
-        console.log("recursiveUpdateModel", dataModel, guiModel);
+    function recursiveUpdateModel(model, guiModel){
+        console.log("recursiveUpdateModel", model, guiModel);
         for (let i = 0; i < guiModel.count; i++){
             let rowObj = guiModel.get(i);
 
@@ -109,15 +109,15 @@ Item {
             let state = rowObj["CheckState"];
 
             if (state == Qt.Checked){
-                let index = dataModel.InsertNewItem();
+                let index = model.InsertNewItem();
 
-                dataModel.SetData("Id", permissionId, index);
-                dataModel.SetData("Name", permissionName, index);
+                model.SetData("Id", permissionId, index);
+                model.SetData("Name", permissionName, index);
             }
 
             let rowChildModel = rowObj["ChildModel"]
             if (rowChildModel.count > 0){
-                rolePermissionsContainer.recursiveUpdateModel(dataModel, rowChildModel);
+                rolePermissionsContainer.recursiveUpdateModel(model, rowChildModel);
             }
         }
     }

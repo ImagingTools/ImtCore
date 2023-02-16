@@ -97,6 +97,12 @@ void CGqlObject::InsertField(const QByteArray &fieldId, const QVariant &value)
 	m_simpleFields.insert(fieldId, value);
 }
 
+void CGqlObject::InsertField(const QByteArray &fieldId, const QVariantList &value)
+{
+//	RemoveField(fieldId);
+//	m_simpleFields.insert(fieldId, value);
+}
+
 
 void CGqlObject::InsertField(const QByteArray &fieldId, const CGqlEnum &value)
 {

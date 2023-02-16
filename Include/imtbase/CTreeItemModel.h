@@ -39,7 +39,6 @@ public:
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
-	virtual bool JsonSerialize(iser::IArchive &archive);
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;

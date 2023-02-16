@@ -104,7 +104,7 @@ Item {
 
                 onLoaded: {
                     if(mainPanelFrameLoader.item){
-                       // userEditorContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
+                        userEditorContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
                     }
                 }
             }//Loader
