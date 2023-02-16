@@ -240,7 +240,6 @@ Item {
         rootItem: collectionViewBaseContainer;
 
         onHeadersChanged: {
-            console.log("onHeadersChanged", baseCommands.headers)
             tableInternal.headers = baseCommands.headers;
             tableInternal.headersCompl = true;
         }

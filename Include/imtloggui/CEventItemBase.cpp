@@ -78,19 +78,8 @@ QVariant CEventItemBase::GetMetaInfo(int metaInfoType) const
 	}
 }
 
-QVariant CEventItemBase::GetMetaInfo(QByteArray metaInfoId) const
-{
-	return QVariant();
-}
-
 
 bool CEventItemBase::SetMetaInfo(int /*metaInfoType*/, const QVariant& /*metaInfo*/)
-{
-	return false;
-}
-
-
-bool CEventItemBase::SetMetaInfo(QByteArray metaInfoId, const QVariant &metaInfo)
 {
 	return false;
 }

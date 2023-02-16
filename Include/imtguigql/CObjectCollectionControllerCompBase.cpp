@@ -638,10 +638,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
 
-			if(informationId == "TypeId"){
-				elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
-			}
-			else if(informationId == "Id"){
+			if(informationId == "Id"){
 				elementInformation = QString(collectionId);
 			}
 			else if(informationId == "Name"){
@@ -714,17 +711,9 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 }
 
 
-QByteArray CObjectCollectionControllerCompBase::GetTypeid(const QList<imtgql::CGqlObject> &inputParams) const
-{
-	return QByteArray();
-}
-
-
 void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const
 {
 }
-
-
 
 
 } // namespace imtgql
