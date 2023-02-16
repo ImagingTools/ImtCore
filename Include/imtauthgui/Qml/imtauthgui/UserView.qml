@@ -179,8 +179,8 @@ DocumentBase {
 
                 onLoaded: {
                     if(mainPanelFrameLoader.item){
-                        container.mainMargin = mainPanelFrameLoader.item.mainMargin;
-                        container.panelWidth = mainPanelFrameLoader.item.panelWidth;
+//                        container.mainMargin = mainPanelFrameLoader.item.mainMargin;
+//                        container.panelWidth = mainPanelFrameLoader.item.panelWidth;
                     }
                 }
             }

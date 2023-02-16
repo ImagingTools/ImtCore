@@ -112,6 +112,7 @@ TableViewItemDelegateBase {
 
                     onClicked: {
     //                    treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
+                        console.log("TreeView isOpen", model)
 
                         model.IsOpen = !model.IsOpen;
                     }

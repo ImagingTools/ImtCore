@@ -94,6 +94,11 @@ protected:
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
 
 	/**
+		Get objects TypeId from the GraphQL
+	*/
+	virtual QByteArray GetTypeid(const QList<imtgql::CGqlObject>& inputParams) const;
+
+	/**
 		Set multiple optional additional filters to initially get a more refined collection.
 	*/
 	virtual void SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;

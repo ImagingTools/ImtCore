@@ -482,13 +482,13 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 {
 	QByteArray retVal;
 	QByteArray objectId = gqlObject.GetId();
+	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 
 	if (objectId.isEmpty() == false) {
 		retVal += objectId;
 		retVal += ": {";
 	}
 
-	QByteArrayList fieldIds = gqlObject.GetFieldIds();
 	for (int i = 0; i < fieldIds.count(); ++i) {
 		const QByteArray& fieldId = fieldIds[i];
 
@@ -502,18 +502,29 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 				if (objectIndex > 0){
 					retVal += ",";
 				}
-				retVal += " {";
+
 				const CGqlObject* paramsObject = gqlObject.GetFieldArgumentObjectPtr(fieldId, objectIndex);
 				if (paramsObject != nullptr){
-					retVal += AddObjectParamPart(*paramsObject);
+					if (!paramsObject->GetFieldIds().isEmpty()){
+						retVal += " {";
+						retVal += AddObjectParamPart(*paramsObject);
+						retVal += "}";
+					}
+					else{
+						retVal += "\\\"";
+						retVal += paramsObject->GetId();
+						retVal += "\\\"";
+					}
 				}
-				retVal += "}";
+
 			}
 			retVal += " ]";
 		}
 		else {
-			retVal += fieldId;
-			retVal += ": ";
+			if (!fieldId.isEmpty()){
+				retVal += fieldId;
+				retVal += ": ";
+			}
 			QVariant value = gqlObject.GetFieldArgumentValue(fieldId);
 			int valueType = value.type();
 			bool isString = (valueType == QVariant::String) || (valueType == QVariant::ByteArray);
