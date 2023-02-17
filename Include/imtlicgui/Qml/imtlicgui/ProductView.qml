@@ -450,7 +450,7 @@ DocumentBase {
 
         readOnly: false;
 
-        rowDelegate: ProductViewItemDelegate {
+        rowDelegate: Component { ProductViewItemDelegate {
             root: tableView;
             onAddButtonClicked: {
                 tableView.selectedIndex = modelIndex;
@@ -461,7 +461,7 @@ DocumentBase {
             onRemoveButtonClicked: {
                 tableView.removeRow(modelIndex.getIndexes());
             }
-        }
+        } }
 
         onRowAdded: {
             console.log("onRowAdded");

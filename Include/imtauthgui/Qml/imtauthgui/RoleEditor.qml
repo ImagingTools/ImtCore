@@ -426,7 +426,7 @@ Item {
                         width: parent.width;
                         height: headerHeight + rowItemHeight * includesTable.tableListView.count;
 
-                        rowDelegate: TableViewItemDelegateBase {
+                        rowDelegate: Component { TableViewItemDelegateBase {
                             root: includesTable;
 
                             Component.onCompleted: {
@@ -442,7 +442,7 @@ Item {
                                     includesTable.height = newHeight;
                                 }
                             }
-                        }
+                        } }
 
                         Component.onCompleted: {
                             includesTable.addColumn({"Id": "Name", "Name": "Name"})
