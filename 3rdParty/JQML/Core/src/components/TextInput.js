@@ -46,9 +46,10 @@ export class TextInput extends Item {
         this.$cP('readOnly', false).connect(this.$readOnlyChanged.bind(this))
 
 
-        this.$s.accepted = Signal()
-        this.$s.editingFinished = Signal()
-        this.$s.textEdited = Signal()
+        this.$cS('accepted')
+        this.$cS('editingFinished')
+        this.$cS('textEdited')
+  
 
         this.$updateTimer = null
     }
@@ -141,7 +142,11 @@ export class TextInput extends Item {
     }
     $focusChanged(){
         super.$focusChanged()
-        if(this.$p.focus.val) this.impl.focus()
+        if(this.$p.focus.val) {
+            this.impl.focus()
+        } else {
+            this.$s.editingFinished()
+        }
     }
     $selectionColorChanged(){
         this.$updateSelection()
@@ -252,7 +257,18 @@ export class TextInput extends Item {
     $keydown(e, state){
         if(e.key === 'Enter' || e.key === 'Return'){
             e.preventDefault()
-            this.$s.accepted()
+            if(this.$p.validator.val){
+                if(this.$p.validator.val.validate(this.impl.value)){
+                    this.$s.accepted()
+                    this.$s.editingFinished()
+                } else {
+                    
+                }
+            } else {
+                this.$s.accepted()
+                this.$s.editingFinished()
+            }
+            
         }
     }
 
