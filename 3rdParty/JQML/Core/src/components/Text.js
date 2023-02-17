@@ -24,6 +24,11 @@ export class Text extends Item {
     static RichText = 3
     static MarkdownText = 4
 
+    static ElideNone = 0
+    static ElideLeft = 1
+    static ElideMiddle = 2
+    static ElideRight = 3
+
     $contentWidthAuto = true
 	$contentHeightAuto = true
 
@@ -41,6 +46,7 @@ export class Text extends Item {
         this.$cP('verticalAlignment', Text.AlignTop).connect(this.$verticalAlignmentChanged.bind(this))
         this.$cP('wrapMode', Text.NoWrap).connect(this.$wrapModeChanged.bind(this))
         this.$cP('textFormat', Text.AutoText)
+        this.$cP('elide', Text.ElideNone).connect(this.$elideChanged.bind(this))
         this.$cPC('font', Font()).connect(this.$fontChanged.bind(this))
 
         this.$s.linkActivated = Signal()
@@ -68,6 +74,17 @@ export class Text extends Item {
     }
     $show(){
         this.dom.style.display = 'flex'
+    }
+    $elideChanged(){
+        if(this.elide === Text.ElideRight){
+            this.dom.style.textOverflow = 'ellipsis' 
+            this.dom.style.overflow = 'auto' 
+        } else {
+            this.dom.style.overflow = 'unset' 
+            this.dom.style.textOverflow = 'unset' 
+        }
+        
+        this.$updateGeometry()
     }
     $textChanged(){
         this.impl.innerHTML = `${this.text}`
