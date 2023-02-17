@@ -131,6 +131,7 @@ export class Item extends QtObject {
     }
     $domCreate(){
         super.$domCreate()
+        if(this.parent) this.parent.$availableGeometry.push(this)
         this.dom = document.createElement("div")
 
         // if(this.UID !== 0)

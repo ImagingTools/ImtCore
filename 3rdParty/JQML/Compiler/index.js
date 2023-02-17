@@ -600,39 +600,39 @@ for(let file of files){
         'IDList': new Set()
     }
 
-    if(fs.existsSync(fileHash)){
-        let savedHash = fs.readFileSync(fileHash, {encoding:'utf8', flag:'r'}).split('\n')
+    // if(fs.existsSync(fileHash)){
+    //     let savedHash = fs.readFileSync(fileHash, {encoding:'utf8', flag:'r'}).split('\n')
 
-        if(currentHash === savedHash[0]){
-            let savedData = fs.readFileSync(fileSave, {encoding:'utf8', flag:'r'})
+    //     if(currentHash === savedHash[0]){
+    //         let savedData = fs.readFileSync(fileSave, {encoding:'utf8', flag:'r'})
 
-            compiledFiles[file].IDList = new Set(savedData[1].split(','))
-            for(let id of compiledFiles[file].IDList){
-                IDList.add(id)
-            }
-            compiledFiles[file].code = savedData
-            compiledFiles[file].cache = true
-            let instructions = getBaseStructure()
+    //         compiledFiles[file].IDList = new Set(savedData[1].split(','))
+    //         for(let id of compiledFiles[file].IDList){
+    //             IDList.add(id)
+    //         }
+    //         compiledFiles[file].code = savedData
+    //         compiledFiles[file].cache = true
+    //         let instructions = getBaseStructure()
     
-            data = data.replaceAll(/((?<![:\/])\/\/(.*?)\n)|(\/\*(.*?)\*\/)/gms, '\n')
+    //         data = data.replaceAll(/((?<![:\/])\/\/(.*?)\n)|(\/\*(.*?)\*\/)/gms, '\n')
             
-            parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
-            let meta = parser.parse(data)
-            if(meta[3]) qmlpragma(meta[3], instructions, file)
-            compiledFiles[file].instructions = instructions
-            continue
-        } else {
-            compiledFiles[file].currentHash = currentHash
-            // fs.writeFile(fileHash, currentHash, function(error){
-            //     if(error) throw error
-            // })
-        }
-    } else {
-        compiledFiles[file].currentHash = currentHash
-        // fs.writeFile(fileHash, currentHash, function(error){
-        //     if(error) throw error
-        // })
-    }
+    //         parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
+    //         let meta = parser.parse(data)
+    //         if(meta[3]) qmlpragma(meta[3], instructions, file)
+    //         compiledFiles[file].instructions = instructions
+    //         continue
+    //     } else {
+    //         compiledFiles[file].currentHash = currentHash
+    //         // fs.writeFile(fileHash, currentHash, function(error){
+    //         //     if(error) throw error
+    //         // })
+    //     }
+    // } else {
+    //     compiledFiles[file].currentHash = currentHash
+    //     // fs.writeFile(fileHash, currentHash, function(error){
+    //     //     if(error) throw error
+    //     // })
+    // }
 
     
     let instructions = getBaseStructure()
@@ -890,12 +890,6 @@ function compile(instructions, code, curr = '$root', prev = ''){
         code.push(`${curr}.$s['${signal.name}'].connect(${signal.sourceFull}.bind(${curr}))`)
     }
 
-    let step = 0
-    for(let child of instructions.children){
-        compile(child, code, curr+'c'+step, curr)
-        step++
-    }
-
     for(let prop in instructions.properties){
         let val = instructions.properties[prop]
         if(instructions.class === 'ListElement'){
@@ -905,6 +899,14 @@ function compile(instructions, code, curr = '$root', prev = ''){
         }
         
     }
+
+    let step = 0
+    for(let child of instructions.children){
+        compile(child, code, curr+'c'+step, curr)
+        step++
+    }
+
+    
 }
 
 let jqml = []
@@ -938,9 +940,9 @@ for(file in compiledFiles){
             tempIDList.push(id)
         }
 
-        fs.writeFile(source + '/cache/' + crypto.createHash('md5').update(file).digest("hex"), compiledFiles[file].currentHash /*+ '\n' + tempIDList.join(',')*/, function(error){
-            if(error) throw error
-        })
+        // fs.writeFile(source + '/cache/' + crypto.createHash('md5').update(file).digest("hex"), compiledFiles[file].currentHash /*+ '\n' + tempIDList.join(',')*/, function(error){
+        //     if(error) throw error
+        // })
     }
     
     

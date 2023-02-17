@@ -30,13 +30,13 @@ export class Row extends Item {
     }
     $updateGeometry(){
         if(this.$widthAuto)
-        this.$sP('width', ()=>{ return this.children.length ? this.children[this.children.length-1].x + this.children[this.children.length-1].width : 0})
+        this.$sP('width', ()=>{ return this.$availableGeometry.length ? this.$availableGeometry[this.$availableGeometry.length-1].x + this.$availableGeometry[this.$availableGeometry.length-1].width : 0})
 
         if(this.$heightAuto)
         this.$sP('height', ()=>{ 
             let height = 0
-            if(this.children.length)
-            for(let child of this.children) {
+            if(this.$availableGeometry.length)
+            for(let child of this.$availableGeometry) {
                 let childHeight = child.height
                 if(childHeight > height) height = childHeight
             }
@@ -45,8 +45,8 @@ export class Row extends Item {
     }
     $updateChildren(){
         let prevIndex = -1
-        for(let i = 0; i < this.children.length; i++){
-            if(this.children[i].dom && !(this.children[i] instanceof ListModel || this.children[i] instanceof Repeater)){
+        for(let i = 0; i < this.$availableGeometry.length; i++){
+            if(!(this.$availableGeometry[i] instanceof Repeater)){
                 this.$anchorsChild(i, prevIndex)
                 prevIndex = i
             }
@@ -55,13 +55,13 @@ export class Row extends Item {
     }
 
     $anchorsChild(index, prevIndex){
-        let child = this.children[index]
+        let child = this.$availableGeometry[index]
         
         child.$sP('anchors.top', ()=>{ return this.top })
         if(index === 0){
             child.$sP('anchors.left', ()=>{ return this.left })
         } else if(prevIndex >= 0) {
-            let prevChild = this.children[prevIndex]
+            let prevChild = this.$availableGeometry[prevIndex]
             child.$sP('anchors.left', ()=>{ return prevChild.right })
             child.$sP('anchors.leftMargin', ()=>{ return this.spacing })
         }

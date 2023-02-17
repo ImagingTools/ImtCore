@@ -38,6 +38,7 @@ export class QtObject {
     }
     context = {}
     ID = new Set()
+    $availableGeometry = []
     // LVL = new Set()
 
     constructor(args) {
@@ -62,6 +63,7 @@ export class QtObject {
             this.index = args.parent.index
 
             args.parent.$treeChilds.push(this)
+            
             if('pos' in args){
                 args.parent.children.splice(args.pos, 0, this)
             } else {
@@ -92,10 +94,14 @@ export class QtObject {
                         return target[name]
                     },
                     set(target, name, value){
-                        target[name] = value
-                        // console.log('DEBUG::handler-set', this.parent, name, value)
-                        this.model.$modelChanged()
-                        this.model.$dataChanged()
+                        let oldValue = target[name]
+                        if(oldValue !== value){
+                            target[name] = value
+                            // console.log('DEBUG::handler-set', this.parent, name, value)
+                            this.model.$modelChanged()
+                            this.model.$dataChanged()
+                        }
+                        
                         return true
                     },
                 }
@@ -791,12 +797,18 @@ export class QtObject {
         
         this.children = []
         if(this.parent){
-            let indx = this.parent.children.indexOf(this)
+            let indx = this.parent.$availableGeometry.indexOf(this)
+            if(indx >= 0) {
+                this.parent.$availableGeometry.splice(indx, 1)
+            }
+
+            indx = this.parent.children.indexOf(this)
             if(indx >= 0) {
                 this.parent.children.splice(indx, 1)
                 this.parent.$childChanged()
             }
 
+            
         }
         for(let propName in this.$p){
             
