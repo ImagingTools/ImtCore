@@ -577,12 +577,10 @@ QHash<int, QByteArray> CTreeItemModel::roleNames() const
 
 bool CTreeItemModel::Serialize(iser::IArchive &archive)
 {
-	int countSize = m_items.count();
+	istd::CChangeNotifier changeNotifier(!archive.IsStoring() ? this : nullptr);
+
 	if (!archive.IsStoring()){
 		Clear();
-	}
-	else if (countSize < 1){
-		return false;
 	}
 
 	return SerializeRecursive(archive,"");
@@ -663,7 +661,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	bool retVal = true;
 	int countSize = m_items.count();
 	iser::CArchiveTag arrayTag(tagName, "array items", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag subArrayTag(tagName, "array item", iser::CArchiveTag::TT_GROUP, &arrayTag);
+	iser::CArchiveTag subArrayTag("Item", "array item", iser::CArchiveTag::TT_GROUP, &arrayTag);
 	iser::CArchiveTag objectTag(tagName, "key", iser::CArchiveTag::TT_GROUP);
 	bool isMultiTag = false;
 
@@ -676,7 +674,9 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 
 	if (isMultiTag == false){
-		retVal = retVal && archive.BeginTag(objectTag);
+		if (!tagName.isEmpty()){
+			retVal = retVal && archive.BeginTag(objectTag);
+		}
 	}
 	else{
 		retVal = retVal && archive.BeginMultiTag(arrayTag, subArrayTag, countSize);
@@ -743,7 +743,9 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 
 	if (isMultiTag == false){
-		retVal = retVal && archive.EndTag(objectTag);
+		if (!tagName.isEmpty()){
+			retVal = retVal && archive.EndTag(objectTag);
+		}
 	}
 	else{
 		retVal = retVal && archive.EndTag(arrayTag);
