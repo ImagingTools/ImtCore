@@ -21,11 +21,11 @@ Dialog {
 
     property int index: -1;
 
-    contentComp: EditDialogBody {
+    contentComp: Component { EditDialogBody {
         id: dialogBody;
 
         rootItem: editDialogContainer;
-    }
+    } }
 
     TreeItemModel {
         id: dialogModelObj;

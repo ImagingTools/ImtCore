@@ -17,8 +17,8 @@ Dialog {
 
     property int index: -1;
 
-    contentComp: EditLicenseDialogBody {
-    }
+    contentComp: Component { EditLicenseDialogBody {
+    } }
 
     Component.onCompleted: {
         editDialogContainer.buttons.addButton({"Id": "Ok", "Name": "OK", "Enabled": true});

@@ -52,7 +52,7 @@ Dialog {
         }
     }
 
-    contentComp: Item {
+    contentComp: Component{ Item {
         id: dialogBody;
 
         height: bodyColumn.height + 40;
@@ -87,7 +87,7 @@ Dialog {
                 }
             }
         }
-    }
+    } }
 
 
 }

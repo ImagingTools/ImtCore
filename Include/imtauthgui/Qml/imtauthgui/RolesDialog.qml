@@ -14,9 +14,9 @@ Dialog {
 
     property var selectedIndex;
 
-    contentComp: RolesDialogBody {
+    contentComp: Component { RolesDialogBody {
         rootItem: rolesDialog;
-    }
+    } }
 
     onFinished: {
         if (buttonId == "Include"){

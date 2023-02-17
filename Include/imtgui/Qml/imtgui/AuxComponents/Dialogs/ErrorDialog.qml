@@ -21,9 +21,9 @@ Dialog {
         messageDialog.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": true});
     }
 
-    contentComp: MessageDialogBody {
+    contentComp: Component { MessageDialogBody {
         message: messageDialog.message;
-    }
+    } }
 
     Component{
         id: emptyDecorator;

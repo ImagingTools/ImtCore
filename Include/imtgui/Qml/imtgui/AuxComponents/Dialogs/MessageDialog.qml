@@ -20,9 +20,9 @@ Dialog {
         }
     }
 
-    contentComp: MessageDialogBody {
+    contentComp: Component { MessageDialogBody {
         message: messageDialog.message;
-    }
+    } }
 
     Component.onCompleted: {
         messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes", "Enabled": true});

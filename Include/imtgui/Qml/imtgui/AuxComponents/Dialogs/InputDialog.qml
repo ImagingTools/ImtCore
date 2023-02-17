@@ -39,9 +39,9 @@ Dialog {
         //inputDialogContainer.title = qsTr("Input");
     }
 
-    contentComp: InputDialogBody {
+    contentComp: Component { InputDialogBody {
         message: inputDialogContainer.message;
         inputValue: inputDialogContainer.inputValue;
-    }
+    } }
 }
 

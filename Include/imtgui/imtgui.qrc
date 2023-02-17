@@ -84,7 +84,6 @@
         <file alias="imtgui/AuxComponents/CustomScrollbar.qml">Qml/imtgui/AuxComponents/CustomScrollbar.qml</file>
 
 	<file alias="imtgui/AuxComponents/PagesProvider.qml">Qml/imtgui/AuxComponents/PagesProvider.qml</file>
-	<file alias="imtgui/AuxComponents/PermissionsProvider.qml">Qml/imtgui/AuxComponents/PermissionsProvider.qml</file>
 	<file alias="imtgui/AuxComponents/SettingsProvider.qml">Qml/imtgui/AuxComponents/SettingsProvider.qml</file>
 	<file alias="imtgui/AuxComponents/UserManagementProvider.qml">Qml/imtgui/AuxComponents/UserManagementProvider.qml</file>
 	<file alias="imtgui/AuxComponents/UserTokenProvider.qml">Qml/imtgui/AuxComponents/UserTokenProvider.qml</file>

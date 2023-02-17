@@ -22,7 +22,7 @@ Dialog {
         }
     }
 
-    contentComp: Item {
+    contentComp: Component { Item {
         id: inputDialogBodyContainer;
 
         height: columnBody.height + 30;
@@ -223,7 +223,7 @@ Dialog {
                 }
             }
         }
-    }
+    } }
 
     Component{
         id: emptyDecorator;
