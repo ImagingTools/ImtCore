@@ -74,6 +74,7 @@ Item {
     }
 
     onDocumentManagerChanged: {
+        console.log("onDocumentManagerChanged", collectionViewContainer.documentManager);
         if (collectionViewContainer.documentManager != null){
             if (commandsLoader.item && commandsLoader.item.documentManager !== undefined){
                 commandsLoader.item.documentManager = collectionViewContainer.documentManager;

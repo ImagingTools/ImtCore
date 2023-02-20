@@ -158,6 +158,13 @@ Rectangle {
         }
     }
 
+    property Item activePage: null;
+
+    function updateGui(){
+        bodyRepeater.model = 0;
+        bodyRepeater.model = leftMenuModel;
+    }
+
     Rectangle{
         id: bodyAdministration;
 
@@ -197,6 +204,8 @@ Rectangle {
                         if (!bodyLoader.item){
                             bodyLoader.source = model.Source;
                         }
+
+                        container.activePage = bodyLoader.item;
                     }
                 }
 

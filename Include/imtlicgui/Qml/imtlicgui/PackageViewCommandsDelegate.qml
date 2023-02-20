@@ -14,8 +14,8 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onEntered: {
-        objectModel.SetData("Id", value);
-        objectModel.SetData("Name", value);
+        container.documentBase.documentModel.SetData("Id", value);
+        container.documentBase.documentModel.SetData("Name", value);
     }
 
     onTableTreeViewEditorChanged: {

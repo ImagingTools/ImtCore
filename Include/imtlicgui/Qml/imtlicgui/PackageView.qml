@@ -37,15 +37,15 @@ DocumentBase {
 
     onDocumentModelChanged: {
         console.log("documentBase onDocumentModelChanged");
-        let items = packageViewContainer.documentModel.GetData("Items");
-        if (!items){
-            packageViewContainer.documentModel.AddTreeModel("Items");
-        }
+//        let items = packageViewContainer.documentModel.GetData("Items");
+//        if (!items){
+//            packageViewContainer.documentModel.AddTreeModel("Items");
+//        }
 
-        let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
-        if (!dependenciesModel){
-            packageViewContainer.documentModel.AddTreeModel("DependenciesModel");
-        }
+//        let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
+//        if (!dependenciesModel){
+//            packageViewContainer.documentModel.AddTreeModel("DependenciesModel");
+//        }
 
         tableView.columnModel.clear();
         let headers = packageViewContainer.documentModel.GetData("Headers");
@@ -85,6 +85,8 @@ DocumentBase {
     //Обновить модель для TreeView
     function updateTreeViewModel(){
         let treeViewModelJson = featuresProvider.model.toJSON();
+
+        console.log("treeViewModelJson", treeViewModelJson);
         packageViewContainer.treeViewModel.CreateFromJson(treeViewModelJson);
     }
 
@@ -113,13 +115,17 @@ DocumentBase {
 
         tableView.rowModel.clear();
 
-        let items = packageViewContainer.documentModel.GetData("Items");
-        if (!items){
-            items = packageViewContainer.documentModel.AddTreeModel("Items");
-        }
+//        let items = packageViewContainer.documentModel.GetData("Items");
+//        if (!items){
+//            items = packageViewContainer.documentModel.AddTreeModel("Items");
+//        }
 
-        if (items.GetItemsCount() > 0){
-            packageViewContainer.recursiveUpdateGui(items, []);
+        if (packageViewContainer.documentModel.ContainsKey("Items")){
+            let items = packageViewContainer.documentModel.GetData("Items");
+
+            if (items.GetItemsCount() > 0){
+                packageViewContainer.recursiveUpdateGui(items, []);
+            }
         }
 
         packageViewContainer.blockUpdatingModel = false;

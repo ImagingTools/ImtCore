@@ -6,5 +6,5 @@ FeaturesProvider 1.0 FeaturesProvider.qml
 LicensesProvider 1.0 LicensesProvider.qml
 FeaturesDependenciesProvider 1.0 FeaturesDependenciesProvider.qml
 LicenseFeaturesModel 1.0 LicenseFeaturesModel.qml
-InstallationEditorCommandsDelegate 1.0 InstallationEditorCommandsDelegate.qml
-InstallationEditor 1.0 InstallationEditor.qml
+LicenseInstanceItemDelegate 1.0 LicenseInstanceItemDelegate.qml
+

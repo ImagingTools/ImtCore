@@ -8,7 +8,6 @@
         <file alias="imtlicgui/PackageView.qml">Qml/imtlicgui/PackageView.qml</file>
         <file alias="imtlicgui/EditDialog.qml">Qml/imtlicgui/EditDialog.qml</file>
         <file alias="imtlicgui/EditLicenseDialog.qml">Qml/imtlicgui/EditLicenseDialog.qml</file>
-        <file alias="imtlicgui/InstallationEditor.qml">Qml/imtlicgui/InstallationEditor.qml</file>
         <file alias="imtlicgui/FeaturesProvider.qml">Qml/imtlicgui/FeaturesProvider.qml</file>
         <file alias="imtlicgui/LicensesProvider.qml">Qml/imtlicgui/LicensesProvider.qml</file>
         <file alias="imtlicgui/FeaturesDependenciesProvider.qml">Qml/imtlicgui/FeaturesDependenciesProvider.qml</file>

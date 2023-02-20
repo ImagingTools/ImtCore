@@ -507,6 +507,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 				}
 			}
 		}
+
 		itemsModel->SetIsArray(true);
 		dataModel->SetExternTreeModel("items", itemsModel);
 		dataModel->SetExternTreeModel("notification", notificationModel);

@@ -17,8 +17,12 @@ Item {
 
     onServerModelChanged: {
         console.log("SettingsProvider onServerModelChanged", container.serverModel);
-
     }
+
+    onLocalModelChanged: {
+        console.log("SettingsProvider onLocalModelChanged", container.localModel);
+    }
+
     onModelsCompletedChanged: {
         if(container.modelsCompleted){
             container.rewriteModel(container.serverModel, container.localModel);

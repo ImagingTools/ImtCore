@@ -66,15 +66,15 @@ DocumentBase {
             tableView.addColumn({"Id": headerId, "Name": headerName});
         }
 
-        let items = container.documentModel.GetData("Items");
-        if (!items){
-            items = container.documentModel.AddTreeModel("Items");
-        }
+//        let items = container.documentModel.GetData("Items");
+//        if (!items){
+//            items = container.documentModel.AddTreeModel("Items");
+//        }
 
-        let dependencies = container.documentModel.GetData("Features");
-        if (!dependencies){
-            dependencies = container.documentModel.AddTreeModel("Features");
-        }
+//        let dependencies = container.documentModel.GetData("Features");
+//        if (!dependencies){
+//            dependencies = container.documentModel.AddTreeModel("Features");
+//        }
 
         container.updateGui();
 
@@ -100,6 +100,10 @@ DocumentBase {
 
     function updateModel(){
         console.log("Begin updateModel");
+        if (container.blockUpdatingModel){
+            return;
+        }
+
         undoRedoManager.beginChanges();
 
         let items = container.documentModel.AddTreeModel("Items");
@@ -184,14 +188,11 @@ DocumentBase {
     }
 
     function updateGui(){
-        console.log("begin updateGui");
         container.blockUpdatingModel = true;
 
         tableView.rowModel.clear();
 
-        let items = container.documentModel.GetData("Items");
-        let featuresModel = container.documentModel.GetData("Features");
-
+        categoryComboBox.currentIndex = -1;
         let categoryId = container.documentModel.GetData("CategoryId");
         for (let i = 0; i < modelCategogy.GetItemsCount(); i++){
             if (categoryId == modelCategogy.GetData("Id", i)){
@@ -201,31 +202,40 @@ DocumentBase {
             }
         }
 
-        for (let i = 0; i < items.GetItemsCount(); i++){
-            let licenseId = items.GetData("Id", i);
-            let licenseName = items.GetData("Name", i);
-            let description = items.GetData("Description", i);
+        if (container.documentModel.ContainsKey("Items")){
+            let items = container.documentModel.GetData("Items");
 
-            tableView.insertRow([i], {"Id": licenseId, "Name": licenseName, "Description": description});
+            let featuresModel = container.documentModel.GetData("Features");
 
-            if (featuresModel.ContainsKey(licenseId)){
-                let featureModel = featuresModel.GetData(licenseId);
-                let optionalFeatureIds = container.getOptionalFeatures(featureModel);
-                let notOptionalFeatureIds = container.getNotOptionalFeatures(featureModel);
+            for (let i = 0; i < items.GetItemsCount(); i++){
+                let licenseId = items.GetData("Id", i);
+                let licenseName = items.GetData("Name", i);
+                let description = items.GetData("Description", i);
 
-                console.log("optionalFeatureIds", optionalFeatureIds);
-                console.log("notOptionalFeatureIds", notOptionalFeatureIds);
+                tableView.insertRow([i], {"Id": licenseId, "Name": licenseName, "Description": description});
 
-                for (let j = 0; j < notOptionalFeatureIds.length; j++){
-                    let featureId = notOptionalFeatureIds[j];
+                if (!featuresModel){
+                    continue;
+                }
 
-                    container.licenseFeaturesUpdateGui(licenseId, featureId, i, optionalFeatureIds);
+                if (featuresModel.ContainsKey(licenseId)){
+                    let featureModel = featuresModel.GetData(licenseId);
+                    let optionalFeatureIds = container.getOptionalFeatures(featureModel);
+                    let notOptionalFeatureIds = container.getNotOptionalFeatures(featureModel);
+
+                    console.log("optionalFeatureIds", optionalFeatureIds);
+                    console.log("notOptionalFeatureIds", notOptionalFeatureIds);
+
+                    for (let j = 0; j < notOptionalFeatureIds.length; j++){
+                        let featureId = notOptionalFeatureIds[j];
+
+                        container.licenseFeaturesUpdateGui(licenseId, featureId, i, optionalFeatureIds);
+                    }
                 }
             }
         }
 
         container.blockUpdatingModel = false;
-        console.log("End updateGui");
     }
 
     function licenseFeaturesUpdateGui(licenseId, featureId, index, optionalFeatureIds){
@@ -419,9 +429,7 @@ DocumentBase {
             radius: 0;
 
             onCurrentIndexChanged: {
-                if (!container.blockUpdatingModel){
-                    updateModel();
-                }
+                container.updateModel();
             }
         }
     }
@@ -465,23 +473,17 @@ DocumentBase {
 
         onRowAdded: {
             console.log("onRowAdded");
-            if (!container.blockUpdatingModel){
-                container.updateModel();
-            }
+            container.updateModel();
         }
 
         onRowRemoved: {
             console.log("onRowRemoved");
-            if (!container.blockUpdatingModel){
-                container.updateModel();
-            }
+            container.updateModel();
         }
 
         onRowModelDataChanged: {
             console.log("onRowModelDataChanged", prop);
-            if (!container.blockUpdatingModel){
-                container.updateModel();
-            }
+            container.updateModel();
         }
     }
 }

@@ -11,7 +11,6 @@ Item {
 
     property Item documentBase: null;
 
-
     property bool isDirty: false;
     property bool transaction: false;
 
@@ -20,7 +19,13 @@ Item {
 
     onModelStateChanged: {
         if (undoRedo.undoStack.length == 1){
-            commandsDelegate.removeChanges();
+           // commandsDelegate.removeChanges();
+
+          //  Events.sendEvent("DocumentIsDirtyChanged", false);
+        }
+
+        if (undoRedoManager.documentBase){
+            undoRedoManager.documentBase.isDirty = undoRedo.undoStack.length != 1;
         }
     }
 
@@ -98,7 +103,7 @@ Item {
         isEnabled = undoRedo.redoStack.length > 0;
         undoRedoManager.documentBase.commandsProvider.setCommandIsEnabled("Redo", isEnabled);
 
-        timerCheckModel.start();
+       // timerCheckModel.start();
     }
 
     function commandHandle(commandId){
@@ -145,15 +150,17 @@ Item {
         interval: 10;
 
         onTriggered: {
-            if (!undoRedoManager.commandsDelegate){
-                return;
-            }
+//            if (!undoRedoManager.commandsDelegate){
+//                return;
+//            }
 
             let newModel = JSON.stringify(undoRedoManager.observedModel)
 
             let startModel = undoRedo.undoStack[0];
             if (_.isEqual(newModel, startModel)){
-                undoRedoManager.commandsDelegate.removeChanges();
+//                undoRedoManager.commandsDelegate.removeChanges();
+
+                Events.sendEvent("DocumentIsDirtyChanged", false);
             }
         }
     }

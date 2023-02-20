@@ -9,14 +9,19 @@ Item {
 
     property string commandId;
 
-    function updateModel(inputParams, fields){
+    // Fields to get from server
+    property var fields: [];
+
+    signal modelUpdated();
+
+    function updateModel(inputParams){
         if (container.commandId == ""){
             console.log( "ERROR: CollectionDataProvider commandId is empty!");
 
             return;
         }
 
-        itemsInfoModel.updateModel(inputParams, fields);
+        itemsInfoModel.updateModel(inputParams, container.fields);
     }
 
     GqlModel {
@@ -66,6 +71,8 @@ Item {
                                 dataModelLocal = dataModelLocal.GetData("PagesCount");
                             }
                         }
+
+                        container.modelUpdated();
                     }
                 }
             }

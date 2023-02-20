@@ -11,7 +11,7 @@ Item {
     property string setCommandId: prefixCommandId + "Add";
     property string updateCommandId: prefixCommandId + "Update";
 
-    property TreeItemModel documentModel: TreeItemModel {}
+    property TreeItemModel documentModel: null;
 
     signal documentModelSaved();
 
@@ -49,9 +49,6 @@ Item {
 
             var gqlData = query.GetQuery();
 
-
-            console.log("PackageItem", gqlData)
-
             this.SetGqlQuery(gqlData);
         }
 
@@ -87,14 +84,18 @@ Item {
             inputParams.InsertField ("Item", jsonString);
             query.AddParam(inputParams);
 
-            var queryFields = Gql.GqlObject("New");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
+            if (commandId === container.setCommandId){
+                var queryFields = Gql.GqlObject("addedNotification");
+                queryFields.InsertField("Id");
+                query.AddField(queryFields);
+            }
+            else if (commandId === container.updateCommandId){
+                var queryFields = Gql.GqlObject("updatedNotification");
+                queryFields.InsertField("Id");
+                query.AddField(queryFields);
+            }
 
             var gqlData = query.GetQuery();
-
-            console.log("PackageUpdate", gqlData)
-
             this.SetGqlQuery(gqlData);
         }
 

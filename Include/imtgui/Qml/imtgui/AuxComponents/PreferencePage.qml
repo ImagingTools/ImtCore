@@ -49,13 +49,17 @@ Rectangle {
     onVisibleChanged: {
         console.log("onVisibleChanged settingsProvider", settingsProvider);
         if (visible){
+            console.log("settingsProvider.localModel", settingsProvider.localModel);
             if (settingsProvider.localModel){
                 let localModelJson = settingsProvider.localModel.toJSON();
+
+                console.log("localModelJson", localModelJson);
                 localModel.CreateFromJson(localModelJson);
 
                 updateCommonModel(localModel);
             }
 
+            console.log("settingsProvider.serverModel", settingsProvider.serverModel);
             if (settingsProvider.serverModel){
                 let serverModelJson = settingsProvider.serverModel.toJSON();
                 serverModel.CreateFromJson(serverModelJson);

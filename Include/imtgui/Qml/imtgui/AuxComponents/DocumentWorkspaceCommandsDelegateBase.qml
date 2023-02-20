@@ -6,12 +6,8 @@ import imtgui 1.0
 Item {
     id: container;
 
-    property TreeItemModel objectModel: documentBase ? container.documentBase.documentModel : null;
-    property TreeItemModel documentsData: null;
-
     property Item documentBase: null;
 
-    property bool closingFlag: false;
     property bool showInputIdDialog: false;
 
     property string commandsId;
@@ -19,12 +15,7 @@ Item {
     property string gqlModelQueryType;
     property string gqlModelQueryTypeNotify;
 
-    /**
-        Таймер чтобы запрос на Item не уходил одновременно с другими, иначе запрос не пройдет
-    */
-    property alias updateItemTimer: timer.interval;
-
-    property bool autoUpdate: true;
+    property int updateItemTimer;
 
     signal entered(string value);
     signal saved(string id, string name);
@@ -34,59 +25,11 @@ Item {
 
     property var itemModelInputParams: ({});
 
-    Timer {
-        id: timer;
-
-        interval: 0;
-
-        onTriggered: {
-            itemModel.updateModel(container.itemModelInputParams);
-        }
-    }
-
-//    onDocumentBaseChanged: {
-//        console.log("DocumentCommands onDocumentBaseChanged", container.documentBase.documentsData);
-
-//        let itemId = container.documentBase.documentsData.GetData("Id", model.index);
-//        container.itemModelInputParams["Id"] = itemId;
-//        console.log("itemId", itemId);
-//    }
-
-//    Component.onCompleted: {
-//        console.log("DocumentCommands onCompleted");
-//        let itemId = documentsData.GetData("Id", model.index);
-//        container.itemModelInputParams["Id"] = itemId;
-//        console.log("itemId", itemId);
-//    }
-
-    onDocumentsDataChanged: {
-        if (container.documentsData != null){
-            console.log("onDocumentsDataChanged", documentsData.toJSON());
-            let itemId = documentsData.GetData("Id", model.index);
-            container.itemModelInputParams["Id"] = itemId;
-            console.log("itemId", itemId);
-        }
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-    }
-
-    onCommandsIdChanged: {
-        console.log("DocumentCommands onCommandsIdChanged", container.commandsId);
-
-        if (container.documentBase && container.documentBase.itemLoad){
-            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-
-            if (container.autoUpdate){
-                timer.start();
-            }
-        }
-    }
-
     onVisibleChanged: {
-        console.log("DocumentCommands onVisibleChanged");
         if (container.visible){
+            Events.sendEvent("CommandsModelChanged", {"Model": documentBase.commandsProvider.commandsModel,
+                                 "CommandsId": documentBase.commandsProvider.commandsId});
+
             Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
         }
         else{
@@ -94,51 +37,26 @@ Item {
         }
     }
 
-    onObjectModelChanged: {
-        if(container.objectModel){
-            container.objectModel.modelChanged.connect(container.modelChanged);
-        }
-    }
-
-    function removeChanges(){
-        container.documentBase.commandsProvider.setCommandIsEnabled("Save", false);
-        container.documentBase.documentManager.setDocumentTitle({"Id": container.documentBase.itemId, "Title": container.documentBase.itemName});
-
-        container.documentBase.isDirty = false;
-    }
-
-    function setIsDirty(){
-        container.documentBase.commandsProvider.setCommandIsEnabled("Save", true);
-
-        let suffix = "*";
-        container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
-
-    }
-
     function commandHandle(commandId){
         console.log("DocumentCommandsBase commandHandle", container.documentBase.itemId, commandId);
 
-        if (commandId == "Close"){
-            let saveCommandIsEnabled = container.documentBase.commandsProvider.commandIsEnabled("Save");
-            if (saveCommandIsEnabled){
+        if (commandId === "Close"){
+            if (container.documentBase.isDirty){
                 modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
             }
             else{
-                container.documentClosed();
+                Events.sendEvent("CloseDocument", {"Id": container.documentBase.itemId});
             }
         }
-        else if (commandId == "Save"){
-            documentBase.updateModel();
-            let itemId = documentBase.itemId;
+        else if (commandId === "Save"){
+            container.documentBase.updateModel();
+            let itemId = container.documentBase.itemId;
             if (itemId === ""){
-                container.gqlModelQueryType = "Add";
-                container.gqlModelQueryTypeNotify = "addedNotification";
-
                 if (container.showInputIdDialog){
                     modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the document:")});
                 }
                 else{
-                    saveQuery.updateModel();
+                    container.addObject();
                 }
             }
             else{
@@ -160,11 +78,11 @@ Item {
             onFinished: {
                 console.log("saveDialog onFinished", buttonId);
                 if (buttonId == "Yes"){
-                    container.closingFlag = true;
-                    container.commandHandle("Save");
+                    container.documentBase.closingFlag = true;
+                    container.documentBase.save();
                 }
                 else if (buttonId == "No"){
-                    container.documentClosed();
+                    Events.sendEvent("CloseDocument", {"Id": container.documentBase.itemId});
                 }
             }
         }
@@ -179,7 +97,7 @@ Item {
                 if (buttonId == "Ok"){
                     container.entered(inputValue);
 
-                    saveQuery.updateModel();
+                    container.addObject();
                 }
             }
         }
@@ -190,56 +108,10 @@ Item {
 
         ErrorDialog {
             onFinished: {
-                if (container.closingFlag){
-                    container.closingFlag = false;
+                if (container.documentBase.closingFlag){
+                    container.documentBase.closingFlag = false;
                 }
             }
-        }
-    }
-
-    /**
-        Обновляем данные только после получения результата с сервера, удостоверясь
-        что нет никаких ошибок
-    */
-    function documentSaved(itemId, itemName){
-        console.log("DocumentsCommands documentSaved", itemId, itemName);
-
-        Events.sendEvent(container.commandsId + "CollectionUpdateGui");
-
-        objectModel.modelChanged.disconnect(container.modelChanged);
-
-        container.saved(itemId, itemName);
-
-        documentBase.itemId = itemId;
-        documentBase.itemName = itemName;
-
-        container.removeChanges();
-
-        objectModel.modelChanged.connect(container.modelChanged);
-
-        if (container.closingFlag){
-            container.documentClosed();
-        }
-    }
-
-    function documentClosed(){
-        console.log("documentClosed", documentBase.itemId);
-        container.closed();
-
-        container.documentBase.documentManager.closeDocument(documentBase.itemId);
-    }
-
-    function modelChanged(){
-        console.log("DocumentsCommands modelChanged");
-        if (!container.documentBase.isDirty){
-
-            container.setIsDirty();
-//            container.documentBase.commandsProvider.setCommandIsEnabled("Save", true);
-
-//            let suffix = "*";
-//            container.documentBase.documentManager.setDocumentTitle({"Id": documentBase.itemId, "Title": documentBase.itemName + suffix});
-
-            container.documentBase.isDirty = true;
         }
     }
 
@@ -316,8 +188,11 @@ Item {
                         let itemId = dataModelLocal.GetData("Id");
                         let itemName = dataModelLocal.GetData("Name");
 
-                        if (container.documentBase.itemLoad){
-                            container.documentSaved(itemId, itemName);
+                        container.documentBase.isDirty = false;
+                        Events.sendEvent("DocumentSaved", {"Id": itemId, "Name": itemName});
+
+                        if (container.documentBase.closingFlag){
+                            Events.sendEvent("CloseDocument", {"Id": container.documentBase.itemId});
                         }
                     }
                 }

@@ -39,6 +39,7 @@ public:
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
+	virtual bool JsonSerialize(iser::IArchive &archive);
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
@@ -52,6 +53,7 @@ public Q_SLOTS:
 	bool Copy(CTreeItemModel* object);
 	void InsertNewItemWithParameters(int index, const QVariantMap& map);
 	int InsertNewItem();
+	int InsertNewItem(int index);
 	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
 	imtbase::CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
 	bool SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index = 0);

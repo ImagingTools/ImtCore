@@ -8,6 +8,16 @@ Item {
 
     property var startPageObj;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("DocumentSaved", documentManager.documentSaved);
+        Events.subscribeEvent("CloseDocument", documentManager.closeDocument);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("DocumentSaved", documentManager.documentSaved);
+        Events.unSubscribeEvent("CloseDocument", documentManager.closeDocument);
+    }
+
     onStartPageObjChanged: {
         console.log("onStartPageObjChanged", documentManager.startPageObj["Source"]);
         documentLoader.source = documentManager.startPageObj["Source"];
@@ -20,6 +30,12 @@ Item {
         if(documentLoader.item.documentManager !==undefined){
             documentLoader.item.documentManager = documentManager;
             console.log("documentLoader.item.documentManager", documentLoader.item.documentManager);
+        }
+    }
+
+    function documentSaved(parameters){
+        if(documentLoader.item){
+            documentLoader.item.updateGui();
         }
     }
 

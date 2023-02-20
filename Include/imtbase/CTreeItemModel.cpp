@@ -103,6 +103,26 @@ int CTreeItemModel::InsertNewItem()
 }
 
 
+int CTreeItemModel::InsertNewItem(int index)
+{
+	if (index < 0 || index > m_items.count()){
+		return -1;
+	}
+
+	beginInsertRows(QModelIndex(), index, index);
+
+	m_items.insert(index, new Item());
+
+	if(m_items.count() > 1){
+		m_isArray = true;
+	}
+
+	endInsertRows();
+
+	return index;
+}
+
+
 int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 {
 	if (index < 0 || index > m_items.count() - 1){
@@ -573,9 +593,15 @@ QHash<int, QByteArray> CTreeItemModel::roleNames() const
 }
 
 
+bool CTreeItemModel::Serialize(iser::IArchive &archive)
+{
+	return JsonSerialize(archive);
+}
+
+
 // reimplemented (iser::ISerializable)
 
-bool CTreeItemModel::Serialize(iser::IArchive &archive)
+bool CTreeItemModel::JsonSerialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(!archive.IsStoring() ? this : nullptr);
 

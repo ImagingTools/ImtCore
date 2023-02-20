@@ -48,6 +48,7 @@ Item {
                     let object = pagesModel.get(model.index);
                     dialogLoader.item.documentsData = model.documentsData;
                     dialogLoader.item.documentManager = model.documentManager;
+                    dialogLoader.item.itemId = model.Id;
                     dialogLoader.item.commandsId = model.CommandsId;
                     dialogLoader.item.forceActiveFocus();
                 }

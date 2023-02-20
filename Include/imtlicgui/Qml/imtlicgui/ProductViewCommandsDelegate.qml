@@ -49,8 +49,8 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onEntered: {
-        container.objectModel.SetData("Id", value);
-        container.objectModel.SetData("Name", value);
+        container.documentBase.documentModel.SetData("Id", value);
+        container.documentBase.documentModel.SetData("Name", value);
     }
 
     Component {
