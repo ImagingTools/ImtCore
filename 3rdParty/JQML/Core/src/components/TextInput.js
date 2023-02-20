@@ -300,6 +300,28 @@ export class TextInput extends Item {
 		}
 		
 	}
+
+    $touchstart(e, state) {
+        // e.preventDefault()
+		if(this.$p.enabled.val){
+
+            state.blocked(this)
+		}
+	}
+	$touchend(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+            this.focus = true
+            state.release()
+		}
+	}
+    $touchmove(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+
+		}
+		
+	}
     
 }
 
