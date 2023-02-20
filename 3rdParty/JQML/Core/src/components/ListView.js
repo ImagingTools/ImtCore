@@ -78,12 +78,13 @@ export class ListView extends Flickable {
     $insert(index){
         if(this.model && this.delegate){
             let childRecursive = (obj, indx)=>{
-                
-                obj.$cP('index', indx)
-                obj.index = indx
+                if(obj.$qmlClassName !== 'ListElement'){
+                    obj.$cP('index', indx)
+                    obj.index = indx
+                }
 
                 for(let child of obj.children){
-                    if(!child.$useModel && !child.$repeater)
+                    if(!child.$useModel && !child.$repeater && child.$qmlClassName !== 'ListElement')
                     childRecursive(child, indx)
                 }
             }
@@ -109,12 +110,13 @@ export class ListView extends Flickable {
         let index = this.children.length
         if(this.model && this.delegate){
             let childRecursive = (obj)=>{
-                
-                obj.$cP('index', index)
-                obj.index = index
+                if(obj.$qmlClassName !== 'ListElement'){
+                    obj.$cP('index', index)
+                    obj.index = index
+                }
 
                 for(let child of obj.children){
-                    if(!child.$useModel && !child.$repeater)
+                    if(!child.$useModel && !child.$repeater && child.$qmlClassName !== 'ListElement')
                     childRecursive(child)
                 }
             }

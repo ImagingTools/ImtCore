@@ -59,8 +59,11 @@ export class QtObject {
             delete args['repeater']
         }
         if('parent' in args && args.parent !== null){
-            this.$cP('index', args.parent.index)
-            this.index = args.parent.index
+            if(this.$qmlClassName !== 'ListElement'){
+                this.$cP('index', args.parent.index)
+                this.index = args.parent.index
+            }
+            
 
             args.parent.$treeChilds.push(this)
             
@@ -73,7 +76,7 @@ export class QtObject {
             this.parent = args.parent
             this.$treeParent = args.parent 
         }
-        if('index' in args){
+        if('index' in args && this.$qmlClassName !== 'ListElement'){
             this.$cP('index', args.index)
             this.index = args.index
         }
@@ -115,6 +118,7 @@ export class QtObject {
                             let target = {}
                             if(this.$repeater.$p.model.val[this.index]){
                                 target = this.$repeater.$p.model.val[this.index]
+                                if(target.$qmlClassName === 'ListElement') return target
                                 handler.model = this.$repeater.$p.model.val
                             }
                             return new Proxy(target, handler)
@@ -122,6 +126,7 @@ export class QtObject {
                             let target = {}
                             if(this.$repeater.$p.model.val.data[this.index]){
                                 target = this.$repeater.$p.model.val.data[this.index]
+                                if(target.$qmlClassName === 'ListElement') return target
                                 handler.model = this.$repeater.$p.model.val
                             }
                             return new Proxy(target, handler)
@@ -141,6 +146,7 @@ export class QtObject {
                                 let target = {}
                                 if(parent.$repeater.$p.model.val[this.index]){
                                     target = parent.$repeater.$p.model.val[this.index]
+                                    if(target.$qmlClassName === 'ListElement') return target
                                     handler.model = parent.$repeater.$p.model.val
                                 }
                                 return new Proxy(target, handler)
@@ -148,6 +154,7 @@ export class QtObject {
                                 let target = {}
                                 if(parent.$repeater.$p.model.val.data[this.index]){
                                     target = parent.$repeater.$p.model.val.data[this.index]
+                                    if(target.$qmlClassName === 'ListElement') return target
                                     handler.model = parent.$repeater.$p.model.val
                                 }
                                 return new Proxy(target, handler)
@@ -165,6 +172,7 @@ export class QtObject {
                                 let target = {}
                                 if(parent.$p.model.val[this.index]){
                                     target = parent.$p.model.val[this.index]
+                                    if(target.$qmlClassName === 'ListElement') return target
                                     handler.model = parent.$p.model.val
                                 }
                                 return new Proxy(target, handler)
@@ -172,6 +180,7 @@ export class QtObject {
                                 let target = {}
                                 if(parent.$p.model.val.data[this.index]){
                                     target = parent.$p.model.val.data[this.index]
+                                    if(target.$qmlClassName === 'ListElement') return target
                                     handler.model = parent.$p.model.val
                                 }
                                 return new Proxy(target, handler)

@@ -64,7 +64,13 @@ export class ListModel extends QtObject {
 				return
 			Array.prototype.push.apply(this.data, new Proxy(dict, handler))
 		} else {
-			this.data.push(new Proxy(dict, handler))
+            if(dict.$qmlClassName === 'ListElement'){
+                dict.$cP('index', this.data.length)
+                this.data.push(dict)
+            } else {
+                this.data.push(new Proxy(dict, handler))
+            }
+			
 		}
         this.count = this.data.length
 
@@ -84,12 +90,33 @@ export class ListModel extends QtObject {
         return index >= 0 && index < this.data.length ? this.data[index] : undefined
     }
     insert(index, dict){
+        let handler = {
+            model: this,
+            has(){
+                return true
+            },
+            get(target, name){
+                return target[name]
+            },
+            set(target, name, value){
+                target[name] = value
+                // console.log('DEBUG::handler-set', this.parent, name, value)
+                this.model.$modelChanged()
+                return true
+            },
+        }
         if (Array.isArray(dict)) {
 			if (dict.length === 0)
 				return
-			Array.prototype.splice.apply(this.data, index, 0, dict)
+			Array.prototype.splice.apply(this.data, index, 0, new Proxy(dict, handler))
 		} else {
-			this.data.splice(index, 0, dict)
+			
+            if(dict.$qmlClassName === 'ListElement'){
+                dict.$cP('index', this.data.length)
+                this.data.splice(index, 0, dict)
+            } else {
+                this.data.splice(index, 0, new Proxy(dict, handler))
+            }
 		}
         this.count = this.data.length
         for(let key in this.$deps){

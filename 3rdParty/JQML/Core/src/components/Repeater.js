@@ -5,6 +5,8 @@ import {GridView} from './GridView'
 export class Repeater extends Item {
     $useModel = true
     $childrenForUpdate = []
+    $widthAuto = true
+    $heightAuto = true
     constructor(args) {
         super(args)
 
@@ -42,11 +44,13 @@ export class Repeater extends Item {
         if(this.model && this.delegate){
             let childRecursive = (obj, indx)=>{
                 
-                obj.$cP('index', indx)
-                obj.index = indx
+                if(obj.$qmlClassName !== 'ListElement'){
+                    obj.$cP('index', indx)
+                    obj.index = indx
+                }
 
                 for(let child of obj.children){
-                    if(!child.$useModel && !child.$repeater)
+                    if(!child.$useModel && !child.$repeater && child.$qmlClassName !== 'ListElement')
                     childRecursive(child, indx)
                 }
             }
@@ -60,12 +64,14 @@ export class Repeater extends Item {
             }
             
             this.count = this.children.length
+            this.$updateGeometry()
             try {
-                obj.$uP()
+                this.$uP()
             } catch (error) {
                 console.error(error)
             }
             this.itemAdded(obj.index, obj)
+            
         }
     }
 
@@ -75,11 +81,14 @@ export class Repeater extends Item {
         if(this.model && this.delegate){
             let childRecursive = (obj)=>{
                 
-                obj.$cP('index', index)
-                obj.index = index
+                if(obj.$qmlClassName !== 'ListElement'){
+                    obj.$cP('index', index)
+                    obj.index = index
+                }
+                
 
                 for(let child of obj.children){
-                    if(!child.$useModel && !child.$repeater)
+                    if(!child.$useModel && !child.$repeater && child.$qmlClassName !== 'ListElement')
                     childRecursive(child)
                 }
             }
@@ -91,12 +100,14 @@ export class Repeater extends Item {
             if(wait){
                 this.$childrenForUpdate.push(obj)
             } else {
+                this.$updateGeometry()
                 try {
-                    obj.$uP()
+                    this.$uP()
                 } catch (error) {
                     console.error(error)
                 }
                 this.itemAdded(obj.index, obj)
+                
             }
         }
     }
@@ -115,6 +126,21 @@ export class Repeater extends Item {
             childRecursive(this.children[i], i)
         }
         this.count = this.children.length
+    }
+
+    $updateGeometry(){
+        if(this.parent && this.children.length > 0){
+            if(this.parent.$qmlClassName === 'Column'){
+                if(this.$widthAuto) this.$sP('width', ()=>{return this.children[0].width})
+                if(this.$heightAuto) this.$sP('height', ()=>{return this.children[this.children.length-1].y - this.children[0].y + this.children[0].height})
+            } else if(this.parent.$qmlClassName === 'Row'){
+                if(this.$widthAuto) this.$sP('height', ()=>{return this.children[0].height})
+                if(this.$heightAuto) this.$sP('width', ()=>{return this.children[this.children.length-1].x - this.children[0].x + this.children[0].width})
+            } else {
+                if(this.$widthAuto) this.$sP('width', ()=>{return this.children[0].width})
+                if(this.$heightAuto) this.$sP('height', ()=>{return this.children[0].height})
+            }
+        }
     }
 
     $updateView(){
@@ -152,6 +178,8 @@ export class Repeater extends Item {
                     obj.$uP()
                     this.itemAdded(obj.index, obj)
                 }
+                this.$updateGeometry()
+                this.$uP()
             } else {
 
             }

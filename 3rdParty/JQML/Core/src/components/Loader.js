@@ -162,10 +162,12 @@ export class Loader extends Item {
 
             if(this.index !== undefined){
                 let childRecursive = (obj, index)=>{
-                    obj.$cP('index',index)
-                    obj.index = index
+                    if(obj.$qmlClassName !== 'ListElement'){
+                        obj.$cP('index',index)
+                        obj.index = index
+                    }
 
-                    if(!obj.$useModel && !obj.$repeater)
+                    if(!obj.$useModel && !obj.$repeater && obj.$qmlClassName !== 'ListElement')
                     for(let child of obj.children){ 
                         childRecursive(child, index)
                     }
@@ -205,9 +207,11 @@ export class Loader extends Item {
 
                 if(this.index !== undefined){
                     let childRecursive = (obj, index)=>{
-                        obj.$cP('index',index)
-                        obj.index = index
-                        if(!obj.$useModel && !obj.$repeater)
+                        if(obj.$qmlClassName !== 'ListElement'){
+                            obj.$cP('index',index)
+                            obj.index = index
+                        }
+                        if(!obj.$useModel && !obj.$repeater && obj.$qmlClassName !== 'ListElement')
                         for(let child of obj.children){
                             childRecursive(child, index)
                         }
@@ -240,23 +244,23 @@ export class Loader extends Item {
 
     $widthChanged(){
         super.$widthChanged()
-        this.$widthOverride = true
+        // this.$widthOverride = true
     }
     $heightChanged(){
         super.$heightChanged()
-        this.$heightOverride = true
+        // this.$heightOverride = true
     }
     $xChanged(){
         super.$xChanged()
-        this.$xOverride = true
+        // this.$xOverride = true
     }
     $yChanged(){
         super.$yChanged()
-        this.$yOverride = true
+        // this.$yOverride = true
     }
     $clipChanged(){
         super.$clipChanged()
-        this.$clipOverride = true
+        // this.$clipOverride = true
     }
 
 
