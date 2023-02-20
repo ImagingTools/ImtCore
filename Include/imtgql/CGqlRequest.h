@@ -48,6 +48,7 @@ protected:
 	virtual QByteArray CreateQueryParams() const;
 	virtual QByteArray AddObjectFieldPart(const CGqlObject& gqlObject) const;
 	virtual QByteArray AddObjectParamPart(const CGqlObject& gqlObject) const;
+	virtual QByteArray AddObjectParamValue(const QVariant& value) const;
 	virtual void ParceObjectFieldPart(CGqlObject &gqlObject, const QJsonObject& object) const;
 	virtual void ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject& object) const;
 

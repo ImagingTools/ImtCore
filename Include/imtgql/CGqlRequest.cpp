@@ -515,34 +515,7 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 			retVal += fieldId;
 			retVal += ": ";
 			QVariant value = gqlObject.GetFieldArgumentValue(fieldId);
-			int valueType = value.type();
-			bool isString = (valueType == QVariant::String) || (valueType == QVariant::ByteArray);
-			bool isEnum = false;
-			if (gqlObject.IsEnum(fieldId)){
-				isString = false;
-				isEnum = true;
-			}
-			if (isString){
-				retVal += "\\\"";
-			}
-			if (isEnum){
-				retVal += value.value<imtgql::CGqlEnum>().GetValue();
-			}
-			else{
-				QByteArray data = value.toByteArray();
-				if (isString){
-					data = data.replace("\\", "\\\\\\\\");
-					data = data.replace("\"", "\\\\\\\"");
-					data = data.replace("\n", "\\\\\\\n");
-					data = data.replace("\r", "\\\\\\\r");
-					data = data.replace("\t", "\\\\\\\t");
-				}
-				retVal += data;
-			}
-			if (isString){
-				retVal += "\\\"";
-			}
-
+			retVal += AddObjectParamValue(value);
 		}
 		if (i < fieldIds.count() - 1){
 			retVal += ", ";
@@ -551,6 +524,66 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 
 	if (objectId.isEmpty() == false){
 		retVal += "}";
+	}
+
+	return retVal;
+}
+
+
+QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
+{
+	QByteArray retVal;
+	int valueType = value.type();
+	qDebug() << "value" << value;
+	if (valueType == QVariant::List || valueType == QVariant::StringList){
+		QVariantList variantList = value.toList();
+		qDebug() << "variantList" << variantList;
+		retVal += "[";
+		for (int i = 0; i < variantList.count(); i++){
+			if (i > 0){
+				retVal += ", ";
+			}
+			retVal += AddObjectParamValue(variantList.value(i));
+		}
+		retVal += "]";
+	}
+	else if (valueType == QVariant::String || valueType == QVariant::ByteArray){
+		retVal += "\\\"";
+		QByteArray data = value.toByteArray();
+		data = data.replace("\\", "\\\\\\\\");
+		data = data.replace("\"", "\\\\\\\"");
+		data = data.replace("\n", "\\\\\\\n");
+		data = data.replace("\r", "\\\\\\\r");
+		data = data.replace("\t", "\\\\\\\t");
+		retVal += data;
+		retVal += "\\\"";
+	}
+	else if (value.canConvert<QStringList>()){
+		QStringList stringList = value.value<QStringList>();
+		qDebug() << "stringList" << stringList;
+		retVal += "[";
+		for (int i = 0; i < stringList.count(); i++){
+			if (i > 0){
+				retVal += ", ";
+			}
+			retVal += AddObjectParamValue(stringList.value(i));
+		}
+		retVal += "]";
+	}
+	else if (value.canConvert<QList<QString>>()){
+		QList<QString> stringList = value.value<QList<QString>>();
+		qDebug() << "QList<QString>" << stringList;
+		retVal += "[";
+		for (int i = 0; i < stringList.count(); i++){
+			if (i > 0){
+				retVal += ", ";
+			}
+			retVal += AddObjectParamValue(stringList.value(i));
+		}
+		retVal += "]";
+	}
+	else if (value.canConvert<imtgql::CGqlEnum>()){
+		retVal += value.value<imtgql::CGqlEnum>().GetValue();
 	}
 
 	return retVal;
