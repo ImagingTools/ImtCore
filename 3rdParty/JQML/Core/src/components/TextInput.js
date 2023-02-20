@@ -282,6 +282,7 @@ export class TextInput extends Item {
     $mousedown(e, state) {
         // e.preventDefault()
 		if(this.$p.enabled.val){
+
             state.blocked(this)
 		}
 	}

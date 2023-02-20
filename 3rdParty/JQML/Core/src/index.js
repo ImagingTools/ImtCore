@@ -174,7 +174,6 @@ global.Core = {
     Singletons: {},
     components: {...QML},
     animations: {},
-    // LVL: 0,
     queueCompleted: [],
     proxyHandler: {
         has(){
@@ -376,7 +375,7 @@ global.Core = {
                 if(root.$readyEvents){
 
                     
-                    //e.preventDefault()
+                    // e.preventDefault()
                     let path = []
                     if(e.type.indexOf('mouse')>=0 || e.type.indexOf('wheel')>=0 || e.type.indexOf('context')>=0 || e.type.indexOf('touch')>=0){
                         

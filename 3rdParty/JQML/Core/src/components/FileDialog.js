@@ -53,7 +53,7 @@ export class FileDialog extends Item {
 
     }
     $selectMultipleChanged(){
-        this.impl.multiple = value ? "multiple" : ""
+        this.impl.multiple = this.selectMultiple ? "multiple" : ""
     }
     $nameFiltersChanged(){
         if(this.nameFilters.length){
