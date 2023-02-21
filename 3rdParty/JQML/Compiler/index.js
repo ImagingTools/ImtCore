@@ -730,7 +730,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
         code.push(`let ${curr}=Core.cC(\`${instructions.class}\`, {parent: ${prev}})`)
     }
 
-    if(instructions.class === 'Column' || instructions.class === 'Row' || instructions.class === 'Image' || instructions.class === 'Repeater'){
+    if(instructions.class === 'Column' || instructions.class === 'Row' || instructions.class === 'Image' || instructions.class === 'Repeater' || instructions.class === 'Text'){
         if(instructions.properties.width) code.push(`${curr}.$widthAuto=false`)
         if(instructions.properties.height) code.push(`${curr}.$heightAuto=false`)
         if(instructions.propertiesLazy.width) code.push(`${curr}.$widthAuto=false`)
