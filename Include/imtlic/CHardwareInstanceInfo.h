@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/TIdentifiableWrap.h>
 #include <imtlic/CProductInstanceInfo.h>
 #include <imtlic/IHardwareInstanceInfo.h>
 
@@ -43,6 +44,8 @@ private:
 	QByteArray m_deviceId;
 	QByteArray m_softwareId;
 };
+
+typedef imtbase::TIdentifiableWrap<CHardwareInstanceInfo> CIdentifiableWHardwareInstanceInfo;
 
 
 } // namespace imtlic

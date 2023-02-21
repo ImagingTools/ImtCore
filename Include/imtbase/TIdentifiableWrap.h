@@ -24,7 +24,7 @@ template<class Base>
 class TIdentifiableWrap: public Base, virtual public IIdentifiable
 {
 public:
-	bool SetIdentifier(const QByteArray& identifier);
+	bool SetObjectUuid(const QByteArray& identifier);
 
 	// reimplemented (IIdentifiable)
 	virtual QByteArray GetObjectUuid() const override;
@@ -50,7 +50,7 @@ private:
 
 
 template<class Base>
-bool TIdentifiableWrap<Base>::SetIdentifier(const QByteArray& identifier)
+bool TIdentifiableWrap<Base>::SetObjectUuid(const QByteArray& identifier)
 {
 	Q_ASSERT(!identifier.isEmpty());
 	if(identifier.isEmpty()){
@@ -61,7 +61,7 @@ bool TIdentifiableWrap<Base>::SetIdentifier(const QByteArray& identifier)
 		return false;
 	}
 
-	if(!IsMutable(identifier)){
+	if(!IsMutable()){
 		return false;
 	}
 
@@ -89,10 +89,18 @@ bool TIdentifiableWrap<Base>::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
 
-	static iser::CArchiveTag identifierTag("Uuid", "Unique identifier of the object", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(identifierTag);
-	retVal = retVal && archive.Process(m_identifier);
-	retVal = retVal && archive.EndTag(identifierTag);
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 identifiableVersion;
+	if (!versionInfo.GetVersionNumber(2022, identifiableVersion)){
+		identifiableVersion = 0;
+	}
+	if (identifiableVersion >= 59002){
+		static iser::CArchiveTag identifierTag("Uuid", "Unique identifier of the object", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(identifierTag);
+		retVal = retVal && archive.Process(m_identifier);
+		retVal = retVal && archive.EndTag(identifierTag);
+	}
+	retVal = retVal && Base::Serialize(archive);
 
 	return retVal;
 }
