@@ -19,11 +19,11 @@ namespace imtlic
 class CHardwareInstanceInfo: virtual public IHardwareInstanceInfo
 {
 public:
-	typedef imtlic::CProductInstanceInfo BaseClass;
-
 	CHardwareInstanceInfo();
 
 	// reimplemented (imtlic::IHardwareInstanceInfo)
+	virtual QByteArray GetProductId() const override;
+	virtual void SetProductId(const QByteArray& productId) override;
 	virtual QByteArray GetDeviceId() const override;
 	virtual void SetDeviceId(const QByteArray& deviceId) override;
 	virtual QByteArray GetSoftwareId() const override;
@@ -41,11 +41,12 @@ public:
 	virtual QByteArray GetFactoryId() const override;
 
 private:
+	QByteArray m_productId;
 	QByteArray m_deviceId;
 	QByteArray m_softwareId;
 };
 
-typedef imtbase::TIdentifiableWrap<CHardwareInstanceInfo> CIdentifiableWHardwareInstanceInfo;
+typedef imtbase::TIdentifiableWrap<CHardwareInstanceInfo> CIdentifiableHardwareInstanceInfo;
 
 
 } // namespace imtlic

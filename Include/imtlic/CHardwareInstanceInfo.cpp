@@ -19,7 +19,24 @@ CHardwareInstanceInfo::CHardwareInstanceInfo()
 }
 
 
+QByteArray CHardwareInstanceInfo::GetProductId() const
+{
+	return m_productId;
+}
+
+
+void CHardwareInstanceInfo::SetProductId(const QByteArray& productId)
+{
+	if (m_productId != productId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_productId = productId;
+	}
+}
+
+
 // reimplemented (imtlic::ILicensedHardwareInstanceInfo)
+
 QByteArray CHardwareInstanceInfo::GetDeviceId() const
 {
 	return m_deviceId;
@@ -50,20 +67,25 @@ void CHardwareInstanceInfo::SetSoftwareId(const QByteArray& softwareId)
 	}
 }
 
+
 // reimplemented (iser::ISerializable)
 
 bool CHardwareInstanceInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	// TODO переделать
-	static iser::CArchiveTag deviceIdTag("SerialNumber", "Serial number of the product", iser::CArchiveTag::TT_LEAF);
-	bool retVal = archive.BeginTag(deviceIdTag);
+	static iser::CArchiveTag productIdTag("ProductId", "Product-ID", iser::CArchiveTag::TT_LEAF);
+	bool retVal = archive.BeginTag(productIdTag);
+	retVal = retVal && archive.Process(m_productId);
+	retVal = retVal && archive.EndTag(productIdTag);
+
+	static iser::CArchiveTag deviceIdTag("DeviceId", "Device-ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(deviceIdTag);
 	retVal = retVal && archive.Process(m_deviceId);
 	retVal = retVal && archive.EndTag(deviceIdTag);
 
 	static iser::CArchiveTag softwareIdTag("SoftwareId", "ID of the license software", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(softwareIdTag);
+	retVal = retVal && archive.BeginTag(softwareIdTag);
 	retVal = retVal && archive.Process(m_softwareId);
 	retVal = retVal && archive.EndTag(softwareIdTag);
 
@@ -92,9 +114,8 @@ bool CHardwareInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMod
 
 		m_deviceId = sourcePtr->m_deviceId;
 		m_softwareId = sourcePtr->m_softwareId;
-		//m_partStatus= sourcePtr->m_partStatus;
+		m_productId = sourcePtr->m_productId;
 
-		//return BaseClass::CopyFrom(object);
 		return true;
 	}
 
@@ -119,17 +140,16 @@ bool CHardwareInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_deviceId.clear();
 	m_softwareId.clear();
-	//m_partStatus.clear();
+	m_productId.clear();
 
-	//return BaseClass::ResetData();
 	return true;
 }
+
 
 QByteArray CHardwareInstanceInfo::GetFactoryId() const
 {
 	return "Hardware";
 }
-
 
 
 } // namespace imtlic

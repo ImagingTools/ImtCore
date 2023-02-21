@@ -1,9 +1,9 @@
 #pragma once
 
 
-// ImtCore includes
-#include <imtlic/IProductInstanceInfo.h>
-#include <imtlic/IPartProductionInfo.h>
+// ACF includes
+#include <iser/IObject.h>
+
 
 namespace imtbase
 {
@@ -25,7 +25,15 @@ class IProductInfo;
 class IHardwareInstanceInfo : virtual public iser::IObject
 {
 public:
+	/**
+		Get a unique ID of this product.
+	*/
+	virtual QByteArray GetProductId() const = 0;
 
+	/**
+		Set product-ID.
+	*/
+	virtual void SetProductId(const QByteArray& productId) = 0;
 
 	/**
 		Get the device Id (identifacator of sensor in the table of sensors) of this product instance.
@@ -45,7 +53,7 @@ public:
 	/**
 		Set the link to licensing software of this product instance.
 	*/
-    virtual void SetSoftwareId(const QByteArray& softwareId) = 0;
+	virtual void SetSoftwareId(const QByteArray& softwareId) = 0;
 };
 
 

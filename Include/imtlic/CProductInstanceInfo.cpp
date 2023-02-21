@@ -250,6 +250,12 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 }
 
 
+QByteArray CProductInstanceInfo::GetFactoryId() const
+{
+	return "Software";
+}
+
+
 QByteArray CProductInstanceInfo::FindProductByName(const QString& productName) const
 {
 	if (m_productCollectionPtr != nullptr){

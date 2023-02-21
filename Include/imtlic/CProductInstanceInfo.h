@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/TIdentifiableWrap.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/CLicenseInstance.h>
@@ -48,6 +49,7 @@ public:
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual QByteArray GetFactoryId() const override;
 
 protected:
 	const imtbase::IObjectCollection* m_customerCollectionPtr;
@@ -66,6 +68,9 @@ private:
 	LicenseInstances m_licenses;
 	imtbase::CCollectionInfo m_licenseContainerInfo;
 };
+
+
+typedef imtbase::TIdentifiableWrap<CProductInstanceInfo> CIdentifiableSoftwareInstanceInfo;
 
 
 } // namespace imtlic

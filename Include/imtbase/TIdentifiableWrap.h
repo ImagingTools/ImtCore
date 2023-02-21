@@ -30,15 +30,14 @@ public:
 	virtual QByteArray GetObjectUuid() const override;
 
 	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive& archive);
+	virtual bool Serialize(iser::IArchive& archive) override;
 
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual bool IsEqual(const istd::IChangeable& object) const;
+	virtual bool IsEqual(const istd::IChangeable& object) const override;
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
-
 
 protected:
 	virtual bool IsIdentifierAccepted(const QByteArray& identifier) const;
@@ -48,6 +47,8 @@ private:
 	QByteArray m_identifier;
 };
 
+
+// public methods
 
 template<class Base>
 bool TIdentifiableWrap<Base>::SetObjectUuid(const QByteArray& identifier)
@@ -82,6 +83,7 @@ QByteArray TIdentifiableWrap<Base>:: GetObjectUuid() const
 	return m_identifier;
 }
 
+
 // reimplemented (iser::ISerializable)
 
 template<class Base>
@@ -94,7 +96,7 @@ bool TIdentifiableWrap<Base>::Serialize(iser::IArchive& archive)
 	if (!versionInfo.GetVersionNumber(2022, identifiableVersion)){
 		identifiableVersion = 0;
 	}
-	if (identifiableVersion >= 59002){
+	if (identifiableVersion >= 6020){
 		static iser::CArchiveTag identifierTag("Uuid", "Unique identifier of the object", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(identifierTag);
 		retVal = retVal && archive.Process(m_identifier);
@@ -169,6 +171,9 @@ bool TIdentifiableWrap<Base>::ResetData(CompatibilityMode /*mode*/)
 	return true;
 }
 
+
+// protected methods
+
 template<class Base>
 bool TIdentifiableWrap<Base>::IsIdentifierAccepted(const QByteArray& identifier) const
 {
@@ -188,6 +193,7 @@ bool TIdentifiableWrap<Base>::IsMutable() const
 
 
 typedef TIdentifiableWrap<IIdentifiable> CIdentifiable;
+
 
 } // namespace imtbase
 
