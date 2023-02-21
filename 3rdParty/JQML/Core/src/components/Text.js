@@ -291,9 +291,9 @@ export class Text extends Item {
     $wrapModeChanged(){
         switch(this.$p.wrapMode.val){
             case Text.NoWrap: this.impl.style.whiteSpace = "pre"; break;
-            case Text.WordWrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "normal"; break;
+            case Text.WordWrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-word"; break;
             case Text.WrapAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; break;
-            case Text.Wrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "break-word"; break;
+            case Text.Wrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-word"; break;
             case Text.WrapAtWordBoundaryOrAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; break;
         }
         // this.$calcWH()
