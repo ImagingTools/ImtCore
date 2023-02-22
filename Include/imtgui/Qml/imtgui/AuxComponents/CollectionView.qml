@@ -242,7 +242,6 @@ Item {
         tableData: collectionViewBase.table;
 
         contentVisible: collectionViewBase.table.selectedIndex != -1;
-
     }
 }
 

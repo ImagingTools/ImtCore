@@ -12,6 +12,10 @@ DocumentWorkspaceCommandsDelegateBase {
 
     property TreeItemModel documentsData: TreeItemModel {};
 
+    onRolesModelChanged: {
+        console.log("onRolesModelChanged", rolesModel);
+    }
+
 //    Component.onCompleted: {
 //        console.log("RoleViewDelegate onCompleted", documentsData.GetData("ProductId", model.index));
 
@@ -27,7 +31,7 @@ DocumentWorkspaceCommandsDelegateBase {
         delegateContainer.itemModelInputParams["ProductId"] = documentsData.GetData("ProductId", model.index);
 
 //        delegateContainer.updateItemTimer = 100;
-//        itemsModel.updateModel();
+        itemsModel.updateModel();
     }
 
     onSelectedIndexChanged: {

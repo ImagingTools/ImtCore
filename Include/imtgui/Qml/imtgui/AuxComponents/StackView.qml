@@ -24,6 +24,16 @@ Item {
         }
     }
 
+    function peek(){
+        if (pagesModel.count > 0){
+            let loader = repeaterView.itemAt(pagesModel.count - 1);
+
+            return loader.item;
+        }
+
+        return null;
+    }
+
     Repeater {
         id: repeaterView;
 
@@ -33,25 +43,42 @@ Item {
 
         model: pagesModel;
 
-        delegate: Item {
-            id: dialogDelegate;
+//        delegate: Item {
+//            id: dialogDelegate;
 
-            anchors.fill: repeaterView;
-            Loader {
-                id: dialogLoader;
+//            anchors.fill: repeaterView;
+//            Loader {
+//                id: dialogLoader;
 
-                anchors.fill: parent;
+//                anchors.fill: parent;
 
-                source: model.Source;
+//                source: model.Source;
 
-                onLoaded: {
-                    let object = pagesModel.get(model.index);
-                    dialogLoader.item.documentsData = model.documentsData;
-                    dialogLoader.item.documentManager = model.documentManager;
-                    dialogLoader.item.itemId = model.Id;
-                    dialogLoader.item.commandsId = model.CommandsId;
-                    dialogLoader.item.forceActiveFocus();
-                }
+//                onLoaded: {
+//                    let object = pagesModel.get(model.index);
+//                    dialogLoader.item.documentsData = model.documentsData;
+//                    dialogLoader.item.documentManager = model.documentManager;
+//                    dialogLoader.item.itemId = model.Id;
+//                    dialogLoader.item.commandsId = model.CommandsId;
+//                    dialogLoader.item.forceActiveFocus();
+//                }
+//            }
+//        }
+
+        delegate: Loader {
+            id: dialogLoader;
+
+            anchors.fill: parent;
+
+            source: model.Source;
+
+            onLoaded: {
+                let object = pagesModel.get(model.index);
+                dialogLoader.item.documentsData = model.documentsData;
+                dialogLoader.item.documentManager = model.documentManager;
+                dialogLoader.item.itemId = model.Id;
+                dialogLoader.item.commandsId = model.CommandsId;
+                dialogLoader.item.forceActiveFocus();
             }
         }
     }

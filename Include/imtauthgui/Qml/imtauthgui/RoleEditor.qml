@@ -48,8 +48,6 @@ Item {
         roleEditorContainer.updateGui();
     }
 
-
-
     function onCommandsModelLoaded(){
         console.log("onCommandsModelLoaded");
         roleEditorContainer.documentBase.commandsProvider.mergeModelWith(commandsModel);
@@ -140,6 +138,10 @@ Item {
 
     function updateModel(){
         console.log("RoleEditor updateModel");
+        if (roleEditorContainer.blockUpdatingModel){
+            return;
+        }
+
         roleEditorContainer.undoRedoManager.beginChanges();
 
         roleEditorContainer.documentModel.SetData("Id", roleIdInput.text);
@@ -242,7 +244,7 @@ Item {
                     onEditingFinished: {
                         console.log("roleNameInput onEditingFinished");
                         let oldText = roleEditorContainer.documentModel.GetData("Name");
-                        if (oldText != roleNameInput.text){
+                        if (oldText !== roleNameInput.text && roleNameInput.text !== ""){
                             roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
                             roleEditorContainer.updateModel();
                         }
@@ -335,7 +337,7 @@ Item {
 
                     onEditingFinished: {
                         let oldText = roleEditorContainer.documentModel.GetData("Description");
-                        if (oldText != descriptionInput.text){
+                        if (oldText !== descriptionInput.text && descriptionInput.text !== ""){
                             roleEditorContainer.updateModel();
                         }
                     }
@@ -449,15 +451,11 @@ Item {
                         }
 
                         onRowAdded: {
-                            if (!roleEditorContainer.blockUpdatingModel){
-                                roleEditorContainer.updateModel();
-                            }
+                            roleEditorContainer.updateModel();
                         }
 
                         onRowRemoved: {
-                            if (!roleEditorContainer.blockUpdatingModel){
-                                roleEditorContainer.updateModel();
-                            }
+                            roleEditorContainer.updateModel();
                         }
                     }
                 }

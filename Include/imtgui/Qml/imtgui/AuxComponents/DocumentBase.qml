@@ -56,6 +56,11 @@ Item {
     function modelChanged(){
         console.log("DocumentsCommands modelChanged");
 
+        let saveExists = documentBase.commandsProvider.commandExists("Save");
+        if (!saveExists){
+            return;
+        }
+
         if (!documentBase.isDirty){
             documentBase.isDirty = true;
         }

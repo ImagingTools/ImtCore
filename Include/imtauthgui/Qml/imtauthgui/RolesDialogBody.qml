@@ -15,6 +15,7 @@ Item {
     property Item rootItem: null;
 
     onProductIdChanged: {
+        console.log("onProductIdChanged", container.productId, container.model.toJSON());
         for (let i = 0; i < container.model.GetItemsCount(); i++){
             let currentProductId = container.model.GetData("Id", i);
             if (currentProductId == container.productId){

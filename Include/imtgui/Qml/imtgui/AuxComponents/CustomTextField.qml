@@ -24,7 +24,8 @@ FocusScope {
     property string fontColor: Style.textColor;
     property string placeHolderFontColor: "gray";
 
-    property color borderColor: textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+    property color borderColor: containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+
     property string borderColorConst: "";
 
     property int radius: 0;
@@ -79,6 +80,7 @@ FocusScope {
         radius: containerTextField.radius;
 
         border.color: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst: textField.activeFocus ? containerTextField.borderColor : Style.hover;
+
         border.width: 1;
     }
 
@@ -116,6 +118,18 @@ FocusScope {
         onTextEdited: {
             containerTextField.textEdited();
             console.log("CustomTextField onTextEdited");
+            console.log("acceptableInput", textField.acceptableInput);
+            console.log("mainRect.border.color", mainRect.border.color);
+
+        }
+
+        onAcceptableInputChanged: {
+            if (textField.acceptableInput){
+                containerTextField.borderColor = Style.iconColorOnSelected;
+            }
+            else{
+                containerTextField.borderColor = Style.errorTextColor;
+            }
         }
 
         onEditingFinished: {

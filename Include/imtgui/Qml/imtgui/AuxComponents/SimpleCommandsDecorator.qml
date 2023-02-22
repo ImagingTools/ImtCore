@@ -34,7 +34,8 @@ Item {
         width: parent.width;
         height: 25;
 
-        color: Style.alternateBaseColor;
+//        color: Style.alternateBaseColor;
+        color: "transparent";
 
         Row {
             id: row;

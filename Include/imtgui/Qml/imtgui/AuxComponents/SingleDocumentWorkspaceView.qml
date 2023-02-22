@@ -34,9 +34,17 @@ Item {
     }
 
     function documentSaved(parameters){
+        let documentId = parameters["Id"];
+        let documentName = parameters["Name"];
+
         if(documentLoader.item){
             documentLoader.item.updateGui();
         }
+
+        // Get last document in stack view and setting data
+        let item = stackView.peek();
+        item.itemId = documentId;
+        item.itemName = documentName;
     }
 
     TreeItemModel {
