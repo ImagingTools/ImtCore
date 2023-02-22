@@ -16,8 +16,11 @@ export class TextEdit extends Item {
     static WrapAnywhere = 2
     static Wrap = 3
 
-    $contentWAuto = true
-    $contentHAuto = true
+    $contentWidthAuto = true
+	$contentHeightAuto = true
+
+    $widthAuto = true
+	$heightAuto = true
 
     constructor(args) {
         super(args)
@@ -34,6 +37,9 @@ export class TextEdit extends Item {
         this.$cP('selectedTextColor', '#fff').connect(this.$selectedTextColorChanged.bind(this))
         this.$cP('readOnly', 'bool', false).connect(this.$readOnlyChanged.bind(this))
 
+        this.$cS('editingFinished')
+
+        this.$updateTimer = null
     }
 
     $domCreate(){
@@ -72,7 +78,42 @@ export class TextEdit extends Item {
     }
     $focusChanged(){
         super.$focusChanged()
-        if(this.$p.focus.val) this.impl.focus()
+        if(this.$p.focus.val) {
+            this.impl.focus()
+        } else {
+            this.$s.editingFinished()
+        }
+        
+    }
+    $updateGeometry(){
+        clearTimeout(this.$updateTimer)
+        
+        this.$updateTimer = setTimeout(()=>{
+            if(this.impl){
+                let rect = this.impl.getBoundingClientRect()
+                if(this.$contentHeightAuto){
+                    if(this.$heightAuto && this.$p.height.val !== rect.height) {
+                        this.$p.height.val = rect.height
+                        this.$p.height.signal()
+                        this.$heightAuto = true
+                        // this.dom.style.height = `${rect.height}px`
+                    }
+                    this.contentHeight = rect.height
+                }
+                if(this.$contentWidthAuto){
+                    if(this.$widthAuto && this.$p.width.val !== rect.width) {
+                        this.$p.width.val = rect.width
+                        this.$p.width.signal()
+                        this.$widthAuto = true
+                        // this.dom.style.width = `${rect.width}px`
+                    }
+                    this.contentWidth = rect.width
+                }
+            }
+            
+        }, 1000 / Core.FPS)
+        
+
     }
     $selectionColorChanged(){
         this.$updateSelection()
@@ -111,62 +152,26 @@ export class TextEdit extends Item {
 	}
 
     $contentWidthChanged(){
-        if(this.$contentWAuto || this.$p.width.val < this.$p.contentWidth.val){
-            if(this.$contentWAuto) {
-                this.width = this.$p.contentWidth.val
-                this.$contentWAuto = true
-            } else {
-                this.width = this.$p.contentWidth.val
-            }
-        }
+
     }
     $contentHeightChanged(){
-        if(this.$contentHAuto){
-            this.height = this.$p.contentHeight.val
-            this.$contentHAuto = true
-        }
+
     }
     $widthChanged(){
         super.$widthChanged()
-        this.$contentWAuto = false
+        this.$widthAuto = false
     }
     $heightChanged(){
         super.$heightChanged()
-        this.$contentHAuto = false
+        this.$heightAuto = false
     }
 
     $textChanged(){
 		this.impl.innerText = this.$p.text.val
         this.$setCursorPosition(this.$cursorPos + (this.$p.text.val.length - this.$cursorOffset))
-        this.$calcWH()
+        this.$updateGeometry()
     }
-    $calcWH(){
-        let tempText = document.createElement("span")
-        let tempDom = document.createElement("div")
-        tempText.innerHTML = this.$p.text.val
-
-        tempText.style.fontFamily = this.impl.style.fontFamily
-        tempText.style.fontSize = this.impl.style.fontSize 
-        tempText.style.fontStyle = this.impl.style.fontStyle
-        tempText.style.fontWeight = this.impl.style.fontWeight
-        tempText.style.textDecoration = this.impl.style.textDecoration
-        tempText.style.whiteSpace = this.impl.style.whiteSpace
-        tempText.style.wordBreak = this.impl.style.wordBreak
-        if(!this.$contentWAuto){
-            tempDom.style.width = this.dom.style.width
-        }
-        if(!this.$contentHAuto){
-            tempDom.style.height = this.dom.style.height
-        }
-
-        document.body.appendChild(tempDom);
-        tempDom.appendChild(tempText);
-
-        let rect = tempText.getBoundingClientRect()
-        this.contentWidth = rect.width
-        this.contentHeight = rect.height
-        tempDom.remove()
-    }
+    
     $colorChanged(){
         this.impl.style.color = `${this.$p.color.val}`
     }
@@ -207,7 +212,7 @@ export class TextEdit extends Item {
             case TextEdit.WrapAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; break;
             case TextEdit.Wrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "break-word"; break;
         }
-        this.$calcWH()
+        this.$updateGeometry()
     }
 
     $fontChanged(){
@@ -216,13 +221,64 @@ export class TextEdit extends Item {
         this.impl.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
         this.impl.style.textDecoration = this.$p['font.underline'].val ? 'underline' : 'unset';
         // this.impl.style.height = `${this.font.pixelSize}px`
-        this.$calcWH()
+        this.$updateGeometry()
     }
 
     $keydown(e, state){
         this.$cursorPos = this.$p.text.val.length ? this.$getCursorPosition() : 0
         this.$cursorOffset = this.$p.text.val.length
     }
+
+    $destroy(){
+        // if(this.$validator) this.$validator.$destroy()
+        clearTimeout(this.$updateTimer)
+        this.impl.remove()
+        super.$destroy()
+    }
+
+    $mousedown(e, state) {
+        // e.preventDefault()
+		if(this.$p.enabled.val){
+
+            state.blocked(this)
+		}
+	}
+	$mouseup(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+            this.focus = true
+            state.release()
+		}
+	}
+    $mousemove(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+
+		}
+		
+	}
+
+    $touchstart(e, state) {
+        // e.preventDefault()
+		if(this.$p.enabled.val){
+
+            state.blocked(this)
+		}
+	}
+	$touchend(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+            this.focus = true
+            state.release()
+		}
+	}
+    $touchmove(e, state) {
+		// e.preventDefault()
+		if(this.$p.enabled.val){
+
+		}
+		
+	}
 }
 
 QML.TextEdit = TextEdit
