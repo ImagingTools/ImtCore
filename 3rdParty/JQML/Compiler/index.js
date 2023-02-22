@@ -679,6 +679,9 @@ function proxyReplace(instructions){
                 }
             }
         }
+        if(instructions.defineSignals[signal.name]){
+            signalParams.push(...instructions.defineSignals[signal.name])
+        }
         for(let i = 0; i < signalParams.length; i++){
             signalParams[i] = signalParams[i].replaceAll('`', '')
         }
