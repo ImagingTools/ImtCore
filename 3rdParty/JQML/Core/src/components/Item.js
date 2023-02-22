@@ -148,14 +148,14 @@ export class Item extends QtObject {
         this.dom.classList.add(this.constructor.name)
         this.dom.id = `el-${this.UID}`
 
-        this.dom.addEventListener("focusin", (e)=>{
-            e.preventDefault()
-			this.focus = true
-		})
-		this.dom.addEventListener("focusout", (e)=>{
-            e.preventDefault()
-			this.focus = false
-		})
+        // this.dom.addEventListener("focusin", (e)=>{
+        //     e.preventDefault()
+		// 	this.focus = true
+		// })
+		// this.dom.addEventListener("focusout", (e)=>{
+        //     e.preventDefault()
+		// 	this.focus = false
+		// })
     }
 
     $destroy() {
