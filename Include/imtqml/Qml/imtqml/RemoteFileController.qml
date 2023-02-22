@@ -54,7 +54,7 @@ QtObject {
         if (this.prefix == ""){
             this.prefix = "files"
         }
-        open(`../../` + this.prefix + `/${fileName}?FileId=${fileHash}`)
+        Qt.openUrlExternally(`../../` + this.prefix + `/${fileName}?FileId=${fileHash}`)
     }
 
     function DeleteFile(fileHash, fileUrl){
