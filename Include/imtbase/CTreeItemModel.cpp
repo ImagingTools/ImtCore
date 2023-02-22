@@ -700,9 +700,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 
 	if (isMultiTag == false){
-		if (!tagName.isEmpty()){
-			retVal = retVal && archive.BeginTag(objectTag);
-		}
+		retVal = retVal && archive.BeginTag(objectTag);
 	}
 	else{
 		retVal = retVal && archive.BeginMultiTag(arrayTag, subArrayTag, countSize);
@@ -769,9 +767,7 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 
 	if (isMultiTag == false){
-		if (!tagName.isEmpty()){
-			retVal = retVal && archive.EndTag(objectTag);
-		}
+		retVal = retVal && archive.EndTag(objectTag);
 	}
 	else{
 		retVal = retVal && archive.EndTag(arrayTag);
