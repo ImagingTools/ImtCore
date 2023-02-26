@@ -10,8 +10,8 @@
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
+#include <imtcore/Version.h>
 #include <imtbase/IIdentifiable.h>
-
 
 namespace imtbase
 {
@@ -93,7 +93,7 @@ bool TIdentifiableWrap<Base>::Serialize(iser::IArchive& archive)
 
 	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
 	quint32 identifiableVersion;
-	if (!versionInfo.GetVersionNumber(2022, identifiableVersion)){
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, identifiableVersion)){
 		identifiableVersion = 0;
 	}
 	if (identifiableVersion >= 5902){
