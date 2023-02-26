@@ -60,7 +60,34 @@ int CGqlObjectCollectionComp::GetOperationFlags(const Id& elementId) const
 
 imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewBranch(const Id& parentId, const QString& name, const QString& description, const Id& proposedElementId, const idoc::IDocumentMetaInfo* elementMetaInfoPtr)
 {
-	return Id();
+	if (m_gqlClientCompPtr.IsValid()){
+		if (m_typesInfo.GetOptionsCount() > 0){
+			QByteArray typeId = m_typesInfo.GetOptionId(0);
+
+			// TODO refactoring retrieve orgId
+			QByteArray orgId;
+			for (auto item : m_items){
+				if (!item.orgId.isEmpty()){
+					orgId = item.orgId;
+					break;
+				}
+			}
+
+			Q_ASSERT(!orgId.isEmpty());
+
+			IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
+			if (delegatePtr != nullptr){
+				istd::TDelPtr<imtgql::IGqlRequest> insertBranchRequestPtr(delegatePtr->CreateInsertBranchRequest(
+							name, "", nullptr, "", parentId, orgId));
+				IGqlObjectCollectionDelegate::InsertBranchResponsePtr insertBranchResponsePtr = delegatePtr->CreateInsertBranchResponsePtr();
+				if (m_gqlClientCompPtr->SendRequest(*insertBranchRequestPtr, *insertBranchResponsePtr)){
+					return insertBranchResponsePtr->GetBranchId();
+				}
+			}
+		}
+	}
+
+	return QByteArray();
 }
 
 
@@ -420,7 +447,7 @@ imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 					imtbase::ICollectionInfo::Ids ids;
 					for (IGqlObjectCollectionDelegate::ElementInfo& element : elementList){
 						// TODO: remove after api changed
-						m_items[element.id] = {parentId, element.isBranch, element.name, element.version};
+						m_items[element.id] = {element.orgId, parentId, element.isBranch, element.name, element.version};
 
 						if (element.isBranch && !element.id.isEmpty() && (iterationFlags & imtbase::ICollectionInfo::IF_BRANCH_ONLY)) {
 							ids.append(element.id);
@@ -573,29 +600,33 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 
 bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
 {
-	//if (m_gqlClientCompPtr.IsValid()){
-	//	QByteArray typeId = GetObjectTypeId(elementId);
-	//	gmgaws::IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-	//	if (delegatePtr != nullptr){
-	//		IGqlObjectCollectionDelegate::ElementInfoResponsePtr responsePtr = delegatePtr->CreateElementInfoResponsePtr();
-	//		istd::TDelPtr<imtgql::IGqlRequest> infoRequestPtr(delegatePtr->CreateElementInfoRequest(elementId));
-	//		if (m_gqlClientCompPtr->SendRequest(*infoRequestPtr, *responsePtr)){
-	//			int version = responsePtr->GetElementInfo().version;
+	if (m_gqlClientCompPtr.IsValid()){
+		QByteArray typeId = GetObjectTypeId(elementId);
+		IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
+		if (delegatePtr != nullptr){
+			IGqlObjectCollectionDelegate::ElementInfoResponsePtr responsePtr = delegatePtr->CreateElementInfoResponsePtr();
+			istd::TDelPtr<imtgql::IGqlRequest> infoRequestPtr(delegatePtr->CreateElementInfoRequest(elementId));
+			if (m_gqlClientCompPtr->SendRequest(*infoRequestPtr, *responsePtr)){
+				int version = responsePtr->GetElementInfo().version;
 
-	//			IGqlObjectCollectionDelegate::ElementDescription elementDescription;
-	//			elementDescription.name = name;
-	//			elementDescription.description = responsePtr->GetElementInfo().description;
+				IGqlObjectCollectionDelegate::ElementDescription elementDescription;
+				elementDescription.name = name;
+				elementDescription.description = responsePtr->GetElementInfo().description;
 
-	//			istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateUpdateElementDescriptionRequest(elementId, elementDescription, version));
-	//			if (requestPtr.IsValid()){
-	//				SetElementNameResponse response(*const_cast<CGqlObjectCollectionComp*>(this), typeId);
-	//				if (m_gqlClientCompPtr->SendRequest(*requestPtr, response)){
-	//					return response.GetStatus();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+				istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateRenameBranchRequest(
+							elementId,
+							m_items[elementId].parentId,
+							m_items[elementId].orgId,
+							name));
+				if (requestPtr.IsValid()){
+					IGqlObjectCollectionDelegate::RenameBranchResponsePtr responsePtr = delegatePtr->CreateRenameBranchResponsePtr();
+					if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+						return responsePtr->Result();
+					}
+				}
+			}
+		}
+	}
 
 	return false;
 }
@@ -658,6 +689,7 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 			const QString& sourceFilePath,
 			const ICollectionInfo::Id& parentId) const
 {
+	Q_ASSERT(false);
 	return QByteArray();
 
 	if (&collection != this){

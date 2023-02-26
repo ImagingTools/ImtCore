@@ -138,14 +138,14 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-private:
+protected:
 	QString GetDocumentExtension(const QByteArray& typeId) const;
 	IGqlObjectCollectionDelegate* GetDelegateForType(const QByteArray& typeId) const;
 
-private:
+protected:
 	IObjectCollection::DataPtr GetDocument(const QByteArray& typeId, const QByteArray& documentId) const;
 
-private:
+protected:
 	I_REF(imtgql::IGqlClient, m_gqlClientCompPtr);
 	I_REF(imtgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
 	I_MULTIREF(IGqlObjectCollectionDelegate, m_gqlDatabaseDelegatesCompPtr);
@@ -161,6 +161,7 @@ private:
 
 	struct Item
 	{
+		QByteArray orgId;
 		QByteArray parentId;
 		bool isBranch;
 		QString name;
