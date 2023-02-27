@@ -60,11 +60,14 @@ export class Text extends Item {
         // this.dom.style.display = "flex"
         // this.dom.style.width = `0px`
         // this.dom.style.height = `0px`
+        this.dom.style.pointerEvents = 'none'
+        this.dom.style.touchAction = 'none'
         this.impl = document.createElement("span")
         this.dom.appendChild(this.impl);
         
         this.impl.style.textAlign = "inherit"
-        this.impl.style.whiteSpace = "pre";
+        this.impl.style.whiteSpace = "pre"
+        
         // this.impl.style.position = "absolute";
         // this.impl.style.width = "fit-content";
         this.impl.innerHTML = ``

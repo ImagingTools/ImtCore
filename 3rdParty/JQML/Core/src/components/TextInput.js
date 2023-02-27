@@ -44,6 +44,7 @@ export class TextInput extends Item {
         this.$cP('echoMode', TextInput.Normal).connect(this.$echoModeChanged.bind(this))
         this.$cP('validator', undefined).connect(this.$validatorChanged.bind(this))
         this.$cP('readOnly', false).connect(this.$readOnlyChanged.bind(this))
+        this.$cP('acceptableInput', true)
 
 
         this.$cS('accepted')
@@ -79,11 +80,14 @@ export class TextInput extends Item {
             if(this.$p.validator.val){
                 if(this.$p.validator.val.validate(this.impl.value)){
                     this.text = this.impl.value
+                    this.acceptableInput = true
                 } else {
                     this.impl.value = this.$p.text.val
+                    this.acceptableInput = false
                 }
             } else {
                 this.text = this.impl.value
+                this.acceptableInput = true
             }
 			
 		}.bind(this))
@@ -261,12 +265,14 @@ export class TextInput extends Item {
                 if(this.$p.validator.val.validate(this.impl.value)){
                     this.$s.accepted()
                     this.$s.editingFinished()
+                    this.acceptableInput = true
                 } else {
-                    
+                    this.acceptableInput = false
                 }
             } else {
                 this.$s.accepted()
                 this.$s.editingFinished()
+                this.acceptableInput = true
             }
             
         }
