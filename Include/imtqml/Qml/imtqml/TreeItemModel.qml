@@ -22,7 +22,7 @@ JSONListModel {
         if(row === null)
             row = 0
         var modelObject = this.get(row)
-        var retVal = modelObject ? modelObject[key] : null
+        var retVal = modelObject ? modelObject.$p[key].val : null
 
 //        if(retVal === undefined){
 //            modelObject = this.get(0)[row]
@@ -57,7 +57,13 @@ JSONListModel {
         if (modelObject === null)
             console.log("modelObject is null")
 
-        modelObject[key] = value
+        if(key in modelObject.$p){
+            modelObject[key] = value
+        } else {
+            modelObject.$cP(key, value)
+        }
+
+
         this.dataChanged(row, row+1)
         this.modelChanged()
     }
@@ -73,7 +79,7 @@ JSONListModel {
         if (modelObject === null)
             console.log("modelObject is null")
 
-        delete modelObject[key]
+        delete modelObject.$p[key]
         this.modelChanged()
     }
 
@@ -132,7 +138,7 @@ JSONListModel {
         var keys = []
         if(this.count > 0){
             var modelObject = this.get(0)
-            keys = Object.keys(modelObject)
+            keys = Object.keys(modelObject.$p)
         }
         return keys;
     }
@@ -145,7 +151,7 @@ JSONListModel {
         if(row === null)
             row = 0
         if(this.count > row)
-            return this.get(row).hasOwnProperty(key)
+            return this.get(row).$p.hasOwnProperty(key)
         return false
     }
 
@@ -226,12 +232,12 @@ JSONListModel {
                 retVal += "{"
 
             var j = 0;
-            for (var property in modelObject) {
+            for (var property in modelObject.$p) {
                 if (j > 0)
                     retVal += ","
                 j++;
                 retVal += "\"" + property + "\":"
-                var modelVal = modelObject[property]
+                var modelVal = modelObject.$p[property].val
                 if (modelVal === null)
                     modelVal += "null"
                 else if(typeof modelVal === 'object' && modelVal._qmlName == 'TreeItemModel.qml'){
@@ -261,9 +267,9 @@ JSONListModel {
 //        console.log("updateTreeItemJSONModel")
         for(var row = 0; row < this.GetItemsCount(); row++){
             var modelObject = this.get(row)
-            var keys = Object.keys(modelObject)
+            var keys = Object.keys(modelObject.$p)
             for ( var index in keys ) {
-                var retVal = modelObject[keys[index]]
+                var retVal = modelObject.$p[keys[index]].val
                 if(retVal !== null && typeof retVal === 'object' && retVal._qmlName !== 'TreeItemModel.qml'){
                     var retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
                     retModel.append(retVal);
