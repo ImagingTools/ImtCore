@@ -1,3 +1,4 @@
+import { ListElement } from './ListElement'
 import {QtObject} from './QtObject'
 // import { Signal } from '../utils/Signal'
 
@@ -44,31 +45,29 @@ export class ListModel extends QtObject {
         }
     }
     append(dict){
-        let handler = {
-            model: this,
-            has(){
-                return true
-            },
-            get(target, name){
-                return target[name]
-            },
-            set(target, name, value){
-                target[name] = value
-                // console.log('DEBUG::handler-set', this.parent, name, value)
-                this.model.$modelChanged()
-                return true
-            },
-        }
         if (Array.isArray(dict)) {
 			if (dict.length === 0)
 				return
-			Array.prototype.push.apply(this.data, new Proxy(dict, handler))
+
+            for(let i = 0; i < dict.length; i++){
+                let listElement = new ListElement({})
+                listElement.$cP('index', i)
+                for(let key in dict[i]){
+                    listElement.$cP(key, dict[i][key])
+                }
+                this.data.push(listElement)
+            }
 		} else {
             if(dict.$qmlClassName === 'ListElement'){
                 dict.$cP('index', this.data.length)
                 this.data.push(dict)
             } else {
-                this.data.push(new Proxy(dict, handler))
+                let listElement = new ListElement({})
+                listElement.$cP('index', this.data.length)
+                for(let key in dict){
+                    listElement.$cP(key, dict[key])
+                }
+                this.data.push(listElement)
             }
 			
 		}
@@ -90,32 +89,30 @@ export class ListModel extends QtObject {
         return index >= 0 && index < this.data.length ? this.data[index] : undefined
     }
     insert(index, dict){
-        let handler = {
-            model: this,
-            has(){
-                return true
-            },
-            get(target, name){
-                return target[name]
-            },
-            set(target, name, value){
-                target[name] = value
-                // console.log('DEBUG::handler-set', this.parent, name, value)
-                this.model.$modelChanged()
-                return true
-            },
-        }
         if (Array.isArray(dict)) {
 			if (dict.length === 0)
 				return
-			Array.prototype.splice.apply(this.data, index, 0, new Proxy(dict, handler))
+
+            for(let i = 0; i < dict.length; i++){
+                let listElement = new ListElement({})
+                listElement.$cP('index', i)
+                for(let key in dict[i]){
+                    listElement.$cP(key, dict[i][key])
+                }
+                this.data.splice(index + i, 0, listElement)
+            }
+			// Array.prototype.splice.apply(this.data, index, 0, new Proxy(dict, handler))
 		} else {
-			
-            if(dict.$qmlClassName === 'ListElement'){
+			if(dict.$qmlClassName === 'ListElement'){
                 dict.$cP('index', this.data.length)
-                this.data.splice(index, 0, dict)
+                this.data.splice(dict)
             } else {
-                this.data.splice(index, 0, new Proxy(dict, handler))
+                let listElement = new ListElement({})
+                listElement.$cP('index', this.data.length)
+                for(let key in dict){
+                    listElement.$cP(key, dict[key])
+                }
+                this.data.splice(listElement)
             }
 		}
         this.count = this.data.length
