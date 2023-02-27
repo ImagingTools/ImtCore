@@ -669,7 +669,19 @@ Item {
         radius: tableContainer.radius;
     }
 
+    CustomScrollbar {
+        id: scrollbar;
 
+        z: 100;
+
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+
+        backgroundColor: Style.baseColor;
+
+        secondSize: 10;
+        targetItem: elementsListObj;
+    }
 
     ListView {
         id: elementsListObj;

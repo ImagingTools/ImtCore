@@ -140,41 +140,9 @@ Rectangle {
         return -1;
     }
 
-//    function openFileDialog(){
-//        fileDialogSave.open();
-//    }
-
     function close(buttonId){
         container.visible = false;
     }
-
-//    RemoteFileController {
-//        id: remoteFileController;
-//    }
-
-//    FileDialog {
-//        id: fileDialogSave;
-
-//        title: qsTr("Save file");
-//        selectExisting: false;
-//        folder: shortcuts.home;
-
-//        nameFilters: ["Text files (*.txt)", "All files (*)"];
-
-//        onAccepted: {
-//            var pathDir = fileDialogSave.folder.toString();
-//            remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
-//            var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
-//            var id = "";
-
-//            if (fileName == ""){
-//                fileName = {};
-//                fileName["name"] = "ServerLog.txt";
-//            }
-
-//            remoteFileController.GetFile(id, fileName);
-//        }
-//    }
 
     MouseArea {
         anchors.fill: parent;

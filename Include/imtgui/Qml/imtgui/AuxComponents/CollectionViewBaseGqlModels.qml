@@ -21,6 +21,7 @@ Item {
     property TreeItemModel items;
 
     property Item rootItem: null;
+    property Item pagination: null;
 
     function updateModels(){
         console.log("CollectionView updateModels");
@@ -92,10 +93,13 @@ Item {
         function updateModel() {
             console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
-            let itemHeight = 35; // hack
-            let height = gqlModelBaseContainer.rootItem.height - gqlModelBaseContainer.rootItem.pagination.height - itemHeight; //Убрать высоту от заголовка и меню пагинации
-            let count = Math.floor(height / itemHeight);
-            let offset = (gqlModelBaseContainer.rootItem.pagination.currentValue - 1) * count;
+//            let itemHeight = 35; // hack
+//            let height = gqlModelBaseContainer.rootItem.height - gqlModelBaseContainer.rootItem.pagination.height - itemHeight; //Убрать высоту от заголовка и меню пагинации
+//            let count = Math.floor(height / itemHeight);
+//            let offset = (gqlModelBaseContainer.rootItem.pagination.currentValue - 1) * count;
+
+            let count = gqlModelBaseContainer.pagination.countElements;
+            let offset = (gqlModelBaseContainer.pagination.currentIndex) * count;
 
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Offset", offset);
@@ -141,6 +145,8 @@ Item {
                         if (dataModelLocal.ContainsKey("items")){
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
                             gqlModelBaseContainer.table.selectedIndex = -1;
+
+                            Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");
                         }
 
                         if (dataModelLocal.ContainsKey("notification")){

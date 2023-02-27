@@ -155,10 +155,10 @@ FocusScope {
 
             onTextChanged:  {
                 containerTextEdit.textEdited();
+
+                editingFinishedTimer.restart();
                 console.log("CustomTextEdit onTextEdited");
             }
-
-
 
             Text {
                 id: placeHolder;
@@ -179,8 +179,14 @@ FocusScope {
                 text: containerTextEdit.placeHolderText;
             }
         }
-
-
     }
 
+    Timer {
+        id: editingFinishedTimer;
+        interval: 1000;
+
+        onTriggered: {
+            containerTextEdit.editingFinished();
+        }
+    }
 }

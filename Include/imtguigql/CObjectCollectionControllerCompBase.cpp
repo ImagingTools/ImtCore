@@ -491,12 +491,18 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			this->SetAdditionalFilters(*viewParamsGql, &filterParams);
 		}
 
-		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
+		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
+
+		int pagesCount = std::ceil(elementsCount / (double)count);
 		if (pagesCount < 0){
 			pagesCount = 1;
 		}
 
 		notificationModel->SetData("PagesCount", pagesCount);
+
+		if (offset >= elementsCount){
+			offset -= count;
+		}
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
 		for (const QByteArray& collectionId : collectionIds){

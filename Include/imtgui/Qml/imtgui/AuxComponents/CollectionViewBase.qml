@@ -223,8 +223,7 @@ Item {
 
         visible: collectionViewBaseContainer.hasPagination && paginationObj.pagesSize != 1;
 
-        onCurrentValueChanged: {
-            console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
+        onCurrentIndexChanged: {
             tableInternal.selectedIndex = -1;
             baseCommands.updateModels();
         }
@@ -238,6 +237,8 @@ Item {
 
         commandsId: collectionViewBaseContainer.commandsId;
         rootItem: collectionViewBaseContainer;
+
+        pagination: paginationObj;
 
         onHeadersChanged: {
             console.log("onHeadersChanged", baseCommands.headers)

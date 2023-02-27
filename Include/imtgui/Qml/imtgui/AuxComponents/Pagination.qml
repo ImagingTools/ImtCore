@@ -11,6 +11,9 @@ Row {
     property int currentValue: 1;
     property int currentIndex: 0;
 
+    // The number of elements on the page
+    property int countElements: 25;
+
     property alias pageCount: listModel.count;
 
     Component.onCompleted: {
@@ -19,6 +22,11 @@ Row {
 
     onPagesSizeChanged: {
         console.log("ProductCollectionViewCommands onSelectedIndexChanged");
+        if (paginationContainer.currentIndex > paginationContainer.pagesSize - 1){
+            paginationContainer.currentIndex--;
+//            paginationContainer.currentValue--;
+        }
+
         paginationContainer.refreshBtn();
     }
 
@@ -30,17 +38,17 @@ Row {
         listModel.clear();
         if (paginationContainer.pagesSize < 10){
             for (var i = 0; i < paginationContainer.pagesSize; i++){
-                listModel.append({number: i+1, selected: paginationContainer.currentValue === i + 1});
+                listModel.append({number: i+1, selected: paginationContainer.currentIndex + 1 === i + 1});
             }
         }
         else {
-            [1, 2].map(function(v){listModel.append({number: v, selected: paginationContainer.currentValue === v})});
-            listModel.append({number: paginationContainer.currentValue - 2 > 1 + 3 ? -1 : 1 + 2, selected: paginationContainer.currentValue === 3});
-            for (var k = Math.max(1 + 3, paginationContainer.currentValue - 2); k <= Math.min(paginationContainer.pagesSize - 3, paginationContainer.currentValue + 2); k++){
-                listModel.append({number: k, selected: paginationContainer.currentValue === k});
+            [1, 2].map(function(v){listModel.append({number: v, selected: paginationContainer.currentIndex + 1 === v})});
+            listModel.append({number: paginationContainer.currentIndex + 1 - 2 > 1 + 3 ? -1 : 1 + 2, selected: paginationContainer.currentIndex + 1 === 3});
+            for (var k = Math.max(1 + 3, paginationContainer.currentIndex + 1 - 2); k <= Math.min(paginationContainer.pagesSize - 3, paginationContainer.currentIndex + 1 + 2); k++){
+                listModel.append({number: k, selected: paginationContainer.currentIndex + 1 === k});
             }
-            listModel.append({number: paginationContainer.currentValue + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentValue === paginationContainer.pagesSize - 2});
-            [paginationContainer.pagesSize - 1, paginationContainer.pagesSize].map(function(v){listModel.append({number: v, selected: paginationContainer.currentValue === v})});
+            listModel.append({number: paginationContainer.currentIndex + 1 + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentIndex + 1 === paginationContainer.pagesSize - 2});
+            [paginationContainer.pagesSize - 1, paginationContainer.pagesSize].map(function(v){listModel.append({number: v, selected: paginationContainer.currentIndex + 1 === v})});
         }
         repeaterPagination.model = listModel;
     }
@@ -55,14 +63,14 @@ Row {
         hasText: false;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        enabled: listModel.count > 1 && paginationContainer.currentValue != 1;
+        enabled: listModel.count > 1 && paginationContainer.currentIndex != 0;
 
         iconSource: buttonDecr.enabled ? "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg":
                                          "../../../" + "Icons/" + Style.theme + "/Left_Off_Disabled.svg";
 
         onClicked: {
-            if (paginationContainer.currentValue - 1 >= 1){
-                paginationContainer.currentValue--;
+            if (paginationContainer.currentIndex >= 1){
+                paginationContainer.currentIndex--;
                 paginationContainer.refreshBtn();
             }
         }
@@ -82,11 +90,11 @@ Row {
             highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
 
-            enabled: model.number !== -1 && paginationContainer.currentValue != model.number;
+            enabled: model.number !== -1 && paginationContainer.currentIndex !== model.index;
             textButton: model.number === -1 ? "..." : model.number;
             onClicked: {
                 paginationContainer.currentIndex = model.index;
-                paginationContainer.currentValue = model.number;
+//                paginationContainer.currentValue = model.number;
                 paginationContainer.refreshBtn();
             }
 
@@ -111,14 +119,14 @@ Row {
         hasText: false;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        enabled: listModel.count > 1 && paginationContainer.currentValue != paginationContainer.pageCount;
+        enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pageCount - 1;
 
         iconSource: buttonIncr.enabled ? "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg":
                                          "../../../" + "Icons/" + Style.theme + "/Right_Off_Disabled.svg";
 
         onClicked: {
-            if (paginationContainer.currentValue + 1 <= paginationContainer.pagesSize){
-                paginationContainer.currentValue++;
+            if (paginationContainer.currentIndex < paginationContainer.pagesSize - 1){
+                paginationContainer.currentIndex++;
                 paginationContainer.refreshBtn();
             }
         }

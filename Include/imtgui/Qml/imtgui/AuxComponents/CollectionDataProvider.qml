@@ -21,7 +21,23 @@ Item {
             return;
         }
 
+        if (!inputParams){
+            inputParams = {}
+        }
+
         itemsInfoModel.updateModel(inputParams, container.fields);
+    }
+
+    Component.onDestruction: {
+        if (container.commandId !== ""){
+            Events.unSubscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
+        }
+    }
+
+    onCommandIdChanged: {
+        if (container.commandId !== ""){
+            Events.subscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
+        }
     }
 
     GqlModel {

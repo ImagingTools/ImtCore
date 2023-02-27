@@ -3,6 +3,8 @@ import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
 
+//import QtQuick.Dialogs 1.3
+
 Item {
     id: containerBase;
 
@@ -100,6 +102,7 @@ Item {
             }
             else if (commandId === "Remove"){
                 modalDialogManager.openDialog(removeDialog, {});
+//                removeDialog.open();
             }
             else if (commandId === "Edit"){
                 let itemId = containerBase.tableData.getSelectedId();
@@ -107,6 +110,8 @@ Item {
                 containerBase.collectionViewBase.selectItem(itemId, itemName);
             }
         }
+
+        console.log("aaaaaaaaaaaaaaaaa", commandId);
 
         let editIsEnabled = containerBase.commandsProvider.commandIsEnabled("Edit");
         if (editIsEnabled){
@@ -156,6 +161,19 @@ Item {
         ErrorDialog {
         }
     }
+
+//    MessageDialog {
+//        id: removeDialog
+//        title: containerBase.removeDialogTitle;
+//        text: containerBase.removeMessage;
+
+//        icon: StandardIcon.Question
+
+//        standardButtons: StandardButton.Yes | StandardButton.YesToAll |
+//                StandardButton.No | StandardButton.NoToAll | StandardButton.Abort
+//        onAccepted: {
+//        }
+//    }
 
     Component {
         id: removeDialog;

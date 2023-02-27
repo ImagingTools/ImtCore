@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
+
 DocumentBase {
     id: packageViewContainer;
 
@@ -37,15 +38,15 @@ DocumentBase {
 
     onDocumentModelChanged: {
         console.log("documentBase onDocumentModelChanged");
-//        let items = packageViewContainer.documentModel.GetData("Items");
-//        if (!items){
-//            packageViewContainer.documentModel.AddTreeModel("Items");
-//        }
+        //        let items = packageViewContainer.documentModel.GetData("Items");
+        //        if (!items){
+        //            packageViewContainer.documentModel.AddTreeModel("Items");
+        //        }
 
-//        let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
-//        if (!dependenciesModel){
-//            packageViewContainer.documentModel.AddTreeModel("DependenciesModel");
-//        }
+        //        let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
+        //        if (!dependenciesModel){
+        //            packageViewContainer.documentModel.AddTreeModel("DependenciesModel");
+        //        }
 
         tableView.columnModel.clear();
         let headers = packageViewContainer.documentModel.GetData("Headers");
@@ -115,10 +116,10 @@ DocumentBase {
 
         tableView.rowModel.clear();
 
-//        let items = packageViewContainer.documentModel.GetData("Items");
-//        if (!items){
-//            items = packageViewContainer.documentModel.AddTreeModel("Items");
-//        }
+        //        let items = packageViewContainer.documentModel.GetData("Items");
+        //        if (!items){
+        //            items = packageViewContainer.documentModel.AddTreeModel("Items");
+        //        }
 
         if (packageViewContainer.documentModel.ContainsKey("Items")){
             let items = packageViewContainer.documentModel.GetData("Items");
@@ -534,28 +535,28 @@ DocumentBase {
             }
         }
 
-//        TreeViewDependencies {
-//            id: treeView;
+        //        TreeViewDependencies {
+        //            id: treeView;
 
-//            height: packageViewContainer.height;
-//            width: parent.width;
+        //            height: packageViewContainer.height;
+        //            width: parent.width;
 
-//            documentModel: packageViewContainer.documentModel;
+        //            documentModel: packageViewContainer.documentModel;
 
-//            featuresTableView: tableView;
-//        }
+        //            featuresTableView: tableView;
+        //        }
 
-//        CustomScrollbar {
-//            z: 100;
+        //        CustomScrollbar {
+        //            z: 100;
 
-//            anchors.right: treeView.right;
-//            anchors.bottom: treeView.bottom;
+        //            anchors.right: treeView.right;
+        //            anchors.bottom: treeView.bottom;
 
-//            backgroundColor: Style.baseColor;
+        //            backgroundColor: Style.baseColor;
 
-//            secondSize: 10;
-//            targetItem: treeView.tableListView;
-//        }
+        //            secondSize: 10;
+        //            targetItem: treeView.tableListView;
+        //        }
 
         BasicTreeView {
             id: treeView;
