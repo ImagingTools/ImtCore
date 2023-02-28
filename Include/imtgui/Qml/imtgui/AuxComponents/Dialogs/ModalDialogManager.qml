@@ -5,6 +5,7 @@ Item {
 
     property var backgroundItem: null;
     property alias count: modalDialogModels.count;
+    visible: count > 0
 
     Component.onDestruction: {
         modalDialogModels.clear();

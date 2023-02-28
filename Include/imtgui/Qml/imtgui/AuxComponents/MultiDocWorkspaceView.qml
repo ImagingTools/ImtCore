@@ -85,8 +85,8 @@ Item {
 
         documentsData.SetData("Id", "", index);
         documentsData.SetData("Title", "<new item>", index);
-        documentsData.SetData("Source", data["Source"], index);
         documentsData.SetData("CommandsId", data["CommandsId"], index);
+        documentsData.SetData("Source", data["Source"], index);
 
         tabPanelInternal.selectedIndex = index;
     }
@@ -96,6 +96,7 @@ Item {
         console.log("MultidocWorkspaceView addDocument", itemId, document["CommandsId"])
 
         if (itemId === ""){
+            console.log("MultidocWorkspaceView new document")
             workspaceView.newDocument(document);
 
             return;

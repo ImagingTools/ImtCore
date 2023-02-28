@@ -3,7 +3,7 @@ import QtQuick 2.12
 Rectangle{
     id:scrollContainer;
 
-    height: vertical ? targetItem.height : secondSize;
+    height: targetItem && vertical ? targetItem.height : secondSize;
     width: vertical ? secondSize : targetItem.width;
     color: backgroundColor;
     radius: 4;
@@ -26,12 +26,12 @@ Rectangle{
     property int pauseDuration: 300;
     property int indicatorMargin: 0;
 
-    property bool notUsed: vertical ? targetItem.contentHeight <= targetItem.height:
+    property bool notUsed: !targetItem ? true : vertical ? targetItem.contentHeight <= targetItem.height:
                                       targetItem.contentWidth <= targetItem.width;
     property bool hideNotUsed: true;
 
-    property real koeff: vertical ? (scrollIndicator.height > scrollContainer.minSize ? 1 :(targetItem.height - scrollContainer.minSize)/(targetItem.contentHeight - targetItem.height)):
-                                    (scrollIndicator.width > scrollContainer.minSize ? 1 :(targetItem.width - scrollContainer.minSize)/(targetItem.contentWidth - targetItem.width));
+    property real koeff: vertical ? (!targetItem || scrollIndicator.height > scrollContainer.minSize ? 1 :(targetItem.height - scrollContainer.minSize)/(targetItem.contentHeight - targetItem.height)):
+                                    (!targetItem || scrollIndicator.width > scrollContainer.minSize ? 1 :(targetItem.width - scrollContainer.minSize)/(targetItem.contentWidth - targetItem.width));
 
 
     property bool visibleState: !canFade ? 1 : isMoving ? 1 : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? 1 : 0;
