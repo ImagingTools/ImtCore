@@ -22,6 +22,7 @@ Rectangle {
     property string fontColor: Style.textColor;
 
     property bool hiddenBackground: true;
+    property bool visibleScrollBar: true;
     property bool moveToEnd: false;
     property int moveToIndex: -1;
 
@@ -109,6 +110,7 @@ Rectangle {
 
             secondSize: 10;
             targetItem: popupMenuListView;
+            visible: popupMenuContainer.visibleScrollBar;
         }
 
         ListView {

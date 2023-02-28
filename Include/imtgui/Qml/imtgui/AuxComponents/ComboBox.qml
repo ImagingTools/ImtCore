@@ -21,6 +21,7 @@ FocusScope {
     property bool hiddenBackground: true;
     property bool openST: false;
     property bool compTextCentered:  false;
+    property bool visibleScrollBar: true;
     property string compMainColor: "transparent";
     property string compSelectedColor: Style.selectedColor;
     property bool moveToEnd: false;
@@ -98,6 +99,7 @@ FocusScope {
             moveToEnd: comboBoxContainer.moveToEnd;
             moveToIndex: comboBoxContainer.moveToIndex;
             rootItem: comboBoxContainer;
+            visibleScrollBar: comboBoxContainer.visibleScrollBar;
             onFinished: {
                 comboBoxContainer.currentIndex = index;
             }
