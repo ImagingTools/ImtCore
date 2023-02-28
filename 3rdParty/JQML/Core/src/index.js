@@ -175,6 +175,13 @@ global.Core = {
     components: {...QML},
     animations: {},
     queueCompleted: [],
+    focusedElement: null,
+    setFocus(item){
+        if(this.focusedElement) {
+            this.focusedElement.focus = false
+        }
+        this.focusedElement = item
+    },
     proxyHandler: {
         has(){
             return true

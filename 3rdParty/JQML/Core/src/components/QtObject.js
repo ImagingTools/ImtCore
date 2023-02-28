@@ -52,6 +52,8 @@ export class QtObject {
         this.$treeChilds = []
         this.$treeParent = null
         this.$treeParent2 = null
+
+        this.$cP('jqmlDebug', false)
         
         
         if('repeater' in args){
@@ -230,6 +232,9 @@ export class QtObject {
 
                 let val = this.$p[propName].func()
                 if(this.$p[propName].val !== val){
+                    if(this.jqmlDebug){
+                        console.info(`JQML::updating property ${propName}. old = `, this.$p[propName].val, `new = `, val)
+                    }
                     this.$p[propName].val = val
                     if(queueSignals.indexOf(this.$p[propName].signal) < 0) queueSignals.push(this.$p[propName].signal)          
                 }

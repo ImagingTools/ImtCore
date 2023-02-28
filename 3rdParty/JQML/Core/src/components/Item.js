@@ -209,7 +209,7 @@ export class Item extends QtObject {
        
     }
     $focusChanged(){
-        this.dom.focus()
+        // this.dom.focus()
     }
     $rotationAndScaleChanged(){
         this.dom.style.transform = `scale(${this.scale}) rotate(${this.rotation}deg)`

@@ -80,7 +80,9 @@ export class TextEdit extends Item {
         super.$focusChanged()
         if(this.$p.focus.val) {
             this.impl.focus()
+            Core.setFocus(this)
         } else {
+            this.impl.blur()
             this.$s.editingFinished()
         }
         
