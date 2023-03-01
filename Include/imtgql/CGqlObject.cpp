@@ -23,7 +23,6 @@ QByteArrayList CGqlObject::GetFieldIds() const
 {
 	QByteArrayList retVal = m_emptyFields;
 	retVal += m_simpleFields.keys();
-	retVal += m_simpleFieldsArray.keys();
 	retVal += m_objectFields.keys();
 	retVal += m_objectFieldsArray.keys();
 
@@ -92,25 +91,18 @@ void CGqlObject::InsertField(const QByteArray &fieldId)
 }
 
 
-void CGqlObject::InsertField(const QByteArray &fieldId, const QVariant& value)
+void CGqlObject::InsertField(const QByteArray &fieldId, const QVariant &value)
 {
 	RemoveField(fieldId);
 	m_simpleFields.insert(fieldId, value);
 }
 
 
-void CGqlObject::InsertField(const QByteArray &fieldId, const QVariantList& value)
+void CGqlObject::InsertField(const QByteArray &fieldId, const CGqlEnum &value)
 {
 	RemoveField(fieldId);
-	m_simpleFieldsArray.insert(fieldId, value);
+	m_simpleFields.insert(fieldId, value);
 }
-
-
-//void CGqlObject::InsertField(const QByteArray &fieldId, const CGqlEnum &value)
-//{
-//	RemoveField(fieldId);
-//	m_simpleFields.insert(fieldId, value);
-//}
 
 
 void CGqlObject::InsertField(const QByteArray &fieldId, const CGqlObject& object)
@@ -199,7 +191,6 @@ void CGqlObject::RemoveField(const QByteArray &fieldId)
 {
 	m_emptyFields.removeAll(fieldId);
 	m_simpleFields.remove(fieldId);
-	m_simpleFieldsArray.remove(fieldId);
 	m_objectFields.remove(fieldId);
 	m_objectFieldsArray.remove(fieldId);
 }

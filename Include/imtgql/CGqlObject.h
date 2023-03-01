@@ -29,8 +29,7 @@ public:
 	CGqlObject* GetParentObject() const;
 	void InsertField(const QByteArray& fieldId);
 	void InsertField(const QByteArray& fieldId, const QVariant& value);
-	void InsertField(const QByteArray& fieldId, const QVariantList& value);
-//	void InsertField(const QByteArray& fieldId, const imtgql::CGqlEnum& value);
+	void InsertField(const QByteArray& fieldId, const imtgql::CGqlEnum& value);
 	void InsertField(const QByteArray& fieldId, const CGqlObject& object);
 	void InsertField(const QByteArray& fieldId, const QList<CGqlObject> objectList);
 	bool IsObject(const QByteArray& fieldId) const;
@@ -44,7 +43,6 @@ protected:
 protected:
 	QList<QByteArray> m_emptyFields;
 	QMap<QByteArray, QVariant> m_simpleFields;
-	QMap<QByteArray, QVariantList> m_simpleFieldsArray;
 	QMap<QByteArray, istd::TSmartPtr<CGqlObject>> m_objectFields;
 	QMap<QByteArray, QList<istd::TSmartPtr<CGqlObject>>> m_objectFieldsArray;
 	QByteArray m_objectId;
@@ -54,5 +52,4 @@ protected:
 
 } // namespace imtgql
 
-Q_DECLARE_METATYPE(imtgql::CGqlObject)
 
