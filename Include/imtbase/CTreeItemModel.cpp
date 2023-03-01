@@ -480,7 +480,7 @@ bool CTreeItemModel::CreateFromJson(const QByteArray &jsonContent)
 
 	QJsonDocument document = QJsonDocument::fromJson(jsonContent, &error);
 	if (error.error != QJsonParseError::NoError){
-		qCritical()  << "Error during parsing JSON document:" << error.errorString();
+		qCritical()  << "Error during parsing JSON document:" << error.errorString() << "content:" << jsonContent;
 		return false;
 	}
 

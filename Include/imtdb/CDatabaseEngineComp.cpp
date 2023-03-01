@@ -231,7 +231,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		return false;
 	}
 
-	qDebug() << GetHostName() << GetUserName() << GetPassword() << GetDatabaseName();
+	qDebug() << GetHostName() << "test" << QString::number(GetPort()) << GetUserName() << GetPassword() << GetDatabaseName();
 
 	bool retVal = false;
 	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);

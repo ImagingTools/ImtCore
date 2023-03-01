@@ -539,6 +539,7 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 			if (error.type() != QSqlError::NoError){
 				SendErrorMessage(0, error.text(), "Database collection");
 
+				qDebug() << "Sql error" << singleQuery;
 				m_dbEngineCompPtr->CancelTransaction();
 
 				return false;
