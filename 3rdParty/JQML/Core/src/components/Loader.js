@@ -73,6 +73,11 @@ export class Loader extends Item {
         if(this.$xOverride){
             this.item.x = 0
         } else {
+            this.x = this.item.x
+            this.$p.x.depends.add(this.item.$p.x.signal)
+            this.item.$p.x.signal.connections[this.$p.x.PID] = ()=>{
+                this.x = this.item.x
+            }
             // this.$p.x.depends.add(this.item.$p.x.signal)
             // this.item.$p.x.signal.connections[this.$p.x.PID] = ()=>{
             //     this.x = this.item.x
@@ -82,6 +87,11 @@ export class Loader extends Item {
         if(this.$yOverride){
             this.item.y = 0
         } else {
+            this.y = this.item.y
+            this.$p.y.depends.add(this.item.$p.y.signal)
+            this.item.$p.y.signal.connections[this.$p.y.PID] = ()=>{
+                this.y = this.item.y
+            }
             // this.$sP('y', ()=>{return this.$p.item.val.y})
             // this.$p.y.depends.add(this.item.$p.y.signal)
             // this.item.$p.y.signal.connections[this.$p.y.PID] = ()=>{
@@ -90,25 +100,31 @@ export class Loader extends Item {
         }
 
         if(this.$widthOverride){
-            this.item.$sP('width', ()=>{return this.width})
-            // this.item.width = this.width
-            // this.$p.width.signal.connections[this.item.$p.width.PID] = ()=>{
-            //     this.$p.item.val.width = this.width
-            // }
-            // this.item.$p.width.depends.add(this.$p.width.signal)
+            // this.item.$sP('width', ()=>{return this.width})
+            this.item.width = this.width
+            this.$p.width.signal.connections[this.item.$p.width.PID] = ()=>{
+                this.$p.item.val.width = this.width
+            }
+            this.item.$p.width.depends.add(this.$p.width.signal)
             // let i = 0
             // while(i < this.item.$uL.properties.length){
             //     if(this.item.$uL.properties[i] === 'width') this.item.$uL.properties.splice(i, 1); else i++
             // }
         } else {
-            this.$sP('width', ()=>{return this.item.width})
-            // this.$p.width.depends.add(this.item.$p.width.signal)
-            // this.item.$p.width.signal.connections[this.$p.width.PID] = ()=>{
-            //     this.width = this.item.width
-            // }
+            // this.$sP('width', ()=>{return this.item.width})
+            this.width = this.item.width
+            this.$p.width.depends.add(this.item.$p.width.signal)
+            this.item.$p.width.signal.connections[this.$p.width.PID] = ()=>{
+                this.width = this.item.width
+            }
         }
         if(this.$heightOverride){
-            this.item.$sP('height', ()=>{return this.height})
+            // this.item.$sP('height', ()=>{return this.height})
+            this.item.height = this.height
+            this.$p.height.signal.connections[this.item.$p.height.PID] = ()=>{
+                this.$p.item.val.height = this.height
+            }
+            this.item.$p.height.depends.add(this.$p.height.signal)
             // this.item.height = this.height
             // this.$p.height.signal.connections[this.item.$p.height.PID] = ()=>{
             //     this.$p.item.val.height = this.height
@@ -119,14 +135,24 @@ export class Loader extends Item {
             //     if(this.item.$uL.properties[i] === 'height') this.item.$uL.properties.splice(i, 1); else i++
             // }
         } else {
-            this.$sP('height', ()=>{return this.item.height})
+            // this.$sP('height', ()=>{return this.item.height})
+            this.height = this.item.height
+            this.$p.height.depends.add(this.item.$p.height.signal)
+            this.item.$p.height.signal.connections[this.$p.height.PID] = ()=>{
+                this.height = this.item.height
+            }
             // this.$p.height.depends.add(this.item.$p.height.signal)
             // this.item.$p.height.signal.connections[this.$p.height.PID] = ()=>{
             //     this.height = this.item.height
             // }
         }
         if(this.$clipOverride){
-            this.item.$sP('clip', ()=>{return this.clip})
+            // this.item.$sP('clip', ()=>{return this.clip})
+            this.item.clip = this.clip
+            this.$p.clip.signal.connections[this.item.$p.clip.PID] = ()=>{
+                this.$p.item.val.clip = this.clip
+            }
+            this.item.$p.clip.depends.add(this.$p.clip.signal)
             // this.item.clip = this.clip
             // this.$p.clip.signal.connections[this.item.$p.clip.PID] = ()=>{
             //     this.$p.item.val.clip = this.clip
@@ -137,7 +163,12 @@ export class Loader extends Item {
             //     if(this.item.$uL.properties[i] === 'clip') this.item.$uL.properties.splice(i, 1); else i++
             // }
         } else {
-            this.$sP('clip', ()=>{return this.item.clip})
+            this.clip = this.item.clip
+            this.$p.clip.depends.add(this.item.$p.clip.signal)
+            this.item.$p.clip.signal.connections[this.$p.clip.PID] = ()=>{
+                this.clip = this.item.clip
+            }
+            // this.$sP('clip', ()=>{return this.item.clip})
             // this.$p.clip.depends.add(this.item.$p.clip.signal)
             // this.item.$p.clip.signal.connections[this.$p.clip.PID] = ()=>{
             //     this.clip = this.item.clip
