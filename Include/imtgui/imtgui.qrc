@@ -23,6 +23,8 @@
         <file alias="imtgui/AuxComponents/TreeItemDelegate.qml">Qml/imtgui/AuxComponents/TreeItemDelegate.qml</file>
         <file alias="imtgui/AuxComponents/CheckBox.qml">Qml/imtgui/AuxComponents/CheckBox.qml</file>
         <file alias="imtgui/AuxComponents/CollectionView.qml">Qml/imtgui/AuxComponents/CollectionView.qml</file>
+		<file alias="imtgui/AuxComponents/GridCollectionView.qml">Qml/imtgui/AuxComponents/GridCollectionView.qml</file>
+		<file alias="imtgui/AuxComponents/GridCollectionViewBase.qml">Qml/imtgui/AuxComponents/GridCollectionViewBase.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/PopupMenuDialog.qml">Qml/imtgui/AuxComponents/Dialogs/PopupMenuDialog.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/MessageDialog.qml">Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml</file>
 	<file alias="imtgui/AuxComponents/Dialogs/ErrorDialog.qml">Qml/imtgui/AuxComponents/Dialogs/ErrorDialog.qml</file>
