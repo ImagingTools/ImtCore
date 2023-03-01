@@ -276,6 +276,9 @@ export class QtObject {
 
                 this.$p[propName].val = val
                 if(this.$p[propName].getter() !== val){
+                    if(this.jqmlDebug){
+                        console.info(`JQML::updating aliase ${propName}. old = `, this.$p[propName].val, `new = `, val)
+                    }
                     this.$p[propName].setter(val)
                 }
                 if(queueSignals.indexOf(this.$p[propName].signal) < 0) queueSignals.push(this.$p[propName].signal)     
@@ -466,6 +469,9 @@ export class QtObject {
                 }
 
                 if(this.$p[name].val !== newVal){
+                    if(this.jqmlDebug){
+                        console.info(`JQML::set property ${name}. old = `, this.$p[name].val, `new = `, newVal)
+                    }
                     for(let s of this.$p[name].depends){
                         delete s[this.$p[name].PID]
                     }
@@ -538,6 +544,9 @@ export class QtObject {
                         this.$uL.aliases.splice(this.$uL.aliases.indexOf(`${name}.${name2}`), 1)
                     }
                     if(this.$p[`${name}.${name2}`].val !== newVal){
+                        if(this.jqmlDebug){
+                            console.info(`JQML::set property ${name}.${name2}. old = `, this.$p[`${name}.${name2}`].val, `new = `, newVal)
+                        }
                         for(let s of this.$p[`${name}.${name2}`].depends){
                             delete s[this.$p[`${name}.${name2}`].PID]
                         }

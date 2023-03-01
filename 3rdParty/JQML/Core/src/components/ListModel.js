@@ -104,15 +104,15 @@ export class ListModel extends QtObject {
 			// Array.prototype.splice.apply(this.data, index, 0, new Proxy(dict, handler))
 		} else {
 			if(dict.$qmlClassName === 'ListElement'){
-                dict.$cP('index', this.data.length)
-                this.data.splice(dict)
+                dict.$cP('index', index)
+                this.data.splice(index, 0, dict)
             } else {
                 let listElement = new ListElement({})
-                listElement.$cP('index', this.data.length)
+                listElement.$cP('index', index)
                 for(let key in dict){
                     listElement.$cP(key, dict[key])
                 }
-                this.data.splice(listElement)
+                this.data.splice(index, 0, listElement)
             }
 		}
         this.count = this.data.length

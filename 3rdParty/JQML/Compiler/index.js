@@ -60,7 +60,8 @@ function getFiles (dir, _files){
     return _files
 }
 
-if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
+// if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
+if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
 // if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source
@@ -336,14 +337,14 @@ function qmlpropdef(m, instructions, file){
             let _meta = parser.parse(m[4].replaceAll('};', '}'))
             if(!_meta[2]) throw 1
             let propertyInstructions = getBaseStructure()
-            preCompile(_meta[2][1], _meta[2][3], _meta[2][2], propertyInstructions) 
+            preCompile(_meta[2][1], _meta[2][3], _meta[2][2], propertyInstructions, file) 
             instructions.propertiesSpecial[name] = propertyInstructions
         } else {
             parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
             let _meta = parser.parse(m[4].replaceAll('};', '}'))
             if(!_meta[2]) throw 1
             let propertyInstructions = getBaseStructure()
-            preCompile(_meta[2][1], _meta[2][3], _meta[2][2], propertyInstructions) 
+            preCompile(_meta[2][1], _meta[2][3], _meta[2][2], propertyInstructions, file) 
             instructions.propertiesQMLNew[name] = propertyInstructions
         }
         
