@@ -1,0 +1,207 @@
+import QtQuick 2.12
+import Acf 1.0
+import imtgui 1.0
+import imtlicgui 1.0
+
+Item {
+    id: gridCollectionViewContainer;
+
+    property int contentMargins: 0;
+
+    property alias baseGridCollectionView: gridCollectionViewBase;
+
+    property string itemId;
+    property string itemName;
+    property bool isUsedDocumentManager: true;
+    property bool visibleMetaInfo: true;
+
+    property string editorPath;
+    property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
+    property string commandUpdateGui;
+    property alias commandsDelegate: commandsLoader.item;
+
+    property alias commandsId: gridCollectionViewBase.commandsId;
+    property alias commands: gridCollectionViewBase.commands;
+    property alias gridCellWidth: gridCollectionViewBase.gridCellWidth;
+    property alias gridCellHeight: gridCollectionViewBase.gridCellHeight;
+
+    property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
+    property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
+//    property alias elementsList: gridCollectionViewBase.elementsList;
+//    property alias gridMinWidth: gridCollectionViewBase.gridMinWidth;
+    property alias gridDecoratorPath: gridCollectionViewBase.gridDecoratorPath;
+
+//    property alias tableItemHeight: gridCollectionViewBase.gridItemHeight;
+    property alias metaInfo: collectionMetaInfo;
+
+    Component.onCompleted: {
+        itemId = documentsData.GetData("Id", model.index);
+        itemName = documentsData.GetData("Title", model.index);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent(commandUpdateGui, updateGui);
+    }
+
+    onCommandUpdateGuiChanged: {
+        Events.subscribeEvent(commandUpdateGui, updateGui);
+    }
+
+    onVisibleChanged: {
+        if (visible){
+            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
+                                                      "CommandsId": commandsProvider.commandsId});
+            console.log("IDTEST::Model", commandsProvider.commandsModel, "IDTEST::CommandsId", commandsProvider.commandsId);
+        }
+    }
+
+    onCommandsIdChanged: {
+        console.log("this onItemIdChanged", itemId, commandsId);
+
+        commandsProvider.commandsId = commandsId;
+
+        gridCollectionViewBase.commands.gqlModelObjectView = commandsId + "ObjectView";
+        gridCollectionViewBase.commands.gqlModelHeadersInfo = commandsId + "Info";
+        gridCollectionViewBase.commands.gqlModelItemsInfo = commandsId + "List";
+
+        gridCollectionViewBase.commandsId = commandsId;
+
+        collectionMetaInfo.gqlModelMetaInfo = commandsId + "MetaInfo";
+
+        if (commandsLoader.item){
+            commandsLoader.item.commandsId = commandsId;
+
+            commandsLoader.item.gqlModelItem = commandsLoader.item.commandsId + "Item";
+            commandsLoader.item.gqlModelRemove = commandsLoader.item.commandsId + "Remove";
+            commandsLoader.item.gqlModelRename = commandsLoader.item.commandsId + "Rename";
+            commandsLoader.item.gqlModelSetDescription = commandsLoader.item.commandsId + "SetDescription";
+        }
+    }
+
+    function updateGui(){
+        gridCollectionViewBase.commands.updateModels();
+    }
+
+    function selectItem(id, name){
+        console.log("MEGATEST2")
+        let editorPath = gridCollectionViewBase.commands.objectViewEditorPath;
+//        let editorPath = "qrc:/Chronos/DeviceElementCollectionView.qml"
+        let commandsId = gridCollectionViewBase.commands.objectViewEditorCommandsId;
+        console.log("CollectionView selectItem", id, name, commandsId, editorPath);
+
+        if (gridCollectionViewContainer.isUsedDocumentManager){
+            documentManager.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+        }
+        else{
+            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});
+        }
+    }
+
+
+    Component {
+        id: contentDialog;
+        Item {
+            id: content;
+            property Item root;
+            property bool centered: true;
+            property string contentId;
+            property string contentName;
+            property string contentSource;
+            property string contentCommandsId;
+            width: contentLoader.width;
+            height: contentLoader.height;
+
+            onRootChanged: {
+                contentLoader.item.root = content.root;
+            }
+
+            Loader {
+                id: contentLoader;
+                anchors.centerIn: parent;
+                source: content.contentSource;
+                onLoaded: {
+                    contentLoader.item.root = content.root;
+                    contentLoader.width = item.width;
+                    contentLoader.height = item.height;
+                    contentLoader.item.itemId = content.contentId;
+                    contentLoader.item.itemName = content.contentName;
+                    contentLoader.item.commandsId = content.contentCommandsId;
+                }
+            }
+        }
+
+    }
+
+    Loader {
+        id: commandsLoader;
+
+        Component.onCompleted: {
+            console.log("commandsLoader.source", parent.commandsDelegatePath);
+            commandsLoader.source = parent.commandsDelegatePath;
+        }
+
+        onLoaded: {
+            commandsLoader.item.tableData = gridCollectionViewBase.grid;
+        }
+    }
+
+    TreeItemModel {
+        id: collectionViewModel;
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.baseColor;
+    }
+
+    GridCollectionViewBase {
+        id: gridCollectionViewBase;
+
+//        anchors.right: collectionMetaInfo.left;
+//        anchors.left: parent.left;
+//        anchors.top: parent.top;
+//        anchors.bottom: parent.bottom;
+
+        anchors.fill: parent;
+
+        anchors.margins: parent.contentMargins;
+
+        itemId: gridCollectionViewContainer.itemId;
+
+        commandsId: parent.commandsId;
+        loadData: true;
+
+        onSelectedIndexChanged: {
+            console.log("gridCollectionViewBase onSelectedIndexChanged");
+            collectionMetaInfo.getMetaInfo();
+        }
+
+        onSelectedItem: {
+            console.log("gridCollectionViewBase onItemSelected");
+            selectItem(id, name);
+        }
+
+    }
+
+    CommandsProvider {
+        id: commandsProvider;
+    }
+
+    MetaInfo {
+        id: collectionMetaInfo;
+
+        anchors.right: parent.right;
+
+        width: visible ? 200 : 1;
+        height: parent.height;
+
+        visible: gridCollectionViewContainer.visibleMetaInfo;
+
+        tableData: gridCollectionViewBase.grid;
+
+//        contentVisible: gridCollectionViewBase.grid.selectedIndex != -1;
+
+    }
+}
+
