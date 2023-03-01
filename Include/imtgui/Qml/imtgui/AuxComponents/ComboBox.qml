@@ -16,6 +16,8 @@ FocusScope {
 
     property string currentText;
 
+    property bool changeable: true;
+
     property bool textCentered: false;
     property bool menuVisible: false;
     property bool hiddenBackground: true;
@@ -198,7 +200,10 @@ FocusScope {
             cursorShape: Qt.PointingHandCursor;
 
             onClicked: {
-                comboBoxContainer.openPopupMenu();
+                if (comboBoxContainer.changeable && comboBoxContainer.model.GetItemsCount() > 0){
+                    comboBoxContainer.openPopupMenu();
+                }
+
                 comboBoxContainer.clicked();
             }
 

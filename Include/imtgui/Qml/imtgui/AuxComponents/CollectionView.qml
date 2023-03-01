@@ -37,12 +37,16 @@ Item {
     property TreeItemModel documentsData: TreeItemModel {}
     property Item documentManager: null;
 
+    property ListModel contextMenuModel: ListModel {}
+
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+
+        collectionViewContainer.fillContextMenuModel();
     }
 
     Keys.onPressed: {
-        if (event.key == Qt.Key_Delete){
+        if (event.key === Qt.Key_Delete){
             commandsLoader.item.commandHandle("Remove");
         }
     }
@@ -84,6 +88,13 @@ Item {
 
     function filterMenuActivate(){
         collectionViewContainer.filterMenuVisible = !collectionViewContainer.filterMenuVisible;
+    }
+
+    function fillContextMenuModel(){
+        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
+        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
+        contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
+        contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
     }
 
     onCommandsIdChanged: {
@@ -180,6 +191,8 @@ Item {
             commandsLoader.item.collectionViewBase = collectionViewContainer;
             commandsLoader.item.commandsProvider = commandsProvider;
             commandsLoader.item.documentManager = collectionViewContainer.documentManager;
+
+            commandsLoader.item.contextMenuModel = collectionViewContainer.contextMenuModel;
         }
     }
 
@@ -209,7 +222,9 @@ Item {
 
         onSelectedIndexChanged: {
             console.log("CollectionViewBase onSelectedIndexChanged");
-            collectionMetaInfo.getMetaInfo();
+            if (collectionMetaInfo.visible){
+                collectionMetaInfo.getMetaInfo();
+            }
         }
 
         onSelectedItem: {

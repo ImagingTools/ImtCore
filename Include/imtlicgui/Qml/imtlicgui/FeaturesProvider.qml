@@ -7,6 +7,14 @@ Item {
 
     property TreeItemModel model: TreeItemModel {}
 
+    Component.onCompleted: {
+        Events.subscribeEvent("PackagesCollectionUpdated", featuresModel.updateModel);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("PackagesCollectionUpdated", featuresModel.updateModel);
+    }
+
     onModelChanged: {
         if (model){
             Events.sendEvent("FeaturesUpdated");
@@ -14,6 +22,8 @@ Item {
     }
 
     function updateModel(){
+        console.log( "provider updateModel");
+
         featuresModel.updateModel();
     }
 
@@ -33,8 +43,11 @@ Item {
             var gqlData = query.GetQuery();
             console.log("TreeView query ", gqlData);
 
+
+            console.log("this", this);
+
 //            Events.sendEvent("TreeViewModelUpdateStarted");
-            this.SetGqlQuery(gqlData);
+            featuresModel.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {

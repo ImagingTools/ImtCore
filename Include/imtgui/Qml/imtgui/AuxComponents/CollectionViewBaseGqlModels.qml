@@ -93,11 +93,6 @@ Item {
         function updateModel() {
             console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
-//            let itemHeight = 35; // hack
-//            let height = gqlModelBaseContainer.rootItem.height - gqlModelBaseContainer.rootItem.pagination.height - itemHeight; //Убрать высоту от заголовка и меню пагинации
-//            let count = Math.floor(height / itemHeight);
-//            let offset = (gqlModelBaseContainer.rootItem.pagination.currentValue - 1) * count;
-
             let count = gqlModelBaseContainer.pagination.countElements;
             let offset = (gqlModelBaseContainer.pagination.currentIndex) * count;
 
@@ -105,9 +100,9 @@ Item {
             viewParams.InsertField("Offset", offset);
             viewParams.InsertField("Count", count);
             viewParams.InsertField("FilterModel");
-            var jsonString = gqlModelBaseContainer.rootItem.modelFilter.toJSON();
-            console.log("updateModel jsonString", jsonString)
-//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+
+            let filterModel = gqlModelBaseContainer.rootItem.modelFilter;
+            var jsonString = filterModel.toJSON();
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
@@ -143,8 +138,13 @@ Item {
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
                         if (dataModelLocal.ContainsKey("items")){
+                            let selectedIndex = gqlModelBaseContainer.table.selectedIndex;
+
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
-                            gqlModelBaseContainer.table.selectedIndex = -1;
+
+                            if (gqlModelBaseContainer.items.GetItemsCount() <= selectedIndex){
+                                gqlModelBaseContainer.table.selectedIndex = -1;
+                            }
 
                             Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");
                         }

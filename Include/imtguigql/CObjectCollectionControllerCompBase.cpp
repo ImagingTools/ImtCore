@@ -494,7 +494,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
 		int pagesCount = std::ceil(elementsCount / (double)count);
-		if (pagesCount < 0){
+		if (pagesCount <= 0){
 			pagesCount = 1;
 		}
 

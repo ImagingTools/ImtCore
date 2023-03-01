@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import Acf 1.0
 
 Item {
     id: container;
@@ -57,7 +58,9 @@ Item {
                     hoverEnabled: true;
 
                     onWheel: {}
-                    onClicked: {}
+                    onClicked: {
+                        Events.sendEvent("DialogBackgroundClicked");
+                    }
                     onDoubleClicked: {}
                     onReleased: {}
                     onPressAndHold: {}
@@ -73,6 +76,7 @@ Item {
 
                 onLoaded: {
                     container.backgroundItem = background;
+
                     dialogLoader.item["root"] = container;
                     for (let key in model.Parameters) {
                         dialogLoader.item[key] = model.Parameters[key];

@@ -26,6 +26,8 @@ Item {
 
     property string commandsId;
 
+    property var contextMenuModel: null;
+
     signal commandActivated(string commandId);
 
     signal renamed(string id, string newName);
@@ -86,7 +88,10 @@ Item {
 
     function openPopupMenu(x, y){
         modalDialogManager.closeDialog();
-        modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
+
+        if (containerBase.contextMenuModel != null){
+            modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
+        }
     }
 
     function commandHandle(commandId){
@@ -102,7 +107,6 @@ Item {
             }
             else if (commandId === "Remove"){
                 modalDialogManager.openDialog(removeDialog, {});
-//                removeDialog.open();
             }
             else if (commandId === "Edit"){
                 let itemId = containerBase.tableData.getSelectedId();
@@ -110,8 +114,6 @@ Item {
                 containerBase.collectionViewBase.selectItem(itemId, itemName);
             }
         }
-
-        console.log("aaaaaaaaaaaaaaaaa", commandId);
 
         let editIsEnabled = containerBase.commandsProvider.commandIsEnabled("Edit");
         if (editIsEnabled){
@@ -161,19 +163,6 @@ Item {
         ErrorDialog {
         }
     }
-
-//    MessageDialog {
-//        id: removeDialog
-//        title: containerBase.removeDialogTitle;
-//        text: containerBase.removeMessage;
-
-//        icon: StandardIcon.Question
-
-//        standardButtons: StandardButton.Yes | StandardButton.YesToAll |
-//                StandardButton.No | StandardButton.NoToAll | StandardButton.Abort
-//        onAccepted: {
-//        }
-//    }
 
     Component {
         id: removeDialog;
@@ -230,16 +219,16 @@ Item {
         }
     }
 
-    ListModel {
-        id: contextMenuModel;
+//    ListModel {
+//        id: contextMenuModel;
 
-        Component.onCompleted: {
-            contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
-            contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
-            contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
-            contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
-        }
-    }
+//        Component.onCompleted: {
+//            contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
+//            contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
+//            contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
+//            contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
+//        }
+//    }
 
     /**
         GQL Request for removing element from the collection by object id

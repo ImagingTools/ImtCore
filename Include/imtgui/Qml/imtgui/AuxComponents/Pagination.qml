@@ -24,7 +24,6 @@ Row {
         console.log("ProductCollectionViewCommands onSelectedIndexChanged");
         if (paginationContainer.currentIndex > paginationContainer.pagesSize - 1){
             paginationContainer.currentIndex--;
-//            paginationContainer.currentValue--;
         }
 
         paginationContainer.refreshBtn();
@@ -94,7 +93,6 @@ Row {
             textButton: model.number === -1 ? "..." : model.number;
             onClicked: {
                 paginationContainer.currentIndex = model.index;
-//                paginationContainer.currentValue = model.number;
                 paginationContainer.refreshBtn();
             }
 

@@ -90,7 +90,7 @@ Item {
         anchors.left: parent.left;
         width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 
-        anchors.bottom: parent.bottom;
+        anchors.bottom: pagination.top;
 
         color: Style.baseColor;
 
@@ -197,18 +197,12 @@ Item {
         }
     }
 
-    function setHeaderSort(headerId, sortOrder){
-        var filterLocal = modelFilterObj.GetData("Sort");
-        filterLocal.SetData("HeaderId", headerId);
-        filterLocal.SetData("SortOrder", sortOrder);
-    }
-
     TreeItemModel {
         id: modelFilterObj;
 
         Component.onCompleted: {
             modelFilterObj.AddTreeModel("FilterIds");
-            modelFilterObj.AddTreeModel("Sort");
+            sortController.sortModel = modelFilterObj.AddTreeModel("Sort");
         }
     }
 
@@ -242,6 +236,12 @@ Item {
 
         onHeadersChanged: {
             console.log("onHeadersChanged", baseCommands.headers)
+            if (baseCommands.headers.GetItemsCount() > 0){
+                let headerId = baseCommands.headers.GetData("Id");
+
+                sortController.setHeaderSort(headerId, "ASC");
+            }
+
             tableInternal.headers = baseCommands.headers;
             tableInternal.headersCompl = true;
         }

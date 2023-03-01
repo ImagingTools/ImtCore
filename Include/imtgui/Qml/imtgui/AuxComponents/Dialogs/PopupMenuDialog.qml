@@ -50,7 +50,7 @@ Rectangle {
     signal started();
 
     Component.onDestruction: {
-        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(root.closeDialog);
+        Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
     }
 
     onFinished: {
@@ -80,7 +80,11 @@ Rectangle {
         /**
             Close the dialog by clicking on the background
         */
-        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.connect(popupMenuContainer.root.closeDialog);
+        Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+    }
+
+    function onBackgroundClicked(){
+        popupMenuContainer.root.closeDialog();
     }
 
     onContentYChanged: {

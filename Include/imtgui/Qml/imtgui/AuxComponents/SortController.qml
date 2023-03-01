@@ -8,29 +8,26 @@ Item {
     property var collectionView;
     property var commands;
 
-    TreeItemModel {
-        id: sortModel;
-    }
+    property TreeItemModel sortModel: TreeItemModel {}
 
     function headerClicked(headerId){
-        console.log("headerClicked", headerId);
+        console.log("headerClicked", headerId, sortModel.toJSON());
 
-        let order = "";
+        let currentHeaderId = container.sortModel.GetData("HeaderId");
+        let currentSortOrder = container.sortModel.GetData("SortOrder");
 
-        if(sortModel.ContainsKey(headerId)){
-            order = sortModel.GetData(headerId);
+        let order = "ASC";
+
+        if (currentHeaderId === headerId){
+            order = currentSortOrder === "ASC" ? "DESC" : "ASC";
         }
 
-        if (order == "ASC"){
-            sortModel.SetData(headerId, "DESC");
-            order = "DESC";
-        }
-        else{
-            sortModel.SetData(headerId, "ASC");
-            order = "ASC";
-        }
-
-        container.collectionView.setHeaderSort(headerId, order);
+        container.setHeaderSort(headerId, order);
         container.commands.updateItemsModel();
+    }
+
+    function setHeaderSort(headerId, sortOrder){
+        container.sortModel.SetData("HeaderId", headerId);
+        container.sortModel.SetData("SortOrder", sortOrder);
     }
 }

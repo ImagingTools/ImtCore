@@ -234,7 +234,9 @@ TreeViewItemDelegateBase {
 
                     checkState: model.Optional ? Qt.Checked : Qt.Unchecked;
 
-                    visible: model.ChildModel ? model.ChildModel.count === 0: true;
+//                    visible: model.ChildModel ? model.ChildModel.count === 0 && packageTreeItemDelegate.level !== 0: packageTreeItemDelegate.level !== 0;
+
+                    visible: packageTreeItemDelegate.level === 0 ? false : model.ChildModel ? model.ChildModel.count === 0 :false;
 
                     onClicked: {
                         model.Optional = !model.Optional;

@@ -220,17 +220,28 @@ DocumentBase {
 
                 if (featuresModel.ContainsKey(licenseId)){
                     let featureModel = featuresModel.GetData(licenseId);
+
+                    console.log("featureModel", featureModel.toJSON());
+
                     let optionalFeatureIds = container.getOptionalFeatures(featureModel);
                     let notOptionalFeatureIds = container.getNotOptionalFeatures(featureModel);
 
                     console.log("optionalFeatureIds", optionalFeatureIds);
                     console.log("notOptionalFeatureIds", notOptionalFeatureIds);
 
-                    for (let j = 0; j < notOptionalFeatureIds.length; j++){
-                        let featureId = notOptionalFeatureIds[j];
+                    for (let j = 0; j < featureModel.GetItemsCount(); j++){
+                        let featureId = featureModel.GetData("Id", j);
+                        let featureName = featureModel.GetData("Name", j);
+                        let isOptional = featureModel.GetData("Optional", j);
 
-                        container.licenseFeaturesUpdateGui(licenseId, featureId, i, optionalFeatureIds);
+                        container.licenseFeaturesUpdateGui(licenseId, {"Id":featureId,"Name":featureName,"Optional":isOptional}, i, optionalFeatureIds);
                     }
+
+//                    for (let j = 0; j < notOptionalFeatureIds.length; j++){
+//                        let featureId = notOptionalFeatureIds[j];
+
+//                        container.licenseFeaturesUpdateGui(licenseId, featureId, i, optionalFeatureIds);
+//                    }
                 }
             }
         }
@@ -238,19 +249,23 @@ DocumentBase {
         container.blockUpdatingModel = false;
     }
 
-    function licenseFeaturesUpdateGui(licenseId, featureId, index, optionalFeatureIds){
+    function licenseFeaturesUpdateGui(licenseId, featureObj, index, optionalFeatureIds){
         let model = featuresProvider.model;
         for (let i = 0; i < model.GetItemsCount(); i++){
             let childModel = model.GetData("ChildModel", i);
             if (childModel){
                 for (let j = 0; j < childModel.GetItemsCount(); j++){
                     let childFeatureId = childModel.GetData("Id", j);
-                    let childFeatureName = childModel.GetData("Name", j);
-                    let childFeatureDescription = childModel.GetData("Description", j);
-                    let optional = childModel.GetData("Optional", j);
+//                    let childFeatureName = childModel.GetData("Name", j);
+//                    let childFeatureDescription = childModel.GetData("Description", j);
+//                    let optional = childModel.GetData("Optional", j);
 
-                    if (childFeatureId == featureId){
-                        tableView.insertRow([index, 0], {"LicenseId": licenseId, "Id": childFeatureId, "Name": childFeatureName, "Description": childFeatureDescription, "Optional": optional, "State": Qt.Unchecked});
+                    if (childFeatureId === featureObj["Id"]){
+                        featureObj["LicenseId"] = licenseId;
+                        featureObj["State"] = Qt.Unchecked;
+                        tableView.insertRow([index, 0], featureObj);
+
+//                        tableView.insertRow([index, 0], {"LicenseId": licenseId, "Id": childFeatureId, "Name": childFeatureName, "Description": childFeatureDescription, "Optional": optional, "State": Qt.Unchecked});
 
                         let subFeaturesModel = childModel.GetData("ChildModel", j);
                         if (subFeaturesModel){

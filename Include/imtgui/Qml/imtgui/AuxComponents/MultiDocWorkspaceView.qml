@@ -147,22 +147,6 @@ Item {
     function saveDirtyDocuments(){
     }
 
-//    function closeDocument(itemId){
-//         let index = this.getDocumentIndexById(itemId);
-
-//         if (index < 0){
-//             index = tabPanelInternal.selectedIndex;
-//         }
-
-//         if (index >= 0){
-//             workspaceView.documentsData.RemoveItem(index);
-
-//             if (tabPanelInternal.selectedIndex >= index && index > 0){
-//                 tabPanelInternal.selectedIndex--;
-//             }
-//         }
-//     }
-
     function saveOpenedDocuments(){
 
     }
