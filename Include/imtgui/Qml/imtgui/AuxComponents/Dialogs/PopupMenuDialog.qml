@@ -103,14 +103,15 @@ Rectangle {
 
             z: 100;
 
-            anchors.right: itemBody.right;
-            anchors.bottom: itemBody.bottom;
+            anchors.right: popupMenuListView.right;
+            anchors.bottom: popupMenuListView.bottom;
 
             backgroundColor: Style.baseColor;
 
             secondSize: 10;
             targetItem: popupMenuListView;
-            visible: popupMenuContainer.visibleScrollBar;
+            visible: !popupMenuContainer.visibleScrollBar ? false : hideNotUsed ? !notUsed : true;
+
         }
 
         ListView {
