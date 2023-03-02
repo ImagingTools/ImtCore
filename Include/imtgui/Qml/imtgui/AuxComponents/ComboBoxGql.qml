@@ -45,6 +45,8 @@ Item {
     property string filterName: "Name";
     property string filterText: "";
     property string fontColor: Style.textColor;//
+    property string fontColorTitle: fontColor;
+
 
     // ID for display in combo box delegates
     property string nameId: "Name";
@@ -209,7 +211,7 @@ Item {
             anchors.left: parent.left;
             anchors.leftMargin: 10;
 
-            color: Style.textColor;
+            color: comboBoxContainerGql.fontColorTitle;
             font.family: Style.fontFamily;
             font.pixelSize: comboBoxContainerGql.textSize;
             visible: comboBoxContainerGql.backVisible;

@@ -321,7 +321,7 @@ Item {
                 textSize: datePicker.textSize;
                 fontColor: datePicker.fontColor;
                 color: datePicker.textFieldColor;
-                borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
                 horizontalAlignment: TextInput.AlignHCenter;
@@ -354,7 +354,7 @@ Item {
                     compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
                     moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
-
+                    visibleScrollBar: false;
 
                     onCurrentIndexChanged:{
                         if(yearComboObj.currentIndex >=0){
@@ -436,7 +436,7 @@ Item {
                 textSize: datePicker.textSize;
                 fontColor: datePicker.fontColor;
                 color: datePicker.textFieldColor;
-                borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
                 readOnly: true;
@@ -469,6 +469,8 @@ Item {
                     titleTxt.color: "transparent";
                     compTextCentered: true;
                     shownItemsCount: 12;
+
+                    visibleScrollBar: false;
 
                     onCurrentIndexChanged:{
                         if(monthComboObj.currentIndex >= 0){
@@ -561,7 +563,7 @@ Item {
                 textSize: datePicker.textSize;
                 fontColor: datePicker.fontColor;
                 color: datePicker.textFieldColor;
-                borderColor: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
                 horizontalAlignment: TextInput.AlignHCenter;
@@ -592,6 +594,9 @@ Item {
                     titleTxt.color: "transparent";
                     compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
+
+                    visibleScrollBar: false;
+
 
                     onCurrentIndexChanged:{
                         if(dayComboObj.currentIndex >=0){
