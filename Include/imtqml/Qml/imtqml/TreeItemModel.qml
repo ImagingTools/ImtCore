@@ -22,7 +22,7 @@ JSONListModel {
         if(row === null)
             row = 0
         var modelObject = this.get(row)
-        var retVal = modelObject ? modelObject.$p[key].val : null
+        var retVal = modelObject ? modelObject[key] : null
 
 //        if(retVal === undefined){
 //            modelObject = this.get(0)[row]
