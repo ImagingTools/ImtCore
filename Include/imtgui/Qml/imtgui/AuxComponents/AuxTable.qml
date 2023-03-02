@@ -677,8 +677,6 @@ Item {
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
 
-        backgroundColor: Style.baseColor;
-
         secondSize: 10;
         targetItem: elementsListObj;
     }

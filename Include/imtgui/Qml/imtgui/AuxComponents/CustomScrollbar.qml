@@ -1,4 +1,6 @@
 import QtQuick 2.12
+import Acf 1.0
+
 
 Rectangle{
     id:scrollContainer;
@@ -17,9 +19,9 @@ Rectangle{
     property real minSize: 30;
     property real secondSize: 20;
     property int indicatorRadius: 4;
-    property string backgroundColor: "#efefef";
-    property string indicatorColor: "gray";
-    property string highlightColor: "#efefef";
+    property string backgroundColor: Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
+    property string indicatorColor: Style.color_scrollIndicator !== undefined ? Style.color_scrollIndicator : "lightgray";
+    property string highlightColor: Style.color_scrollHighlight !== undefined ? Style.color_scrollHighlight : "lightgray";
 
     property bool canFade: false;
     property bool isMoving: false;
