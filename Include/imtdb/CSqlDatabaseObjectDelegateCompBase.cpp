@@ -16,6 +16,13 @@ namespace imtdb
 
 // public methods
 
+QString CSqlDatabaseObjectDelegateCompBase::SqlEncode(const QString& sqlQuery) const
+{
+	QString retVal = sqlQuery;
+	return retVal.replace("'", "''");
+}
+
+
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 const iprm::IOptionsList* CSqlDatabaseObjectDelegateCompBase::GetObjectTypeInfos() const

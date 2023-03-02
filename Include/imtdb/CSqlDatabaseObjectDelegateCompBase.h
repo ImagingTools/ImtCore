@@ -32,6 +32,8 @@ public:
 		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "SeparatorObjectId");
 	I_END_COMPONENT
 
+	virtual QString SqlEncode(const QString& sqlQuery) const;
+
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 	virtual const iprm::IOptionsList* GetObjectTypeInfos() const override;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
