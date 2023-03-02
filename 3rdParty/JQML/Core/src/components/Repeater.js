@@ -119,6 +119,7 @@ export class Repeater extends Item {
         let childRecursive = (obj, index)=>{
             obj.index = index
             for(let child of obj.children){
+                if(!child.$useModel && !child.$repeater && child.$qmlClassName !== 'ListElement')
                 childRecursive(child, index)
             }
         }
