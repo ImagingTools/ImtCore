@@ -53,7 +53,7 @@ export class QtObject {
         this.$treeParent = null
         this.$treeParent2 = null
 
-        this.$cP('jqmlDebug', false)
+        if(this.$qmlClassName !== 'ListElement') this.$cP('jqmlDebug', false)
         
         
         if('repeater' in args){
