@@ -142,7 +142,6 @@ FocusScope {
                     width: tableViewRoot.width / tableViewRoot.columnCount;
                     height: tableViewRoot.headerHeight;
 
-
                     Text {
                         id: headerText;
 

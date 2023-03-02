@@ -36,8 +36,6 @@ TreeViewItemDelegateBase {
                 MouseArea {
                     anchors.fill: parent;
 
-                    cursorShape: Qt.IBeamCursor;
-
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
 
                     onClicked: {
@@ -109,8 +107,6 @@ TreeViewItemDelegateBase {
                 MouseArea {
                     anchors.fill: parent;
 
-                    cursorShape: Qt.IBeamCursor;
-
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : 0;
 
                     onClicked: {
@@ -176,8 +172,6 @@ TreeViewItemDelegateBase {
 
                 MouseArea {
                     anchors.fill: parent;
-
-                    cursorShape: Qt.IBeamCursor;
 
                     visible: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : false;
 

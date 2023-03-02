@@ -58,8 +58,6 @@ TreeViewItemDelegateBase {
                 MouseArea {
                     anchors.fill: parent;
 
-                    cursorShape: Qt.IBeamCursor;
-
                     visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                     onClicked: {
@@ -134,8 +132,6 @@ TreeViewItemDelegateBase {
                     MouseArea {
                         anchors.fill: parent;
 
-                        cursorShape: Qt.IBeamCursor;
-
                         visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                         onClicked: {
@@ -206,8 +202,6 @@ TreeViewItemDelegateBase {
                     MouseArea {
                         anchors.fill: parent;
 
-                        cursorShape: Qt.IBeamCursor;
-
                         visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                         onClicked: {
@@ -255,7 +249,7 @@ TreeViewItemDelegateBase {
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
-                visible: model.Level == 0;
+                visible: model.Level == 0 && model.Selected;
 
                 AuxButton {
                     anchors.verticalCenter: addButtonRect.verticalCenter;
@@ -280,7 +274,7 @@ TreeViewItemDelegateBase {
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
-                visible: model.Level == 1;
+                visible: model.Level == 1 && model.Selected;
 
                 AuxButton {
                     anchors.verticalCenter: removeButtonRect.verticalCenter;
