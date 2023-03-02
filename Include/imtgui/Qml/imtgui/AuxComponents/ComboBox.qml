@@ -60,6 +60,7 @@ FocusScope {
     property int textSize: Style.fontSize_common;
     property int itemHeight: 26;
     property string fontColor: Style.textColor;
+    property string fontColorTitle: fontColor;
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
@@ -169,7 +170,7 @@ FocusScope {
 
             anchors.verticalCenter: parent.verticalCenter;
 
-            color: comboBoxContainer.fontColor;
+            color: comboBoxContainer.fontColorTitle;
             text: comboBoxContainer.currentText;
             font.family: Style.fontFamily;
             font.pixelSize: comboBoxContainer.textSize;
