@@ -30,7 +30,22 @@ export class Row extends Item {
     }
     $updateGeometry(){
         if(this.$widthAuto)
-        this.$sP('width', ()=>{ return this.$availableGeometry.length ? this.$availableGeometry[this.$availableGeometry.length-1].x + this.$availableGeometry[this.$availableGeometry.length-1].width : 0})
+        this.$sP('width', ()=>{ 
+            let x1 = 0
+            let x2 = 0
+            let first = true
+            for(let child of this.$availableGeometry){
+                if(child.visible){
+                    if(first){
+                        x1 = child.x
+                        first = false
+                    } else {
+                        x2 = child.x + child.width
+                    }
+                }
+            }
+            return x2 - x1
+        })
 
         if(this.$heightAuto)
         this.$sP('height', ()=>{ 
@@ -46,7 +61,7 @@ export class Row extends Item {
     $updateChildren(){
         let prevIndex = -1
         for(let i = 0; i < this.$availableGeometry.length; i++){
-            if(!(this.$availableGeometry[i] instanceof Repeater)){
+            if(!(this.$availableGeometry[i] instanceof Repeater) && this.$availableGeometry[i].visible){
                 this.$anchorsChild(i, prevIndex)
                 prevIndex = i
             }
@@ -58,9 +73,10 @@ export class Row extends Item {
         let child = this.$availableGeometry[index]
         
         child.$sP('anchors.top', ()=>{ return this.top })
-        if(index === 0){
+        if(prevIndex < 0){
             child.$sP('anchors.left', ()=>{ return this.left })
-        } else if(prevIndex >= 0) {
+            child.anchors.leftMargin = 0
+        } else {
             let prevChild = this.$availableGeometry[prevIndex]
             child.$sP('anchors.left', ()=>{ return prevChild.right })
             child.$sP('anchors.leftMargin', ()=>{ return this.spacing })

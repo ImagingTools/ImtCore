@@ -224,6 +224,10 @@ export class Item extends QtObject {
                 
         //     }
         // }
+
+        if(this.parent && (this.parent.$qmlClassName === 'Row' || this.parent.$qmlClassName === 'Column')){
+            this.parent.$childChanged()
+        }
     }
     $clipChanged(){
         this.dom.style.overflow = this.clip ? "hidden" : "unset"
