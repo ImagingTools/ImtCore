@@ -467,8 +467,9 @@ export class QtObject {
                 while(this.$uL.aliases.indexOf(name) >= 0){
                     this.$uL.aliases.splice(this.$uL.aliases.indexOf(name), 1)
                 }
-
-                if(this.$p[name].val !== newVal){
+                if(this.$p[name].freeze){
+                    this.$p[name].freezeVal = newVal
+                } else if(this.$p[name].val !== newVal){
                     if(this.jqmlDebug){
                         console.info(`JQML::set property ${name}. old = `, this.$p[name].val, `new = `, newVal)
                     }
@@ -597,6 +598,9 @@ export class QtObject {
             } else {
                 this.$p[name].func = ()=>{
                     caller = this.$p[name]
+                    if(this.$p[name].freeze){
+                        return this.$p[name].val
+                    }
                     let res = func()
                     caller = null
                     if(typeof res === 'number'){
