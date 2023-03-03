@@ -6,6 +6,7 @@ TreeItemModelObserver {
     id: container;
 
     property DesignSchemaProvider designProvider: null;
+    property LanguageProvider languageProvider: null;
 
     property Item root: null;
 
@@ -13,12 +14,17 @@ TreeItemModelObserver {
         console.log("SettingsModelObserver onModelChanged");
         for (let i = 0; i < changeList.length; i++){
             let changeObj = changeList[i]
+
+            console.log("changeObj", JSON.stringify(changeObj));
             let changeId = changeObj["id"];
 
             let ids = changeId.split('/')
             console.log("ids", ids);
 
             if (ids.includes("Language")){
+
+                context.language = languageProvider.getLanguage();
+
                 container.root.updateAllModels();
             }
             else if (ids.includes("DesignSchema")){
