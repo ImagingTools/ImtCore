@@ -363,6 +363,11 @@ Item {
                             if (datePicker.checkDate(selectedYear, datePicker.selectedIndexMonth, Number(dayField.text))){
                                 yearField.text = selectedYear;
                             }
+                            else{
+                                yearComboObj.currentIndex = -1;
+                                monthComboObj.currentIndex = -1;
+                                dayComboObj.currentIndex = -1;
+                            }
                         }
 
                     }
@@ -476,6 +481,11 @@ Item {
                         if(monthComboObj.currentIndex >= 0){
                             if (datePicker.checkDate(Number(yearField.text), monthComboObj.currentIndex, Number(dayField.text))){
                                 datePicker.selectedIndexMonth = monthComboObj.currentIndex;
+                            }
+                            else{
+                                yearComboObj.currentIndex = -1;
+                                monthComboObj.currentIndex = -1;
+                                dayComboObj.currentIndex = -1;
                             }
                         }
                     }
@@ -604,6 +614,11 @@ Item {
 
                             if (datePicker.checkDate(datePicker.selectedYear, datePicker.selectedIndexMonth, Number(selectedDay))){
                                 dayField.text = selectedDay;
+                            }
+                            else{
+                                yearComboObj.currentIndex = -1;
+                                monthComboObj.currentIndex = -1;
+                                dayComboObj.currentIndex = -1;
                             }
                         }
 
