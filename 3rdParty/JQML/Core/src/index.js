@@ -182,12 +182,25 @@ global.Core = {
         }
         this.focusedElement = item
     },
+    globalContext: [],
+    getLastGlobalContext(){
+        return this.globalContext.length > 0 ? this.globalContext[this.globalContext.length-1] : {}
+    },
+    setGlobalContext(context){
+        this.globalContext.push(context)
+    },
+    removeLastGlobalContext(){
+        this.globalContext.pop()
+    },
     proxyHandler: {
         has(){
             return true
         },
         get(target, name){
-            if(name in target){
+            let globalContext = Core.getLastGlobalContext()
+            if(name in globalContext){
+                return globalContext[name]
+            } else if(name in target){
                 return target[name]
             } else {
                 if(name in QML){
@@ -256,7 +269,10 @@ global.Core = {
             return true
         },
         get(target, name){
-            if(name in target){
+            let globalContext = Core.getLastGlobalContext()
+            if(name in globalContext){
+                return globalContext[name]
+            } else if(name in target){
                 return target[name]
             } else {
                 if(name in QML){

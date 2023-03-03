@@ -10,9 +10,14 @@ export function Signal(...args){
         for(let key in signal.connections){
 
             try {
-                if(signal.connections[key]) signal.connections[key](...args)
+                if(signal.connections[key]) {
+                    Core.setGlobalContext(signal.context)
+                    signal.connections[key](...args)
+                    Core.removeLastGlobalContext()
+                }
             } catch (error) {
                 console.error(`skip::signal::`,error)
+                Core.removeLastGlobalContext()
             }
 
         }

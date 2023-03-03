@@ -72,20 +72,20 @@ let files = getFiles(source)
 
 let IDList = new Set()
 
-function fillSignalParamsFromDefaultClass(name, params, className){
-    if(className === 'Repeater') {
-        if(name === 'itemAdded') params.push('item')
-        if(name === 'itemRemoved') params.push('item')
-    }
-    if(className === 'ListModel') { 
-        if(name === 'dataChanged') {
-            params.push('topLeft')
-            params.push('bottomRight')
-            params.push('keyRoles')
-        }
+// function fillSignalParamsFromDefaultClass(name, params, className){
+//     if(className === 'Repeater') {
+//         if(name === 'itemAdded') params.push('item')
+//         if(name === 'itemRemoved') params.push('item')
+//     }
+//     if(className === 'ListModel') { 
+//         if(name === 'dataChanged') {
+//             params.push('topLeft')
+//             params.push('bottomRight')
+//             params.push('keyRoles')
+//         }
 
-    }
-}
+//     }
+// }
 
 function proxyJS(sourceOrig, currentName, instruction, ignoreList = []){
     let source = sourceOrig
@@ -389,7 +389,7 @@ function qmlprop(m, instructions, file){
             instructions.connectionSignals.push({
                 name: signalName,
                 source: src,
-                sourceFull: `let $compileTemp=function(){with(this.$s['${signalName}'].context){${src}}}`,
+                sourceFull: `let $compileTemp=function(){${src}}`,
             })
         } else {
             let signalCall = m[1]
@@ -403,7 +403,7 @@ function qmlprop(m, instructions, file){
             instructions.connectionSignals.push({
                 name: signalName,
                 source: src,
-                sourceFull: `let $compileTemp=function(){with(this.$s['${signalName}'].context){${src}}}`,
+                sourceFull: `let $compileTemp=function(){${src}}`,
             })
         } 
     } else if (m[1][0] === "dot"){
@@ -523,7 +523,7 @@ function qmlprop(m, instructions, file){
                 instructions.connectionSignals.push({
                     name: signalName,
                     source: src,
-                    sourceFull: `let $compileTemp=function(){with(this.$s['${signalName}'].context){${src}}}`,
+                    sourceFull: `let $compileTemp=function(){${src}}`,
                 })
             } else {
                 if(name === 'id'){
@@ -671,23 +671,23 @@ function proxyReplace(instructions){
         instructions.methods[name].sourceFull = proxyJS(instructions.methods[name].sourceFull, name, instructions, instructions.methods[name].params).replaceAll('let $compileTemp=', '')
     }
     for(let signal of instructions.connectionSignals){
-        let signalParams = []
-        if(QML.indexOf(instructions.class) < 0)
-        for(let path in compiledFiles){
-            if(path.indexOf(instructions.class) >= 0){
-                if(compiledFiles[path].instructions.defineSignals[signal.name]){
-                    signalParams.push(...compiledFiles[path].instructions.defineSignals[signal.name])
-                }
-            }
-        }
-        if(instructions.defineSignals[signal.name]){
-            signalParams.push(...instructions.defineSignals[signal.name])
-        }
-        for(let i = 0; i < signalParams.length; i++){
-            signalParams[i] = signalParams[i].replaceAll('`', '')
-        }
-        fillSignalParamsFromDefaultClass(signal.name, signalParams, instructions.class)
-        signal.sourceFull = proxyJS(signal.sourceFull, signal.name, instructions, signalParams).replaceAll('let $compileTemp=', '')
+        // let signalParams = []
+        // if(QML.indexOf(instructions.class) < 0)
+        // for(let path in compiledFiles){
+        //     if(path.indexOf(instructions.class) >= 0){
+        //         if(compiledFiles[path].instructions.defineSignals[signal.name]){
+        //             signalParams.push(...compiledFiles[path].instructions.defineSignals[signal.name])
+        //         }
+        //     }
+        // }
+        // if(instructions.defineSignals[signal.name]){
+        //     signalParams.push(...instructions.defineSignals[signal.name])
+        // }
+        // for(let i = 0; i < signalParams.length; i++){
+        //     signalParams[i] = signalParams[i].replaceAll('`', '')
+        // }
+        // fillSignalParamsFromDefaultClass(signal.name, signalParams, instructions.class)
+        signal.sourceFull = proxyJS(signal.sourceFull, signal.name, instructions).replaceAll('let $compileTemp=', '')
     }
     for(let name in instructions.propertiesQML){
         proxyReplace(instructions.propertiesQML[name])

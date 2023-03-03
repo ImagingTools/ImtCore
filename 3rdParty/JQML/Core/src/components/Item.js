@@ -198,32 +198,32 @@ export class Item extends QtObject {
         this.dom.style.opacity = this.visible ? this.opacity : 0
         this.dom.style.visibility = this.visible ? 'visible' : 'hidden'
         this.dom.style.zIndex = this.visible ? /*2147483646/2 +*/ this.z : -1
-        for(let i = this.children.length-1; i >= 0; i--){
-            if(this.children[i].$p.visible && this.children[i].$qmlClassName !== 'ListElement' && this.children[i].$qmlClassName !== 'FileDialog'){
-                if(this.visible){
-                    this.children[i].$p.visible.freeze = false
-                    if('freezeVal' in this.children[i].$p.visible){
-                        this.children[i].visible = this.children[i].$p.visible.freezeVal
-                    } else if(this.children[i].$p.visible.func) {
-                        let val = this.children[i].$p.visible.func()
-                        if(this.children[i].$p.visible.val !== val){
-                            this.children[i].$p.visible.val = val
-                            this.children[i].$p.visible.signal()
-                        }
+        // for(let i = this.children.length-1; i >= 0; i--){
+        //     if(this.children[i].$p.visible && this.children[i].$qmlClassName !== 'ListElement' && this.children[i].$qmlClassName !== 'FileDialog'){
+        //         if(this.visible){
+        //             this.children[i].$p.visible.freeze = false
+        //             if('freezeVal' in this.children[i].$p.visible){
+        //                 this.children[i].visible = this.children[i].$p.visible.freezeVal
+        //             } else if(this.children[i].$p.visible.func) {
+        //                 let val = this.children[i].$p.visible.func()
+        //                 if(this.children[i].$p.visible.val !== val){
+        //                     this.children[i].$p.visible.val = val
+        //                     this.children[i].$p.visible.signal()
+        //                 }
                         
-                    } else {
-                        this.children[i].visible = this.visible
-                    }
-                    //this.children[i].visible = 'freezeVal' in this.children[i].$p.visible ? this.children[i].$p.visible.freezeVal : this.children[i].$p.visible.func()
-                } else {
-                    this.children[i].$p.visible.freeze = false
-                    this.children[i].visible = this.visible
-                    this.children[i].$p.visible.freeze = true
-                }
+        //             } else {
+        //                 this.children[i].visible = this.visible
+        //             }
+        //             //this.children[i].visible = 'freezeVal' in this.children[i].$p.visible ? this.children[i].$p.visible.freezeVal : this.children[i].$p.visible.func()
+        //         } else {
+        //             this.children[i].$p.visible.freeze = false
+        //             this.children[i].visible = this.visible
+        //             this.children[i].$p.visible.freeze = true
+        //         }
                 
                 
-            }
-        }
+        //     }
+        // }
     }
     $clipChanged(){
         this.dom.style.overflow = this.clip ? "hidden" : "unset"
