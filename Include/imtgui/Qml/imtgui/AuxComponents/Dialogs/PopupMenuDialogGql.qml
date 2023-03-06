@@ -42,9 +42,9 @@ Item {
     }
 
 
-    property var properties;
-    property var gettedParams;
-    property var filterIdsModel;
+    property TreeItemModel properties: TreeItemModel{};
+    property TreeItemModel gettedParams: TreeItemModel{};
+    property TreeItemModel filterIdsModel: TreeItemModel{};
 
     /**
         Count of the visible item, if value = -1 then count unlimited

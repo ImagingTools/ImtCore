@@ -84,7 +84,7 @@ Item {
                     if (dialogLoader.item.centered){
                         dialogLoader.anchors.centerIn = dialogDelegate;
                     }
-                    dialogLoader.item.started()
+                    dialogLoader.item.started();
 
                     console.log("dialogLoader.item.parent", dialogLoader.item.parent);
 

@@ -140,7 +140,7 @@ Item {
                         if (dataModelLocal.ContainsKey("items")){
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
 
-                            if (sgqlModelBaseContainer.table){
+                            if (gqlModelBaseContainer.table){
                                 let selectedIndex = gqlModelBaseContainer.table.selectedIndex;
                                 if (gqlModelBaseContainer.items.GetItemsCount() <= selectedIndex){
                                     gqlModelBaseContainer.table.selectedIndex = -1;
