@@ -11,8 +11,6 @@ DocumentBase {
 
     property int selectedIndex: -1;
 
-    property alias pageIndex: mainPanel.selectedIndex;
-
     property BasicTableView includedRolesTable;
 
     property string productId: "";

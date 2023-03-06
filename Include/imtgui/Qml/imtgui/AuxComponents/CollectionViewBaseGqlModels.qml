@@ -138,14 +138,14 @@ Item {
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
                         if (dataModelLocal.ContainsKey("items")){
-                            let selectedIndex = gqlModelBaseContainer.table.selectedIndex;
-
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
 
-                            if (gqlModelBaseContainer.items.GetItemsCount() <= selectedIndex){
-                                gqlModelBaseContainer.table.selectedIndex = -1;
+                            if (sgqlModelBaseContainer.table){
+                                let selectedIndex = gqlModelBaseContainer.table.selectedIndex;
+                                if (gqlModelBaseContainer.items.GetItemsCount() <= selectedIndex){
+                                    gqlModelBaseContainer.table.selectedIndex = -1;
+                                }
                             }
-
                             Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");
                         }
 

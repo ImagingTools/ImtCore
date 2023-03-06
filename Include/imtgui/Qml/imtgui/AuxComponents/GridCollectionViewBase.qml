@@ -168,6 +168,11 @@ Item {
 
         rootItem: collectionViewBaseContainer;
         commandsId: collectionViewBaseContainer.commandsId;
+        pagination: paginationObj;
+
+        Component.onCompleted: {
+            console.log("CollectionViewBaseGqlModels onCompleted")
+        }
 
 
         onCommandsIdChanged: {

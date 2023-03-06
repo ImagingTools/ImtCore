@@ -355,7 +355,7 @@ Item {
                 }
 
                 function setCellWidth(){
-                    if(!deleg.complCompl){
+                    if(!deleg || !deleg.complCompl){
                         return;
                     }
 

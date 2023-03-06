@@ -51,6 +51,10 @@ Rectangle {
 
         boundsBehavior: Flickable.StopAtBounds;
 
+        Component.onCompleted: {
+            console.log("Style.menuButtonDecoratorPath", Style.menuButtonDecoratorPath)
+        }
+
         Keys.onPressed: {
             console.log("MenuPanel onPressed");
 
