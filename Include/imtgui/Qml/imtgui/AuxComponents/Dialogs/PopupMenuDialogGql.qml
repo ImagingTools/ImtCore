@@ -38,7 +38,7 @@ Item {
         fontColor: popupMenuContainer.fontColor;
         onClicked: {popupMenuContainer.finished(commandId, index)}
 
-        rootItem: popupMenuContainer;
+        rootItem: popupMenuContainer.rootItem;
     }
 
 
