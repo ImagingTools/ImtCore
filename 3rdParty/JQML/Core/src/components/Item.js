@@ -201,7 +201,7 @@ export class Item extends QtObject {
         // for(let i = this.children.length-1; i >= 0; i--){
         //     if(this.children[i].$p.visible && this.children[i].$qmlClassName !== 'ListElement' && this.children[i].$qmlClassName !== 'FileDialog'){
         //         if(this.visible){
-        //             this.children[i].$p.visible.freeze = false
+        //             this.children[i].$p.visible.freeze = true
         //             if('freezeVal' in this.children[i].$p.visible){
         //                 this.children[i].visible = this.children[i].$p.visible.freezeVal
         //             } else if(this.children[i].$p.visible.func) {
@@ -216,7 +216,7 @@ export class Item extends QtObject {
         //             }
         //             //this.children[i].visible = 'freezeVal' in this.children[i].$p.visible ? this.children[i].$p.visible.freezeVal : this.children[i].$p.visible.func()
         //         } else {
-        //             this.children[i].$p.visible.freeze = false
+        //             this.children[i].$p.visible.freeze = true
         //             this.children[i].visible = this.visible
         //             this.children[i].$p.visible.freeze = true
         //         }
@@ -262,6 +262,10 @@ export class Item extends QtObject {
         this.focus = true
     }
     $anchorsChanged(){
+        this.$p.x.freeze = false
+        this.$p.y.freeze = false
+        this.$p.width.freeze = false
+        this.$p.height.freeze = false
         if(this.anchors.fill){
             if(this.anchors.fill === this.parent){
                 this.$sP('x', ()=>{
@@ -276,6 +280,10 @@ export class Item extends QtObject {
                 this.$sP('height', ()=>{
                     return this.anchors.fill.height - this.anchors.bottomMargin - this.anchors.topMargin
                 })
+                this.$p.x.freeze = true
+                this.$p.y.freeze = true
+                this.$p.width.freeze = true
+                this.$p.height.freeze = true
             } else if(this.parent === this.anchors.fill.parent ) {
                 this.$sP('x', ()=>{
                     return this.anchors.fill.x + this.anchors.leftMargin
@@ -289,6 +297,10 @@ export class Item extends QtObject {
                 this.$sP('height', ()=>{
                     return this.anchors.fill.height - this.anchors.bottomMargin - this.anchors.topMargin
                 })
+                this.$p.x.freeze = true
+                this.$p.y.freeze = true
+                this.$p.width.freeze = true
+                this.$p.height.freeze = true
             } else {
                 this.$sP('x', ()=>{
                     return this.anchors.fill.x + this.anchors.leftMargin + (this.anchors.fill.parent.x - this.parent.x)
@@ -302,11 +314,15 @@ export class Item extends QtObject {
                 this.$sP('height', ()=>{
                     return this.anchors.fill.height - this.anchors.bottomMargin - this.anchors.topMargin
                 })
+                this.$p.x.freeze = true
+                this.$p.y.freeze = true
+                this.$p.width.freeze = true
+                this.$p.height.freeze = true
                 // разные 
             }
+            
         } else if(this.anchors.centerIn){
-            
-            
+
             if(this.anchors.centerIn === this.parent){
                 this.$sP('x', ()=>{
                     return this.anchors.centerIn.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
@@ -314,6 +330,8 @@ export class Item extends QtObject {
                 this.$sP('y', ()=>{
                     return this.anchors.centerIn.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
                 })
+                this.$p.x.freeze = true
+                this.$p.y.freeze = true
             } else if(this.parent === this.anchors.centerIn.parent ) {
                 this.$sP('x', ()=>{
                     return this.anchors.centerIn.x + this.anchors.centerIn.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
@@ -321,6 +339,8 @@ export class Item extends QtObject {
                 this.$sP('y', ()=>{
                     return this.anchors.centerIn.y + this.anchors.centerIn.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
                 })
+                this.$p.x.freeze = true
+                this.$p.y.freeze = true
             } else {
                 this.$sP('x', ()=>{
                     return this.anchors.centerIn.x + this.anchors.centerIn.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin - (this.anchors.centerIn.parent.width/2 - this.parent.width/2)
@@ -328,6 +348,8 @@ export class Item extends QtObject {
                 this.$sP('y', ()=>{
                     return this.anchors.centerIn.y + this.anchors.centerIn.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin - (this.anchors.centerIn.parent.height/2 - this.parent.height/2)
                 })
+                this.$p.x.freeze = true
+                this.$p.y.freeze = true
                 // разные 
             }
             
@@ -338,14 +360,17 @@ export class Item extends QtObject {
                     this.$sP('x', ()=>{
                         return horizontalCenterTarget.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
                     })
+                    this.$p.x.freeze = true
                 } else if(this.parent === horizontalCenterTarget.parent ) {
                     this.$sP('x', ()=>{
                         return horizontalCenterTarget.x + horizontalCenterTarget.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin
                     })
+                    this.$p.x.freeze = true
                 } else {
                     this.$sP('x', ()=>{
                         return horizontalCenterTarget.x + horizontalCenterTarget.width / 2 - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin - (horizontalCenterTarget.parent.width/2 - this.parent.width/2)
                     })
+                    this.$p.x.freeze = true
                     // разные 
                 }
                 // this.x = this.anchors.horizontalCenter - this.width / 2 + this.anchors.leftMargin - this.anchors.rightMargin + this.anchors.horizontalCenterOffset
@@ -357,10 +382,12 @@ export class Item extends QtObject {
                         this.$sP('x', ()=>{
                             return this.anchors.leftMargin
                         })
+                        this.$p.x.freeze = true
                     } else if(this.anchors.left.float === 'right'){
                         this.$sP('x', ()=>{
                             return this.anchors.leftMargin + leftTarget.width
                         })
+                        this.$p.x.freeze = true
                     }
                     
                 } else if(this.parent === leftTarget.parent ) {
@@ -368,20 +395,24 @@ export class Item extends QtObject {
                         this.$sP('x', ()=>{
                             return leftTarget.x + this.anchors.leftMargin
                         })
+                        this.$p.x.freeze = true
                     } else if(this.anchors.left.float === 'right'){
                         this.$sP('x', ()=>{
                             return leftTarget.x + this.anchors.leftMargin + leftTarget.width
                         })
+                        this.$p.x.freeze = true
                     }
                 } else {
                     if(this.anchors.left.float === 'left'){
                         this.$sP('x', ()=>{
                             return leftTarget.x + this.anchors.leftMargin + (leftTarget.parent.x - this.parent.x)
                         })
+                        this.$p.x.freeze = true
                     } else if(this.anchors.left.float === 'right'){
                         this.$sP('x', ()=>{
                             return leftTarget.x + this.anchors.leftMargin + leftTarget.width + (leftTarget.parent.x - this.parent.x)
                         })
+                        this.$p.x.freeze = true
                     }
                     // разные 
                 }
@@ -390,10 +421,12 @@ export class Item extends QtObject {
                         this.$sP('width', ()=>{
                             return this.anchors.rightMargin - this.x
                         })
+                        this.$p.width.freeze = true
                     } else if(this.anchors.right.float === 'right'){
                         this.$sP('width', ()=>{
                             return rightTarget.width - this.anchors.rightMargin - this.x
                         })
+                        this.$p.width.freeze = true
                     }
                     
                 } else if(this.parent === rightTarget.parent ) {
@@ -401,20 +434,24 @@ export class Item extends QtObject {
                         this.$sP('width', ()=>{
                             return rightTarget.x - this.anchors.rightMargin - this.x
                         })
+                        this.$p.width.freeze = true
                     } else if(this.anchors.right.float === 'right'){
                         this.$sP('width', ()=>{
                             return rightTarget.x + rightTarget.width - this.anchors.rightMargin - this.x
                         })
+                        this.$p.width.freeze = true
                     }
                 } else {
                     if(this.anchors.right.float === 'left'){
                         this.$sP('width', ()=>{
                             return rightTarget.x - this.anchors.rightMargin - this.x + (rightTarget.parent.x - this.parent.x)
                         })
+                        this.$p.width.freeze = true
                     } else if(this.anchors.right.float === 'right'){
                         this.$sP('width', ()=>{
                             return rightTarget.x + rightTarget.width - this.anchors.rightMargin - this.x + (rightTarget.parent.x - this.parent.x)
                         })
+                        this.$p.width.freeze = true
                     }
                     // разные 
                 }
@@ -426,10 +463,12 @@ export class Item extends QtObject {
                             this.$sP('x', ()=>{
                                 return this.anchors.leftMargin
                             })
+                            this.$p.x.freeze = true
                         } else if(this.anchors.left.float === 'right'){
                             this.$sP('x', ()=>{
                                 return this.anchors.leftMargin + leftTarget.width
                             })
+                            this.$p.x.freeze = true
                         }
                         
                     } else if(this.parent === leftTarget.parent ) {
@@ -437,20 +476,24 @@ export class Item extends QtObject {
                             this.$sP('x', ()=>{
                                 return leftTarget.x + this.anchors.leftMargin
                             })
+                            this.$p.x.freeze = true
                         } else if(this.anchors.left.float === 'right'){
                             this.$sP('x', ()=>{
                                 return leftTarget.x + this.anchors.leftMargin + leftTarget.width
                             })
+                            this.$p.x.freeze = true
                         }
                     } else {
                         if(this.anchors.left.float === 'left'){
                             this.$sP('x', ()=>{
                                 return leftTarget.x + this.anchors.leftMargin + (leftTarget.parent.x - this.parent.x)
                             })
+                            this.$p.x.freeze = true
                         } else if(this.anchors.left.float === 'right'){
                             this.$sP('x', ()=>{
                                 return leftTarget.x + this.anchors.leftMargin + leftTarget.width + (leftTarget.parent.x - this.parent.x)
                             })
+                            this.$p.x.freeze = true
                         }
                         // разные 
                     }
@@ -463,10 +506,12 @@ export class Item extends QtObject {
                             this.$sP('x', ()=>{
                                 return -(this.width + this.anchors.rightMargin)
                             })
+                            this.$p.x.freeze = true
                         } else if(this.anchors.right.float === 'right'){
                             this.$sP('x', ()=>{
                                 return rightTarget.width - (this.width + this.anchors.rightMargin)
                             })
+                            this.$p.x.freeze = true
                         }
                         
                     } else if(this.parent === rightTarget.parent ) {
@@ -474,20 +519,24 @@ export class Item extends QtObject {
                             this.$sP('x', ()=>{
                                 return rightTarget.x - (this.width + this.anchors.rightMargin)
                             })
+                            this.$p.x.freeze = true
                         } else if(this.anchors.right.float === 'right'){
                             this.$sP('x', ()=>{
                                 return rightTarget.x + rightTarget.width - (this.width + this.anchors.rightMargin)
                             })
+                            this.$p.x.freeze = true
                         }
                     } else {
                         if(this.anchors.right.float === 'left'){
                             this.$sP('x', ()=>{
                                 return rightTarget.x - (this.width + this.anchors.rightMargin) + (rightTarget.parent.x - this.parent.x)
                             })
+                            this.$p.x.freeze = true
                         } else if(this.anchors.right.float === 'right'){
                             this.$sP('x', ()=>{
                                 return rightTarget.x + rightTarget.width - (this.width + this.anchors.rightMargin) + (rightTarget.parent.x - this.parent.x)
                             })
+                            this.$p.x.freeze = true
                         }
                         // разные 
                     }
@@ -501,14 +550,17 @@ export class Item extends QtObject {
                     this.$sP('y', ()=>{
                         return verticalCenterTarget.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
                     })
+                    this.$p.y.freeze = true
                 } else if(this.parent === verticalCenterTarget.parent ) {
                     this.$sP('y', ()=>{
                         return verticalCenterTarget.y + verticalCenterTarget.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin
                     })
+                    this.$p.y.freeze = true
                 } else {
                     this.$sP('y', ()=>{
                         return verticalCenterTarget.y + verticalCenterTarget.height / 2 - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin - (verticalCenterTarget.parent.height/2 - this.parent.height/2)
                     })
+                    this.$p.y.freeze = true
                     // разные 
                 }
                 // this.y = this.anchors.verticalCenter - this.height / 2 + this.anchors.topMargin - this.anchors.bottomMargin + this.anchors.verticalCenterOffset
@@ -520,10 +572,12 @@ export class Item extends QtObject {
                         this.$sP('y', ()=>{
                             return this.anchors.topMargin
                         })
+                        this.$p.y.freeze = true
                     } else if(this.anchors.top.float === 'bottom'){
                         this.$sP('y', ()=>{
                             return this.anchors.topMargin + topTarget.height
                         })
+                        this.$p.y.freeze = true
                     }
                     
                 } else if(this.parent === topTarget.parent ) {
@@ -531,10 +585,12 @@ export class Item extends QtObject {
                         this.$sP('y', ()=>{
                             return topTarget.y + this.anchors.topMargin
                         })
+                        this.$p.y.freeze = true
                     } else if(this.anchors.top.float === 'bottom'){
                         this.$sP('y', ()=>{
                             return topTarget.y + this.anchors.topMargin + topTarget.height
                         })
+                        this.$p.y.freeze = true
                     }
                 } else {
                     
@@ -542,10 +598,12 @@ export class Item extends QtObject {
                         this.$sP('y', ()=>{
                             return topTarget.y + this.anchors.topMargin + (topTarget.parent.y - this.parent.y)
                         })
+                        this.$p.y.freeze = true
                     } else if(this.anchors.top.float === 'bottom'){
                         this.$sP('y', ()=>{
                             return topTarget.y + this.anchors.topMargin + topTarget.height + (topTarget.parent.y - this.parent.y)
                         })
+                        this.$p.y.freeze = true
                     }
                     // разные 
                 }
@@ -554,10 +612,12 @@ export class Item extends QtObject {
                         this.$sP('height', ()=>{
                             return this.anchors.bottomMargin - this.y
                         })
+                        this.$p.height.freeze = true
                     } else if(this.anchors.bottom.float === 'bottom'){
                         this.$sP('height', ()=>{
                             return bottomTarget.height - this.anchors.bottomMargin - this.y
                         })
+                        this.$p.height.freeze = true
                     }
                     
                 } else if(this.parent === bottomTarget.parent ) {
@@ -565,20 +625,24 @@ export class Item extends QtObject {
                         this.$sP('height', ()=>{
                             return bottomTarget.y - this.anchors.bottomMargin - this.y
                         })
+                        this.$p.height.freeze = true
                     } else if(this.anchors.bottom.float === 'bottom'){
                         this.$sP('height', ()=>{
                             return bottomTarget.y + bottomTarget.height - this.anchors.bottomMargin - this.y
                         })
+                        this.$p.height.freeze = true
                     }
                 } else {
                     if(this.anchors.bottom.float === 'top'){
                         this.$sP('height', ()=>{
                             return bottomTarget.y - this.anchors.bottomMargin - this.y + (bottomTarget.parent.y - this.parent.y)
                         })
+                        this.$p.height.freeze = true
                     } else if(this.anchors.bottom.float === 'bottom'){
                         this.$sP('height', ()=>{
                             return bottomTarget.y + bottomTarget.height - this.anchors.bottomMargin - this.y + (bottomTarget.parent.y - this.parent.y)
                         })
+                        this.$p.height.freeze = true
                     }
                     // разные 
                 }
@@ -590,10 +654,12 @@ export class Item extends QtObject {
                             this.$sP('y', ()=>{
                                 return this.anchors.topMargin
                             })
+                            this.$p.y.freeze = true
                         } else if(this.anchors.top.float === 'bottom'){
                             this.$sP('y', ()=>{
                                 return this.anchors.topMargin + topTarget.height
                             })
+                            this.$p.y.freeze = true
                         }
                         
                     } else if(this.parent === topTarget.parent ) {
@@ -601,20 +667,24 @@ export class Item extends QtObject {
                             this.$sP('y', ()=>{
                                 return topTarget.y + this.anchors.topMargin
                             })
+                            this.$p.y.freeze = true
                         } else if(this.anchors.top.float === 'bottom'){
                             this.$sP('y', ()=>{
                                 return topTarget.y + this.anchors.topMargin + topTarget.height
                             })
+                            this.$p.y.freeze = true
                         }
                     } else {
                         if(this.anchors.top.float === 'top'){
                             this.$sP('y', ()=>{
                                 return topTarget.y + this.anchors.topMargin + (topTarget.parent.y - this.parent.y)
                             })
+                            this.$p.y.freeze = true
                         } else if(this.anchors.top.float === 'bottom'){
                             this.$sP('y', ()=>{
                                 return topTarget.y + this.anchors.topMargin + topTarget.height + (topTarget.parent.y - this.parent.y)
                             })
+                            this.$p.y.freeze = true
                         }
                         // разные 
                     }
@@ -627,10 +697,12 @@ export class Item extends QtObject {
                             this.$sP('y', ()=>{
                                 return -(this.height + this.anchors.bottomMargin)
                             })
+                            this.$p.y.freeze = true
                         } else if(this.anchors.bottom.float === 'bottom'){
                             this.$sP('y', ()=>{
                                 return bottomTarget.height - (this.height + this.anchors.bottomMargin)
                             })
+                            this.$p.y.freeze = true
                         }
                         
                     } else if(this.parent === bottomTarget.parent ) {
@@ -638,27 +710,33 @@ export class Item extends QtObject {
                             this.$sP('y', ()=>{
                                 return bottomTarget.y - (this.height + this.anchors.bottomMargin)
                             })
+                            this.$p.y.freeze = true
                         } else if(this.anchors.bottom.float === 'bottom'){
                             this.$sP('y', ()=>{
                                 return bottomTarget.y + bottomTarget.height - (this.height + this.anchors.bottomMargin)
                             })
+                            this.$p.y.freeze = true
                         }
                     } else {
                         if(this.anchors.bottom.float === 'top'){
                             this.$sP('y', ()=>{
                                 return bottomTarget.y - (this.height + this.anchors.bottomMargin) + (bottomTarget.parent.y - this.parent.y)
                             })
+                            this.$p.y.freeze = true
                         } else if(this.anchors.bottom.float === 'bottom'){
                             this.$sP('y', ()=>{
                                 return bottomTarget.y + bottomTarget.height - (this.height + this.anchors.bottomMargin) + (bottomTarget.parent.y - this.parent.y)
                             })
+                            this.$p.y.freeze = true
                         }
                         // разные 
                     }
                     // this.y = this.anchors.bottom - this.height - this.anchors.bottomMargin
                 }
             }
+
         }
+        
     }
 
     // $updateChildrenRect(){

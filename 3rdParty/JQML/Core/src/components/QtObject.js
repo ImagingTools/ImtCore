@@ -394,6 +394,7 @@ export class QtObject {
         if(typeof val === 'function'){
             this.$p[name] = {
                 'val': undefined,
+                'freeze': false,
                 'signal': signal,
                 'depends': new Set(),
                 'func': ()=>{
@@ -421,6 +422,7 @@ export class QtObject {
         } else {
             this.$p[name] = {
                 'val': val,
+                'freeze': false,
                 'signal': signal,
                 'depends': new Set(),
                 'PID': PID++
@@ -467,18 +469,22 @@ export class QtObject {
                 while(this.$uL.aliases.indexOf(name) >= 0){
                     this.$uL.aliases.splice(this.$uL.aliases.indexOf(name), 1)
                 }
-                if(this.$p[name].freeze){
-                    this.$p[name].freezeVal = newVal
-                } else if(this.$p[name].val !== newVal){
+                if(this.$p[name].val !== newVal){
                     if(this.jqmlDebug){
                         console.info(`JQML::set property ${name}. old = `, this.$p[name].val, `new = `, newVal)
                     }
-                    for(let s of this.$p[name].depends){
-                        delete s[this.$p[name].PID]
+                    if(this.$p[name].freeze === true){
+                        signal()
+                        signal()
+                    } else {
+                        for(let s of this.$p[name].depends){
+                            delete s[this.$p[name].PID]
+                        }
+                        this.$p[name].depends.clear()
+                        this.$p[name].val = newVal
+                        signal()
                     }
-                    this.$p[name].depends.clear()
-                    this.$p[name].val = newVal
-                    signal()
+                    
                 }              
             },
         })
@@ -598,9 +604,6 @@ export class QtObject {
             } else {
                 this.$p[name].func = ()=>{
                     caller = this.$p[name]
-                    if(this.$p[name].freeze){
-                        return this.$p[name].val
-                    }
                     let res = func()
                     caller = null
                     if(typeof res === 'number'){
