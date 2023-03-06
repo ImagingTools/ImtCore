@@ -104,10 +104,10 @@ export class Image extends Item {
         }
     }
     $sourceChanged(){
-        if(this.$p.source.val){
+        if(this.source){
             this.progress = 0
             this.status = Image.Loading
-            let source = this.$p.source.val.replaceAll(/[\n,\t, ]/g, '')
+            let source = this.source.replaceAll(/[\n,\t, ]/g, '')
             let path = []
             if(Core.rootPath !== ''){
                 path.push(Core.rootPath)
@@ -122,6 +122,8 @@ export class Image extends Item {
             let fullpath = path.join('/').replaceAll('//', '/')
             
             this.$img.src = fullpath
+        } else {
+            this.dom.style.backgroundImage = `none`
         }
     }
 
