@@ -90,7 +90,7 @@ Item {
         anchors.left: parent.left;
         width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 
-        anchors.bottom: pagination.top;
+        anchors.bottom: paginationObj.top;
 
         color: Style.baseColor;
 
