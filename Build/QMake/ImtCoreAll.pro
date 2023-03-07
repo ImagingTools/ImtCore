@@ -4,6 +4,13 @@ TEMPLATE = subdirs
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
+SUBDIRS += imtdev
+imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
+
+SUBDIRS += ImtDevPck
+ImtDevPck.file = ../../Impl/ImtDevPck/QMake/ImtDevPck.pro
+ImtDevPck.depends = imtdev
+
 SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 
