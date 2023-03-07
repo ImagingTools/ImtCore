@@ -60,6 +60,7 @@ export class Item extends QtObject {
         this.$cP('y', 0).connect(this.$yChanged.bind(this))
         this.$cP('z', 0).connect(this.$zChanged.bind(this))
         this.$cP('visible', true).connect(this.$visibleChanged.bind(this))
+        if(this.parent) this.$sP('visible', ()=>{return this.parent.visible})
         this.$cP('clip', false).connect(this.$clipChanged.bind(this))
         this.$cP('opacity', 1.0).connect(this.$opacityChanged.bind(this))
         this.$cP('enabled', true).connect(this.$enabledChanged.bind(this))
@@ -198,27 +199,26 @@ export class Item extends QtObject {
         this.dom.style.opacity = this.visible ? this.opacity : 0
         this.dom.style.visibility = this.visible ? 'visible' : 'hidden'
         this.dom.style.zIndex = this.visible ? /*2147483646/2 +*/ this.z : -1
+
         // for(let i = this.children.length-1; i >= 0; i--){
         //     if(this.children[i].$p.visible && this.children[i].$qmlClassName !== 'ListElement' && this.children[i].$qmlClassName !== 'FileDialog'){
         //         if(this.visible){
-        //             this.children[i].$p.visible.freeze = true
-        //             if('freezeVal' in this.children[i].$p.visible){
-        //                 this.children[i].visible = this.children[i].$p.visible.freezeVal
-        //             } else if(this.children[i].$p.visible.func) {
-        //                 let val = this.children[i].$p.visible.func()
-        //                 if(this.children[i].$p.visible.val !== val){
-        //                     this.children[i].$p.visible.val = val
-        //                     this.children[i].$p.visible.signal()
-        //                 }
+        //             this.children[i].$p.visible.blocked = false
+        //             if(this.children[i].$p.visible.func) {
+        //                 caller = this.children[i].$p.visible
+        //                 this.children[i].visible = this.children[i].$p.visible.func()
+        //                 caller = null
                         
+        //             } else if('blockedVal' in this.children[i].$p.visible){
+        //                 this.children[i].visible = this.children[i].$p.visible.blockedVal
         //             } else {
         //                 this.children[i].visible = this.visible
         //             }
-        //             //this.children[i].visible = 'freezeVal' in this.children[i].$p.visible ? this.children[i].$p.visible.freezeVal : this.children[i].$p.visible.func()
         //         } else {
-        //             this.children[i].$p.visible.freeze = true
+        //             this.children[i].$p.visible.blockedVal = this.children[i].$p.visible.val
+        //             this.children[i].$p.visible.blocked = false
         //             this.children[i].visible = this.visible
-        //             this.children[i].$p.visible.freeze = true
+        //             this.children[i].$p.visible.blocked = true
         //         }
                 
                 

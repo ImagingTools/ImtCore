@@ -828,7 +828,12 @@ function compile(instructions, code, curr = '$root', prev = ''){
     
     for(let prop in instructions.propertiesLazy){
         let val = instructions.propertiesLazy[prop]
-        code.push(`${curr}.$sP(\`${prop}\`, function(){return ${val}}.bind(${curr}))`)
+        if(prop === 'visible'){
+            code.push(`${curr}.$sP(\`${prop}\`, function(){return this.parent.visible && ${val}}.bind(${curr}))`)
+        } else {
+            code.push(`${curr}.$sP(\`${prop}\`, function(){return ${val}}.bind(${curr}))`)
+        }
+        
     }
     for(let prop in instructions.propertiesNew){
         let val = instructions.propertiesNew[prop]
@@ -899,7 +904,12 @@ function compile(instructions, code, curr = '$root', prev = ''){
         if(instructions.class === 'ListElement'){
             code.push(`${curr}.$cP(\`${prop}\`,${val})`)
         } else {
-            code.push(`${curr}.${prop}=${val}`)
+            if(prop === 'visible'){
+                code.push(`${curr}.$sP(\`${prop}\`, function(){return this.parent.visible && ${val}}.bind(${curr}))`)
+            } else {
+                code.push(`${curr}.${prop}=${val}`)
+            }
+            
         }
         
     }
