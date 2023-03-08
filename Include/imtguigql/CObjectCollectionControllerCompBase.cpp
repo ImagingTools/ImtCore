@@ -356,21 +356,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
 	if (!objectId.isEmpty()){
-		dataModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
-
-		itemsModel->SetData("NewId", newName);
-		itemsModel->SetData("NewName", newName);
+		dataModel->SetData("Id", objectId);
+		dataModel->SetData("Name", newName);
 
 		m_objectCollectionCompPtr->SetElementName(objectId, newName);
-		dataModel->SetExternTreeModel("item", itemsModel);
 	}
-
-	rootModelPtr->SetExternTreeModel("data", dataModel);
 
 	return rootModelPtr.PopPtr();
 }
@@ -394,26 +387,16 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 		description = inputParams->at(0).GetFieldArgumentValue("Description").toString();
 	}
 
-	imtbase::CTreeItemModel* rootModel(new imtbase::CTreeItemModel());
-
-	imtbase::CTreeItemModel* dataModel = nullptr;
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	if (!objectId.isEmpty()){
-
-		dataModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
-
-		itemsModel->SetData("Id", objectId);
-		itemsModel->SetData("Description", description);
-
-		dataModel->SetExternTreeModel("item", itemsModel);
-
+		dataModelPtr->SetData("Id", objectId);
+		dataModelPtr->SetData("Description", description);
 		m_objectCollectionCompPtr->SetElementDescription(objectId, description);
 	}
 
-	rootModel->SetExternTreeModel("data", dataModel);
-
-	return rootModel;
+	return rootModelPtr.PopPtr();
 }
 
 

@@ -3,8 +3,6 @@ import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
 
-//import QtQuick.Dialogs 1.3
-
 Item {
     id: containerBase;
 
@@ -147,6 +145,7 @@ Item {
     }
 
     onRemoved: {
+        console.log('onRemoved',id)
         if (containerBase.documentManager){
             containerBase.documentManager.closeDocument(id);
         }
@@ -353,14 +352,10 @@ Item {
                     if (dataModelLocal.ContainsKey(containerBase.gqlModelRename)) {
                         dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRename);
 
-                        if (dataModelLocal.ContainsKey("item")) {
-                            dataModelLocal = dataModelLocal.GetData("item");
+                        let oldId = dataModelLocal.GetData("Id");
+                        let newName = dataModelLocal.GetData("Name");
 
-                            let oldId = dataModelLocal.GetData("OldId");
-                            let newName = dataModelLocal.GetData("NewName");
-
-                            containerBase.renamed(oldId, newName);
-                        }
+                        containerBase.renamed(oldId, newName);
                     }
                 }
             }
@@ -421,14 +416,10 @@ Item {
 
                         dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelSetDescription);
 
-                        if (dataModelLocal.ContainsKey("item")) {
-                            dataModelLocal = dataModelLocal.GetData("item");
+                        var id = dataModelLocal.GetData("Id");
+                        var description = dataModelLocal.GetData("Description");
 
-                            var id = dataModelLocal.GetData("Id");
-                            var description = dataModelLocal.GetData("Description");
-
-                            containerBase.descriptionSetted(id, description);
-                        }
+                        containerBase.descriptionSetted(id, description);
                     }
                 }
             }

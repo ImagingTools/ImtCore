@@ -62,7 +62,8 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 		imtbase::CTreeItemModel* sourceModelPtr = dataModelPtr->AddTreeModel("source");
 
 		QByteArray resources = resource.readAll();
-		if (sourceModelPtr->CreateFromJson(resources)){
+		bool ok = sourceModelPtr->CreateFromJson(resources);
+		if (!ok){
 		}
 	}
 
@@ -71,7 +72,8 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 		imtbase::CTreeItemModel* decoratorsModelPtr = dataModelPtr->AddTreeModel("decorators");
 
 		QByteArray decoratorsData = decorators.readAll();
-		if (decoratorsModelPtr->CreateFromJson(decoratorsData)){
+		bool ok = decoratorsModelPtr->CreateFromJson(decoratorsData);
+		if (!ok){
 		}
 	}
 

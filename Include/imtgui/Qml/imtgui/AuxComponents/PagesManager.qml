@@ -7,10 +7,14 @@ Item {
 
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem: null;
-    property int activePageIndex;
+    property int activePageIndex: -1;
 
     onActiveItemChanged: {
         console.log("onActiveItemChanged", container.activeItem);
+    }
+
+    onActivePageIndexChanged: {
+        console.log("PagesManager onActivePageIndexChanged", container.activePageIndex);
     }
 
     function updateModel(){
@@ -43,13 +47,14 @@ Item {
             id: pagesDeleg;
 
             anchors.fill: parent;
-            //anchors.margins: thumbnailDecoratorContainer.mainMargin;
             anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
 
             visible: container.activePageIndex === model.index;
 
             Component.onCompleted: {
                 console.log("pagesDeleg onCompleted", model.Source);
+
+                mainDocumentManager.registerDocumentManager(model.Id, null);
             }
 
             /**
@@ -70,6 +75,8 @@ Item {
             Loader {
                 id: pagesLoader;
                 anchors.fill: parent;
+
+//                source: model.Source;
 
                 onItemChanged: {
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)

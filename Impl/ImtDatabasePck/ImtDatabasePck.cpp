@@ -36,6 +36,11 @@ I_EXPORT_COMPONENT(
 			"Database Document");
 
 I_EXPORT_COMPONENT(
+			SqlDatabaseJsonDelegate,
+			"Delegate for the json document-oriented tables",
+			"Database Document Json SQL");
+
+I_EXPORT_COMPONENT(
 			StandardMetaInfoTableDelegate,
 			"Delegate for the meta-info table",
 			"Database Document Meta");

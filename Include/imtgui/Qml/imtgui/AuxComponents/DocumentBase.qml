@@ -22,8 +22,12 @@ Item {
 
     property bool saveIsBlocked: false;
 
+    property bool blockUpdatingModel: false;
+
     // If true - after update the document will be closed
     property bool closingFlag: false;
+
+    property bool nameOutsideEditor: false;
 
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
@@ -49,8 +53,26 @@ Item {
         documentBase.documentModel.modelChanged.disconnect(documentBase.modelChanged);
     }
 
+    onBlockUpdatingModelChanged: {
+        Events.sendEvent("DocumentUpdating", documentBase.blockUpdatingModel);
+    }
+
     onDocumentModelChanged: {
+        console.log("documentBase onDocumentModelChanged", JSON.stringify(documentBase.documentModel));
         documentBase.documentModel.modelChanged.connect(documentBase.modelChanged);
+
+        documentBase.itemId = documentBase.documentModel.GetData("Id");
+        documentBase.itemName = documentBase.documentModel.GetData("Name");
+
+        documentBase.updateDocumentTitle()
+    }
+
+    function onEntered(value){
+        documentBase.documentModel.SetData("Id", value);
+        documentBase.documentModel.SetData("Name", value);
+
+        documentBase.itemId = value;
+        documentBase.itemName = value;
     }
 
     function modelChanged(){
@@ -67,7 +89,7 @@ Item {
     }
 
     onIsDirtyChanged: {
-        Events.sendEvent("DocumentIsDirtyChanged", documentBase.isDirty);
+        Events.sendEvent("DocumentIsDirtyChanged", {"Id": documentBase.itemId, "IsDirty": documentBase.isDirty});
 
         documentBase.commandsProvider.setCommandIsEnabled("Save", documentBase.isDirty);
     }
@@ -76,10 +98,6 @@ Item {
         if(commandsDelegateBase.item && commandsDelegateBase.item.documentsData !==undefined){
             commandsDelegateBase.item.documentsData = documentBase.documentsData;
         }
-//        if (documentBase.itemLoad){
-//            documentBase.itemId = documentsData.GetData("Id", model.index);
-//            documentBase.itemName = documentsData.GetData("Title", model.index);
-//        }
     }
 
     onDocumentManagerChanged: {
@@ -96,22 +114,22 @@ Item {
 
             commandsDelegate.commandsId = documentBase.commandsId;
 
-            documentBase.commandsDelegate.itemModelInputParams["Id"] = itemId;
-            documentBase.commandsDelegate.updateModel();
+//            documentBase.commandsDelegate.itemModelInputParams["Id"] = itemId;
+//            documentBase.commandsDelegate.updateModel();
         }
     }
 
-//    onVisibleChanged: {
-//        if (documentBase.visible){
-//            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-//                                 "CommandsId": commandsProvider.commandsId});
+    function updateDocumentTitle(){
+        if (documentBase.documentManager != null){
+            let documentId = documentBase.documentModel.GetData("Id");
+            let documentName = documentBase.documentModel.GetData("Name");
+            if (documentName === ""){
+                documentName = "<new item>"
+            }
 
-//            Events.subscribeEvent(documentBase.commandsId + "CommandActivated", documentBase.commandsDelegate.commandHandle);
-//        }
-//        else{
-//            Events.unSubscribeEvent(documentBase.commandsId + "CommandActivated", documentBase.commandsDelegate.commandHandle);
-//        }
-//    }
+            documentBase.documentManager.setDocumentTitle({"Id": documentId, "Title": documentName});
+        }
+    }
 
     function updateGui(){}
 

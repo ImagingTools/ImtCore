@@ -12,8 +12,6 @@ DocumentBase {
 
     property int textInputHeight: 30;
 
-    property bool blockUpdatingModel: false;
-
     onDocumentModelChanged: {
         console.log("AccountEditor onDocumentModelChanged");
         accountEditorContainer.updateGui();

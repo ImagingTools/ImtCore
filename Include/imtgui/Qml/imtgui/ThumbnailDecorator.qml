@@ -19,6 +19,8 @@ Rectangle {
     property alias authorizationPageAlias: authorizationPage;
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
+    property alias documentManager: mainDocumentManager;
+    property alias dialogManager: modalDialogManager;
 
     Component.onCompleted: {
         Events.subscribeEvent("setPreferencesVisible", thumbnailDecoratorContainer.setPreferencesVisible);
@@ -53,6 +55,10 @@ Rectangle {
         model: pagesManager.pageModel;
 
         color: Style.imagingToolsGradient1;
+
+        onActivePageIndexChanged: {
+            //pagesManager.activePageIndex = menuPanel.activePageIndex;
+        }
     }
 
     Item {
@@ -75,6 +81,12 @@ Rectangle {
                 }
             }
         }
+    }
+
+    MainDocumentManager {
+        id: mainDocumentManager;
+
+        menuPanelRef: menuPanel;
     }
 
     PagesManager {

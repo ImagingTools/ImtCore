@@ -135,7 +135,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 				}
 
 				if (licenseId.isEmpty()){
-					errorMessage = QT_TR_NOOP(licenseName + " has an empty License-ID!");
+					errorMessage = QT_TR_NOOP(licenseName + " has an empty License-ID");
 					return nullptr;
 				}
 

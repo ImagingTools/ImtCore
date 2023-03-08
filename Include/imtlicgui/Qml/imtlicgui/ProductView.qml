@@ -5,7 +5,7 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-    property bool blockUpdatingModel: false;
+    nameOutsideEditor: true;
 
     Component.onCompleted: {
         Events.subscribeEvent("FeaturesUpdated", container.onFeaturesUpdated);

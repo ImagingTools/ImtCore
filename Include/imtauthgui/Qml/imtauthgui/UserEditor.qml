@@ -24,6 +24,10 @@ Item {
         userEditorContainer.updateGui();
     }
 
+    onBlockUpdatingModelChanged: {
+        Events.sendEvent("DocumentUpdating", userEditorContainer.blockUpdatingModel);
+    }
+
     onUndoRedoManagerChanged: {
         console.log("UserEditor onUndoRedoManagerChanged", undoRedoManager);
     }

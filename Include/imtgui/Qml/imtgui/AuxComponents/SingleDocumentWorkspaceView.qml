@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtgui 1.0
 
 Item {
     id: documentManager;
@@ -8,14 +9,20 @@ Item {
 
     property var startPageObj;
 
+    property bool documentLoading: false;
+
     Component.onCompleted: {
-        Events.subscribeEvent("DocumentSaved", documentManager.documentSaved);
-        Events.subscribeEvent("CloseDocument", documentManager.closeDocument);
+//        Events.subscribeEvent("DocumentSaved", documentManager.documentSaved);
+//        Events.subscribeEvent("CloseDocument", documentManager.closeDocument);
+
+        Events.subscribeEvent("DocumentUpdating", documentManager.documentUpdating);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("DocumentSaved", documentManager.documentSaved);
-        Events.unSubscribeEvent("CloseDocument", documentManager.closeDocument);
+//        Events.unSubscribeEvent("DocumentSaved", documentManager.documentSaved);
+//        Events.unSubscribeEvent("CloseDocument", documentManager.closeDocument);
+
+        Events.unSubscribeEvent("DocumentUpdating", documentManager.documentUpdating);
     }
 
     onStartPageObjChanged: {
@@ -34,6 +41,18 @@ Item {
         }
     }
 
+    onDocumentLoadingChanged: {
+        loading.visible = documentManager.documentLoading;
+    }
+
+    function documentUpdating(updatingFlag){
+        console.log("documentUpdating", updatingFlag);
+
+        if (!updatingFlag){
+            documentManager.documentLoading = false;
+        }
+    }
+
     function documentSaved(parameters){
         let documentId = parameters["Id"];
         let documentName = parameters["Name"];
@@ -46,6 +65,12 @@ Item {
         let item = stackView.peek();
         item.itemId = documentId;
         item.itemName = documentName;
+
+        item.isDirty = false;
+
+        if (item.closingFlag){
+            closeDocument(item.itemId);
+        }
     }
 
     TreeItemModel {
@@ -69,7 +94,24 @@ Item {
         }
     }
 
-    function addDocument(document){
+//    function addDocument(document){
+//        let keys = Object.keys(document);
+
+//        document["documentsData"] = documentsData;
+//        document["documentManager"] = documentManager;
+
+//        for (let key of keys){
+//            documentsData.SetData(key, document[key]);
+//        }
+
+//        documentsData.SetData("Title", document["Name"]);
+
+//        stackView.push(document);
+//    }
+
+    function openDocument(itemId, document){
+        documentManager.documentLoading = true;
+        console.log("openDocument" , JSON.stringify(document));
         let keys = Object.keys(document);
 
         document["documentsData"] = documentsData;
@@ -79,13 +121,36 @@ Item {
             documentsData.SetData(key, document[key]);
         }
 
-        documentsData.SetData("Title", document["Name"]);
+//        documentsData.SetData("Title", document["Name"]);
+        let documentId = document["Id"];
+        documentController.documentTypeId = document["CommandsId"];
+        documentController.getData(documentId, document);
 
         stackView.push(document);
     }
 
-    function closeDocument(){
-        stackView.pop();
+    function saveDocument(documentId){
+        console.log("saveDocument" ,documentId);
+
+        let item = stackView.peek();
+        let documentData = item.documentModel;
+        if (documentId === ""){
+            documentController.setData(documentId, documentData);
+        }
+        else{
+            documentController.updateData(documentId, documentData);
+        }
+    }
+
+    function closeDocument(documentId){
+        let document = stackView.peek();
+
+        if (document && document.isDirty){
+            modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
+        }
+        else{
+            stackView.pop();
+        }
     }
 
     function setDocumentTitle(){
@@ -95,5 +160,69 @@ Item {
         id: stackView;
 
         anchors.fill: parent;
+    }
+
+    Loading {
+        id: loading;
+
+        anchors.fill: parent;
+
+        visible: false;
+    }
+
+    GqlDocumentDataController {
+        id: documentController;
+
+        onDocumentModelChanged: {
+            if (documentController.documentModel != null){
+                let item = stackView.peek();
+                item.documentModel = documentController.documentModel;
+            }
+        }
+
+        onDocumentAdded: {
+            documentManager.documentSaved({"Id":documentId, "Name":documentName});
+        }
+
+        onDocumentUpdated: {
+            documentManager.documentSaved({"Id":documentId, "Name":documentName});
+        }
+
+        onSavingError: {
+            modalDialogManager.openDialog(savingErrorDialog, {"message": message});
+        }
+    }
+
+    Component {
+        id: savingErrorDialog;
+
+        ErrorDialog {
+            onFinished: {
+            }
+        }
+    }
+
+    Component {
+        id: saveDialog;
+        MessageDialog {
+            Component.onCompleted: {
+                console.log("saveDialog onCompleted");
+                buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
+            }
+
+            onFinished: {
+                console.log("saveDialog onFinished", buttonId);
+                let document = stackView.peek();
+                if (buttonId == "Yes"){
+                    document.closingFlag = true;
+
+                    saveDocument(document.itemId);
+                }
+                else if (buttonId == "No"){
+                    document.isDirty = false;
+                    closeDocument(document.itemId);
+                }
+            }
+        }
     }
 }

@@ -180,6 +180,15 @@ Item {
                 filterMenuLocal.visible = !filterMenuLocal.visible;
             }
         }
+
+        Loading {
+            id: ldng;
+
+            anchors.fill: tableInternal;
+            anchors.topMargin: tableInternal.headerElementHeight;
+
+            visible: false;
+        }
     }
 
     SortController {
@@ -233,6 +242,7 @@ Item {
         rootItem: collectionViewBaseContainer;
 
         pagination: paginationObj;
+        loading: ldng;
 
         onHeadersChanged: {
             console.log("onHeadersChanged", baseCommands.headers)

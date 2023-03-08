@@ -33,9 +33,10 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 		roleId = qPrintable(data[0]);
 	}
 
-	dataModelPtr->SetData("Id", roleId);
-	dataModelPtr->SetData("ProductId", productId);
+	dataModelPtr->SetData("Id", "");
 	dataModelPtr->SetData("Name", "");
+	dataModelPtr->SetData("RoleId", roleId);
+	dataModelPtr->SetData("ProductId", productId);
 	dataModelPtr->SetData("Description", "");
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -49,8 +50,7 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 		QByteArray roleId = roleInfoPtr->GetRoleId();
 		QString roleName = roleInfoPtr->GetRoleName();
 
-//		roleInfoPtr->GetProductId();
-
+		dataModelPtr->SetData("Id", roleId + *m_separatorObjectIdAttrPtr + productId);
 		dataModelPtr->SetData("Name", roleName);
 
 		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
@@ -111,8 +111,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 		itemModel.CreateFromJson(itemData);
 
 		QByteArray roleId;
-		if (itemModel.ContainsKey("Id")){
-			roleId = itemModel.GetData("Id").toByteArray();
+		if (itemModel.ContainsKey("RoleId")){
+			roleId = itemModel.GetData("RoleId").toByteArray();
 			if (roleId.isEmpty()){
 
 				errorMessage = QT_TR_NOOP("Role-ID can't be empty!");

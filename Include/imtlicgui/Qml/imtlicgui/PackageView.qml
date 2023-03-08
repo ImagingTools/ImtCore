@@ -2,13 +2,12 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-
 DocumentBase {
     id: packageViewContainer;
 
     commandsDelegateSourceComp: packageViewCommandsDelegate;
 
-    property bool blockUpdatingModel: false;
+    nameOutsideEditor: true;
 
     property TreeItemModel treeViewModel: TreeItemModel {}
 
@@ -37,7 +36,7 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
-        console.log("documentBase onDocumentModelChanged");
+        console.log("packageview onDocumentModelChanged");
         //        let items = packageViewContainer.documentModel.GetData("Items");
         //        if (!items){
         //            packageViewContainer.documentModel.AddTreeModel("Items");

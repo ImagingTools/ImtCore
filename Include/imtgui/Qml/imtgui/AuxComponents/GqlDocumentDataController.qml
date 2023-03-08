@@ -5,19 +5,25 @@ import imtqml 1.0
 Item {
     id: container;
 
-    property string prefixCommandId: "";
-
-    property string getCommandId: prefixCommandId + "Item";
-    property string setCommandId: prefixCommandId + "Add";
-    property string updateCommandId: prefixCommandId + "Update";
+    property string documentTypeId: "";
+    property string updateCommandId: container.documentTypeId + "Update";
+    property string getCommandId: container.documentTypeId + "Item";
+    property string setCommandId: container.documentTypeId + "Add";
 
     property TreeItemModel documentModel: null;
 
-    signal documentModelSaved();
+    property alias gqlGetModel: getModel;
+    property alias gqlSetModel: setModel;
+
+    signal documentUpdated(string documentId, string documentName);
+    signal documentAdded(string documentId, string documentName);
+    signal savingError(string message);
+
+    onDocumentTypeIdChanged: {
+        console.log("onDocumentTypeIdChanged", documentTypeId);
+    }
 
     function getData(documentId, inputParams){
-
-        console.log("getData", documentId, getCommandId);
         getModel.get(documentId, inputParams);
     }
 
@@ -33,6 +39,7 @@ Item {
         id: getModel;
 
         function get(modelId, externInputParams){
+            console.log("query getModel", container.getCommandId, modelId);
             var query = Gql.GqlRequest("query", container.getCommandId);
 
             var queryFields = Gql.GqlObject("item");
@@ -48,6 +55,8 @@ Item {
             query.AddParam(inputParams);
 
             var gqlData = query.GetQuery();
+
+            console.log(container.getCommandId + "Item query", gqlData);
 
             this.SetGqlQuery(gqlData);
         }
@@ -80,7 +89,6 @@ Item {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
             var jsonString = data.toJSON();
-//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             inputParams.InsertField ("Item", jsonString);
             query.AddParam(inputParams);
 
@@ -96,6 +104,9 @@ Item {
             }
 
             var gqlData = query.GetQuery();
+
+            console.log(gqlData);
+
             this.SetGqlQuery(gqlData);
         }
 
@@ -105,10 +116,17 @@ Item {
                 var dataModelLocal;
                 if (setModel.ContainsKey("errors")){
                     dataModelLocal = setModel.GetData("errors");
-                    dataModelLocal = dataModelLocal.GetData(container.setCommandId);
+
+                    if (dataModelLocal.ContainsKey(container.setCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.setCommandId);
+                    }
+                    else if (dataModelLocal.ContainsKey(container.updateCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.updateCommandId);
+                    }
+
                     if (dataModelLocal.ContainsKey("message")){
                         let message = dataModelLocal.GetData("message");
-                        modalDialogManager.openDialog(errorDialog, {"message": message});
+                        container.savingError(message);
                     }
 
                     return;
@@ -116,9 +134,24 @@ Item {
 
                 if (setModel.ContainsKey("data")){
                     dataModelLocal = setModel.GetData("data");
-                }
 
-                container.documentModelSaved();
+                    if (dataModelLocal.ContainsKey(setCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(setCommandId);
+                        dataModelLocal = dataModelLocal.GetData("addedNotification");
+
+                        let documentId = dataModelLocal.GetData("Id");
+                        let documentName = dataModelLocal.GetData("Name");
+                        container.documentUpdated(documentId, documentName);
+                    }
+                    else if (dataModelLocal.ContainsKey(updateCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(updateCommandId);
+                        dataModelLocal = dataModelLocal.GetData("updatedNotification");
+
+                        let documentId = dataModelLocal.GetData("Id");
+                        let documentName = dataModelLocal.GetData("Name");
+                        container.documentAdded(documentId, documentName);
+                    }
+                }
             }
         }
     }

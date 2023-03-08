@@ -154,7 +154,7 @@ Item {
 
             let startModel = undoRedo.undoStack[0];
             if (_.isEqual(newModel, startModel)){
-                Events.sendEvent("DocumentIsDirtyChanged", false);
+                Events.sendEvent("DocumentIsDirtyChanged", {"Id": documentBase.itemId, "IsDirty": false});
             }
         }
     }

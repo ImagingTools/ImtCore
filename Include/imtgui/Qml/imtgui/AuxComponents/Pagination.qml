@@ -89,10 +89,10 @@ Row {
             highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
 
-            enabled: model.number !== -1 && paginationContainer.currentIndex !== model.index;
+            enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
             textButton: model.number === -1 ? "..." : model.number;
             onClicked: {
-                paginationContainer.currentIndex = model.index;
+                paginationContainer.currentIndex = model.number - 1;
                 paginationContainer.refreshBtn();
             }
 
@@ -117,7 +117,7 @@ Row {
         hasText: false;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pageCount - 1;
+        enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pagesSize - 1;
 
         iconSource: buttonIncr.enabled ? "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg":
                                          "../../../" + "Icons/" + Style.theme + "/Right_Off_Disabled.svg";

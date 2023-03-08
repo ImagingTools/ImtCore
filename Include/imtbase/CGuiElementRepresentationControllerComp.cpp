@@ -52,7 +52,7 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 			const imtgui::IGuiElementModel* guiElementPtr = guiElementContainerPtr->GetGuiElementModel(elementId);
 			if (guiElementPtr != nullptr){
 				if (!isAdmin){
-					if (m_commandPermissionsProviderCompPtr.IsValid()){
+					if (m_commandPermissionsProviderCompPtr.IsValid() && !elementId.isEmpty()){
 						QByteArrayList elementPermissions = m_commandPermissionsProviderCompPtr->GetCommandPermissions(elementId);
 
 						if (m_checkPermissionCompPtr.IsValid()){

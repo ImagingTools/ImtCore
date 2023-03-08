@@ -23,6 +23,11 @@ Item {
     property Item rootItem: null;
     property Item pagination: null;
 
+    property Item loading: null;
+
+    // Поля которые запросятся для модели коллекции
+    property var fieldsData: ["Id", "Name"]
+
     function updateModels(){
         console.log("CollectionView updateModels");
         headerInfoModel.updateModel();
@@ -79,6 +84,13 @@ Item {
                             dataModelLocal = dataModelLocal.GetData("Headers");
                             gqlModelBaseContainer.headers = dataModelLocal;
 
+                            for(var i = 0; i < gqlModelBaseContainer.headers.GetItemsCount(); i++){
+                                let headerId = gqlModelBaseContainer.headers.GetData("Id", i);
+                                if (!gqlModelBaseContainer.fieldsData.includes(headerId)){
+                                    gqlModelBaseContainer.fieldsData.push(headerId);
+                                }
+                            }
+
                             itemsInfoModel.updateModel();
                         }
                     }
@@ -110,17 +122,18 @@ Item {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Name");
-            for(var i = 0; i < gqlModelBaseContainer.headers.GetItemsCount(); i++){
-                queryFields.InsertField(gqlModelBaseContainer.headers.GetData("Id", i));
+            for(var i = 0; i < fieldsData.length; i++){
+                queryFields.InsertField(fieldsData[i]);
             }
-
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
 
             console.log("gqlData", gqlData);
+
+            if (gqlModelBaseContainer.loading){
+                gqlModelBaseContainer.loading.visible = true;
+            }
 
             this.SetGqlQuery(gqlData);
         }
@@ -138,14 +151,24 @@ Item {
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
                         if (dataModelLocal.ContainsKey("items")){
+                            if (gqlModelBaseContainer.loading){
+                                gqlModelBaseContainer.loading.visible = false;
+                            }
+
+                            if (!gqlModelBaseContainer.table){
+                                return;
+                            }
+
+                            let selectedIndex = gqlModelBaseContainer.table.selectedIndex;
+
+                            gqlModelBaseContainer.table.selectedIndex = -1;
+
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
 
-                            if (gqlModelBaseContainer.table){
-                                let selectedIndex = gqlModelBaseContainer.table.selectedIndex;
-                                if (gqlModelBaseContainer.items.GetItemsCount() <= selectedIndex){
-                                    gqlModelBaseContainer.table.selectedIndex = -1;
-                                }
+                            if (gqlModelBaseContainer.items.GetItemsCount() > selectedIndex){
+                                gqlModelBaseContainer.table.selectedIndex = selectedIndex;
                             }
+
                             Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");
                         }
 

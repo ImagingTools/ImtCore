@@ -52,13 +52,21 @@ DocumentBase {
     }
 
     function updateGui(){
+        container.blockUpdatingModel = true;
+
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             loader.item.updateGui();
         }
+
+        container.blockUpdatingModel = false;
     }
 
     function updateModel(){
+        if (container.blockUpdatingModel){
+            return;
+        }
+
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             loader.item.updateModel();

@@ -503,12 +503,6 @@ idoc::MetaInfoPtr CRoleDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArr
 
 bool CRoleDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
 {
-//	if (record.contains("Description")){
-//		QString description = record.value("Description").toString();
-
-//		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::ElementInfoType::EIT_DESCRIPTION, description);
-//	}
-
 	return true;
 }
 

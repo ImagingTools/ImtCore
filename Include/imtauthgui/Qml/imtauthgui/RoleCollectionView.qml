@@ -49,6 +49,6 @@ CollectionView {
 
         console.log("selectItem", id, name, productId)
 
-        documentManager.addDocument({"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+        documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
     }
 }

@@ -12,7 +12,7 @@ Item{
     property bool autoWidth: true;
     property bool isCloseEnable: true;
 
-    property string text: "no name";
+    property string text;
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
 
     property string decoratorSource;

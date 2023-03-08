@@ -33,16 +33,17 @@ Rectangle {
         menuPanel.activePageIndex = -1;
     }
 
-    onActivePageIndexChanged: {
-        //lvPages.currentIndex = menuPanel.activePageIndex;
-    }
-
     onModelChanged: {
         console.log("MenuPanel onModelChanged", menuPanel.model);
         clearModels();
 
         lvPages.model = menuPanel.model;
     }
+
+    onActivePageIndexChanged: {
+        console.log("MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
+    }
+
 
     ListView {
         id: lvPages;
@@ -85,10 +86,11 @@ Rectangle {
             imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Selected.svg":
                                                      "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
             decoratorSource : Style.menuButtonDecoratorPath;
-            selected: lvPages.currentIndex === model.index;
+            selected: menuPanel.activePageIndex === model.index;
 
             onClicked: {
-                lvPages.currentIndex = model.index;
+//                lvPages.currentIndex = model.index;
+                console.log("MenuPanel onClicked", model.index);
                 menuPanel.activePageIndex = model.index;
                 menuPanel.activePageName = model["Name"];
                 menuPanel.activeIcon = model["Icon"];

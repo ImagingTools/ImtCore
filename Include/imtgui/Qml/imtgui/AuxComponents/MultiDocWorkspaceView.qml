@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtgui 1.0
 
 Item {
     id: workspaceView;
@@ -20,16 +21,22 @@ Item {
 
     property TreeItemModel documentsData: TreeItemModel {}
 
+    property bool documentLoading: false;
+
     Component.onCompleted: {
         Events.subscribeEvent("DocumentSaved", workspaceView.documentSaved);
         Events.subscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
         Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
+
+        Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("DocumentSaved", workspaceView.documentSaved);
         Events.unSubscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
         Events.unSubscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
+
+        Events.unSubscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
     }
 
     onVisibleChanged: {
@@ -37,11 +44,15 @@ Item {
             Events.subscribeEvent("DocumentSaved", workspaceView.documentSaved);
             Events.subscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
             Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
+
+            Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         }
         else{
             Events.unSubscribeEvent("DocumentSaved", workspaceView.documentSaved);
             Events.unSubscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
             Events.unSubscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
+
+            Events.unSubscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         }
     }
 
@@ -51,29 +62,88 @@ Item {
         }
     }
 
-    function documentIsDirtyChanged(isDirty){
-        let currentTitle = workspaceView.documentsData.GetData("Title", tabPanelInternal.selectedIndex);
-        if (isDirty){
-            let lastSymbol = currentTitle.charAt(currentTitle.length - 1);
-            if (lastSymbol !== '*'){
-                currentTitle = currentTitle + '*';
-            }
+    onDocumentLoadingChanged: {
+        loading.visible = workspaceView.documentLoading;
+    }
+
+    function documentUpdating(updatingFlag){
+        console.log("documentUpdating", updatingFlag);
+
+        if (!updatingFlag){
+            workspaceView.documentLoading = false;
         }
-        else{
-            currentTitle = currentTitle.replace('*', '');
+    }
+
+    function getTypeId(){
+        if (workspaceView.mainCollectionView != null){
+            return workspaceView.mainCollectionView.commandsId;
         }
 
-        workspaceView.documentsData.SetData("Title", currentTitle, tabPanelInternal.selectedIndex);
+        return "";
+    }
+
+    function getMainCollectionView(){
+        return workspaceView.mainCollectionView;
+    }
+
+    function documentIsDirtyChanged(parameters){
+        console.log("documentIsDirtyChanged", JSON.stringify(parameters));
+        let documentId = parameters["Id"];
+        let isDirty = parameters["IsDirty"];
+
+        let documentIndex = workspaceView.getDocumentIndexById(documentId);
+        if (documentIndex < 0){
+            documentIndex = tabPanelInternal.selectedIndex;
+        }
+
+        if (documentIndex > 0){
+            let currentTitle = workspaceView.documentsData.GetData("Title", documentIndex);
+            if (isDirty){
+                let lastSymbol = currentTitle.charAt(currentTitle.length - 1);
+                if (lastSymbol !== '*'){
+                    currentTitle = currentTitle + '*';
+                }
+            }
+            else{
+                currentTitle = currentTitle.replace('*', '');
+            }
+
+            workspaceView.documentsData.SetData("Title", currentTitle, documentIndex);
+        }
+    }
+
+    function dirtyDocumentsExists(){
+        for (let i = 1; i < workspaceView.documentsData.GetItemsCount(); i++){
+            let documentBase = workspaceView.documentsData.GetData("Item", i);
+            if (documentBase.isDirty){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     function documentSaved(parameters){
+        console.log("documentSaved");
+
         let documentId = parameters["Id"];
         let documentName = parameters["Name"];
 
+        console.log("documentId", documentId);
+        console.log("documentName", documentName);
+
         workspaceView.documentsData.SetData("Id", documentId, tabPanelInternal.selectedIndex);
-        workspaceView.documentsData.SetData("Title", documentName, tabPanelInternal.selectedIndex);
 
         let documentBase = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+//        documentBase.updateDocumentTitle();
+
+        workspaceView.setDocumentTitle({"Id": documentId, "Title": documentName});
+
+        documentBase.isDirty = false;
+
+        if (documentBase.closingFlag){
+            workspaceView.closeDocument(documentBase.itemId);
+        }
 
         if (workspaceView.mainCollectionView != null){
             workspaceView.mainCollectionView.updateGui();
@@ -84,7 +154,7 @@ Item {
         let index = documentsData.InsertNewItem();
 
         documentsData.SetData("Id", "", index);
-        documentsData.SetData("Title", "<new item>", index);
+        //documentsData.SetData("Title", "<new item>", index);
         documentsData.SetData("CommandsId", data["CommandsId"], index);
         documentsData.SetData("Source", data["Source"], index);
 
@@ -102,9 +172,9 @@ Item {
             return;
         }
 
-        let pageIndex = this.getDocumentIndexById(itemId);
-        console.log("MultidocWorkspaceView pageIndex", pageIndex)
-        if (pageIndex < 0){
+        let documentIndex = this.getDocumentIndexById(itemId);
+        console.log("MultidocWorkspaceView documentIndex", documentIndex)
+        if (documentIndex < 0){
             var index = documentsData.InsertNewItem();
             console.log("MultidocWorkspaceView addDocument index:", index)
 
@@ -113,59 +183,197 @@ Item {
             documentsData.SetData("Title", document["Name"], index);
             documentsData.SetData("Source", document["Source"], index);
 
-            pageIndex = index;
+            documentIndex = index;
         }
 
-        tabPanelInternal.selectedIndex = pageIndex;
+        tabPanelInternal.selectedIndex = documentIndex;
     }
 
-    function closeCurrentDocument(){
-        console.log("MultidocWorkspaceView closeCurrentDocument")
-         if (tabPanelInternal.selectedIndex >= 0){
-             workspaceView.documentsData.RemoveItem(tabPanelInternal.selectedIndex);
+//    function closeCurrentDocument(){
+//        console.log("MultidocWorkspaceView closeCurrentDocument")
+//         if (tabPanelInternal.selectedIndex >= 0){
+//             workspaceView.documentsData.RemoveItem(tabPanelInternal.selectedIndex);
 
-             if (tabPanelInternal.selectedIndex > 0){
-                 tabPanelInternal.selectedIndex--;
-             }
-         }
-     }
+//             if (tabPanelInternal.selectedIndex > 0){
+//                 tabPanelInternal.selectedIndex--;
+//             }
+//         }
+//     }
 
     function closeDocument(itemId){
+        console.log("closeDocument", itemId);
          let index = this.getDocumentIndexById(itemId);
-         if (index >= 0){
-             workspaceView.documentsData.RemoveItem(index);
+        console.log("index", index);
+         if (index < 0){
+             index = tabPanelInternal.selectedIndex;
+         }
 
-             if (tabPanelInternal.selectedIndex >= index && index > 0){
-                 tabPanelInternal.selectedIndex--;
+         if (index !== 0){
+             let documentBase = workspaceView.documentsData.GetData("Item", index);
+
+             if (documentBase.isDirty){
+                 modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
+             }
+             else{
+                 workspaceView.documentsData.RemoveItem(index);
+
+                 if (tabPanelInternal.selectedIndex >= index && index > 0){
+                     tabPanelInternal.selectedIndex--;
+                 }
              }
          }
      }
 
-    function saveDocument(index){
+    function insertNewDocument(documentId, params){
+        workspaceView.documentLoading = true;
+
+        let index = documentsData.InsertNewItem();
+
+        documentsData.SetData("Id", documentId, index);
+
+        let commandId = workspaceView.mainCollectionView.getEditorCommandId();
+        documentsData.SetData("CommandsId", commandId, index);
+
+        let source = workspaceView.mainCollectionView.getEditorPath();
+        documentsData.SetData("Source", source, index);
+
+        documentController.documentTypeId = commandId;
+        documentController.getData(documentId, params);
+
+        return index;
+    }
+
+    function openDocument(documentId, params){
+        console.log("openDocument", documentId);
+
+        let documentIndex = this.getDocumentIndexById(documentId);
+        if (documentIndex < 0){
+            documentIndex = workspaceView.insertNewDocument(documentId, params);
+        }
+
+        tabPanelInternal.selectedIndex = documentIndex;
+    }
+
+    function saveDocument(documentId){
+        console.log("saveDocument", documentId);
+
+        let documentIndex = -1;
+
+        let isNew = false;
+        if (documentId === ""){
+            documentIndex = tabPanelInternal.selectedIndex;
+            isNew = true;
+        }
+        else{
+            documentIndex = this.getDocumentIndexById(documentId);
+        }
+
+        if (documentIndex >= 0){
+            let commandId = workspaceView.mainCollectionView.getEditorCommandId();
+            documentController.documentTypeId = commandId;
+
+            let documentBase = workspaceView.documentsData.GetData("Item", documentIndex);
+
+            documentBase.updateModel();
+
+            let documentData = documentBase.documentModel;
+
+            if (isNew){
+                if (!documentBase.nameOutsideEditor){
+                    documentController.setData(documentId, documentData);
+                }
+                else{
+                    modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the document:")});
+                }
+            }
+            else{
+                documentController.updateData(documentId, documentData);
+            }
+        }
+    }
+
+    Component {
+        id: saveDialog;
+        MessageDialog {
+            Component.onCompleted: {
+                console.log("saveDialog onCompleted");
+                buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
+            }
+
+            onFinished: {
+                console.log("saveDialog onFinished", buttonId);
+                let documentBase = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+                if (buttonId == "Yes"){
+                    documentBase.closingFlag = true;
+
+                    workspaceView.saveDocument(documentBase.itemId);
+                }
+                else if (buttonId == "No"){
+                    documentBase.isDirty = false;
+                    workspaceView.closeDocument(documentBase.itemId);
+                }
+            }
+        }
+    }
+
+    Component {
+        id: inputDialog;
+        InputDialog {
+            title: qsTr("Entering a name");
+            onFinished: {
+                console.log("InputDialog result", buttonId, inputValue);
+                if (buttonId == "Ok"){
+                    let documentBase = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+                    documentBase.onEntered(inputValue);
+
+                    documentController.setData(documentBase.itemId, documentBase.documentModel);
+                }
+            }
+        }
+    }
+
+    Component {
+        id: savingErrorDialog;
+
+        ErrorDialog {
+            onFinished: {
+//                if (container.documentBase.closingFlag){
+//                    container.documentBase.closingFlag = false;
+//                }
+            }
+        }
     }
 
     function saveDirtyDocuments(){
     }
 
-    function saveOpenedDocuments(){
-
-    }
-
     function setDocumentTitle(parameters){
+        console.log("setDocumentTitle", JSON.stringify(parameters));
+
         let itemId = parameters["Id"];
         let newTitle = parameters["Title"];
 
         let index = this.getDocumentIndexById(itemId);
-        if (index >= 0){
+        if (index < 0){
+            index = tabPanelInternal.selectedIndex;
+        }
+
+        if (index !== 0){
             workspaceView.documentsData.SetData("Title", newTitle, index);
+            let document = workspaceView.documentsData.GetData("Item", index);
+            if (document.isDirty){
+                workspaceView.documentIsDirtyChanged({"Id": document.itemId, "IsDirty": true});
+            }
         }
     }
 
     function getDocumentIndexById(documentId){
-        for (var i = 1; i < documentsData.GetItemsCount(); i++){
-            var m_id = documentsData.GetData("Id", i);
-            if (m_id === documentId){
-                return i;
+        if (documentId !== ""){
+            for (var i = 0; i < documentsData.GetItemsCount(); i++){
+                var id = documentsData.GetData("Id", i);
+                if (id === documentId){
+                    return i;
+                }
             }
         }
 
@@ -201,6 +409,40 @@ Item {
                 tabPanelInternal.viewTabInListView(tabPanelInternal.selectedIndex);
             }
         }
+    }
+
+    GqlDocumentDataController {
+        id: documentController;
+
+        onDocumentModelChanged: {
+            if (documentController.documentModel != null){
+                if (tabPanelInternal.selectedIndex >= 0){
+                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+                    item.documentModel = documentController.documentModel;
+                }
+            }
+        }
+
+        onDocumentAdded: {
+            workspaceView.documentSaved({"Id":documentId, "Name":documentName});
+        }
+
+        onDocumentUpdated: {
+            workspaceView.documentSaved({"Id":documentId, "Name":documentName});
+        }
+
+        onSavingError: {
+            modalDialogManager.openDialog(savingErrorDialog, {"message": message});
+        }
+    }
+
+    GqlDocumentObserver {
+        id: documentObserver;
+
+        observedGetModel: documentController.gqlGetModel;
+        observedSetModel: documentController.gqlSetModel;
+
+//        loadingView: loading;
     }
 
     ListView {
@@ -265,5 +507,13 @@ Item {
                 }
             }
         }
+    }
+
+    Loading {
+        id: loading;
+
+        anchors.fill: parent;
+
+        visible: false;
     }
 }

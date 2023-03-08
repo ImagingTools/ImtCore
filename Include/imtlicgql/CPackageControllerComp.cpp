@@ -91,7 +91,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				}
 
 				if (featureId.isEmpty()){
-					errorMessage = QT_TR_NOOP("Feature-ID cannot be empty!");
+					errorMessage = QT_TR_NOOP(QString("%1 has an empty Feature-ID").arg(featureName));
 					return nullptr;
 				}
 
@@ -103,12 +103,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				bool isOptional = false;
 				if (featuresModelPtr->ContainsKey("Optional", i)){
 					isOptional = featuresModelPtr->GetData("Optional", i).toBool();
-				}
-
-				if (featureId.isEmpty()){
-					errorMessage = QT_TR_NOOP(featureName + " " + "has an empty Feature-ID!");
-
-					return nullptr;
 				}
 
 				imtlic::CFeatureInfo* featureInfoPtr = new imtlic::CFeatureInfo;
@@ -155,19 +149,19 @@ bool CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 		QString& errorMessage) const
 {
 	for (int i = 0; i < subFeaturesModelPtr->GetItemsCount(); i++){
+		QString featureName;
+		if (subFeaturesModelPtr->ContainsKey("Name", i)){
+			featureName = subFeaturesModelPtr->GetData("Name", i).toString();
+		}
+
 		QByteArray featureId;
 		if (subFeaturesModelPtr->ContainsKey("Id", i)){
 			featureId = subFeaturesModelPtr->GetData("Id", i).toByteArray();
 		}
 
 		if (featureId.isEmpty()){
-			errorMessage = QT_TR_NOOP("Feature-ID cannot be empty!");
+			errorMessage = QT_TR_NOOP(QString("%1 has an empty Feature-ID").arg(featureName));
 			return false;
-		}
-
-		QString featureName;
-		if (subFeaturesModelPtr->ContainsKey("Name", i)){
-			featureName = subFeaturesModelPtr->GetData("Name", i).toString();
 		}
 
 		QString description;

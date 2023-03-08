@@ -21,6 +21,10 @@ Item {
         roleNameInput.focus = true;
     }
 
+    onBlockUpdatingModelChanged: {
+        Events.sendEvent("DocumentUpdating", roleEditorContainer.blockUpdatingModel);
+    }
+
     onDocumentBaseChanged: {
         console.log("onDocumentBaseChanged", roleEditorContainer.documentBase);
         if (roleEditorContainer.documentBase != null){
@@ -105,8 +109,8 @@ Item {
 
         roleEditorContainer.blockUpdatingModel = true;
 
-        if (roleEditorContainer.documentModel.ContainsKey("Id")){
-            roleIdInput.text = documentModel.GetData("Id");
+        if (roleEditorContainer.documentModel.ContainsKey("RoleId")){
+            roleIdInput.text = documentModel.GetData("RoleId");
         }
 
         if (roleEditorContainer.documentModel.ContainsKey("Name")){
@@ -144,7 +148,7 @@ Item {
 
         roleEditorContainer.undoRedoManager.beginChanges();
 
-        roleEditorContainer.documentModel.SetData("Id", roleIdInput.text);
+        roleEditorContainer.documentModel.SetData("RoleId", roleIdInput.text);
         roleEditorContainer.documentModel.SetData("Name", roleNameInput.text);
         roleEditorContainer.documentModel.SetData("Description", descriptionInput.text);
 

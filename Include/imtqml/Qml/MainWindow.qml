@@ -12,23 +12,6 @@ Window
     minimumWidth: 740;
 
     visible: true;
-
-    property var activeFocusItems: []
-
-    onActiveFocusItemChanged: {
-        console.log("onActiveFocusItemChanged", activeFocusItem);
-
-//        if (mainWindow.activeFocusItem != null){
-//            activeFocusItems.push(mainWindow.activeFocusItem);
-//        }
-//        else{
-//            activeFocusItems.pop();
-
-//            let item = activeFocusItems[activeFocusItems.length - 1]
-
-//            item.forceActiveFocus();
-//        }
-    }
 }
 
 
