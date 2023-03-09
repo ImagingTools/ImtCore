@@ -60,8 +60,8 @@ function getFiles (dir, _files){
     return _files
 }
 
-// if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
-if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
+if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
+// if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
 // if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source

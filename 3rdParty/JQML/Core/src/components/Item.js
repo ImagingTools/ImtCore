@@ -731,11 +731,13 @@ export class Item extends QtObject {
                         }
                         // разные 
                     }
+                    
                     // this.y = this.anchors.bottom - this.height - this.anchors.bottomMargin
                 }
             }
 
         }
+        if(this.$completed) this.$uP()
         
     }
 

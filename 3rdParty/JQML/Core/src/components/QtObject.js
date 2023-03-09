@@ -481,8 +481,18 @@ export class QtObject {
                             delete s[this.$p[name].PID]
                         }
                         this.$p[name].depends.clear()
-                        this.$p[name].val = newVal
-                        signal()
+                        if(name === 'visible' && this.parent){
+                            this.$sP('visible', ()=>{return this.parent.visible && newVal})
+                            let val = this.$p[name].func()
+                            if(this.$p[name].val !== val){
+                                this.$p[name].val = val
+                                signal()
+                            }
+                        } else {
+                            this.$p[name].val = newVal
+                            signal()
+                        }
+                        
                     }
                     
                 }              

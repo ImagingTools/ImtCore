@@ -1139,12 +1139,12 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
               expression(true, true);
             }
             if (is("operator", "in")) {
-                if ((init[0] == "var" || init[0] == "let") && init[1].length > 1)
+                if (init && (init[0] == "var" || init[0] == "let") && init[1].length > 1)
                     croak("Only one variable declaration allowed in for..in loop");
                 return for_in(init);
             }
             if (is("operator", "of")) {
-              if ((init[0] == "var" || init[0] == "let") && init[1].length > 1)
+              if (init && (init[0] == "var" || init[0] == "let") && init[1].length > 1)
                   croak("Only one variable declaration allowed in for..in loop");
               return for_of(init);
           }
@@ -1163,14 +1163,14 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     };
 
     function for_in(init) {
-        var lhs = (init[0] == "var" || init[0] == "let") ? as("name", init[1][0]) : init;
+        var lhs = init && (init[0] == "var" || init[0] == "let") ? as("name", init[1][0]) : init;
         next();
         var obj = expression();
         expect(")");
         return as("for-in", init, lhs, obj, in_loop(statement));
     };
     function for_of(init) {
-      var lhs = (init[0] == "var" || init[0] == "let") ? as("name", init[1][0]) : init;
+      var lhs = init && (init[0] == "var" || init[0] == "let") ? as("name", init[1][0]) : init;
       next();
       var obj = expression();
       expect(")");
