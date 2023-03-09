@@ -5,7 +5,7 @@ import imtgui 1.0
 Item {
     id: collectionViewBaseContainer;
 
-    property alias commands: baseCommands;     
+    property alias commands: baseCommands;
     property alias gridElementsDelegate: gridInternal.delegate;
     property alias gridElementsModel: gridInternal.model;
     property alias gridCellWidth: gridInternal.cellWidth;
@@ -105,6 +105,7 @@ Item {
 
         GridView {
             id: gridInternal;
+
             anchors.fill: parent;
             property int selectedIndex: -1;
 //            property alias elements: model;
@@ -117,7 +118,7 @@ Item {
 
             onSelectedIndexChanged: {
                 console.log("CollectionView GridView onSelectedIndexChanged");
-                collectionViewBaseContainer.selectedIndexChanged(tableInternal.selectedIndex);
+                collectionViewBaseContainer.selectedIndexChanged(gridInternal.selectedIndex);
             }
 
 //            onElementsChanged: {
