@@ -202,6 +202,23 @@ Item {
         }
     }
 
+    function setDateFromString(stringDate){
+        var year = stringDate.slice(0,4);
+        var month = stringDate.slice(5,7);
+        var day = stringDate.slice(8);
+        if(day[0] == "0"){
+            day = day.slice(1);
+        }
+        if(month[0] == "0"){
+            month = month.slice(1);
+        }
+
+        month = Number(month) - 1;
+
+        setDate(year, month, day);
+
+    }
+
     function fillDayModel(){
         dayTreeModel.Clear();
         var lastDay = datePicker.getLastDayOfMonth(datePicker.selectedIndexMonth + 1);
