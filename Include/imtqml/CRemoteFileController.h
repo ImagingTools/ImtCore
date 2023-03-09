@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
-#undef DeleteFile
 
 
 namespace imtqml
