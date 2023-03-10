@@ -122,8 +122,8 @@ Item {
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
-            for(var i = 0; i < fieldsData.length; i++){
-                queryFields.InsertField(fieldsData[i]);
+            for(var i = 0; i < gqlModelBaseContainer.fieldsData.length; i++){
+                queryFields.InsertField(gqlModelBaseContainer.fieldsData[i]);
             }
             query.AddField(queryFields);
 

@@ -24,7 +24,7 @@ Item {
     }
 
     function getData(documentId, inputParams){
-        getModel.get(documentId, inputParams);
+        getModel.getModelData(documentId, inputParams);
     }
 
     function setData(documentId, documentData){
@@ -38,7 +38,7 @@ Item {
     GqlModel {
         id: getModel;
 
-        function get(modelId, externInputParams){
+        function getModelData(modelId, externInputParams){
             console.log("query getModel", container.getCommandId, modelId);
             var query = Gql.GqlRequest("query", container.getCommandId);
 
@@ -48,9 +48,11 @@ Item {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
-            let keys = Object.keys(externInputParams)
-            for (let key of keys){
-                inputParams.InsertField(key, externInputParams[key]);
+            if (externInputParams){
+                let keys = Object.keys(externInputParams)
+                for (let key of keys){
+                    inputParams.InsertField(key, externInputParams[key]);
+                }
             }
             query.AddParam(inputParams);
 
