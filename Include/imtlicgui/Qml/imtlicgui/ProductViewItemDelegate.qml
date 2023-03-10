@@ -13,7 +13,7 @@ TreeViewItemDelegateBase {
     rowBodyDelegate: Component { Row {
             id: row;
 
-            height: productTreeItemDelegate.root ? root.rowItemHeight : 0;
+            height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
             Item {
                 width: checkBox.visible ? 20 : 0;
