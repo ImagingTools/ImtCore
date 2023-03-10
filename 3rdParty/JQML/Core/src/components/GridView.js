@@ -26,6 +26,8 @@ export class GridView extends Flickable {
         // this.$cP('spacing', 'real', 0).connect(this.$spacingChanged.bind(this))
         this.$cP('currentIndex', -1).connect(this.$currentIndexChanged.bind(this))
         this.$cP('currentItem', undefined)
+
+        this.$updateTimer = null
     }
     $domCreate(){
         super.$domCreate()
@@ -43,10 +45,48 @@ export class GridView extends Flickable {
         } else {
             
         }
-        // this.$updateChildren()
+        this.$updateGeometry()
     }
     $cellChanged(){
-        // this.$updateChildren()
+        this.$updateGeometry()
+    }
+    $widthChanged(){
+        super.$widthChanged()
+        this.$updateGeometry()
+    }
+    $heightChanged(){
+        super.$heightChanged()
+        this.$updateGeometry()
+    }
+    $updateGeometry(){
+        clearTimeout(this.$updateTimer)
+        this.$updateTimer = setTimeout(()=>{
+            if(this.$contentHeightAuto){
+                let top = 0
+                let bottom = 0
+                if(this.children.length)
+                for(let child of this.children) {
+                    let childTop = child.dom.offsetTop
+                    let childBottom = childTop + child.height
+                    if(childTop < top) top = childTop
+                    if(childBottom > bottom) bottom = childBottom
+                }
+                this.contentHeight = bottom - top
+            }
+            if(this.$contentWidthAuto){
+                let left = 0
+                let right = 0
+                if(this.children.length)
+                for(let child of this.children) {
+                    let childLeft = child.dom.offsetLeft
+                    let childRight = childLeft + child.width
+                    if(childLeft < left) left = childLeft
+                    if(childRight > right) right = childRight
+                }
+                this.contentWidth = right - left
+            }
+        }, 100)
+		
     }
     $modelChanged(){
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
@@ -56,9 +96,6 @@ export class GridView extends Flickable {
     $delegateChanged(){
         this.$updateView()
     }
-    // $spacingChanged(){
-    //     this.$updateChildren()
-    // }
     $currentIndexChanged(){
         //this.currentItem = this.currentIndex > -1 && this.currentIndex < this.children.length ? this.children[this.currentIndex] : undefined
     }
@@ -101,9 +138,10 @@ export class GridView extends Flickable {
                     childRecursive(child, indx)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this, index: index}) : this.delegate({parent: this, index: index})
+            let item = this.createComponent('Item', this) 
+            this.delegate.createObject ? this.delegate.createObject({parent: item, index: index}) : this.delegate({parent: item, index: index})
             this.children.pop()
-            this.children.splice(index, 0, obj)
+            this.children.splice(index, 0, item)
 
             for(let i = 0; i < this.children.length; i++){
                 childRecursive(this.children[i], i)
@@ -112,7 +150,7 @@ export class GridView extends Flickable {
             this.count = this.children.length
             this.$updateChild(index)
             try {
-                obj.$uP()
+                item.$uP()
             } catch (error) {
                 console.error(error)
             }
@@ -132,16 +170,17 @@ export class GridView extends Flickable {
                     childRecursive(child)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this, index: index}) : this.delegate({parent: this, index: index})
-            childRecursive(obj)
+            let item = this.createComponent('Item', this) 
+            this.delegate.createObject ? this.delegate.createObject({parent: item, index: index}) : this.delegate({parent: item, index: index})
+            childRecursive(item)
             this.count = this.children.length
             this.$updateChild(index)
 
             if(wait){
-                this.$childrenForUpdate.push(obj)
+                this.$childrenForUpdate.push(item)
             } else {
                 try {
-                    obj.$uP()
+                    item.$uP()
                 } catch (error) {
                     console.error(error)
                 }
@@ -234,6 +273,7 @@ export class GridView extends Flickable {
     // }
 
     $destroy(){
+        clearTimeout(this.$updateTimer)
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
         this.impl.remove()
