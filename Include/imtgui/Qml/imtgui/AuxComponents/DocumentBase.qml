@@ -71,8 +71,8 @@ Item {
         documentBase.documentModel.SetData("Id", value);
         documentBase.documentModel.SetData("Name", value);
 
-        documentBase.itemId = value;
-        documentBase.itemName = value;
+//        documentBase.itemId = value;
+//        documentBase.itemName = value;
     }
 
     function modelChanged(){

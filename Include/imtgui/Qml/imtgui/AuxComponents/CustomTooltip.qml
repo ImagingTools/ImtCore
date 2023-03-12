@@ -30,6 +30,9 @@ Item {
     property bool openST: false;
     property int waitingDuration: 500;
 
+    Component.onDestruction: {
+        customTooltip.closeTooltip();
+    }
 
     function openTooltip(xX, yY){
         if(!customTooltip.openST){

@@ -135,9 +135,10 @@ Item {
         workspaceView.documentsData.SetData("Id", documentId, tabPanelInternal.selectedIndex);
 
         let documentBase = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
-//        documentBase.updateDocumentTitle();
-
         workspaceView.setDocumentTitle({"Id": documentId, "Title": documentName});
+
+        documentBase.itemId = documentId;
+        documentBase.itemName = documentName;
 
         documentBase.isDirty = false;
 
@@ -289,6 +290,15 @@ Item {
             else{
                 documentController.updateData(documentId, documentData);
             }
+        }
+    }
+
+    function updateDocumentModel(documentId, params){
+        let documentIndex = this.getDocumentIndexById(documentId);
+        if (documentIndex >= 0){
+            let commandId = workspaceView.mainCollectionView.getEditorCommandId();
+            documentController.documentTypeId = commandId;
+            documentController.getData(documentId, params);
         }
     }
 

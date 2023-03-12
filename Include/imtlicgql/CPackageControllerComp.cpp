@@ -13,6 +13,10 @@ namespace imtlicgql
 {
 
 
+// pretected methods
+
+// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+
 istd::IChangeable* CPackageControllerComp::CreateObject(
 		const QList<imtgql::CGqlObject>& inputParams,
 		QByteArray& objectId,
@@ -25,8 +29,14 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		return nullptr;
 	}
 
+	if (!m_featureInfoProviderCompPtr.IsValid()){
+		Q_ASSERT(false);
+		return nullptr;
+	}
+
 	if (inputParams.isEmpty()){
 		errorMessage = QObject::tr("Can not create package: %1").arg(QString(objectId));
+		Q_ASSERT(false);
 		return nullptr;
 	}
 
@@ -51,6 +61,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 		if (objectId.isEmpty()){
 			errorMessage = QT_TR_NOOP("Package-ID can not be empty!");
+			Q_ASSERT(false);
 			return nullptr;
 		}
 
@@ -89,6 +100,12 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				if (featuresModelPtr->ContainsKey("Id", i)){
 					featureId = featuresModelPtr->GetData("Id", i).toByteArray();
 				}
+
+//				const imtlic::IFeatureInfo* findFeatureInfoPtr = m_featureInfoProviderCompPtr->GetFeatureInfo(featureId);
+//				if (findFeatureInfoPtr != nullptr){
+//					errorMessage = QT_TR_NOOP(QString("Please change the Feature-ID for %1. (Feature-ID already exists)").arg(featureName));
+//					return nullptr;
+//				}
 
 				if (featureId.isEmpty()){
 					errorMessage = QT_TR_NOOP(QString("%1 has an empty Feature-ID").arg(featureName));
@@ -158,6 +175,12 @@ bool CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 		if (subFeaturesModelPtr->ContainsKey("Id", i)){
 			featureId = subFeaturesModelPtr->GetData("Id", i).toByteArray();
 		}
+
+//		const imtlic::IFeatureInfo* findFeatureInfoPtr = m_featureInfoProviderCompPtr->GetFeatureInfo(featureId);
+//		if (findFeatureInfoPtr != nullptr){
+//			errorMessage = QT_TR_NOOP(QString("Please change the Feature-ID for %1. (Feature-ID already exists)").arg(featureName));
+//			return false;
+//		}
 
 		if (featureId.isEmpty()){
 			errorMessage = QT_TR_NOOP(QString("%1 has an empty Feature-ID").arg(featureName));

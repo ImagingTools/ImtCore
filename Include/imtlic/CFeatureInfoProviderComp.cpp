@@ -39,11 +39,6 @@ const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& f
 						}
 					}
 				}
-
-//				const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->FindFeatureById(featureId);
-//				if (featureInfoPtr != nullptr){
-//					return dynamic_cast<const imtlic::IFeatureInfo*>(featureInfoPtr->CloneMe());
-//				}
 			}
 		}
 	}

@@ -100,3 +100,5 @@ SimpleCommandsDecorator 1.0 ./AuxComponents/SimpleCommandsDecorator.qml
 CollectionDataProvider 1.0 ./AuxComponents/CollectionDataProvider.qml
 UuidGenerator 1.0 ./AuxComponents/UuidGenerator.qml
 ApplicationInfoProvider 1.0 ./AuxComponents/ApplicationInfoProvider.qml
+Loading 1.0 ./AuxComponents/Loading.qml
+

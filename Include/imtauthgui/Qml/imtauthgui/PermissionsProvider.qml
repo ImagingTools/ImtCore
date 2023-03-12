@@ -31,6 +31,8 @@ Item {
             query.AddParam(inputParams);
 
             var gqlData = query.GetQuery();
+
+            console.log(gqlData);
             this.SetGqlQuery(gqlData);
         }
 

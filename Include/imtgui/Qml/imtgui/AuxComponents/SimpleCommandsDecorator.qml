@@ -4,6 +4,8 @@ import Acf 1.0
 Item {
     id: container;
 
+    width: commands.width;
+
     property TreeItemModel commandModel: null;
 
     property alias radius: commands.radius;
@@ -31,10 +33,9 @@ Item {
     Rectangle {
         id: commands;
 
-        width: parent.width;
+        width: row.width;
         height: 25;
 
-//        color: Style.alternateBaseColor;
         color: "transparent";
 
         Row {
@@ -56,6 +57,8 @@ Item {
                                                   "../../../../Icons/Light/" + model.Icon + "_Off_Disabled.svg";
 
                     enabled: model.IsEnabled;
+
+                    tooltipText: model.Name;
 
                     property string commandId: model.Id;
 
