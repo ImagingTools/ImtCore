@@ -17,6 +17,9 @@ Rectangle {
         id: topPanelDecoratorLoader;
 
         source: Style.topPanelDecoratorPath;
+        onSourceChanged: {
+            console.log("topPanelDecoratorLoader onSourceChanged", topPanelDecoratorLoader.source)
+        }
 
         onItemChanged: {
             if (topPanelDecoratorLoader.item){

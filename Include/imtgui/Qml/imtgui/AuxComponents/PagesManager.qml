@@ -46,7 +46,7 @@ Item {
         delegate: Item {
             id: pagesDeleg;
 
-            anchors.fill: parent;
+            anchors.fill: container;
             anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
 
             visible: container.activePageIndex === model.index;
@@ -75,6 +75,9 @@ Item {
             Loader {
                 id: pagesLoader;
                 anchors.fill: parent;
+//                onWidthChanged: {
+//                    console.log("pagesLoader onWidthChanged", width)
+//                }
 
 //                source: model.Source;
 

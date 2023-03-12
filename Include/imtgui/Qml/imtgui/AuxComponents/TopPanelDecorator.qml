@@ -7,66 +7,72 @@ Item {
 
     height: 60;
 
-    property Item centerPanel: topCenterPanel;
+    property Item centerPanel: null;
     property Item topPanel: null;
 
     Component.onCompleted: {
-        console.log("topPanelDecorator onCompleted")
+        console.log("topPanelDecorator base onCompleted")
     }
 
-    TopCenterPanel {
-        id: topCenterPanel;
-
-        z: 10;
-
-        anchors.left: parent.left;
-
-//        width: 0.95 * topPanelDecorator.width;
-        width: topPanelDecorator.width - rightPanel.width;
-        height: topPanelDecorator.height;
-
-        topPanel: topPanelDecorator.topPanel;
-
-        decoratorSource: Style.topCenterPanelDecoratorPath;
-
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-        }
+    Rectangle {
+        anchors.fill: parent;
+        color: "red";
     }
 
-    TopRightPanel {
-        id: rightPanel;
+//    TopCenterPanel {
+//        id: topCenterPanel;
 
-        z: 100;
+////        z: 10;
 
-        anchors.right: parent.right;
+//        anchors.left: parent.left;
 
-//        width: topPanelDecorator.width - topCenterPanel.width;
-        width: 100;
-        height: topPanelDecorator.height;
+////        width: 0.95 * topPanelDecorator.width;
+//        width: topPanelDecorator.width;// - rightPanel.width;
+//        height: topPanelDecorator.height;
 
-        decoratorSource: Style.topRightPanelDecoratorPath;
+//        topPanel: topPanelDecorator.topPanel;
 
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-        }
+////        decoratorSource: Style.topCenterPanelDecoratorPath;
+//        color: "blue"
 
-        Component.onCompleted: {
-            console.log("rightPanel");
-            console.log("rightPanel.width", rightPanel.width);
-            console.log("rightPanel.height", rightPanel.height);
-            rightPanel.decoratorSource = "TopRightPanelDecorator.qml";
-        }
+////        gradient: Gradient {
+////            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+////            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+////            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+////            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+////        }
+//    }
 
-        onDecoratorSourceChanged: {
-            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath);
-        }
-    }
+//    TopRightPanel {
+//        id: rightPanel;
+
+//        z: 100;
+
+//        anchors.right: parent.right;
+
+////        width: topPanelDecorator.width - topCenterPanel.width;
+//        width: 100;
+//        height: topPanelDecorator.height;
+
+//        decoratorSource: Style.topRightPanelDecoratorPath;
+
+//        gradient: Gradient {
+//            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+//            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+//            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+//            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+//        }
+
+//        Component.onCompleted: {
+//            console.log("rightPanel");
+//            console.log("rightPanel.width", rightPanel.width);
+//            console.log("rightPanel.height", rightPanel.height);
+//            rightPanel.decoratorSource = "TopRightPanelDecorator.qml";
+//        }
+
+//        onDecoratorSourceChanged: {
+//            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath);
+//        }
+//    }
 }
 

@@ -15,6 +15,9 @@ JSONListModel {
         return this.count
     }
 
+    function GetTreeItemModel(key, row){
+        return GetData(key, row)
+    }
 
     function GetData(key, row){
         if(row === undefined)

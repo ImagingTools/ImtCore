@@ -106,6 +106,7 @@ Item {
     }
 
     onTableDecoratorChanged: {
+        console.log("onTableDecoratorChanged");
 
         tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
         tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
