@@ -8,7 +8,7 @@ CollectionView {
     contentMargins: 10;
 
     tableElementsDelegate: Component { TableProductRolesDelegate {
-        width: parent.width;
+        width: baseCollectionView.table.width;
 
         selectedIndex: baseCollectionView.table.selectedIndex;
 
@@ -26,6 +26,9 @@ CollectionView {
 
             roleCollectionViewContainer.forceActiveFocus();
         }
+        Component.onCompleted: {
+            console.log('DEBUG::TableProductRolesDelegate', parent)
+        }
     } }
 
     Component.onCompleted: {
@@ -36,6 +39,8 @@ CollectionView {
         elementsList.spacing = 10;
         baseCollectionView.table.showHeaders = false;
         baseCollectionView.hasPagination = false;
+
+        console.log('DEBUG::roleCollectionViewContainer', width, height, parent.width, parent.height)
     }
 
     function selectItem(id, name){
