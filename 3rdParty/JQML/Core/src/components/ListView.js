@@ -22,18 +22,66 @@ export class ListView extends Flickable {
         this.$cP('spacing', 0).connect(this.$spacingChanged.bind(this))
         this.$cP('currentIndex', -1).connect(this.$currentIndexChanged.bind(this))
         this.$cP('currentItem', undefined)
+
+        this.$updateGeometry()
     }
     $domCreate(){
         super.$domCreate()
     }
 
     $orientationChanged(){
+        this.$updateGeometry()
+    }
 
+    // $contentWidthChanged(){
+
+    // }
+    // $contentHeightChanged(){
+        
+    // }
+
+    $contentXChanged(){
+        if(this.orientation === ListView.Horizontal){
+            super.$contentXChanged()
+        }
+    }
+    $contentYChanged(){
+        if(this.orientation === ListView.Vertical){
+            super.$contentYChanged()
+        }
+    }
+
+    $updateGeometry(){
+		if(this.orientation === ListView.Vertical && this.contentItem){
+            // this.$sP('contentHeight', ()=>{ 
+                let childLength = typeof this.model === 'number' ? this.model : this.contentItem.children.length
+                let childHeight = this.contentItem.children.length > 0 ? this.contentItem.children[0].height : 100
+                let contentHeight = 0
+                if(childLength > 0){
+                    contentHeight = (childLength-1)*this.spacing + childHeight*childLength
+                }
+                this.contentHeight = contentHeight
+            // })
+        }
+        
+		if(this.orientation === ListView.Horizontal && this.contentItem){
+            // this.$sP('contentWidth', ()=>{ 
+                let childLength = typeof this.model === 'number' ? this.model : this.contentItem.children.length
+                let childWidth = this.contentItem.children.length > 0 ? this.contentItem.children[0].width : 100
+                let contentWidth = 0
+                if(childLength > 0){
+                    contentWidth = (childLength-1)*this.spacing + childWidth*childLength
+                }
+                this.contentWidth = contentWidth
+            // })
+        }
+        
     }
 
     $modelChanged(){
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
         this.$model = this.model
+        this.$updateGeometry()
         this.$updateView()
     }
     $delegateChanged(){
@@ -43,18 +91,18 @@ export class ListView extends Flickable {
 
     }
     $currentIndexChanged(){
-        //this.currentItem = this.currentIndex > -1 && this.currentIndex < this.children.length ? this.children[this.currentIndex] : undefined
+        //this.currentItem = this.currentIndex > -1 && this.currentIndex < this.contentItem.children.length ? this.contentItem.children[this.currentIndex] : undefined
     }
     itemAtIndex(index){
-        return index >= 0 && index < this.children.length ? this.children[index] : undefined
+        return index >= 0 && index < this.contentItem.children.length ? this.contentItem.children[index] : undefined
     }
     positionViewAtBeginning(){
         this.contentX = 0
         this.contentY = 0
     }
     positionViewAtEnd(){
-        this.contentX = this.children[this.children.length-1].x + this.children[this.children.length-1].width
-        this.contentY = this.children[this.children.length-1].y + this.children[this.children.length-1].height
+        this.contentX = this.contentItem.children[this.contentItem.children.length-1].x + this.contentItem.children[this.contentItem.children.length-1].width
+        this.contentY = this.contentItem.children[this.contentItem.children.length-1].y + this.contentItem.children[this.contentItem.children.length-1].height
     }
     positionViewAtIndex(index, mode){
         let pos = 'start'
@@ -64,14 +112,14 @@ export class ListView extends Flickable {
             case ListView.End: pos = 'end'; break;
         }
         if(pos === 'start') {
-            this.contentX = this.children[index].x
-            this.contentY = this.children[index].y
+            this.contentX = this.contentItem.children[index].x
+            this.contentY = this.contentItem.children[index].y
         } else if(pos === 'center') {
-            this.contentX = this.children[index].x - (this.width - this.children[index].width)/2
-            this.contentY = this.children[index].y - (this.height - this.children[index].height)/2
+            this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2
+            this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2
         } else if(pos === 'end') {
-            this.contentX = this.children[index].x - (this.width - this.children[index].width)
-            this.contentY = this.children[index].y - (this.height - this.children[index].height)
+            this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)
+            this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)
         }
     }
 
@@ -88,15 +136,15 @@ export class ListView extends Flickable {
                     childRecursive(child, indx)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this, index: index}) : this.delegate({parent: this, index: index})
-            this.children.pop()
-            this.children.splice(index, 0, obj)
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.contentItem, index: index}) : this.delegate({parent: this.contentItem, index: index})
+            this.contentItem.children.pop()
+            this.contentItem.children.splice(index, 0, obj)
 
-            for(let i = 0; i < this.children.length; i++){
-                childRecursive(this.children[i], i)
+            for(let i = 0; i < this.contentItem.children.length; i++){
+                childRecursive(this.contentItem.children[i], i)
             }
             
-            this.count = this.children.length
+            this.count = this.contentItem.children.length
             this.$anchorsChild(index)
             try {
                 obj.$uP()
@@ -107,7 +155,7 @@ export class ListView extends Flickable {
     }
 
     $append(wait = false){
-        let index = this.children.length
+        let index = this.contentItem.children.length
         if(this.model && this.delegate){
             let childRecursive = (obj)=>{
                 if(obj.$qmlClassName !== 'ListElement'){
@@ -120,9 +168,9 @@ export class ListView extends Flickable {
                     childRecursive(child)
                 }
             }
-            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this, index: index}) : this.delegate({parent: this, index: index})
+            let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.contentItem, index: index}) : this.delegate({parent: this.contentItem, index: index})
             childRecursive(obj)
-            this.count = this.children.length
+            this.count = this.contentItem.children.length
             this.$anchorsChild(index)
 
             if(wait){
@@ -138,7 +186,7 @@ export class ListView extends Flickable {
         }
     }
     $remove(index, count){
-        let removed = this.children.splice(index, count)
+        let removed = this.contentItem.children.splice(index, count)
         for(let rem of removed){
             rem.$destroy()
         }
@@ -149,29 +197,29 @@ export class ListView extends Flickable {
                 childRecursive(child, index)
             }
         }
-        for(let i = 0; i < this.children.length; i++){
-            childRecursive(this.children[i], i)
+        for(let i = 0; i < this.contentItem.children.length; i++){
+            childRecursive(this.contentItem.children[i], i)
         }
-        this.count = this.children.length
+        this.count = this.contentItem.children.length
     }
 
     $updateView(){
         if(this.model && this.delegate){
             if(typeof this.model === 'number'){
-                if(this.model > this.children.length){
-                    let count = this.model - this.children.length
+                if(this.model > this.contentItem.children.length){
+                    let count = this.model - this.contentItem.children.length
                     for(let i = 0; i < count; i++){      
                         this.$append()
                     }
                 } else {
-                    this.$remove(3, this.children.length - this.model)
+                    this.$remove(3, this.contentItem.children.length - this.model)
                 }  
                 
             } else if (typeof this.model === 'object'){
-                while(this.children.length){
-                    this.children.pop().$destroy()
+                while(this.contentItem.children.length){
+                    this.contentItem.children.pop().$destroy()
                 }
-                this.children = []
+                this.contentItem.children = []
                 this.count = 0
 
                 
@@ -199,16 +247,16 @@ export class ListView extends Flickable {
     
 
     $anchorsChild(index){
-        let child = this.children[index]
+        let child = this.contentItem.children[index]
         if(index === 0){
-            child.$sP('anchors.left', ()=>{ return this.left })
-            child.$sP('anchors.top', ()=>{ return this.top })
+            child.$sP('anchors.left', ()=>{ return this.contentItem.left })
+            child.$sP('anchors.top', ()=>{ return this.contentItem.top })
         } else {
             if(this.orientation === ListView.Horizontal){
-                child.$sP('anchors.left', ()=>{ return this.children[index-1].right })
+                child.$sP('anchors.left', ()=>{ return this.contentItem.children[index-1].right })
                 child.$sP('anchors.leftMargin', ()=>{ return this.spacing })
             } else {
-                child.$sP('anchors.top', ()=>{ return this.children[index-1].bottom })
+                child.$sP('anchors.top', ()=>{ return this.contentItem.children[index-1].bottom })
                 child.$sP('anchors.topMargin', ()=>{ return this.spacing })
             }
         }
@@ -219,7 +267,6 @@ export class ListView extends Flickable {
     $destroy(){
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
-        this.impl.remove()
         super.$destroy()
     }
 

@@ -266,6 +266,16 @@ export class Item extends QtObject {
         this.$p.y.freeze = false
         this.$p.width.freeze = false
         this.$p.height.freeze = false
+
+        if(this.anchors.fill && (this.anchors.fill.$qmlClassName === 'Flickable' || this.anchors.fill.$qmlClassName === 'ListView' || this.anchors.fill.$qmlClassName === 'GridView')) this.$p['anchors.fill'].val = null
+        if(this.anchors.centerIn && (this.anchors.centerIn.$qmlClassName === 'Flickable' || this.anchors.centerIn.$qmlClassName === 'ListView' || this.anchors.centerIn.$qmlClassName === 'GridView')) this.$p['anchors.centerIn'].val = null
+        if(this.anchors.left && (this.anchors.left.$qmlClassName === 'Flickable' || this.anchors.left.$qmlClassName === 'ListView' || this.anchors.left.$qmlClassName === 'GridView')) this.$p['anchors.left'].val = null
+        if(this.anchors.right && (this.anchors.right.$qmlClassName === 'Flickable' || this.anchors.right.$qmlClassName === 'ListView' || this.anchors.right.$qmlClassName === 'GridView')) this.$p['anchors.right'].val = null
+        if(this.anchors.top && (this.anchors.top.$qmlClassName === 'Flickable' || this.anchors.top.$qmlClassName === 'ListView' || this.anchors.top.$qmlClassName === 'GridView')) this.$p['anchors.top'].val = null
+        if(this.anchors.bottom && (this.anchors.bottom.$qmlClassName === 'Flickable' || this.anchors.bottom.$qmlClassName === 'ListView' || this.anchors.bottom.$qmlClassName === 'GridView')) this.$p['anchors.bottom'].val = null
+        if(this.anchors.horizontalCenter && (this.anchors.horizontalCenter.$qmlClassName === 'Flickable' || this.anchors.horizontalCenter.$qmlClassName === 'ListView' || this.anchors.horizontalCenter.$qmlClassName === 'GridView')) this.$p['anchors.horizontalCenter'].val = null
+        if(this.anchors.verticalCenter && (this.anchors.verticalCenter.$qmlClassName === 'Flickable' || this.anchors.verticalCenter.$qmlClassName === 'ListView' || this.anchors.verticalCenter.$qmlClassName === 'GridView')) this.$p['anchors.verticalCenter'].val = null
+
         if(this.anchors.fill){
             if(this.anchors.fill === this.parent){
                 this.$sP('x', ()=>{
