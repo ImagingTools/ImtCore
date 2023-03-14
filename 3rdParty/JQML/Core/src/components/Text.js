@@ -60,8 +60,8 @@ export class Text extends Item {
         // this.dom.style.display = "flex"
         // this.dom.style.width = `0px`
         // this.dom.style.height = `0px`
-        this.dom.style.pointerEvents = 'none'
-        this.dom.style.touchAction = 'none'
+        // this.dom.style.pointerEvents = 'none'
+        // this.dom.style.touchAction = 'none'
         this.impl = document.createElement("span")
         this.dom.appendChild(this.impl);
         

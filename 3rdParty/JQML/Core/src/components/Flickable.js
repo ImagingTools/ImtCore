@@ -48,7 +48,7 @@ export class Flickable extends Item {
     }
 
     $updateGeometry(){
-		if(this.$contentHeightAuto){
+		if(this.$contentHeightAuto && this.contentItem){
 			let contentHeightFunc = ()=>{
 				let top = 0
 				let bottom = 0
@@ -69,7 +69,7 @@ export class Flickable extends Item {
 			}
 		}
         
-		if(this.$contentWidthAuto){
+		if(this.$contentWidthAuto && this.contentItem){
 			let contentWidthFunc = ()=>{
 				let left = 0
 				let right = 0
@@ -188,7 +188,7 @@ export class Flickable extends Item {
 	$scroll(deltaX, deltaY){
 		
 
-		if(this.flickableDirection !== Flickable.VerticalFlick && this.contentWidth > 0){
+		if(this.flickableDirection !== Flickable.VerticalFlick && this.contentWidth > 0 && this.contentWidth > this.width){
 			if(deltaX > 0)
 			if(this.contentX + deltaX < this.contentWidth - this.width){
 				this.contentX += deltaX
@@ -203,7 +203,7 @@ export class Flickable extends Item {
 			}
 		}
 		
-		if(this.flickableDirection !== Flickable.HorizontalFlick && this.contentHeight > 0){
+		if(this.flickableDirection !== Flickable.HorizontalFlick && this.contentHeight > 0 && this.contentHeight > this.height){
 			if(deltaY > 0)
 			if(this.contentY + deltaY < this.contentHeight - this.height){
 				this.contentY += deltaY
