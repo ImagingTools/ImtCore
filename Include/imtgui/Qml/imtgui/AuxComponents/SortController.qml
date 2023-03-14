@@ -30,4 +30,8 @@ Item {
         container.sortModel.SetData("HeaderId", headerId);
         container.sortModel.SetData("SortOrder", sortOrder);
     }
+
+    function isEmpty(){
+        return container.sortModel.GetItemsCount() === 0;
+    }
 }

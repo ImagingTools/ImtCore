@@ -159,14 +159,17 @@ Item {
                                 return;
                             }
 
-                            let selectedIndex = gqlModelBaseContainer.table.selectedIndex;
+                            let indexes = gqlModelBaseContainer.table.getSelectedIndexes();
 
-                            gqlModelBaseContainer.table.selectedIndex = -1;
+                            gqlModelBaseContainer.table.resetSelection();
 
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
 
-                            if (gqlModelBaseContainer.items.GetItemsCount() > selectedIndex){
-                                gqlModelBaseContainer.table.selectedIndex = selectedIndex;
+                            if (indexes.length === 1){
+                                let selectedIndex = indexes[0];
+                                if (gqlModelBaseContainer.items.GetItemsCount() > selectedIndex){
+                                    gqlModelBaseContainer.table.select(selectedIndex);
+                                }
                             }
 
                             Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");

@@ -32,6 +32,8 @@ Item {
     signal descriptionSetted(string id, string description);
     signal removed(string id);
 
+    signal selectionChanged();
+
     property string removeDialogTitle: qsTr("Deleting a selected element");
     property string removeMessage: qsTr("Remove selected item from the collection ?");
 
@@ -44,22 +46,44 @@ Item {
     property string gqlModelItem;
     property string gqlModelMetaInfo;
 
-    onTableDataChanged: {
-        if (containerBase.tableData){
-            containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
-        }
-    }
+    onSelectionChanged: {
+        let indexes = containerBase.tableData.getSelectedIndexes();
 
-    //TODO -> onItemSelectionChanged
-    onSelectedIndexChanged: {
-        console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
-        //        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
-        let isEnabled = containerBase.selectedIndex > -1;
+        let isEnabled = indexes.length > 0;
         if(containerBase.commandsProvider){
             containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
             containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
         }
     }
+
+//    function onSelectionChanged(){
+//        let indexes = containerBase.tableData.getSelectedIndexes();
+
+//        let isEnabled = indexes.length > 0;
+//        if(containerBase.commandsProvider){
+//            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+//            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+//        }
+//    }
+
+    onTableDataChanged: {
+        if (containerBase.tableData){
+            containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
+
+            containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
+        }
+    }
+
+//    //TODO -> onItemSelectionChanged
+//    onSelectedIndexChanged: {
+//        console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
+//        //        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
+//        let isEnabled = containerBase.selectedIndex > -1;
+//        if(containerBase.commandsProvider){
+//            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+//            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+//        }
+//    }
     onCommandsProviderChanged: {
         if(commandsProvider){
             let isEnabled = containerBase.selectedIndex > -1;
@@ -72,6 +96,7 @@ Item {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
         if (containerBase.tableData){
             containerBase.tableData.rightButtonMouseClicked.disconnect(containerBase.openPopupMenu);
+            containerBase.tableData.selectionChanged.disconnect(containerBase.selectionChanged);
         }
     }
 
@@ -107,9 +132,26 @@ Item {
                 modalDialogManager.openDialog(removeDialog, {});
             }
             else if (commandId === "Edit"){
-                let itemId = containerBase.tableData.getSelectedId();
-                let itemName = containerBase.tableData.getSelectedName();
-                containerBase.collectionViewBase.selectItem(itemId, itemName);
+                let itemIds = containerBase.tableData.getSelectedIds();
+                let itemNames = containerBase.tableData.getSelectedNames();
+
+                if (itemIds.length > 0){
+                    let itemId = itemIds[0];
+                    let itemName = itemNames[0];
+
+                    containerBase.collectionViewBase.selectItem(itemId, itemName);
+                }
+
+//                for (let i = 0; i < itemIds.length; i++){
+//                    let itemId = itemIds[i];
+//                    let itemName = itemNames[i];
+
+//                    containerBase.collectionViewBase.selectItem(itemId, itemName);
+//                }
+
+//                let itemId = containerBase.tableData.getSelectedId();
+//                let itemName = containerBase.tableData.getSelectedName();
+//                containerBase.collectionViewBase.selectItem(itemId, itemName);
             }
         }
 
@@ -170,8 +212,18 @@ Item {
             title: containerBase.removeDialogTitle;
             onFinished: {
                 if (buttonId == "Yes"){
-                    let itemId = containerBase.tableData.getSelectedId();
-                    removeModel.updateModel(itemId);
+//                    let itemId = containerBase.tableData.getSelectedId();
+//                    removeModel.updateModel(itemId);
+
+                    let itemIds = containerBase.tableData.getSelectedIds();
+                    let itemNames = containerBase.tableData.getSelectedNames();
+
+                    for (let i = 0; i < itemIds.length; i++){
+                        let itemId = itemIds[i];
+                        let itemName = itemNames[i];
+
+                        removeModel.updateModel(itemId);
+                    }
                 }
 
                 tableData.forceActiveFocus();

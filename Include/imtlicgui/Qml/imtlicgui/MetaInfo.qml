@@ -16,10 +16,10 @@ Rectangle {
 
     property bool contentVisible: true;
 
-    property Item tableData: null;
+//    property Item tableData: null;
 
-    function getMetaInfo(){
-        metaInfo.getMetaInfo();
+    function getMetaInfo(selectedId){
+        metaInfo.getMetaInfo(selectedId);
     }
 
     Flickable {
@@ -122,12 +122,12 @@ Rectangle {
     GqlModel {
         id: metaInfo;
 
-        function getMetaInfo(){
+        function getMetaInfo(selectedId){
             console.log( "CollectionView metaInfo getMetaInfo");
             var query = Gql.GqlRequest("query", container.gqlModelMetaInfo);
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", container.tableData.getSelectedId());
+            inputParams.InsertField("Id", selectedId);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("metaInfo");
@@ -154,6 +154,7 @@ Rectangle {
 
                     if (dataModelLocal.ContainsKey(container.gqlModelMetaInfo)){
                         dataModelLocal = dataModelLocal.GetData(container.gqlModelMetaInfo);
+                        console.log( "dataModelLocal", dataModelLocal.toJSON());
 
                         container.modelData = dataModelLocal;
                     }

@@ -11,12 +11,21 @@ CollectionViewCommandsDelegateBase {
     removeDialogTitle: qsTr("Deleting a product");
     removeMessage: qsTr("Delete the selected product ?");
 
-    onSelectedIndexChanged: {
-        console.log("ProductCollectionViewCommands onSelectedIndexChanged", container.selectedIndex);
+//    onSelectedIndexChanged: {
+//        console.log("ProductCollectionViewCommands onSelectedIndexChanged", container.selectedIndex);
 
-        let isEnabled = container.selectedIndex > -1;
-        if (container.commandsProvider){
-            commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
+//        let isEnabled = container.selectedIndex > -1;
+//        if (container.commandsProvider){
+//            commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
+//            commandsProvider.setCommandIsEnabled("Export", isEnabled);
+//        }
+//    }
+
+    onSelectionChanged: {
+        let indexes = container.tableData.getSelectedIndexes();
+        let isEnabled = indexes.length === 1;
+        if(container.commandsProvider){
+//            commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
             commandsProvider.setCommandIsEnabled("Export", isEnabled);
         }
     }

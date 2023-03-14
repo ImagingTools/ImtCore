@@ -22,7 +22,9 @@ CollectionView {
 
         onClicked: {
             console.log("onClicked", model.index);
-            baseCollectionView.table.selectedIndex = index;
+//            baseCollectionView.table.selectedIndex = index;
+
+            baseCollectionView.table.tableSelection.singleSelect(index);
 
             roleCollectionViewContainer.forceActiveFocus();
         }
@@ -50,10 +52,11 @@ CollectionView {
 
         let elements = baseCollectionView.table.elements;
 
-        let productId = elements.GetData("Id", baseCollectionView.table.selectedIndex);
+        let indexes = baseCollectionView.table.getSelectedIndexes();
+        if (indexes.length > 0){
+            let productId = elements.GetData("Id", indexes[0]);
 
-        console.log("selectItem", id, name, productId)
-
-        documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+            documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+        }
     }
 }

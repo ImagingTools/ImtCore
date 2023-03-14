@@ -228,10 +228,29 @@ Item {
         commandsId: parent.commandsId;
         loadData: true;
 
-        onSelectedIndexChanged: {
-            console.log("CollectionViewBase onSelectedIndexChanged");
+//        onSelectedIndexChanged: {
+//            console.log("CollectionViewBase onSelectedIndexChanged");
+//            if (collectionMetaInfo.visible){
+//                collectionMetaInfo.getMetaInfo();
+//            }
+//        }
+
+        onSelectionChanged: {
             if (collectionMetaInfo.visible){
-                collectionMetaInfo.getMetaInfo();
+                if (selection.length === 1){
+                    let itemIds = collectionViewBase.table.getSelectedIds();
+                    let itemNames = collectionViewBase.table.getSelectedNames();
+
+                    if (itemIds.length > 0){
+                        let itemId = itemIds[0];
+                        collectionMetaInfo.getMetaInfo(itemId);
+                    }
+
+                    collectionMetaInfo.contentVisible = true;
+                }
+                else{
+                    collectionMetaInfo.contentVisible = false
+                }
             }
         }
 
@@ -262,9 +281,9 @@ Item {
 
         visible: collectionViewContainer.visibleMetaInfo;
 
-        tableData: collectionViewBase.table;
+//        tableData: collectionViewBase.table;
 
-        contentVisible: collectionViewBase.table.selectedIndex != -1;
+//        contentVisible: collectionViewBase.table.selectedIndex != -1;
     }
 }
 

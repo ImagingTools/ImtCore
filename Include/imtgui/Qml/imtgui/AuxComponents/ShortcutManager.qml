@@ -16,37 +16,80 @@ Item {
         }
     }
 
-//    Shortcut {
-//        sequence: "Ctrl+S";
-//        context: Qt.ApplicationShortcut;
+    Shortcut {
+        sequence: "Ctrl+A";
+        context: Qt.ApplicationShortcut;
 
-//        onActivated: {
-//            console.log("onActivated Ctrl+S");
+        onActivated: {
+            console.log("onActivated Ctrl+A");
 
-//            Events.sendEvent("SaveActivated");
-//        }
-//    }
+            Events.sendEvent("SelectAll");
+        }
+    }
 
-//    Shortcut {
-//        sequence: "Ctrl+Z";
-//        context: Qt.ApplicationShortcut;
+    Shortcut {
+        sequence: "Shift+Down";
+        context: Qt.ApplicationShortcut;
 
-//        onActivated: {
-//            console.log("onActivated Ctrl+Z");
+        onActivated: {
+            console.log("onActivated Shift+Down");
 
-//            Events.sendEvent("UndoActivated");
-//        }
-//    }
+            Events.sendEvent("ShiftDown");
+        }
+    }
 
-//    Shortcut {
-//        sequence: "Ctrl+Shift+Z";
-//        context: Qt.ApplicationShortcut;
+    Shortcut {
+        sequence: "Shift+Up";
+        context: Qt.ApplicationShortcut;
 
-//        onActivated: {
-//            console.log("onActivated Ctrl+Shift+Z");
+        onActivated: {
+            console.log("onActivated Shift+Up");
 
-//            Events.sendEvent("RedoActivated");
-//        }
-//    }
+            Events.sendEvent("ShiftUp");
+        }
+    }
+
+    Shortcut {
+        sequence: "Shift+LBM";
+        context: Qt.ApplicationShortcut;
+
+        onActivated: {
+            console.log("onActivated Shift+LBM");
+
+//            Events.sendEvent("ShiftUp");
+        }
+    }
+    //    Shortcut {
+    //        sequence: "Ctrl+S";
+    //        context: Qt.ApplicationShortcut;
+
+    //        onActivated: {
+    //            console.log("onActivated Ctrl+S");
+
+    //            Events.sendEvent("SaveActivated");
+    //        }
+    //    }
+
+    //    Shortcut {
+    //        sequence: "Ctrl+Z";
+    //        context: Qt.ApplicationShortcut;
+
+    //        onActivated: {
+    //            console.log("onActivated Ctrl+Z");
+
+    //            Events.sendEvent("UndoActivated");
+    //        }
+    //    }
+
+    //    Shortcut {
+    //        sequence: "Ctrl+Shift+Z";
+    //        context: Qt.ApplicationShortcut;
+
+    //        onActivated: {
+    //            console.log("onActivated Ctrl+Shift+Z");
+
+    //            Events.sendEvent("RedoActivated");
+    //        }
+    //    }
 }
 

@@ -17,25 +17,6 @@ Rectangle {
         headerText.text += "/ " + header;
     }
 
-//    onDocumentManagerChanged: {
-
-//        if (container.documentManager != null){
-//            for (let i = 0; i < bodyRepeater.count; i++){
-//                let item = bodyRepeater.itemAt(i);
-//                item.item.documentManager = container.documentManager;
-//            }
-//        }
-//    }
-
-//    onDocumentsDataChanged: {
-//        if (container.documentsData != null){
-//            for (let i = 0; i < bodyRepeater.count; i++){
-//                let item = bodyRepeater.itemAt(i);
-//                item.item.documentsData = container.documentsData;
-//            }
-//        }
-//    }
-
     Row {
         id: header;
 

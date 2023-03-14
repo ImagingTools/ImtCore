@@ -52,6 +52,29 @@ Item {
     property int wrapMode: Text.NoWrap;
     property int elideMode: Text.ElideRight;
     property bool isRightBorder: false;
+
+    signal selectionChanged(var selection);
+    property TableSelection tableSelection: TableSelection {
+        onSelectionChanged: {
+            tableContainer.selectionChanged(tableSelection.selectedIndexes);
+        }
+    }
+    function getSelectedIndexes(){
+        return tableContainer.tableSelection.selectedIndexes;
+    }
+
+    function setSelectedIndexes(indexes){
+        return tableContainer.tableSelection.selectedIndexes;
+    }
+
+    function select(index){
+        tableContainer.tableSelection.singleSelect(index);
+    }
+
+    function resetSelection(){
+        tableContainer.tableSelection.resetSelection();
+    }
+
     //
 
     //properties for delegate:
@@ -96,12 +119,18 @@ Item {
     Component.onCompleted: {
         tableContainer.headerMinHeight = tableContainer.headerHeight;
         tableContainer.setWidth();
-    }
 
+        tableContainer.tableSelection.table = elementsListObj;
+    }
 
     onFocusChanged: {
         if (tableContainer.focus){
             elementsListObj.forceActiveFocus();
+
+//            tableSelection.subscribeEvents();
+        }
+        else{
+//            tableSelection.unsubscribeEvents();
         }
     }
 
@@ -266,6 +295,31 @@ Item {
             tableContainer.elideMode = tableContainer.headerDecorator.GetData("ElideMode");
         }
 
+    }
+
+    function getSelectedIds(){
+        console.log("getSelectedIds");
+        let retVal = []
+
+        let indexes = tableContainer.getSelectedIndexes();
+        for (let i = 0; i < indexes.length; i++){
+            let item = elementsListObj.itemAtIndex(indexes[i]);
+            retVal.push(item.getSelectedId());
+        }
+
+        return retVal;
+    }
+
+    function getSelectedNames(){
+        let retVal = []
+
+        let indexes = tableContainer.getSelectedIndexes();
+        for (let i = 0; i < indexes.length; i++){
+            let item = elementsListObj.itemAtIndex(indexes[i]);
+            retVal.push(item.getSelectedName());
+        }
+
+        return retVal;
     }
 
 
@@ -694,23 +748,25 @@ Item {
 
         clip: true;
         Keys.onUpPressed: {
-            if (tableContainer.selectedIndex > 0){
-                tableContainer.selectedIndex--;
-            }
-            else{
-                tableContainer.selectedIndex = elementsListObj.count - 1;
-            }
+            tableContainer.tableSelection.up();
         }
 
         Keys.onDownPressed: {
-            if (tableContainer.selectedIndex < elementsListObj.count - 1){
-                tableContainer.selectedIndex++;
-            }
-            else{
-                tableContainer.selectedIndex = 0;
-            }
+            tableContainer.tableSelection.down();
         }
 
+        onFocusChanged: {
+            console.log("Table onFocusChanged", focus);
+        }
+
+        onActiveFocusChanged: {
+            if (elementsListObj.activeFocus){
+                tableContainer.tableSelection.subscribeEvents();
+            }
+            else{
+                tableContainer.tableSelection.unsubscribeEvents();
+            }
+        }
 
         delegate:
 
@@ -722,7 +778,9 @@ Item {
             width: elementsListObj.width;
             minHeight: tableContainer.itemHeight;
 
-            selected: tableContainer.selectedIndex === model.index;
+//            selected: tableContainer.selectedIndex === model.index;
+
+            //selected: tableContainer.tableSelection.selectedIndexes.includes(model.index);
 
             //!!!
             cellDecorator: tableContainer.cellDecorator;
@@ -754,7 +812,9 @@ Item {
             }
 
             onClicked: {
-                tableContainer.selectedIndex = model.index;
+//                tableContainer.selectedIndex = model.index;
+
+                tableContainer.tableSelection.singleSelect(model.index);
 
                 elementsListObj.forceActiveFocus();
             }

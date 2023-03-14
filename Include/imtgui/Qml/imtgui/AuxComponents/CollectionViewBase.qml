@@ -33,6 +33,8 @@ Item {
     signal selectedIndexChanged(int index);
     signal elementsChanged();
 
+    signal selectionChanged(var selection);
+
     /**
         Если true -> данные будут запрошены с сервера,
         иначе нужно будет подставлять данные вручную
@@ -162,9 +164,13 @@ Item {
                 collectionViewBaseContainer.selectedItem(idSelected, name);
             }
 
-            onSelectedIndexChanged: {
-                console.log("CollectionView AuxTable onSelectedIndexChanged");
-                collectionViewBaseContainer.selectedIndexChanged(tableInternal.selectedIndex);
+//            onSelectedIndexChanged: {
+//                console.log("CollectionView AuxTable onSelectedIndexChanged");
+//                collectionViewBaseContainer.selectedIndexChanged(tableInternal.selectedIndex);
+//            }
+
+            onSelectionChanged: {
+                collectionViewBaseContainer.selectionChanged(selection);
             }
 
             onTextFilterChanged: {
@@ -246,7 +252,7 @@ Item {
 
         onHeadersChanged: {
             console.log("onHeadersChanged", baseCommands.headers)
-            if (baseCommands.headers.GetItemsCount() > 0){
+            if (baseCommands.headers.GetItemsCount() > 0 && sortController.isEmpty()){
                 let headerId = baseCommands.headers.GetData("Id");
 
                 sortController.setHeaderSort(headerId, "ASC");
