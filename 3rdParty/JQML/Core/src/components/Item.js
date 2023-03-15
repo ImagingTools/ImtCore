@@ -65,6 +65,7 @@ export class Item extends QtObject {
         this.$cP('opacity', 1.0).connect(this.$opacityChanged.bind(this))
         this.$cP('enabled', true).connect(this.$enabledChanged.bind(this))
         this.$cP('focus', false).connect(this.$focusChanged.bind(this))
+        this.$cP('activeFocus', ()=>{return this.focus}).connect(this.$focusChanged.bind(this))
         this.$cP('width', 0).connect(this.$widthChanged.bind(this))
         this.$cP('height', 0).connect(this.$heightChanged.bind(this))
         this.$cP('scale', 1.0).connect(this.$rotationAndScaleChanged.bind(this))

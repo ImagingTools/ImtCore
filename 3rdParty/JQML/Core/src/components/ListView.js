@@ -51,32 +51,44 @@ export class ListView extends Flickable {
         }
     }
 
-    // $updateGeometry(){
-	// 	if(this.orientation === ListView.Vertical && this.contentItem){
-    //         // this.$sP('contentHeight', ()=>{ 
-    //             let childLength = typeof this.model === 'number' ? this.model : this.contentItem.children.length
-    //             let childHeight = this.contentItem.children.length > 0 ? this.contentItem.children[0].height : 100
-    //             let contentHeight = 0
-    //             if(childLength > 0){
-    //                 contentHeight = (childLength-1)*this.spacing + childHeight*childLength
-    //             }
-    //             this.contentHeight = contentHeight
-    //         // })
-    //     }
+    $updateGeometry(){
+		if(this.contentItem){
+            // this.$sP('contentHeight', ()=>{ 
+                let childLength = typeof this.model === 'number' ? this.model : this.contentItem.children.length
+                let contentHeight = 0
+                
+                for(let i = 0; i < childLength; i++){
+                    let childHeight = 100
+                    if(i < this.contentItem.children.length){
+                        childHeight = this.contentItem.children[i].height
+                    }
+                    contentHeight += childHeight
+                }
+                contentHeight += (childLength-1)*this.spacing
+                
+                this.contentHeight = contentHeight
+            // })
+        }
         
-	// 	if(this.orientation === ListView.Horizontal && this.contentItem){
-    //         // this.$sP('contentWidth', ()=>{ 
-    //             let childLength = typeof this.model === 'number' ? this.model : this.contentItem.children.length
-    //             let childWidth = this.contentItem.children.length > 0 ? this.contentItem.children[0].width : 100
-    //             let contentWidth = 0
-    //             if(childLength > 0){
-    //                 contentWidth = (childLength-1)*this.spacing + childWidth*childLength
-    //             }
-    //             this.contentWidth = contentWidth
-    //         // })
-    //     }
+		if(this.contentItem){
+            // this.$sP('contentWidth', ()=>{ 
+                let childLength = typeof this.model === 'number' ? this.model : this.contentItem.children.length
+                let contentWidth = 0
+                
+                for(let i = 0; i < childLength; i++){
+                    let childWidth = 100
+                    if(i < this.contentItem.children.length){
+                        childWidth = this.contentItem.children[i].width
+                    }
+                    contentWidth += childWidth
+                }
+                contentWidth += (childLength-1)*this.spacing
+                
+                this.contentWidth = contentWidth
+            // })
+        }
         
-    // }
+    }
     $updateGeometry(){
 		if(this.orientation === ListView.Vertical && this.contentItem){
 			let contentHeightFunc = ()=>{
@@ -92,7 +104,7 @@ export class ListView extends Flickable {
 				return bottom - top
 			}
 			this.contentHeight = contentHeightFunc()
-			this.$sP('contentHeight', contentHeightFunc)
+			// this.$sP('contentHeight', contentHeightFunc)
 			
 		}
         
@@ -110,7 +122,7 @@ export class ListView extends Flickable {
 				return right - left
 			}
 			this.contentWidth = contentWidthFunc()
-			this.$sP('contentWidth', contentWidthFunc)
+			// this.$sP('contentWidth', contentWidthFunc)
 			
 		}
     }
@@ -174,12 +186,15 @@ export class ListView extends Flickable {
                 }
             }
             let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.contentItem, index: index}) : this.delegate({parent: this.contentItem, index: index})
+            obj.widthChanged.connect(this.$updateGeometry.bind(this))
+            obj.heightChanged.connect(this.$updateGeometry.bind(this))
             this.contentItem.children.pop()
             this.contentItem.children.splice(index, 0, obj)
 
             for(let i = 0; i < this.contentItem.children.length; i++){
                 childRecursive(this.contentItem.children[i], i)
             }
+            
             
             this.count = this.contentItem.children.length
             this.$anchorsChild(index)
@@ -188,7 +203,7 @@ export class ListView extends Flickable {
             } catch (error) {
                 console.error(error)
             }
-            this.$updateGeometry()
+            // this.$updateGeometry()
         }
     }
 
@@ -207,6 +222,8 @@ export class ListView extends Flickable {
                 }
             }
             let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.contentItem, index: index}) : this.delegate({parent: this.contentItem, index: index})
+            obj.widthChanged.connect(this.$updateGeometry.bind(this))
+            obj.heightChanged.connect(this.$updateGeometry.bind(this))
             childRecursive(obj)
             this.count = this.contentItem.children.length
             this.$anchorsChild(index)
@@ -222,7 +239,6 @@ export class ListView extends Flickable {
                 }
             }
         }
-        this.$updateGeometry()
     }
     $remove(index, count){
         let removed = this.contentItem.children.splice(index, count)
