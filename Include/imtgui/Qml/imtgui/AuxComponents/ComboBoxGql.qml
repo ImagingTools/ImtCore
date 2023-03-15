@@ -46,6 +46,7 @@ Item {
     property string filterText: "";
     property string fontColor: Style.textColor;//
     property string fontColorTitle: fontColor;
+    property bool keepFilterText: false;
 
 
     // ID for display in combo box delegates
@@ -177,9 +178,10 @@ Item {
         comboBoxContainerGql.dialogsCountPrev = modalDialogManager.count;
         //var point = comboBoxContainerGql.mapToItem(thumbnailDecoratorContainer, 0, 0);
         var point = comboBoxContainerGql.mapToItem(null, 0, 0);
+        var filterText_ = comboBoxContainerGql.keepFilterText ? comboBoxContainerGql.currentText : "";
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
-                                                   "filterText": comboBoxContainerGql.currentText,
+                                                   "filterText": filterText_,
                                                    "model": comboBoxContainerGql.model,
                                                    "width": comboBoxContainerGql.width,
                                                    "countVisibleItem": 5 });
