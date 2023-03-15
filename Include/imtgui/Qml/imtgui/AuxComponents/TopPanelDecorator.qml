@@ -14,65 +14,60 @@ Item {
         console.log("topPanelDecorator base onCompleted")
     }
 
-    Rectangle {
-        anchors.fill: parent;
-        color: "red";
-    }
 
-//    TopCenterPanel {
-//        id: topCenterPanel;
+    TopCenterPanel {
+        id: topCenterPanel;
 
-////        z: 10;
 
-//        anchors.left: parent.left;
+        anchors.left: parent.left;
 
-////        width: 0.95 * topPanelDecorator.width;
-//        width: topPanelDecorator.width;// - rightPanel.width;
-//        height: topPanelDecorator.height;
+//        width: 0.95 * topPanelDecorator.width;
+        width: topPanelDecorator.width - rightPanel.width;
+        height: topPanelDecorator.height;
 
-//        topPanel: topPanelDecorator.topPanel;
+        topPanel: topPanelDecorator.topPanel;
 
-////        decoratorSource: Style.topCenterPanelDecoratorPath;
+        decoratorSource: Style.topCenterPanelDecoratorPath;
 //        color: "blue"
 
-////        gradient: Gradient {
-////            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-////            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-////            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-////            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-////        }
-//    }
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+        }
+    }
 
-//    TopRightPanel {
-//        id: rightPanel;
+    TopRightPanel {
+        id: rightPanel;
 
-//        z: 100;
+        z: 100;
 
-//        anchors.right: parent.right;
+        anchors.right: parent.right;
 
-////        width: topPanelDecorator.width - topCenterPanel.width;
-//        width: 100;
-//        height: topPanelDecorator.height;
+//        width: topPanelDecorator.width - topCenterPanel.width;
+        width: 100;
+        height: topPanelDecorator.height;
 
-//        decoratorSource: Style.topRightPanelDecoratorPath;
+        decoratorSource: Style.topRightPanelDecoratorPath;
 
-//        gradient: Gradient {
-//            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-//            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-//            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-//            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-//        }
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+        }
 
-//        Component.onCompleted: {
-//            console.log("rightPanel");
-//            console.log("rightPanel.width", rightPanel.width);
-//            console.log("rightPanel.height", rightPanel.height);
-//            rightPanel.decoratorSource = "TopRightPanelDecorator.qml";
-//        }
+        Component.onCompleted: {
+            console.log("rightPanel");
+            console.log("rightPanel.width", rightPanel.width);
+            console.log("rightPanel.height", rightPanel.height);
+            rightPanel.decoratorSource = "TopRightPanelDecorator.qml";
+        }
 
-//        onDecoratorSourceChanged: {
-//            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath);
-//        }
-//    }
+        onDecoratorSourceChanged: {
+            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath);
+        }
+    }
 }
 

@@ -177,7 +177,7 @@ Item {
         console.log("MultidocWorkspaceView documentIndex", documentIndex)
         if (documentIndex < 0){
             var index = documentsData.InsertNewItem();
-            console.log("MultidocWorkspaceView addDocument index:", index)
+            console.log("MultidocWorkspaceView addDocument index:", index, document["Source"])
 
             documentsData.SetData("Id", itemId, index);
             documentsData.SetData("CommandsId", document["CommandsId"], index);

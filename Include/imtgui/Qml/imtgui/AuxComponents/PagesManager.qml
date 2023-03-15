@@ -30,7 +30,7 @@ Item {
         id: pagesProvider;
 
         onPagesModelChanged: {
-            console.log("pagesProvider onPagesModelChanged");
+            console.log("pagesProvider onPagesModelChanged", container.pageModel.toJSON());
             pagesData.model = pagesProvider.pagesModel;
             container.pageModel = pagesProvider.pagesModel;
         }
@@ -64,7 +64,7 @@ Item {
                 if(pagesDeleg.visible){
                     if (!pagesLoader.item){
                         var source = container.pageModel.GetData("Source", model.index);
-                        console.log('DEBUG::', pagesLoader)
+                        console.log('DEBUG::pagesData', source)
                         pagesLoader.source = source;
                     }
 
