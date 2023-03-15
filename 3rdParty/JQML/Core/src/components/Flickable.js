@@ -16,8 +16,8 @@ export class Flickable extends Item {
 
     constructor(args) {
         super(args)
-        this.$cP('contentHeight', 0).connect(this.$contentHeightChanged.bind(this))
-        this.$cP('contentWidth', 0).connect(this.$contentWidthChanged.bind(this))
+        this.$cP('contentHeight', -1).connect(this.$contentHeightChanged.bind(this))
+        this.$cP('contentWidth', -1).connect(this.$contentWidthChanged.bind(this))
         this.$cP('contentX', 0).connect(this.$contentXChanged.bind(this))
         this.$cP('contentY', 0).connect(this.$contentYChanged.bind(this))
         this.$cP('flickableDirection', Flickable.AutoFlickDirection).connect(this.$flickableDirectionChanged.bind(this))
@@ -36,6 +36,8 @@ export class Flickable extends Item {
     $domCreate(){
         super.$domCreate()
 		this.contentItem = this.createComponent('Item', this)
+		this.contentItem.$sP('width', ()=>{return this.width})
+		this.contentItem.$sP('height', ()=>{return this.height})
         this.dom.style.overflow = "auto"
     }
 
@@ -47,49 +49,49 @@ export class Flickable extends Item {
         }, 100)
     }
 
-    $updateGeometry(){
-		if(this.$contentHeightAuto && this.contentItem){
-			let contentHeightFunc = ()=>{
-				let top = 0
-				let bottom = 0
-				if(this.contentItem.children.length)
-				for(let child of this.contentItem.children) {
-					let childTop = child.y
-					let childBottom = childTop + child.height
-					if(childTop < top) top = childTop
-					if(childBottom > bottom) bottom = childBottom
-				}
-				return bottom - top
-			}
-			this.contentHeight = contentHeightFunc()
-			if(this.contentHeight === 0){
-				this.$sP('contentHeight', ()=>{ return this.parent ? this.parent.height : 0})
-			} else {
-				this.$sP('contentHeight', contentHeightFunc)
-			}
-		}
+    // $updateGeometry(){
+	// 	if(this.$contentHeightAuto && this.contentItem){
+	// 		let contentHeightFunc = ()=>{
+	// 			let top = 0
+	// 			let bottom = 0
+	// 			if(this.contentItem.children.length)
+	// 			for(let child of this.contentItem.children) {
+	// 				let childTop = child.y
+	// 				let childBottom = childTop + child.height
+	// 				if(childTop < top) top = childTop
+	// 				if(childBottom > bottom) bottom = childBottom
+	// 			}
+	// 			return bottom - top
+	// 		}
+	// 		this.contentHeight = contentHeightFunc()
+	// 		if(this.contentHeight === 0){
+	// 			this.$sP('contentHeight', ()=>{ return this.parent ? this.parent.height : 0})
+	// 		} else {
+	// 			this.$sP('contentHeight', contentHeightFunc)
+	// 		}
+	// 	}
         
-		if(this.$contentWidthAuto && this.contentItem){
-			let contentWidthFunc = ()=>{
-				let left = 0
-				let right = 0
-				if(this.contentItem.children.length)
-				for(let child of this.contentItem.children) {
-					let childLeft = child.x
-					let childRight = childLeft + child.width
-					if(childLeft < left) left = childLeft
-					if(childRight > right) right = childRight
-				}
-				return right - left
-			}
-			this.contentWidth = contentWidthFunc()
-			if(this.contentWidth === 0){
-				this.$sP('contentWidth', ()=>{ return this.parent ? this.parent.width : 0})
-			} else {
-				this.$sP('contentWidth', contentWidthFunc)
-			}
-		}
-    }
+	// 	if(this.$contentWidthAuto && this.contentItem){
+	// 		let contentWidthFunc = ()=>{
+	// 			let left = 0
+	// 			let right = 0
+	// 			if(this.contentItem.children.length)
+	// 			for(let child of this.contentItem.children) {
+	// 				let childLeft = child.x
+	// 				let childRight = childLeft + child.width
+	// 				if(childLeft < left) left = childLeft
+	// 				if(childRight > right) right = childRight
+	// 			}
+	// 			return right - left
+	// 		}
+	// 		this.contentWidth = contentWidthFunc()
+	// 		if(this.contentWidth === 0){
+	// 			this.$sP('contentWidth', ()=>{ return this.parent ? this.parent.width : 0})
+	// 		} else {
+	// 			this.$sP('contentWidth', contentWidthFunc)
+	// 		}
+	// 	}
+    // }
 
     $flickableDirectionChanged(){
         this.dom.style.overflow = "hidden";
