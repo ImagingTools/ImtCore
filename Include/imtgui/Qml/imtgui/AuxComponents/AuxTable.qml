@@ -56,7 +56,7 @@ Item {
     signal selectionChanged(var selection);
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
-            tableContainer.selectionChanged(tableSelection.selectedIndexes);
+            tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
         }
     }
     function getSelectedIndexes(){
@@ -808,7 +808,7 @@ Item {
             Component.onCompleted: {
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
                     tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
-                }
+                }z
             }
 
             onClicked: {
