@@ -179,6 +179,7 @@ Item {
         var point = comboBoxContainerGql.mapToItem(null, 0, 0);
         modalDialogManager.openDialog(popupMenu, { "x":     point.x,
                                                    "y":     point.y,
+                                                   "filterText": comboBoxContainerGql.currentText,
                                                    "model": comboBoxContainerGql.model,
                                                    "width": comboBoxContainerGql.width,
                                                    "countVisibleItem": 5 });

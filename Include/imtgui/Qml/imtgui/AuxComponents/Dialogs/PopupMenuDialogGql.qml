@@ -114,7 +114,14 @@ Item {
         anchors.left: parent.left;
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
-        onTextEdited: {
+//        onTextEdited: {
+//            popupMenuContainer.rootItem.currentIndex = -1;
+//            popupMenuContainer.offset = 0;
+//            modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+//            itemsModel.updateModel(0);
+//        }
+        onTextChanged:  {
+
             popupMenuContainer.rootItem.currentIndex = -1;
             popupMenuContainer.offset = 0;
             modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
