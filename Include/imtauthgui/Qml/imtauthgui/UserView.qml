@@ -44,7 +44,7 @@ DocumentBase {
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: container.commandsId;
+        commandsId: container.documentUuid;
         documentBase: container;
         onModelStateChanged: {
             container.updateGui();
@@ -118,7 +118,7 @@ DocumentBase {
             iconSource: "../../../Icons/" + Style.theme + "/Left_On_Normal.svg";
 
             onClicked: {
-                Events.sendEvent("UserCommandActivated", "Close")
+                Events.sendEvent(container.documentUuid + "CommandActivated", "Close")
             }
         }
 

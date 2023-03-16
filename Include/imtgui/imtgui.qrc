@@ -131,6 +131,7 @@
 	<file alias="imtgui/AuxComponents/ShortcutManager.qml">Qml/imtgui/AuxComponents/ShortcutManager.qml</file>
 	<file alias="imtgui/AuxComponents/Loading.qml">Qml/imtgui/AuxComponents/Loading.qml</file>
 	<file alias="imtgui/AuxComponents/TableSelection.qml">Qml/imtgui/AuxComponents/TableSelection.qml</file>
+	<file alias="imtgui/AuxComponents/StateMachine.qml">Qml/imtgui/AuxComponents/StateMachine.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

@@ -190,18 +190,11 @@ Item {
         tabPanelInternal.selectedIndex = documentIndex;
     }
 
-//    function closeCurrentDocument(){
-//        console.log("MultidocWorkspaceView closeCurrentDocument")
-//         if (tabPanelInternal.selectedIndex >= 0){
-//             workspaceView.documentsData.RemoveItem(tabPanelInternal.selectedIndex);
+    function closeDocument(itemId, force){
+        if (force === undefined){
+            force = false;
+        }
 
-//             if (tabPanelInternal.selectedIndex > 0){
-//                 tabPanelInternal.selectedIndex--;
-//             }
-//         }
-//     }
-
-    function closeDocument(itemId){
         console.log("closeDocument", itemId);
          let index = this.getDocumentIndexById(itemId);
         console.log("index", index);
@@ -212,15 +205,21 @@ Item {
          if (index !== 0){
              let documentBase = workspaceView.documentsData.GetData("Item", index);
 
-             if (documentBase.isDirty){
+             if (documentBase.isDirty && !force){
+                 tabPanelInternal.selectedIndex = index;
+
                  modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
              }
              else{
-                 workspaceView.documentsData.RemoveItem(index);
-
                  if (tabPanelInternal.selectedIndex >= index && index > 0){
                      tabPanelInternal.selectedIndex--;
                  }
+
+                 workspaceView.documentsData.RemoveItem(index);
+
+                 console.log("RemoveItem");
+
+                 console.log("End");
              }
          }
      }
@@ -400,7 +399,8 @@ Item {
         model: workspaceView.documentsData;
 
         onCloseItem: {
-            tabPanelInternal.selectedIndex = index;
+            console.log("onCloseItem", index);
+//            tabPanelInternal.selectedIndex = index;
 
             let item = workspaceView.documentsData.GetData("Item", index);
             item.commandsDelegate.commandHandle("Close");
@@ -426,10 +426,20 @@ Item {
 
         onDocumentModelChanged: {
             if (documentController.documentModel != null){
-                if (tabPanelInternal.selectedIndex >= 0){
-                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
-                    item.documentModel = documentController.documentModel;
+                let documentId = documentController.documentModel.GetData("Id");
+
+                for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
+                    let id = workspaceView.documentsData.GetData("Id", i);
+                    if (id === documentId){
+                        let item = workspaceView.documentsData.GetData("Item", i);
+                        item.documentModel = documentController.documentModel;
+                    }
                 }
+
+//                if (tabPanelInternal.selectedIndex >= 0){
+//                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+//                    item.documentModel = documentController.documentModel;
+//                }
             }
         }
 

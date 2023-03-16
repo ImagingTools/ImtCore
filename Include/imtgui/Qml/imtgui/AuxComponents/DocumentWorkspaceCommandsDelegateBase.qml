@@ -25,17 +25,22 @@ Item {
 
     property var itemModelInputParams: ({});
 
-    onVisibleChanged: {
-        if (container.visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": documentBase.commandsProvider.commandsModel,
-                                 "CommandsId": documentBase.commandsProvider.commandsId});
+//    onVisibleChanged: {
+//        console.log("DocumentCommandsBase onVisibleChanged", visible);
+//        console.log("container.commandsId", container.commandsId);
+//        if (container.visible){
+////            Events.sendEvent("CommandsModelChanged", {"Model": documentBase.commandsProvider.commandsModel,
+////                                 "CommandsId": documentBase.commandsProvider.commandsId});
 
-            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-        }
-        else{
-            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
-        }
-    }
+//            Events.sendEvent("CommandsModelChanged", {"Model": documentBase.commandsProvider.commandsModel,
+//                                 "CommandsId": documentBase.documentUuid});
+
+////            Events.subscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
+//        }
+//        else{
+////            Events.unSubscribeEvent(container.commandsId + "CommandActivated", container.commandHandle);
+//        }
+//    }
 
     function commandHandle(commandId){
         console.log("DocumentCommandsBase commandHandle", container.documentBase.itemId, commandId);

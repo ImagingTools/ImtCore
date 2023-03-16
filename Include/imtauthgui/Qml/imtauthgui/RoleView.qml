@@ -98,7 +98,7 @@ DocumentBase {
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: container.commandsId;
+        commandsId: container.documentUuid;
         documentBase: container;
         commandsDelegate: container.commandsDelegate;
 
@@ -156,7 +156,9 @@ DocumentBase {
             iconSource: "../../../Icons/" + Style.theme + "/Left_On_Normal.svg";
 
             onClicked: {
-                Events.sendEvent("RoleCommandActivated", "Close")
+//                Events.sendEvent("RoleCommandActivated", "Close")
+
+                Events.sendEvent(container.documentUuid + "CommandActivated", "Close")
             }
         }
 

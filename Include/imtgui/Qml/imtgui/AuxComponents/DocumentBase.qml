@@ -38,18 +38,41 @@ Item {
 
     signal commandsDelegateLoaded();
 
+    property string documentUuid;
+    UuidGenerator {
+        id: uuidGenerator;
+    }
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Delete){
-            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Remove");
+//            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Remove");
+
+            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Remove");
         }
     }
 
     Component.onCompleted: {
+        documentBase.documentUuid = uuidGenerator.generateUUID();
+
         commandsDelegate.documentBase = documentBase;
     }
 
+    onVisibleChanged: {
+        if (visible){
+            documentBase.commandsProvider.updateGui();
+        }
+    }
+
+    onDocumentUuidChanged: {
+        if (documentBase.documentUuid !== ""){
+            documentBase.commandsProvider.documentUuid = documentBase.documentUuid;
+            Events.subscribeEvent(documentBase.documentUuid + "CommandActivated", documentBase.commandsDelegate.commandHandle);
+        }
+    }
+
     Component.onDestruction: {
-        Events.unSubscribeEvent(documentBase.commandsId + "CommandActivated", documentBase.commandsDelegate.commandHandle);
+        Events.unSubscribeEvent(documentBase.documentUuid + "CommandActivated", documentBase.commandsDelegate.commandHandle);
+
         documentBase.documentModel.modelChanged.disconnect(documentBase.modelChanged);
     }
 
@@ -70,9 +93,6 @@ Item {
     function onEntered(value){
         documentBase.documentModel.SetData("Id", value);
         documentBase.documentModel.SetData("Name", value);
-
-//        documentBase.itemId = value;
-//        documentBase.itemName = value;
     }
 
     function modelChanged(){
@@ -107,10 +127,10 @@ Item {
     }
 
     onCommandsIdChanged: {
-        console.log("documentBase onCommandsIdChanged", documentBase.commandsId, itemId);
+        console.log("documentBase onCommandsIdChanged", documentBase.commandsId, itemName);
 
         if (documentBase.itemLoad){
-            Events.subscribeEvent(documentBase.commandsId + "CommandActivated", documentBase.commandsDelegate.commandHandle);
+//            Events.subscribeEvent(documentBase.commandsId + "CommandActivated", documentBase.commandsDelegate.commandHandle);
 
             commandsDelegate.commandsId = documentBase.commandsId;
 
@@ -142,7 +162,7 @@ Item {
 
         onActivated: {
             console.log("Ctrl+S onActivated");
-            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Save");
+            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Save");
         }
     }
 
@@ -153,7 +173,7 @@ Item {
 
         onActivated: {
             console.log("Ctrl+Z onActivated");
-            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Undo");
+            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Undo");
         }
     }
 
@@ -164,7 +184,7 @@ Item {
 
         onActivated: {
             console.log("Ctrl+Shift+Z onActivated");
-            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Redo");
+            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Redo");
         }
     }
 
@@ -185,11 +205,11 @@ Item {
         }
     }
 
-    function close(){
-        Events.sendEvent(documentBase.commandsId + "CommandActivated", "Close");
-    }
+//    function close(){
+//        Events.sendEvent(documentBase.commandsId + "CommandActivated", "Close");
+//    }
 
-    function save(){
-        Events.sendEvent(documentBase.commandsId + "CommandActivated", "Save");
-    }
+//    function save(){
+//        Events.sendEvent(documentBase.commandsId + "CommandActivated", "Save");
+//    }
 }

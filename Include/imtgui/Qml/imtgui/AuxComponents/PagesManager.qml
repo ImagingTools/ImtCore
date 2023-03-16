@@ -9,6 +9,8 @@ Item {
     property Item activeItem: null;
     property int activePageIndex: -1;
 
+    property MainDocumentManager documentManager: null;
+
     onActiveItemChanged: {
         console.log("onActiveItemChanged", container.activeItem);
     }

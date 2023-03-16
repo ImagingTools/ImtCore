@@ -7,4 +7,16 @@ CollectionViewCommandsDelegateBase {
 
     removeDialogTitle: qsTr("Deleting an user");
     removeMessage: qsTr("Delete the selected user ?");
+
+    function onEdit(){
+        let itemIds = container.tableData.getSelectedIds();
+        let itemNames = container.tableData.getSelectedNames();
+
+        if (itemIds.length > 0){
+            let itemId = itemIds[0];
+            let itemName = itemNames[0];
+
+            container.collectionViewBase.selectItem(itemId, itemName);
+        }
+    }
 }

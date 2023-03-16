@@ -84,13 +84,13 @@ Item {
 //            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
 //        }
 //    }
-    onCommandsProviderChanged: {
-        if(commandsProvider){
-            let isEnabled = containerBase.selectedIndex > -1;
-            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
-            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
-        }
-    }
+//    onCommandsProviderChanged: {
+//        if(commandsProvider){
+//            let isEnabled = containerBase.selectedIndex > -1;
+//            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+//            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
+//        }
+//    }
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
@@ -117,6 +117,26 @@ Item {
         }
     }
 
+    function onEdit(){
+        let itemIds = containerBase.tableData.getSelectedIds();
+        let itemNames = containerBase.tableData.getSelectedNames();
+
+        for (let i = 0; i < itemIds.length; i++){
+            let itemId = itemIds[i];
+            let itemName = itemNames[i];
+
+            containerBase.collectionViewBase.selectItem(itemId, itemName);
+        }
+    }
+
+    function onRemove(){
+        modalDialogManager.openDialog(removeDialog, {});
+    }
+
+    function onNew(){
+        containerBase.collectionViewBase.selectItem("", "<new item>");
+    }
+
     function commandHandle(commandId){
         console.log("CollectionView commandHandle", commandId);
         if (containerBase.commandsProvider == null){
@@ -126,50 +146,37 @@ Item {
         let commandIsEnabled = containerBase.commandsProvider.commandIsEnabled(commandId);
         if (commandIsEnabled){
             if (commandId === "New"){
-                containerBase.collectionViewBase.selectItem("", "<new item>");
+                containerBase.onNew();
             }
             else if (commandId === "Remove"){
-                modalDialogManager.openDialog(removeDialog, {});
+                containerBase.onRemove();
             }
             else if (commandId === "Edit"){
-                let itemIds = containerBase.tableData.getSelectedIds();
-                let itemNames = containerBase.tableData.getSelectedNames();
-
-                if (itemIds.length > 0){
-                    let itemId = itemIds[0];
-                    let itemName = itemNames[0];
-
-                    containerBase.collectionViewBase.selectItem(itemId, itemName);
-                }
-
-//                for (let i = 0; i < itemIds.length; i++){
-//                    let itemId = itemIds[i];
-//                    let itemName = itemNames[i];
-
-//                    containerBase.collectionViewBase.selectItem(itemId, itemName);
-//                }
-
-//                let itemId = containerBase.tableData.getSelectedId();
-//                let itemName = containerBase.tableData.getSelectedName();
-//                containerBase.collectionViewBase.selectItem(itemId, itemName);
+                containerBase.onEdit();
             }
         }
 
         let editIsEnabled = containerBase.commandsProvider.commandIsEnabled("Edit");
         if (editIsEnabled){
             if (commandId === "Rename"){
-                let selectedName = containerBase.tableData.getSelectedName();
-                modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+                let indexes = containerBase.tableData.getSelectedIndexes();
+                if (indexes.length > 0){
+                    let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
+                    modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+                }
             }
             else if (commandId === "SetDescription"){
                 let elements = containerBase.tableData.elements;
-                let selectedDescription = "";
 
-                if (elements.ContainsKey("Description", selectedIndex)){
-                    selectedDescription = elements.GetData("Description", selectedIndex);
+                let indexes = containerBase.tableData.getSelectedIndexes();
+                if (indexes.length > 0){
+                    let selectedDescription = "";
+                    if (elements.ContainsKey("Description", indexes[0])){
+                        selectedDescription = elements.GetData("Description", indexes[0]);
+                    }
+
+                    modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
                 }
-
-                modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
             }
         }
 
@@ -189,7 +196,7 @@ Item {
     onRemoved: {
         console.log('onRemoved',id)
         if (containerBase.documentManager){
-            containerBase.documentManager.closeDocument(id);
+            containerBase.documentManager.closeDocument(id, true);
         }
 
         containerBase.collectionViewBase.updateGui();
@@ -361,7 +368,9 @@ Item {
             var inputParams = Gql.GqlObject("input");
 
             query = Gql.GqlRequest("query", containerBase.gqlModelRename);
-            inputParams.InsertField("Id", containerBase.tableData.getSelectedId());
+
+            let itemIds = containerBase.tableData.getSelectedIds();
+            inputParams.InsertField("Id", itemIds[0]);
 
             inputParams.InsertField("NewName", newName);
 
@@ -425,7 +434,9 @@ Item {
             var inputParams = Gql.GqlObject("input");
 
             query = Gql.GqlRequest("query", containerBase.gqlModelSetDescription);
-            inputParams.InsertField("Id", containerBase.tableData.getSelectedId());
+
+            let itemIds = containerBase.tableData.getSelectedIds();
+            inputParams.InsertField("Id", itemIds[0]);
 
             inputParams.InsertField("Description", description);
 

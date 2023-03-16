@@ -28,7 +28,7 @@ DocumentBase {
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: accountEditorContainer.commandsId;
+        commandsId: accountEditorContainer.documentUuid;
 
         commandsDelegate: accountEditorContainer.commandsDelegate;
         documentBase: accountEditorContainer;

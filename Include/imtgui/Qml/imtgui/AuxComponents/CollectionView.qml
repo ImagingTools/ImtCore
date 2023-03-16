@@ -39,6 +39,8 @@ Item {
 
     property ListModel contextMenuModel: ListModel {}
 
+    property alias commandsProvider: commandsProviderLocal;
+
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
 
@@ -66,9 +68,10 @@ Item {
     }
 
     onVisibleChanged: {
+        console.log("CollectionView onVisibleChanged", visible);
         if (collectionViewContainer.visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
+            Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderLocal.commandsModel,
+                                                      "CommandsId": commandsProviderLocal.commandsId});
 
             Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
         }
@@ -100,7 +103,8 @@ Item {
     onCommandsIdChanged: {
         console.log("this onItemIdChanged", collectionViewContainer.commandsId);
 
-        commandsProvider.commandsId = collectionViewContainer.commandsId;
+        commandsProviderLocal.commandsId = collectionViewContainer.commandsId;
+        commandsProviderLocal.documentUuid = collectionViewContainer.commandsId;
 
         collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandsId + "ObjectView";
         collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandsId + "Info";
@@ -197,7 +201,7 @@ Item {
             commandsLoader.item.tableData = collectionViewBase.table;
 
             commandsLoader.item.collectionViewBase = collectionViewContainer;
-            commandsLoader.item.commandsProvider = commandsProvider;
+            commandsLoader.item.commandsProvider = commandsProviderLocal;
             commandsLoader.item.documentManager = collectionViewContainer.documentManager;
 
             commandsLoader.item.contextMenuModel = collectionViewContainer.contextMenuModel;
@@ -268,7 +272,11 @@ Item {
     }
 
     CommandsProvider {
-        id: commandsProvider;
+        id: commandsProviderLocal;
+
+        onCommandsIdChanged: {
+//            commandsProviderLocal.updateModel();
+        }
     }
 
     MetaInfo {
@@ -280,10 +288,6 @@ Item {
         height: parent.height;
 
         visible: collectionViewContainer.visibleMetaInfo;
-
-//        tableData: collectionViewBase.table;
-
-//        contentVisible: collectionViewBase.table.selectedIndex != -1;
     }
 }
 

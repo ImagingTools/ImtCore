@@ -98,6 +98,8 @@ Rectangle {
         anchors.bottom: thumbnailDecoratorContainer.bottom;
 
         activePageIndex: menuPanel.activePageIndex;
+
+        documentManager: mainDocumentManager;
     }
 
     TopPanel {

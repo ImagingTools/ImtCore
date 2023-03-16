@@ -34,7 +34,9 @@ Item {
         id: commands;
 
         width: row.width;
-        height: 25;
+//        height: 25;
+
+        height: container.height;
 
         color: "transparent";
 

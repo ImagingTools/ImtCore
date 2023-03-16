@@ -814,6 +814,8 @@ Item {
             onClicked: {
 //                tableContainer.selectedIndex = model.index;
 
+                console.log("AuxTable onClicked");
+
                 tableContainer.tableSelection.singleSelect(model.index);
 
                 elementsListObj.forceActiveFocus();

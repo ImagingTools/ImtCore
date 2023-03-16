@@ -23,5 +23,7 @@ CollectionViewCommandsDelegateBase {
 
         commandsProvider.commandsModel.SetData("Id", "New", index);
         commandsProvider.commandsModel.SetData("IsEnabled", true, index);
+        commandsProvider.commandsModel.SetData("Visible", false, index);
+        commandsProvider.commandsModel.SetData("Status", "", index);
     }
 }

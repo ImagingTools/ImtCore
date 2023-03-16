@@ -7,9 +7,9 @@ Item {
 
     property string commandsId;
 
-    property TreeItemModel commandsModel: TreeItemModel {};
+    property string documentUuid;
 
-    property bool localData: false; //The commands model is not loaded from the server
+    property TreeItemModel commandsModel: TreeItemModel {};
 
     signal modelLoaded();
     signal commandModeChanged(string commandId, bool newMode);
@@ -21,14 +21,21 @@ Item {
 
     onCommandsModelChanged: {
         Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-                                                  "CommandsId": commandsProviderContainer.commandsId});
+                                                  "CommandsId": commandsProviderContainer.documentUuid});
 
         commandsProviderContainer.modelLoaded();
     }
 
     function updateModel(){
+//        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
+//                                                  "CommandsId": commandsProviderContainer.commandsId});
+
+        modelCommands.updateModel();
+    }
+
+    function updateGui(){
         Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-                                                  "CommandsId": commandsProviderContainer.documentKey});
+                             "CommandsId": commandsProviderContainer.documentUuid});
     }
 
     function setCommandIsEnabled(commandId, isEnabled){
@@ -46,6 +53,37 @@ Item {
 
                     commandsProviderContainer.commandModeChanged(commandId, isEnabled);
                 }
+            }
+        }
+    }
+
+    function setCommandIcon(commandId, icon){
+        for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            if (currentCommandId === commandId){
+                commandsProviderContainer.commandsModel.SetData("Icon", icon, i);
+                break;
+            }
+        }
+    }
+
+    function setCommandName(commandId, commandName){
+        for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            if (currentCommandId === commandId){
+                commandsProviderContainer.commandsModel.SetData("Name", commandName, i);
+                break;
+            }
+        }
+    }
+
+    function setCommandNotification(commandId, notification){
+        console.log("setCommandNotification", commandId, notification);
+        for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
+            let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
+            if (currentCommandId === commandId){
+                commandsProviderContainer.commandsModel.SetData("Status", notification, i);
+                break;
             }
         }
     }

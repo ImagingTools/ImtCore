@@ -63,6 +63,34 @@ Item {
                 onClicked: {
                     Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
                 }
+
+                Rectangle {
+                    id: notification;
+
+                    anchors.top: parent.top;
+                    anchors.right: parent.right;
+
+                    width: notificationText.width + 5;
+                    height: notificationText.height;
+
+                    color: Style.errorTextColor;
+                    radius: 4;
+
+                    visible: model.Status && model.Status !== "";
+
+                    Text {
+                        id: notificationText;
+
+                        anchors.centerIn: notification;
+
+                        text: model.Status;
+
+                        font.family: Style.fontFamilyBold;
+                        font.pixelSize: Style.fontSize_common;
+
+                        color: Style.baseColor;
+                    }
+                }
             }
         }
     }
