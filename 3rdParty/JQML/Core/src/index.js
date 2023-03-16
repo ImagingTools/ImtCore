@@ -177,7 +177,7 @@ global.Core = {
     queueCompleted: [],
     focusedElement: null,
     setFocus(item){
-        if(this.focusedElement) {
+        if(this.focusedElement && item !== this.focusedElement) {
             this.focusedElement.focus = false
         }
         this.focusedElement = item

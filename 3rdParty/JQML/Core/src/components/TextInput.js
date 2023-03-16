@@ -27,6 +27,7 @@ export class TextInput extends Item {
 
     $widthAuto = true
 	$heightAuto = true
+    $editing = false
 
     constructor(args) {
         super(args)
@@ -77,6 +78,7 @@ export class TextInput extends Item {
 
 
         this.impl.addEventListener("input", function(e) {
+            this.$editing = true
             if(this.$p.validator.val){
                 if(this.$p.validator.val.validate(this.impl.value)){
                     this.text = this.impl.value
@@ -151,7 +153,10 @@ export class TextInput extends Item {
             Core.setFocus(this)
         } else {
             this.impl.blur()
-            this.$s.editingFinished()
+            if(this.$editing) {
+                this.$editing = false
+                this.$s.editingFinished()
+            }
         }
     }
     $selectionColorChanged(){
