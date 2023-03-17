@@ -198,7 +198,7 @@ Item {
 
         visible: gridCollectionViewContainer.visibleMetaInfo;
 
-        tableData: gridCollectionViewBase.grid;
+//        tableData: gridCollectionViewBase.grid;
 
 //        contentVisible: gridCollectionViewBase.grid.selectedIndex != -1;
 
