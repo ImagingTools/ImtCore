@@ -365,9 +365,8 @@ Item {
                     fontColor: yearField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
-                    //hiddenBackground: false;
 
-                    titleTxt.color: "transparent";
+                    fontColorTitle: "transparent";
                     compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
                     moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
@@ -486,9 +485,8 @@ Item {
                     fontColor: monthField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
-                    //hiddenBackground: false;
 
-                    titleTxt.color: "transparent";
+                    fontColorTitle: "transparent";
                     compTextCentered: true;
                     shownItemsCount: 12;
 
@@ -616,9 +614,8 @@ Item {
                     fontColor: dayField.fontColor;
                     borderColor: "transparent";
                     backgroundColor: "transparent";
-                    //hiddenBackground: false;
 
-                    titleTxt.color: "transparent";
+                    fontColorTitle: "transparent";
                     compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
 
