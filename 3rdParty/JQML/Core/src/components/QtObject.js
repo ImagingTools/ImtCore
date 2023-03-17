@@ -222,9 +222,7 @@ export class QtObject {
         let queueSignals = []
 
 
-        for(let i = this.children.length-1; i >= 0; i--){
-            this.children[i].$uP(step + 1)
-        }
+        
         
         while(this.$uL.properties.length){
             let propName = this.$uL.properties.shift()
@@ -297,7 +295,9 @@ export class QtObject {
             
         }
         
-
+        for(let i = this.children.length-1; i >= 0; i--){
+            this.children[i].$uP(step + 1)
+        }
         
 
 
