@@ -8,7 +8,7 @@ Row {
     spacing: 10;
 
     property int pagesSize: 1;
-    property int currentValue: 1;
+    property int currentValue: currentIndex + 1;
     property int currentIndex: 0;
 
     // The number of elements on the page
