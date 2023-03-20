@@ -29,6 +29,8 @@ export class Loader extends Item {
         this.$cP('source', '').connect(this.$sourceChanged.bind(this))
         this.$cP('sourceComponent', undefined).connect(this.$sourceComponentChanged.bind(this))
 
+        this.$sP('width', ()=>{return this.item.width})
+        this.$sP('height', ()=>{return this.item.height})
         this.$s.loaded = Signal()
         
     }
