@@ -140,7 +140,7 @@ Item {
                 console.log(index)
                 console.log(commandId)
                 if (index > -1){
-                    for (var item = 0; item < gettedParams.GetItemsCount(); item++){
+                    for (var item = 0; item < comboBoxContainerGql.gettedParams.GetItemsCount(); item++){
                         let param = comboBoxContainerGql.gettedParams.GetData("Name",  item);
                         let value = popup.model.GetData(param, index);
                         console.log(param, " = ", value);

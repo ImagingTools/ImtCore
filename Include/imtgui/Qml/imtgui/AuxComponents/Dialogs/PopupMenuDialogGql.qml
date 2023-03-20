@@ -30,6 +30,8 @@ Item {
     property bool hiddenBackground: true;
     property bool canClose: true;
 
+    property bool ready: root && rootItem && gettedParams && filterIdsModel && properties;
+
     // ID for display in combo box delegates
     property string nameId: "Name";
 
@@ -54,6 +56,11 @@ Item {
     signal finished(string commandId, int index);
     signal endList();
     signal textEdited();
+    signal started();
+
+    function onBackgroundClicked(){
+        popupMenuContainer.root.closeDialog();
+    }
 
     TreeItemModel{
         id: modelFilter;
@@ -73,7 +80,7 @@ Item {
             modelFilter.SetData(properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
         }
         itemsModel.updateModel(0);
-//        root.closeDialog();
+        //        root.closeDialog();
     }
 
     onRootChanged: {
@@ -87,7 +94,9 @@ Item {
         /**
             Close the dialog by clicking on the background
         */
-        popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.connect(popupMenuContainer.root.closeDialog);
+        //popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.connect(popupMenuContainer.root.closeDialog);
+        Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+
     }
     Component.onCompleted: {
         modelFilter.AddTreeModel("FilterIds");
@@ -97,8 +106,10 @@ Item {
     }
 
     Component.onDestruction: {
-        if(popupMenuContainer.root.backgroundItem.backgroundAreaItem)
-            popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(popupMenuContainer.root.closeDialog);
+//        if(popupMenuContainer.root.backgroundItem.backgroundAreaItem)
+            //popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(popupMenuContainer.root.closeDialog);
+            Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+
     }
 
 
@@ -114,18 +125,20 @@ Item {
         anchors.left: parent.left;
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
-//        onTextEdited: {
-//            popupMenuContainer.rootItem.currentIndex = -1;
-//            popupMenuContainer.offset = 0;
-//            modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
-//            itemsModel.updateModel(0);
-//        }
+        //        onTextEdited: {
+        //            popupMenuContainer.rootItem.currentIndex = -1;
+        //            popupMenuContainer.offset = 0;
+        //            modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+        //            itemsModel.updateModel(0);
+        //        }
         onTextChanged:  {
 
-            popupMenuContainer.rootItem.currentIndex = -1;
-            popupMenuContainer.offset = 0;
-            modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
-            itemsModel.updateModel(0);
+            if(popupMenuContainer.ready){
+                popupMenuContainer.rootItem.currentIndex = -1;
+                popupMenuContainer.offset = 0;
+                modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+                itemsModel.updateModel(0);
+            }
         }
         onAccepted: {
             popupMenuContainer.root.closeDialog();
@@ -179,13 +192,15 @@ Item {
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
             onContentYChanged: {
-                if(contentHeight - contentY - popupMenuListView.height == 0){
-                    if(!popupMenuContainer.endListStatus && itemsModel.state == "Ready"){
-                        console.log("Create additional query")
-                        loadedRec.visible = true;
-                        popupMenuContainer.offset = popupMenuContainer.offset + popupMenuContainer.count;
-                        console.log("Offset = ", popupMenuContainer.offset);
-                        itemsModel.updateModel(popupMenuContainer.offset);
+                if(popupMenuContainer.ready){
+                    if(contentHeight - contentY - popupMenuListView.height == 0){
+                        if(!popupMenuContainer.endListStatus && itemsModel.state == "Ready"){
+                            console.log("Create additional query")
+                            loadedRec.visible = true;
+                            popupMenuContainer.offset = popupMenuContainer.offset + popupMenuContainer.count;
+                            console.log("Offset = ", popupMenuContainer.offset);
+                            itemsModel.updateModel(popupMenuContainer.offset);
+                        }
                     }
                 }
             }
@@ -196,17 +211,17 @@ Item {
     }//ItemListView
 
     DropShadow {
-       id: dropShadow;
+        id: dropShadow;
 
-       anchors.fill: itemBody;
+        anchors.fill: itemBody;
 
-       horizontalOffset: 2;
-       verticalOffset: 2;
+        horizontalOffset: 2;
+        verticalOffset: 2;
 
-       radius: 4;
-       color: Style.shadowColor;
+        radius: 4;
+        color: Style.shadowColor;
 
-       source: itemBody;
+        source: itemBody;
     }
 
     GqlModel {
@@ -222,12 +237,12 @@ Item {
             viewParams.InsertField("Count", popupMenuContainer.count);
             viewParams.InsertField("FilterModel");
             var jsonString = modelFilter.toJSON();
-//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            //            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             viewParams.InsertField("FilterModel", jsonString);
             inputParams.InsertFieldObject(viewParams);
             var queryFields = Gql.GqlObject("items");
-            for (var item = 0; item < gettedParams.GetItemsCount(); item++){
-                var nameParam = gettedParams.GetData("Name", item);
+            for (var item = 0; item < popupMenuContainer.gettedParams.GetItemsCount(); item++){
+                var nameParam = popupMenuContainer.gettedParams.GetData("Name", item);
                 queryFields.InsertField(nameParam);
             }
             query.AddField(queryFields)
