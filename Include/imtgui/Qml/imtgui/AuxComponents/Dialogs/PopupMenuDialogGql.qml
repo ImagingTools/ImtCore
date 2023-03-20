@@ -35,6 +35,7 @@ Item {
     // ID for display in combo box delegates
     property string nameId: "Name";
 
+
     property Component delegate: PopupMenuDelegate{
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
@@ -73,7 +74,7 @@ Item {
     }
 
     onModelChanged: {
-        popupMenuListView.model = popupMenuContainer.model;
+        //popupMenuListView.model = popupMenuContainer.model;
     }
     onPropertiesChanged: {
         for (var item = 0; item < properties.GetItemsCount(); item++){
@@ -228,7 +229,7 @@ Item {
         id: itemsModel;
 
         function updateModel(offsetVar) {
-            var query = Gql.GqlRequest("query", commandId);
+            var query = Gql.GqlRequest("query", popupMenuContainer.commandId);
 
             var inputParams = Gql.GqlObject("input");
             query.AddParam(inputParams);
@@ -254,22 +255,25 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, itemsModel);
             if (this.state === "Ready"){
+
+
                 let dataModelLocal;
 
                 if (itemsModel.ContainsKey("errors")){
-
                     return;
                 }
 
                 if (itemsModel.ContainsKey("data")){
                     dataModelLocal = itemsModel.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(commandId)){
-                        dataModelLocal = dataModelLocal.GetData(commandId);
+                    if (dataModelLocal.ContainsKey(popupMenuContainer.commandId)){
+                        dataModelLocal = dataModelLocal.GetData(popupMenuContainer.commandId);
                         dataModelLocal = dataModelLocal.GetData("items");
-                        console.log(commandId, " = ", dataModelLocal);
+                        console.log(popupMenuContainer.commandId, " = ", dataModelLocal);
                         if (popupMenuContainer.offset == 0){
                             popupMenuContainer.model = dataModelLocal;
+                            popupMenuListView.model = popupMenuContainer.model;
+
                             loadedRec.visible = false;
                         }
                         else{
@@ -279,9 +283,11 @@ Item {
                                     popupMenuContainer.model.InsertNewItem();
                                     dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
                                 }
+                                popupMenuListView.model = popupMenuContainer.model;
+
                             }
                             else{
-                                endListStatus = true;
+                                popupMenuContainer.endListStatus = true;
                             }
                             loadedRec.visible = false;
                         }
