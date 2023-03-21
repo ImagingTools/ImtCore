@@ -19,6 +19,8 @@ Item {
     property alias gridDecoratorPath: loaderTableDecorator.source;
     property alias modelFilter: modelFilterObj;
     property alias pagination: paginationObj;
+    property alias paginationCurrentIndex: paginationObj.currentIndex;
+    property alias paginationPageSize: paginationObj.pagesSize;
     property string commandsId;
 //    property alias elementsList: gridInternal.elementsList;
 //    property alias gridItemHeight: gridInternal.itemHeight;

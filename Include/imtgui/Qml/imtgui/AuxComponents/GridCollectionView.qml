@@ -35,6 +35,8 @@ Item {
 
 //    property alias tableItemHeight: gridCollectionViewBase.gridItemHeight;
     property alias metaInfo: collectionMetaInfo;
+    property alias paginationCurrentIndex: gridCollectionViewBase.paginationCurrentIndex;
+    property alias paginationPageSize: gridCollectionViewBase.paginationPageSize;
 
 
 
