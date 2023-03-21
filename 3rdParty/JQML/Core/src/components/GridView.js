@@ -267,38 +267,29 @@ export class GridView extends Flickable {
     
 
     $updateChildren(){
+        let x = 0
+        let y = 0
         for(let i = 0; i < this.contentItem.children.length; i++){
-            this.$anchorsChild(i)
+            let child = this.contentItem.children[i]
+
+            if(i > 0) {
+                x += this.cellWidth
+                if(x + this.cellWidth > this.width){
+                    x = 0
+                    y += this.cellHeight
+                }
+            }
+
+            child.x = x
+            child.y = y
         }
     }
     $updateChild(index){
-        // let child = this.contentItem.children[index]
-        // child.dom.style.position = 'relative'
-        // if(child.width === 0 && !child.$p.width.func) child.$sP('width', ()=>{ return this.cellWidth })
-        // if(child.height === 0 && !child.$p.height.func) child.$sP('height', ()=>{ return this.cellHeight })
+
     }
 
     $anchorsChild(index){
-        let child = this.contentItem.children[index]
-        // if(index === 0){
-        //     child.x = 0
-        //     child.y = 0
-        // } else {
-            let x = (this.cellWidth * index) % this.width
-            let col = Math.trunc((this.cellWidth * index) / this.width)
-            let y = col * this.cellHeight
-            child.x = x
-            child.y = y
-            // if(this.orientation === GridView.layoutDirection){
-            //     child.$sP('anchors.left', ()=>{ return this.contentItem.children[index-1].right })
-            //     child.$sP('anchors.leftMargin', ()=>{ return this.spacing })
-            // } else {
-            //     child.$sP('anchors.top', ()=>{ return this.contentItem.children[index-1].bottom })
-            //     child.$sP('anchors.topMargin', ()=>{ return this.spacing })
-            // }
-        // }
-        
-        
+
     }
 
     $destroy(){
