@@ -75,34 +75,36 @@ Row {
         }
     }
 
-    Repeater {
-        id: repeaterPagination;
+    Row{
+        Repeater {
+            id: repeaterPagination;
 
-        delegate: AuxButton {
-            id: buttonDelegate;
+            delegate: AuxButton {
+                id: buttonDelegate;
 
-            height: 20;
-            width: 24;
+                height: 20;
+                width: 24;
 
-            hasIcon: false;
-            hasText: true;
-            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+                hasIcon: false;
+                hasText: true;
+                highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
 
-            enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
-            textButton: model.number === -1 ? "..." : model.number;
-            onClicked: {
-                paginationContainer.currentIndex = model.number - 1;
-                paginationContainer.refreshBtn();
-            }
+                enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
+                textButton: model.number === -1 ? "..." : model.number;
+                onClicked: {
+                    paginationContainer.currentIndex = model.number - 1;
+                    paginationContainer.refreshBtn();
+                }
 
-            Rectangle {
-                anchors.top: buttonDelegate.bottom;
-                width: parent.width;
-                height: 2;
+                Rectangle {
+                    anchors.top: buttonDelegate.bottom;
+                    width: parent.width;
+                    height: 2;
 
-                color: Style.tabSelectedColor;
-                visible: model.selected;
+                    color: Style.tabSelectedColor;
+                    visible: model.selected;
+                }
             }
         }
     }
