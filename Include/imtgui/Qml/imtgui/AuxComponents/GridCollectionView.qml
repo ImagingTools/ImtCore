@@ -27,12 +27,16 @@ Item {
 
     property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
     property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
+    //property alias selectedIndex: gridCollectionViewBase.grid.selectedIndex;
+    property alias selectedIndex: gridCollectionViewBase.indexSelected;
 //    property alias elementsList: gridCollectionViewBase.elementsList;
 //    property alias gridMinWidth: gridCollectionViewBase.gridMinWidth;
     property alias gridDecoratorPath: gridCollectionViewBase.gridDecoratorPath;
 
 //    property alias tableItemHeight: gridCollectionViewBase.gridItemHeight;
     property alias metaInfo: collectionMetaInfo;
+
+
 
     Component.onCompleted: {
         itemId = documentsData.GetData("Id", model.index);
@@ -60,9 +64,9 @@ Item {
 
         commandsProvider.commandsId = commandsId;
 
-        gridCollectionViewBase.commands.gqlModelObjectView = commandsId + "ObjectView";
-        gridCollectionViewBase.commands.gqlModelHeadersInfo = commandsId + "Info";
-        gridCollectionViewBase.commands.gqlModelItemsInfo = commandsId + "List";
+        gridCollectionViewBase.gqlModelObjectView = commandsId + "ObjectView";
+        gridCollectionViewBase.gqlModelHeadersInfo = commandsId + "Info";
+        gridCollectionViewBase.gqlModelItemsInfo = commandsId + "List";
 
         gridCollectionViewBase.commandsId = commandsId;
 

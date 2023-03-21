@@ -6,6 +6,11 @@ Item {
     id: collectionViewBaseContainer;
 
     property alias commands: baseCommands;
+
+    property alias gqlModelObjectView: baseCommands.gqlModelObjectView;
+    property alias gqlModelHeadersInfo: baseCommands.gqlModelHeadersInfo;
+    property alias gqlModelItemsInfo: baseCommands.gqlModelItemsInfo;
+
     property alias gridElementsDelegate: gridInternal.delegate;
     property alias gridElementsModel: gridInternal.model;
     property alias gridCellWidth: gridInternal.cellWidth;
@@ -20,6 +25,7 @@ Item {
     property string itemId;
 
     property alias grid: gridInternal;
+    property alias indexSelected: gridInternal.selectedIndex;
 
     property bool hasPagination: true;   
 
@@ -44,7 +50,11 @@ Item {
     Rectangle {
         id: backgroundTable;
 
-        anchors.fill: parent;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 50;
 
 //        anchors.top: filterMenu.visible ? filterMenu.bottom: parent.top;
 //        anchors.left: parent.left;
@@ -107,6 +117,10 @@ Item {
             id: gridInternal;
 
             anchors.fill: parent;
+
+            boundsBehavior: Flickable.StopAtBounds;
+            clip: true;
+
             property int selectedIndex: -1;
 //            property alias elements: model;
             signal selectItem(string idSelected, string name);
