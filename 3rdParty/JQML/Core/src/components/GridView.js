@@ -285,7 +285,14 @@ export class GridView extends Flickable {
         }
     }
     $updateChild(index){
-
+        this.contentItem.children[index].xChanged.connect(()=>{
+            this.contentX = 0
+            this.contentY = 0
+        })
+        this.contentItem.children[index].yChanged.connect(()=>{
+            this.contentX = 0
+            this.contentY = 0
+        })
     }
 
     $anchorsChild(index){
