@@ -19,7 +19,7 @@ Item {
 //    property alias gridItemHeight: gridInternal.itemHeight;
     property string itemId;
 
-    property var grid: gridInternal;
+    property alias grid: gridInternal;
 
     property bool hasPagination: true;   
 
@@ -53,7 +53,7 @@ Item {
 
         color: Style.baseColor;
 
-        radius: thumbnailDecoratorContainer.mainRadius;
+        radius: 10;
 
         TreeItemModel{
             id: gridDecoratorModel;
@@ -84,7 +84,7 @@ Item {
                             cellWidth.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("CellWidth"));
                         }
 
-                        gridInternal.tableDecorator = gridDecoratorModel;
+                        //gridInternal.tableDecorator = gridDecoratorModel;
                     }
                 }
             }

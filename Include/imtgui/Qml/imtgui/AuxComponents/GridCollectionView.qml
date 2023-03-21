@@ -100,16 +100,19 @@ Item {
 
     Component {
         id: contentDialog;
+
         Item {
             id: content;
+
+            width: contentLoader.width;
+            height: contentLoader.height;
+
             property Item root;
             property bool centered: true;
             property string contentId;
             property string contentName;
             property string contentSource;
             property string contentCommandsId;
-            width: contentLoader.width;
-            height: contentLoader.height;
 
             onRootChanged: {
                 contentLoader.item.root = content.root;
@@ -117,7 +120,9 @@ Item {
 
             Loader {
                 id: contentLoader;
+
                 anchors.centerIn: parent;
+
                 source: content.contentSource;
                 onLoaded: {
                     contentLoader.item.root = content.root;

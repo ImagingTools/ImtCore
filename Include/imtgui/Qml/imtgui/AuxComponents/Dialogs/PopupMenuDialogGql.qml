@@ -73,10 +73,18 @@ Item {
         id: modelFilter;
     }
 
-    onFinished: {
-        if(popupMenuContainer.canClose){
-            popupMenuContainer.root.closeDialog();
-        }
+    Component.onCompleted: {
+        //console.log("_____________POPUP_COMPL_____________")
+        modelFilter.AddTreeModel("FilterIds");
+        modelFilter.SetData("FilterIds", popupMenuContainer.filterIdsModel)
+        modelFilter.AddTreeModel("Sort");
+
+        itemsModel.updateModel(0);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+
     }
 
 
@@ -87,8 +95,9 @@ Item {
             modelFilter.SetData(popupMenuContainer.properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
         }
 //        itemsModel.updateModel(0);
-        //        root.closeDialog();
     }
+
+
 
     onRootChanged: {
         /**
@@ -101,24 +110,15 @@ Item {
         /**
             Close the dialog by clicking on the background
         */
-        //popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.connect(popupMenuContainer.root.closeDialog);
         Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
 
     }
-    Component.onCompleted: {
-        //console.log("_____________POPUP_COMPL_____________")
-        modelFilter.AddTreeModel("FilterIds");
-        modelFilter.SetData("FilterIds", popupMenuContainer.filterIdsModel)
-        modelFilter.AddTreeModel("Sort");
 
-        itemsModel.updateModel(0);
-    }
 
-    Component.onDestruction: {
-        //        if(popupMenuContainer.root.backgroundItem.backgroundAreaItem)
-        //popupMenuContainer.root.backgroundItem.backgroundAreaItem.clicked.disconnect(popupMenuContainer.root.closeDialog);
-        Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
-
+    onFinished: {
+        if(popupMenuContainer.canClose){
+            popupMenuContainer.root.closeDialog();
+        }
     }
 
 
@@ -147,6 +147,8 @@ Item {
                 popupMenuContainer.offset = 0;
                 modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
                 itemsModel.updateModel(0);
+                pause.stop();
+                pause.start();
             }
         }
         onAccepted: {
@@ -154,6 +156,16 @@ Item {
             popupMenuContainer.close();
         }
 
+    }
+
+    PauseAnimation {
+        id: pause;
+
+        duration: 500;
+        onFinished:  {
+
+            itemsModel.updateModel(0);
+        }
     }
 
     Rectangle {
@@ -206,7 +218,10 @@ Item {
             onContentYChanged: {
                 if(popupMenuContainer.ready){
                     if(contentHeight - contentY - popupMenuListView.height == 0){
-                        if(!popupMenuContainer.endListStatus && itemsModel.state == "Ready" && popupMenuContainer.elementsCount > popupMenuContainer.offset){
+                        var ok = !popupMenuContainer.endListStatus
+                                && itemsModel.state == "Ready"
+                               && popupMenuContainer.elementsCount > popupMenuContainer.offset;
+                        if(ok){
 
                             //popupMenuContainer.endListStatus = true;
 
@@ -224,6 +239,9 @@ Item {
 
         }//ListView
     }//ItemListView
+
+
+
 
     DropShadow {
         id: dropShadow;
@@ -305,7 +323,7 @@ Item {
                             //popupMenuListView.model = popupMenuContainer.model;
 
                             loadedRec.visible = false;
-                            // popupMenuContainer.endListStatus = false;
+                             popupMenuContainer.endListStatus = false;
                         }
                         else{
                             console.log("count items = ", dataModelLocal.GetItemsCount())
@@ -315,7 +333,7 @@ Item {
                                     dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
                                 }
                                 //popupMenuListView.model = popupMenuContainer.model;
-                                //popupMenuContainer.endListStatus = false;
+                                popupMenuContainer.endListStatus = false;
 
                             }
                             else{
