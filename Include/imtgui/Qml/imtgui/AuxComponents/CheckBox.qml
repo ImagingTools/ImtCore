@@ -8,6 +8,8 @@ Item {
     height: 13;
 
     property alias checkSize: checkRect.height;
+    property alias borderWidth: checkRect.border.width;
+    property string borderColor: "";
     property alias border: checkRect.border;
     property alias color: checkRect.color;
     property alias radius: checkRect.radius;
@@ -49,7 +51,7 @@ Item {
         color: "transparent";
 
         border.width: 1;
-        border.color: container.isActive ? Style.borderColor : Style.disabledInActiveTextColor;
+        border.color: container.borderColor !=="" ? container.borderColor  : container.isActive ? Style.borderColor : Style.disabledInActiveTextColor;
 
         Image {
             id: image;
