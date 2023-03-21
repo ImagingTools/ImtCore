@@ -157,7 +157,47 @@ export class ListModel extends QtObject {
         
     }
     toJSON(){
-        return ''
+        let retVal = ''
+        if(this.count > 1){
+            retVal += '{'
+        } else {
+            retVal += '['
+        }
+
+        for (var i = 0; i < this.count; i++){
+            var modelObject = this.get(i)
+            if (i > 0) retVal += ","
+            if (this.count > 1) retVal += "{"
+
+            var j = 0;
+            for (var property in modelObject.$p) {
+                if (j > 0)
+                    retVal += ","
+                j++;
+                retVal += "\"" + property + "\":"
+                var modelVal = modelObject.$p[property].val
+                if (modelVal === null)
+                    modelVal += "null"
+                else if(typeof modelVal === 'object' && modelVal.$qmlClassName === "ListModel"){
+                    retVal += modelVal.toJSON()
+                }
+                else if(typeof modelVal === 'string' || modelVal instanceof String){
+                    retVal += "\"" + modelVal + "\""
+                }
+                else if(typeof modelVal === 'object' && !modelVal.$qmlClassName){
+                    retVal += JSON.stringify(modelVal)
+                }else
+                    retVal += modelVal
+            }
+            if (this.count > 1) retVal += "}"
+        }
+
+        if(this.count > 1){
+            retVal += '}'
+        } else {
+            retVal += ']'
+        }
+        return retVal
     }
 
     // $destroy(){
