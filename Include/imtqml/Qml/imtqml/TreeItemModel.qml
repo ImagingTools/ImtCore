@@ -243,7 +243,7 @@ JSONListModel {
                 var modelVal = modelObject.$p[property].val
                 if (modelVal === null)
                     modelVal += "null"
-                else if(typeof modelVal === 'object' && modelVal._qmlName == 'TreeItemModel.qml'){
+                else if(typeof modelVal === 'object' && (modelVal._qmlName === 'TreeItemModel.qml' || modelVal.$qmlClassName === "ListModel")){
                     retVal += modelVal.toJSON()
                 }
                 else if(typeof modelVal === 'string' || modelVal instanceof String){
