@@ -9,28 +9,13 @@ DocumentWorkspaceCommandsDelegateBase {
     property var selectedIndex: delegateContainer.documentBase ? delegateContainer.documentBase.includedRolesTable.selectedIndex : 0;
 
     property TreeItemModel rolesModel: TreeItemModel {};
-
     property TreeItemModel documentsData: TreeItemModel {};
-
-    onRolesModelChanged: {
-        console.log("onRolesModelChanged", rolesModel);
-    }
-
-//    Component.onCompleted: {
-//        console.log("RoleViewDelegate onCompleted", documentsData.GetData("ProductId", model.index));
-
-//        delegateContainer.itemModelInputParams["ProductId"] = documentsData.GetData("ProductId", model.index);
-
-//        delegateContainer.updateItemTimer = 100;
-//        itemsModel.updateModel();
-//    }
 
     onDocumentsDataChanged: {
         console.log("RoleViewDelegate onDocumentsDataChanged", documentsData.GetData("ProductId", model.index));
 
         delegateContainer.itemModelInputParams["ProductId"] = documentsData.GetData("ProductId", model.index);
 
-//        delegateContainer.updateItemTimer = 100;
         itemsModel.updateModel();
     }
 

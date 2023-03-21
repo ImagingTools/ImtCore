@@ -71,7 +71,7 @@ DocumentBase {
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: packageViewContainer.commandsId;
+        commandsId: packageViewContainer.documentUuid;
         commandsDelegate: packageViewContainer.commandsDelegate;
         documentBase: packageViewContainer;
         onModelStateChanged: {

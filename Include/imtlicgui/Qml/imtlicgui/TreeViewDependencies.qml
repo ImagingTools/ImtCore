@@ -2,88 +2,169 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-BasicTreeView {
+BasicTreeView2 {
     id: treeView;
 
     clip: true;
 
     headerVisible: false;
 
-    tristate: true;
+    checkable: true;
 
-    property BasicTreeView featuresTableView: null;
+    property BasicTreeView2 featuresTableView: null;
     property TreeItemModel documentModel: null;
 
-    UuidGenerator {
-        id: generator;
+    property var selectedFeatureData: [];
+
+    property bool blockUpdatingModel: false;
+
+    rowDelegate: TreeViewItemDelegateBase2 {
+        width: treeView.width;
+
+        root: treeView;
+
+        onCheckedStateChanged: {
+            console.log("onCheckedStateChanged");
+            let itemData = treeView.getItemDataByUuid(uuid);
+            if (itemData){
+//                treeView.updateGui();
+
+                let featureId = itemData.getData("Id");
+
+                treeView.updateModel(featureId, state);
+            }
+        }
     }
 
-    Component.onCompleted: {
-        let uuid = generator.generateUUID();
+    Connections{
+        target: treeView.featuresTableView;
 
-        treeView.commandId = uuid;
-    }
-
-    Component.onDestruction: {
-        treeView.featuresTableView.selectedIndexChanged.disconnect(treeView.onSelectedIndexChanged);
-    }
-
-    onFeaturesTableViewChanged: {
-        if (treeView.featuresTableView != null){
-            treeView.featuresTableView.selectedIndexChanged.connect(treeView.onSelectedIndexChanged);
+        onSelectionChanged: {
+            treeView.onSelectedIndexChanged();
         }
     }
 
     function onSelectedIndexChanged(){
-        if (featuresTableView.selectedIndex != null){
-            updateGui();
+        console.log("treeView onSelectedIndexChanged", treeView.documentModel);
+
+        let indexes = treeView.featuresTableView.getSelectedIndexes();
+        if (indexes.length !== 1){
+            treeView.visible = false;
+        }
+        else{
+            treeView.visible = true;
+
+            treeView.selectedFeatureData = treeView.featuresTableView.getItemDataByIndex(indexes[0]);
+
+            let featureId = treeView.selectedFeatureData.getData("Id");
+            if (featureId === ""){
+                treeView.visible = false;
+            }
+            else{
+                treeView.updateGui();
+            }
+        }
+
+//        let selectedItems = featuresTableView.getSelectedItems();
+
+//        if (selectedItems.length !== 1){
+//            treeView.visible = false;
+//        }
+//        else{
+//            treeView.visible = true;
+//            treeView.selectedFeatureData = selectedItems[0];
+
+//            let featureId = treeView.selectedFeatureData.getData("Id");
+//            if (featureId === ""){
+//                treeView.visible = false;
+//            }
+//            else{
+//                treeView.updateGui();
+//            }
+//        }
+    }
+
+    function clear(){
+        let items = treeView.getAllItemsAsList();
+
+        for (let i = 0; i < items.length; i++){
+            let item = items[i];
+
+            item.resetData();
         }
     }
 
     function updateGui(){
-        Events.sendEvent(treeView.commandId + "ClearAllTreeView");
+        console.log("treeView updateGui");
 
-        let featureId = featuresTableView.selectedIndex.itemData.Id;
+        treeView.blockUpdatingModel = true;
 
-        Events.sendEvent(treeView.commandId + featureId + "SetVisible", false);
+        treeView.clear();
+
+        let featureId = treeView.selectedFeatureData.getData("Id");
+
+        if (!featureId || featureId === ""){
+            return;
+        }
+
+        if (!treeView.documentModel.ContainsKey("DependenciesModel")){
+            return;
+        }
+
+        console.log("featureId", featureId);
 
         let dependenciesModel = treeView.documentModel.GetData("DependenciesModel");
-
         if (dependenciesModel.ContainsKey(featureId)){
             let values = dependenciesModel.GetData(featureId);
-            let dependencyFeatures = values.split(';')
-
-            for (let i = 0; i < dependencyFeatures.length; i++){
-                let dependencyId = dependencyFeatures[i];
-
-                Events.sendEvent(dependencyId + "SetState", Qt.Checked);
-
-                let retVal = [];
-                treeView.findChildrenFeatureDependencies(dependencyId, retVal);
-
-                for (let j = 0; j < retVal.length; j++){
-                    let childrenDependencyFeatureId = retVal[j];
-
-                    Events.sendEvent(treeView.commandId + childrenDependencyFeatureId + "SetState", Qt.Checked);
-                    Events.sendEvent(treeView.commandId + childrenDependencyFeatureId + "SetActive", false);
-                }
-            }
+            let dependencyFeatures = values.split(';');
 
             let inactiveElements = [];
             treeView.findParentFeatureDependencies(featureId, inactiveElements);
 
-            console.log("inactiveElements", inactiveElements);
+            let items = treeView.getAllItemsAsList();
 
-            for (let i = 0; i < inactiveElements.length; i++){
-                let inactiveElement = inactiveElements[i];
+            let retVal = [];
+            for (let i = 0; i < items.length; i++){
+                let item = items[i];
 
-                Events.sendEvent(treeView.commandId + inactiveElement + "SetState", Qt.Unchecked);
-                Events.sendEvent(treeView.commandId + inactiveElement + "SetActive", false);
+                if (item.level === 0){
+                    item.isCheckable = false;
+                }
+
+                let itemId = item.getData("Id");
+
+                if (itemId === featureId){
+                    item.isVisible = false;
+                }
+
+                if (dependencyFeatures.includes(itemId)){
+                    item.checkedState = Qt.Checked;
+
+                    let dependencyId = dependencyFeatures.indexOf(itemId);
+
+                    treeView.findChildrenFeatureDependencies(dependencyId, retVal);
+                }
+
+                if (retVal.includes(itemId)){
+                    item.checkedState = Qt.Checked;
+                    item.isActive = false;
+                }
+
+                if (inactiveElements.includes(itemId)){
+                    item.checkedState = Qt.Unchecked;
+                    item.isActive = false;
+                }
             }
         }
+
+        treeView.blockUpdatingModel = false;
     }
 
     function updateModel(featureId, checkState){
+        if (treeView.blockUpdatingModel){
+            return;
+        }
+
         console.log("updateDependenciesModel");
         let dependenciesModel = treeView.documentModel.GetData("DependenciesModel");
 
@@ -91,7 +172,7 @@ BasicTreeView {
             dependenciesModel = treeView.documentModel.AddTreeModel("DependenciesModel");
         }
 
-        let selectedId = tableView.selectedIndex.itemData.Id;
+        let selectedId = treeView.selectedFeatureData.getData("Id");
         let dependencyId = featureId;
 
         if (dependenciesModel.ContainsKey(selectedId)){
@@ -146,10 +227,6 @@ BasicTreeView {
             treeView.updateGui();
         }
     }
-
-//    TreeItemModelConverter {
-//        id: converter;
-//    }
 
     function findParentFeatureDependencies(featureId, retVal){
         console.log("findParentFeatureDependencies");

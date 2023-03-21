@@ -176,6 +176,8 @@ Item {
                 anchors.centerIn: parent;
                 source: content.contentSource;
                 onLoaded: {
+                    console.log("contentLoader onLoaded");
+
                     contentLoader.item.root = content.root;
                     contentLoader.item.rootItem = content.rootItem;
                     contentLoader.width = item.width;

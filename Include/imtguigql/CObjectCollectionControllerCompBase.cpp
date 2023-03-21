@@ -4,6 +4,9 @@
 // STL includes
 #include <cmath>
 
+// ACF includes
+#include <iprm/CTextParam.h>
+
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 
@@ -431,7 +434,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		}
 
 		iprm::CParamsSet filterParams;
+
 		imtbase::CCollectionFilter m_filter;
+		iprm::CParamsSet objectFilter;
 		int offset = 0, count = -1;
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
@@ -468,9 +473,26 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 						m_filter.SetSortingInfoIds(QByteArrayList() << headerId);
 					}
 				}
+
+				imtbase::CTreeItemModel* objectFilterPtr = generalModel.GetTreeItemModel("ObjectFilter");
+				if (objectFilterPtr != nullptr){
+					QByteArray key;
+					if (objectFilterPtr->ContainsKey("Key")){
+						key = objectFilterPtr->GetData("Key").toByteArray();
+					}
+
+					istd::TDelPtr<iprm::CTextParam> textParamPtr(new iprm::CTextParam());
+					if (objectFilterPtr->ContainsKey("Value")){
+						QString value = objectFilterPtr->GetData("Value").toString();
+						textParamPtr->SetText(value);
+					}
+					objectFilter.SetEditableParameter(key, textParamPtr.PopPtr());
+				}
 			}
 
 			filterParams.SetEditableParameter("Filter", &m_filter);
+			filterParams.SetEditableParameter("ObjectFilter", &objectFilter);
+
 			this->SetAdditionalFilters(*viewParamsGql, &filterParams);
 		}
 

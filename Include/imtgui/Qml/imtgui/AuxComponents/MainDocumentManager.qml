@@ -71,12 +71,16 @@ Item {
     }
 
     function dirtyDocumentsExists(){
+        console.log('dirtyDocumentsExists')
         let typeIds = Object.keys(root.documentManagers);
         for (let i = 0; i < typeIds.length; i++){
             let typeId = typeIds[i];
             let documentManager = root.documentManagers[typeId];
-            if (documentManager.dirtyDocumentsExists()){
-                return true;
+            if (documentManager != null){
+                console.log(typeId, documentManager.dirtyDocumentsExists())
+                if (documentManager.dirtyDocumentsExists()){
+                    return true;
+                }
             }
         }
 

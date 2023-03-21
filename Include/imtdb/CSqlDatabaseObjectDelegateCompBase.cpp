@@ -7,6 +7,7 @@
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
+#include <iprm/ITextParam.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 
@@ -272,10 +273,15 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
+	bool retVal = true;
 	QString objectFilterQuery;
-	bool retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
-	if (!retVal){
-		return false;
+	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+	if (objectFilterParamPtr.IsValid()){
+		iprm::TParamsPtr<iprm::ITextParam> textParamPtr(objectFilterParamPtr.GetPtr(), "ObjectFilter");
+		retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
+		if (!retVal){
+			return false;
+		}
 	}
 
 	QString textFilterQuery;
@@ -305,9 +311,24 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 
 
 bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
-			const iprm::IParamsSet& /*filterParams*/,
-			QString& /*filterQuery*/) const
+			const iprm::IParamsSet& filterParams,
+			QString& filterQuery) const
 {
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (!paramIds.isEmpty()){
+		QByteArrayList idsList = paramIds.toList();
+		QByteArray key = idsList[0];
+
+		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
+		if (textParamPtr == nullptr){
+			return false;
+		}
+
+		QString value = textParamPtr->GetText();
+		filterQuery = QString("%1 = '%2'").arg(qPrintable(key)).arg(value);
+	}
+
 	return true;
 }
 

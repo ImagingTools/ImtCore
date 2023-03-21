@@ -96,7 +96,7 @@ Item {
 
             commandsModel.SetData("Id", "Exclude", index);
             commandsModel.SetData("Name", "Exclude", index);
-            commandsModel.SetData("IsEnabled", true, index);
+            commandsModel.SetData("IsEnabled", false, index);
             commandsModel.SetData("Icon", "Delete", index);
             commandsModel.SetData("Visible", false, index);
 
@@ -416,7 +416,9 @@ Item {
                                     enabled: model.IsEnabled;
 
                                     onClicked: {
-                                        Events.sendEvent(roleEditorContainer.documentBase.commandsId + "CommandActivated", model.Id);
+//                                        Events.sendEvent(roleEditorContainer.documentBase.commandsId + "CommandActivated", model.Id);
+
+                                        roleEditorContainer.documentBase.commandsDelegate.commandHandle(model.Id);
                                     }
                                 }
                             }
@@ -430,13 +432,19 @@ Item {
                         anchors.topMargin: 0;
 
                         width: parent.width;
-                        height: headerHeight + rowItemHeight * includesTable.tableListView.count;
 
                         rowDelegate: Component { TableViewItemDelegateBase {
                             root: includesTable;
 
                             Component.onCompleted: {
-                                let newHeight = includesTable.rowCount * includesTable.rowItemHeight + includesTable.headerHeight;
+                                console.log("TableViewItemDelegateBase onCompleted");
+
+
+                                let count = includesTable.rowModel.count;
+                                console.log("includesTable.rowCount", count);
+                                let newHeight = count * includesTable.rowItemHeight + includesTable.headerHeight;
+                                console.log("newHeight", newHeight);
+                                console.log("includesTable.height", includesTable.height);
                                 if (newHeight > includesTable.height){
                                     includesTable.height = newHeight;
                                 }
@@ -460,6 +468,11 @@ Item {
 
                         onRowRemoved: {
                             roleEditorContainer.updateModel();
+                        }
+
+                        onSelectedIndexChanged: {
+                            let isEnabled = includesTable.selectedIndex != null;
+                            commandsModel.SetData("IsEnabled", isEnabled, 1);
                         }
                     }
                 }

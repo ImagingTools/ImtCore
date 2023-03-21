@@ -20,6 +20,16 @@ Item {
     property TreeItemModel headers;
     property TreeItemModel items;
 
+    property TreeItemModel notificationModel: null;
+
+    onNotificationModelChanged: {
+        if (gqlModelBaseContainer.notificationModel != null){
+            if (gqlModelBaseContainer.notificationModel.ContainsKey("PagesCount")){
+                gqlModelBaseContainer.rootItem.pagination.pagesSize = gqlModelBaseContainer.notificationModel.GetData("PagesCount");
+            }
+        }
+    }
+
     property Item rootItem: null;
     property Item pagination: null;
 
@@ -150,6 +160,10 @@ Item {
                     dataModelLocal = itemsInfoModel.GetData("data");
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
+                        if (dataModelLocal.ContainsKey("notification")){
+                            gqlModelBaseContainer.notificationModel = dataModelLocal.GetData("notification");
+                        }
+
                         if (dataModelLocal.ContainsKey("items")){
                             if (gqlModelBaseContainer.loading){
                                 gqlModelBaseContainer.loading.visible = false;
@@ -173,15 +187,6 @@ Item {
                             }
 
                             Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");
-                        }
-
-                        if (dataModelLocal.ContainsKey("notification")){
-                            dataModelLocal = dataModelLocal.GetData("notification");
-                            if (dataModelLocal.ContainsKey("PagesCount")){
-                                dataModelLocal = dataModelLocal.GetData("PagesCount");
-
-                                gqlModelBaseContainer.rootItem.pagination.pagesSize = dataModelLocal;
-                            }
                         }
                     }
                 }

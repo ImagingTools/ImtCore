@@ -10,6 +10,8 @@ FocusScope {
     property bool readOnly: true;
     property bool withoutSelection: false;
 
+    property var headerDelegate;
+
     property alias headerDelegate: listView.header;
     property alias rowDelegate: listView.delegate;
     property alias contentHeader: listView.header;
@@ -28,7 +30,7 @@ FocusScope {
 
     property ModelIndex selectedIndex: null;
 
-    property TableViewSelection selection: TableViewSelection {};
+    property TreeViewSelection selection: TreeViewSelection {};
 
     property alias tableListView: listView;
 
@@ -180,7 +182,6 @@ FocusScope {
         model: tableViewRoot.rowModel;
 
         boundsBehavior: Flickable.StopAtBounds;
-
         headerPositioning: ListView.OverlayHeader;
 
         delegate: TableViewItemDelegateBase {
@@ -189,10 +190,6 @@ FocusScope {
             Component.onCompleted: {
 
             }
-        }
-
-        onHeightChanged: {
-            console.log("listView onHeightChanged", listView.height);
         }
     }
 
@@ -208,22 +205,22 @@ FocusScope {
         columnModel.insert(index, column);
     }
 
-//    function insertColumn(index, column){
+    //    function insertColumn(index, column){
 
-//        /*let index = */columnModel.InsertNewItem();
+    //        /*let index = */columnModel.InsertNewItem();
 
-//        for (let key in column){
-//            columnModel.SetData(key, column[key], index);
-//        }
-//    }
+    //        for (let key in column){
+    //            columnModel.SetData(key, column[key], index);
+    //        }
+    //    }
 
-//    function insertRow(index, row){
-//        rowModel.InsertNewItem();
+    //    function insertRow(index, row){
+    //        rowModel.InsertNewItem();
 
-//        for (let key in row){
-//            rowModel.SetData(key, row[key], index);
-//        }
-//    }
+    //        for (let key in row){
+    //            rowModel.SetData(key, row[key], index);
+    //        }
+    //    }
 
     function insertRow(index, row){
         row["Level"] = 0;

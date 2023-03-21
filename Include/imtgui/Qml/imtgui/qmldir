@@ -81,7 +81,7 @@ BasicTableView 1.0 ./AuxComponents/BasicTableView.qml
 BasicTreeView 1.0 ./AuxComponents/BasicTreeView.qml
 TableViewItemDelegateBase 1.0 ./AuxComponents/TableViewItemDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./AuxComponents/TreeViewItemDelegateBase.qml
-TableViewSelection 1.0 ./AuxComponents/TableViewSelection.qml
+TreeViewSelection 1.0 ./AuxComponents/TreeViewSelection.qml
 TabPanel 1.0 ./AuxComponents/TabPanel.qml
 DesignSchemaProvider 1.0 ./AuxComponents/DesignSchemaProvider.qml
 LanguageProvider 1.0 ./AuxComponents/LanguageProvider.qml
@@ -103,3 +103,7 @@ ApplicationInfoProvider 1.0 ./AuxComponents/ApplicationInfoProvider.qml
 Loading 1.0 ./AuxComponents/Loading.qml
 StateMachine 1.0 ./AuxComponents/StateMachine.qml
 
+BasicTableView2 1.0 ./AuxComponents/BasicTableView2.qml
+BasicTreeView2 1.0 ./AuxComponents/BasicTreeView2.qml
+TableViewItemDelegateBase2 1.0 ./AuxComponents/TableViewItemDelegateBase2.qml
+TreeViewItemDelegateBase2 1.0 ./AuxComponents/TreeViewItemDelegateBase2.qml

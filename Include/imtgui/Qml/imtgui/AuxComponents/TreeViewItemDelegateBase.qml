@@ -163,6 +163,10 @@ TableViewItemDelegateBase {
 
             visible: treeDelegateBase.isOpen;
 
+            Component.onCompleted: {
+                console.log("Column onCompleted");
+            }
+
             Repeater {
                 id: childModelRepeater;
 
@@ -199,14 +203,11 @@ TableViewItemDelegateBase {
                 }
             }
 
-            property ListModel childModel: model.ChildModel ? model.ChildModel: 0;
+            property ListModel childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
             onChildModelChanged: {
                 console.log("TreeViewItemDelegateBase onChildModelChanged", childModel);
-                console.log("childModelRepeater.model", childModelRepeater.model);
                 if (childrenColumn.childModel){
-                    console.log("childModelRepeater.model1", childModelRepeater.model);
                     childModelRepeater.model = childrenColumn.childModel;
-                    console.log("childModelRepeater.model2", childModelRepeater.model);
                 }
             }
         }

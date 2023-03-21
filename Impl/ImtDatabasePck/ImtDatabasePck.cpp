@@ -45,6 +45,11 @@ I_EXPORT_COMPONENT(
 			"Delegate for the meta-info table",
 			"Database Document Meta");
 
+I_EXPORT_COMPONENT(
+			DatabaseAutomaticBackup,
+			"Database automatic backup",
+			"Database Automatic Backup PostgreSQL SQL");
+
 
 } // namespace ImtDatabasePck
 

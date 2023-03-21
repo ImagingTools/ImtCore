@@ -33,6 +33,8 @@ QtObject {
     }
 
     function subscribeEvents(){
+        console.log("TableSelection subscribeEvents");
+
         Events.subscribeEvent("SelectAll", root.selectAll);
         Events.subscribeEvent("ShiftUp", root.shiftUp);
         Events.subscribeEvent("ShiftDown", root.shiftDown);

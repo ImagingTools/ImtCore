@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
+#include <iprm/ITextParam.h>
 #include <istd/TOptDelPtr.h>
 #include <istd/CSystem.h>
 #include <istd/CCrcCalculator.h>
@@ -129,7 +130,14 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
-	return QString("SELECT COUNT(*) FROM \"%1\" WHERE IsActive = true").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
+	QString filterQuery;
+	if (paramsPtr != nullptr){
+		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+			return QByteArray();
+		}
+	}
+
+	return QString("SELECT COUNT(*) FROM \"%1\" WHERE IsActive = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
 }
 
 
@@ -224,6 +232,15 @@ bool CSqlJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFil
 bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
 	bool retVal = true;
+	QString objectFilterQuery;
+	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+	if (objectFilterParamPtr.IsValid()){
+		iprm::TParamsPtr<iprm::ITextParam> textParamPtr(objectFilterParamPtr.GetPtr(), "ObjectFilter");
+		retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
+		if (!retVal){
+			return false;
+		}
+	}
 
 	QString textFilterQuery;
 	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
@@ -234,8 +251,39 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 		}
 	}
 
+	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()){
+		filterQuery = " AND ";
+	}
+
+	filterQuery += objectFilterQuery;
+	if (!objectFilterQuery.isEmpty() && !textFilterQuery.isEmpty()){
+		filterQuery += " AND ";
+	}
+
 	if (!textFilterQuery.isEmpty()){
-		filterQuery += "AND (" + textFilterQuery + ")";
+		filterQuery += "(" + textFilterQuery + ")";
+	}
+	return true;
+}
+
+
+bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
+			const iprm::IParamsSet& filterParams,
+			QString& filterQuery) const
+{
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+
+	if (!paramIds.isEmpty()){
+		QByteArrayList idsList = paramIds.toList();
+		QByteArray key = idsList[0];
+
+		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
+		if (textParamPtr == nullptr){
+			return false;
+		}
+
+		QString value = textParamPtr->GetText();
+		filterQuery = QString("document->>'%1' = '%2'").arg(qPrintable(key)).arg(value);
 	}
 
 	return true;

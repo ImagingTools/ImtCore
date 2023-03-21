@@ -70,11 +70,11 @@ Item {
                     anchors.top: parent.top;
                     anchors.right: parent.right;
 
-                    width: notificationText.width + 5;
+                    width: notificationText.width + 10;
                     height: notificationText.height;
 
                     color: Style.errorTextColor;
-                    radius: 4;
+                    radius: width;
 
                     visible: model.Status && model.Status !== "";
 

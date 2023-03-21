@@ -12,6 +12,7 @@
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 #include <imtdb/CStandardSqlMetaInfoTableDelegateComp.h>
+#include <imtdb/CDatabaseAutomaticBackupComp.h>
 
 
 /**
@@ -27,6 +28,7 @@ typedef icomp::TModelCompWrap<imtdb::CDatabaseAccessSettingsComp> DatabaseAccess
 typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;
 typedef imtdb::CSqlJsonDatabaseDelegateComp SqlDatabaseJsonDelegate;
 typedef imtdb::CStandardSqlMetaInfoTableDelegateComp StandardMetaInfoTableDelegate;
+typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
 
 
 } // namespace ImtDatabasePck

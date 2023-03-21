@@ -17,11 +17,22 @@ Item {
 
     property int index: -1;
 
+//    function equal(otherIndex){
+
+//        console.log("equal")
+
+//        return root._equalRecursive(root, otherIndex);
+//    }
+
     function equal(otherIndex){
+        console.log("equal", otherIndex);
+        let selfIndexes = root.getIndexes();
+        let otherIndexes = otherIndex.getIndexes();
 
-        console.log("equal")
+        console.log("selfIndexes", selfIndexes.toString());
+        console.log("otherIndexes", otherIndexes.toString());
 
-        return root._equalRecursive(root, otherIndex);
+        return selfIndexes.toString() === otherIndexes.toString();
     }
 
     function _equalRecursive(modelIndex1, modelIndex2){

@@ -392,7 +392,6 @@ Item {
             delegate: Item{
                 id: deleg;
 
-
                 height: headersList.height;
 
                 property bool compl: false;
