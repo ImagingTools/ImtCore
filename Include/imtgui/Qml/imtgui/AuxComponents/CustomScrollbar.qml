@@ -290,7 +290,6 @@ Rectangle{
             property var coord :mapToItem(scrollContainer,0,0);
             //cursorShape: containsMouse ? Qt.PointingHandCursor: Qt.ArrowCursor;
             onWheel: {
-
                 if(scrollContainer.inSideTarget){
                     wheel.accepted = false;
                 }
@@ -385,12 +384,16 @@ Rectangle{
             onReleased: {
                 scrollMA.dragEnabled = false;
             }
+            onExited: {
+                //scrollMA.dragEnabled = false;
+            }
             onPositionChanged: {
+
                 if(scrollMA.dragEnabled)
                 {
                     var newCoords = mapToItem(scrollContainer,mouse.x,mouse.y);
 
-                    if(vertical){
+                    if(scrollContainer.vertical){
                         var deltaY = newCoords.y - scrollMA.coord.y;
                         if(scrollContainer.targetItem.contentY + deltaY <= 0){
                             scrollContainer.targetItem.contentY = 0;
