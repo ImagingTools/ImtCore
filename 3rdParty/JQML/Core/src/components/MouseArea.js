@@ -3,28 +3,8 @@ import {Signal} from '../utils/Signal'
 
 export class MouseArea extends Item {
     
-    mouse = {
-        accepted: false,
-        button: Qt.LeftButton,
-        buttons: Qt.LeftButton,
-        //flags: int,
-        modifiers: 0,
-        //source: int,
-        wasHeld: false,
-        x: 0,
-        y: 0,
-    }
-    wheel = {
-        accepted: false,
-        buttons: Qt.LeftButton,
-        angleDelta: 0,
-        inverted: false,
-        pixelDelta: 0,
-        //flags: int,
-        modifiers: 0,
-        x: 0,
-        y: 0,
-    }
+    
+    
     constructor(args) {
         super(args)
 
@@ -38,6 +18,31 @@ export class MouseArea extends Item {
         this.$s.wheel = Signal()
         this.$s.doubleClicked = Signal()
         this.$s.positionChanged = Signal()
+
+		this.mouse = {
+			accepted: false,
+			button: Qt.LeftButton,
+			buttons: Qt.LeftButton,
+			//flags: int,
+			modifiers: 0,
+			//source: int,
+			wasHeld: false,
+			x: 0,
+			y: 0,
+		}
+		this.$s.wheel.accepted = false
+		this.$s.wheel.buttons = Qt.LeftButton
+		this.$s.wheel.angleDelta = {
+			x: 0,
+			y: 0,
+		}
+		this.$s.wheel.inverted = false
+		this.$s.wheel.pixelDelta = 0
+		//this.$s.wheel.//flags: int
+		this.$s.wheel.modifiers = 0
+		this.$s.wheel.x = 0
+		this.$s.wheel.y = 0
+		
 
 		this.clicked = this.$s.clicked
 		this.entered = this.$s.entered
@@ -105,7 +110,7 @@ export class MouseArea extends Item {
 		this.wheel.x = e.offsetX
 		this.wheel.y = e.offsetY
 		this.wheel.modifiers = 0x00000000
-		this.wheel.angleDelta = e.wheelDeltaY / 8
+		this.wheel.angleDelta.y = e.wheelDeltaY / 8
         this.wheel.pixelDelta = e.wheelDeltaY
 		if(e.altKey) this.wheel.modifiers |= Qt.AltModifier
         if(e.shiftKey) this.wheel.modifiers |= Qt.ShiftModifier
@@ -205,6 +210,7 @@ export class MouseArea extends Item {
 	$mousewheel(e, state) {
 		e.preventDefault()
 		this.$feelWheel(e)
+		this.$s.wheel()
 	}
 	$wheel(e, state) {
 		e.preventDefault()
