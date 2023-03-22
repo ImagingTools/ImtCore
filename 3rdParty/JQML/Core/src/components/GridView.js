@@ -167,6 +167,7 @@ export class GridView extends Flickable {
             
             this.count = this.contentItem.children.length
             this.$updateChild(index)
+            this.$updateChildren()
             try {
                 obj.$uP()
             } catch (error) {
@@ -193,6 +194,7 @@ export class GridView extends Flickable {
             childRecursive(obj)
             this.count = this.contentItem.children.length
             this.$updateChild(index)
+            this.$updateChildren()
 
             if(wait){
                 this.$childrenForUpdate.push(obj)
