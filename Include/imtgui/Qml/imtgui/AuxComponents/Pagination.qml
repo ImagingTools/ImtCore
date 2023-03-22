@@ -70,7 +70,9 @@ Row {
         onClicked: {
             if (paginationContainer.currentIndex >= 1){
                 paginationContainer.currentIndex--;
-                paginationContainer.refreshBtn();
+                if (paginationContainer.pagesSize >= 10){
+                    paginationContainer.refreshBtn();
+                }
             }
         }
     }
@@ -94,7 +96,9 @@ Row {
                 textButton: model.number === -1 ? "..." : model.number;
                 onClicked: {
                     paginationContainer.currentIndex = model.number - 1;
-                    paginationContainer.refreshBtn();
+                    if (paginationContainer.pagesSize >= 10){
+                        paginationContainer.refreshBtn();
+                    }
                 }
 
                 Rectangle {
@@ -103,7 +107,7 @@ Row {
                     height: 2;
 
                     color: Style.tabSelectedColor;
-                    visible: model.selected;
+                    visible: model.index == paginationContainer.currentIndex;//model.selected;
                 }
             }
         }
@@ -127,7 +131,9 @@ Row {
         onClicked: {
             if (paginationContainer.currentIndex < paginationContainer.pagesSize - 1){
                 paginationContainer.currentIndex++;
-                paginationContainer.refreshBtn();
+                if (paginationContainer.pagesSize >= 10){
+                    paginationContainer.refreshBtn();
+                }
             }
         }
     }
