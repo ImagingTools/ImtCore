@@ -211,6 +211,7 @@ export class MouseArea extends Item {
 		e.preventDefault()
 		this.$feelWheel(e)
 		this.$s.wheel()
+		if(this.wheel.accepted) state.blocked(this)
 	}
 	$wheel(e, state) {
 		e.preventDefault()
