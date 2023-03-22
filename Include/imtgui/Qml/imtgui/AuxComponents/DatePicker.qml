@@ -371,6 +371,7 @@ Item {
                     shownItemsCount: datePicker.shownItemsCountCombo;
                     moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
                     visibleScrollBar: false;
+                    isColor: true;
 
                     onCurrentIndexChanged:{
                         if(yearComboObj.currentIndex >=0){
@@ -491,6 +492,7 @@ Item {
                     shownItemsCount: 12;
 
                     visibleScrollBar: false;
+                    isColor: true;
 
                     onCurrentIndexChanged:{
                         if(monthComboObj.currentIndex >= 0){
@@ -620,6 +622,7 @@ Item {
                     shownItemsCount: datePicker.shownItemsCountCombo;
 
                     visibleScrollBar: false;
+                    isColor: true;
 
 
                     onCurrentIndexChanged:{

@@ -18,6 +18,8 @@ FocusScope {
 
     property bool changeable: true;
 
+    property bool isColor: false;
+
     property bool textCentered: false;
     property bool menuVisible: false;
     property bool hiddenBackground: true;
@@ -159,10 +161,12 @@ FocusScope {
         color: comboBoxContainer.backgroundColor;
 
         gradient: Gradient {
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+
+            GradientStop { position: 0.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
+
         }
 
         Text {
