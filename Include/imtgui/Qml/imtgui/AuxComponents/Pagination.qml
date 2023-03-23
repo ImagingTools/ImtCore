@@ -107,7 +107,7 @@ Row {
                     height: 2;
 
                     color: Style.tabSelectedColor;
-                    visible: model.index == paginationContainer.currentIndex;//model.selected;
+                    visible: paginationContainer.pagesSize < 10 ? model.index == paginationContainer.currentIndex : model.selected;
                 }
             }
         }
