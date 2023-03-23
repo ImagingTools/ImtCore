@@ -25,7 +25,7 @@ Item {
     }
 
     property string pageId: "About";
-    property string pageName: qsTr("About");
+    property string pageName: "About";
 
 
 
