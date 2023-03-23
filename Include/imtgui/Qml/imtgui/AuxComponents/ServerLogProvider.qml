@@ -7,7 +7,7 @@ Item {
     id: root;
 
     width: 100;
-    height: 23;
+    height: 30;
 
     AuxButton {
         id: button;
