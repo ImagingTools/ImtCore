@@ -217,8 +217,7 @@ Rectangle {
 
                         anchors.left: parent.left;
                         anchors.leftMargin: 10;
-                        anchors.right: parent.right;
-                        anchors.rightMargin: 10;
+                        width: mainPanel.width - 2*anchors.leftMargin;
 
                         decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 

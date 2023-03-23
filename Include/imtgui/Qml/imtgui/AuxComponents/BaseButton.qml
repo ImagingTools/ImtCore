@@ -3,7 +3,7 @@ import QtQuick 2.12
 Item {
     id: baseButton;
 
-    width: loader.width;
+    width: 0;//loader.width;
     height: loader.height;
 
     property alias decoratorSource: loader.source;
@@ -65,7 +65,7 @@ Item {
     }
 
     onWidthChanged: {
-        if(baseButton.width !== loader.width){
+        if(baseButton.width !== loader.width && baseButton.width > 0){
             loader.width = baseButton.width;
             if (loader.item){
                 loader.item.width = baseButton.width;
@@ -181,6 +181,13 @@ Item {
 
             loader.width = loader.item.width;
             loader.height = loader.item.height;
+
+            if(baseButton.width > 0){
+                loader.item.width = baseButton.width;
+            }
+            else{
+                baseButton.width = loader.item.width;
+            }
 
             loader.item.visible = baseButton.visible;
 
