@@ -8,6 +8,10 @@
 #include <istd/TOptDelPtr.h>
 #include <istd/CSystem.h>
 #include <istd/CCrcCalculator.h>
+#include <iprm/TParamsPtr.h>
+
+// ImtCore includes
+#include <imtbase/ICollectionFilter.h>
 
 
 namespace imtdb
@@ -57,7 +61,7 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 
 		documentContent = QByteArray::fromBase64(documentContent);
 
-		if (ReadDataFromMemory(documentContent, *documentPtr)){
+		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
 		}
 	}
@@ -85,13 +89,15 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 	if (workingDocumentPtr.IsValid()){
 		QByteArray documentContent;
-		if (WriteDataToMemory(*workingDocumentPtr, documentContent)){
+		if (WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 			QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
-			retVal.query = QString("INSERT INTO \"%1\"(Id, Name, Description, Added, LastRevisionId) VALUES('%2', '%3', '%4', '%5', '%6');")
+			retVal.query = QString("INSERT INTO \"%1\"(Id, %2, Name, Description, Added, LastRevisionId) VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
+						.arg(qPrintable(*m_objectTypeIdColumnAttrPtr))
 						.arg(qPrintable(objectId))
+						.arg(qPrintable(typeId))
 						.arg(objectName)
 						.arg(objectDescription)
 						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
@@ -139,6 +145,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 								.arg(tableValues.join(", "))
 								.toLocal8Bit();
 				}
+				else{
+					SendErrorMessage(0, "Meta information of the document could not be created", "SQL Database Delegate");
+
+					return imtdb::IDatabaseObjectDelegate::NewObjectQuery();
+				}
 			}
 
 			retVal.objectName = objectName;
@@ -164,10 +175,33 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 			const QByteArray& objectId,
 			const istd::IChangeable& object) const
 {
+	// Get number of the revisions of the document in the database:
+	QByteArray countRevisionsQuery = QString("SELECT COUNT(*) FROM \"%1\" WHERE %2 = '%3';")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(objectId)).toUtf8();
+
+	QSqlError error;
+	QSqlQuery countQuery = m_databaseEngineCompPtr->ExecSqlQuery(countRevisionsQuery, &error);
+
+	quint64 revisionsCount = 0;
+	if (error.type() == QSqlError::NoError){
+		if (countQuery.first()){
+			revisionsCount = countQuery.value(0).toULongLong();
+		}
+	}
+	else{
+		SendErrorMessage(0, "The number of revisions of the document could not be queried", "Database Manager");
+
+		return QByteArray();
+	}
+
 	QByteArray retVal;
 
+	QByteArray typeId = collection.GetObjectTypeId(objectId);
+
 	QByteArray documentContent;
-	if (WriteDataToMemory(object, documentContent)){
+	if (WriteDataToMemory(typeId, object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 		QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
@@ -185,8 +219,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(revisionUuid))
 					.arg(qPrintable(objectId))
 					.arg(qPrintable(documentContent.toBase64()))
-					.arg(777777)
-					.arg(QObject::tr("...."))
+					.arg(revisionsCount + 1)
+					.arg("")
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum)
 					.toLocal8Bit();
@@ -267,14 +301,16 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObject(const QByteArr
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable& object, QByteArray& data) const
+bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const
 {
-	if (!m_documentPersistenceCompPtr.IsValid()){
+	const ifile::IFilePersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
+	if (documentPersistencePtr == nullptr){
+		SendErrorMessage(0, QString("Document data could not be written due no persistence was found for the type: %1").arg(qPrintable(typeId)));
+
 		return false;
 	}
 
 	QString tempFolder = QDir::tempPath() + "/ImtCore/SqlDatabaseDocumentDelegate/" + QUuid::createUuid().toString();
-
 	if (!istd::CSystem::EnsurePathExists(tempFolder)){
 		return false;
 	}
@@ -282,13 +318,13 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable
 	int flags = ifile::IFilePersistence::QF_FILE | ifile::IFilePersistence::QF_SAVE;
 
 	QStringList supportedExts;
-	m_documentPersistenceCompPtr->GetFileExtensions(supportedExts, &object, flags);
+	documentPersistencePtr->GetFileExtensions(supportedExts, &object, flags);
 
 	QString fileName = QUuid::createUuid().toString();
 	QString workingExtension;
 	for (const QString ext : supportedExts){
 		QString filePath = fileName + "." + ext;
-		if (m_documentPersistenceCompPtr->IsOperationSupported(&object, &filePath, flags, false)){
+		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
 			workingExtension = ext;
 			break;
 		}
@@ -298,7 +334,7 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable
 
 	QString filePath = tempFolder + "/" + fileName;
 
-	int operationState = m_documentPersistenceCompPtr->SaveToFile(object, filePath);
+	int operationState = documentPersistencePtr->SaveToFile(object, filePath);
 	if (operationState != ifile::IFilePersistence::OS_OK){
 		istd::CSystem::RemoveDirectory(tempFolder);
 
@@ -322,9 +358,12 @@ bool CSqlDatabaseDocumentDelegateComp::WriteDataToMemory(const istd::IChangeable
 }
 
 
-bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data, istd::IChangeable& object) const
+bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const
 {
-	if (!m_documentPersistenceCompPtr.IsValid()){
+	const ifile::IFilePersistence* documentPersistencePtr = FindDocumentPersistence(typeId);
+	if (documentPersistencePtr == nullptr){
+		SendErrorMessage(0, QString("Document data could not be read due no persistence was found for the type: %1").arg(qPrintable(typeId)));
+
 		return false;
 	}
 
@@ -337,13 +376,13 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 	int flags = ifile::IFilePersistence::QF_FILE | ifile::IFilePersistence::QF_SAVE;
 
 	QStringList supportedExts;
-	m_documentPersistenceCompPtr->GetFileExtensions(supportedExts, &object, flags);
+	documentPersistencePtr->GetFileExtensions(supportedExts, &object, flags);
 
 	QString fileName = QUuid::createUuid().toString();
 	QString workingExtension;
 	for (const QString ext : supportedExts){
 		QString filePath = fileName + "." + ext;
-		if (m_documentPersistenceCompPtr->IsOperationSupported(&object, &filePath, flags, false)){
+		if (documentPersistencePtr->IsOperationSupported(&object, &filePath, flags, false)){
 			workingExtension = ext;
 			break;
 		}
@@ -364,7 +403,7 @@ bool CSqlDatabaseDocumentDelegateComp::ReadDataFromMemory(const QByteArray& data
 
 	documentFile.close();
 
-	int operationState = m_documentPersistenceCompPtr->LoadFromFile(object, filePath);
+	int operationState = documentPersistencePtr->LoadFromFile(object, filePath);
 	if (operationState != ifile::IFilePersistence::OS_OK){
 		istd::CSystem::RemoveDirectory(tempFolder);
 
@@ -402,10 +441,27 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 }
 
 
+
+bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+{
+	filterQuery.clear();
+
+	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+	if (collectionFilterParamPtr.IsValid()){
+		QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
+
+		filterQuery = QString("TypeId = '%1'").arg(qPrintable(typeId)).toLocal8Bit();
+	}
+
+	return true;
+}
+
+
 bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
-		const QSqlRecord& record,
-		idoc::MetaInfoPtr& objectMetaInfoPtr,
-		idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
+			const QByteArray& typeId,
+			const QSqlRecord& record,
+			idoc::MetaInfoPtr& objectMetaInfoPtr,
+			idoc::MetaInfoPtr& collectionItemMetaInfoPtr) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
 		return false;
@@ -423,7 +479,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 	if (metaInfoQuery.next()){
 		QSqlRecord metaInfoRecord = metaInfoQuery.record();
 
-		objectMetaInfoPtr = CreateObjectMetaInfo(QByteArray());
+		objectMetaInfoPtr = CreateObjectMetaInfo(typeId);
 		if (objectMetaInfoPtr.IsValid()){
 			if (!SetObjectMetaInfoFromRecord(metaInfoRecord, *objectMetaInfoPtr)){
 				objectMetaInfoPtr.Reset();
@@ -433,7 +489,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 		}
 	}
 
-	collectionItemMetaInfoPtr.SetPtr(CreateCollectionItemMetaInfo(QByteArray()));
+	collectionItemMetaInfoPtr.SetPtr(CreateCollectionItemMetaInfo(typeId));
 	if (collectionItemMetaInfoPtr.IsValid()){
 		if (!SetCollectionItemMetaInfoFromRecord(record, *collectionItemMetaInfoPtr)){
 			collectionItemMetaInfoPtr.Reset();
@@ -477,6 +533,29 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRec
 	}
 
 	return false;
+}
+
+
+// protected methods
+
+const ifile::IFilePersistence * CSqlDatabaseDocumentDelegateComp::FindDocumentPersistence(const QByteArray& typeId) const
+{
+	int persistenceIndex = -1;
+
+	if (m_typesCompPtr.IsValid()) {
+		for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i) {
+			if (typeId == m_typesCompPtr->GetOptionId(i)) {
+				persistenceIndex = i;
+				break;
+			}
+		}
+	}
+
+	if ((persistenceIndex >= 0) && persistenceIndex < m_documentPersistenceListCompPtr.GetCount()) {
+		return m_documentPersistenceListCompPtr[persistenceIndex];
+	}
+
+	return nullptr;
 }
 
 
