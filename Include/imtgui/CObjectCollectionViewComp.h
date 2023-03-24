@@ -301,7 +301,7 @@ private:
 		void AddItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 		void UpdateItem(const imtbase::IObjectCollectionInfo::Id& objectId);
 		void RemoveItem(const imtbase::IObjectCollectionInfo::Id& objectId);
-		void SetFilter(const QString& textFilter);
+		void SetTextFilter(const QString& textFilter);
 		void SetSorting(int logicalIndex, Qt::SortOrder order);
 		void SetCurrentTypeId(const QByteArray& typeId);
 		const imtbase::ICollectionFilter& GetFilter() const;
@@ -324,6 +324,7 @@ private:
 		mutable imtbase::ICollectionInfo::Ids m_ids;
 		int m_totalRowCount;
 		ObjectMetaInfo m_metaInfo;
+		QStringList m_columns;
 		bool m_isPageMode;
 
 		CObjectCollectionViewComp& m_parent;

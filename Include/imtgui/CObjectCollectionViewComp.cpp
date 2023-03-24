@@ -686,7 +686,6 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 
 			int logicIndex = fieldIds.indexOf(fieldId);
 			int visualIndex = ItemList->header()->visualIndex(logicIndex);
-			Q_ASSERT(visualIndex >= 0);
 
 			ItemList->header()->moveSection(visualIndex, currentIndex);
 			fieldSet.remove(fieldId);
@@ -978,7 +977,7 @@ void CObjectCollectionViewComp::OnTypeChanged()
 
 void CObjectCollectionViewComp::OnFilterChanged(const QString& text)
 {
-	m_tableModel.SetFilter(text);
+	m_tableModel.SetTextFilter(text);
 
 	RestoreColumnsSettings();
 }
@@ -1055,6 +1054,9 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 	Q_ASSERT(collectionPtr != nullptr);
 
 	ItemList->clearSelection();
+
+	if (!collectionPtr)
+		return;
 
 	{
 		SignalSemaphore semaphore(m_semaphoreCounter);
@@ -1334,6 +1336,8 @@ void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjec
 	m_metaInfo.clear();
 	m_metaInfoMap.clear();
 
+	m_columns = m_parent.GetMetaInfoHeaders(m_parent.m_currentTypeId);
+
 	if (m_totalRowCount > 0){
 		imtbase::IObjectCollection::Ids elementIds = collection.GetElementIds(0, 1, &filterParams);
 		if (!elementIds.isEmpty()){
@@ -1453,7 +1457,8 @@ void CObjectCollectionViewComp::TableModel::SetSorting(int logicalIndex, Qt::Sor
 
 	m_filter.SetSortingInfoIds(QByteArrayList() << informationIds[logicalIndex]);
 
-	UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
+	if (objectCollectionPtr)
+		UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
 }
 
 
@@ -1469,7 +1474,7 @@ const imtbase::ICollectionFilter& CObjectCollectionViewComp::TableModel::GetFilt
 }
 
 
-void CObjectCollectionViewComp::TableModel::SetFilter(const QString& textFilter)
+void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFilter)
 {
 	imtbase::IObjectCollection* objectCollectionPtr = m_parent.GetObservedObject();
 	Q_ASSERT(objectCollectionPtr != nullptr);
@@ -1487,7 +1492,8 @@ void CObjectCollectionViewComp::TableModel::SetFilter(const QString& textFilter)
 
 	m_filter.SetTextFilter(textFilter);
 
-	UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
+	if (objectCollectionPtr)
+		UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
 }
 
 
@@ -1509,7 +1515,7 @@ int CObjectCollectionViewComp::TableModel::columnCount(const QModelIndex& parent
 		return 0;
 	}
 
-	return m_metaInfo.count();
+	return m_columns.count();
 }
 
 
@@ -1565,11 +1571,10 @@ QVariant CObjectCollectionViewComp::TableModel::headerData(int section, Qt::Orie
 
 	if (orientation == Qt::Horizontal){
 		switch (role){
-		case Qt::DisplayRole: {
-			const QStringList headers = m_parent.GetMetaInfoHeaders(m_parent.m_currentTypeId);
-			if (section < headers.size())
-				return headers[section];
-		}
+		case Qt::DisplayRole:
+			if (section < m_columns.size()){
+				return m_columns[section];
+			}
 		}
 	}
 
