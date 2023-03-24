@@ -274,7 +274,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
 	if (!paramIds.isEmpty()){
-		QByteArrayList idsList = paramIds.toList();
+		QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
 		QByteArray key = idsList[0];
 
 		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
