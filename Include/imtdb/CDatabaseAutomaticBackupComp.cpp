@@ -19,7 +19,10 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 
 	QObject::connect(&m_timer, &QTimer::timeout, this, &CDatabaseAutomaticBackupComp::OnTimeout);
 
-	m_timer.start(5000);
+	Backup();
+
+	int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr : 60000;
+	m_timer.start(interval);
 }
 
 
@@ -31,22 +34,64 @@ void CDatabaseAutomaticBackupComp::OnComponentDestroyed()
 
 // private methods
 
-bool CDatabaseAutomaticBackupComp::CheckTodayBackup() const
+bool CDatabaseAutomaticBackupComp::Backup()
 {
 	if (!m_databaseLoginSettingsCompPtr.IsValid()){
 		return false;
 	}
 
-	QString dbName = m_databaseLoginSettingsCompPtr->GetDatabaseName();
-	QDir folder(m_backupPathCompPtr->GetPath());
-	if (folder.exists()){
-		QDate currentDate = QDate::currentDate();
-		QStringList nameFilter = {dbName + "_" + currentDate.toString("yyyy-MM-dd")};
-		folder.setNameFilters(nameFilter);
-		if (!folder.entryList().isEmpty()){
-			return false;
-		}
+	if (!m_relativeFilePathCompPtr.IsValid()){
+		return false;
 	}
+
+	QString host = m_databaseLoginSettingsCompPtr->GetHost();
+	QString dbName = m_databaseLoginSettingsCompPtr->GetDatabaseName();
+	QString password = m_databaseLoginSettingsCompPtr->GetPassword();
+	QString userName = m_databaseLoginSettingsCompPtr->GetUserName();
+	int port = m_databaseLoginSettingsCompPtr->GetPort();
+
+	QProcess process(0);
+
+	QString program = "pg_dump";
+	QStringList arguments;
+
+	arguments << "-h";
+	arguments << host;
+
+	arguments << "-p";
+	arguments << QString::number(port);
+
+	arguments << "-U";
+	arguments << userName;
+
+	arguments << "-b";
+	arguments << "-v";
+	arguments << "-f";
+
+	QString backupFolderPath = m_backupSettingsCompPtr->GetPath();
+
+	QDir folder(backupFolderPath);
+	if (!folder.exists()){
+		folder.mkdir(backupFolderPath);
+	}
+
+//	QString fileName = m_relativeFilePathCompPtr->GetPath();
+	QString fmt = "yyyyMMddhhmmss";
+	QString fileName = dbName + "_" + QDateTime::currentDateTime().toString(fmt);
+	arguments << backupFolderPath + "/" + fileName;
+
+	arguments << dbName;
+
+	QStringList envList;
+	envList << "PGPASSWORD=" + password;
+	process.setEnvironment(envList);
+
+	process.start(*m_programAttrPtr, arguments);
+
+	m_lastBackupDateTime = QDateTime::currentDateTime();
+
+	process.waitForStarted();
+	process.waitForFinished();
 
 	return true;
 }
@@ -56,70 +101,27 @@ bool CDatabaseAutomaticBackupComp::CheckTodayBackup() const
 
 void CDatabaseAutomaticBackupComp::OnTimeout()
 {
-	if (m_databaseLoginSettingsCompPtr.IsValid()){
-		if (!CheckTodayBackup()){
-			return;
-		}
-
-		QString host = m_databaseLoginSettingsCompPtr->GetHost();
-		QString dbName = m_databaseLoginSettingsCompPtr->GetDatabaseName();
-		QString password = m_databaseLoginSettingsCompPtr->GetPassword();
-		QString userName = m_databaseLoginSettingsCompPtr->GetUserName();
-		int port = m_databaseLoginSettingsCompPtr->GetPort();
-
+	if (m_databaseLoginSettingsCompPtr.IsValid() && m_backupSettingsCompPtr.IsValid()){
 		QDateTime currentDateTime = QDateTime::currentDateTime();
+		QTime startTime = m_backupSettingsCompPtr->GetStartTime();
+		if (startTime.isValid()){
+			QDateTime intervalDateTime(m_lastBackupDateTime);
 
-		QTime time = QTime::fromString(*m_startTimeAttrPtr, "HH:mm");
-		if (time.isValid()){
-			QDateTime dateTime;
-
-			dateTime.setTime(time);
-			dateTime.setDate(currentDateTime.date());
-
+			QDateTime dateTime(currentDateTime.date(), startTime);
 			if (currentDateTime >= dateTime){
-				QProcess process(0);
+				imtapp::IBackupSettings::BackupInterval interval = m_backupSettingsCompPtr->GetInterval();
 
-				QString program = "pg_dump";
-				QStringList arguments;
-
-				// -h <HostName> -p 5432 -U <UserName> -F d -b -v -f %BACKUP_FILE% <DATABASENAME>
-
-				arguments << "-h";
-				arguments << host;
-
-				arguments << "-p";
-				arguments << QString::number(port);
-
-				arguments << "-U";
-				arguments << userName;
-
-				arguments << "-b";
-				arguments << "-v";
-				arguments << "-f";
-
-				QString backupFolderPath = m_backupPathCompPtr->GetPath();
-
-				QDir folder(backupFolderPath);
-				if (!folder.exists()){
-					folder.mkdir(backupFolderPath);
+				bool ok = false;
+				int countDays = m_lastBackupDateTime.daysTo(currentDateTime);
+				if ((interval == imtapp::IBackupSettings::BackupInterval::BI_DAY && countDays >= 1) ||
+						(interval == imtapp::IBackupSettings::BackupInterval::BI_WEEK && countDays >= 7) ||
+						(interval == imtapp::IBackupSettings::BackupInterval::BI_MONTH && countDays >= 30)){
+					ok = true;
 				}
 
-				QString fileName = dbName + "_" + currentDateTime.date().toString("yyyy-MM-dd");
-				arguments << backupFolderPath + "/" + fileName;
-
-				arguments << dbName;
-
-				QStringList envList;
-				envList << "PGPASSWORD=" + password;
-				process.setEnvironment(envList);
-
-				process.start(program, arguments);
-
-				process.waitForStarted();
-				process.waitForFinished();
-
-				QByteArray allStandardError = process.readAllStandardError();
-				SendCriticalMessage(0, allStandardError, "Database automatic backup");
+				if (ok){
+					Backup();
+				}
 			}
 		}
 		else{

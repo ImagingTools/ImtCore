@@ -70,11 +70,6 @@ void CObserverQmlComp::OnComponentCreated()
 						if (m_settingsModelPtr->ContainsKey("Parameters")){
 							imtbase::CTreeItemModel* parametersPtr = m_settingsModelPtr->GetTreeItemModel("Parameters");
 							if (parametersPtr != nullptr){
-
-								for (int i = 0; i < parametersPtr->GetItemsCount(); i++){
-									imtbase::CTreeItemModel* paramPtr = parametersPtr->GetTreeItemModel("Parameters", i);
-								}
-
 								QVariant data = QVariant::fromValue(parametersPtr);
 
 								quickItem->setProperty("localSettings", data);

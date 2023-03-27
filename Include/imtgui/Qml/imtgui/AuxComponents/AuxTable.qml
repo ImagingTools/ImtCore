@@ -807,7 +807,7 @@ Item {
             Component.onCompleted: {
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
                     tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
-                }z
+                }
             }
 
             onClicked: {

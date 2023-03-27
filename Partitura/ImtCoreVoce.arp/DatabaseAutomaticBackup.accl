@@ -8,9 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DatabaseAutomaticBackup" X="575" Y="400" Note=""/>
-        <Element ComponentName="PreferencesFilePath" X="575" Y="250" Note=""/>
-        <Element ComponentName="SystemLocation" X="575" Y="100" Note=""/>
+        <Element ComponentName="DatabaseAutomaticBackup" X="550" Y="150" Note=""/>
+        <Element ComponentName="TimeStampFileNameParam" X="550" Y="325" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

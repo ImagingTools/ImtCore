@@ -32,6 +32,12 @@ Rectangle {
 
     property alias applicationInfoProvider: aboutApplicationProvider.applicationInfoProvider;
 
+    property int pageWidth: 450;
+    property int pageHeight: 480;
+
+    signal saved();
+    signal closed();
+
     PageAboutProvider {
         id: aboutApplicationProvider;
     }
@@ -49,27 +55,33 @@ Rectangle {
     onVisibleChanged: {
         console.log("onVisibleChanged settingsProvider", settingsProvider);
         if (visible){
-            console.log("settingsProvider.localModel", settingsProvider.localModel);
-            if (settingsProvider.localModel){
+            //console.log("settingsProvider.localModel", settingsProvider.localModel);
+            if (settingsProvider && settingsProvider.localModel){
                 let localModelJson = settingsProvider.localModel.toJSON();
 
                 console.log("localModelJson", localModelJson);
                 localModel.CreateFromJson(localModelJson);
 
-                updateCommonModel(localModel);
+//                updateCommonModel(localModel);
             }
 
-            console.log("settingsProvider.serverModel", settingsProvider.serverModel);
-            if (settingsProvider.serverModel){
+            updateCommonModel(container.localModel);
+
+           // console.log("settingsProvider.serverModel", settingsProvider.serverModel);
+            if (settingsProvider && settingsProvider.serverModel){
                 let serverModelJson = settingsProvider.serverModel.toJSON();
                 serverModel.CreateFromJson(serverModelJson);
 
-                updateCommonModel(serverModel);
+//                updateCommonModel(serverModel);
             }
+
+            updateCommonModel(container.serverModel);
 
             updateCommonModel(aboutApplicationProvider.pageModel);
 
-            settingsProvider.rewriteModel(serverModel, localModel);
+            if (settingsProvider){
+                settingsProvider.rewriteModel(serverModel, localModel);
+            }
 
             localModel.modelChanged.connect(container.modelChanged);
             serverModel.modelChanged.connect(container.modelChanged);
@@ -154,8 +166,8 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: 450;
-        height: 480;
+        width: container.pageWidth;
+        height: container.pageHeight;
 
         radius: container.radius;
 
@@ -356,10 +368,12 @@ Rectangle {
 
                 if (buttonId == "Close"){
                     container.visible = false;
+
+                    container.closed();
                 }
                 else if (buttonId == "Apply"){
 
-                    if (container.settingsProvider.serverModel != null){
+                    if (container.settingsProvider && container.settingsProvider.serverModel != null){
                         if (!_.isEqual(JSON.stringify(container.serverModel), JSON.stringify(container.settingsProvider.serverModel))){
                             container.settingsProvider.serverModel.Copy(container.serverModel);
 
@@ -367,7 +381,7 @@ Rectangle {
                         }
                     }
 
-                    if (container.settingsProvider.localModel != null){
+                    if (container.settingsProvider && container.settingsProvider.localModel != null){
                         if (!_.isEqual(JSON.stringify(container.localModel), JSON.stringify(container.settingsProvider.localModel))){
                             container.settingsProvider.localModel.Copy(container.localModel);
 
@@ -376,6 +390,8 @@ Rectangle {
                     }
 
                     buttonsDialog.setButtonState("Apply", false);
+
+                    container.saved();
                 }
             }
         }

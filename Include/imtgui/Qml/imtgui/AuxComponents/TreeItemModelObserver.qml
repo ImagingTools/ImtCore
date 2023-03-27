@@ -17,7 +17,7 @@ Item {
     }
 
     function registerModel(model){
-        console.log("PreferenceObserver registerModel");
+        console.log("PreferenceObserver registerModel", model);
 
         container.observedModel = model;
         container.observedModel.modelChanged.connect(container.observedModelDataChanged);
@@ -33,12 +33,16 @@ Item {
     }
 
     function compare(model1, model2){
+        console.log("compare");
+        console.log("model1", model1.toJSON());
+        console.log("model2", model2.toJSON());
         let changeList = []
         compareRecursive(model1, model2, changeList, "");
         return changeList;
     }
 
     function compareRecursive(model1, model2, changeList, parentKey){
+        console.log("compareRecursive", model1, model2, changeList, parentKey);
         if (!model1 || !model2){
             return;
         }
@@ -47,13 +51,19 @@ Item {
             let dataId = model1.GetData("Id", i);
 
             let keys = model1.GetKeys(i);
+            console.log("keys", keys);
             for (let j = 0; j < keys.length; j++){
                 let key = keys[j];
 
                 let globalId = parentKey + '/' + dataId;
-                if (model1.ContainsKey(key) && model2.ContainsKey(key)){
+                if (model1.ContainsKey(key, i) && model2.ContainsKey(key, i)){
                     let model1Value = model1.GetData(key, i);
                     let model2Value = model2.GetData(key, i);
+
+                    console.log("typeof model1Value", typeof model1Value, model1Value);
+                    console.log("typeof model2Value", typeof model2Value, model2Value);
+                    console.log("model1Value constructor", model1Value.constructor);
+                    console.log("model2Value constructor", model2Value.constructor);
 
                     if(typeof model1Value === 'object' && typeof model2Value === 'object'){
                         compareRecursive(model1Value, model2Value, changeList, globalId);
@@ -73,7 +83,7 @@ Item {
                         }
                     }
                 }
-                else if (model1.ContainsKey(key) && !model2.ContainsKey(key)){
+                else if (model1.ContainsKey(key, i) && !model2.ContainsKey(key, i)){
                     let model1Value = model1.GetData(key, i);
                     let changeObj = {}
 
@@ -85,7 +95,7 @@ Item {
 
                     changeList.push(changeObj)
                 }
-                else if (!model1.ContainsKey(key) && model2.ContainsKey(key)){
+                else if (!model1.ContainsKey(key, i) && model2.ContainsKey(key, i)){
                     let model2Value = model2.GetData(key, i);
                     let changeObj = {}
 

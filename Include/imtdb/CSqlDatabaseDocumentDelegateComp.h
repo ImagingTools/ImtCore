@@ -74,7 +74,7 @@ protected:
 protected:
 	const ifile::IFilePersistence* FindDocumentPersistence(const QByteArray& typeId) const;
 
-private:
+protected:
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_documentPersistenceListCompPtr);
 	I_REF(IMetaInfoTableDelegate, m_metaInfoTableDelegateCompPtr);

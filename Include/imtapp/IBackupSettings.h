@@ -5,16 +5,19 @@
 #include <iser/IObject.h>
 #include <ifile/IFileNameParam.h>
 
+// ImtCore includes
+#include <imtapp/IScheduler.h>
+
 
 namespace imtapp
 {
 
 
-class IBackupSettings: virtual public iser::IObject
+class IBackupSettings: virtual public iser::IObject,
+						virtual public imtapp::IScheduler,
+						virtual public ifile::IFileNameParam
 {
-public:
-	virtual ifile::IFileNameParam GetBackupFolderPath() const = 0;
-	virtual QString GetBackupStartTime() const = 0;
+
 };
 
 

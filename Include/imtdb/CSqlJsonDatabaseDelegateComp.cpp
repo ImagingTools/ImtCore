@@ -69,7 +69,7 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 	if (record.contains(*m_documentContentColumnIdAttrPtr)){
 		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
 
-		if (ReadDataFromMemory(documentContent, *documentPtr)){
+		if (ReadDataFromMemory("", documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
 		}
 	}

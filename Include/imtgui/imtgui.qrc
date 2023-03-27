@@ -101,7 +101,6 @@
 	<file alias="imtgui/AuxComponents/BasicTreeView.qml">Qml/imtgui/AuxComponents/BasicTreeView.qml</file>
 	<file alias="imtgui/AuxComponents/TableViewItemDelegateBase.qml">Qml/imtgui/AuxComponents/TableViewItemDelegateBase.qml</file>
 	<file alias="imtgui/AuxComponents/TreeViewItemDelegateBase.qml">Qml/imtgui/AuxComponents/TreeViewItemDelegateBase.qml</file>
-	<file alias="imtgui/AuxComponents/TableViewSelection.qml">Qml/imtgui/AuxComponents/TableViewSelection.qml</file>
 	
 	<file alias="imtgui/AuxComponents/SuperUserPasswordDialog.qml">Qml/imtgui/AuxComponents/SuperUserPasswordDialog.qml</file>
 	<file alias="imtgui/AuxComponents/LanguageProvider.qml">Qml/imtgui/AuxComponents/LanguageProvider.qml</file>
@@ -132,6 +131,13 @@
 	<file alias="imtgui/AuxComponents/Loading.qml">Qml/imtgui/AuxComponents/Loading.qml</file>
 	<file alias="imtgui/AuxComponents/TableSelection.qml">Qml/imtgui/AuxComponents/TableSelection.qml</file>
 	<file alias="imtgui/AuxComponents/StateMachine.qml">Qml/imtgui/AuxComponents/StateMachine.qml</file>
+	
+	<file alias="imtgui/AuxComponents/PathPicker.qml">Qml/imtgui/AuxComponents/PathPicker.qml</file>
+	<file alias="imtgui/AuxComponents/TimePicker.qml">Qml/imtgui/AuxComponents/TimePicker.qml</file>
+	<file alias="imtgui/AuxComponents/SettingsTimePicker.qml">Qml/imtgui/AuxComponents/SettingsTimePicker.qml</file>
+	<file alias="imtgui/AuxComponents/Preference.qml">Qml/imtgui/AuxComponents/Preference.qml</file>
+	<file alias="imtgui/AuxComponents/TreeViewModelAdapter.qml">Qml/imtgui/AuxComponents/TreeViewModelAdapter.qml</file>
+	<file alias="imtgui/AuxComponents/TreeDelegate.qml">Qml/imtgui/AuxComponents/TreeDelegate.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

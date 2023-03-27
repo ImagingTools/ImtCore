@@ -15,6 +15,7 @@ CheckBox 1.0 ./AuxComponents/CheckBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
 FilterMenu 1.0 ./AuxComponents/FilterMenu.qml
 TableDelegate 1.0 ./AuxComponents/TableDelegate.qml
+TreeDelegate 1.0 ./AuxComponents/TreeDelegate.qml
 DatePicker 1.0 ./AuxComponents/DatePicker.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
 PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
@@ -42,6 +43,7 @@ UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
 LoginButton 1.0 ./AuxComponents/LoginButton.qml
 PagesManager 1.0 ./AuxComponents/PagesManager.qml
 PreferencePage 1.0 ./AuxComponents/PreferencePage.qml
+Preference 1.0 ./AuxComponents/Preference.qml
 ServerNoConnectionView 1.0 ./AuxComponents/ServerNoConnectionView.qml
 ComboBoxGql 1.0 ./AuxComponents/ComboBoxGql.qml
 PopupMenuDelegate 1.0 ./AuxComponents/PopupMenuDelegate.qml
@@ -103,7 +105,5 @@ ApplicationInfoProvider 1.0 ./AuxComponents/ApplicationInfoProvider.qml
 Loading 1.0 ./AuxComponents/Loading.qml
 StateMachine 1.0 ./AuxComponents/StateMachine.qml
 
-BasicTableView2 1.0 ./AuxComponents/BasicTableView2.qml
-BasicTreeView2 1.0 ./AuxComponents/BasicTreeView2.qml
-TableViewItemDelegateBase2 1.0 ./AuxComponents/TableViewItemDelegateBase2.qml
-TreeViewItemDelegateBase2 1.0 ./AuxComponents/TreeViewItemDelegateBase2.qml
+TreeViewModelAdapter 1.0 ./AuxComponents/TreeViewModelAdapter.qml
+

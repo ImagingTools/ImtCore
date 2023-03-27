@@ -8,10 +8,11 @@
 #include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFilePersistence.h>
-
+#include <ifile/IRelativeFilePath.h>
 
 // ImtCore includes
 #include <imtdb/IDatabaseLoginSettings.h>
+#include <imtapp/IBackupSettings.h>
 
 
 namespace imtdb
@@ -28,8 +29,10 @@ public:
 
 	I_BEGIN_COMPONENT(CDatabaseAutomaticBackupComp);
 		I_ASSIGN(m_databaseLoginSettingsCompPtr, "DatabaseLoginSettings", "Database login settings", true, "DatabaseLoginSettings");
-		I_ASSIGN(m_backupPathCompPtr, "BackupFolderPath", "Backup folder path", false, "BackupFolderPath");
-		I_ASSIGN(m_startTimeAttrPtr, "StartTime", "The time at which backup will start", false, "00:00");
+		I_ASSIGN(m_backupSettingsCompPtr, "BackupSettings", "Backup settings", true, "BackupSettings");
+		I_ASSIGN(m_relativeFilePathCompPtr, "RelativeFilePath", "Relative file path", true, "RelativeFilePath");
+		I_ASSIGN(m_programAttrPtr, "Program", "Program name", true, "Program");
+		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer", false, 60000);
 	I_END_COMPONENT;
 
 protected:
@@ -38,7 +41,8 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	bool CheckTodayBackup() const;
+	bool Backup();
+
 private Q_SLOTS:
 	void OnTimeout();
 
@@ -47,8 +51,13 @@ protected:
 
 protected:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseLoginSettingsCompPtr);
-	I_REF(ifile::IFileNameParam, m_backupPathCompPtr);
-	I_ATTR(QString, m_startTimeAttrPtr);
+	I_REF(imtapp::IBackupSettings, m_backupSettingsCompPtr);
+	I_REF(ifile::IRelativeFilePath, m_relativeFilePathCompPtr);
+	I_ATTR(QString, m_programAttrPtr);
+	I_ATTR(int, m_checkIntervalAttrPtr);
+
+private:
+	QDateTime m_lastBackupDateTime;
 };
 
 

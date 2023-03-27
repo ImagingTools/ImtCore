@@ -35,18 +35,10 @@ DocumentBase {
         featuresProvider.modelChanged.disconnect(packageViewContainer.updateTreeViewModel);
     }
 
+
+
     onDocumentModelChanged: {
         console.log("packageview onDocumentModelChanged");
-        //        let items = packageViewContainer.documentModel.GetData("Items");
-        //        if (!items){
-        //            packageViewContainer.documentModel.AddTreeModel("Items");
-        //        }
-
-        //        let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
-        //        if (!dependenciesModel){
-        //            packageViewContainer.documentModel.AddTreeModel("DependenciesModel");
-        //        }
-
         tableView.columnModel.clear();
         let headers = packageViewContainer.documentModel.GetData("Headers");
         for (let i = 0; i < headers.GetItemsCount(); i++){

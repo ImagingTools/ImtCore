@@ -13,41 +13,29 @@
         <Element Id="DatabaseAutomaticBackup" PackageId="ImtDatabasePck" ComponentId="DatabaseAutomaticBackup">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="BackupFolderPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="PreferencesFilePath"/>
+                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseLoginSettings" Type="Reference" ExportId="DatabaseLoginSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="StartTime" Type="String" ExportId="StartTime">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="Program" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="pg_dump"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RelativeFilePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TimeStampFileNameParam"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PreferencesFilePath" PackageId="FilePck" ComponentId="RelativeFileNameParam">
+        <Element Id="TimeStampFileNameParam" PackageId="FilePck" ComponentId="TimeStampFileNameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="Backups"/>
+                    <AttributeInfo Id="FileExtension" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value=".backup"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathType" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="2"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SystemLocation"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SystemLocation" PackageId="FilePck" ComponentId="SystemLocation">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="LocationType">
-                        <Data IsEnabled="true" Value="9"/>
+                    <AttributeInfo Id="PrefixText" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="prolife_"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

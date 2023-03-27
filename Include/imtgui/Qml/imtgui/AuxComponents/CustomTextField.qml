@@ -58,6 +58,10 @@ FocusScope {
         textField.focus = value;
     }
 
+    function ensureVisible(pos) {
+        textField.ensureVisible(pos);
+    }
+
     onFocusChanged: {
         console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus);
 
