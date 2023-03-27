@@ -194,6 +194,8 @@ bool CDatabaseEngineComp::OpenDatabase() const
 
 	databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
 	QString databaseName = GetDatabaseName();
+	qDebug() << "Open database" << GetDatabaseName() << GetHostName() << GetPort() << GetUserName() << GetPassword();
+
 	if (m_dbTypeAttrPtr->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
 
 	}
@@ -347,7 +349,30 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 					queryString = QString(queryString).arg("Revisions").toUtf8();
 				}
 				else{
-					queryString = QString(queryString).arg("revisions").toUtf8();
+					if (TableExist("revisions")){
+						queryString = QString(queryString).arg("revisions").toUtf8();
+					}
+					else{
+						if (*m_autoCreateTablesAttrPtr > 0) {
+							QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
+							if (!migrationsFolder.exists()){
+								SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: ").arg(m_migrationFolderPathCompPtr->GetPath()));
+
+								return false;
+							}
+							ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
+							if (sqlError.type() != QSqlError::NoError){
+
+								SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
+
+								return false;
+							}
+							else{
+								queryString = QString(queryString).arg("Revisions").toUtf8();
+							}
+
+						}
+					}
 				}
 
 				ExecSqlQuery(queryString, &sqlError);

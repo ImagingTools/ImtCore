@@ -34,7 +34,7 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 	Q_ASSERT(dataModelPtr != nullptr);
 
 	QSqlError sqlError;
-	QByteArray query = QString("SELECT * FROM \"Users\" WHERE UserId = '%1';").arg(qPrintable(*m_superuserLoginAttrPtr)).toLocal8Bit();
+	QByteArray query = QString("SELECT * FROM \"Users\" WHERE \"UserId\" = '%1';").arg(qPrintable(*m_superuserLoginAttrPtr)).toLocal8Bit();
 
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 
