@@ -92,7 +92,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 
 	NewObjectQuery retVal;
 
-	retVal.query += QString("\nINSERT INTO \"UsersSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
+    retVal.query += QString("\nINSERT INTO \"UserSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
 			.arg(qPrintable(userId))
 			.arg(qPrintable(data)).toLocal8Bit();
 
@@ -104,7 +104,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId) const
 {
-	return QString("\nDELETE FROM \"UsersSettings\" WHERE \"UserId\" = '%1';")
+    return QString("\nDELETE FROM \"UserSettings\" WHERE \"UserId\" = '%1';")
 			.arg(qPrintable(objectId)).toLocal8Bit();
 }
 
@@ -138,7 +138,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 		data = QByteArray((const char*) archive.GetBuffer(), archive.GetBufferSize()).toBase64();
 	}
 
-	QByteArray retVal = QString("UPDATE \"UsersSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
+    QByteArray retVal = QString("UPDATE \"UserSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
 			.arg(qPrintable(userId))
 			.arg(qPrintable(data))
 			.arg(qPrintable(objectId))
