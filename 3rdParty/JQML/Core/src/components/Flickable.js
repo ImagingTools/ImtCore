@@ -187,40 +187,50 @@ export class Flickable extends Item {
 		
 
 	}
+	$parentScroll(deltaX, deltaY){
+		let parent = this.parent
+		while(parent && !(parent.$qmlClassName === 'Flickable' || parent.$qmlClassName === 'ListView' || parent.$qmlClassName === 'GridView')){
+			parent = parent.parent
+		}
+
+		if(parent) parent.$scroll(deltaX, deltaY)
+	}
 	$scroll(deltaX, deltaY){
-		
-
-		if(this.flickableDirection !== Flickable.VerticalFlick && this.contentWidth > 0 && this.contentWidth > this.width){
-			if(deltaX > 0)
-			if(this.contentX + deltaX < this.contentWidth - this.width){
-				this.contentX += deltaX
+		if(this.interactive && this.enabled){
+			if(this.flickableDirection !== Flickable.VerticalFlick && this.contentWidth > 0 && this.contentWidth > this.width){
+				if(deltaX > 0)
+				if(this.contentX + deltaX < this.contentWidth - this.width){
+					this.contentX += deltaX
+				} else {
+					this.contentX = this.contentWidth - this.width
+				}
+				if(deltaX < 0)
+				if(this.contentX + deltaX > 0){
+					this.contentX += deltaX
+				} else {
+					this.contentX = 0
+				}
 			} else {
-				this.contentX = this.contentWidth - this.width
+				// this.$parentScroll(deltaX, 0)
 			}
-			if(deltaX < 0)
-			if(this.contentX + deltaX > 0){
-				this.contentX += deltaX
+			
+			if(this.flickableDirection !== Flickable.HorizontalFlick && this.contentHeight > 0 && this.contentHeight > this.height){
+				if(deltaY > 0)
+				if(this.contentY + deltaY < this.contentHeight - this.height){
+					this.contentY += deltaY
+				} else {
+					this.contentY = this.contentHeight - this.height
+				}
+				if(deltaY < 0)
+				if(this.contentY + deltaY > 0){
+					this.contentY += deltaY
+				} else {
+					this.contentY = 0
+				}
 			} else {
-				this.contentX = 0
+				// this.$parentScroll(0, deltaY)
 			}
 		}
-		
-		if(this.flickableDirection !== Flickable.HorizontalFlick && this.contentHeight > 0 && this.contentHeight > this.height){
-			if(deltaY > 0)
-			if(this.contentY + deltaY < this.contentHeight - this.height){
-				this.contentY += deltaY
-			} else {
-				this.contentY = this.contentHeight - this.height
-			}
-			if(deltaY < 0)
-			if(this.contentY + deltaY > 0){
-				this.contentY += deltaY
-			} else {
-				this.contentY = 0
-			}
-		}
-
-		
 
 	}
 	$fillMouse(e){
@@ -264,19 +274,37 @@ export class Flickable extends Item {
 
 			this.$scroll(deltaX, deltaY)
 
-			if(tempContentX === this.contentX && tempContentY === this.contentY){
+			if((this.contentX + deltaX < 0 || this.contentX + deltaX > this.contentWidth - this.width) && (this.contentY + deltaY < 0 || this.contentY + deltaY > this.contentHeight - this.height)){
 				let parent = this.parent
 				let find = false
 				while(parent && !find){
 					if(parent && parent.webScroll !== undefined){
 						find = true
-						this.$pressed = false
-						parent.$mousedown(e, state)
+						if(parent.interactive && parent.enabled){
+							this.$pressed = false
+							parent.$mousedown(e, state)
+						}
 					} else {
 						parent = parent.parent
 					}
 				}
+			} else {
+				this.$scroll(deltaX, deltaY)
 			}
+
+			// if(tempContentX === this.contentX && tempContentY === this.contentY){
+			// 	let parent = this.parent
+			// 	let find = false
+			// 	while(parent && !find){
+			// 		if(parent && parent.webScroll !== undefined){
+			// 			find = true
+			// 			this.$pressed = false
+			// 			parent.$mousedown(e, state)
+			// 		} else {
+			// 			parent = parent.parent
+			// 		}
+			// 	}
+			// }
 		}
 		
 	}
@@ -312,21 +340,40 @@ export class Flickable extends Item {
 			let tempContentX = this.contentX
 			let tempContentY = this.contentY
 
-			this.$scroll(deltaX, deltaY)
-
-			if(tempContentX === this.contentX && tempContentY === this.contentY){
+			if((this.contentX + deltaX < 0 || this.contentX + deltaX > this.contentWidth - this.width) && (this.contentY + deltaY < 0 || this.contentY + deltaY > this.contentHeight - this.height)){
 				let parent = this.parent
 				let find = false
 				while(parent && !find){
 					if(parent && parent.webScroll !== undefined){
 						find = true
-						this.$pressed = false
-						parent.$touchstart(e, state)
+						if(parent.interactive && parent.enabled){
+							this.$pressed = false
+							parent.$touchstart(e, state)
+						}
+						
 					} else {
 						parent = parent.parent
 					}
 				}
+			} else {
+				this.$scroll(deltaX, deltaY)
 			}
+
+			// this.$scroll(deltaX, deltaY)
+
+			// if(tempContentX === this.contentX && tempContentY === this.contentY){
+			// 	let parent = this.parent
+			// 	let find = false
+			// 	while(parent && !find){
+			// 		if(parent && parent.webScroll !== undefined){
+			// 			find = true
+			// 			this.$pressed = false
+			// 			parent.$touchstart(e, state)
+			// 		} else {
+			// 			parent = parent.parent
+			// 		}
+			// 	}
+			// }
 		}
 	}
 
