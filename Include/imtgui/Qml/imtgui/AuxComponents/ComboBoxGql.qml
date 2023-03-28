@@ -10,9 +10,9 @@ Item {
     height: 30;
 
     property var model;
-    property var properties;
-    property var gettedParams;
-    property var filterIdsModel;
+    property TreeItemModel properties : TreeItemModel{};
+    property TreeItemModel gettedParams : TreeItemModel{};
+    property TreeItemModel filterIdsModel : TreeItemModel{};
 
     property color borderColor: comboBoxContainerGql.focus ? Style.iconColorOnSelected : Style.alternateBaseColor;
 
