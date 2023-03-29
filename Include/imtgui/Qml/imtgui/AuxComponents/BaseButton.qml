@@ -37,7 +37,41 @@ Item {
 
     signal loaded();
 
+    function setItemProperties(){
 
+        baseButton.setItemPropertiesAdd()
+
+        loader.item.text = baseButton.text;
+        loader.item.imageSource = baseButton.imageSource;
+        loader.item.isActive = baseButton.isActive;
+        loader.item.isFocused = baseButton.isFocused;
+        loader.item.isPressed = baseButton.isPressed;
+        loader.item.isHovered = baseButton.isHovered;
+        loader.item.isMainButton = baseButton.isMainButton;
+        loader.item.enabled = baseButton.enabled;
+        loader.item.isHighlighted = baseButton.isHighlighted;
+        loader.item.selected = baseButton.selected;
+        loader.item.color = baseButton.color;
+
+        loader.width = loader.item.width;
+        loader.height = loader.item.height;
+
+        if(baseButton.width > 0){
+            loader.item.width = baseButton.width;
+        }
+        else{
+            baseButton.width = loader.item.width;
+        }
+
+        loader.item.visible = baseButton.visible;
+
+        baseButton.loaded();
+
+    }
+
+    function setItemPropertiesAdd(){//for web
+
+    }
 
     onPressed: {
         //baseButton.isPressed = !baseButton.isPressed;
@@ -167,40 +201,8 @@ Item {
         sourceComponent: commonButtonDecorator;
 
         onLoaded: {
-            loader.setItemProperties();
+            baseButton.setItemProperties();
         }
-
-
-        function setItemProperties(){
-
-            loader.item.text = baseButton.text;
-            loader.item.imageSource = baseButton.imageSource;
-            loader.item.isActive = baseButton.isActive;
-            loader.item.isFocused = baseButton.isFocused;
-            loader.item.isPressed = baseButton.isPressed;
-            loader.item.isHovered = baseButton.isHovered;
-            loader.item.isMainButton = baseButton.isMainButton;
-            loader.item.enabled = baseButton.enabled;
-            loader.item.isHighlighted = baseButton.isHighlighted;
-            loader.item.selected = baseButton.selected;
-            loader.item.color = baseButton.color;
-
-            loader.width = loader.item.width;
-            loader.height = loader.item.height;
-
-            if(baseButton.width > 0){
-                loader.item.width = baseButton.width;
-            }
-            else{
-                baseButton.width = loader.item.width;
-            }
-
-            loader.item.visible = baseButton.visible;
-
-            baseButton.loaded();
-        }
-
-
 
     }
 

@@ -53,8 +53,7 @@ Rectangle {
             inputDecoratorLoader2.item.rootItem = passwordTextInput;
         }
 
-        //loginButton.decorator = Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-
+        //loginButton.width = 150;
     }
 
 
@@ -290,6 +289,13 @@ Rectangle {
 
                     anchors.centerIn: parent;
 
+                    property int loadingCount: 0;//for web
+                    function setItemPropertiesAdd(){
+                        if(loginButton.loadingCount > 0){
+                            loginButton.width = 0;
+                        }
+                    }
+
                     decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
                     enabled: loginTextInput.text != "" && passwordTextInput.text != "";
 
@@ -297,6 +303,10 @@ Rectangle {
 
                     onClicked: {
                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
+                    }
+
+                    onDecoratorChanged: {
+                        loginButton.loadingCount++;
                     }
                 }
             }//
