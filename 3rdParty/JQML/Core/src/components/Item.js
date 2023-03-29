@@ -165,6 +165,9 @@ export class Item extends QtObject {
         super.$destroy()
     }
 
+    setFocus(param){
+        this.focus =  param === true ? true : false
+    }
     $xChanged(){
         let x = this.x
         // if(!this.$anchorsX){
