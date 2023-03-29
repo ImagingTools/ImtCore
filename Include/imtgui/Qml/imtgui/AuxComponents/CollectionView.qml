@@ -133,6 +133,10 @@ Item {
         let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
         console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
+        if(name == undefined){
+            name =" ";
+        }
+
         if (collectionViewContainer.isUsedDocumentManager){
             documentManager.openDocument(id, {"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
         }
