@@ -1,6 +1,7 @@
 import {Item} from './Item'
 import {Gradient} from './Gradient'
 import {Signal} from '../utils/Signal'
+import {Qt} from '../utils/Qt'
 
 export class Rectangle extends Item {
     constructor(args) {
@@ -38,9 +39,15 @@ export class Rectangle extends Item {
         }
         
     }
-
+    
     $colorChanged(){
-        this.dom.style.backgroundColor = this.color
+        let rgba = Qt.$colorToRGBA(this.color)
+        this.dom.style.backgroundColor = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
+    }
+    $opacityChanged(){
+        let rgba = Qt.$colorToRGBA(this.color)
+        this.dom.style.opacity = 1
+        this.dom.style.backgroundColor = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
     }
     $radiusChanged(){
         this.dom.style.borderRadius = `${this.radius}px`

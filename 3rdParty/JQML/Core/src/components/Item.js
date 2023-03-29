@@ -62,7 +62,17 @@ export class Item extends QtObject {
         this.$cP('visible', true).connect(this.$visibleChanged.bind(this))
         if(this.parent) this.$sP('visible', ()=>{return this.parent.visible})
         this.$cP('clip', false).connect(this.$clipChanged.bind(this))
-        this.$cP('opacity', 1.0).connect(this.$opacityChanged.bind(this))
+        this.$cP('opacity', ()=>{
+            let parent = this.parent
+            while(parent && !parent.dom){
+                parent = parent.parent
+            }
+            if(parent && parent.dom){
+                return parent.opacity
+            } else {
+                return 1.0
+            }
+        }).connect(this.$opacityChanged.bind(this))
         this.$cP('enabled', true).connect(this.$enabledChanged.bind(this))
         this.$cP('focus', false).connect(this.$focusChanged.bind(this))
         this.$cP('activeFocus', ()=>{return this.focus}).connect(this.$focusChanged.bind(this))
@@ -237,7 +247,7 @@ export class Item extends QtObject {
         this.dom.style.overflow = this.clip ? "hidden" : "unset"
     }
     $opacityChanged(){
-        this.dom.style.opacity = this.opacity
+        // this.dom.style.opacity = this.opacity
     }
     $enabledChanged(){
        
