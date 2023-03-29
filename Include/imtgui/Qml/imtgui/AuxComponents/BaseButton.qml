@@ -37,6 +37,8 @@ Item {
 
     signal loaded();
 
+
+
     onPressed: {
         //baseButton.isPressed = !baseButton.isPressed;
         baseButton.isHighlighted = true;
@@ -164,8 +166,12 @@ Item {
         visible: baseButton.visible;
         sourceComponent: commonButtonDecorator;
 
-
         onLoaded: {
+            loader.setItemProperties();
+        }
+
+
+        function setItemProperties(){
 
             loader.item.text = baseButton.text;
             loader.item.imageSource = baseButton.imageSource;
@@ -192,8 +198,9 @@ Item {
             loader.item.visible = baseButton.visible;
 
             baseButton.loaded();
-
         }
+
+
 
     }
 

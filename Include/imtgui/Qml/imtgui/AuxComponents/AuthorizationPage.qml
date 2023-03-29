@@ -18,13 +18,9 @@ Rectangle {
 
     property alias title: welcomeText.text;
 
-    function logout(){
-        authPageContainer.tokenProvider.login = "";
-        authPageContainer.visible = true;
-    }
-
     Component.onCompleted: {
         Events.subscribeEvent("logout", authPageContainer.logout);
+        decoratorPause.start();
     }
 
     onVisibleChanged: {
@@ -35,6 +31,40 @@ Rectangle {
             loginTextInput.text = "";
 
             loginTextInput.focus = true;
+        }
+    }
+
+    function logout(){
+        authPageContainer.tokenProvider.login = "";
+        authPageContainer.visible = true;
+    }
+
+    function setDecorators(){
+        if(inputDecoratorLoader1.item){
+            inputDecoratorLoader1.item.rootItem = loginTextInput;
+        }
+        if(inputDecoratorLoader1.item){
+            inputDecoratorLoader1.item.rootItem = loginTextInput;
+        }
+        if(titleDecoratorLoader2.item){
+            titleDecoratorLoader2.item.rootItem = titlePassword;
+        }
+        if(inputDecoratorLoader2.item){
+            inputDecoratorLoader2.item.rootItem = passwordTextInput;
+        }
+
+        //loginButton.decorator = Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+
+    }
+
+
+    PauseAnimation {
+        id: decoratorPause;
+
+        duration: 500;
+
+        onFinished: {
+            authPageContainer.setDecorators();
         }
     }
 
@@ -112,9 +142,6 @@ Rectangle {
 
                     sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
                     onLoaded: {
-                        if(titleDecoratorLoader1.item){
-                            titleDecoratorLoader1.item.rootItem = titleLogin;
-                        }
                     }
                 }
             }
@@ -148,9 +175,6 @@ Rectangle {
 
                     sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
                     onLoaded: {
-                        if(inputDecoratorLoader1.item){
-                            inputDecoratorLoader1.item.rootItem = loginTextInput;
-                        }
                     }
                 }
             }
@@ -169,9 +193,6 @@ Rectangle {
 
                     sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
                     onLoaded: {
-                        if(titleDecoratorLoader2.item){
-                            titleDecoratorLoader2.item.rootItem = titlePassword;
-                        }
                     }
                 }
             }
@@ -204,9 +225,6 @@ Rectangle {
 
                     sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
                     onLoaded: {
-                        if(inputDecoratorLoader2.item){
-                            inputDecoratorLoader2.item.rootItem = passwordTextInput;
-                        }
 
                     }
                 }
