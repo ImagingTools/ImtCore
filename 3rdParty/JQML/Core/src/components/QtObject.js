@@ -439,7 +439,7 @@ export class QtObject {
                     let _caller = caller
                     if(_caller.type === 'alias'){
                         signal.connections[_caller.PID] = ()=>{
-                            let val1 = _caller.func()
+                            let val1 = _caller.func ? _caller.func() : _caller.val
                             let val2 = _caller.getter()
                             if(val1 !== _caller.val){
                                 _caller.val = val1
@@ -530,7 +530,7 @@ export class QtObject {
                         let _caller = caller
                         if(_caller.type === 'alias'){
                             signal.connections[_caller.PID] = ()=>{
-                                let val1 = _caller.func()
+                                let val1 = _caller.func ? _caller.func() : _caller.val
                                 let val2 = _caller.getter()
                                 if(val1 !== _caller.val){
                                     _caller.val = val1
@@ -745,7 +745,7 @@ export class QtObject {
                     let _caller = caller
                     if(_caller.type === 'alias'){
                         signal.connections[_caller.PID] = ()=>{
-                            let val1 = _caller.func()
+                            let val1 = _caller.func ? _caller.func() : _caller.val
                             let val2 = _caller.getter()
                             if(val1 !== _caller.val){
                                 _caller.val = val1
@@ -783,6 +783,7 @@ export class QtObject {
                         delete s[this.$p[name].PID]
                     }
                     this.$p[name].depends.clear()
+                    this.$p[name].func = null
                     this.$p[name].val = newVal
                     setter(newVal)
                     signal()
