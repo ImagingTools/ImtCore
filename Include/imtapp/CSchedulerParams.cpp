@@ -1,4 +1,4 @@
-#include <imtapp/CBackupSettings.h>
+#include <imtapp/CSchedulerParams.h>
 
 
 // ACF includes
@@ -17,13 +17,13 @@ namespace imtapp
 
 // reimplemented (ISchedulerParams)
 
-const QDateTime& CBackupSettings::GetStartTime() const
+const QDateTime& CSchedulerParams::GetStartTime() const
 {
 	return m_startTime;
 }
 
 
-void CBackupSettings::SetStartTime(const QDateTime& startTime)
+void CSchedulerParams::SetStartTime(const QDateTime& startTime)
 {
 	if (m_startTime != startTime){
 		istd::CChangeNotifier notifier(this);
@@ -33,13 +33,13 @@ void CBackupSettings::SetStartTime(const QDateTime& startTime)
 }
 
 
-int CBackupSettings::GetInterval() const
+int CSchedulerParams::GetInterval() const
 {
 	return m_interval;
 }
 
 
-void CBackupSettings::SetInterval(int interval)
+void CSchedulerParams::SetInterval(int interval)
 {
 	if (m_interval != interval){
 		istd::CChangeNotifier notifier(this);
@@ -49,41 +49,14 @@ void CBackupSettings::SetInterval(int interval)
 }
 
 
-int CBackupSettings::GetPathType() const
-{
-	return IFileNameParam::PathType::PT_DIRECTORY;
-}
-
-
-const QString& CBackupSettings::GetPath() const
-{
-	return m_backupFolderPath;
-}
-
-
-void CBackupSettings::SetPath(const QString& path)
-{
-	if (m_backupFolderPath != path){
-		istd::CChangeNotifier notifier(this);
-
-		m_backupFolderPath = path;
-	}
-}
-
-
 // reimplemented (iser::ISerializable)
 
-bool CBackupSettings::Serialize(iser::IArchive& archive)
+bool CSchedulerParams::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag backupFolderTag("BackupFolder", "Backup folder", iser::CArchiveTag::TT_LEAF);
-	bool retVal = archive.BeginTag(backupFolderTag);
-	retVal = retVal && archive.Process(m_backupFolderPath);
-	retVal = retVal && archive.EndTag(backupFolderTag);
-
-	static iser::CArchiveTag intervalTag("Interval", "Backup interval", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(intervalTag);
+	static iser::CArchiveTag intervalTag("Interval", "Interval", iser::CArchiveTag::TT_LEAF);
+	bool retVal = archive.BeginTag(intervalTag);
 	retVal = retVal && archive.Process(m_interval);
 	retVal = retVal && archive.EndTag(intervalTag);
 
@@ -103,19 +76,18 @@ bool CBackupSettings::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
-int CBackupSettings::GetSupportedOperations() const
+int CSchedulerParams::GetSupportedOperations() const
 {
 	return SO_COPY | SO_COMPARE | SO_CLONE | SO_RESET;
 }
 
 
-bool CBackupSettings::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CSchedulerParams::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	const CBackupSettings* sourcePtr = dynamic_cast<const CBackupSettings*>(&object);
+	const CSchedulerParams* sourcePtr = dynamic_cast<const CSchedulerParams*>(&object);
 	if (sourcePtr != nullptr){
-		m_backupFolderPath = sourcePtr->m_backupFolderPath;
 		m_startTime = sourcePtr->m_startTime;
 		m_interval = sourcePtr->m_interval;
 
@@ -126,12 +98,11 @@ bool CBackupSettings::CopyFrom(const IChangeable& object, CompatibilityMode /*mo
 }
 
 
-bool CBackupSettings::IsEqual(const IChangeable& object) const
+bool CSchedulerParams::IsEqual(const IChangeable& object) const
 {
-	const IBackupSettings* sourcePtr = dynamic_cast<const IBackupSettings*>(&object);
+	const ISchedulerParams* sourcePtr = dynamic_cast<const ISchedulerParams*>(&object);
 	if (sourcePtr != nullptr){
-		return	m_backupFolderPath == sourcePtr->GetPath() &&
-				m_startTime == sourcePtr->GetStartTime() &&
+		return	m_startTime == sourcePtr->GetStartTime() &&
 				m_interval == sourcePtr->GetInterval();
 	}
 
@@ -139,9 +110,9 @@ bool CBackupSettings::IsEqual(const IChangeable& object) const
 }
 
 
-istd::IChangeable* CBackupSettings::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CSchedulerParams::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CBackupSettings> clonePtr(new CBackupSettings);
+	istd::TDelPtr<CSchedulerParams> clonePtr(new CSchedulerParams);
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
@@ -150,11 +121,10 @@ istd::IChangeable* CBackupSettings::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CBackupSettings::ResetData(CompatibilityMode /*mode*/)
+bool CSchedulerParams::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_backupFolderPath.clear();
 	m_interval = 0;
 
 	return true;

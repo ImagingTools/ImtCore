@@ -9,6 +9,7 @@
 #include <ilog/TLoggerCompWrap.h>
 #include <ifile/IFilePersistence.h>
 #include <ifile/IRelativeFilePath.h>
+#include <iprm/IParamsSet.h>
 
 // ImtCore includes
 #include <imtdb/IDatabaseLoginSettings.h>
@@ -30,9 +31,9 @@ public:
 	I_BEGIN_COMPONENT(CDatabaseAutomaticBackupComp);
 		I_ASSIGN(m_databaseLoginSettingsCompPtr, "DatabaseLoginSettings", "Database login settings", true, "DatabaseLoginSettings");
 		I_ASSIGN(m_backupSettingsCompPtr, "BackupSettings", "Backup settings", true, "BackupSettings");
-		I_ASSIGN(m_relativeFilePathCompPtr, "RelativeFilePath", "Relative file path", true, "RelativeFilePath");
 		I_ASSIGN(m_programAttrPtr, "Program", "Program name", true, "Program");
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer", false, 60000);
+		I_ASSIGN(m_backupOnStartAttrPtr, "BackupOnStart", "Backup on start", true, true);
 	I_END_COMPONENT;
 
 protected:
@@ -51,10 +52,10 @@ protected:
 
 protected:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseLoginSettingsCompPtr);
-	I_REF(imtapp::IBackupSettings, m_backupSettingsCompPtr);
-	I_REF(ifile::IRelativeFilePath, m_relativeFilePathCompPtr);
+	I_REF(iprm::IParamsSet, m_backupSettingsCompPtr);
 	I_ATTR(QString, m_programAttrPtr);
 	I_ATTR(int, m_checkIntervalAttrPtr);
+	I_ATTR(bool, m_backupOnStartAttrPtr);
 
 private:
 	QDateTime m_lastBackupDateTime;

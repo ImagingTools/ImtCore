@@ -41,7 +41,7 @@ bool CBackupSettingsRepresentationControllerComp::GetRepresentationFromDataModel
 
 		int index = elementsModelPtr->InsertNewItem();
 
-		QTime startTime = backupSettingsPtr->GetStartTime();
+		QDateTime startTime = backupSettingsPtr->GetStartTime();
 
 		elementsModelPtr->SetData("Id", "StartTime", index);
 		elementsModelPtr->SetData("Name", QT_TR_NOOP("Start Time"), index);
@@ -59,27 +59,12 @@ bool CBackupSettingsRepresentationControllerComp::GetRepresentationFromDataModel
 
 		index = elementsModelPtr->InsertNewItem();
 
-		IBackupSettings::BackupInterval backupInterval = backupSettingsPtr->GetInterval();
+		int backupInterval = backupSettingsPtr->GetInterval();
 
-		elementsModelPtr->SetData("Id", "BackupInterval", index);
+		elementsModelPtr->SetData("Id", "Interval", index);
 		elementsModelPtr->SetData("Name", QT_TR_NOOP("Backup Interval"), index);
-		elementsModelPtr->SetData("Value", backupInterval - 1, index);
-		elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml", index);
-
-		imtbase::CTreeItemModel* intervalModelPtr = elementsModelPtr->AddTreeModel("Parameters", index);
-
-		int intervalIndex = intervalModelPtr->InsertNewItem();
-
-		intervalModelPtr->SetData("Id", "Day", intervalIndex);
-		intervalModelPtr->SetData("Name", "Day", intervalIndex);
-
-		intervalIndex = intervalModelPtr->InsertNewItem();
-		intervalModelPtr->SetData("Id", "Week", intervalIndex);
-		intervalModelPtr->SetData("Name", "Week", intervalIndex);
-
-		intervalIndex = intervalModelPtr->InsertNewItem();
-		intervalModelPtr->SetData("Id", "Month", intervalIndex);
-		intervalModelPtr->SetData("Name", "Month", intervalIndex);
+		elementsModelPtr->SetData("Value", backupInterval, index);
+		elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/AuxComponents/SettingIntegerInput.qml", index);
 
 		return true;
 	}
@@ -110,15 +95,14 @@ bool CBackupSettingsRepresentationControllerComp::GetDataModelFromRepresentation
 				}
 
 				if (parameterId == "StartTime"){
-					QTime time = QTime::fromString(parameterValue, "HH:mm");
-					backupSettingsPtr->SetStartTime(time);
+					QDateTime dateTime = QDateTime::fromString(parameterValue, "HH:mm");
+					backupSettingsPtr->SetStartTime(dateTime);
 				}
 				else if (parameterId == "BackupFolder"){
 					backupSettingsPtr->SetPath(parameterValue);
 				}
-				else if (parameterId == "BackupInterval"){
-					int index = parameterValue.toInt() + 1;
-					backupSettingsPtr->SetInterval((IBackupSettings::BackupInterval) index);
+				else if (parameterId == "Interval"){
+					backupSettingsPtr->SetInterval(parameterValue.toInt());
 				}
 			}
 

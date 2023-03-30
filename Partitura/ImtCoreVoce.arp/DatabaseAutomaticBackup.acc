@@ -13,6 +13,9 @@
         <Element Id="DatabaseAutomaticBackup" PackageId="ImtDatabasePck" ComponentId="DatabaseAutomaticBackup">
             <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="BackupOnStart" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -21,9 +24,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="Program" Type="String" ExportId="">
                         <Data IsEnabled="true" Value="pg_dump"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RelativeFilePath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TimeStampFileNameParam"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

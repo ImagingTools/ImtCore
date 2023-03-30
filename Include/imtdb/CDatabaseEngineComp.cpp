@@ -686,8 +686,9 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 
 	BeginTransaction();
 
-	for (const QString& singleQuery: queryList){
+	for (QString& singleQuery: queryList){
 		if (!singleQuery.isEmpty()){
+			singleQuery = singleQuery.replace('\b', ';');
 			QSqlError error;
 			ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
 			if (error.type() != QSqlError::NoError){

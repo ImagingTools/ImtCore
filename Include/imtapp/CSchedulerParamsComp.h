@@ -6,29 +6,28 @@
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
-#include <imtapp/CBackupSettings.h>
+#include <imtapp/CSchedulerParams.h>
 
 
 namespace imtapp
 {
 
 
-class CBackupSettingsComp:
+class CSchedulerParamsComp:
 			public icomp::CComponentBase,
-			virtual public CBackupSettings
+			virtual public CSchedulerParams
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef CBackupSettings BaseClass2;
+	typedef CSchedulerParams BaseClass2;
 
-	I_BEGIN_COMPONENT(CBackupSettingsComp);
-		I_REGISTER_INTERFACE(IBackupSettings);
+	I_BEGIN_COMPONENT(CSchedulerParamsComp);
+		I_REGISTER_INTERFACE(ISchedulerParams);
 		I_REGISTER_INTERFACE(iser::IObject);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_backupPathCompPtr, "BackupFolderPath", "Backup folder path", true, "BackupFolderPath");
 		I_ASSIGN(m_startTimeAttrPtr, "StartTime", "The time at which backup will start", true, "dd-MM-yyyy HH:mm");
-		I_ASSIGN(m_backupIntervalAttrPtr, "BackupInterval", "Backup interval", true, 0);
+		I_ASSIGN(m_intervalAttrPtr, "Interval", "Interval (in seconds)", true, 0);
 	I_END_COMPONENT;
 
 protected:
@@ -36,9 +35,8 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_REF(ifile::IFileNameParam, m_backupPathCompPtr);
 	I_ATTR(QString, m_startTimeAttrPtr);
-	I_ATTR(int, m_backupIntervalAttrPtr);
+	I_ATTR(int, m_intervalAttrPtr);
 };
 
 

@@ -532,9 +532,10 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 
 	m_dbEngineCompPtr->BeginTransaction();
 
-	for (const QString& singleQuery: queryList){
+	for (QString& singleQuery: queryList){
 		if (!singleQuery.isEmpty()){
 			QSqlError error;
+			singleQuery = singleQuery.replace('\b', ';');
 			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
 			if (error.type() != QSqlError::NoError){
 				SendErrorMessage(0, error.text(), "Database collection");

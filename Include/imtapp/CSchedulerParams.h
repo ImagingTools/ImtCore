@@ -8,14 +8,14 @@
 #include <iser/ISerializable.h>
 
 // ImtCore includes
-#include <imtapp/IBackupSettings.h>
+#include <imtapp/ISchedulerParams.h>
 
 
 namespace imtapp
 {
 
 
-class CBackupSettings: virtual public IBackupSettings
+class CSchedulerParams: virtual public ISchedulerParams
 {
 public:
 	// reimplemented (ISchedulerParams)
@@ -23,11 +23,6 @@ public:
 	virtual void SetStartTime(const QDateTime& startTime) override;
 	virtual int GetInterval() const override;
 	virtual void SetInterval(int interval) override;
-
-	// reimplemented (ifile::IFileNameParam)
-	virtual int GetPathType() const override;
-	virtual const QString& GetPath() const override;
-	virtual void SetPath(const QString& path) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -40,7 +35,6 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	QString m_backupFolderPath;
 	QDateTime m_startTime;
 	int m_interval;
 };

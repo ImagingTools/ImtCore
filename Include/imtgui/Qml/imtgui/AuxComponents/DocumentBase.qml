@@ -128,15 +128,7 @@ Item {
 
     onCommandsIdChanged: {
         console.log("documentBase onCommandsIdChanged", documentBase.commandsId, itemName);
-
-        if (documentBase.itemLoad){
-//            Events.subscribeEvent(documentBase.commandsId + "CommandActivated", documentBase.commandsDelegate.commandHandle);
-
-            commandsDelegate.commandsId = documentBase.commandsId;
-
-//            documentBase.commandsDelegate.itemModelInputParams["Id"] = itemId;
-//            documentBase.commandsDelegate.updateModel();
-        }
+        commandsDelegate.commandsId = documentBase.commandsId;
     }
 
     function updateDocumentTitle(){

@@ -20,7 +20,7 @@ namespace imtdb
 QString CSqlDatabaseObjectDelegateCompBase::SqlEncode(const QString& sqlQuery) const
 {
 	QString retVal = sqlQuery;
-	return retVal.replace("'", "''");
+	return retVal.replace("'", "''").replace(";", "\b");
 }
 
 

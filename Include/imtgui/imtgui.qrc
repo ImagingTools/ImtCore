@@ -48,7 +48,6 @@
         <file alias="imtgui/AuxComponents/TopPanelDecorator.qml">Qml/imtgui/AuxComponents/TopPanelDecorator.qml</file>
         <file alias="imtgui/AuxComponents/TopRightPanelDecorator.qml">Qml/imtgui/AuxComponents/TopRightPanelDecorator.qml</file>
         <file alias="imtgui/AuxComponents/TopCenterPanelDecorator.qml">Qml/imtgui/AuxComponents/TopCenterPanelDecorator.qml</file>
-        <file alias="imtgui/AuxComponents/SettingsButton.qml">Qml/imtgui/AuxComponents/SettingsButton.qml</file>
         <file alias="imtgui/AuxComponents/UndoRedo.qml">Qml/imtgui/AuxComponents/UndoRedo.qml</file>
         <file alias="imtgui/AuxComponents/CustomTextField.qml">Qml/imtgui/AuxComponents/CustomTextField.qml</file>
         <file alias="imtgui/AuxComponents/LoginButton.qml">Qml/imtgui/AuxComponents/LoginButton.qml</file>
@@ -138,6 +137,10 @@
 	<file alias="imtgui/AuxComponents/Preference.qml">Qml/imtgui/AuxComponents/Preference.qml</file>
 	<file alias="imtgui/AuxComponents/TreeViewModelAdapter.qml">Qml/imtgui/AuxComponents/TreeViewModelAdapter.qml</file>
 	<file alias="imtgui/AuxComponents/TreeDelegate.qml">Qml/imtgui/AuxComponents/TreeDelegate.qml</file>
+	<file alias="imtgui/AuxComponents/TreeViewSelection.qml">Qml/imtgui/AuxComponents/TreeViewSelection.qml</file>
+	<file alias="imtgui/AuxComponents/TimeIntervalPicker.qml">Qml/imtgui/AuxComponents/TimeIntervalPicker.qml</file>
+	<file alias="imtgui/AuxComponents/SchedulerParams.qml">Qml/imtgui/AuxComponents/SchedulerParams.qml</file>
+	<file alias="imtgui/AuxComponents/Spinner.qml">Qml/imtgui/AuxComponents/Spinner.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

@@ -1,4 +1,4 @@
-#include <imtapp/CBackupSettingsComp.h>
+#include <imtapp/CSchedulerParamsComp.h>
 
 
 namespace imtapp
@@ -9,19 +9,16 @@ namespace imtapp
 
 // reimplemented (icomp::CComponentBase)
 
-void CBackupSettingsComp::OnComponentCreated()
+void CSchedulerParamsComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	QString backupPath = m_backupPathCompPtr->GetPath();
-	BaseClass2::SetPath(backupPath);
 
 	QDateTime time = QDateTime::fromString(*m_startTimeAttrPtr, "dd-MM-yyyy HH:mm");
 	if (time.isValid()){
 		BaseClass2::SetStartTime(time);
 	}
 
-	BaseClass2::SetInterval(*m_backupIntervalAttrPtr);
+	BaseClass2::SetInterval(*m_intervalAttrPtr);
 }
 
 

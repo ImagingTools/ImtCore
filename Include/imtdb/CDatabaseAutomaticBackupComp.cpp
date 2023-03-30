@@ -6,6 +6,9 @@
 #include <QtCore/QProcess>
 #include <QtCore/QDateTime>
 
+// ACF includes
+#include <iprm/TParamsPtr.h>
+
 
 namespace imtdb
 {
@@ -19,7 +22,9 @@ void CDatabaseAutomaticBackupComp::OnComponentCreated()
 
 	QObject::connect(&m_timer, &QTimer::timeout, this, &CDatabaseAutomaticBackupComp::OnTimeout);
 
-	Backup();
+	if (*m_backupOnStartAttrPtr){
+		Backup();
+	}
 
 	int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr : 60000;
 	m_timer.start(interval);
@@ -40,7 +45,7 @@ bool CDatabaseAutomaticBackupComp::Backup()
 		return false;
 	}
 
-	if (!m_relativeFilePathCompPtr.IsValid()){
+	if (!m_backupSettingsCompPtr.IsValid()){
 		return false;
 	}
 
@@ -68,14 +73,18 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	arguments << "-v";
 	arguments << "-f";
 
-	QString backupFolderPath = m_backupSettingsCompPtr->GetPath();
+	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(m_backupSettingsCompPtr.GetPtr(), "BackupFolder");
+
+	QString backupFolderPath = ".";
+	if (fileNameParamPtr.IsValid()){
+		backupFolderPath = fileNameParamPtr->GetPath();
+	}
 
 	QDir folder(backupFolderPath);
 	if (!folder.exists()){
 		folder.mkdir(backupFolderPath);
 	}
 
-//	QString fileName = m_relativeFilePathCompPtr->GetPath();
 	QString fmt = "yyyyMMddhhmmss";
 	QString fileName = dbName + "_" + QDateTime::currentDateTime().toString(fmt);
 	arguments << backupFolderPath + "/" + fileName;
@@ -102,30 +111,32 @@ bool CDatabaseAutomaticBackupComp::Backup()
 void CDatabaseAutomaticBackupComp::OnTimeout()
 {
 	if (m_databaseLoginSettingsCompPtr.IsValid() && m_backupSettingsCompPtr.IsValid()){
-		QDateTime currentDateTime = QDateTime::currentDateTime();
-		QTime startTime = m_backupSettingsCompPtr->GetStartTime();
-		if (startTime.isValid()){
-			QDateTime intervalDateTime(m_lastBackupDateTime);
+		iprm::TParamsPtr<imtapp::ISchedulerParams> schedulerParamPtr(m_backupSettingsCompPtr.GetPtr(), "SchedulerParams");
+		if (schedulerParamPtr.IsValid()){
+			QDateTime currentDateTime = QDateTime::currentDateTime();
+			QDateTime startTime = schedulerParamPtr->GetStartTime();
+			if (startTime.isValid()){
+				if (currentDateTime >= startTime){
+					bool ok = false;
+					if (m_lastBackupDateTime.isValid()){
+						int interval = schedulerParamPtr->GetInterval();
+						int secs = m_lastBackupDateTime.secsTo(currentDateTime);
+						if (secs >= interval){
+							ok = true;
+						}
+					}
+					else{
+						ok = true;
+					}
 
-			QDateTime dateTime(currentDateTime.date(), startTime);
-			if (currentDateTime >= dateTime){
-				imtapp::IBackupSettings::BackupInterval interval = m_backupSettingsCompPtr->GetInterval();
-
-				bool ok = false;
-				int countDays = m_lastBackupDateTime.daysTo(currentDateTime);
-				if ((interval == imtapp::IBackupSettings::BackupInterval::BI_DAY && countDays >= 1) ||
-						(interval == imtapp::IBackupSettings::BackupInterval::BI_WEEK && countDays >= 7) ||
-						(interval == imtapp::IBackupSettings::BackupInterval::BI_MONTH && countDays >= 30)){
-					ok = true;
-				}
-
-				if (ok){
-					Backup();
+					if (ok){
+						Backup();
+					}
 				}
 			}
-		}
-		else{
-			SendErrorMessage(0, "time is not valid", "Database automatic backup");
+			else{
+				SendErrorMessage(0, "time is not valid", "Database automatic backup");
+			}
 		}
 	}
 	else{

@@ -6,21 +6,29 @@ import QtQuick.Dialogs 1.3
 Item {
     id: root;
 
-    width: 270;
+    width: 400;
     height: 30;
 
-    property string path: model.Value;
+    property string path: model.Path;
 
     onPathChanged: {
-        if (model.Value !== root.path){
-            model.Value = root.path;
+        if (model.Path !== root.path){
+            model.Path = root.path;
         }
+
+        tfc.ensureVisible(0)
+    }
+
+    Component.onCompleted: {
+        fileDialog.setFolder('file:///' + model.Path)
     }
 
     Item {
         anchors.fill: parent;
 
         CustomTextField {
+            id: tfc;
+
             anchors.left: parent.left;
             anchors.right: button.left;
             anchors.rightMargin: 10;
@@ -31,10 +39,6 @@ Item {
             text: root.path;
 
             readOnly: true;
-
-            onTextChanged: {
-                ensureVisible(0);
-            }
         }
 
         BaseButton {
@@ -43,7 +47,7 @@ Item {
             anchors.right: parent.right;
             anchors.verticalCenter: parent.verticalCenter;
 
-            text: "Browse";
+            text: "Browse...";
 
             decorator: defaultButtonDecorator;
 
@@ -71,11 +75,8 @@ Item {
 
         onAccepted: {
             var pathDir = fileDialog.fileUrl.toString();
-
             console.log("fileUrl", fileDialog.fileUrl);
-
             pathDir = pathDir.replace('file:///', '')
-
             root.path = pathDir;
         }
     }

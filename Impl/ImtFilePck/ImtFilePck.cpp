@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"File format conversion",
 			"File Format Conversion");
 
+I_EXPORT_COMPONENT(
+			FileNameParamRepresentationController,
+			"File name param representation controller",
+			"FileName Param Representation Controller");
+
 
 } // namespace ImtFilePck
 

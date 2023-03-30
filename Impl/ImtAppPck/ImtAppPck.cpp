@@ -20,9 +20,19 @@ I_EXPORT_COMPONENT(
 			"Backup Settings");
 
 I_EXPORT_COMPONENT(
+			SchedulerParams,
+			"Scheduler params",
+			"Scheduler Params");
+
+I_EXPORT_COMPONENT(
 			BackupSettingsRepresentationController,
 			"Backup settings representation controller",
 			"Backup Settings Representation Controller");
+
+I_EXPORT_COMPONENT(
+			SchedulerParamsRepresentationController,
+			"Scheduler params representation controller",
+			"Scheduler Params Representation Controller");
 
 
 } // namespace ImtAppPck

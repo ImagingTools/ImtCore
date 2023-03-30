@@ -212,7 +212,7 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 
 bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex)
 {
-	bool retVal = false;
+	bool retVal = true;
 	QList<QByteArray> keys;
 	externTreeModel->GetKeys(keys, externIndex);
 	for (QByteArray key : keys){
@@ -225,23 +225,27 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *exte
 		if (treeItemModelPtr != nullptr){
 			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
 
-			int itemsCount = treeItemModelPtr->GetItemsCount();
+			retVal = retVal && childModelPtr->CopyFrom(*treeItemModelPtr);
 
-			for (int i = 0; i < itemsCount; i++){
-				int childIndex = childModelPtr->InsertNewItem();
-				retVal = childModelPtr->CopyItemDataFromModel(childIndex, treeItemModelPtr, i);
-				if (retVal == false){
-					break;
-				}
-			}
+//			int itemsCount = treeItemModelPtr->GetItemsCount();
+
+//			for (int i = 0; i < itemsCount; i++){
+//				int childIndex = childModelPtr->InsertNewItem();
+//				retVal = childModelPtr->CopyItemDataFromModel(childIndex, treeItemModelPtr, i);
+//				if (retVal == false){
+//					break;
+//				}
+//			}
 		}
 		else{
-			retVal = SetData(key, value, index);
+			retVal = retVal && SetData(key, value, index);
 		}
-		if (retVal == false){
+
+		if (!retVal){
 			break;
 		}
 	}
+
 	return retVal;
 }
 
@@ -418,7 +422,9 @@ CTreeItemModel *CTreeItemModel::GetModelFromItem(int itemIndex) const
 	CTreeItemModel* modelPtr = new CTreeItemModel();
 
 //	CopyItemDataToModel(itemIndex, modelPtr);
-	modelPtr->CopyItemDataFromModel(0, this, itemIndex);
+	bool result = modelPtr->CopyItemDataFromModel(0, this, itemIndex);
+
+	qDebug() << "GetModelFromItem CopyItemDataFromModel " << result;
 
 	return modelPtr;
 }

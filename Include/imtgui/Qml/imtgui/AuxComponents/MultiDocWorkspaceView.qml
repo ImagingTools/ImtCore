@@ -435,11 +435,6 @@ Item {
                         item.documentModel = documentController.documentModel;
                     }
                 }
-
-//                if (tabPanelInternal.selectedIndex >= 0){
-//                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
-//                    item.documentModel = documentController.documentModel;
-//                }
             }
         }
 

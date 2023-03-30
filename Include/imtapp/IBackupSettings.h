@@ -6,15 +6,14 @@
 #include <ifile/IFileNameParam.h>
 
 // ImtCore includes
-#include <imtapp/IScheduler.h>
+#include <imtapp/ISchedulerParams.h>
 
 
 namespace imtapp
 {
 
 
-class IBackupSettings: virtual public iser::IObject,
-						virtual public imtapp::IScheduler,
+class IBackupSettings: virtual public imtapp::ISchedulerParams,
 						virtual public ifile::IFileNameParam
 {
 
