@@ -134,14 +134,14 @@ Item {
         console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
         if(name == undefined){
-            name =" ";
+            name = " ";
         }
 
         if (collectionViewContainer.isUsedDocumentManager){
-            documentManager.openDocument(id, {"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+            documentManager.openDocument(id, {"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath});
         }
         else{
-            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});
+            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": commandsId,"contentSource": editorPath});
         }
     }
 
@@ -168,11 +168,14 @@ Item {
             height: contentLoader.height;
 
             onRootChanged: {
-                contentLoader.item.root = content.root;
+                if(contentLoader.item){
+                    contentLoader.item.root = content.root;
+                }
             }
             onRootItemChanged: {
-                contentLoader.item.rootItem = content.rootItem;
-
+                if(contentLoader.item){
+                    contentLoader.item.rootItem = content.rootItem;
+                }
             }
 
             Loader {
