@@ -44,7 +44,7 @@ protected:
 	I_ATTR(QByteArray, m_elementIdAttrPtr);
 	I_TEXTATTR(m_elementNameAttrPtr);
 	I_TEXTATTR(m_elementDescriptionAttrPtr);
-	I_TEXTATTR(m_elementItemPathAttrPtr);
+	I_ATTR(QString, m_elementItemPathAttrPtr);
 	I_TEXTATTR(m_elementStatusAttrPtr);
 	I_ATTR(bool, m_enabledAttrPtr);
 	I_ATTR(bool, m_visibleAttrPtr);

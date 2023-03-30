@@ -42,7 +42,7 @@ QString CGuiElementModelComp::GetElementDescription() const
 QString CGuiElementModelComp::GetElementItemPath() const
 {
 	if (m_elementItemPathAttrPtr.IsValid()){
-		return *m_elementItemPathAttrPtr;
+		return (*m_elementItemPathAttrPtr);
 	}
 
 	return QString();
