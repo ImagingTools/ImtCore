@@ -65,7 +65,7 @@ Item {
 
         onWidthChanged: {
             if (tabPanelDecorator.rootItem && tabPanelDecorator.rootItem.autoWidth){
-                tabPanelDecorator.rootItem.width = tabPanelDecorator.width;
+                tabPanelDecorator.rootItem.width = tabPanelDecorator.width + imagetabDelegate.width + 30;
             }
         }
 
