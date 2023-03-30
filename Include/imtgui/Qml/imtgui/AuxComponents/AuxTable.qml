@@ -26,6 +26,7 @@ Item {
     property alias delegate: elementsListObj.delegate;
     property alias elements: elementsListObj.model;
     property alias elementsList: elementsListObj;
+    property alias cacheBuffer: elementsListObj.cacheBuffer;
 
     property alias headerDelegate: headersList.delegate;
     property real headerElementWidth: (headersList.width)/headersList.count;
@@ -699,7 +700,7 @@ Item {
 
         anchors.verticalCenter: headersPanel.verticalCenter;
         anchors.right: headersPanel.right;
-        //anchors.rightMargin: -width;
+        anchors.rightMargin: -width/2;
 
         visible: tableContainer.hasFilter && tableContainer.showHeaders;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;

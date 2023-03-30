@@ -18,6 +18,7 @@ Item {
 
     property bool selected: false;
     property string color: "";
+    property Item rootItem: null;
     //
     
 }

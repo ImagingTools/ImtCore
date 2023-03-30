@@ -201,6 +201,9 @@ Item {
         sourceComponent: commonButtonDecorator;
 
         onLoaded: {
+            if(loader.item.rootItem !== undefined){
+                loader.item.rootItem = baseButton;
+            }
             baseButton.setItemProperties();
         }
 
@@ -237,6 +240,7 @@ Item {
         }
 
     }
-    
+
+
 }
 

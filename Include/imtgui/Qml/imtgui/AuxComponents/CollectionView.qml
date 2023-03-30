@@ -14,6 +14,7 @@ Item {
     property string itemName;
     property bool isUsedDocumentManager: true;
     property bool visibleMetaInfo: true;
+    property bool hasFilter: true;
 
     property string commandsId;
     property string editorPath;
@@ -240,6 +241,7 @@ Item {
 
         commandsId: parent.commandsId;
         loadData: true;
+        hasFilter: collectionViewContainer.hasFilter;
 
 //        onSelectedIndexChanged: {
 //            console.log("CollectionViewBase onSelectedIndexChanged");
