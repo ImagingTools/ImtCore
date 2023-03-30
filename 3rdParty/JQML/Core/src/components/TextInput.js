@@ -170,6 +170,9 @@ export class TextInput extends Item {
 		this.$style = document.head.appendChild(document.createElement("style"))
 		this.$style.innerHTML = `#el-${this.UID} input::selection{color: ${this.$p.selectedTextColor.val}; background: ${this.$p.selectionColor.val}} #el-${this.UID} input::-moz-selection{color: ${this.$p.selectedTextColor.val}; background: ${this.$p.selectionColor.val}}`
 	}
+    $opacityChanged(){
+        this.dom.style.opacity = this.opacity
+    }
 
     
     $widthChanged(){

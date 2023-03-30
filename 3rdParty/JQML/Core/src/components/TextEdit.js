@@ -87,6 +87,9 @@ export class TextEdit extends Item {
         }
         
     }
+    $opacityChanged(){
+        this.dom.style.opacity = this.opacity
+    }
     $updateGeometry(){
         clearTimeout(this.$updateTimer)
         

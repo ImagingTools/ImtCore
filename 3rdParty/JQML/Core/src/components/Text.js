@@ -39,7 +39,7 @@ export class Text extends Item {
         super(args)
 
         this.$cP('text', '').connect(this.$textChanged.bind(this))
-        this.$cP('color', "'black'").connect(this.$colorChanged.bind(this))
+        this.$cP('color', 'black').connect(this.$colorChanged.bind(this))
         this.$cP('contentHeight', 0).connect(this.$contentHeightChanged.bind(this))
         this.$cP('contentWidth', 0).connect(this.$contentWidthChanged.bind(this))
         this.$cP('horizontalAlignment', Text.AlignLeft).connect(this.$horizontalAlignmentChanged.bind(this))
@@ -197,7 +197,13 @@ export class Text extends Item {
     //     // this.$updateGeometry()
     // }
     $colorChanged(){
-        this.impl.style.color = `${this.$p.color.val}`
+        let rgba = Qt.$colorToRGBA(this.color)
+        this.impl.style.color = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
+    }
+    $opacityChanged(){
+        let rgba = Qt.$colorToRGBA(this.color)
+        this.dom.style.opacity = 1
+        this.impl.style.color = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
     }
     $contentWidthChanged(){
         // this.impl.style.width = `${this.contentWidth}px`
