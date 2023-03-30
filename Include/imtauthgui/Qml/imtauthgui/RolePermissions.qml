@@ -126,6 +126,7 @@ Item {
         id: emptyDecorator;
         Item{
             property Item rootItem: null;
+            property int mainMargin: 0;
         }
     }
 
