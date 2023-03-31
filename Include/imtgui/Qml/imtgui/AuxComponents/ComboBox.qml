@@ -57,6 +57,11 @@ FocusScope {
        };
 
     property alias image: cbArrowIcon;
+    property alias imageSource: cbArrowIcon.source;
+    property alias imageWidth:  cbArrowIcon.width;
+    property alias imageHeight: cbArrowIcon.height;
+    property alias imageRotation: cbArrowIcon.rotation;
+
     property alias containsMouse: cbMouseArea.containsMouse;
 
     property int textSize: Style.fontSize_common;
