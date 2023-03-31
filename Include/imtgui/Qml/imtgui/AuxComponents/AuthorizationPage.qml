@@ -6,7 +6,8 @@ import imtqml 1.0
 Rectangle {
     id: authPageContainer;
 
-    color: Style.dialogBackgroundColor;
+    color: "transparent";
+
     property var windows;
 
     property string state;
@@ -56,6 +57,12 @@ Rectangle {
         //loginButton.width = 150;
     }
 
+
+    Rectangle{
+        anchors.fill: parent;
+        color: Style.dialogBackgroundColor;
+        opacity: 0.5;
+    }
 
     PauseAnimation {
         id: decoratorPause;

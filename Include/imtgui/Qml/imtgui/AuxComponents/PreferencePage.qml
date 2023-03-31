@@ -8,8 +8,7 @@ import QtQuick.Dialogs 1.3
 Rectangle {
     id: container;
 
-    color: Style.dialogBackgroundColor;
-    radius: 3;
+    color: "transparent";
 
     property Item root: null;
 
@@ -38,12 +37,18 @@ Rectangle {
     signal saved();
     signal closed();
 
+    Rectangle{
+        anchors.fill: parent;
+        color: Style.dialogBackgroundColor;
+        opacity: 0.5;
+    }
+
     PageAboutProvider {
         id: aboutApplicationProvider;
     }
 
     Component.onDestruction: {
-        commonModel.modelChanged.disconnect(container.modelChanged);
+        container.commonModel.modelChanged.disconnect(container.modelChanged);
     }
 
     onApplicationInfoProviderChanged: {
@@ -53,24 +58,24 @@ Rectangle {
     }
 
     onVisibleChanged: {
-        console.log("onVisibleChanged settingsProvider", settingsProvider);
+        console.log("onVisibleChanged settingsProvider", container.settingsProvider);
         if (visible){
             //console.log("settingsProvider.localModel", settingsProvider.localModel);
-            if (settingsProvider && settingsProvider.localModel){
-                let localModelJson = settingsProvider.localModel.toJSON();
+            if (container.settingsProvider && container.settingsProvider.localModel){
+                let localModelJson = container.settingsProvider.localModel.toJSON();
 
                 console.log("localModelJson", localModelJson);
-                localModel.CreateFromJson(localModelJson);
+                container.localModel.CreateFromJson(localModelJson);
 
 //                updateCommonModel(localModel);
             }
 
             updateCommonModel(container.localModel);
 
-           // console.log("settingsProvider.serverModel", settingsProvider.serverModel);
-            if (settingsProvider && settingsProvider.serverModel){
-                let serverModelJson = settingsProvider.serverModel.toJSON();
-                serverModel.CreateFromJson(serverModelJson);
+           // console.log("settingsProvider.serverModel", container.settingsProvider.serverModel);
+            if (container.settingsProvider && container.settingsProvider.serverModel){
+                let serverModelJson = container.settingsProvider.serverModel.toJSON();
+                container.serverModel.CreateFromJson(serverModelJson);
 
 //                updateCommonModel(serverModel);
             }
@@ -79,12 +84,12 @@ Rectangle {
 
             updateCommonModel(aboutApplicationProvider.pageModel);
 
-            if (settingsProvider){
-                settingsProvider.rewriteModel(serverModel, localModel);
+            if (container.settingsProvider){
+                container.settingsProvider.rewriteModel(container.serverModel, container.localModel);
             }
 
-            localModel.modelChanged.connect(container.modelChanged);
-            serverModel.modelChanged.connect(container.modelChanged);
+            container.localModel.modelChanged.connect(container.modelChanged);
+            container.serverModel.modelChanged.connect(container.modelChanged);
 
             updateGui();
 
@@ -103,19 +108,19 @@ Rectangle {
     }
 
     function clearModels(){
-        serverModel.Clear();
-        localModel.Clear();
-        commonModel.Clear();
+        container.serverModel.Clear();
+        container.localModel.Clear();
+        container.commonModel.Clear();
 
         mainPanelRepeater.model = 0;
         bodyPanelRepeater.model = 0;
     }
 
     function updateGui(){
-        mainPanelRepeater.model = commonModel;
+        mainPanelRepeater.model = container.commonModel;
 
         mainPanel.selectedIndex = 0;
-        let parametersModel = commonModel.GetData("Parameters")
+        let parametersModel = container.commonModel.GetData("Parameters")
         bodyPanelRepeater.model = parametersModel
     }
 
@@ -128,22 +133,22 @@ Rectangle {
 
                 let index = getPageIndexByPageId(pageId)
                 if (index < 0){
-                    index = commonModel.InsertNewItem();
+                    index = container.commonModel.InsertNewItem();
                 }
 
-                commonModel.SetData("Id", pageId, index);
-                commonModel.SetData("Name", pageName, index);
+                container.commonModel.SetData("Id", pageId, index);
+                container.commonModel.SetData("Name", pageName, index);
 
                 if(pageParameters != null){
-                    commonModel.SetData("Parameters", pageParameters, index);
+                    container.commonModel.SetData("Parameters", pageParameters, index);
                 }
             }
         }
     }
 
     function getPageIndexByPageId(pageId){
-        for (let i = 0; i < commonModel.GetItemsCount(); i++){
-            let id = commonModel.GetData("Id", i);
+        for (let i = 0; i < container.commonModel.GetItemsCount(); i++){
+            let id = container.commonModel.GetData("Id", i);
             if (id === pageId){
                 return i;
             }
