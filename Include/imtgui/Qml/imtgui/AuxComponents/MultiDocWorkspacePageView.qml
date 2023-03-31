@@ -82,11 +82,15 @@ Rectangle {
 
     property var startPageObj;
 
+    property MainDocumentManager mainDocumentManager: null;
+
     onStartPageObjChanged: {
         console.log("multiDocPageView onStartPageObjChanged");
         documentManager.addDocument(multiDocPageView.startPageObj)
 
-        mainDocumentManager.registerDocumentManager(multiDocPageView.startPageObj["CommandsId"], documentManager);
+        if (multiDocPageView.mainDocumentManager != null){
+            multiDocPageView.mainDocumentManager.registerDocumentManager(multiDocPageView.startPageObj["CommandsId"], documentManager);
+        }
     }
 
     MultiDocWorkspaceView {

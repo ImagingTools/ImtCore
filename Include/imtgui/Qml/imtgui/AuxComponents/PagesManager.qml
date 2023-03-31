@@ -56,7 +56,9 @@ Item {
             Component.onCompleted: {
                 console.log("pagesDeleg onCompleted", model.Source);
 
-                mainDocumentManager.registerDocumentManager(model.Id, null);
+                if (container.documentManager != null){
+                    container.documentManager.registerDocumentManager(model.Id, null);
+                }
             }
 
             /**
@@ -77,20 +79,18 @@ Item {
             Loader {
                 id: pagesLoader;
                 anchors.fill: parent;
-//                onWidthChanged: {
-//                    console.log("pagesLoader onWidthChanged", width)
-//                }
-
-//                source: model.Source;
 
                 onItemChanged: {
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
                     console.log("model.PageId", model.Id)
                     if (pagesLoader.item){
+                        pagesLoader.item.mainDocumentManager = container.documentManager;
                         pagesLoader.item.startPageObj = {"Id": model.Id,
                                                          "Name": model.Name,
                                                          "Source": model.StartItem,
                                                          "CommandsId": model.Id};
+
+
                     }
                 }
             }
