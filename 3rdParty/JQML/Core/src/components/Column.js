@@ -38,6 +38,7 @@ export class Column extends Item {
                 if(child.visible){
                     if(first){
                         y1 = child.y
+                        y2 = child.height + y1
                         first = false
                     } else {
                         y2 = child.y + child.height

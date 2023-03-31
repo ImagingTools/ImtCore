@@ -38,6 +38,7 @@ export class Row extends Item {
                 if(child.visible){
                     if(first){
                         x1 = child.x
+                        x2 = child.width + x1
                         first = false
                     } else {
                         x2 = child.x + child.width
