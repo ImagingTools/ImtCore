@@ -118,6 +118,7 @@
         <file alias="imtgui/AuxComponents/RoundButton.qml">Qml/imtgui/AuxComponents/RoundButton.qml</file>
         <file alias="imtgui/AuxComponents/CustomRadioButton.qml">Qml/imtgui/AuxComponents/CustomRadioButton.qml</file>
         <file alias="imtgui/AuxComponents/RadioBox.qml">Qml/imtgui/AuxComponents/RadioBox.qml</file>
+        <file alias="imtgui/AuxComponents/ButtonPanel.qml">Qml/imtgui/AuxComponents/ButtonPanel.qml</file>
 	
 	<file alias="imtgui/AuxComponents/SimpleCommandsDecorator.qml">Qml/imtgui/AuxComponents/SimpleCommandsDecorator.qml</file>
 	<file alias="imtgui/AuxComponents/CollectionDataProvider.qml">Qml/imtgui/AuxComponents/CollectionDataProvider.qml</file>	
