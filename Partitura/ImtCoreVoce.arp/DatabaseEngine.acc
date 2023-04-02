@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5048" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5060" Description="ACF"/>
+            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -13,6 +13,12 @@
         <Element Id="PgSqlDatabaseEngine" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCreateDatabase" Type="Integer" ExportId="AutoCreateDatabase">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoCreateTables" Type="Integer" ExportId="AutoCreateTables">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -46,7 +52,7 @@
         <Element Id="RelativeFileNameParam" PackageId="FilePck" ComponentId="RelativeFileNameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="">
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="MigrationPath">
                         <Data IsEnabled="true" Value="Migrations"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathType" Type="Integer" ExportId="">
