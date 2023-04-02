@@ -4,9 +4,9 @@
 #include <istd/IPolymorphic.h>
 
 #include <ejdocument.h>
-#include <../EJExport/docx/ejconvertordocx.h>
-#include <../EJExport/pdf/ejconvertorpdf.h>
-#include <../EJExport/xlsx/ejconvertorexcel.h>
+#include <../EjExport/docx/ejconvertordocx.h>
+#include <../EjExport/pdf/ejconvertorpdf.h>
+#include <../EjExport/xlsx/ejconvertorexcel.h>
 
 namespace imtej
 {

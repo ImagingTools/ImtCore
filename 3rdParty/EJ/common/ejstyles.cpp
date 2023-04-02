@@ -1,5 +1,5 @@
 #include "../include/ejstyles.h"
-#include "../include/EjDocument.h"
+#include "../include/ejdocument.h"
 #include "ejtextcontrol.h"
 #include <QFont>
 

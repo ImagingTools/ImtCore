@@ -3,7 +3,7 @@
 //#include "imageplug_global.h"
 #include <QObject>
 #include <QtCore/qglobal.h>
-#include "EjDocument.h"
+#include "ejdocument.h"
 
 
 #if defined(IMAGE_LIBRARY)
