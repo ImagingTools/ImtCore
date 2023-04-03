@@ -43,7 +43,7 @@ EjTextControl::EjTextControl(QObject *parent) :
     m_posCursorX = leftColontitul;
     m_posCursorY = metric.height() * 100;// + m_interval;
     m_height = 0;//metric.height() * 110;
-    m_isViewDoc = false;
+    m_isViewDoc = true;
     m_startCursor = true;
     m_showCell = false;
     m_inputSelBlock = NULL;
@@ -4738,7 +4738,7 @@ void EjTextControl::calc(int index, bool force)
 	EjCalcParams calcParams;
     calcParams.viewScale = scaleSize;
 
-    int right_pos;
+    int right_pos = 0;
     int back_type = 0;
     bool new_string = false;
     double k_scale;
