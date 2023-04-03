@@ -48,7 +48,9 @@ export var Qt = {
         return window.open(url, '_blank')
     },
     qsTr: function(sourceText){
-        return sourceText
+        let translate = Core.context.languages[`${Core.context.application}_${Core.context.language}`]
+        let result = translate ? translate[sourceText] : sourceText
+        return result ? result : sourceText
     },
 
     $colors: {

@@ -1,32 +1,5 @@
 import {Signal} from '../utils/Signal'
 
-
-
-var context = {
-    backend: {
-        window: window
-    },
-    location: location,
-    history: history,
-}
-context.location.pushState = (...args)=>{history.pushState(...args)}
-context.location.changeHref = (href)=>{
-    context.location.href = href
-}
-
-Object.defineProperty(context.location, 'searchParams', {
-    get: ()=>{ 
-        let res = {}
-        let params = context.location.search.slice(1).split('&')
-        for(let param of params){
-            let temp = param.split('=')
-            if(temp.length === 2) res[temp[0]] = temp[1]
-        }
-        return res
-    },
-})
-
-
 export class QtObject {
     $p = {}
     $s = {}
@@ -36,7 +9,7 @@ export class QtObject {
         properties: [],
         aliases: [],
     }
-    context = {}
+    // context = {}
     ID = new Set()
     $availableGeometry = []
     // LVL = new Set()
@@ -46,7 +19,8 @@ export class QtObject {
         this.$PI = new Proxy(this, Core.proxyHandlerID)
         this.$P0 = new Proxy(this, Core.proxyHandler0)
         this.$qmlClassName = this.constructor.name
-        this._context = context
+        // this._context = context
+        this.context = Core.context
         this.UID = UID++
         UIDList[this.UID] = this
         this.children = []
@@ -376,7 +350,7 @@ export class QtObject {
         
     }
 
-    $cP(name, val){
+    $cP(name, val, privilegedFunc = null){
         if(typeof val === 'number'){
             if(isNaN(val)){
                 val = 0
@@ -492,6 +466,7 @@ export class QtObject {
                             }
                         } else {
                             this.$p[name].val = newVal
+                            if(privilegedFunc) privilegedFunc()
                             signal()
                         }
                         

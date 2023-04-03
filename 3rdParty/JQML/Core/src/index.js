@@ -176,21 +176,26 @@ global.Core = {
     animations: {},
     queueCompleted: [],
     focusedElement: null,
-    languages: {},
+    context: null,
+    // languages: {},
     // currentLanguage: 'ru',
     XMLParser: new DOMParser(),
-    setLanguage(name){
-        if(this.languages[name]){
-            this.root.currentLanguage = 'ru'
-        } else {
+    updateLanguage(){
+        if(Core.context.application && Core.context.language && !Core.context.languages[`${Core.context.application}_${Core.context.language}`]){
             let xhr = new XMLHttpRequest()
-            xhr.open('GET', `/lang/${name}`, false)
+            xhr.open('GET', `../Translations/${Core.context.application}_${Core.context.language}.ts`, false)
             xhr.onload = ()=>{
                 if (xhr.readyState === XMLHttpRequest.DONE){
-                    let xml = this.XMLParser.parseFromString(xhr.responseText, 'text/xml')
+                    let xml = Core.XMLParser.parseFromString(xhr.responseText, 'text/xml')
+                    let messages = xml.getElementsByTagName('message')
                     let dict = {}
-                    this.languages[name] = dict
-                    this.root.currentLanguage = name
+                    for(let message of messages){
+                        let source = message.getElementsByTagName('source')[0]
+                        let translation = message.getElementsByTagName('translation')[0]
+                        dict[source.innerHTML] = translation.innerHTML
+                    }
+                    
+                    Core.context.languages[`${Core.context.application}_${Core.context.language}`] = dict
                 }
             }
             xhr.send()
@@ -389,7 +394,32 @@ global.Core = {
         ul li{list-style:none;}
         img{vertical-align:top;}
         h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit;}
-        </style>`)
+        </style>`)     
+        
+        Core.context = this.cC('QtObject', {parent: null})
+        Core.context.backend = {
+            window: window
+        }
+        Core.context.location = location
+        Core.context.history = history
+        Object.defineProperty(Core.context.location, 'searchParams', {
+            get: ()=>{ 
+                let res = {}
+                let params = Core.context.location.search.slice(1).split('&')
+                for(let param of params){
+                    let temp = param.split('=')
+                    if(temp.length === 2) res[temp[0]] = temp[1]
+                }
+                return res
+            },
+        })
+        Core.context.location.changeHref = (href)=>{
+            context.location.href = href
+        }
+        Core.context.languages = {}
+        Core.context.$cP('language', '', this.updateLanguage)
+        Core.context.$cP('application', '', this.updateLanguage)
+
         let root = this.cC('Item', {parent: null})
         Core.root = root
         let dom = document.createElement("div")

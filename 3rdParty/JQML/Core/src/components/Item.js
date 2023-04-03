@@ -210,7 +210,7 @@ export class Item extends QtObject {
         this.dom.style.height = `${this.height}px`
     }
     $visibleChanged(){
-        this.dom.style.opacity = this.visible ? this.opacity : 0
+        // this.dom.style.opacity = this.visible ? this.opacity : 0
         this.dom.style.visibility = this.visible ? 'visible' : 'hidden'
         this.dom.style.zIndex = this.visible ? /*2147483646/2 +*/ this.z : -1
 
