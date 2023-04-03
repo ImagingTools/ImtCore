@@ -31,6 +31,8 @@ export class Flickable extends Item {
         this.$s.movementStarted = Signal()
 
 		this.$childUpdater = null
+
+		this.$scrollInterval = null
     }
 
     $domCreate(){
@@ -311,6 +313,9 @@ export class Flickable extends Item {
 
 	$touchstart(e, state) {
 		e.preventDefault()
+		this.$velocityX = 0
+		this.$velocityY = 0
+		clearInterval(this.$scrollInterval)
 		if(this.enabled && this.interactive){
 			state.blocked(this)
 			this.$fillMouse(e)
@@ -325,6 +330,27 @@ export class Flickable extends Item {
 			this.$fillMouse(e)
 			this.$pressed = false
 			
+			if(this.$velocityX !== 0 || this.$velocityY !== 0){
+				
+				this.$scrollInterval = setInterval(() => {
+					this.$scroll(this.$velocityX, this.$velocityY)
+					if(Math.abs(this.$velocityX) < 0.5){
+						this.$velocityX = 0
+					} else if(this.$velocityX > 0){
+						this.$velocityX -= 0.1
+					} else if(this.$velocityX < 0){
+						this.$velocityX += 0.1
+					}
+					if(Math.abs(this.$velocityY) < 0.5){
+						this.$velocityY = 0
+					} else if(this.$velocityY > 0){
+						this.$velocityY -= 0.1
+					} else if(this.$velocityY < 0){
+						this.$velocityY += 0.1
+					}
+					if(this.$velocityX === 0 && this.$velocityY === 0) clearInterval(this.$scrollInterval)
+				}, 10);
+			}
 		}
 	}
 	$touchmove(e, state) {
@@ -335,6 +361,8 @@ export class Flickable extends Item {
 			this.$fillMouse(e)
 			deltaX -= this.$mouseX
 			deltaY -= this.$mouseY
+			this.$velocityX = deltaX / 2
+			this.$velocityY = deltaY / 2
 
 			
 			let tempContentX = this.contentX
@@ -378,6 +406,7 @@ export class Flickable extends Item {
 	}
 
 	$destroy(){
+		clearInterval(this.$scrollInterval)
 		clearTimeout(this.$flickTimer)
 		clearTimeout(this.$childUpdater)
 		super.$destroy()
