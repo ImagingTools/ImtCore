@@ -59,6 +59,8 @@ Item {
         fontColor: comboBoxContainerGql.fontColor;
 
         rootItem: comboBoxContainerGql;
+
+
     };
 
     property alias popupComp: popupMenu;

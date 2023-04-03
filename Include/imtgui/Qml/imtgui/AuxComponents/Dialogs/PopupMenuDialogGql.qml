@@ -140,13 +140,12 @@ Item {
         //            modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
         //            itemsModel.updateModel(0);
         //        }
-        onTextChanged:  {
+        onTextEdited:  {
 
             if(popupMenuContainer.ready){
                 popupMenuContainer.rootItem.currentIndex = -1;
                 popupMenuContainer.offset = 0;
                 modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
-                itemsModel.updateModel(0);
                 pause.stop();
                 pause.start();
             }
@@ -163,7 +162,6 @@ Item {
 
         duration: 500;
         onFinished:  {
-
             itemsModel.updateModel(0);
         }
     }
