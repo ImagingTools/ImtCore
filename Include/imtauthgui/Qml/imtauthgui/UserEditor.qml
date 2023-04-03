@@ -12,7 +12,7 @@ Item {
     property bool blockUpdatingModel: false;
 
     property int mainMargin: 0;
-    property int panelWidth: 400; 
+    property int panelWidth: 400;
 
     Component.onCompleted: {
         usernameInput.focus = true;
@@ -108,7 +108,7 @@ Item {
 
                 onLoaded: {
                     if(mainPanelFrameLoader.item){
-                       // userEditorContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
+                        // userEditorContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
                     }
                 }
             }//Loader
@@ -157,7 +157,7 @@ Item {
                     onEditingFinished: {
                         console.log("onEditingFinished Username");
                         let oldText = userEditorContainer.documentModel.GetData("Username");
-                        if (oldText != usernameInput.text){
+                        if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
                             userEditorContainer.updateModel();
                         }
                     }
@@ -209,7 +209,7 @@ Item {
 
                     onEditingFinished: {
                         let oldText = userEditorContainer.documentModel.GetData("Password");
-                        if (oldText != passwordInput.text){
+                        if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
                             userEditorContainer.updateModel();
                         }
                     }
@@ -249,7 +249,7 @@ Item {
 
                     onEditingFinished: {
                         let oldText = userEditorContainer.documentModel.GetData("Name");
-                        if (oldText != nameInput.text){
+                        if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
                             userEditorContainer.updateModel();
                         }
                     }
@@ -307,7 +307,7 @@ Item {
 
                     onEditingFinished: {
                         let oldText = userEditorContainer.documentModel.GetData("Email");
-                        if (oldText != mailInput.text){
+                        if (oldText && oldText !== mailInput.text || !oldText && mailInput.text !== ""){
                             userEditorContainer.updateModel();
                         }
                     }

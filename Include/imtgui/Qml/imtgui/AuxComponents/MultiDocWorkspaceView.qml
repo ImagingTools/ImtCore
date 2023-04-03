@@ -23,6 +23,8 @@ Item {
 
     property bool documentLoading: false;
 
+    property MainDocumentManager mainDocumentManager: null;
+
     Component.onCompleted: {
         Events.subscribeEvent("DocumentSaved", workspaceView.documentSaved);
         Events.subscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
@@ -427,13 +429,18 @@ Item {
         onDocumentModelChanged: {
             if (documentController.documentModel != null){
                 let documentId = documentController.documentModel.GetData("Id");
-
-                for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
-                    let id = workspaceView.documentsData.GetData("Id", i);
-                    if (id === documentId){
-                        let item = workspaceView.documentsData.GetData("Item", i);
-                        item.documentModel = documentController.documentModel;
+                if (documentId !== ""){
+                    for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
+                        let id = workspaceView.documentsData.GetData("Id", i);
+                        if (id === documentId){
+                            let item = workspaceView.documentsData.GetData("Item", i);
+                            item.documentModel = documentController.documentModel;
+                        }
                     }
+                }
+                else{
+                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+                    item.documentModel = documentController.documentModel;
                 }
             }
         }
@@ -512,6 +519,10 @@ Item {
                         dataLoader.item.documentManager = workspaceView;
                     }
 
+                    if(dataLoader.item.mainDocumentManager !== undefined){
+                        dataLoader.item.mainDocumentManager = workspaceView.mainDocumentManager;
+                    }
+
                     //C
                     dataLoader.item.itemId = model.Id;
                     //
@@ -527,7 +538,10 @@ Item {
     Loading {
         id: loading;
 
-        anchors.fill: parent;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.top: parent.top;
 
         visible: false;
     }

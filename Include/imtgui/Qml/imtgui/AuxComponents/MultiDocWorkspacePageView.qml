@@ -84,6 +84,10 @@ Rectangle {
 
     property MainDocumentManager mainDocumentManager: null;
 
+    onMainDocumentManagerChanged: {
+        console.log("multiDocPageView onMainDocumentManagerChanged" , mainDocumentManager);
+    }
+
     onStartPageObjChanged: {
         console.log("multiDocPageView onStartPageObjChanged");
         documentManager.addDocument(multiDocPageView.startPageObj)
@@ -98,8 +102,6 @@ Rectangle {
 
         anchors.fill: parent;
 
-        Component.onCompleted: {
-
-        }
+        mainDocumentManager: multiDocPageView.mainDocumentManager;
     }
 }

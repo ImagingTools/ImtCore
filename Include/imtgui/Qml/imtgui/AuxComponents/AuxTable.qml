@@ -23,6 +23,8 @@ Item {
     property TreeItemModel widthDecorator : TreeItemModel{};
     property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
 
+    property SortController sortController: null;
+
     property alias delegate: elementsListObj.delegate;
     property alias elements: elementsListObj.model;
     property alias elementsList: elementsListObj;
@@ -128,10 +130,10 @@ Item {
         if (tableContainer.focus){
             elementsListObj.forceActiveFocus();
 
-//            tableSelection.subscribeEvents();
+            //            tableSelection.subscribeEvents();
         }
         else{
-//            tableSelection.unsubscribeEvents();
+            //            tableSelection.unsubscribeEvents();
         }
     }
 
@@ -387,6 +389,13 @@ Item {
             model: tableContainer.headers;
             boundsBehavior: Flickable.StopAtBounds;
             property bool compl: false;
+
+            property int currentIndex: 0;
+
+            onCurrentIndexChanged: {
+                console.log("headersList onCurrentIndexChanged", headersList.currentIndex);
+            }
+
             Component.onCompleted: {
                 headersList.compl = true;
             }
@@ -622,23 +631,18 @@ Item {
 
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.right: parent.right;
-                        anchors.rightMargin: visible ? Math.max(tableContainer.textMarginHor, tableContainer.verticalBorderSize) : 0;
+                        anchors.rightMargin: model.index === headersList.count - 1 ? iconFilter.width : visible ? Math.max(tableContainer.textMarginHor, tableContainer.verticalBorderSize) : 0
 
                         height: 10;
                         width: visible ? 10 : 0;
 
-                        visible: headersList.currentIndex === model.index && tableContainer.hasSort;
+                        visible: sortController.currentHeaderId === model.Id && tableContainer.hasSort;
 
                         sourceSize.width: width;
                         sourceSize.height: height;
 
-                        source: iconSort.state_ == "up" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
+                        source: sortController.currentOrder == "DESC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
                                                           "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
-
-
-                        property string state_: "up";
-
-
                     }
 
                 }//mainRec
@@ -663,13 +667,17 @@ Item {
                     }
 
                     onClicked: {
-                        headersList.currentIndex = model.index;
+                        if (!tableContainer.sortController){
+                            return;
+                        }
 
-                        if (iconSort.state_ == "up"){
-                            iconSort.state_ = "down";
+                        if (tableContainer.sortController.currentHeaderId !== model.Id){
+                            tableContainer.sortController.currentOrder = "ASC";
+
+                            tableContainer.sortController.currentHeaderId = model.Id;
                         }
                         else{
-                            iconSort.state_ = "up";
+                            tableContainer.sortController.currentOrder = tableContainer.sortController.currentOrder === "ASC" ? "DESC" : "ASC";
                         }
 
                         tableContainer.headerClicked(model.Id);
@@ -699,8 +707,7 @@ Item {
         id: iconFilter;
 
         anchors.verticalCenter: headersPanel.verticalCenter;
-        anchors.right: headersPanel.right;
-        anchors.rightMargin: -width/2;
+        anchors.right: parent.right;
 
         visible: tableContainer.hasFilter && tableContainer.showHeaders;
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
@@ -778,7 +785,7 @@ Item {
             width: elementsListObj.width;
             minHeight: tableContainer.itemHeight;
 
-//            selected: tableContainer.selectedIndex === model.index;
+            //            selected: tableContainer.selectedIndex === model.index;
 
             //selected: tableContainer.tableSelection.selectedIndexes.includes(model.index);
 
@@ -812,7 +819,7 @@ Item {
             }
 
             onClicked: {
-//                tableContainer.selectedIndex = model.index;
+                //                tableContainer.selectedIndex = model.index;
 
                 console.log("AuxTable onClicked");
 

@@ -133,6 +133,8 @@ Item {
         console.log("saveDocument" ,documentId);
 
         let item = stackView.peek();
+
+        item.updateModel();
         let documentData = item.documentModel;
         if (documentId === ""){
             documentController.setData(documentId, documentData);

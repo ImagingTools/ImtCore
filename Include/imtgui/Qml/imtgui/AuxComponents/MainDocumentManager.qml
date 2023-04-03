@@ -76,7 +76,8 @@ Item {
         for (let i = 0; i < typeIds.length; i++){
             let typeId = typeIds[i];
             let documentManager = root.documentManagers[typeId];
-            if (documentManager != null){
+            if (documentManager !== null){
+                console.log('documentManager', documentManager)
                 console.log(typeId, documentManager.dirtyDocumentsExists())
                 if (documentManager.dirtyDocumentsExists()){
                     return true;

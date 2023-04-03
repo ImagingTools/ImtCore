@@ -377,7 +377,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateRenameObjectQuery(
 	QByteArray roleId = rolePtr->GetRoleId();
 	QByteArray productId = rolePtr->GetProductId();
 
-	QByteArray retVal = QString("UPDATE \"Roles\" SET \'Name\' = '%1' WHERE \'RoleId\' ='%2' AND \'ProductId\' = '%3';")
+	QByteArray retVal = QString("UPDATE \"Roles\" SET \'Name\' = '%1' WHERE \"RoleId\" ='%2' AND \"ProductId\" = '%3';")
 			.arg(qPrintable(newObjectName))
 			.arg(qPrintable(roleId))
 			.arg(qPrintable(productId)).toLocal8Bit();

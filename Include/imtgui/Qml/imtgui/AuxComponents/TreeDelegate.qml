@@ -5,7 +5,7 @@ Rectangle {
     id: treeDelegate;
 
     width: 1000;
-    height: minHeight;
+    height: visible ? minHeight: 0;
     color: "transparent";
 
     visible: model.Visible;
@@ -15,7 +15,7 @@ Rectangle {
 
     property real minHeight: 40;
     property bool selected: false;
-    property bool opened: false;
+    property bool opened: true;
     property bool hasChildren: model.HasChildren;
     property int depth: model.Depth;
 

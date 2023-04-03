@@ -131,7 +131,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAccountDatabaseDelegateComp::Cre
 
 	NewObjectQuery retVal;
 
-	retVal.query = QString("INSERT INTO \"Accounts\" (Id, Name, Description, Type, OwnerMail, OwnerLastName, OwnerFirstName) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+	retVal.query = QString("INSERT INTO \"Accounts\" (\"Id\", \"Name\", \"Description\", \"Type\", \"OwnerMail\", \"OwnerLastName\", \"OwnerFirstName\") VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 							.arg(qPrintable(accountId))
 							.arg(accountName)
 							.arg(accountDescription)

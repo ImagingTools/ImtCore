@@ -248,7 +248,7 @@ Item {
                     onEditingFinished: {
                         console.log("roleNameInput onEditingFinished");
                         let oldText = roleEditorContainer.documentModel.GetData("Name");
-                        if (oldText !== roleNameInput.text && roleNameInput.text !== ""){
+                        if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
                             roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
                             roleEditorContainer.updateModel();
                         }
@@ -341,7 +341,7 @@ Item {
 
                     onEditingFinished: {
                         let oldText = roleEditorContainer.documentModel.GetData("Description");
-                        if (oldText !== descriptionInput.text && descriptionInput.text !== ""){
+                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
                             roleEditorContainer.updateModel();
                         }
                     }

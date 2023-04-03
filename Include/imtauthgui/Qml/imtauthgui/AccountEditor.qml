@@ -42,16 +42,28 @@ DocumentBase {
         console.log("AccountEditor updateGui");
         accountEditorContainer.blockUpdatingModel = true;
 
-        accountNameInput.text = accountEditorContainer.documentModel.GetData("Name");
-        accountDescriptionInput.text = accountEditorContainer.documentModel.GetData("Description");
+        if (accountEditorContainer.documentModel.ContainsKey("Name")){
+            accountNameInput.text = accountEditorContainer.documentModel.GetData("Name");
+        }
 
-        if (accountEditorContainer.documentModel.ContainsKey("Addresses")){
-            let addressesModel = accountEditorContainer.documentModel.GetData("Addresses");
+        if (accountEditorContainer.documentModel.ContainsKey("Description")){
+            accountDescriptionInput.text = accountEditorContainer.documentModel.GetData("Description");
+        }
 
-            countryInput.text = addressesModel.GetData("Country");
-            postalCodeInput.text = addressesModel.GetData("PostalCode");
-            cityInput.text = addressesModel.GetData("City");
-            streetInput.text = addressesModel.GetData("Street");
+        if (accountEditorContainer.documentModel.ContainsKey("Country")){
+            countryInput.text = accountEditorContainer.documentModel.GetData("Country");
+        }
+
+        if (accountEditorContainer.documentModel.ContainsKey("PostalCode")){
+            postalCodeInput.text = accountEditorContainer.documentModel.GetData("PostalCode");
+        }
+
+        if (accountEditorContainer.documentModel.ContainsKey("City")){
+            cityInput.text = accountEditorContainer.documentModel.GetData("City");
+        }
+
+        if (accountEditorContainer.documentModel.ContainsKey("Street")){
+            streetInput.text = accountEditorContainer.documentModel.GetData("Street");
         }
 
         if (accountEditorContainer.documentModel.ContainsKey("CompanyName")){
@@ -80,18 +92,17 @@ DocumentBase {
         let description = accountDescriptionInput.text;
         accountEditorContainer.documentModel.SetData("Description", description)
 
-        let adressesModel = accountEditorContainer.documentModel.AddTreeModel("Addresses");
         let country = countryInput.text;
-        adressesModel.SetData("Country", country)
+        accountEditorContainer.documentModel.SetData("Country", country)
 
         let postalCode = postalCodeInput.text;
-        adressesModel.SetData("PostalCode", postalCode)
+        accountEditorContainer.documentModel.SetData("PostalCode", postalCode)
 
         let city = cityInput.text;
-        adressesModel.SetData("City", city)
+        accountEditorContainer.documentModel.SetData("City", city)
 
         let street = streetInput.text;
-        adressesModel.SetData("Street", street)
+        accountEditorContainer.documentModel.SetData("Street", street)
 
         let companyName = companyNameInput.text;
         accountEditorContainer.documentModel.SetData("CompanyName", companyName)
@@ -159,9 +170,11 @@ DocumentBase {
                 height: accountEditorContainer.textInputHeight;
                 width: bodyColumn.width;
 
+                placeHolderText: qsTr("Enter the account name");
+
                 onEditingFinished: {
                     let oldText = accountEditorContainer.documentModel.GetData("Name");
-                    if (oldText != accountNameInput.text){
+                    if (oldText && oldText !== accountNameInput.text || !oldText && accountNameInput.text !== ""){
                         accountEditorContainer.updateModel();
                     }
                 }
@@ -185,10 +198,12 @@ DocumentBase {
                 height: accountEditorContainer.textInputHeight;
                 width: bodyColumn.width;
 
+                placeHolderText: qsTr("Enter the account description");
+
                 onEditingFinished: {
                     console.log("accountDescriptionInput");
                     let oldText = documentModel.GetData("Description");
-                    if (oldText != accountDescriptionInput.text){
+                    if (oldText && oldText !== accountDescriptionInput.text || !oldText && accountDescriptionInput.text !== ""){
                         accountEditorContainer.updateModel();
                     }
                 }
@@ -248,10 +263,12 @@ DocumentBase {
 
                         textInputValidator: mailValid;
 
+                        placeHolderText: qsTr("Enter the email");
+
                         onEditingFinished: {
                             console.log("emailInput");
                             let oldText = accountEditorContainer.documentModel.GetData("Email");
-                            if (oldText != emailInput.text){
+                            if (oldText && oldText !== emailInput.text || !oldText && emailInput.text !== ""){
                                 accountEditorContainer.updateModel();
                             }
                         }
@@ -275,10 +292,12 @@ DocumentBase {
                         height: accountEditorContainer.textInputHeight;
                         width: accountOwnerBlock.width;
 
+                        placeHolderText: qsTr("Enter the company name");
+
                         onEditingFinished: {
                             console.log("companyNameInput");
                             let oldText = accountEditorContainer.documentModel.GetData("CompanyName");
-                            if (oldText != companyNameInput.text){
+                            if (oldText && oldText !== companyNameInput.text || !oldText && companyNameInput.text !== ""){
                                 accountEditorContainer.updateModel();
                             }
                         }
@@ -334,10 +353,11 @@ DocumentBase {
                         height: accountEditorContainer.textInputHeight;
                         width: companyAddressBlock.width;
 
+                        placeHolderText: qsTr("Enter the country");
+
                         onEditingFinished: {
-                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
-                            let oldText = addresses.GetData("Country");
-                            if (oldText != countryInput.text){
+                            let oldText = accountEditorContainer.documentModel.GetData("Country");
+                            if (oldText && oldText !== countryInput.text || !oldText && countryInput.text !== ""){
                                 accountEditorContainer.updateModel();
                             }
                         }
@@ -359,10 +379,11 @@ DocumentBase {
                         height: accountEditorContainer.textInputHeight;
                         width: companyAddressBlock.width;
 
+                        placeHolderText: qsTr("Enter the city");
+
                         onEditingFinished: {
-                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
-                            let oldText = addresses.GetData("City");
-                            if (oldText != cityInput.text){
+                            let oldText = accountEditorContainer.documentModel.GetData("City");
+                            if (oldText && oldText !== cityInput.text || !oldText && cityInput.text !== ""){
                                 accountEditorContainer.updateModel();
                             }
                         }
@@ -384,10 +405,11 @@ DocumentBase {
                         height: accountEditorContainer.textInputHeight;
                         width: companyAddressBlock.width;
 
+                        placeHolderText: qsTr("Enter the postal code");
+
                         onEditingFinished: {
-                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
-                            let oldText = addresses.GetData("PostalCode");
-                            if (oldText != postalCodeInput.text){
+                            let oldText = accountEditorContainer.documentModel.GetData("PostalCode");
+                            if (oldText && oldText !== postalCodeInput.text || !oldText && postalCodeInput.text !== ""){
                                 accountEditorContainer.updateModel();
                             }
                         }
@@ -408,10 +430,11 @@ DocumentBase {
                         height: accountEditorContainer.textInputHeight;
                         width: companyAddressBlock.width;
 
+                        placeHolderText: qsTr("Enter the street");
+
                         onEditingFinished: {
-                            let addresses = accountEditorContainer.documentModel.GetData("Addresses");
-                            let oldText = addresses.GetData("Street");
-                            if (oldText != streetInput.text){
+                            let oldText = accountEditorContainer.documentModel.GetData("Street");
+                            if (oldText && oldText !== streetInput.text || !oldText && streetInput.text !== ""){
                                 accountEditorContainer.updateModel();
                             }
                         }

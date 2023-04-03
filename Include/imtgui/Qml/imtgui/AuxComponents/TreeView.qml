@@ -7,11 +7,38 @@ AuxTable {
     property int basePadding: 30;
 
     function collapse(index){
+        console.log("collapse", index);
+        let uuid = treeView.elements.GetData("Uuid", index);
 
+        let indexes = []
+        treeView.getChildrenIndexes(uuid, indexes);
+
+        for (let i = 0; i < indexes.length; i++){
+            treeView.elements.SetData("Visible", false, indexes[i]);
+        }
     }
 
     function expand(index){
+        console.log("expand", index);
+        let uuid = treeView.elements.GetData("Uuid", index);
 
+        let indexes = []
+        treeView.getChildrenIndexes(uuid, indexes);
+
+        for (let i = 0; i < indexes.length; i++){
+            treeView.elements.SetData("Visible", true, indexes[i]);
+        }
+    }
+
+    function getChildrenIndexes(uuid, retVal){
+        for (let i = 0; i < treeView.elements.GetItemsCount(); i++){
+            let parentUuid = treeView.elements.GetData("Parent", i);
+            if (parentUuid === uuid){
+                retVal.push(i)
+                let currentUuid = treeView.elements.GetData("Uuid", i);
+                treeView.getChildrenIndexes(currentUuid, retVal);
+            }
+        }
     }
 
     delegate: TreeDelegate {
@@ -19,7 +46,7 @@ AuxTable {
 
         x: treeDelegate.depth * treeView.basePadding
 
-        height: treeView.itemHeight;
+        height: treeDelegate.visible ? treeView.itemHeight : 0;
 
         basePadding: treeView.basePadding;
         width: treeView.width - x;

@@ -84,13 +84,14 @@ Item {
                     console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
                     console.log("model.PageId", model.Id)
                     if (pagesLoader.item){
-                        pagesLoader.item.mainDocumentManager = container.documentManager;
+                        if (pagesLoader.item.mainDocumentManager !== undefined){
+                            pagesLoader.item.mainDocumentManager = container.documentManager;
+                        }
+
                         pagesLoader.item.startPageObj = {"Id": model.Id,
                                                          "Name": model.Name,
                                                          "Source": model.StartItem,
                                                          "CommandsId": model.Id};
-
-
                     }
                 }
             }

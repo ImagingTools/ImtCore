@@ -160,6 +160,8 @@ Item {
             property real minWidth: 1000000;
             property bool headersCompl: false;
 
+            sortController: sortCont;
+
             onSelectItem: {
                 collectionViewBaseContainer.selectedItem(idSelected, name);
             }
@@ -198,17 +200,16 @@ Item {
     }
 
     SortController {
-        id: sortController;
+        id: sortCont;
 
-        collectionView: collectionViewBaseContainer;
         commands: baseCommands;
 
         Component.onCompleted: {
-            tableInternal.headerClicked.connect(sortController.headerClicked);
+            tableInternal.headerClicked.connect(sortCont.headerClicked);
         }
 
         Component.onDestruction: {
-            tableInternal.headerClicked.disconnect(sortController.headerClicked);
+            tableInternal.headerClicked.disconnect(sortCont.headerClicked);
         }
     }
 
@@ -217,7 +218,7 @@ Item {
 
         Component.onCompleted: {
             modelFilterObj.AddTreeModel("FilterIds");
-            sortController.sortModel = modelFilterObj.AddTreeModel("Sort");
+            sortCont.sortModel = modelFilterObj.AddTreeModel("Sort");
         }
     }
 
@@ -252,10 +253,12 @@ Item {
 
         onHeadersChanged: {
             console.log("onHeadersChanged", baseCommands.headers)
-            if (baseCommands.headers.GetItemsCount() > 0 && sortController.isEmpty()){
+            if (baseCommands.headers.GetItemsCount() > 0 && sortCont.isEmpty()){
                 let headerId = baseCommands.headers.GetData("Id");
 
-                sortController.setHeaderSort(headerId, "ASC");
+                sortCont.currentHeaderId = headerId;
+
+                sortCont.setHeaderSort(headerId, "ASC");
             }
 
             tableInternal.headers = baseCommands.headers;

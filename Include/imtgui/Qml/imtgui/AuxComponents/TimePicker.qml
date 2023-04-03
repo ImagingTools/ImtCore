@@ -36,7 +36,6 @@ Item {
         return result;
     }
 
-
     function setHours(hour){
         hours.setValue(hour);
     }

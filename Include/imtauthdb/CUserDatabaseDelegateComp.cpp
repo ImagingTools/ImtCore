@@ -55,7 +55,7 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 		userPtr->SetMail(mail);
 	}
 
-	QByteArray selectUserPermissions = QString("SELECT * from \"UserPermissions\" WHERE \"UserId\" = '%1'").arg(qPrintable(userId)).toUtf8();
+	QByteArray selectUserPermissions = QString("SELECT * FROM \"UserPermissions\" WHERE \"UserId\" = '%1'").arg(qPrintable(userId)).toUtf8();
 
 	QSqlError error;
 	QSqlQuery userPermissionsQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectUserPermissions, &error);
@@ -75,7 +75,7 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 
 	userPtr->SetLocalPermissions(permissionsIds);
 
-	QByteArray selectUserRoles = QString("SELECT * from \"UserRoles\" WHERE \"UserId\" = '%1'").arg(qPrintable(userId)).toUtf8();
+	QByteArray selectUserRoles = QString("SELECT * FROM \"UserRoles\" WHERE \"UserId\" = '%1'").arg(qPrintable(userId)).toUtf8();
 
 	QSqlQuery userRolesQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectUserRoles, &error);
 
@@ -223,7 +223,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray newUserPasswordHash = newUserPtr->GetPasswordHash();
 	QString newMail = newUserPtr->GetMail();
 
-	QByteArray retVal = QString("UPDATE \"Users\" SET \"UserId\" ='%1', \"Password\" = '%2', \"Name\" = '%3', Email = '%4', \"Description\" = '%5', \"LastModified\" = '%6' WHERE \"UserId\" ='%7';")
+	QByteArray retVal = QString("UPDATE \"Users\" SET \"UserId\" ='%1', \"Password\" = '%2', \"Name\" = '%3', \"Email\" = '%4', \"Description\" = '%5', \"LastModified\" = '%6' WHERE \"UserId\" ='%7';")
 			.arg(qPrintable(newUserId))
 			.arg(qPrintable(newUserPasswordHash))
 			.arg(qPrintable(newName))

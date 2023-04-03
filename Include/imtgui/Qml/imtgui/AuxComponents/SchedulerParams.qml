@@ -13,25 +13,6 @@ Item {
 
     property var itemData: model;
 
-//    Component.onCompleted: {
-//        console.log("root onCompleted");
-
-//        let seconds = Number(model.Interval);
-//        console.log("seconds", seconds);
-//        var d = Math.floor(seconds / (3600*24));
-//        console.log("d", d);
-
-//        if (d === 1){
-//            comboBox.currentIndex = 0;
-//        }
-//        else if (d === 7){
-//            comboBox.currentIndex = 1;
-//        }
-//        else if (d === 30){
-//            comboBox.currentIndex = 2;
-//        }
-//    }
-
     function secondsToDhms(seconds) {
         seconds = Number(seconds);
         var d = Math.floor(seconds / (3600*24));
@@ -64,7 +45,11 @@ Item {
             id: timePicker;
 
             onTimeChanged: {
-                console.log("onIntervalChanged");
+                console.log("onTimeChanged");
+                if (timePicker.ignoringChanging){
+                    return;
+                }
+
                 let hours = timePicker.hours;
                 let minutes = timePicker.minutes;
 
@@ -76,11 +61,20 @@ Item {
                 var datestring = ("0" + d.getDate()).slice(-2) + "-" + ("0"+(d.getMonth()+1)).slice(-2) + "-" +
                         d.getFullYear() + " " + ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
 
-                model.StartTime = datestring;
+                console.log("model.StartTime", model.StartTime);
+                console.log("datestring", datestring);
+
+                if (model.StartTime !== datestring){
+                    console.log("model.StartTime = ", datestring);
+                    model.StartTime = datestring;
+                }
             }
+
+            property bool ignoringChanging: false;
 
             onAllCompletedChanged: {
                 if (timePicker.allCompleted){
+                    console.log("onAllCompletedChanged");
                     if (model.StartTime !== ""){
                         let dateTime = model.StartTime;
 
@@ -91,7 +85,13 @@ Item {
                         let hours = Number(time.split(':')[0])
                         let minutes = Number(time.split(':')[1])
 
+                        console.log("hours");
+                        console.log("minutes");
+
+                        timePicker.ignoringChanging = true;
                         timePicker.setHours(hours);
+                        timePicker.ignoringChanging = false;
+
                         timePicker.setMinutes(minutes);
                     }
                 }
@@ -138,26 +138,33 @@ Item {
             textCentered: false;
 
             onCurrentIndexChanged: {
+                console.log("onCurrentIndexChanged", itemData.Interval);
                 if (comboBox.currentIndex >= 0){
                     let id = comboBox.model.GetData("Id", comboBox.currentIndex);
                     let secondsInHour = 3600;
 
+                    let newInterval = -1;
                     if (id === "Day"){
-                        itemData.Interval = 24 * secondsInHour;
+                        newInterval = 24 * secondsInHour;
                     }
                     else if (id === "Week"){
-                        itemData.Interval = 24 * secondsInHour * 7;
+                        newInterval = 24 * secondsInHour * 7;
                     }
                     else if (id === "Month"){
-                        itemData.Interval = 24 * secondsInHour * 30;
+                        newInterval = 24 * secondsInHour * 30;
                     }
 
                     console.log("itemData.Interval", itemData.Interval);
+                    console.log("newInterval", newInterval);
+
+                    if (newInterval !== -1 && itemData.Interval !== newInterval){
+                        console.log("itemData.Interval = ", newInterval);
+                        itemData.Interval = newInterval;
+                    }
                 }
             }
 
             onModelChanged: {
-
                 let seconds = Number(itemData.Interval);
                 console.log("seconds", seconds);
                 var d = Math.floor(seconds / (3600*24));
@@ -174,25 +181,5 @@ Item {
                 }
             }
         }
-
-        //        TimeIntervalPicker {
-        //            id: timeIntervalPicker;
-
-        //            onTimeChanged: {
-        //                console.log("onIntervalChanged");
-        //                let seconds = timeIntervalPicker.getInSeconds();
-        //                console.log("seconds", seconds);
-
-        //                model.Interval = seconds;
-        //            }
-
-        //            onAllCompletedChanged: {
-        //                let data = root.secondsToDhms(model.Interval);
-
-        //                timeIntervalPicker.setDays(data['d']);
-        //                timeIntervalPicker.setHours(data['h']);
-        //                timeIntervalPicker.setMinutes(data['m']);
-        //            }
-        //        }
     }
 }

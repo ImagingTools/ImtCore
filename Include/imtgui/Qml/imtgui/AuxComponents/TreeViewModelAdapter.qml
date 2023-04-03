@@ -31,6 +31,32 @@ Item {
         return treeItemModel;
     }
 
+    function addNewItemToModel(model, parameters, index, parentIndex){
+        let uuid = uuidGenerator.generateUUID();
+
+        model.InsertNewItem(index);
+        model.SetData("Uuid", uuid, index);
+        model.SetData("Visible", true, index);
+        model.SetData("Active", true, index);
+        model.SetData("HasChildren", false, index);
+
+        let keys = Object.keys(parameters);
+        for (let i = 0; i < keys.length; i++){
+            model.SetData(keys[i], parameters[keys[i]], index);
+        }
+
+        let parentUuid = "";
+        let depth = 0;
+        if (parentIndex >= 0){
+            parentUuid = model.GetData("Uuid", parentIndex);
+            let parentDepth = model.GetData("Depth", parentIndex);
+            depth = parentDepth + 1;
+        }
+
+        model.SetData("Parent", parentUuid, index);
+        model.SetData("Depth", depth, index);
+    }
+
     function toAdaptedModelRecursive(adaptedModel, treeItemModel, parentUuid, depth){
         for (let i = 0; i < treeItemModel.GetItemsCount(); i++){
             let index = adaptedModel.InsertNewItem();

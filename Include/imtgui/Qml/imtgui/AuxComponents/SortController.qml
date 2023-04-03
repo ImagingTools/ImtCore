@@ -5,24 +5,17 @@ import imtgui 1.0
 Item {
     id: container;
 
-    property var collectionView;
     property var commands;
 
     property TreeItemModel sortModel: TreeItemModel {}
 
+    property string currentHeaderId: "";
+    property string currentOrder: "ASC";
+
     function headerClicked(headerId){
         console.log("headerClicked", headerId, sortModel.toJSON());
 
-        let currentHeaderId = container.sortModel.GetData("HeaderId");
-        let currentSortOrder = container.sortModel.GetData("SortOrder");
-
-        let order = "ASC";
-
-        if (currentHeaderId === headerId){
-            order = currentSortOrder === "ASC" ? "DESC" : "ASC";
-        }
-
-        container.setHeaderSort(headerId, order);
+        container.setHeaderSort(currentHeaderId, currentOrder);
         container.commands.updateItemsModel();
     }
 

@@ -52,15 +52,10 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 			dataModel->SetData("Description", accountDescription);
 			dataModel->SetData("Email", mail);
 			dataModel->SetData("CompanyName", companyName);
-
-			imtbase::CTreeItemModel* addressesModel = new imtbase::CTreeItemModel();
-
-			addressesModel->SetData("Country", country);
-			addressesModel->SetData("City", city);
-			addressesModel->SetData("PostalCode", postalCode);
-			addressesModel->SetData("Street", street);
-
-			dataModel->SetExternTreeModel("Addresses", addressesModel);
+			dataModel->SetData("Country", country);
+			dataModel->SetData("City", city);
+			dataModel->SetData("PostalCode", postalCode);
+			dataModel->SetData("Street", street);
 		}
 	}
 
@@ -122,32 +117,28 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			companyInfoPtr->SetCompanyName(companyName);
 		}
 
-		if (itemModel.ContainsKey("Addresses")){
-			imtauth::CAddress address;
-			imtbase::CTreeItemModel* addressModel = itemModel.GetTreeItemModel("Addresses");
-
-			if (addressModel->ContainsKey("Country")){
-				QString country = addressModel->GetData("Country").toString();
-				address.SetCountry(country);
-			}
-
-			if (addressModel->ContainsKey("City")){
-				QString city = addressModel->GetData("City").toString();
-				address.SetCity(city);
-			}
-
-			if (addressModel->ContainsKey("PostalCode")){
-				int postalCode = addressModel->GetData("PostalCode").toInt();
-				address.SetPostalCode(postalCode);
-			}
-
-			if (addressModel->ContainsKey("Street")){
-				QString street = addressModel->GetData("Street").toString();
-				address.SetStreet(street);
-			}
-
-			companyInfoPtr->SetAddress(address);
+		imtauth::CAddress address;
+		if (itemModel.ContainsKey("Country")){
+			QString country = itemModel.GetData("Country").toString();
+			address.SetCountry(country);
 		}
+
+		if (itemModel.ContainsKey("City")){
+			QString city = itemModel.GetData("City").toString();
+			address.SetCity(city);
+		}
+
+		if (itemModel.ContainsKey("PostalCode")){
+			int postalCode = itemModel.GetData("PostalCode").toInt();
+			address.SetPostalCode(postalCode);
+		}
+
+		if (itemModel.ContainsKey("Street")){
+			QString street = itemModel.GetData("Street").toString();
+			address.SetStreet(street);
+		}
+
+		companyInfoPtr->SetAddress(address);
 
 		return companyInfoPtr.PopPtr();
 	}

@@ -33,7 +33,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 		packageName = record.value("Name").toString();
 	}
 
-	QByteArray query = QString("SELECT * from \"Features\" WHERE PackageId = '%1'").arg(qPrintable(packageId)).toUtf8();
+	QByteArray query = QString("SELECT * FROM \"Features\" WHERE \"PackageId\" = '%1'").arg(qPrintable(packageId)).toUtf8();
 
 	QSqlError error;
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &error);
@@ -66,7 +66,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 		featureInfoPtr->SetFeatureName(featureName);
 		featureInfoPtr->SetOptional(isOptional);
 
-		QByteArray dependenciesQuery = QString("SELECT DependencyId FROM \"FeatureDependencies\" WHERE FeatureId = '%1'").arg(qPrintable(featureId)).toUtf8();
+		QByteArray dependenciesQuery = QString("SELECT \"DependencyId\" FROM \"FeatureDependencies\" WHERE \"FeatureId\" = '%1'").arg(qPrintable(featureId)).toUtf8();
 		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
 
 		QByteArrayList featureDependencies;
@@ -85,7 +85,7 @@ istd::IChangeable* CFeaturePackageDatabaseDelegateComp::CreateObjectFromRecord(c
 			featurePackagePtr->SetFeatureDependencies(featureId, featureDependencies);
 		}
 
-		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE ParentId = '%1'").arg(qPrintable(featureId)).toUtf8();
+		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE \"ParentId\" = '%1'").arg(qPrintable(featureId)).toUtf8();
 
 		CreateSubFeaturesFromRecord(featurePackagePtr.GetPtr(), featureInfoPtr, subFeaturesQuery);
 
@@ -144,7 +144,7 @@ void CFeaturePackageDatabaseDelegateComp::CreateSubFeaturesFromRecord(
 			parentFeatureId = subFeaturesRecord.value("ParentId").toByteArray();
 		}
 
-		QByteArray dependenciesQuery = QString("SELECT DependencyId FROM \"FeatureDependencies\" WHERE FeatureId = '%1'").arg(qPrintable(subFeatureId)).toUtf8();
+		QByteArray dependenciesQuery = QString("SELECT \"DependencyId\" FROM \"FeatureDependencies\" WHERE \"FeatureId\" = '%1'").arg(qPrintable(subFeatureId)).toUtf8();
 		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
 
 		QByteArrayList featureDependencies;
@@ -163,7 +163,7 @@ void CFeaturePackageDatabaseDelegateComp::CreateSubFeaturesFromRecord(
 			featurePackagePtr->SetFeatureDependencies(subFeatureId, featureDependencies);
 		}
 
-		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE ParentId = '%1';").arg(qPrintable(subFeatureId)).toUtf8();
+		QByteArray subFeaturesQuery = QString("SELECT * FROM \"Features\" WHERE \"ParentId\" = '%1';").arg(qPrintable(subFeatureId)).toUtf8();
 
 		CreateSubFeaturesFromRecord(featurePackagePtr, subFeatureInfoPtr, subFeaturesQuery);
 	}
@@ -187,7 +187,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 
 		NewObjectQuery retVal;
 
-		retVal.query = QString("INSERT INTO \"Packages\"(Id, Name, Description, Added, LastModified) VALUES('%1', '%2', '%3', '%4', '%5');")
+		retVal.query = QString("INSERT INTO \"Packages\"(\"Id\", \"Name\", \"Description\", \"Added\", \"LastModified\") VALUES('%1', '%2', '%3', '%4', '%5');")
 				.arg(qPrintable(packageId))
 				.arg(objectName)
 				.arg(objectDescription)
@@ -208,7 +208,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 				QString featureDescription = featurePackagePtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 				retVal.query += "\n" +
-						QString("INSERT INTO \"Features\"(Id, Name, Description, PackageId, Optional) VALUES('%1', '%2', '%3', '%4', '%5');")
+						QString("INSERT INTO \"Features\"(\"Id\", \"Name\", \"Description\", \"PackageId\", \"Optional\") VALUES('%1', '%2', '%3', '%4', '%5');")
 						.arg(qPrintable(featureId))
 						.arg(featureName)
 						.arg(featureDescription)
@@ -221,7 +221,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 				if (dependsIds.size() > 0){
 					for (const QByteArray& dependFeatureId : dependsIds){
 						retVal.query += "\n" +
-								QString("INSERT INTO \"FeatureDependencies\"(featureid, dependencyid) VALUES('%1', '%2');")
+								QString("INSERT INTO \"FeatureDependencies\"(\"FeatureId\", \"DependencyId\") VALUES('%1', '%2');")
 								.arg(qPrintable(featureId))
 								.arg(qPrintable(dependFeatureId))
 								.toLocal8Bit();
@@ -250,7 +250,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
 		if (featurePackagePtr != nullptr){
 			packageId = featurePackagePtr->GetPackageId();
 			if (!packageId.isEmpty()){
-				QByteArray retVal = "\n" + QString("DELETE FROM \"Packages\" WHERE Id = '%1';").arg(qPrintable(packageId)).toLocal8Bit();
+				QByteArray retVal = "\n" + QString("DELETE FROM \"Packages\" WHERE \"Id\" = '%1';").arg(qPrintable(packageId)).toLocal8Bit();
 
 				return retVal;
 			}
@@ -282,7 +282,7 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
 		QString featureDescription = featurePackagePtr->GetFeatureList().GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 		retVal += "\n" +
-				QString("INSERT INTO \"Features\"(Id, Name, Description, ParentId, Optional) VALUES('%1', '%2', '%3', '%4', '%5');")
+				QString("INSERT INTO \"Features\"(\"Id\", \"Name\", \"Description\", \"ParentId\", \"Optional\") VALUES('%1', '%2', '%3', '%4', '%5');")
 				.arg(qPrintable(featureId))
 				.arg(featureName)
 				.arg(featureDescription)
@@ -317,7 +317,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 	QByteArray oldPackageId = oldObjectPtr->GetPackageId();
 	QByteArray newPackageId = newObjectPtr->GetPackageId();
 
-	QByteArray retVal = QString("UPDATE \"Packages\" SET Id ='%1', LastModified = '%2' WHERE Id ='%3';")
+	QByteArray retVal = QString("UPDATE \"Packages\" SET \"Id\" = '%1', \"LastModified\" = '%2' WHERE \"Id\" ='%3';")
 			.arg(qPrintable(newPackageId))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(oldPackageId))
@@ -342,7 +342,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 			retVal += "\n" +
-					QString("INSERT INTO \"Features\" (Id, Name, Description, PackageId, Optional) VALUES('%1', '%2', '%3', '%4', '%5');")
+					QString("INSERT INTO \"Features\" (\"Id\", \"Name\", \"Description\", \"PackageId\", \"Optional\") VALUES('%1', '%2', '%3', '%4', '%5');")
 					.arg(qPrintable(addFeatureId))
 					.arg(featureName)
 					.arg(featureDescription)
@@ -356,7 +356,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 	// Delete removed features to the package:
 	for (const QByteArray& removedFeatureId : removedFeatures){
 		retVal += "\n" +
-				QString("DELETE FROM \"Features\" WHERE Id = '%1' AND PackageId = '%2';")
+				QString("DELETE FROM \"Features\" WHERE \"Id\" = '%1' AND \"PackageId\" = '%2';")
 				.arg(qPrintable(removedFeatureId))
 				.arg(qPrintable(newPackageId)).toLocal8Bit();
 	}
@@ -372,7 +372,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 			bool isOptional = featureInfoPtr->IsOptional();
 
-			retVal += QString("\nUPDATE \"Features\" SET Id = '%1', Name = '%2', Description = '%3', PackageId = '%4', Optional = '%5' WHERE PackageId = '%6' AND Id = '%7';")
+			retVal += QString("\nUPDATE \"Features\" SET \"Id\" = '%1', \"Name\" = '%2', \"Description\" = '%3', \"PackageId\" = '%4', \"Optional\" = '%5' WHERE \"PackageId\" = '%6' AND \"Id\" = '%7';")
 					.arg(qPrintable(updatedFeatureId))
 					.arg(featureName)
 					.arg(featureDescription)
@@ -381,7 +381,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(newPackageId))
 					.arg(qPrintable(updatedFeatureId)).toLocal8Bit();
 
-			retVal += QString("\nDELETE FROM \"Features\" WHERE ParentId = '%1';").arg(qPrintable(updatedFeatureId)).toLocal8Bit();
+			retVal += QString("\nDELETE FROM \"Features\" WHERE \"ParentId\" = '%1';").arg(qPrintable(updatedFeatureId)).toLocal8Bit();
 
 			CreateInsertSubFeaturesQuery(newObjectPtr, featureInfoPtr, retVal);
 		}
@@ -396,13 +396,13 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(featureId);
 
 			retVal += "\n" +
-					QString("DELETE FROM \"FeatureDependencies\" WHERE featureid = '%1';")
+					QString("DELETE FROM \"FeatureDependencies\" WHERE \"FeatureId\" = '%1';")
 					.arg(qPrintable(featureId))
 					.toLocal8Bit();
 
 			for (const QByteArray& dependFeatureId : dependsIds){
 				retVal += "\n" +
-						QString("INSERT INTO \"FeatureDependencies\" (featureid, dependencyid) VALUES('%1', '%2');")
+						QString("INSERT INTO \"FeatureDependencies\" (\"FeatureId\", \"DependencyId\") VALUES('%1', '%2');")
 						.arg(qPrintable(featureId))
 						.arg(qPrintable(dependFeatureId))
 						.toLocal8Bit();
@@ -411,14 +411,14 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			QByteArrayList subFeatureIds = featureInfoPtr->GetSubFeatureIds();
 			for (const QByteArray& subFeatureId : subFeatureIds){
 				retVal += "\n" +
-						QString("DELETE FROM \"FeatureDependencies\" WHERE featureid = '%1';")
+						QString("DELETE FROM \"FeatureDependencies\" WHERE \"FeatureId\" = '%1';")
 						.arg(qPrintable(subFeatureId))
 						.toLocal8Bit();
 
 				QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(subFeatureId);
 				for (const QByteArray& dependFeatureId : dependsIds){
 					retVal += "\n" +
-							QString("INSERT INTO \"FeatureDependencies\" (featureid, dependencyid) VALUES('%1', '%2');")
+							QString("INSERT INTO \"FeatureDependencies\" (\"FeatureId\", \"DependencyId\") VALUES('%1', '%2');")
 							.arg(qPrintable(subFeatureId))
 							.arg(qPrintable(dependFeatureId))
 							.toLocal8Bit();
@@ -454,7 +454,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 
 	QByteArray packageId = currentPackagePtr->GetPackageId();
 
-	QByteArray retVal = QString("UPDATE \"Packages\" SET Name = '%1', LastModified = '%2' WHERE Id ='%3';")
+	QByteArray retVal = QString("UPDATE \"Packages\" SET \"Name\" = '%1', \"LastModified\" = '%2' WHERE \"Id\" ='%3';")
 			.arg(newObjectName)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(packageId)).toLocal8Bit();
@@ -478,7 +478,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE \"Packages\" SET Description = '%1', LastModified = '%2' WHERE Id ='%3';")
+	QByteArray retVal = QString("UPDATE \"Packages\" SET \"Description\" = '%1', \"LastModified\" = '%2' WHERE \"Id\" ='%3';")
 			.arg(description)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(packagePtr->GetPackageId())).toLocal8Bit();

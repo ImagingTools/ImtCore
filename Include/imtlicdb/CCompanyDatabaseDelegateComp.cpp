@@ -124,7 +124,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CCompanyDatabaseDelegateComp::Cre
 
 	NewObjectQuery retVal;
 
-	retVal.query = QString("INSERT INTO \"Accounts\" (Id, Name, Description, Mail, CompanyName, Country, City, PostalCode, Street) VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9');")
+	retVal.query = QString("INSERT INTO \"Accounts\" (\"Id\", \"Name\", \"Description\", \"Mail\", \"CompanyName\", \"Country\", \"City\", \"PostalCode\", \"Street\") VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7', '%8', '%9');")
 			.arg(qPrintable(accountId))
 			.arg(accountName)
 			.arg(companyDescription)
@@ -153,7 +153,7 @@ QByteArray CCompanyDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray retVal = QString("DELETE FROM \"Accounts\" WHERE Id = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
+		QByteArray retVal = QString("DELETE FROM \"Accounts\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
 
 		return retVal;
 	}
@@ -193,7 +193,7 @@ QByteArray CCompanyDatabaseDelegateComp::CreateUpdateObjectQuery(
 	int postalCode = address.GetPostalCode();
 	QString street = address.GetStreet();
 
-	QByteArray retVal = QString("UPDATE \"Accounts\" SET Id ='%1', Name = '%2', Description = '%3', Mail = '%4', CompanyName = '%5', Country = '%6', City = '%7', PostalCode = '%8', Street = '%9' WHERE Id ='%10';")
+	QByteArray retVal = QString("UPDATE \"Accounts\" SET \"Id\" ='%1',\"Name\" = '%2', \"Description\" = '%3', \"Mail\" = '%4', \"CompanyName\" = '%5', \"Country\" = '%6', \"City\" = '%7', \"PostalCode\" = '%8', \"Street\" = '%9' WHERE \"Id\" ='%10';")
 			.arg(qPrintable(accountId))
 			.arg(accountName)
 			.arg(accountDescription)
@@ -230,7 +230,7 @@ QByteArray CCompanyDatabaseDelegateComp::CreateRenameObjectQuery(
 	}
 
 	QByteArray newId = newObjectName.toUtf8();
-	QByteArray retVal = QString("UPDATE \"Accounts\" SET Id = '%1', Name = '%2' WHERE Id = '%3';")
+	QByteArray retVal = QString("UPDATE \"Accounts\" SET \"Id\" = '%1', \"Name\" = '%2' WHERE \"Id\" = '%3';")
 			.arg(qPrintable(newId))
 			.arg(newObjectName)
 			.arg(qPrintable(objectId)).toLocal8Bit();
@@ -254,7 +254,7 @@ QByteArray CCompanyDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE \"Accounts\" SET Description = '%1' WHERE Id ='%2';").arg(description).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("UPDATE \"Accounts\" SET \"Description\" = '%1' WHERE \"Id\" ='%2';").arg(description).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -283,56 +283,6 @@ bool CCompanyDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord&
 	}
 
 	return false;
-
-//	if (record.contains("Name")){
-//		QString accountName = record.value("Name").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME, accountName);
-//	}
-
-//	if (record.contains("Description")){
-//		QString accountDescription = record.value("Description").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION, accountDescription);
-//	}
-
-//	if (record.contains("Mail")){
-//		QString mail = record.value("Mail").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL, mail);
-//	}
-
-//	if (record.contains("CompanyName")){
-//		QString companyName = record.value("CompanyName").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::ICompanyInfo::MIT_COMPANY_NAME, companyName);
-//	}
-
-//	if (record.contains("Country")){
-//		QString companyName = record.value("Country").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_COUNTRY, companyName);
-//	}
-
-//	if (record.contains("City")){
-//		QString city = record.value("City").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_CITY, city);
-//	}
-
-//	if (record.contains("PostalCode")){
-//		QString postalCode = record.value("PostalCode").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_POSTAL_CODE, postalCode);
-//	}
-
-//	if (record.contains("Street")){
-//		QString street = record.value("Street").toString();
-
-//		metaInfo.SetMetaInfo(imtauth::IAddress::MIT_STREET, street);
-//	}
-
-//	return true;
 }
 
 
