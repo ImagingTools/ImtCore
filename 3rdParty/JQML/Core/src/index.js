@@ -176,6 +176,27 @@ global.Core = {
     animations: {},
     queueCompleted: [],
     focusedElement: null,
+    languages: {},
+    // currentLanguage: 'ru',
+    XMLParser: new DOMParser(),
+    setLanguage(name){
+        if(this.languages[name]){
+            this.root.currentLanguage = 'ru'
+        } else {
+            let xhr = new XMLHttpRequest()
+            xhr.open('GET', `/lang/${name}`, false)
+            xhr.onload = ()=>{
+                if (xhr.readyState === XMLHttpRequest.DONE){
+                    let xml = this.XMLParser.parseFromString(xhr.responseText, 'text/xml')
+                    let dict = {}
+                    this.languages[name] = dict
+                    this.root.currentLanguage = name
+                }
+            }
+            xhr.send()
+        }
+        
+    },
     setFocus(item){
         if(this.focusedElement && item !== this.focusedElement) {
             this.focusedElement.focus = false
@@ -379,6 +400,8 @@ global.Core = {
         dom.classList.add('Item')
         document.body.appendChild(dom)
         root.$setDom(dom)
+
+        root.$cP('currentLanguage', 'ru')
 
         root.eventState = {
             target: null,

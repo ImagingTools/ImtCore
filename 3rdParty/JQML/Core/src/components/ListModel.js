@@ -53,7 +53,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
-                    listElement.$cP(key, dict[i][key])
+                    listElement.$cP(key, dict[i][key]).connect(this.$modelChanged.bind(this))
                 }
                 this.data.push(listElement)
             }
@@ -65,7 +65,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({})
                 listElement.$cP('index', this.data.length)
                 for(let key in dict){
-                    listElement.$cP(key, dict[key])
+                    listElement.$cP(key, dict[key]).connect(this.$modelChanged.bind(this))
                 }
                 this.data.push(listElement)
             }
@@ -97,7 +97,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
-                    listElement.$cP(key, dict[i][key])
+                    listElement.$cP(key, dict[i][key]).connect(this.$modelChanged.bind(this))
                 }
                 this.data.splice(index + i, 0, listElement)
             }
@@ -110,7 +110,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({})
                 listElement.$cP('index', index)
                 for(let key in dict){
-                    listElement.$cP(key, dict[key])
+                    listElement.$cP(key, dict[key]).connect(this.$modelChanged.bind(this))
                 }
                 this.data.splice(index, 0, listElement)
             }
