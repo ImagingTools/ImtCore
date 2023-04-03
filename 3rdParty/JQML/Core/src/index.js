@@ -414,7 +414,7 @@ global.Core = {
             },
         })
         Core.context.location.changeHref = (href)=>{
-            context.location.href = href
+            Core.context.location.href = href
         }
         Core.context.languages = {}
         Core.context.$cP('language', '', this.updateLanguage)
