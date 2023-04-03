@@ -203,7 +203,7 @@ global.Core = {
         
     },
     setFocus(item){
-        if(this.focusedElement && item !== this.focusedElement) {
+        if(this.focusedElement && this.focusedElement.UID && item !== this.focusedElement) {
             this.focusedElement.focus = false
         }
         this.focusedElement = item

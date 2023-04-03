@@ -8,6 +8,7 @@ export class Href extends QtObject  {
 
         this.$cP('url', '')
         this.$interval = setInterval(()=>{
+            if(this.url !== location.href)
             this.url = location.href
         }, 1000 / Core.FPS)
 
