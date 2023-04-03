@@ -313,8 +313,8 @@ export class Flickable extends Item {
 
 	$touchstart(e, state) {
 		e.preventDefault()
-		this.$velocityX = 0
-		this.$velocityY = 0
+		Core.velocityX = 0
+		Core.velocityY = 0
 		clearInterval(this.$scrollInterval)
 		if(this.enabled && this.interactive){
 			state.blocked(this)
@@ -330,26 +330,26 @@ export class Flickable extends Item {
 			this.$fillMouse(e)
 			this.$pressed = false
 			
-			if(this.$velocityX !== 0 || this.$velocityY !== 0){
+			if(Core.velocityX !== 0 || Core.velocityY !== 0){
 				
 				this.$scrollInterval = setInterval(() => {
-					this.$scroll(this.$velocityX, this.$velocityY)
-					if(Math.abs(this.$velocityX) < 0.5){
-						this.$velocityX = 0
-					} else if(this.$velocityX > 0){
-						this.$velocityX -= 0.1
-					} else if(this.$velocityX < 0){
-						this.$velocityX += 0.1
+					this.$scroll(Core.velocityX, Core.velocityY)
+					if(Math.abs(Core.velocityX) < 0.03){
+						Core.velocityX = 0
+					} else if(Core.velocityX > 0){
+						Core.velocityX -= 0.01
+					} else if(Core.velocityX < 0){
+						Core.velocityX += 0.01
 					}
-					if(Math.abs(this.$velocityY) < 0.5){
-						this.$velocityY = 0
-					} else if(this.$velocityY > 0){
-						this.$velocityY -= 0.1
-					} else if(this.$velocityY < 0){
-						this.$velocityY += 0.1
+					if(Math.abs(Core.velocityY) < 0.03){
+						Core.velocityY = 0
+					} else if(Core.velocityY > 0){
+						Core.velocityY -= 0.01
+					} else if(Core.velocityY < 0){
+						Core.velocityY += 0.01
 					}
-					if(this.$velocityX === 0 && this.$velocityY === 0) clearInterval(this.$scrollInterval)
-				}, 10);
+					if(Core.velocityX === 0 && Core.velocityY === 0) clearInterval(this.$scrollInterval)
+				}, 1);
 			}
 		}
 	}
@@ -361,8 +361,8 @@ export class Flickable extends Item {
 			this.$fillMouse(e)
 			deltaX -= this.$mouseX
 			deltaY -= this.$mouseY
-			this.$velocityX = deltaX / 2
-			this.$velocityY = deltaY / 2
+			Core.velocityX = deltaX / 5
+			Core.velocityY = deltaY / 5
 
 			
 			let tempContentX = this.contentX

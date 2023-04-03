@@ -255,7 +255,7 @@ export class MouseArea extends Item {
 	}
 	$touchstart(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val){
+		if(this.$p.enabled.val && Core.velocityX === 0 && Core.velocityY === 0){
 			if(!this.mouse.accepted) state.blocked(this)
 			this.$fillMouse(e)
 			this.pressed = true
