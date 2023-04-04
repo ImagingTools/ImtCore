@@ -29,10 +29,13 @@ Item {
     property bool endListStatus: false;
     property bool hiddenBackground: true;
     property bool canClose: true;
+    property bool preventFirstLoading: false;
 
     property alias modelFilterAlias: modelFilter;
 
     property int elementsCount;
+    property int pauseDuration: 500;
+
 
     onElementsCountChanged: {
         //console.log("__________ELEMENTS_COUNT____________",elementsCount);
@@ -80,16 +83,17 @@ Item {
         id: modelFilter;
     }
 
+
     Component.onCompleted: {
-        //console.log("_____________POPUP_COMPL_____________")
+        //console.log("_____________POPUP_COMPL_____________", popupMenuContainer.preventFirstLoading);
 
         modelFilter.AddTreeModel("FilterIds");
         modelFilter.SetData("FilterIds", popupMenuContainer.filterIdsModel)
         modelFilter.AddTreeModel("Sort");
-//        modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
 
-
-        itemsModel.updateModel(0);
+        if(!popupMenuContainer.preventFirstLoading){
+            itemsModel.updateModel(0);
+        }
     }
 
     Component.onDestruction: {
@@ -145,7 +149,9 @@ Item {
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
 
-        //onTextEdited:  {
+//        onTextEdited:  {
+//            console.log("______TEXT_EDITED______")
+//        }
             onTextChanged:  {
 
             if(popupMenuContainer.ready){
@@ -271,6 +277,7 @@ Item {
         id: itemsModel;
 
         function updateModel(offsetVar) {
+            //console.log("______UPDATE_MODEL_____");
             var query = Gql.GqlRequest("query", popupMenuContainer.commandId);
 
             var inputParams = Gql.GqlObject("input");

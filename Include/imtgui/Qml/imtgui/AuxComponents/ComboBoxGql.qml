@@ -28,6 +28,7 @@ Item {
     property bool canClose: true;
     property bool complexModel: false;
     property bool openST: false;
+    property bool preventFirstLoading: false;
 
     property int radius: 5;
     property int currentIndex: -1;
@@ -48,6 +49,8 @@ Item {
     property string fontColorTitle: fontColor;
     property bool keepFilterText: false;
     property bool inFocus: false;
+    property int pauseDuration: 500;
+
 
 
     // ID for display in combo box delegates
@@ -122,6 +125,8 @@ Item {
             textSize: comboBoxContainerGql.textSize;
             fontColor: comboBoxContainerGql.fontColor;
             canClose: comboBoxContainerGql.canClose;
+            preventFirstLoading: comboBoxContainerGql.preventFirstLoading;
+            pauseDuration: comboBoxContainerGql.pauseDuration;
 //            function getCurrentText(index){
 //                return popup.model.GetData("Name",index);
 //            }
