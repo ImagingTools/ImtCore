@@ -4,6 +4,7 @@
 // ACF includer
 #include <istd/TDelPtr.h>
 #include <iprm/CParamsSet.h>
+#include <iprm/CIdParam.h>
 #include <imod/TModelWrap.h>
 
 
@@ -94,6 +95,11 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 
 			paramsPtr->SetEditableParameter("UserInfo", userInfoParamPtr.PopPtr(), true);
 		}
+
+		istd::TDelPtr<iprm::IIdParam> languageIdParam = new iprm::CIdParam();
+		languageIdParam->SetId(gqlRequest.GetGqlContext()->GetLanguageId());
+
+		paramsPtr->SetEditableParameter("LanguageParam", languageIdParam.PopPtr(), true);
 	}
 
 	return paramsPtr.PopPtr();
