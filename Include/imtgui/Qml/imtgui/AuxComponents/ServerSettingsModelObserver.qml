@@ -11,7 +11,7 @@ TreeItemModelObserver {
     property Item root: null;
 
     onModelChanged: {
-        console.log("SettingsModelObserver onModelChanged");
+        console.log("ServerSettingsModelObserver onModelChanged");
         for (let i = 0; i < changeList.length; i++){
             let changeObj = changeList[i]
 
@@ -19,9 +19,10 @@ TreeItemModelObserver {
             let changeId = changeObj["id"];
 
             let ids = changeId.split('/')
-            console.log("ids", ids);
+            console.log("ServerSettingsModelObserver ids", ids);
 
             if (ids.includes("Language")){
+                console.log("ServerSettingsModelObserver Language", languageProvider.getLanguage());
 
                 context.language = languageProvider.getLanguage();
 
