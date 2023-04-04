@@ -70,6 +70,14 @@ export var Qt = {
         "tan":"#d2b48c","teal":"#008080","thistle":"#d8bfd8","tomato":"#ff6347","turquoise":"#40e0d0","violet":"#ee82ee","wheat":"#f5deb3","white":"#ffffff","whitesmoke":"#f5f5f5","yellow":"#ffff00","yellowgreen":"#9acd32"
     },
     $colorToRGBA(color){
+        if(!color){
+            return {
+                r: 255,
+                g: 255,
+                b: 255,
+                a: 0,
+            }
+        }
         let hexColor = '#ffffff'
         if(this.$colors[color]){
             hexColor = this.$colors[color]

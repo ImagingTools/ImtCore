@@ -83,6 +83,7 @@ export class TextInput extends Item {
                 if(this.$p.validator.val.validate(this.impl.value)){
                     this.text = this.impl.value
                     this.acceptableInput = true
+                    this.textEdited()
                 } else {
                     this.impl.value = this.$p.text.val
                     this.acceptableInput = false
@@ -90,6 +91,7 @@ export class TextInput extends Item {
             } else {
                 this.text = this.impl.value
                 this.acceptableInput = true
+                this.textEdited()
             }
 			
 		}.bind(this))

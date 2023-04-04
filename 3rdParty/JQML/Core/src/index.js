@@ -417,8 +417,8 @@ global.Core = {
             Core.context.location.href = href
         }
         Core.context.languages = {}
-        Core.context.$cP('language', '', this.updateLanguage)
-        Core.context.$cP('application', '', this.updateLanguage)
+        Core.context.$cP('language', '').connect(this.updateLanguage.bind(this))
+        Core.context.$cP('application', '').connect(this.updateLanguage.bind(this))
 
         let root = this.cC('Item', {parent: null})
         Core.root = root

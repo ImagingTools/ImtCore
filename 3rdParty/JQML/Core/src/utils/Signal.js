@@ -7,40 +7,60 @@ export function Signal(...args){
                 signal.context[names[i][k]] = args[k]
             }   
         }
+        let callList = []
         for(let key in signal.connections){
-
+            callList[signal.connections[key].index] = key
+        }
+        
+        for(let key of callList.sort()){
             try {
                 if(signal.connections[key]) {
                     Core.setGlobalContext(signal.context)
-                    signal.connections[key](...args)
+                    signal.connections[key].slot(...args)
                     Core.removeLastGlobalContext()
                 }
             } catch (error) {
                 console.error(`skip::signal::`,error)
                 Core.removeLastGlobalContext()
             }
-
         }
+        // for(let key in signal.connections){
+
+        //     try {
+        //         if(signal.connections[key]) {
+        //             Core.setGlobalContext(signal.context)
+        //             signal.connections[key].slot(...args)
+        //             Core.removeLastGlobalContext()
+        //         }
+        //     } catch (error) {
+        //         console.error(`skip::signal::`,error)
+        //         Core.removeLastGlobalContext()
+        //     }
+
+        // }
     }
-    signal.repeats = {}
+    signal.count = 0
     signal.context = {}
     signal.connections = {}
     signal.connect = (...args) => {
         let name = args.length === 1 ? args[0].name : args[1].name
-        let count = 0
-        while(signal.connections[name + count]){
-            count++
-        }
+
         switch(args.length){
-            case 1: signal.connections[name + count] = args[0]; break;
-            case 2: signal.connections[name + count] = args[1].bind(args[0]); break;
+            case 1: signal.connections[name + signal.count] = {slot: args[0], index: signal.count}; break;
+            case 2: signal.connections[name + signal.count] = {slot: args[1].bind(args[0]), index: signal.count}; break;
         }
+        signal.count++
+        return signal
+    }
+    signal.connectWithName = (name, slot) => {
+        signal.connections[name] = {slot: slot, index: signal.count};
+        signal.count++
         return signal
     }
     signal.disconnect = (...args) => {
         let find = false
         for(let key in signal.connections){
-            if(!find && signal.connections[key] === args[0]){
+            if(!find && signal.connections[key].slot === args[0]){
                 delete signal.connections[key]
                 find = true
             }

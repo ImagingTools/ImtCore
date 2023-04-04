@@ -350,7 +350,7 @@ export class QtObject {
         
     }
 
-    $cP(name, val, privilegedFunc = null){
+    $cP(name, val){
         if(typeof val === 'number'){
             if(isNaN(val)){
                 val = 0
@@ -412,7 +412,7 @@ export class QtObject {
                 if(caller && caller !== this.$p[name]){
                     let _caller = caller
                     if(_caller.type === 'alias'){
-                        signal.connections[_caller.PID] = ()=>{
+                        signal.connectWithName(_caller.PID, ()=>{
                             let val1 = _caller.func ? _caller.func() : _caller.val
                             let val2 = _caller.getter()
                             if(val1 !== _caller.val){
@@ -423,16 +423,16 @@ export class QtObject {
                                 _caller.val = val2
                                 _caller.signal()
                             }
-                        }
+                        })
                     } else {
                         _caller.depends.add(signal)
-                        signal.connections[_caller.PID] = ()=>{
+                        signal.connectWithName(_caller.PID, ()=>{
                             let val = _caller.func()
                             if(_caller.val !== val){
                                 _caller.val = val
                                 _caller.signal()
                             }
-                        }
+                        })
                     }
                 }
                 
@@ -466,7 +466,6 @@ export class QtObject {
                             }
                         } else {
                             this.$p[name].val = newVal
-                            if(privilegedFunc) privilegedFunc()
                             signal()
                         }
                         
@@ -504,7 +503,7 @@ export class QtObject {
                     if(caller && caller !== this.$p[`${name}.${name2}`]){
                         let _caller = caller
                         if(_caller.type === 'alias'){
-                            signal.connections[_caller.PID] = ()=>{
+                            signal.connectWithName(_caller.PID, ()=>{
                                 let val1 = _caller.func ? _caller.func() : _caller.val
                                 let val2 = _caller.getter()
                                 if(val1 !== _caller.val){
@@ -515,16 +514,16 @@ export class QtObject {
                                     _caller.val = val2
                                     _caller.signal()
                                 }
-                            }
+                            })
                         } else {
                             _caller.depends.add(signal)
-                            signal.connections[_caller.PID] = ()=>{
+                            signal.connectWithName(_caller.PID, ()=>{
                                 let val = _caller.func()
                                 if(_caller.val !== val){
                                     _caller.val = val
                                     _caller.signal()
                                 }
-                            }
+                            })
                         }
                     }
 
@@ -719,7 +718,7 @@ export class QtObject {
                 if(caller && caller !== this.$p[name]){
                     let _caller = caller
                     if(_caller.type === 'alias'){
-                        signal.connections[_caller.PID] = ()=>{
+                        signal.connectWithName(_caller.PID, ()=>{
                             let val1 = _caller.func ? _caller.func() : _caller.val
                             let val2 = _caller.getter()
                             if(val1 !== _caller.val){
@@ -730,16 +729,16 @@ export class QtObject {
                                 _caller.val = val2
                                 _caller.signal()
                             }
-                        }
+                        })
                     } else {
                         _caller.depends.add(signal)
-                        signal.connections[_caller.PID] = ()=>{
+                        signal.connectWithName(_caller.PID, ()=>{
                             let val = _caller.func()
                             if(_caller.val !== val){
                                 _caller.val = val
                                 _caller.signal()
                             }
-                        }
+                        })
                     }
                 }
                 
