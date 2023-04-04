@@ -135,6 +135,9 @@ Item {
         }
     }
 
+    function setTextFocus(focus){
+        filterField.setFocus(focus);
+    }
 
     CustomTextField {
         id: filterField;
