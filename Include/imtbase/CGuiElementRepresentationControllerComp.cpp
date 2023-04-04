@@ -3,8 +3,10 @@
 
 // ACF includes
 #include <iprm/TParamsPtr.h>
+#include <iprm/IIdParam.h>
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtauth/IUserInfo.h>
 #include <imtgui/IGuiElementContainer.h>
 
@@ -36,11 +38,18 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 
 	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
 
+
 	imtauth::IUserInfo::FeatureIds userPermissions;
 	bool isAdmin = true;
 	if (userInfoParamPtr.IsValid()){
 		userPermissions = userInfoParamPtr->GetPermissions();
 		isAdmin = userInfoParamPtr->IsAdmin();
+	}
+
+	iprm::TParamsPtr<iprm::IIdParam> languageParamPtr(paramsPtr, "LanguageParam");
+	QByteArray languageId;
+	if (languageParamPtr.IsValid()){
+		languageId = languageParamPtr->GetId();
 	}
 
 	const imtgui::IGuiElementContainer* guiElementContainerPtr = dynamic_cast<const imtgui::IGuiElementContainer*>(&dataModel);
@@ -72,6 +81,14 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 				QString elementStatus = guiElementPtr->GetElementStatus();
 				bool isEnabled = guiElementPtr->IsEnabled();
 				bool isVisible = guiElementPtr->IsVisible();
+
+				if (m_translationManagerCompPtr.IsValid()){
+					QByteArray context = "Attribute";
+					QString elementNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), elementName.toUtf8(), languageId, context);
+
+					elementName = elementNameTr;
+				}
+
 
 				representation.SetData("Id", elementId, index);
 				representation.SetData("Name", elementName, index);

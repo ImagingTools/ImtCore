@@ -34,7 +34,7 @@ private:
 	I_ATTR(QByteArray, m_headersModelIdAttrPtr);
 	I_MULTIATTR(QString, m_headersIdsAttrPtr);
 	I_MULTIATTR(QString, m_headersSearchByFilterAttrPtr);
-	I_MULTITEXTATTR(m_headersNamesAttrPtr);
+	I_MULTIATTR(QString, m_headersNamesAttrPtr);
 };
 
 
