@@ -47,6 +47,7 @@ Item {
     property string fontColor: Style.textColor;//
     property string fontColorTitle: fontColor;
     property bool keepFilterText: false;
+    property bool inFocus: false;
 
 
     // ID for display in combo box delegates
@@ -82,6 +83,7 @@ Item {
 
     signal clicked();
     signal finished(string commandId, int index);
+    signal editSignal();
 
 
     onModelChanged: {

@@ -30,6 +30,8 @@ Item {
     property bool hiddenBackground: true;
     property bool canClose: true;
 
+    property alias modelFilterAlias: modelFilter;
+
     property int elementsCount;
 
     onElementsCountChanged: {
@@ -69,15 +71,23 @@ Item {
         popupMenuContainer.root.closeDialog();
     }
 
+    function updateModel(){
+        itemsModel.updateModel(0);
+    }
+
+
     TreeItemModel{
         id: modelFilter;
     }
 
     Component.onCompleted: {
         //console.log("_____________POPUP_COMPL_____________")
+
         modelFilter.AddTreeModel("FilterIds");
         modelFilter.SetData("FilterIds", popupMenuContainer.filterIdsModel)
         modelFilter.AddTreeModel("Sort");
+//        modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+
 
         itemsModel.updateModel(0);
     }
@@ -94,7 +104,7 @@ Item {
         for (var item = 0; item < popupMenuContainer.properties.GetItemsCount(); item++){
             modelFilter.SetData(popupMenuContainer.properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
         }
-//        itemsModel.updateModel(0);
+        //itemsModel.updateModel(0);
     }
 
 
@@ -134,18 +144,15 @@ Item {
         anchors.left: parent.left;
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
-        //        onTextEdited: {
-        //            popupMenuContainer.rootItem.currentIndex = -1;
-        //            popupMenuContainer.offset = 0;
-        //            modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
-        //            itemsModel.updateModel(0);
-        //        }
-        onTextEdited:  {
+
+        //onTextEdited:  {
+            onTextChanged:  {
 
             if(popupMenuContainer.ready){
                 popupMenuContainer.rootItem.currentIndex = -1;
                 popupMenuContainer.offset = 0;
                 modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+                popupMenuContainer.rootItem.editSignal();
                 pause.stop();
                 pause.start();
             }
@@ -154,6 +161,11 @@ Item {
             popupMenuContainer.root.closeDialog();
             popupMenuContainer.close();
         }
+
+        onTextInputFocusChanged: {
+            popupMenuContainer.rootItem.inFocus = filterField.textInputFocus;
+        }
+
 
     }
 
@@ -281,7 +293,7 @@ Item {
             query.AddField(queryFields)
             var gqlData = query.GetQuery();
 
-            //console.log("COMBO_QUERY ", gqlData);
+            console.log("COMBO_QUERY ", gqlData);
 
             this.SetGqlQuery(gqlData);
         }

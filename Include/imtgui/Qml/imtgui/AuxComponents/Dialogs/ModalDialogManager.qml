@@ -6,6 +6,7 @@ Item {
 
     property var backgroundItem: null;
     property alias count: modalDialogModels.count;
+    property Item topItem: null;
     visible: count > 0
 
     Component.onDestruction: {
@@ -75,6 +76,8 @@ Item {
                 sourceComponent: model.Component;
 
                 onLoaded: {
+                    container.topItem = dialogLoader.item;
+
                     container.backgroundItem = background;
 
                     dialogLoader.item["root"] = container;
