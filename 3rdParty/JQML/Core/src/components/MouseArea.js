@@ -261,6 +261,9 @@ export class MouseArea extends Item {
 			this.pressed = true
 			this.$s.pressed()
 
+			this.tempMouse.x = this.mouse.x
+			this.tempMouse.y = this.mouse.y
+
 			if(!this.$p.hoverEnabled.val){
 				this.containsMouse = true
 				this.hover = true
@@ -316,7 +319,7 @@ export class MouseArea extends Item {
 				this.hover = false
 				this.$s.exited()
 				if(!this.mouse.accepted) state.release()
-				state.view.$mousedown(e, state)
+				state.view.$touchstart(e, state)
 				
 			} else {
 				this.$s.positionChanged()
