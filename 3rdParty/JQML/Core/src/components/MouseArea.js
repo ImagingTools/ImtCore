@@ -312,7 +312,7 @@ export class MouseArea extends Item {
 		e.preventDefault()
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
-			if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10)){
+			if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 25 || Math.abs(this.mouse.y-this.tempMouse.y) > 25)){
 				// console.log('CONSOLE::', this)
 				this.pressed = false
 				this.containsMouse = false
