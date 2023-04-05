@@ -11,6 +11,7 @@ Item {
     property string legend;
     property int textWidth: legendText.width;
     property string fontFamily: Style.fontFamilyBold;
+    property int fontPixelSize: Style.fontSize_subtitle;
     property bool fontBold: false;
     property alias indicatorHeight: activeIndicator.height;
 
@@ -32,7 +33,7 @@ Item {
         horizontalAlignment: Text.AlignLeft;
         verticalAlignment: Text.AlignTop;
         wrapMode: Text.NoWrap;
-        font.pixelSize: Style.fontSize_subtitle;
+        font.pixelSize: textButton.fontPixelSize;
         font.bold: textButton.fontBold;
         font.family: textButton.fontFamily;
         color: textButton.active ? Style.color_text_titles : Style.color_text_notActive;

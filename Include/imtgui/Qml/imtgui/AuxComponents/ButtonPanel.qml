@@ -11,8 +11,8 @@ Rectangle {
 
     color: "transparent";
 
-    property int delegateWidth: 120;
-    property int delegateHeight: 40;
+    property int delegateWidth: Style.size_ButtonWidth;
+    property int delegateHeight: Style.size_ButtonHeight;
     property int visibleCount: 5;
     property int mainMargin: 10;
 
@@ -30,28 +30,78 @@ Rectangle {
     property TreeItemModel verticalModel: TreeItemModel{};
 
 
-    onButtonModelChanged: {
-        buttonPanel.horizontalModel.Clear();
-        buttonPanel.verticalModel.Clear();
+    property Component buttonDelegate : defaultDelegate;
 
-        var horizCount  = Math.floor((horizontalListView.width + buttonPanel.horizontalSpacing)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
-        var count = buttonModel.GetItemsCount();
-        if(count <= horizCount){
-            buttonPanel.horizontalModel = buttonPanel.buttonModel;
-        }
-        else{
-            for(var i = 0; i < horizCount; i++){
+    Component {
+        id: defaultDelegate;
 
-            }
+        AuxButton {
+            id: button;
 
-            for(var k = horizCount; k < count; k++){
+            width: buttonPanel.delegateWidth;
+            height: buttonPanel.delegateHeight;
 
+            radius: Style.size_ButtonRadius;
+            color: pressed ? Style.color_button_active : containsMouse ? Style.color_button_hovered : Style.color_button;
+            fontColor: pressed ? "#ffffff" : Style.color_buttonText;
+            fontPixelSize: Style.fontSize_common;
+            highlighted: false;
+            border.color:  "transparent";
+
+            hasText: true;
+            hasIcon: false;
+
+            backgroundColor: Style.alternateBaseColor;
+
+            textButton: model.Name;
+
+            property string id: model.Id;
+            property Item rootItem: buttonPanel;
+
+
+            onClicked:{
+                rootItem.clicked(id);
             }
         }
 
     }
 
+    signal clicked(string buttonId);
 
+    Component.onCompleted: {
+        //setModels();
+    }
+
+    onButtonModelChanged: {
+        setModels();
+
+    }
+
+    function setModels(){
+        buttonPanel.horizontalModel.Clear();
+        buttonPanel.verticalModel.Clear();
+
+        var horizCount  = Math.floor((horizontalListViewContainer.width + buttonPanel.horizontalSpacing)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
+        console.log("horizCount ",horizCount);
+
+        var count = buttonPanel.buttonModel.GetItemsCount();
+        if(count <= horizCount){
+            buttonPanel.horizontalModel = buttonPanel.buttonModel;
+        }
+        else{
+            for(var i = 0; i < horizCount; i++){
+                buttonPanel.horizontalModel.InsertNewItem()
+                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+            }
+
+            for(var k = horizCount; k < count; k++){
+                var kk = 0;
+                buttonPanel.verticalModel.InsertNewItem();
+                buttonPanel.verticalModel.CopyItemDataFromModel(k,buttonPanel.buttonModel,kk);
+                kk++;
+            }
+        }
+    }
 
 
     Rectangle{
@@ -72,15 +122,17 @@ Rectangle {
 
             spacing: buttonPanel.horizontalSpacing;
 
-            model: 10;
+            model: buttonPanel.horizontalModel;
 
-            delegate: Rectangle{
+            delegate: buttonPanel.buttonDelegate;
 
-                width: buttonPanel.delegateWidth;
-                height: buttonPanel.delegateHeight;
+//            delegate: Rectangle{
 
-                color: "red";
-            }
+//                width: buttonPanel.delegateWidth;
+//                height: buttonPanel.delegateHeight;
+
+//                color: "red";
+//            }
 
         }//horizontalListView
     }//horizontalListViewContainer
@@ -142,6 +194,7 @@ Rectangle {
 
         clip: true;
 
+
         property bool openST: false;
         onOpenSTChanged: {
             if(openST){
@@ -165,17 +218,19 @@ Rectangle {
 
             spacing: buttonPanel.verticalSpacing;
 
-            model: 10;
+            model: buttonPanel.verticalModel;
 
-            delegate: Rectangle{
-                anchors.horizontalCenter:  verticalListView.horizontalCenter;
+            delegate: buttonPanel.buttonDelegate;
 
-                width: buttonPanel.delegateWidth;
-                height: buttonPanel.delegateHeight;
+//            delegate: Rectangle{
+//                anchors.horizontalCenter:  verticalListView.horizontalCenter;
 
-                color: "green";
+//                width: buttonPanel.delegateWidth;
+//                height: buttonPanel.delegateHeight;
 
-            }
+//                color: "green";
+
+//            }
 
         }//verticalListView
 

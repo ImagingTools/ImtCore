@@ -17,7 +17,7 @@ Rectangle {
     property int mainRadius: 3;
     property string mainColor: Style.backgroundColor;
 
-    property alias title: welcomeText.text;
+    //property alias title: welcomeText.text;
 
     Component.onCompleted: {
         Events.subscribeEvent("logout", authPageContainer.logout);
@@ -33,6 +33,10 @@ Rectangle {
 
             loginTextInput.focus = true;
         }
+    }
+
+    function passwordRecovery(){
+        console.log("passwordRecovery");
     }
 
     function logout(){
@@ -94,42 +98,74 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
 
         width: 400;
-        height: 350;
+        //height: 380;
+        height: bodyColumn.height + headerItem.height;
 
         radius: authPageContainer.mainRadius;
         color: authPageContainer.mainColor;
 
         clip: true;
 
-        Rectangle{
-            id: headerRec;
+        Component{
+            id: headerDefaultComp;
+
+            Rectangle{
+                id: headerRec;
+
+                width: parent.width;
+                height: 80;
+
+                color: parent.color;
+                radius: parent.radius;
+
+                Text{
+                    id: welcomeText;
+
+                    anchors.top: parent.top;
+                    anchors.topMargin: 30;
+                    anchors.left: parent.left;
+                    anchors.leftMargin: (parent.width - welcomeText.width)/2;
+
+                    color: Style.textColor;
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_title;
+
+                    text: qsTr("Welcome");
+                }
+            }
+
+        }
+
+        Item{
+            id: headerItem;
 
             width: parent.width;
-            height: 80;
+            height: 70;
 
-            color: parent.color;
-            radius: parent.radius;
+            Loader{
+                id: headerLoader;
 
-            Text{
-                id: welcomeText;
 
-                anchors.top: parent.top;
-                anchors.topMargin: 30;
-                anchors.left: parent.left;
-                anchors.leftMargin: (parent.width - welcomeText.width)/2;
+                anchors.horizontalCenter: parent.horizontalCenter;
 
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_title;
+                sourceComponent: Style.authorizationHeaderDecorator !== undefined ? Style.authorizationHeaderDecorator: headerDefaultComp;
 
-                text: qsTr("Welcome");
+                onLoaded:{
+                    headerItem.height = headerLoader.item.height;
+                    headerLoader.width = headerLoader.item.width;
+                    headerLoader.height = headerLoader.item.height;
+
+                }
+
             }
         }
+
 
         Column {
             id: bodyColumn;
 
-            anchors.top: headerRec.bottom;
+            //anchors.top: headerRec.bottom;
+            anchors.top: headerItem.bottom;
             anchors.horizontalCenter: parent.horizontalCenter;
 
             spacing: 10;
@@ -248,7 +284,7 @@ Rectangle {
                     highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
                     iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
-                                          passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
+                                                                                   passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
                     onClicked: {
                         if(passwordTextInput.echoMode == TextInput.Password){
                             passwordTextInput.echoMode = TextInput.Normal;
@@ -263,6 +299,49 @@ Rectangle {
 
 
             }
+
+            Item{
+                id: passwordRecoveryItem;
+
+                width: parent.width;
+                height: titlePasswordRecovery.height;
+
+                Text {
+                    id: titlePasswordRecovery;
+
+                    anchors.right: parent.right;
+
+                    color: Style.textColor;
+                    font.family: Style.fontFamilyBold;
+                    font.pixelSize: Style.fontSize_common;
+                    font.underline: true;
+
+                    text: qsTr("Password recovery");
+
+                    Loader{
+                        id: titleDecoratorLoader3;
+
+                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+                        onLoaded: {
+                        }
+                    }
+
+                }
+
+                MouseArea{
+                    id: passwordRecoveryMA;
+
+                    anchors.fill: parent;
+
+                    cursorShape: Qt.PointingHandCursor;
+                    hoverEnabled: true;
+                    onClicked: {
+                        authPageContainer.passwordRecovery();
+                    }
+
+                }
+            }
+
 
             Item{
                 id: errorMessageItem;
@@ -317,7 +396,7 @@ Rectangle {
                     }
                 }
             }//
-        }
+        }//bodyColumn
     }
 
     Component{
