@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtauth/IUserInfo.h>
+#include <imtauth/IUserGroupInfo.h>
 #include <imtauth/CUserBaseInfo.h>
 
 
@@ -10,7 +10,7 @@ namespace imtauth
 {
 
 
-class CUserInfo: virtual public IUserInfo, public CUserBaseInfo
+class CUserGroupInfo: virtual public IUserGroupInfo, public CUserBaseInfo
 {
 	typedef CUserBaseInfo BaseClass;
 

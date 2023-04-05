@@ -2,7 +2,8 @@
 
 
 // ACF includes
-#include <iser/IObject.h>
+#include <imtauth/IUserBaseInfo.h>
+#include <imtauth/IUserInfoProvider.h>
 
 namespace imtauth
 {
@@ -12,9 +13,10 @@ namespace imtauth
     Interface for describing an user group.
     \ingroup User
 */
-class IUserGroupInfo: virtual public iser::IObject
+class IUserGroupInfo: virtual public IUserBaseInfo
 {
 public:
+	typedef QSet<QByteArray> UserIds;
 
     /**
         Get id of the group.
@@ -27,16 +29,6 @@ public:
     virtual bool SetId(QByteArray id) = 0;
 
     /**
-        Get name of the group.
-    */
-    virtual QString GetName() const = 0;
-
-    /**
-        Set name of the group.
-    */
-    virtual bool SetName(QString name) = 0;
-
-    /**
         Get description of the group.
     */
     virtual QString GetDescription() const = 0;
@@ -45,6 +37,22 @@ public:
         Set description of the group.
     */
     virtual bool SetDescription(QString name) = 0;
+
+    /**
+		Get roles.
+	*/
+	virtual RoleIds GetUsers() const = 0;
+
+	/**
+		Set roles.
+	*/
+	virtual void SetUsers(const UserIds &users) = 0;
+
+    /**
+		Get list of all availiable users.
+	*/
+	virtual const imtauth::IUserInfoProvider* GetUserProvider() const = 0;
+
 
 };
 
