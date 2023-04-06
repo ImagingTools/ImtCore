@@ -71,6 +71,7 @@ Rectangle {
                 Component.onCompleted: {
                     leftMenuModel.append({Id: "Roles",  Name: qsTr("Roles"), Source: "RoleCollectionView.qml"})
                     leftMenuModel.append({Id: "Users",  Name: qsTr("Users"), Source: "UserCollectionView.qml"})
+                    leftMenuModel.append({Id: "Groups",  Name: qsTr("Groups"), Source: "UserGroupCollectionView.qml"})
                 }
 
 //                ListElement{

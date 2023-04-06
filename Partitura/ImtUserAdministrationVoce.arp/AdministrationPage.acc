@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5048" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5063" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,6 +18,7 @@
                             <Values>
                                 <Value>Pages/RolesPage</Value>
                                 <Value>Pages/UsersPage</Value>
+                                <Value>Pages/UserGroupsPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -201,6 +202,30 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="UserGroupsPage" PackageId="ImtUserAdministrationVoce" ComponentId="UserGroupsPage">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RolesPage/RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RoleRepository">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="UsersPage" PackageId="ImtUserAdministrationVoce" ComponentId="UsersPage">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -230,6 +255,7 @@
                 <ExportedInterfaces/>
                 <ExportedComponents>
                     <Component ExportedId="RolesPage" ComponentId="RolesPage"/>
+                    <Component ExportedId="UserGroupsPage" ComponentId="UserGroupsPage"/>
                     <Component ExportedId="UsersPage" ComponentId="UsersPage"/>
                 </ExportedComponents>
             </Data>

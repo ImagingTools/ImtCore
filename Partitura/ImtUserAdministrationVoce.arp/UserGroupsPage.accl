@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5063" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Demultiplexer" X="550" Y="75" Note=""/>
+        <Element ComponentName="HashCalculator" X="400" Y="550" Note=""/>
+        <Element ComponentName="ObjectViewDataProvider" X="1050" Y="550" Note=""/>
+        <Element ComponentName="UserCommands" X="475" Y="350" Note=""/>
+        <Element ComponentName="UserDataController" X="225" Y="350" Note=""/>
+        <Element ComponentName="UserGroupListController" X="1000" Y="350" Note=""/>
+        <Element ComponentName="UserGroupsHeadersDataProvider" X="775" Y="550" Note=""/>
+        <Element ComponentName="UserInfo" X="125" Y="550" Note=""/>
+        <Element ComponentName="UsersCommands" X="725" Y="350" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="UserCommands">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="775" Y="425" Note=""/>
+                <Element ComponentName="Close" X="475" Y="600" Note=""/>
+                <Element ComponentName="Commands" X="275" Y="275" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1050" Y="275" Note=""/>
+                <Element ComponentName="Empty" X="305" Y="425" Note=""/>
+                <Element ComponentName="Redo" X="475" Y="425" Note=""/>
+                <Element ComponentName="Save" X="100" Y="600" Note=""/>
+                <Element ComponentName="Undo" X="100" Y="425" Note=""/>
+                <Element ComponentName="UserCommandsController" X="575" Y="75" Note=""/>
+                <Element ComponentName="UserGroupCommandPermissions" X="1050" Y="425" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="UsersCommands">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="775" Y="400" Note=""/>
+                <Element ComponentName="Commands" X="275" Y="225" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1025" Y="225" Note=""/>
+                <Element ComponentName="Edit" X="525" Y="400" Note=""/>
+                <Element ComponentName="New" X="100" Y="400" Note=""/>
+                <Element ComponentName="Remove" X="300" Y="400" Note=""/>
+                <Element ComponentName="UsersCommandPermissions" X="1025" Y="400" Note=""/>
+                <Element ComponentName="UsersCommandsController" X="575" Y="50" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

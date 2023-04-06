@@ -13,6 +13,8 @@
         <file alias="imtauthgui/RoleView.qml">Qml/imtauthgui/RoleView.qml</file>
         <file alias="imtauthgui/UserCollectionView.qml">Qml/imtauthgui/UserCollectionView.qml</file>
         <file alias="imtauthgui/UserCollectionViewCommandsDelegate.qml">Qml/imtauthgui/UserCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtauthgui/UserGroupCollectionView.qml">Qml/imtauthgui/UserGroupCollectionView.qml</file>
+        <file alias="imtauthgui/UserGroupCollectionViewCommandsDelegate.qml">Qml/imtauthgui/UserGroupCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/UserEditor.qml">Qml/imtauthgui/UserEditor.qml</file>
         <file alias="imtauthgui/UserView.qml">Qml/imtauthgui/UserView.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">Qml/imtauthgui/RoleCollectionViewCommandsDelegate.qml</file>
