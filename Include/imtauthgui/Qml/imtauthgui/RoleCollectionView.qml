@@ -17,19 +17,15 @@ CollectionView {
         baseCollectionView: roleCollectionViewContainer.baseCollectionView;
 
         onDoubleClicked: {
+            baseCollectionView.table.tableSelection.singleSelect(index);
+
             baseCollectionView.table.selectItem(id, name);
         }
 
         onClicked: {
-            console.log("onClicked", model.index);
-//            baseCollectionView.table.selectedIndex = index;
-
+            console.log('roleCollectionViewContainer onClicked', index)
             baseCollectionView.table.tableSelection.singleSelect(index);
-
-            roleCollectionViewContainer.forceActiveFocus();
-        }
-        Component.onCompleted: {
-            console.log('DEBUG::TableProductRolesDelegate', parent)
+            roleCollectionViewContainer.baseCollectionView.table.elementsList.forceActiveFocus();
         }
     } }
 
@@ -41,8 +37,45 @@ CollectionView {
         elementsList.spacing = 10;
         baseCollectionView.table.showHeaders = false;
         baseCollectionView.hasPagination = false;
+    }
 
-        console.log('DEBUG::roleCollectionViewContainer', width, height, parent.width, parent.height)
+    onElementsChanged: {
+        let elementsModel =  elementsList.model.GetData("Roles");
+        console.log('elementsModel', elementsModel.GetItemsCount())
+        baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
+    }
+
+    function getSelectedIds(){
+        let retVal = []
+
+        let elementsModel = roleCollectionViewContainer.baseCollectionView.table.elements;
+        let model = elementsModel.GetData("Roles");
+        let indexes = roleCollectionViewContainer.baseCollectionView.table.getSelectedIndexes();
+        for (let i = 0; i < indexes.length; i++){
+            if (model.ContainsKey("Id", indexes[i])){
+                let id = model.GetData("Id", indexes[i]);
+                retVal.push(id);
+            }
+        }
+
+        return retVal;
+    }
+
+    function getSelectedNames(){
+        console.log("new getSelectedNames");
+        let retVal = []
+
+        let elementsModel = roleCollectionViewContainer.baseCollectionView.table.elements;
+        let model = elementsModel.GetData("Roles");
+        let indexes = roleCollectionViewContainer.baseCollectionView.table.getSelectedIndexes();
+        for (let i = 0; i < indexes.length; i++){
+            if (model.ContainsKey("Name", indexes[i])){
+                let id = model.GetData("Name", indexes[i]);
+                retVal.push(id);
+            }
+        }
+
+        return retVal;
     }
 
     function selectItem(id, name){
@@ -52,11 +85,7 @@ CollectionView {
 
         let elements = baseCollectionView.table.elements;
 
-        let indexes = baseCollectionView.table.getSelectedIndexes();
-        if (indexes.length > 0){
-            let productId = elements.GetData("Id", indexes[0]);
-
-            documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
-        }
+        let productId = elements.GetData("Id");
+        documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
     }
 }

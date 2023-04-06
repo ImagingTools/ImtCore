@@ -14,6 +14,7 @@ DocumentBase {
 
     onDocumentModelChanged: {
         console.log("AccountEditor onDocumentModelChanged");
+
         accountEditorContainer.updateGui();
         undoRedoManager.registerModel(accountEditorContainer.documentModel);
 
@@ -73,7 +74,6 @@ DocumentBase {
         if (accountEditorContainer.documentModel.ContainsKey("Email")){
             emailInput.text = accountEditorContainer.documentModel.GetData("Email");
         }
-
         accountEditorContainer.blockUpdatingModel = false;
     }
 
@@ -408,7 +408,7 @@ DocumentBase {
                         placeHolderText: qsTr("Enter the postal code");
 
                         onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("PostalCode");
+                            let oldText = String(accountEditorContainer.documentModel.GetData("PostalCode"));
                             if (oldText && oldText !== postalCodeInput.text || !oldText && postalCodeInput.text !== ""){
                                 accountEditorContainer.updateModel();
                             }

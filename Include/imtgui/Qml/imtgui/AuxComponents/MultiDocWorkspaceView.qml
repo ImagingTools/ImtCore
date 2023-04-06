@@ -144,6 +144,8 @@ Item {
 
         documentBase.isDirty = false;
 
+        documentBase.saved();
+
         if (documentBase.closingFlag){
             workspaceView.closeDocument(documentBase.itemId);
         }
@@ -227,6 +229,7 @@ Item {
      }
 
     function insertNewDocument(documentId, params){
+        console.log("insertNewDocument", documentId);
         workspaceView.documentLoading = true;
 
         let index = documentsData.InsertNewItem();
@@ -236,8 +239,12 @@ Item {
         let commandId = workspaceView.mainCollectionView.getEditorCommandId();
         documentsData.SetData("CommandsId", commandId, index);
 
+        console.log("commandId", commandId);
+
         let source = workspaceView.mainCollectionView.getEditorPath();
         documentsData.SetData("Source", source, index);
+
+        console.log("source", source);
 
         documentController.documentTypeId = commandId;
         documentController.getData(documentId, params);
@@ -369,8 +376,13 @@ Item {
             index = tabPanelInternal.selectedIndex;
         }
 
-        if (index !== 0){
+        console.log("index", index);
+        console.log("newTitle", newTitle);
+
+        if (index > 0){
             workspaceView.documentsData.SetData("Title", newTitle, index);
+
+            console.log("workspaceView.documentsData", workspaceView.documentsData);
             let document = workspaceView.documentsData.GetData("Item", index);
             if (document.isDirty){
                 workspaceView.documentIsDirtyChanged({"Id": document.itemId, "IsDirty": true});
@@ -427,14 +439,22 @@ Item {
         id: documentController;
 
         onDocumentModelChanged: {
+            console.log("GqlDocumentDataController onDocumentModelChanged", documentController.documentModel);
             if (documentController.documentModel != null){
                 let documentId = documentController.documentModel.GetData("Id");
+                console.log("documentId", documentId);
                 if (documentId !== ""){
                     for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
                         let id = workspaceView.documentsData.GetData("Id", i);
                         if (id === documentId){
-                            let item = workspaceView.documentsData.GetData("Item", i);
-                            item.documentModel = documentController.documentModel;
+                            if (workspaceView.documentsData.ContainsKey("Item", i)){
+                                let item = workspaceView.documentsData.GetData("Item", i);
+                                console.log("workspaceView.documentsData", workspaceView.documentsData);
+                                console.log("item", item);
+                                item.documentModel = documentController.documentModel;
+
+                                break;
+                            }
                         }
                     }
                 }
@@ -446,10 +466,12 @@ Item {
         }
 
         onDocumentAdded: {
+            console.log("GqlDocumentDataController onDocumentAdded");
             workspaceView.documentSaved({"Id":documentId, "Name":documentName});
         }
 
         onDocumentUpdated: {
+            console.log("GqlDocumentDataController onDocumentUpdated");
             workspaceView.documentSaved({"Id":documentId, "Name":documentName});
         }
 
@@ -463,8 +485,6 @@ Item {
 
         observedGetModel: documentController.gqlGetModel;
         observedSetModel: documentController.gqlSetModel;
-
-//        loadingView: loading;
     }
 
     ListView {
@@ -503,6 +523,8 @@ Item {
 
                 onLoaded: {
                     console.log("MultidocWorkspaceView onLoaded", model.CommandsId);
+                    workspaceView.documentsData.SetData("Item", dataLoader.item, model.index);
+
                     if (model.index === 0){
                         workspaceView.mainCollectionView = dataLoader.item;
                     }
@@ -528,8 +550,6 @@ Item {
                     //
 
                     dataLoader.item.commandsId = model.CommandsId
-
-                    workspaceView.documentsData.SetData("Item", dataLoader.item, model.index);
                 }
             }
         }
@@ -544,5 +564,9 @@ Item {
         anchors.top: parent.top;
 
         visible: false;
+
+        onVisibleChanged: {
+            Events.sendEvent("CommandsDecoratorSetVisible", !loading.visible);
+        }
     }
 }

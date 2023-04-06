@@ -20,16 +20,14 @@ Item {
     }
 
     onCommandsModelChanged: {
-        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-                                                  "CommandsId": commandsProviderContainer.documentUuid});
+//        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
+//                                                  "CommandsId": commandsProviderContainer.documentUuid});
+        updateGui();
 
         commandsProviderContainer.modelLoaded();
     }
 
     function updateModel(){
-//        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-//                                                  "CommandsId": commandsProviderContainer.commandsId});
-
         modelCommands.updateModel();
     }
 

@@ -32,6 +32,10 @@ Item {
     signal descriptionSetted(string id, string description);
     signal removed(string id);
 
+    property alias removeGqlModel: removeModel;
+    property alias renameGqlModel: renameQuery;
+    property alias setDescriptionGqlModel: setDescriptionQuery;
+
     signal selectionChanged();
 
     property string removeDialogTitle: qsTr("Deleting a selected element");
@@ -233,7 +237,7 @@ Item {
                     }
                 }
 
-                tableData.forceActiveFocus();
+                containerBase.tableData.forceActiveFocus();
             }
         }
     }
@@ -247,7 +251,7 @@ Item {
                     renameQuery.rename(inputValue);
                 }
 
-                tableData.forceActiveFocus();
+                containerBase.tableData.forceActiveFocus();
             }
         }
     }
@@ -261,7 +265,7 @@ Item {
                     setDescriptionQuery.setDescription(inputValue);
                 }
 
-                tableData.forceActiveFocus();
+                containerBase.tableData.forceActiveFocus();
             }
         }
     }

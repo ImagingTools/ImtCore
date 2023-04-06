@@ -12,6 +12,8 @@ Item {
     property bool hasFilter: false;
     property bool hasSort: false;
 
+    property bool checkable: false;
+
     property bool showHeaders: true;
 
     property TreeItemModel headers; //: elementsListObj.model;
@@ -57,6 +59,9 @@ Item {
     property bool isRightBorder: false;
 
     signal selectionChanged(var selection);
+
+    signal stateCheckedChanged(int index, string state);
+
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
             tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
@@ -129,11 +134,6 @@ Item {
     onFocusChanged: {
         if (tableContainer.focus){
             elementsListObj.forceActiveFocus();
-
-            //            tableSelection.subscribeEvents();
-        }
-        else{
-            //            tableSelection.unsubscribeEvents();
         }
     }
 
@@ -306,8 +306,10 @@ Item {
 
         let indexes = tableContainer.getSelectedIndexes();
         for (let i = 0; i < indexes.length; i++){
-            let item = elementsListObj.itemAtIndex(indexes[i]);
-            retVal.push(item.getSelectedId());
+            if (elementsListObj.model.ContainsKey("Id", indexes[i])){
+                let id = elementsListObj.model.GetData("Id", indexes[i]);
+                retVal.push(id);
+            }
         }
 
         return retVal;
@@ -318,8 +320,10 @@ Item {
 
         let indexes = tableContainer.getSelectedIndexes();
         for (let i = 0; i < indexes.length; i++){
-            let item = elementsListObj.itemAtIndex(indexes[i]);
-            retVal.push(item.getSelectedName());
+            if (elementsListObj.model.ContainsKey("Name", indexes[i])){
+                let name = elementsListObj.model.GetData("Name", indexes[i]);
+                retVal.push(name);
+            }
         }
 
         return retVal;
@@ -636,12 +640,12 @@ Item {
                         height: 10;
                         width: visible ? 10 : 0;
 
-                        visible: sortController.currentHeaderId === model.Id && tableContainer.hasSort;
+                        visible: tableContainer.sortController && tableContainer.sortController.currentHeaderId === model.Id && tableContainer.hasSort;
 
                         sourceSize.width: width;
                         sourceSize.height: height;
 
-                        source: sortController.currentOrder == "DESC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
+                        source: tableContainer.sortController && tableContainer.sortController.currentOrder == "DESC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
                                                           "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
                     }
 
@@ -785,9 +789,11 @@ Item {
             width: elementsListObj.width;
             minHeight: tableContainer.itemHeight;
 
-            //            selected: tableContainer.selectedIndex === model.index;
+            table: tableContainer;
 
-            //selected: tableContainer.tableSelection.selectedIndexes.includes(model.index);
+//            selected: model.Selected ? model.Selected : false;
+
+            selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
 
             //!!!
             cellDecorator: tableContainer.cellDecorator;
@@ -813,16 +819,26 @@ Item {
             //!!!
 
             Component.onCompleted: {
+//                console.log("TableDelegate onCompleted", elementsListObj.model.ContainsKey("Selected", model.index));
+//                if (!elementsListObj.model.ContainsKey("Selected", model.index)){
+//                    elementsListObj.model.SetData("Selected", false, model.index)
+//                }
+                tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
+
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
                     tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
                 }
             }
 
+            Component.onDestruction: {
+                tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
+            }
+
+            function selectionChanged(){
+                tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
+            }
+
             onClicked: {
-                //                tableContainer.selectedIndex = model.index;
-
-                console.log("AuxTable onClicked");
-
                 tableContainer.tableSelection.singleSelect(model.index);
 
                 elementsListObj.forceActiveFocus();
@@ -830,21 +846,17 @@ Item {
 
             onRightButtonMouseClicked: {
                 console.log("AuxTable onRightButtonMouseClicked", mX, mY);
-                //var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
                 var point = mapToItem(null, mX, mY);
                 tableContainer.rightButtonMouseClicked(point.x, point.y);
             }
 
             onDoubleClicked: {
                 console.log("onDoubleClicked", model["Id"], model["Name"])
-                //var point = mapToItem(thumbnailDecoratorContainer, mX, mY);
-
                 tableContainer.selectedIndex = model.index;
 
                 var point = mapToItem(null, mX, mY);
                 tableContainer.doubleClicked(point.x, point.y)
                 tableContainer.selectItem(model.Id, model.Name);
-
             }
         }
 

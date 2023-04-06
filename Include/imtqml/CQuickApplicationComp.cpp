@@ -14,13 +14,14 @@
 #include <QtQuickWidgets/QQuickWidget>
 
 #if defined (Q_OS_WIN)
-	#if QT_VERSION >= 0x050500 && QT_VERSION < 0x060000
-	#include <QtPlatformHeaders/QWindowsWindowFunctions>
-	#endif
+#if QT_VERSION >= 0x050500 && QT_VERSION < 0x060000
+#include <QtPlatformHeaders/QWindowsWindowFunctions>
+#endif
 #endif
 
 // ACF includes
 #include <istd/CSystem.h>
+#include <istd/TDelPtr.h>
 #include <iqtgui/CCommandTools.h>
 #include <iqtgui/CHierarchicalCommand.h>
 
@@ -41,7 +42,7 @@ namespace imtqml
 
 CQuickApplicationComp::CQuickApplicationComp()
 	:m_defaultWidgetFlags(0),
-	m_trayMessages(*this)
+	  m_trayMessages(*this)
 {
 }
 
@@ -91,50 +92,49 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 
 	if (BaseClass::InitializeApplication(argc, argv)){
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_STARTING);
+		istd::TDelPtr<QQmlApplicationEngine> engine = new QQmlApplicationEngine(this);
+		if (m_mainQuickCompPtr.IsValid()){
+			engine->addImportPath("qrc:/");
+			engine->addImportPath("qrc:/qml");
 
-        if (m_mainQuickCompPtr.IsValid()){
-            QQmlApplicationEngine *engine = new QQmlApplicationEngine(this);
+			QQmlContext* roolContextPtr = engine->rootContext();
+			if (roolContextPtr != nullptr){
+				if (m_contextCompPtr.IsValid()){
+					imtqml::CClientUserContextComp* contextPtr = dynamic_cast<imtqml::CClientUserContextComp*>(m_contextCompPtr.GetPtr());
+					if (contextPtr != nullptr){
+						contextPtr->SetQmlEngine(engine.GetPtr());
 
-            engine->addImportPath("qrc:/");
-            engine->addImportPath("qrc:/qml");
+						roolContextPtr->setContextProperty("context", contextPtr);
+					}
+				}
+			}
 
-            QQmlContext* roolContextPtr = engine->rootContext();
-            if (roolContextPtr != nullptr){
-                if (m_contextCompPtr.IsValid()){
-                    imtqml::CClientUserContextComp* contextPtr = dynamic_cast<imtqml::CClientUserContextComp*>(m_contextCompPtr.GetPtr());
-                    if (contextPtr != nullptr){
-                        contextPtr->SetQmlEngine(engine);
+			QObject::connect(engine.GetPtr(), &QQmlApplicationEngine::quit, &QGuiApplication::quit);
+			engine->load(QUrl("qrc:/qml/MainWindow.qml"));
 
-                        roolContextPtr->setContextProperty("context", contextPtr);
-                    }
-                }
-            }
+			imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
+			if (quickObjectPtr != nullptr){
 
-            engine->load(QUrl("qrc:/qml/MainWindow.qml"));
+				QList<QObject*> rootObjects = engine->rootObjects();
+				if (!rootObjects.isEmpty()){
+					QObject* root = rootObjects[0];
+					Q_ASSERT(root != nullptr);
 
-            imtqml::IQuickObject *quickObjectPtr = m_mainQuickCompPtr.GetPtr();
-            if (quickObjectPtr != nullptr){
-
-                QList<QObject*> rootObjects = engine->rootObjects();
-                if (!rootObjects.isEmpty()){
-                    QObject* root = rootObjects[0];
-                    Q_ASSERT(root != nullptr);
-
-                    QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
-                    if (window != nullptr){
-                        window->setIcon(QGuiApplication::windowIcon());
-                        window->setTitle(QGuiApplication::applicationName());
-                        QQuickItem* mainItem = window->contentItem();
-                        if (mainItem != nullptr){
-                            quickObjectPtr->CreateQuickItem(mainItem);
-                        }
-                    }
-                }
-            }
-            else{
-                return -1;
-            }
-        }
+					QQuickWindow* window = qobject_cast<QQuickWindow*>(root);
+					if (window != nullptr){
+						window->setIcon(QGuiApplication::windowIcon());
+						window->setTitle(QGuiApplication::applicationName());
+						QQuickItem* mainItem = window->contentItem();
+						if (mainItem != nullptr){
+							quickObjectPtr->CreateQuickItem(mainItem);
+						}
+					}
+				}
+			}
+			else{
+				return -1;
+			}
+		}
 
 		HideSplashScreen();
 
@@ -242,9 +242,9 @@ CQuickApplicationComp::TrayMessages::TrayMessages(CQuickApplicationComp& parent)
 // reimplemented (ilog::IMessageConsumer)
 
 bool CQuickApplicationComp::TrayMessages::IsMessageSupported(
-			int /*messageCategory*/,
-			int /*messageId*/,
-			const istd::IInformationProvider* /*messagePtr*/) const
+		int /*messageCategory*/,
+		int /*messageId*/,
+		const istd::IInformationProvider* /*messagePtr*/) const
 {
 	return m_parent.m_trayIconPtr.IsValid();
 }

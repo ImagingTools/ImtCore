@@ -23,6 +23,10 @@ Item {
         console.log("onDocumentTypeIdChanged", documentTypeId);
     }
 
+    onDocumentAdded: {
+        console.log("container onDocumentAdded");
+    }
+
     function getData(documentId, inputParams){
         getModel.getModelData(documentId, inputParams);
     }
@@ -115,6 +119,8 @@ Item {
         onStateChanged: {
             console.log("State:", this.state, setModel);
             if (this.state === "Ready"){
+
+                console.log("Data Ready");
                 var dataModelLocal;
                 if (setModel.ContainsKey("errors")){
                     dataModelLocal = setModel.GetData("errors");
@@ -134,23 +140,27 @@ Item {
                     return;
                 }
 
+                console.log("setModel", setModel.toJSON());
+
                 if (setModel.ContainsKey("data")){
                     dataModelLocal = setModel.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(setCommandId)){
-                        dataModelLocal = dataModelLocal.GetData(setCommandId);
+                    if (dataModelLocal.ContainsKey(container.setCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.setCommandId);
                         dataModelLocal = dataModelLocal.GetData("addedNotification");
 
                         let documentId = dataModelLocal.GetData("Id");
                         let documentName = dataModelLocal.GetData("Name");
                         container.documentUpdated(documentId, documentName);
                     }
-                    else if (dataModelLocal.ContainsKey(updateCommandId)){
-                        dataModelLocal = dataModelLocal.GetData(updateCommandId);
+                    else if (dataModelLocal.ContainsKey(container.updateCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.updateCommandId);
                         dataModelLocal = dataModelLocal.GetData("updatedNotification");
 
                         let documentId = dataModelLocal.GetData("Id");
                         let documentName = dataModelLocal.GetData("Name");
+
+                        console.log("documentAdded", documentId, documentName);
                         container.documentAdded(documentId, documentName);
                     }
                 }

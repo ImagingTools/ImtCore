@@ -42,6 +42,8 @@ Item {
 
     property alias commandsProvider: commandsProviderLocal;
 
+    signal elementsChanged();
+
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
 
@@ -228,6 +230,14 @@ Item {
         color: Style.baseColor;
     }
 
+    function getSelectedIds(){
+        return collectionViewBase.table.getSelectedIds();
+    }
+
+    function getSelectedNames(){
+        return collectionViewBase.table.getSelectedNames();
+    }
+
     CollectionViewBase {
         id: collectionViewBase;
 
@@ -243,18 +253,11 @@ Item {
         loadData: true;
         hasFilter: collectionViewContainer.hasFilter;
 
-//        onSelectedIndexChanged: {
-//            console.log("CollectionViewBase onSelectedIndexChanged");
-//            if (collectionMetaInfo.visible){
-//                collectionMetaInfo.getMetaInfo();
-//            }
-//        }
-
         onSelectionChanged: {
             if (collectionMetaInfo.visible){
                 if (selection.length === 1){
-                    let itemIds = collectionViewBase.table.getSelectedIds();
-                    let itemNames = collectionViewBase.table.getSelectedNames();
+                    let itemIds = collectionViewContainer.getSelectedIds();
+                    let itemNames = collectionViewContainer.getSelectedNames();
 
                     if (itemIds.length > 0){
                         let itemId = itemIds[0];
@@ -271,7 +274,6 @@ Item {
 
         onSelectedItem: {
             console.log("CollectionViewBase onItemSelected");
-//            collectionViewContainer.selectItem(id, name);
 
             if (id == ""){
                 commandsLoader.item.commandHandle("New");
@@ -280,14 +282,14 @@ Item {
                 commandsLoader.item.commandHandle("Edit");
             }
         }
+
+        onElementsChanged: {
+            collectionViewContainer.elementsChanged();
+        }
     }
 
     CommandsProvider {
         id: commandsProviderLocal;
-
-        onCommandsIdChanged: {
-//            commandsProviderLocal.updateModel();
-        }
     }
 
     MetaInfo {

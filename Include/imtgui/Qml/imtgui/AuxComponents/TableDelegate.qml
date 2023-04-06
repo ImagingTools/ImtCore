@@ -12,10 +12,13 @@ Rectangle {
     property int count: 0; // bodyArray.length;
 
     property real minHeight: 40;
+
     property bool selected: false;
+    property int checkedState: Qt.Unchecked;
+
+    property Item table: null;
 
     property var bodyArray:  [];
-
 
     property TreeItemModel cellDecorator : TreeItemModel{};
     property TreeItemModel widthDecorator : TreeItemModel{};
@@ -50,7 +53,7 @@ Rectangle {
 
     property bool compl: false;
 
-
+    signal checkedStateClicked(int newState);
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);
     signal doubleClicked(int mX, int mY);
@@ -71,7 +74,6 @@ Rectangle {
         tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
         tableDelegateContainer.setBorderParams();
     }
-
 
     function getItemData(){
         return model;
@@ -260,9 +262,32 @@ Rectangle {
     }
 
 
+    CheckBox {
+        id: checkBox;
+
+        z: 1000;
+
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.left: parent.left;
+        anchors.leftMargin: 10;
+
+        checkState: tableDelegateContainer.checkedState;
+
+        visible: tableDelegateContainer.table ? tableDelegateContainer.table.checkable : false;
+
+        onClicked: {
+            tableDelegateContainer.checkedStateClicked(Qt.Checked - checkBox.checkState);
+        }
+    }
+
     ListView {
         id: dataList;
-        anchors.fill: parent;
+
+        anchors.left: checkBox.visible ? checkBox.right : parent.left;
+        anchors.right: parent.right;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+
         clip: true;
         orientation: ListView.Horizontal;
         spacing: 0;
@@ -279,8 +304,6 @@ Rectangle {
 
             property bool compl: false;
             property bool complCompl: deleg.compl && dataList.compl;
-
-
 
             Component.onCompleted: {
                 deleg.compl = true;

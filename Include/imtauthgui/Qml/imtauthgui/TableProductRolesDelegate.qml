@@ -16,7 +16,7 @@ Item {
     property Item baseCollectionView: null;
 
     signal clicked(int index);
-    signal doubleClicked(string id, string name);
+    signal doubleClicked(string id, string name, int index);
 
     Component.onCompleted: {
         if (model.Roles){
@@ -142,7 +142,24 @@ Item {
                     width: productRolesDelegate.width;
                     height: body.height;
 
-                    color: rolesRepeater.selectedIndex == model.index ? Style.selectedColor : "transparent";
+                    property bool selected: false;
+
+                    color: this.selected ? Style.selectedColor : "transparent";
+
+                    Component.onCompleted: {
+                        let table = productRolesDelegate.baseCollectionView.table;
+                        table.tableSelection.selectionChanged.connect(this.selectionChanged);
+                    }
+
+                    Component.onDestruction: {
+                        let table = productRolesDelegate.baseCollectionView.table;
+                        table.tableSelection.selectionChanged.disconnect(this.selectionChanged);
+                    }
+
+                    function selectionChanged(){
+                        let table = productRolesDelegate.baseCollectionView.table;
+                        selected = table.tableSelection.selectedIndexes.includes(model.index);
+                    }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter;
@@ -166,13 +183,13 @@ Item {
                         onClicked: {
                             rolesRepeater.selectedIndex = model.index;
 
-                            productRolesDelegate.clicked(productRolesDelegate.index);
+                            productRolesDelegate.clicked(rolesRepeater.selectedIndex);
                         }
 
                         onDoubleClicked: {
                             rolesRepeater.selectedIndex = model.index;
 
-                            productRolesDelegate.doubleClicked(model.Id, model.Name);
+                            productRolesDelegate.doubleClicked(model.Id, model.Name, model.index);
                         }
                     }
                 }

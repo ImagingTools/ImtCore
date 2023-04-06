@@ -26,4 +26,43 @@ CollectionViewCommandsDelegateBase {
         commandsProvider.commandsModel.SetData("Visible", false, index);
         commandsProvider.commandsModel.SetData("Status", "", index);
     }
+
+    function onEdit(){
+        let itemIds = container.collectionViewBase.getSelectedIds();
+        let itemNames = container.collectionViewBase.getSelectedNames();
+
+        if (itemIds.length > 0){
+            let itemId = itemIds[0];
+            let itemName = itemNames[0];
+
+            container.collectionViewBase.selectItem(itemId, itemName);
+        }
+    }
+
+    function onRemove(){
+        modalDialogManager.openDialog(removeDialog, {});
+    }
+
+    Component {
+        id: removeDialog;
+        MessageDialog {
+            message: container.removeMessage;
+            title: container.removeDialogTitle;
+            onFinished: {
+                if (buttonId == "Yes"){
+                    let itemIds = container.collectionViewBase.getSelectedIds();
+                    let itemNames = container.collectionViewBase.getSelectedNames();
+
+                    for (let i = 0; i < itemIds.length; i++){
+                        let itemId = itemIds[i];
+                        let itemName = itemNames[i];
+
+                        container.removeGqlModel.updateModel(itemId);
+                    }
+                }
+
+                container.tableData.forceActiveFocus();
+            }
+        }
+    }
 }

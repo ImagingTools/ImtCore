@@ -7,7 +7,6 @@ Dialog {
 
     title: qsTr("Message");
 
-
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     property string message;
@@ -16,13 +15,15 @@ Dialog {
         console.log("MessageDialog onPressed", event.key);
 
         if (event.key == Qt.Key_Return){
-             messageDialog.finished("Yes");
+            messageDialog.finished("Yes");
         }
     }
 
-    contentComp: Component { MessageDialogBody {
-        message: messageDialog.message;
-    } }
+    contentComp: Component {
+        MessageDialogBody {
+            message: messageDialog.message;
+        }
+    }
 
     Component.onCompleted: {
         messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes", "Enabled": true});
@@ -46,6 +47,4 @@ Dialog {
             }
         }
     }
-
-
 }

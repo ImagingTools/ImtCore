@@ -11,10 +11,12 @@ Item {
 
     Component.onCompleted: {
         Events.subscribeEvent("CommandsDecoratorClear", commandsDecoratorContainer.clearModel);
+        Events.subscribeEvent("CommandsDecoratorSetVisible", commandsDecoratorContainer.setVisible);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("CommandsDecoratorClear", commandsDecoratorContainer.clearModel);
+        Events.unSubscribeEvent("CommandsDecoratorSetVisible", commandsDecoratorContainer.setVisible);
     }
 
     function setCommandsModel(parameters){
@@ -28,6 +30,10 @@ Item {
 
     function clearModel(){
         repeaterCommands.model = 0;
+    }
+
+    function setVisible(visible){
+        rowCommands.visible = visible;
     }
 
     Component{

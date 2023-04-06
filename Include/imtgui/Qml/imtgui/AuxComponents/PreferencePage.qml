@@ -183,6 +183,13 @@ Rectangle {
 
             width: parent.width;
             source: "../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+
+//            sourceComponent: Component {
+//                TopPanelDialog {
+//                    title: qsTr("Preferences");
+//                }
+//            }
+
             onLoaded:  {
                 loaderTopPanel.item.title = qsTr("Preferences");
                 loaderTopPanel.item.closeButtonClicked.connect(container.close);

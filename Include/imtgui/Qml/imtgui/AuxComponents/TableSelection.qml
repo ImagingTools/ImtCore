@@ -7,29 +7,22 @@ QtObject {
     property var selectedIndexes: []
 
     property ListView table: null;
-
     signal selectionChanged();
 
+    property int countElements: root.table ? root.table.count : -1;
+
     Component.onDestruction: {
-       root.unsubscribeEvents();
+        root.unsubscribeEvents();
     }
 
     onTableChanged: {
-        if (table != null){
+        if (root.table != null){
             root.subscribeEvents();
         }
     }
 
     onSelectionChanged: {
-        for (let i = 0; i < root.table.count; i++){
-            let item = root.table.itemAtIndex(i);
-            if (root.selectedIndexes.includes(i)){
-                item.selected = true;
-            }
-            else{
-                item.selected = false;
-            }
-        }
+        console.log("onSelectionChanged", root.selectedIndexes);
     }
 
     function subscribeEvents(){
@@ -47,14 +40,14 @@ QtObject {
     }
 
     function resetSelection(){
-        selectedIndexes = []
+        root.selectedIndexes = []
 
         root.selectionChanged();
     }
 
     function singleSelect(index){
-        selectedIndexes = []
-        selectedIndexes.push(index)
+        root.selectedIndexes = []
+        root.selectedIndexes.push(index)
 
         root.selectionChanged();
     }
@@ -62,8 +55,8 @@ QtObject {
     function selectAll(){
         selectedIndexes = []
 
-        for (let i = 0; i < table.count; i++){
-            selectedIndexes.push(i);
+        for (let i = 0; i < root.countElements; i++){
+            root.selectedIndexes.push(i);
         }
 
         root.selectionChanged();
@@ -83,7 +76,7 @@ QtObject {
     function down(){
         if (root.selectedIndexes.length > 0){
             let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
-            if (table.count - 1 > lastIndex){
+            if (root.countElements - 1 > lastIndex){
                 root.singleSelect(lastIndex + 1)
 
                 root.selectionChanged();
@@ -111,7 +104,7 @@ QtObject {
     function shiftDown(){
         if (root.selectedIndexes.length > 0){
             let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
-            if (table.count - 1 > lastIndex){
+            if (root.countElements - 1 > lastIndex){
                 var index = root.selectedIndexes.indexOf(lastIndex + 1);
                 if (index >= 0){
                     root.selectedIndexes.splice(root.selectedIndexes.indexOf(lastIndex), 1);

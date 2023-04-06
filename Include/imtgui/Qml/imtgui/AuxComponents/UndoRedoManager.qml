@@ -7,7 +7,7 @@ Item {
     property string commandsId;
     property var commandsDelegate;
 
-    property TreeItemModel observedModel;
+    property TreeItemModel observedModel: null;
 
     property Item documentBase: null;
 
@@ -40,12 +40,16 @@ Item {
     onVisibleChanged: {
         console.log("undoRedoManager onVisibleChanged", undoRedoManager.visible);
         if (undoRedoManager.visible){
-            observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
-            Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
+            if (undoRedoManager.observedModel != null){
+                undoRedoManager.observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
+                Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
+            }
         }
         else{
-            observedModel.modelChanged.disconnect(undoRedoManager.modelUpdated);
-            Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
+            if (undoRedoManager.observedModel != null){
+                undoRedoManager.observedModel.modelChanged.disconnect(undoRedoManager.modelUpdated);
+                Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
+            }
         }
     }
 
@@ -79,7 +83,11 @@ Item {
     }
 
     function registerModel(model){
-        if (undoRedoManager.observedModel != model){
+        if (!model){
+            return;
+        }
+
+        if (undoRedoManager.observedModel !== model){
             undoRedoManager.observedModel = model;
 
             undoRedo.addModel(undoRedoManager.observedModel);

@@ -5,8 +5,6 @@ import imtgui 1.0
 Item {
     id: documentBase;
 
-//    anchors.fill: parent;
-
     property string itemId;
     property string itemName;
     property string commandsId;
@@ -14,9 +12,6 @@ Item {
     property TreeItemModel documentModel: TreeItemModel {};
     property TreeItemModel documentsData: TreeItemModel{};
     property Item documentManager: null;
-
-    // If you need to request a model from the server then TRUE
-    property bool itemLoad: true;
 
     property bool isDirty: false;
 
@@ -37,6 +32,8 @@ Item {
     }
 
     signal commandsDelegateLoaded();
+
+    signal saved();
 
     property string documentUuid;
     UuidGenerator {
@@ -196,12 +193,4 @@ Item {
             documentBase.commandsDelegateLoaded();
         }
     }
-
-//    function close(){
-//        Events.sendEvent(documentBase.commandsId + "CommandActivated", "Close");
-//    }
-
-//    function save(){
-//        Events.sendEvent(documentBase.commandsId + "CommandActivated", "Save");
-//    }
 }

@@ -41,7 +41,6 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(const 
 		if (m_translationManagerCompPtr.IsValid()){
 			QByteArray context = "Attribute";
 			QString headerNameTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), headerName.toUtf8(), languageId, context);
-
 			headerName = headerNameTr;
 		}
 

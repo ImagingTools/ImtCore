@@ -24,7 +24,13 @@ Rectangle {
 
     property int fontSize: Style.fontSize_common;
 
+    property bool modelIsDirty: false;
+
     signal modelChanged();
+
+    onModelChanged: {
+        root.modelIsDirty = true;
+    }
 
     onSettingsModelChanged: {
         if (root.settingsModel != null){
