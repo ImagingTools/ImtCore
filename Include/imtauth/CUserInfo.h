@@ -16,8 +16,6 @@ class CUserInfo: virtual public IUserInfo, public CUserBaseInfo
 
 public:
 	// reimplemented (iser::IUserInfo)
-	virtual QByteArray GetUserId() const override;
-	virtual void SetUserId(const QByteArray& userId) override;
 	virtual QByteArray GetPasswordHash() const override;
 	virtual void SetPasswordHash(const QByteArray& passwordHash) override;
 	virtual QString GetMail() const override;

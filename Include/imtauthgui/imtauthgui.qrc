@@ -28,6 +28,9 @@
         <file alias="imtauthgui/RolesDialogBody.qml">Qml/imtauthgui/RolesDialogBody.qml</file>
         <file alias="imtauthgui/PermissionsProvider.qml">Qml/imtauthgui/PermissionsProvider.qml</file>
         <file alias="imtauthgui/RolesProvider.qml">Qml/imtauthgui/RolesProvider.qml</file>
+	<file alias="imtauthgui/UserGroupView.qml">Qml/imtauthgui/UserGroupView.qml</file>
+	<file alias="imtauthgui/GroupEditor.qml">Qml/imtauthgui/GroupEditor.qml</file>
+	<file alias="imtauthgui/GroupRoles.qml">Qml/imtauthgui/GroupRoles.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

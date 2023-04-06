@@ -6,7 +6,8 @@ import imtgui 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: delegateContainer;
 
-    property var selectedIndex: delegateContainer.documentBase ? delegateContainer.documentBase.includedRolesTable.selectedIndex : 0;
+//    property var selectedIndex: delegateContainer.documentBase ? delegateContainer.documentBase.includedRolesTable.selectedIndex : 0;
+    property var selectedIndex: null;
 
     property TreeItemModel rolesModel: TreeItemModel {};
     property TreeItemModel documentsData: TreeItemModel {};
@@ -19,9 +20,15 @@ DocumentWorkspaceCommandsDelegateBase {
         itemsModel.updateModel();
     }
 
+    onDocumentBaseChanged: {
+        if (delegateContainer.documentBase != null){
+            delegateContainer.selectedIndex = delegateContainer.documentBase.includedRolesTable.selectedIndex;
+        }
+    }
+
     onSelectedIndexChanged: {
         console.log("RoleViewDelegate onSelectedIndexChanged", delegateContainer.selectedIndex);
-        let isEnabled = delegateContainer.selectedIndex != null;
+        let isEnabled = delegateContainer.selectedIndex !== null;
 
         delegateContainer.documentBase.commandsProvider.setCommandIsEnabled("Exclude", isEnabled);
     }

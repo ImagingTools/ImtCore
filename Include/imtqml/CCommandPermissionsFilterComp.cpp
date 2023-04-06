@@ -21,7 +21,7 @@ imtbase::CTreeItemModel* CCommandPermissionsFilterComp::CreateRepresentationFrom
 		if (commandsModelPtr != nullptr){
 			const imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 			if (userInfoPtr != nullptr){
-				const QByteArray userId = userInfoPtr->GetUserId();
+				const QByteArray userId = userInfoPtr->GetId();
 				if(m_commandPermissionsCompPtr.IsValid()){
 					imtauth::IUserInfo::FeatureIds userPermissions = userInfoPtr->GetPermissions();
 					istd::TDelPtr<imtbase::CTreeItemModel> filteredCommandsModelPtr(new imtbase::CTreeItemModel());

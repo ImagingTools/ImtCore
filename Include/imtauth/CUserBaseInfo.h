@@ -18,6 +18,8 @@ public:
 	// reimplemented (iser::IUserBaseInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
 	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const override;
+	virtual QByteArray GetId() const override;
+	virtual void SetId(const QByteArray& id) override;
 	virtual QString GetName() const override;
 	virtual void SetName(const QString& name) override;
 	virtual FeatureIds GetPermissions() const override;
@@ -46,6 +48,7 @@ private:
 	IUserBaseInfo::FeatureIds m_restrictions;
 	IUserBaseInfo::RoleIds m_roles;
 	QString m_name;
+	QByteArray m_id;
 };
 
 

@@ -83,8 +83,6 @@ Item {
         }
     }
 
-
-
     Rectangle {
         id: backgroundTable;
 
@@ -196,6 +194,10 @@ Item {
             anchors.topMargin: tableInternal.headerElementHeight;
 
             visible: false;
+
+            onVisibleChanged: {
+                console.log("Loading onVisibleChanged", ldng.visible);
+            }
         }
     }
 
@@ -267,6 +269,16 @@ Item {
 
         onItemsChanged: {
             tableInternal.elements = baseCommands.items;
+        }
+
+        onItemsInfoGqlStateChanged: {
+            console.log("onItemsInfoGqlStateChanged", state);
+            if (state === "Loading"){
+                ldng.visible = true;
+            }
+            else{
+                ldng.visible = false;
+            }
         }
     }
 }

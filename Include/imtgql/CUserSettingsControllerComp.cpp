@@ -37,7 +37,7 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 	if (gqlContextPtr != nullptr){
 		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			userId = userInfoPtr->GetUserId();
+			userId = userInfoPtr->GetId();
 		}
 	}
 
@@ -97,7 +97,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(const imtgql::CG
 	if (gqlContextPtr != nullptr){
 		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
 		if (userInfoPtr != nullptr){
-			userId = userInfoPtr->GetUserId();
+			userId = userInfoPtr->GetId();
 		}
 	}
 

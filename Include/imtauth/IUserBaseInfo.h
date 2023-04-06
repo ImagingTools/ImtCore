@@ -24,7 +24,6 @@ public:
 	typedef QSet<QByteArray> FeatureIds;
 	typedef QSet<QByteArray> RoleIds;
 
-
 	/**
 		Get list of all availiable permissions.
 	*/
@@ -34,6 +33,16 @@ public:
 		Get list of all availiable roles.
 	*/
 	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const = 0;
+
+	/**
+		Get id of the user.
+	*/
+	virtual QByteArray GetId() const = 0;
+
+	/**
+		Set id of the user.
+	*/
+	virtual void SetId(const QByteArray& id) = 0;
 
 	/**
 		Get name.

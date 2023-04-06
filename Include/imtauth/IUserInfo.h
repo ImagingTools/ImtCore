@@ -67,16 +67,6 @@ public:
 	};
 
 	/**
-		Get username of the user.
-	*/
-	virtual QByteArray GetUserId() const = 0;
-
-	/**
-		Set username of the user.
-	*/
-	virtual void SetUserId(const QByteArray& userId) = 0;
-
-	/**
 		Get password hash of the user.
 	*/
 	virtual QByteArray GetPasswordHash() const = 0;

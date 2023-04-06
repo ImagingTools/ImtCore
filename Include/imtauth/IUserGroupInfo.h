@@ -10,50 +10,38 @@ namespace imtauth
 
 
 /**
-    Interface for describing an user group.
-    \ingroup User
+	Interface for describing an user group.
+	\ingroup User
 */
 class IUserGroupInfo: virtual public IUserBaseInfo
 {
 public:
 	typedef QSet<QByteArray> UserIds;
 
-    /**
-        Get id of the group.
-    */
-    virtual QByteArray GetId() const = 0;
-
-    /**
-        Set id of the group.
-    */
-    virtual bool SetId(QByteArray id) = 0;
-
-    /**
-        Get description of the group.
-    */
-    virtual QString GetDescription() const = 0;
-
-    /**
-        Set description of the group.
-    */
-    virtual bool SetDescription(QString name) = 0;
-
-    /**
-		Get roles.
+	/**
+		Get description of the group.
 	*/
-	virtual RoleIds GetUsers() const = 0;
+	virtual QString GetDescription() const = 0;
 
 	/**
-		Set roles.
+		Set description of the group.
 	*/
-	virtual void SetUsers(const UserIds &users) = 0;
+	virtual void SetDescription(const QString& description) = 0;
 
-    /**
+	/**
+		Get users.
+	*/
+	virtual UserIds GetUsers() const = 0;
+
+	/**
+		Set users.
+	*/
+	virtual void SetUsers(const UserIds& users) = 0;
+
+	/**
 		Get list of all availiable users.
 	*/
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const = 0;
-
-
 };
 
 

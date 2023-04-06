@@ -54,7 +54,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 
 	QByteArray token = sessionPtr->GetToken();
 
-	QByteArray userId = sessionPtr->GetUserId();;
+	QByteArray userId = sessionPtr->GetUserId();
 
 	NewObjectQuery retVal;
 

@@ -34,6 +34,22 @@ const imtauth::IRoleInfoProvider* CUserBaseInfo::GetRoleProvider() const
 }
 
 
+QByteArray CUserBaseInfo::GetId() const
+{
+	return m_id;
+}
+
+
+void CUserBaseInfo::SetId(const QByteArray& id)
+{
+	if (m_id != id){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_id = id;
+	}
+}
+
+
 QString CUserBaseInfo::GetName() const
 {
 	return m_name;
@@ -121,6 +137,11 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 {
 	bool retVal = true;
 
+	static iser::CArchiveTag idTag("Id", "Id of user", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
+
 	static iser::CArchiveTag nameTag("Name", "Name of user", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
@@ -157,6 +178,7 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
+		m_id = sourcePtr->m_id;
 		m_name = sourcePtr->m_name;
 		m_permissions = sourcePtr->m_permissions;
 		m_restrictions = sourcePtr->m_restrictions;
@@ -185,6 +207,7 @@ bool CUserBaseInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
+	m_id.clear();
 	m_name.clear();
 	m_permissions.clear();
 	m_restrictions.clear();

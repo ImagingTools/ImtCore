@@ -35,7 +35,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
 		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
-			QByteArray username = userInfoPtr->GetUserId();
+			QByteArray username = userInfoPtr->GetId();
 			QString name = userInfoPtr->GetName();
 			QByteArray passwordHash = userInfoPtr->GetPasswordHash();
 			QString mail = userInfoPtr->GetMail();
@@ -131,7 +131,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 			objectId = username;
 
-			userInfoPtr->SetUserId(username);
+			userInfoPtr->SetId(username);
 		}
 
 		if (itemModel.ContainsKey("Name")){

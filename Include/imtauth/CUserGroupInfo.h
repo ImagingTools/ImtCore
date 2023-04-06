@@ -15,14 +15,12 @@ class CUserGroupInfo: virtual public IUserGroupInfo, public CUserBaseInfo
 	typedef CUserBaseInfo BaseClass;
 
 public:
-	// reimplemented (iser::IUserInfo)
-	virtual QByteArray GetUserId() const override;
-	virtual void SetUserId(const QByteArray& userId) override;
-	virtual QByteArray GetPasswordHash() const override;
-	virtual void SetPasswordHash(const QByteArray& passwordHash) override;
-	virtual QString GetMail() const override;
-	virtual void SetMail(const QString& mail) override;
-	virtual bool IsAdmin() const override;
+	// reimplemented (IUserGroupInfo)
+	virtual QString GetDescription() const override;
+	virtual void SetDescription(const QString& description) override;
+	virtual UserIds GetUsers() const override;
+	virtual void SetUsers(const UserIds& users) override;
+	virtual const imtauth::IUserInfoProvider* GetUserProvider() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -33,9 +31,8 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-	QByteArray m_userId;
-	QByteArray m_passwordHash;
-	QString m_mail;
+	QString m_description;
+	IUserGroupInfo::UserIds m_userIds;
 };
 
 

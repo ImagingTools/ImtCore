@@ -19,23 +19,6 @@ namespace imtauth
 
 // public methods
 
-
-QByteArray CUserInfo::GetUserId() const
-{
-	return m_userId;
-}
-
-
-void CUserInfo::SetUserId(const QByteArray& userId)
-{
-	if (m_userId != userId){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_userId = userId;
-	}
-}
-
-
 QByteArray CUserInfo::GetPasswordHash() const
 {
 	return m_passwordHash;

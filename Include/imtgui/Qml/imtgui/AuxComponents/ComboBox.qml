@@ -76,6 +76,10 @@ FocusScope {
     signal finished(string commandId, int index);
 
     onModelChanged: {
+        if (!comboBoxContainer.model){
+            return;
+        }
+
         if (comboBoxContainer.currentIndex > -1){
             comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId);
         }
@@ -83,11 +87,15 @@ FocusScope {
 
     onCurrentIndexChanged: {
         console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
+        if (!comboBoxContainer.model){
+            return;
+        }
+
         if (comboBoxContainer.currentIndex > -1){
-            console.log("model", JSON.stringify(model));
-            let name = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
-            console.log("name", name);
-            comboBoxContainer.currentText = name;
+            if (comboBoxContainer.model.ContainsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
+                let name = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+                comboBoxContainer.currentText = name;
+            }
         }
         else{
             comboBoxContainer.currentText = "";

@@ -24,7 +24,7 @@ bool CUserInfoComp::IsAdmin() const
 	bool isAdmin = false;
 
 	if (m_adminIdAttrPtr.IsValid()){
-		isAdmin = *m_adminIdAttrPtr == GetUserId();
+		isAdmin = *m_adminIdAttrPtr == GetId();
 	}
 
 	return isAdmin;

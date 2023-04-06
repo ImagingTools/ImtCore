@@ -53,7 +53,6 @@ Rectangle {
 
     property bool compl: false;
 
-    signal checkedStateClicked(int newState);
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);
     signal doubleClicked(int mX, int mY);
@@ -276,7 +275,14 @@ Rectangle {
         visible: tableDelegateContainer.table ? tableDelegateContainer.table.checkable : false;
 
         onClicked: {
-            tableDelegateContainer.checkedStateClicked(Qt.Checked - checkBox.checkState);
+            model.CheckedState = Qt.Checked - model.CheckedState;
+
+//            if (tableDelegateContainer.table.itemIsChecked(model.index)){
+
+//            }
+//            else{
+//                tableDelegateContainer.table.setCheckedItem(model.index);
+//            }
         }
     }
 

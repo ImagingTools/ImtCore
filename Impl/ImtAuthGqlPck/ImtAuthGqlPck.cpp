@@ -40,6 +40,11 @@ I_EXPORT_COMPONENT(
 		"User Controller");
 
 I_EXPORT_COMPONENT(
+		UserGroupController,
+		"Group of the users",
+		"User Group Controller");
+
+I_EXPORT_COMPONENT(
 		AuthorizationOptionsController,
 		"AuthorizationOptionsController",
 		"Authorization Options Controller");

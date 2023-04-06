@@ -13,15 +13,17 @@ Item {
     }
 
     function getLicenseName(productId, licenseId){
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            let id = model.GetData("Id", i);
+        for (let i = 0; i < provider.model.GetItemsCount(); i++){
+            let id = provider.model.GetData("Id", i);
             if (id === productId){
-                let productLicensesModel = model.GetData("Licenses", i);
-                 for (let licenseIndex = 0; licenseIndex < productLicensesModel.GetItemsCount(); licenseIndex++){
-                     if (licenseId == productLicensesModel.GetData("Id", licenseIndex)){
-                         return productLicensesModel.GetData("Name", licenseIndex)
+                if (provider.model.ContainsKey("Licenses", i)){
+                    let productLicensesModel = provider.model.GetData("Licenses", i);
+                     for (let licenseIndex = 0; licenseIndex < productLicensesModel.GetItemsCount(); licenseIndex++){
+                         if (licenseId === productLicensesModel.GetData("Id", licenseIndex)){
+                             return productLicensesModel.GetData("Name", licenseIndex)
+                         }
                      }
-                 }
+                }
             }
         }
         return ""

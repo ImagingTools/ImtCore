@@ -22,6 +22,8 @@ Item {
 
     property TreeItemModel notificationModel: null;
 
+    signal itemsInfoGqlStateChanged(string state);
+
     onNotificationModelChanged: {
         if (gqlModelBaseContainer.notificationModel != null){
             if (gqlModelBaseContainer.notificationModel.ContainsKey("PagesCount")){
@@ -141,15 +143,16 @@ Item {
 
             console.log("gqlData", gqlData);
 
-            if (gqlModelBaseContainer.loading){
-                gqlModelBaseContainer.loading.visible = true;
-            }
+//            if (gqlModelBaseContainer.loading){
+//                gqlModelBaseContainer.loading.visible = true;
+//            }
 
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
             console.log("State:", this.state, itemsInfoModel);
+            gqlModelBaseContainer.itemsInfoGqlStateChanged(this.state);
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (itemsInfoModel.ContainsKey("errors")){
@@ -165,9 +168,9 @@ Item {
                         }
 
                         if (dataModelLocal.ContainsKey("items")){
-                            if (gqlModelBaseContainer.loading){
-                                gqlModelBaseContainer.loading.visible = false;
-                            }
+//                            if (gqlModelBaseContainer.loading){
+//                                gqlModelBaseContainer.loading.visible = false;
+//                            }
 
                             if (!gqlModelBaseContainer.table){
                                 return;

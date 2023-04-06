@@ -6,6 +6,14 @@ import imtauthgui 1.0
 Rectangle {
     id: filterContainer;
 
+    onHeightChanged: {
+        console.log("filterContainer onHeightChanged", filterContainer.height);
+    }
+
+    onWidthChanged: {
+        console.log("filterContainer onWidthChanged", filterContainer.width);
+    }
+
     color: Style.backgroundColor;
 
     property alias loaderDecorator: loaderDecoratorObj;

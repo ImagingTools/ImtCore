@@ -26,6 +26,11 @@ I_EXPORT_COMPONENT(
 			"SQL User Delegate");
 
 I_EXPORT_COMPONENT(
+			UserGroupDatabaseDelegate,
+			"User group object delegate for SQL table",
+			"SQL User Group Delegate");
+
+I_EXPORT_COMPONENT(
 			UsersSessionsDatabaseDelegate,
 			"User sessions delegate for SQL table",
 			"SQL User Session Delegate");

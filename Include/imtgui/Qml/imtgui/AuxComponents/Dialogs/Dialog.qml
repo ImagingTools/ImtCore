@@ -36,7 +36,7 @@ Rectangle {
     property alias contentItem: loaderBodyDialog.item;
 
     property Component topPanelDefault: Component{
-        TopPanelDialog{}
+        TopPanelDialog {}
     }
 
     Keys.onPressed: {

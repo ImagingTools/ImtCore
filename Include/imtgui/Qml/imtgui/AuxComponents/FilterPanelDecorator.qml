@@ -6,6 +6,7 @@ Item {
     id: filterPanelDecorator;
 
     height: 30;
+    width: rowFilter.width;
 
     property Item rootLoader: null;
 
@@ -19,12 +20,7 @@ Item {
 
     onFocusChanged: {
         if (filterPanelDecorator.focus){
-            console.log("filterPanelDecorator.focus", filterPanelDecorator.focus);
-            console.log("tfc.focus1", tfc.focus);
-          //  tfc.focus = filterPanelDecorator.focus;
-
             tfc.forceActiveFocus();
-            console.log("tfc.focus2", tfc.focus);
         }
     }
 

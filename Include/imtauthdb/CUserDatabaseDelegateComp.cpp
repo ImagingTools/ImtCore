@@ -34,7 +34,7 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 	QByteArray userId;
 	if (record.contains("UserId")){
 		userId = record.value("UserId").toByteArray();
-		userPtr->SetUserId(userId);
+		userPtr->SetId(userId);
 	}
 
 	QString name;
@@ -120,7 +120,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		name = objectName;
 	}
 
-	QByteArray userId = qPrintable(userPtr->GetUserId());
+	QByteArray userId = qPrintable(userPtr->GetId());
 	QByteArray passwordHash = userPtr->GetPasswordHash();
 	QString mail = userPtr->GetMail();
 
@@ -182,7 +182,7 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray userId = qPrintable(userPtr->GetUserId());
+		QByteArray userId = qPrintable(userPtr->GetId());
 		if (userId.isEmpty()){
 			return QByteArray();
 		}
@@ -216,8 +216,8 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray oldUserId = qPrintable(oldUserPtr->GetUserId());
-	QByteArray newUserId = qPrintable(newUserPtr->GetUserId());
+	QByteArray oldUserId = qPrintable(oldUserPtr->GetId());
+	QByteArray newUserId = qPrintable(newUserPtr->GetId());
 
 	QString newName = newUserPtr->GetName();
 	QByteArray newUserPasswordHash = newUserPtr->GetPasswordHash();
@@ -334,7 +334,7 @@ QByteArray CUserDatabaseDelegateComp::CreateRenameObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray userId = qPrintable(userPtr->GetUserId());
+	QByteArray userId = qPrintable(userPtr->GetId());
 
 	QByteArray retVal = QString("UPDATE \"Users\" SET \"Name\" = '%1', \"LastModified\" = '%2' WHERE \"UserId\" ='%3';")
 			.arg(qPrintable(newObjectName))

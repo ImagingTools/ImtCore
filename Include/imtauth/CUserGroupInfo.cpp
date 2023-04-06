@@ -1,5 +1,4 @@
-#include "imtbase/IObjectCollection.h"
-#include <imtauth/CUserInfo.h>
+#include <imtauth/CUserGroupInfo.h>
 
 
 // Qt includes
@@ -19,93 +18,77 @@ namespace imtauth
 
 // public methods
 
+// reimplemented (IUserGroupInfo)
 
-QByteArray CUserInfo::GetUserId() const
+QString CUserGroupInfo::GetDescription() const
 {
-	return m_userId;
+	return m_description;
 }
 
 
-void CUserInfo::SetUserId(const QByteArray& userId)
+void CUserGroupInfo::SetDescription(const QString& description)
 {
-	if (m_userId != userId){
+	if (m_description != description){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_userId = userId;
+		m_description = description;
 	}
 }
 
 
-QByteArray CUserInfo::GetPasswordHash() const
+IUserBaseInfo::RoleIds CUserGroupInfo::GetUsers() const
 {
-	return m_passwordHash;
+	return m_userIds;
 }
 
 
-void CUserInfo::SetPasswordHash(const QByteArray& passwordHash)
+void CUserGroupInfo::SetUsers(const UserIds& users)
 {
-	if (m_passwordHash != passwordHash){
+	if (m_userIds != users){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_passwordHash = passwordHash;
+		m_userIds = users;
 	}
 }
 
 
-QString CUserInfo::GetMail() const
+const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 {
-	return m_mail;
+	return nullptr;
 }
 
 
-void CUserInfo::SetMail(const QString& mail)
-{
-	if (m_mail != mail){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_mail = mail;
-	}
-}
-
-
-bool CUserInfo::IsAdmin() const
-{
-	return false;
-}
-
-
-bool CUserInfo::Serialize(iser::IArchive &archive)
+bool CUserGroupInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 	bool retVal = true;
 
 	BaseClass::Serialize(archive);
 
-	static iser::CArchiveTag usernameTag("Username", "Username of user", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag usernameTag("Description", "Description of the group", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(usernameTag);
-	retVal = retVal && archive.Process(m_userId);
+	retVal = retVal && archive.Process(m_description);
 	retVal = retVal && archive.EndTag(usernameTag);
 
-	static iser::CArchiveTag mailTag("Mail", "Mail of user", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(mailTag);
-	retVal = retVal && archive.Process(m_mail);
-	retVal = retVal && archive.EndTag(mailTag);
+	QByteArray usersTag = "Users";
+	QByteArray userTag = "User";
+	QByteArrayList userPermissions = m_userIds.values();
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, userPermissions, usersTag, userTag);
 
 	return retVal;
 }
 
 
-bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
+bool CUserGroupInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 {
-	const CUserInfo* sourcePtr = dynamic_cast<const CUserInfo*>(&object);
+	const CUserGroupInfo* sourcePtr = dynamic_cast<const CUserGroupInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
 		BaseClass::CopyFrom(object);
 
-		m_userId = sourcePtr->m_userId;
-		m_passwordHash = sourcePtr->m_passwordHash;
-		m_mail = sourcePtr->m_mail;
+		m_description = sourcePtr->m_description;
+		m_userIds = sourcePtr->m_userIds;
 
 		return true;
 	}
@@ -114,9 +97,9 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 }
 
 
-istd::IChangeable *CUserInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeable *CUserGroupInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CUserInfo> clonePtr(new CUserInfo);
+	istd::TDelPtr<CUserGroupInfo> clonePtr(new CUserGroupInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
@@ -125,14 +108,14 @@ istd::IChangeable *CUserInfo::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUserInfo::ResetData(CompatibilityMode mode)
+bool CUserGroupInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	BaseClass::ResetData(mode);
 
-	m_userId.clear();
-	m_mail.clear();
+	m_description.clear();
+	m_userIds.clear();
 
 	return true;
 }

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5063" Description="ACF"/>
-            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5060" Description="ACF"/>
+            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -16,10 +16,10 @@
                     <AttributeInfo Id="GqlRequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserCommands</Value>
-                                <Value>UsersCommands</Value>
-                                <Value>UserDataController</Value>
-                                <Value>UserGroupListController</Value>
+                                <Value>GroupCommands</Value>
+                                <Value>GroupsCommands</Value>
+                                <Value>GroupController</Value>
+                                <Value>GroupsListController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -29,44 +29,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="HashCalculator" PackageId="ImtCryptPck" ComponentId="HashCalculator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="ObjectViewDataProvider" PackageId="ImtQmlPck" ComponentId="ObjectViewDataProvider">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroup"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectViewPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="../../imtauthgui/UserGroupView.qml"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserCommands" PackageId="" ComponentId="UserCommands">
+        <Element Id="GroupCommands" PackageId="" ComponentId="UserCommands">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserDataController" PackageId="ImtAuthGqlPck" ComponentId="UserController">
+        <Element Id="GroupController" PackageId="ImtAuthGqlPck" ComponentId="UserController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserGroupAdd</Value>
-                                <Value>UserGroupUpdate</Value>
-                                <Value>UserGroupItem</Value>
+                                <Value>GroupAdd</Value>
+                                <Value>GroupUpdate</Value>
+                                <Value>GroupItem</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -79,7 +62,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RolesCollection">
@@ -97,21 +80,36 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserGroupListController" PackageId="ImtAuthGqlPck" ComponentId="UserCollectionController">
+        <Element Id="GroupsCommands" PackageId="" ComponentId="UsersCommands">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GroupsListController" PackageId="ImtAuthGqlPck" ComponentId="UserCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserGroupsInfo</Value>
-                                <Value>UserGroupsList</Value>
-                                <Value>UserGroupsRemove</Value>
-                                <Value>UserGroupsMetaInfo</Value>
-                                <Value>UserGroupsRename</Value>
-                                <Value>UserGroupsSetDescription</Value>
-                                <Value>UserGroupsObjectView</Value>
+                                <Value>GroupsInfo</Value>
+                                <Value>GroupsList</Value>
+                                <Value>GroupsRemove</Value>
+                                <Value>GroupsMetaInfo</Value>
+                                <Value>GroupsRename</Value>
+                                <Value>GroupsSetDescription</Value>
+                                <Value>GroupsObjectView</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HeadersProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserGroupsHeadersDataProvider"/>
@@ -119,7 +117,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectViewProvider" Type="Reference" ExportId="">
@@ -133,6 +131,26 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="HashCalculator" PackageId="ImtCryptPck" ComponentId="HashCalculator">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="ObjectViewDataProvider" PackageId="ImtQmlPck" ComponentId="ObjectViewDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Group"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectViewPath" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="../../imtauthgui/UserGroupView.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -154,7 +172,7 @@
                     <AttributeInfo Id="HeadersNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Group name</Value>
+                                <Value>Group Name</Value>
                                 <Value>Description</Value>
                             </Values>
                         </Data>
@@ -183,15 +201,6 @@
                         <Data IsEnabled="true" Value="su"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UsersCommands" PackageId="" ComponentId="UsersCommands">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -250,7 +259,7 @@
                                     <Data IsEnabled="true" Value="UserGroupCommandPermissions"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="UserGroup"/>
+                                    <Data IsEnabled="true" Value="Group"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="CheckPermissionOr"/>
@@ -263,6 +272,34 @@
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
                                     <Data IsEnabled="true" Value="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="GroupCommandsController" PackageId="ImtGqlPck" ComponentId="GqlRepresentationDataController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>GroupCommands</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="Commands"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="CommandsRepresentation"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -321,43 +358,15 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="UserCommandsController" PackageId="ImtGqlPck" ComponentId="GqlRepresentationDataController">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>UserCommands</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="Commands"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="CommandsRepresentation"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
                     <Element Id="UserGroupCommandPermissions" PackageId="ImtCoreVoce" ComponentId="DocumentCommandPermissions">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="CloseCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
-                                            <Value>ViewUsers</Value>
+                                            <Value>RemoveGroup</Value>
+                                            <Value>ChangeGroup</Value>
+                                            <Value>ViewGroups</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -367,27 +376,27 @@
                                 <AttributeInfo Id="RedoCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>AddGroup</Value>
+                                            <Value>RemoveGroup</Value>
+                                            <Value>ChangeGroup</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="SaveCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>AddGroup</Value>
+                                            <Value>RemoveGroup</Value>
+                                            <Value>ChangeGroup</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UndoCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>AddUser</Value>
-                                            <Value>RemoveUser</Value>
-                                            <Value>ChangeUser</Value>
+                                            <Value>AddGroup</Value>
+                                            <Value>RemoveGroup</Value>
+                                            <Value>ChangeGroup</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -397,9 +406,9 @@
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="UserCommandsController"/>
-                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="UserCommandsController"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="UserCommandsController"/>
+                    <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="GroupCommandsController"/>
+                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GroupCommandsController"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="GroupCommandsController"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>
@@ -434,7 +443,7 @@
                                     <Data IsEnabled="true" Value="UsersCommandPermissions"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="Users"/>
+                                    <Data IsEnabled="true" Value="Groups"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="CheckPermissionOr"/>
@@ -460,6 +469,34 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="GroupsCommandsController" PackageId="ImtGqlPck" ComponentId="GqlRepresentationDataController">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>GroupsCommands</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
+                                <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="Commands"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="CommandsRepresentation"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="New" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -473,7 +510,7 @@
                                     <Data IsEnabled="true" Value="true"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Name" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Create new user"/>
+                                    <Data IsEnabled="true" Value="Create new group"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -502,8 +539,8 @@
                                 <AttributeInfo Id="EditCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ChangeUserGroup</Value>
-                                            <Value>RemoveUserGroup</Value>
+                                            <Value>ChangeGroup</Value>
+                                            <Value>RemoveGroup</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -530,40 +567,12 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="UsersCommandsController" PackageId="ImtGqlPck" ComponentId="GqlRepresentationDataController">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>UsersCommands</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="Commands"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="CommandsRepresentation"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="UsersCommandsController"/>
-                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="UsersCommandsController"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="UsersCommandsController"/>
+                    <Interface InterfaceId="imtgql::IGqlRepresentationController" ComponentId="GroupsCommandsController"/>
+                    <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GroupsCommandsController"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="GroupsCommandsController"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
             </Data>

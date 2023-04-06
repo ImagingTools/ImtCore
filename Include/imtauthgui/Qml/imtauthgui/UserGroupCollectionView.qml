@@ -4,14 +4,8 @@ import imtgui 1.0
 
 CollectionView {
     id: userGroupCollectionViewContainer;
-    Rectangle {
-        anchors.fill: parent;
-        color: "red";
-    }
 
     Component.onCompleted: {
-        console.log("UserGroupCollection onCompleted", model.index);
-        userGroupCollectionViewContainer.commandUpdateGui = "UserGroupCollectionUpdateGui";
         userGroupCollectionViewContainer.commandsDelegatePath = "../../imtauthgui/UserGroupCollectionViewCommandsDelegate.qml";
         
         baseCollectionView.commands.fieldsData.push("UserGroupId");
