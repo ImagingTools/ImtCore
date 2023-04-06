@@ -25,6 +25,9 @@ Rectangle {
 
     property alias openST: verticalListViewContainer.openST;
 
+    property string openButtonText: ">>";
+    property string openButtonImageSource: "";
+
     property TreeItemModel buttonModel: TreeItemModel{};
     property TreeItemModel horizontalModel: TreeItemModel{};
     property TreeItemModel verticalModel: TreeItemModel{};
@@ -69,11 +72,19 @@ Rectangle {
     signal clicked(string buttonId);
 
     Component.onCompleted: {
-        //setModels();
+        if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+            buttonPanel.setModels();
+        }
+    }
+
+    onWidthChanged: {
+        if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+            buttonPanel.setModels();
+        }
     }
 
     onButtonModelChanged: {
-        setModels();
+        buttonPanel.setModels();
 
     }
 
@@ -95,10 +106,10 @@ Rectangle {
             }
 
             for(var k = horizCount; k < count; k++){
-                var kk = 0;
-                buttonPanel.verticalModel.InsertNewItem();
-                buttonPanel.verticalModel.CopyItemDataFromModel(k,buttonPanel.buttonModel,kk);
-                kk++;
+
+                var kk = buttonPanel.verticalModel.InsertNewItem();
+                buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
+
             }
         }
     }
@@ -126,13 +137,6 @@ Rectangle {
 
             delegate: buttonPanel.buttonDelegate;
 
-//            delegate: Rectangle{
-
-//                width: buttonPanel.delegateWidth;
-//                height: buttonPanel.delegateHeight;
-
-//                color: "red";
-//            }
 
         }//horizontalListView
     }//horizontalListViewContainer
@@ -140,7 +144,6 @@ Rectangle {
     AuxButton{
         id: openButton;
 
-//        anchors.verticalCenter: parent.verticalCenter;
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
         anchors.rightMargin: buttonPanel.mainMargin;
@@ -148,8 +151,10 @@ Rectangle {
         width: 40;
         height: 30;
         radius: 4;
-        hasText: true;
-        textButton: ">>";
+        hasText: buttonPanel.openButtonText !== "";
+        hasIcon: buttonPanel.openButtonImageSource !== 0;
+        textButton: buttonPanel.openButtonText;
+        iconSource: buttonPanel.openButtonImageSource;
         fontPixelSize: 30;
         fontColor: containsMouse ? "black" : "gray";
         color: containsMouse || verticalListViewContainer.openST ? "lightgray" : "transparent";
@@ -211,7 +216,7 @@ Rectangle {
             anchors.centerIn: parent;
 
             width: buttonPanel.delegateWidth;
-            height:  buttonPanel.delegateHeight * buttonPanel.visibleCount + (spacing - 1) * buttonPanel.visibleCount;
+            height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + (spacing - 1) * buttonPanel.visibleCount));
 
             clip: true;
             boundsBehavior: Flickable.StopAtBounds;
@@ -222,15 +227,6 @@ Rectangle {
 
             delegate: buttonPanel.buttonDelegate;
 
-//            delegate: Rectangle{
-//                anchors.horizontalCenter:  verticalListView.horizontalCenter;
-
-//                width: buttonPanel.delegateWidth;
-//                height: buttonPanel.delegateHeight;
-
-//                color: "green";
-
-//            }
 
         }//verticalListView
 
@@ -243,8 +239,8 @@ Rectangle {
         target: verticalListViewContainer;
         property: "height";
         duration: 100;
-        from:0;
-        to:verticalListView.height + 2*buttonPanel.mainMargin;
+        from: 0;
+        to: verticalListView.height + 2*buttonPanel.mainMargin;
     }
 
     NumberAnimation {
@@ -253,8 +249,8 @@ Rectangle {
         target: verticalListViewContainer;
         property: "height";
         duration: 100;
-        from:verticalListView.height + 2*buttonPanel.mainMargin;
-        to:0;
+        from: verticalListView.height + 2*buttonPanel.mainMargin;
+        to: 0;
     }
 
 }
