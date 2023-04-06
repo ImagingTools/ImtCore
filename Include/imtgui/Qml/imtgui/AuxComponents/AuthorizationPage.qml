@@ -112,11 +112,11 @@ Rectangle {
             Rectangle{
                 id: headerRec;
 
-                width: parent.width;
+                width: loginContainer.width;
                 height: 80;
 
-                color: parent.color;
-                radius: parent.radius;
+                color: loginContainer.color;
+                radius: loginContainer.radius;
 
                 Text{
                     id: welcomeText;

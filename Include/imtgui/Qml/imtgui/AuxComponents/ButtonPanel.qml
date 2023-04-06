@@ -25,6 +25,8 @@ Rectangle {
 
     property alias openST: verticalListViewContainer.openST;
 
+    property bool hasActiveState: false;
+
     property string openButtonText: ">>";
     property string openButtonImageSource: "";
 
@@ -71,6 +73,13 @@ Rectangle {
 
     signal clicked(string buttonId);
 
+    onClicked: {
+        if(buttonPanel.hasActiveState){
+            buttonPanel.setActive(buttonId);
+        }
+
+    }
+
     Component.onCompleted: {
         if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
             buttonPanel.setModels();
@@ -85,6 +94,51 @@ Rectangle {
 
     onButtonModelChanged: {
         buttonPanel.setModels();
+
+    }
+
+
+
+    function setActive(buttonId){
+        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            var id = buttonPanel.buttonModel.GetData("Id",i);
+            if(id == buttonId){
+                buttonPanel.buttonModel.SetData("Active",true, i);
+                break;
+            }
+        }
+
+        if(buttonPanel.hasActiveState){
+            buttonPanel.setModelsWithActive();
+        }
+
+    }
+
+    function setModelsWithActive(){
+
+        buttonPanel.horizontalModel.Clear();
+        buttonPanel.verticalModel.Clear();
+
+        var horizCount  = Math.floor((horizontalListViewContainer.width + buttonPanel.horizontalSpacing)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
+        console.log("horizCount ",horizCount);
+
+        var count = buttonPanel.buttonModel.GetItemsCount();
+        if(count <= horizCount){
+            buttonPanel.horizontalModel = buttonPanel.buttonModel;
+        }
+        else{
+            for(var i = 0; i < horizCount; i++){
+                buttonPanel.horizontalModel.InsertNewItem()
+                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+            }
+
+            for(var k = horizCount; k < count; k++){
+
+                var kk = buttonPanel.verticalModel.InsertNewItem();
+                buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
+
+            }
+        }
 
     }
 
