@@ -20,6 +20,7 @@
 #include <imtauth/CUserCollection.h>
 #include <imtauth/CUserInfoMetaInfoCreatorComp.h>
 #include <imtauth/CUserInfoComp.h>
+#include <imtauth/CUserGroupInfoComp.h>
 #include <imtauth/CRoleCollectionAdapterComp.h>
 #include <imtauth/CCheckPermissionCompBase.h>
 #include <imtauth/CFeaturePackageRepresentationControllerComp.h>
@@ -63,6 +64,7 @@ typedef imtauth::CCompanyInfoMetaInfoCreatorComp CompanyInfoMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CRoleComp> Role;
 typedef imtauth::CRoleMetaInfoCreatorComp RoleMetaInfoCreator;
 typedef icomp::TModelCompWrap<imtauth::CUserInfoComp> UserInfo;
+typedef icomp::TModelCompWrap<imtauth::CUserGroupInfoComp> UserGroupInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtauth::CUserCollection,

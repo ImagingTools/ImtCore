@@ -31,7 +31,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 		UserCollectionController,
-		"UserCollectionController",
+		"User collection controller",
 		"User Collection Controller");
 
 I_EXPORT_COMPONENT(
@@ -43,6 +43,11 @@ I_EXPORT_COMPONENT(
 		UserGroupController,
 		"Group of the users",
 		"User Group Controller");
+
+I_EXPORT_COMPONENT(
+		UserGroupCollectionController,
+		"User group collection controller",
+		"User Group Collection Controller");
 
 I_EXPORT_COMPONENT(
 		AuthorizationOptionsController,

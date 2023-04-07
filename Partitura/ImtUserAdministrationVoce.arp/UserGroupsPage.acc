@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5063" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -41,7 +41,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GroupController" PackageId="ImtAuthGqlPck" ComponentId="UserController">
+        <Element Id="GroupController" PackageId="ImtAuthGqlPck" ComponentId="UserGroupController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
@@ -55,9 +55,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="CommandPermissions">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="HashCalculator"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -74,8 +71,8 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="UserInfo"/>
+                    <AttributeInfo Id="UserGroupFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupInfo"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -92,7 +89,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GroupsListController" PackageId="ImtAuthGqlPck" ComponentId="UserCollectionController">
+        <Element Id="GroupsListController" PackageId="ImtAuthGqlPck" ComponentId="UserGroupCollectionController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
@@ -155,6 +152,18 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AdminId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="UserGroupsHeadersDataProvider" PackageId="ImtQmlPck" ComponentId="HeadersDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -189,18 +198,6 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AdminId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="su"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

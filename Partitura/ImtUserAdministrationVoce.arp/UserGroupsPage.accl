@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5063" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -15,8 +15,8 @@
         <Element ComponentName="GroupsListController" X="1000" Y="350" Note=""/>
         <Element ComponentName="HashCalculator" X="400" Y="550" Note=""/>
         <Element ComponentName="ObjectViewDataProvider" X="1050" Y="550" Note=""/>
+        <Element ComponentName="UserGroupInfo" X="175" Y="450" Note=""/>
         <Element ComponentName="UserGroupsHeadersDataProvider" X="775" Y="550" Note=""/>
-        <Element ComponentName="UserInfo" X="125" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="UsersCommands">

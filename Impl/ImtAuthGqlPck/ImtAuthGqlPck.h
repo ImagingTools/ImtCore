@@ -12,6 +12,7 @@
 #include <imtauthgql/CUserCollectionControllerComp.h>
 #include <imtauthgql/CUserControllerComp.h>
 #include <imtauthgql/CUserGroupControllerComp.h>
+#include <imtauthgql/CUserGroupCollectionControllerComp.h>
 #include <imtauthgql/CAuthorizationOptionsControllerComp.h>
 
 
@@ -28,6 +29,7 @@ typedef imtauthgql::CRoleControllerComp RoleController;
 typedef imtauthgql::CUserCollectionControllerComp UserCollectionController;
 typedef imtauthgql::CUserControllerComp UserController;
 typedef imtauthgql::CUserGroupControllerComp UserGroupController;
+typedef imtauthgql::CUserGroupCollectionControllerComp UserGroupCollectionController;
 typedef imtauthgql::CAuthorizationOptionsControllerComp AuthorizationOptionsController;
 
 

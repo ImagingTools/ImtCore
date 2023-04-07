@@ -5,7 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtauth/CUserInfo.h>
+#include <imtauth/CUserGroupInfo.h>
 #include <imtlic/IFeatureInfoProvider.h>
 #include <imtauth/IRoleInfoProvider.h>
 #include <imtbase/IObjectCollection.h>
@@ -14,30 +14,25 @@ namespace imtauth
 {
 
 
-class CUserInfoComp:
+class CUserGroupInfoComp:
 		public icomp::CComponentBase,
-		public CUserInfo
+		public CUserGroupInfo
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
 
-	I_BEGIN_COMPONENT(CUserInfoComp);
-		I_REGISTER_INTERFACE(IUserInfo);
+	I_BEGIN_COMPONENT(CUserGroupInfoComp);
+		I_REGISTER_INTERFACE(IUserGroupInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_roleProviderCompPtr, "RoleProvider", "Role provider", true, "RoleProvider");
-		I_ASSIGN(m_adminIdAttrPtr, "AdminId", "Id for admin user", true, "admin");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
-	// reimplemented (iser::IUserInfo)
-	virtual bool IsAdmin() const override;
-
 private:
 	I_REF(imtauth::IRoleInfoProvider, m_roleProviderCompPtr);
-	I_ATTR(QByteArray, m_adminIdAttrPtr);
 };
 
 

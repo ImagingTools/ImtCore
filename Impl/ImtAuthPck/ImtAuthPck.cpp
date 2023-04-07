@@ -70,6 +70,11 @@ I_EXPORT_COMPONENT(
 			"User Info");
 
 I_EXPORT_COMPONENT(
+			UserGroupInfo,
+			"User group Info",
+			"User Group Info");			
+
+I_EXPORT_COMPONENT(
 			UserCollection,
 			"List of all users",
 			"List of all users");
