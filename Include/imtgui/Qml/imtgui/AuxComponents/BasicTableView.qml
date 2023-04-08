@@ -25,7 +25,11 @@ FocusScope {
     property int rowItemHeight: 30;
     property int headerHeight: 35;
 
-    property var rowModel: ListModel {};
+    property var rowModel: ListModel {
+        onDataChanged: {
+            console.log("rowModel onDataChanged", data, topLeft, bottomRight);
+        }
+    };
     property var columnModel: ListModel {};
 
     property ModelIndex selectedIndex: null;
@@ -54,19 +58,19 @@ FocusScope {
     Keys.onPressed: {
         console.log("TableView Keys.onPressed");
 
-        if (tableViewRoot.selectedIndex == null){
-            return;
-        }
+//        if (tableViewRoot.selectedIndex == null){
+//            return;
+//        }
 
-        let itemData = tableViewRoot.selectedIndex.itemData;
+//        let itemData = tableViewRoot.selectedIndex.itemData;
 
-        if (event.key == Qt.Key_Left){
-            itemData.IsOpen = false;
-        }
-        else if (event.key == Qt.Key_Right){
-            console.log("Qt.Key_Right");
-            itemData.IsOpen = true;
-        }
+//        if (event.key == Qt.Key_Left){
+//            itemData.IsOpen = false;
+//        }
+//        else if (event.key == Qt.Key_Right){
+//            console.log("Qt.Key_Right");
+//            itemData.IsOpen = true;
+//        }
     }
 
     Loader {
@@ -183,6 +187,8 @@ FocusScope {
 
         boundsBehavior: Flickable.StopAtBounds;
         headerPositioning: ListView.OverlayHeader;
+
+        cacheBuffer: 10000;
 
         delegate: TableViewItemDelegateBase {
             root: tableViewRoot;

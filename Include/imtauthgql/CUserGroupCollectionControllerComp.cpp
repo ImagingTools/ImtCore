@@ -1,6 +1,7 @@
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
 
-// ACF includes
+
+// ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
 
 
@@ -21,14 +22,13 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 {
 	bool retVal = true;
 
-	gqlRequest.GetFields();
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
 
 	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
-		imtauth::CUserGroupInfo* userGroupInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr orderDataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(collectionId, orderDataPtr)){
-			userGroupInfoPtr = dynamic_cast<imtauth::CUserGroupInfo*>(orderDataPtr.GetPtr());
+		imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr groupDataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
+			userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(groupDataPtr.GetPtr());
 		}
 
 		if (userGroupInfoPtr != nullptr){
@@ -39,7 +39,7 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
 				}
 				else if(informationId == "Id"){
-					QByteArray objectUuid = userGroupInfoPtr->GetId();
+					QByteArray objectUuid = userGroupInfoPtr->GetObjectUuid();
 					elementInformation = objectUuid;
 				}
 				else if(informationId == "Name"){
@@ -47,20 +47,6 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 				}
 				else if(informationId == "Description"){
 					elementInformation = userGroupInfoPtr->GetDescription();
-				}
-				else if(informationId == "Added"){
-					idoc::MetaInfoPtr metaInfoPtr = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
-					if (metaInfoPtr.IsValid()){
-						elementInformation = metaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
-								.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-					}
-				}
-				else if(informationId == "LastModified"){
-					idoc::MetaInfoPtr metaInfoPtr = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
-					if (metaInfoPtr.IsValid()){
-						elementInformation = metaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
-								.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-					}
 				}
 
 				if (elementInformation.isNull()){

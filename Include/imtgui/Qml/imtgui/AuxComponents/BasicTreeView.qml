@@ -60,17 +60,57 @@ BasicTableView {
         treeViewRoot.insertRow([rowModel.count], row);
     }
 
-//    function addRow(row){
-//        let count = rowModel.GetItemsCount();
-//        insertRow([count], row);
-//    }
     Component {
         id: modelComponent;
-        ListModel {
-        }
+        ListModel {}
     }
 
-    function insertRow(indexes, row){
+    function setRow(indexes, row){
+        if (!indexes || indexes.length === 0){
+            console.error("BasicTreeView::setRow() - invalid indexes", indexes)
+            return;
+        }
+
+        let localModel = rowModel;
+        for (let i = 0; i < indexes.length - 1; i++){
+            let index = indexes[i];
+            if (localModel.count <= index){
+                console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes);
+                return;
+            }
+            localModel = localModel.get(index).ChildModel;
+        }
+
+        let lastIndex = indexes[indexes.length - 1];
+        localModel.set(lastIndex, row);
+    }
+
+    function getRow(indexes){
+        if (!indexes || indexes.length === 0){
+            console.error("BasicTreeView::getRow() - invalid indexes", indexes)
+            return;
+        }
+
+        let localModel = rowModel;
+        for (let i = 0; i < indexes.length - 1; i++){
+            let index = indexes[i];
+            if (localModel.count <= index){
+                console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes);
+                return;
+            }
+            localModel = localModel.get(index).ChildModel;
+        }
+
+        let lastIndex = indexes[indexes.length - 1];
+
+        return localModel.get(lastIndex);
+    }
+
+    function insertRow(indexes, row, parent){
+        if (!parent){
+            parent = null;
+        }
+
         console.log("insertRow", indexes, JSON.stringify(row))
         if (!indexes || indexes.length == 0){
             console.error("BasicTreeView::insertRow() - invalid indexes", indexes)
@@ -79,7 +119,7 @@ BasicTableView {
 
         let hasKey = "ChildModel" in row;
         if (!hasKey){
-            row["ChildModel"] = modelComponent.createObject(treeViewRoot);
+            row["ChildModel"] = modelComponent.createObject(treeViewRoot.rowModel);
         }
 
         hasKey = "CheckState" in row;

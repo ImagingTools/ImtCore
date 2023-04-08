@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5063" Description="ACF"/>
-            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5060" Description="ACF"/>
+            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -63,6 +63,9 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserGroupSqlRepository"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserSqlRepository"/>
                     </AttributeInfo>
@@ -119,6 +122,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -208,9 +214,6 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RolesPage/RoleCollectionAdapter"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -221,9 +224,6 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="UserGroupRepository">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
@@ -342,6 +342,24 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="UserGroupSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserGroupSqlRepository">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="UserSqlRepository" PackageId="ImtUserAdministrationVoce" ComponentId="UserSqlRepository">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -363,6 +381,7 @@
                 <ExportedComponents>
                     <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleRepository/RoleCollectionAdapter"/>
                     <Component ExportedId="RoleRepository" ComponentId="RoleRepository"/>
+                    <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
                     <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>
                 </ExportedComponents>
             </Data>

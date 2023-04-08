@@ -4,8 +4,6 @@
 // ImtCore includes
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
 #include <imtauth/IUserGroupInfo.h>
-#include <imtcrypt/IHashGenerator.h>
-
 
 namespace imtauthgql
 {
@@ -17,7 +15,7 @@ public:
 	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserGroupControllerComp);
-		I_ASSIGN(m_userInfoFactCompPtr, "UserGroupFactory", "Factory used for creation of the new group", true, "UserGroupFactory");
+		I_ASSIGN(m_userGroupInfoFactCompPtr, "UserGroupFactory", "Factory used for creation of the new group", true, "UserGroupFactory");
 		I_ASSIGN(m_rolesCollectionCompPtr, "RolesCollection", "Roles collection", true, "RolesCollection");
 	I_END_COMPONENT;
 
@@ -25,8 +23,11 @@ protected:
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const override;
 
+	bool InsertSubGroupsToModelFromRepresentation(imtauth::IUserGroupInfo& groupInfoPtr, const imtbase::CTreeItemModel& representationModel) const;
+	void InsertSubGroupsToRepresentationFromModel(const imtauth::IUserGroupInfo& groupInfoPtr, imtbase::CTreeItemModel& representationModel) const;
+
 private:
-	I_FACT(imtauth::IUserGroupInfo, m_userInfoFactCompPtr);
+	I_FACT(imtauth::IUserGroupInfo, m_userGroupInfoFactCompPtr);
 	I_REF(imtbase::IObjectCollection, m_rolesCollectionCompPtr);
 };
 

@@ -21,6 +21,12 @@ namespace imtauth
 
 // public methods
 
+CUserBaseInfo::CUserBaseInfo():
+	m_roles(QByteArrayList())
+{
+
+}
+
 
 const imtlic::IFeatureInfoProvider *CUserBaseInfo::GetPermissionProvider() const
 {
@@ -147,20 +153,13 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-	QByteArray permissionsTag = "Permissions";
-	QByteArray permissionTag = "Permission";
-	QByteArrayList userPermissions = m_permissions.values();
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, userPermissions, permissionsTag, permissionTag);
+	QByteArrayList permissions = m_permissions.values();
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, "Permissions", "Permission");
 
-	QByteArray restrictionsTag = "Restrictions";
-	QByteArray restrictionTag = "Restriction";
-	QByteArrayList userRestrictions = m_restrictions.values();
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, userRestrictions, restrictionsTag, restrictionTag);
+	QByteArrayList restrictions = m_restrictions.values();
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, "Restrictions", "Restriction");
 
-	QByteArray rolesTag = "Roles";
-	QByteArray roleTag = "Role";
-	QByteArrayList userRoles = m_roles.values();
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, userRoles, rolesTag, roleTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roles, "Roles", "Role");
 
 	return retVal;
 }

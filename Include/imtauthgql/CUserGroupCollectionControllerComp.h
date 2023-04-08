@@ -18,13 +18,13 @@ public:
 	I_END_COMPONENT;
 
 protected:
-// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
-bool SetupGqlItem(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
-		const QByteArray& collectionId,
-		QString& errorMessage) const;
+	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+	bool SetupGqlItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const QByteArray& collectionId,
+			QString& errorMessage) const override;
 };
 
 

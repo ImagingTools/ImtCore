@@ -1,6 +1,13 @@
 #include <imtauthgql/CUserGroupControllerComp.h>
 
 
+// ACF includes
+#include <istd/TChangeDelegator.h>
+
+// ImtCore includes
+#include <imtauth/CUserGroupInfo.h>
+
+
 namespace imtauthgql
 {
 
@@ -22,13 +29,13 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 	QByteArray userGroupId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userGroupId, dataPtr)){
-		const imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+		imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(dataPtr.GetPtr());
 		if (userGroupInfoPtr != nullptr){
-			QByteArray groupId = userGroupInfoPtr->GetId();
+			QByteArray groupUuid = userGroupInfoPtr->GetObjectUuid();
 			QString name = userGroupInfoPtr->GetName();
 			QString description = userGroupInfoPtr->GetDescription();
 
-			dataModel->SetData("Id", groupId);
+			dataModel->SetData("Id", groupUuid);
 			dataModel->SetData("Name", name);
 			dataModel->SetData("Description", description);
 			dataModel->SetData("Users", "");
@@ -37,6 +44,16 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 			if (!userGroupIds.empty()){
 				QByteArray users = userGroupIds.values().join(';');
 				dataModel->SetData("Users", users);
+			}
+
+			imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles();
+			if (!roleIds.empty()){
+				QByteArray roles = roleIds.join(';');
+				dataModel->SetData("Roles", roles);
+			}
+
+			if (!userGroupInfoPtr->GetSubGroups().IsEmpty()){
+				InsertSubGroupsToRepresentationFromModel(*userGroupInfoPtr, *dataModel->AddTreeModel("ChildModel"));
 			}
 		}
 	}
@@ -55,14 +72,14 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		QString& errorMessage) const
 {
 
-	if (!m_userInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
+	if (!m_userGroupInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
 		return nullptr;
 	}
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		istd::TDelPtr<imtauth::IUserGroupInfo> userGroupInfoPtr = m_userInfoFactCompPtr.CreateInstance();
+		istd::TDelPtr<imtauth::CIdentifiableUserGroupInfo> userGroupInfoPtr = new imtauth::CIdentifiableUserGroupInfo();
 		if (userGroupInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an group info!");
 			return nullptr;
@@ -71,9 +88,30 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
 
+		if (itemModel.ContainsKey("Id")){
+			QByteArray id = itemModel.GetData("Id").toByteArray();
+			if (!id.isEmpty()){
+				objectId = id;
+			}
+		}
+
+		if (objectId.isEmpty()){
+			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+		}
+
+		userGroupInfoPtr->SetObjectUuid(objectId);
+
+		userGroupInfoPtr->SetId(objectId);
+
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
 			userGroupInfoPtr->SetName(name);
+		}
+
+		if (name.isEmpty()){
+			errorMessage = QT_TR_NOOP("Group Name cannot be empty");
+
+			return nullptr;
 		}
 
 		if (itemModel.ContainsKey("Description")){
@@ -90,12 +128,82 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 			}
 		}
 
+		if (itemModel.ContainsKey("Roles")){
+			QByteArray roles = itemModel.GetData("Roles").toByteArray();
+			if (!roles.isEmpty()){
+				QByteArrayList roleIds = roles.split(';');
+				userGroupInfoPtr->SetRoles(imtauth::IUserGroupInfo::RoleIds(roleIds.begin(), roleIds.end()));
+			}
+		}
+
+		if (itemModel.ContainsKey("ChildModel")){
+			imtbase::CTreeItemModel* childrenModel = itemModel.GetTreeItemModel("ChildModel");
+			if (childrenModel != nullptr){
+				InsertSubGroupsToModelFromRepresentation(*userGroupInfoPtr.GetPtr(), *childrenModel);
+			}
+		}
+
 		return userGroupInfoPtr.PopPtr();
 	}
 
 	errorMessage = QObject::tr("Can not create group: %1").arg(QString(objectId));
 
 	return nullptr;
+}
+
+
+bool CUserGroupControllerComp::InsertSubGroupsToModelFromRepresentation(imtauth::IUserGroupInfo& parentGroupInfoPtr, const imtbase::CTreeItemModel& representationModel) const
+{
+	for (int i = 0; i < representationModel.GetItemsCount(); i++){
+		QByteArray groupUuid = representationModel.GetData("Id", i).toByteArray();
+		QString groupName = representationModel.GetData("Name", i).toString();
+		QString groupDescription = representationModel.GetData("Description", i).toString();
+
+		istd::TChangeDelegator<imtauth::CIdentifiableUserGroupInfo>* groupInfoPtr = new istd::TChangeDelegator<imtauth::CIdentifiableUserGroupInfo>;
+		groupInfoPtr->SetSlavePtr(&parentGroupInfoPtr);
+
+		groupInfoPtr->SetObjectUuid(groupUuid);
+		groupInfoPtr->SetName(groupName);
+		groupInfoPtr->SetDescription(groupDescription);
+
+		parentGroupInfoPtr.InsertSubGroup(groupInfoPtr);
+
+		if (representationModel.ContainsKey("ChildModel", i)){
+			imtbase::CTreeItemModel *subModelPtr = representationModel.GetTreeItemModel("ChildModel", i);
+			if (subModelPtr != nullptr){
+				bool result = InsertSubGroupsToModelFromRepresentation(*groupInfoPtr, *subModelPtr);
+				if (!result){
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+
+void CUserGroupControllerComp::InsertSubGroupsToRepresentationFromModel(const imtauth::IUserGroupInfo& groupInfoPtr, imtbase::CTreeItemModel& representationModel) const
+{
+	const imtauth::UserGroupInfoList& subGroups = groupInfoPtr.GetSubGroups();
+	for (int i = 0; i < subGroups.GetCount(); i++){
+		const imtauth::CIdentifiableUserGroupInfo* subGroupPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(subGroups.GetAt(i));
+		if (subGroupPtr != nullptr){
+			QByteArray groupUuid = subGroupPtr->GetObjectUuid();
+			QString groupName = subGroupPtr->GetName();
+			QString groupDescription = subGroupPtr->GetDescription();
+
+			int index = representationModel.InsertNewItem();
+
+			representationModel.SetData("Id", groupUuid, index);
+			representationModel.SetData("Name", groupName, index);
+			representationModel.SetData("Description", groupDescription, index);
+
+			if (!subGroupPtr->GetSubGroups().IsEmpty()){
+				InsertSubGroupsToRepresentationFromModel(*subGroupPtr, *representationModel.AddTreeModel("ChildModel", index));
+			}
+		}
+	}
 }
 
 

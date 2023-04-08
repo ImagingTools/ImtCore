@@ -22,7 +22,7 @@ class IUserBaseInfo:
 {
 public:
 	typedef QSet<QByteArray> FeatureIds;
-	typedef QSet<QByteArray> RoleIds;
+	typedef QList<QByteArray> RoleIds;
 
 	/**
 		Get list of all availiable permissions.

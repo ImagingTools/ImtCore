@@ -10,26 +10,14 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="GroupUserDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="UserDatabaseDelegate">
+        <Element Id="CompactXmlFileSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroupId"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserGroups"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserInfo" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="UserInfo"/>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -56,7 +44,74 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GroupUserDatabaseDelegate"/>
+                        <Data IsEnabled="true" Value="UserGroupDatabaseDelegate"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserGroupInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserGroupInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserGroupDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="UserGroupDatabaseDelegate">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserGroupInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentPersistenceList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>CompactXmlFileSerializer</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumntContentColumnId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Document"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="DocumentId"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Types"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroups"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

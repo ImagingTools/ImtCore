@@ -32,7 +32,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(const QByteArray&
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QString(" AND \"%1\".Id = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
+			baseQuery + QString(" AND \"%1\".\"Id\" = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);

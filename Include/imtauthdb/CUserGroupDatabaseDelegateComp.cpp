@@ -3,9 +3,10 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
+#include <istd/CCrcCalculator.h>
 
 // ImtCore includes
-#include <imtauth/CUserInfoMetaInfo.h>
+#include <imtauth/CUserGroupInfo.h>
 
 
 namespace imtauthdb
@@ -18,26 +19,75 @@ namespace imtauthdb
 
 istd::IChangeable* CUserGroupDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	if (!m_documentFactoriesCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	istd::TDelPtr<istd::IChangeable> documentPtr;
+	documentPtr.SetPtr(new imtauth::CIdentifiableUserGroupInfo());
+	if (!documentPtr.IsValid()){
+		return nullptr;
+	}
+
+	if (record.contains(*m_documentContentColumnIdAttrPtr)){
+		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
+
+		if (ReadDataFromMemory("UserGroupInfo", documentContent, *documentPtr)){
+			return documentPtr.PopPtr();
+		}
+	}
+
 	return nullptr;
 }
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::CreateNewObjectQuery(
 		const QByteArray& /*typeId*/,
-		const QByteArray& /*proposedObjectId*/,
+		const QByteArray& proposedObjectId,
 		const QString& objectName,
 		const QString& objectDescription,
 		const istd::IChangeable* valuePtr) const
 {
-	return IDatabaseObjectDelegate::NewObjectQuery();
-}
+	NewObjectQuery retVal;
 
+	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
+	if (valuePtr != nullptr){
+		workingDocumentPtr.SetPtr(valuePtr, false);
+	}
 
-QByteArray CUserGroupDatabaseDelegateComp::CreateDeleteObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId) const
-{
-	return QByteArray();
+	if (workingDocumentPtr.IsValid()){
+		QByteArray documentContent;
+		if (WriteDataToMemory("UserGroupInfo", *workingDocumentPtr, documentContent)){
+			const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(workingDocumentPtr.GetPtr());
+			Q_ASSERT(groupInfoPtr != nullptr);
+			if (groupInfoPtr == nullptr){
+				return NewObjectQuery();
+			}
+
+			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
+			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+
+			QByteArray accountId = "";
+			QByteArray groupId = groupInfoPtr->GetId();
+
+			int revisionVersion = 1;
+			retVal.query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);")
+						.arg(qPrintable(*m_tableNameAttrPtr))
+						.arg(qPrintable(objectId))
+						.arg(SqlEncode(documentContent))
+						.arg(revisionVersion)
+						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+						.arg(checksum).toLocal8Bit();
+
+			retVal.objectName = objectName;
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -46,52 +96,41 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const QByteArray& objectId,
 		const istd::IChangeable& object) const
 {
-	return QByteArray();
-}
+	QByteArray retVal;
 
-
-QByteArray CUserGroupDatabaseDelegateComp::CreateRenameObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const QString& newObjectName) const
-{
-	return QByteArray();
-}
-
-
-QByteArray CUserGroupDatabaseDelegateComp::CreateDescriptionObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const QString& description) const
-{
-	return QByteArray();
-}
-
-
-// protected methods
-
-// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
-
-idoc::MetaInfoPtr CUserGroupDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
-{
-	return idoc::MetaInfoPtr(new imod::TModelWrap<imtauth::CUserInfoMetaInfo>);
-}
-
-
-bool CUserGroupDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
-{
-	const istd::IChangeable* instancePtr = CreateObjectFromRecord(record);
-	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
-		idoc::MetaInfoPtr retVal;
-		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "GroupInfo", retVal)){
-			Q_ASSERT(retVal.IsValid());
-
-			return metaInfo.CopyFrom(*retVal);
+	QByteArray documentContent;
+	if (WriteDataToMemory("UserGroupInfo", object, documentContent)){
+		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+		const imtauth::CIdentifiableUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&object);
+		Q_ASSERT(groupInfoPtr != nullptr);
+		if (groupInfoPtr == nullptr){
+			return QByteArray();
 		}
+//		QByteArray objectUuid = groupInfoPtr->GetObjectUuid();
+
+		retVal = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectId))
+					.arg(SqlEncode(documentContent))
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(checksum).toLocal8Bit();
 	}
 
-	return false;
+	return retVal;
 }
+
+
+// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
+
+QString CUserGroupDatabaseDelegateComp::GetBaseSelectionQuery() const
+{
+	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
+					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					" as t2 WHERE \"IsActive\" = true")
+			.arg(qPrintable(*m_objectIdColumnAttrPtr))
+			.arg(qPrintable(*m_tableNameAttrPtr));
+}
+
 
 
 } // namespace imtauthdb

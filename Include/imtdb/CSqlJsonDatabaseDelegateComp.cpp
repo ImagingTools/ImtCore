@@ -27,7 +27,7 @@ static const QByteArray s_idColumn = "Id";
 QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(const QByteArray& objectId, int offset, int count, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		return QString("SELECT * FROM \"%1\" WHERE IsActive = true AND %2 = '%3'")
+		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true AND \"%2\" = '%3'")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(objectId)).toLocal8Bit();
@@ -95,7 +95,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
-	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE %2 = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(*m_objectIdColumnAttrPtr)).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(*m_objectIdColumnAttrPtr)).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -117,7 +117,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		const QByteArray& objectId,
 		const QString& description) const
 {
-	QByteArray retVal = QString("UPDATE \"%1\" SET document = jsonb_set(document, '{Description}', '\"%2\"', true), LastModified = '%3' WHERE %4 ='%5' AND IsActive = true;")
+	QByteArray retVal = QString("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
 			.arg(qPrintable(*m_tableNameAttrPtr))
 			.arg(description)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
@@ -137,7 +137,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 		}
 	}
 
-	return QString("SELECT COUNT(*) FROM \"%1\" WHERE IsActive = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
+	return QString("SELECT COUNT(*) FROM \"%1\" WHERE \"IsActive\" = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
 }
 
 
@@ -145,9 +145,9 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 
 QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
-	return QString("SELECT Id, %1, AccountId, Document, RevisionNumber, LastModified,"
-					"(SELECT LastModified FROM \"%2\" as t1 WHERE RevisionNumber = 1 AND t2.%1 = t1.%1 LIMIT 1) as Added FROM \"%2\""
-					" as t2 WHERE IsActive = true")
+	return QString("SELECT \"Id\", \"%1\", \"AccountId\", \"Document\", \"RevisionNumber\", \"LastModified\","
+					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					" as t2 WHERE \"IsActive\" = true")
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))
 			.arg(qPrintable(*m_tableNameAttrPtr));
 }
@@ -161,7 +161,7 @@ bool CSqlJsonDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 	}
 
 	if (!objectId.isEmpty()){
-		QByteArray query = QString("SELECT * from \"%1\" WHERE %2 = '%3' AND RevisionNumber = 1;")
+		QByteArray query = QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3' AND \"RevisionNumber\" = 1;")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(objectId)).toUtf8();
@@ -218,10 +218,10 @@ bool CSqlJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFil
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
 		if (columnId == "LastModified" || columnId == "Added"){
-			sortQuery = QString("ORDER BY %1 %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+			sortQuery = QString("ORDER BY \"%1\" %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
 		}
 		else{
-			sortQuery = QString("ORDER BY document->>'%1' %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
+			sortQuery = QString("ORDER BY \"Document\"->>'%1' %2").arg(qPrintable(columnId)).arg(qPrintable(sortOrder));
 		}
 	}
 
@@ -283,7 +283,7 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 		}
 
 		QString value = textParamPtr->GetText();
-		filterQuery = QString("document->>'%1' = '%2'").arg(qPrintable(key)).arg(value);
+		filterQuery = QString("\"Document\"->>'%1' = '%2'").arg(qPrintable(key)).arg(value);
 	}
 
 	return true;
@@ -301,12 +301,12 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 
 	QString textFilter = collectionFilter.GetTextFilter();
 	if (!textFilter.isEmpty()){
-		textFilterQuery = QString("document->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+		textFilterQuery = QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
 
 		for (int i = 1; i < filteringColumnIds.count(); ++i){
 			textFilterQuery += " OR ";
 
-			textFilterQuery += QString("document->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+			textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
 		}
 	}
 

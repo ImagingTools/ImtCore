@@ -15,6 +15,8 @@ class CUserBaseInfo: virtual public IUserBaseInfo
 {
 
 public:
+	CUserBaseInfo();
+
 	// reimplemented (iser::IUserBaseInfo)
 	virtual const imtlic::IFeatureInfoProvider* GetPermissionProvider() const override;
 	virtual const imtauth::IRoleInfoProvider* GetRoleProvider() const override;
@@ -43,7 +45,7 @@ protected:
 	const imtlic::IFeatureInfoProvider* m_permissionProviderPtr;
 	const imtauth::IRoleInfoProvider* m_roleProviderPtr;
 
-private:
+protected:
 	IUserBaseInfo::FeatureIds m_permissions;
 	IUserBaseInfo::FeatureIds m_restrictions;
 	IUserBaseInfo::RoleIds m_roles;
