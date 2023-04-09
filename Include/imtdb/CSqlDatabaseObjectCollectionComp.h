@@ -11,6 +11,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IObjectCollectionQuery.h>
 #include <imtbase/CObjectCollection.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IMetaInfoCreator.h>
@@ -99,6 +100,12 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const Id& parentId = Id(),
 				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual imtbase::IObjectCollectionQuery* GetObjectCollectionQuery(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const;
 	virtual Id GetParentId(const Id& elementId) const override;
 	virtual Ids GetElementPath(const Id& elementId) const override;
 	virtual bool IsBranch(const Id& elementId) const override;

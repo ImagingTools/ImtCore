@@ -169,6 +169,16 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectInfoFromRecord(
 }
 
 
+QVariant CSqlDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const QSqlRecord& sqlRecord, const QByteArray& infoId) const
+{
+	if (sqlRecord.contains(infoId)){
+		return sqlRecord.value(QString(infoId));
+	}
+
+	return QVariant();
+}
+
+
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
 	QByteArray retVal = QString("DELETE FROM \"%1\";").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();

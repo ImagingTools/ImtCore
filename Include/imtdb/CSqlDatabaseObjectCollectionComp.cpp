@@ -13,6 +13,7 @@
 #include <imtbase/CParamsSetJoiner.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtbase/CObjectCollection.h>
+#include <imtdb/CSqlDatabaseObjectCollectionQuery.h>
 
 
 namespace imtdb
@@ -372,6 +373,37 @@ bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
 	return false;
 }
 
+
+imtbase::IObjectCollectionQuery *CSqlDatabaseObjectCollectionComp::GetObjectCollectionQuery(
+			int offset, 
+			int count, 
+			const iprm::IParamsSet *selectionParamsPtr, 
+			const Id &parentId, 
+			int iterationFlags) const
+{
+	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
+
+	if (m_objectDelegateCompPtr.IsValid() && m_dbEngineCompPtr.IsValid()){
+		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
+		if (objectSelectionQuery.isEmpty()){
+			return nullptr;
+		}
+
+		QSqlError sqlError;
+		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+		if (sqlError.type() != QSqlError::NoError){
+			SendErrorMessage(0, sqlError.text(), "Database collection");
+
+			qDebug() << "Sql error" << objectSelectionQuery;
+
+			return nullptr;
+		}
+		
+		return new CSqlDatabaseObjectCollectionQuery(sqlQuery, m_objectDelegateCompPtr.GetPtr());
+	}
+
+    return nullptr;
+}
 
 imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetParentId(const Id& /*elementId*/) const
 {

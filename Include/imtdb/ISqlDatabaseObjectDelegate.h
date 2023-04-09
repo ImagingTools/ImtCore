@@ -36,6 +36,12 @@ public:
 		Create a data object for the given SQL record.
 	*/
 	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const = 0;
+
+	/**
+		Create object meta-information element based on the SQL record.
+	*/
+	virtual QVariant GetElementInfoFromRecord(const QSqlRecord& record, const QByteArray& infoId) const = 0;
+
 };
 
 

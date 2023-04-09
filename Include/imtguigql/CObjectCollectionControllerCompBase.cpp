@@ -9,6 +9,8 @@
 
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
+#include <imtbase/IObjectCollectionQuery.h>
+#include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 
 
 namespace imtguigql
@@ -509,15 +511,36 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			offset -= count;
 		}
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-		for (const QByteArray& collectionId : collectionIds){
-			int itemIndex = itemsModel->InsertNewItem();
-			if (itemIndex >= 0){
-				if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, collectionId, errorMessage)){
+		imtdb::CSqlDatabaseObjectCollectionComp* objectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr()); 
+		imtbase::IObjectCollectionQuery* objectCollectionQuery = objectCollectionCompPtr->GetObjectCollectionQuery(offset, count, &filterParams);
+
+		if (objectCollectionQuery != nullptr){
+			while (objectCollectionQuery->Next()){
+				imtbase::IObjectCollection::DataPtr objectDataPtr;
+				if (objectCollectionQuery->GetObjectData(objectDataPtr))
+				{
+					int itemIndex = itemsModel->InsertNewItem();
+					if (itemIndex >= 0){
+						if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, objectCollectionQuery, errorMessage)){
+							return nullptr;				
+						}
+					}
+				}
+				else{
 					return nullptr;
 				}
 			}
 		}
+
+		// imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+		// for (const QByteArray& collectionId : collectionIds){
+		// 	int itemIndex = itemsModel->InsertNewItem();
+		// 	if (itemIndex >= 0){
+		// 		if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, collectionId, errorMessage)){
+		// 			return nullptr;
+		// 		}
+		// 	}
+		// }
 
 		itemsModel->SetIsArray(true);
 		dataModel->SetExternTreeModel("items", itemsModel);
@@ -661,6 +684,67 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			}
 			else{
 				idoc::MetaInfoPtr elementMetaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(collectionId);
+				if (elementMetaInfo.IsValid()){
+					if (informationId == QByteArray("Added")){
+						elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+								.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+					}
+					else if (informationId == QByteArray("LastModified")){
+						elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
+								.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+					}
+				}
+			}
+
+			if(elementInformation.isNull()){
+				elementInformation = GetObjectInformation(informationId, collectionId);
+			}
+			if (elementInformation.isNull()){
+				elementInformation = "";
+			}
+
+			retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CObjectCollectionControllerCompBase::SetupGqlItem(
+			const imtgql::CGqlRequest &gqlRequest, 
+			imtbase::CTreeItemModel &model, 
+			int itemIndex, 
+			const imtbase::IObjectCollectionQuery *objectCollectionQuery, 
+			QString &errorMessage) const
+{
+	if (objectCollectionQuery == nullptr){
+		return false;
+	}
+	
+	bool retVal = true;
+	QByteArray collectionId = objectCollectionQuery->GetObjectId();
+
+	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
+
+	if (!informationIds.isEmpty()){
+		idoc::MetaInfoPtr elementMetaInfo = objectCollectionQuery->GetDataMetaInfo();
+
+		for (QByteArray informationId : informationIds){
+			QVariant elementInformation;
+
+			if(informationId == "Id"){
+				elementInformation = QString(collectionId);
+			}
+			else if(informationId == "Name"){
+				elementInformation = objectCollectionQuery->GetElementInfo("Name");
+			}
+			else if(informationId == "Description"){
+				elementInformation = objectCollectionQuery->GetElementInfo("Description");
+			}
+			else{
 				if (elementMetaInfo.IsValid()){
 					if (informationId == QByteArray("Added")){
 						elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
