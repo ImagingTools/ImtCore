@@ -13,7 +13,7 @@
 #include <imtbase/CParamsSetJoiner.h>
 #include <imtdb/CDatabaseEngineComp.h>
 #include <imtbase/CObjectCollection.h>
-#include <imtdb/CSqlDatabaseObjectCollectionQuery.h>
+#include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
 
 
 namespace imtdb
@@ -374,7 +374,7 @@ bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
 }
 
 
-imtbase::IObjectCollectionQuery *CSqlDatabaseObjectCollectionComp::GetObjectCollectionQuery(
+imtbase::IObjectCollectionIterator *CSqlDatabaseObjectCollectionComp::CreateObjectCollectionIterator(
 			int offset, 
 			int count, 
 			const iprm::IParamsSet *selectionParamsPtr, 
@@ -399,7 +399,7 @@ imtbase::IObjectCollectionQuery *CSqlDatabaseObjectCollectionComp::GetObjectColl
 			return nullptr;
 		}
 		
-		return new CSqlDatabaseObjectCollectionQuery(sqlQuery, m_objectDelegateCompPtr.GetPtr());
+		return new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr());
 	}
 
     return nullptr;

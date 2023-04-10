@@ -6,10 +6,11 @@
 
 // ACF includes
 #include <iprm/CTextParam.h>
+#include <istd/TDelPtr.h>
 
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
-#include <imtbase/IObjectCollectionQuery.h>
+#include <imtbase/IObjectCollectionIterator.h>
 #include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 
 
@@ -512,16 +513,16 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		}
 
 		imtdb::CSqlDatabaseObjectCollectionComp* objectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr()); 
-		imtbase::IObjectCollectionQuery* objectCollectionQuery = objectCollectionCompPtr->GetObjectCollectionQuery(offset, count, &filterParams);
+		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 
-		if (objectCollectionQuery != nullptr){
-			while (objectCollectionQuery->Next()){
+		if (objectCollectionIterator != nullptr){
+			while (objectCollectionIterator->Next()){
 				imtbase::IObjectCollection::DataPtr objectDataPtr;
-				if (objectCollectionQuery->GetObjectData(objectDataPtr))
+				if (objectCollectionIterator->GetObjectData(objectDataPtr))
 				{
 					int itemIndex = itemsModel->InsertNewItem();
 					if (itemIndex >= 0){
-						if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, objectCollectionQuery, errorMessage)){
+						if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
 							return nullptr;				
 						}
 					}
@@ -531,16 +532,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 				}
 			}
 		}
-
-		// imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-		// for (const QByteArray& collectionId : collectionIds){
-		// 	int itemIndex = itemsModel->InsertNewItem();
-		// 	if (itemIndex >= 0){
-		// 		if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, collectionId, errorMessage)){
-		// 			return nullptr;
-		// 		}
-		// 	}
-		// }
 
 		itemsModel->SetIsArray(true);
 		dataModel->SetExternTreeModel("items", itemsModel);
@@ -717,20 +708,20 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 			const imtgql::CGqlRequest &gqlRequest, 
 			imtbase::CTreeItemModel &model, 
 			int itemIndex, 
-			const imtbase::IObjectCollectionQuery *objectCollectionQuery, 
+			const imtbase::IObjectCollectionIterator *objectCollectionIterator, 
 			QString &errorMessage) const
 {
-	if (objectCollectionQuery == nullptr){
+	if (objectCollectionIterator == nullptr){
 		return false;
 	}
 	
 	bool retVal = true;
-	QByteArray collectionId = objectCollectionQuery->GetObjectId();
+	QByteArray collectionId = objectCollectionIterator->GetObjectId();
 
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
 
 	if (!informationIds.isEmpty()){
-		idoc::MetaInfoPtr elementMetaInfo = objectCollectionQuery->GetDataMetaInfo();
+		idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
 
 		for (QByteArray informationId : informationIds){
 			QVariant elementInformation;
@@ -739,10 +730,10 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 				elementInformation = QString(collectionId);
 			}
 			else if(informationId == "Name"){
-				elementInformation = objectCollectionQuery->GetElementInfo("Name");
+				elementInformation = objectCollectionIterator->GetElementInfo("Name");
 			}
 			else if(informationId == "Description"){
-				elementInformation = objectCollectionQuery->GetElementInfo("Description");
+				elementInformation = objectCollectionIterator->GetElementInfo("Description");
 			}
 			else{
 				if (elementMetaInfo.IsValid()){
