@@ -30,6 +30,13 @@ export class Repeater extends Item {
     $modelChanged(){
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
         this.$model = this.model
+        if(!this.model){
+            while(this.contentItem.children.length){
+                this.contentItem.children.pop().$destroy()
+            }
+            this.contentItem.children = []
+            this.count = 0
+        }
         this.$updateView()
     }
     $delegateChanged(){
