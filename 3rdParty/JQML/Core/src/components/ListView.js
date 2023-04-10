@@ -157,8 +157,13 @@ export class ListView extends Flickable {
         this.contentY = 0
     }
     positionViewAtEnd(){
-        this.contentX = this.contentItem.children[this.contentItem.children.length-1].x + this.contentItem.children[this.contentItem.children.length-1].width
-        this.contentY = this.contentItem.children[this.contentItem.children.length-1].y + this.contentItem.children[this.contentItem.children.length-1].height
+        if(this.contentWidth > this.width){
+            this.contentX = Math.min(this.contentItem.children[this.contentItem.children.length-1].x + this.contentItem.children[this.contentItem.children.length-1].width, this.contentWidth - this.width)
+        }
+        if(this.contentHeight > this.height){
+            this.contentY = Math.min(this.contentItem.children[this.contentItem.children.length-1].y + this.contentItem.children[this.contentItem.children.length-1].height, this.contentHeight - this.height)
+        }
+        
     }
     positionViewAtIndex(index, mode){
         let pos = 'start'
@@ -168,14 +173,32 @@ export class ListView extends Flickable {
             case ListView.End: pos = 'end'; break;
         }
         if(pos === 'start') {
-            this.contentX = this.contentItem.children[index].x
-            this.contentY = this.contentItem.children[index].y
+            if(this.contentWidth > this.width){
+                this.contentX = Math.min(this.contentItem.children[index].x, this.contentWidth - this.width)
+            }
+            if(this.contentHeight > this.height){
+                this.contentY = Math.min(this.contentItem.children[index].y, this.contentHeight - this.height)
+            }
+            // this.contentX = this.contentItem.children[index].x
+            // this.contentY = this.contentItem.children[index].y
         } else if(pos === 'center') {
-            this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2
-            this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2
+            if(this.contentWidth > this.width){
+                this.contentX = Math.min(this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2, this.contentWidth - this.width)
+            }
+            if(this.contentHeight > this.height){
+                this.contentY = Math.min(this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2, this.contentHeight - this.height)
+            }
+            // this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2
+            // this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2
         } else if(pos === 'end') {
-            this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)
-            this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)
+            if(this.contentWidth > this.width){
+                this.contentX = Math.min(this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width), this.contentWidth - this.width)
+            }
+            if(this.contentHeight > this.height){
+                this.contentY = Math.min(this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height), this.contentHeight - this.height)
+            }
+            // this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)
+            // this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)
         }
     }
 
