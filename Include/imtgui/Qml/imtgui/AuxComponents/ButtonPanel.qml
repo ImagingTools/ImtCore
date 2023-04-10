@@ -16,6 +16,8 @@ Rectangle {
     property int visibleCount: 5;
     property int mainMargin: 10;
 
+    property int horizCount: 0;
+
     property int horizontalSpacing: 50;
     property int verticalSpacing: 10;
 
@@ -47,7 +49,7 @@ Rectangle {
             height: buttonPanel.delegateHeight;
 
             radius: Style.size_ButtonRadius;
-            color: pressed ? Style.color_button_active : containsMouse ? Style.color_button_hovered : Style.color_button;
+            color: active ? "red" : pressed ? Style.color_button_active : containsMouse ? Style.color_button_hovered : Style.color_button;
             fontColor: pressed ? "#ffffff" : Style.color_buttonText;
             fontPixelSize: Style.fontSize_common;
             highlighted: false;
@@ -60,12 +62,14 @@ Rectangle {
 
             textButton: model.Name;
 
+            property bool active: model.Active !== undefined ? model.Active : false;
             property string id: model.Id;
             property Item rootItem: buttonPanel;
 
 
             onClicked:{
                 rootItem.clicked(id);
+
             }
         }
 
@@ -75,7 +79,11 @@ Rectangle {
 
     onClicked: {
         if(buttonPanel.hasActiveState){
-            buttonPanel.setActive(buttonId);
+            var ind =  buttonPanel.setActive(buttonId);
+            //console.log("_____SELECTED_INDEX___ ",ind)
+
+            buttonPanel.setModelsWithActive(ind);
+
         }
 
     }
@@ -98,74 +106,97 @@ Rectangle {
     }
 
 
-
-    function setActive(buttonId){
-        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-            var id = buttonPanel.buttonModel.GetData("Id",i);
-            if(id == buttonId){
-                buttonPanel.buttonModel.SetData("Active",true, i);
-                break;
-            }
-        }
-
-        if(buttonPanel.hasActiveState){
-            buttonPanel.setModelsWithActive();
-        }
-
-    }
-
-    function setModelsWithActive(){
-
-        buttonPanel.horizontalModel.Clear();
-        buttonPanel.verticalModel.Clear();
-
-        var horizCount  = Math.floor((horizontalListViewContainer.width + buttonPanel.horizontalSpacing)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
-        console.log("horizCount ",horizCount);
-
-        var count = buttonPanel.buttonModel.GetItemsCount();
-        if(count <= horizCount){
-            buttonPanel.horizontalModel = buttonPanel.buttonModel;
-        }
-        else{
-            for(var i = 0; i < horizCount; i++){
-                buttonPanel.horizontalModel.InsertNewItem()
-                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
-            }
-
-            for(var k = horizCount; k < count; k++){
-
-                var kk = buttonPanel.verticalModel.InsertNewItem();
-                buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
-
-            }
-        }
-
-    }
-
     function setModels(){
         buttonPanel.horizontalModel.Clear();
         buttonPanel.verticalModel.Clear();
 
-        var horizCount  = Math.floor((horizontalListViewContainer.width + buttonPanel.horizontalSpacing)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
-        console.log("horizCount ",horizCount);
+        buttonPanel.horizCount  = Math.floor((horizontalListViewContainer.width + buttonPanel.horizontalSpacing)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
+        //console.log("horizCount ",buttonPanel.horizCount);
 
         var count = buttonPanel.buttonModel.GetItemsCount();
-        if(count <= horizCount){
-            buttonPanel.horizontalModel = buttonPanel.buttonModel;
+        if(count <= buttonPanel.horizCount){
+            //buttonPanel.horizontalModel = buttonPanel.buttonModel;
+            for(var i = 0; i < count; i++){
+                buttonPanel.horizontalModel.InsertNewItem()
+                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+            }
         }
         else{
-            for(var i = 0; i < horizCount; i++){
+            for(var i = 0; i < buttonPanel.horizCount; i++){
                 buttonPanel.horizontalModel.InsertNewItem()
                 buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
             }
 
-            for(var k = horizCount; k < count; k++){
+            for(var k = buttonPanel.horizCount; k < count; k++){
 
                 var kk = buttonPanel.verticalModel.InsertNewItem();
                 buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
 
             }
         }
+    }
+
+
+    function setActive(buttonId){
+        var retval = 0;
+        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            var id = buttonPanel.buttonModel.GetData("Id",i);
+            if(id == buttonId){
+                buttonPanel.buttonModel.SetData("Active",true, i);
+                retval = i;
+
+            }
+            else{
+                buttonPanel.buttonModel.SetData("Active",false, i);
+            }
+        }
+
+        return retval;
+
+    }
+
+    function setModelsWithActive(index){
+
+        //console.log("_____SELECTED_INDEX___ ",index)
+
+        if (index < buttonPanel.horizCount){
+            for(var i = 0; i < buttonPanel.horizontalModel.GetItemsCount(); i++){
+                buttonPanel.horizontalModel.SetData("Active",(index == i), i);
+            }
+        }
+
+        else{//перезаполнение моделей
+            console.log("УРА")
+            buttonPanel.horizontalModel.Clear();
+            buttonPanel.verticalModel.Clear();
+            var count = buttonPanel.buttonModel.GetItemsCount();
+            var startVertInd = index;
+
+            var countVert = 0;
+            for(i = startVertInd; i < count; i++){
+                buttonPanel.horizontalModel.InsertNewItem()
+                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+                countVert++;
+            }
+
+            var countHoriz = 0;
+            for(i = 0; i < buttonPanel.horizCount - countVert; i++){
+                buttonPanel.horizontalModel.InsertNewItem()
+                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+                countHoriz++;
+            }
+
+            //вертикальная модель
+            for(var k = countHoriz; k < startVertInd; k++){
+
+                var kk = buttonPanel.verticalModel.InsertNewItem();
+                buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
+
+            }
+
+
+        }
+
     }
 
 
