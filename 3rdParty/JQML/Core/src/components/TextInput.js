@@ -71,6 +71,7 @@ export class TextInput extends Item {
         
         this.impl.style.textAlign = "inherit"
         this.impl.style.width = "100%";
+        this.impl.style.height = 'auto'
 
 		this.impl.style.borderWidth = "0"
 		this.impl.style.background = "none"
@@ -256,11 +257,12 @@ export class TextInput extends Item {
     }
 
     $fontChanged(){
+        this.impl.style.fontFamily = this.$p['font.family'].val ? this.$p['font.family'].val : 'unset';
         this.impl.style.fontSize = `${this.$p['font.pixelSize'].val}px`
         this.impl.style.fontStyle = this.$p['font.italic'].val ? 'italic' : 'normal';
         this.impl.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
         this.impl.style.textDecoration = this.$p['font.underline'].val ? 'underline' : 'unset';
-        this.impl.style.height = `${this.$p['font.pixelSize'].val}px`
+        // this.impl.style.height = `${this.$p['font.pixelSize'].val}px`
         this.$updateGeometry()
 
         if(this.$p['font.family'].val && this.$p['font.pixelSize'].val){

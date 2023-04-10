@@ -221,6 +221,7 @@ export class TextEdit extends Item {
     }
 
     $fontChanged(){
+        this.impl.style.fontFamily = this.$p['font.family'].val ? this.$p['font.family'].val : 'unset';
         this.impl.style.fontSize = `${this.$p['font.pixelSize'].val}px`
         this.impl.style.fontStyle = this.$p['font.italic'].val ? 'italic' : 'normal';
         this.impl.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
