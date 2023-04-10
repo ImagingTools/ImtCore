@@ -20,122 +20,6 @@ namespace imtauthgql
 
 // reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
-imtbase::CTreeItemModel* CUserCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
-		errorsItemModel->SetData("message", errorMessage);
-	}
-	else{
-		imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
-		imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
-
-		const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
-
-		const imtgql::CGqlObject* viewParamsGql = nullptr;
-		if (inputParams->size() > 0){
-			viewParamsGql = inputParams->at(0).GetFieldArgumentObjectPtr("viewParams");
-		}
-
-		iprm::CParamsSet filterParams;
-		imtbase::CCollectionFilter m_filter;
-		int offset = 0, count = -1;
-		if (viewParamsGql != nullptr){
-			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
-			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
-
-			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
-			if (!filterBA.isEmpty()){
-				imtbase::CTreeItemModel generalModel;
-				generalModel.CreateFromJson(filterBA);
-
-				imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("FilterIds");
-				if (filterModel != nullptr){
-					QByteArrayList filteringInfoIds;
-					for (int i = 0; i < filterModel->GetItemsCount(); i++){
-						QByteArray headerId = filterModel->GetData("Id", i).toByteArray();
-						if (!headerId.isEmpty()){
-							filteringInfoIds << headerId;
-						}
-					}
-					m_filter.SetFilteringInfoIds(filteringInfoIds);
-				}
-
-				QString filterText = generalModel.GetData("TextFilter").toString();
-				if (!filterText.isEmpty()){
-					m_filter.SetTextFilter(filterText);
-				}
-
-				imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
-				if (sortModel != nullptr){
-					QByteArray headerId = sortModel->GetData("HeaderId").toByteArray();
-					QByteArray sortOrder = sortModel->GetData("SortOrder").toByteArray();
-					if (!headerId.isEmpty() && !sortOrder.isEmpty()){
-						m_filter.SetSortingOrder(sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
-						m_filter.SetSortingInfoIds(QByteArrayList() << headerId);
-					}
-				}
-			}
-
-			filterParams.SetEditableParameter("Filter", &m_filter);
-			this->SetAdditionalFilters(*viewParamsGql, &filterParams);
-		}
-
-		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
-		if (pagesCount < 0){
-			pagesCount = 1;
-		}
-
-		notificationModel->SetData("PagesCount", pagesCount);
-
-		const imtgql::IGqlContext* contextPtr = gqlRequest.GetGqlContext();
-		if (contextPtr != nullptr){
-			const imtauth::IUserInfo* contextUserInfoPtr = contextPtr->GetUserInfo();
-			if (contextUserInfoPtr != nullptr){
-				imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-				for (const QByteArray& collectionId : collectionIds){
-					imtbase::IObjectCollection::DataPtr dataPtr;
-					if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-						imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
-						if (userInfoPtr != nullptr){
-							bool add = false;
-
-							if (!userInfoPtr->IsAdmin()){
-								add = true;
-							}
-							else if (contextUserInfoPtr != nullptr){
-								add = contextUserInfoPtr->IsAdmin();
-							}
-
-							if (add){
-								int itemIndex = itemsModel->InsertNewItem();
-								if (itemIndex >= 0){
-									if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, collectionId, errorMessage)){
-										return nullptr;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		dataModel->SetExternTreeModel("items", itemsModel);
-		dataModel->SetExternTreeModel("notification", notificationModel);
-	}
-
-	return rootModelPtr.PopPtr();
-}
-
-
 QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
@@ -197,6 +81,90 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 	}
 
 	return rootModelPtr.PopPtr();
+}
+
+
+bool CUserCollectionControllerComp::SetupGqlItem(
+		const imtgql::CGqlRequest& gqlRequest,
+		imtbase::CTreeItemModel& model,
+		int itemIndex,
+		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+		QString& errorMessage) const
+{
+	if (objectCollectionIterator == nullptr){
+		return false;
+	}
+
+	bool retVal = true;
+	QByteArray collectionId = objectCollectionIterator->GetObjectId();
+	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
+
+	if (!informationIds.isEmpty()){
+		const imtauth::IUserInfo* contextUserInfoPtr = nullptr;
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetGqlContext();
+		if (contextPtr != nullptr){
+			contextUserInfoPtr = contextPtr->GetUserInfo();
+		}
+
+		const imtauth::IUserInfo* userInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (objectCollectionIterator->GetObjectData(userDataPtr)){
+			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
+		}
+
+		if (userInfoPtr != nullptr && contextUserInfoPtr != nullptr){
+			bool ok = false;
+
+			if (!userInfoPtr->IsAdmin()){
+				ok = true;
+			}
+			else{
+				ok = contextUserInfoPtr->IsAdmin();
+			}
+
+			if (ok){
+				idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
+				for (QByteArray informationId : informationIds){
+					QVariant elementInformation;
+
+					if(informationId == "Id"){
+						elementInformation = QString(collectionId);
+					}
+					else if(informationId == "Name"){
+						elementInformation = objectCollectionIterator->GetElementInfo("Name");
+					}
+					else if(informationId == "Description"){
+						elementInformation = objectCollectionIterator->GetElementInfo("Description");
+					}
+					else{
+						if (elementMetaInfo.IsValid()){
+							if (informationId == QByteArray("Added")){
+								elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+										.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+							}
+							else if (informationId == QByteArray("LastModified")){
+								elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
+										.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+							}
+						}
+					}
+
+					if(elementInformation.isNull()){
+						elementInformation = GetObjectInformation(informationId, collectionId);
+					}
+					if (elementInformation.isNull()){
+						elementInformation = "";
+					}
+
+					retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 

@@ -192,12 +192,14 @@ void CUserGroupControllerComp::InsertSubGroupsToRepresentationFromModel(const im
 			QByteArray groupUuid = subGroupPtr->GetObjectUuid();
 			QString groupName = subGroupPtr->GetName();
 			QString groupDescription = subGroupPtr->GetDescription();
+			QByteArray roleIds = subGroupPtr->GetRoles().join(';');
 
 			int index = representationModel.InsertNewItem();
 
 			representationModel.SetData("Id", groupUuid, index);
 			representationModel.SetData("Name", groupName, index);
 			representationModel.SetData("Description", groupDescription, index);
+			representationModel.SetData("Roles", roleIds, index);
 
 			if (!subGroupPtr->GetSubGroups().IsEmpty()){
 				InsertSubGroupsToRepresentationFromModel(*subGroupPtr, *representationModel.AddTreeModel("ChildModel", index));

@@ -17,7 +17,7 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 		const imtgql::CGqlRequest& gqlRequest,
 		imtbase::CTreeItemModel& model,
 		int itemIndex,
-		const QByteArray& collectionId,
+		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 		QString& errorMessage) const
 {
 	bool retVal = true;
@@ -27,14 +27,15 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
 		imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = nullptr;
 		imtbase::IObjectCollection::DataPtr groupDataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
+		if (objectCollectionIterator->GetObjectData(groupDataPtr)){
 			userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(groupDataPtr.GetPtr());
 		}
 
 		if (userGroupInfoPtr != nullptr){
+			QByteArray collectionId = objectCollectionIterator->GetObjectId();
+
 			for (QByteArray informationId : informationIds){
 				QVariant elementInformation;
-
 				if(informationId == "TypeId"){
 					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
 				}

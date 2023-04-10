@@ -7,7 +7,14 @@ FocusScope {
 
     height: bodyColumn.height + 40;
 
+    property TreeItemModel rolesModel: TreeItemModel {}
+    property string activeRoleIds: ""
+
     property Item rootItem: null;
+
+    Component.onDestruction: {
+        container.rolesModel.modelChanged.disconnect(container.updateModel);
+    }
 
     onFocusChanged: {
         console.log("InputBody onFocusChanged", container.focus);
@@ -15,6 +22,33 @@ FocusScope {
         if (container.focus){
             inputName.focus = container.focus;
         }
+    }
+
+    function started(){
+        let activeRoleList = container.activeRoleIds.split(';');
+        for (let i = 0; i < container.rolesModel.GetItemsCount(); i++){
+            let id = container.rolesModel.GetData("Id", i);
+            if (activeRoleList.includes(id)){
+                container.rolesModel.SetData("CheckedState", Qt.Checked, i);
+            }
+        }
+
+        container.rolesModel.modelChanged.connect(container.updateModel);
+
+        rolesTable.elements = container.rolesModel;
+    }
+
+    function updateModel(){
+        let activeRoleList = [];
+        for (let i = 0; i < container.rolesModel.GetItemsCount(); i++){
+            let id = container.rolesModel.GetData("Id", i);
+            let state = container.rolesModel.GetData("CheckedState", i);
+            if (state === Qt.Checked){
+                activeRoleList.push(id);
+            }
+        }
+
+        container.activeRoleIds = activeRoleList.join(';')
     }
 
     Column {
@@ -76,6 +110,38 @@ FocusScope {
             }
 
             KeyNavigation.tab: inputName;
+        }
+
+        Text {
+            id: titleRoles;
+
+            text: qsTr("Group Roles");
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+        }
+
+        TreeItemModel {
+            id: headersModel;
+
+            Component.onCompleted: {
+                headersModel.InsertNewItem();
+
+                headersModel.SetData("Id", "Name");
+                headersModel.SetData("Name", "Role Name");
+
+                rolesTable.headers = headersModel;
+            }
+        }
+
+        AuxTable {
+            id: rolesTable;
+
+            width: parent.width;
+            height: 300;
+
+            checkable: true;
+            radius: 0;
         }
     }
 }

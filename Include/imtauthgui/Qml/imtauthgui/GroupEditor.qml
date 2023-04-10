@@ -10,6 +10,8 @@ Item {
     property TreeItemModel documentModel: TreeItemModel {}
     property UndoRedoManager undoRedoManager: null;
 
+    property TreeItemModel rolesModel: TreeItemModel {}
+
     property bool blockUpdatingModel: false;
 
     property int mainMargin: 0;
@@ -26,11 +28,34 @@ Item {
     onDocumentModelChanged: {
         console.log("UserEditor onDocumentModelChanged", userEditorContainer.documentModel);
 
-        userCollectionProvider.updateModel();
+        rolesProvider.updateModel();
     }
 
     onBlockUpdatingModelChanged: {
         Events.sendEvent("DocumentUpdating", userEditorContainer.blockUpdatingModel);
+    }
+
+    CollectionDataProvider {
+        id: rolesProvider;
+
+        commandId: "Roles";
+
+        fields: ["Id", "Name"];
+
+        onModelUpdated: {
+            if (rolesProvider.collectionModel != null){
+                if (rolesProvider.collectionModel.ContainsKey("Roles")){
+                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
+                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+                        rolesModel.SetData("CheckedState", Qt.Unchecked, i);
+                    }
+
+                    userEditorContainer.rolesModel = rolesModel;
+                }
+            }
+
+            userCollectionProvider.updateModel();
+        }
     }
 
     CollectionDataProvider {
@@ -159,7 +184,7 @@ Item {
             let indexes = selectedIndex.getIndexes();
 
             let currentRow = childrenGroups.getRow(indexes);
-            modalDialogManager.openDialog(editDialog, {"groupName": currentRow["Name"], "groupDescription": currentRow["Description"]});
+            modalDialogManager.openDialog(editDialog, {"groupName": currentRow["Name"], "groupDescription": currentRow["Description"], "activeRoleIds": currentRow["Roles"]});
         }
     }
 
@@ -168,6 +193,12 @@ Item {
 
         EditDialog {
             id: dialog;
+
+            onStarted: {
+                dialog.rolesModel.Copy(userEditorContainer.rolesModel);
+
+                dialog.bodyItem.started();
+            }
 
             onFinished: {
                 if (buttonId === "Ok"){
@@ -180,7 +211,7 @@ Item {
 
                         let oldRow = childrenGroups.getRow(indexes);
 
-                        childrenGroups.setRow(indexes, {"Id": oldRow["Id"], "Name": newGroupName, "Description": newGroupDescription});
+                        childrenGroups.setRow(indexes, {"Id": oldRow["Id"], "Name": newGroupName, "Description": newGroupDescription, "Roles": dialog.bodyItem.activeRoleIds});
 
                         updateModel();
                         updateGui();
@@ -204,7 +235,7 @@ Item {
                     let newGroupName = dialog.groupName;
                     let newGroupDescription = dialog.groupDescription;
 
-                    let rowObj = {"Id": uuid, "Name": newGroupName, "Description": newGroupDescription};
+                    let rowObj = {"Id": uuid, "Name": newGroupName, "Description": newGroupDescription, "Roles": []};
                     if (selectedIndex != null){
                         let indexes = selectedIndex.getIndexes();
 

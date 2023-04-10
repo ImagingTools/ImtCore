@@ -518,12 +518,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		if (objectCollectionIterator != nullptr){
 			while (objectCollectionIterator->Next()){
 				imtbase::IObjectCollection::DataPtr objectDataPtr;
-				if (objectCollectionIterator->GetObjectData(objectDataPtr))
-				{
+				if (objectCollectionIterator->GetObjectData(objectDataPtr)){
 					int itemIndex = itemsModel->InsertNewItem();
 					if (itemIndex >= 0){
 						if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, objectCollectionIterator.GetPtr(), errorMessage)){
-							return nullptr;				
+							return nullptr;
 						}
 					}
 				}

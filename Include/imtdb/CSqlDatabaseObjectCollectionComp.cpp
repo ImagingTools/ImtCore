@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtSql/QSqlQuery>
+#include <QtCore/QSharedPointer>
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
@@ -391,6 +392,7 @@ imtbase::IObjectCollectionIterator *CSqlDatabaseObjectCollectionComp::CreateObje
 
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+
 		if (sqlError.type() != QSqlError::NoError){
 			SendErrorMessage(0, sqlError.text(), "Database collection");
 
@@ -402,8 +404,9 @@ imtbase::IObjectCollectionIterator *CSqlDatabaseObjectCollectionComp::CreateObje
 		return new CSqlDatabaseObjectCollectionIterator(sqlQuery, m_objectDelegateCompPtr.GetPtr());
 	}
 
-    return nullptr;
+	return nullptr;
 }
+
 
 imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetParentId(const Id& /*elementId*/) const
 {

@@ -19,11 +19,11 @@ public:
 
 protected:
 	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
-	bool SetupGqlItem(
+	virtual bool SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
 			imtbase::CTreeItemModel& model,
 			int itemIndex,
-			const QByteArray& collectionId,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 			QString& errorMessage) const override;
 };
 

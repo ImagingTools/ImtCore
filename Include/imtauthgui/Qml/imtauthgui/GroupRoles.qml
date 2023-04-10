@@ -88,7 +88,7 @@ Item {
                 if (rolesProvider.collectionModel.ContainsKey("Roles")){
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles");
                     for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        rolesModel.SetData("CheckedState", Qt.Unchecked);
+                        rolesModel.SetData("CheckedState", Qt.Unchecked, i);
                     }
 
                     rolesTable.elements = rolesModel;
@@ -106,7 +106,7 @@ Item {
         anchors.fill: parent;
         color: Style.backgroundColor;
 
-        Loader{
+        Loader {
             id: backgroundDecoratorLoader;
 
             sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;

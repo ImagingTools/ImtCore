@@ -10,10 +10,16 @@ Dialog {
     property string groupName: "";
     property string groupDescription: "";
 
+    property TreeItemModel rolesModel: TreeItemModel {}
+    property string activeRoleIds: ""
+
     contentComp: Component { EditDialogBody {
         id: dialogBody;
 
+        rolesModel: editDialogContainer.rolesModel;
+
         rootItem: editDialogContainer;
+        activeRoleIds: editDialogContainer.activeRoleIds;
     } }
 
     Component.onCompleted: {

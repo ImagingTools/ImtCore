@@ -48,7 +48,6 @@ public:
 		Get object data element meta information from the current record with the given infoId.
 	*/
 	virtual QVariant GetElementInfo(QByteArray infoId) const = 0;
-
 };
 
 
