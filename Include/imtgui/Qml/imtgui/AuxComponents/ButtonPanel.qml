@@ -52,7 +52,7 @@ Rectangle {
             height: buttonPanel.delegateHeight;
 
             radius: Style.size_ButtonRadius;
-            color: active ? "red" : pressed ? Style.color_button_active : containsMouse ? Style.color_button_hovered : Style.color_button;
+            color:  pressed ? Style.color_button_active : containsMouse ? Style.color_button_hovered : Style.color_button;
             fontColor: pressed ? "#ffffff" : Style.color_buttonText;
             fontPixelSize: Style.fontSize_common;
             highlighted: false;
