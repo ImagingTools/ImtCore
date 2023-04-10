@@ -36,6 +36,9 @@ Rectangle {
     property TreeItemModel horizontalModel: TreeItemModel{};
     property TreeItemModel verticalModel: TreeItemModel{};
 
+    property TreeItemModel proxiModel: TreeItemModel{};
+
+
 
     property Component buttonDelegate : defaultDelegate;
 
@@ -86,6 +89,10 @@ Rectangle {
 
         }
 
+        if(verticalListViewContainer.openST){
+            verticalListViewContainer.openST = false;
+        }
+
     }
 
     Component.onCompleted: {
@@ -122,7 +129,7 @@ Rectangle {
             }
         }
         else{
-            for(var i = 0; i < buttonPanel.horizCount; i++){
+            for(i = 0; i < buttonPanel.horizCount; i++){
                 buttonPanel.horizontalModel.InsertNewItem()
                 buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
             }
@@ -166,36 +173,35 @@ Rectangle {
         }
 
         else{//перезаполнение моделей
-            console.log("УРА")
-            buttonPanel.horizontalModel.Clear();
-            buttonPanel.verticalModel.Clear();
+
+            buttonPanel.proxiModel.Clear();
+
             var count = buttonPanel.buttonModel.GetItemsCount();
-            var startVertInd = index;
 
             var countVert = 0;
-            for(i = startVertInd; i < count; i++){
-                buttonPanel.horizontalModel.InsertNewItem()
-                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+            for(i = index; i < count; i++){
+                buttonPanel.proxiModel.InsertNewItem()
+                buttonPanel.proxiModel.CopyItemDataFromModel(countVert,buttonPanel.buttonModel,i);
                 countVert++;
             }
 
             var countHoriz = 0;
-            for(i = 0; i < buttonPanel.horizCount - countVert; i++){
-                buttonPanel.horizontalModel.InsertNewItem()
-                buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+            for(i = 0; i < count - countVert ; i++){
+                buttonPanel.proxiModel.InsertNewItem()
+                buttonPanel.proxiModel.CopyItemDataFromModel(countVert + countHoriz,buttonPanel.buttonModel,i);
                 countHoriz++;
             }
 
-            //вертикальная модель
-            for(var k = countHoriz; k < startVertInd; k++){
-
-                var kk = buttonPanel.verticalModel.InsertNewItem();
-                buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
-
+            buttonPanel.buttonModel.Clear();
+            for(i = 0; i < count  ; i++){
+                buttonPanel.buttonModel.InsertNewItem()
+                buttonPanel.buttonModel.CopyItemDataFromModel(i,buttonPanel.proxiModel,i);
             }
 
+            buttonPanel.setModels();
 
-        }
+
+        }//перезаполнение моделей
 
     }
 
