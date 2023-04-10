@@ -16,7 +16,7 @@ Item {
 
     property bool showHeaders: true;
 
-    property TreeItemModel headers; //: elementsListObj.model;
+    property TreeItemModel headers : TreeItemModel{}; //: elementsListObj.model;
 
     property TreeItemModel tableDecorator : TreeItemModel{};
 
@@ -809,7 +809,7 @@ Item {
             width: elementsListObj.width;
             minHeight: tableContainer.itemHeight;
 
-            table: tableContainer;
+            tableItem: tableContainer;
 
             selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
             checkedState: model.CheckedState ? model.CheckedState : Qt.Unchecked;

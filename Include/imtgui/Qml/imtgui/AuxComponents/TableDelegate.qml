@@ -16,7 +16,7 @@ Rectangle {
     property bool selected: false;
     property int checkedState: Qt.Unchecked;
 
-    property Item table: null;
+    property Item tableItem: null;
 
     property var bodyArray:  [];
 
@@ -272,16 +272,16 @@ Rectangle {
 
         checkState: tableDelegateContainer.checkedState;
 
-        visible: tableDelegateContainer.table ? tableDelegateContainer.table.checkable : false;
+        visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
 
         onClicked: {
             model.CheckedState = Qt.Checked - model.CheckedState;
 
-//            if (tableDelegateContainer.table.itemIsChecked(model.index)){
+//            if (tableDelegateContainer.tableItem.itemIsChecked(model.index)){
 
 //            }
 //            else{
-//                tableDelegateContainer.table.setCheckedItem(model.index);
+//                tableDelegateContainer.tableItem.setCheckedItem(model.index);
 //            }
         }
     }
