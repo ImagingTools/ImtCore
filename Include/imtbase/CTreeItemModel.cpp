@@ -464,6 +464,8 @@ void CTreeItemModel::Clear()
 {
 	qDeleteAll(m_items);
 	m_items.clear();
+    Refresh();
+
 }
 
 
