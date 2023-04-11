@@ -28,15 +28,20 @@ Rectangle {
     property alias openST: verticalListViewContainer.openST;
 
     property bool hasActiveState: false;
+    property string activeId: "";
 
     property string openButtonText: "";
     property string openButtonImageSource: "";
+    property int openButtonWidth: 32;
+    property int openButtonHeight: 22;
+    property int openDuration: 0;
 
     property TreeItemModel buttonModel: TreeItemModel{};
     property TreeItemModel horizontalModel: TreeItemModel{};
     property TreeItemModel verticalModel: TreeItemModel{};
 
     property TreeItemModel proxiModel: TreeItemModel{};
+    property TreeItemModel rightOrderModel: TreeItemModel{};
 
 
 
@@ -82,6 +87,7 @@ Rectangle {
 
     onClicked: {
         if(buttonPanel.hasActiveState){
+            buttonPanel.activeId = buttonId;
             var ind =  buttonPanel.setActive(buttonId);
             //console.log("_____SELECTED_INDEX___ ",ind)
 
@@ -102,16 +108,46 @@ Rectangle {
     }
 
     onWidthChanged: {
-        if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
-            buttonPanel.setModels();
-        }
+        widthPause.stop();
+        widthPause.start();
     }
 
     onButtonModelChanged: {
+        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            var active = buttonPanel.buttonModel.GetData("Active",i);
+            if(active){
+                buttonPanel.activeId = buttonPanel.buttonModel.GetData("Id",i);
+            }
+            buttonPanel.rightOrderModel.InsertNewItem()
+            buttonPanel.rightOrderModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+        }
         buttonPanel.setModels();
-
     }
 
+
+    PauseAnimation {
+        id: widthPause;
+
+        duration: 200;
+
+        onFinished: {
+            if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+                buttonPanel.setModels();
+            }
+
+            if(buttonPanel.hasActiveState){
+                var index = buttonPanel.checkActiveInVertical();
+                if(index > -1){
+                    buttonPanel.setModelsWithActive(index);
+                }
+
+                if(buttonPanel.buttonModel.GetItemsCount() <= buttonPanel.horizCount){
+                    buttonPanel.setRightOrder();
+                }
+            }
+
+        }
+    }
 
     function setModels(){
         buttonPanel.horizontalModel.Clear();
@@ -140,6 +176,10 @@ Rectangle {
                 buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
 
             }
+        }
+
+        if(verticalListViewContainer.openST){
+            verticalListViewContainer.openST = false;
         }
     }
 
@@ -205,6 +245,39 @@ Rectangle {
 
     }
 
+    function checkActiveInVertical(){
+        var index = false;
+        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            var active = buttonPanel.buttonModel.GetData("Active",i);
+            if(active){
+                index = i;
+                break;
+            }
+        }
+
+        if(index < buttonPanel.horizCount){
+            index = -1;
+        }
+
+        return index;
+
+    }
+
+    function setRightOrder(){
+        buttonPanel.buttonModel.Clear();
+        for(var i = 0; i < buttonPanel.rightOrderModel.GetItemsCount(); i++){
+            buttonPanel.buttonModel.InsertNewItem()
+            buttonPanel.buttonModel.CopyItemDataFromModel(i,buttonPanel.rightOrderModel,i);
+        }
+
+        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            var id = buttonPanel.buttonModel.GetData("Id",i);
+                buttonPanel.buttonModel.SetData("Active",(id == buttonPanel.activeId), i);
+        }
+
+        buttonPanel.setModels();
+
+    }
 
     Rectangle{
         id: horizontalListViewContainer;
@@ -239,8 +312,8 @@ Rectangle {
         anchors.right: parent.right;
         anchors.rightMargin: buttonPanel.mainMargin;
 
-        width: 36;
-        height: 26;
+        width: buttonPanel.openButtonWidth;
+        height: buttonPanel.openButtonHeight;
         radius: 4;
         hasText: buttonPanel.openButtonText !== "";
         hasIcon: buttonPanel.openButtonImageSource !== 0;
@@ -296,10 +369,21 @@ Rectangle {
         property bool openST: false;
         onOpenSTChanged: {
             if(openST){
-                animHeightTo.start();
+                if(buttonPanel.openDuration){
+                    animHeightTo.start();
+                }
+                else{
+                    buttonPanel.open();
+                }
             }
             else{
-                animHeightFrom.start();
+                if(buttonPanel.openDuration){
+                    animHeightFrom.start();
+                }
+
+                else{
+                    buttonPanel.close();
+                }
             }
         }
 
@@ -331,7 +415,7 @@ Rectangle {
 
         target: verticalListViewContainer;
         property: "height";
-        duration: 100;
+        duration: buttonPanel.openDuration;
         from: 0;
         to: verticalListView.height + 2*buttonPanel.mainMargin;
     }
@@ -341,9 +425,19 @@ Rectangle {
 
         target: verticalListViewContainer;
         property: "height";
-        duration: 100;
+        duration: buttonPanel.openDuration;
         from: verticalListView.height + 2*buttonPanel.mainMargin;
         to: 0;
     }
+
+    function open(){
+        verticalListViewContainer.height = verticalListView.height + 2*buttonPanel.mainMargin;
+    }
+
+    function close(){
+        verticalListViewContainer.height = 0;
+    }
+
+
 
 }
