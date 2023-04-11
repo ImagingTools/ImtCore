@@ -205,45 +205,55 @@ Rectangle {
     function setModelsWithActive(index){
 
         //console.log("_____SELECTED_INDEX___ ",index)
+        //console.log("_____HORIZ_COUNT___ ",buttonPanel.horizCount)
 
-        if (index < buttonPanel.horizCount){
-            for(var i = 0; i < buttonPanel.horizontalModel.GetItemsCount(); i++){
-                buttonPanel.horizontalModel.SetData("Active",(index == i), i);
+        if(buttonPanel.horizCount == 0){
+            for(var i = 0; i < buttonPanel.verticalModel.GetItemsCount(); i++){
+                buttonPanel.verticalModel.SetData("Active",(index == i), i);
             }
+
         }
 
-        else{//перезаполнение моделей
+        else{
 
-            buttonPanel.proxiModel.Clear();
-
-            var count = buttonPanel.buttonModel.GetItemsCount();
-
-            var countVert = 0;
-            for(i = index; i < count; i++){
-                buttonPanel.proxiModel.InsertNewItem()
-                buttonPanel.proxiModel.CopyItemDataFromModel(countVert,buttonPanel.buttonModel,i);
-                countVert++;
+            if (index < buttonPanel.horizCount){
+                for(var i = 0; i < buttonPanel.horizontalModel.GetItemsCount(); i++){
+                    buttonPanel.horizontalModel.SetData("Active",(index == i), i);
+                }
             }
 
-            var countHoriz = 0;
-            for(i = 0; i < count - countVert ; i++){
-                buttonPanel.proxiModel.InsertNewItem()
-                buttonPanel.proxiModel.CopyItemDataFromModel(countVert + countHoriz,buttonPanel.buttonModel,i);
-                countHoriz++;
-            }
+            else{//перезаполнение моделей
 
-            buttonPanel.buttonModel.Clear();
-            for(i = 0; i < count  ; i++){
-                buttonPanel.buttonModel.InsertNewItem()
-                buttonPanel.buttonModel.CopyItemDataFromModel(i,buttonPanel.proxiModel,i);
-            }
+                buttonPanel.proxiModel.Clear();
 
-            buttonPanel.setModels();
+                var count = buttonPanel.buttonModel.GetItemsCount();
+
+                var countVert = 0;
+                for(i = index; i < count; i++){
+                    buttonPanel.proxiModel.InsertNewItem()
+                    buttonPanel.proxiModel.CopyItemDataFromModel(countVert,buttonPanel.buttonModel,i);
+                    countVert++;
+                }
+
+                var countHoriz = 0;
+                for(i = 0; i < count - countVert ; i++){
+                    buttonPanel.proxiModel.InsertNewItem()
+                    buttonPanel.proxiModel.CopyItemDataFromModel(countVert + countHoriz,buttonPanel.buttonModel,i);
+                    countHoriz++;
+                }
+
+                buttonPanel.buttonModel.Clear();
+                for(i = 0; i < count  ; i++){
+                    buttonPanel.buttonModel.InsertNewItem()
+                    buttonPanel.buttonModel.CopyItemDataFromModel(i,buttonPanel.proxiModel,i);
+                }
+
+                buttonPanel.setModels();
 
 
-        }//перезаполнение моделей
-
-    }
+            }//перезаполнение моделей
+        }
+    }//setModelsWithActive
 
     function checkActiveInVertical(){
         var index = false;
@@ -272,7 +282,7 @@ Rectangle {
 
         for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
             var id = buttonPanel.buttonModel.GetData("Id",i);
-                buttonPanel.buttonModel.SetData("Active",(id == buttonPanel.activeId), i);
+            buttonPanel.buttonModel.SetData("Active",(id == buttonPanel.activeId), i);
         }
 
         buttonPanel.setModels();
