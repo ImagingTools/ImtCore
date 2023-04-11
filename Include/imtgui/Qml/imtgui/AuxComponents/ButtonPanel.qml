@@ -135,7 +135,7 @@ Rectangle {
                 buttonPanel.setModels();
             }
 
-            if(buttonPanel.hasActiveState){
+            if(buttonPanel.hasActiveState && buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
                 var index = buttonPanel.checkActiveInVertical();
                 if(index > -1){
                     buttonPanel.setModelsWithActive(index);
@@ -437,7 +437,6 @@ Rectangle {
     function close(){
         verticalListViewContainer.height = 0;
     }
-
 
 
 }

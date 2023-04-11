@@ -8,7 +8,7 @@ Item {
     height: legendText.height + activeIndicator.height + activeIndicator.anchors.topMargin;
     visible: true;
     property bool active: false;
-    property string legend;
+    property string legend: "";
     property int textWidth: legendText.width;
     property string fontFamily: Style.fontFamilyBold;
     property int fontPixelSize: Style.fontSize_subtitle;
