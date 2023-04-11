@@ -29,7 +29,7 @@ Rectangle {
 
     property bool hasActiveState: false;
 
-    property string openButtonText: ">>";
+    property string openButtonText: "";
     property string openButtonImageSource: "";
 
     property TreeItemModel buttonModel: TreeItemModel{};
@@ -239,8 +239,8 @@ Rectangle {
         anchors.right: parent.right;
         anchors.rightMargin: buttonPanel.mainMargin;
 
-        width: 40;
-        height: 30;
+        width: 36;
+        height: 26;
         radius: 4;
         hasText: buttonPanel.openButtonText !== "";
         hasIcon: buttonPanel.openButtonImageSource !== 0;
@@ -248,9 +248,11 @@ Rectangle {
         iconSource: buttonPanel.openButtonImageSource;
         fontPixelSize: 30;
         fontColor: containsMouse ? "black" : "gray";
-        color: containsMouse || verticalListViewContainer.openST ? "lightgray" : "transparent";
+        color: containsMouse || verticalListViewContainer.openST ? Style.color_button : "transparent";
         borderColor: "transparent";
         highlighted: false;
+
+        visible: buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
 
         onClicked: {
             verticalListViewContainer.openST = !verticalListViewContainer.openST;
