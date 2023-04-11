@@ -58,7 +58,9 @@ Item {
                     anchors.fill: parent;
                     hoverEnabled: true;
 
-                    onWheel: {}
+                    onWheel: {
+                        wheel.accepted = true;
+                    }
                     onClicked: {
                         Events.sendEvent("DialogBackgroundClicked");
                     }
