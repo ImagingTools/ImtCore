@@ -449,7 +449,10 @@ global.Core = {
 		for(let event of events){
 			root.dom.addEventListener(event, (e)=>{
                 if(root.$readyEvents){
-
+                    if(e.type === 'touchstart'){
+                        Core.velocityX = 0
+                        Core.velocityY = 0
+                    }
                     
                     // e.preventDefault()
                     let path = []

@@ -9,6 +9,10 @@ export class ListView extends Flickable {
     static Center = 1
     static End = 2
 
+    static NoSnap = 0
+    static SnapToItem = 1
+    static SnapOneItem = 2
+
     $useModel = true
     $childrenForUpdate = []
 
@@ -22,6 +26,7 @@ export class ListView extends Flickable {
         this.$cP('spacing', 0).connect(this.$spacingChanged.bind(this))
         this.$cP('currentIndex', -1).connect(this.$currentIndexChanged.bind(this))
         this.$cP('currentItem', undefined)
+        this.$cP('snapMode', ListView.NoSnap)
 
         this.$updateGeometry()
     }
@@ -360,6 +365,157 @@ export class ListView extends Flickable {
         
     }
 
+    $mousedown(e, state) {
+        this.$snapX = this.contentX
+        this.$snapY = this.contentY
+        for(let i = 0; i < this.contentItem.children.length; i++){
+            let item = this.contentItem.children[i]
+            if(this.orientation === ListView.Horizontal){
+                if(item.x === this.$snapX) {
+                    this.$snapIndex = i
+                }
+            } else {
+                if(item.Y === this.$snapY) {
+                    this.$snapIndex = i
+                }
+            }
+            
+        }
+        
+        super.$mousedown(e, state)
+	}
+    $mouseup(e, state) {
+        if(this.snapMode !== ListView.NoSnap){
+            e.preventDefault()
+            if(this.enabled && this.interactive){
+                if(this.orientation === ListView.Horizontal){
+                    if(this.$snapX > this.contentX){
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.contentItem.dom.style.transitionProperty = 'left'
+                        this.positionViewAtIndex(this.$snapIndex-1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    } else if(this.$snapX < this.contentX){
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.contentItem.dom.style.transitionProperty = 'left'
+                        this.positionViewAtIndex(this.$snapIndex+1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    }
+                } else {
+                    if(this.$snapY > this.contentY){
+                        this.contentItem.dom.style.transitionProperty = 'top'
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.positionViewAtIndex(this.$snapIndex-1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    } else if(this.$snapY < this.contentY){
+                        this.contentItem.dom.style.transitionProperty = 'top'
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.positionViewAtIndex(this.$snapIndex+1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    }
+                }
+                state.release()
+                Core.velocityX = 0
+		        Core.velocityY = 0
+                this.$pressed = false
+            }
+        } else {
+            super.$mouseup(e, state)
+        }
+		
+
+	}
+
+    $touchstart(e, state) {
+        this.$snapX = this.contentX
+        this.$snapY = this.contentY
+        for(let i = 0; i < this.contentItem.children.length; i++){
+            let item = this.contentItem.children[i]
+            if(this.orientation === ListView.Horizontal){
+                if(item.x === this.$snapX) {
+                    this.$snapIndex = i
+                }
+            } else {
+                if(item.Y === this.$snapY) {
+                    this.$snapIndex = i
+                }
+            }
+            
+        }
+        
+        super.$touchstart(e, state)
+	}
+    $touchend(e, state) {
+        if(this.snapMode !== ListView.NoSnap){
+            e.preventDefault()
+            if(this.enabled && this.interactive){
+                if(this.orientation === ListView.Horizontal){
+                    if(this.$snapX > this.contentX){
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.contentItem.dom.style.transitionProperty = 'left'
+                        this.positionViewAtIndex(this.$snapIndex-1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    } else if(this.$snapX < this.contentX){
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.contentItem.dom.style.transitionProperty = 'left'
+                        this.positionViewAtIndex(this.$snapIndex+1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    }
+                } else {
+                    if(this.$snapY > this.contentY){
+                        this.contentItem.dom.style.transitionProperty = 'top'
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.positionViewAtIndex(this.$snapIndex-1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    } else if(this.$snapY < this.contentY){
+                        this.contentItem.dom.style.transitionProperty = 'top'
+                        this.contentItem.dom.style.transitionDuration = '600ms'
+                        this.positionViewAtIndex(this.$snapIndex+1)
+                        clearTimeout(this.$snapTimer)
+                        this.$snapTimer = setTimeout(()=>{
+                            this.contentItem.dom.style.transitionProperty = 'unset'
+                            this.contentItem.dom.style.transitionDuration = 'unset'
+                        }, 600)
+                    }
+                }
+                state.release()
+                Core.velocityX = 0
+		        Core.velocityY = 0
+                this.$pressed = false
+            }
+        } else {
+            super.$touchend(e, state)
+        }
+		
+
+	}
     $destroy(){
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]

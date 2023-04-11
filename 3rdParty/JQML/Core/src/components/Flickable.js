@@ -247,6 +247,8 @@ export class Flickable extends Item {
 	}
 	$mousedown(e, state) {
 		e.preventDefault()
+		Core.velocityX = 0
+		Core.velocityY = 0
 		if(this.enabled && this.interactive){
 			state.blocked(this)
 			this.$fillMouse(e)
@@ -260,6 +262,28 @@ export class Flickable extends Item {
 			state.release()
 			this.$fillMouse(e)
 			this.$pressed = false
+
+			if(Core.velocityX !== 0 || Core.velocityY !== 0){
+				
+				this.$scrollInterval = setInterval(() => {
+					this.$scroll(Core.velocityX, Core.velocityY)
+					if(Math.abs(Core.velocityX) < 0.03){
+						Core.velocityX = 0
+					} else if(Core.velocityX > 0){
+						Core.velocityX -= 0.01
+					} else if(Core.velocityX < 0){
+						Core.velocityX += 0.01
+					}
+					if(Math.abs(Core.velocityY) < 0.03){
+						Core.velocityY = 0
+					} else if(Core.velocityY > 0){
+						Core.velocityY -= 0.01
+					} else if(Core.velocityY < 0){
+						Core.velocityY += 0.01
+					}
+					if(Core.velocityX === 0 && Core.velocityY === 0) clearInterval(this.$scrollInterval)
+				}, 1);
+			}
 		}
 	}
 	$mousemove(e, state) {
@@ -270,6 +294,8 @@ export class Flickable extends Item {
 			this.$fillMouse(e)
 			deltaX -= this.$mouseX
 			deltaY -= this.$mouseY
+			Core.velocityX = deltaX / 5
+			Core.velocityY = deltaY / 5
 
 			let tempContentX = this.contentX
 			let tempContentY = this.contentY
