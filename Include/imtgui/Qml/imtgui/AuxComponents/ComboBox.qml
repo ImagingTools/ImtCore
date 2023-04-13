@@ -39,6 +39,7 @@ FocusScope {
     property int currentIndex: -1;
 
     property alias titleTxt: cbTitleTxt;
+    property alias titleTxtColor: cbTitleTxt.color;
 
     property real contentY;
 
@@ -61,6 +62,7 @@ FocusScope {
     property alias imageWidth:  cbArrowIcon.width;
     property alias imageHeight: cbArrowIcon.height;
     property alias imageRotation: cbArrowIcon.rotation;
+    property alias imageVisible: cbArrowIcon.visible;
 
     property alias containsMouse: cbMouseArea.containsMouse;
 
