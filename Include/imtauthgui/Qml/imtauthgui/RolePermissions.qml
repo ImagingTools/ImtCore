@@ -31,17 +31,31 @@ Item {
     PermissionsProvider {
         id: permissionsProvider;
 
+        Component.onDestruction: {
+            permissionsTable.rowModelDataChanged.disconnect(rolePermissionsContainer.updateModel);
+        }
+
         onDataModelChanged: {
-            rolePermissionsContainer.updateGui();
+            if (permissionsProvider.dataModel != null){
+                let listModel = converter.convertToListModel(permissionsProvider.dataModel);
+                permissionsTable.rowModel = listModel;
+                rolePermissionsContainer.updateGui();
+
+                permissionsTable.rowModelDataChanged.connect(rolePermissionsContainer.updateModel);
+            }
         }
 
         onDependenciesModelChanged: {
-            dependenciesProvider.dataModel = dependenciesModel;
+            dependenciesProvider.model = dependenciesModel;
         }
     }
 
     FeaturesDependenciesProvider {
         id: dependenciesProvider;
+    }
+
+    TreeItemModelConverter {
+        id: converter;
     }
 
     function updateGui(){
@@ -50,17 +64,22 @@ Item {
 
         let selectedPermissionsIds = [];
         if (rolePermissionsContainer.documentModel.ContainsKey("Permissions")){
-            let selectedPermissionsModel = rolePermissionsContainer.documentModel.GetData("Permissions");
-
-            for (let i = 0; i < selectedPermissionsModel.GetItemsCount(); i++){
-                let permissionId = selectedPermissionsModel.GetData("Id", i);
-
-                selectedPermissionsIds.push(permissionId);
+            let selectedPermissions = rolePermissionsContainer.documentModel.GetData("Permissions");
+            if (selectedPermissions !== ""){
+                selectedPermissionsIds = selectedPermissions.split(';');
             }
         }
-        permissionsTable.rowModel.clear();
 
-        recursiveUpdateGui(permissionsProvider.dataModel, [], selectedPermissionsIds);
+        let itemsList = permissionsTable.getItemsDataAsList();
+        for (let i = 0; i < itemsList.length; i++){
+            let id = itemsList[i].Id;
+            if (selectedPermissionsIds.includes(id)){
+                itemsList[i].CheckState = Qt.Checked;
+            }
+            else{
+                itemsList[i].CheckState = Qt.Unchecked;
+            }
+        }
 
         rolePermissionsContainer.blockUpdatingModel = false;
     }
@@ -87,16 +106,21 @@ Item {
     }
 
     function updateModel(){
-        console.log("documentModel1", documentModel.toJSON());
+        console.log("documentModel1", rolePermissionsContainer.documentModel.toJSON());
         rolePermissionsContainer.undoRedoManager.beginChanges();
 
-        let permissionsModel = rolePermissionsContainer.documentModel.AddTreeModel("Permissions");
-
-        rolePermissionsContainer.recursiveUpdateModel(permissionsModel, permissionsTable.rowModel);
+        let selectedPermissionIds = []
+        let itemsList = permissionsTable.getItemsDataAsList();
+        for (let i = 0; i < itemsList.length; i++){
+            let id = itemsList[i].Id;
+            let state = itemsList[i].CheckState;
+            if (state === Qt.Checked){
+                selectedPermissionIds.push(id)
+            }
+        }
+        rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
 
         rolePermissionsContainer.undoRedoManager.endChanges();
-
-        console.log("documentModel2", documentModel.toJSON());
     }
 
     function recursiveUpdateModel(dataModel, guiModel){
@@ -145,7 +169,6 @@ Item {
                 }
             }
         }
-
     }
 
     Loader{
@@ -195,7 +218,7 @@ Item {
         tristate: true;
 
         Component.onCompleted: {
-            permissionsTable.addColumn({"Id": "Name", "Name": "Name"});
+            permissionsTable.addColumn({"Id": "Name", "Name": "Permission Name"});
         }
 
         onRowModelDataChanged: {

@@ -24,6 +24,8 @@ public:
 	virtual void SetId(const QByteArray& id) override;
 	virtual QString GetName() const override;
 	virtual void SetName(const QString& name) override;
+	virtual QString GetDescription() const override;
+	virtual void SetDescription(const QString& description) override;
 	virtual FeatureIds GetPermissions() const override;
 	virtual FeatureIds GetLocalPermissions() const override;
 	virtual void SetLocalPermissions(const FeatureIds &permissions) override;
@@ -31,6 +33,8 @@ public:
 	virtual void SetProhibitions(const FeatureIds &prohibitions) override;
 	virtual RoleIds GetRoles() const override;
 	virtual void SetRoles(const RoleIds &roles) override;
+	virtual void AddRole(const QByteArray& roleId) override;
+	virtual bool RemoveRole(const QByteArray& userId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -51,6 +55,7 @@ protected:
 	IUserBaseInfo::RoleIds m_roles;
 	QString m_name;
 	QByteArray m_id;
+	QString m_description;
 };
 
 

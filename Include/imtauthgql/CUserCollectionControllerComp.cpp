@@ -130,11 +130,17 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 					if(informationId == "Id"){
 						elementInformation = QString(collectionId);
 					}
+					else if(informationId == "UserId"){
+						elementInformation = userInfoPtr->GetId();
+					}
 					else if(informationId == "Name"){
-						elementInformation = objectCollectionIterator->GetElementInfo("Name");
+						elementInformation = userInfoPtr->GetName();
 					}
 					else if(informationId == "Description"){
-						elementInformation = objectCollectionIterator->GetElementInfo("Description");
+						elementInformation = userInfoPtr->GetDescription();
+					}
+					else if(informationId == "Email"){
+						elementInformation = userInfoPtr->GetMail();
 					}
 					else{
 						if (elementMetaInfo.IsValid()){

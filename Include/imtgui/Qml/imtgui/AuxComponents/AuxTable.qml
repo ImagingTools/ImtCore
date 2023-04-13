@@ -60,28 +60,6 @@ Item {
 
     signal selectionChanged(var selection);
 
-//    signal checkedElementsChanged();
-
-//    property var _checkedElements: [];
-
-//    function setCheckedItem(index){
-//        tableContainer._checkedElements.push(index)
-//        tableContainer.checkedElementsChanged();
-//    }
-
-//    function resetCheckedItems(){
-//        tableContainer._checkedElements = [];
-//        tableContainer.checkedElementsChanged();
-//    }
-
-//    function getCheckedItems(){
-//        return tableContainer._checkedElements;
-//    }
-
-//    function itemIsChecked(index){
-//        return tableContainer._checkedElements.includes((index));
-//    }
-
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
             tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
@@ -835,11 +813,11 @@ Item {
 
             textMarginHor: tableContainer.textMarginHor_deleg;
             textMarginVer: tableContainer.textMarginVer_deleg;
+
             //!!!
 
             Component.onCompleted: {
                 tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
-//                tableContainer.checkedElementsChanged.connect(tableDelegate.checkedElementsChanged);
 
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
                     tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
@@ -848,23 +826,11 @@ Item {
 
             Component.onDestruction: {
                 tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
-//                tableContainer.checkedElementsChanged.disconnect(tableDelegate.checkedElementsChanged);
             }
 
             function selectionChanged(){
                 tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
             }
-
-//            function checkedElementsChanged(){
-//                tableDelegate.selected = tableContainer._checkedElements.includes(model.index);
-
-//                if (tableContainer._checkedElements.includes(model.index)){
-//                    tableDelegate.checkedState = Qt.Checked;
-//                }
-//                else{
-//                    tableDelegate.checkedState = Qt.Unchecked;
-//                }
-//            }
 
             onClicked: {
                 tableContainer.tableSelection.singleSelect(model.index);

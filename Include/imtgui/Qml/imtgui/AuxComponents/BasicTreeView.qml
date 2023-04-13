@@ -167,11 +167,7 @@ BasicTableView {
         row["Level"] = indexes.length - 1;
 
         let lastIndex = indexes[indexes.length - 1];
-
-        console.log("localModel before insert:", localModel.count, lastIndex);
-
         localModel.insert(lastIndex, row);
-        console.log("localModel after insert:", localModel.count);
 
         treeViewRoot.rowAdded();
     }

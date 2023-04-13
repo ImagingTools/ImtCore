@@ -14,14 +14,10 @@ Item {
     property int mainMargin: 0;
     property int panelWidth: 400;
 
-    Component.onCompleted: {
-        usernameInput.focus = true;
-    }
-
     onDocumentModelChanged: {
         console.log("UserEditor onDocumentModelChanged", userEditorContainer.documentModel);
-
         userEditorContainer.updateGui();
+        usernameInput.focus = true;
     }
 
     onBlockUpdatingModelChanged: {

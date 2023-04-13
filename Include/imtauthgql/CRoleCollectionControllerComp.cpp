@@ -143,10 +143,11 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(const imtgql
 						if (productId == roleProductId){
 							int roleIndex = rolesModelPtr->InsertNewItem();
 
-							QByteArray objectId = roleInfoPtr->GetRoleId() + *m_separatorObjectIdAttrPtr + roleProductId;
-
-							rolesModelPtr->SetData("Id", objectId, roleIndex);
+							rolesModelPtr->SetData("Id", roleObjectId, roleIndex);
+							rolesModelPtr->SetData("RoleId", roleId, roleIndex);
+							rolesModelPtr->SetData("ProductId", roleProductId, roleIndex);
 							rolesModelPtr->SetData("Name", roleInfoPtr->GetRoleName(), roleIndex);
+							rolesModelPtr->SetData("Description", roleInfoPtr->GetRoleDescription(), roleIndex);
 						}
 					}
 				}

@@ -2,19 +2,22 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5060" Description="ACF"/>
+            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="OptionsListAdapter" PackageId="ImtCorePck" ComponentId="OptionsListAdapter">
+        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repository"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -31,20 +34,28 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserMetaInfoCreator"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserDatabaseDelegate"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectFactory" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="UserInfo"/>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserInfo</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="User"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Users"/>
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserInfo</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -55,14 +66,31 @@
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentContentColumnId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Document"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserInfo</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DocumentPersistenceList" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>JsonSerializer</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="UserMetaInfoCreator"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserId"/>
+                        <Data IsEnabled="true" Value="DocumentId"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
@@ -70,8 +98,11 @@
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Users"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UserInfo" Type="Factory" ExportId="">
-                        <Data IsEnabled="true" Value="UserInfo"/>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="UserGroupCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupDatabaseSqlDelegate" Type="Reference" ExportId="UserGroupDatabaseSqlDelegate">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -88,18 +119,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="UserMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="UserInfoMetaInfoCreator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="UserInfo"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
@@ -107,6 +126,7 @@
         <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="UserDatabaseDelegate"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>
     </ExportedInterfaces>

@@ -27,65 +27,27 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 	dataModel->SetData("Password", "");
 	dataModel->SetData("Email", "");
 
-	imtbase::CTreeItemModel* productsModel = dataModel->AddTreeModel("Products");
-
 	QByteArray userId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
+			QByteArray objectUuid = userInfoPtr->GetObjectUuid();
 			QByteArray username = userInfoPtr->GetId();
 			QString name = userInfoPtr->GetName();
 			QByteArray passwordHash = userInfoPtr->GetPasswordHash();
 			QString mail = userInfoPtr->GetMail();
+			QByteArray roles = userInfoPtr->GetRoles().join(';');
+			QByteArray groups = userInfoPtr->GetGroups().join(';');
 
+			dataModel->SetData("Id", objectUuid);
 			dataModel->SetData("Username", username);
 			dataModel->SetData("Name", name);
 			dataModel->SetData("Password", passwordHash);
 			dataModel->SetData("Email", mail);
-
-			imtauth::IUserInfo::RoleIds roles = userInfoPtr->GetRoles();
-
-			for (const QByteArray& roleId : roles){
-				imtbase::IObjectCollection::DataPtr dataPtr;
-				if (m_rolesCollectionCompPtr->GetObjectData(roleId, dataPtr)){
-					const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
-					if (roleInfoPtr != nullptr){
-						QByteArray productId = roleInfoPtr->GetProductId();
-						QString roleName = roleInfoPtr->GetRoleName();
-
-						int productIndex = -1;
-
-						for (int i = 0; i < productsModel->GetItemsCount(); i++){
-							QByteArray productIdFromModel;
-							if (productsModel->ContainsKey("Id", i)){
-								productIdFromModel = productsModel->GetData("Id", i).toByteArray();
-							}
-
-							if (productIdFromModel == productId){
-								productIndex = i;
-								break;
-							}
-						}
-
-						imtbase::CTreeItemModel* rolesModel = nullptr;
-						if (productIndex < 0){
-							productIndex = productsModel->InsertNewItem();
-							productsModel->SetData("Id", productId, productIndex);
-							rolesModel = productsModel->AddTreeModel("Roles", productIndex);
-						}
-						else{
-							rolesModel = productsModel->GetTreeItemModel("Roles", productIndex);
-						}
-
-						int roleIndex = rolesModel->InsertNewItem();
-
-						rolesModel->SetData("Id", roleId, roleIndex);
-						rolesModel->SetData("Name", roleName, roleIndex);
-					}
-				}
-			}
+			dataModel->SetData("Groups", groups);
+			dataModel->SetData("Roles", roles);
 		}
 	}
 
@@ -102,7 +64,6 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		QString &description,
 		QString& errorMessage) const
 {
-
 	if (!m_userInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
 		return nullptr;
@@ -110,7 +71,8 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		istd::TDelPtr<imtauth::IUserInfo> userInfoPtr = m_userInfoFactCompPtr.CreateInstance();
+		imtauth::IUserInfo* userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
+		imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr);
 		if (userInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
 			return nullptr;
@@ -118,6 +80,19 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
+
+		if (itemModel.ContainsKey("Id")){
+			QByteArray id = itemModel.GetData("Id").toByteArray();
+			if (!id.isEmpty()){
+				objectId = id;
+			}
+		}
+
+		if (objectId.isEmpty()){
+			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+		}
+
+		userInfoPtr->SetObjectUuid(objectId);
 
 		QByteArray username;
 		if (itemModel.ContainsKey("Username")){
@@ -128,8 +103,6 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 				return nullptr;
 			}
-
-			objectId = username;
 
 			userInfoPtr->SetId(username);
 		}
@@ -144,7 +117,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 			bool calculate = true;
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(username, dataPtr)){
+			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 				const imtauth::IUserInfo* currentuserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 				if (currentuserInfoPtr != nullptr){
 					QByteArray currentPasswordHash = currentuserInfoPtr->GetPasswordHash();
@@ -185,34 +158,25 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			userInfoPtr->SetLocalPermissions(permissions);
 		}
 
-		if (itemModel.ContainsKey("Products")){
-			imtauth::IUserInfo::RoleIds roles;
-			imtbase::CTreeItemModel* productsModel = itemModel.GetTreeItemModel("Products");
-			if (productsModel != nullptr){
-				for(int i = 0; i < productsModel->GetItemsCount(); i++){
-					if (productsModel->ContainsKey("Id", i)){
-						QByteArray productId = productsModel->GetData("Id", i).toByteArray();
-						imtbase::CTreeItemModel* rolesModel = productsModel->GetTreeItemModel("Roles", i);
-						if (rolesModel != nullptr){
-							for (int j = 0; j < rolesModel->GetItemsCount(); j++){
-								QByteArray roleId;
-								if (rolesModel->ContainsKey("Id", j)){
-									roleId = rolesModel->GetData("Id", j).toByteArray();
-								}
-
-								if (!roleId.isEmpty()){
-									roles << roleId;
-								}
-							}
-						}
-					}
-				}
+		if (itemModel.ContainsKey("Roles")){
+			QByteArray roles = itemModel.GetData("Roles").toByteArray();
+			if (!roles.isEmpty()){
+				QByteArrayList roleIds = roles.split(';');
+				userInfoPtr->SetRoles(roleIds);
 			}
-
-			userInfoPtr->SetRoles(roles);
 		}
 
-		return userInfoPtr.PopPtr();
+		if (itemModel.ContainsKey("Groups")){
+			QByteArray groups = itemModel.GetData("Groups").toByteArray();
+			if (!groups.isEmpty()){
+				QByteArrayList groupIds = groups.split(';');
+				for (const QByteArray& groupId : groupIds){
+					userInfoPtr->AddToGroup(groupId);
+				}
+			}
+		}
+
+		return userInfoPtr;
 	}
 
 	errorMessage = QObject::tr("Can not create user: %1").arg(QString(objectId));

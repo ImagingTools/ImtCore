@@ -33,8 +33,9 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 
 		if (userGroupInfoPtr != nullptr){
 			QByteArray collectionId = objectCollectionIterator->GetObjectId();
-
+			bool ok = true;
 			for (QByteArray informationId : informationIds){
+
 				QVariant elementInformation;
 				if(informationId == "TypeId"){
 					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
@@ -49,12 +50,20 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 				else if(informationId == "Description"){
 					elementInformation = userGroupInfoPtr->GetDescription();
 				}
+				else if(informationId == "Roles"){
+					elementInformation = userGroupInfoPtr->GetRoles().join(';');
+				}
+				else if(informationId == "ParentGroups"){
+					elementInformation = userGroupInfoPtr->GetParentGroups().join(';');
+				}
 
 				if (elementInformation.isNull()){
 					elementInformation = "";
 				}
 
-				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+				if (ok){
+					retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+				}
 			}
 		}
 

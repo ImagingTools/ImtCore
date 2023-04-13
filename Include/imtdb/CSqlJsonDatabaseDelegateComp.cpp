@@ -1,14 +1,10 @@
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 
 
-// Qt includes
-#include <QtCore/QFile>
-
 // ACF includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
 #include <istd/TOptDelPtr.h>
-#include <istd/CSystem.h>
 #include <istd/CCrcCalculator.h>
 
 
@@ -69,7 +65,7 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 	if (record.contains(*m_documentContentColumnIdAttrPtr)){
 		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
 
-		if (ReadDataFromMemory("", documentContent, *documentPtr)){
+		if (ReadDataFromMemory("DocumentInfo", documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
 		}
 	}
@@ -87,6 +83,29 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 {
 	NewObjectQuery retVal;
 
+	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
+	if (valuePtr != nullptr){
+		workingDocumentPtr.SetPtr(valuePtr, false);
+	}
+
+	if (workingDocumentPtr.IsValid()){
+		QByteArray documentContent;
+		if (WriteDataToMemory("DocumentInfo", *workingDocumentPtr, documentContent)){
+			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
+			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+
+			int revisionVersion = 1;
+			retVal.query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);")
+						.arg(qPrintable(*m_tableNameAttrPtr))
+						.arg(qPrintable(objectId))
+						.arg(SqlEncode(documentContent))
+						.arg(revisionVersion)
+						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+						.arg(checksum).toLocal8Bit();
+
+			retVal.objectName = objectName;
+		}
+	}
 	return retVal;
 }
 
@@ -104,9 +123,22 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
 QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+			const istd::IChangeable& object,
+			bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
+
+	QByteArray documentContent;
+	if (WriteDataToMemory("DocumentInfo", object, documentContent)){
+		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+
+		retVal = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectId))
+					.arg(SqlEncode(documentContent))
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(checksum).toLocal8Bit();
+	}
 
 	return retVal;
 }
@@ -145,7 +177,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 
 QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
-	return QString("SELECT \"Id\", \"%1\", \"AccountId\", \"Document\", \"RevisionNumber\", \"LastModified\","
+	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
 					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
 					" as t2 WHERE \"IsActive\" = true")
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))

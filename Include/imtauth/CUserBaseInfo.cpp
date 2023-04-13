@@ -72,6 +72,22 @@ void CUserBaseInfo::SetName(const QString& name)
 }
 
 
+QString CUserBaseInfo::GetDescription() const
+{
+	return m_description;
+}
+
+
+void CUserBaseInfo::SetDescription(const QString& description)
+{
+	if (m_description != description){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_description = description;
+	}
+}
+
+
 IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions() const
 {
 	IUserBaseInfo::FeatureIds allPermissions;
@@ -139,26 +155,49 @@ void CUserBaseInfo::SetRoles(const RoleIds &roles)
 }
 
 
+void CUserBaseInfo::AddRole(const QByteArray& roleId)
+{
+	if (!m_roles.contains(roleId)){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_roles << roleId;
+	}
+}
+
+
+bool CUserBaseInfo::RemoveRole(const QByteArray& userId)
+{
+	bool result = m_roles.removeOne(userId);
+	if (result){
+		istd::CChangeNotifier changeNotifier(this);
+	}
+
+	return result;
+}
+
+
 bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 {
 	bool retVal = true;
 
-	static iser::CArchiveTag idTag("Id", "Id of user", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(idTag);
 	retVal = retVal && archive.Process(m_id);
 	retVal = retVal && archive.EndTag(idTag);
 
-	static iser::CArchiveTag nameTag("Name", "Name of user", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-	QByteArrayList permissions = m_permissions.values();
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, permissions, "Permissions", "Permission");
 
-	QByteArrayList restrictions = m_restrictions.values();
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, restrictions, "Restrictions", "Restriction");
+	static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_permissions, "Permissions", "Permission");
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Restrictions", "Restriction");
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roles, "Roles", "Role");
 
 	return retVal;

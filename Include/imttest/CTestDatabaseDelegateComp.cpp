@@ -136,7 +136,8 @@ QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectQuery(
 QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+			const istd::IChangeable& object,
+			bool /*useExternDelegate*/) const
 {
 	const imttest::ITestInfo* testInfoPtr = dynamic_cast<const imttest::ITestInfo*>(&object);
 	if (testInfoPtr == nullptr){

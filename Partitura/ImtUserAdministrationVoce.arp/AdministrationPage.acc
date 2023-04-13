@@ -339,6 +339,9 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
                     </Element>
@@ -353,6 +356,12 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UserSqlRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserDatabaseSqlDelegate" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UserSqlRepository"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                                     <Data IsEnabled="false"/>
@@ -371,6 +380,15 @@
                                 </AttributeInfo>
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                                     <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupDatabaseSqlDelegate" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>

@@ -25,11 +25,7 @@ FocusScope {
     property int rowItemHeight: 30;
     property int headerHeight: 35;
 
-    property var rowModel: ListModel {
-        onDataChanged: {
-            console.log("rowModel onDataChanged", data, topLeft, bottomRight);
-        }
-    };
+    property var rowModel: ListModel {};
     property var columnModel: ListModel {};
 
     property ModelIndex selectedIndex: null;
@@ -55,22 +51,34 @@ FocusScope {
         tableViewRoot.Keys.onPressed.disconnect(tableViewRoot.selection.tableKeyPressed);
     }
 
-    Keys.onPressed: {
-        console.log("TableView Keys.onPressed");
+    property var itemsList: [];
 
-//        if (tableViewRoot.selectedIndex == null){
-//            return;
-//        }
+    function _addItem(item){
+        tableViewRoot.itemsList.push(item);
+    }
 
-//        let itemData = tableViewRoot.selectedIndex.itemData;
+    function _removeItem(item){
+        var index = tableViewRoot.itemsList.indexOf(item);
+        if (index !== -1) {
+          tableViewRoot.itemsList.splice(index, 1);
+        }
+    }
 
-//        if (event.key == Qt.Key_Left){
-//            itemData.IsOpen = false;
-//        }
-//        else if (event.key == Qt.Key_Right){
-//            console.log("Qt.Key_Right");
-//            itemData.IsOpen = true;
-//        }
+    function getItemsDataAsList(){
+        return itemsList;
+    }
+
+    function getCheckedItems(){
+        let result = []
+
+        for (let i = 0; i < tableViewRoot.itemsList.length; i++){
+            let itemData = tableViewRoot.itemsList[i];
+            if (itemData.CheckState === Qt.Checked){
+                result.push(itemData);
+            }
+        }
+
+        return result;
     }
 
     Loader {
@@ -192,10 +200,6 @@ FocusScope {
 
         delegate: TableViewItemDelegateBase {
             root: tableViewRoot;
-
-            Component.onCompleted: {
-
-            }
         }
     }
 

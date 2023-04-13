@@ -13,6 +13,7 @@
 #include <imtcore/Version.h>
 #include <imtbase/IIdentifiable.h>
 
+
 namespace imtbase
 {
 
@@ -115,6 +116,7 @@ int TIdentifiableWrap<Base>::GetSupportedOperations() const
 {
 	return SO_CLONE | SO_COPY | SO_RESET;
 }
+
 
 template<class Base>
 bool TIdentifiableWrap<Base>::CopyFrom(const istd::IChangeable& object,  CompatibilityMode /*mode*/)

@@ -83,7 +83,8 @@ public:
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
-				const istd::IChangeable& object) const = 0;
+				const istd::IChangeable& object,
+				bool useExternDelegate = true) const = 0;
 
 	/**
 		Create query for the renaming of the object.

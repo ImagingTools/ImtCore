@@ -173,7 +173,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+			const istd::IChangeable& object, bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
 	QByteArray countRevisionsQuery = QString("SELECT COUNT(*) FROM \"%1\" WHERE %2 = '%3';")

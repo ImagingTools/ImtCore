@@ -4,8 +4,10 @@
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <istd/CCrcCalculator.h>
+#include <istd/TOptDelPtr.h>
 
 // ImtCore includes
+#include <imtauth/IUserInfo.h>
 #include <imtauth/CUserGroupInfo.h>
 
 
@@ -68,20 +70,38 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 				return NewObjectQuery();
 			}
 
+			imtauth::IUserGroupInfo::RoleIds groupRoleIds = groupInfoPtr->GetRoles();
+
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
-			QByteArray accountId = "";
-			QByteArray groupId = groupInfoPtr->GetId();
+			imtauth::IUserGroupInfo::UserIds userIds = groupInfoPtr->GetUsers();
+			for (const QByteArray& userId : userIds){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+					imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+					if (userInfoPtr != nullptr){
+						if (!userInfoPtr->GetGroups().contains(objectId)){
+							userInfoPtr->AddToGroup(objectId);
+
+							for (const QByteArray& roleId : groupRoleIds){
+								userInfoPtr->AddRole(roleId);
+							}
+
+							retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
+						}
+					}
+				}
+			}
 
 			int revisionVersion = 1;
-			retVal.query = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);")
-						.arg(qPrintable(*m_tableNameAttrPtr))
-						.arg(qPrintable(objectId))
-						.arg(SqlEncode(documentContent))
-						.arg(revisionVersion)
-						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-						.arg(checksum).toLocal8Bit();
+			retVal.query += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectId))
+					.arg(SqlEncode(documentContent))
+					.arg(revisionVersion)
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(checksum).toLocal8Bit();
 
 			retVal.objectName = objectName;
 		}
@@ -94,26 +114,92 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
-		const istd::IChangeable& object) const
+		const istd::IChangeable& object,
+		bool useExternDelegate) const
 {
-	QByteArray retVal;
+	const imtauth::IUserGroupInfo* oldObjectPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		oldObjectPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(objectPtr.GetPtr());
+	}
 
+	if (oldObjectPtr == nullptr){
+		return QByteArray();
+	}
+
+	QByteArray retVal;
 	QByteArray documentContent;
 	if (WriteDataToMemory("UserGroupInfo", object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-		const imtauth::CIdentifiableUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserGroupInfo*>(&object);
+		const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&object);
 		Q_ASSERT(groupInfoPtr != nullptr);
 		if (groupInfoPtr == nullptr){
 			return QByteArray();
 		}
-//		QByteArray objectUuid = groupInfoPtr->GetObjectUuid();
 
-		retVal = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(objectId))
-					.arg(SqlEncode(documentContent))
-					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-					.arg(checksum).toLocal8Bit();
+		if (useExternDelegate){
+			imtauth::IUserGroupInfo::RoleIds groupRoleIds = groupInfoPtr->GetRoles();
+
+			imtauth::IUserGroupInfo::UserIds oldUserIds = oldObjectPtr->GetUsers();
+			imtauth::IUserGroupInfo::UserIds newUserIds = groupInfoPtr->GetUsers();
+
+			imtauth::IUserGroupInfo::UserIds addedUsers;
+			imtauth::IUserGroupInfo::UserIds removedUsers;
+
+			for (const QByteArray& userId : newUserIds){
+				if (!oldUserIds.contains(userId)){
+					addedUsers.append(userId);
+				}
+			}
+
+			for (const QByteArray& userId : oldUserIds){
+				if (!newUserIds.contains(userId)){
+					removedUsers.append(userId);
+				}
+			}
+
+			for (const QByteArray& userId : addedUsers){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+					imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+					if (userInfoPtr != nullptr){
+						if (!userInfoPtr->GetGroups().contains(objectId)){
+							userInfoPtr->AddToGroup(objectId);
+
+							for (const QByteArray& roleId : groupRoleIds){
+								userInfoPtr->AddRole(roleId);
+							}
+
+							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
+						}
+					}
+				}
+			}
+
+			for (const QByteArray& userId : removedUsers){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+					imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+					if (userInfoPtr != nullptr){
+						bool result = userInfoPtr->RemoveFromGroup(objectId);
+						if (result){
+							for (const QByteArray& roleId : groupRoleIds){
+								userInfoPtr->RemoveRole(roleId);
+							}
+
+							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
+						}
+					}
+				}
+			}
+		}
+
+		retVal += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(SqlEncode(documentContent))
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(checksum).toLocal8Bit();
 	}
 
 	return retVal;
@@ -125,8 +211,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 QString CUserGroupDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
 	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-					" as t2 WHERE \"IsActive\" = true")
+				   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+				   " as t2 WHERE \"IsActive\" = true")
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))
 			.arg(qPrintable(*m_tableNameAttrPtr));
 }

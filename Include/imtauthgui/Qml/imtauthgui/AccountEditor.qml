@@ -15,8 +15,7 @@ DocumentBase {
     onDocumentModelChanged: {
         console.log("AccountEditor onDocumentModelChanged");
 
-        accountEditorContainer.updateGui();
-        undoRedoManager.registerModel(accountEditorContainer.documentModel);
+        groupsProvider.updateModel();
 
         accountNameInput.focus = true;
     }
@@ -74,6 +73,25 @@ DocumentBase {
         if (accountEditorContainer.documentModel.ContainsKey("Email")){
             emailInput.text = accountEditorContainer.documentModel.GetData("Email");
         }
+
+        let groupIds = [];
+        if (accountEditorContainer.documentModel.ContainsKey("Roles")){
+            let groups = accountEditorContainer.documentModel.GetData("Roles")
+            if (groups !== ""){
+                groupIds = groups.split(';');
+            }
+        }
+
+        for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
+            let id = groupsTable.elements.GetData("Id", i);
+            if (groupIds.includes(id)){
+                groupsTable.elements.SetData("CheckedState", Qt.Checked, i);
+            }
+            else{
+                groupsTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+            }
+        }
+
         accountEditorContainer.blockUpdatingModel = false;
     }
 
@@ -109,6 +127,18 @@ DocumentBase {
 
         let email = emailInput.text;
         accountEditorContainer.documentModel.SetData("Email", email)
+
+        let selectedGroupIds = []
+        for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
+            let id = groupsTable.elements.GetData("Id", i);
+            let state = groupsTable.elements.GetData("CheckedState", i);
+            if (state === Qt.Checked){
+                selectedGroupIds.push(id)
+            }
+        }
+
+        let groups = selectedGroupIds.join(';');
+        accountEditorContainer.documentModel.SetData("Groups", groups)
 
         undoRedoManager.endChanges();
     }
@@ -443,6 +473,61 @@ DocumentBase {
                     }
                 }// Company address block
             }//Company address block borders
+
+            CollectionDataProvider {
+                id: groupsProvider;
+
+                commandId: "Groups";
+
+                fields: ["Id", "Name"];
+
+                onModelUpdated: {
+                    if (groupsProvider.collectionModel != null){
+                        for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+                            groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
+                        }
+
+                        groupsTable.elements = groupsProvider.collectionModel;
+
+                        accountEditorContainer.updateGui();
+                        undoRedoManager.registerModel(accountEditorContainer.documentModel);
+
+                        groupsProvider.collectionModel.modelChanged.connect(accountEditorContainer.updateModel);
+                    }
+                }
+            }
+
+            TreeItemModel {
+                id: headersModel;
+
+                Component.onCompleted: {
+                    headersModel.InsertNewItem();
+
+                    headersModel.SetData("Id", "Name");
+                    headersModel.SetData("Name", "Group Name");
+
+                    groupsTable.headers = headersModel;
+                }
+            }
+
+            Text {
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Groups");
+            }
+
+            AuxTable {
+                id: groupsTable;
+
+                width: parent.width;
+                height: 300;
+
+                checkable: true;
+                radius: 0;
+            }
+
         }//Body column
     }//Flickable
 }// Account Editor container

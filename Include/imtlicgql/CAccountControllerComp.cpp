@@ -140,6 +140,13 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		companyInfoPtr->SetAddress(address);
 
+		if (itemModel.ContainsKey("Groups")){
+			QByteArray groups = itemModel.GetData("Groups").toByteArray();
+			if (!groups.isEmpty()){
+				QByteArrayList groupIds = groups.split(';');
+			}
+		}
+
 		return companyInfoPtr.PopPtr();
 	}
 

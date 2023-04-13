@@ -150,12 +150,6 @@
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UsersSessionsDatabaseDelegate"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="SessionInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TypeName" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="Session"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>

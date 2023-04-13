@@ -16,130 +16,84 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("UserRoles onDocumentModelChanged", documentModel);
-
         rolesProvider.updateModel();
+    }
+
+    onVisibleChanged: {
+        if (userRolesContainer.visible){
+            userRolesContainer.updateGui();
+        }
+    }
+
+    CollectionDataProvider {
+        id: rolesProvider;
+
+        commandId: "Roles";
+
+        fields: ["Id", "Name"];
+
+        onModelUpdated: {
+            if (rolesProvider.collectionModel != null){
+                if (rolesProvider.collectionModel.ContainsKey("Roles")){
+                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
+                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+                        rolesModel.SetData("CheckedState", Qt.Unchecked, i);
+                    }
+
+                    rolesTable.elements = rolesModel;
+
+                    userRolesContainer.updateGui();
+
+                    rolesProvider.collectionModel.modelChanged.connect(userRolesContainer.updateModel);
+                }
+            }
+        }
     }
 
     function updateGui(){
         console.log("UserRoles updateGui");
         userRolesContainer.blockUpdatingModel = true;
 
-        let selectedRolesList = []
-        if (documentModel.ContainsKey("Products")){
-            let selectedRoles = documentModel.GetData("Products");
-
-            for (let i = 0; i < selectedRoles.GetItemsCount(); i++){
-                let productId = selectedRoles.GetData("Id", i);
-                let rolesModel = selectedRoles.GetData("Roles", i);
-                if (rolesModel){
-                    for (let j = 0; j < rolesModel.GetItemsCount(); j++){
-                        let roleId = rolesModel.GetData("Id", j);
-
-                        let value = productId + ';' + roleId;
-
-                        selectedRolesList.push(value)
-                    }
-                }
+        let roleIds = [];
+        if (userRolesContainer.documentModel.ContainsKey("Roles")){
+            let roles = userRolesContainer.documentModel.GetData("Roles")
+            if (roles !== ""){
+                roleIds = roles.split(';');
             }
         }
 
-        rolesTable.rowModel.clear();
-        rolesTable.height = 0;
-
-        for (let i = 0; i < rolesProvider.model.GetItemsCount(); i++){
-            let productId = rolesProvider.model.GetData("Id", i);
-
-            let row = {"Id": productId, "Name": productId, "Roles": []};
-            let rolesModel = rolesProvider.model.GetData("Roles", i);
-            if (rolesModel){
-                let roles = []
-                for (let j = 0; j < rolesModel.GetItemsCount(); j++){
-
-                    let roleId = rolesModel.GetData("Id", j);
-                    let roleName = rolesModel.GetData("Name", j);
-
-                    let value = productId + ';' + roleId;
-
-                    let roleRow = {"Id": roleId, "Name": roleName, "CheckState": Qt.Unchecked}
-
-                    if (selectedRolesList.includes(value)){
-                        roleRow["CheckState"] = Qt.Checked;
-                    }
-
-                    roles.push(roleRow)
-                }
-
-                row["Roles"] = roles;
+        for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
+            let id = rolesTable.elements.GetData("Id", i);
+            if (roleIds.includes(id)){
+                rolesTable.elements.SetData("CheckedState", Qt.Checked, i);
             }
-
-            rolesTable.addRow(row);
+            else{
+                rolesTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+            }
         }
-
-        permissionsTable.rowModel.clear();
-        permissionsTable.height = permissionsTable.headerHeight;
-
-        //Permissions update...
 
         userRolesContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("UserRoles updateModel");
+        if (userRolesContainer.blockUpdatingModel){
+            return;
+        }
 
         userRolesContainer.undoRedoManager.beginChanges();
 
-        let selectedRoles = documentModel.AddTreeModel("Products");
-
-        for (let i = 0; i < rolesTable.rowCount; i++){
-            let rowObj = rolesTable.rowModel.get(i);
-
-            let productId = rowObj["Id"];
-
-            let roles = rowObj["Roles"];
-
-            console.log("roles", roles);
-
-            for (let j = 0; j < roles.count; j++){
-                let roleObj = roles.get(j);
-
-                console.log("roleObj", roleObj);
-
-                let roleId = roleObj["Id"];
-                let roleName = roleObj["Name"];
-                let state = roleObj["CheckState"];
-
-                if (state == Qt.Checked){
-                    let productIndex = -1;
-
-                    for (let k = 0; k < selectedRoles.GetItemsCount(); k++){
-                        let selectedProductId = selectedRoles.GetData("Id", k);
-                        if (selectedProductId == productId){
-                            productIndex = k;
-                            break;
-                        }
-                    }
-
-                    let rolesModel;
-                    if (productIndex < 0){
-                        productIndex = selectedRoles.InsertNewItem();
-
-                        selectedRoles.SetData("Id", productId, productIndex);
-                        selectedRoles.SetData("Name", productId, productIndex);
-
-                        rolesModel = selectedRoles.AddTreeModel("Roles", productIndex);
-                    }
-                    else{
-                        rolesModel = selectedRoles.GetData("Roles", productIndex)
-                    }
-
-                    let roleIndex = rolesModel.InsertNewItem();
-
-                    rolesModel.SetData("Id", roleId, roleIndex);
-                    rolesModel.SetData("Name", roleName, roleIndex);
-                }
+        let selectedRoleIds = []
+        for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
+            let id = rolesTable.elements.GetData("Id", i);
+            let state = rolesTable.elements.GetData("CheckedState", i);
+            if (state === Qt.Checked){
+                selectedRoleIds.push(id)
             }
         }
+
+        let result = selectedRoleIds.join(';');
+        userRolesContainer.documentModel.SetData("Roles", result);
 
         userRolesContainer.undoRedoManager.endChanges();
     }
@@ -148,14 +102,6 @@ Item {
         id: emptyDecorator;
         Item{
             property Item rootItem: null;
-        }
-    }
-
-    RolesProvider {
-        id: rolesProvider;
-
-        onModelChanged: {
-            userRolesContainer.updateGui();
         }
     }
 
@@ -174,91 +120,49 @@ Item {
                 }
             }
         }
-
     }
 
-    Flickable {
-        anchors.fill: parent;
+    Text {
+        id: titleRoles;
 
-        anchors.leftMargin: 20;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+//        anchors.leftMargin: 10;
 
-        contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height + 50;
+        text: qsTr("Roles");
+        color: Style.textColor;
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_common;
+    }
 
-        boundsBehavior: Flickable.StopAtBounds;
+    TreeItemModel {
+        id: headersModel;
 
-        Column {
-            id: bodyColumn;
+        Component.onCompleted: {
+            headersModel.InsertNewItem();
 
-            width: 400;
+            headersModel.SetData("Id", "Name");
+            headersModel.SetData("Name", "Role Name");
 
-            spacing: 7;
+            rolesTable.headers = headersModel;
+        }
+    }
 
-            Text {
-                id: titleRoles;
+    AuxTable {
+        id: rolesTable;
 
-                text: qsTr("Roles");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
+        anchors.top: titleRoles.bottom;
+        anchors.topMargin: 7;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+        anchors.left: parent.left;
+//        anchors.leftMargin: 10;
 
-            BasicTableView {
-                id: rolesTable;
+        width: 400;
 
-                width: bodyColumn.width;
+        elements: TreeItemModel {}
 
-                headerVisible: false;
-                withoutSelection: true;
-
-                rowDelegate: Component { TableUserRolesDelegate {
-                    root: rolesTable;
-                    Component.onCompleted: {
-                        rolesTable.height += height;
-                    }
-                } }
-
-                Component.onCompleted: {
-                    rolesTable.addColumn({"Id": "Name", "Name": "Name"})
-                }
-
-                onRowModelDataChanged: {
-                    console.error("onRowModelDataChanged", prop)
-                    if (!userRolesContainer.blockUpdatingModel){
-                        userRolesContainer.updateModel();
-                    }
-                }
-            }
-
-            Text {
-                id: titlePermissions;
-
-                text: qsTr("Permissions");
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-
-                visible: false;
-            }
-
-            BasicTableView {
-                id: permissionsTable;
-
-                width: bodyColumn.width;
-                height: permissionsTable.headerHeight;
-
-                visible: false;
-
-                rowDelegate: Component { TableViewItemDelegateBase {
-                    Component.onCompleted: {
-                        permissionsTable.height += height;
-                    }
-                } }
-
-                Component.onCompleted: {
-                    permissionsTable.addColumn({"Id": "Name", "Name": "Name"})
-                }
-            }
-        }//Column bodyColumn
-    }//Flickable
+        checkable: true;
+        radius: 0;
+    }
 }//Container

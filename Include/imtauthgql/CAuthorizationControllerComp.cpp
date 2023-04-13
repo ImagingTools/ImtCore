@@ -39,31 +39,36 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 			passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password);
 		}
 
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_userCollectionCompPtr->GetObjectData(login, dataPtr)){
-			const imtauth::CUserInfo* userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
-			if (userInfoPtr != nullptr){
-				QByteArray userPassword = userInfoPtr->GetPasswordHash();
-				if (userPassword == passwordHash){
-					imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
+		imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds();
+		for (const imtbase::IObjectCollection::Id& userId : userIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+				const imtauth::CUserInfo* userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
+				if (userInfoPtr != nullptr){
+					if (userInfoPtr->GetId() == login){
+						QByteArray userPassword = userInfoPtr->GetPasswordHash();
+						if (userPassword == passwordHash){
+							imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-					QByteArray tokenValue = QUuid::createUuid().toByteArray();
+							QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
-					dataModel->SetData("Token", tokenValue);
-					dataModel->SetData("Login", login);
+							dataModel->SetData("Token", tokenValue);
+							dataModel->SetData("Login", login);
 
-					istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
+							istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 
-					sessionInfoPtr->SetUserId(login);
-					sessionInfoPtr->SetToken(tokenValue);
+							sessionInfoPtr->SetUserId(userId);
+							sessionInfoPtr->SetToken(tokenValue);
 
-					if (m_sessionCollectionCompPtr.IsValid()){
-						m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
+							if (m_sessionCollectionCompPtr.IsValid()){
+								m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
+							}
+
+							rootModelPtr->SetExternTreeModel("data", dataModel);
+
+							return rootModelPtr.PopPtr();
+						}
 					}
-
-					rootModelPtr->SetExternTreeModel("data", dataModel);
-
-					return rootModelPtr.PopPtr();
 				}
 			}
 		}

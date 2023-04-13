@@ -31,7 +31,6 @@ CollectionView {
 
     Component.onCompleted: {
         console.log("RoleCollection onCompleted", model.index);
-        roleCollectionViewContainer.commandUpdateGui = "RoleCollectionUpdateGui";
         roleCollectionViewContainer.commandsDelegatePath = "../../imtauthgui/RoleCollectionViewCommandsDelegate.qml";
 
         elementsList.spacing = 10;
@@ -40,7 +39,7 @@ CollectionView {
     }
 
     onElementsChanged: {
-        let elementsModel =  elementsList.model.GetData("Roles");
+        let elementsModel = elementsList.model.GetData("Roles");
         console.log('elementsModel', elementsModel.GetItemsCount())
         baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
     }

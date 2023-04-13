@@ -1,10 +1,8 @@
 #pragma once
 
 
-// ACF includes
-#include <iprm/ISelectionParam.h>
-
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtdb/IDatabaseEngine.h>
 #include <imtgql/CGqlRepresentationDataControllerComp.h>
 

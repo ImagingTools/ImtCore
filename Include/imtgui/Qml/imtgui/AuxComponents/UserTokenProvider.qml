@@ -10,11 +10,10 @@ Item {
 
     signal accepted();
     signal errorSignal(string message);
+
     onErrorSignal: {
         console.log("ERROR: ",message);
     }
-
-
 
     function authorization(loginF, passwordF){
         console.log('DEBUG::authorization', loginF, passwordF);

@@ -2,17 +2,17 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5032" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5060" Description="ACF"/>
+            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="OptionsListAdapter" X="600" Y="500" Note=""/>
-        <Element ComponentName="Repository" X="625" Y="325" Note=""/>
-        <Element ComponentName="UserDatabaseDelegate" X="225" Y="150" Note=""/>
-        <Element ComponentName="UserInfo" X="600" Y="150" Note=""/>
-        <Element ComponentName="UserMetaInfoCreator" X="225" Y="500" Note=""/>
+        <Element ComponentName="JsonSerializer" X="175" Y="350" Note=""/>
+        <Element ComponentName="Repository" X="550" Y="550" Note=""/>
+        <Element ComponentName="Types" X="550" Y="125" Note=""/>
+        <Element ComponentName="UserDatabaseDelegate" X="550" Y="350" Note=""/>
+        <Element ComponentName="UserInfo" X="875" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

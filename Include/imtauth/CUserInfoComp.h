@@ -6,9 +6,8 @@
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
-#include <imtlic/IFeatureInfoProvider.h>
 #include <imtauth/IRoleInfoProvider.h>
-#include <imtbase/IObjectCollection.h>
+
 
 namespace imtauth
 {
@@ -16,7 +15,7 @@ namespace imtauth
 
 class CUserInfoComp:
 		public icomp::CComponentBase,
-		public CUserInfo
+		public CIdentifiableUserInfo
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

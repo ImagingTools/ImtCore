@@ -6,9 +6,9 @@
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
-#include <imtlic/IFeatureInfoProvider.h>
 #include <imtauth/IRoleInfoProvider.h>
-#include <imtbase/IObjectCollection.h>
+#include <imtauth/IUserGroupInfoProvider.h>
+
 
 namespace imtauth
 {
@@ -25,6 +25,7 @@ public:
 		I_REGISTER_INTERFACE(IUserGroupInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_roleProviderCompPtr, "RoleProvider", "Role provider", true, "RoleProvider");
+		I_ASSIGN(m_userGroupProviderCompPtr, "UserGroupProvider", "User group provider", true, "UserGroupProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -33,7 +34,10 @@ protected:
 
 private:
 	I_REF(imtauth::IRoleInfoProvider, m_roleProviderCompPtr);
+	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupProviderCompPtr);
 };
 
 
 } // namespace imtauth
+
+

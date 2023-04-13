@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtauth/IUserGroupInfo.h>
 
 
 namespace imtauthgql

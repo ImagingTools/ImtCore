@@ -203,7 +203,7 @@ TableViewItemDelegateBase {
                 }
             }
 
-            property ListModel childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
+            property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
             onChildModelChanged: {
                 console.log("TreeViewItemDelegateBase onChildModelChanged", childModel);
                 if (childrenColumn.childModel){

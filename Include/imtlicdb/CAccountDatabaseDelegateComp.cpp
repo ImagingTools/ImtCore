@@ -170,7 +170,8 @@ QByteArray CAccountDatabaseDelegateComp::CreateDeleteObjectQuery(
 QByteArray CAccountDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+			const istd::IChangeable& object,
+			bool /*useExternDelegate*/) const
 {
 	const imtauth::IAccountInfo* accountInfoPtr = dynamic_cast<const imtauth::IAccountInfo*>(&object);
 	if (accountInfoPtr == nullptr){

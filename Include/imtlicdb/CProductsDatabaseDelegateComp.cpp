@@ -221,7 +221,8 @@ QByteArray CProductsDatabaseDelegateComp::CreateDeleteObjectQuery(
 QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+			const istd::IChangeable& object,
+			bool /*useExternDelegate*/) const
 {
 	const imtlic::IProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(&object);
 	if (newProductPtr == nullptr){

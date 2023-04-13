@@ -78,7 +78,8 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectQuery(
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+			const istd::IChangeable& object,
+			bool /*useExternDelegate*/) const
 {
 	return QByteArray();
 }

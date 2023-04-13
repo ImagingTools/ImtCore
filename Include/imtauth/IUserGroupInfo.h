@@ -7,6 +7,7 @@
 //ImtCore includes
 #include <imtauth/IUserBaseInfo.h>
 #include <imtauth/IUserInfoProvider.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 
 
 namespace imtauth
@@ -20,17 +21,8 @@ namespace imtauth
 class IUserGroupInfo: virtual public IUserBaseInfo
 {
 public:
-	typedef QSet<QByteArray> UserIds;
-
-	/**
-		Get description of the group.
-	*/
-	virtual QString GetDescription() const = 0;
-
-	/**
-		Set description of the group.
-	*/
-	virtual void SetDescription(const QString& description) = 0;
+	typedef QByteArrayList UserIds;
+	typedef QByteArrayList GroupIds;
 
 	/**
 		Get users.
@@ -43,33 +35,40 @@ public:
 	virtual void SetUsers(const UserIds& users) = 0;
 
 	/**
+		Add user to group.
+	*/
+	virtual void AddUser(const QByteArray& userId) = 0;
+
+	/**
+		Remove user from this group.
+	*/
+	virtual bool RemoveUser(const QByteArray& userId) = 0;
+
+	/**
+		Get parent groups.
+	*/
+	virtual GroupIds GetParentGroups() const = 0;
+
+	/**
+		Add parent group to this group.
+	*/
+	virtual void AddParentGroup(const QByteArray& parentGroupId) = 0;
+
+	/**
+		Remove parent group from this group.
+	*/
+	virtual bool RemoveParentGroup(const QByteArray& parentGroupId) = 0;
+
+	/**
 		Get list of all availiable users.
 	*/
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const = 0;
 
 	/**
-		Get the parent group pointer.
+		Get list of all availiable user groups.
 	*/
-	virtual const IUserGroupInfo* GetParentGroup() const = 0;
-
-	/**
-		Get sub groups for this group.
-	*/
-	virtual const istd::TPointerVector<const IUserGroupInfo>& GetSubGroups() const  = 0;
-
-	/**
-		Insert sub group.
-	*/
-	virtual bool InsertSubGroup(const IUserGroupInfo* subGroupInfo) = 0;
-
-	/**
-		Remove sub group.
-	*/
-	virtual void DeleteSubGroup(const QByteArray& subGroupId) = 0;
+	virtual const imtauth::IUserGroupInfoProvider* GetUserGroupProvider() const = 0;
 };
-
-
-typedef istd::TPointerVector<const IUserGroupInfo> UserGroupInfoList;
 
 
 } // namespace imtauth

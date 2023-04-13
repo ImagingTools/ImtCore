@@ -1,9 +1,5 @@
-#include "imtbase/IObjectCollection.h"
 #include <imtauth/CUserInfo.h>
 
-
-// Qt includes
-#include <QtCore/QByteArrayList>
 
 // ACF includes
 #include <istd/TDelPtr.h>
@@ -57,22 +53,51 @@ bool CUserInfo::IsAdmin() const
 }
 
 
+IUserGroupInfo::GroupIds CUserInfo::GetGroups() const
+{
+	return m_groupIds;
+}
+
+
+void CUserInfo::AddToGroup(const QByteArray& groupId)
+{
+	if (!m_groupIds.contains(groupId)){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_groupIds << groupId;
+	}
+}
+
+
+bool CUserInfo::RemoveFromGroup(const QByteArray& groupId)
+{
+	bool result = m_groupIds.removeAll(groupId);
+	if (result){
+		istd::CChangeNotifier changeNotifier(this);
+	}
+
+	return result;
+}
+
+
 bool CUserInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 	bool retVal = true;
 
-	BaseClass::Serialize(archive);
-
-	static iser::CArchiveTag usernameTag("Username", "Username of user", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(usernameTag);
-	retVal = retVal && archive.Process(m_userId);
-	retVal = retVal && archive.EndTag(usernameTag);
+	retVal = retVal && BaseClass::Serialize(archive);
 
 	static iser::CArchiveTag mailTag("Mail", "Mail of user", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(mailTag);
 	retVal = retVal && archive.Process(m_mail);
 	retVal = retVal && archive.EndTag(mailTag);
+
+	static iser::CArchiveTag passwordTag("PasswordHash", "Password hash", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(passwordTag);
+	retVal = retVal && archive.Process(m_passwordHash);
+	retVal = retVal && archive.EndTag(passwordTag);
+
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_groupIds, "Groups", "Group");
 
 	return retVal;
 }
@@ -86,9 +111,9 @@ bool CUserInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
 
 		BaseClass::CopyFrom(object);
 
-		m_userId = sourcePtr->m_userId;
 		m_passwordHash = sourcePtr->m_passwordHash;
 		m_mail = sourcePtr->m_mail;
+		m_groupIds = sourcePtr->m_groupIds;
 
 		return true;
 	}
@@ -114,8 +139,9 @@ bool CUserInfo::ResetData(CompatibilityMode mode)
 
 	BaseClass::ResetData(mode);
 
-	m_userId.clear();
 	m_mail.clear();
+	m_passwordHash.clear();
+	m_groupIds.clear();
 
 	return true;
 }

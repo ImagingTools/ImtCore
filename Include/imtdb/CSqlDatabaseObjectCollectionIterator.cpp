@@ -12,7 +12,7 @@ namespace imtdb
 // public methods
 
 CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(QSqlQuery sqlQuery, ISqlDatabaseObjectDelegate *databaseDelegate):
-	m_currentIndex(0)
+	m_currentIndex(-1)
 {
 	while(sqlQuery.next()){
 		m_records.append(sqlQuery.record());

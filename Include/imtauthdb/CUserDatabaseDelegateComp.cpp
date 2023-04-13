@@ -3,8 +3,11 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
+#include <istd/CCrcCalculator.h>
+#include <istd/TOptDelPtr.h>
 
 // ImtCore includes
+#include <imtauth/CUserInfo.h>
 #include <imtauth/CUserInfoMetaInfo.h>
 
 
@@ -22,360 +25,185 @@ istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 		return nullptr;
 	}
 
-	if (!m_userInfoFactCompPtr.IsValid()){
+	if (!m_documentFactoriesCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtauth::IUserInfo> userPtr = m_userInfoFactCompPtr.CreateInstance();
-	if (!userPtr.IsValid()){
-		return nullptr;
-	}
+	int index = m_documentFactoriesCompPtr.FindValue("UserInfo");
+	if (index >= 0){
+		istd::TDelPtr<istd::IChangeable> documentPtr;
+		istd::IChangeable* userInstancePtr = m_documentFactoriesCompPtr.CreateInstance(index);
+		documentPtr.SetPtr(dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr));
 
-	QByteArray userId;
-	if (record.contains("UserId")){
-		userId = record.value("UserId").toByteArray();
-		userPtr->SetId(userId);
-	}
+		if (!documentPtr.IsValid()){
+			return nullptr;
+		}
 
-	QString name;
-	if (record.contains("Name")){
-		name = record.value("Name").toString();
-		userPtr->SetName(name);
-	}
+		if (record.contains(*m_documentContentColumnIdAttrPtr)){
+			QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
 
-	QByteArray passwordHash;
-	if (record.contains("Password")){
-		passwordHash = record.value("Password").toByteArray();
-		userPtr->SetPasswordHash(passwordHash);
-	}
-
-	QString mail;
-	if (record.contains("Email")){
-		mail = record.value("Email").toString();
-		userPtr->SetMail(mail);
-	}
-
-	QByteArray selectUserPermissions = QString("SELECT * FROM \"UserPermissions\" WHERE \"UserId\" = '%1'").arg(qPrintable(userId)).toUtf8();
-
-	QSqlError error;
-	QSqlQuery userPermissionsQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectUserPermissions, &error);
-
-	imtauth::IUserInfo::FeatureIds permissionsIds;
-
-	while (userPermissionsQuery.next()){
-		QSqlRecord permissionRecord = userPermissionsQuery.record();
-		QByteArray permissionId;
-
-		if (permissionRecord.contains("PermissionId")){
-			permissionId = permissionRecord.value("PermissionId").toByteArray();
-
-			permissionsIds << permissionId;
+			if (ReadDataFromMemory("UserInfo", documentContent, *documentPtr)){
+				return documentPtr.PopPtr();
+			}
 		}
 	}
 
-	userPtr->SetLocalPermissions(permissionsIds);
-
-	QByteArray selectUserRoles = QString("SELECT * FROM \"UserRoles\" WHERE \"UserId\" = '%1'").arg(qPrintable(userId)).toUtf8();
-
-	QSqlQuery userRolesQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectUserRoles, &error);
-
-	imtauth::IUserInfo::RoleIds rolesIds;
-
-	while (userRolesQuery.next()){
-		QSqlRecord roleRecord = userRolesQuery.record();
-
-		QByteArray roleId;
-		if (roleRecord.contains("RoleId")){
-			roleId = roleRecord.value("RoleId").toByteArray();
-		}
-
-		QByteArray productId;
-		if (roleRecord.contains("ProductId")){
-			productId = roleRecord.value("ProductId").toByteArray();
-		}
-
-		rolesIds << roleId + *m_separatorObjectIdAttrPtr + productId;
-	}
-
-	userPtr->SetRoles(rolesIds);
-
-	return userPtr.PopPtr();
+	return nullptr;
 }
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::CreateNewObjectQuery(
 		const QByteArray& /*typeId*/,
-		const QByteArray& /*proposedObjectId*/,
+		const QByteArray& proposedObjectId,
 		const QString& objectName,
 		const QString& objectDescription,
 		const istd::IChangeable* valuePtr) const
 {
-	const imtauth::IUserInfo* userPtr = dynamic_cast<const imtauth::IUserInfo*>(valuePtr);
-	if (userPtr == nullptr){
-		return NewObjectQuery();
-	}
-
-	QString name = userPtr->GetName();
-	if (name.isEmpty()){
-		name = objectName;
-	}
-
-	QByteArray userId = qPrintable(userPtr->GetId());
-	QByteArray passwordHash = userPtr->GetPasswordHash();
-	QString mail = userPtr->GetMail();
-
 	NewObjectQuery retVal;
 
-	retVal.query += "\n" + QString("INSERT INTO \"Users\" (\"UserId\", \"Password\", \"Name\", \"Email\", \"Description\", \"Added\", \"LastModified\") VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
-			.arg(qPrintable(userId))
-			.arg(qPrintable(passwordHash))
-			.arg(name)
-			.arg(mail)
-			.arg("")
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.toLocal8Bit();
-	retVal.objectName = name;
-
-	imtauth::IUserInfo::FeatureIds permissionsIds = userPtr->GetPermissions();
-
-	for (const QByteArray& permissionId : permissionsIds){
-		retVal.query += "\n" +
-				QString("INSERT INTO \"UserPermissions\" (\"UserId\", \"PermissionId\") VALUES('%1', '%2');")
-				.arg(qPrintable(userId))
-				.arg(qPrintable(permissionId)).toLocal8Bit();
+	istd::TOptDelPtr<istd::IChangeable> workingDocumentPtr;
+	if (valuePtr != nullptr){
+		workingDocumentPtr.SetPtr(const_cast<istd::IChangeable*>(valuePtr), false);
 	}
 
-	imtauth::IUserInfo::RoleIds rolesIds = userPtr->GetRoles();
+	if (workingDocumentPtr.IsValid()){
+		imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(workingDocumentPtr.GetPtr());
+		Q_ASSERT(userInfoPtr != nullptr);
+		if (userInfoPtr == nullptr){
+			return NewObjectQuery();
+		}
 
-	for (const QByteArray& productRoleId : rolesIds){
-		QStringList data = QString(productRoleId).split(*m_separatorObjectIdAttrPtr);
+		QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 
-		if (data.size() == 2){
-			QByteArray roleId = data[0].toUtf8();
-			QByteArray productId = data[1].toUtf8();
+		QByteArrayList groupIds = userInfoPtr->GetGroups();
+		for (const QByteArray& groupId : groupIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
+				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+				if (userGroupInfoPtr != nullptr){
+					userGroupInfoPtr->AddUser(objectId);
 
-			retVal.query += "\n" +
-					QString("INSERT INTO \"UserRoles\" (\"UserId\", \"RoleId\", \"ProductId\") VALUES('%1', '%2', '%3');")
-					.arg(qPrintable(userId))
-					.arg(qPrintable(roleId))
-					.arg(qPrintable(productId)).toLocal8Bit();
+					for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
+						userInfoPtr->AddRole(roleId);
+					}
+
+					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
+				}
+			}
+		}
+
+		QByteArray documentContent;
+		if (WriteDataToMemory("UserInfo", *userInfoPtr, documentContent)){
+			int revisionVersion = 1;
+			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+
+			retVal.query += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectId))
+					.arg(SqlEncode(documentContent))
+					.arg(revisionVersion)
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(checksum).toLocal8Bit();
+
+			retVal.objectName = objectName;
 		}
 	}
 
 	return retVal;
-}
-
-
-QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId) const
-{
-	imtbase::IObjectCollection::DataPtr objectPtr;
-	if (collection.GetObjectData(objectId, objectPtr)){
-		const imtauth::IUserInfo* userPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
-		if (userPtr == nullptr){
-			return QByteArray();
-		}
-
-		if (userPtr->IsAdmin()){
-			return QByteArray();
-		}
-
-		QByteArray userId = qPrintable(userPtr->GetId());
-		if (userId.isEmpty()){
-			return QByteArray();
-		}
-
-		QByteArray retVal = QString("DELETE FROM \"Users\" WHERE \"UserId\" = '%1';").arg(qPrintable(userId)).toLocal8Bit();
-
-		return retVal;
-	}
-
-	return QByteArray();
 }
 
 
 QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
-		const istd::IChangeable& object) const
+		const istd::IChangeable& object,
+		bool useExternDelegate) const
 {
-	const imtauth::IUserInfo* newUserPtr = dynamic_cast<const imtauth::IUserInfo*>(&object);
-	if (newUserPtr == nullptr){
-		return QByteArray();
-	}
-
-	const imtauth::IUserInfo* oldUserPtr = nullptr;
+	const imtauth::IUserInfo* oldObjectPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
-		oldUserPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
+		oldObjectPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
 	}
 
-	if (oldUserPtr == nullptr){
+	if (oldObjectPtr == nullptr){
 		return QByteArray();
 	}
 
-	QByteArray oldUserId = qPrintable(oldUserPtr->GetId());
-	QByteArray newUserId = qPrintable(newUserPtr->GetId());
-
-	QString newName = newUserPtr->GetName();
-	QByteArray newUserPasswordHash = newUserPtr->GetPasswordHash();
-	QString newMail = newUserPtr->GetMail();
-
-	QByteArray retVal = QString("UPDATE \"Users\" SET \"UserId\" ='%1', \"Password\" = '%2', \"Name\" = '%3', \"Email\" = '%4', \"Description\" = '%5', \"LastModified\" = '%6' WHERE \"UserId\" ='%7';")
-			.arg(qPrintable(newUserId))
-			.arg(qPrintable(newUserPasswordHash))
-			.arg(qPrintable(newName))
-			.arg(qPrintable(newMail))
-			.arg(qPrintable(""))
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(oldUserId)).toLocal8Bit();
-
-	imtauth::IUserInfo::FeatureIds newPermissionsIds = newUserPtr->GetLocalPermissions();
-	imtauth::IUserInfo::FeatureIds oldPermissionsIds = oldUserPtr->GetLocalPermissions();
-
-	for (const QByteArray& permissionId : newPermissionsIds){
-		if (!oldPermissionsIds.contains(permissionId)){
-			retVal += "\n" +
-					QString("INSERT INTO \"UserPermissions\" (\"UserId\", \"PermissionId\") VALUES('%1', '%2');")
-					.arg(qPrintable(newUserId))
-					.arg(qPrintable(permissionId)).toLocal8Bit();
-		}
+	imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(&const_cast<istd::IChangeable&>(object));
+	Q_ASSERT(userInfoPtr != nullptr);
+	if (userInfoPtr == nullptr){
+		return QByteArray();
 	}
 
-	for (const QByteArray& permissionId : oldPermissionsIds){
-		if (!newPermissionsIds.contains(permissionId)){
-			retVal += "\n" +
-					QString("DELETE FROM \"UserPermissions\" WHERE \"UserId\" = '%1' AND \"PermissionId\" = '%2';")
-					.arg(qPrintable(newUserId))
-					.arg(qPrintable(permissionId)).toLocal8Bit();
+	QByteArray retVal;
+
+	if (useExternDelegate){
+		QByteArrayList oldGroupIds = oldObjectPtr->GetGroups();
+		QByteArrayList newGroupIds = userInfoPtr->GetGroups();
+
+		QByteArrayList addedGroups;
+		QByteArrayList removedGroups;
+
+		for (const QByteArray& groupId : newGroupIds){
+			if (!oldGroupIds.contains(groupId)){
+				addedGroups.append(groupId);
+			}
 		}
-	}
 
-	imtauth::IUserInfo::FeatureIds newProhibitionsIds = newUserPtr->GetProhibitions();
-	imtauth::IUserInfo::FeatureIds oldProhibitionsIds = oldUserPtr->GetProhibitions();
-
-	for (const QByteArray& prohibitionId : newProhibitionsIds){
-		if (!oldProhibitionsIds.contains(prohibitionId)){
-			retVal += "\n" +
-					QString("INSERT INTO \"UserProhibitions\" (\"UserId\", \"ProhibitionId\") VALUES('%1', '%2');")
-					.arg(qPrintable(newUserId))
-					.arg(qPrintable(prohibitionId)).toLocal8Bit();
+		for (const QByteArray& groupId : oldGroupIds){
+			if (!newGroupIds.contains(groupId)){
+				removedGroups.append(groupId);
+			}
 		}
-	}
 
-	for (const QByteArray& prohibitionId : oldProhibitionsIds){
-		if (!newProhibitionsIds.contains(prohibitionId)){
-			retVal += "\n" +
-					QString("DELETE FROM \"UserProhibitions\" WHERE \"UserId\" = '%1' AND \"ProhibitionId\" = '%2';")
-					.arg(qPrintable(newUserId))
-					.arg(qPrintable(prohibitionId)).toLocal8Bit();
+		for (const QByteArray& groupId : addedGroups){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
+				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+				if (userGroupInfoPtr != nullptr){
+					if (!userGroupInfoPtr->GetUsers().contains(objectId)){
+						userGroupInfoPtr->AddUser(objectId);
+
+						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
+							userInfoPtr->AddRole(roleId);
+						}
+
+						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
+					}
+				}
+			}
 		}
-	}
 
-	imtauth::IUserInfo::RoleIds newRolesIds = newUserPtr->GetRoles();
-	imtauth::IUserInfo::RoleIds oldRolesIds = oldUserPtr->GetRoles();
+		for (const QByteArray& groupId : removedGroups){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_userGroupCollectionCompPtr->GetObjectData(groupId, dataPtr)){
+				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+				if (userGroupInfoPtr != nullptr){
+					bool result = userGroupInfoPtr->RemoveUser(objectId);
+					if (result){
+						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
+							userInfoPtr->RemoveRole(roleId);
+						}
 
-	for (const QByteArray& productRoleId : newRolesIds){
-		if (!oldRolesIds.contains(productRoleId)){
-			QStringList data = QString(productRoleId).split(*m_separatorObjectIdAttrPtr);
-
-			if (data.size() == 2){
-				QByteArray roleId = data[0].toUtf8();
-				QByteArray productId = data[1].toUtf8();
-
-				retVal += "\n" +
-						QString("INSERT INTO \"UserRoles\" (\"UserId\", \"RoleId\", \"ProductId\") VALUES('%1', '%2', '%3');")
-						.arg(qPrintable(newUserId))
-						.arg(qPrintable(roleId))
-						.arg(qPrintable(productId)).toLocal8Bit();
+						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
+					}
+				}
 			}
 		}
 	}
 
-	for (const QByteArray& productRoleId : oldRolesIds){
-		if (!newRolesIds.contains(productRoleId)){
-			QStringList data = QString(productRoleId).split(*m_separatorObjectIdAttrPtr);
-
-			if (data.size() == 2){
-				QByteArray roleId = data[0].toUtf8();
-				QByteArray productId = data[1].toUtf8();
-
-				retVal += "\n" +
-						QString("DELETE FROM \"UserRoles\" WHERE \"UserId\" = '%1' AND \"RoleId\" = '%2' AND \"ProductId\" = '%3';")
-						.arg(qPrintable(newUserId))
-						.arg(qPrintable(roleId))
-						.arg(qPrintable(productId)).toLocal8Bit();
-			}
-		}
+	QByteArray documentContent;
+	if (WriteDataToMemory("UserInfo", *userInfoPtr, documentContent)){
+		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+		retVal += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(SqlEncode(documentContent))
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(checksum).toLocal8Bit();
 	}
 
 	return retVal;
-}
-
-
-QByteArray CUserDatabaseDelegateComp::CreateRenameObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const QString& newObjectName) const
-{
-	const imtauth::IUserInfo* userPtr = nullptr;
-	imtbase::IObjectCollection::DataPtr objectPtr;
-	if (collection.GetObjectData(objectId, objectPtr)){
-		userPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
-	}
-
-	if (userPtr == nullptr){
-		return QByteArray();
-	}
-
-	if (objectId.isEmpty()){
-		return QByteArray();
-	}
-
-	QByteArray userId = qPrintable(userPtr->GetId());
-
-	QByteArray retVal = QString("UPDATE \"Users\" SET \"Name\" = '%1', \"LastModified\" = '%2' WHERE \"UserId\" ='%3';")
-			.arg(qPrintable(newObjectName))
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(userId)).toLocal8Bit();
-
-	return retVal;
-}
-
-
-QByteArray CUserDatabaseDelegateComp::CreateDescriptionObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const QString& description) const
-{
-	return QByteArray();
-}
-
-
-// protected methods
-// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
-
-idoc::MetaInfoPtr CUserDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
-{
-	return idoc::MetaInfoPtr(new imod::TModelWrap<imtauth::CUserInfoMetaInfo>);
-}
-
-
-bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
-{
-	const istd::IChangeable* instancePtr = CreateObjectFromRecord(record);
-	if ((instancePtr != nullptr) && m_metaInfoCreatorCompPtr.IsValid()){
-		idoc::MetaInfoPtr retVal;
-		if (m_metaInfoCreatorCompPtr->CreateMetaInfo(instancePtr, "UserInfo", retVal)){
-			Q_ASSERT(retVal.IsValid());
-
-			return metaInfo.CopyFrom(*retVal);
-		}
-	}
-
-	return false;
 }
 
 

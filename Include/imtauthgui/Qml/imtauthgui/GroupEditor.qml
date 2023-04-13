@@ -10,88 +10,87 @@ Item {
     property TreeItemModel documentModel: TreeItemModel {}
     property UndoRedoManager undoRedoManager: null;
 
-    property TreeItemModel rolesModel: TreeItemModel {}
-
     property bool blockUpdatingModel: false;
 
     property int mainMargin: 0;
     property int panelWidth: 400;
 
-    Component.onCompleted: {
-        nameInput.focus = true;
-    }
-
-    Component.onDestruction: {
-        userCollectionProvider.collectionModel.modelChanged.disconnect(userEditorContainer.usersModelChanged);
-    }
-
     onDocumentModelChanged: {
         console.log("UserEditor onDocumentModelChanged", userEditorContainer.documentModel);
 
-        rolesProvider.updateModel();
+        groupsProvider.updateModel();
     }
 
     onBlockUpdatingModelChanged: {
         Events.sendEvent("DocumentUpdating", userEditorContainer.blockUpdatingModel);
     }
 
+//    function getAllChildrenGroups(groupId, retVal){
+//         for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+//             let id = groupsProvider.collectionModel.GetData("Id", i);
+//             let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
+//             let parentGroupIds = parentGroups.split(';')
+
+//             if (parentGroupIds.includes(groupId)){
+//                 retVal.push(id);
+
+//                 userEditorContainer.getAllChildrenGroups(id, retVal);
+//             }
+//         }
+//    }
+
     CollectionDataProvider {
-        id: rolesProvider;
+        id: groupsProvider;
 
-        commandId: "Roles";
+        commandId: "Groups";
+        fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
 
-        fields: ["Id", "Name"];
+        Component.onDestruction: {
+            groupsProvider.collectionModel.modelChanged.disconnect(userEditorContainer.updateModel);
+        }
 
         onModelUpdated: {
-            if (rolesProvider.collectionModel != null){
-                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        rolesModel.SetData("CheckedState", Qt.Unchecked, i);
+            if (groupsProvider.collectionModel != null){
+                let documentId = userEditorContainer.documentModel.GetData("Id");
+                console.log("documentId", documentId);
+                let removedIndexes = []
+                for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+                    let id = groupsProvider.collectionModel.GetData("Id", i);
+                    let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
+                    console.log("parentGroups", parentGroups);
+
+                    let parentGroupIds = parentGroups.split(';')
+                    console.log("parentGroupIds", parentGroupIds);
+                    if (id === documentId || parentGroupIds.includes(documentId)){
+                        removedIndexes.push(i);
                     }
 
-                    userEditorContainer.rolesModel = rolesModel;
+                    groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
                 }
+
+                console.log("removedIndexes", removedIndexes);
+
+                for (let i = 0; i < removedIndexes.length; i++){
+                    if (i == 0){
+                        groupsProvider.collectionModel.RemoveItem(removedIndexes[i]);
+                    }
+                    else{
+                        groupsProvider.collectionModel.RemoveItem(removedIndexes[i] - 1);
+                    }
+                }
+
+                parentGroupsTable.elements = groupsProvider.collectionModel;
+
+                userEditorContainer.updateGui();
+                groupsProvider.collectionModel.modelChanged.connect(userEditorContainer.updateModel);
+
+                nameInput.focus = true;
             }
-
-            userCollectionProvider.updateModel();
         }
-    }
-
-    CollectionDataProvider {
-        id: userCollectionProvider;
-
-        commandId: "Users";
-
-        fields: ["UserId", "Name"];
-
-        onModelUpdated: {
-
-            for (let i = 0; i < userCollectionProvider.collectionModel.GetItemsCount(); i++){
-                let userId = userCollectionProvider.collectionModel.GetData("UserId", i);
-                let userName = userCollectionProvider.collectionModel.GetData("Name", i);
-
-                userCollectionProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
-            }
-
-            usersTable.elements = userCollectionProvider.collectionModel;
-            userEditorContainer.updateGui();
-
-            userCollectionProvider.collectionModel.modelChanged.connect(userEditorContainer.usersModelChanged);
-        }
-    }
-
-    function usersModelChanged(){
-        console.log("usersModelChanged");
-        userEditorContainer.updateModel();
-    }
-
-    TreeItemModelConverter {
-        id: converter;
     }
 
     function updateGui(){
-        console.log("UserEditor updateGui");
+        console.log("GroupEditor updateGui");
 
         userEditorContainer.blockUpdatingModel = true;
 
@@ -103,36 +102,29 @@ Item {
             descriptionInput.text = userEditorContainer.documentModel.GetData("Description");
         }
 
-        let userIds = []
-        if (userEditorContainer.documentModel.ContainsKey("Users")){
-            let users = userEditorContainer.documentModel.GetData("Users");
-            if (users !== ""){
-                userIds = users.split(';');
+        let parentGroupIds = []
+        if (userEditorContainer.documentModel.ContainsKey("ParentGroups")){
+            let parentGroups = userEditorContainer.documentModel.GetData("ParentGroups");
+            if (parentGroups !== ""){
+                parentGroupIds = parentGroups.split(';')
             }
         }
 
-        for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
-            let id = usersTable.elements.GetData("Id", i);
-            if (userIds.includes(id)){
-                usersTable.elements.SetData("CheckedState", Qt.Checked, i);
+        for (let i = 0; i < parentGroupsTable.elements.GetItemsCount(); i++){
+            let id = parentGroupsTable.elements.GetData("Id", i);
+            if (parentGroupIds.includes(id)){
+                parentGroupsTable.elements.SetData("CheckedState", Qt.Checked, i);
             }
             else{
-                usersTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+                parentGroupsTable.elements.SetData("CheckedState", Qt.Unchecked, i);
             }
-        }
-
-        if (userEditorContainer.documentModel.ContainsKey("ChildModel")){
-            let childrenModel = userEditorContainer.documentModel.GetData("ChildModel");
-
-            let listModel = converter.convertToListModel(childrenModel);
-            childrenGroups.rowModel = listModel;
         }
 
         userEditorContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
-        console.log("UserEditor updateModel");
+        console.log("GroupEditor updateModel");
         if (userEditorContainer.blockUpdatingModel){
             return;
         }
@@ -142,117 +134,46 @@ Item {
         userEditorContainer.documentModel.SetData("Description", descriptionInput.text);
         userEditorContainer.documentModel.SetData("Name", nameInput.text);
 
-        let selectedUserIds = []
-        for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
-            let id = usersTable.elements.GetData("Id", i);
-            let state = usersTable.elements.GetData("CheckedState", i);
+        let selectedRoleIds = []
+        let selectedGroupIds = []
+        for (let i = 0; i < parentGroupsTable.elements.GetItemsCount(); i++){
+            let id = parentGroupsTable.elements.GetData("Id", i);
+            let state = parentGroupsTable.elements.GetData("CheckedState", i);
             if (state === Qt.Checked){
-                selectedUserIds.push(id)
+                selectedGroupIds.push(id);
+                let roles = parentGroupsTable.elements.GetData("Roles", i);
+                let roleIds = roles.split(';')
+                for (let j = 0; j < roleIds.length; j++){
+                    if (!selectedRoleIds.includes(roleIds[j])){
+                        selectedRoleIds.push(roleIds[j])
+                    }
+                }
+            }
+        }
+        userEditorContainer.documentModel.SetData("ParentGroups", selectedGroupIds.join(';'));
+
+        let ok = true;
+        if (userEditorContainer.documentModel.ContainsKey("Roles")){
+            let userRoles = userEditorContainer.documentModel.GetData("Roles");
+            if (userRoles !== ""){
+                ok = false;
+
+                let userRoleIds = userRoles.split(';');
+                for (let j = 0; j < selectedRoleIds.length; j++){
+                    if (!userRoleIds.includes(selectedRoleIds[j])){
+                        userRoleIds.push(selectedRoleIds[j])
+                    }
+                }
+                userEditorContainer.documentModel.SetData("Roles", userRoleIds.join(';'));
             }
         }
 
-        let result = selectedUserIds.join(';');
-        userEditorContainer.documentModel.SetData("Users", result);
-
-        let childrenModel = converter.convertFromListModel(childrenGroups.rowModel);
-        userEditorContainer.documentModel.SetData("ChildModel", childrenModel);
+        if (ok){
+            userEditorContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
+        }
 
         userEditorContainer.undoRedoManager.endChanges();
         console.log("End updateModel");
-    }
-
-    UuidGenerator{
-        id: uuidGenerator;
-    }
-
-    function onInsert(){
-        modalDialogManager.openDialog(addDialog, {});
-    }
-
-    function onDelete(){
-        let selectedIndex = childrenGroups.selectedIndex;
-        if (selectedIndex != null){
-            let indexes = selectedIndex.getIndexes();
-
-            childrenGroups.removeRow(indexes);
-        }
-    }
-
-    function onEdit(){
-        let selectedIndex = childrenGroups.selectedIndex;
-        if (selectedIndex != null){
-            let indexes = selectedIndex.getIndexes();
-
-            let currentRow = childrenGroups.getRow(indexes);
-            modalDialogManager.openDialog(editDialog, {"groupName": currentRow["Name"], "groupDescription": currentRow["Description"], "activeRoleIds": currentRow["Roles"]});
-        }
-    }
-
-    Component {
-        id: editDialog;
-
-        EditDialog {
-            id: dialog;
-
-            onStarted: {
-                dialog.rolesModel.Copy(userEditorContainer.rolesModel);
-
-                dialog.bodyItem.started();
-            }
-
-            onFinished: {
-                if (buttonId === "Ok"){
-                    let selectedIndex = childrenGroups.selectedIndex;
-                    if (selectedIndex != null){
-                        let indexes = selectedIndex.getIndexes();
-
-                        let newGroupName = dialog.groupName;
-                        let newGroupDescription = dialog.groupDescription;
-
-                        let oldRow = childrenGroups.getRow(indexes);
-
-                        childrenGroups.setRow(indexes, {"Id": oldRow["Id"], "Name": newGroupName, "Description": newGroupDescription, "Roles": dialog.bodyItem.activeRoleIds});
-
-                        updateModel();
-                        updateGui();
-                    }
-                }
-            }
-        }
-    }
-
-    Component {
-        id: addDialog;
-
-        EditDialog {
-            id: dialog;
-
-            onFinished: {
-                if (buttonId === "Ok"){
-                    let selectedIndex = childrenGroups.selectedIndex;
-                    let uuid = uuidGenerator.generateUUID();
-
-                    let newGroupName = dialog.groupName;
-                    let newGroupDescription = dialog.groupDescription;
-
-                    let rowObj = {"Id": uuid, "Name": newGroupName, "Description": newGroupDescription, "Roles": []};
-                    if (selectedIndex != null){
-                        let indexes = selectedIndex.getIndexes();
-
-                        let childrenIndexes = selectedIndex.childModel;
-                        indexes.push(childrenIndexes.length);
-
-                        childrenGroups.insertRow(indexes, rowObj);
-                    }
-                    else{
-                        childrenGroups.addRow(rowObj);
-                    }
-
-                    updateModel();
-                    updateGui();
-                }
-            }
-        }
     }
 
     Component{
@@ -340,6 +261,8 @@ Item {
                             }
                         }
                     }
+
+                    KeyNavigation.tab: descriptionInput;
                 }
 
                 Text {
@@ -386,128 +309,29 @@ Item {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
 
-                    text: qsTr("Children Groups");
+                    text: qsTr("Parent Groups");
                 }
 
                 TreeItemModel {
-                    id: commandsModel;
+                    id: groupsHeadersModel;
 
                     Component.onCompleted: {
-                        let index = commandsModel.InsertNewItem();
+                        let index = groupsHeadersModel.InsertNewItem();
 
-                        commandsModel.SetData("Id", "Insert", index);
-                        commandsModel.SetData("Name", "Insert", index);
-                        commandsModel.SetData("IsEnabled", true, index);
-                        commandsModel.SetData("Icon", "Add", index);
+                        groupsHeadersModel.SetData("Id", "Name");
+                        groupsHeadersModel.SetData("Name", "Group Name");
 
-                        index = commandsModel.InsertNewItem();
-
-                        commandsModel.SetData("Id", "Delete", index);
-                        commandsModel.SetData("Name", "Delete", index);
-                        commandsModel.SetData("IsEnabled", false, index);
-                        commandsModel.SetData("Icon", "Delete", index);
-
-                        index = commandsModel.InsertNewItem();
-
-                        commandsModel.SetData("Id", "Edit", index);
-                        commandsModel.SetData("Name", "Edit", index);
-                        commandsModel.SetData("IsEnabled", false, index);
-                        commandsModel.SetData("Icon", "Edit", index);
-
-                        commands.commandModel = commandsModel;
+                        parentGroupsTable.headers = groupsHeadersModel;
                     }
-                }
-
-                Item{
-                    width: parent.width;
-                    height: rect.height + childrenGroups.height;
-
-                    Rectangle {
-                        id: rect;
-
-                        width: parent.width;
-                        height: 25;
-
-                        color: Style.alternateBaseColor;
-
-                        SimpleCommandsDecorator {
-                            id: commands;
-
-                            anchors.horizontalCenter: parent.horizontalCenter;
-                            anchors.verticalCenter: parent.verticalCenter;
-
-                            height: 20;
-
-                            color: parent.color;
-
-                            onCommandActivated: {
-                                if (commandId == "Insert"){
-                                    userEditorContainer.onInsert();
-                                }
-                                else if (commandId == "Delete"){
-                                    userEditorContainer.onDelete();
-                                }
-                                else if (commandId == "Edit"){
-                                    userEditorContainer.onEdit();
-                                }
-                            }
-                        }
-                    }
-
-                    BasicTreeView {
-                        id: childrenGroups;
-
-                        anchors.top: rect.bottom;
-
-                        width: bodyColumn.width;
-                        height: 300;
-
-                        Component.onCompleted: {
-                            childrenGroups.addColumn({"Id" : "Name", "Name": "Group Name"})
-                            childrenGroups.addColumn({"Id" : "Description", "Name": "Description"})
-                        }
-
-                        onSelectedIndexChanged: {
-                            let ok = childrenGroups.selectedIndex != null;
-
-                            commandsModel.SetData("IsEnabled", ok, 1);
-                            commandsModel.SetData("IsEnabled", ok, 2);
-                        }
-                    }
-                }
-
-                TreeItemModel {
-                    id: headersModel;
-
-                    Component.onCompleted: {
-                        headersModel.InsertNewItem();
-
-                        headersModel.SetData("Id", "Name");
-                        headersModel.SetData("Name", "Username");
-
-                        usersTable.headers = headersModel;
-                    }
-                }
-
-                Text {
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-
-                    text: qsTr("Users");
-
-                    visible: false;
                 }
 
                 AuxTable {
-                    id: usersTable;
+                    id: parentGroupsTable;
 
-                    width: bodyColumn.width;
+                    width: parent.width;
                     height: 300;
 
                     checkable: true;
-
-                    visible: false;
 
                     radius: 0;
                 }

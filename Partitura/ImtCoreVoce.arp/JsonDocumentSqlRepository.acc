@@ -10,21 +10,12 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
+        <Element Id="JsonDocumentCollection" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -34,37 +25,22 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleMetaInfoCreator"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ObjectDelegate" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleDatabaseDelegate"/>
+                        <Data IsEnabled="true" Value="SqlDatabaseJsonDelegate"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ParentRoleProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
+        <Element Id="JsonSerializer" PackageId="FilePck" ComponentId="JsonFileSerializer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repository"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RoleDatabaseDelegate" PackageId="ImtAuthDbPck" ComponentId="RoleDatabaseDelegate">
+        <Element Id="SqlDatabaseJsonDelegate" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseJsonDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
@@ -73,12 +49,8 @@
                     <AttributeInfo Id="DocumentContentColumnId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Document"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>Role</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="DocumentFactories">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentPersistenceList" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
@@ -87,32 +59,38 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="DocumentId"/>
+                    <AttributeInfo Id="MetaInfoTableDelegate" Type="Reference" ExportId="MetaInfoTableDelegate">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MetaInfoTableName" Type="Id" ExportId="MetaInfoTableName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="ObjectIdColumn">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIdColumn" Type="Id" ExportId="ObjectTypeIdColumn">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TableName" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Roles"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="RoleMetaInfoCreator" PackageId="ImtAuthPck" ComponentId="RoleMetaInfoCreator">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="RevisionsTableName" Type="Id" ExportId="RevisionsTableName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Role"/>
+                    <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="SeparatorObjectId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TableName" Type="Id" ExportId="TableName">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -123,14 +101,14 @@
                     <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RoleInfo</Value>
+                                <Value>DocumentInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>RoleInfo</Value>
+                                <Value>DocumentInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -140,15 +118,11 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imod::IModel" ComponentId="Repository"/>
-        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="Repository"/>
-        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
-        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
-        <Interface InterfaceId="istd::IChangeable" ComponentId="Repository"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="JsonDocumentCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="JsonDocumentCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="JsonDocumentCollection"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="SqlDatabaseJsonDelegate"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="JsonDocumentCollection"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleCollectionAdapter"/>
-        <Component ExportedId="RoleRepository" ComponentId="Repository"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>

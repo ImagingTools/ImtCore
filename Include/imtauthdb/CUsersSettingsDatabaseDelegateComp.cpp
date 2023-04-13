@@ -104,7 +104,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId) const
 {
-    return QString("\nDELETE FROM \"UserSettings\" WHERE \"UserId\" = '%1';")
+	return QString("\nDELETE FROM \"UserSettings\" WHERE \"UserId\" = '%1';")
 			.arg(qPrintable(objectId)).toLocal8Bit();
 }
 
@@ -112,7 +112,8 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
 QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const istd::IChangeable& object) const
+			const istd::IChangeable& object,
+			bool /*useExternDelegate*/) const
 {
 	const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(&object);
 	if (userSettingsPtr == nullptr){

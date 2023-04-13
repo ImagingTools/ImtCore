@@ -62,9 +62,6 @@
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserGroupRepository">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RolesCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
                     </AttributeInfo>

@@ -1,14 +1,6 @@
 #include <imtauthgql/CAuthorizationOptionsControllerComp.h>
 
 
-// ACF includes
-#include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
-
-// ImtCore includes
-#include <imtbase/IObjectCollection.h>
-
-
 namespace imtauthgql
 {
 
@@ -24,7 +16,6 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
 	rootModelPtr.SetPtr(BaseClass::CreateRepresentationFromRequest(gqlRequest, errorMessage));
 	if (!rootModelPtr.IsValid()){
 		return nullptr;
@@ -34,7 +25,7 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 	Q_ASSERT(dataModelPtr != nullptr);
 
 	QSqlError sqlError;
-	QByteArray query = QString("SELECT * FROM \"Users\" WHERE \"UserId\" = '%1';").arg(qPrintable(*m_superuserLoginAttrPtr)).toLocal8Bit();
+	QByteArray query = QString("SELECT * FROM \"Users\" WHERE \"Document\"->>'Id' = '%1';").arg(qPrintable(*m_superuserLoginAttrPtr)).toLocal8Bit();
 
 	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(query, &sqlError);
 

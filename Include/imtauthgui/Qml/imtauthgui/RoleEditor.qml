@@ -15,46 +15,42 @@ Item {
     property int mainMargin: 0;
     property int panelWidth: 400;
 
-    signal commandModeChanged(string commandId, bool newMode);
-
-    Component.onCompleted: {
-        roleNameInput.focus = true;
-    }
-
     onBlockUpdatingModelChanged: {
         Events.sendEvent("DocumentUpdating", roleEditorContainer.blockUpdatingModel);
     }
 
-    onDocumentBaseChanged: {
-        console.log("onDocumentBaseChanged", roleEditorContainer.documentBase);
-        if (roleEditorContainer.documentBase != null){
-            roleEditorContainer.documentBase.includedRolesTable = includesTable;
-            roleEditorContainer.documentBase.commandsProvider.modelLoaded.connect(onCommandsModelLoaded);
-            roleEditorContainer.documentBase.commandsProvider.commandModeChanged.connect(commandModeChanged);
+    onDocumentModelChanged: {
+        rolesProvider.updateModel();
+    }
+
+    CollectionDataProvider {
+        id: rolesProvider;
+
+        commandId: "Roles";
+        fields: ["Id", "Name", "Description"];
+
+        Component.onDestruction: {
+            rolesProvider.collectionModel.modelChanged.disconnect(roleEditorContainer.updateModel);
         }
-    }
 
-    Component.onDestruction: {
-        roleEditorContainer.documentBase.commandsProvider.modelLoaded.disconnect(onCommandsModelLoaded);
-        roleEditorContainer.documentBase.commandsProvider.commandModeChanged.disconnect(commandModeChanged);
-    }
+        onModelUpdated: {
+            if (rolesProvider.collectionModel != null){
+                if (rolesProvider.collectionModel.ContainsKey("Roles")){
+                    let rolesModel = rolesProvider.collectionModel.GetData("Roles")
 
-    onCommandModeChanged: {
-        for (let i = 0; i < commandsModel.GetItemsCount(); i++){
-            let currentCommandId = commandsModel.GetData("Id", i);
-            if (currentCommandId == commandId){
-                commandsModel.SetData("IsEnabled", newMode, i);
+                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+                        rolesModel.SetData("CheckedState", Qt.Unchecked, i);
+                    }
+
+                    parentRolesTable.elements = rolesModel;
+
+                    roleEditorContainer.updateGui();
+                    rolesModel.modelChanged.connect(roleEditorContainer.updateModel);
+
+                    roleNameInput.focus = true;
+                }
             }
         }
-    }
-
-    onDocumentModelChanged: {
-        roleEditorContainer.updateGui();
-    }
-
-    function onCommandsModelLoaded(){
-        console.log("onCommandsModelLoaded");
-        roleEditorContainer.documentBase.commandsProvider.mergeModelWith(commandsModel);
     }
 
     Component{
@@ -80,30 +76,6 @@ Item {
         }
     }
 
-    TreeItemModel {
-        id: commandsModel;
-
-        Component.onCompleted: {
-            let index = commandsModel.InsertNewItem();
-
-            commandsModel.SetData("Id", "Include", index);
-            commandsModel.SetData("Name", "Include", index);
-            commandsModel.SetData("IsEnabled", true, index);
-            commandsModel.SetData("Icon", "Add", index);
-            commandsModel.SetData("Visible", false, index);
-
-            index = commandsModel.InsertNewItem();
-
-            commandsModel.SetData("Id", "Exclude", index);
-            commandsModel.SetData("Name", "Exclude", index);
-            commandsModel.SetData("IsEnabled", false, index);
-            commandsModel.SetData("Icon", "Delete", index);
-            commandsModel.SetData("Visible", false, index);
-
-            repeater.model = commandsModel;
-        }
-    }
-
     function updateGui(){
         console.log("RoleEditor updateGui", documentModel.toJSON());
 
@@ -121,19 +93,23 @@ Item {
             descriptionInput.text = documentModel.GetData("Description");
         }
 
-        includesTable.rowModel.clear();
-        includesTable.height = includesTable.headerHeight + includesTable.rowItemHeight;
+        let parentRolesIds = []
+        if (roleEditorContainer.documentModel.ContainsKey("ParentRoles")){
+            let parentGroups = roleEditorContainer.documentModel.GetData("ParentRoles");
+            if (parentGroups !== ""){
+                parentRolesIds = parentGroups.split(';')
+            }
+        }
 
-        if (documentModel.ContainsKey("Parents")){
-            let parents = documentModel.GetData("Parents");
-
-            for (let i = 0; i < parents.GetItemsCount(); i++){
-                let parentId = parents.GetData("Id", i);
-                let parentName = parents.GetData("Name", i);
-
-                let row = {"Id": parentId, "Name": parentName}
-
-                includesTable.addRow(row);
+        if (parentRolesTable.elements){
+            for (let i = 0; i < parentRolesTable.elements.GetItemsCount(); i++){
+                let id = parentRolesTable.elements.GetData("Id", i);
+                if (parentRolesIds.includes(id)){
+                    parentRolesTable.elements.SetData("CheckedState", Qt.Checked, i);
+                }
+                else{
+                    parentRolesTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+                }
             }
         }
 
@@ -152,18 +128,15 @@ Item {
         roleEditorContainer.documentModel.SetData("Name", roleNameInput.text);
         roleEditorContainer.documentModel.SetData("Description", descriptionInput.text);
 
-        let parents = roleEditorContainer.documentModel.AddTreeModel("Parents");
-
-        let rowModel = includesTable.rowModel;
-
-        for (let i = 0; i < includesTable.rowModel.count; i++){
-            let rowObj = includesTable.rowModel.get(i);
-
-            let index = parents.InsertNewItem();
-
-            parents.SetData("Id", rowObj["Id"], index);
-            parents.SetData("Name", rowObj["Name"], index);
+        let selectedRoleIds = []
+        for (let i = 0; i < parentRolesTable.elements.GetItemsCount(); i++){
+            let id = parentRolesTable.elements.GetData("Id", i);
+            let state = parentRolesTable.elements.GetData("CheckedState", i);
+            if (state === Qt.Checked){
+                selectedRoleIds.push(id)
+            }
         }
+        roleEditorContainer.documentModel.SetData("ParentRoles", selectedRoleIds.join(';'));
 
         roleEditorContainer.undoRedoManager.endChanges();
     }
@@ -179,7 +152,6 @@ Item {
 
         clip: true;
 
-
         Item{
             id: columnContainer;
 
@@ -192,16 +164,8 @@ Item {
             height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
             Loader{
                 id: mainPanelFrameLoader;
-
                 anchors.fill: parent;
-
                 sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
-
-                onLoaded: {
-                    if(mainPanelFrameLoader.item){
-                     //   roleEditorContainer.mainMargin = mainPanelFrameLoader.item.mainMargin;
-                    }
-                }
             }
             Column {
                 id: bodyColumn;
@@ -367,7 +331,7 @@ Item {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
 
-                    text: qsTr("Included roles");
+                    text: qsTr("Parent Roles");
 
                     Loader{
                         id: titleDecoratorLoader4;
@@ -381,102 +345,33 @@ Item {
                     }
                 }
 
-                Item {
+                TreeItemModel {
+                    id: rolesHeadersModel;
+
+                    Component.onCompleted: {
+                        let index = rolesHeadersModel.InsertNewItem();
+
+                        rolesHeadersModel.SetData("Id", "Name");
+                        rolesHeadersModel.SetData("Name", "Role Name");
+
+                        parentRolesTable.headers = rolesHeadersModel;
+                    }
+                }
+
+                AuxTable {
+                    id: parentRolesTable;
+
                     width: parent.width;
-                    height: commands.height + includesTable.height + includesTable.anchors.topMargin;
-                    visible: true;
+                    height: 300;
 
-                    Rectangle {
-                        id: commands;
+                    elements: TreeItemModel {}
 
-                        width: parent.width;
-                        height: 25;
+                    checkable: true;
 
-                        color: Style.alternateBaseColor;
-
-                        Row {
-                            id: row;
-
-                            anchors.horizontalCenter: parent.horizontalCenter;
-                            anchors.verticalCenter: parent.verticalCenter;
-
-                            spacing: 10;
-
-                            Repeater {
-                                id: repeater;
-
-                                delegate: AuxButton {
-
-                                    width: 18;
-                                    height: width;
-
-                                    iconSource: enabled ? "../../../../Icons/Light/" + model.Icon +"_Off_Normal.svg" :
-                                                                  "../../../../Icons/Light/" + model.Icon +"_Off_Disabled.svg";
-
-                                    enabled: model.IsEnabled;
-
-                                    onClicked: {
-//                                        Events.sendEvent(roleEditorContainer.documentBase.commandsId + "CommandActivated", model.Id);
-
-                                        roleEditorContainer.documentBase.commandsDelegate.commandHandle(model.Id);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    BasicTableView {
-                        id: includesTable;
-
-                        anchors.top: commands.bottom;
-                        anchors.topMargin: 0;
-
-                        width: parent.width;
-
-                        rowDelegate: Component { TableViewItemDelegateBase {
-                            root: includesTable;
-
-                            Component.onCompleted: {
-                                console.log("TableViewItemDelegateBase onCompleted");
-
-
-                                let count = includesTable.rowModel.count;
-                                console.log("includesTable.rowCount", count);
-                                let newHeight = count * includesTable.rowItemHeight + includesTable.headerHeight;
-                                console.log("newHeight", newHeight);
-                                console.log("includesTable.height", includesTable.height);
-                                if (newHeight > includesTable.height){
-                                    includesTable.height = newHeight;
-                                }
-                            }
-
-                            Component.onDestruction: {
-                                let newHeight = includesTable.height - height;
-                                if (newHeight >= includesTable.headerHeight + includesTable.rowItemHeight){
-                                    includesTable.height = newHeight;
-                                }
-                            }
-                        } }
-
-                        Component.onCompleted: {
-                            includesTable.addColumn({"Id": "Name", "Name": "Name"})
-                        }
-
-                        onRowAdded: {
-                            roleEditorContainer.updateModel();
-                        }
-
-                        onRowRemoved: {
-                            roleEditorContainer.updateModel();
-                        }
-
-                        onSelectedIndexChanged: {
-                            let isEnabled = includesTable.selectedIndex != null;
-                            commandsModel.SetData("IsEnabled", isEnabled, 1);
-                        }
-                    }
+                    radius: 0;
                 }
             }//Column bodyColumn
         }
     }//Flickable
+
 }//Container

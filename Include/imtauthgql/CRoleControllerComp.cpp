@@ -20,63 +20,44 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 	}
 
 	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
-	imtbase::CTreeItemModel* permissionsModelPtr = dataModelPtr->AddTreeModel("Permissions");
-	imtbase::CTreeItemModel* parentsModelPtr = dataModelPtr->AddTreeModel("Parents");
 
 	const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
 	QByteArray objectId = GetObjectIdFromInputParams(*inputParams);
-	QByteArray productId = inputParams->at(0).GetFieldArgumentValue("ProductId").toByteArray();
-
-	QByteArray roleId;
-	if (m_separatorObjectIdAttrPtr.IsValid()){
-		QStringList data = QString(objectId).split(*m_separatorObjectIdAttrPtr);
-		roleId = qPrintable(data[0]);
-	}
 
 	dataModelPtr->SetData("Id", "");
 	dataModelPtr->SetData("Name", "");
-	dataModelPtr->SetData("RoleId", roleId);
-	dataModelPtr->SetData("ProductId", productId);
-	dataModelPtr->SetData("Description", "");
+
+	if (!inputParams->empty()){
+		QByteArray productId = inputParams->at(0).GetFieldArgumentValue("ProductId").toByteArray();
+		dataModelPtr->SetData("ProductId", productId);
+	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+		const imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(dataPtr.GetPtr());
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
 			return nullptr;
 		}
 
+		QByteArray objectUuid = roleInfoPtr->GetObjectUuid();
 		QByteArray roleId = roleInfoPtr->GetRoleId();
 		QString roleName = roleInfoPtr->GetRoleName();
+		QByteArray productId = roleInfoPtr->GetProductId();
 
-		dataModelPtr->SetData("Id", roleId + *m_separatorObjectIdAttrPtr + productId);
+		dataModelPtr->SetData("Id", objectUuid);
+		dataModelPtr->SetData("RoleId", roleId);
+		dataModelPtr->SetData("ProductId", productId);
 		dataModelPtr->SetData("Name", roleName);
 
 		QString description = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 		dataModelPtr->SetData("Description", description);
 
-		const QByteArrayList parentsRolesIds  = roleInfoPtr->GetIncludedRoles();
-		for (const QByteArray& parentRoleId : parentsRolesIds){
-			QByteArray objectRoleParentId = parentRoleId + *m_separatorObjectIdAttrPtr + productId;
-			imtbase::IObjectCollection::DataPtr parentRoleDataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(objectRoleParentId, parentRoleDataPtr)){
-				const imtauth::IRole* role = dynamic_cast<const imtauth::IRole*>(parentRoleDataPtr.GetPtr());
-				if (role != nullptr){
-					QString parentRoleName = role->GetRoleName();
-
-					int index = parentsModelPtr->InsertNewItem();
-					parentsModelPtr->SetData("Id", parentRoleId, index);
-					parentsModelPtr->SetData("Name", parentRoleName, index);
-				}
-			}
-		}
+		QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
+		dataModelPtr->SetData("ParentRoles", parentsRolesIds.join(';'));
 
 		imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
-		for (const QByteArray& permissionId : permissions){
-			int index = permissionsModelPtr->InsertNewItem();
-			permissionsModelPtr->SetData("Id", permissionId, index);
-		}
+		dataModelPtr->SetData("Permissions", permissions.join(';'));
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
@@ -100,8 +81,7 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		istd::TDelPtr<imtauth::IRole> roleInfoPtr = m_roleFactCompPtr.CreateInstance();
-
+		istd::TDelPtr<imtauth::CIdentifiableRoleInfo> roleInfoPtr = new imtauth::CIdentifiableRoleInfo();
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role!");
 			return nullptr;
@@ -109,6 +89,19 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
+
+		if (itemModel.ContainsKey("Id")){
+			QByteArray id = itemModel.GetData("Id").toByteArray();
+			if (!id.isEmpty()){
+				objectId = id;
+			}
+		}
+
+		if (objectId.isEmpty()){
+			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+		}
+
+		roleInfoPtr->SetObjectUuid(objectId);
 
 		QByteArray roleId;
 		if (itemModel.ContainsKey("RoleId")){
@@ -144,49 +137,27 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 			roleInfoPtr->SetProductId(productId);
 		}
 
-		if (m_separatorObjectIdAttrPtr.IsValid()){
-			objectId = roleId + *m_separatorObjectIdAttrPtr + productId;
-		}
+		if (itemModel.ContainsKey("ParentRoles")){
+			QByteArray parentRoles = itemModel.GetData("ParentRoles").toByteArray();
+			if (!parentRoles.isEmpty()){
+				QByteArrayList parentRoleIds = parentRoles.split(';');
+				for (const QByteArray& parentRoleId : parentRoleIds){
+					if (!roleInfoPtr->IncludeRole(parentRoleId)){
+						errorMessage = QT_TR_NOOP(QString("Unable include role %1 to the role %2. Check the dependencies between them.")
+												  .arg(qPrintable(parentRoleId))
+												  .arg(qPrintable(roleId)));
 
-		if (itemModel.ContainsKey("Parents")){
-			imtbase::CTreeItemModel* parentsModelPtr = itemModel.GetTreeItemModel("Parents");
-			Q_ASSERT(parentsModelPtr != nullptr);
-			if (parentsModelPtr == nullptr){
-				return nullptr;
-			}
-
-			for(int index = 0; index < parentsModelPtr->GetItemsCount(); index++){
-				QByteArray parentRoleId = parentsModelPtr->GetData("Id", index).toByteArray();
-				QString parentRoleIdStr = parentRoleId;
-				parentRoleId = parentRoleIdStr.split(*m_separatorObjectIdAttrPtr)[0].toUtf8();
-
-				if (!roleInfoPtr->IncludeRole(parentRoleId)){
-					errorMessage = QT_TR_NOOP(QString("Unable include role %1 to the role %2. Check the dependencies between them.")
-												.arg(qPrintable(parentRoleId))
-												.arg(qPrintable(roleId)));
-
-					return nullptr;
+						return nullptr;
+					}
 				}
 			}
 		}
 
 		if (itemModel.ContainsKey("Permissions")){
-			imtbase::CTreeItemModel* permissionsModelPtr = itemModel.GetTreeItemModel("Permissions");
-			if (permissionsModelPtr != nullptr){
-				imtauth::IRole::FeatureIds permissions;
-
-				for(int index = 0; index < permissionsModelPtr->GetItemsCount(); index++){
-					QByteArray featureId;
-					if (permissionsModelPtr->ContainsKey("Id", index)){
-						featureId = permissionsModelPtr->GetData("Id", index).toByteArray();
-					}
-
-					if (!featureId.isEmpty()){
-						permissions << featureId;
-					}
-				}
-
-				roleInfoPtr->SetLocalPermissions(permissions);
+			QByteArray permissions = itemModel.GetData("Permissions").toByteArray();
+			if (!permissions.isEmpty()){
+				QByteArrayList permissionIds = permissions.split(';');
+				roleInfoPtr->SetLocalPermissions(imtauth::IRole::FeatureIds(permissionIds.begin(), permissionIds.end()));
 			}
 		}
 

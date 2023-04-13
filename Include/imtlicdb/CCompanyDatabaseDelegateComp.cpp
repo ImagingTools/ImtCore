@@ -165,7 +165,8 @@ QByteArray CCompanyDatabaseDelegateComp::CreateDeleteObjectQuery(
 QByteArray CCompanyDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& /*collection*/,
 		const QByteArray& objectId,
-		const istd::IChangeable& object) const
+		const istd::IChangeable& object,
+		bool /*useExternDelegate*/) const
 {
 	const imtauth::ICompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(&object);
 	if (companyInfoPtr == nullptr){

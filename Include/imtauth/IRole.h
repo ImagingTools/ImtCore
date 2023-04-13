@@ -14,13 +14,14 @@
 namespace imtauth
 {
 
+
 /**
 	Interface describing a role.
 */
 class IRole: virtual public iser::IObject
 {
 public:
-	typedef QSet<QByteArray> FeatureIds;
+	typedef QByteArrayList FeatureIds;
 
 	virtual const IRoleInfoProvider* GetParentRolesProvider() const = 0;
 

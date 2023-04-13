@@ -31,6 +31,8 @@
 	<file alias="imtauthgui/UserGroupView.qml">Qml/imtauthgui/UserGroupView.qml</file>
 	<file alias="imtauthgui/GroupEditor.qml">Qml/imtauthgui/GroupEditor.qml</file>
 	<file alias="imtauthgui/GroupRoles.qml">Qml/imtauthgui/GroupRoles.qml</file>
+	<file alias="imtauthgui/UserGroups.qml">Qml/imtauthgui/UserGroups.qml</file>
+	<file alias="imtauthgui/GroupUsers.qml">Qml/imtauthgui/GroupUsers.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -30,9 +30,9 @@ I_EXPORT_COMPONENT(
 			"Account Information Authority");
 
 I_EXPORT_COMPONENT(
-            CompanyInfo,
-            "Account company information",
-            "Account company Information");
+			CompanyInfo,
+			"Account company information",
+			"Account company Information");
 
 I_EXPORT_COMPONENT(
 			ContactInfoMetaInfoCreator,
@@ -113,6 +113,11 @@ I_EXPORT_COMPONENT(
 			UserSettings,
 			"User Settings",
 			"User Settings");
+
+I_EXPORT_COMPONENT(
+			UserGroupInfoProvider,
+			"User group provider",
+			"UserGroup Group User Provider");
 
 
 } // namespace ImtAuthPck

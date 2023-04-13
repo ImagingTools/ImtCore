@@ -22,15 +22,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="OptionsListAdapter" PackageId="ImtCorePck" ComponentId="OptionsListAdapter">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CollectionInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Repository"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="Repository" PackageId="ImtDatabasePck" ComponentId="SqlDatabaseCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -75,6 +66,9 @@
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="DocumentContentColumnId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Document"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
@@ -89,9 +83,6 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="DocumntContentColumnId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Document"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -103,6 +94,12 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TableName" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="UserGroups"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserDatabaseSqlDelegate" Type="Reference" ExportId="UserDatabaseSqlDelegate">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -121,6 +118,7 @@
     <ExportedInterfaces>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="Repository"/>
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
+        <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="UserGroupDatabaseDelegate"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

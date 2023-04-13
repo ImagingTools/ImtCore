@@ -2,13 +2,13 @@
 
 
 // ImtCore includes
+#include <imtbase/TIdentifiableWrap.h>
 #include <imtauth/IRole.h>
-#include <imtauth/IRoleInfoProvider.h>
-#include <imtlic/CProductLicensingInfo.h>
 
 
 namespace imtauth
 {
+
 
 class CRole: virtual public IRole
 {
@@ -65,6 +65,9 @@ private:
 
 	const imtauth::IRoleInfoProvider* m_roleInfoProviderPtr;
 };
+
+
+typedef imtbase::TIdentifiableWrap<CRole> CIdentifiableRoleInfo;
 
 
 } // namespace imtauth

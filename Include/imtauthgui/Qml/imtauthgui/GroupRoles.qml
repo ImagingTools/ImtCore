@@ -21,6 +21,12 @@ Item {
         rolesProvider.updateModel();
     }
 
+    onVisibleChanged: {
+        if (groupRolesContainer.visible){
+            groupRolesContainer.updateGui();
+        }
+    }
+
     function updateGui(){
         console.log("UserRoles updateGui");
 
@@ -123,7 +129,7 @@ Item {
 
         anchors.top: parent.top;
         anchors.left: parent.left;
-        anchors.leftMargin: 10;
+//        anchors.leftMargin: 10;
 
         text: qsTr("Roles");
         color: Style.textColor;
@@ -152,9 +158,11 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
         anchors.left: parent.left;
-        anchors.leftMargin: 10;
+//        anchors.leftMargin: 10;
 
         width: 400;
+
+        elements: TreeItemModel {}
 
         checkable: true;
         radius: 0;

@@ -1,6 +1,7 @@
 #pragma once
 
 // ImtCore includes
+#include <imtauth/IUserGroupInfo.h>
 #include <imtauth/IUserBaseInfo.h>
 
 
@@ -90,6 +91,21 @@ public:
 		Check admin user.
 	*/
 	virtual bool IsAdmin() const = 0;
+
+	/**
+		Get groups.
+	*/
+	virtual IUserGroupInfo::GroupIds GetGroups() const = 0;
+
+	/**
+		Add this user to group.
+	*/
+	virtual void AddToGroup(const QByteArray& groupId) = 0;
+
+	/**
+		Remove this user from group.
+	*/
+	virtual bool RemoveFromGroup(const QByteArray& groupId) = 0;
 };
 
 

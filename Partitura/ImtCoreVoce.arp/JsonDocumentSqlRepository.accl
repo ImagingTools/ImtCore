@@ -8,11 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="CompactXmlFileSerializer" X="200" Y="325" Note=""/>
-        <Element ComponentName="Repository" X="575" Y="550" Note=""/>
-        <Element ComponentName="Types" X="575" Y="125" Note=""/>
-        <Element ComponentName="UserGroupDatabaseDelegate" X="575" Y="325" Note=""/>
-        <Element ComponentName="UserGroupInfo" X="925" Y="325" Note=""/>
+        <Element ComponentName="JsonDocumentCollection" X="625" Y="450" Note=""/>
+        <Element ComponentName="JsonSerializer" X="200" Y="250" Note=""/>
+        <Element ComponentName="SqlDatabaseJsonDelegate" X="625" Y="250" Note=""/>
+        <Element ComponentName="Types" X="625" Y="75" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

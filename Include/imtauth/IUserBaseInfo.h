@@ -21,7 +21,7 @@ class IUserBaseInfo:
 		virtual public iser::IObject
 {
 public:
-	typedef QSet<QByteArray> FeatureIds;
+	typedef QList<QByteArray> FeatureIds;
 	typedef QList<QByteArray> RoleIds;
 
 	/**
@@ -55,6 +55,16 @@ public:
 	virtual void SetName(const QString& name) = 0;
 
 	/**
+		Get description.
+	*/
+	virtual QString GetDescription() const = 0;
+
+	/**
+		Set description.
+	*/
+	virtual void SetDescription(const QString& description) = 0;
+
+	/**
 		Get permissions.
 	*/
 	virtual FeatureIds GetPermissions() const = 0;
@@ -67,7 +77,7 @@ public:
 	/**
 		Set local permissions.
 	*/
-	virtual void SetLocalPermissions(const FeatureIds &permissions) = 0;
+	virtual void SetLocalPermissions(const FeatureIds& permissions) = 0;
 
 	/**
 		Get restrictions.
@@ -77,7 +87,7 @@ public:
 	/**
 		Set restrictions.
 	*/
-	virtual void SetProhibitions(const FeatureIds &prohibitions) = 0;
+	virtual void SetProhibitions(const FeatureIds& prohibitions) = 0;
 
 	/**
 		Get roles.
@@ -87,7 +97,17 @@ public:
 	/**
 		Set roles.
 	*/
-	virtual void SetRoles(const RoleIds &roles) = 0;
+	virtual void SetRoles(const RoleIds& roles) = 0;
+
+	/**
+		Add role to user.
+	*/
+	virtual void AddRole(const QByteArray& roleId) = 0;
+
+	/**
+		Remove role from user.
+	*/
+	virtual bool RemoveRole(const QByteArray& userId) = 0;
 };
 
 

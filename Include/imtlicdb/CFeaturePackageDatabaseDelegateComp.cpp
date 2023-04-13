@@ -297,7 +297,8 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
 QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
-		const istd::IChangeable& object) const
+		const istd::IChangeable& object,
+		bool /*useExternDelegate*/) const
 {
 	const imtlic::CFeaturePackage* newObjectPtr = dynamic_cast<const imtlic::CFeaturePackage*>(&object);
 	if (newObjectPtr == nullptr){
