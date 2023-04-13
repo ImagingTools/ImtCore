@@ -9,8 +9,6 @@
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 
 
-
-
 namespace imtdb
 {
 

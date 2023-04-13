@@ -67,15 +67,6 @@ const QDateTime& CTimeRange::GetEndTime() const
 
 bool CTimeRange::SetBeginTime(const QDateTime& time)
 {
-	//if (m_begin.isValid()){
-	//	if (m_begin > time){
-	//		m_begin = time;
-	//		return true;
-	//	}
-
-	//	return false;
-	//}
-	
 	m_begin = time;
 
 	return true;
@@ -84,15 +75,6 @@ bool CTimeRange::SetBeginTime(const QDateTime& time)
 
 bool CTimeRange::SetEndTime(const QDateTime& time)
 {
-	//if (m_end.isValid()){
-	//	if (m_end < time){
-	//		m_end = time;
-	//		return true;
-	//	}
-
-	//	return false;
-	//}
-
 	m_end = time;
 
 	return true;
@@ -105,6 +87,7 @@ bool CTimeRange::SetTimeRange(const QDateTime& begin, const QDateTime& end)
 		if (begin <= end){
 			m_begin = begin;
 			m_end = end;
+
 			return true;
 		}
 

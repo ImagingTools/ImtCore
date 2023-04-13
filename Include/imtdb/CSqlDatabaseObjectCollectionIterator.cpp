@@ -99,3 +99,5 @@ QVariant CSqlDatabaseObjectCollectionIterator::GetElementInfo(QByteArray infoId)
 
 
 } // namespace imtdb
+
+
