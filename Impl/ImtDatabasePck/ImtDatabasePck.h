@@ -13,6 +13,7 @@
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 #include <imtdb/CStandardSqlMetaInfoTableDelegateComp.h>
 #include <imtdb/CDatabaseAutomaticBackupComp.h>
+#include <imtdb/CMongoDatabaseObjectCollectionComp.h>
 
 
 /**
@@ -29,6 +30,7 @@ typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;
 typedef imtdb::CSqlJsonDatabaseDelegateComp SqlDatabaseJsonDelegate;
 typedef imtdb::CStandardSqlMetaInfoTableDelegateComp StandardMetaInfoTableDelegate;
 typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
+typedef icomp::TModelCompWrap<imtdb::CMongoDatabaseObjectCollectionComp> MongoDatabaseCollection;
 
 
 } // namespace ImtDatabasePck

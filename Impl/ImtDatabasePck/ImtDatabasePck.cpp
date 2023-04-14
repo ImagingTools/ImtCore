@@ -50,6 +50,11 @@ I_EXPORT_COMPONENT(
 			"Database automatic backup",
 			"Database Automatic Backup PostgreSQL SQL");
 
+I_EXPORT_COMPONENT(
+			MongoDatabaseCollection,
+			"Mongo-based object collection",
+			"Mongo Database");
+
 
 } // namespace ImtDatabasePck
 
