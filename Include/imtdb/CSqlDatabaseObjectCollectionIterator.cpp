@@ -60,7 +60,7 @@ QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectId() const
 
 bool imtdb::CSqlDatabaseObjectCollectionIterator::GetObjectData(imtbase::IObjectCollection::DataPtr &dataPtr) const
 {
-	if (m_databaseDelegate == nullptr){
+	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
 		return false;
 	}
 
@@ -75,7 +75,7 @@ bool imtdb::CSqlDatabaseObjectCollectionIterator::GetObjectData(imtbase::IObject
 
 idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetDataMetaInfo() const
 {
-	if (m_databaseDelegate == nullptr){
+	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
 		return idoc::MetaInfoPtr();
 	}
 
@@ -90,7 +90,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionIterator::GetDataMetaInfo() const
 
 QVariant CSqlDatabaseObjectCollectionIterator::GetElementInfo(QByteArray infoId) const
 {
-	if (m_databaseDelegate == nullptr){
+	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
 		return QVariant();
 	}
 
