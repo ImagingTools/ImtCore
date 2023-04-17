@@ -67,6 +67,7 @@ export class Text extends Item {
         
         this.impl.style.textAlign = "inherit"
         this.impl.style.whiteSpace = "pre"
+        this.impl.style.lineHeight = "normal";
         
         // this.impl.style.position = "absolute";
         // this.impl.style.width = "fit-content";
