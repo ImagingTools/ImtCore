@@ -35,9 +35,11 @@ export class TextEdit extends Item {
         this.$cPC('font', Font()).connect(this.$fontChanged.bind(this))
         this.$cP('selectionColor', '#000080').connect(this.$selectionColorChanged.bind(this))
         this.$cP('selectedTextColor', '#fff').connect(this.$selectedTextColorChanged.bind(this))
-        this.$cP('readOnly', 'bool', false).connect(this.$readOnlyChanged.bind(this))
-
+        this.$cP('readOnly', false).connect(this.$readOnlyChanged.bind(this))
+        // this.$sP('height', ()=>{return this.contentHeight})
         this.$cS('editingFinished')
+        this.$sP('width', ()=>{return this.contentWidth})
+        this.$sP('height', ()=>{return this.contentHeight})
 
         this.$updateTimer = null
     }
@@ -45,24 +47,45 @@ export class TextEdit extends Item {
     $domCreate(){
         super.$domCreate()
 
-        this.impl = document.createElement("div")
-        this.dom.style.display = 'flex'
+        this.impl = document.createElement("textarea")
+        // this.dom.style.display = 'flex'
         this.dom.appendChild(this.impl);
         
         this.impl.style.textAlign = "inherit"
         this.impl.style.width = "100%";
-        this.impl.style.height = "auto";
+        this.impl.style.height = '100%'
+        this.impl.style.resize = 'none'
 
 		this.impl.style.borderWidth = "0"
-		this.impl.style.background = "none"
 		this.impl.style.outline = "none"
-        this.impl.contentEditable = true
+        this.impl.style.whiteSpace = "pre"; 
+		this.impl.cols = 1
+		this.impl.rows = 1
 
 
         this.impl.addEventListener("input", function(e) {
             //e.preventDefault()
-			this.text = this.impl.innerText
+			this.text = this.impl.value
+            this.$updateGeometry()
 		}.bind(this))
+
+        this.$hiddenElement = document.createElement("div")
+        this.dom.appendChild(this.$hiddenElement)
+        this.$hiddenElement.style.textAlign = "inherit"
+        // this.$hiddenElement.style.width = "100%";
+        // this.$hiddenElement.style.height = '100%'
+        this.$hiddenElement.style.visibility = 'hidden'
+        this.$hiddenElement.style.zIndex = -1
+        this.$hiddenElement.style.display = 'flex'
+        this.$hiddenElement.style.position = 'absolute'
+        
+
+        this.$hiddenElementContent = document.createElement("span")
+        this.$hiddenElement.appendChild(this.$hiddenElementContent)
+        this.$hiddenElement.style.maxWidth = '100%'
+        this.$hiddenElementContent.style.whiteSpace = "pre";
+        this.$hiddenElementContent.style.lineHeight = "normal";
+
 
         this.$fontChanged()
     }
@@ -70,15 +93,16 @@ export class TextEdit extends Item {
         this.dom.style.display = 'flex'
     }
     $readOnlyChanged(){
-        if(this.$p.readOnly.val){
-            this.impl.contentEditable = true
-        } else {
-            this.impl.contentEditable = false
-        }
+        // if(this.$p.readOnly.val){
+        //     this.impl.contentEditable = true
+        // } else {
+        //     this.impl.contentEditable = false
+        // }
     }
     $focusChanged(){
         super.$focusChanged()
         if(this.$p.focus.val) {
+            this.$updateGeometry()
             this.impl.focus()
             Core.setFocus(this)
         } else {
@@ -91,32 +115,55 @@ export class TextEdit extends Item {
         this.dom.style.opacity = this.opacity
     }
     $updateGeometry(){
-        clearTimeout(this.$updateTimer)
+        if(this.impl.value.length){
+            this.$hiddenElementContent.innerHTML = this.impl.value[this.impl.value.length-1] === '\n' ? this.impl.value + '!' : this.impl.value
+            this.contentWidth = this.$hiddenElement.scrollWidth
+        } else {
+            this.$hiddenElementContent.innerHTML = '!'
+            this.contentWidth = 0
+        }
+
+        // this.contentWidth = this.$hiddenElement.scrollWidth
+        this.contentHeight = this.$hiddenElement.scrollHeight
+
+        let width = this.$hiddenElement.scrollWidth - this.$hiddenElementContent.scrollWidth
+        let height = this.text === '' ? this.$hiddenElement.scrollHeight - this.font.pixelSize : this.$hiddenElement.scrollHeight - this.$hiddenElementContent.scrollHeight
+        this.impl.style.padding = `0`
+        if(this.verticalAlignment === TextEdit.AlignVCenter){
+            this.impl.style.paddingTop = `${height/2}px`
+            this.impl.style.paddingBottom = `${height/2}px`
+        }
+        if(this.horizontalAlignment === TextEdit.AlignHCenter){
+            this.impl.style.paddingLeft = `${width/2}px`
+            this.impl.style.paddingRight = `${width/2}px`
+        }
+        // console.log(width, height)
+        // clearTimeout(this.$updateTimer)
         
-        this.$updateTimer = setTimeout(()=>{
-            if(this.impl){
-                let rect = this.impl.getBoundingClientRect()
-                if(this.$contentHeightAuto){
-                    if(this.$heightAuto && this.$p.height.val !== rect.height) {
-                        this.$p.height.val = rect.height
-                        this.$p.height.signal()
-                        this.$heightAuto = true
-                        // this.dom.style.height = `${rect.height}px`
-                    }
-                    this.contentHeight = rect.height
-                }
-                if(this.$contentWidthAuto){
-                    if(this.$widthAuto && this.$p.width.val !== rect.width) {
-                        this.$p.width.val = rect.width
-                        this.$p.width.signal()
-                        this.$widthAuto = true
-                        // this.dom.style.width = `${rect.width}px`
-                    }
-                    this.contentWidth = rect.width
-                }
-            }
+        // this.$updateTimer = setTimeout(()=>{
+        //     if(this.impl){
+        //         let rect = this.impl.getBoundingClientRect()
+        //         if(this.$contentHeightAuto){
+        //             if(this.$heightAuto && this.$p.height.val !== rect.height) {
+        //                 this.$p.height.val = rect.height
+        //                 this.$p.height.signal()
+        //                 this.$heightAuto = true
+        //                 // this.dom.style.height = `${rect.height}px`
+        //             }
+        //             this.contentHeight = rect.height
+        //         }
+        //         if(this.$contentWidthAuto){
+        //             if(this.$widthAuto && this.$p.width.val !== rect.width) {
+        //                 this.$p.width.val = rect.width
+        //                 this.$p.width.signal()
+        //                 this.$widthAuto = true
+        //                 // this.dom.style.width = `${rect.width}px`
+        //             }
+        //             this.contentWidth = rect.width
+        //         }
+        //     }
             
-        }, 1000 / Core.FPS)
+        // }, 1000 / Core.FPS)
         
 
     }
@@ -172,9 +219,9 @@ export class TextEdit extends Item {
     }
 
     $textChanged(){
-		this.impl.innerText = this.$p.text.val
-        this.$setCursorPosition(this.$cursorPos + (this.$p.text.val.length - this.$cursorOffset))
-        this.$updateGeometry()
+		this.impl.value = this.text
+        // this.$setCursorPosition(this.$cursorPos + (this.$p.text.val.length - this.$cursorOffset))
+        // this.$updateGeometry()
     }
     
     $colorChanged(){
@@ -185,37 +232,39 @@ export class TextEdit extends Item {
         switch(this.$p.horizontalAlignment.val){
 			case TextEdit.AlignLeft:
 				this.impl.style.textAlign = "start";
-				this.dom.style.justifyContent = "flex-start";
+				this.$hiddenElement.style.justifyContent = "flex-start";
 				break;
 			case TextEdit.AlignRight:
 				this.impl.style.textAlign = "end";
-				this.dom.style.justifyContent = "flex-end";
+				this.$hiddenElement.style.justifyContent = "flex-end";
 				break;
 			case TextEdit.AlignHCenter:
 				this.impl.style.textAlign = "center";
-				this.dom.style.justifyContent = "center";
+				this.$hiddenElement.style.justifyContent = "center";
 				break;
 		}
+        this.$updateGeometry()
     }
     $verticalAlignmentChanged(){
         switch(this.$p.verticalAlignment.val){
 			case TextEdit.AlignTop:
-				this.dom.style.alignItems = "flex-start";
+				this.$hiddenElement.style.alignItems = "flex-start";
 				break;
 			case TextEdit.AlignBottom:
-				this.dom.style.alignItems = "flex-end";
+				this.$hiddenElement.style.alignItems = "flex-end";
 				break;
 			case TextEdit.AlignVCenter:
-				this.dom.style.alignItems = "center";
+				this.$hiddenElement.style.alignItems = "center";
 				break;
 		}
+        this.$updateGeometry()
     }
     $wrapModeChanged(){
         switch(this.$p.wrapMode.val){
-            case TextEdit.NoWrap: this.impl.style.whiteSpace = "pre"; break;
-            case TextEdit.WordWrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "normal"; break;
-            case TextEdit.WrapAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; break;
-            case TextEdit.Wrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "break-word"; break;
+            case TextEdit.NoWrap: this.impl.style.whiteSpace = "pre"; this.$hiddenElementContent.style.whiteSpace = "pre"; break;
+            case TextEdit.WordWrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "normal"; this.$hiddenElementContent.style.whiteSpace = "pre-wrap"; this.$hiddenElementContent.style.wordWrap = "normal"; break;
+            case TextEdit.WrapAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; this.$hiddenElementContent.style.whiteSpace = "pre-wrap"; this.$hiddenElementContent.style.wordBreak = "break-all"; break;
+            case TextEdit.Wrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordWrap = "break-word"; this.$hiddenElementContent.style.whiteSpace = "pre-wrap"; this.$hiddenElementContent.style.wordWrap = "break-word"; break;
         }
         this.$updateGeometry()
     }
@@ -226,19 +275,26 @@ export class TextEdit extends Item {
         this.impl.style.fontStyle = this.$p['font.italic'].val ? 'italic' : 'normal';
         this.impl.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
         this.impl.style.textDecoration = this.$p['font.underline'].val ? 'underline' : 'unset';
-        // this.impl.style.height = `${this.font.pixelSize}px`
+
+        this.$hiddenElementContent.style.fontFamily = this.$p['font.family'].val ? this.$p['font.family'].val : 'unset';
+        this.$hiddenElementContent.style.fontSize = `${this.$p['font.pixelSize'].val}px`
+        this.$hiddenElementContent.style.fontStyle = this.$p['font.italic'].val ? 'italic' : 'normal';
+        this.$hiddenElementContent.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
+        this.$hiddenElementContent.style.textDecoration = this.$p['font.underline'].val ? 'underline' : 'unset';
+
         this.$updateGeometry()
     }
 
     $keydown(e, state){
-        this.$cursorPos = this.$p.text.val.length ? this.$getCursorPosition() : 0
-        this.$cursorOffset = this.$p.text.val.length
+        // this.$cursorPos = this.$p.text.val.length ? this.$getCursorPosition() : 0
+        // this.$cursorOffset = this.$p.text.val.length
     }
 
     $destroy(){
         // if(this.$validator) this.$validator.$destroy()
         clearTimeout(this.$updateTimer)
         this.impl.remove()
+        this.$hiddenElement.remove()
         super.$destroy()
     }
 
