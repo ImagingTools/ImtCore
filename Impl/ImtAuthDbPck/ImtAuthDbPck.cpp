@@ -40,6 +40,11 @@ I_EXPORT_COMPONENT(
 			"User settings delegate for SQL table",
 			"SQL User Settings Delegate");
 
+I_EXPORT_COMPONENT(
+			SuperuserProvider,
+			"Superuser provider",
+			"SQL User su Superuser SuperUser admin");
+
 
 } // namespace ImtAuthDbPck
 

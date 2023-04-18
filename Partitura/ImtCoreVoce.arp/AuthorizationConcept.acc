@@ -51,22 +51,16 @@
                     <AttributeInfo Id="DataModel" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserMode"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RepresentationController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="UserModeRepresentation"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SuperuserLogin" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="su"/>
+                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SuperuserProvider"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -92,6 +86,18 @@
         <Element Id="HashCalculator" PackageId="ImtCryptPck" ComponentId="HashCalculator">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="SuperuserProvider" PackageId="ImtAuthDbPck" ComponentId="SuperuserProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="UserMode" PackageId="BasePck" ComponentId="SelectionParam">

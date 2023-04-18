@@ -730,6 +730,7 @@ Item {
 
         anchors.fill: elementsListObj;
         color: Style.baseColor;
+
         radius: tableContainer.radius;
     }
 

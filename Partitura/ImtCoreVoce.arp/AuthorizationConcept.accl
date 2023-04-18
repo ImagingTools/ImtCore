@@ -12,6 +12,7 @@
         <Element ComponentName="AuthorizationOptionsController" X="175" Y="250" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="75" Note=""/>
         <Element ComponentName="HashCalculator" X="725" Y="375" Note=""/>
+        <Element ComponentName="SuperuserProvider" X="575" Y="250" Note=""/>
         <Element ComponentName="UserMode" X="100" Y="375" Note=""/>
         <Element ComponentName="UserModeOptions" X="100" Y="525" Note=""/>
         <Element ComponentName="UserModeRepresentation" X="400" Y="375" Note=""/>

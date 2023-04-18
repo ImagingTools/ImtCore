@@ -62,7 +62,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 		QByteArray roleProductId = roleInfoPtr->GetProductId();
 
 		int index = dataModelPtr->InsertNewItem();
-		dataModelPtr->SetData("Name", "Included Roles", index);
+		dataModelPtr->SetData("Name", "Parent Roles", index);
 		imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("Children", index);
 
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
