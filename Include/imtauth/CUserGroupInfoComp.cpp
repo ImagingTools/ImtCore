@@ -20,6 +20,10 @@ void CUserGroupInfoComp::OnComponentCreated()
 	if (m_userGroupProviderCompPtr.IsValid()){
 		m_userGroupInfoProviderPtr = m_userGroupProviderCompPtr.GetPtr();
 	}
+
+	if (m_userProviderCompPtr.IsValid()){
+		m_userInfoProviderPtr = m_userProviderCompPtr.GetPtr();
+	}
 }
 
 

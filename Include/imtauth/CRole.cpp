@@ -163,12 +163,8 @@ void CRole::SetProductId(const QByteArray& productId)
 }
 
 
-bool CRole::IncludeRole(const QByteArray &roleId)
+bool CRole::IncludeRole(const QByteArray& roleId)
 {
-	if (m_roleId == roleId){
-		return false;
-	}
-
 	QByteArrayList parentRoles = GetParentRoles(roleId);
 
 	if (parentRoles.contains(m_roleId)){
@@ -183,7 +179,7 @@ bool CRole::IncludeRole(const QByteArray &roleId)
 }
 
 
-void CRole::ExcludeRole(const QByteArray &roleId)
+void CRole::ExcludeRole(const QByteArray& roleId)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -289,7 +285,9 @@ bool CRole::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-QByteArrayList CRole::GetParentRoles(const QByteArray &roleId) const
+// protected methods
+
+QByteArrayList CRole::GetParentRoles(const QByteArray& roleId) const
 {
 	QByteArrayList retVal;
 	if (m_roleInfoProviderPtr != nullptr){
@@ -303,7 +301,7 @@ QByteArrayList CRole::GetParentRoles(const QByteArray &roleId) const
 }
 
 
-void CRole::GetParentRoleList(const IRole &role, QByteArrayList &roleList) const
+void CRole::GetParentRoleList(const IRole &role, QByteArrayList& roleList) const
 {
 	QByteArrayList includedRoles = role.GetIncludedRoles();
 

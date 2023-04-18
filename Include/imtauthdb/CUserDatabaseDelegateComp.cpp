@@ -19,39 +19,6 @@ namespace imtauthdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CUserDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
-{
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	if (!m_documentFactoriesCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	int index = m_documentFactoriesCompPtr.FindValue("UserInfo");
-	if (index >= 0){
-		istd::TDelPtr<istd::IChangeable> documentPtr;
-		istd::IChangeable* userInstancePtr = m_documentFactoriesCompPtr.CreateInstance(index);
-		documentPtr.SetPtr(dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr));
-
-		if (!documentPtr.IsValid()){
-			return nullptr;
-		}
-
-		if (record.contains(*m_documentContentColumnIdAttrPtr)){
-			QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
-
-			if (ReadDataFromMemory("UserInfo", documentContent, *documentPtr)){
-				return documentPtr.PopPtr();
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::CreateNewObjectQuery(
 		const QByteArray& /*typeId*/,
 		const QByteArray& proposedObjectId,
@@ -83,9 +50,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				if (userGroupInfoPtr != nullptr){
 					userGroupInfoPtr->AddUser(objectId);
 
-					for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-						userInfoPtr->AddRole(roleId);
-					}
+//					for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
+//						userInfoPtr->AddRole(roleId);
+//					}
 
 					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
 				}
@@ -93,7 +60,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		}
 
 		QByteArray documentContent;
-		if (WriteDataToMemory("UserInfo", *userInfoPtr, documentContent)){
+		if (WriteDataToMemory("DocumentInfo", *userInfoPtr, documentContent)){
 			int revisionVersion = 1;
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
@@ -164,9 +131,9 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (!userGroupInfoPtr->GetUsers().contains(objectId)){
 						userGroupInfoPtr->AddUser(objectId);
 
-						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-							userInfoPtr->AddRole(roleId);
-						}
+//						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
+//							userInfoPtr->AddRole(roleId);
+//						}
 
 						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
 					}
@@ -181,9 +148,9 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userGroupInfoPtr != nullptr){
 					bool result = userGroupInfoPtr->RemoveUser(objectId);
 					if (result){
-						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-							userInfoPtr->RemoveRole(roleId);
-						}
+//						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
+//							userInfoPtr->RemoveRole(roleId);
+//						}
 
 						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
 					}
@@ -193,7 +160,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 	}
 
 	QByteArray documentContent;
-	if (WriteDataToMemory("UserInfo", *userInfoPtr, documentContent)){
+	if (WriteDataToMemory("DocumentInfo", *userInfoPtr, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 		retVal += QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );")
 				.arg(qPrintable(*m_tableNameAttrPtr))

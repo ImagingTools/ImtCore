@@ -5,7 +5,7 @@ import imtlicgui 1.0
 import Acf 1.0
 
 Item {
-    id: userEditorContainer;
+    id: userGroupEditorContainer;
 
     property TreeItemModel documentModel: TreeItemModel {}
     property UndoRedoManager undoRedoManager: null;
@@ -16,28 +16,28 @@ Item {
     property int panelWidth: 400;
 
     onDocumentModelChanged: {
-        console.log("UserEditor onDocumentModelChanged", userEditorContainer.documentModel);
+        console.log("UserEditor onDocumentModelChanged", userGroupEditorContainer.documentModel);
 
         groupsProvider.updateModel();
     }
 
     onBlockUpdatingModelChanged: {
-        Events.sendEvent("DocumentUpdating", userEditorContainer.blockUpdatingModel);
+        Events.sendEvent("DocumentUpdating", userGroupEditorContainer.blockUpdatingModel);
     }
 
-//    function getAllChildrenGroups(groupId, retVal){
-//         for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-//             let id = groupsProvider.collectionModel.GetData("Id", i);
-//             let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
-//             let parentGroupIds = parentGroups.split(';')
+    function getAllChildrenGroups(groupId, retVal){
+         for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+             let id = groupsProvider.collectionModel.GetData("Id", i);
+             let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
+             let parentGroupIds = parentGroups.split(';')
 
-//             if (parentGroupIds.includes(groupId)){
-//                 retVal.push(id);
+             if (parentGroupIds.includes(groupId)){
+                 retVal.push(id);
 
-//                 userEditorContainer.getAllChildrenGroups(id, retVal);
-//             }
-//         }
-//    }
+                 userGroupEditorContainer.getAllChildrenGroups(id, retVal);
+             }
+         }
+    }
 
     CollectionDataProvider {
         id: groupsProvider;
@@ -46,22 +46,20 @@ Item {
         fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
 
         Component.onDestruction: {
-            groupsProvider.collectionModel.modelChanged.disconnect(userEditorContainer.updateModel);
+            groupsProvider.collectionModel.modelChanged.disconnect(userGroupEditorContainer.updateModel);
         }
 
         onModelUpdated: {
             if (groupsProvider.collectionModel != null){
-                let documentId = userEditorContainer.documentModel.GetData("Id");
-                console.log("documentId", documentId);
+                let documentId = userGroupEditorContainer.documentModel.GetData("Id");
                 let removedIndexes = []
+
+                let childrenIds = []
+                userGroupEditorContainer.getAllChildrenGroups(documentId, childrenIds);
+
                 for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
                     let id = groupsProvider.collectionModel.GetData("Id", i);
-                    let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
-                    console.log("parentGroups", parentGroups);
-
-                    let parentGroupIds = parentGroups.split(';')
-                    console.log("parentGroupIds", parentGroupIds);
-                    if (id === documentId || parentGroupIds.includes(documentId)){
+                    if (id === documentId || childrenIds.includes(id)){
                         removedIndexes.push(i);
                     }
 
@@ -70,19 +68,16 @@ Item {
 
                 console.log("removedIndexes", removedIndexes);
 
+                let removedCount = 0
                 for (let i = 0; i < removedIndexes.length; i++){
-                    if (i == 0){
-                        groupsProvider.collectionModel.RemoveItem(removedIndexes[i]);
-                    }
-                    else{
-                        groupsProvider.collectionModel.RemoveItem(removedIndexes[i] - 1);
-                    }
+                    groupsProvider.collectionModel.RemoveItem(removedIndexes[i] - removedCount);
+                    removedCount++;
                 }
 
                 parentGroupsTable.elements = groupsProvider.collectionModel;
 
-                userEditorContainer.updateGui();
-                groupsProvider.collectionModel.modelChanged.connect(userEditorContainer.updateModel);
+                userGroupEditorContainer.updateGui();
+                groupsProvider.collectionModel.modelChanged.connect(userGroupEditorContainer.updateModel);
 
                 nameInput.focus = true;
             }
@@ -92,19 +87,19 @@ Item {
     function updateGui(){
         console.log("GroupEditor updateGui");
 
-        userEditorContainer.blockUpdatingModel = true;
+        userGroupEditorContainer.blockUpdatingModel = true;
 
-        if (userEditorContainer.documentModel.ContainsKey("Name")){
-            nameInput.text = userEditorContainer.documentModel.GetData("Name");
+        if (userGroupEditorContainer.documentModel.ContainsKey("Name")){
+            nameInput.text = userGroupEditorContainer.documentModel.GetData("Name");
         }
 
-        if (userEditorContainer.documentModel.ContainsKey("Description")){
-            descriptionInput.text = userEditorContainer.documentModel.GetData("Description");
+        if (userGroupEditorContainer.documentModel.ContainsKey("Description")){
+            descriptionInput.text = userGroupEditorContainer.documentModel.GetData("Description");
         }
 
         let parentGroupIds = []
-        if (userEditorContainer.documentModel.ContainsKey("ParentGroups")){
-            let parentGroups = userEditorContainer.documentModel.GetData("ParentGroups");
+        if (userGroupEditorContainer.documentModel.ContainsKey("ParentGroups")){
+            let parentGroups = userGroupEditorContainer.documentModel.GetData("ParentGroups");
             if (parentGroups !== ""){
                 parentGroupIds = parentGroups.split(';')
             }
@@ -120,19 +115,19 @@ Item {
             }
         }
 
-        userEditorContainer.blockUpdatingModel = false;
+        userGroupEditorContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("GroupEditor updateModel");
-        if (userEditorContainer.blockUpdatingModel){
+        if (userGroupEditorContainer.blockUpdatingModel){
             return;
         }
 
-        userEditorContainer.undoRedoManager.beginChanges();
+        userGroupEditorContainer.undoRedoManager.beginChanges();
 
-        userEditorContainer.documentModel.SetData("Description", descriptionInput.text);
-        userEditorContainer.documentModel.SetData("Name", nameInput.text);
+        userGroupEditorContainer.documentModel.SetData("Description", descriptionInput.text);
+        userGroupEditorContainer.documentModel.SetData("Name", nameInput.text);
 
         let selectedRoleIds = []
         let selectedGroupIds = []
@@ -150,11 +145,11 @@ Item {
                 }
             }
         }
-        userEditorContainer.documentModel.SetData("ParentGroups", selectedGroupIds.join(';'));
+        userGroupEditorContainer.documentModel.SetData("ParentGroups", selectedGroupIds.join(';'));
 
         let ok = true;
-        if (userEditorContainer.documentModel.ContainsKey("Roles")){
-            let userRoles = userEditorContainer.documentModel.GetData("Roles");
+        if (userGroupEditorContainer.documentModel.ContainsKey("Roles")){
+            let userRoles = userGroupEditorContainer.documentModel.GetData("Roles");
             if (userRoles !== ""){
                 ok = false;
 
@@ -164,15 +159,15 @@ Item {
                         userRoleIds.push(selectedRoleIds[j])
                     }
                 }
-                userEditorContainer.documentModel.SetData("Roles", userRoleIds.join(';'));
+              //  userGroupEditorContainer.documentModel.SetData("Roles", userRoleIds.join(';'));
             }
         }
 
         if (ok){
-            userEditorContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
+           // userGroupEditorContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
         }
 
-        userEditorContainer.undoRedoManager.endChanges();
+        userGroupEditorContainer.undoRedoManager.endChanges();
         console.log("End updateModel");
     }
 
@@ -185,9 +180,7 @@ Item {
 
     Rectangle {
         id: background;
-
         anchors.fill: parent;
-
         color: Style.backgroundColor;
         Loader{
             id: backgroundDecoratorLoader;
@@ -199,145 +192,312 @@ Item {
                 }
             }
         }
-
-        Item{
-            id: columnContainer;
-
-            width: userEditorContainer.panelWidth;
-            height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
-
-            Loader{
-                id: mainPanelFrameLoader;
-
-                anchors.fill: parent;
-
-                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
-            }//Loader
-
-            Column {
-                id: bodyColumn;
-
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.topMargin: userEditorContainer.mainMargin;
-                anchors.leftMargin: userEditorContainer.mainMargin;
-
-                width: userEditorContainer.panelWidth - 2*anchors.leftMargin;
-
-                spacing: 10;
-
-                Text {
-                    id: titleName;
-
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-
-                    text: qsTr("Group Name");
-                }
-
-                CustomTextField {
-                    id: nameInput;
-
-                    width: parent.width;
-                    height: 30;
-
-                    placeHolderText: qsTr("Enter the name");
-
-                    onEditingFinished: {
-                        let oldText = userEditorContainer.documentModel.GetData("Name");
-                        if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
-                            userEditorContainer.updateModel();
-                        }
-                    }
-
-                    Loader{
-                        id: inputDecoratorLoader3;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader3.item){
-                                inputDecoratorLoader3.item.rootItem = nameInput;
-                            }
-                        }
-                    }
-
-                    KeyNavigation.tab: descriptionInput;
-                }
-
-                Text {
-                    id: titleDescription;
-
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-
-                    text: qsTr("Description");
-                }
-
-                CustomTextField {
-                    id: descriptionInput;
-
-                    width: parent.width;
-                    height: 30;
-
-                    placeHolderText: qsTr("Enter the description");
-
-                    onEditingFinished: {
-                        let oldText = userEditorContainer.documentModel.GetData("Description");
-                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
-                            userEditorContainer.updateModel();
-                        }
-                    }
-
-                    KeyNavigation.tab: nameInput;
-
-                    Loader{
-                        id: inputDecoratorLoader4;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader4.item){
-                                inputDecoratorLoader4.item.rootItem = nameInput;
-                            }
-                        }
-                    }
-                }
-
-                Text {
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-
-                    text: qsTr("Parent Groups");
-                }
-
-                TreeItemModel {
-                    id: groupsHeadersModel;
-
-                    Component.onCompleted: {
-                        let index = groupsHeadersModel.InsertNewItem();
-
-                        groupsHeadersModel.SetData("Id", "Name");
-                        groupsHeadersModel.SetData("Name", "Group Name");
-
-                        parentGroupsTable.headers = groupsHeadersModel;
-                    }
-                }
-
-                AuxTable {
-                    id: parentGroupsTable;
-
-                    width: parent.width;
-                    height: 300;
-
-                    checkable: true;
-
-                    radius: 0;
-                }
-            }//Column bodyColumn
-        }//columnContainer
-        //
     }
+
+    Item{
+        id: columnContainer;
+
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+
+        width: userGroupEditorContainer.panelWidth;
+        height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
+
+        Loader{
+            id: mainPanelFrameLoader;
+
+            anchors.fill: parent;
+
+            sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+        }//Loader
+
+        Column {
+            id: bodyColumn;
+
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.topMargin: userGroupEditorContainer.mainMargin;
+            anchors.leftMargin: userGroupEditorContainer.mainMargin;
+
+            width: userGroupEditorContainer.panelWidth - 2*anchors.leftMargin;
+
+            spacing: 10;
+
+            Text {
+                id: titleName;
+
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Group Name");
+            }
+
+            CustomTextField {
+                id: nameInput;
+
+                width: parent.width;
+                height: 30;
+
+                placeHolderText: qsTr("Enter the name");
+
+                onEditingFinished: {
+                    let oldText = userGroupEditorContainer.documentModel.GetData("Name");
+                    if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
+                        userGroupEditorContainer.updateModel();
+                    }
+                }
+
+                Loader{
+                    id: inputDecoratorLoader3;
+
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader3.item){
+                            inputDecoratorLoader3.item.rootItem = nameInput;
+                        }
+                    }
+                }
+
+                KeyNavigation.tab: descriptionInput;
+            }
+
+            Text {
+                id: titleDescription;
+
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Description");
+            }
+
+            CustomTextField {
+                id: descriptionInput;
+
+                width: parent.width;
+                height: 30;
+
+                placeHolderText: qsTr("Enter the description");
+
+                onEditingFinished: {
+                    let oldText = userGroupEditorContainer.documentModel.GetData("Description");
+                    if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
+                        userGroupEditorContainer.updateModel();
+                    }
+                }
+
+                KeyNavigation.tab: nameInput;
+
+                Loader{
+                    id: inputDecoratorLoader4;
+
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader4.item){
+                            inputDecoratorLoader4.item.rootItem = nameInput;
+                        }
+                    }
+                }
+            }
+        }//Column bodyColumn
+    }//columnContainer
+
+    Text {
+        id: title;
+        anchors.top: columnContainer.bottom;
+        anchors.topMargin: 10;
+
+        color: Style.textColor;
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_common;
+
+        text: qsTr("Parent Groups");
+    }
+
+    TreeItemModel {
+        id: groupsHeadersModel;
+
+        Component.onCompleted: {
+            let index = groupsHeadersModel.InsertNewItem();
+
+            groupsHeadersModel.SetData("Id", "Name");
+            groupsHeadersModel.SetData("Name", "Group Name");
+
+            parentGroupsTable.headers = groupsHeadersModel;
+        }
+    }
+
+    AuxTable {
+        id: parentGroupsTable;
+
+        anchors.top: title.bottom;
+        anchors.topMargin: 10;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+
+        width: 400;
+
+        elements: TreeItemModel {}
+        checkable: true;
+        radius: 0;
+    }
+
+//    Rectangle {
+//        id: background;
+
+//        anchors.fill: parent;
+
+//        color: Style.backgroundColor;
+//        Loader{
+//            id: backgroundDecoratorLoader;
+
+//            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+//            onLoaded: {
+//                if(backgroundDecoratorLoader.item){
+//                    backgroundDecoratorLoader.item.rootItem = background;
+//                }
+//            }
+//        }
+
+//        Item{
+//            id: columnContainer;
+
+//            width: userGroupEditorContainer.panelWidth;
+//            height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
+
+//            Loader{
+//                id: mainPanelFrameLoader;
+
+//                anchors.fill: parent;
+
+//                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+//            }//Loader
+
+//            Column {
+//                id: bodyColumn;
+
+//                anchors.top: parent.top;
+//                anchors.left: parent.left;
+//                anchors.topMargin: userGroupEditorContainer.mainMargin;
+//                anchors.leftMargin: userGroupEditorContainer.mainMargin;
+
+//                width: userGroupEditorContainer.panelWidth - 2*anchors.leftMargin;
+
+//                spacing: 10;
+
+//                Text {
+//                    id: titleName;
+
+//                    color: Style.textColor;
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_common;
+
+//                    text: qsTr("Group Name");
+//                }
+
+//                CustomTextField {
+//                    id: nameInput;
+
+//                    width: parent.width;
+//                    height: 30;
+
+//                    placeHolderText: qsTr("Enter the name");
+
+//                    onEditingFinished: {
+//                        let oldText = userGroupEditorContainer.documentModel.GetData("Name");
+//                        if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
+//                            userGroupEditorContainer.updateModel();
+//                        }
+//                    }
+
+//                    Loader{
+//                        id: inputDecoratorLoader3;
+
+//                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+//                        onLoaded: {
+//                            if(inputDecoratorLoader3.item){
+//                                inputDecoratorLoader3.item.rootItem = nameInput;
+//                            }
+//                        }
+//                    }
+
+//                    KeyNavigation.tab: descriptionInput;
+//                }
+
+//                Text {
+//                    id: titleDescription;
+
+//                    color: Style.textColor;
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_common;
+
+//                    text: qsTr("Description");
+//                }
+
+//                CustomTextField {
+//                    id: descriptionInput;
+
+//                    width: parent.width;
+//                    height: 30;
+
+//                    placeHolderText: qsTr("Enter the description");
+
+//                    onEditingFinished: {
+//                        let oldText = userGroupEditorContainer.documentModel.GetData("Description");
+//                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
+//                            userGroupEditorContainer.updateModel();
+//                        }
+//                    }
+
+//                    KeyNavigation.tab: nameInput;
+
+//                    Loader{
+//                        id: inputDecoratorLoader4;
+
+//                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+//                        onLoaded: {
+//                            if(inputDecoratorLoader4.item){
+//                                inputDecoratorLoader4.item.rootItem = nameInput;
+//                            }
+//                        }
+//                    }
+//                }
+
+//                Text {
+//                    color: Style.textColor;
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_common;
+
+//                    text: qsTr("Parent Groups");
+//                }
+
+//                TreeItemModel {
+//                    id: groupsHeadersModel;
+
+//                    Component.onCompleted: {
+//                        let index = groupsHeadersModel.InsertNewItem();
+
+//                        groupsHeadersModel.SetData("Id", "Name");
+//                        groupsHeadersModel.SetData("Name", "Group Name");
+
+//                        parentGroupsTable.headers = groupsHeadersModel;
+//                    }
+//                }
+
+//                AuxTable {
+//                    id: parentGroupsTable;
+
+//                    width: parent.width;
+//                    height: 300;
+
+//                    checkable: true;
+
+//                    radius: 0;
+//                }
+//            }//Column bodyColumn
+//        }//columnContainer
+//        //
+//    }
 
 }//Container

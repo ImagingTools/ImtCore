@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
-#include <imtlic/IFeatureInfoProvider.h>
 
 
 namespace imtauth
@@ -15,7 +14,7 @@ namespace imtauth
 
 class CRoleComp:
 		public icomp::CComponentBase,
-		public CRole
+		public CIdentifiableRoleInfo
 {
 public:
 	typedef icomp::CComponentBase BaseClass;

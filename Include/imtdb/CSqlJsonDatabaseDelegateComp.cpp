@@ -307,15 +307,21 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 
 	if (!paramIds.isEmpty()){
 		QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
-		QByteArray key = idsList[0];
+		for (int i = 0; i < idsList.size(); i++){
+			QByteArray key = idsList[i];
 
-		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
-		if (textParamPtr == nullptr){
-			return false;
+			const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
+			if (textParamPtr == nullptr){
+				return false;
+			}
+
+			if (i > 0){
+				filterQuery += " OR ";
+			}
+
+			QString value = textParamPtr->GetText();
+			filterQuery += QString("\"Document\"->>'%1' = '%2'").arg(qPrintable(key)).arg(value);
 		}
-
-		QString value = textParamPtr->GetText();
-		filterQuery = QString("\"Document\"->>'%1' = '%2'").arg(qPrintable(key)).arg(value);
 	}
 
 	return true;

@@ -567,6 +567,33 @@ Item {
 
         onVisibleChanged: {
             Events.sendEvent("CommandsDecoratorSetVisible", !loading.visible);
+            if (loading.visible){
+                timer.start();
+            }
+            else{
+                timer.stop();
+            }
+        }
+    }
+
+    Timer {
+        id: timer;
+
+        interval: 10000;
+
+        onTriggered: {
+            modalDialogManager.openDialog(loadingErrorDialog, {"message": "Error loading the document"});
+        }
+    }
+
+    Component {
+        id: loadingErrorDialog;
+
+        ErrorDialog {
+            title: "Error Loading";
+            onFinished: {
+                loading.visible = false;
+            }
         }
     }
 }

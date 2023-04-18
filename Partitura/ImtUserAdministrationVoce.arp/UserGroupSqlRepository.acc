@@ -46,14 +46,14 @@
                     <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserGroupInfo</Value>
+                                <Value>DocumentInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserGroupInfo</Value>
+                                <Value>DocumentInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -110,6 +110,21 @@
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserProvider" Type="Reference" ExportId="UserProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserGroupInfoProvider" PackageId="ImtAuthPck" ComponentId="UserGroupInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repository"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -120,5 +135,7 @@
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="Repository"/>
         <Interface InterfaceId="imtdb::ISqlDatabaseObjectDelegate" ComponentId="UserGroupDatabaseDelegate"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="UserGroupInfoProvider" ComponentId="UserGroupInfoProvider"/>
+    </ExportedComponents>
 </Acf>

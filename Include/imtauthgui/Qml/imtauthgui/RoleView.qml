@@ -72,13 +72,24 @@ DocumentBase {
         container.updateGui();
     }
 
+    Loading {
+        id: loading;
+
+        anchors.fill: parent;
+
+        visible: false;
+    }
+
     function updateGui(){
+        loading.visible = true;
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             if (loader.item){
                 loader.item.updateGui();
             }
         }
+
+        loading.visible = false;
     }
 
     function updateModel(){

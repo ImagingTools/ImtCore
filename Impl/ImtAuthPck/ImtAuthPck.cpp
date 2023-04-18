@@ -90,6 +90,11 @@ I_EXPORT_COMPONENT(
 			"Role Collection Adapter");
 
 I_EXPORT_COMPONENT(
+			UserCollectionAdapter,
+			"Adapting the collection to the provider",
+			"User Collection Adapter");
+
+I_EXPORT_COMPONENT(
 			CheckPermissions,
 			"Check permissions",
 			"Check Permissions");

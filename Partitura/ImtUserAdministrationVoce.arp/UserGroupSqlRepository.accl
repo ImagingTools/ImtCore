@@ -12,7 +12,8 @@
         <Element ComponentName="Repository" X="575" Y="550" Note=""/>
         <Element ComponentName="Types" X="575" Y="125" Note=""/>
         <Element ComponentName="UserGroupDatabaseDelegate" X="575" Y="325" Note=""/>
-        <Element ComponentName="UserGroupInfo" X="925" Y="325" Note=""/>
+        <Element ComponentName="UserGroupInfo" X="950" Y="325" Note=""/>
+        <Element ComponentName="UserGroupInfoProvider" X="925" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

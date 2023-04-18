@@ -755,6 +755,8 @@ Item {
 
         boundsBehavior: Flickable.StopAtBounds;
 
+        cacheBuffer: 10000;
+
         clip: true;
         Keys.onUpPressed: {
             tableContainer.tableSelection.up();

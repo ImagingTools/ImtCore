@@ -5,8 +5,6 @@ import imtgui 1.0
 DocumentBase {
     id: container;
 
-    anchors.fill: parent;
-
     saveIsBlocked: true;
 
     property string title: qsTr("User Groups");

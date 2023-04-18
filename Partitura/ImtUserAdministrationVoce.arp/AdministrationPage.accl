@@ -21,27 +21,29 @@
         <Element ComponentName="VisualStatus" X="425" Y="225" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="PagesPermissions">
-            <PositionMap>
-                <Element ComponentName="CommandPermissionsProviderJoiner" X="575" Y="200" Note=""/>
-                <Element ComponentName="RolesPermissions" X="250" Y="400" Note=""/>
-                <Element ComponentName="UsersPermissions" X="875" Y="400" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="Repositories">
-            <PositionMap>
-                <Element ComponentName="RoleRepository" X="600" Y="250" Note=""/>
-                <Element ComponentName="UserGroupSqlRepository" X="600" Y="575" Note=""/>
-                <Element ComponentName="UserSqlRepository" X="600" Y="425" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Pages">
             <PositionMap>
                 <Element ComponentName="RolesPage" X="875" Y="425" Note=""/>
                 <Element ComponentName="UserGroupsPage" X="500" Y="500" Note=""/>
                 <Element ComponentName="UsersPage" X="500" Y="325" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Repositories">
+            <PositionMap>
+                <Element ComponentName="Role" X="450" Y="225" Note=""/>
+                <Element ComponentName="RoleCollectionAdapter" X="550" Y="375" Note=""/>
+                <Element ComponentName="RoleDocumentSqlRepository" X="225" Y="225" Note=""/>
+                <Element ComponentName="UserGroupSqlRepository" X="875" Y="525" Note=""/>
+                <Element ComponentName="UserSqlRepository" X="875" Y="225" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="PagesPermissions">
+            <PositionMap>
+                <Element ComponentName="CommandPermissionsProviderJoiner" X="575" Y="200" Note=""/>
+                <Element ComponentName="RolesPermissions" X="250" Y="400" Note=""/>
+                <Element ComponentName="UsersPermissions" X="875" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

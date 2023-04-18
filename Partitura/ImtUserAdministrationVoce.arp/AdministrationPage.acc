@@ -63,8 +63,17 @@
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserGroupInfoProvider"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserGroupSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserCollectionAdapter"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserSqlRepository"/>
@@ -217,13 +226,19 @@
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RoleRepository">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
                                 <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="UserGroupRepository">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserProvider" Type="Reference" ExportId="UserProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
@@ -241,10 +256,10 @@
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RoleRepository">
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserRepository" Type="Reference" ExportId="UserRepository">
@@ -330,14 +345,51 @@
         <EmbeddedRegistry Id="Repositories">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="RoleRepository" PackageId="ImtUserAdministrationVoce" ComponentId="RoleRepository">
+                    <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
+                        <Data IsEnabled="true" Flags="2">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="ParentRoleProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RoleCollectionAdapter" PackageId="ImtAuthPck" ComponentId="RoleCollectionAdapter">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
+                                <AttributeInfo Id="RoleCollection" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleDocumentSqlRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="$IMTCORESEPARATOR$"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
+                    <Element Id="RoleDocumentSqlRepository" PackageId="ImtCoreVoce" ComponentId="JsonDocumentSqlRepository">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="DocumentFactories" Type="Factory[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>Role</Value>
+                                        </Values>
+                                    </Data>
+                                </AttributeInfo>
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="DocumentId"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TableName" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="Roles"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                                     <Data IsEnabled="false"/>
@@ -355,13 +407,16 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                    <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="UserSqlRepository"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserDatabaseSqlDelegate" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="UserSqlRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UserSqlRepository/UserCollectionAdapter"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                                     <Data IsEnabled="false"/>
@@ -378,14 +433,17 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
-                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
-                                    <Data IsEnabled="true" Value="RoleRepository/RoleCollectionAdapter"/>
+                                <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="RoleCollectionAdapter"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserGroupCollection" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserGroupDatabaseSqlDelegate" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="UserGroupSqlRepository"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                                    <Data IsEnabled="true" Value="UserGroupSqlRepository/UserGroupInfoProvider"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                                     <Data IsEnabled="false"/>
@@ -397,8 +455,10 @@
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces/>
                 <ExportedComponents>
-                    <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleRepository/RoleCollectionAdapter"/>
-                    <Component ExportedId="RoleRepository" ComponentId="RoleRepository"/>
+                    <Component ExportedId="RoleCollectionAdapter" ComponentId="RoleCollectionAdapter"/>
+                    <Component ExportedId="RoleRepository" ComponentId="RoleDocumentSqlRepository"/>
+                    <Component ExportedId="UserCollectionAdapter" ComponentId="UserSqlRepository/UserCollectionAdapter"/>
+                    <Component ExportedId="UserGroupInfoProvider" ComponentId="UserGroupSqlRepository/UserGroupInfoProvider"/>
                     <Component ExportedId="UserGroupSqlRepository" ComponentId="UserGroupSqlRepository"/>
                     <Component ExportedId="UserSqlRepository" ComponentId="UserSqlRepository"/>
                 </ExportedComponents>

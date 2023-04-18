@@ -24,6 +24,7 @@ public:
 		I_REGISTER_INTERFACE(IUserInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_roleProviderCompPtr, "RoleProvider", "Role provider", true, "RoleProvider");
+		I_ASSIGN(m_userGroupProviderCompPtr, "UserGroupProvider", "User group provider", true, "UserGroupProvider");
 		I_ASSIGN(m_adminIdAttrPtr, "AdminId", "Id for admin user", true, "admin");
 	I_END_COMPONENT;
 
@@ -36,6 +37,7 @@ protected:
 
 private:
 	I_REF(imtauth::IRoleInfoProvider, m_roleProviderCompPtr);
+	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupProviderCompPtr);
 	I_ATTR(QByteArray, m_adminIdAttrPtr);
 };
 

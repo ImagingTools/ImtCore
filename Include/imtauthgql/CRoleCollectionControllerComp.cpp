@@ -148,6 +148,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(const imtgql
 							rolesModelPtr->SetData("ProductId", roleProductId, roleIndex);
 							rolesModelPtr->SetData("Name", roleInfoPtr->GetRoleName(), roleIndex);
 							rolesModelPtr->SetData("Description", roleInfoPtr->GetRoleDescription(), roleIndex);
+							rolesModelPtr->SetData("ParentRoles", roleInfoPtr->GetIncludedRoles().join(';'), roleIndex);
 						}
 					}
 				}

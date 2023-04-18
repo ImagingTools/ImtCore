@@ -144,15 +144,15 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 				QByteArrayList groupIds = groups.split(';');
 				for (const QByteArray& parentGroupId : groupIds){
 					userGroupInfoPtr->AddParentGroup(parentGroupId);
-					imtbase::IObjectCollection::DataPtr dataPtr;
-					if (m_objectCollectionCompPtr->GetObjectData(parentGroupId, dataPtr)){
-						imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
-						if (userGroupInfoPtr != nullptr){
-							for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-								userGroupInfoPtr->AddRole(roleId);
-							}
-						}
-					}
+//					imtbase::IObjectCollection::DataPtr dataPtr;
+//					if (m_objectCollectionCompPtr->GetObjectData(parentGroupId, dataPtr)){
+//						imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+//						if (userGroupInfoPtr != nullptr){
+//							for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
+//								userGroupInfoPtr->AddRole(roleId);
+//							}
+//						}
+//					}
 				}
 			}
 		}

@@ -37,9 +37,9 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 		if (companyInfoPtr != nullptr){
 			QString accountName = companyInfoPtr->GetAccountName();
 			QString accountDescription = companyInfoPtr->GetAccountDescription();
-			QByteArray accountId = accountName.toUtf8();
 			QString mail = companyInfoPtr->GetMail();
 			QString companyName = companyInfoPtr->GetCompanyName();
+			QByteArrayList groups = companyInfoPtr->GetGroups();
 
 			const imtauth::CAddress address = companyInfoPtr->GetAddress();
 			QString country = address.GetCountry();
@@ -56,6 +56,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 			dataModel->SetData("City", city);
 			dataModel->SetData("PostalCode", postalCode);
 			dataModel->SetData("Street", street);
+			dataModel->SetData("Groups", groups.join(';'));
 		}
 	}
 
@@ -79,8 +80,12 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		istd::TDelPtr<imtauth::CCompanyInfo> companyInfoPtr = new imtauth::CCompanyInfo();
+		imtauth::ICompanyInfo* companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
+		if (companyInstancePtr == nullptr){
+			return nullptr;
+		}
 
+		imtauth::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtauth::CIdentifiableCompanyInfo*>(companyInstancePtr);
 		if (companyInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
 			return nullptr;
@@ -88,6 +93,19 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
+
+		if (itemModel.ContainsKey("Id")){
+			QByteArray id = itemModel.GetData("Id").toByteArray();
+			if (!id.isEmpty()){
+				objectId = id;
+			}
+		}
+
+		if (objectId.isEmpty()){
+			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+		}
+
+		companyInfoPtr->SetObjectUuid(objectId);
 
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
@@ -97,8 +115,6 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			errorMessage = QT_TR_NOOP("Account name can't be empty");
 			return nullptr;
 		}
-
-		objectId = name.toUtf8();
 
 		companyInfoPtr->SetAccountName(name);
 
@@ -144,10 +160,13 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			QByteArray groups = itemModel.GetData("Groups").toByteArray();
 			if (!groups.isEmpty()){
 				QByteArrayList groupIds = groups.split(';');
+				for (const QByteArray& groupId : groupIds){
+					companyInfoPtr->AddGroup(groupId);
+				}
 			}
 		}
 
-		return companyInfoPtr.PopPtr();
+		return companyInfoPtr;
 	}
 
 	errorMessage = QObject::tr("Can not create account: %1").arg(QString(objectId));

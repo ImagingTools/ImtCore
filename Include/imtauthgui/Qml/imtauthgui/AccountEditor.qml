@@ -16,8 +16,6 @@ DocumentBase {
         console.log("AccountEditor onDocumentModelChanged");
 
         groupsProvider.updateModel();
-
-        accountNameInput.focus = true;
     }
 
     Component {
@@ -35,6 +33,31 @@ DocumentBase {
 
         onModelStateChanged: {
             accountEditorContainer.updateGui();
+        }
+    }
+
+    CollectionDataProvider {
+        id: groupsProvider;
+
+        commandId: "Groups";
+
+        fields: ["Id", "Name"];
+
+        onModelUpdated: {
+            if (groupsProvider.collectionModel != null){
+                for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+                    groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
+                }
+
+                groupsTable.elements = groupsProvider.collectionModel;
+
+                accountEditorContainer.updateGui();
+                undoRedoManager.registerModel(accountEditorContainer.documentModel);
+
+                groupsProvider.collectionModel.modelChanged.connect(accountEditorContainer.updateModel);
+
+                accountNameInput.focus = true;
+            }
         }
     }
 
@@ -75,8 +98,8 @@ DocumentBase {
         }
 
         let groupIds = [];
-        if (accountEditorContainer.documentModel.ContainsKey("Roles")){
-            let groups = accountEditorContainer.documentModel.GetData("Roles")
+        if (accountEditorContainer.documentModel.ContainsKey("Groups")){
+            let groups = accountEditorContainer.documentModel.GetData("Groups")
             if (groups !== ""){
                 groupIds = groups.split(';');
             }
@@ -473,29 +496,6 @@ DocumentBase {
                     }
                 }// Company address block
             }//Company address block borders
-
-            CollectionDataProvider {
-                id: groupsProvider;
-
-                commandId: "Groups";
-
-                fields: ["Id", "Name"];
-
-                onModelUpdated: {
-                    if (groupsProvider.collectionModel != null){
-                        for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-                            groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
-                        }
-
-                        groupsTable.elements = groupsProvider.collectionModel;
-
-                        accountEditorContainer.updateGui();
-                        undoRedoManager.registerModel(accountEditorContainer.documentModel);
-
-                        groupsProvider.collectionModel.modelChanged.connect(accountEditorContainer.updateModel);
-                    }
-                }
-            }
 
             TreeItemModel {
                 id: headersModel;

@@ -110,6 +110,79 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 }
 
 
+bool CAccountCollectionControllerComp::SetupGqlItem(
+		const imtgql::CGqlRequest& gqlRequest,
+		imtbase::CTreeItemModel& model,
+		int itemIndex,
+		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+		QString& errorMessage) const
+{
+	if (objectCollectionIterator == nullptr){
+		return false;
+	}
+
+	bool retVal = true;
+	QByteArray collectionId = objectCollectionIterator->GetObjectId();
+	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
+
+	if (!informationIds.isEmpty()){
+		const imtauth::ICompanyInfo* companyInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr userDataPtr;
+		if (objectCollectionIterator->GetObjectData(userDataPtr)){
+			companyInfoPtr = dynamic_cast<const imtauth::ICompanyInfo*>(userDataPtr.GetPtr());
+		}
+
+		if (companyInfoPtr != nullptr){
+			idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
+
+			imtauth::CAddress address = companyInfoPtr->GetAddress();
+			for (QByteArray informationId : informationIds){
+				QVariant elementInformation;
+
+				if(informationId == "Id"){
+					elementInformation = QString(collectionId);
+				}
+				else if(informationId == "AccountName"){
+					elementInformation = companyInfoPtr->GetAccountName();
+				}
+				else if(informationId == "AccountDescription"){
+					elementInformation = companyInfoPtr->GetAccountDescription();
+				}
+				else if(informationId == "Mail"){
+					elementInformation = companyInfoPtr->GetMail();
+				}
+				else{
+					if (elementMetaInfo.IsValid()){
+						if (informationId == QByteArray("Added")){
+							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+						}
+						else if (informationId == QByteArray("LastModified")){
+							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
+									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+						}
+					}
+				}
+
+				if(elementInformation.isNull()){
+					elementInformation = GetObjectInformation(informationId, collectionId);
+				}
+				if (elementInformation.isNull()){
+					elementInformation = "";
+				}
+
+				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+			}
+
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+
 } // namespace imtlicgql
 
 

@@ -8,6 +8,7 @@
 #include <imod/CModelUpdateBridge.h>
 
 // ImtCore includes
+#include <imtbase/TIdentifiableWrap.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtauth/IAccountInfo.h>
 #include <imtauth/CContactInfo.h>
@@ -62,6 +63,9 @@ private:
 	imod::TModelWrap<CContactInfo> m_contact;
 	imod::CModelUpdateBridge m_contactUpdateBridge;
 };
+
+
+typedef imtbase::TIdentifiableWrap<CAccountInfo> CIdentifiableAccountInfo;
 
 
 } // namespace imtauth

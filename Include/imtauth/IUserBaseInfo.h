@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtauth/IRole.h>
 #include <imtauth/IRoleInfoProvider.h>
+#include <imtauth/IUserGroupInfoProvider.h>
 
 
 namespace imtauth
@@ -108,6 +109,11 @@ public:
 		Remove role from user.
 	*/
 	virtual bool RemoveRole(const QByteArray& userId) = 0;
+
+	/**
+		Get list of all availiable user groups.
+	*/
+	virtual const imtauth::IUserGroupInfoProvider* GetUserGroupProvider() const = 0;
 };
 
 

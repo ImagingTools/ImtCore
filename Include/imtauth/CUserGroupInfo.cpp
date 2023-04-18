@@ -17,7 +17,7 @@ namespace imtauth
 
 
 CUserGroupInfo::CUserGroupInfo():
-	m_userGroupInfoProviderPtr(nullptr)
+	m_userInfoProviderPtr(nullptr)
 {
 
 }
@@ -27,7 +27,18 @@ CUserGroupInfo::CUserGroupInfo():
 
 IUserGroupInfo::UserIds CUserGroupInfo::GetUsers() const
 {
-	return m_userIds;
+	QByteArrayList retVal = m_userIds;
+
+	if (m_userGroupInfoProviderPtr != nullptr){
+		for (const QByteArray& parentGroupId : m_parentGroupIds){
+			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr != nullptr){
+				retVal += parentGroupPtr->GetUsers();
+			}
+		}
+	}
+
+	return retVal;
 }
 
 
@@ -68,13 +79,23 @@ imtauth::IUserGroupInfo::GroupIds CUserGroupInfo::GetParentGroups() const
 }
 
 
-void CUserGroupInfo::AddParentGroup(const QByteArray& parentGroupId)
+bool CUserGroupInfo::AddParentGroup(const QByteArray& parentGroupId)
 {
-	if (!m_parentGroupIds.contains(parentGroupId)){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_parentGroupIds << parentGroupId;
+	if (m_id == parentGroupId){
+		return false;
 	}
+
+	QByteArrayList parentGroups = GetParentGroups(parentGroupId);
+
+	if (parentGroups.contains(m_id)){
+		return false;
+	}
+
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_parentGroupIds.append(parentGroupId);
+
+	return true;
 }
 
 
@@ -91,13 +112,43 @@ bool CUserGroupInfo::RemoveParentGroup(const QByteArray& parentGroupId)
 
 const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 {
-	return nullptr;
+	return m_userInfoProviderPtr;
 }
 
 
-const imtauth::IUserGroupInfoProvider* CUserGroupInfo::GetUserGroupProvider() const
+// reimplemented (IUserBaseInfo)
+
+imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles() const
 {
-	return m_userGroupInfoProviderPtr;
+	QByteArrayList retVal = m_roles;
+
+	if (m_userGroupInfoProviderPtr != nullptr){
+		for (const QByteArray& parentGroupId : m_parentGroupIds){
+			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr != nullptr){
+				retVal += parentGroupPtr->GetRoles();
+			}
+		}
+	}
+
+	return retVal;
+}
+
+
+IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions() const
+{
+	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions();
+
+	if (m_userGroupInfoProviderPtr != nullptr){
+		for (const QByteArray& parentGroupId : m_parentGroupIds){
+			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr != nullptr){
+				allPermissions += parentGroupPtr->GetPermissions();
+			}
+		}
+	}
+
+	return allPermissions;
 }
 
 
@@ -151,8 +202,41 @@ bool CUserGroupInfo::ResetData(CompatibilityMode mode)
 	m_userIds.clear();
 	m_parentGroupIds.clear();
 	m_userGroupInfoProviderPtr = nullptr;
+	m_userInfoProviderPtr = nullptr;
 
 	return true;
+}
+
+
+// protected methods
+
+QByteArrayList CUserGroupInfo::GetParentGroups(const QByteArray& groupId) const
+{
+	QByteArrayList retVal;
+	if (m_userGroupInfoProviderPtr != nullptr){
+		const istd::TDelPtr<IUserGroupInfo> groupPtr(const_cast<IUserGroupInfo*>(m_userGroupInfoProviderPtr->GetUserGroup(groupId)));
+		if (groupPtr != nullptr){
+			GetParentGroupList(*groupPtr, retVal);
+		}
+	}
+
+	return retVal;
+}
+
+
+void CUserGroupInfo::GetParentGroupList(const IUserGroupInfo& userGroupInfo, QByteArrayList& groupList) const
+{
+	QByteArrayList parentGroups = userGroupInfo.GetParentGroups();
+
+	groupList += parentGroups;
+	if (m_userGroupInfoProviderPtr != nullptr){
+		for (const QByteArray& groupId : parentGroups){
+			const istd::TDelPtr<IUserGroupInfo> groupPtr(const_cast<IUserGroupInfo*>(m_userGroupInfoProviderPtr->GetUserGroup(groupId)));
+			if (groupPtr != nullptr){
+				GetParentGroupList(*groupPtr, groupList);
+			}
+		}
+	}
 }
 
 

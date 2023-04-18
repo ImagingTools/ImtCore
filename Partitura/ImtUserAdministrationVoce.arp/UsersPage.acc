@@ -106,6 +106,9 @@
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -164,9 +167,8 @@
                     <AttributeInfo Id="HeadersIds" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserId</Value>
                                 <Value>Name</Value>
-                                <Value>Email</Value>
+                                <Value>Mail</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -176,7 +178,6 @@
                     <AttributeInfo Id="HeadersNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>Username</Value>
                                 <Value>Name</Value>
                                 <Value>Email</Value>
                             </Values>
@@ -188,9 +189,8 @@
                     <AttributeInfo Id="SearchByFilterIds" Type="String[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserId</Value>
                                 <Value>Name</Value>
-                                <Value>Email</Value>
+                                <Value>Mail</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

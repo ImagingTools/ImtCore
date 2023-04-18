@@ -16,6 +16,10 @@ void CUserInfoComp::OnComponentCreated()
 	if (m_roleProviderCompPtr.IsValid()){
 		m_roleProviderPtr = m_roleProviderCompPtr.GetPtr();
 	}
+
+	if (m_userGroupProviderCompPtr.IsValid()){
+		m_userGroupInfoProviderPtr = m_userGroupProviderCompPtr.GetPtr();
+	}
 }
 
 

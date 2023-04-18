@@ -52,7 +52,7 @@ public:
 	/**
 		Add parent group to this group.
 	*/
-	virtual void AddParentGroup(const QByteArray& parentGroupId) = 0;
+	virtual bool AddParentGroup(const QByteArray& parentGroupId) = 0;
 
 	/**
 		Remove parent group from this group.
@@ -63,11 +63,6 @@ public:
 		Get list of all availiable users.
 	*/
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const = 0;
-
-	/**
-		Get list of all availiable user groups.
-	*/
-	virtual const imtauth::IUserGroupInfoProvider* GetUserGroupProvider() const = 0;
 };
 
 

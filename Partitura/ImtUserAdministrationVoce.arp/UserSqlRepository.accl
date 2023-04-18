@@ -11,6 +11,7 @@
         <Element ComponentName="JsonSerializer" X="175" Y="350" Note=""/>
         <Element ComponentName="Repository" X="550" Y="550" Note=""/>
         <Element ComponentName="Types" X="550" Y="125" Note=""/>
+        <Element ComponentName="UserCollectionAdapter" X="200" Y="550" Note=""/>
         <Element ComponentName="UserDatabaseDelegate" X="550" Y="350" Note=""/>
         <Element ComponentName="UserInfo" X="875" Y="350" Note=""/>
     </PositionMap>

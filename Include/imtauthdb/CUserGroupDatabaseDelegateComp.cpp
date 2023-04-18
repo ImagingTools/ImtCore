@@ -19,34 +19,6 @@ namespace imtauthdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-istd::IChangeable* CUserGroupDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
-{
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	if (!m_documentFactoriesCompPtr.IsValid()){
-		return nullptr;
-	}
-
-	istd::TDelPtr<istd::IChangeable> documentPtr;
-	documentPtr.SetPtr(new imtauth::CIdentifiableUserGroupInfo());
-	if (!documentPtr.IsValid()){
-		return nullptr;
-	}
-
-	if (record.contains(*m_documentContentColumnIdAttrPtr)){
-		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
-
-		if (ReadDataFromMemory("UserGroupInfo", documentContent, *documentPtr)){
-			return documentPtr.PopPtr();
-		}
-	}
-
-	return nullptr;
-}
-
-
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::CreateNewObjectQuery(
 		const QByteArray& /*typeId*/,
 		const QByteArray& proposedObjectId,
@@ -63,7 +35,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 
 	if (workingDocumentPtr.IsValid()){
 		QByteArray documentContent;
-		if (WriteDataToMemory("UserGroupInfo", *workingDocumentPtr, documentContent)){
+		if (WriteDataToMemory("DocumentInfo", *workingDocumentPtr, documentContent)){
 			const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(workingDocumentPtr.GetPtr());
 			Q_ASSERT(groupInfoPtr != nullptr);
 			if (groupInfoPtr == nullptr){
@@ -83,10 +55,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 					if (userInfoPtr != nullptr){
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
-
-							for (const QByteArray& roleId : groupRoleIds){
-								userInfoPtr->AddRole(roleId);
-							}
+//							for (const QByteArray& roleId : groupRoleIds){
+//								userInfoPtr->AddRole(roleId);
+//							}
 
 							retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
 						}
@@ -129,7 +100,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray retVal;
 	QByteArray documentContent;
-	if (WriteDataToMemory("UserGroupInfo", object, documentContent)){
+	if (WriteDataToMemory("DocumentInfo", object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 		const imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(&object);
 		Q_ASSERT(groupInfoPtr != nullptr);
@@ -166,9 +137,9 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
 
-							for (const QByteArray& roleId : groupRoleIds){
-								userInfoPtr->AddRole(roleId);
-							}
+//							for (const QByteArray& roleId : groupRoleIds){
+//								userInfoPtr->AddRole(roleId);
+//							}
 
 							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
 						}
@@ -183,9 +154,9 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (userInfoPtr != nullptr){
 						bool result = userInfoPtr->RemoveFromGroup(objectId);
 						if (result){
-							for (const QByteArray& roleId : groupRoleIds){
-								userInfoPtr->RemoveRole(roleId);
-							}
+//							for (const QByteArray& roleId : groupRoleIds){
+//								userInfoPtr->RemoveRole(roleId);
+//							}
 
 							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
 						}

@@ -31,9 +31,9 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		const imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<const imtauth::CIdentifiableUserInfo*>(dataPtr.GetPtr());
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
-			QByteArray objectUuid = userInfoPtr->GetObjectUuid();
+			QByteArray objectUuid = userId;
 			QByteArray username = userInfoPtr->GetId();
 			QString name = userInfoPtr->GetName();
 			QByteArray passwordHash = userInfoPtr->GetPasswordHash();

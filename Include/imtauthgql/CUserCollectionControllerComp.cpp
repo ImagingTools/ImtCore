@@ -139,7 +139,7 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 					else if(informationId == "Description"){
 						elementInformation = userInfoPtr->GetDescription();
 					}
-					else if(informationId == "Email"){
+					else if(informationId == "Mail"){
 						elementInformation = userInfoPtr->GetMail();
 					}
 					else{

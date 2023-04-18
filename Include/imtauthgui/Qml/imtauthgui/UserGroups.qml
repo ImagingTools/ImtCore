@@ -107,12 +107,12 @@ Item {
                         userRoleIds.push(selectedRoleIds[j])
                     }
                 }
-                userGroupsContainer.documentModel.SetData("Roles", userRoleIds.join(';'));
+               // userGroupsContainer.documentModel.SetData("Roles", userRoleIds.join(';'));
             }
         }
 
         if (ok){
-            userGroupsContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
+           // userGroupsContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
         }
 
         userGroupsContainer.undoRedoManager.endChanges();

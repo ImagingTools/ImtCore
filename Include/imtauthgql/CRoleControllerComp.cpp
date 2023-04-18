@@ -34,13 +34,13 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<const imtauth::CIdentifiableRoleInfo*>(dataPtr.GetPtr());
+		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
 			return nullptr;
 		}
 
-		QByteArray objectUuid = roleInfoPtr->GetObjectUuid();
+		QByteArray objectUuid = objectId;
 		QByteArray roleId = roleInfoPtr->GetRoleId();
 		QString roleName = roleInfoPtr->GetRoleName();
 		QByteArray productId = roleInfoPtr->GetProductId();
@@ -81,7 +81,12 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
-		istd::TDelPtr<imtauth::CIdentifiableRoleInfo> roleInfoPtr = new imtauth::CIdentifiableRoleInfo();
+		imtauth::IRole* roleInstancePtr = m_roleFactCompPtr.CreateInstance();
+		if (roleInstancePtr == nullptr){
+			return nullptr;
+		}
+
+		imtauth::CIdentifiableRoleInfo* roleInfoPtr = dynamic_cast<imtauth::CIdentifiableRoleInfo*>(roleInstancePtr);
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role!");
 			return nullptr;
@@ -142,7 +147,7 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 			if (!parentRoles.isEmpty()){
 				QByteArrayList parentRoleIds = parentRoles.split(';');
 				for (const QByteArray& parentRoleId : parentRoleIds){
-					if (!roleInfoPtr->IncludeRole(parentRoleId)){
+					if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
 						errorMessage = QT_TR_NOOP(QString("Unable include role %1 to the role %2. Check the dependencies between them.")
 												  .arg(qPrintable(parentRoleId))
 												  .arg(qPrintable(roleId)));
@@ -161,7 +166,7 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 			}
 		}
 
-		return roleInfoPtr.PopPtr();
+		return roleInfoPtr;
 	}
 
 	return nullptr;

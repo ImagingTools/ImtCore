@@ -35,6 +35,7 @@ public:
 	virtual void SetRoles(const RoleIds &roles) override;
 	virtual void AddRole(const QByteArray& roleId) override;
 	virtual bool RemoveRole(const QByteArray& userId) override;
+	virtual const imtauth::IUserGroupInfoProvider* GetUserGroupProvider() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -48,6 +49,7 @@ public:
 protected:
 	const imtlic::IFeatureInfoProvider* m_permissionProviderPtr;
 	const imtauth::IRoleInfoProvider* m_roleProviderPtr;
+	const imtauth::IUserGroupInfoProvider* m_userGroupInfoProviderPtr;
 
 protected:
 	IUserBaseInfo::FeatureIds m_permissions;

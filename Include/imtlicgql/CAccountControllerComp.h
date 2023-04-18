@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtguigql/CObjectCollectionControllerCompBase.h>
-#include <imtauth/IAccountBaseInfo.h>
+#include <imtauth/ICompanyInfo.h>
 
 
 namespace imtlicgql
@@ -25,7 +25,7 @@ protected:
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const override;
 
 private:
-	I_FACT(imtauth::IAccountBaseInfo, m_accountInfoFactCompPtr);
+	I_FACT(imtauth::ICompanyInfo, m_accountInfoFactCompPtr);
 };
 
 

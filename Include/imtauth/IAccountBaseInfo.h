@@ -46,6 +46,21 @@ public:
 	virtual void SetAddress(const CAddress& address) = 0;
 	virtual QString GetMail() const = 0;
 	virtual void SetMail(const QString& mail) = 0;
+
+	/**
+		Get groups.
+	*/
+	virtual QByteArrayList GetGroups() const = 0;
+
+	/**
+		Add group to this group.
+	*/
+	virtual bool AddGroup(const QByteArray& groupId) = 0;
+
+	/**
+		Remove group from this group.
+	*/
+	virtual bool RemoveGroup(const QByteArray& groupId) = 0;
 };
 
 

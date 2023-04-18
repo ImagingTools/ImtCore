@@ -28,6 +28,7 @@
 #include <imtauth/CCheckPermissionOrComp.h>
 #include <imtauth/CUserSettingsComp.h>
 #include <imtauth/CUserGroupInfoProviderComp.h>
+#include <imtauth/CUserCollectionAdapterComp.h>
 
 
 namespace ImtAuthPck
@@ -52,7 +53,7 @@ typedef icomp::TModelCompWrap<
 						istd::IChangeable>> AccountInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
-						imtauth::CCompanyInfo,
+						imtauth::CIdentifiableCompanyInfo,
 						imtauth::IAccountBaseInfo,
 						imtauth::ICompanyInfo,
 						iser::IObject,
@@ -74,6 +75,7 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable>> UserCollection;
 typedef imtauth::CUserInfoMetaInfoCreatorComp UserInfoMetaInfoCreator;
 typedef imtauth::CRoleCollectionAdapterComp RoleCollectionAdapter;
+typedef imtauth::CUserCollectionAdapterComp UserCollectionAdapter;
 typedef imtauth::CCheckPermissionCompBase CheckPermissions;
 typedef imtauth::CFeaturePackageRepresentationControllerComp FeaturePackageRepresentationController;
 typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvider;

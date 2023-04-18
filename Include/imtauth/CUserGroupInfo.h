@@ -24,10 +24,13 @@ public:
 	virtual void AddUser(const QByteArray& userId) override;
 	virtual bool RemoveUser(const QByteArray& userId) override;
 	virtual GroupIds GetParentGroups() const override;
-	virtual void AddParentGroup(const QByteArray& parentGroupId) override;
+	virtual bool AddParentGroup(const QByteArray& parentGroupId) override;
 	virtual bool RemoveParentGroup(const QByteArray& parentGroupId) override;
 	virtual const imtauth::IUserInfoProvider* GetUserProvider() const override;
-	virtual const imtauth::IUserGroupInfoProvider* GetUserGroupProvider() const override;
+
+	// reimplemented (IUserBaseInfo)
+	virtual RoleIds GetRoles() const override;
+	virtual FeatureIds GetPermissions() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -38,9 +41,13 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
+	QByteArrayList GetParentGroups(const QByteArray& groupId) const;
+	void GetParentGroupList(const IUserGroupInfo& userGroupInfo, QByteArrayList& groupList) const;
+
+protected:
 	IUserGroupInfo::UserIds m_userIds;
 	IUserGroupInfo::GroupIds m_parentGroupIds;
-	imtauth::IUserGroupInfoProvider* m_userGroupInfoProviderPtr;
+	imtauth::IUserInfoProvider* m_userInfoProviderPtr;
 };
 
 

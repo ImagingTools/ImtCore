@@ -46,16 +46,25 @@
                     <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserInfo</Value>
+                                <Value>DocumentInfo</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>UserInfo</Value>
+                                <Value>DocumentInfo</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserCollectionAdapter" PackageId="ImtAuthPck" ComponentId="UserCollectionAdapter">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repository"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -116,6 +125,9 @@
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -131,6 +143,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="Repository"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="UserCollectionAdapter" ComponentId="UserCollectionAdapter"/>
         <Component ExportedId="UserInfo" ComponentId="UserInfo"/>
         <Component ExportedId="UserRepository" ComponentId="Repository"/>
     </ExportedComponents>

@@ -25,10 +25,10 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
 
 	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
-		imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = nullptr;
+		imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
 		imtbase::IObjectCollection::DataPtr groupDataPtr;
 		if (objectCollectionIterator->GetObjectData(groupDataPtr)){
-			userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(groupDataPtr.GetPtr());
+			userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
 		}
 
 		if (userGroupInfoPtr != nullptr){
@@ -41,8 +41,7 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 					elementInformation = m_objectCollectionCompPtr->GetObjectTypeId(collectionId);
 				}
 				else if(informationId == "Id"){
-					QByteArray objectUuid = userGroupInfoPtr->GetObjectUuid();
-					elementInformation = objectUuid;
+					elementInformation = collectionId;
 				}
 				else if(informationId == "Name"){
 					elementInformation = userGroupInfoPtr->GetName();

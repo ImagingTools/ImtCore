@@ -23,6 +23,36 @@ Item {
         rolesProvider.updateModel();
     }
 
+    function getAllParentRoleIds(roleId, rolesModel, retVal){
+        for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+            let id = rolesModel.GetData("Id", i);
+            if (id === roleId){
+                let parentRoles = rolesModel.GetData("ParentRoles", i);
+                let parentRolesIds = parentRoles.split(';');
+                for (let j = 0; j < parentRolesIds.length; j++){
+                    retVal.push(parentRolesIds[j])
+                    roleEditorContainer.getAllParentRoleIds(parentRolesIds[j], rolesModel, retVal);
+                }
+            }
+        }
+    }
+
+    function getAllChildrenRoleIds(roleId, rolesModel, retVal){
+        for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+            let id = rolesModel.GetData("Id", i);
+
+            let parentRoles = rolesModel.GetData("ParentRoles", i);
+            if (parentRoles !== ""){
+                let parentRolesIds = parentRoles.split(';');
+                if (parentRolesIds.includes(roleId)){
+                    retVal.push(id);
+
+                    roleEditorContainer.getAllChildrenRoleIds(id, rolesModel, retVal);
+                }
+            }
+        }
+    }
+
     CollectionDataProvider {
         id: rolesProvider;
 
@@ -36,10 +66,43 @@ Item {
         onModelUpdated: {
             if (rolesProvider.collectionModel != null){
                 if (rolesProvider.collectionModel.ContainsKey("Roles")){
+                    let documentId = roleEditorContainer.documentModel.GetData("Id");
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles")
 
+                    // Get all children ID-s
+                    let childrenIds = []
+                    roleEditorContainer.getAllChildrenRoleIds(documentId, rolesModel, childrenIds);
+
+                    // Get all parent ID-s
+                    let parentIds = []
+                    if (roleEditorContainer.documentModel.ContainsKey("ParentRoles")){
+                        let parentRoles = roleEditorContainer.documentModel.GetData("ParentRoles")
+                        let parentRolesIds = parentRoles.split(';')
+                        for (let j = 0; j < parentRolesIds.length; j++){
+                            roleEditorContainer.getAllParentRoleIds(parentRolesIds[j], rolesModel, parentIds);
+                        }
+                    }
+
+                    console.log("childrenIds", childrenIds);
+                    console.log("parentIds", parentIds);
+
+                    // Indexes for deleting
+                    let removedIndexes = []
                     for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+                        let id = rolesModel.GetData("Id", i);
                         rolesModel.SetData("CheckedState", Qt.Unchecked, i);
+
+                        if (id === documentId || childrenIds.includes(id) || parentIds.includes(id)){
+                            removedIndexes.push(i);
+                        }
+                    }
+
+                    console.log("removedIndexes", removedIndexes);
+
+                    let removedCount = 0
+                    for (let i = 0; i < removedIndexes.length; i++){
+                        rolesModel.RemoveItem(removedIndexes[i] - removedCount);
+                        removedCount++;
                     }
 
                     parentRolesTable.elements = rolesModel;
@@ -141,237 +204,227 @@ Item {
         roleEditorContainer.undoRedoManager.endChanges();
     }
 
-    Flickable {
-        anchors.fill: parent;
-        anchors.leftMargin: 0;
+    Item{
+        id: columnContainer;
 
-        contentWidth: columnContainer.width + columnContainer.anchors.leftMargin;
-        contentHeight: columnContainer.height + columnContainer.anchors.topMargin;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
 
-        boundsBehavior: Flickable.StopAtBounds;
+        width: roleEditorContainer.panelWidth;
+        height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
 
-        clip: true;
-
-        Item{
-            id: columnContainer;
+        Loader{
+            id: mainPanelFrameLoader;
+            anchors.fill: parent;
+            sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+        }
+        Column {
+            id: bodyColumn;
 
             anchors.top: parent.top;
             anchors.left: parent.left;
-            anchors.leftMargin: 2;
-            anchors.topMargin: 2;
+            anchors.topMargin: roleEditorContainer.mainMargin;
+            anchors.leftMargin: roleEditorContainer.mainMargin;
 
-            width: roleEditorContainer.panelWidth;
-            height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
-            Loader{
-                id: mainPanelFrameLoader;
-                anchors.fill: parent;
-                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+            width: roleEditorContainer.panelWidth - 2*anchors.leftMargin;
+
+            spacing: 10;
+
+            Text {
+                id: titleRoleName;
+
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+
+                text: qsTr("Role Name");
+
+                Loader{
+                    id: titleDecoratorLoader1;
+
+                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(titleDecoratorLoader1.item){
+                            titleDecoratorLoader1.item.rootItem = titleRoleName;
+                        }
+                    }
+                }
             }
-            Column {
-                id: bodyColumn;
 
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.topMargin: roleEditorContainer.mainMargin;
-                anchors.leftMargin: roleEditorContainer.mainMargin;
+            CustomTextField {
+                id: roleNameInput;
 
-                width: roleEditorContainer.panelWidth - 2*anchors.leftMargin;
+                width: parent.width;
+                height: 30;
 
-                spacing: 10;
+                placeHolderText: qsTr("Enter the role name");
 
-
-                Text {
-                    id: titleRoleName;
-
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-
-                    text: qsTr("Role Name");
-
-                    Loader{
-                        id: titleDecoratorLoader1;
-
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader1.item){
-                                titleDecoratorLoader1.item.rootItem = titleRoleName;
-                            }
-                        }
+                onEditingFinished: {
+                    console.log("roleNameInput onEditingFinished");
+                    let oldText = roleEditorContainer.documentModel.GetData("Name");
+                    if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
+                        roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
+                        roleEditorContainer.updateModel();
                     }
                 }
 
-                CustomTextField {
-                    id: roleNameInput;
+                KeyNavigation.tab: roleIdInput;
 
-                    width: parent.width;
-                    height: 30;
+                Loader{
+                    id: inputDecoratorLoader1;
 
-                    placeHolderText: qsTr("Enter the role name");
-
-                    onEditingFinished: {
-                        console.log("roleNameInput onEditingFinished");
-                        let oldText = roleEditorContainer.documentModel.GetData("Name");
-                        if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
-                            roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
-                            roleEditorContainer.updateModel();
-                        }
-                    }
-
-                    KeyNavigation.tab: roleIdInput;
-
-                    Loader{
-                        id: inputDecoratorLoader1;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader1.item){
-                                inputDecoratorLoader1.item.rootItem = roleNameInput;
-                            }
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader1.item){
+                            inputDecoratorLoader1.item.rootItem = roleNameInput;
                         }
                     }
                 }
+            }
 
-                Text {
-                    id: titleRoleId;
+            Text {
+                id: titleRoleId;
 
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
 
-                    text: qsTr("Role-ID");
+                text: qsTr("Role-ID");
 
-                    Loader{
-                        id: titleDecoratorLoader2;
+                Loader{
+                    id: titleDecoratorLoader2;
 
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader2.item){
-                                titleDecoratorLoader2.item.rootItem = titleRoleId;
-                            }
+                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(titleDecoratorLoader2.item){
+                            titleDecoratorLoader2.item.rootItem = titleRoleId;
                         }
                     }
                 }
+            }
 
-                CustomTextField {
-                    id: roleIdInput;
+            CustomTextField {
+                id: roleIdInput;
 
-                    width: parent.width;
-                    height: 30;
-                    readOnly: true;
+                width: parent.width;
+                height: 30;
+                readOnly: true;
 
-                    KeyNavigation.tab: descriptionInput;
+                KeyNavigation.tab: descriptionInput;
 
-                    Loader{
-                        id: inputDecoratorLoader2;
+                Loader{
+                    id: inputDecoratorLoader2;
 
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader2.item){
-                                inputDecoratorLoader2.item.rootItem = roleIdInput;
-                            }
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader2.item){
+                            inputDecoratorLoader2.item.rootItem = roleIdInput;
                         }
                     }
                 }
+            }
 
-                Text {
-                    id: titleDescription;
+            Text {
+                id: titleDescription;
 
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
 
-                    text: qsTr("Description");
+                text: qsTr("Description");
 
-                    Loader{
-                        id: titleDecoratorLoader3;
+                Loader{
+                    id: titleDecoratorLoader3;
 
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader3.item){
-                                titleDecoratorLoader3.item.rootItem = titleDescription;
-                            }
+                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(titleDecoratorLoader3.item){
+                            titleDecoratorLoader3.item.rootItem = titleDescription;
                         }
                     }
                 }
+            }
 
-                CustomTextField {
-                    id: descriptionInput;
+            CustomTextField {
+                id: descriptionInput;
 
-                    width: parent.width;
-                    height: 30;
+                width: parent.width;
+                height: 30;
 
-                    placeHolderText: qsTr("Enter the description");
+                placeHolderText: qsTr("Enter the description");
 
-                    onEditingFinished: {
-                        let oldText = roleEditorContainer.documentModel.GetData("Description");
-                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
-                            roleEditorContainer.updateModel();
-                        }
-                    }
-
-                    KeyNavigation.tab: roleNameInput;
-
-                    Loader{
-                        id: inputDecoratorLoader3;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader3.item){
-                                inputDecoratorLoader3.item.rootItem = descriptionInput;
-                            }
-                        }
+                onEditingFinished: {
+                    let oldText = roleEditorContainer.documentModel.GetData("Description");
+                    if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
+                        roleEditorContainer.updateModel();
                     }
                 }
 
-                Text {
-                    id: titleIncludes;
+                KeyNavigation.tab: roleNameInput;
 
-                    color: Style.textColor;
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
+                Loader{
+                    id: inputDecoratorLoader3;
 
-                    text: qsTr("Parent Roles");
-
-                    Loader{
-                        id: titleDecoratorLoader4;
-
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader4.item){
-                                titleDecoratorLoader4.item.rootItem = titleIncludes;
-                            }
+                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+                    onLoaded: {
+                        if(inputDecoratorLoader3.item){
+                            inputDecoratorLoader3.item.rootItem = descriptionInput;
                         }
                     }
                 }
+            }
+        }//Column bodyColumn
+    }
 
-                TreeItemModel {
-                    id: rolesHeadersModel;
+    TreeItemModel {
+        id: rolesHeadersModel;
 
-                    Component.onCompleted: {
-                        let index = rolesHeadersModel.InsertNewItem();
+        Component.onCompleted: {
+            let index = rolesHeadersModel.InsertNewItem();
 
-                        rolesHeadersModel.SetData("Id", "Name");
-                        rolesHeadersModel.SetData("Name", "Role Name");
+            rolesHeadersModel.SetData("Id", "Name");
+            rolesHeadersModel.SetData("Name", "Role Name");
 
-                        parentRolesTable.headers = rolesHeadersModel;
-                    }
-                }
-
-                AuxTable {
-                    id: parentRolesTable;
-
-                    width: parent.width;
-                    height: 300;
-
-                    elements: TreeItemModel {}
-
-                    checkable: true;
-
-                    radius: 0;
-                }
-            }//Column bodyColumn
+            parentRolesTable.headers = rolesHeadersModel;
         }
-    }//Flickable
+    }
 
+    Text {
+        id: titleIncludes;
+
+        anchors.top: columnContainer.bottom;
+        anchors.topMargin: 10;
+
+        color: Style.textColor;
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_common;
+
+        text: qsTr("Parent Roles");
+
+        Loader{
+            id: titleDecoratorLoader4;
+
+            sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
+            onLoaded: {
+                if(titleDecoratorLoader4.item){
+                    titleDecoratorLoader4.item.rootItem = titleIncludes;
+                }
+            }
+        }
+    }
+
+    AuxTable {
+        id: parentRolesTable;
+
+        anchors.top: titleIncludes.bottom;
+        anchors.topMargin: 10;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+
+        width: 400;
+
+        elements: TreeItemModel {}
+        checkable: true;
+        radius: 0;
+    }
 }//Container

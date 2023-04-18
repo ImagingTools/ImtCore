@@ -80,6 +80,40 @@ bool CUserInfo::RemoveFromGroup(const QByteArray& groupId)
 }
 
 
+IUserBaseInfo::RoleIds CUserInfo::GetRoles() const
+{
+	QByteArrayList retVal = m_roles;
+
+	if (m_userGroupInfoProviderPtr != nullptr){
+		for (const QByteArray& parentGroupId : m_groupIds){
+			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr != nullptr){
+				retVal += parentGroupPtr->GetRoles();
+			}
+		}
+	}
+
+	return m_roles;
+}
+
+
+IUserBaseInfo::FeatureIds CUserInfo::GetPermissions() const
+{
+	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions();
+
+	if (m_userGroupInfoProviderPtr != nullptr){
+		for (const QByteArray& parentGroupId : m_groupIds){
+			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr != nullptr){
+				allPermissions += parentGroupPtr->GetPermissions();
+			}
+		}
+	}
+
+	return allPermissions;
+}
+
+
 bool CUserInfo::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);

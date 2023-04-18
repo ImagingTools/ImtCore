@@ -5,6 +5,7 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtauth
@@ -86,6 +87,38 @@ void CCompanyInfo::SetMail(const QString &mail)
 	}
 }
 
+
+QByteArrayList CCompanyInfo::GetGroups() const
+{
+	return m_groupIds;
+}
+
+
+bool CCompanyInfo::AddGroup(const QByteArray& groupId)
+{
+	if (!m_groupIds.contains(groupId)){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_groupIds << groupId;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CCompanyInfo::RemoveGroup(const QByteArray& groupId)
+{
+	bool result = m_groupIds.removeOne(groupId);
+	if (result){
+		istd::CChangeNotifier changeNotifier(this);
+	}
+
+	return result;
+}
+
+
 void CCompanyInfo::SetCompanyName(const QString &companyName)
 {
 	if (m_companyName != companyName){
@@ -129,7 +162,54 @@ bool CCompanyInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_companyName);
 	retVal = retVal && archive.EndTag(companyNameTag);
 
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_groupIds, "Groups", "Group");
+
 	return retVal;
+}
+
+
+bool CCompanyInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/)
+{
+	const CCompanyInfo* sourcePtr = dynamic_cast<const CCompanyInfo*>(&object);
+	if (sourcePtr != nullptr){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_accountName = sourcePtr->m_accountName;
+		m_accountDescription = sourcePtr->m_accountDescription;
+		m_address = sourcePtr->m_address;
+		m_mail = sourcePtr->m_mail;
+		m_companyName = sourcePtr->m_companyName;
+		m_groupIds = sourcePtr->m_groupIds;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+istd::IChangeable *CCompanyInfo::CloneMe(CompatibilityMode mode) const
+{
+	istd::TDelPtr<CCompanyInfo> clonePtr(new CCompanyInfo);
+	if (clonePtr->CopyFrom(*this, mode)){
+		return clonePtr.PopPtr();
+	}
+
+	return nullptr;
+}
+
+
+bool CCompanyInfo::ResetData(CompatibilityMode mode)
+{
+	istd::CChangeNotifier changeNotifier(this);
+
+	m_accountName.clear();
+	m_accountDescription.clear();
+	m_mail.clear();
+	m_companyName.clear();
+	m_groupIds.clear();
+
+	return true;
 }
 
 

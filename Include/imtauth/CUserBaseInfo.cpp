@@ -22,7 +22,9 @@ namespace imtauth
 // public methods
 
 CUserBaseInfo::CUserBaseInfo():
-	m_roles(QByteArrayList())
+	m_permissionProviderPtr(nullptr),
+	m_roleProviderPtr(nullptr),
+	m_userGroupInfoProviderPtr(nullptr)
 {
 
 }
@@ -176,6 +178,12 @@ bool CUserBaseInfo::RemoveRole(const QByteArray& userId)
 }
 
 
+const imtauth::IUserGroupInfoProvider* CUserBaseInfo::GetUserGroupProvider() const
+{
+	return m_userGroupInfoProviderPtr;
+}
+
+
 bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 {
 	bool retVal = true;
@@ -222,6 +230,7 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 		m_restrictions = sourcePtr->m_restrictions;
 		m_roles = sourcePtr->m_roles;
 		m_roleProviderPtr = sourcePtr->m_roleProviderPtr;
+		m_userGroupInfoProviderPtr = sourcePtr->m_userGroupInfoProviderPtr;
 
 		return true;
 	}
@@ -252,6 +261,7 @@ bool CUserBaseInfo::ResetData(CompatibilityMode mode)
 	m_roles.clear();
 	m_roleProviderPtr = nullptr;
 	m_permissionProviderPtr = nullptr;
+	m_userGroupInfoProviderPtr = nullptr;
 
 	return true;
 }
