@@ -36,6 +36,8 @@ Item {
     property alias renameGqlModel: renameQuery;
     property alias setDescriptionGqlModel: setDescriptionQuery;
 
+    property alias setDescriptionDialogComp : setDescriptionDialog;
+
     signal selectionChanged();
 
     property string removeDialogTitle: qsTr("Deleting a selected element");
@@ -141,6 +143,28 @@ Item {
         containerBase.collectionViewBase.selectItem("", "<new item>");
     }
 
+    function onRename(){
+        let indexes = containerBase.tableData.getSelectedIndexes();
+        if (indexes.length > 0){
+            let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
+            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+        }
+    }
+
+    function onSetDescription(){
+        let elements = containerBase.tableData.elements;
+
+        let indexes = containerBase.tableData.getSelectedIndexes();
+        if (indexes.length > 0){
+            let selectedDescription = "";
+            if (elements.ContainsKey("Description", indexes[0])){
+                selectedDescription = elements.GetData("Description", indexes[0]);
+            }
+
+            modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
+        }
+    }
+
     function commandHandle(commandId){
         console.log("CollectionView commandHandle", commandId);
         if (containerBase.commandsProvider == null){
@@ -163,24 +187,10 @@ Item {
         let editIsEnabled = containerBase.commandsProvider.commandIsEnabled("Edit");
         if (editIsEnabled){
             if (commandId === "Rename"){
-                let indexes = containerBase.tableData.getSelectedIndexes();
-                if (indexes.length > 0){
-                    let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
-                    modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
-                }
+                containerBase.onRename();
             }
             else if (commandId === "SetDescription"){
-                let elements = containerBase.tableData.elements;
-
-                let indexes = containerBase.tableData.getSelectedIndexes();
-                if (indexes.length > 0){
-                    let selectedDescription = "";
-                    if (elements.ContainsKey("Description", indexes[0])){
-                        selectedDescription = elements.GetData("Description", indexes[0]);
-                    }
-
-                    modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
-                }
+                containerBase.onSetDescription();
             }
         }
 

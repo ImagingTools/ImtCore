@@ -51,8 +51,14 @@
                     <AttributeInfo Id="FeatureInfoProvider" Type="Reference" ExportId="FeatureInfoProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ProductProvider" Type="Reference" ExportId="ProductProvider">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/RoleCollectionAdapter"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/RoleCollectionAdapter"/>
@@ -66,11 +72,17 @@
                     <AttributeInfo Id="UserCollection" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserSqlRepository"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserGroupInfoProvider"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserGroupInfoProvider"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserGroupSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserInfoProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Repositories/UserCollectionAdapter"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Repositories/UserCollectionAdapter"/>
@@ -127,6 +139,9 @@
         <Element Id="Repositories" PackageId="" ComponentId="Repositories">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="DatabaseEngine">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -223,6 +238,9 @@
                                 <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="RoleInfoProvider" Type="Reference" ExportId="RoleInfoProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="RoleProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
@@ -232,10 +250,16 @@
                                 <AttributeInfo Id="UserCollection" Type="Reference" ExportId="UserCollection">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
+                                <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
                                 <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserGroupRepository" Type="Reference" ExportId="UserGroupRepository">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserInfoProvider" Type="Reference" ExportId="UserInfoProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserProvider" Type="Reference" ExportId="UserProvider">
@@ -257,6 +281,9 @@
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="UserGroupInfoProvider" Type="Reference" ExportId="UserGroupInfoProvider">
                                     <Data IsEnabled="false"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="UserGroupProvider">

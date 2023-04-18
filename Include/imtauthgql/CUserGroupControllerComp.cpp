@@ -103,11 +103,8 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 
 		userGroupInfoPtr->SetObjectUuid(objectId);
 
-		userGroupInfoPtr->SetId(objectId);
-
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();
-			userGroupInfoPtr->SetName(name);
 		}
 
 		if (name.isEmpty()){
@@ -115,6 +112,27 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 
 			return nullptr;
 		}
+
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+				imtauth::IUserGroupInfo* currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+				if (currentUserGroupInfoPtr != nullptr){
+					if (collectionId != objectId){
+						QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
+						if (currentUserGroupName == name){
+							errorMessage = QT_TR_NOOP("Group name already exists");
+							return nullptr;
+						}
+					}
+				}
+			}
+		}
+
+		userGroupInfoPtr->SetName(name);
+
+		userGroupInfoPtr->SetId(objectId);
 
 		if (itemModel.ContainsKey("Description")){
 			QString description = itemModel.GetData("Description").toString();
@@ -144,15 +162,6 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 				QByteArrayList groupIds = groups.split(';');
 				for (const QByteArray& parentGroupId : groupIds){
 					userGroupInfoPtr->AddParentGroup(parentGroupId);
-//					imtbase::IObjectCollection::DataPtr dataPtr;
-//					if (m_objectCollectionCompPtr->GetObjectData(parentGroupId, dataPtr)){
-//						imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
-//						if (userGroupInfoPtr != nullptr){
-//							for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-//								userGroupInfoPtr->AddRole(roleId);
-//							}
-//						}
-//					}
 				}
 			}
 		}

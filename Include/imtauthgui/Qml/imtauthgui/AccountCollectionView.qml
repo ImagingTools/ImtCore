@@ -5,7 +5,6 @@ CollectionView {
     id: container;
 
     Component.onCompleted: {
-        container.commandUpdateGui = "AccountCollectionUpdateGui";
         container.commandsDelegatePath = "../../imtauthgui/AccountCollectionViewCommandsDelegate.qml";
     }
 }

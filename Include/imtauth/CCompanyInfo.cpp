@@ -142,7 +142,7 @@ bool CCompanyInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_accountName);
 	retVal = retVal && archive.EndTag(accountNameTag);
 
-	static iser::CArchiveTag accountDescriptionTag("AccountDescription", "Account description", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag accountDescriptionTag("Description", "Account description", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(accountDescriptionTag);
 	retVal = retVal && archive.Process(m_accountDescription);
 	retVal = retVal && archive.EndTag(accountDescriptionTag);

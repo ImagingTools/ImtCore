@@ -145,7 +145,7 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 				else if(informationId == "AccountName"){
 					elementInformation = companyInfoPtr->GetAccountName();
 				}
-				else if(informationId == "AccountDescription"){
+				else if(informationId == "Description"){
 					elementInformation = companyInfoPtr->GetAccountDescription();
 				}
 				else if(informationId == "Mail"){

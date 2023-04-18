@@ -103,9 +103,26 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 				return nullptr;
 			}
-
-			userInfoPtr->SetId(username);
 		}
+
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+				imtauth::IUserInfo* currentUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+				if (currentUserInfoPtr != nullptr){
+					if (collectionId != objectId){
+						QByteArray currentUsername = currentUserInfoPtr->GetId();
+						if (currentUsername == username){
+							errorMessage = QT_TR_NOOP("Username already exists");
+							return nullptr;
+						}
+					}
+				}
+			}
+		}
+
+		userInfoPtr->SetId(username);
 
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();

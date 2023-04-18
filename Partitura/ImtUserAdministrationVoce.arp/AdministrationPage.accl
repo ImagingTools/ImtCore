@@ -21,14 +21,6 @@
         <Element ComponentName="VisualStatus" X="425" Y="225" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="Pages">
-            <PositionMap>
-                <Element ComponentName="RolesPage" X="875" Y="425" Note=""/>
-                <Element ComponentName="UserGroupsPage" X="500" Y="500" Note=""/>
-                <Element ComponentName="UsersPage" X="500" Y="325" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="Role" X="450" Y="225" Note=""/>
@@ -36,6 +28,14 @@
                 <Element ComponentName="RoleDocumentSqlRepository" X="225" Y="225" Note=""/>
                 <Element ComponentName="UserGroupSqlRepository" X="875" Y="525" Note=""/>
                 <Element ComponentName="UserSqlRepository" X="875" Y="225" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="Pages">
+            <PositionMap>
+                <Element ComponentName="RolesPage" X="875" Y="425" Note=""/>
+                <Element ComponentName="UserGroupsPage" X="500" Y="500" Note=""/>
+                <Element ComponentName="UsersPage" X="500" Y="325" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

@@ -16,6 +16,7 @@ public:
 
 	I_BEGIN_COMPONENT(CUserCollectionControllerComp);
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider", true, "RoleInfoProvider");
+		I_ASSIGN(m_userGroupInfoProviderCompPtr, "UserGroupInfoProvider", "User group info provider", true, "UserGroupInfoProvider");
 	I_END_COMPONENT;
 
 protected:
@@ -31,6 +32,7 @@ protected:
 
 protected:
 	I_REF(imtauth::IRoleInfoProvider, m_roleInfoProviderCompPtr);
+	I_REF(imtauth::IUserGroupInfoProvider, m_userGroupInfoProviderCompPtr);
 };
 
 

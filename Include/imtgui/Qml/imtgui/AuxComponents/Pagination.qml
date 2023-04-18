@@ -4,7 +4,7 @@ import Acf 1.0;
 Row {
     id: paginationContainer;
 
-    height: 20;
+    height: visible ? 20 : 0;
     spacing: 10;
 
     property int pagesSize: 1;

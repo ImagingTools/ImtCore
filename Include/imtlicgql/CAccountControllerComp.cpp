@@ -116,6 +116,23 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			return nullptr;
 		}
 
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+				imtauth::IAccountBaseInfo* accountInfoPtr = dynamic_cast<imtauth::IAccountBaseInfo*>(dataPtr.GetPtr());
+				if (accountInfoPtr != nullptr){
+					if (collectionId != objectId){
+						QString currentName = accountInfoPtr->GetAccountName();
+						if (currentName == name){
+							errorMessage = QT_TR_NOOP("Account Name already exists");
+							return nullptr;
+						}
+					}
+				}
+			}
+		}
+
 		companyInfoPtr->SetAccountName(name);
 
 		if (itemModel.ContainsKey("Description")){

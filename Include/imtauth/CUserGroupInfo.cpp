@@ -33,7 +33,11 @@ IUserGroupInfo::UserIds CUserGroupInfo::GetUsers() const
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
 			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr != nullptr){
-				retVal += parentGroupPtr->GetUsers();
+				for (const QByteArray& userId : parentGroupPtr->GetUsers()){
+					if (!retVal.contains(userId)){
+						retVal << userId;
+					}
+				}
 			}
 		}
 	}
@@ -126,7 +130,11 @@ imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles() const
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
 			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr != nullptr){
-				retVal += parentGroupPtr->GetRoles();
+				for (const QByteArray& roleId : parentGroupPtr->GetRoles()){
+					if (!retVal.contains(roleId)){
+						retVal << roleId;
+					}
+				}
 			}
 		}
 	}
