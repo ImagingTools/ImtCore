@@ -125,6 +125,18 @@ Rectangle {
     }
 
 
+    function getMaxString(){
+        var max = "";
+        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            var str = buttonPanel.buttonModel.GetData("Name",i);
+            if(str.length > max.length){
+                max = str;
+            }
+
+        }
+        return max;
+    }
+
     PauseAnimation {
         id: widthPause;
 
