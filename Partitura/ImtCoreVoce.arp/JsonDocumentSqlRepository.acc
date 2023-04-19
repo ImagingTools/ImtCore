@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5063" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -62,6 +62,9 @@
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="IsMultiType" Type="Boolean" ExportId="IsMultiType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -72,10 +75,10 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectIdColumn" Type="Id" ExportId="ObjectIdColumn">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="DocumentId"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeIdColumn" Type="Id" ExportId="ObjectTypeIdColumn">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="TypeId"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypes" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Types"/>
@@ -98,7 +101,7 @@
         <Element Id="Types" PackageId="BasePck" ComponentId="SelectionConstraints">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="TypeIds">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentInfo</Value>

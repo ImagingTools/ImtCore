@@ -19,6 +19,7 @@ public:
 	typedef imtdb::CSqlDatabaseDocumentDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CSqlJsonDatabaseDelegateComp)
+		I_ASSIGN(m_isMultiTypeAttrPtr, "IsMultiType", "Is document multitype supported", true, false);
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -55,6 +56,9 @@ public:
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
+
+protected:
+	I_ATTR(bool, m_isMultiTypeAttrPtr);
 };
 
 
