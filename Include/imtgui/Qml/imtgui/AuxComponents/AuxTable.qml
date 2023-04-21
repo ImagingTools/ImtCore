@@ -31,6 +31,7 @@ Item {
     property alias elements: elementsListObj.model;
     property alias elementsList: elementsListObj;
     property alias cacheBuffer: elementsListObj.cacheBuffer;
+    property alias contentHeight: elementsListObj.contentHeight;
 
     property alias headerDelegate: headersList.delegate;
     property real headerElementWidth: (headersList.width)/headersList.count;
@@ -583,7 +584,7 @@ Item {
                                                                               Style.fontSize_common * deleg.scale;
 
 
-                        font.family: Style.fontFamilyBold;
+                        font.family: Style.fontFamily;
 
                         font.bold: tableContainer.emptyDecorHeader ? true :
                                                                      tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
