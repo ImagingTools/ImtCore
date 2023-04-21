@@ -18,6 +18,10 @@ Item {
     property alias tableItemHeight: tableInternal.itemHeight;
     property alias tableDecoratorPath: loaderTableDecorator.source;
     property alias tableDecoratorComp: loaderTableDecorator.sourceComponent;
+    property alias tableCellDecorator: tableInternal.cellDecorator;
+    property alias tableWidthDecorator: tableInternal.widthDecorator;
+    property alias tableWidth: tableInternal.width;
+    property alias tableHeaders: tableInternal.headers;
 
     property string itemId;
     property var table: tableInternal;

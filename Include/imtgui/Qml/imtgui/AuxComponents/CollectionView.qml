@@ -31,6 +31,11 @@ Item {
     property alias tableHeaderHeight: collectionViewBase.tableHeaderHeight;
     property alias tableItemHeight: collectionViewBase.tableItemHeight;
     property alias metaInfo: collectionMetaInfo;
+    property alias tableCellDecorator: collectionViewBase.tableCellDecorator;
+    property alias tableWidthDecorator: collectionViewBase.tableWidthDecorator;
+    property alias tableWidth: collectionViewBase.tableWidth;
+    property alias tableHeaders: collectionViewBase.tableHeaders;
+
 
     property alias filterMenu: collectionViewBase.filterMenu;
     property alias filterMenuVisible: collectionViewBase.filterMenuVisible;
