@@ -27,6 +27,7 @@ Item {
     property alias elementsList: collectionViewBase.elementsList;
     property alias tableMinWidth: collectionViewBase.tableMinWidth;
     property alias tableDecoratorPath: collectionViewBase.tableDecoratorPath;
+    property alias tableDecoratorComp: collectionViewBase.tableDecoratorComp;
     property alias tableHeaderHeight: collectionViewBase.tableHeaderHeight;
     property alias tableItemHeight: collectionViewBase.tableItemHeight;
     property alias metaInfo: collectionMetaInfo;

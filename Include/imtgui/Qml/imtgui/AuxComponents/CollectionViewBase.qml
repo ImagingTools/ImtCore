@@ -17,6 +17,7 @@ Item {
     property alias tableHeaderHeight: tableInternal.headerHeight;
     property alias tableItemHeight: tableInternal.itemHeight;
     property alias tableDecoratorPath: loaderTableDecorator.source;
+    property alias tableDecoratorComp: loaderTableDecorator.sourceComponent;
 
     property string itemId;
     property var table: tableInternal;
@@ -122,7 +123,10 @@ Item {
                             cellWidth.InsertNewItem();
                             headers.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("Headers"));
                             cells.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("Cells"));
-                            cellWidth.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("CellWidth"));
+                            //cellWidth.CopyItemDataFromModel(i,tableDecorator.GetTreeItemModel("CellWidth"));
+                            var widthVal = tableDecorator.GetTreeItemModel("CellWidth").IsValidData("Width",i) ? tableDecorator.GetTreeItemModel("CellWidth").GetData("Width",i) : -1;
+                            cellWidth.SetData("Width", widthVal,i);
+
                         }
 
                         tableInternal.tableDecorator = tableDecoratorModel;
