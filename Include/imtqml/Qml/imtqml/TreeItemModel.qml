@@ -92,7 +92,7 @@ JSONListModel {
     }
 
     function IsValidData(key, row){
-        return this.GetData(key, row) ? true : false
+        return this.GetData(key, row) !==null ? true : false
     }
 
     function SetExternTreeModel(key, value, row){
