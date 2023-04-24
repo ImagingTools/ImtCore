@@ -5,6 +5,8 @@ import imtgui 1.0
 Item {
     id: collectionViewBaseContainer;
 
+
+
     property alias commands: baseCommands;
 
     property string commandsId;
@@ -34,6 +36,7 @@ Item {
     property alias modelFilter: modelFilterObj;
     property alias pagination: paginationObj;
 
+
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
     signal elementsChanged();
@@ -50,6 +53,7 @@ Item {
         console.log("CollectionViewBase onCompleted");
 
         tableInternal.focus = true;
+
     }
 
     onCommandsIdChanged: {

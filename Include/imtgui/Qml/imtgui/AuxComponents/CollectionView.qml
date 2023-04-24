@@ -6,6 +6,7 @@ import imtlicgui 1.0
 Item {
     id: collectionViewContainer;
 
+
     property int contentMargins: 0;
 
     property alias baseCollectionView: collectionViewBase;
@@ -22,6 +23,7 @@ Item {
     property string commandUpdateGui;
     property alias commandsDelegate: commandsLoader.item;
 
+    property alias table: collectionViewBase.table;
     property alias tableElementsDelegate: collectionViewBase.tableElementsDelegate;
     property alias tableHeadersDelegate: collectionViewBase.tableHeadersDelegate;
     property alias elementsList: collectionViewBase.elementsList;
@@ -258,6 +260,7 @@ Item {
         commandsId: parent.commandsId;
         loadData: true;
         hasFilter: collectionViewContainer.hasFilter;
+
 
         onSelectionChanged: {
             if (collectionMetaInfo.visible){
