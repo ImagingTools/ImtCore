@@ -1,7 +1,7 @@
 import QtQuick 2.0
 
 JSONListModel {
-    id: container;
+    id: treeItemModelContainer;
 
     property var infoPath: [];
     property string baseUrl;
@@ -213,7 +213,7 @@ JSONListModel {
 
     //Parse from the extern json to the intern model
     function CreateFromJson(jsonString){
-        container.clear();
+        treeItemModelContainer.clear();
         this.json = jsonString;
 
         this.updateJSONModel()
