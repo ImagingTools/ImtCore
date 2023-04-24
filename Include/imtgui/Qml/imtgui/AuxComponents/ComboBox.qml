@@ -41,6 +41,9 @@ FocusScope {
     property alias titleTxt: cbTitleTxt;
     property alias titleTxtColor: cbTitleTxt.color;
 
+    property string placeHolderText: "";
+
+
     property real contentY;
 
     // ID for display in combo box delegates
@@ -190,7 +193,7 @@ FocusScope {
             anchors.verticalCenter: parent.verticalCenter;
 
             color: comboBoxContainer.fontColorTitle;
-            text: comboBoxContainer.currentText;
+            text: comboBoxContainer.currentText !== "" ? comboBoxContainer.currentText : comboBoxContainer.placeHolderText;
             font.family: Style.fontFamily;
             font.pixelSize: comboBoxContainer.textSize;
         }
