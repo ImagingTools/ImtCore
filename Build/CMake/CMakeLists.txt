@@ -60,7 +60,7 @@ add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
 
-if(NOT DEFINED USE_MONGODB OR USE_MONGODB)
+if(DEFINED USE_MONGODB AND USE_MONGODB)
 	add_subdirectory("${INCLUDE_DIR}/imtmongo/CMake" "${AUX_INCLUDE_DIR}/imtmongo")
 endif()
 
@@ -159,7 +159,7 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
 	add_dependencies(ImtAuthGqlPck imtauthgql)
 
-	if(NOT DEFINED USE_MONGODB OR USE_MONGODB)
+        if(DEFINED USE_MONGODB AND USE_MONGODB)
 		add_subdirectory("${IMPL_DIR}/ImtMongoPck/CMake" "${AUX_INCLUDE_DIR}/ImtMongoPck")
 		add_dependencies(ImtMongoPck imtmongo)
 	endif()
