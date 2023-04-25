@@ -92,7 +92,7 @@ Item {
                         let id = rolesModel.GetData("Id", i);
                         rolesModel.SetData("CheckedState", Qt.Unchecked, i);
 
-                        if (id === documentId || childrenIds.includes(id) || parentIds.includes(id)){
+                        if (id === documentId || childrenIds.includes(id)){
                             removedIndexes.push(i);
                         }
                     }

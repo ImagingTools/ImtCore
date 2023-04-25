@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
-#include <imtauth/IUserInfo.h>
 
 
 namespace imtauthdb
@@ -32,6 +31,9 @@ public:
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
 				bool useExternDelegate = true) const override;
+	virtual QByteArray CreateDeleteObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId) const override;
 
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userGroupDatabaseDelegateCompPtr);

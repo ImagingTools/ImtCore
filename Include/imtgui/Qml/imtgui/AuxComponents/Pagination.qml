@@ -21,9 +21,9 @@ Row {
     }
 
     onPagesSizeChanged: {
-        console.log("ProductCollectionViewCommands onSelectedIndexChanged");
+        console.log("Pagination onPagesSizeChanged", pagesSize);
         if (paginationContainer.currentIndex > paginationContainer.pagesSize - 1){
-            paginationContainer.currentIndex--;
+            paginationContainer.currentIndex = 0;
         }
 
         paginationContainer.refreshBtn();
@@ -107,7 +107,7 @@ Row {
                     height: 2;
 
                     color: Style.tabSelectedColor;
-                    visible: paginationContainer.pagesSize < 10 ? model.index == paginationContainer.currentIndex : model.selected;
+                    visible: paginationContainer.pagesSize < 10 ? model.index === paginationContainer.currentIndex : model.selected;
                 }
             }
         }

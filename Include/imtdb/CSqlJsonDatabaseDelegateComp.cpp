@@ -12,10 +12,6 @@ namespace imtdb
 {
 
 
-static const QByteArray s_documentIdColumn = "DocumentId";
-static const QByteArray s_idColumn = "Id";
-
-
 // public methods
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -30,6 +26,8 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(const QByteArray& obj
 	}
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
+
+	qDebug() << "selectionQuery" << selectionQuery;
 
 	return selectionQuery;
 }
@@ -90,7 +88,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 
 	if (workingDocumentPtr.IsValid()){
 		QByteArray documentContent;
-		if (WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
+		if (WriteDataToMemory("DocumentInfo", *workingDocumentPtr, documentContent)){
+			qDebug() << "documentContent " << documentContent;
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
@@ -169,7 +168,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
 			.arg(qPrintable(*m_tableNameAttrPtr))
-			.arg(description)
+			.arg(SqlEncode(description))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))
 			.arg(qPrintable(objectId)).toLocal8Bit();
@@ -180,14 +179,18 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
-	QString filterQuery;
-	if (paramsPtr != nullptr){
-		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
-			return QByteArray();
-		}
-	}
+//	QString filterQuery;
+//	if (paramsPtr != nullptr){
+//		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+//			return QByteArray();
+//		}
+//	}
 
-	return QString("SELECT COUNT(*) FROM \"%1\" WHERE \"IsActive\" = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
+	QString baseQuery = GetSelectionQuery(QByteArray(), 0, -1, paramsPtr);
+
+//	return  QString("SELECT COUNT(*) FROM \"%1\" WHERE \"IsActive\" = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
+
+	return QString("SELECT COUNT(*) FROM (%1) as t").arg(baseQuery).toLocal8Bit();
 }
 
 

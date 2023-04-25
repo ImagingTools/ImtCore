@@ -17,8 +17,8 @@ Item {
 
     property string commandsId;
 
-    property TreeItemModel headers;
-    property TreeItemModel items;
+    property TreeItemModel headers: TreeItemModel {};
+    property TreeItemModel items: TreeItemModel {};
 
     property TreeItemModel notificationModel: null;
 
@@ -143,10 +143,6 @@ Item {
 
             console.log("gqlData", gqlData);
 
-//            if (gqlModelBaseContainer.loading){
-//                gqlModelBaseContainer.loading.visible = true;
-//            }
-
             this.SetGqlQuery(gqlData);
         }
 
@@ -167,19 +163,18 @@ Item {
                             gqlModelBaseContainer.notificationModel = dataModelLocal.GetData("notification");
                         }
 
-                        if (dataModelLocal.ContainsKey("items")){
-//                            if (gqlModelBaseContainer.loading){
-//                                gqlModelBaseContainer.loading.visible = false;
-//                            }
+                        if (!dataModelLocal.ContainsKey("items")){
+                            dataModelLocal.AddTreeModel("items")
+                        }
 
+                        if (dataModelLocal.ContainsKey("items")){
                             if (!gqlModelBaseContainer.table){
                                 return;
                             }
 
                             let indexes = gqlModelBaseContainer.table.getSelectedIndexes();
-
                             gqlModelBaseContainer.table.resetSelection();
-
+                            gqlModelBaseContainer.items.Clear();
                             gqlModelBaseContainer.items = dataModelLocal.GetData("items");
 
                             if (indexes.length === 1){

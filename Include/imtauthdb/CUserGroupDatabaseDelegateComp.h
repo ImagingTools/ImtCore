@@ -2,8 +2,6 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
-#include <imtauth/CUserGroupInfo.h>
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 
 

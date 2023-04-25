@@ -1,11 +1,7 @@
 #pragma once
 
 
-// ACF includes
-#include <ifile/IFilePersistence.h>
-
 // ImtCore includes
-#include <imtdb/IMetaInfoTableDelegate.h>
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
 
 

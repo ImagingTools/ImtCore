@@ -2,13 +2,11 @@
 
 
 // ACF includes
-#include <imod/TModelWrap.h>
 #include <istd/CCrcCalculator.h>
 #include <istd/TOptDelPtr.h>
 
 // ImtCore includes
-#include <imtauth/CUserInfo.h>
-#include <imtauth/CUserInfoMetaInfo.h>
+#include <imtauth/IUserInfo.h>
 
 
 namespace imtauthdb
@@ -49,10 +47,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 				if (userGroupInfoPtr != nullptr){
 					userGroupInfoPtr->AddUser(objectId);
-
-//					for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-//						userInfoPtr->AddRole(roleId);
-//					}
 
 					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
 				}
@@ -130,11 +124,6 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userGroupInfoPtr != nullptr){
 					if (!userGroupInfoPtr->GetUsers().contains(objectId)){
 						userGroupInfoPtr->AddUser(objectId);
-
-//						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-//							userInfoPtr->AddRole(roleId);
-//						}
-
 						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
 					}
 				}
@@ -148,10 +137,6 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userGroupInfoPtr != nullptr){
 					bool result = userGroupInfoPtr->RemoveUser(objectId);
 					if (result){
-//						for (const QByteArray& roleId : userGroupInfoPtr->GetRoles()){
-//							userInfoPtr->RemoveRole(roleId);
-//						}
-
 						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
 					}
 				}
@@ -169,6 +154,30 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(checksum).toLocal8Bit();
 	}
+
+	return retVal;
+}
+
+
+QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId) const
+{
+	const imtauth::IUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr objectPtr;
+	if (collection.GetObjectData(objectId, objectPtr)){
+		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(objectPtr.GetPtr());
+	}
+
+	if (userInfoPtr == nullptr){
+		return QByteArray();
+	}
+
+	if (userInfoPtr->IsAdmin()){
+		return QByteArray();
+	}
+
+	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(*m_objectIdColumnAttrPtr)).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }

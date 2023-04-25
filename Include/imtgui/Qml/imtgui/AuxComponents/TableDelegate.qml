@@ -260,7 +260,6 @@ Rectangle {
         visible: tableDelegateContainer.selected;
     }
 
-
     CheckBox {
         id: checkBox;
 
@@ -276,13 +275,6 @@ Rectangle {
 
         onClicked: {
             model.CheckedState = Qt.Checked - model.CheckedState;
-
-//            if (tableDelegateContainer.tableItem.itemIsChecked(model.index)){
-
-//            }
-//            else{
-//                tableDelegateContainer.tableItem.setCheckedItem(model.index);
-//            }
         }
     }
 

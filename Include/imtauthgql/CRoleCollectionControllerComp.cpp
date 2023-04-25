@@ -68,10 +68,10 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 		QByteArrayList parentRolesIds = roleInfoPtr->GetIncludedRoles();
 
 		for (const QByteArray& parentRoleId : parentRolesIds){
-			QByteArray objectId = parentRoleId + *m_separatorObjectIdAttrPtr + roleProductId;
+//			QByteArray objectId = parentRoleId + *m_separatorObjectIdAttrPtr + roleProductId;
 
 			imtbase::IObjectCollection::DataPtr parentDataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(objectId, parentDataPtr)){
+			if (m_objectCollectionCompPtr->GetObjectData(parentRoleId, parentDataPtr)){
 				const imtauth::IRole* parentRoleInfoPtr = dynamic_cast<const imtauth::IRole*>(parentDataPtr.GetPtr());
 				if (parentRoleInfoPtr != nullptr){
 					QString parentRoleName = parentRoleInfoPtr->GetRoleName();

@@ -25,7 +25,7 @@ FocusScope {
     property int rowItemHeight: 30;
     property int headerHeight: 35;
 
-    property var rowModel: ListModel {};
+    property ListModel rowModel: ListModel {};
     property var columnModel: ListModel {};
 
     property ModelIndex selectedIndex: null;
@@ -203,6 +203,19 @@ FocusScope {
         }
     }
 
+    CustomScrollbar {
+        id: scrollbar;
+
+        z: 100;
+
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+
+        secondSize: 10;
+        targetItem: listView;
+    }
+
+
     function addRow(row){
         return insertRow(rowModel.count, row);
     }
@@ -214,23 +227,6 @@ FocusScope {
     function insertColumn(index, column){
         columnModel.insert(index, column);
     }
-
-    //    function insertColumn(index, column){
-
-    //        /*let index = */columnModel.InsertNewItem();
-
-    //        for (let key in column){
-    //            columnModel.SetData(key, column[key], index);
-    //        }
-    //    }
-
-    //    function insertRow(index, row){
-    //        rowModel.InsertNewItem();
-
-    //        for (let key in row){
-    //            rowModel.SetData(key, row[key], index);
-    //        }
-    //    }
 
     function insertRow(index, row){
         row["Level"] = 0;

@@ -129,29 +129,36 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			userInfoPtr->SetName(name);
 		}
 
+		QByteArray password;
 		if (itemModel.ContainsKey("Password")){
-			QByteArray password = itemModel.GetData("Password").toByteArray();
-
-			bool calculate = true;
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-				const imtauth::IUserInfo* currentuserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-				if (currentuserInfoPtr != nullptr){
-					QByteArray currentPasswordHash = currentuserInfoPtr->GetPasswordHash();
-					if (currentPasswordHash == password){
-						calculate = false;
-					}
-				}
-			}
-
-			if (calculate){
-				if (m_hashCalculatorCompPtr.IsValid()){
-					password = m_hashCalculatorCompPtr->GenerateHash(username + password);
-				}
-			}
-
-			userInfoPtr->SetPasswordHash(password);
+			password = itemModel.GetData("Password").toByteArray();
 		}
+
+		if (password.isEmpty()){
+			errorMessage = QT_TR_NOOP("Password cannot be empty");
+
+			return nullptr;
+		}
+
+		bool calculate = true;
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+			const imtauth::IUserInfo* currentuserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+			if (currentuserInfoPtr != nullptr){
+				QByteArray currentPasswordHash = currentuserInfoPtr->GetPasswordHash();
+				if (currentPasswordHash == password){
+					calculate = false;
+				}
+			}
+		}
+
+		if (calculate){
+			if (m_hashCalculatorCompPtr.IsValid()){
+				password = m_hashCalculatorCompPtr->GenerateHash(username + password);
+			}
+		}
+
+		userInfoPtr->SetPasswordHash(password);
 
 		if (itemModel.ContainsKey("Email")){
 			QString mail = itemModel.GetData("Email").toString();

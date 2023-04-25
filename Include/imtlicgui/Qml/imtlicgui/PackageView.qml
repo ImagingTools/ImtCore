@@ -26,16 +26,14 @@ DocumentBase {
         console.log("PackageView onCompleted");
         packageViewContainer.updateTreeViewModel();
 
-        featuresProvider.modelChanged.connect(packageViewContainer.updateTreeViewModel);
+//        featuresProvider.modelChanged.connect(packageViewContainer.updateTreeViewModel);
 
         commandsDelegate.tableTreeViewEditor = tableView;
     }
 
     Component.onDestruction: {
-        featuresProvider.modelChanged.disconnect(packageViewContainer.updateTreeViewModel);
+//        featuresProvider.modelChanged.disconnect(packageViewContainer.updateTreeViewModel);
     }
-
-
 
     onDocumentModelChanged: {
         console.log("packageview onDocumentModelChanged");
@@ -74,12 +72,22 @@ DocumentBase {
         }
     }
 
+    TreeItemModelConverter {
+        id: converter;
+    }
+
     //Обновить модель для TreeView
     function updateTreeViewModel(){
-        let treeViewModelJson = featuresProvider.model.toJSON();
+        console.log("updateTreeViewModel", featuresProvider.model);
+//        let treeViewModelJson = featuresProvider.model.toJSON();
 
-        console.log("treeViewModelJson", treeViewModelJson);
-        packageViewContainer.treeViewModel.CreateFromJson(treeViewModelJson);
+//        console.log("treeViewModelJson", treeViewModelJson);
+//        packageViewContainer.treeViewModel.CreateFromJson(treeViewModelJson);
+        let listModel = converter.convertToListModel(featuresProvider.model);
+
+        treeView.rowModel = listModel;
+
+        console.log("treeView.rowModel", JSON.stringify(featuresProvider.model));
     }
 
     //Синхронизация фич в package и treeView
@@ -87,18 +95,41 @@ DocumentBase {
         console.log("syncronise");
         let items = packageViewContainer.documentModel.GetData("Items");
 
+        let itemsListModel = converter.convertToListModel(items);
+
+        let dataList = treeView.getItemsDataAsList();
+
         let packageIndex = -1;
-        for (let i = 0; i < packageViewContainer.treeViewModel.GetItemsCount(); i++){
-            let id = packageViewContainer.treeViewModel.GetData("Id", i);
-            if (packageViewContainer.itemId == id){
+        for (let i = 0; i < treeView.rowModel.count; i++){
+            let id =  treeView.rowModel.get(i).Id;
+            if (packageViewContainer.itemId === id){
                 packageIndex = i;
                 break;
             }
         }
 
         if (packageIndex >= 0){
-            packageViewContainer.treeViewModel.SetData("ChildModel", items, packageIndex);
+            treeView.rowModel.remove(packageIndex);
+            let rowObj = {"Name": packageViewContainer.itemName,
+                        "Id": packageViewContainer.itemId,
+                        "ChildModel": itemsListModel};
+            treeView.rowModel.insert(packageIndex, rowObj)
         }
+
+//        let items = packageViewContainer.documentModel.GetData("Items");
+
+//        let packageIndex = -1;
+//        for (let i = 0; i < packageViewContainer.treeViewModel.GetItemsCount(); i++){
+//            let id = packageViewContainer.treeViewModel.GetData("Id", i);
+//            if (packageViewContainer.itemId == id){
+//                packageIndex = i;
+//                break;
+//            }
+//        }
+
+//        if (packageIndex >= 0){
+//            packageViewContainer.treeViewModel.SetData("ChildModel", items, packageIndex);
+//        }
     }
 
     function updateGui(){
@@ -250,6 +281,19 @@ DocumentBase {
         targetItem: tableView.tableListView;
     }
 
+    function isPackage(itemId){
+        if (featuresProvider && featuresProvider.model){
+            for (let i = 0; i < featuresProvider.model.GetItemsCount(); i++){
+                let packageId = featuresProvider.model.GetData("Id", i);
+                if (packageId === itemId){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     BasicTreeView {
         id: tableView;
 
@@ -348,6 +392,71 @@ DocumentBase {
         }
 
         function updateTreeViewGui(){
+            console.log("updateTreeViewGui");
+            if (tableView.selectedIndex == null){
+                return;
+            }
+
+            let selectedId = tableView.selectedIndex.itemData.Id;
+
+            //Список всех зависящих фич для selectedId
+            let childrenFeatureList = [];
+            rightPanel.findChildrenFeatureDependencies(selectedId, childrenFeatureList);
+
+            //Список всех зависящих фич от selectedId
+            let inactiveElements = [];
+            rightPanel.findParentFeatureDependencies(selectedId, inactiveElements);
+
+            //Запрещаем зависимость от всех родителей
+            let parentIds = getAllParents(tableView.selectedIndex);
+            inactiveElements = inactiveElements.concat(parentIds)
+
+            for (let i = 0; i < parentIds.length; i++){
+                let parentId = parentIds[i];
+
+                //Запрещаем зависимость для всех фич которые зависят от родителей
+                rightPanel.findParentFeatureDependencies(parentId, inactiveElements);
+
+                //Автоматом выбираем фичи от которых зависят родители
+                rightPanel.findChildrenFeatureDependencies(parentId, childrenFeatureList);
+            }
+
+
+            //Список основных зависящих фич для selectedId
+            let dependenciesList = []
+
+            let dependenciesModel = packageViewContainer.documentModel.GetData("DependenciesModel");
+            if (dependenciesModel && dependenciesModel.ContainsKey(selectedId)){
+                let dependencies = dependenciesModel.GetData(selectedId);
+                if (dependencies != ""){
+                    dependenciesList = dependencies.split(';');
+                }
+            }
+
+            let itemsDataList = treeView.getItemsDataAsList();
+            console.log("itemsDataList" ,itemsDataList);
+            for (let i = 0; i < itemsDataList.length; i++){
+                let itemData = itemsDataList[i];
+                let itemId = itemData.Id;
+
+                itemData.Visible = itemId !== selectedId;
+                itemData.Active = !inactiveElements.includes(itemId);
+                itemData.CheckBoxVisible = !packageViewContainer.isPackage(itemId);
+                itemData.CheckState = Qt.Unchecked;
+
+                if (childrenFeatureList.includes(itemId) && !dependenciesList.includes(itemId)){
+                    itemData.Active = false;
+                    itemData.CheckState = Qt.Checked;
+                }
+                //Если содержится во всех фичах и содержится в основном
+                else if (childrenFeatureList.includes(itemId) && dependenciesList.includes(itemId)){
+                    itemData.Active = true;
+                    itemData.CheckState = Qt.Checked;
+                }
+            }
+        }
+
+        function updateTreeViewGui2(){
             console.log("Begin updateTreeViewGui", tableView.selectedIndex);
             if (tableView.selectedIndex == null){
                 return;
@@ -537,17 +646,17 @@ DocumentBase {
         //            featuresTableView: tableView;
         //        }
 
-        //        CustomScrollbar {
-        //            z: 100;
+//        CustomScrollbar {
+//            z: 100;
 
-        //            anchors.right: treeView.right;
-        //            anchors.bottom: treeView.bottom;
+//            anchors.right: treeView.right;
+//            anchors.bottom: treeView.bottom;
 
-        //            backgroundColor: Style.baseColor;
+//            backgroundColor: Style.baseColor;
 
-        //            secondSize: 10;
-        //            targetItem: treeView.tableListView;
-        //        }
+//            secondSize: 10;
+//            targetItem: treeView.tableListView;
+//        }
 
         BasicTreeView {
             id: treeView;

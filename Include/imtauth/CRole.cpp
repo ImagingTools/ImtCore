@@ -181,9 +181,10 @@ bool CRole::IncludeRole(const QByteArray& roleId)
 
 void CRole::ExcludeRole(const QByteArray& roleId)
 {
-	istd::CChangeNotifier changeNotifier(this);
-
-	m_parents.removeOne(roleId);
+	bool result = m_parents.removeAll(roleId);
+	if (result){
+		istd::CChangeNotifier changeNotifier(this);
+	}
 }
 
 

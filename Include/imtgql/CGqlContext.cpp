@@ -24,6 +24,14 @@ imtgql::CGqlContext::CGqlContext(): m_userInfoPtr(nullptr)
 }
 
 
+imtgql::CGqlContext::~CGqlContext()
+{
+	delete m_userInfoPtr;
+
+	ResetData();
+}
+
+
 QByteArray CGqlContext::GetLanguageId() const
 {
 	return m_languageId;

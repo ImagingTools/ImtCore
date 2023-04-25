@@ -2,13 +2,12 @@
 
 
 // ACF includes
-#include <imod/TModelWrap.h>
 #include <istd/CCrcCalculator.h>
 #include <istd/TOptDelPtr.h>
 
 // ImtCore includes
 #include <imtauth/IUserInfo.h>
-#include <imtauth/CUserGroupInfo.h>
+#include <imtauth/IUserGroupInfo.h>
 
 
 namespace imtauthdb
@@ -55,10 +54,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 					if (userInfoPtr != nullptr){
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
-//							for (const QByteArray& roleId : groupRoleIds){
-//								userInfoPtr->AddRole(roleId);
-//							}
-
 							retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
 						}
 					}
@@ -137,10 +132,6 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
 
-//							for (const QByteArray& roleId : groupRoleIds){
-//								userInfoPtr->AddRole(roleId);
-//							}
-
 							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
 						}
 					}
@@ -154,10 +145,6 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (userInfoPtr != nullptr){
 						bool result = userInfoPtr->RemoveFromGroup(objectId);
 						if (result){
-//							for (const QByteArray& roleId : groupRoleIds){
-//								userInfoPtr->RemoveRole(roleId);
-//							}
-
 							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
 						}
 					}

@@ -14,6 +14,7 @@ class CGqlContext: virtual public IGqlContext
 {
 public:
 	CGqlContext();
+	~CGqlContext();
 
 	void SetLanguageId(const QByteArray& languageId);
 	void SetDesignScheme(const QByteArray& designScheme);

@@ -88,7 +88,8 @@ IUserBaseInfo::RoleIds CUserInfo::GetRoles() const
 		for (const QByteArray& parentGroupId : m_groupIds){
 			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr != nullptr){
-				for (const QByteArray& roleId : parentGroupPtr->GetRoles()){
+				QByteArrayList groupRoleIds = parentGroupPtr->GetRoles();
+				for (const QByteArray& roleId : groupRoleIds){
 					if (!retVal.contains(roleId)){
 						retVal << roleId;
 					}
@@ -97,7 +98,7 @@ IUserBaseInfo::RoleIds CUserInfo::GetRoles() const
 		}
 	}
 
-	return m_roles;
+	return retVal;
 }
 
 

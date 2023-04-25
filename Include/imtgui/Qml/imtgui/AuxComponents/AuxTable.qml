@@ -357,6 +357,51 @@ Item {
         return null;
     }
 
+    function allChecked(){
+        if (!tableContainer.checkable){
+            return;
+        }
+
+        if (elementsListObj.model){
+            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
+                let state = elementsListObj.model.GetData("CheckedState", i);
+                if (state !== Qt.Checked){
+                    elementsListObj.model.SetData("CheckedState", Qt.Checked, i);
+                }
+            }
+        }
+    }
+
+    function allUnchecked(){
+        if (!tableContainer.checkable){
+            return;
+        }
+
+        if (elementsListObj.model){
+            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
+                let state = elementsListObj.model.GetData("CheckedState", i);
+                if (state !== Qt.Unchecked){
+                    elementsListObj.model.SetData("CheckedState", Qt.Unchecked, i);
+                }
+            }
+        }
+    }
+
+    function isAllChecked(){
+        if (!tableContainer.checkable){
+            return false;
+        }
+
+        for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
+            let state = elementsListObj.model.GetData("CheckedState", i);
+            if (state !== Qt.Checked){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     MouseArea {
         id: maTable;
 
@@ -367,6 +412,8 @@ Item {
             tableContainer.selectedIndex = -1;
         }
     }
+
+    property bool isAllItemChecked: false;
 
     Item {
         id: headersPanel;
@@ -562,11 +609,34 @@ Item {
                     }
                     //cornerPatches
 
+                    CheckBox {
+                        id: checkBox;
+
+                        z: 1000;
+
+                        anchors.verticalCenter: parent.verticalCenter;
+                        anchors.left: parent.left;
+                        anchors.leftMargin: 8;
+
+                        checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
+
+                        visible: tableContainer.checkable && model.index === 0 && tableContainer.elements.GetItemsCount() > 0;
+
+                        onClicked: {
+                            if (checkBox.checkState === Qt.Checked){
+                                tableContainer.allUnchecked();
+                            }
+                            else{
+                                tableContainer.allChecked();
+                            }
+                        }
+                    }
+
                     Text {
                         id: name;
 
                         anchors.verticalCenter: parent.verticalCenter;
-                        anchors.left: parent.left;
+                        anchors.left: checkBox.visible ? checkBox.right : parent.left;
                         anchors.right: iconSort.visible ? iconSort.left : parent.right;
                         anchors.leftMargin: tableContainer.textMarginHor;
                         anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
@@ -644,7 +714,7 @@ Item {
                         sourceSize.width: width;
                         sourceSize.height: height;
 
-                        source: tableContainer.sortController && tableContainer.sortController.currentOrder == "DESC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
+                        source: tableContainer.sortController && tableContainer.sortController.currentOrder == "ASC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
                                                           "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
                     }
 
@@ -757,7 +827,7 @@ Item {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        cacheBuffer: 10000;
+        cacheBuffer: 1000;
 
         clip: true;
         Keys.onUpPressed: {
@@ -795,6 +865,10 @@ Item {
 
             selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
             checkedState: model.CheckedState ? model.CheckedState : Qt.Unchecked;
+
+            onCheckedStateChanged: {
+                tableContainer.isAllItemChecked = tableContainer.isAllChecked();
+            }
 
             //!!!
             cellDecorator: tableContainer.cellDecorator;
@@ -834,6 +908,10 @@ Item {
 
             function selectionChanged(){
                 tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
+
+                if (tableDelegate.selected){
+                    elementsListObj.positionViewAtIndex(model.index, ListView.Visible);
+                }
             }
 
             onClicked: {

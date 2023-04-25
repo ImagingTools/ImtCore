@@ -18,7 +18,6 @@ bool CSuperuserProviderComp::SuperuserExists() const
 {
 	if (m_userCollectionCompPtr.IsValid()){
 		imtbase::ICollectionInfo::Ids userObjectIds = m_userCollectionCompPtr->GetElementIds();
-
 		for (const imtbase::ICollectionInfo::Id& userObjectId : userObjectIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){

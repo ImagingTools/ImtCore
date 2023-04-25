@@ -26,17 +26,34 @@ Item {
     }
 
     function getAllChildrenGroups(groupId, retVal){
-         for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-             let id = groupsProvider.collectionModel.GetData("Id", i);
-             let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
-             let parentGroupIds = parentGroups.split(';')
+        for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+            let id = groupsProvider.collectionModel.GetData("Id", i);
+            let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
+            if (parentGroups !== ""){
+                let parentGroupIds = parentGroups.split(';')
+                if (parentGroupIds.includes(groupId)){
+                    retVal.push(id);
 
-             if (parentGroupIds.includes(groupId)){
-                 retVal.push(id);
+                    userGroupEditorContainer.getAllChildrenGroups(id, retVal);
+                }
+            }
+        }
+    }
 
-                 userGroupEditorContainer.getAllChildrenGroups(id, retVal);
-             }
-         }
+    function getAllParentGroupIds(groupId, retVal){
+        for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+            let id = groupsProvider.collectionModel.GetData("Id", i);
+            if (id === groupId){
+                let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
+                if (parentGroups !== ""){
+                    let parentGroupsIds = parentGroups.split(';');
+                    for (let j = 0; j < parentGroupsIds.length; j++){
+                        retVal.push(parentGroupsIds[j])
+                        userGroupEditorContainer.getAllParentGroupIds(parentGroupsIds[j], retVal);
+                    }
+                }
+            }
+        }
     }
 
     CollectionDataProvider {
@@ -56,6 +73,19 @@ Item {
 
                 let childrenIds = []
                 userGroupEditorContainer.getAllChildrenGroups(documentId, childrenIds);
+
+                // Get all parent ID-s
+                let parentIds = []
+                if (userGroupEditorContainer.documentModel.ContainsKey("ParentGroups")){
+                    let parentGroups = userGroupEditorContainer.documentModel.GetData("ParentGroups")
+                    let parentGroupIds = parentGroups.split(';')
+                    for (let j = 0; j < parentGroupIds.length; j++){
+                        userGroupEditorContainer.getAllParentGroupIds(parentGroupIds[j], parentIds);
+                    }
+                }
+
+                console.log("parentIds", parentIds);
+                console.log("childrenIds", childrenIds);
 
                 for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
                     let id = groupsProvider.collectionModel.GetData("Id", i);
@@ -159,12 +189,12 @@ Item {
                         userRoleIds.push(selectedRoleIds[j])
                     }
                 }
-              //  userGroupEditorContainer.documentModel.SetData("Roles", userRoleIds.join(';'));
+                //  userGroupEditorContainer.documentModel.SetData("Roles", userRoleIds.join(';'));
             }
         }
 
         if (ok){
-           // userGroupEditorContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
+            // userGroupEditorContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
         }
 
         userGroupEditorContainer.undoRedoManager.endChanges();
@@ -343,161 +373,161 @@ Item {
         radius: 0;
     }
 
-//    Rectangle {
-//        id: background;
+    //    Rectangle {
+    //        id: background;
 
-//        anchors.fill: parent;
+    //        anchors.fill: parent;
 
-//        color: Style.backgroundColor;
-//        Loader{
-//            id: backgroundDecoratorLoader;
+    //        color: Style.backgroundColor;
+    //        Loader{
+    //            id: backgroundDecoratorLoader;
 
-//            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
-//            onLoaded: {
-//                if(backgroundDecoratorLoader.item){
-//                    backgroundDecoratorLoader.item.rootItem = background;
-//                }
-//            }
-//        }
+    //            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
+    //            onLoaded: {
+    //                if(backgroundDecoratorLoader.item){
+    //                    backgroundDecoratorLoader.item.rootItem = background;
+    //                }
+    //            }
+    //        }
 
-//        Item{
-//            id: columnContainer;
+    //        Item{
+    //            id: columnContainer;
 
-//            width: userGroupEditorContainer.panelWidth;
-//            height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
+    //            width: userGroupEditorContainer.panelWidth;
+    //            height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
 
-//            Loader{
-//                id: mainPanelFrameLoader;
+    //            Loader{
+    //                id: mainPanelFrameLoader;
 
-//                anchors.fill: parent;
+    //                anchors.fill: parent;
 
-//                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
-//            }//Loader
+    //                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
+    //            }//Loader
 
-//            Column {
-//                id: bodyColumn;
+    //            Column {
+    //                id: bodyColumn;
 
-//                anchors.top: parent.top;
-//                anchors.left: parent.left;
-//                anchors.topMargin: userGroupEditorContainer.mainMargin;
-//                anchors.leftMargin: userGroupEditorContainer.mainMargin;
+    //                anchors.top: parent.top;
+    //                anchors.left: parent.left;
+    //                anchors.topMargin: userGroupEditorContainer.mainMargin;
+    //                anchors.leftMargin: userGroupEditorContainer.mainMargin;
 
-//                width: userGroupEditorContainer.panelWidth - 2*anchors.leftMargin;
+    //                width: userGroupEditorContainer.panelWidth - 2*anchors.leftMargin;
 
-//                spacing: 10;
+    //                spacing: 10;
 
-//                Text {
-//                    id: titleName;
+    //                Text {
+    //                    id: titleName;
 
-//                    color: Style.textColor;
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_common;
+    //                    color: Style.textColor;
+    //                    font.family: Style.fontFamily;
+    //                    font.pixelSize: Style.fontSize_common;
 
-//                    text: qsTr("Group Name");
-//                }
+    //                    text: qsTr("Group Name");
+    //                }
 
-//                CustomTextField {
-//                    id: nameInput;
+    //                CustomTextField {
+    //                    id: nameInput;
 
-//                    width: parent.width;
-//                    height: 30;
+    //                    width: parent.width;
+    //                    height: 30;
 
-//                    placeHolderText: qsTr("Enter the name");
+    //                    placeHolderText: qsTr("Enter the name");
 
-//                    onEditingFinished: {
-//                        let oldText = userGroupEditorContainer.documentModel.GetData("Name");
-//                        if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
-//                            userGroupEditorContainer.updateModel();
-//                        }
-//                    }
+    //                    onEditingFinished: {
+    //                        let oldText = userGroupEditorContainer.documentModel.GetData("Name");
+    //                        if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
+    //                            userGroupEditorContainer.updateModel();
+    //                        }
+    //                    }
 
-//                    Loader{
-//                        id: inputDecoratorLoader3;
+    //                    Loader{
+    //                        id: inputDecoratorLoader3;
 
-//                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-//                        onLoaded: {
-//                            if(inputDecoratorLoader3.item){
-//                                inputDecoratorLoader3.item.rootItem = nameInput;
-//                            }
-//                        }
-//                    }
+    //                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+    //                        onLoaded: {
+    //                            if(inputDecoratorLoader3.item){
+    //                                inputDecoratorLoader3.item.rootItem = nameInput;
+    //                            }
+    //                        }
+    //                    }
 
-//                    KeyNavigation.tab: descriptionInput;
-//                }
+    //                    KeyNavigation.tab: descriptionInput;
+    //                }
 
-//                Text {
-//                    id: titleDescription;
+    //                Text {
+    //                    id: titleDescription;
 
-//                    color: Style.textColor;
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_common;
+    //                    color: Style.textColor;
+    //                    font.family: Style.fontFamily;
+    //                    font.pixelSize: Style.fontSize_common;
 
-//                    text: qsTr("Description");
-//                }
+    //                    text: qsTr("Description");
+    //                }
 
-//                CustomTextField {
-//                    id: descriptionInput;
+    //                CustomTextField {
+    //                    id: descriptionInput;
 
-//                    width: parent.width;
-//                    height: 30;
+    //                    width: parent.width;
+    //                    height: 30;
 
-//                    placeHolderText: qsTr("Enter the description");
+    //                    placeHolderText: qsTr("Enter the description");
 
-//                    onEditingFinished: {
-//                        let oldText = userGroupEditorContainer.documentModel.GetData("Description");
-//                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
-//                            userGroupEditorContainer.updateModel();
-//                        }
-//                    }
+    //                    onEditingFinished: {
+    //                        let oldText = userGroupEditorContainer.documentModel.GetData("Description");
+    //                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
+    //                            userGroupEditorContainer.updateModel();
+    //                        }
+    //                    }
 
-//                    KeyNavigation.tab: nameInput;
+    //                    KeyNavigation.tab: nameInput;
 
-//                    Loader{
-//                        id: inputDecoratorLoader4;
+    //                    Loader{
+    //                        id: inputDecoratorLoader4;
 
-//                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-//                        onLoaded: {
-//                            if(inputDecoratorLoader4.item){
-//                                inputDecoratorLoader4.item.rootItem = nameInput;
-//                            }
-//                        }
-//                    }
-//                }
+    //                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
+    //                        onLoaded: {
+    //                            if(inputDecoratorLoader4.item){
+    //                                inputDecoratorLoader4.item.rootItem = nameInput;
+    //                            }
+    //                        }
+    //                    }
+    //                }
 
-//                Text {
-//                    color: Style.textColor;
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_common;
+    //                Text {
+    //                    color: Style.textColor;
+    //                    font.family: Style.fontFamily;
+    //                    font.pixelSize: Style.fontSize_common;
 
-//                    text: qsTr("Parent Groups");
-//                }
+    //                    text: qsTr("Parent Groups");
+    //                }
 
-//                TreeItemModel {
-//                    id: groupsHeadersModel;
+    //                TreeItemModel {
+    //                    id: groupsHeadersModel;
 
-//                    Component.onCompleted: {
-//                        let index = groupsHeadersModel.InsertNewItem();
+    //                    Component.onCompleted: {
+    //                        let index = groupsHeadersModel.InsertNewItem();
 
-//                        groupsHeadersModel.SetData("Id", "Name");
-//                        groupsHeadersModel.SetData("Name", "Group Name");
+    //                        groupsHeadersModel.SetData("Id", "Name");
+    //                        groupsHeadersModel.SetData("Name", "Group Name");
 
-//                        parentGroupsTable.headers = groupsHeadersModel;
-//                    }
-//                }
+    //                        parentGroupsTable.headers = groupsHeadersModel;
+    //                    }
+    //                }
 
-//                AuxTable {
-//                    id: parentGroupsTable;
+    //                AuxTable {
+    //                    id: parentGroupsTable;
 
-//                    width: parent.width;
-//                    height: 300;
+    //                    width: parent.width;
+    //                    height: 300;
 
-//                    checkable: true;
+    //                    checkable: true;
 
-//                    radius: 0;
-//                }
-//            }//Column bodyColumn
-//        }//columnContainer
-//        //
-//    }
+    //                    radius: 0;
+    //                }
+    //            }//Column bodyColumn
+    //        }//columnContainer
+    //        //
+    //    }
 
 }//Container
