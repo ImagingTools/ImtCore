@@ -26,7 +26,7 @@ Item {
         id: background;
 
         anchors.fill: parent;
-        color: popupMenuDelegate.mainColor;
+        color: popupMenuDelegate.rootItem.currentIndex == model.index ? popupMenuDelegate.selectedColor : popupMenuDelegate.mainColor;
     }
 
     Rectangle {
