@@ -95,6 +95,10 @@ Item {
     function modelChanged(){
         console.log("DocumentsCommands modelChanged");
 
+        if (documentBase.blockUpdatingModel){
+            return;
+        }
+
         let saveExists = documentBase.commandsProvider.commandExists("Save");
         if (!saveExists){
             return;

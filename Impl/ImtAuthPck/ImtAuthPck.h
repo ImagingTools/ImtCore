@@ -35,13 +35,13 @@ namespace ImtAuthPck
 {
 
 
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtauth::CContactInfo,
-						imtauth::IContactInfo,
-						iser::IObject,
-						iser::ISerializable,
-						istd::IChangeable>> ContactInfo;
+//typedef icomp::TModelCompWrap<
+//			icomp::TMakeComponentWrap<
+//						imtauth::CContactInfo,
+//						imtauth::IContactInfo,
+//						iser::IObject,
+//						iser::ISerializable,
+//						istd::IChangeable>> ContactInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<imtauth::CAddress>> Address;
 typedef icomp::TModelCompWrap<
@@ -54,7 +54,7 @@ typedef icomp::TModelCompWrap<
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtauth::CIdentifiableCompanyInfo,
-						imtauth::IAccountBaseInfo,
+						imtauth::IContactBaseInfo,
 						imtauth::ICompanyInfo,
 						iser::IObject,
 						iser::ISerializable,

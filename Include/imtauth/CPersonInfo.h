@@ -1,48 +1,39 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QDate>
-
 // ACF includes
 #include <imtauth/IPersonInfo.h>
+
+// ImtCore includes
+#include <imtauth/CPersonBaseInfo.h>
 
 
 namespace imtauth
 {
 
 
-class CPersonInfo: virtual public IPersonInfo
+class CPersonInfo: virtual public IPersonInfo, virtual public CPersonBaseInfo
 {
 public:
-    virtual QString GetAccountName() const override;
-    virtual void SetAccountName(const QString &accountName) override;
-    virtual QString GetAccountDescription() const override;
-    virtual void SetAccountDescription(const QString &accountDescription) override;
-    virtual CAddress GetAddress() const override;
-    virtual void SetAddress(const CAddress &address) override;
-    virtual QString GetMail() const override;
-    virtual void SetMail(const QString &mail) override;
+	typedef CPersonBaseInfo BaseClass;
 
-    virtual QDate GetBirthday() const override;
-    virtual void SetBirthday(const QDate &birthday) override;
-    virtual QString GetNameField(NameFieldType fieldType) const override;
-    virtual void SetNameField(NameFieldType fieldType, const QString &value) override;
+	// reimplemented (IPersonInfo)
+	virtual const IAddressProvider* GetAddresses() const override;
 
-    // reimplemented (iser::ISerializable)
-    virtual bool Serialize(iser::IArchive& archive) override;
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive& archive) override;
+
+	// reimplemented (istd::IChangeable)
+	virtual int GetSupportedOperations() const override;
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
-    QString m_accountName;
-    QString m_accountDescription;
-    CAddress m_address;
-    QString m_mail;
-
-    QString m_firstName;
-    QString m_lastName;
-    QString m_nick;
-    QDate m_birthday;
+	imod::TModelWrap<CAddressCollection> m_addresses;
 };
 
 
 }
+
+

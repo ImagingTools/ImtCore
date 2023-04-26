@@ -116,9 +116,26 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 				errorMessage = QT_TR_NOOP("Role-ID can't be empty!");
 				return nullptr;
 			}
-
-			roleInfoPtr->SetRoleId(roleId);
 		}
+
+		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
+		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
+				imtauth::IRole* currentRoleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
+				if (currentRoleInfoPtr != nullptr){
+					if (collectionId != objectId){
+						QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
+						if (currentRoleId == roleId){
+							errorMessage = QT_TR_NOOP("Role already exists");
+							return nullptr;
+						}
+					}
+				}
+			}
+		}
+
+		roleInfoPtr->SetRoleId(roleId);
 
 		if (itemModel.ContainsKey("Name")){
 			name = itemModel.GetData("Name").toString();

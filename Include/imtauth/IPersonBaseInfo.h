@@ -23,7 +23,7 @@ class IAddressProvider;
 	Interface describing the contact information.
 	\ingroup Authentification
 */
-class IContactInfo: virtual public IContactBaseInfo
+class IPersonBaseInfo: virtual public IContactBaseInfo
 {
 public:
 	enum GenderType
@@ -85,7 +85,6 @@ public:
 	virtual void SetBirthday(const QDate& birthday) = 0;
 	virtual QString GetNameField(NameFieldType fieldType) const = 0;
 	virtual void SetNameField(NameFieldType fieldType, const QString& value) = 0;
-	virtual const IAddressProvider* GetAddresses() const = 0;
 };
 
 

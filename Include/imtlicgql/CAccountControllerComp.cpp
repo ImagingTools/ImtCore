@@ -35,27 +35,26 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 	if (m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
 		const imtauth::CCompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::CCompanyInfo*>(dataPtr.GetPtr());
 		if (companyInfoPtr != nullptr){
-			QString accountName = companyInfoPtr->GetAccountName();
-			QString accountDescription = companyInfoPtr->GetAccountDescription();
-			QString mail = companyInfoPtr->GetMail();
-			QString companyName = companyInfoPtr->GetCompanyName();
+			QString accountName = companyInfoPtr->GetName();
+			QString accountDescription = companyInfoPtr->GetDescription();
+			QString mail = companyInfoPtr->GetEmail();
 			QByteArrayList groups = companyInfoPtr->GetGroups();
 
-			const imtauth::CAddress address = companyInfoPtr->GetAddress();
-			QString country = address.GetCountry();
-			QString city = address.GetCity();
-			int postalCode = address.GetPostalCode();
-			QString street = address.GetStreet();
+//			const imtauth::CAddress address = companyInfoPtr->GetAddress();
+//			QString country = address.GetCountry();
+//			QString city = address.GetCity();
+//			int postalCode = address.GetPostalCode();
+//			QString street = address.GetStreet();
 
 			dataModel->SetData("Id", accountId);
 			dataModel->SetData("Name", accountName);
 			dataModel->SetData("Description", accountDescription);
 			dataModel->SetData("Email", mail);
-			dataModel->SetData("CompanyName", companyName);
-			dataModel->SetData("Country", country);
-			dataModel->SetData("City", city);
-			dataModel->SetData("PostalCode", postalCode);
-			dataModel->SetData("Street", street);
+//			dataModel->SetData("CompanyName", companyName);
+//			dataModel->SetData("Country", country);
+//			dataModel->SetData("City", city);
+//			dataModel->SetData("PostalCode", postalCode);
+//			dataModel->SetData("Street", street);
 			dataModel->SetData("Groups", groups.join(';'));
 		}
 	}
@@ -120,10 +119,10 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				imtauth::IAccountBaseInfo* accountInfoPtr = dynamic_cast<imtauth::IAccountBaseInfo*>(dataPtr.GetPtr());
+				imtauth::IContactBaseInfo* accountInfoPtr = dynamic_cast<imtauth::IContactBaseInfo*>(dataPtr.GetPtr());
 				if (accountInfoPtr != nullptr){
 					if (collectionId != objectId){
-						QString currentName = accountInfoPtr->GetAccountName();
+						QString currentName = accountInfoPtr->GetName();
 						if (currentName == name){
 							errorMessage = QT_TR_NOOP("Account Name already exists");
 							return nullptr;
@@ -133,45 +132,45 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			}
 		}
 
-		companyInfoPtr->SetAccountName(name);
+		companyInfoPtr->SetName(name);
 
 		if (itemModel.ContainsKey("Description")){
 			description = itemModel.GetData("Description").toString();
-			companyInfoPtr->SetAccountDescription(description);
+			companyInfoPtr->SetDescription(description);
 		}
 
 		if (itemModel.ContainsKey("Email")){
 			QString email = itemModel.GetData("Email").toString();
-			companyInfoPtr->SetMail(email);
+			companyInfoPtr->SetEmail(email);
 		}
 
-		if (itemModel.ContainsKey("CompanyName")){
-			QString companyName = itemModel.GetData("CompanyName").toString();
-			companyInfoPtr->SetCompanyName(companyName);
-		}
+//		if (itemModel.ContainsKey("CompanyName")){
+//			QString companyName = itemModel.GetData("CompanyName").toString();
+//			companyInfoPtr->SetCompanyName(companyName);
+//		}
 
-		imtauth::CAddress address;
-		if (itemModel.ContainsKey("Country")){
-			QString country = itemModel.GetData("Country").toString();
-			address.SetCountry(country);
-		}
+//		imtauth::CAddress address;
+//		if (itemModel.ContainsKey("Country")){
+//			QString country = itemModel.GetData("Country").toString();
+//			address.SetCountry(country);
+//		}
 
-		if (itemModel.ContainsKey("City")){
-			QString city = itemModel.GetData("City").toString();
-			address.SetCity(city);
-		}
+//		if (itemModel.ContainsKey("City")){
+//			QString city = itemModel.GetData("City").toString();
+//			address.SetCity(city);
+//		}
 
-		if (itemModel.ContainsKey("PostalCode")){
-			int postalCode = itemModel.GetData("PostalCode").toInt();
-			address.SetPostalCode(postalCode);
-		}
+//		if (itemModel.ContainsKey("PostalCode")){
+//			int postalCode = itemModel.GetData("PostalCode").toInt();
+//			address.SetPostalCode(postalCode);
+//		}
 
-		if (itemModel.ContainsKey("Street")){
-			QString street = itemModel.GetData("Street").toString();
-			address.SetStreet(street);
-		}
+//		if (itemModel.ContainsKey("Street")){
+//			QString street = itemModel.GetData("Street").toString();
+//			address.SetStreet(street);
+//		}
 
-		companyInfoPtr->SetAddress(address);
+//		companyInfoPtr->SetAddress(address);
 
 		if (itemModel.ContainsKey("Groups")){
 			QByteArray groups = itemModel.GetData("Groups").toByteArray();

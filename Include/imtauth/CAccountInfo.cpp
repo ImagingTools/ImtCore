@@ -27,14 +27,14 @@ CAccountInfo::CAccountInfo()
 	:m_accountType(AT_COMPANY),
 	m_contactUpdateBridge(this)
 {
-	IAddressManager* addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
-				const_cast<IAddressProvider*>(m_contact.GetAddresses()));
-	if (addressManagerPtr != nullptr){
-		CAddress address;
-		addressManagerPtr->AddAddress(&address);
-	}
+//	IAddressManager* addressManagerPtr = dynamic_cast<imtauth::IAddressManager*>(
+//				const_cast<IAddressProvider*>(m_contact.GetAddresses()));
+//	if (addressManagerPtr != nullptr){
+//		CAddress address;
+//		addressManagerPtr->AddAddress(&address);
+//	}
 
-	m_contact.AttachObserver(&m_contactUpdateBridge);
+//	m_contact.AttachObserver(&m_contactUpdateBridge);
 }
 
 
@@ -110,7 +110,7 @@ void CAccountInfo::SetAccountPicture(const iimg::IBitmap& picture)
 
 const IContactInfo* CAccountInfo::GetAccountOwner() const
 {
-	return &m_contact;
+	return nullptr;
 }
 
 
@@ -118,7 +118,7 @@ void CAccountInfo::SetAccountOwner(const IContactInfo& ownerInfo)
 {
 	istd::CChangeNotifier changeNorifier(this);
 
-	m_contact.CopyFrom(ownerInfo);
+//	m_contact.CopyFrom(ownerInfo);
 }
 
 
@@ -182,10 +182,10 @@ bool CAccountInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && m_accountPicture.Serialize(archive);
 	retVal = retVal && archive.EndTag(accountPictureTag);
 
-	static iser::CArchiveTag contactTag("Contact", "Contact", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(contactTag);
-	retVal = retVal && m_contact.Serialize(archive);
-	retVal = retVal && archive.EndTag(contactTag);
+//	static iser::CArchiveTag contactTag("Contact", "Contact", iser::CArchiveTag::TT_GROUP);
+//	retVal = retVal && archive.BeginTag(contactTag);
+//	retVal = retVal && m_contact.Serialize(archive);
+//	retVal = retVal && archive.EndTag(contactTag);
 
 	return retVal;
 }
@@ -215,7 +215,7 @@ bool CAccountInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		bool retVal = true;
 
 		retVal = retVal && m_accountPicture.CopyFrom(sourcePtr->GetAccountPicture());
-		retVal = retVal && m_contact.CopyFrom(sourcePtr->m_contact);
+//		retVal = retVal && m_contact.CopyFrom(sourcePtr->m_contact);
 
 		return retVal;
 	}
@@ -244,7 +244,7 @@ bool CAccountInfo::ResetData(CompatibilityMode /*mode*/)
 	m_accountDescription.clear();
 	m_accountPicture.ResetImage();
 
-	return m_contact.ResetData();
+	return true;
 }
 
 

@@ -101,7 +101,9 @@ Item {
     }
 
     function filterMenuActivate(){
-        collectionViewContainer.filterMenuVisible = !collectionViewContainer.filterMenuVisible;
+        if (collectionViewContainer.hasFilter){
+            collectionViewContainer.filterMenuVisible = !collectionViewContainer.filterMenuVisible;
+        }
     }
 
     function fillContextMenuModel(){

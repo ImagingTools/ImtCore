@@ -64,7 +64,13 @@ Item {
                 console.log("model.StartTime", model.StartTime);
                 console.log("datestring", datestring);
 
-                if (model.StartTime !== datestring){
+                let timeStr = "";
+                if (model.StartTime !== ""){
+                    timeStr = model.StartTime.split(' ')[1];
+                }
+
+                let newTimeStr = datestring.split(' ')[1];
+                if (timeStr !== newTimeStr){
                     console.log("model.StartTime = ", datestring);
                     model.StartTime = datestring;
                 }

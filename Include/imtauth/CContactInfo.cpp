@@ -15,12 +15,6 @@ namespace imtauth
 
 // public static methods
 
-QByteArray CContactInfo::GetTypeId()
-{
-	return "PersonInfo";
-}
-
-
 // public methods
 
 CContactInfo::CContactInfo()
@@ -36,7 +30,7 @@ CContactInfo::CContactInfo()
 
 // reimplemented (IContactInfo)
 
-QString CContactInfo::GetMail() const
+QString CContactInfo::GetEmail() const
 {
 	return m_email;
 }
@@ -133,14 +127,6 @@ const IAddressProvider* CContactInfo::GetAddresses() const
 }
 
 
-// reimplemented (iser::IObject)
-
-QByteArray CContactInfo::GetFactoryId() const
-{
-	return GetTypeId();
-}
-
-
 // reimplemented (iser::ISerializable)
 
 bool CContactInfo::Serialize(iser::IArchive& archive)
@@ -149,7 +135,7 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag emailTag("EMail", "EMail", iser::CArchiveTag::TT_LEAF);
+	static iser::CArchiveTag emailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(emailTag);
 	retVal = retVal && archive.Process(m_email);
 	retVal = retVal && archive.EndTag(emailTag);
@@ -218,10 +204,10 @@ bool CContactInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 
 istd::IChangeable* CContactInfo::CloneMe(CompatibilityMode mode) const
 {
-	istd::TDelPtr<CContactInfo> clonePtr(new CContactInfo);
-	if (clonePtr->CopyFrom(*this, mode)){
-		return clonePtr.PopPtr();
-	}
+//	istd::TDelPtr<CContactInfo> clonePtr(new CContactInfo);
+//	if (clonePtr->CopyFrom(*this, mode)){
+//		return clonePtr.PopPtr();
+//	}
 
 	return nullptr;
 }

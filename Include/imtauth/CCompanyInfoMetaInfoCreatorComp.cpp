@@ -37,17 +37,17 @@ bool CCompanyInfoMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME, companyInfoPtr->GetAccountName());
-	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION, companyInfoPtr->GetAccountDescription());
-	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL, companyInfoPtr->GetMail());
-	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_COMPANY_NAME, companyInfoPtr->GetCompanyName());
+//	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME, companyInfoPtr->GetAccountName());
+//	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION, companyInfoPtr->GetAccountDescription());
+//	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL, companyInfoPtr->GetMail());
+//	metaInfoPtr->SetMetaInfo(imtauth::ICompanyInfo::MIT_COMPANY_NAME, companyInfoPtr->GetCompanyName());
 
-	const imtauth::CAddress address = companyInfoPtr->GetAddress();
+//	const imtauth::CAddress address = companyInfoPtr->GetAddress();
 
-	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_COUNTRY, address.GetCountry());
-	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_CITY, address.GetCity());
-	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_POSTAL_CODE, address.GetPostalCode());
-	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_STREET, address.GetStreet());
+//	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_COUNTRY, address.GetCountry());
+//	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_CITY, address.GetCity());
+//	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_POSTAL_CODE, address.GetPostalCode());
+//	metaInfoPtr->SetMetaInfo(imtauth::IAddress::MIT_STREET, address.GetStreet());
 
 	return true;
 }

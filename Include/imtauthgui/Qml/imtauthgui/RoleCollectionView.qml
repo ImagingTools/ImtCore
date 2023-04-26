@@ -7,6 +7,8 @@ CollectionView {
 
     contentMargins: 10;
 
+    hasFilter: false;
+
     tableElementsDelegate: Component { TableProductRolesDelegate {
         width: baseCollectionView.table.width;
 

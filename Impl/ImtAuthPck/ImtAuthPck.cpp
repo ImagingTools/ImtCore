@@ -14,10 +14,10 @@ I_EXPORT_PACKAGE(
 			"ImagingTools license management component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
-I_EXPORT_COMPONENT(
-			ContactInfo,
-			"Contact information",
-			"Contact Information Authority");
+//I_EXPORT_COMPONENT(
+//			ContactInfo,
+//			"Contact information",
+//			"Contact Information Authority");
 
 I_EXPORT_COMPONENT(
 			Address,

@@ -37,7 +37,7 @@ void CContactInfoEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 		GenderCombo->setCurrentIndex(0);
 	}
 
-	EMailEdit->setText(contactPtr->GetMail());
+	EMailEdit->setText(contactPtr->GetEmail());
 	BirthdayEdit->setDate(contactPtr->GetBirthday());
 	FirstNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_FIRST_NAME));
 	LastNameEdit->setText(contactPtr->GetNameField(imtauth::IContactInfo::NFT_LAST_NAME));

@@ -68,6 +68,14 @@ bool CTreeItemModel::Copy(CTreeItemModel* object)
 }
 
 
+bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
+{
+	bool result = IsEqual(*modelPtr);
+
+	return result;
+}
+
+
 void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &map)
 {
 	if (index < 0 || index > m_items.count()){
@@ -673,6 +681,65 @@ bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 		m_queryParams = sourcePtr->m_queryParams;
 		m_isArray = sourcePtr->m_isArray;
 		m_state = sourcePtr->m_state;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+bool CTreeItemModel::IsEqual(const IChangeable& object) const
+{
+	const CTreeItemModel* sourcePtr = dynamic_cast<const CTreeItemModel*>(&object);
+	if (sourcePtr != nullptr){
+		if (m_items.size() != sourcePtr->m_items.size()){
+			return false;
+		}
+
+		for (int i = 0; i < sourcePtr->m_items.count(); i++){
+			Item* item = m_items[i];
+			Item* sourceItem = sourcePtr->m_items[i];
+
+			QList<QByteArray> itemKeys;
+			item->GetKeys(itemKeys);
+
+			qDebug() << "itemKeys" << itemKeys;
+
+			QList<QByteArray> keys;
+			sourceItem->GetKeys(keys);
+
+			qDebug() << "keys" << keys;
+
+			for (const QByteArray& key : keys){
+				if (!itemKeys.contains(key)){
+					qDebug() << "!itemKeys.contains(key)";
+					return false;
+				}
+
+				QVariant sourceValue = sourceItem->Value(key);
+				QVariant itemValue = item->Value(key);
+
+				CTreeItemModel* sourceTreeItemModelPtr = sourceValue.value<CTreeItemModel*>();
+				if (sourceTreeItemModelPtr != nullptr){
+					CTreeItemModel* treeItemModelPtr = itemValue.value<CTreeItemModel*>();
+					if (treeItemModelPtr == nullptr){
+						qDebug() << "treeItemModelPtr == nullptr";
+						return false;
+					}
+
+					bool result = sourceTreeItemModelPtr->IsEqual(*treeItemModelPtr);
+					if (!result){
+						qDebug() << "!result";
+						return false;
+					}
+				}
+				else if (sourceValue != itemValue){
+					qDebug() << "sourceValue != itemValue";
+					return false;
+				}
+			}
+		}
 
 		return true;
 	}

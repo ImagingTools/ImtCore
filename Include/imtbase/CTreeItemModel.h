@@ -44,6 +44,7 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual int GetSupportedOperations() const override;
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool IsEqual(const IChangeable& object) const override;
 	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual void OnEndChanges(const ChangeSet& changeSet) override;
 	virtual void OnBeginChanges() override;
@@ -51,6 +52,7 @@ public:
 public Q_SLOTS:
 	void SetParent(QObject *parent);
 	bool Copy(CTreeItemModel* object);
+	bool IsEqualWithModel(CTreeItemModel* modelPtr) const;
 	void InsertNewItemWithParameters(int index, const QVariantMap& map);
 	int InsertNewItem();
 	int InsertNewItem(int index);

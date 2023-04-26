@@ -60,7 +60,7 @@ private:
 	QString m_accountDescription;
 	imod::TModelWrap<iimg::CBitmap> m_accountPicture;
 
-	imod::TModelWrap<CContactInfo> m_contact;
+//	imod::TModelWrap<CContactInfo> m_contact;
 	imod::CModelUpdateBridge m_contactUpdateBridge;
 };
 

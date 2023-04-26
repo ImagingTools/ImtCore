@@ -1,11 +1,7 @@
 #include <imtlicgql/CAccountCollectionControllerComp.h>
 
 
-// Qt includes
-#include <QtCore/QTranslator>
-
 // ImtCore includes
-#include <imtauth/CAccountInfo.h>
 #include <imtauth/ICompanyInfo.h>
 
 
@@ -19,21 +15,21 @@ namespace imtlicgql
 
 QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {
-	idoc::MetaInfoPtr metaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
-	if (metaInfoPtr.IsValid()){
-		if (informationId == QByteArray("Name")){
-			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME);
-		}
-		else if (informationId == QByteArray("Mail")){
-			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL);
-		}
-		else if (informationId == QByteArray("AccountType")){
-			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE);
-		}
-		else if (informationId == QByteArray("Description")){
-			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION);
-		}
-	}
+//	idoc::MetaInfoPtr metaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
+//	if (metaInfoPtr.IsValid()){
+//		if (informationId == QByteArray("Name")){
+//			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_NAME);
+//		}
+//		else if (informationId == QByteArray("Mail")){
+//			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_MAIL);
+//		}
+//		else if (informationId == QByteArray("AccountType")){
+//			return metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE);
+//		}
+//		else if (informationId == QByteArray("Description")){
+//			return metaInfoPtr->GetMetaInfo(imtauth::ICompanyInfo::MIT_ACCOUNT_DESCRIPTION);
+//		}
+//	}
 
 	return QVariant();
 }
@@ -79,21 +75,21 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 	dataModelPtr->SetData("Name", QT_TR_NOOP("Company Name"), index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString companyName = companyInfoPtr->GetCompanyName();
+	QString companyName = companyInfoPtr->GetName();
 	children->SetData("Value", companyName);
 
 	index = dataModelPtr->InsertNewItem();
 	dataModelPtr->SetData("Name", QT_TR_NOOP("Email"), index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString mail = companyInfoPtr->GetMail();
+	QString mail = companyInfoPtr->GetEmail();
 	children->SetData("Value", mail);
 
 	index = dataModelPtr->InsertNewItem();
 	dataModelPtr->SetData("Name", QT_TR_NOOP("Description"), index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString description = companyInfoPtr->GetAccountDescription();
+	QString description = companyInfoPtr->GetDescription();
 
 	children->SetData("Value", description);
 
@@ -102,7 +98,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 
 	children = dataModelPtr->AddTreeModel("Children", index);
 
-	QString name = companyInfoPtr->GetAccountName();
+	QString name = companyInfoPtr->GetName();
 
 	children->SetData("Value", name);
 
@@ -135,7 +131,7 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 		if (companyInfoPtr != nullptr){
 			idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
 
-			imtauth::CAddress address = companyInfoPtr->GetAddress();
+//			imtauth::CAddress address = companyInfoPtr->GetAddress();
 			for (QByteArray informationId : informationIds){
 				QVariant elementInformation;
 
@@ -143,13 +139,13 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 					elementInformation = QString(collectionId);
 				}
 				else if(informationId == "AccountName"){
-					elementInformation = companyInfoPtr->GetAccountName();
+					elementInformation = companyInfoPtr->GetName();
 				}
 				else if(informationId == "Description"){
-					elementInformation = companyInfoPtr->GetAccountDescription();
+					elementInformation = companyInfoPtr->GetDescription();
 				}
 				else if(informationId == "Mail"){
-					elementInformation = companyInfoPtr->GetMail();
+					elementInformation = companyInfoPtr->GetEmail();
 				}
 				else{
 					if (elementMetaInfo.IsValid()){

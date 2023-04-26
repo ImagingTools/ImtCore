@@ -12,17 +12,17 @@ namespace imtauth
 {
 
 
-class CAccountCollection: public imtbase::TAggergatedObjectCollectionWrap<IAccountInfoProvider, CAccountInfo>
-{
-public:
-	typedef imtbase::TAggergatedObjectCollectionWrap<IAccountInfoProvider, CAccountInfo> BaseClass;
+//class CAccountCollection: public imtbase::TAggergatedObjectCollectionWrap<IAccountInfoProvider, CAccountInfo>
+//{
+//public:
+//	typedef imtbase::TAggergatedObjectCollectionWrap<IAccountInfoProvider, CAccountInfo> BaseClass;
 
-	CAccountCollection();
+//	CAccountCollection();
 
-	// reimplemented (IAccountInfoProvider)
-	virtual const imtbase::ICollectionInfo& GetAccountList() const override;
-	virtual const IAccountInfo* GetAccount(const QByteArray& accountId) const override = 0;
-};
+//	// reimplemented (IAccountInfoProvider)
+//	virtual const imtbase::ICollectionInfo& GetAccountList() const override;
+//	virtual const IAccountInfo* GetAccount(const QByteArray& accountId) const override = 0;
+//};
 
 
 } // namespace imtauth

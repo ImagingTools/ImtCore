@@ -654,7 +654,7 @@ Item {
                                                                               Style.fontSize_common * deleg.scale;
 
 
-                        font.family: Style.fontFamily;
+                        font.family: Style.fontFamilyBold;
 
                         font.bold: tableContainer.emptyDecorHeader ? true :
                                                                      tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?

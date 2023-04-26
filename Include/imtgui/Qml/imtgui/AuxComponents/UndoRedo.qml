@@ -39,10 +39,30 @@ Item {
         return null;
     }
 
+    Component {
+        id: treeItemModelComp;
+
+        TreeItemModel {}
+    }
+
     function addModel(obj){
         console.log("addModel", JSON.stringify(obj));
-        undoRedo.undoStack.push(JSON.stringify(obj));
-        undoRedo.redoStack = [];
+
+        if (undoRedo.undoStack.length >= 1){
+            let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
+            if (obj.IsEqualWithModel(lastModel)){
+                return;
+            }
+        }
+
+        let emptyModel = treeItemModelComp.createObject(null);
+        emptyModel.Copy(obj)
+
+        undoRedo.undoStack.push(emptyModel);
+
+        if (undoRedo.redoStack.length > 0){
+            undoRedo.redoStack = [];
+        }
 
         undoRedo.modelAdded();
     }

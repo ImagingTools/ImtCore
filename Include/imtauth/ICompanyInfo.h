@@ -1,27 +1,21 @@
 #pragma once
 
+
+// ACF includes
+#include <istd/TPointerVector.h>
+
 // ImtCore includes
-#include <imtauth/IAccountBaseInfo.h>
+#include <imtauth/ICompanyBaseInfo.h>
 
 
 namespace imtauth
 {
 
 
-class ICompanyInfo: virtual public IAccountBaseInfo
+class ICompanyInfo: virtual public ICompanyBaseInfo
 {
 public:
-	enum MetaInfoTypes
-	{
-		/**
-			Name of company given as QString.
-		*/
-		MIT_COMPANY_NAME = IAccountBaseInfo::MIT_MAIL + 1,
-	};
-
-	// reimplemented (imtauth::IAccountBaseInfo)
-	virtual QString GetCompanyName() const = 0;
-	virtual void SetCompanyName(const QString& companyName) = 0;
+	virtual const IAddressProvider* GetAddresses() const = 0;
 };
 
 

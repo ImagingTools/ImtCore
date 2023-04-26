@@ -1,53 +1,21 @@
 #pragma once
 
+
 // ImtCore includes
-#include <imtauth/IAccountBaseInfo.h>
+#include <imtauth/IPersonBaseInfo.h>
 
 
 namespace imtauth
 {
 
 
-class IPersonInfo: virtual public IAccountBaseInfo{
+class IPersonInfo: virtual public IPersonBaseInfo
+{
 public:
-	enum NameFieldType
-	{
-		NFT_FIRST_NAME,
-		NFT_LAST_NAME,
-		NFT_NICKNAME
-	};
-
-	I_DECLARE_ENUM(NameFieldType, NFT_FIRST_NAME, NFT_LAST_NAME, NFT_NICKNAME);
-
-	enum MetaInfoTypes
-	{
-		/**
-			Contact first name given as QString.
-		*/
-		MIT_FIRST_NAME = IAccountBaseInfo::MIT_MAIL + 1,
-
-		/**
-			Contact last name given as QString.
-		*/
-		MIT_LAST_NAME,
-
-		/**
-			Contact nickname given as QString.
-		*/
-		MIT_NICKNAME,
-
-		/**
-			Contact gender type given as GenderType.
-		*/
-		MIT_BIRTHDAY,
-	};
-
-	// reimplemented (imtauth::IAccountBaseInfo)
-	virtual QDate GetBirthday() const = 0;
-	virtual void SetBirthday(const QDate& birthday) = 0;
-	virtual QString GetNameField(NameFieldType fieldType) const = 0;
-	virtual void SetNameField(NameFieldType fieldType, const QString& value) = 0;
+	virtual const IAddressProvider* GetAddresses() const = 0;
 };
 
 
 } // namespace imtauth
+
+

@@ -25,20 +25,6 @@ I_EXPORT_COMPONENT(
 			"Product object delegate for SQL table",
 			"SQL Product License Delegate");
 
-I_EXPORT_COMPONENT(
-			AccountDatabaseDelegate,
-			"Account info object for SQL table",
-			"SQL Account Address Contact Delegate");
-
-I_EXPORT_COMPONENT(
-			ProductInstanceDatabaseDelegate,
-			"Product instance object delegate for SQL table",
-			"SQL Product License Instance Installation Delegate");
-
-I_EXPORT_COMPONENT(
-            CompanyDatabaseDelegate,
-            "Company info object for SQL table",
-            "SQL Company Address Contact Delegate");
 
 } // namespace ImtLicenseDbPck
 

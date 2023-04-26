@@ -7,30 +7,23 @@ Item {
     property string commandsId;
     property var commandsDelegate;
 
+    // Model before saving
+    property TreeItemModel mainModel: TreeItemModel {};
+
     property TreeItemModel observedModel: null;
 
     property Item documentBase: null;
 
-    property bool isDirty: false;
     property bool transaction: false;
 
     signal modelStateChanged();
-    signal commandActivated(string commandId);
-
-    onModelStateChanged: {
-        if (undoRedo.undoStack.length == 1){
-           // commandsDelegate.removeChanges();
-
-          //  Events.sendEvent("DocumentIsDirtyChanged", false);
-        }
-
-        if (undoRedoManager.documentBase){
-            undoRedoManager.documentBase.isDirty = undoRedo.undoStack.length != 1;
-        }
-    }
 
     Component.onDestruction: {
         Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
+
+        if (undoRedoManager.documentBase != null){
+            undoRedoManager.documentBase.saved.disconnect(undoRedoManager.documentSaved);
+        }
     }
 
     onCommandsIdChanged: {
@@ -41,44 +34,48 @@ Item {
         console.log("undoRedoManager onVisibleChanged", undoRedoManager.visible);
         if (undoRedoManager.visible){
             if (undoRedoManager.observedModel != null){
-                undoRedoManager.observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
                 Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
             }
         }
         else{
             if (undoRedoManager.observedModel != null){
-                undoRedoManager.observedModel.modelChanged.disconnect(undoRedoManager.modelUpdated);
                 Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
             }
         }
     }
 
+    onDocumentBaseChanged: {
+        if (undoRedoManager.documentBase != null){
+            undoRedoManager.documentBase.saved.connect(undoRedoManager.documentSaved);
+        }
+    }
+
+    function documentSaved(){
+        undoRedoManager.mainModel.Copy(undoRedoManager.documentBase.documentModel);
+    }
+
     function beginChanges(){
         console.log("UndoRedoManager beginChanges");
-        if (undoRedoManager.isDirty){
-            console.assert(undoRedoManager.isDirty == true,  "beginChanges():: beginChanges isDirty == true");
+        if (undoRedoManager.transaction){
+            console.assert(undoRedoManager.transaction == true,  "beginChanges():: beginChanges transaction == true");
 
             return;
         }
-
-        undoRedoManager.isDirty = true;
 
         undoRedoManager.transaction = true;
     }
 
     function endChanges(){
         console.log("UndoRedoManager endChanges");
-        if (!undoRedoManager.isDirty){
-            console.assert(undoRedoManager.isDirty == false,  "endChanges():: beginChanges isDirty = false");
+        if (!undoRedoManager.transaction){
+            console.assert(undoRedoManager.transaction == false,  "endChanges():: beginChanges transaction = false");
 
             return;
         }
         else{
-            undoRedoManager.isDirty = false;
+            undoRedoManager.transaction = false;
 
             undoRedoManager.modelUpdated();
-
-            undoRedoManager.transaction = false;
         }
     }
 
@@ -90,16 +87,15 @@ Item {
         if (undoRedoManager.observedModel !== model){
             undoRedoManager.observedModel = model;
 
-            undoRedo.addModel(undoRedoManager.observedModel);
+            undoRedoManager.mainModel.Copy(undoRedoManager.observedModel);
 
-            undoRedoManager.observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
+            undoRedo.addModel(undoRedoManager.observedModel);
         }
     }
 
-
     function modelUpdated(){
-        console.log("undoRedoManager modelUpdated", undoRedoManager.isDirty);
-        if (undoRedoManager.transaction &&!undoRedoManager.isDirty){
+        console.log("undoRedoManager modelUpdated", undoRedoManager.transaction);
+        if (!undoRedoManager.transaction){
             undoRedo.addModel(undoRedoManager.observedModel);
         }
     }
@@ -110,13 +106,10 @@ Item {
 
         isEnabled = undoRedo.redoStack.length > 0;
         undoRedoManager.documentBase.commandsProvider.setCommandIsEnabled("Redo", isEnabled);
-
-       // timerCheckModel.start();
     }
 
     function commandHandle(commandId){
         console.log("undoRedoManager commandHandle", commandId);
-
         let isEnabled = undoRedoManager.documentBase.commandsProvider.commandIsEnabled(commandId);
         if (!isEnabled){
             return;
@@ -130,41 +123,27 @@ Item {
             result = undoRedo.redo();
         }
 
-        undoRedoManager.commandActivated(commandId);
-
         if (result !== null){
+            let isEqual = undoRedoManager.mainModel.IsEqualWithModel(result);
+            console.log("isEqual", isEqual);
+            if (undoRedoManager.documentBase){
+                undoRedoManager.documentBase.isDirty = !isEqual;
+
+                undoRedoManager.documentBase.blockUpdatingModel = true;
+            }
 
             undoRedoManager.createModel(result);
-
             undoRedoManager.modelStateChanged();
-        }
-    }
 
-    function createModel(json){
-        undoRedoManager.observedModel.modelChanged.disconnect(undoRedoManager.modelUpdated);
-        console.log("createModel", json);
-
-        json = json.replace(/\\/g, '');
-        json = json.slice(1, json.length - 1);
-
-        undoRedoManager.observedModel.CreateFromJson(json);
-
-        undoRedoManager.observedModel.modelChanged.connect(undoRedoManager.modelUpdated);
-    }
-
-    Timer {
-        id: timerCheckModel;
-
-        interval: 10;
-
-        onTriggered: {
-            let newModel = JSON.stringify(undoRedoManager.observedModel)
-
-            let startModel = undoRedo.undoStack[0];
-            if (_.isEqual(newModel, startModel)){
-                Events.sendEvent("DocumentIsDirtyChanged", {"Id": documentBase.itemId, "IsDirty": false});
+            if (undoRedoManager.documentBase){
+                undoRedoManager.documentBase.blockUpdatingModel = false;
             }
         }
+    }
+
+    function createModel(obj){
+        console.log("createModel", JSON.stringify(obj));
+        undoRedoManager.observedModel.Copy(obj);
     }
 
     UndoRedo {
@@ -182,5 +161,4 @@ Item {
             undoRedoManager.checkCommandMode();
         }
     }
-
 }
