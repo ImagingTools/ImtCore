@@ -46,7 +46,11 @@ Item {
     }
 
     function addModel(obj){
-        console.log("addModel", JSON.stringify(obj));
+        if (!obj){
+            return;
+        }
+
+        console.log("addModel2", JSON.stringify(obj));
 
         if (undoRedo.undoStack.length >= 1){
             let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
@@ -55,7 +59,7 @@ Item {
             }
         }
 
-        let emptyModel = treeItemModelComp.createObject(null);
+        let emptyModel = treeItemModelComp.createObject(undoRedo);
         emptyModel.Copy(obj)
 
         undoRedo.undoStack.push(emptyModel);

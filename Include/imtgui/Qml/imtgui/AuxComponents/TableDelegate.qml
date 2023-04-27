@@ -274,7 +274,10 @@ Rectangle {
         visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
 
         onClicked: {
+            console.log("checkBox onClicked");
+
             model.CheckedState = Qt.Checked - model.CheckedState;
+            console.log("model.CheckedState", model.CheckedState);
         }
     }
 

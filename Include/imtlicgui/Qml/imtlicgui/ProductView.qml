@@ -57,6 +57,8 @@ DocumentBase {
     }
 
     onDocumentModelChanged: {
+        container.commandsDelegate.tableData = tableView;
+
         let headers = container.documentModel.GetData("Headers");
         tableView.columnModel.clear();
         for (let i = 0; i < headers.GetItemsCount(); i++){
@@ -340,16 +342,16 @@ DocumentBase {
                 if (buttonId == "Add"){
                     undoRedoManager.beginChanges();
 
-                    let featuresModel = documentModel.GetData("Features");
+                    let featuresModel = container.documentModel.GetData("Features");
                     if (!featuresModel){
-                        featuresModel = documentModel.AddTreeModel("Features");
+                        featuresModel = container.documentModel.AddTreeModel("Features");
                     }
 
                     let licenseId = tableView.selectedIndex.itemData.Id;
 
-                    let featureId = selectedIndex.itemData.Id;
-                    let featureName = selectedIndex.itemData.Name;
-                    let isOptional = selectedIndex.itemData.Optional;
+                    let featureId = this.selectedIndex.itemData.Id;
+                    let featureName = this.selectedIndex.itemData.Name;
+                    let isOptional = this.selectedIndex.itemData.Optional;
 
                     if (featuresModel.ContainsKey(licenseId)){
                         let featureModel = featuresModel.GetData(licenseId);

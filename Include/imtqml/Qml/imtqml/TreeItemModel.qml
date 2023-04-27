@@ -100,7 +100,7 @@ JSONListModel {
     }
 
     function CopyItemDataFromModel(index, model, externIndex){
-        var keys = model.GetKeys();
+        var keys = model.GetKeys(index);
 
         for(var key in keys){
             let value = model.GetData(keys[key], externIndex);
@@ -109,7 +109,7 @@ JSONListModel {
     }
 
     function CopyItemDataToModel(index, model, externIndex){
-        var keys = this.GetKeys();
+        var keys = this.GetKeys(index);
 
         for(var key in keys){
             let value = this.GetData(keys[key], index);
@@ -127,6 +127,12 @@ JSONListModel {
 
     }
 
+    function IsEqualWithModel(externModel){
+        if(!externModel) return false
+
+        return true;
+    }
+
     function Copy(obj){
         if(!obj) return false
 
@@ -137,10 +143,10 @@ JSONListModel {
         return true
     }
 
-    function GetKeys(){
+    function GetKeys(index){
         var keys = []
         if(this.count > 0){
-            var modelObject = this.get(0)
+            var modelObject = this.get(index)
             keys = Object.keys(modelObject.$p)
         }
         return keys;

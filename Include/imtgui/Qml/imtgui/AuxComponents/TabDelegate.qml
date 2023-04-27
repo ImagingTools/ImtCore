@@ -29,6 +29,9 @@ Item{
         height: tabDelegate.height;
 
         onItemChanged: {
+
+            console.log("loaderDecorator.item.width", loaderDecorator.item.width);
+
             tabDelegate.width = loaderDecorator.item.width;
             if(loaderDecorator.item.rootItem !== undefined){
                 loaderDecorator.item.rootItem = tabDelegate;

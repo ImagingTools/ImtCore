@@ -100,6 +100,8 @@ Item {
 
         if (documentIndex > 0){
             let currentTitle = workspaceView.documentsData.GetData("Title", documentIndex);
+            console.log("currentTitle", currentTitle);
+            console.log("workspaceView.documentsData", workspaceView.documentsData.toJSON());
             if (isDirty){
                 let lastSymbol = currentTitle.charAt(currentTitle.length - 1);
                 if (lastSymbol !== '*'){
@@ -239,15 +241,13 @@ Item {
         let commandId = workspaceView.mainCollectionView.getEditorCommandId();
         documentsData.SetData("CommandsId", commandId, index);
 
-        console.log("commandId", commandId);
-
         let source = workspaceView.mainCollectionView.getEditorPath();
         documentsData.SetData("Source", source, index);
 
-        console.log("source", source);
-
         documentController.documentTypeId = commandId;
         documentController.getData(documentId, params);
+
+        console.log("workspaceView.documentsData", workspaceView.documentsData.toJSON());
 
         return index;
     }
@@ -382,7 +382,7 @@ Item {
         if (index > 0){
             workspaceView.documentsData.SetData("Title", newTitle, index);
 
-            console.log("workspaceView.documentsData", workspaceView.documentsData);
+            console.log("workspaceView.documentsData", workspaceView.documentsData.toJSON());
             let document = workspaceView.documentsData.GetData("Item", index);
             if (document.isDirty){
                 workspaceView.documentIsDirtyChanged({"Id": document.itemId, "IsDirty": true});

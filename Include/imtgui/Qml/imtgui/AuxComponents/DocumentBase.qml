@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 
 Item {
-    id: documentBase;
+    id: documentBaseRoot;
 
     property string itemId;
     property string itemName;
@@ -28,7 +28,7 @@ Item {
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
     property CommandsProvider commandsProvider: CommandsProvider {
-        commandsId: documentBase.commandsId;
+        commandsId: documentBaseRoot.commandsId;
     }
 
     signal commandsDelegateLoaded();
@@ -42,105 +42,105 @@ Item {
 
     Keys.onPressed: {
         if (event.key == Qt.Key_Delete){
-//            Events.sendEvent(documentBase.commandsId + "CommandActivated", "Remove");
+//            Events.sendEvent(documentBaseRoot.commandsId + "CommandActivated", "Remove");
 
-            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Remove");
+            Events.sendEvent(documentBaseRoot.documentUuid + "CommandActivated", "Remove");
         }
     }
 
     Component.onCompleted: {
-        documentBase.documentUuid = uuidGenerator.generateUUID();
+        documentBaseRoot.documentUuid = uuidGenerator.generateUUID();
 
-        commandsDelegate.documentBase = documentBase;
+        commandsDelegate.documentBase = documentBaseRoot;
     }
 
     onVisibleChanged: {
         if (visible){
-            documentBase.commandsProvider.updateGui();
+            documentBaseRoot.commandsProvider.updateGui();
         }
     }
 
     onDocumentUuidChanged: {
-        if (documentBase.documentUuid !== ""){
-            documentBase.commandsProvider.documentUuid = documentBase.documentUuid;
-            Events.subscribeEvent(documentBase.documentUuid + "CommandActivated", documentBase.commandsDelegate.commandHandle);
+        if (documentBaseRoot.documentUuid !== ""){
+            documentBaseRoot.commandsProvider.documentUuid = documentBaseRoot.documentUuid;
+            Events.subscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
         }
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(documentBase.documentUuid + "CommandActivated", documentBase.commandsDelegate.commandHandle);
+        Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
 
-        documentBase.documentModel.modelChanged.disconnect(documentBase.modelChanged);
+        documentBaseRoot.documentModel.modelChanged.disconnect(documentBaseRoot.modelChanged);
     }
 
     onBlockUpdatingModelChanged: {
-        Events.sendEvent("DocumentUpdating", documentBase.blockUpdatingModel);
+        Events.sendEvent("DocumentUpdating", documentBaseRoot.blockUpdatingModel);
     }
 
     onDocumentModelChanged: {
-        console.log("documentBase onDocumentModelChanged", JSON.stringify(documentBase.documentModel));
-        documentBase.documentModel.modelChanged.connect(documentBase.modelChanged);
+        console.log("documentBaseRoot onDocumentModelChanged", JSON.stringify(documentBaseRoot.documentModel));
+        documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
 
-        documentBase.itemId = documentBase.documentModel.GetData("Id");
-        documentBase.itemName = documentBase.documentModel.GetData("Name");
+        documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
+        documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
 
-        documentBase.updateDocumentTitle()
+        documentBaseRoot.updateDocumentTitle()
     }
 
     function onEntered(value){
-        documentBase.documentModel.SetData("Id", value);
-        documentBase.documentModel.SetData("Name", value);
+        documentBaseRoot.documentModel.SetData("Id", value);
+        documentBaseRoot.documentModel.SetData("Name", value);
     }
 
     function modelChanged(){
         console.log("DocumentsCommands modelChanged");
 
-        if (documentBase.blockUpdatingModel){
+        if (documentBaseRoot.blockUpdatingModel){
             return;
         }
 
-        let saveExists = documentBase.commandsProvider.commandExists("Save");
+        let saveExists = documentBaseRoot.commandsProvider.commandExists("Save");
         if (!saveExists){
             return;
         }
 
-        if (!documentBase.isDirty){
-            documentBase.isDirty = true;
+        if (!documentBaseRoot.isDirty){
+            documentBaseRoot.isDirty = true;
         }
     }
 
     onIsDirtyChanged: {
-        Events.sendEvent("DocumentIsDirtyChanged", {"Id": documentBase.itemId, "IsDirty": documentBase.isDirty});
+        Events.sendEvent("DocumentIsDirtyChanged", {"Id": documentBaseRoot.itemId, "IsDirty": documentBaseRoot.isDirty});
 
-        documentBase.commandsProvider.setCommandIsEnabled("Save", documentBase.isDirty);
+        documentBaseRoot.commandsProvider.setCommandIsEnabled("Save", documentBaseRoot.isDirty);
     }
 
     onDocumentsDataChanged: {
         if(commandsDelegateBase.item && commandsDelegateBase.item.documentsData !==undefined){
-            commandsDelegateBase.item.documentsData = documentBase.documentsData;
+            commandsDelegateBase.item.documentsData = documentBaseRoot.documentsData;
         }
     }
 
     onDocumentManagerChanged: {
         if(commandsDelegateBase.item){
-            commandsDelegateBase.item.documentBase = documentBase;
+            commandsDelegateBase.item.documentBaseRoot = documentBaseRoot;
         }
     }
 
     onCommandsIdChanged: {
-        console.log("documentBase onCommandsIdChanged", documentBase.commandsId, itemName);
-        commandsDelegate.commandsId = documentBase.commandsId;
+        console.log("documentBaseRoot onCommandsIdChanged", documentBaseRoot.commandsId, itemName);
+        commandsDelegate.commandsId = documentBaseRoot.commandsId;
     }
 
     function updateDocumentTitle(){
-        if (documentBase.documentManager != null){
-            let documentId = documentBase.documentModel.GetData("Id");
-            let documentName = documentBase.documentModel.GetData("Name");
+        if (documentBaseRoot.documentManager != null){
+            let documentId = documentBaseRoot.documentModel.GetData("Id");
+            let documentName = documentBaseRoot.documentModel.GetData("Name");
             if (documentName === ""){
                 documentName = "<new item>"
             }
 
-            documentBase.documentManager.setDocumentTitle({"Id": documentId, "Title": documentName});
+            documentBaseRoot.documentManager.setDocumentTitle({"Id": documentId, "Title": documentName});
         }
     }
 
@@ -151,33 +151,33 @@ Item {
     Shortcut {
         sequence: "Ctrl+S";
 
-        enabled: documentBase.visible;
+        enabled: documentBaseRoot.visible;
 
         onActivated: {
             console.log("Ctrl+S onActivated");
-            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Save");
+            Events.sendEvent(documentBaseRoot.documentUuid + "CommandActivated", "Save");
         }
     }
 
     Shortcut {
         sequence: "Ctrl+Z";
 
-        enabled: documentBase.visible;
+        enabled: documentBaseRoot.visible;
 
         onActivated: {
             console.log("Ctrl+Z onActivated");
-            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Undo");
+            Events.sendEvent(documentBaseRoot.documentUuid + "CommandActivated", "Undo");
         }
     }
 
     Shortcut {
         sequence: "Ctrl+Shift+Z";
 
-        enabled: documentBase.visible;
+        enabled: documentBaseRoot.visible;
 
         onActivated: {
             console.log("Ctrl+Shift+Z onActivated");
-            Events.sendEvent(documentBase.documentUuid + "CommandActivated", "Redo");
+            Events.sendEvent(documentBaseRoot.documentUuid + "CommandActivated", "Redo");
         }
     }
 
@@ -188,13 +188,13 @@ Item {
         }
 
         onLoaded: {
-            commandsDelegateBase.item.documentBase = documentBase;
+            commandsDelegateBase.item.documentBase = documentBaseRoot;
 
             if(commandsDelegateBase.item.documentsData !==undefined){
-                commandsDelegateBase.item.documentsData = documentBase.documentsData;
+                commandsDelegateBase.item.documentsData = documentBaseRoot.documentsData;
             }
 
-            documentBase.commandsDelegateLoaded();
+            documentBaseRoot.commandsDelegateLoaded();
         }
     }
 }

@@ -4,7 +4,7 @@ import Acf 1.0
 TableViewItemDelegateBase {
     id: treeDelegateBase;
 
-    height: !root ? 0 : isOpen ? footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
+    height: !treeDelegateBase.root ? 0 : treeDelegateBase.isOpen ? treeDelegateBase.footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
 
     property bool isOpen: model.IsOpen;
 
@@ -27,22 +27,6 @@ TableViewItemDelegateBase {
 
     signal parentCheckStateChanged(var data);
     signal childrenCheckStateChanged(var data);
-
-//    Component.onCompleted: {
-//        let prefix = treeDelegateBase.root.commandId + model.Id;
-//        Events.subscribeEvent(treeDelegateBase.root.commandId + "ClearAllTreeView", treeDelegateBase.clear);
-//        Events.subscribeEvent(prefix + "SetState", treeDelegateBase.setState);
-//        Events.subscribeEvent(prefix + "SetActive", treeDelegateBase.setActive);
-//        Events.subscribeEvent(prefix + "SetVisible", treeDelegateBase.setVisible);
-//    }
-
-//    Component.onDestruction: {
-//        let prefix = treeDelegateBase.root.commandId + model.Id;
-//        Events.unSubscribeEvent(treeDelegateBase.root.commandId + "ClearAllTreeView", treeDelegateBase.clear);
-//        Events.unSubscribeEvent(prefix + "SetState", treeDelegateBase.setState);
-//        Events.unSubscribeEvent(prefix + "SetActive", treeDelegateBase.setActive);
-//        Events.unSubscribeEvent(prefix + "SetVisible", treeDelegateBase.setVisible);
-//    }
 
     function clear(){
         model.CheckState = Qt.Unchecked;

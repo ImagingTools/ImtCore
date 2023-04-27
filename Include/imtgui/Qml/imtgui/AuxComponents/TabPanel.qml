@@ -41,6 +41,8 @@ Rectangle {
         delegate: TabDelegate {
             height: list.height;
 
+            width: 100;
+
             selected: model.index === tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
             lastElement: model.index === list.count - 1;
@@ -49,6 +51,10 @@ Rectangle {
             isCloseEnable: tabPanelContainer.isCloseEnable;
 
             decoratorSource: Style.tabPanelDecoratorPath;
+
+            onTextChanged: {
+                console.log("TabDelegate onTitleChanged", model.index, model.Title);
+            }
 
             onClicked: {
                 console.log("TabDelegate onClicked", list.model);

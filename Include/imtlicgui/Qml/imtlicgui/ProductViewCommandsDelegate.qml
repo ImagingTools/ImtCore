@@ -9,7 +9,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
     property Item tableData: null;
 
-    property ModelIndex selectedIndex: tableData != null ? container.tableData.selectedIndex: null;
+    property ModelIndex selectedIndex: container.tableData != null ? container.tableData.selectedIndex: null;
 
     signal edited(string itemId, string itemName);
     signal removed(string itemId);
@@ -18,9 +18,9 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("CollectionViewCommands onSelectedIndexChanged");
         let isEnabled = false;
 
-        if (container.selectedIndex != null){
+        if (container.selectedIndex != null && container.selectedIndex.itemData){
             let level = container.selectedIndex.itemData.Level;
-            if (level == 0){
+            if (level === 0){
                 isEnabled = true;
             }
         }

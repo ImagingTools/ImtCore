@@ -123,13 +123,6 @@ TableViewItemDelegateBase {
                         datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
                     }
 
-                    //                Component.onCompleted: {
-                    //                    console.log("onCompleted");
-                    //                    let date = model.Expiration;
-                    //                    let data = date.split("-");
-                    //                    datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
-                    //                }
-
                     onDateChanged: {
                         console.log("onDateChanged", datePicker.getDate());
                         model.Expiration = datePicker.getDate();

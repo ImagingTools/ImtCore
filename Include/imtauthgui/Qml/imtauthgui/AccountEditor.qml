@@ -255,7 +255,7 @@ DocumentBase {
 
                 onEditingFinished: {
                     console.log("accountDescriptionInput");
-                    let oldText = documentModel.GetData("Description");
+                    let oldText = accountEditorContainer.documentModel.GetData("Description");
                     if (oldText && oldText !== accountDescriptionInput.text || !oldText && accountDescriptionInput.text !== ""){
                         accountEditorContainer.updateModel();
                     }

@@ -18,7 +18,7 @@ Item {
     function convertToListModel(treeItemModel){
         console.log("convertToListModel");
 
-        let obj = listModelComp.createObject(null);
+        let obj = listModelComp.createObject(converter);
 
         privateBlock.convertToListModelRecursive(obj, treeItemModel);
 
@@ -28,7 +28,7 @@ Item {
     function convertFromListModel(listModel){
         console.log("convertFromListModel");
 
-        let obj = treeItemModelComp.createObject(null);
+        let obj = treeItemModelComp.createObject(converter);
 
         privateBlock.convertFromListModelRecursive(listModel, obj);
 
@@ -39,6 +39,9 @@ Item {
         id: privateBlock;
 
         function convertFromListModelRecursive(listModel, treeItemModel){
+            if (!listModel || !treeItemModel){
+                return;
+            }
 
             for (let i = 0; i < listModel.count; i++){
                 let index = treeItemModel.InsertNewItem();
@@ -64,6 +67,10 @@ Item {
         }
 
         function convertToListModelRecursive(listModel, treeItemModel){
+            if (!listModel || !treeItemModel){
+                return;
+            }
+
             for (let i = 0; i < treeItemModel.GetItemsCount(); i++){
                 let itemKeys = treeItemModel.GetKeys(i);
 

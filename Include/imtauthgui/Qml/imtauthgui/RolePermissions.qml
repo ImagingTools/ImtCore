@@ -84,27 +84,6 @@ Item {
         rolePermissionsContainer.blockUpdatingModel = false;
     }
 
-    function recursiveUpdateGui(dataModel, tableIndexes, selectedPermissions){
-        for (let i = 0; i < dataModel.GetItemsCount(); i++){
-            let permissionId = dataModel.GetData("Id", i);
-            let permissionName = dataModel.GetData("Name", i);
-
-            let row = {"Id": permissionId, "Name": permissionName, "CheckState": Qt.Unchecked};
-
-            if (selectedPermissions.includes(permissionId)){
-                row["CheckState"] = Qt.Checked;
-            }
-
-            permissionsTable.insertRow(tableIndexes.concat([i]), row);
-
-            let childModel = dataModel.GetData("ChildModel", i);
-            if (childModel){
-                let childIndexes = [].concat(tableIndexes.concat([i]))
-                rolePermissionsContainer.recursiveUpdateGui(childModel, childIndexes,selectedPermissions);
-            }
-        }
-    }
-
     function updateModel(){
         console.log("documentModel1", rolePermissionsContainer.documentModel.toJSON());
         rolePermissionsContainer.undoRedoManager.beginChanges();
@@ -121,29 +100,6 @@ Item {
         rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
 
         rolePermissionsContainer.undoRedoManager.endChanges();
-    }
-
-    function recursiveUpdateModel(dataModel, guiModel){
-        console.log("recursiveUpdateModel", dataModel, guiModel);
-        for (let i = 0; i < guiModel.count; i++){
-            let rowObj = guiModel.get(i);
-
-            let permissionId = rowObj["Id"];
-            let permissionName = rowObj["Name"];
-            let state = rowObj["CheckState"];
-
-            if (state == Qt.Checked){
-                let index = dataModel.InsertNewItem();
-
-                dataModel.SetData("Id", permissionId, index);
-                dataModel.SetData("Name", permissionName, index);
-            }
-
-            let rowChildModel = rowObj["ChildModel"]
-            if (rowChildModel.count > 0){
-                rolePermissionsContainer.recursiveUpdateModel(dataModel, rowChildModel);
-            }
-        }
     }
 
     Component{
@@ -228,7 +184,7 @@ Item {
         }
 
         onSelectedIndexChanged: {
-            if (selectedIndex != null){
+            if (selectedIndex != null && selectedIndex.itemData){
                 let selectedFeatureId = selectedIndex.itemData.Id;
 
                 let featureDependencies = dependenciesProvider.getAllDependencies(selectedFeatureId);

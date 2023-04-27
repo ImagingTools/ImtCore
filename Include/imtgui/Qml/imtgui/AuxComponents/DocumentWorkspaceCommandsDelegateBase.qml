@@ -28,7 +28,7 @@ Item {
     function commandHandle(commandId){
         console.log("DocumentCommandsBase commandHandle", container.documentBase.itemId, commandId);
 
-        let documentId = documentBase.documentModel.GetData("Id");
+        let documentId = container.documentBase.documentModel.GetData("Id");
 
         if (commandId === "Close"){
             console.log("Close");

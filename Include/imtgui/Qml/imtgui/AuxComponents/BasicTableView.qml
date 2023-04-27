@@ -10,8 +10,6 @@ FocusScope {
     property bool readOnly: true;
     property bool withoutSelection: false;
 
-    property var headerDelegate;
-
     property alias headerDelegate: listView.header;
     property alias rowDelegate: listView.delegate;
     property alias contentHeader: listView.header;

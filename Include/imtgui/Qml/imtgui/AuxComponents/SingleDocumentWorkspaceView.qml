@@ -94,21 +94,6 @@ Item {
         }
     }
 
-//    function addDocument(document){
-//        let keys = Object.keys(document);
-
-//        document["documentsData"] = documentsData;
-//        document["documentManager"] = documentManager;
-
-//        for (let key of keys){
-//            documentsData.SetData(key, document[key]);
-//        }
-
-//        documentsData.SetData("Title", document["Name"]);
-
-//        stackView.push(document);
-//    }
-
     function openDocument(itemId, document){
         documentManager.documentLoading = true;
         console.log("openDocument" , JSON.stringify(document));
@@ -218,11 +203,11 @@ Item {
                 if (buttonId == "Yes"){
                     document.closingFlag = true;
 
-                    saveDocument(document.itemId);
+                    documentManager.saveDocument(document.itemId);
                 }
                 else if (buttonId == "No"){
                     document.isDirty = false;
-                    closeDocument(document.itemId);
+                    documentManager.closeDocument(document.itemId);
                 }
             }
         }

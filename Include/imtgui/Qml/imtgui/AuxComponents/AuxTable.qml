@@ -620,7 +620,7 @@ Item {
 
                         checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
 
-                        visible: tableContainer.checkable && model.index === 0 && tableContainer.elements.GetItemsCount() > 0;
+                        visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0;
 
                         onClicked: {
                             if (checkBox.checkState === Qt.Checked){

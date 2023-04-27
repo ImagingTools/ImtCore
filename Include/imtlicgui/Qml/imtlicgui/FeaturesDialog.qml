@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 
 Dialog {
-    id: root;
+    id: featuresDialog;
 
     width: 300;
 
@@ -12,25 +12,25 @@ Dialog {
     property ModelIndex selectedIndex: null;
 
     Component.onCompleted: {
-        root.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
-        root.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
+        featuresDialog.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
+        featuresDialog.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
 
-        root.title = qsTr("Select features");
+        featuresDialog.title = qsTr("Select features");
 
-        root.updateGui();
+        featuresDialog.updateGui();
     }
 
     onFinished: {
         if (buttonId == "Add"){
-            root.selectedIndex = root.contentItem.tableView.selectedIndex;
+            featuresDialog.selectedIndex = featuresDialog.contentItem.tableView.selectedIndex;
         }
     }
 
     function updateGui(){
-        root.contentItem.tableView.columnModel.clear();
-        root.contentItem.tableView.rowModel.clear();
+        featuresDialog.contentItem.tableView.columnModel.clear();
+        featuresDialog.contentItem.tableView.rowModel.clear();
 
-        root.contentItem.tableView.addColumn({"Id": "Name", "Name": "Feature Name"})
+        featuresDialog.contentItem.tableView.addColumn({"Id": "Name", "Name": "Feature Name"})
 
         let model = featuresProvider.model;
 
@@ -38,7 +38,7 @@ Dialog {
             let id = model.GetData("Id", i);
             let name = model.GetData("Name", i);
 
-            root.contentItem.tableView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
+            featuresDialog.contentItem.tableView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
 
             let childModel = model.GetData("ChildModel", i);
             if (childModel){
@@ -46,7 +46,7 @@ Dialog {
                     let featureId = childModel.GetData("Id", j);
                     let featureName = childModel.GetData("Name", j);
 
-                    root.contentItem.tableView.insertRow([i, j], {"Name": featureName, "Id": featureId, "CheckBoxVisible": false})
+                    featuresDialog.contentItem.tableView.insertRow([i, j], {"Name": featureName, "Id": featureId, "CheckBoxVisible": false})
                 }
             }
         }
@@ -68,7 +68,7 @@ Dialog {
             anchors.rightMargin: 10;
             anchors.leftMargin: 10;
 
-            width: root.width;
+            width: featuresDialog.width;
 
             BasicTreeView {
                 id: tableTreeView;
@@ -79,10 +79,13 @@ Dialog {
                 onSelectedIndexChanged: {
                     console.log("onSelectedIndexChanged", tableTreeView.selectedIndex);
 
-                    if (tableTreeView.selectedIndex != null){
+                    if (tableTreeView.selectedIndex != null && tableTreeView.selectedIndex.itemData){
                          console.log("selectedIndex.itemData.Level", tableTreeView.selectedIndex.itemData.Level);
-                        let state = tableTreeView.selectedIndex.itemData.Level == 1;
-                        root.buttons.setButtonState("Add", state);
+                        let state = tableTreeView.selectedIndex.itemData.Level === 1;
+
+                        console.log("featuresDialog", featuresDialog);
+                        console.log("featuresDialog.buttons", featuresDialog.buttons);
+                        featuresDialog.buttons.setButtonState("Add", state);
                     }
                 }
             }
