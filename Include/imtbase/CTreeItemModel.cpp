@@ -429,10 +429,7 @@ CTreeItemModel *CTreeItemModel::GetModelFromItem(int itemIndex) const
 
 	CTreeItemModel* modelPtr = new CTreeItemModel();
 
-//	CopyItemDataToModel(itemIndex, modelPtr);
 	bool result = modelPtr->CopyItemDataFromModel(0, this, itemIndex);
-
-	qDebug() << "GetModelFromItem CopyItemDataFromModel " << result;
 
 	return modelPtr;
 }

@@ -19,6 +19,8 @@ class CCompanyBaseInfo: virtual public ICompanyBaseInfo, virtual public CContact
 public:
 	typedef CContactBaseInfo BaseClass;
 
+	CCompanyBaseInfo();
+
 	// reimplemented (ICompanyInfo)
 	virtual const ICompanyInfo* GetParent() const override;
 	virtual const istd::TPointerVector<const ICompanyBaseInfo>& GetChildren() const override;
@@ -41,7 +43,7 @@ private:
 };
 
 
-typedef imtbase::TIdentifiableWrap<CCompanyBaseInfo> CIdentifiableCompanyInfo;
+typedef imtbase::TIdentifiableWrap<CCompanyBaseInfo> CIdentifiableCompanyBaseInfo;
 
 
 }

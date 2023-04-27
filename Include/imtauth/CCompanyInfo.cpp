@@ -14,6 +14,14 @@ namespace imtauth
 
 // public methods
 
+
+CCompanyInfo::CCompanyInfo():
+	m_modelUpdateBridge(this, imod::CModelUpdateBridge::UF_SOURCE)
+{
+	m_addresses.AttachObserver(&m_modelUpdateBridge);
+}
+
+
 // reimplemented (ICompanyInfo)
 
 const IAddressProvider* CCompanyInfo::GetAddresses() const
@@ -28,12 +36,22 @@ bool CCompanyInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = BaseClass::Serialize(archive);
+	bool retVal = true;
 
-	static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(addressesTag);
-	retVal = retVal && m_addresses.Serialize(archive);
-	retVal = retVal && archive.EndTag(addressesTag);
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 identifiableVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, identifiableVersion)){
+		identifiableVersion = 0;
+	}
+
+	if (identifiableVersion > 6362){
+		retVal = retVal && BaseClass::Serialize(archive);
+
+		static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
+		retVal = retVal && archive.BeginTag(addressesTag);
+		retVal = retVal && m_addresses.Serialize(archive);
+		retVal = retVal && archive.EndTag(addressesTag);
+	}
 
 	return retVal;
 }

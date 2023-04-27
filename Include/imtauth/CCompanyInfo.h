@@ -15,6 +15,8 @@ class CCompanyInfo: virtual public ICompanyInfo, virtual public CCompanyBaseInfo
 public:
 	typedef CCompanyBaseInfo BaseClass;
 
+	CCompanyInfo();
+
 	// reimplemented (ICompanyInfo)
 	virtual const IAddressProvider* GetAddresses() const override;
 
@@ -28,7 +30,12 @@ public:
 
 private:
 	imod::TModelWrap<CAddressCollection> m_addresses;
+
+	imod::CModelUpdateBridge m_modelUpdateBridge;
 };
+
+
+typedef imtbase::TIdentifiableWrap<CCompanyInfo> CIdentifiableCompanyInfo;
 
 
 }

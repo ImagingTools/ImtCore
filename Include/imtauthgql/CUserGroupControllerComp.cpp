@@ -35,7 +35,7 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 			QString name = userGroupInfoPtr->GetName();
 			QString description = userGroupInfoPtr->GetDescription();
 
-			dataModel->SetData("Id", groupUuid);
+			dataModel->SetData("Id", userGroupId);
 			dataModel->SetData("Name", name);
 			dataModel->SetData("Description", description);
 			dataModel->SetData("Users", "");

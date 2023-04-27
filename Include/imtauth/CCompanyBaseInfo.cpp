@@ -14,6 +14,13 @@ namespace imtauth
 
 // public methods
 
+
+CCompanyBaseInfo::CCompanyBaseInfo():
+	m_parentCompanyPtr(nullptr)
+{
+}
+
+
 // reimplemented (ICompanyInfo)
 
 const ICompanyInfo* CCompanyBaseInfo::GetParent() const
@@ -36,10 +43,12 @@ bool CCompanyBaseInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = BaseClass::Serialize(archive);
 
-	static iser::CArchiveTag parentCompanyTag("ParentCompany", "Parent of the company", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(parentCompanyTag);
-	retVal = retVal && m_parentCompanyPtr->Serialize(archive);
-	retVal = retVal && archive.EndTag(parentCompanyTag);
+	if (m_parentCompanyPtr != nullptr){
+		static iser::CArchiveTag parentCompanyTag("ParentCompany", "Parent of the company", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(parentCompanyTag);
+		retVal = retVal && m_parentCompanyPtr->Serialize(archive);
+		retVal = retVal && archive.EndTag(parentCompanyTag);
+	}
 
 	static iser::CArchiveTag subCompaniesTag("SubCompanies", "Subsidiary companies", iser::CArchiveTag::TT_MULTIPLE);
 	static iser::CArchiveTag companyTag("Company", "Company", iser::CArchiveTag::TT_GROUP, &subCompaniesTag);
