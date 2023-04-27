@@ -102,7 +102,10 @@ JSONListModel {
     }
 
     function CopyItemDataFromModel(index, model, externIndex){
-        var keys = model.GetKeys(index);
+        if(externIndex === undefined){
+            externIndex = 0;
+        }
+        var keys = model.GetKeys(externIndex);
 
         for(var key in keys){
             let value = model.GetData(keys[key], externIndex);
@@ -111,6 +114,9 @@ JSONListModel {
     }
 
     function CopyItemDataToModel(index, model, externIndex){
+        if(externIndex === undefined){
+            externIndex = 0;
+        }
         var keys = this.GetKeys(index);
 
         for(var key in keys){
