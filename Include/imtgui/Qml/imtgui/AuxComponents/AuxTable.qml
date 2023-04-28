@@ -546,6 +546,10 @@ Item {
                                                                  tableContainer.headerDecorator.GetData("Color", model.index) :
                                                                  Style.baseColor;
 
+                    opacity:  tableContainer.emptyDecorHeader ? 1 :
+                                                             tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
+                                                                 tableContainer.headerDecorator.GetData("Opacity", model.index) :
+                                                                 1;
 
                     radius: tableContainer.emptyDecorHeader ? 0 :
                                                               tableContainer.headerDecorator.IsValidData("CellRadius", model.index) ?
@@ -609,117 +613,118 @@ Item {
                     }
                     //cornerPatches
 
-                    CheckBox {
-                        id: checkBox;
 
-                        z: 1000;
-
-                        anchors.verticalCenter: parent.verticalCenter;
-                        anchors.left: parent.left;
-                        anchors.leftMargin: 8;
-
-                        checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
-
-                        visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0;
-
-                        onClicked: {
-                            if (checkBox.checkState === Qt.Checked){
-                                tableContainer.allUnchecked();
-                            }
-                            else{
-                                tableContainer.allChecked();
-                            }
-                        }
-                    }
-
-                    Text {
-                        id: name;
-
-                        anchors.verticalCenter: parent.verticalCenter;
-                        anchors.left: checkBox.visible ? checkBox.right : parent.left;
-                        anchors.right: iconSort.visible ? iconSort.left : parent.right;
-                        anchors.leftMargin: tableContainer.textMarginHor;
-                        anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
-
-                        verticalAlignment: Text.AlignVCenter;
-                        horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
-                                                                               tableContainer.headerDecorator.IsValidData("TextPosition", model.index) ?
-                                                                                   tableContainer.headerDecorator.GetData("TextPosition", model.index) :
-                                                                                   Text.AlignLeft;
-
-
-                        font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
-                                                                          tableContainer.headerDecorator.IsValidData("FontSize", model.index) ?
-                                                                              tableContainer.headerDecorator.GetData("FontSize", model.index) :
-                                                                              Style.fontSize_common * deleg.scale;
-
-
-                        font.family: Style.fontFamilyBold;
-
-                        font.bold: tableContainer.emptyDecorHeader ? true :
-                                                                     tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
-                                                                         tableContainer.headerDecorator.GetData("FontBold", model.index) :
-                                                                         true;
-
-
-                        color: tableContainer.emptyDecorHeader ? Style.textColor :
-                                                                 tableContainer.headerDecorator.IsValidData("FontColor", model.index) ?
-                                                                     tableContainer.headerDecorator.GetData("FontColor", model.index) :
-                                                                     Style.textColor;
-                        elide: tableContainer.elideMode;
-
-                        wrapMode: tableContainer.wrapMode;
-
-                        onLinkActivated: {
-                            Qt.openUrlExternally(link)
-                        }
-
-                        text: model.Name;
-
-                        Component.onCompleted: {
-                            tableContainer.heightRecalc.connect(name.sendHeightData);
-                        }
-
-                        onHeightChanged: {
-                            name.sendHeightData();
-                        }
-
-                        function sendHeightData(){
-                            if(tableContainer.wrapMode !== Text.NoWrap){
-                                if(model.index < heightModel.count){
-                                    var height_ = name.height +
-                                            2*tableContainer.textMarginVer +
-                                            topBorder.height + bottomBorder.height;
-
-                                    heightModel.setProperty(model.index, "cellHeight", height_);
-
-                                }
-                            }
-                        }
-
-                    }
-
-                    Image {
-                        id: iconSort;
-
-                        anchors.verticalCenter: parent.verticalCenter;
-                        anchors.right: parent.right;
-                        anchors.rightMargin: model.index === headersList.count - 1 ? iconFilter.width : visible ? Math.max(tableContainer.textMarginHor, tableContainer.verticalBorderSize) : 0
-
-                        height: 10;
-                        width: visible ? 10 : 0;
-
-                        visible: tableContainer.sortController && tableContainer.sortController.currentHeaderId === model.Id && tableContainer.hasSort;
-
-                        sourceSize.width: width;
-                        sourceSize.height: height;
-
-                        source: tableContainer.sortController && tableContainer.sortController.currentOrder == "ASC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
-                                                          "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
-                    }
 
                 }//mainRec
 
+                CheckBox {
+                    id: checkBox;
+
+                    z: 1000;
+
+                    anchors.verticalCenter: mainRec.verticalCenter;
+                    anchors.left: mainRec.left;
+                    anchors.leftMargin: 8;
+
+                    checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
+
+                    visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0;
+
+                    onClicked: {
+                        if (checkBox.checkState === Qt.Checked){
+                            tableContainer.allUnchecked();
+                        }
+                        else{
+                            tableContainer.allChecked();
+                        }
+                    }
+                }
+
+                Text {
+                    id: name;
+
+                    anchors.verticalCenter: mainRec.verticalCenter;
+                    anchors.left: checkBox.visible ? checkBox.right : mainRec.left;
+                    anchors.right: iconSort.visible ? iconSort.left : mainRec.right;
+                    anchors.leftMargin: tableContainer.textMarginHor;
+                    anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
+
+                    verticalAlignment: Text.AlignVCenter;
+                    horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
+                                                                           tableContainer.headerDecorator.IsValidData("TextPosition", model.index) ?
+                                                                               tableContainer.headerDecorator.GetData("TextPosition", model.index) :
+                                                                               Text.AlignLeft;
+
+
+                    font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
+                                                                      tableContainer.headerDecorator.IsValidData("FontSize", model.index) ?
+                                                                          tableContainer.headerDecorator.GetData("FontSize", model.index) :
+                                                                          Style.fontSize_common * deleg.scale;
+
+
+                    font.family: Style.fontFamilyBold;
+
+                    font.bold: tableContainer.emptyDecorHeader ? true :
+                                                                 tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
+                                                                     tableContainer.headerDecorator.GetData("FontBold", model.index) :
+                                                                     true;
+
+
+                    color: tableContainer.emptyDecorHeader ? Style.textColor :
+                                                             tableContainer.headerDecorator.IsValidData("FontColor", model.index) ?
+                                                                 tableContainer.headerDecorator.GetData("FontColor", model.index) :
+                                                                 Style.textColor;
+                    elide: tableContainer.elideMode;
+
+                    wrapMode: tableContainer.wrapMode;
+
+                    onLinkActivated: {
+                        Qt.openUrlExternally(link)
+                    }
+
+                    text: model.Name;
+
+                    Component.onCompleted: {
+                        tableContainer.heightRecalc.connect(name.sendHeightData);
+                    }
+
+                    onHeightChanged: {
+                        name.sendHeightData();
+                    }
+
+                    function sendHeightData(){
+                        if(tableContainer.wrapMode !== Text.NoWrap){
+                            if(model.index < heightModel.count){
+                                var height_ = name.height +
+                                        2*tableContainer.textMarginVer +
+                                        topBorder.height + bottomBorder.height;
+
+                                heightModel.setProperty(model.index, "cellHeight", height_);
+
+                            }
+                        }
+                    }
+
+                }
+
+                Image {
+                    id: iconSort;
+
+                    anchors.verticalCenter: mainRec.verticalCenter;
+                    anchors.right: mainRec.right;
+                    anchors.rightMargin: model.index === headersList.count - 1 ? iconFilter.width : visible ? Math.max(tableContainer.textMarginHor, tableContainer.verticalBorderSize) : 0
+
+                    height: 10;
+                    width: visible ? 10 : 0;
+
+                    visible: tableContainer.sortController && tableContainer.sortController.currentHeaderId === model.Id && tableContainer.hasSort;
+
+                    sourceSize.width: width;
+                    sourceSize.height: height;
+
+                    source: tableContainer.sortController && tableContainer.sortController.currentOrder == "ASC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
+                                                      "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
+                }
 
                 ////
 

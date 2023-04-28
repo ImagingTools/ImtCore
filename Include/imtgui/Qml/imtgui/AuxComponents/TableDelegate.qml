@@ -396,6 +396,13 @@ Rectangle {
                                                                    "transparent";
 
 
+
+                opacity: tableDelegateContainer.emptyDecorCell ? 1 :
+                                                                 tableDelegateContainer.cellDecorator.IsValidData("Opacity", model.index) ?
+                                                                     tableDelegateContainer.cellDecorator.GetData("Opacity", model.index) :
+                                                                     1;
+
+
                 radius: tableDelegateContainer.emptyDecorCell ? 0 :
                                                                 tableDelegateContainer.cellDecorator.IsValidData("CellRadius", model.index) ?
                                                                     tableDelegateContainer.cellDecorator.GetData("CellRadius", model.index) :0;
