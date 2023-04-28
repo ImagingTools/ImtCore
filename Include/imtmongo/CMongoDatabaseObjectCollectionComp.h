@@ -3,7 +3,6 @@
  
 // Qt includes
 #include <QtCore/QReadWriteLock>
-#include <QtSql/QtSql>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -17,10 +16,10 @@
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TModelUpdateBinder.h>
 
-//#include <imtdb/ISqlDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseLoginSettings.h>
 
 #include <imtmongo/IMongoDatabaseEngine.h>
+#include <imtmongo/IMongoDatabaseObjectDelegate.h>
 
 
 namespace imtmongo
@@ -28,7 +27,7 @@ namespace imtmongo
 
 
 /**
-	Component implementation of a SQL-database collection.
+	Component implementation of a Mongo database collection.
 */
 class CMongoDatabaseObjectCollectionComp:
 			public QObject,
@@ -45,11 +44,12 @@ public:
 		I_REGISTER_INTERFACE(imtbase::ICollectionInfo);
 		I_ASSIGN(m_objectCollectionFactoryCompPtr, "ObjectCollectionFactory", "Factory used for object collection creation", false, "ObjectCollectionFactory");
 		I_ASSIGN(m_mongoDatabaseEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
-		//I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
+		I_ASSIGN(m_objectDelegateCompPtr, "ObjectDelegate", "Database object delegate used for creation of C++ objects from the SQL record", true, "ObjectDelegate");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 		I_ASSIGN(m_filterParamsCompPtr, "FilteringParams", "Parameter using for the filterering the table", false, "FilteringParams");
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Database access settings", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_collectionDataControllerCompPtr, "CollectionDataController", "Data export/import controller for the collection", false, "DataController");
+		I_ASSIGN(m_collectionNameAttrPtr, "CollectionName", "The collection name", true, "CollectionName");
 	I_END_COMPONENT;
 
 	CMongoDatabaseObjectCollectionComp();
@@ -122,7 +122,9 @@ public:
 
 protected:
 
-	QSqlRecord GetObjectRecord(const QByteArray& objectId) const;
+	QByteArray GetCollectionName() const;
+
+	mongocxx::cursor GetObjectRecord(const QByteArray& objectId) const;
 
 	void OnFilterParamsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* filterParamsPtr);
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
@@ -136,11 +138,12 @@ protected:
 
 private:
     I_FACT(imtbase::IObjectCollection, m_objectCollectionFactoryCompPtr);
-	//I_REF(imtdb::ISqlDatabaseObjectDelegate, m_objectDelegateCompPtr);
+	I_REF(imtmongo::IMongoDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_REF(imtbase::ICollectionDataController, m_collectionDataControllerCompPtr);
+	I_ATTR(QByteArray, m_collectionNameAttrPtr);
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CMongoDatabaseObjectCollectionComp> m_filterParamsObserver;
 	imtbase::TModelUpdateBinder<imtdb::IDatabaseLoginSettings, CMongoDatabaseObjectCollectionComp> m_databaseAccessObserver;

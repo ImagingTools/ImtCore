@@ -2,11 +2,13 @@
 
 // mongocxx includes
 #include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
+#include <bsoncxx/document/value.hpp>
+
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 
 // Qt includes
-//#include <QtSql/QSqlQuery>
 #include <QtCore/QSharedPointer>
 
 // ACF includes
@@ -16,10 +18,11 @@
 
 // ImtCore includes
 #include <imtbase/CParamsSetJoiner.h>
-//#include <imtdb/CDatabaseEngineComp.h>
-#include <imtbase/CObjectCollection.h>
-//#include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
+#include <imtmongo/CMongoDatabaseObjectCollectionIterator.h>
 
+
+using bsoncxx::builder::basic::kvp;
+using bsoncxx::builder::basic::make_document;
 
 namespace imtmongo
 {
@@ -77,17 +80,14 @@ QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 			const Id& /*parentId*/)
 {
 
-
 	QByteArray objectId = proposedObjectId;
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-
-
-//	else {
-//		changeNotifier.Abort();
-//	}
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	coll.insert_one(make_document(kvp("_oid", objectId.toStdString())));
 
 	return QByteArray();
 }
@@ -95,39 +95,47 @@ QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 
 bool CMongoDatabaseObjectCollectionComp::RemoveElement(const Id& elementId)
 {
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", elementId.toStdString()));
+	coll.delete_one(doc);
 
-
-
-//	if (ExecuteTransaction(query)){
-//		return true;
-//	}
-//	else{
-//		changeNotifier.Abort();
-//	}
-
-	return false;
+	return true;
 }
 
 
-const istd::IChangeable* CMongoDatabaseObjectCollectionComp::GetObjectPtr(const QByteArray& /*objectId*/) const
+const istd::IChangeable* CMongoDatabaseObjectCollectionComp::GetObjectPtr(const QByteArray& objectId) const
 {
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
+	bsoncxx::stdx::optional<bsoncxx::document::value> result = coll.find_one(doc);
+	if (result) {
+		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(result.value());
+		return dataObjPtr;
+	}
+
 	return nullptr;
 }
 
 
 bool CMongoDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const
 {
-
-
 	if (objectId.isEmpty()){
 		return false;
 	}
 
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
+	bsoncxx::stdx::optional<bsoncxx::document::value> result = coll.find_one(doc);
+	if (result) {
 
-//	istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
-//	dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
-//		return dataObjPtr;
-//	});
+		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(result.value());
+		dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
+			return dataObjPtr;
+		});
+	}
 
 	return dataPtr.IsValid();
 }
@@ -138,17 +146,13 @@ bool CMongoDatabaseObjectCollectionComp::SetObjectData(
 			const istd::IChangeable& object,
 			CompatibilityMode /*mode*/)
 {
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value oid = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
+	bsoncxx::document::view_or_value doc = m_objectDelegateCompPtr->CreateUpdateObjectQuery(objectId, object);
+	coll.update_one(oid, doc);
 
-
-
-//	if (ExecuteTransaction(query)){
-//		return true;
-//	}
-//	else{
-//		changeNotifier.Abort();
-//	}
-
-	return false;
+	return true;
 }
 
 
@@ -162,28 +166,29 @@ imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollect
 	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
-//	if (m_objectDelegateCompPtr.IsValid()) {
-//		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
-//		if (objectSelectionQuery.isEmpty()) {
-//			return nullptr;
-//		}
+	if (m_objectDelegateCompPtr.IsValid()) {
 
-//		QSqlError sqlError;
-//		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
+		mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+		mongocxx::collection coll = db[GetCollectionName().toStdString()];
+		bsoncxx::document::view_or_value find_params ;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
+		mongocxx::options::find findOption;
+		findOption = findOption.limit(count);
+		findOption = findOption.skip(offset);
+		mongocxx::cursor cursor = coll.find(find_params, findOption);
 
-//		while (sqlQuery.next()) {
-//			istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
-//			DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr]() {
-//				return dataObjPtr;
-//				});
+		for (bsoncxx::document::view doc : cursor) {
+			istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(doc);
+			DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr]() {
+				return dataObjPtr;
+				});
 
-//			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(sqlQuery.record());
+			QByteArray objectId = m_objectDelegateCompPtr->GetObjectIdFromRecord(doc);
 
-//			QByteArray typeId = m_objectDelegateCompPtr->GetObjectTypeId(objectId);
+			QByteArray typeId = m_objectDelegateCompPtr->GetObjectTypeId(objectId);
 
-//			collectionPtr->InsertNewObject(typeId, "", "", dataPtr, objectId);
-//		}
-//	}
+			collectionPtr->InsertNewObject(typeId, "", "", dataPtr, objectId);
+		}
+	}
 	return collectionPtr;
 }
 
@@ -194,7 +199,10 @@ imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollect
 
 const iprm::IOptionsList* CMongoDatabaseObjectCollectionComp::GetObjectTypesInfo() const
 {
+	if (m_objectDelegateCompPtr.IsValid()) {
 
+		return m_objectDelegateCompPtr->GetObjectTypeInfos();
+	}
 
 	return nullptr;
 }
@@ -202,6 +210,10 @@ const iprm::IOptionsList* CMongoDatabaseObjectCollectionComp::GetObjectTypesInfo
 
 imtbase::ICollectionInfo::Id CMongoDatabaseObjectCollectionComp::GetObjectTypeId(const QByteArray& objectId) const
 {
+	if (m_objectDelegateCompPtr.IsValid()) {
+
+		return m_objectDelegateCompPtr->GetObjectTypeId(objectId);
+	}
 
 	return QByteArray();
 }
@@ -224,9 +236,12 @@ int CMongoDatabaseObjectCollectionComp::GetElementsCount(
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
 
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value find_params;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
+	int count = coll.count_documents(find_params);
 
-
-	return 0;
+	return count;
 }
 
 
@@ -239,14 +254,13 @@ imtbase::ICollectionInfo::Ids CMongoDatabaseObjectCollectionComp::GetElementIds(
 {
 	Ids retVal;
 
-	// Create an instance.
-//	mongocxx::instance inst{};
-//	mongocxx::client client{mongocxx::uri{"mongodb://localhost:27017"}};
-//	mongocxx::database db = client["agisbil"];
-
 	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db["address-type"];
-	mongocxx::cursor cursor = coll.find({});
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value find_params ;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
+	mongocxx::options::find findOption;
+	findOption = findOption.limit(count);
+	findOption = findOption.skip(offset);
+	mongocxx::cursor cursor = coll.find(find_params, findOption);
 
 	// Iterate the cursor into bsoncxx::document::view objects.
 	for (const bsoncxx::document::view& doc : cursor) {
@@ -276,6 +290,7 @@ bool CMongoDatabaseObjectCollectionComp::GetSubsetInfo(
 			const Id& /*parentId*/,
 			int /*iterationFlags*/) const
 {
+
 	return false;
 }
 
@@ -289,9 +304,33 @@ imtbase::IObjectCollectionIterator *CMongoDatabaseObjectCollectionComp::CreateOb
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value findParams ;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
+
+	mongocxx::options::find findOption;
+	findOption = findOption.limit(count);
+	findOption = findOption.skip(offset);
+	/*if(count > 0){
+		if(offset > 0){
+			findOption = findOption.limit(count);
+			findOption = findOption.skip(offset);
+		}
+		else
+			findOption = findOption.limit(count);
+	}
+	else{
+		if(offset > 0)
+			findOption = findOption.skip(offset);
+	}*/
+
+	mongocxx::cursor cursor = coll.find(findParams, findOption);
+
+	CMongoDatabaseObjectCollectionIterator* iterator =
+			new CMongoDatabaseObjectCollectionIterator(cursor, m_objectDelegateCompPtr.GetPtr());
 
 
-	return nullptr;
+	return iterator;
 }
 
 
@@ -362,13 +401,19 @@ bool CMongoDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-
-
-QSqlRecord CMongoDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& objectId) const
+QByteArray CMongoDatabaseObjectCollectionComp::GetCollectionName() const
 {
+	return m_collectionNameAttrPtr->GetValue();
+}
 
 
-	return QSqlRecord();
+mongocxx::cursor CMongoDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& objectId) const
+{
+	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
+	mongocxx::cursor cursor = coll.find(doc);
+	return cursor;
 }
 
 
