@@ -42,12 +42,12 @@ export class Rectangle extends Item {
     
     $colorChanged(){
         let rgba = Qt.$colorToRGBA(this.color)
-        this.dom.style.backgroundColor = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
+        this.dom.style.backgroundColor = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
     }
     $opacityChanged(){
         let rgba = Qt.$colorToRGBA(this.color)
         this.dom.style.opacity = 1
-        this.dom.style.backgroundColor = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
+        this.dom.style.backgroundColor = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
     }
     $radiusChanged(){
         this.dom.style.borderRadius = `${this.radius}px`

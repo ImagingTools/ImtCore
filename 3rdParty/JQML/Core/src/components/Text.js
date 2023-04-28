@@ -199,12 +199,12 @@ export class Text extends Item {
     // }
     $colorChanged(){
         let rgba = Qt.$colorToRGBA(this.color)
-        this.impl.style.color = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
+        this.impl.style.color = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
     }
     $opacityChanged(){
         let rgba = Qt.$colorToRGBA(this.color)
         this.dom.style.opacity = 1
-        this.impl.style.color = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : this.opacity})`
+        this.impl.style.color = `rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
     }
     $contentWidthChanged(){
         // this.impl.style.width = `${this.contentWidth}px`

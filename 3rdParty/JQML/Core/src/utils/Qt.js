@@ -79,12 +79,21 @@ export var Qt = {
             }
         }
         let hexColor = '#ffffff'
+        let alpha = false
         if(this.$colors[color]){
             hexColor = this.$colors[color]
         } else {
             if(color[0] === '#') {
                 if(color.length === 4){
                     hexColor = `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}`
+                } else if(color.length === 7) {
+                    hexColor = color
+                } else if(color.length === 5) {
+                    alpha = true
+                    hexColor = `#${color[1]}${color[1]}${color[2]}${color[2]}${color[3]}${color[3]}${color[4]}${color[4]}`
+                } else if(color.length === 9) {
+                    alpha = true
+                    hexColor = color
                 } else {
                     hexColor = color
                 }
@@ -97,12 +106,22 @@ export var Qt = {
                 }
             }
         }
-        return {
-            r: parseInt(hexColor[1]+hexColor[2], 16),
-            g: parseInt(hexColor[3]+hexColor[4], 16),
-            b: parseInt(hexColor[5]+hexColor[6], 16),
-            a: 1,
+        if(alpha){
+            return {
+                r: parseInt(hexColor[3]+hexColor[4], 16),
+                g: parseInt(hexColor[5]+hexColor[6], 16),
+                b: parseInt(hexColor[7]+hexColor[8], 16),
+                a: parseInt(hexColor[1]+hexColor[2], 16)/255,
+            }
+        } else {
+            return {
+                r: parseInt(hexColor[1]+hexColor[2], 16),
+                g: parseInt(hexColor[3]+hexColor[4], 16),
+                b: parseInt(hexColor[5]+hexColor[6], 16),
+                a: 1,
+            }
         }
+        
 
     }
 }
