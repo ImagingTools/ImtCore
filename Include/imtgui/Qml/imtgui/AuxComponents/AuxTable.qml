@@ -865,6 +865,7 @@ Item {
             height: tableContainer.itemHeight;
             width: elementsListObj.width;
             minHeight: tableContainer.itemHeight;
+            headers: tableContainer.headers;
 
             tableItem: tableContainer;
 

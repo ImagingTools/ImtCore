@@ -20,6 +20,10 @@ Rectangle {
 
     property var bodyArray:  [];
 
+	property var dataModel: model;
+
+	property TreeItemModel headers: TreeItemModel{};
+
     property TreeItemModel cellDecorator : TreeItemModel{};
     property TreeItemModel widthDecorator : TreeItemModel{};
     property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
@@ -49,6 +53,8 @@ Rectangle {
     property string maxLengthText: '';
 
     property int textMarginHor: 8;
+    property int textLeftMargin: 8;
+    property int textRightMargin: 8;
     property int textMarginVer: textTopMargin;
 
     property bool compl: false;
@@ -62,7 +68,7 @@ Rectangle {
     Component.onCompleted: {
         tableDelegateContainer.compl = true;
         tableDelegateContainer.minHeight = tableDelegateContainer.height;
-        tableDelegateContainer.setWidth();
+		tableDelegateContainer.setWidth();
     }
 
     onWidthDecoratorChanged: {
@@ -73,6 +79,10 @@ Rectangle {
         tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
         tableDelegateContainer.setBorderParams();
     }
+
+	onHeadersChanged: {
+		tableDelegateContainer.count--; tableDelegateContainer.count++;
+	}
 
     function getItemData(){
         return model;
@@ -309,6 +319,8 @@ Rectangle {
             Component.onCompleted: {
                 deleg.compl = true;
 
+              //  console.log("DataModel", tableDelegateContainer.dataModel.toJSON());
+
             }
             onComplComplChanged: {
                 if(deleg.complCompl){
@@ -494,15 +506,15 @@ Rectangle {
                 anchors.verticalCenter: mainRec.verticalCenter;
                 anchors.left: mainRec.left;
                 anchors.right: mainRec.right;
-                anchors.leftMargin: tableDelegateContainer.textMarginHor;
-                anchors.rightMargin: tableDelegateContainer.textMarginHor;
+                anchors.leftMargin: tableDelegateContainer.textLeftMargin;
+                anchors.rightMargin: tableDelegateContainer.textRightMargin;
 
 
                 verticalAlignment: Text.AlignVCenter;
                 horizontalAlignment: tableDelegateContainer.emptyDecorCell ? Text.AlignLeft :
-                                                                             tableDelegateContainer.cellDecorator.IsValidData("TextPosition", model.index) ?
-                                                                                 tableDelegateContainer.cellDecorator.GetData("TextPosition", model.index) :
-                                                                                 Text.AlignLeft;
+                                                                                tableDelegateContainer.cellDecorator.IsValidData("TextPosition", model.index) ?
+                                                                                    tableDelegateContainer.cellDecorator.GetData("TextPosition", model.index) :
+                                                                                    Text.AlignLeft;
 
 
 
@@ -516,15 +528,15 @@ Rectangle {
                 font.family: Style.fontFamily;
 
                 font.bold: tableDelegateContainer.emptyDecorCell ? true :
-                                                                   tableDelegateContainer.cellDecorator.IsValidData("FontBold", model.index) ?
-                                                                       tableDelegateContainer.cellDecorator.GetData("FontBold", model.index) :
-                                                                       true;
+                                                                    tableDelegateContainer.cellDecorator.IsValidData("FontBold", model.index) ?
+                                                                        tableDelegateContainer.cellDecorator.GetData("FontBold", model.index) :
+                                                                        true;
 
 
                 color: tableDelegateContainer.emptyDecorCell ? Style.textColor :
-                                                               tableDelegateContainer.cellDecorator.IsValidData("FontColor", model.index) ?
-                                                                   tableDelegateContainer.cellDecorator.GetData("FontColor", model.index) :
-                                                                   Style.textColor;
+                                                                tableDelegateContainer.cellDecorator.IsValidData("FontColor", model.index) ?
+                                                                    tableDelegateContainer.cellDecorator.GetData("FontColor", model.index) :
+                                                                    Style.textColor;
 
                 elide: tableDelegateContainer.elideMode;
 
@@ -533,10 +545,10 @@ Rectangle {
                 onLinkActivated: {
                     Qt.openUrlExternally(link);
                 }
+                //  text: "ttteeewww"
+                // text: tableDelegateContainer.headers.GetData("Id", model.index + 1)
 
-                text: tableDelegateContainer.bodyArray[model.index] == undefined ? "" :
-                                                                                  tableDelegateContainer.bodyArray[model.index];
-
+                text: tableDelegateContainer.dataModel[tableDelegateContainer.headers.GetData("Id", model.index)]
 
                 onHeightChanged: {
                     if(tableDelegateContainer.wrapMode !== Text.NoWrap){
