@@ -1,9 +1,13 @@
 #pragma once
 
 
+// ImtCore includes
+#include <imtdev/IDeviceAccessor.h>
+#include <imtdev/IDeviceEnumerator.h>
+
+
 namespace iprm
 {
-	class IParamsSet;
 	class IOptionsList;
 }
 
@@ -12,15 +16,18 @@ namespace imtdev
 {
 
 
-class IDeviceInfo;
+class IDeviceStaticInfo;
+class IDeviceInstanceInfo;
 
 
 /**
-	Common interface for controlling devices in a general way.
+	Common interface for controlling a device.
 	Devices are abstract operating units having internal processing loop.
-	Devices can be started, stopped and also used for executing external commands.
+	Devices can be opened, closed and also used for executing external commands.
+	Controller enumerates, opens, closes devices, accesses static information about devices,
+	as well as information about the device instances.
 */
-class IDeviceController: virtual public istd::IChangeable
+class IDeviceController: virtual public IDeviceEnumerator
 {
 public:
 	/**
@@ -45,29 +52,21 @@ public:
 		DS_ACTIVE
 	};
 
-	/**
-		Binary flags for describing capabilities of a device.
-	*/
-	enum DeviceCapabilities
-	{
-		DC_READ = 1,
-		DC_WRITE = 2
-	};
 
 	/**
-		Get the list of devices.
+		Get IDs of device types supported by the controller.
 	*/
-	virtual const iprm::IOptionsList& GetDeviceInfoList() const = 0;
+	virtual QByteArrayList GetSupportedDeviceTypeIds() const = 0;
 
 	/**
-		Get capability flags for the given device.
+		Get device static info for the given DeviceTypeId.
 	*/
-	virtual int GetDeviceCapabilities(const QByteArray& deviceId) const = 0;
+	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const = 0;
 
 	/**
-		Get information about the device
+		Get the list of available devices.
 	*/
-	virtual const IDeviceInfo* GetDeviceInfo(const QByteArray& deviceId) const = 0;
+	virtual const iprm::IOptionsList& GetAvailableDeviceList() const = 0;
 
 	/**
 		Get the current state of the device.
@@ -75,44 +74,20 @@ public:
 	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const = 0;
 
 	/**
-		Do device initialization. After correct initialization the device is still inactive, but prepared for working.
-		\note Only correctly initialized devices can be used.
+		Get device instance info for the given DeviceId.
+		For some devices DeviceInstanceInfo can only be obtained for open devices
 	*/
-	virtual bool InitializeDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr = nullptr) = 0;
+	virtual const IDeviceInstanceInfo* GetDeviceInstanceInfo(const QByteArray& deviceId) const = 0;
 
 	/**
 		Start processing loop of the given device. The state of the device will be switched into DS_ACTIVE, if the operation was successful.
-		The method should be called after \c InitializeDevice
-		\sa InitializeDevice
 	*/
-	virtual bool StartDevice(const QByteArray& deviceId) = 0;
+	virtual DeviceAccessorPtr OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr) = 0;
 
 	/**
 		Stop processing loop of the given device. The device will be in the \c DS_INACTIVE state, if the operation was successful.
 	*/
-	virtual bool StopDevice(const QByteArray& deviceId) = 0;
-
-	/**
-		Get the list of commands supported by the device with the given ID.
-	*/
-	virtual QByteArrayList GetSupportedCommands(const QByteArray& deviceId) const = 0;
-
-	/**
-		Execute a command on the device.
-		\return Processing state of the command. \sa iproc::IProcessor::TaskState
-	*/
-	virtual int ExecuteCommand(
-				const QByteArray& deviceId,
-				const QByteArray& commandId,
-				const iprm::IParamsSet* commandParamsPtr = nullptr) = 0;
-
-	virtual int GetConfiguration(
-				const QByteArray& deviceId,
-				iprm::IParamsSet& configuration) const = 0;
-
-	virtual int SetConfiguration(
-				const QByteArray& deviceId,
-				const iprm::IParamsSet& configuration) = 0;
+	virtual bool CloseDevice(const QByteArray& deviceId) = 0;
 };
 
 

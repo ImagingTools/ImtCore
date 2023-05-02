@@ -1,12 +1,14 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QByteArray>
-
 // ACF includes
-#include <ibase/IProgressManager.h>
 #include <idoc/IDocumentMetaInfo.h>
+
+
+namespace ibase
+{
+	class IProgressManager;
+}
 
 
 namespace imtdev
