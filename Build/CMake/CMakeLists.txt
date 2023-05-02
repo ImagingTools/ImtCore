@@ -59,6 +59,7 @@ add_subdirectory("${INCLUDE_DIR}/imthttp/CMake" "${AUX_INCLUDE_DIR}/imthttp")
 add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
+add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")
 
 if(DEFINED USE_MONGODB AND USE_MONGODB)
 	add_subdirectory("${INCLUDE_DIR}/imtmongo/CMake" "${AUX_INCLUDE_DIR}/imtmongo")
