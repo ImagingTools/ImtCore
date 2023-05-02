@@ -40,6 +40,10 @@ export var Qt = {
     PartiallyChecked: 1,
     Checked: 2,
 
+    platform: {
+        os: 'web',
+    },
+
     point: function(x, y){
         return {}
     },
@@ -51,6 +55,9 @@ export var Qt = {
         let translate = Core.context.languages[`${Core.context.application}_${Core.context.language}`]
         let result = translate ? translate[sourceText] : sourceText
         return result ? result : sourceText
+    },
+    rgba(r, g, b, a){
+        return `rgba(${Math.trunc(r*255)},${Math.trunc(g*255)},${Math.trunc(b*255)},${Math.trunc(a*255)})`
     },
 
     $colors: {

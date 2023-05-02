@@ -82,6 +82,11 @@ export class Item extends QtObject {
         this.$cP('rotation', 0).connect(this.$rotationAndScaleChanged.bind(this))
         this.$cP('transformOrigin', Item.Center).connect(this.$transformChanged.bind(this))
 
+        // if(this.parent && this.parent.$qmlClassName === 'Loader'){
+        //     this.$sP('width', ()=>{return this.parent.width})
+        //     this.$sP('height', ()=>{return this.parent.height})
+        // }
+
         this.$cPC('anchors', {
             left: undefined,
             top: undefined,
@@ -141,10 +146,10 @@ export class Item extends QtObject {
         this.Keys.onVolumeUpPressed = this.$s['Keys.volumeUpPressed'] = Signal()
         this.Keys.onYesPressed = this.$s['Keys.yesPressed'] = Signal()
     }
-    $domCreate(){
+    $domCreate(tag = 'div'){
         super.$domCreate()
         if(this.parent) this.parent.$availableGeometry.push(this)
-        this.dom = document.createElement("div")
+        this.dom = document.createElement(tag)
 
         // if(this.UID !== 0)
         // Core.root.dom.appendChild(this.dom)

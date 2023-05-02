@@ -23,27 +23,19 @@ export class Canvas extends Item {
     }
 
     $domCreate(){
-        super.$domCreate()
+        super.$domCreate("canvas")
 
-        this.dom = document.createElement("canvas")
+    }
 
-        if(this.parent){
-            this.parent.dom.appendChild(this.dom)
-        }
-        
-        this.dom.style.position = 'absolute'
-        this.dom.style.overflow = 'unset'
-        this.dom.style.zIndex = this.z
-        this.dom.classList.add(this.constructor.name)
-        this.dom.id = `el-${this.UID}`
-
-        this.dom.addEventListener("focusin", (e)=>{
-			this.focus = true
-		})
-		this.dom.addEventListener("focusout", (e)=>{
-			this.focus = false
-		})
-
+    $widthChanged(){
+        super.$widthChanged()
+        this.dom.setAttribute('width', this.width)
+        this.paint()
+    }
+    $heightChanged(){
+        super.$heightChanged()
+        this.dom.setAttribute('height', this.height)
+        this.paint()
     }
 
     cancelRequestAnimationFrame(handle){

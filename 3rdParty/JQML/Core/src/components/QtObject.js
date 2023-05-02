@@ -780,7 +780,7 @@ export class QtObject {
         
     }
     
-    $domCreate(){
+    $domCreate(tag = 'div'){
         
     }
     $updateChildrenRect(){
