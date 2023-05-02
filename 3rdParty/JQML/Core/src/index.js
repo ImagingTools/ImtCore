@@ -3,6 +3,7 @@ import {Qt} from './utils/Qt'
 global.Qt = Qt
 global.QML = {}
 require('./components/Component')
+require('./components/WebSocket')
 require('./components/Shortcut')
 require('./components/QtObject')
 require('./components/Item')
