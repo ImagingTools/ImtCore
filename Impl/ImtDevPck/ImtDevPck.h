@@ -17,8 +17,8 @@ namespace ImtDevPck
 {
 
 
-typedef imtdev::CDeviceDataFilePersistenceComp DeviceDataFilePersistence;
 typedef imtdev::CCompositeDeviceControllerComp CompositeDeviceController;
+typedef imtdev::CDeviceDataFilePersistenceComp DeviceDataFilePersistence;
 
 
 } // namespace ImtDevPck
