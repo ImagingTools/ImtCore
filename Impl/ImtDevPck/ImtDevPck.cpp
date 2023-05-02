@@ -19,6 +19,11 @@ I_EXPORT_COMPONENT(
 			"File persistence for the device data",
 			"File Device Persistence Storage EEPROM");
 
+I_EXPORT_COMPONENT(
+			CompositeDeviceController,
+			"Composite device controller for hierarchical access and enumeration",
+			"Device Controller");
+
 
 } // namespace ImtDevPck
 

@@ -6,6 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // Acula includes
+#include <imtdev/CCompositeDeviceControllerComp.h>
 #include <imtdev/CDeviceDataFilePersistenceComp.h>
 
 
@@ -17,6 +18,7 @@ namespace ImtDevPck
 
 
 typedef imtdev::CDeviceDataFilePersistenceComp DeviceDataFilePersistence;
+typedef imtdev::CCompositeDeviceControllerComp CompositeDeviceController;
 
 
 } // namespace ImtDevPck
