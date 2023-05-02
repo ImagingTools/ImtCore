@@ -901,6 +901,7 @@ Item {
             //!!!
 
             Component.onCompleted: {
+                console.log("TableDelegate onCompleted", model.index);
                 tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
 
                 for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){

@@ -46,15 +46,19 @@ Item {
     }
 
     function addModel(obj){
+        console.log("addModel");
         if (!obj){
             return;
         }
 
-        console.log("addModel2", JSON.stringify(obj));
+        console.log("obj", JSON.stringify(obj));
 
         if (undoRedo.undoStack.length >= 1){
             let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
-            if (obj.IsEqualWithModel(lastModel)){
+            console.log("lastModel", JSON.stringify(lastModel));
+            let isEqual = obj.IsEqualWithModel(lastModel);
+            console.log("isEqual", isEqual);
+            if (isEqual){
                 return;
             }
         }

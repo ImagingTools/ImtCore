@@ -8,7 +8,6 @@ Item {
     width: texttabDelegate.width + imagetabDelegate.width + 30;
     property Item rootItem: null;
 
-
     Rectangle {
         anchors.fill: parent;
         color: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.selected ? Style.baseColor: "transparent": "transparent";
@@ -25,7 +24,6 @@ Item {
 
         color: Style.tabSelectedColor;
         visible: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.selected: false;
-
     }
 
     Item {
@@ -60,14 +58,7 @@ Item {
         anchors.left: imagetabDelegate.right;
         anchors.leftMargin: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElement ? 0 :10 : 0;
 
-//        width:  text.width + tabDelegate.height;
         width: text.width;
-
-        onWidthChanged: {
-            if (tabPanelDecorator.rootItem && tabPanelDecorator.rootItem.autoWidth){
-                tabPanelDecorator.rootItem.width = tabPanelDecorator.width + imagetabDelegate.width + 30;
-            }
-        }
 
         Text {
             id: text;

@@ -142,6 +142,8 @@
 	<file alias="imtgui/AuxComponents/TimeIntervalPicker.qml">Qml/imtgui/AuxComponents/TimeIntervalPicker.qml</file>
 	<file alias="imtgui/AuxComponents/SchedulerParams.qml">Qml/imtgui/AuxComponents/SchedulerParams.qml</file>
 	<file alias="imtgui/AuxComponents/Spinner.qml">Qml/imtgui/AuxComponents/Spinner.qml</file>
+
+	<file alias="imtgui/AuxComponents/TableCellDelegate.qml">Qml/imtgui/AuxComponents/TableCellDelegate.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

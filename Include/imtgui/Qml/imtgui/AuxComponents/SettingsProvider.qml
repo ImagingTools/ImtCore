@@ -31,7 +31,9 @@ Item {
     }
 
     function clearModel(){
-        container.serverModel.Clear();
+        if (container.serverModel){
+            container.serverModel.Clear();
+        }
     }
 
     function updateModel(){
@@ -78,7 +80,7 @@ Item {
         id: settingsQuery;
 
         function getSettings() {
-            console.log("getSettings");
+            console.log("GetSettings");
 
             var query = Gql.GqlRequest("query", "GetSettings");
 
@@ -116,11 +118,12 @@ Item {
         id: preferenceSaveQuery;
 
         function save(){
+            console.log("SetSettings");
+
             var query = Gql.GqlRequest("mutation", "SetSettings");
 
             var inputParams = Gql.GqlObject("input");
             var jsonString = container.serverModel.toJSON();
-//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"");
 
             inputParams.InsertField("Item", jsonString);
             query.AddParam(inputParams);

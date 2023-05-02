@@ -109,4 +109,4 @@ Loading 1.0 ./AuxComponents/Loading.qml
 StateMachine 1.0 ./AuxComponents/StateMachine.qml
 
 TreeViewModelAdapter 1.0 ./AuxComponents/TreeViewModelAdapter.qml
-
+TableCellDelegate 1.0 ./AuxComponents/TableCellDelegate.qml

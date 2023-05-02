@@ -21,6 +21,7 @@ Item {
     }
 
     function registerDocumentManager(typeId, documentManager){
+        console.log("registerDocumentManager", typeId, documentManager);
         root.documentManagers[typeId] = documentManager;
 
         Events.subscribeEvent(typeId + "CollectionUpdated", root.collectionUpdated);
@@ -75,10 +76,10 @@ Item {
         let typeIds = Object.keys(root.documentManagers);
         for (let i = 0; i < typeIds.length; i++){
             let typeId = typeIds[i];
+            console.log('typeId', typeId);
             let documentManager = root.documentManagers[typeId];
-            if (documentManager !== null){
+            if (documentManager && documentManager !== null){
                 console.log('documentManager', documentManager)
-                console.log(typeId, documentManager.dirtyDocumentsExists())
                 if (documentManager.dirtyDocumentsExists()){
                     return true;
                 }

@@ -12,16 +12,10 @@ Item {
     property bool documentLoading: false;
 
     Component.onCompleted: {
-//        Events.subscribeEvent("DocumentSaved", documentManager.documentSaved);
-//        Events.subscribeEvent("CloseDocument", documentManager.closeDocument);
-
         Events.subscribeEvent("DocumentUpdating", documentManager.documentUpdating);
     }
 
     Component.onDestruction: {
-//        Events.unSubscribeEvent("DocumentSaved", documentManager.documentSaved);
-//        Events.unSubscribeEvent("CloseDocument", documentManager.closeDocument);
-
         Events.unSubscribeEvent("DocumentUpdating", documentManager.documentUpdating);
     }
 
@@ -30,13 +24,10 @@ Item {
         documentLoader.source = documentManager.startPageObj["Source"];
 
         if (documentLoader.item.commandsId !== undefined){
-            console.log("documentLoader.item.commandsId", documentManager.startPageObj["CommandsId"]);
             documentLoader.item.commandsId = documentManager.startPageObj["CommandsId"];
         }
 
-//        console.log("documentLoader.item", documentLoader.item);
         if(documentLoader.item.documentManager !== undefined){
-            console.log("documentLoader.item.documentManager", documentManager);
             documentLoader.item.documentManager = documentManager;
         }
     }
@@ -67,6 +58,7 @@ Item {
         item.itemName = documentName;
 
         item.isDirty = false;
+        item.saved();
 
         if (item.closingFlag){
             closeDocument(item.itemId);

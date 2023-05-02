@@ -10,6 +10,30 @@ Rectangle {
 
     radius: 7;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("SetUserPanelButtonVisible", topRightPanelDecorator.setUserPanelButtonVisible);
+        Events.subscribeEvent("SetUserPanelButtonEnabled", topRightPanelDecorator.setUserPanelButtonEnabled);
+        Events.subscribeEvent("SetPreferenceButtonVisible", topRightPanelDecorator.setPreferenceButtonVisible);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("SetUserPanelButtonVisible", topRightPanelDecorator.setUserPanelButtonVisible);
+        Events.unSubscribeEvent("SetPreferenceButtonVisible", topRightPanelDecorator.setPreferenceButtonVisible);
+        Events.unSubscribeEvent("SetUserPanelButtonEnabled", topRightPanelDecorator.setUserPanelButtonEnabled);
+    }
+
+    function setUserPanelButtonVisible(visible){
+        userPanel.visible = visible;
+    }
+
+    function setUserPanelButtonEnabled(enabled){
+        userPanel.enabled = enabled;
+    }
+
+    function setPreferenceButtonVisible(visible){
+        preferenceButton.visible = visible;
+    }
+
     UserPanel {
         id: userPanel;
         anchors.verticalCenter: parent.verticalCenter;
@@ -25,34 +49,4 @@ Rectangle {
         width: 24;
         height: 24;
     }
-
-//    Row {
-//        id: container;
-
-//        anchors.fill: parent;
-
-//        height: parent.height;
-//        spacing: 10;
-
-//        UserPanel {
-//            anchors.verticalCenter: parent.verticalCenter;
-//        }
-
-//        PreferenceButton {
-//            id: preferenceButton;
-
-//            width: 24;
-//            height: 24;
-
-//            anchors.verticalCenter: parent.verticalCenter;
-//        }
-////        LoginButton {
-////            id: loginButton;
-
-////            width: 24;
-////            height: 24;
-
-////            anchors.verticalCenter: parent.verticalCenter;
-////        }
-//    }
 }

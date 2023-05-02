@@ -25,7 +25,6 @@ Rectangle {
     Component.onCompleted: {
         Events.subscribeEvent("setPreferencesVisible", thumbnailDecoratorContainer.setPreferencesVisible);
         Events.subscribeEvent("clearModels", thumbnailDecoratorContainer.clearModels);
-
     }
 
     function updateModels(){
@@ -172,6 +171,11 @@ Rectangle {
 
         onUserModeChanged: {
             if (userMode == "NO_USER_MANAGEMENT"){
+                Events.sendEvent("SetUserPanelButtonVisible", false);
+                thumbnailDecoratorContainer.root.updateAllModels();
+            }
+            else if (userMode == "OPTIONAL_USER_MANAGEMENT"){
+                Events.sendEvent("SetUserPanelButtonEnabled", true);
                 thumbnailDecoratorContainer.root.updateAllModels();
             }
             else if (userMode == "STRONG_USER_MANAGEMENT"){

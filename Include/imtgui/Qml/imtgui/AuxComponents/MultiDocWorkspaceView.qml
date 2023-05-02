@@ -413,9 +413,6 @@ Item {
         model: workspaceView.documentsData;
 
         onCloseItem: {
-            console.log("onCloseItem", index);
-//            tabPanelInternal.selectedIndex = index;
-
             let item = workspaceView.documentsData.GetData("Item", index);
             item.commandsDelegate.commandHandle("Close");
         }

@@ -51,6 +51,7 @@ Item {
     }
 
     function documentSaved(){
+        console.log("UndoRedoManager documentSaved");
         undoRedoManager.mainModel.Copy(undoRedoManager.documentBase.documentModel);
     }
 

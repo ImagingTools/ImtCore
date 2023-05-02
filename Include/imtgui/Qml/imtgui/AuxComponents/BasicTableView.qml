@@ -40,13 +40,13 @@ FocusScope {
     signal rowRemoved();
 
     Component.onCompleted: {
-        tableViewRoot.Keys.onPressed.connect(tableViewRoot.selection.tableKeyPressed);
+//        tableViewRoot.Keys.onPressed.connect(tableViewRoot.selection.tableKeyPressed);
 
         tableViewRoot.selection.selectedIndex = tableViewRoot.selectedIndex;
     }
 
     Component.onDestruction: {
-        tableViewRoot.Keys.onPressed.disconnect(tableViewRoot.selection.tableKeyPressed);
+//        tableViewRoot.Keys.onPressed.disconnect(tableViewRoot.selection.tableKeyPressed);
     }
 
     property var itemsList: [];
