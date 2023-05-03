@@ -88,7 +88,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 
 	if (workingDocumentPtr.IsValid()){
 		QByteArray documentContent;
-		if (WriteDataToMemory("DocumentInfo", *workingDocumentPtr, documentContent)){
+        if (WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
 			qDebug() << "documentContent " << documentContent;
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
