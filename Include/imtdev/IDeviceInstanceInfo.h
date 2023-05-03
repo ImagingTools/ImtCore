@@ -44,6 +44,9 @@ public:
 };
 
 
+typedef QSharedPointer<IDeviceInstanceInfo> DeviceInstanceInfoPtr;
+
+
 } // namespace imtdev
 
 

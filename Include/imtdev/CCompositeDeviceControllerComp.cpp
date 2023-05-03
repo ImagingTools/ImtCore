@@ -72,13 +72,18 @@ IDeviceController::DeviceState CCompositeDeviceControllerComp::GetDeviceState(co
 }
 
 
-const IDeviceInstanceInfo* CCompositeDeviceControllerComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
+DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
 	if (m_deviceControllerMap.contains(deviceId)){
-		return m_deviceControllerMap[deviceId]->GetDeviceInstanceInfo(deviceId);
+		istd::TDelPtr<imtdev::IDeviceInstanceInfo> instanceInfoPtr;
+		instanceInfoPtr.SetCastedOrRemove(m_deviceControllerMap[deviceId]->GetDeviceInstanceInfo(deviceId)->CloneMe());
+
+		DeviceInstanceInfoPtr retVal(instanceInfoPtr.PopPtr());
+
+		return retVal;
 	}
 
-	return nullptr;
+	return DeviceInstanceInfoPtr();
 }
 
 

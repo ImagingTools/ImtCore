@@ -50,7 +50,7 @@ public:
 	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
 	virtual const iprm::IOptionsList& GetAvailableDeviceList() const override;
 	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
-	virtual const IDeviceInstanceInfo* GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
+	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
 	virtual imtdev::DeviceAccessorPtr OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr) override;
 	virtual bool CloseDevice(const QByteArray& deviceId) override;
 
