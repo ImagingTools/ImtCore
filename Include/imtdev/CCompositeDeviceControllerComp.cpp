@@ -279,7 +279,7 @@ void CCompositeDeviceControllerComp::OnDeviceListChanged(int modelId, const istd
 
 	istd::CChangeGroup group(&m_deviceList);
 
-	m_deviceList.ResetData();
+	m_deviceList.CopyFrom(iprm::COptionsManager());
 	m_deviceControllerMap.clear();
 
 	QString devices;
