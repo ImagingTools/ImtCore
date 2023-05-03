@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5063" Description="ACF"/>
-            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5060" Description="ACF"/>
+            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -55,6 +55,7 @@
                     <AttributeInfo Id="DocumentPersistenceList" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>JsonSerializer</Value>
                                 <Value>JsonSerializer</Value>
                             </Values>
                         </Data>
@@ -108,7 +109,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="TypeNames">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>DocumentInfo</Value>
