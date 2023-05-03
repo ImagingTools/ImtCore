@@ -401,6 +401,7 @@ export class ListView extends Flickable {
             }
             i++
         }
+        return 0
 
     }
     $remove(index, count){
@@ -454,6 +455,7 @@ export class ListView extends Flickable {
             } else {
                 this.$items[0].x = 0
                 this.$items[0].y = 0
+                this.$updateGeometry()
             }
 
             let currentIndex = this.$getCurrentIndex()
