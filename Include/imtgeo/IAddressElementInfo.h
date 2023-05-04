@@ -13,47 +13,46 @@ namespace imtgeo
 
 
 /**
-    Interface for describing a address element regions.
+	Interface for describing a address element regions.
 	\ingroup Handbooks
 */
 class IAddressElementInfo: virtual public iser::IObject
 {
 public:
+	/**
+		Get id of the address element.
+	*/
+	virtual QByteArray GetId() const = 0;
 
-    /**
-        Get id of the address element.
-    */
-    virtual QByteArray GetId() const = 0;
+	/**
+		Set id of the address element.
+	*/
+	virtual void SetId(QByteArray id) = 0;
 
-    /**
-        Set id of the address element.
-    */
-    virtual void SetId(QByteArray id) = 0;
+	/**
+		Get id of parent the address element.
+	*/
+	virtual QByteArray GetParentId() const = 0;
 
-    /**
-        Get id of parent the address element.
-    */
-    virtual QByteArray GetParentId() const = 0;
+	/**
+		Set id of parent the address element.
+	*/
+	virtual void SetParentId(QByteArray parentId) = 0;
 
-    /**
-        Set id of parent the address element.
-    */
-    virtual void SetParentId(QByteArray parentId) = 0;
+	/**
+		Get id of type the address element.
+	*/
+	virtual const QByteArray GetTypeId() const = 0;
 
-    /**
-        Get id of type the address element.
-    */
-    virtual const QByteArray GetTypeId() const = 0;
-
-    /**
-        Get name of the address element.
+	/**
+		Get name of the address element.
 	*/
 	virtual QString GetName() const = 0;
 
-    /**
-        Get description of the address element.
-    */
-    virtual QString GetDescription() const = 0;
+	/**
+		Get description of the address element.
+	*/
+	virtual QString GetDescription() const = 0;
 
 	/**
 		Get string address.

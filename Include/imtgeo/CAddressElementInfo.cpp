@@ -1,5 +1,6 @@
 #include "CAddressElementInfo.h"
 
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
@@ -10,6 +11,7 @@
 
 namespace imtgeo
 {
+
 
 // public methods
 
@@ -26,37 +28,37 @@ CAddressElementInfo::~CAddressElementInfo()
 
 QByteArray CAddressElementInfo::GetId() const
 {
-    return m_id;
+	return m_id;
 }
 
 
 void CAddressElementInfo::SetId(QByteArray id)
 {
-    if (m_id != id){
+	if (m_id != id){
 		istd::CChangeNotifier notifier(this);
-        m_id = id;
+		m_id = id;
 	}
 }
 
 
 QByteArray CAddressElementInfo::GetParentId() const
 {
-    return m_parentId;
+	return m_parentId;
 }
 
 
 void CAddressElementInfo::SetParentId(QByteArray parentId)
 {
-    if (m_parentId != parentId){
-        istd::CChangeNotifier notifier(this);
-        m_parentId = parentId;
-    }
+	if (m_parentId != parentId){
+		istd::CChangeNotifier notifier(this);
+		m_parentId = parentId;
+	}
 }
 
 
 const QByteArray CAddressElementInfo::GetTypeId() const
 {
-    return m_typeId;
+	return m_typeId;
 }
 
 
@@ -77,31 +79,31 @@ void CAddressElementInfo::SetName(QString name)
 
 QString CAddressElementInfo::GetDescription() const
 {
-    return m_description;
+	return m_description;
 }
 
 
 void CAddressElementInfo::SetDescription(QString description)
 {
-    if (m_description != description){
-        istd::CChangeNotifier notifier(this);
-        m_description = description;
-    }
+	if (m_description != description){
+		istd::CChangeNotifier notifier(this);
+		m_description = description;
+	}
 }
 
 
 QByteArray CAddressElementInfo::GetSerialId() const
 {
-    return m_serialId;
+	return m_serialId;
 }
 
 
 void CAddressElementInfo::SetSerialId(QByteArray serialId)
 {
-    if (m_serialId != serialId){
-        istd::CChangeNotifier notifier(this);
-        m_serialId = serialId;
-    }
+	if (m_serialId != serialId){
+		istd::CChangeNotifier notifier(this);
+		m_serialId = serialId;
+	}
 }
 
 
@@ -158,30 +160,30 @@ bool CAddressElementInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-    static iser::CArchiveTag idTag("Id", "Address elemen id", iser::CArchiveTag::TT_LEAF);
-    retVal = archive.BeginTag(idTag);
-    retVal = retVal && archive.Process(m_id);
-    retVal = retVal && archive.EndTag(idTag);
+	static iser::CArchiveTag idTag("Id", "Address elemen id", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
 
-    static iser::CArchiveTag parentIdTag("ParentId", "Parent address elemen id", iser::CArchiveTag::TT_LEAF);
-    retVal = archive.BeginTag(parentIdTag);
-    retVal = retVal && archive.Process(m_parentId);
-    retVal = retVal && archive.EndTag(parentIdTag);
+	static iser::CArchiveTag parentIdTag("ParentId", "Parent address elemen id", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(parentIdTag);
+	retVal = retVal && archive.Process(m_parentId);
+	retVal = retVal && archive.EndTag(parentIdTag);
 
-    static iser::CArchiveTag typeTag("Type", "Type address elemen id", iser::CArchiveTag::TT_LEAF);
-    retVal = archive.BeginTag(typeTag);
-    retVal = retVal && archive.Process(m_typeId);
-    retVal = retVal && archive.EndTag(typeTag);
+	static iser::CArchiveTag typeTag("Type", "Type address elemen id", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(typeTag);
+	retVal = retVal && archive.Process(m_typeId);
+	retVal = retVal && archive.EndTag(typeTag);
 
 	static iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-    static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
-    retVal = archive.BeginTag(descriptionTag);
-    retVal = retVal && archive.Process(m_description);
-    retVal = retVal && archive.EndTag(descriptionTag);
+	static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	retVal = archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
 
 
 	static iser::CArchiveTag fullAddressTag("fullAddress", "String of the full address", iser::CArchiveTag::TT_LEAF);
@@ -215,17 +217,16 @@ bool CAddressElementInfo::CopyFrom(const IChangeable& object, CompatibilityMode 
 {
 	istd::CChangeGroup changeGroup(this);
 
-
-    const CAddressElementInfo* sourcePtr = dynamic_cast<const CAddressElementInfo*>(&object);
+	const CAddressElementInfo* sourcePtr = dynamic_cast<const CAddressElementInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-        m_id = sourcePtr->m_id;
-        m_parentId = sourcePtr->m_parentId;
-        m_typeId = sourcePtr->m_typeId;
-        m_name = sourcePtr->m_name;
-        m_description = sourcePtr->m_description;
-        m_serialId = sourcePtr->m_serialId;
+		m_id = sourcePtr->m_id;
+		m_parentId = sourcePtr->m_parentId;
+		m_typeId = sourcePtr->m_typeId;
+		m_name = sourcePtr->m_name;
+		m_description = sourcePtr->m_description;
+		m_serialId = sourcePtr->m_serialId;
 		m_address = sourcePtr->m_address;
 		m_latitude = sourcePtr->m_latitude;
 		m_longitude = sourcePtr->m_longitude;
@@ -239,7 +240,7 @@ bool CAddressElementInfo::CopyFrom(const IChangeable& object, CompatibilityMode 
 
 istd::IChangeable* CAddressElementInfo::CloneMe(CompatibilityMode mode) const
 {
-    istd::TDelPtr<CAddressElementInfo> clonePtr(new CAddressElementInfo);
+	istd::TDelPtr<CAddressElementInfo> clonePtr(new CAddressElementInfo);
 	if (clonePtr->CopyFrom(*this, mode)){
 		return clonePtr.PopPtr();
 	}
@@ -252,11 +253,11 @@ bool CAddressElementInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-    m_id.clear();
-    m_parentId.clear();
+	m_id.clear();
+	m_parentId.clear();
 	m_name.clear();
-    m_description.clear();
-    m_serialId.clear();
+	m_description.clear();
+	m_serialId.clear();
 	m_address.clear();
 	m_latitude = 0;
 	m_longitude = 0;
