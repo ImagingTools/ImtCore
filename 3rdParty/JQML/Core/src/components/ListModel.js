@@ -50,7 +50,7 @@ export class ListModel extends QtObject {
 				return
 
             for(let i = 0; i < dict.length; i++){
-                let listElement = new ListElement({})
+                let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
                     listElement.$cP(key, dict[i][key]).connect(this.$modelChanged.bind(this))
@@ -62,7 +62,7 @@ export class ListModel extends QtObject {
                 dict.$cP('index', this.data.length)
                 this.data.push(dict)
             } else {
-                let listElement = new ListElement({})
+                let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', this.data.length)
                 for(let key in dict){
                     listElement.$cP(key, dict[key]).connect(this.$modelChanged.bind(this))
@@ -94,7 +94,7 @@ export class ListModel extends QtObject {
 				return
 
             for(let i = 0; i < dict.length; i++){
-                let listElement = new ListElement({})
+                let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
                     listElement.$cP(key, dict[i][key]).connect(this.$modelChanged.bind(this))
@@ -107,7 +107,7 @@ export class ListModel extends QtObject {
                 dict.$cP('index', index)
                 this.data.splice(index, 0, dict)
             } else {
-                let listElement = new ListElement({})
+                let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', index)
                 for(let key in dict){
                     listElement.$cP(key, dict[key]).connect(this.$modelChanged.bind(this))
@@ -200,12 +200,12 @@ export class ListModel extends QtObject {
         return retVal
     }
 
-    // $destroy(){
-    //     this.clear()
-    //     this.$data = []
-    //     this.$deps = {}
-    //     super.$destroy()
-    // }
+    $destroy(){
+        this.clear()
+        this.$data = []
+        this.$deps = {}
+        super.$destroy()
+    }
 }
 
 QML.ListModel = ListModel
