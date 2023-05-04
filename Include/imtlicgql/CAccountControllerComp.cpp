@@ -28,6 +28,12 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 	dataModel->SetData("Description", "");
 	dataModel->SetData("Email", "");
 	dataModel->SetData("CompanyName", "");
+	dataModel->SetData("CompanyName", "");
+	dataModel->SetData("Country", "");
+	dataModel->SetData("City", "");
+	dataModel->SetData("PostalCode", "");
+	dataModel->SetData("Street", "");
+	dataModel->SetData("Groups", "");
 
 	QByteArray accountId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 

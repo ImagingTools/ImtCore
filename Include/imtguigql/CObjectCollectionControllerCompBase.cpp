@@ -512,6 +512,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			offset -= count;
 		}
 
+//		for (int i = 0; i < 1000; i++){
+//			itemsModel->InsertNewItem();
+
+//			itemsModel->SetData("Id", "Test" + QString::number(i), i);
+//			itemsModel->SetData("Name", "Test" + QString::number(i), i);
+//			itemsModel->SetData("Description", "Test" + QString::number(i), i);
+//		}
+
 		imtdb::CSqlDatabaseObjectCollectionComp* objectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr());
 		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 

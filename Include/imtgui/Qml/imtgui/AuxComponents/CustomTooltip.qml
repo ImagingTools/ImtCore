@@ -30,6 +30,10 @@ Item {
     property bool openST: false;
     property int waitingDuration: 500;
 
+    property real lineHeight: 1;
+
+    property Component tooltipContentComp: hint;
+
     Component.onDestruction: {
         customTooltip.closeTooltip();
     }
@@ -60,7 +64,7 @@ Item {
                 point.y = point.y + customTooltip.componentMargin;
             }
 
-            modalDialogManager.openDialog(hint, {"x": point.x, "y": point.y});
+            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
 
             modalDialogManager.backgroundItem.visible = false;
 
@@ -84,7 +88,7 @@ Item {
 
         visible: false;
 
-        width: customTooltip.componentWidth - 2*customTooltip.textMargin;
+       // width: customTooltip.componentWidth - 2*customTooltip.textMargin;
 
         font.family: Style.fontFamily;
         font.pixelSize:  customTooltip.fontPixelSize;
@@ -111,7 +115,6 @@ Item {
         color: customTooltip.fontColor;
 
         text: qsTr(customTooltip.text);
-
     }
 
     Component{
@@ -149,9 +152,9 @@ Item {
 
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
 
-
                 text: qsTr(customTooltip.text);
 
+                lineHeight: customTooltip.lineHeight;
             }
         }
     }

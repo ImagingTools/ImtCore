@@ -172,6 +172,8 @@
                             <Values>
                                 <Value>Name</Value>
                                 <Value>Mail</Value>
+                                <Value>Roles</Value>
+                                <Value>Groups</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -183,6 +185,8 @@
                             <Values>
                                 <Value>Name</Value>
                                 <Value>Email</Value>
+                                <Value>Roles</Value>
+                                <Value>Groups</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>

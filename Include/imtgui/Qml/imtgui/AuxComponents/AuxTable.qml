@@ -59,7 +59,13 @@ Item {
     property int elideMode: Text.ElideRight;
     property bool isRightBorder: false;
 
+    property bool isAllItemChecked: false;
+
     signal selectionChanged(var selection);
+
+    property Component cellDelegateComp: Component {
+        TableCellDelegate {}
+    }
 
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
@@ -165,6 +171,32 @@ Item {
             pause.stop();
             pause.start();
         }
+    }
+
+    property var columnContentComps: []
+
+    onHeadersChanged: {
+        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            tableContainer.columnContentComps.push(null);
+        }
+    }
+
+    function getHeaderIndex(headerId){
+        if (!tableContainer.headers){
+            return -1;
+        }
+
+        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            if (tableContainer.headers.GetData("Id", i) === headerId){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    function setColumnContentComponent(columnIndex, comp){
+        tableContainer.columnContentComps[columnIndex] = comp;
     }
 
     function setCellHeight(){
@@ -413,8 +445,6 @@ Item {
         }
     }
 
-    property bool isAllItemChecked: false;
-
     Item {
         id: headersPanel;
 
@@ -547,9 +577,9 @@ Item {
                                                                  Style.baseColor;
 
                     opacity:  tableContainer.emptyDecorHeader ? 1 :
-                                                             tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
-                                                                 tableContainer.headerDecorator.GetData("Opacity", model.index) :
-                                                                 1;
+                                                                tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
+                                                                    tableContainer.headerDecorator.GetData("Opacity", model.index) :
+                                                                    1;
 
                     radius: tableContainer.emptyDecorHeader ? 0 :
                                                               tableContainer.headerDecorator.IsValidData("CellRadius", model.index) ?
@@ -723,7 +753,7 @@ Item {
                     sourceSize.height: height;
 
                     source: tableContainer.sortController && tableContainer.sortController.currentOrder == "ASC" ? "../../../Icons/" + Style.theme + "/Up_On_Normal.svg":
-                                                      "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
+                                                                                                                   "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
                 }
 
                 ////
@@ -822,6 +852,8 @@ Item {
         targetItem: elementsListObj;
     }
 
+
+
     ListView {
         id: elementsListObj;
 
@@ -832,7 +864,7 @@ Item {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        cacheBuffer: 1000;
+        //        cacheBuffer: 10000;
 
         clip: true;
         Keys.onUpPressed: {
@@ -857,7 +889,6 @@ Item {
         }
 
         delegate:
-
             TableDelegate {
 
             id: tableDelegate;
@@ -898,15 +929,12 @@ Item {
             textMarginHor: tableContainer.textMarginHor_deleg;
             textMarginVer: tableContainer.textMarginVer_deleg;
 
+            cellDelegate: tableContainer.cellDelegateComp;
+
             //!!!
 
             Component.onCompleted: {
-                console.log("TableDelegate onCompleted", model.index);
                 tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
-
-                for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-                    tableDelegate.addToArray(model[tableContainer.headers.GetData("Id", i)]);
-                }
             }
 
             Component.onDestruction: {

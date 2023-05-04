@@ -40,6 +40,10 @@ Item {
         id: uuidGenerator;
     }
 
+    function documentCanBeSaved(){
+        return true;
+    }
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Delete){
 //            Events.sendEvent(documentBaseRoot.commandsId + "CommandActivated", "Remove");
@@ -123,7 +127,7 @@ Item {
 
     onDocumentManagerChanged: {
         if(commandsDelegateBase.item){
-            commandsDelegateBase.item.documentBaseRoot = documentBaseRoot;
+            commandsDelegateBase.item.documentBase = documentBaseRoot;
         }
     }
 

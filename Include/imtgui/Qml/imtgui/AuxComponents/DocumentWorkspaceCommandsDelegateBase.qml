@@ -40,9 +40,11 @@ Item {
             console.log("Save");
             console.log("container.documentBase.isDirty", container.documentBase.isDirty);
             if (container.documentBase.isDirty){
-                let itemId = container.documentBase.itemId;
-                let documentManager = container.documentBase.documentManager;
-                documentManager.saveDocument(itemId);
+//                if (container.documentBase.documentCanBeSaved()){
+                    let itemId = container.documentBase.itemId;
+                    let documentManager = container.documentBase.documentManager;
+                    documentManager.saveDocument(itemId);
+//                }
             }
         }
 

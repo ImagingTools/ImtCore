@@ -17,8 +17,6 @@ BasicTableView {
             root: treeViewRoot;
 
             onParentCheckStateChanged: {
-                console.log("onParentCheckedChanged")
-
                 model.CheckState = data.CheckState;
 
                 for (let i = 0; i < childrenDelegates.length; i++){
@@ -27,8 +25,6 @@ BasicTableView {
             }
 
             onChildrenCheckStateChanged: {
-                console.log("onChildrenCheckedChanged")
-
                 let isAllChecked = root.__checkState(childrenDelegates, Qt.Checked);
                 let isAllUnchecked = root.__checkState(childrenDelegates, Qt.Unchecked);
 
@@ -56,7 +52,6 @@ BasicTableView {
     }
 
     function addRow(row){
-        console.log("addRow");
         treeViewRoot.insertRow([rowModel.count], row);
     }
 
@@ -67,7 +62,6 @@ BasicTableView {
 
     function setRow(indexes, row){
         if (!indexes || indexes.length === 0){
-            console.error("BasicTreeView::setRow() - invalid indexes", indexes)
             return;
         }
 
@@ -75,7 +69,6 @@ BasicTableView {
         for (let i = 0; i < indexes.length - 1; i++){
             let index = indexes[i];
             if (localModel.count <= index){
-                console.error("BasicTreeView::insertRow() - invalid index ", index, "from the indexes", indexes);
                 return;
             }
             localModel = localModel.get(index).ChildModel;
@@ -111,7 +104,6 @@ BasicTableView {
             parent = null;
         }
 
-        console.log("insertRow", indexes, JSON.stringify(row))
         if (!indexes || indexes.length == 0){
             console.error("BasicTreeView::insertRow() - invalid indexes", indexes)
             return;
@@ -267,8 +259,6 @@ BasicTableView {
 //    }
 
     function removeRow(indexes){
-        console.log("removeRow", indexes)
-
         let localModel = rowModel;
 
         for (let i = 0; i < indexes.length - 1; i++){
@@ -285,22 +275,7 @@ BasicTableView {
 
         localModel.remove(lastIndex);
 
-        console.log("localModel", localModel);
-
         treeViewRoot.rowRemoved();
-    }
-
-    function printModel(rowModel){
-        for (let i = 0; i < rowModel.count; i++){
-            let obj = rowModel.get(i);
-
-            console.log("obj", JSON.stringify(obj));
-
-            if (obj.ChildModel.length > 0){
-                printModel(obj.ChildModel);
-            }
-        }
-
     }
 
     function __checkState(delegates, state){

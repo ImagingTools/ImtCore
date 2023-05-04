@@ -11,18 +11,12 @@ QtObject {
 
     property ModelIndex selectedIndex: null;
 
-    onSelectedIndexChanged: {
-        console.log("TableViewSelection onSelectedIndexChanged");
-    }
-
     function tableKeyPressed(event){
-        console.log("TableViewSelection tableKeyPressed", event.key);
         if (tableViewRoot.selectedIndex == null){
             return;
         }
 
         if (event.key == Qt.Key_Up) {
-            console.log("Key_Up");
             let currentIndex = tableViewRoot.selectedIndex;
             let prevIndex = currentIndex.prevIndex;
             if (prevIndex == null){
@@ -86,43 +80,27 @@ QtObject {
     //    }
 
     function select(item){
-        console.log("select", item);
-        //        if (selectionMode == SelectionMode.SM_SINGLE_SELECTION){
-        //            items = []
-        //        }
-
         root.updateSelection();
 
         item.Selected = true;
 
         root.items.push(item)
 
-        console.log("items", items);
-
         root.selectionChanged();
     }
 
     function deselect(item){
-        console.log("deselect", item);
-
         item.Selected = false;
-
-        console.log("items 1 ", root.items);
-
         let pos = root.items.indexOf(item)
-        console.log("pos", pos);
 
         if (pos >= 0){
             root.items.splice(pos, 1)
         }
 
-        console.log("items 2 ", root.items);
-
         root.selectionChanged();
     }
 
     function contains(item){
-        console.log("Selection contains", item);
         return root.items.includes(item);
     }
 

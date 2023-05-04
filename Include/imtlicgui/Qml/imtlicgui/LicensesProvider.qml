@@ -7,6 +7,8 @@ Item {
 
     property TreeItemModel model: TreeItemModel {}
 
+    property bool completed: false;
+
     function updateModel(){
         console.log("LicensesProvider updateModel");
         licensesModel.updateModel();
@@ -42,6 +44,8 @@ Item {
 
             var gqlData = query.GetQuery();
 
+            provider.completed = false;;
+
             this.SetGqlQuery(gqlData);
         }
 
@@ -52,6 +56,8 @@ Item {
                 if (dataModelLocal.ContainsKey("Licenses")){
                     dataModelLocal = dataModelLocal.GetData("Licenses");
                     provider.model = dataModelLocal;
+
+                    provider.completed = true;
                 }
             }
         }

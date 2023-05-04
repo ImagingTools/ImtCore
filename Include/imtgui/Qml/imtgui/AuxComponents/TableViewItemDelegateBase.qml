@@ -182,8 +182,6 @@ FocusScope {
         z: -1;
 
         onClicked: {
-            console.log("onClicked");
-
             if (!delegate.root.withoutSelection){
                 delegate.updateSelection();
             }

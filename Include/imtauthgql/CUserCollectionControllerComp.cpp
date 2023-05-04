@@ -160,6 +160,45 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 					else if(informationId == "Mail"){
 						elementInformation = userInfoPtr->GetMail();
 					}
+					else if(informationId == "Roles"){
+						QByteArrayList resultList;
+						if (m_roleInfoProviderCompPtr.IsValid()){
+							for (const QByteArray& roleId: userInfoPtr->GetRoles()){
+								const imtauth::IRole* roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+								if (roleInfoPtr != nullptr){
+									QString roleName = roleInfoPtr->GetRoleName();
+									QString roleDescription = roleInfoPtr->GetRoleDescription();
+
+									QString result = roleName;
+									if (!roleDescription.isEmpty()){
+										result += " (" + roleDescription + ")";
+									}
+									resultList << result.toUtf8();
+								}
+							}
+						}
+						elementInformation = resultList.join(';');
+					}
+					else if(informationId == "Groups"){
+						QByteArrayList resultList;
+						if (m_userGroupInfoProviderCompPtr.IsValid()){
+							for (const QByteArray& groupId: userInfoPtr->GetGroups()){
+								const imtauth::IUserGroupInfo* userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+								if (userGroupInfoPtr != nullptr){
+									QString groupName = userGroupInfoPtr->GetName();
+									QString groupDescription = userGroupInfoPtr->GetDescription();
+
+									QString result = groupName;
+									if (!groupDescription.isEmpty()){
+										result += " (" + groupDescription + ")";
+									}
+
+									resultList << result.toUtf8();
+								}
+							}
+						}
+						elementInformation = resultList.join(';');
+					}
 					else{
 						if (elementMetaInfo.IsValid()){
 							if (informationId == QByteArray("Added")){
@@ -172,6 +211,7 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 							}
 						}
 					}
+
 
 					if(elementInformation.isNull()){
 						elementInformation = GetObjectInformation(informationId, collectionId);

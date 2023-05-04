@@ -701,16 +701,15 @@ bool CTreeItemModel::IsEqual(const IChangeable& object) const
 			QList<QByteArray> itemKeys;
 			item->GetKeys(itemKeys);
 
-			qDebug() << "itemKeys" << itemKeys;
-
 			QList<QByteArray> keys;
 			sourceItem->GetKeys(keys);
 
-			qDebug() << "keys" << keys;
+			if (itemKeys.size() != keys.size()){
+				return false;
+			}
 
 			for (const QByteArray& key : keys){
 				if (!itemKeys.contains(key)){
-					qDebug() << "!itemKeys.contains(key)";
 					return false;
 				}
 
@@ -721,18 +720,15 @@ bool CTreeItemModel::IsEqual(const IChangeable& object) const
 				if (sourceTreeItemModelPtr != nullptr){
 					CTreeItemModel* treeItemModelPtr = itemValue.value<CTreeItemModel*>();
 					if (treeItemModelPtr == nullptr){
-						qDebug() << "treeItemModelPtr == nullptr";
 						return false;
 					}
 
 					bool result = sourceTreeItemModelPtr->IsEqual(*treeItemModelPtr);
 					if (!result){
-						qDebug() << "!result";
 						return false;
 					}
 				}
 				else if (sourceValue != itemValue){
-					qDebug() << "sourceValue != itemValue";
 					return false;
 				}
 			}

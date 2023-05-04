@@ -69,8 +69,6 @@ Item {
     }
 
     function documentUpdating(updatingFlag){
-        console.log("documentUpdating", updatingFlag);
-
         if (!updatingFlag){
             workspaceView.documentLoading = false;
         }
@@ -89,7 +87,6 @@ Item {
     }
 
     function documentIsDirtyChanged(parameters){
-        console.log("documentIsDirtyChanged", JSON.stringify(parameters));
         let documentId = parameters["Id"];
         let isDirty = parameters["IsDirty"];
 
@@ -100,8 +97,6 @@ Item {
 
         if (documentIndex > 0){
             let currentTitle = workspaceView.documentsData.GetData("Title", documentIndex);
-            console.log("currentTitle", currentTitle);
-            console.log("workspaceView.documentsData", workspaceView.documentsData.toJSON());
             if (isDirty){
                 let lastSymbol = currentTitle.charAt(currentTitle.length - 1);
                 if (lastSymbol !== '*'){
@@ -128,13 +123,8 @@ Item {
     }
 
     function documentSaved(parameters){
-        console.log("documentSaved");
-
         let documentId = parameters["Id"];
         let documentName = parameters["Name"];
-
-        console.log("documentId", documentId);
-        console.log("documentName", documentName);
 
         workspaceView.documentsData.SetData("Id", documentId, tabPanelInternal.selectedIndex);
 
@@ -170,20 +160,16 @@ Item {
 
     function addDocument(document){
         let itemId = document["Id"];
-        console.log("MultidocWorkspaceView addDocument", itemId, document["CommandsId"])
 
         if (itemId === ""){
-            console.log("MultidocWorkspaceView new document")
             workspaceView.newDocument(document);
 
             return;
         }
 
         let documentIndex = this.getDocumentIndexById(itemId);
-        console.log("MultidocWorkspaceView documentIndex", documentIndex)
         if (documentIndex < 0){
             var index = documentsData.InsertNewItem();
-            console.log("MultidocWorkspaceView addDocument index:", index, document["Source"])
 
             documentsData.SetData("Id", itemId, index);
             documentsData.SetData("CommandsId", document["CommandsId"], index);
@@ -201,9 +187,7 @@ Item {
             force = false;
         }
 
-        console.log("closeDocument", itemId);
          let index = this.getDocumentIndexById(itemId);
-        console.log("index", index);
          if (index < 0){
              index = tabPanelInternal.selectedIndex;
          }
@@ -222,16 +206,11 @@ Item {
                  }
 
                  workspaceView.documentsData.RemoveItem(index);
-
-                 console.log("RemoveItem");
-
-                 console.log("End");
              }
          }
      }
 
     function insertNewDocument(documentId, params){
-        console.log("insertNewDocument", documentId);
         workspaceView.documentLoading = true;
 
         let index = documentsData.InsertNewItem();
@@ -247,14 +226,10 @@ Item {
         documentController.documentTypeId = commandId;
         documentController.getData(documentId, params);
 
-        console.log("workspaceView.documentsData", workspaceView.documentsData.toJSON());
-
         return index;
     }
 
     function openDocument(documentId, params){
-        console.log("openDocument", documentId);
-
         let documentIndex = this.getDocumentIndexById(documentId);
         if (documentIndex < 0){
             documentIndex = workspaceView.insertNewDocument(documentId, params);
@@ -264,8 +239,6 @@ Item {
     }
 
     function saveDocument(documentId){
-        console.log("saveDocument", documentId);
-
         let documentIndex = -1;
 
         let isNew = false;
@@ -282,6 +255,14 @@ Item {
             documentController.documentTypeId = commandId;
 
             let documentBase = workspaceView.documentsData.GetData("Item", documentIndex);
+
+            if (!documentBase.documentCanBeSaved()){
+                if (documentBase.closingFlag){
+                    documentBase.closingFlag = false;
+                }
+
+                return;
+            }
 
             documentBase.updateModel();
 
@@ -314,12 +295,10 @@ Item {
         id: saveDialog;
         MessageDialog {
             Component.onCompleted: {
-                console.log("saveDialog onCompleted");
                 buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
             }
 
             onFinished: {
-                console.log("saveDialog onFinished", buttonId);
                 let documentBase = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
                 if (buttonId == "Yes"){
                     documentBase.closingFlag = true;
@@ -339,7 +318,6 @@ Item {
         InputDialog {
             title: qsTr("Entering a name");
             onFinished: {
-                console.log("InputDialog result", buttonId, inputValue);
                 if (buttonId == "Ok"){
                     let documentBase = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
                     documentBase.onEntered(inputValue);
@@ -355,9 +333,6 @@ Item {
 
         ErrorDialog {
             onFinished: {
-//                if (container.documentBase.closingFlag){
-//                    container.documentBase.closingFlag = false;
-//                }
             }
         }
     }
@@ -366,8 +341,6 @@ Item {
     }
 
     function setDocumentTitle(parameters){
-        console.log("setDocumentTitle", JSON.stringify(parameters));
-
         let itemId = parameters["Id"];
         let newTitle = parameters["Title"];
 
@@ -376,13 +349,9 @@ Item {
             index = tabPanelInternal.selectedIndex;
         }
 
-        console.log("index", index);
-        console.log("newTitle", newTitle);
-
         if (index > 0){
             workspaceView.documentsData.SetData("Title", newTitle, index);
 
-            console.log("workspaceView.documentsData", workspaceView.documentsData.toJSON());
             let document = workspaceView.documentsData.GetData("Item", index);
             if (document.isDirty){
                 workspaceView.documentIsDirtyChanged({"Id": document.itemId, "IsDirty": true});
@@ -436,18 +405,14 @@ Item {
         id: documentController;
 
         onDocumentModelChanged: {
-            console.log("GqlDocumentDataController onDocumentModelChanged", documentController.documentModel);
             if (documentController.documentModel != null){
                 let documentId = documentController.documentModel.GetData("Id");
-                console.log("documentId", documentId);
                 if (documentId !== ""){
                     for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
                         let id = workspaceView.documentsData.GetData("Id", i);
                         if (id === documentId){
                             if (workspaceView.documentsData.ContainsKey("Item", i)){
                                 let item = workspaceView.documentsData.GetData("Item", i);
-                                console.log("workspaceView.documentsData", workspaceView.documentsData);
-                                console.log("item", item);
                                 item.documentModel = documentController.documentModel;
 
                                 break;
@@ -463,18 +428,24 @@ Item {
         }
 
         onDocumentAdded: {
-            console.log("GqlDocumentDataController onDocumentAdded");
             workspaceView.documentSaved({"Id":documentId, "Name":documentName});
         }
 
         onDocumentUpdated: {
-            console.log("GqlDocumentDataController onDocumentUpdated");
             workspaceView.documentSaved({"Id":documentId, "Name":documentName});
         }
 
         onSavingError: {
-            modalDialogManager.openDialog(savingErrorDialog, {"message": message});
+            workspaceView.openErrorDialog(message);
+
+//            if (container.documentBase.closingFlag){
+//                container.documentBase.closingFlag = false;
+//            }
         }
+    }
+
+    function openErrorDialog(message){
+        modalDialogManager.openDialog(savingErrorDialog, {"message": message});
     }
 
     GqlDocumentObserver {
@@ -519,7 +490,6 @@ Item {
                 source: model.Source;
 
                 onLoaded: {
-                    console.log("MultidocWorkspaceView onLoaded", model.CommandsId);
                     workspaceView.documentsData.SetData("Item", dataLoader.item, model.index);
 
                     if (model.index === 0){
@@ -564,33 +534,6 @@ Item {
 
         onVisibleChanged: {
             Events.sendEvent("CommandsDecoratorSetVisible", !loading.visible);
-            if (loading.visible){
-                timer.start();
-            }
-            else{
-                timer.stop();
-            }
-        }
-    }
-
-    Timer {
-        id: timer;
-
-        interval: 10000;
-
-        onTriggered: {
-            modalDialogManager.openDialog(loadingErrorDialog, {"message": "Error loading the document"});
-        }
-    }
-
-    Component {
-        id: loadingErrorDialog;
-
-        ErrorDialog {
-            title: "Error Loading";
-            onFinished: {
-                loading.visible = false;
-            }
         }
     }
 }

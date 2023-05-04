@@ -8,7 +8,7 @@ Rectangle {
     height: minHeight;
 	color: "transparent";
 
-	property alias cellDelegate: dataList.delegate
+    property var cellDelegate;
     property int textTopMargin: 8;
     property int count: 0; // bodyArray.length;
 
@@ -22,6 +22,8 @@ Rectangle {
     property var bodyArray:  [];
 
 	property var dataModel: model;
+
+    property int rowIndex: model.index;
 
 	property TreeItemModel headers: TreeItemModel{};
 
@@ -68,38 +70,30 @@ Rectangle {
 
     Component.onCompleted: {
         tableDelegateContainer.compl = true;
-		tableDelegateContainer.minHeight = tableDelegateContainer.height;
-		tableDelegateContainer.setWidth();
+        tableDelegateContainer.minHeight = tableDelegateContainer.height;
+        tableDelegateContainer.setWidth();
     }
 
     onWidthDecoratorChanged: {
         tableDelegateContainer.setWidth();
     }
 
+//    onCellDelegateChanged: {
+//        dataList.delegate = tableDelegateContainer.cellDelegate;
+//    }
+
     onCellDecoratorChanged: {
         tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
         tableDelegateContainer.setBorderParams();
     }
 
-	onHeadersChanged: {
-		tableDelegateContainer.count--; tableDelegateContainer.count++;
-	}
+    onHeadersChanged: {
+        tableDelegateContainer.count = tableDelegateContainer.headers.GetItemsCount();
+    }
 
     function getItemData(){
         return model;
     }
-
-    function clearArray(){
-        while(tableDelegateContainer.bodyArray.length > 0)
-            tableDelegateContainer.bodyArray.pop();
-        tableDelegateContainer.count = 0;
-    }
-
-    function addToArray(str){
-        tableDelegateContainer.bodyArray.push(str);
-        tableDelegateContainer.count = tableDelegateContainer.bodyArray.length;
-    }
-
 
     function getSelectedId(){
         return model.Id;
@@ -244,7 +238,7 @@ Rectangle {
                 maxVal = currVal;
             }
         }
-		tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
+        tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
     }
 
 
@@ -285,10 +279,7 @@ Rectangle {
         visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
 
         onClicked: {
-            
-
             model.CheckedState = Qt.Checked - model.CheckedState;
-            
         }
     }
 
@@ -309,10 +300,17 @@ Rectangle {
         }
         model: tableDelegateContainer.count;
 
-		delegate: TableCellDelegate {
-			id: tableCellDelegate
-			pTableDelegateContainer: tableDelegateContainer
-		}//delegate
+//        delegate: Loader {
+//            sourceComponent: tableDelegateContainer.cellDelegate;
+//            onLoaded: {
+//                item.pTableDelegateContainer = tableDelegateContainer;
+//                item.pDataList = dataList;
+//            }
+//        }
+        delegate: TableCellDelegate {
+            pTableDelegateContainer: tableDelegateContainer;
+            pDataList: dataList;
+        }
     }//dataList
 
     MouseArea {

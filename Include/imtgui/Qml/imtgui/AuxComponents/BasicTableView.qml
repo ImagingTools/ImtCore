@@ -89,14 +89,6 @@ FocusScope {
         }
     }
 
-    MouseArea {
-        anchors.fill: listView;
-
-        onClicked: {
-            console.log("BG onClicked");
-        }
-    }
-
     FocusScope {
         id: headerItem;
 
@@ -109,16 +101,10 @@ FocusScope {
 
         property alias headerBackground: headerBackgroundLoader.sourceComponent;
 
-        onFocusChanged: {
-            console.log("headerItem onFocusChanged", focus);
-        }
-
         MouseArea {
             anchors.fill: parent;
 
             onClicked: {
-                console.log("Headers onClicked");
-
                 headerItem.focus = true;
             }
         }
@@ -162,7 +148,6 @@ FocusScope {
                         anchors.verticalCenter: repeaterItem.verticalCenter;
 
                         Component.onCompleted: {
-                            console.log("Header debug:", model.Name, model.index);
                             headerText.text =  model.Name;
                         }
 
@@ -279,26 +264,4 @@ FocusScope {
 
         return false;
     }
-
-    //    function moveColumn(from, to) {
-    //        if (from < 0 || from >= columnCount || to < 0 || to >= columnCount) {
-    //            console.warn(__viewTypeName + "::moveColumn(): invalid argument")
-    //            return
-    //        }
-    //        if (__isTreeView && to === 0) {
-    //            console.warn(__viewTypeName + "::moveColumn(): Can't move column 0")
-    //            return
-    //        }
-    //        if (sortIndicatorColumn === from)
-    //            sortIndicatorColumn = to
-    //        columnModel.move(from, to, 1)
-    //    }
-
-    //    function getColumn(index) {
-    //        if (index < 0 || index >= columnCount){
-    //            return null
-    //        }
-
-    //        return columnModel.GetModelFromItem(index);
-    //    }
 }

@@ -17,14 +17,6 @@ TableViewItemDelegateBase {
 
     level: treeDelegateBase.parentDelegate == null ? 0 : treeDelegateBase.parentDelegate.level + 1;
 
-    onLevelChanged: {
-        console.log("onLevelChanged", model.Id, level);
-    }
-
-    onHeightChanged: {
-        console.log("onHeightChanged", model.Id, height);
-    }
-
     signal parentCheckStateChanged(var data);
     signal childrenCheckStateChanged(var data);
 
@@ -35,12 +27,10 @@ TableViewItemDelegateBase {
     }
 
     function setState(state){
-        console.log( model.Id, "setState", state);
         model.CheckState = state;
     }
 
     function setActive(active){
-        console.log( model.Id, "setActive", active);
         model.Active = active;
     }
 
@@ -49,7 +39,6 @@ TableViewItemDelegateBase {
     }
 
     onSelectedChanged: {
-        console.log("packageTreeItemDelegate onSelectedChanged", treeDelegateBase.selected);
         if (treeDelegateBase.selected){
             treeDelegateBase.root.selectedIndex = treeDelegateBase.modelIndex;
         }
@@ -95,9 +84,6 @@ TableViewItemDelegateBase {
                                                           "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
                     onClicked: {
-    //                    treeDelegateBase.isOpen = !treeDelegateBase.isOpen;
-                        console.log("TreeView isOpen", model)
-
                         model.IsOpen = !model.IsOpen;
                     }
                 }
@@ -147,21 +133,15 @@ TableViewItemDelegateBase {
 
             visible: treeDelegateBase.isOpen;
 
-            Component.onCompleted: {
-                console.log("Column onCompleted");
-            }
-
             Repeater {
                 id: childModelRepeater;
 
                 delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
 
                 onItemAdded: {
-                    console.log("TableViewItemDelegate onItemAdded", item.itemData.Id);
                     item.parentDelegate = treeDelegateBase;
                     treeDelegateBase.childrenDelegates.push(item);
 
-                    console.log("TableViewItemDelegate onItemAdded");
                     item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
                     treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
 
@@ -174,7 +154,6 @@ TableViewItemDelegateBase {
                 }
 
                 onItemRemoved: {
-                    console.log("TreeViewItemDelegateBase onItemRemoved", item.itemData.Id);
                     let index = treeDelegateBase.childrenDelegates.indexOf(item);
                     if (index > -1) {
                         treeDelegateBase.childrenDelegates.splice(index, 1);
@@ -189,7 +168,6 @@ TableViewItemDelegateBase {
 
             property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
             onChildModelChanged: {
-                console.log("TreeViewItemDelegateBase onChildModelChanged", childModel);
                 if (childrenColumn.childModel){
                     childModelRepeater.model = childrenColumn.childModel;
                 }

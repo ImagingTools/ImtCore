@@ -19,9 +19,9 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
-		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", true, "SessionCollection");
-		I_ASSIGN(m_settingsCollectionCompPtr, "SettingsCollection", "Settings collection", true, "SettingsCollection");
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
+		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", false, "SessionCollection");
+		I_ASSIGN(m_settingsCollectionCompPtr, "SettingsCollection", "Settings collection", false, "SettingsCollection");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
 	I_END_COMPONENT;
 
 protected:

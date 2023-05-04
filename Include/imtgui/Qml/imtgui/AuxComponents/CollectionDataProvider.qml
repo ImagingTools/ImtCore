@@ -9,6 +9,9 @@ Item {
 
     property string commandId;
 
+    // Property indicating whether the model is ready for use
+    property bool completed: false;
+
     // Fields to get from server
     property var fields: [];
 
@@ -61,6 +64,8 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
+
+            container.completed = false;
             console.log("gqlModelBaseContainer query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
@@ -87,6 +92,8 @@ Item {
                                 dataModelLocal = dataModelLocal.GetData("PagesCount");
                             }
                         }
+
+                        container.completed = true;
 
                         container.modelUpdated();
                     }
