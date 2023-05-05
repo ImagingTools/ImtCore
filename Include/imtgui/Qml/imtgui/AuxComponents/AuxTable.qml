@@ -41,7 +41,7 @@ Item {
 
     property int radius: 7;
 
-    property alias columnCount: headersList.count;
+	property alias columnCount: headersList.count;
 
     //
     property string borderColorHorizontal: "transparent";
@@ -62,10 +62,6 @@ Item {
     property bool isAllItemChecked: false;
 
     signal selectionChanged(var selection);
-
-    property Component cellDelegateComp: Component {
-        TableCellDelegate {}
-    }
 
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
@@ -927,9 +923,7 @@ Item {
             isRightBorder: tableContainer.isRightBorder_deleg;
 
             textMarginHor: tableContainer.textMarginHor_deleg;
-            textMarginVer: tableContainer.textMarginVer_deleg;
-
-            cellDelegate: tableContainer.cellDelegateComp;
+			textMarginVer: tableContainer.textMarginVer_deleg;
 
             //!!!
 

@@ -7,13 +7,15 @@ Item {
 
     property Item pTableDelegateContainer: Item{};
 
-    /// \workaround to calc cells count
+	/// \workaround to calc cells count
     property Item pDataList: null;
 
     property bool compl: false;
     property bool complCompl: delegateContainer.compl && pDataList.compl;
 
     property alias contentComp: contentLoader.sourceComponent;
+	property real textLeftIndent: 0
+	property real textRightIndent: 0
 
     property int columnIndex: model.index;
     property int rowIndex: pTableDelegateContainer ? pTableDelegateContainer.rowIndex : -1;
@@ -214,6 +216,11 @@ Item {
 
         Text {
             id: name;
+
+			anchors.left: parent.left
+			anchors.leftMargin:  delegateContainer.textLeftIndent
+			anchors.right: parent.right
+			anchors.rightMargin: delegateContainer.textRightIndent
 
             verticalAlignment: Text.AlignVCenter;
             horizontalAlignment: delegateContainer.pTableDelegateContainer ?

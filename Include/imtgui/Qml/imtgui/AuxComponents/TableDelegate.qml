@@ -8,7 +8,7 @@ Rectangle {
     height: minHeight;
 	color: "transparent";
 
-    property var cellDelegate;
+	property alias cellDelegate: dataList.delegate
     property int textTopMargin: 8;
     property int count: 0; // bodyArray.length;
 
@@ -76,11 +76,7 @@ Rectangle {
 
     onWidthDecoratorChanged: {
         tableDelegateContainer.setWidth();
-    }
-
-//    onCellDelegateChanged: {
-//        dataList.delegate = tableDelegateContainer.cellDelegate;
-//    }
+	}
 
     onCellDecoratorChanged: {
         tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
@@ -300,17 +296,10 @@ Rectangle {
         }
         model: tableDelegateContainer.count;
 
-//        delegate: Loader {
-//            sourceComponent: tableDelegateContainer.cellDelegate;
-//            onLoaded: {
-//                item.pTableDelegateContainer = tableDelegateContainer;
-//                item.pDataList = dataList;
-//            }
-//        }
-        delegate: TableCellDelegate {
-            pTableDelegateContainer: tableDelegateContainer;
-            pDataList: dataList;
-        }
+		delegate: TableCellDelegate {
+			id: tableCellDelegate
+			pTableDelegateContainer: tableDelegateContainer
+		}//delegate
     }//dataList
 
     MouseArea {
