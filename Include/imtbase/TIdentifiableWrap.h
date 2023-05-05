@@ -97,12 +97,12 @@ bool TIdentifiableWrap<Base>::Serialize(iser::IArchive& archive)
 	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, identifiableVersion)){
 		identifiableVersion = 0;
 	}
-	if (identifiableVersion >= 5902){
+//	if (identifiableVersion >= 5902){
 		static iser::CArchiveTag identifierTag("Uuid", "Unique identifier of the object", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(identifierTag);
 		retVal = retVal && archive.Process(m_identifier);
 		retVal = retVal && archive.EndTag(identifierTag);
-	}
+//	}
 	retVal = retVal && Base::Serialize(archive);
 
 	return retVal;
