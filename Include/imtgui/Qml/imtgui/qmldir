@@ -15,6 +15,7 @@ CheckBox 1.0 ./AuxComponents/CheckBox.qml
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
 FilterMenu 1.0 ./AuxComponents/FilterMenu.qml
 TableDelegate 1.0 ./AuxComponents/TableDelegate.qml
+TableCellDelegate 1.0 ./AuxComponents/TableCellDelegate.qml
 TreeDelegate 1.0 ./AuxComponents/TreeDelegate.qml
 DatePicker 1.0 ./AuxComponents/DatePicker.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
@@ -109,4 +110,3 @@ Loading 1.0 ./AuxComponents/Loading.qml
 StateMachine 1.0 ./AuxComponents/StateMachine.qml
 
 TreeViewModelAdapter 1.0 ./AuxComponents/TreeViewModelAdapter.qml
-TableCellDelegate 1.0 ./AuxComponents/TableCellDelegate.qml

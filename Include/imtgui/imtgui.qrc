@@ -17,6 +17,7 @@
         <file alias="imtgui/AuxComponents/AuxTable.qml">Qml/imtgui/AuxComponents/AuxTable.qml</file>
         <file alias="imtgui/AuxComponents/TabPanel.qml">Qml/imtgui/AuxComponents/TabPanel.qml</file>
         <file alias="imtgui/AuxComponents/TableDelegate.qml">Qml/imtgui/AuxComponents/TableDelegate.qml</file>
+        <file alias="imtgui/AuxComponents/TableCellDelegate.qml">Qml/imtgui/AuxComponents/TableCellDelegate.qml</file>
         <file alias="imtgui/AuxComponents/TabDelegate.qml">Qml/imtgui/AuxComponents/TabDelegate.qml</file>
         <file alias="imtgui/AuxComponents/ComboBox.qml">Qml/imtgui/AuxComponents/ComboBox.qml</file>
         <file alias="imtgui/AuxComponents/TreeView.qml">Qml/imtgui/AuxComponents/TreeView.qml</file>
