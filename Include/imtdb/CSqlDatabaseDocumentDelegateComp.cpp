@@ -550,6 +550,9 @@ const ifile::IFilePersistence * CSqlDatabaseDocumentDelegateComp::FindDocumentPe
 			}
 		}
 	}
+    if(persistenceIndex == -1 & m_typesCompPtr->GetOptionsCount() == 1){
+        persistenceIndex = 0;
+    }
 
 	if ((persistenceIndex >= 0) && persistenceIndex < m_documentPersistenceListCompPtr.GetCount()) {
 		return m_documentPersistenceListCompPtr[persistenceIndex];
