@@ -4,6 +4,7 @@ global.Qt = Qt
 global.QML = {}
 require('./components/Component')
 require('./components/WebSocket')
+require('./components/WebView')
 require('./components/Shortcut')
 require('./components/QtObject')
 require('./components/Item')
