@@ -112,8 +112,15 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr) const
 		enginePtr->addImportPath("qrc:/qml");
 
 		QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlAttrPtr->GetValue()));
+		QQuickItem* retVal = qobject_cast<QQuickItem*>(component.create(enginePtr->rootContext()));
 
-		return qobject_cast<QQuickItem*>(component.create(enginePtr->rootContext()));
+		if (component.isError()) {
+			qWarning() << "UNABLE TO CREATE QML COMPONENT " << QUrl("qrc" + m_pathToQmlAttrPtr->GetValue());
+        	qWarning() << component.errors();
+			qWarning() << "----------------";
+    	}
+
+		return retVal;
 	}
 
 	return nullptr;
