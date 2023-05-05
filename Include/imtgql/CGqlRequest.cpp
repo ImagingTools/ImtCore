@@ -586,6 +586,10 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 	else if (value.canConvert<imtgql::CGqlEnum>()){
 		retVal += value.value<imtgql::CGqlEnum>().GetValue();
 	}
+	else {
+		QByteArray data = value.toByteArray();
+		retVal += data;
+	}
 
 	return retVal;
 }
