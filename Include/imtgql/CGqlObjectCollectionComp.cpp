@@ -120,7 +120,7 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 							if (file.open(QIODevice::ReadOnly)){
 								QByteArray data = file.readAll();
 
-								istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(name));
+								istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(name, parentId));
 
 								IGqlObjectCollectionDelegate::UploadUrlResponsePtr uploadUrlDocumentResponsePtr = delegatePtr->CreateUploadUrlResponsePtr();
 								if (m_gqlClientCompPtr->SendRequest(*getDocumentUploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)){
@@ -268,7 +268,8 @@ bool CGqlObjectCollectionComp::SetObjectData(
 					if (file.open(QIODevice::ReadOnly)){
 						QByteArray data = file.readAll();
 
-						istd::TDelPtr<imtgql::IGqlRequest> uploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(name));
+						Q_ASSERT(false);
+						istd::TDelPtr<imtgql::IGqlRequest> uploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(name, ""));
 						if (!uploadUrlRequestPtr.IsValid()){
 							return false;
 						}
@@ -712,7 +713,7 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 						QString objectName = fileInfo.completeBaseName();
 
 						IGqlObjectCollectionDelegate::UploadUrlResponsePtr uploadUrlDocumentResponsePtr = delegatePtr->CreateUploadUrlResponsePtr();
-						istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(objectName));
+						istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(objectName, parentId));
 						if (m_gqlClientCompPtr->SendRequest(*getDocumentUploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)){
 							QString uploadUrl = uploadUrlDocumentResponsePtr->GetUploadUrl();
 							if (!uploadUrl.isEmpty()){

@@ -248,7 +248,7 @@ public:
 	/**
 		If \c OF_SUPPORT_FILE_UPLOAD flag is supported, this method should return the request for getting the upload-URL for the new document.
 	*/
-	virtual imtgql::IGqlRequest* CreateUploadUrlRequest(const QString& name) const = 0;
+	virtual imtgql::IGqlRequest* CreateUploadUrlRequest(const QString& fileName, const QByteArray& parentId) const = 0;
 
 	/**
 		Create the request to get document download URL.
