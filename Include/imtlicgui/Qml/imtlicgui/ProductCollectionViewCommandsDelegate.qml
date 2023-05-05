@@ -4,6 +4,7 @@ import imtqml 1.0
 import imtgui 1.0
 import imtlicgui 1.0
 import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs 6.2
 
 CollectionViewCommandsDelegateBase {
     id: container;

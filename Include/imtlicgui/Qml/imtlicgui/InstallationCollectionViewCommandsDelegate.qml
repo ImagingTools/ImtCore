@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs 6.2
 
 CollectionViewCommandsDelegateBase {
     id: container;
