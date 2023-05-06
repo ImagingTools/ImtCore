@@ -113,7 +113,11 @@ export class WebView extends Item {
         this.$window.location.reload(true)
     }
     runJavaScript(script, callback) {
-        // not implemented yet
+        let el = this.$window.document.createElement('script')
+        this.$window.document.head.appendChild(el)
+        el.innerText = `(function() {${script}})()`
+        el.remove()
+        if(callback) callback()
     }
     setCookie(domain, name, value) {
         let added = this.$getCookie(name) ? false : true
