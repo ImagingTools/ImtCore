@@ -19,12 +19,16 @@ defineTest(compyleWeb) {
     buildwebdir = $$1
 	dir = $$1/src
 	jqmldir = $(IMTCOREDIR)/3rdParty/JQML
-
+	npmexe = npm
     # replace slashes in destination path for Windows
-	win32:dir ~= s,/,\\,g
-	win32:jqmldir ~= s,/,\\,g
-
-    QMAKE_PRE_LINK += cd $$shell_quote($$jqmldir) && npm run compile  $$shell_quote($$dir) $$escape_expand(\\n\\t)
+	win32{
+	    dir ~= s,/,\\,g
+		jqmldir ~= s,/,\\,g
+		PATH += $(IMTCOREDIR)/3rdParty/nodejs
+		npmexe = $(IMTCOREDIR)/3rdParty/nodejs/npm_acf.cmd
+		npmexe ~= s,/,\\,g
+	}
+	QMAKE_PRE_LINK += cd $$shell_quote($$jqmldir) && $$npmexe run compile  $$shell_quote($$dir) $$escape_expand(\\n\\t)
 	export(QMAKE_PRE_LINK)
 
     copyToWebDir($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources)
