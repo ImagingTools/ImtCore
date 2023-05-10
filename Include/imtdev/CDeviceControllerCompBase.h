@@ -9,7 +9,7 @@
 #include <iprm/IOptionsList.h>
 #include <iprm/COptionsManager.h>
 #include <ilog/TLoggerCompWrap.h>
-#include <iproc/IProcessor.h>
+//#include <iproc/IProcessor.h>
 
 // GmgCore includes
 #include <imtdev/IDeviceController.h>

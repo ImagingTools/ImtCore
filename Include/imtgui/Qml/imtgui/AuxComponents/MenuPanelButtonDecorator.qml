@@ -51,7 +51,7 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        width: 70;
+        width: parent.width - 12;
         height: description.height;
 
         Text {
@@ -59,6 +59,9 @@ Item {
 
             anchors.verticalCenter: parent.verticalCenter;
             anchors.horizontalCenter: parent.horizontalCenter;
+            width: parent.width;
+            wrapMode: Text.WordWrap;
+            horizontalAlignment: Text.AlignHCenter;
 
             elide: Text.ElideRight;
 

@@ -4,13 +4,6 @@ TEMPLATE = subdirs
 SUBDIRS += imtbase
 imtbase.file = ../../Include/imtbase/QMake/imtbase.pro
 
-SUBDIRS += imtdev
-imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
-
-SUBDIRS += ImtDevPck
-ImtDevPck.file = ../../Impl/ImtDevPck/QMake/ImtDevPck.pro
-ImtDevPck.depends = imtdev
-
 SUBDIRS += imtdesign
 imtdesign.file = ../../Include/imtdesign/QMake/imtdesign.pro
 
@@ -22,6 +15,13 @@ SUBDIRS += DesignTokenCreatorExe
 DesignTokenCreatorExe.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
 DesignTokenCreatorExe.depends = imtbase imtdesign ImtDesignPck
 
+SUBDIRS += imtdev
+imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
+
+SUBDIRS += ImtDevPck
+ImtDevPck.file = ../../Impl/ImtDevPck/QMake/ImtDevPck.pro
+ImtDevPck.depends = imtdev
+
 SUBDIRS += imtstyle
 imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
 imtstyle.depends = DesignTokenCreatorExe
@@ -32,6 +32,12 @@ ImtStylePck.depends = imtstyle DesignTokenCreatorExe
 
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
+
+SUBDIRS += imtauthdb
+imtauthdb.file = ../../Include/imtauthdb/QMake/imtauthdb.pro
+
+SUBDIRS += imtauthgql
+imtauthgql.file = ../../Include/imtauthgql/QMake/imtauthgql.pro
 
 SUBDIRS += imtauthgui
 imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
@@ -86,10 +92,10 @@ imt3dgui.depends = DesignTokenCreatorExe
 SUBDIRS += imtzip
 imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 
-!macx {
-	SUBDIRS += imtpy
-	imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
-}
+#!macx {
+#	SUBDIRS += imtpy
+#	imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
+#}
 
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
@@ -214,9 +220,9 @@ ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
 ImtZipPck.depends = imtzip
 
 !macx {
-	SUBDIRS += ImtPyPck
-	ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
-	ImtPyPck.depends = imtpy
+#	SUBDIRS += ImtPyPck
+#	ImtPyPck.file = ../../Impl/ImtPyPck/QMake/ImtPyPck.pro
+#	ImtPyPck.depends = imtpy
 }
 
 SUBDIRS += ImtGqlPck

@@ -153,7 +153,7 @@ IRequestServlet::ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 	}
 
 	else{
-		responsePtr = generateErrorResponsePtr("Unable to open file", IProtocolEngine::SC_NOT_FOUND);
+		responsePtr = generateErrorResponsePtr(QByteArray("Unable to open file ") + commandIdFileName, IProtocolEngine::SC_NOT_FOUND);
 	}
 
 	return responsePtr;

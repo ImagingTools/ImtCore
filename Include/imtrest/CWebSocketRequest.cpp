@@ -7,6 +7,8 @@
 #include <QtNetwork/QSslSocket>
 #endif
 #include <QtWebSockets/QWebSocket>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 
 namespace imtrest
@@ -66,9 +68,31 @@ QHostAddress CWebSocketRequest::GetRemoteAddress() const
 	return m_remoteAddress;
 }
 
+
 void CWebSocketRequest::SetBody(const QByteArray &body)
 {
 	this->m_body = body;
+	m_type = MT_UNKNOWN;
+	QJsonDocument document = QJsonDocument::fromJson(body);
+	QJsonObject object = document.object();
+	if (object.value("type") == "connection_init"){
+		m_type = MT_CONNECTION_INIT;
+	}	
+	if (object.value("type") == "start"){
+		m_type = MT_START;
+	}
+	if (object.value("type") == "error"){
+		m_type = MT_ERROR;
+	}
+	if (object.value("type") == "stop"){
+		m_type = MT_STOP;
+	}
+}
+
+
+CWebSocketRequest::MethodType CWebSocketRequest::GetMethodType() const
+{
+	return m_type;
 }
 
 
@@ -136,14 +160,16 @@ bool CWebSocketRequest::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-void CWebSocketRequest::OnWebSocketTextMessage(const QString& /*textMessage*/)
+void CWebSocketRequest::OnWebSocketTextMessage(const QString& textMessage)
 {
+	SetBody(textMessage.toUtf8());
 	m_requestHandler.ProcessRequest(*this);
 }
 
 
-void CWebSocketRequest::OnWebSocketBinaryMessage(const QByteArray& /*dataMessage*/)
+void CWebSocketRequest::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 {
+	SetBody(dataMessage);
 	m_requestHandler.ProcessRequest(*this);
 }
 
