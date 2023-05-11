@@ -159,6 +159,9 @@ istd::IChangeable* CSelection::CloneMe(CompatibilityMode mode) const
 
 bool CSelection::ResetData(CompatibilityMode /*mode*/)
 {
+	istd::CChangeGroup group(this);
+
+	ApplySelectionMode(SM_SINGLE);
 	ApplySelection(Ids());
 
 	return true;
