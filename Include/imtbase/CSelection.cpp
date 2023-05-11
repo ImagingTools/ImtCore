@@ -1,6 +1,9 @@
 #include <imtbase/CSelection.h>
 
 
+// Std includes
+#include <algorithm>
+
 // ACF includes
 #include <istd/TDelPtr.h>
 #include <istd/CChangeGroup.h>
@@ -83,7 +86,7 @@ bool CSelection::Serialize(iser::IArchive& archive)
 	SelectionMode selectionMode = m_selectionMode;
 	QByteArrayList selectedIds = m_selectedIds.values();
 
-	qSort(selectedIds);
+	std::sort(selectedIds.begin(), selectedIds.end());
 
 	static iser::CArchiveTag selectionModeTag("SelectionMode", "Selection mode", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(selectionModeTag);
@@ -96,7 +99,7 @@ bool CSelection::Serialize(iser::IArchive& archive)
 		istd::CChangeGroup group(this);
 
 		ApplySelectionMode(selectionMode);
-		retVal = ApplySelection(selectedIds.toSet());
+		retVal = ApplySelection(Ids(selectedIds.cbegin(), selectedIds.cend()));
 
 		if (!retVal){
 			ApplySelection(Ids());
