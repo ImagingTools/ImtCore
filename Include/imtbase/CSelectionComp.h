@@ -23,6 +23,7 @@ public:
 		I_REGISTER_INTERFACE(ISelection);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_constraintsCompPtr, "Constraints", "Selection constraints", false, "");
+		I_ASSIGN(m_initialSelectionModeAttrPtr, "SelectionMode", "Initial selection mode\n0 - SM_SINGLE\n1 - SM_MULTI", true, 0);
 	I_END_COMPONENT;
 
 protected:
@@ -32,6 +33,7 @@ protected:
 
 private:
 	I_REF(ICollectionInfo, m_constraintsCompPtr);
+	I_REF(int, m_initialSelectionModeAttrPtr);
 };
 
 
