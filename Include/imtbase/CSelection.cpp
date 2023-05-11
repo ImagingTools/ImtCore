@@ -83,12 +83,14 @@ bool CSelection::Serialize(iser::IArchive& archive)
 	SelectionMode selectionMode = m_selectionMode;
 	QByteArrayList selectedIds = m_selectedIds.values();
 
+	qSort(selectedIds);
+
 	static iser::CArchiveTag selectionModeTag("SelectionMode", "Selection mode", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(selectionModeTag);
 	retVal = retVal && I_SERIALIZE_ENUM(SelectionMode, archive, selectionMode);
 	retVal = retVal && archive.EndTag(selectionModeTag);
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer(archive, selectedIds, "SelectedIds", "Id");
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer(archive, selectedIds, "SelectedItems", "Item");
 
 	if (retVal && !archive.IsStoring()){
 		istd::CChangeGroup group(this);
@@ -192,6 +194,12 @@ void CSelection::ApplySelectionMode(SelectionMode selectionMode)
 
 bool CSelection::ApplySelection(const Ids& selectionIds)
 {
+	for (const Id& id : selectionIds){
+		if (id.isEmpty()){
+			return false;
+		}
+	}
+
 	if (m_selectionMode == SM_SINGLE && selectionIds.count() > 1){
 		return false;
 	}
