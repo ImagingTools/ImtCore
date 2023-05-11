@@ -123,6 +123,12 @@ function(jqml_compile_web)
 	message("buildwebdir ${buildwebdir}")
 #	message("webdirs ${webdirs}")
 
+	set(NPM_EXE npm)
+
+	if(${MSVC})
+		set(NPM_EXE  ${IMTCOREDIR}/3rdParty/nodejs/npm_acf.cmd)
+	endif()
+
 	# Python path
 	list(APPEND webdirs ${buildwebdir})
 
@@ -134,7 +140,7 @@ function(jqml_compile_web)
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML/preparesources.py ${webdirs}
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML
-		COMMAND npm run compile ${buildwebdir}/src
+		COMMAND ${NPM_EXE} run compile ${buildwebdir}/src
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 	    )
 

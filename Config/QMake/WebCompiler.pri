@@ -20,11 +20,12 @@ defineTest(compyleWeb) {
 	dir = $$1/src
 	jqmldir = $(IMTCOREDIR)/3rdParty/JQML
 	npmexe = npm
-    # replace slashes in destination path for Windows
-	win32{
+
+    win32{
 	    dir ~= s,/,\\,g
 		jqmldir ~= s,/,\\,g
-		PATH += $(IMTCOREDIR)/3rdParty/nodejs
+
+        PATH += $(IMTCOREDIR)/3rdParty/nodejs
 		npmexe = $(IMTCOREDIR)/3rdParty/nodejs/npm_acf.cmd
 		npmexe ~= s,/,\\,g
 	}
@@ -40,37 +41,14 @@ defineTest(compyleWeb) {
 	win32:QRC_WEB_FILE ~= s,/,\\,g
 	win32:QRC_CPP_WEB_FILE ~= s,/,\\,g
 
-win32{
-    QMAKE_RCC = rcc.exe
-}
-else{
-    QMAKE_RCC = rcc
-}
+    win32{
+	    QMAKE_RCC = rcc.exe
+	}
+	else{
+	    QMAKE_RCC = rcc
+	}
 
     QMAKE_PRE_LINK += $$[QT_INSTALL_BINS]/$$QMAKE_RCC -name $${TARGET}Web $${QRC_WEB_FILE} -o $${QRC_CPP_WEB_FILE}
-
-
-    export(QMAKE_PRE_LINK)
-
-#    QRC_CPP_WEB_FILE2 = $${buildwebdir}/Resources/qrc_$${TARGET}Web.cpp
-#	win32:QRC_CPP_WEB_FILE2 ~= s,/,\\,g
-
-#    dummyfile2.target = $${QRC_CPP_WEB_FILE}
-#	dummyfile2.commands = echo $$dummyfile.target
-#	QMAKE_EXTRA_TARGETS += dummyfile2
-#	GENERATED_SOURCES += $$dummyfile2.target
-
+	export(QMAKE_PRE_LINK)
 }
 
-defineTest(createWebQrc) {
-    buildwebdir = $$1
-
-    QRC_CPP_WEB_FILE2 = $${buildwebdir}/Resources/qrc_$${TARGET}Web.cpp
-	win32:QRC_CPP_WEB_FILE2 ~= s,/,\\,g
-
-    dummyfile2.target = $${QRC_CPP_WEB_FILE2}
-	dummyfile2.commands = echo $$dummyfile.target
-	QMAKE_EXTRA_TARGETS += dummyfile2
-	GENERATED_SOURCES += $$dummyfile2.target
-
-}

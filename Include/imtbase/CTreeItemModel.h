@@ -84,6 +84,7 @@ public Q_SLOTS:
 	QByteArray TakeQueryParam(const QByteArray& key);
 	QMap<QByteArray, QByteArray> &GetQueryParams();
 	void ClearQueryParams(const QByteArray& key);
+	void SetUpdateEnabled(bool updateEnabled);
 
 	void Refresh();
 
@@ -136,6 +137,7 @@ private:
 	bool m_isArray;
 
 	QString m_state;
+	bool m_isUpdateEnabled;
 
 protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);

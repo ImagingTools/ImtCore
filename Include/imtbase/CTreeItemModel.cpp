@@ -13,6 +13,7 @@
 #include <istd/CChangeNotifier.h>
 #include <istd/TSmartPtr.h>
 #include <imod/CModelUpdateBridge.h>
+#include "CTreeItemModel.h"
 
 
 namespace imtbase
@@ -21,7 +22,8 @@ namespace imtbase
 
 CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
-	m_isArray(false)
+	m_isArray(false),
+	m_isUpdateEnabled(false)
 {
 	imtbase::CTreeItemModel* parentModel = dynamic_cast<imtbase::CTreeItemModel*>(parent);
 	if (parentModel != nullptr){
@@ -140,10 +142,12 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 	beginRemoveRows(QModelIndex(), index, index);
 
 	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
-	changeSet.SetChangeInfo("operation", "remove item");
-	changeSet.SetChangeInfo("index", index);
+	if (m_isUpdateEnabled){
+		changeSet.SetChangeInfo("operation", "remove item");
+		changeSet.SetChangeInfo("index", index);
 
-	BeginChanges(changeSet);
+		BeginChanges(changeSet);
+	}
 
 	Item* item = m_items.takeAt(index);
 	QList<QByteArray> keys;
@@ -154,7 +158,9 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		m_isArray = false;
 	}
 
-	EndChanges(changeSet);
+	if (m_isUpdateEnabled){
+		EndChanges(changeSet);
+	}
 
 	endRemoveRows();
 
@@ -293,19 +299,25 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 	}
 
 	Item* item = m_items[index];
-	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 
-	changeSet.SetChangeInfo("operation", "set");
-	changeSet.SetChangeInfo("curVal", item->Value(key));
-	changeSet.SetChangeInfo("newVal", value);
-	changeSet.SetChangeInfo("key", key);
-	changeSet.SetChangeInfo("index", index);
+	if (m_isUpdateEnabled){
+		IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 
-	BeginChanges(changeSet);
+		changeSet.SetChangeInfo("operation", "set");
+		changeSet.SetChangeInfo("curVal", item->Value(key));
+		changeSet.SetChangeInfo("newVal", value);
+		changeSet.SetChangeInfo("key", key);
+		changeSet.SetChangeInfo("index", index);
 
-	item->SetValue(key, value);
+		BeginChanges(changeSet);
 
-	EndChanges(changeSet);
+		item->SetValue(key, value);
+
+		EndChanges(changeSet);
+	}
+	else{
+		item->SetValue(key, value);
+	}
 
 	int keyRole = -1;
 	QList<int> keys = m_roleNames.keys();
@@ -336,18 +348,24 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index, const ChangeIn
 	}
 
 	Item* item = m_items[index];
-	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 
-	changeSet.SetChangeInfo("operation", "remove");
-	changeSet.SetChangeInfo("curVal", item->Value(key));
-	changeSet.SetChangeInfo("key", key);
-	changeSet.SetChangeInfo("index", index);
+	if (m_isUpdateEnabled){
+		IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 
-	BeginChanges(changeSet);
+		changeSet.SetChangeInfo("operation", "remove");
+		changeSet.SetChangeInfo("curVal", item->Value(key));
+		changeSet.SetChangeInfo("key", key);
+		changeSet.SetChangeInfo("index", index);
 
-	item->RemoveValue(key);
+		BeginChanges(changeSet);
 
-	EndChanges(changeSet);
+		item->RemoveValue(key);
+
+		EndChanges(changeSet);
+	}
+	else{
+		item->RemoveValue(key);
+	}
 
 	int keyRole = -1;
 	QList<int> keys = m_roleNames.keys();
@@ -543,6 +561,12 @@ QMap<QByteArray, QByteArray> &CTreeItemModel::GetQueryParams()
 void CTreeItemModel::ClearQueryParams(const QByteArray& /*key*/)
 {
 	m_queryParams.clear();
+}
+
+
+void CTreeItemModel::SetUpdateEnabled(bool updateEnabled)
+{
+	m_isUpdateEnabled = updateEnabled;
 }
 
 

@@ -1,5 +1,5 @@
 :: Created by npm, please don't edit manually.
-:: @ECHO OFF
+@ECHO OFF
 
 SETLOCAL
 

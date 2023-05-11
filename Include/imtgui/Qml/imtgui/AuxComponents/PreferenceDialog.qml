@@ -3,7 +3,6 @@ import QtQuick 2.15
 import Acf 1.0
 import imtqml 1.0
 import QtQuick.Dialogs 1.3
-import QtQuick.Dialogs 6.2
 
 Rectangle {
     id: preferenceContainer;
