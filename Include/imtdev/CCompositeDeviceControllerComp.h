@@ -55,7 +55,7 @@ public:
 	virtual bool CloseDevice(const QByteArray& deviceId) override;
 
 	// reimplemented (IDeviceEnumerator)
-	virtual StartResult StartEnumeration(IResultHandler* resultHandlerPtr) override;
+    virtual IDeviceEnumerator::StartResult StartEnumeration(IDeviceEnumerator::IResultHandler* resultHandlerPtr) override;
 	virtual void CancelEnumeration() override;
 
 	// reimplemented (IDeviceEnumerationResultHandler)

@@ -109,7 +109,7 @@ bool CCompositeDeviceControllerComp::CloseDevice(const QByteArray& deviceId)
 
 // reimplemented (IDeviceEnumerator)
 
-IDeviceEnumerator::StartResult CCompositeDeviceControllerComp::StartEnumeration(IResultHandler* resultHandlerPtr)
+IDeviceEnumerator::StartResult CCompositeDeviceControllerComp::StartEnumeration(IDeviceEnumerator::IResultHandler* resultHandlerPtr)
 {
 	return SR_FAILED;
 }
