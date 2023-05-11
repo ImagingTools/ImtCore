@@ -65,6 +65,8 @@ DocumentBase {
             return;
         }
 
+        container.documentModel.SetData("Id", container.itemId);
+
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             loader.item.updateModel();

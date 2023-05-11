@@ -146,12 +146,17 @@ Item {
         let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
         console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
-        if(name == undefined){
+        if(name === undefined){
             name = " ";
         }
 
         if (collectionViewContainer.isUsedDocumentManager){
-            documentManager.openDocument(id, {"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath});
+            if (id === ""){
+                documentManager.addDocument({"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath}, {}, false);
+            }
+            else{
+                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath});
+            }
         }
         else{
             modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": commandsId,"contentSource": editorPath});

@@ -86,6 +86,15 @@ Item {
         }
     }
 
+    function addDocument(documentObj, params, isRequested){
+        if (isRequested === undefined){
+            isRequested = false;
+        }
+
+        let itemId = documentObj["Id"];
+        documentManager.openDocument(itemId, documentObj, isRequested);
+    }
+
     function openDocument(itemId, document){
         documentManager.documentLoading = true;
         console.log("openDocument" , JSON.stringify(document));
@@ -98,10 +107,9 @@ Item {
             documentsData.SetData(key, document[key]);
         }
 
-//        documentsData.SetData("Title", document["Name"]);
         let documentId = document["Id"];
-        documentController.documentTypeId = document["CommandsId"];
-        documentController.getData(documentId, document);
+        let commandId = document["CommandsId"];
+        documentController.getData(documentId, document, commandId);
 
         stackView.push(document);
     }

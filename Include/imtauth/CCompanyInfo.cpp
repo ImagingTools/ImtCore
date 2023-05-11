@@ -22,6 +22,12 @@ CCompanyInfo::CCompanyInfo():
 }
 
 
+void CCompanyInfo::AddAddress(IAddress& address)
+{
+	m_addresses.AddAddress(&address);
+}
+
+
 // reimplemented (ICompanyInfo)
 
 const IAddressProvider* CCompanyInfo::GetAddresses() const

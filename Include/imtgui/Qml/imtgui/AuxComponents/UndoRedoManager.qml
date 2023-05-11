@@ -51,12 +51,10 @@ Item {
     }
 
     function documentSaved(){
-        console.log("UndoRedoManager documentSaved");
         undoRedoManager.mainModel.Copy(undoRedoManager.documentBase.documentModel);
     }
 
     function beginChanges(){
-        console.log("UndoRedoManager beginChanges");
         if (undoRedoManager.transaction){
             console.assert(undoRedoManager.transaction == true,  "beginChanges():: beginChanges transaction == true");
 
@@ -67,7 +65,6 @@ Item {
     }
 
     function endChanges(){
-        console.log("UndoRedoManager endChanges");
         if (!undoRedoManager.transaction){
             console.assert(undoRedoManager.transaction == false,  "endChanges():: beginChanges transaction = false");
 
@@ -90,14 +87,38 @@ Item {
 
             undoRedoManager.mainModel.Copy(undoRedoManager.observedModel);
 
-            undoRedo.addModel(undoRedoManager.observedModel);
+            let copyModel = undoRedoManager.getCopyFromModel(undoRedoManager.observedModel);
+            undoRedo.addModel(copyModel);
         }
+    }
+
+    Component {
+        id: treeItemModelComp;
+
+        TreeItemModel {}
+    }
+
+    function getCopyFromModel(model){
+        let emptyModel = treeItemModelComp.createObject(undoRedo);
+        emptyModel.Copy(model)
+
+        return emptyModel;
     }
 
     function modelUpdated(){
         console.log("undoRedoManager modelUpdated", undoRedoManager.transaction);
         if (!undoRedoManager.transaction){
-            undoRedo.addModel(undoRedoManager.observedModel);
+            let copyModel = undoRedoManager.getCopyFromModel(undoRedoManager.observedModel);
+
+            if (undoRedo.undoStack.length >= 1){
+                let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
+                let isEqual = copyModel.IsEqualWithModel(lastModel);
+                if (isEqual){
+                    return;
+                }
+            }
+
+            undoRedo.addModel(copyModel);
         }
     }
 

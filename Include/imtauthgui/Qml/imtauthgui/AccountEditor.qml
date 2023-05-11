@@ -8,19 +8,20 @@ DocumentBase {
 
     anchors.fill: parent;
 
-    commandsDelegateSourceComp: accountEditorCommandsDelegate;
-
     property int textInputHeight: 30;
+    property bool modelsIsLoaded: groupsProvider.completed && accountEditorContainer.modelIsReady;
 
-    onDocumentModelChanged: {
-        console.log("AccountEditor onDocumentModelChanged");
-
+    Component.onCompleted: {
         groupsProvider.updateModel();
     }
 
-    Component {
-        id: accountEditorCommandsDelegate;
-        AccountEditorCommandsDelegate {}
+    onModelIsReadyChanged: {
+        if (accountEditorContainer.modelIsReady){
+            accountEditorContainer.updateGui();
+            undoRedoManager.registerModel(accountEditorContainer.documentModel);
+
+            accountNameInput.focus = true;
+        }
     }
 
     UndoRedoManager {
@@ -48,15 +49,8 @@ DocumentBase {
                 for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
                     groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
                 }
-
                 groupsTable.elements = groupsProvider.collectionModel;
-
-                accountEditorContainer.updateGui();
-                undoRedoManager.registerModel(accountEditorContainer.documentModel);
-
                 groupsProvider.collectionModel.modelChanged.connect(accountEditorContainer.updateModel);
-
-                accountNameInput.focus = true;
             }
         }
     }
@@ -105,13 +99,15 @@ DocumentBase {
             }
         }
 
-        for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
-            let id = groupsTable.elements.GetData("Id", i);
-            if (groupIds.includes(id)){
-                groupsTable.elements.SetData("CheckedState", Qt.Checked, i);
-            }
-            else{
-                groupsTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+        if (groupsTable.elements){
+            for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
+                let id = groupsTable.elements.GetData("Id", i);
+                if (groupIds.includes(id)){
+                    groupsTable.elements.SetData("CheckedState", Qt.Checked, i);
+                }
+                else{
+                    groupsTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+                }
             }
         }
 
@@ -125,7 +121,9 @@ DocumentBase {
             return;
         }
 
-        undoRedoManager.beginChanges();
+//        undoRedoManager.beginChanges();
+
+//        accountEditorContainer.documentModel.SetData("Id", accountEditorContainer.itemId);
 
         let name = accountNameInput.text;
         accountEditorContainer.documentModel.SetData("Name", name)
@@ -152,18 +150,20 @@ DocumentBase {
         accountEditorContainer.documentModel.SetData("Email", email)
 
         let selectedGroupIds = []
-        for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
-            let id = groupsTable.elements.GetData("Id", i);
-            let state = groupsTable.elements.GetData("CheckedState", i);
-            if (state === Qt.Checked){
-                selectedGroupIds.push(id)
+        if (groupsTable.elements){
+            for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
+                let id = groupsTable.elements.GetData("Id", i);
+                let state = groupsTable.elements.GetData("CheckedState", i);
+                if (state === Qt.Checked){
+                    selectedGroupIds.push(id)
+                }
             }
         }
 
         let groups = selectedGroupIds.join(';');
         accountEditorContainer.documentModel.SetData("Groups", groups)
 
-        undoRedoManager.endChanges();
+//        undoRedoManager.endChanges();
     }
 
     Rectangle {

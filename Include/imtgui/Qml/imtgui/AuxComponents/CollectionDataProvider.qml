@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: container;
 
     property TreeItemModel collectionModel: TreeItemModel {};
@@ -28,7 +28,7 @@ Item {
             inputParams = {}
         }
 
-        itemsInfoModel.updateModel(inputParams, container.fields);
+        container.itemsInfoModel.updateModel(inputParams, container.fields);
     }
 
     Component.onDestruction: {
@@ -43,9 +43,7 @@ Item {
         }
     }
 
-    GqlModel {
-        id: itemsInfoModel;
-
+    property GqlModel itemsInfoModel: GqlModel {
         function updateModel(externInputParams, fields) {
             console.log( "gqlModelBaseContainer updateModel", container.commandId + "List");
             var query = Gql.GqlRequest("query", container.commandId + "List");
@@ -71,15 +69,15 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, itemsInfoModel);
+            console.log("State:", this.state, container.itemsInfoModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (itemsInfoModel.ContainsKey("errors")){
                     return;
                 }
 
-                if (itemsInfoModel.ContainsKey("data")){
-                    dataModelLocal = itemsInfoModel.GetData("data");
+                if (container.itemsInfoModel.ContainsKey("data")){
+                    dataModelLocal = container.itemsInfoModel.GetData("data");
                     if (dataModelLocal.ContainsKey(container.commandId + "List")){
                         dataModelLocal = dataModelLocal.GetData(container.commandId + "List");
                         if (dataModelLocal.ContainsKey("items")){

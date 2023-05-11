@@ -7,6 +7,12 @@ DocumentBase {
 
     nameOutsideEditor: true;
 
+    commandsDelegateSourceComp: Component {
+        ProductViewCommandsDelegate {
+            tableData: tableView;
+        }
+    }
+
     Component.onCompleted: {
         Events.subscribeEvent("FeaturesUpdated", container.onFeaturesUpdated);
     }
@@ -47,12 +53,6 @@ DocumentBase {
                     container.updateGui();
                 }
             }
-        }
-    }
-
-    commandsDelegateSourceComp: Component {
-        ProductViewCommandsDelegate {
-            tableData: tableView;
         }
     }
 

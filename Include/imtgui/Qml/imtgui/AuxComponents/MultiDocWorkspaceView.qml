@@ -65,6 +65,7 @@ Item {
     }
 
     onDocumentLoadingChanged: {
+        console.log("onDocumentLoadingChanged", workspaceView.documentLoading);
         loading.visible = workspaceView.documentLoading;
     }
 
@@ -147,36 +148,39 @@ Item {
         }
     }
 
-    function newDocument(data){
-        let index = documentsData.InsertNewItem();
-
-        documentsData.SetData("Id", "", index);
-        //documentsData.SetData("Title", "<new item>", index);
-        documentsData.SetData("CommandsId", data["CommandsId"], index);
-        documentsData.SetData("Source", data["Source"], index);
-
-        tabPanelInternal.selectedIndex = index;
-    }
-
-    function addDocument(document){
-        let itemId = document["Id"];
-
-        if (itemId === ""){
-            workspaceView.newDocument(document);
-
-            return;
+    // isRequested - if true, then the document model will be requested from the server
+    function addDocument(documentObj, params, isRequested){
+        if (isRequested === undefined){
+            isRequested = false;
         }
 
-        let documentIndex = this.getDocumentIndexById(itemId);
+        workspaceView.documentLoading = true;
+
+        let itemId = documentObj["Id"];
+        let commandId = documentObj["CommandsId"];
+        let title = documentObj["Name"];
+        let source = documentObj["Source"];
+
+        let index = workspaceView.documentsData.InsertNewItem();
+
+        workspaceView.documentsData.SetData("Id", itemId, index);
+        workspaceView.documentsData.SetData("CommandsId", commandId, index);
+        workspaceView.documentsData.SetData("Title", title, index);
+        workspaceView.documentsData.SetData("Source", source, index);
+
+        if (isRequested){
+            documentController.getData(itemId, params, commandId);
+        }
+
+        tabPanelInternal.selectedIndex = index;
+
+        return index;
+    }
+
+    function openDocument(documentId, params){
+        let documentIndex = workspaceView.getDocumentIndexById(documentId);
         if (documentIndex < 0){
-            var index = documentsData.InsertNewItem();
-
-            documentsData.SetData("Id", itemId, index);
-            documentsData.SetData("CommandsId", document["CommandsId"], index);
-            documentsData.SetData("Title", document["Name"], index);
-            documentsData.SetData("Source", document["Source"], index);
-
-            documentIndex = index;
+            documentIndex = workspaceView.addDocument(params, params, true);
         }
 
         tabPanelInternal.selectedIndex = documentIndex;
@@ -187,55 +191,27 @@ Item {
             force = false;
         }
 
-         let index = this.getDocumentIndexById(itemId);
-         if (index < 0){
-             index = tabPanelInternal.selectedIndex;
-         }
-
-         if (index !== 0){
-             let documentBase = workspaceView.documentsData.GetData("Item", index);
-
-             if (documentBase.isDirty && !force){
-                 tabPanelInternal.selectedIndex = index;
-
-                 modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
-             }
-             else{
-                 if (tabPanelInternal.selectedIndex >= index && index > 0){
-                     tabPanelInternal.selectedIndex--;
-                 }
-
-                 workspaceView.documentsData.RemoveItem(index);
-             }
-         }
-     }
-
-    function insertNewDocument(documentId, params){
-        workspaceView.documentLoading = true;
-
-        let index = documentsData.InsertNewItem();
-
-        documentsData.SetData("Id", documentId, index);
-
-        let commandId = workspaceView.mainCollectionView.getEditorCommandId();
-        documentsData.SetData("CommandsId", commandId, index);
-
-        let source = workspaceView.mainCollectionView.getEditorPath();
-        documentsData.SetData("Source", source, index);
-
-        documentController.documentTypeId = commandId;
-        documentController.getData(documentId, params);
-
-        return index;
-    }
-
-    function openDocument(documentId, params){
-        let documentIndex = this.getDocumentIndexById(documentId);
-        if (documentIndex < 0){
-            documentIndex = workspaceView.insertNewDocument(documentId, params);
+        let index = this.getDocumentIndexById(itemId);
+        if (index < 0){
+            index = tabPanelInternal.selectedIndex;
         }
 
-        tabPanelInternal.selectedIndex = documentIndex;
+        if (index !== 0){
+            let documentBase = workspaceView.documentsData.GetData("Item", index);
+
+            if (documentBase.isDirty && !force){
+                tabPanelInternal.selectedIndex = index;
+
+                modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
+            }
+            else{
+                if (tabPanelInternal.selectedIndex >= index && index > 0){
+                    tabPanelInternal.selectedIndex--;
+                }
+
+                workspaceView.documentsData.RemoveItem(index);
+            }
+        }
     }
 
     function saveDocument(documentId){
@@ -282,14 +258,13 @@ Item {
         }
     }
 
-    function updateDocumentModel(documentId, params){
-        let documentIndex = this.getDocumentIndexById(documentId);
-        if (documentIndex >= 0){
-            let commandId = workspaceView.mainCollectionView.getEditorCommandId();
-            documentController.documentTypeId = commandId;
-            documentController.getData(documentId, params);
-        }
-    }
+    //    function updateDocumentModel(documentId, params){
+    //        let documentIndex = this.getDocumentIndexById(documentId);
+    //        if (documentIndex >= 0){
+    //            let commandId = workspaceView.mainCollectionView.getEditorCommandId();
+    //            documentController.getData(documentId, params, commandId);
+    //        }
+    //    }
 
     Component {
         id: saveDialog;
@@ -437,10 +412,6 @@ Item {
 
         onSavingError: {
             workspaceView.openErrorDialog(message);
-
-//            if (container.documentBase.closingFlag){
-//                container.documentBase.closingFlag = false;
-//            }
         }
     }
 

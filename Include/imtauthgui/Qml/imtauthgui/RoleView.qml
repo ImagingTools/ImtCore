@@ -93,6 +93,12 @@ DocumentBase {
     }
 
     function updateModel(){
+        if (container.blockUpdatingModel){
+            return;
+        }
+
+        container.documentModel.SetData("Id", container.itemId);
+
         for (let index = 0; index < leftMenuModel.count; index++){
             let loader = bodyRepeater.itemAt(index);
             if (loader.item){

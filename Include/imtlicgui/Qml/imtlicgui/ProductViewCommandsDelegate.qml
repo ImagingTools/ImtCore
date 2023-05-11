@@ -53,8 +53,8 @@ DocumentWorkspaceCommandsDelegateBase {
         container.documentBase.documentModel.SetData("Name", value);
     }
 
-    Component {
-        id: messageDialog;
+    property Component messageDialog: Component {
+//        id: messageDialog;
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
@@ -66,8 +66,8 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }
 
-    Component {
-        id: setDescriptionDialog;
+    property Component setDescriptionDialog: Component {
+//        id: setDescriptionDialog;
         InputDialog {
             onFinished: {
                 if (buttonId == "Ok"){
@@ -80,8 +80,8 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }
 
-    Component {
-        id: popupMenu;
+    property Component popupMenu: Component {
+//        id: popupMenu;
 
         PopupMenuDialog {
             onFinished: {
@@ -91,8 +91,8 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }
 
-    Component {
-        id: editDialog;
+    property Component editDialog: Component {
+//        id: editDialog;
         EditLicenseDialog {
             onFinished: {
                 if (buttonId == "Ok"){
@@ -111,34 +111,5 @@ DocumentWorkspaceCommandsDelegateBase {
             }
         }
     }
-
-    ListModel {
-        id: contextMenuModel;
-
-        Component.onCompleted: {
-            contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
-            contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
-            contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
-        }
-    }
-
-//    onClosed: {
-//        Events.sendEvent("LicenseFeaturesUpdate");
-//    }
-
-//    onEdited: {
-//        let elementsModel = tableData.elements;
-//        let oldLicenseId = itemId;
-//        let newLicenseId = elementsModel.GetData("Id", selectedIndex);
-
-//        if (oldLicenseId != newLicenseId){
-//            lisensesFeaturesModel.updateLicensesDependenciesAfterLicenseEditing(oldLicenseId, newLicenseId);
-//        }
-//    }
-
-//    RegExpValidator{
-//        id: validatorId;
-//        regExp: "[0-9][0-9]\.[0-9999]";
-//    }
 }
 

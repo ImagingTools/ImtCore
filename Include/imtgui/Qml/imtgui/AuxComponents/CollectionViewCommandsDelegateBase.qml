@@ -62,16 +62,6 @@ Item {
         }
     }
 
-//    function onSelectionChanged(){
-//        let indexes = containerBase.tableData.getSelectedIndexes();
-
-//        let isEnabled = indexes.length > 0;
-//        if(containerBase.commandsProvider){
-//            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
-//            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
-//        }
-//    }
-
     onTableDataChanged: {
         if (containerBase.tableData){
             containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
@@ -79,24 +69,6 @@ Item {
             containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
         }
     }
-
-//    //TODO -> onItemSelectionChanged
-//    onSelectedIndexChanged: {
-//        console.log("CollectionViewCommands onSelectedIndexChanged", containerBase.selectedIndex, containerBase);
-//        //        let mode = containerBase.selectedIndex > -1 ? "Normal" : "Disabled";
-//        let isEnabled = containerBase.selectedIndex > -1;
-//        if(containerBase.commandsProvider){
-//            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
-//            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
-//        }
-//    }
-//    onCommandsProviderChanged: {
-//        if(commandsProvider){
-//            let isEnabled = containerBase.selectedIndex > -1;
-//            containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
-//            containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
-//        }
-//    }
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);

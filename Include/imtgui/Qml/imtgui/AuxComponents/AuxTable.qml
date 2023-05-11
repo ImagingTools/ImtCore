@@ -860,7 +860,7 @@ Item {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        //        cacheBuffer: 10000;
+        cacheBuffer: 1000;
 
         clip: true;
         Keys.onUpPressed: {

@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: container;
 
     property string documentTypeId: "";
@@ -12,38 +12,26 @@ Item {
 
     property TreeItemModel documentModel: null;
 
-    property alias gqlGetModel: getModel;
-    property alias gqlSetModel: setModel;
-
     signal documentUpdated(string documentId, string documentName);
     signal documentAdded(string documentId, string documentName);
     signal savingError(string message);
 
-    onDocumentTypeIdChanged: {
-        console.log("onDocumentTypeIdChanged", documentTypeId);
-    }
-
-    onDocumentAdded: {
-        console.log("container onDocumentAdded");
-    }
-
-    function getData(documentId, inputParams){
-        getModel.getModelData(documentId, inputParams);
+    function getData(documentId, inputParams, typeId){
+        container.documentTypeId = typeId;
+        container.gqlGetModel.getModelData(documentId, inputParams);
     }
 
     function setData(documentId, documentData){
-        setModel.set(setCommandId, documentId, documentData);
+        container.gqlSetModel.set(setCommandId, documentId, documentData);
     }
 
     function updateData(documentId, documentData){
-        setModel.set(updateCommandId, documentId, documentData);
+        container.gqlSetModel.set(updateCommandId, documentId, documentData);
     }
 
-    GqlModel {
-        id: getModel;
-
+    property GqlModel gqlGetModel: GqlModel {
         function getModelData(modelId, externInputParams){
-            console.log("query getModel", container.getCommandId, modelId);
+            console.log("query container.gqlGetModel", container.getCommandId, modelId);
             var query = Gql.GqlRequest("query", container.getCommandId);
 
             var queryFields = Gql.GqlObject("item");
@@ -68,15 +56,15 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, getModel);
+            console.log("State:", this.state, container.gqlGetModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (getModel.ContainsKey("errors")){
+                if (container.gqlGetModel.ContainsKey("errors")){
                     return;
                 }
 
-                dataModelLocal = getModel.GetData("data");
+                dataModelLocal = container.gqlGetModel.GetData("data");
                 if(dataModelLocal && dataModelLocal.ContainsKey(container.getCommandId)){
                     dataModelLocal = dataModelLocal.GetData(container.getCommandId);
 
@@ -86,9 +74,7 @@ Item {
         }
     }//GqlModel itemModel
 
-    GqlModel {
-        id: setModel;
-
+    property GqlModel gqlSetModel: GqlModel {
         function set(commandId, modelId, data){
             var query = Gql.GqlRequest("query", commandId);
 
@@ -117,13 +103,13 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, setModel);
+            console.log("State:", this.state, container.gqlSetModel);
             if (this.state === "Ready"){
 
                 console.log("Data Ready");
                 var dataModelLocal;
-                if (setModel.ContainsKey("errors")){
-                    dataModelLocal = setModel.GetData("errors");
+                if (container.gqlSetModel.ContainsKey("errors")){
+                    dataModelLocal = container.gqlSetModel.GetData("errors");
 
                     if (dataModelLocal.ContainsKey(container.setCommandId)){
                         dataModelLocal = dataModelLocal.GetData(container.setCommandId);
@@ -140,10 +126,10 @@ Item {
                     return;
                 }
 
-                console.log("setModel", setModel.toJSON());
+                console.log("container.gqlSetModel", container.gqlSetModel.toJSON());
 
-                if (setModel.ContainsKey("data")){
-                    dataModelLocal = setModel.GetData("data");
+                if (container.gqlSetModel.ContainsKey("data")){
+                    dataModelLocal = container.gqlSetModel.GetData("data");
 
                     if (dataModelLocal.ContainsKey(container.setCommandId)){
                         dataModelLocal = dataModelLocal.GetData(container.setCommandId);

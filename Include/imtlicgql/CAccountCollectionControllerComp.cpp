@@ -138,13 +138,13 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 				if(informationId == "Id"){
 					elementInformation = QString(collectionId);
 				}
-				else if(informationId == "AccountName"){
+				else if(informationId == "Name"){
 					elementInformation = companyInfoPtr->GetName();
 				}
 				else if(informationId == "Description"){
 					elementInformation = companyInfoPtr->GetDescription();
 				}
-				else if(informationId == "Mail"){
+				else if(informationId == "Email"){
 					elementInformation = companyInfoPtr->GetEmail();
 				}
 				else{

@@ -46,21 +46,26 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 			QString mail = companyInfoPtr->GetEmail();
 			QByteArrayList groups = companyInfoPtr->GetGroups();
 
-//			const imtauth::CAddress address = companyInfoPtr->GetAddress();
-//			QString country = address.GetCountry();
-//			QString city = address.GetCity();
-//			int postalCode = address.GetPostalCode();
-//			QString street = address.GetStreet();
+			const imtauth::IAddressProvider* addressProviderPtr = companyInfoPtr->GetAddresses();
+			if (addressProviderPtr != nullptr){
+				imtbase::ICollectionInfo::Ids addressesIds = addressProviderPtr->GetAddressList().GetElementIds();
+				for (const imtbase::ICollectionInfo::Id& addressId : addressesIds){
+					const imtauth::IAddress* addressPtr = addressProviderPtr->GetAddress(addressId);
+					if (addressPtr != nullptr){
+						dataModel->SetData("Country", addressPtr->GetCountry());
+						dataModel->SetData("City", addressPtr->GetCity());
+						dataModel->SetData("PostalCode", addressPtr->GetPostalCode());
+						dataModel->SetData("Street", addressPtr->GetStreet());
+
+						break;
+					}
+				}
+			}
 
 			dataModel->SetData("Id", accountId);
 			dataModel->SetData("Name", accountName);
 			dataModel->SetData("Description", accountDescription);
 			dataModel->SetData("Email", mail);
-//			dataModel->SetData("CompanyName", companyName);
-//			dataModel->SetData("Country", country);
-//			dataModel->SetData("City", city);
-//			dataModel->SetData("PostalCode", postalCode);
-//			dataModel->SetData("Street", street);
 			dataModel->SetData("Groups", groups.join(';'));
 		}
 	}
@@ -150,33 +155,34 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			companyInfoPtr->SetEmail(email);
 		}
 
-//		if (itemModel.ContainsKey("CompanyName")){
-//			QString companyName = itemModel.GetData("CompanyName").toString();
-//			companyInfoPtr->SetCompanyName(companyName);
-//		}
-
 //		imtauth::CAddress address;
-//		if (itemModel.ContainsKey("Country")){
-//			QString country = itemModel.GetData("Country").toString();
-//			address.SetCountry(country);
-//		}
 
-//		if (itemModel.ContainsKey("City")){
-//			QString city = itemModel.GetData("City").toString();
-//			address.SetCity(city);
-//		}
+		if (itemModel.ContainsKey("CompanyName")){
+			QString companyName = itemModel.GetData("CompanyName").toString();
+		}
 
-//		if (itemModel.ContainsKey("PostalCode")){
-//			int postalCode = itemModel.GetData("PostalCode").toInt();
-//			address.SetPostalCode(postalCode);
-//		}
+		imtauth::CAddress address;
+		if (itemModel.ContainsKey("Country")){
+			QString country = itemModel.GetData("Country").toString();
+			address.SetCountry(country);
+		}
 
-//		if (itemModel.ContainsKey("Street")){
-//			QString street = itemModel.GetData("Street").toString();
-//			address.SetStreet(street);
-//		}
+		if (itemModel.ContainsKey("City")){
+			QString city = itemModel.GetData("City").toString();
+			address.SetCity(city);
+		}
 
-//		companyInfoPtr->SetAddress(address);
+		if (itemModel.ContainsKey("PostalCode")){
+			int postalCode = itemModel.GetData("PostalCode").toInt();
+			address.SetPostalCode(postalCode);
+		}
+
+		if (itemModel.ContainsKey("Street")){
+			QString street = itemModel.GetData("Street").toString();
+			address.SetStreet(street);
+		}
+
+		companyInfoPtr->AddAddress(address);
 
 		if (itemModel.ContainsKey("Groups")){
 			QByteArray groups = itemModel.GetData("Groups").toByteArray();

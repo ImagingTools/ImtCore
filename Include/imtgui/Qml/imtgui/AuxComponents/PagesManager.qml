@@ -81,8 +81,6 @@ Item {
                 anchors.fill: parent;
 
                 onItemChanged: {
-                    console.log("ThumbnailDecorator Repeater Loader onItemChanged", pagesLoader.source)
-                    console.log("model.PageId", model.Id)
                     if (pagesLoader.item){
                         if (pagesLoader.item.mainDocumentManager !== undefined){
                             pagesLoader.item.mainDocumentManager = container.documentManager;

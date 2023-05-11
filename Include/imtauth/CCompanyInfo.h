@@ -17,6 +17,8 @@ public:
 
 	CCompanyInfo();
 
+	virtual void AddAddress(IAddress& address);
+
 	// reimplemented (ICompanyInfo)
 	virtual const IAddressProvider* GetAddresses() const override;
 

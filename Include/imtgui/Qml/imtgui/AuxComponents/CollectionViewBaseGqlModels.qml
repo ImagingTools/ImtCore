@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: gqlModelBaseContainer;
 
     property string gqlModelHeadersInfo: commandsId + "Info";
@@ -42,18 +42,16 @@ Item {
 
     function updateModels(){
         console.log("CollectionView updateModels");
-        headerInfoModel.updateModel();
+        gqlModelBaseContainer.headerInfoModel.updateModel();
 
-        objectViewModel.getObjectView();
+        gqlModelBaseContainer.objectViewModel.getObjectView();
     }
 
     function updateItemsModel(){
-        itemsInfoModel.updateModel();
+        gqlModelBaseContainer.itemsInfoModel.updateModel();
     }
 
-    GqlModel {
-        id: headerInfoModel;
-
+    property GqlModel headerInfoModel: GqlModel {
         function updateModel() {
             console.log( "headerInfoModel update", gqlModelBaseContainer.gqlModelHeadersInfo);
 
@@ -70,19 +68,19 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, headerInfoModel);
+            console.log("State:", this.state, gqlModelBaseContainer.headerInfoModel);
             if (this.state === "Ready"){
                 console.log("onStateChanged Ready", gqlModelBaseContainer.gqlModelHeadersInfo);
 
                 var dataModelLocal;
 
-                if (headerInfoModel.ContainsKey("errors")){
+                if (gqlModelBaseContainer.headerInfoModel.ContainsKey("errors")){
 
                     return;
                 }
 
-                if (headerInfoModel.ContainsKey("data")){
-                    dataModelLocal = headerInfoModel.GetData("data");
+                if (gqlModelBaseContainer.headerInfoModel.ContainsKey("data")){
+                    dataModelLocal = gqlModelBaseContainer.headerInfoModel.GetData("data");
 
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelHeadersInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelHeadersInfo);
@@ -103,7 +101,7 @@ Item {
                                 }
                             }
 
-                            itemsInfoModel.updateModel();
+                            gqlModelBaseContainer.itemsInfoModel.updateModel();
                         }
                     }
                 }
@@ -111,9 +109,7 @@ Item {
         }
     }
 
-    GqlModel {
-        id: itemsInfoModel;
-
+    property GqlModel itemsInfoModel: GqlModel {
         function updateModel() {
             console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
@@ -147,16 +143,16 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, itemsInfoModel);
+            console.log("State:", this.state, gqlModelBaseContainer.itemsInfoModel);
             gqlModelBaseContainer.itemsInfoGqlStateChanged(this.state);
             if (this.state === "Ready"){
                 var dataModelLocal;
-                if (itemsInfoModel.ContainsKey("errors")){
+                if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("errors")){
                     return;
                 }
 
-                if (itemsInfoModel.ContainsKey("data")){
-                    dataModelLocal = itemsInfoModel.GetData("data");
+                if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("data")){
+                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("data");
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
                         if (dataModelLocal.ContainsKey("notification")){
@@ -192,8 +188,7 @@ Item {
         }
     }
 
-    GqlModel {
-        id: objectViewModel;
+    property GqlModel objectViewModel: GqlModel {
 
         function getObjectView(){
             console.log( "CollectionView objectView");
@@ -210,15 +205,15 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, objectViewModel);
+            console.log("State:", this.state, gqlModelBaseContainer.objectViewModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (objectViewModel.ContainsKey("errors")){
+                if (gqlModelBaseContainer.objectViewModel.ContainsKey("errors")){
                     return;
                 }
 
-                dataModelLocal = objectViewModel.GetData("data");
+                dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("data");
 
                 if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelObjectView)){
                     dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelObjectView);

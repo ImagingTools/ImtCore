@@ -200,7 +200,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 				errorMessage = QT_TR_NOOP("Object with this ID already exists");
 			}
 			else{
-				newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
+				newObjectId = m_objectCollectionCompPtr->InsertNewObject("DocumentInfo", name, description, newObject, objectId);
 			}
 		}
 

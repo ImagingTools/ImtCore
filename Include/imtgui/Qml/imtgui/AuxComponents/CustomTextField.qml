@@ -93,6 +93,49 @@ FocusScope {
 
         anchors.fill: textField;
         cursorShape: containerTextField.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
+
+        acceptedButtons: Qt.RightButton;
+
+        onClicked: {
+            let point = mapToItem(null, mouse.x, mouse.y);
+
+            inputActions.open(point.x, point.y);
+        }
+    }
+
+    InputActions {
+        id: inputActions;
+
+        onCopyClicked: {
+            textField.copy();
+        }
+
+        onCutClicked: {
+            textField.cut();
+
+            containerTextField.editingFinished();
+        }
+
+        onPasteClicked: {
+            let oldText = textField.text;
+            textField.paste();
+            let newText = textField.text;
+            if (oldText !== newText){
+                containerTextField.editingFinished();
+            }
+        }
+
+        onRemoveClicked: {
+            if (textField.selectedText !== ""){
+                textField.remove(textField.selectionStart, textField.selectionEnd);
+
+                containerTextField.editingFinished();
+            }
+        }
+
+        onSelectAllClicked: {
+            textField.selectAll();
+        }
     }
 
     TextInput {
@@ -115,16 +158,11 @@ FocusScope {
         clip: true;
 
         onAccepted: {
-            console.log("CustomTextField onAccepted");
             containerTextField.accepted();
         }
 
         onTextEdited: {
             containerTextField.textEdited();
-            console.log("CustomTextField onTextEdited");
-            console.log("acceptableInput", textField.acceptableInput);
-            console.log("mainRect.border.color", mainRect.border.color);
-
         }
 
         onAcceptableInputChanged: {
@@ -137,6 +175,8 @@ FocusScope {
         }
 
         onEditingFinished: {
+            console.log("TextInput onEditingFinished");
+
             containerTextField.editingFinished();
         }
 

@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0;
 
-Item {
+QtObject {
     id: undoRedo;
 
     property var undoStack: [];
@@ -39,34 +39,12 @@ Item {
         return null;
     }
 
-    Component {
-        id: treeItemModelComp;
-
-        TreeItemModel {}
-    }
-
     function addModel(obj){
-        console.log("addModel");
         if (!obj){
             return;
         }
 
-        console.log("obj", JSON.stringify(obj));
-
-        if (undoRedo.undoStack.length >= 1){
-            let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
-            console.log("lastModel", JSON.stringify(lastModel));
-            let isEqual = obj.IsEqualWithModel(lastModel);
-            console.log("isEqual", isEqual);
-            if (isEqual){
-                return;
-            }
-        }
-
-        let emptyModel = treeItemModelComp.createObject(undoRedo);
-        emptyModel.Copy(obj)
-
-        undoRedo.undoStack.push(emptyModel);
+        undoRedo.undoStack.push(obj);
 
         if (undoRedo.redoStack.length > 0){
             undoRedo.redoStack = [];

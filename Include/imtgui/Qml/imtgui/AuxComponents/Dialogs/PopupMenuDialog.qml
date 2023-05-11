@@ -1,5 +1,5 @@
 import QtQuick 2.12
-import Qt5Compat.GraphicalEffects 1.0
+//import Qt5Compat.GraphicalEffects 1.0
 import QtGraphicalEffects 1.12
 import Acf 1.0
 import imtgui 1.0
@@ -28,6 +28,8 @@ Item {
     property int moveToIndex: -1;
 
     property alias contentY: popupMenuListView.contentY;
+
+    property bool forceFocus: false;
 
     // ID for display in combo box delegates
     property string nameId: "Name";

@@ -96,7 +96,9 @@ Item {
 
                     console.log("dialogLoader.item.parent", dialogLoader.item.parent);
 
-                    dialogLoader.item.forceActiveFocus();
+                    if (dialogLoader.item.forceFocus === undefined || dialogLoader.item.forceFocus){
+                        dialogLoader.item.forceActiveFocus();
+                    }
                 }
             }
         }

@@ -11,7 +11,7 @@ Item {
     property Item pDataList: null;
 
     property bool compl: false;
-    property bool complCompl: delegateContainer.compl && pDataList.compl;
+    property bool complCompl: pDataList ? delegateContainer.compl && pDataList.compl : false;
 
     property alias contentComp: contentLoader.sourceComponent;
 	property real textLeftIndent: 0

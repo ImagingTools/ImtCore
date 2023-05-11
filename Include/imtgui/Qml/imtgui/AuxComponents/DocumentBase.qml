@@ -8,6 +8,7 @@ Item {
     property string itemId;
     property string itemName;
     property string commandsId;
+    property string documentUuid;
 
     property TreeItemModel documentModel: TreeItemModel {};
     property TreeItemModel documentsData: TreeItemModel{};
@@ -22,6 +23,8 @@ Item {
     // If true - after update the document will be closed
     property bool closingFlag: false;
 
+    property bool modelIsReady: false;
+
     property bool nameOutsideEditor: false;
 
     property alias commandsDelegate: commandsDelegateBase.item;
@@ -35,7 +38,6 @@ Item {
 
     signal saved();
 
-    property string documentUuid;
     UuidGenerator {
         id: uuidGenerator;
     }
@@ -44,18 +46,17 @@ Item {
         return true;
     }
 
-    Keys.onPressed: {
-        if (event.key == Qt.Key_Delete){
-//            Events.sendEvent(documentBaseRoot.commandsId + "CommandActivated", "Remove");
-
-            Events.sendEvent(documentBaseRoot.documentUuid + "CommandActivated", "Remove");
-        }
-    }
+//    Keys.onPressed: {
+//        if (event.key === Qt.Key_Delete){
+//            Events.sendEvent(documentBaseRoot.documentUuid + "CommandActivated", "Remove");
+//        }
+//    }
 
     Component.onCompleted: {
+        console.log("Document onCompleted", itemId);
         documentBaseRoot.documentUuid = uuidGenerator.generateUUID();
 
-        commandsDelegate.documentBase = documentBaseRoot;
+        documentBaseRoot.commandsDelegate.documentBase = documentBaseRoot;
     }
 
     onVisibleChanged: {
@@ -82,13 +83,29 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("documentBaseRoot onDocumentModelChanged", JSON.stringify(documentBaseRoot.documentModel));
+        documentBaseRoot.modelIsReady = true;
+
         documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
 
         documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
         documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
 
         documentBaseRoot.updateDocumentTitle()
+    }
+
+    onIsDirtyChanged: {
+        Events.sendEvent("DocumentIsDirtyChanged", {"Id": documentBaseRoot.itemId, "IsDirty": documentBaseRoot.isDirty});
+
+        documentBaseRoot.commandsProvider.setCommandIsEnabled("Save", documentBaseRoot.isDirty);
+    }
+
+    onCommandsIdChanged: {
+//        commandsDelegate.commandsId = documentBaseRoot.commandsId;
+        if (documentBaseRoot.itemId === ""){
+            documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
+            documentBaseRoot.updateModel();
+            documentBaseRoot.modelIsReady = true;
+        }
     }
 
     function onEntered(value){
@@ -113,30 +130,9 @@ Item {
         }
     }
 
-    onIsDirtyChanged: {
-        Events.sendEvent("DocumentIsDirtyChanged", {"Id": documentBaseRoot.itemId, "IsDirty": documentBaseRoot.isDirty});
-
-        documentBaseRoot.commandsProvider.setCommandIsEnabled("Save", documentBaseRoot.isDirty);
-    }
-
-    onDocumentsDataChanged: {
-        if(commandsDelegateBase.item && commandsDelegateBase.item.documentsData !==undefined){
-            commandsDelegateBase.item.documentsData = documentBaseRoot.documentsData;
-        }
-    }
-
-    onDocumentManagerChanged: {
-        if(commandsDelegateBase.item){
-            commandsDelegateBase.item.documentBase = documentBaseRoot;
-        }
-    }
-
-    onCommandsIdChanged: {
-        console.log("documentBaseRoot onCommandsIdChanged", documentBaseRoot.commandsId, itemName);
-        commandsDelegate.commandsId = documentBaseRoot.commandsId;
-    }
-
     function updateDocumentTitle(){
+        console.log("updateDocumentTitle");
+
         if (documentBaseRoot.documentManager != null){
             let documentId = documentBaseRoot.documentModel.GetData("Id");
             let documentName = documentBaseRoot.documentModel.GetData("Name");
@@ -194,9 +190,9 @@ Item {
         onLoaded: {
             commandsDelegateBase.item.documentBase = documentBaseRoot;
 
-            if(commandsDelegateBase.item.documentsData !==undefined){
-                commandsDelegateBase.item.documentsData = documentBaseRoot.documentsData;
-            }
+//            if(commandsDelegateBase.item.documentsData !==undefined){
+//                commandsDelegateBase.item.documentsData = documentBaseRoot.documentsData;
+//            }
 
             documentBaseRoot.commandsDelegateLoaded();
         }

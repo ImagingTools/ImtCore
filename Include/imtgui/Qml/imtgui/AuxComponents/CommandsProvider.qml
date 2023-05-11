@@ -2,33 +2,29 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: commandsProviderContainer;
 
-    property string commandsId;
-
-    property string documentUuid;
-
     property TreeItemModel commandsModel: TreeItemModel {};
+
+    property string commandsId;
+    property string documentUuid;
 
     signal modelLoaded();
     signal commandModeChanged(string commandId, bool newMode);
 
     onCommandsIdChanged: {
-        console.log("commandsProviderContainer onCommandsIdChanged", commandsProviderContainer.commandsId);
-        modelCommands.updateModel();
+        commandsProviderContainer.modelCommands.updateModel();
     }
 
     onCommandsModelChanged: {
-//        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-//                                                  "CommandsId": commandsProviderContainer.documentUuid});
-        updateGui();
+        commandsProviderContainer.updateGui();
 
         commandsProviderContainer.modelLoaded();
     }
 
     function updateModel(){
-        modelCommands.updateModel();
+        commandsProviderContainer.modelCommands.updateModel();
     }
 
     function updateGui(){
@@ -37,8 +33,6 @@ Item {
     }
 
     function setCommandIsEnabled(commandId, isEnabled){
-        console.log("commandsProviderContainer setCommandIsEnabled", commandId, isEnabled);
-
         if(commandsProviderContainer.commandsModel === undefined) return;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
@@ -76,7 +70,6 @@ Item {
     }
 
     function setCommandNotification(commandId, notification){
-        console.log("setCommandNotification", commandId, notification);
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             if (currentCommandId === commandId){
@@ -122,30 +115,24 @@ Item {
         }
     }
 
-    GqlModel {
-        id: modelCommands;
-
+    property GqlModel modelCommands: GqlModel {
         function updateModel() {
-            console.log("CommandsProvider updateModel", commandsProviderContainer.commandsId + "Commands");
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
-
             var gqlData = query.GetQuery();
-
             this.SetGqlQuery(gqlData);
         }
 
-
         onStateChanged: {
-            console.log("State:", this.state, modelCommands);
+            console.log("State:", this.state, commandsProviderContainer.modelCommands);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (modelCommands.ContainsKey("errors")){
+                if (commandsProviderContainer.modelCommands.ContainsKey("errors")){
                     return;
                 }
 
-                if (modelCommands.ContainsKey("data")){
-                    dataModelLocal = modelCommands.GetData("data")
+                if (commandsProviderContainer.modelCommands.ContainsKey("data")){
+                    dataModelLocal = commandsProviderContainer.modelCommands.GetData("data")
                     if(dataModelLocal.ContainsKey(commandsProviderContainer.commandsId + "Commands")){
                         dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandsId + "Commands");
 
