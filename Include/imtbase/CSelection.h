@@ -16,9 +16,13 @@ namespace imtbase
 /**
 	Implementation of the multiple selection.
 */
-class CSelection: virtual public ISelection
+class CSelection:
+			public imod::TSingleModelObserverBase<ICollectionInfo>,
+			virtual public ISelection
 {
 public:
+	typedef imod::CSingleModelObserverBase BaseClass;
+
 	CSelection();
 	CSelection(SelectionMode selectionMode);
 
@@ -27,6 +31,7 @@ public:
 	// reimplemented (ISelection)
 	virtual const ICollectionInfo* GetSelectionConstraints() const override;
 	virtual SelectionMode GetSelectionMode() const override;
+	virtual void SetSelectionMode(SelectionMode mode) override;
 	virtual Ids GetSelectedIds() const override;
 	virtual bool SetSelectedIds(const Ids& selectedIds) override;
 
@@ -40,38 +45,20 @@ public:
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-private:
-	class ConstraintsObserver: public imod::TSingleModelObserverBase<ICollectionInfo>
-	{
-	public:
-		ConstraintsObserver(CSelection& parent);
-
-	protected:
-		// reimplemented (imod::CSingleModelObserverBase)
-		virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeset) override;
-
-		// reimplemented (imod::IObserver)
-		virtual bool OnModelDetached(imod::IModel* modelPtr) override;
-
-	private:
-		CSelection& m_parent;
-	};
+protected:
+	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
 
 private:
 	/**
-		Apply identifiers to selection and emit notification
-	*/
-	void ApplySelection(const Ids& selectionIds);
-
-	/**
-		Apply selection mode and emit notification
+		If more than one ID is selected and SM_SINGLE is set, the selection will be reset
 	*/
 	void ApplySelectionMode(SelectionMode selectionMode);
+	bool ApplySelection(const Ids& selectionIds);
 
 private:
 	SelectionMode m_selectionMode;
 	Ids m_selectedIds;
-	ConstraintsObserver m_constraintsObserver;
 };
 
 

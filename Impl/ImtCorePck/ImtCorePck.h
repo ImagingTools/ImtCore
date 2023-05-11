@@ -44,6 +44,7 @@
 #include <imtbase/CSingleCommandPermissionsProviderComp.h>
 #include <imtbase/CCommandPermissionsProviderJoinerComp.h>
 #include <imtbase/CApplicationInfoRepresentationComp.h>
+#include <imtbase/CSelectionComp.h>
 
 
 /**
@@ -101,6 +102,7 @@ typedef imtbase::CGuiElementRepresentationControllerComp GuiElementRepresentatio
 typedef imtbase::CSingleCommandPermissionsProviderComp SingleCommandPermissionsProvider;
 typedef imtbase::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
 typedef imtbase::CApplicationInfoRepresentationComp ApplicationInfoRepresentation;
+typedef icomp::TModelCompWrap<imtbase::CSelectionComp> Selection;
 
 
 } // namespace ImtCorePck

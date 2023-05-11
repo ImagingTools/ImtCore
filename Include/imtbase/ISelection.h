@@ -23,7 +23,7 @@ class ISelection: virtual public iser::ISerializable
 {
 public:
 	typedef QByteArray Id;
-	typedef QVector<Id> Ids;
+	typedef QSet<Id> Ids;
 
 	static const QByteArray CN_SELECTION_MODE_CHANGED;
 	static const QByteArray CN_SELECTION_CHANGED;
@@ -41,7 +41,7 @@ public:
 
 	enum SelectionMode
 	{
-		SM_SINGLE = 1,
+		SM_SINGLE = 0,
 		SM_MULTI
 	};
 
@@ -56,6 +56,11 @@ public:
 		Get selection mode.
 	*/
 	virtual SelectionMode GetSelectionMode() const = 0;
+
+	/**
+		Set selection mode.
+	*/
+	virtual void SetSelectionMode(SelectionMode mode) = 0;
 
 	/**
 		Get selected IDs.

@@ -290,7 +290,7 @@ void CProductLicensingInfoGuiComp::OnLicenseSelectionChanged(
 	if (licenseIds.count() == 1){
 		imtlic::IProductLicensingInfo* productLicensingInfo = GetObservedObject();
 		if (productLicensingInfo != nullptr){
-			const imtlic::ILicenseInfo* licensePtr = productLicensingInfo->GetLicenseInfo(licenseIds.first());
+			const imtlic::ILicenseInfo* licensePtr = productLicensingInfo->GetLicenseInfo(licenseIds.toList().first());
 			if (licensePtr != nullptr){
 				m_selectedLicenseId = licensePtr->GetLicenseId();
 				m_selectedFeatures = licensePtr->GetFeatureInfos();

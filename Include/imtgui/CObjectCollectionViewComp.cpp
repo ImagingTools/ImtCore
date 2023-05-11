@@ -67,6 +67,11 @@ imtbase::ISelection::SelectionMode CObjectCollectionViewComp::GetSelectionMode()
 }
 
 
+void CObjectCollectionViewComp::SetSelectionMode(SelectionMode /*mode*/)
+{
+}
+
+
 imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 {
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
@@ -87,7 +92,9 @@ imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 		}
 	}
 
-	return itemIds;
+	ISelection::Ids ids(itemIds.cbegin(), itemIds.cend());
+
+	return ids;
 }
 
 

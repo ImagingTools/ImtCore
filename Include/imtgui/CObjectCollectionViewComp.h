@@ -116,6 +116,7 @@ public:
 	// reimplemented (imtbase::ISelection)
 	virtual const imtbase::ICollectionInfo* GetSelectionConstraints() const override;
 	virtual SelectionMode GetSelectionMode() const override;
+	virtual void SetSelectionMode(SelectionMode mode) override;
 	virtual Ids GetSelectedIds() const override;
 	virtual bool SetSelectedIds(const Ids& selectedIds) override;
 

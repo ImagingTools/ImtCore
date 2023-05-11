@@ -199,6 +199,11 @@ I_EXPORT_COMPONENT(
 			"Application info representation",
 			"ApplicationInfo Application Representation Client");
 
+I_EXPORT_COMPONENT(
+			Selection,
+			"Ids based selection",
+			"Selection Id");
+
 
 } // namespace ImtCorePck
 

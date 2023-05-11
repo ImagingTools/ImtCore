@@ -6,10 +6,10 @@ void CSelectionTest::initTestCase()
 	QByteArray firstVar("firstKey");
 	QByteArray secondVar("secondKey");
 	QByteArray emptyKey("");
-	m_testMultiSelectedIds.append(firstVar);
-	m_testMultiSelectedIds.append(secondVar);
-	m_testSingleSelectedIds.append(secondVar);
-	m_testSelectedWithEmptyKeysIds.append(emptyKey);
+	m_testMultiSelectedIds += (firstVar);
+	m_testMultiSelectedIds += (secondVar);
+	m_testSingleSelectedIds += (secondVar);
+	m_testSelectedWithEmptyKeysIds += (emptyKey);
 }
 
 
