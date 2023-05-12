@@ -35,7 +35,13 @@ public:
 		/**
 			A company account.
 		*/
-		AT_COMPANY
+        AT_COMPANY,
+
+        /**
+            An account of a company representative.
+        */
+        AT_REPRESENTATIVE
+
 	};
 
 	enum MetaInfoTypes
