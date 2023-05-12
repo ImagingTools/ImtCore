@@ -19,6 +19,22 @@ namespace imtgeo
 class IAddressElementInfo: virtual public iser::IObject
 {
 public:
+    enum AddressElementType
+    {
+        AE_REGION = 0,
+        AE_AREA,
+        AE_CITY,
+        AE_SETTLEMENT,
+        AE_DISTRICT,
+        AE_KVARTAL,
+        AE_STREET,
+        AE_BUILDING,
+        AE_APARTMENT,
+        AE_SNT,
+        AE_ALLEYA,
+		AE_ANY
+    };
+	
 	/**
 		Get id of the address element.
 	*/
@@ -40,9 +56,9 @@ public:
 	virtual void SetParentId(QByteArray parentId) = 0;
 
 	/**
-		Get id of type the address element.
-	*/
-	virtual const QByteArray GetTypeId() const = 0;
+        Get type of the address element.
+    */
+    virtual AddressElementType GetType() const = 0;
 
 	/**
 		Get name of the address element.

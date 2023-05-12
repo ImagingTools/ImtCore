@@ -160,7 +160,10 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
 	add_dependencies(ImtAuthGqlPck imtauthgql)
 
-        if(DEFINED USE_MONGODB AND USE_MONGODB)
+	add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
+	add_dependencies(ImtGeoPck imtgeo)
+
+    if(DEFINED USE_MONGODB AND USE_MONGODB)
 		add_subdirectory("${IMPL_DIR}/ImtMongoPck/CMake" "${AUX_INCLUDE_DIR}/ImtMongoPck")
 		add_dependencies(ImtMongoPck imtmongo)
 	endif()

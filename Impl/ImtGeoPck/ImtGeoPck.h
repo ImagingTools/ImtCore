@@ -1,0 +1,33 @@
+#pragma once
+
+
+// ACF includes
+#include <icomp/TModelCompWrap.h>
+#include <icomp/TMakeComponentWrap.h>
+
+// ImtCore includes
+#include <imtgeo/CAddressElementInfo.h>
+#include <imtgeo/CAddressElementDatabaseDelegateComp.h>
+
+
+
+/**
+	ImtGqlPck package
+*/
+namespace ImtGeoPck
+{
+
+
+typedef icomp::TModelCompWrap<
+            icomp::TMakeComponentWrap <
+                        imtgeo::CAddressElementInfo,
+                        imtgeo::IAddressElementInfo,
+                        iser::IObject,
+                        iser::ISerializable,
+                        istd::IChangeable>> AddressElementInfo;
+typedef imtgeo::CAddressElementDatabaseDelegateComp AddressElementDatabaseDelegate;
+
+
+} // namespace ImtGeoPck
+
+

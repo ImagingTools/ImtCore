@@ -46,10 +46,19 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 	istd::TDelPtr<istd::IChangeable> documentPtr;
 
 	int index = 0;
+	QByteArray typeId = "DocumentInfo";
 	if (record.contains("TypeId")){
-		QByteArray typeId = record.value("TypeId").toByteArray();
+		typeId = record.value("TypeId").toByteArray();
+		index = -1;
 
-		index = m_documentFactoriesCompPtr.FindValue(typeId);
+		if (m_typesCompPtr.IsValid()) {
+			for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i) {
+				if (typeId == m_typesCompPtr->GetOptionId(i)) {
+					index = i;
+					break;
+				}
+			}
+		}
 	}
 
 	if (m_documentFactoriesCompPtr.GetCount() > 0 && index >= 0){
@@ -63,7 +72,7 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 	if (record.contains(*m_documentContentColumnIdAttrPtr)){
 		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
 
-		if (ReadDataFromMemory("DocumentInfo", documentContent, *documentPtr)){
+		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
 		}
 	}

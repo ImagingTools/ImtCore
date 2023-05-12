@@ -27,11 +27,12 @@ public:
 	virtual void SetLatitude(double lat);
 	virtual void SetLongitude(double lat);
 	virtual QByteArray GetSerialId() const;
+	virtual void SetType(AddressElementType type);
 
 	// reimplemented (IAddressElementInfo)
 	virtual QByteArray GetId() const override;
 	virtual QByteArray GetParentId() const override;
-	virtual const QByteArray GetTypeId() const override;
+	virtual AddressElementType GetType() const override;
 	virtual QString GetName() const override;
 	virtual QString GetDescription() const override;
 	virtual QString GetFullAddress() const override;
@@ -50,7 +51,7 @@ public:
 private:
 	QByteArray m_id;
 	QByteArray m_parentId;
-	QByteArray m_typeId;
+	AddressElementType m_type;
 	QString m_name;
 	QString m_description;
 	QByteArray m_serialId;
