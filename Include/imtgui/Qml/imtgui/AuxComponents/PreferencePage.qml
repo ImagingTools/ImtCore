@@ -47,7 +47,7 @@ Rectangle {
     }
 
     Component.onDestruction: {
-        container.commonModel.modelChanged.disconnect(container.modelChanged);
+        container.commonModel.dataChanged.disconnect(container.modelChanged);
     }
 
     onApplicationInfoProviderChanged: {
@@ -87,8 +87,8 @@ Rectangle {
                 container.settingsProvider.rewriteModel(container.serverModel, container.localModel);
             }
 
-            container.localModel.modelChanged.connect(container.modelChanged);
-            container.serverModel.modelChanged.connect(container.modelChanged);
+            container.localModel.dataChanged.connect(container.modelChanged);
+            container.serverModel.dataChanged.connect(container.modelChanged);
 
             updateGui();
 
