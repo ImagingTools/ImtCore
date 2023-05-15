@@ -12,7 +12,7 @@ Item {
 
     Component.onDestruction: {
         if (container.observedModel != null){
-            container.observedModel.modelChanged.disconnect(container.observedModelDataChanged);
+            container.observedModel.dataChanged.disconnect(container.observedModelDataChanged);
         }
     }
 
@@ -20,7 +20,7 @@ Item {
         console.log("PreferenceObserver registerModel", model);
 
         container.observedModel = model;
-        container.observedModel.modelChanged.connect(container.observedModelDataChanged);
+        container.observedModel.dataChanged.connect(container.observedModelDataChanged);
         container.beginModel.Copy(container.observedModel);
     }
 
