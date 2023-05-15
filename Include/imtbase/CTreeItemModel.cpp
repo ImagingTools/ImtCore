@@ -13,7 +13,6 @@
 #include <istd/CChangeNotifier.h>
 #include <istd/TSmartPtr.h>
 #include <imod/CModelUpdateBridge.h>
-#include "CTreeItemModel.h"
 
 
 namespace imtbase
@@ -25,11 +24,15 @@ CTreeItemModel::CTreeItemModel(QObject *parent)
 	m_isArray(false),
 	m_isUpdateEnabled(false)
 {
+	m_isTransaction = false;
 	imtbase::CTreeItemModel* parentModel = dynamic_cast<imtbase::CTreeItemModel*>(parent);
 	if (parentModel != nullptr){
 		SetSlavePtr(parentModel);
 	}
+
+	connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(OnDataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
 }
+
 
 CTreeItemModel::~CTreeItemModel()
 {
@@ -88,9 +91,13 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 
 	m_items.insert(index, new Item());
 
+	m_isTransaction = true;
+
 	for(auto value = map.cbegin(); value != map.cend(); ++ value){
 		SetData(value.key().toUtf8(), *value, index);
 	}
+
+	m_isTransaction = false;
 
 	endInsertRows();
 }
@@ -139,8 +146,6 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		return false;
 	}
 
-	beginRemoveRows(QModelIndex(), index, index);
-
 	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 	if (m_isUpdateEnabled){
 		changeSet.SetChangeInfo("operation", "remove item");
@@ -149,10 +154,13 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		BeginChanges(changeSet);
 	}
 
+	beginRemoveRows(QModelIndex(), index, index);
+
 	Item* item = m_items.takeAt(index);
 	QList<QByteArray> keys;
-
 	delete item;
+
+	endRemoveRows();
 
 	if(m_items.isEmpty()){
 		m_isArray = false;
@@ -161,8 +169,6 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 	if (m_isUpdateEnabled){
 		EndChanges(changeSet);
 	}
-
-	endRemoveRows();
 
 	return true;
 }
@@ -240,16 +246,6 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *exte
 			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
 
 			retVal = retVal && childModelPtr->CopyFrom(*treeItemModelPtr);
-
-//			int itemsCount = treeItemModelPtr->GetItemsCount();
-
-//			for (int i = 0; i < itemsCount; i++){
-//				int childIndex = childModelPtr->InsertNewItem();
-//				retVal = childModelPtr->CopyItemDataFromModel(childIndex, treeItemModelPtr, i);
-//				if (retVal == false){
-//					break;
-//				}
-//			}
 		}
 		else{
 			retVal = retVal && SetData(key, value, index);
@@ -334,7 +330,9 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 		QVector<int> keyRoles;
 		keyRoles.append(keyRole);
 
-		emit dataChanged(topLeft, bottomRight, keyRoles);
+		if (!m_isTransaction){
+			emit dataChanged(topLeft, bottomRight, keyRoles);
+		}
 	}
 
 	return true;
@@ -487,8 +485,7 @@ void CTreeItemModel::Clear()
 {
 	qDeleteAll(m_items);
 	m_items.clear();
-    Refresh();
-
+	Refresh();
 }
 
 
@@ -567,6 +564,15 @@ void CTreeItemModel::ClearQueryParams(const QByteArray& /*key*/)
 void CTreeItemModel::SetUpdateEnabled(bool updateEnabled)
 {
 	m_isUpdateEnabled = updateEnabled;
+}
+
+
+void CTreeItemModel::OnDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+	CTreeItemModel* parentModelPtr = GetParent();
+	if (parentModelPtr != nullptr){
+		emit parentModelPtr->dataChanged(topLeft, bottomRight, roles);
+	}
 }
 
 
@@ -933,8 +939,6 @@ void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &cha
 void CTreeItemModel::OnEndChanges(const ChangeSet& changeSet)
 {
 	BaseClass::OnEndChanges(changeSet);
-
-	emit modelChanged(changeSet);
 }
 
 

@@ -85,6 +85,7 @@ public Q_SLOTS:
 	QMap<QByteArray, QByteArray> &GetQueryParams();
 	void ClearQueryParams(const QByteArray& key);
 	void SetUpdateEnabled(bool updateEnabled);
+	void OnDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
 
 	void Refresh();
 
@@ -99,7 +100,6 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
-	void modelChanged(const ChangeSet& changeSet);
 
 private:
 	class Item
@@ -138,6 +138,7 @@ private:
 
 	QString m_state;
 	bool m_isUpdateEnabled;
+	bool m_isTransaction;
 
 protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
