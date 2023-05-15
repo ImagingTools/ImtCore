@@ -204,6 +204,16 @@ I_EXPORT_COMPONENT(
 			"Ids based selection",
 			"Selection Id");
 
+I_EXPORT_COMPONENT(
+			SelectionAdapter,
+			"Selection adapter",
+			"Selection SelectionParam Adapter");
+
+I_EXPORT_COMPONENT(
+			SelectionPrmAdapter,
+			"Selection param adapter",
+			"Selection SelectionParam Adapter");
+
 
 } // namespace ImtCorePck
 

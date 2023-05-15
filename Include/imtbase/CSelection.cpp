@@ -59,7 +59,7 @@ ISelection::SelectionMode CSelection::GetSelectionMode() const
 }
 
 
-void CSelection::SetSelectionMode(SelectionMode mode)
+bool CSelection::SetSelectionMode(SelectionMode mode)
 {
 	return ApplySelectionMode(mode);
 }
@@ -180,7 +180,7 @@ void CSelection::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 
 // private methods
 
-void CSelection::ApplySelectionMode(SelectionMode selectionMode)
+bool CSelection::ApplySelectionMode(SelectionMode selectionMode)
 {
 	if (m_selectionMode != selectionMode){
 		istd::CChangeGroup group(this);
@@ -195,6 +195,8 @@ void CSelection::ApplySelectionMode(SelectionMode selectionMode)
 			ApplySelection(Ids());
 		}
 	}
+
+	return true;
 }
 
 

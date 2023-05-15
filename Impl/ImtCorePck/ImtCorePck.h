@@ -45,6 +45,8 @@
 #include <imtbase/CCommandPermissionsProviderJoinerComp.h>
 #include <imtbase/CApplicationInfoRepresentationComp.h>
 #include <imtbase/CSelectionComp.h>
+#include <imtbase/CSelectionAdapterComp.h>
+#include <imtbase/CSelectionParamAdapterComp.h>
 
 
 /**
@@ -103,6 +105,8 @@ typedef imtbase::CSingleCommandPermissionsProviderComp SingleCommandPermissionsP
 typedef imtbase::CCommandPermissionsProviderJoinerComp CommandPermissionsProviderJoiner;
 typedef imtbase::CApplicationInfoRepresentationComp ApplicationInfoRepresentation;
 typedef icomp::TModelCompWrap<imtbase::CSelectionComp> Selection;
+typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
+typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionPrmAdapter;
 
 
 } // namespace ImtCorePck

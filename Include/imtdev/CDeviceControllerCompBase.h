@@ -6,10 +6,10 @@
 
 // ACF includes
 #include <imod/TModelWrap.h>
-#include <iprm/IOptionsList.h>
-#include <iprm/COptionsManager.h>
 #include <ilog/TLoggerCompWrap.h>
-//#include <iproc/IProcessor.h>
+
+// ImtCore includes
+#include <imtbase/CCollectionInfo.h>
 
 // GmgCore includes
 #include <imtdev/IDeviceController.h>
@@ -30,7 +30,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CDeviceControllerCompBase)
 		I_REGISTER_SUBELEMENT(DeviceInfoList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, iprm::IOptionsList, ExtractDeviceInfoList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imtbase::ICollectionInfo, ExtractDeviceInfoList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, istd::IChangeable, ExtractDeviceInfoList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imod::IModel, ExtractDeviceInfoList);
 		I_REGISTER_INTERFACE(IDeviceController);
@@ -39,7 +39,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDeviceController)
-	virtual const iprm::IOptionsList& GetAvailableDeviceList() const override;
+	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
 	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 
 protected:
@@ -73,7 +73,7 @@ private:
 private:
 	I_ATTR(bool, m_isAutoCloseEnabledAttrPtr);
 
-	typedef imod::TModelWrap<iprm::COptionsManager> DeviceInfoList;
+	typedef imod::TModelWrap<imtbase::CCollectionInfo> DeviceInfoList;
 	DeviceInfoList m_deviceList;
 	mutable QMutex m_deviceListMutex;
 };

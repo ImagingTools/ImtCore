@@ -67,8 +67,9 @@ imtbase::ISelection::SelectionMode CObjectCollectionViewComp::GetSelectionMode()
 }
 
 
-void CObjectCollectionViewComp::SetSelectionMode(SelectionMode /*mode*/)
+bool CObjectCollectionViewComp::SetSelectionMode(SelectionMode /*mode*/)
 {
+	return false;
 }
 
 

@@ -31,7 +31,7 @@ public:
 	// reimplemented (ISelection)
 	virtual const ICollectionInfo* GetSelectionConstraints() const override;
 	virtual SelectionMode GetSelectionMode() const override;
-	virtual void SetSelectionMode(SelectionMode mode) override;
+	virtual bool SetSelectionMode(SelectionMode mode) override;
 	virtual Ids GetSelectedIds() const override;
 	virtual bool SetSelectedIds(const Ids& selectedIds) override;
 
@@ -53,7 +53,7 @@ private:
 	/**
 		If more than one ID is selected and SM_SINGLE is set, the selection will be reset
 	*/
-	void ApplySelectionMode(SelectionMode selectionMode);
+	bool ApplySelectionMode(SelectionMode selectionMode);
 	bool ApplySelection(const Ids& selectionIds);
 
 private:

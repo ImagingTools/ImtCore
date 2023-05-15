@@ -7,9 +7,9 @@
 #include <imtdev/IDeviceInstanceInfo.h>
 
 
-namespace iprm
+namespace imtbase
 {
-	class IOptionsList;
+	class ICollectionInfo;
 }
 
 
@@ -66,7 +66,7 @@ public:
 	/**
 		Get the list of available devices.
 	*/
-	virtual const iprm::IOptionsList& GetAvailableDeviceList() const = 0;
+	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const = 0;
 
 	/**
 		Get the current state of the device.

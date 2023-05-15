@@ -10,9 +10,10 @@
 #include <imod/IModel.h>
 #include <imod/CMultiModelDispatcherBase.h>
 #include <icomp/CComponentBase.h>
-#include <iprm/COptionsManager.h>
 #include <icomp/CComponentBase.h>
 
+// ImtCore includes
+#include <imtbase/CCollectionInfo.h>
 #include <imtdev/IDeviceInstanceInfo.h>
 #include <imtdev/IDeviceStaticInfo.h>
 #include <imtdev/IDeviceController.h>
@@ -34,7 +35,7 @@ public:
 
 	I_BEGIN_COMPONENT(CCompositeDeviceControllerComp);
 		I_REGISTER_SUBELEMENT(DeviceInfoList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, iprm::IOptionsList, ExtractDeviceInfoList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imtbase::ICollectionInfo, ExtractDeviceInfoList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, istd::IChangeable, ExtractDeviceInfoList);
 		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imod::IModel, ExtractDeviceInfoList);
 		I_REGISTER_INTERFACE(IDeviceController);
@@ -48,7 +49,7 @@ public:
 	// reimplemented (IDeviceController)
 	virtual QByteArrayList GetSupportedDeviceTypeIds() const override;
 	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
-	virtual const iprm::IOptionsList& GetAvailableDeviceList() const override;
+	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
 	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
 	virtual imtdev::DeviceAccessorPtr OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr) override;
@@ -93,8 +94,6 @@ private:
 		CCompositeDeviceControllerComp& m_parent;
 	};
 
-	typedef imod::TModelWrap<iprm::COptionsManager> DeviceInfoList;
-
 	template <class InteraceType>
 	static InteraceType* ExtractDeviceInfoList(CCompositeDeviceControllerComp& parent)
 	{
@@ -107,7 +106,10 @@ private:
 	I_ATTR(int, m_enumerationIntervalAttrPtr);
 
 	QMap<QByteArray, IDeviceController*> m_deviceControllerMap;
+
+	typedef imod::TModelWrap<imtbase::CCollectionInfo> DeviceInfoList;
 	DeviceInfoList m_deviceList;
+
 	DeviceListObserver m_deviceListObserver;
 
 	int m_enumeratorIndex;

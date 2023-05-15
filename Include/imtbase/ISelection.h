@@ -60,7 +60,7 @@ public:
 	/**
 		Set selection mode.
 	*/
-	virtual void SetSelectionMode(SelectionMode mode) = 0;
+	virtual bool SetSelectionMode(SelectionMode mode) = 0;
 
 	/**
 		Get selected IDs.

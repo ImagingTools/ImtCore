@@ -23,7 +23,7 @@ namespace imtdev
 
 // reimplemented (IDeviceController)
 
-const iprm::IOptionsList& CDeviceControllerCompBase::GetAvailableDeviceList() const
+const imtbase::ICollectionInfo& CDeviceControllerCompBase::GetAvailableDeviceList() const
 {
 	return m_deviceList;
 }
@@ -34,14 +34,14 @@ IDeviceController::DeviceState CDeviceControllerCompBase::GetDeviceState(const Q
 	QMutexLocker listLocker(&m_deviceListMutex);
 	QMutexLocker mapLocker(&m_openedDevicesMutex);
 
-	for (int i = 0; i < m_deviceList.GetOptionsCount(); i++){
-		if (m_deviceList.GetOptionId(i) == deviceId){
-			if (m_openedDevices.contains(deviceId)){
-				return DS_ACTIVE;
-			}
+	imtbase::ICollectionInfo::Ids ids = m_deviceList.GetElementIds();
 
-			return DS_INACTIVE;
+	if (ids.contains(deviceId)){
+		if (m_openedDevices.contains(deviceId)){
+			return DS_ACTIVE;
 		}
+
+		return DS_INACTIVE;
 	}
 
 	return DS_NONE;
@@ -54,11 +54,12 @@ void CDeviceControllerCompBase::UpdateDeviceList(EnumeratedDeviceList& enumerate
 {
 	Q_ASSERT(qApp->thread() == QThread::currentThread());
 
-	iprm::COptionsManager tempDeviceList;
+	imtbase::CCollectionInfo tempDeviceList;
+
 	for (int i = 0; i < enumeratedDeviceList.count(); i++){
-		tempDeviceList.InsertOption(
-					enumeratedDeviceList[i].name,
+		tempDeviceList.InsertItem(
 					enumeratedDeviceList[i].id,
+					enumeratedDeviceList[i].name,
 					enumeratedDeviceList[i].description);
 	}
 
@@ -93,10 +94,7 @@ void CDeviceControllerCompBase::AutoCloseDisconnectedDevices()
 	QMutexLocker listLocker(&m_deviceListMutex);
 	QMutexLocker mapLocker(&m_openedDevicesMutex);
 
-	QSet<QByteArray> deviceListIds;
-	for (int i = 0; i < m_deviceList.GetOptionsCount(); i++){
-		deviceListIds += m_deviceList.GetOptionId(i);
-	}
+	imtbase::ICollectionInfo::Ids deviceListIds = m_deviceList.GetElementIds();
 
 	QSet<QByteArray> idsForClose;
 	for (const QByteArray& id : m_openedDevices.keys()){

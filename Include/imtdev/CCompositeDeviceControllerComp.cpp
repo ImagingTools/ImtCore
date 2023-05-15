@@ -56,7 +56,7 @@ const IDeviceStaticInfo* CCompositeDeviceControllerComp::GetDeviceStaticInfo(con
 }
 
 
-const iprm::IOptionsList& CCompositeDeviceControllerComp::GetAvailableDeviceList() const
+const imtbase::ICollectionInfo& CCompositeDeviceControllerComp::GetAvailableDeviceList() const
 {
 	return m_deviceList;
 }
@@ -279,7 +279,7 @@ void CCompositeDeviceControllerComp::OnDeviceListChanged(int modelId, const istd
 
 	istd::CChangeGroup group(&m_deviceList);
 
-	m_deviceList.CopyFrom(iprm::COptionsManager());
+	m_deviceList.CopyFrom(imtbase::CCollectionInfo());
 	m_deviceControllerMap.clear();
 
 	QString devices;
@@ -288,15 +288,16 @@ void CCompositeDeviceControllerComp::OnDeviceListChanged(int modelId, const istd
 	for (int i = 0; i < count; i++){
 		IDeviceController* deviceControllerPtr = m_deviceControllerCompPtr[i];
 		if (deviceControllerPtr != nullptr){
-			const iprm::IOptionsList& deviceList = deviceControllerPtr->GetAvailableDeviceList();
+			const imtbase::ICollectionInfo& deviceList = deviceControllerPtr->GetAvailableDeviceList();
 
-			int count = deviceList.GetOptionsCount();
-			for (int i = 0; i < count; i++){
-				QByteArray id = deviceList.GetOptionId(i);
-				QString name = deviceList.GetOptionName(i);
-				QString description = deviceList.GetOptionDescription(i);
+			imtbase::ICollectionInfo::Ids ids = deviceList.GetElementIds();
 
-				m_deviceList.InsertOption(name, id, description);
+			for (const imtbase::ICollectionInfo::Id id : ids){
+				QByteArray id = id;
+				QString name = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+				QString description = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+
+				m_deviceList.InsertItem(id, name, description);
 				m_deviceControllerMap[id] = deviceControllerPtr;
 
 				devices += name + ", ";
