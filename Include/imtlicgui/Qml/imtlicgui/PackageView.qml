@@ -47,6 +47,16 @@ DocumentBase {
         featuresProvider.onModelChanged.connect(container.updateTreeViewModel);
     }
 
+    Component.onDestruction: {
+        featuresProvider.onModelChanged.disconnect(container.updateTreeViewModel);
+    }
+
+    onCommandsIdChanged: {
+        if (container.itemId === ""){
+            container.commandsProvider.setCommandIsEnabled("Save", true);
+        }
+    }
+
     onSaved: {
         featuresProvider.updateModel();
     }
@@ -58,6 +68,16 @@ DocumentBase {
 
     onModelIsReadyChanged: {
         if (container.modelIsReady){
+            container.blockUpdatingModel = true;
+
+            if (!container.documentModel.ContainsKey("Items")){
+                container.documentModel.AddTreeModel("Items")
+            }
+
+            if (!container.documentModel.ContainsKey("DependenciesModel")){
+                container.documentModel.AddTreeModel("DependenciesModel")
+            }
+
             tableView.columnModel = container.headersModel;
 
             tableView.rowModel = container.featuresModel;
@@ -65,17 +85,8 @@ DocumentBase {
             container.updateTreeViewModel();
             container.updateGui();
 
+            container.blockUpdatingModel = false;
             undoRedoManager.registerModel(container.documentModel);
-        }
-    }
-
-    onDocumentModelChanged: {
-        if (!container.documentModel.ContainsKey("Items")){
-            container.documentModel.AddTreeModel("Items")
-        }
-
-        if (!container.documentModel.ContainsKey("DependenciesModel")){
-            container.documentModel.AddTreeModel("DependenciesModel")
         }
     }
 
@@ -89,8 +100,12 @@ DocumentBase {
         id: undoRedoManager;
         documentBase: container;
         onModelStateChanged: {
+            console.log("onModelStateChanged");
+
+            undoRedoManager.modelIsRegistered = false;
             container.updateGui();
             container.syncronise();
+            undoRedoManager.modelIsRegistered = true;
         }
     }
 
@@ -161,7 +176,7 @@ DocumentBase {
 
     function updateGui(){
         console.log("updateGui");
-        container.blockUpdatingModel = true;
+//        container.blockUpdatingModel = true;
 
         if (container.documentModel.ContainsKey("Items")){
             container.featuresModel = container.documentModel.GetData("Items");
@@ -175,7 +190,7 @@ DocumentBase {
 
         rightPanel.updateTreeViewGui();
 
-        container.blockUpdatingModel = false;
+//        container.blockUpdatingModel = false;
         console.log("end updateGui");
 
     }
@@ -185,8 +200,11 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
+        container.documentModel.SetData("Id", container.itemId);
+        container.documentModel.SetData("Name", container.itemName);
+
         if (!container.documentModel.ContainsKey("Items")){
-            container.documentModel.AddTreeModel("Items")
+            container.featuresModel = container.documentModel.AddTreeModel("Items")
         }
 
         if (!container.documentModel.ContainsKey("DependenciesModel")){
@@ -269,21 +287,6 @@ DocumentBase {
         color: Style.backgroundColor;
     }
 
-    CustomScrollbar {
-        id: scrollbar;
-
-        z: 100;
-
-        anchors.right: tableView.right;
-        anchors.bottom: tableView.bottom;
-        anchors.top: tableView.top;
-
-        backgroundColor: Style.baseColor;
-
-        secondSize: 10;
-        targetItem: tableView.tableListView;
-    }
-
     BasicTreeView {
         id: tableView;
 
@@ -307,6 +310,20 @@ DocumentBase {
             }
 
             return true;
+        }
+
+        function featureIdExists(featureId){
+            let delegateItems = tableView.getItemsDataAsList();
+            for (let item of delegateItems){
+                let itemData = item.getItemData();
+                if (itemData.Id === featureId){
+                    return true;
+                }
+            }
+
+            let globalExists = featuresProvider.featureIsExists(featureId);
+
+            return globalExists;
         }
     }
 
@@ -441,9 +458,15 @@ DocumentBase {
                 let itemData = delegateItem.getItemData();
                 let itemId = itemData.Id;
 
+                if (container.isPackage(itemId) && delegateItem.level === 0){
+                    delegateItem.isCheckable = false;
+
+                    continue
+                }
+
                 delegateItem.isVisible = itemId !== selectedId;
                 delegateItem.isActive = !inactiveElements.includes(itemId);
-                delegateItem.isCheckable = !container.isPackage(itemId);
+                delegateItem.isCheckable = itemId !== "";
                 delegateItem.checkState = Qt.Unchecked;
 
                 if (childrenFeatureList.includes(itemId) && !dependenciesList.includes(itemId)){
@@ -533,6 +556,7 @@ DocumentBase {
             anchors.top: headerTreeView.bottom;
             anchors.left: headerTreeView.left;
             anchors.leftMargin: 10;
+            anchors.topMargin: 10;
 
             color: Style.textColor;
             font.pixelSize: Style.fontSize_common;
@@ -548,8 +572,10 @@ DocumentBase {
 
             anchors.top: headerTreeView.bottom;
             anchors.bottom: parent.bottom;
-
-            width: parent.width;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.rightMargin: 5;
+//            width: parent.width;
 
             clip: true;
 
@@ -575,9 +601,11 @@ DocumentBase {
                     console.log("onCheckStateChanged");
                     if (tableView.selectedIndex != null){
                         if (!treeView.delegateUpdatingBlock){
-                            container.updateDependenciesModel(delegate.itemData.Id, delegate.checkState);
 
-                            rightPanel.updateTreeViewGui();
+                            if (delegate.itemData.Id !== ""){
+                                container.updateDependenciesModel(delegate.itemData.Id, delegate.checkState);
+                                rightPanel.updateTreeViewGui();
+                            }
                         }
                     }
                 }

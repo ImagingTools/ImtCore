@@ -11,4 +11,8 @@ CollectionViewCommandsDelegateBase {
     onRemoved: {
         featuresProvider.updateModel();
     }
+
+    onRenamed: {
+        featuresProvider.updateModel();
+    }
 }

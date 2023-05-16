@@ -8,15 +8,11 @@ TreeViewItemDelegateBase {
     signal addButtonClicked();
     signal removeButtonClicked();
 
+    signal emptyIdError();
+
     signal dataChanged();
 
     checkState: model.CheckState ? model.CheckState : Qt.Unchecked;
-
-//    onRootChanged: {
-//        if (productTreeItemDelegate.root != null){
-//            productTreeItemDelegate.root.tableSelection.singleSelect(productTreeItemDelegate.modelIndex);
-//        }
-//    }
 
     rowBodyDelegate: Component { Row {
             id: row;
@@ -68,7 +64,7 @@ TreeViewItemDelegateBase {
                     anchors.fill: parent;
 
                     visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && productTreeItemDelegate.level == 0 : false;
-//                    visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
+                    //                    visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                     onClicked: {
                         mouseArea.clicked(null);
@@ -104,12 +100,16 @@ TreeViewItemDelegateBase {
 
                             if (model.Id === ""){
                                 let id = model.Name.replace(/\s+/g, '');
-                                model.Id = id;
+
+                                let alreadyExists = productTreeItemDelegate.root.licenseIdExists(id);
+                                if (!alreadyExists){
+                                    model.Id = id;
+                                }
                             }
 
                             productTreeItemDelegate.dataChanged();
 
-//                            productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Name");
+                            //                            productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Name");
                         }
                     }
                 }
@@ -145,7 +145,7 @@ TreeViewItemDelegateBase {
                         anchors.fill: parent;
 
                         visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && productTreeItemDelegate.level == 0 : false;
-//                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
+                        //                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                         onClicked: {
                             mouseArea.clicked(null);
@@ -174,14 +174,23 @@ TreeViewItemDelegateBase {
                         }
 
                         onEditingFinished: {
+                            if (modalDialogManager.count > 0){
+                                return;
+                            }
+
                             inputId.visible = false;
 
                             if (model.Id !== inputId.text){
-                                model.Id = inputId.text;
 
-                                productTreeItemDelegate.dataChanged();
+                                let alreadyExists = productTreeItemDelegate.root.licenseIdExists(inputId.text);
+                                if (!alreadyExists){
+                                    model.Id = inputId.text;
 
-//                                productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Id");
+                                    productTreeItemDelegate.dataChanged();
+                                }
+                                else{
+                                    productTreeItemDelegate.root.openLicenseErrorDialog(qsTr("License-ID already exists"));
+                                }
                             }
                         }
                     }
@@ -216,7 +225,7 @@ TreeViewItemDelegateBase {
 
                     MouseArea {
                         anchors.fill: parent;
-//                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
+                        //                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
                         visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && productTreeItemDelegate.level == 0 : false;
 
                         onClicked: {
@@ -252,8 +261,6 @@ TreeViewItemDelegateBase {
                                 model.Description = inputDescription.text;
 
                                 productTreeItemDelegate.dataChanged();
-
-//                                productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Description");
                             }
                         }
                     }
@@ -266,7 +273,6 @@ TreeViewItemDelegateBase {
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
-//                visible: model.Level == 0 && model.Selected;
                 visible: productTreeItemDelegate.level == 0 && productTreeItemDelegate.selected;
 
                 AuxButton {
@@ -281,7 +287,12 @@ TreeViewItemDelegateBase {
                     onClicked: {
                         console.log("onClicked");
 
-                        productTreeItemDelegate.addButtonClicked();
+                        if (model.Id === ""){
+                            productTreeItemDelegate.emptyIdError();
+                        }
+                        else{
+                            productTreeItemDelegate.addButtonClicked();
+                        }
                     }
                 }
             }
@@ -291,8 +302,6 @@ TreeViewItemDelegateBase {
 
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
-
-//                visible: model.Level == 1 && model.Selected;
 
                 visible: productTreeItemDelegate.level == 1 && productTreeItemDelegate.selected;
 

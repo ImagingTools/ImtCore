@@ -19,8 +19,6 @@ TreeItemModelObserver {
             let ids = changeId.split('/')
             if (ids.includes("Language")){
                 context.language = languageProvider.getLanguage();
-
-//                container.root.updateAllModels();
             }
             else if (ids.includes("DesignSchema")){
                 if (container.designProvider != null){

@@ -58,14 +58,21 @@ FocusScope {
         delegate.root.tableSelection.selectionChanged.disconnect(delegate.selectionChanged);
     }
 
-    onRootChanged:  {
-        delegate.root._addItem(delegate);
-
-        delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
+    Component.onCompleted: {
+        if (delegate.root){
+            delegate.root._addItem(delegate);
+            delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
+        }
     }
 
+//    onRootChanged:  {
+//        if (delegate.root){
+//            delegate.root._addItem(delegate);
+//            delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
+//        }
+//    }
+
     function selectionChanged(){
-        console.log("selectionChanged");
         if (delegate.root){
             delegate.selected = delegate.root.tableSelection.isSelected(delegate.modelIndex);
         }
@@ -129,7 +136,6 @@ FocusScope {
 
             height: delegate.root ? delegate.root.rowItemHeight : 0;
 
-            property var values: [];
             property var columnModel: delegate.root ? delegate.root.columnModel : 0;
             onColumnModelChanged: {
                 repeater.model = row.columnModel;
@@ -159,8 +165,7 @@ FocusScope {
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
 
-//                        text: row.values[model.index]
-                        text: delegate.dataModel[model.Id];
+                        text: delegate.dataModel[model.Id] ? delegate.dataModel[model.Id] : "";
                     }
                 }
             }

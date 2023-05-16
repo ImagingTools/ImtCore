@@ -68,29 +68,17 @@ TableViewItemDelegateBase {
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.horizontalCenter: parent.horizontalCenter;
 
-//                    checkState: model.CheckState;
-
                     checkState: treeDelegateBase.checkState;
-
-//                    isActive: model.Active;
-
                     isActive: treeDelegateBase.isActive;
-
-//                    visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && model.CheckBoxVisible : false;
                     visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && treeDelegateBase.isCheckable : false;
 
                     onClicked: {
-                        console.log("checkBox onClicked1", treeDelegateBase.checkState);
-
                         if (treeDelegateBase.checkState == Qt.PartiallyChecked){
                             treeDelegateBase.checkState = Qt.Checked;
                         }
                         else{
                             treeDelegateBase.checkState = Qt.Checked - treeDelegateBase.checkState;
                         }
-
-                        console.log("checkBox onClicked2", treeDelegateBase.checkState);
-
 
 //                        if (model.CheckState == Qt.PartiallyChecked){
 //                            model.CheckState = Qt.Checked;
@@ -117,7 +105,6 @@ TableViewItemDelegateBase {
     footerDelegate: Component { Column {
             id: childrenColumn;
 
-//            visible: treeDelegateBase.isOpen;
             visible: treeDelegateBase.isOpened;
 
             Repeater {

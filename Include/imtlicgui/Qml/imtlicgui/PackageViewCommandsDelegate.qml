@@ -26,15 +26,6 @@ DocumentWorkspaceCommandsDelegateBase {
         featuresProvider.updateModel();
     }
 
-//    property Component modelIndexComp: Component {
-//        ModelIndex {}
-//    }
-
-//    function createNewModelIndex(parentIndex, ){
-//        let count = model.GetItemsCount();
-//        model.InsertNewItemWithParameters(count, {"Id":"", "Name":"Feature Name", "Description":"", "Optional":false})
-//    }
-
     function createNewItem(model){
         let count = model.GetItemsCount();
         model.InsertNewItemWithParameters(count, {"Id":"", "Name":"Feature Name", "Description":"", "Optional":false})
@@ -43,6 +34,8 @@ DocumentWorkspaceCommandsDelegateBase {
     onCommandActivated: {
         console.log("PackageViewCommands onCommandActivated", commandId);
         if (commandId === "New"){
+            let insertedIndexes = []
+            let count = tableTreeViewEditor.rowModel.GetItemsCount();
             let index = container.tableTreeViewEditor.selectedIndex;
             if (index !== null){
                 let parentModel = index.getParentModel();
@@ -56,17 +49,33 @@ DocumentWorkspaceCommandsDelegateBase {
                     }
                 }
 
+                insertedIndexes = insertedIndexes.concat(index.getIndexes());
+
                 container.createNewItem(childModel);
+
+                let childCount = childModel.GetItemsCount();
 
                 container.tableTreeViewEditor.rowModel = 0;
                 container.tableTreeViewEditor.rowModel = container.documentBase.documentModel.GetData("Items");
+
+                insertedIndexes.push(childCount - 1);
             }
             else{
                 container.createNewItem(tableTreeViewEditor.rowModel);
+                insertedIndexes.push(count);
             }
 
             container.documentBase.modelChanged();
             container.documentBase.updateModel();
+
+            let delegateItems = container.tableTreeViewEditor.getItemsDataAsList();
+            for (let delegateItem of delegateItems){
+                let delegateIndex = delegateItem.modelIndex;
+                if (delegateIndex.equalByArrayIndexes(insertedIndexes)){
+                    container.tableTreeViewEditor.singleSelect(delegateIndex);
+                    break;
+                }
+            }
         }
         else if (commandId === "Remove"){
             let index = container.tableTreeViewEditor.selectedIndex;
@@ -76,15 +85,12 @@ DocumentWorkspaceCommandsDelegateBase {
 
                 let featureId = index.itemData.Id;
                 removedFeaturesIds.push(featureId);
-                console.log("removedFeaturesIds", removedFeaturesIds);
 
                 for (let removedFeatureId of removedFeaturesIds){
                     container.removeDependencies(removedFeatureId);
                 }
 
-                let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
-                console.log("dependenciesModel", dependenciesModel.toJSON());
-
+                let delegateItems = container.tableTreeViewEditor.getItemsDataAsList();
                 container.tableTreeViewEditor.removeByIndex(index);
                 container.documentBase.syncronise()
                 container.documentBase.modelChanged()
@@ -92,38 +98,7 @@ DocumentWorkspaceCommandsDelegateBase {
 
                 container.tableTreeViewEditor.resetSelection();
 
-//                //Удаление всех зависимостей от этой фичи
-//                let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
-//                if (dependenciesModel){
-//                    for (let removedFeatureId of removedFeaturesIds){
-//                        if (dependenciesModel.ContainsKey(removedFeatureId)){
-//                            dependenciesModel.RemoveData(removedFeatureId);
-//                        }
-
-//                        let keys = dependenciesModel.GetKeys();
-
-//                        for (let i = 0; i < keys.length; i++){
-//                            let key = keys[i];
-//                            let values = dependenciesModel.GetData(key);
-
-//                            if (values !== ""){
-//                                let dependenciesList = values.split(';');
-
-//                                if (dependenciesList.includes(removedFeatureId)){
-//                                    let pos = dependenciesList.indexOf(removedFeatureId);
-//                                    dependenciesList.splice(pos, 1);
-
-//                                    let newDependencies = dependenciesList.join(';');
-//                                    dependenciesModel.SetData(key, newDependencies);
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-
-//                tableTreeViewEditor.removeByIndex(index);
-//                container.documentBase.modelChanged()
-//                container.documentBase.updateModel();
+                delegateItems = container.tableTreeViewEditor.getItemsDataAsList();
             }
         }
     }

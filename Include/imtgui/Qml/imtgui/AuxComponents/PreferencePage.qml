@@ -101,8 +101,6 @@ Rectangle {
 
     function modelChanged(){
         console.log("Preference modelChanged");
-
-        console.log("setButtonState Apply true");
         buttonsDialog.setButtonState("Apply", true);
     }
 
@@ -384,11 +382,6 @@ Rectangle {
                 }
                 else if (buttonId == "Apply"){
                     if (container.settingsProvider && container.settingsProvider.serverModel != null){
-//                        if (!_.isEqual(JSON.stringify(container.serverModel), JSON.stringify(container.settingsProvider.serverModel))){
-//                            container.settingsProvider.serverModel.Copy(container.serverModel);
-//                            container.settingsProvider.saveServerModel();
-//                        }
-
                         if (!container.serverModel.IsEqualWithModel(container.settingsProvider.serverModel)){
                             container.settingsProvider.serverModel.Copy(container.serverModel);
                             container.settingsProvider.saveServerModel();
@@ -396,11 +389,6 @@ Rectangle {
                     }
 
                     if (container.settingsProvider && container.settingsProvider.localModel != null){
-//                        if (!_.isEqual(JSON.stringify(container.localModel), JSON.stringify(container.settingsProvider.localModel))){
-//                            container.settingsProvider.localModel.Copy(container.localModel);
-//                            container.settingsProvider.saveLocalModel();
-//                        }
-
                         if (!container.localModel.IsEqualWithModel(container.settingsProvider.localModel)){
                             container.settingsProvider.localModel.Copy(container.localModel);
                             container.settingsProvider.saveLocalModel();

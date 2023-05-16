@@ -5,24 +5,6 @@ import imtgui  1.0
 TreeViewItemDelegateBase {
     id: packageTreeItemDelegate;
 
-    onRootChanged: {
-        if (packageTreeItemDelegate.root != null){
-            packageTreeItemDelegate.root.tableSelection.singleSelect(packageTreeItemDelegate.modelIndex);
-        }
-    }
-
-    function idIsValid(id){
-        let delegateItems = packageTreeItemDelegate.root.getItemsDataAsList();
-        for (let item of delegateItems){
-            let itemData = item.getItemData();
-            if (itemData.Id === id){
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     rowBodyDelegate: Component{ Row {
             id: row;
 
@@ -89,7 +71,10 @@ TreeViewItemDelegateBase {
 
                             if (model.Id === ""){
                                 let id = model.Name.replace(/\s+/g, '');
-                                model.Id = id;
+                                let alreadyExists = packageTreeItemDelegate.root.featureIdExists(id);
+                                if (!alreadyExists){
+                                    model.Id = id;
+                                }
                             }
                         }
                     }
@@ -158,24 +143,22 @@ TreeViewItemDelegateBase {
                         inputId.visible = false;
 
                         if (model.Id !== inputId.text){
-                            let ok = packageTreeItemDelegate.root.canRename(model.Id);
-                            if (ok){
-                                model.Id = inputId.text;
+                            let canRename = packageTreeItemDelegate.root.canRename(model.Id);
+                            if (canRename){
+                                let alreadyExists = packageTreeItemDelegate.root.featureIdExists(inputId.text);
+                                if (!alreadyExists){
+                                    model.Id = inputId.text;
+
+                                    return;
+                                }
+                                else{
+                                    packageTreeItemDelegate.root.openFeatureErrorDialog(qsTr("Feature-ID already exists (In this or another package)"));
+                                }
                             }
                             else{
                                 packageTreeItemDelegate.root.openFeatureErrorDialog(qsTr("It is impossible to rename the feature, please remove all dependencies"));
                             }
                         }
-
-//                        let ok = packageTreeItemDelegate.idIsValid(inputId.text);
-//                        if (ok){
-//                            if (model.Id !== inputId.text){
-//                                model.Id = inputId.text;
-//                            }
-//                        }
-//                        else{
-//                            packageTreeItemDelegate.root.openFeatureErrorDialog();
-//                        }
                     }
                 }
             }

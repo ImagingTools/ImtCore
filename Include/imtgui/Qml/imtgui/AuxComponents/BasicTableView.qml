@@ -26,6 +26,11 @@ FocusScope {
     property int headerHeight: 35;
 
     property var rowModel: ListModel {};
+
+    onRowModelChanged: {
+        tableViewRoot.itemsList = []
+    }
+
     property var columnModel: ListModel {};
 
     property ModelIndex selectedIndex: null;
@@ -82,6 +87,10 @@ FocusScope {
 
     function resetSelection(){
         tableViewRoot.tableSelection.resetSelection();
+    }
+
+    function singleSelect(item){
+        tableViewRoot.tableSelection.singleSelect(item);
     }
 
     function addChildItem(parentIndex, rowObj){
@@ -216,13 +225,19 @@ FocusScope {
         }
     }
 
+    function flickableToEnd(){
+        flick.contentY = flick.contentHeight;
+    }
+
+    property alias flickable: flick;
+
     Flickable {
         id: flick;
 
         anchors.top: headerItem.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
         anchors.bottom: parent.bottom;
+
+        width: parent.width;
 
         contentWidth: bodyColumn.width;
         contentHeight: bodyColumn.height;
@@ -248,47 +263,13 @@ FocusScope {
         }
     }
 
-    //    Loader {
-    //        id: tableDelegateLoader;
-
-    //        sourceComponent: TableViewItemDelegateBase {
-    //            root: tableViewRoot;
-    //        }
-
-    //        onLoaded: {
-    //            tableDelegateLoader.item.root = tableViewRoot;
-
-    ////            listView.delegate = tableDelegateLoader.item;
-    //        }
-    //    }
-
-    //    ListView {
-    //        id: listView;
-
-    //        anchors.top: headerItem.bottom;
-    //        anchors.left: parent.left;
-    //        anchors.right: parent.right;
-    //        anchors.bottom: parent.bottom;
-
-    //        model: tableViewRoot.rowModel;
-
-    //        boundsBehavior: Flickable.StopAtBounds;
-    //        headerPositioning: ListView.OverlayHeader;
-
-    //        cacheBuffer: 1000;
-
-    //        delegate: TableViewItemDelegateBase {
-    //            root: tableViewRoot;
-    //        }
-    //    }
-
     CustomScrollbar {
         id: scrollbar;
 
         z: 100;
 
         anchors.right: flick.right;
-        anchors.bottom: flick.bottom;
+        anchors.top: flick.top;
 
         secondSize: 10;
         targetItem: flick;

@@ -51,21 +51,27 @@ Item {
             return;
         }
 
-        groupUsersContainer.undoRedoManager.beginChanges();
+        if (groupUsersContainer.undoRedoManager){
+            groupUsersContainer.undoRedoManager.beginChanges();
+        }
 
         let selectedUserIds = []
-        for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
-            let id = usersTable.elements.GetData("Id", i);
-            let state = usersTable.elements.GetData("CheckedState", i);
-            if (state === Qt.Checked){
-                selectedUserIds.push(id)
+        if (usersTable.elements){
+            for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
+                let id = usersTable.elements.GetData("Id", i);
+                let state = usersTable.elements.GetData("CheckedState", i);
+                if (state === Qt.Checked){
+                    selectedUserIds.push(id)
+                }
             }
         }
 
         let result = selectedUserIds.join(';');
         groupUsersContainer.documentModel.SetData("Users", result);
 
-        groupUsersContainer.undoRedoManager.endChanges();
+        if (groupUsersContainer.undoRedoManager){
+            groupUsersContainer.undoRedoManager.endChanges();
+        }
     }
 
     Component{

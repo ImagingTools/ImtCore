@@ -69,29 +69,31 @@ Item {
             return;
         }
 
-        userGroupsContainer.undoRedoManager.beginChanges();
+        if (userGroupsContainer.undoRedoManager){
+            userGroupsContainer.undoRedoManager.beginChanges();
+        }
 
         let selectedRoleIds = []
         let selectedGroupIds = []
-        for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
-            let id = groupsTable.elements.GetData("Id", i);
-            let state = groupsTable.elements.GetData("CheckedState", i);
-            if (state === Qt.Checked){
-                if (groupsTable.elements.ContainsKey("Roles", i)){
-                    let roles = groupsTable.elements.GetData("Roles", i);
-                    let roleIds = roles.split(';')
-                    for (let j = 0; j < roleIds.length; j++){
-                        if (!selectedRoleIds.includes(roleIds[j])){
-                            selectedRoleIds.push(roleIds[j])
+        if  (groupsTable.elements){
+            for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
+                let id = groupsTable.elements.GetData("Id", i);
+                let state = groupsTable.elements.GetData("CheckedState", i);
+                if (state === Qt.Checked){
+                    if (groupsTable.elements.ContainsKey("Roles", i)){
+                        let roles = groupsTable.elements.GetData("Roles", i);
+                        let roleIds = roles.split(';')
+                        for (let j = 0; j < roleIds.length; j++){
+                            if (!selectedRoleIds.includes(roleIds[j])){
+                                selectedRoleIds.push(roleIds[j])
+                            }
                         }
                     }
-                }
 
-                selectedGroupIds.push(id)
+                    selectedGroupIds.push(id)
+                }
             }
         }
-
-        console.log("selectedRoleIds", selectedRoleIds);
 
         userGroupsContainer.documentModel.SetData("Groups", selectedGroupIds.join(';'));
 
@@ -115,7 +117,9 @@ Item {
            // userGroupsContainer.documentModel.SetData("Roles", selectedRoleIds.join(';'));
         }
 
-        userGroupsContainer.undoRedoManager.endChanges();
+        if (userGroupsContainer.undoRedoManager){
+            userGroupsContainer.undoRedoManager.endChanges();
+        }
     }
 
     Component{

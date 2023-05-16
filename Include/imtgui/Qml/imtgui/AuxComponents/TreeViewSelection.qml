@@ -18,6 +18,8 @@ QtObject {
     }
 
     function singleSelect(modelIndex){
+        console.log("singleSelect", modelIndex);
+
         root.items = []
         root.items.push(modelIndex)
 

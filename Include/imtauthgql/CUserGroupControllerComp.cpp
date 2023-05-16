@@ -23,6 +23,11 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
+	dataModel->SetData("Id", "");
+	dataModel->SetData("Name", "");
+	dataModel->SetData("Description", "");
+	dataModel->SetData("Users", "");
+
 	QByteArray userGroupId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userGroupId, dataPtr)){

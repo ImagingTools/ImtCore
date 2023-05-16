@@ -58,21 +58,27 @@ Item {
             return;
         }
 
-        groupRolesContainer.undoRedoManager.beginChanges();
+        if (groupRolesContainer.undoRedoManager){
+            groupRolesContainer.undoRedoManager.beginChanges();
+        }
 
         let selectedRoleIds = []
-        for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
-            let id = rolesTable.elements.GetData("Id", i);
-            let state = rolesTable.elements.GetData("CheckedState", i);
-            if (state === Qt.Checked){
-                selectedRoleIds.push(id)
+        if (rolesTable.elements){
+            for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
+                let id = rolesTable.elements.GetData("Id", i);
+                let state = rolesTable.elements.GetData("CheckedState", i);
+                if (state === Qt.Checked){
+                    selectedRoleIds.push(id)
+                }
             }
         }
 
         let result = selectedRoleIds.join(';');
         groupRolesContainer.documentModel.SetData("Roles", result);
 
-        groupRolesContainer.undoRedoManager.endChanges();
+        if (groupRolesContainer.undoRedoManager){
+            groupRolesContainer.undoRedoManager.endChanges();
+        }
     }
 
     Component{
@@ -101,7 +107,7 @@ Item {
 
                     groupRolesContainer.updateGui();
 
-                    rolesProvider.collectionModel.modelChanged.connect(groupRolesContainer.updateModel);
+                    rolesProvider.collectionModel.dataChanged.connect(groupRolesContainer.updateModel);
                 }
             }
         }

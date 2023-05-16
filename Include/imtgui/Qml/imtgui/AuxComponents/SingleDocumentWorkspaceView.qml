@@ -95,7 +95,7 @@ Item {
         documentManager.openDocument(itemId, documentObj, isRequested);
     }
 
-    function openDocument(itemId, document){
+    function openDocument(itemId, document, isRequested){
         documentManager.documentLoading = true;
         console.log("openDocument" , JSON.stringify(document));
         let keys = Object.keys(document);
@@ -109,6 +109,10 @@ Item {
 
         let documentId = document["Id"];
         let commandId = document["CommandsId"];
+
+        if (isRequested){
+        }
+
         documentController.getData(documentId, document, commandId);
 
         stackView.push(document);

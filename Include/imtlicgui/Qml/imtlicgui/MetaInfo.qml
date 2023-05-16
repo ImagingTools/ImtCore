@@ -102,6 +102,8 @@ Rectangle {
 
                                     anchors.left: parent.left;
                                     anchors.leftMargin: 10;
+                                    anchors.right: parent.right;
+                                    anchors.rightMargin: 10;
 
                                     font.family: Style.fontFamily;
                                     font.pixelSize: Style.fontSize_small;

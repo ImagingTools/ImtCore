@@ -11,8 +11,8 @@ DocumentWorkspaceCommandsDelegateBase {
 
     property ModelIndex selectedIndex: container.tableData != null ? container.tableData.selectedIndex: null;
 
-    signal edited(string itemId, string itemName);
-    signal removed(string itemId);
+//    signal edited(string itemId, string itemName);
+//    signal removed(string itemId);
 
     onSelectedIndexChanged: {
         console.log("CollectionViewCommands onSelectedIndexChanged");
@@ -49,6 +49,8 @@ DocumentWorkspaceCommandsDelegateBase {
 
             let item = container.tableData.getRootItemByIndex(count);
             item.select();
+
+            container.tableData.flickableToEnd();
         }
         else if (commandId === "Remove"){
             let selectedIndex = container.tableData.selectedIndex;
@@ -69,67 +71,67 @@ DocumentWorkspaceCommandsDelegateBase {
 
             container.documentBase.modelChanged();
             container.documentBase.updateModel();
-            container.tableTreeViewEditor.resetSelection();
+            container.tableData.resetSelection();
         }
     }
 
-    onEntered: {
-        container.documentBase.documentModel.SetData("Id", value);
-        container.documentBase.documentModel.SetData("Name", value);
-    }
+//    onEntered: {
+//        container.documentBase.documentModel.SetData("Id", value);
+//        container.documentBase.documentModel.SetData("Name", value);
+//    }
 
-    property Component messageDialog: Component {
-        MessageDialog {
-            onFinished: {
-                if (buttonId == "Yes"){
-                    let selectedIndex = container.tableData.selectedIndex;
+//    property Component messageDialog: Component {
+//        MessageDialog {
+//            onFinished: {
+//                if (buttonId == "Yes"){
+//                    let selectedIndex = container.tableData.selectedIndex;
 
-                    container.tableData.removeRow([selectedIndex.index]);
-                }
-            }
-        }
-    }
+//                    container.tableData.removeRow([selectedIndex.index]);
+//                }
+//            }
+//        }
+//    }
 
-    property Component setDescriptionDialog: Component {
-        InputDialog {
-            onFinished: {
-                if (buttonId == "Ok"){
-                    let elements = container.tableData.elements;
-                    elements.SetData("Description", inputValue, container.selectedIndex);
+//    property Component setDescriptionDialog: Component {
+//        InputDialog {
+//            onFinished: {
+//                if (buttonId == "Ok"){
+//                    let elements = container.tableData.elements;
+//                    elements.SetData("Description", inputValue, container.selectedIndex);
 
-                    container.documentBase.updateGui();
-                }
-            }
-        }
-    }
+//                    container.documentBase.updateGui();
+//                }
+//            }
+//        }
+//    }
 
-    property Component popupMenu: Component {
-        PopupMenuDialog {
-            onFinished: {
-                console.log("DocumentView PopupMenuDialog", commandId);
-                container.commandActivated(commandId);
-            }
-        }
-    }
+//    property Component popupMenu: Component {
+//        PopupMenuDialog {
+//            onFinished: {
+//                console.log("DocumentView PopupMenuDialog", commandId);
+//                container.commandActivated(commandId);
+//            }
+//        }
+//    }
 
-    property Component editDialog: Component {
-        EditLicenseDialog {
-            onFinished: {
-                if (buttonId == "Ok"){
-                    let elementsModel = container.documentBase.documentModel.GetData("Items");
+//    property Component editDialog: Component {
+//        EditLicenseDialog {
+//            onFinished: {
+//                if (buttonId == "Ok"){
+//                    let elementsModel = container.documentBase.documentModel.GetData("Items");
 
-                    let oldId = elementsModel.GetData("Id", container.selectedIndex);
-                    let oldName = elementsModel.GetData("Name", container.selectedIndex);
+//                    let oldId = elementsModel.GetData("Id", container.selectedIndex);
+//                    let oldName = elementsModel.GetData("Name", container.selectedIndex);
 
-                    elementsModel.SetData("Name", valueName, container.selectedIndex);
-                    elementsModel.SetData("Id", valueId, container.selectedIndex);
+//                    elementsModel.SetData("Name", valueName, container.selectedIndex);
+//                    elementsModel.SetData("Id", valueId, container.selectedIndex);
 
-                    container.edited(oldId, oldName);
+//                    container.edited(oldId, oldName);
 
-                    container.documentBase.updateGui();
-                }
-            }
-        }
-    }
+//                    container.documentBase.updateGui();
+//                }
+//            }
+//        }
+//    }
 }
 

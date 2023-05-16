@@ -91,7 +91,9 @@ Item {
             return;
         }
 
-        rolePermissionsContainer.undoRedoManager.beginChanges();
+        if (rolePermissionsContainer.undoRedoManager){
+            rolePermissionsContainer.undoRedoManager.beginChanges();
+        }
 
         let selectedPermissionIds = []
         let itemsList = permissionsTable.getItemsDataAsList();
@@ -106,7 +108,9 @@ Item {
         }
         rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
 
-        rolePermissionsContainer.undoRedoManager.endChanges();
+        if (rolePermissionsContainer.undoRedoManager){
+            rolePermissionsContainer.undoRedoManager.endChanges();
+        }
     }
 
     Component{

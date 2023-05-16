@@ -1,9 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
 import imtgui 1.0
-import imtlicgui 1.0
-import QtQuick.Dialogs 1.3
+import Qt.labs.platform 1.1
 
 CollectionViewCommandsDelegateBase {
     id: container;
@@ -11,21 +9,10 @@ CollectionViewCommandsDelegateBase {
     removeDialogTitle: qsTr("Deleting a product");
     removeMessage: qsTr("Delete the selected product ?");
 
-//    onSelectedIndexChanged: {
-//        console.log("ProductCollectionViewCommands onSelectedIndexChanged", container.selectedIndex);
-
-//        let isEnabled = container.selectedIndex > -1;
-//        if (container.commandsProvider){
-//            commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
-//            commandsProvider.setCommandIsEnabled("Export", isEnabled);
-//        }
-//    }
-
     onSelectionChanged: {
         let indexes = container.tableData.getSelectedIndexes();
         let isEnabled = indexes.length === 1;
         if(container.commandsProvider){
-//            commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
             commandsProvider.setCommandIsEnabled("Export", isEnabled);
         }
     }
@@ -42,6 +29,14 @@ CollectionViewCommandsDelegateBase {
                                       "CommandsId": container.collectionViewBase.baseCollectionView.commands.objectViewEditorCommandsId});
         }
         else if (commandId === "Export"){
+            console.log("Export");
+
+            let itemIds = container.tableData.getSelectedIds();
+
+            console.log("id", itemIds[0]);
+
+            fileDialogSave.currentFile = 'file:///' + itemIds[0] + ".xml";
+
             fileDialogSave.open();
         }
     }
@@ -56,22 +51,21 @@ CollectionViewCommandsDelegateBase {
         id: fileDialogSave;
 
         title: qsTr("Save file");
-        selectExisting: false;
-        folder: shortcuts.home;
 
         nameFilters: ["Features files (*.xml)", "All files (*)"];
+        fileMode: FileDialog.SaveFile;
 
         onAccepted: {
             var pathDir = fileDialogSave.folder.toString();
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
-            var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
+            var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
 
-            let id = container.tableData.getSelectedId();
+            let itemIds = container.tableData.getSelectedIds();
             if (fileName == ""){
                 fileName = {};
-                fileName["name"] = id + ".xml";
+                fileName["name"] = itemIds[0] + ".xml";
             }
-            remoteFileController.GetFile(id, fileName);
+            remoteFileController.GetFile(itemIds[0], fileName);
         }
     }
 }

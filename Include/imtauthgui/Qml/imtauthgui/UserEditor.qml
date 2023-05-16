@@ -55,14 +55,18 @@ Item {
     function updateModel(){
         console.log("UserEditor updateModel");
 
-        userEditorContainer.undoRedoManager.beginChanges();
+        if (userEditorContainer.undoRedoManager){
+            userEditorContainer.undoRedoManager.beginChanges();
+        }
 
         userEditorContainer.documentModel.SetData("Username", usernameInput.text);
         userEditorContainer.documentModel.SetData("Name", nameInput.text);
         userEditorContainer.documentModel.SetData("Email", mailInput.text);
         userEditorContainer.documentModel.SetData("Password", passwordInput.text);
 
-        userEditorContainer.undoRedoManager.endChanges();
+        if (userEditorContainer.undoRedoManager){
+            userEditorContainer.undoRedoManager.endChanges();
+        }
     }
 
     Component{

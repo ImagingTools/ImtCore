@@ -83,9 +83,6 @@ Item {
                         }
                     }
 
-                    console.log("childrenIds", childrenIds);
-                    console.log("parentIds", parentIds);
-
                     // Indexes for deleting
                     let removedIndexes = []
                     for (let i = 0; i < rolesModel.GetItemsCount(); i++){
@@ -108,7 +105,7 @@ Item {
                     parentRolesTable.elements = rolesModel;
 
                     roleEditorContainer.updateGui();
-                    rolesModel.modelChanged.connect(roleEditorContainer.updateModel);
+                    rolesModel.dataChanged.connect(roleEditorContainer.updateModel);
 
                     roleNameInput.focus = true;
                 }
@@ -185,23 +182,30 @@ Item {
             return;
         }
 
-        roleEditorContainer.undoRedoManager.beginChanges();
+        if (roleEditorContainer.undoRedoManager){
+            roleEditorContainer.undoRedoManager.beginChanges();
+        }
 
         roleEditorContainer.documentModel.SetData("RoleId", roleIdInput.text);
         roleEditorContainer.documentModel.SetData("Name", roleNameInput.text);
         roleEditorContainer.documentModel.SetData("Description", descriptionInput.text);
 
         let selectedRoleIds = []
-        for (let i = 0; i < parentRolesTable.elements.GetItemsCount(); i++){
-            let id = parentRolesTable.elements.GetData("Id", i);
-            let state = parentRolesTable.elements.GetData("CheckedState", i);
-            if (state === Qt.Checked){
-                selectedRoleIds.push(id)
+        if (parentRolesTable.elements){
+            for (let i = 0; i < parentRolesTable.elements.GetItemsCount(); i++){
+                let id = parentRolesTable.elements.GetData("Id", i);
+                let state = parentRolesTable.elements.GetData("CheckedState", i);
+                if (state === Qt.Checked){
+                    selectedRoleIds.push(id)
+                }
             }
         }
+
         roleEditorContainer.documentModel.SetData("ParentRoles", selectedRoleIds.join(';'));
 
-        roleEditorContainer.undoRedoManager.endChanges();
+        if (roleEditorContainer.undoRedoManager){
+            roleEditorContainer.undoRedoManager.endChanges();
+        }
     }
 
     Item{

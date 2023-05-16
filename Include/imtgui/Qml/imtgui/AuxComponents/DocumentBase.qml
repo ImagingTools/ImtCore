@@ -50,7 +50,7 @@ Item {
         console.log("Document onCompleted", itemId);
         documentBaseRoot.documentUuid = uuidGenerator.generateUUID();
 
-//        documentBaseRoot.commandsDelegate.documentBase = documentBaseRoot;
+        documentBaseRoot.commandsProvider.modelLoaded.connect(documentBaseRoot.onCommandsModelLoaded);
     }
 
     onVisibleChanged: {
@@ -69,7 +69,7 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
 
-//        documentBaseRoot.documentModel.modelChanged.disconnect(documentBaseRoot.modelChanged);
+        documentBaseRoot.commandsProvider.modelLoaded.disconnect(documentBaseRoot.onCommandsModelLoaded);
     }
 
     onBlockUpdatingModelChanged: {
@@ -79,22 +79,17 @@ Item {
     onDocumentModelChanged: {
         console.log("onDocumentModelChanged", documentBaseRoot.documentModel);
 
-        documentBaseRoot.modelIsReady = true;
-
-//        documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
-
         documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
 
-//        documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
-//        documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
+        documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
+        documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
 
         documentBaseRoot.updateDocumentTitle()
+
+        documentBaseRoot.modelIsReady = true;
     }
 
     function onDataChanged(topLeft, bottomRight, roles){
-        console.log("DocumentBase onDataChanged", topLeft, bottomRight, roles);
-        //console.log('Data Changed', topLeft.row, data(topLeft, roles[0]))
-
         documentBaseRoot.modelChanged();
     }
 
@@ -105,10 +100,7 @@ Item {
     }
 
     onCommandsIdChanged: {
-//        commandsDelegate.commandsId = documentBaseRoot.commandsId;
         if (documentBaseRoot.itemId === ""){
-//            documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
-
             documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
 
             documentBaseRoot.updateModel();
@@ -122,8 +114,7 @@ Item {
     }
 
     function modelChanged(){
-        console.log("DocumentsCommands modelChanged", documentBaseRoot.documentModel.toJSON());
-
+        console.log("DocumentsCommands modelChanged");
         if (documentBaseRoot.blockUpdatingModel){
             return;
         }
@@ -139,8 +130,6 @@ Item {
     }
 
     function updateDocumentTitle(){
-        console.log("updateDocumentTitle");
-
         if (documentBaseRoot.documentManager != null){
             let documentId = documentBaseRoot.documentModel.GetData("Id");
             let documentName = documentBaseRoot.documentModel.GetData("Name");
@@ -150,13 +139,9 @@ Item {
 
             documentBaseRoot.documentManager.setDocumentTitle({"Id": documentId, "Title": documentName});
         }
-
-        console.log("end updateDocumentTitle");
     }
 
-    onItemIdChanged: {
-        console.log("onItemIdChanged", itemId);
-    }
+    function onCommandsModelLoaded(){}
 
     function updateGui(){}
 

@@ -13,8 +13,6 @@ DocumentBase {
         }
     }
 
-    property bool featuresUpdated: false;
-
     property TreeItemModel licensesModel: TreeItemModel {}
     property TreeItemModel featuresModel: TreeItemModel {}
 
@@ -62,6 +60,11 @@ DocumentBase {
         Events.unSubscribeEvent("FeaturesUpdated", productViewContainer.onFeaturesUpdated);
     }
 
+    onCommandsIdChanged: {
+        if (productViewContainer.itemId === ""){
+            productViewContainer.commandsProvider.setCommandIsEnabled("Save", true);
+        }
+    }
 
     Component {
         id: messageDialog;
@@ -76,16 +79,24 @@ DocumentBase {
 
     onModelIsReadyChanged: {
         let headers = productViewContainer.softwareHeadersModel;
-        for (let i = 0; i < headers.GetItemsCount(); i++){
-            let headerId = headers.GetData("Id", i);
-            let headerName = headers.GetData("Name", i);
 
-            tableView.addColumn({"Id": headerId, "Name": headerName});
+        tableView.columnModel = headers;
+
+        productViewContainer.blockUpdatingModel = true;
+
+        if (!productViewContainer.documentModel.ContainsKey("Items")){
+            productViewContainer.documentModel.AddTreeModel("Items")
+        }
+
+        if (!productViewContainer.documentModel.ContainsKey("Features")){
+            productViewContainer.documentModel.AddTreeModel("Features")
         }
 
         productViewContainer.licensesModel.Copy(productViewContainer.documentModel.GetData("Items"))
 
         productViewContainer.updateGui();
+
+        productViewContainer.blockUpdatingModel = false;
 
         undoRedoManager.registerModel(documentModel);
     }
@@ -97,7 +108,11 @@ DocumentBase {
     function onFeaturesUpdated(){
         console.log( "ProductView onFeaturesUpdated", productViewContainer.featuresUpdated);
 
+        productViewContainer.checkValidFeatures();
+
         productViewContainer.updateFeaturesModel();
+
+        productViewContainer.updateGui();
     }
 
     function updateFeaturesModel(){
@@ -145,6 +160,19 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
+        productViewContainer.documentModel.SetData("Id", productViewContainer.itemId);
+        productViewContainer.documentModel.SetData("Name", productViewContainer.itemName);
+
+        if (categoryComboBox.currentIndex == 0){
+            productViewContainer.documentModel.SetData("CategoryId", "Software");
+        }
+        else if (categoryComboBox.currentIndex == 1){
+            productViewContainer.documentModel.SetData("CategoryId", "Hardware");
+        }
+        else{
+            productViewContainer.documentModel.SetData("CategoryId", "");
+        }
+
         if (!productViewContainer.documentModel.ContainsKey("Items")){
             productViewContainer.documentModel.AddTreeModel("Items")
         }
@@ -160,11 +188,11 @@ DocumentBase {
         productViewContainer.blockUpdatingModel = true;
 
         let categoryId = productViewContainer.documentModel.GetData("CategoryId");
-        if (categoryId === "Software"){
-            categoryComboBox.currentIndex = 0;
+        if (categoryId === "Hardware"){
+            categoryComboBox.currentIndex = 1;
         }
         else{
-            categoryComboBox.currentIndex = 1;
+            categoryComboBox.currentIndex = 0;
         }
 
         tableView.rowModel = 0;
@@ -240,6 +268,32 @@ DocumentBase {
             }
 
             model.SetData("LicenseId", licenseId, j);
+        }
+    }
+
+    function checkValidFeatures(){
+        let featuresModel = productViewContainer.documentModel.GetData("Features");
+        let licenseIDs = featuresModel.GetKeys();
+
+        for (let licenseId of licenseIDs){
+            let licenseFeaturesModel = featuresModel.GetData(licenseId);
+
+            let removedIndexes = []
+            for (let j = 0; j < licenseFeaturesModel.GetItemsCount(); j++){
+                let featureId = licenseFeaturesModel.GetData("Id", j);
+
+                let ok = featuresProvider.featureIsExists(featureId);
+                if (!ok){
+                    console.log("Removed feature", featureId);
+                    removedIndexes.push(j);
+                }
+            }
+
+            let removedCount = 0
+            for (let i = 0; i < removedIndexes.length; i++){
+                licenseFeaturesModel.RemoveItem(removedIndexes[i] - removedCount);
+                removedCount++;
+            }
         }
     }
 
@@ -371,6 +425,7 @@ DocumentBase {
 
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
+            font.pixelSize: Style.fontSize_common;
 
             text: qsTr("Category");
         }
@@ -406,22 +461,22 @@ DocumentBase {
         }
     }
 
-    CustomScrollbar {
-        id: scrollbar;
-
-        z: 100;
-
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
-
-        backgroundColor: Style.baseColor;
-
-        secondSize: 10;
-        targetItem: tableView;
-    }
-
     TreeItemModel {
         id: filterFeatureModel;
+    }
+
+    function updateFeaturesModelWithNewLicenseID(oldLicenseID, newLicenseID){
+        if (productViewContainer.documentModel.ContainsKey("Features")){
+            let featuresModel = productViewContainer.documentModel.GetData("Features");
+            if (featuresModel.ContainsKey(oldLicenseID)){
+                let features = featuresModel.GetData(oldLicenseID);
+
+                let newFeaturesModel = featuresModel.AddTreeModel(newLicenseID);
+                newFeaturesModel.Copy(features);
+
+                featuresModel.RemoveData(oldLicenseID);
+            }
+        }
     }
 
     BasicTreeView {
@@ -434,8 +489,29 @@ DocumentBase {
 
         readOnly: false;
 
+        function openLicenseErrorDialog(message){
+            productViewContainer.documentManager.openErrorDialog(message);
+        }
+
+        function licenseIdExists(licenseId){
+            let delegateItems = tableView.getItemsDataAsList();
+            for (let item of delegateItems){
+                let itemData = item.getItemData();
+                if (itemData.Id === licenseId){
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         rowDelegate: Component { ProductViewItemDelegate {
             root: tableView;
+
+            onEmptyIdError: {
+                let message = qsTr("It is not possible to add features to a license with an empty ID");
+                productViewContainer.documentManager.openErrorDialog(message);
+            }
 
             onDataChanged: {
                 let itemsModel = productViewContainer.documentModel.GetData("Items");
@@ -443,6 +519,12 @@ DocumentBase {
                 let licenseId = tableView.rowModel.GetData("Id", model.index);
                 let licenseName = tableView.rowModel.GetData("Name", model.index);
                 let licenseDescription = tableView.rowModel.GetData("Description", model.index);
+
+                let oldLicenseId = itemsModel.GetData("Id", model.index);
+
+                if (oldLicenseId !== "" && oldLicenseId !== licenseId){
+                    productViewContainer.updateFeaturesModelWithNewLicenseID(oldLicenseId, licenseId);
+                }
 
                 itemsModel.SetData("Id", licenseId, model.index);
                 itemsModel.SetData("Name", licenseName, model.index);
@@ -544,6 +626,8 @@ DocumentBase {
                     }
                 }
             }
+
+
         } }
     }
 }

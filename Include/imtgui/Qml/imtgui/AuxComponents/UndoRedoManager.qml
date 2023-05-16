@@ -108,15 +108,12 @@ QtObject {
     }
 
     function modelUpdated(){
-        console.log("undoRedoManager modelUpdated", undoRedoManager.transaction);
         if (!undoRedoManager.transaction){
             let copyModel = undoRedoManager.getCopyFromModel(undoRedoManager.observedModel);
 
             if (undoRedo.undoStack.length >= 1){
                 let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
                 let isEqual = copyModel.IsEqualWithModel(lastModel);
-                console.log("isEqual", isEqual);
-
                 if (isEqual){
                     return;
                 }
@@ -134,8 +131,13 @@ QtObject {
         undoRedoManager.documentBase.commandsProvider.setCommandIsEnabled("Redo", isEnabled);
     }
 
+    function equalWithMainModel(externModel){
+        let isEqual = undoRedoManager.mainModel.IsEqualWithModel(externModel);
+
+        return isEqual;
+    }
+
     function commandHandle(commandId){
-        console.log("undoRedoManager commandHandle", commandId);
         let isEnabled = undoRedoManager.documentBase.commandsProvider.commandIsEnabled(commandId);
         if (!isEnabled){
             return;
@@ -150,8 +152,7 @@ QtObject {
         }
 
         if (result !== null){
-            let isEqual = undoRedoManager.mainModel.IsEqualWithModel(result);
-            console.log("isEqual", isEqual);
+            let isEqual = undoRedoManager.equalWithMainModel(result);
             if (undoRedoManager.documentBase){
                 undoRedoManager.documentBase.isDirty = !isEqual;
 
@@ -168,7 +169,6 @@ QtObject {
     }
 
     function createModel(obj){
-        console.log("createModel", JSON.stringify(obj));
         undoRedoManager.observedModel.Copy(obj);
     }
 }

@@ -51,8 +51,20 @@ QtObject {
         return selfIndexes.toString() === otherIndexes.toString();
     }
 
+    function equalByArrayIndexes(indexes){
+        console.log("equalByArrayIndexes");
+
+        let selfIndexes = root.getIndexes();
+
+        console.log("selfIndexes", selfIndexes.toString());
+        console.log("otherIndexes", indexes.toString());
+
+        console.log("result", selfIndexes.toString() === indexes.toString());
+
+        return selfIndexes.toString() === indexes.toString();
+    }
+
     function _equalRecursive(modelIndex1, modelIndex2){
-        console.log("_equalRecursive", modelIndex1, modelIndex2);
         let result = true;
         if (modelIndex1.index == modelIndex2.index){
 
@@ -77,7 +89,6 @@ QtObject {
         Get full path to the item from model index.
     */
     function getIndexes(){
-        console.log("getIndexes")
         let result = []
         root._recursiveIndexes(root, result);
 
@@ -88,7 +99,6 @@ QtObject {
         private function
     */
     function _recursiveIndexes(modelIndex, retval){
-        console.log("_recursiveIndexes")
         if (modelIndex){
             retval.push(modelIndex.index)
             root._recursiveIndexes(modelIndex.parentIndex, retval);

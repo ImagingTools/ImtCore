@@ -43,6 +43,7 @@ QtObject {
         if (!obj){
             return;
         }
+        console.log("addModel", obj.toJSON());
 
         undoRedo.undoStack.push(obj);
 
