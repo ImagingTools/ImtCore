@@ -33,7 +33,7 @@ protected:
 
 private:
 	I_REF(ICollectionInfo, m_constraintsCompPtr);
-	I_REF(int, m_initialSelectionModeAttrPtr);
+	I_ATTR(int, m_initialSelectionModeAttrPtr);
 };
 
 

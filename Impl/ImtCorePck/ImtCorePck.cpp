@@ -210,7 +210,7 @@ I_EXPORT_COMPONENT(
 			"Selection SelectionParam Adapter");
 
 I_EXPORT_COMPONENT(
-			SelectionPrmAdapter,
+			SelectionParamAdapter,
 			"Selection param adapter",
 			"Selection SelectionParam Adapter");
 

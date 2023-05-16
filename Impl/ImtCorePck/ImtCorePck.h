@@ -106,7 +106,7 @@ typedef imtbase::CCommandPermissionsProviderJoinerComp CommandPermissionsProvide
 typedef imtbase::CApplicationInfoRepresentationComp ApplicationInfoRepresentation;
 typedef icomp::TModelCompWrap<imtbase::CSelectionComp> Selection;
 typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
-typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionPrmAdapter;
+typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
 
 
 } // namespace ImtCorePck
