@@ -123,10 +123,10 @@ function(jqml_compile_web)
 	message("buildwebdir ${buildwebdir}")
 #	message("webdirs ${webdirs}")
 
-	set(NPM_EXE npm)
+	set(NODE_EXE node)
 
 	if(${MSVC})
-		set(NPM_EXE  ${IMTCOREDIR}/3rdParty/nodejs/npm_acf.cmd)
+		set(NODE_EXE  ${IMTCOREDIR}/3rdParty/nodejs/node.exe)
 	endif()
 
 	# Python path
@@ -137,10 +137,11 @@ function(jqml_compile_web)
 		${buildwebdir}/__header.h  # fake! ensure we run!
 		${QRC_WEB_FILE}
 		PRE_BUILD
+                COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML/preparesources.py ${webdirs}
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML
-		COMMAND ${NPM_EXE} run compile ${buildwebdir}/src
+		COMMAND ${NODE_EXE} ${IMTCOREDIR}/3rdParty/JQML/Compiler/index.js ${buildwebdir}/src
 		COMMENT "WEB COMPILER for ${PROJECT_NAME}"
 	    )
 
@@ -155,7 +156,6 @@ function(jqml_compile_web)
 	add_custom_command(
 		OUTPUT ${QRC_CPP_WEB_FILE}
 		COMMAND  ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/jqml.full.js  ${buildwebdir}/Resources/jqml.full.js
-		COMMAND  ${CMAKE_COMMAND} -E copy ${buildwebdir}/src/Acf/core.js  ${buildwebdir}/Resources/core.js
 		COMMAND
 		Qt${QT_VERSION_MAJOR}::rcc
 		ARGS
