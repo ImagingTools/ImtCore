@@ -46,17 +46,11 @@ Item {
         return true;
     }
 
-//    Keys.onPressed: {
-//        if (event.key === Qt.Key_Delete){
-//            Events.sendEvent(documentBaseRoot.documentUuid + "CommandActivated", "Remove");
-//        }
-//    }
-
     Component.onCompleted: {
         console.log("Document onCompleted", itemId);
         documentBaseRoot.documentUuid = uuidGenerator.generateUUID();
 
-        documentBaseRoot.commandsDelegate.documentBase = documentBaseRoot;
+//        documentBaseRoot.commandsDelegate.documentBase = documentBaseRoot;
     }
 
     onVisibleChanged: {
@@ -75,7 +69,7 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
 
-        documentBaseRoot.documentModel.modelChanged.disconnect(documentBaseRoot.modelChanged);
+//        documentBaseRoot.documentModel.modelChanged.disconnect(documentBaseRoot.modelChanged);
     }
 
     onBlockUpdatingModelChanged: {
@@ -83,14 +77,25 @@ Item {
     }
 
     onDocumentModelChanged: {
+        console.log("onDocumentModelChanged", documentBaseRoot.documentModel);
+
         documentBaseRoot.modelIsReady = true;
 
-        documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
+//        documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
 
-        documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
-        documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
+        documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
+
+//        documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
+//        documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
 
         documentBaseRoot.updateDocumentTitle()
+    }
+
+    function onDataChanged(topLeft, bottomRight, roles){
+        console.log("DocumentBase onDataChanged", topLeft, bottomRight, roles);
+        //console.log('Data Changed', topLeft.row, data(topLeft, roles[0]))
+
+        documentBaseRoot.modelChanged();
     }
 
     onIsDirtyChanged: {
@@ -102,7 +107,10 @@ Item {
     onCommandsIdChanged: {
 //        commandsDelegate.commandsId = documentBaseRoot.commandsId;
         if (documentBaseRoot.itemId === ""){
-            documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
+//            documentBaseRoot.documentModel.modelChanged.connect(documentBaseRoot.modelChanged);
+
+            documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
+
             documentBaseRoot.updateModel();
             documentBaseRoot.modelIsReady = true;
         }
@@ -114,7 +122,7 @@ Item {
     }
 
     function modelChanged(){
-        console.log("DocumentsCommands modelChanged");
+        console.log("DocumentsCommands modelChanged", documentBaseRoot.documentModel.toJSON());
 
         if (documentBaseRoot.blockUpdatingModel){
             return;
@@ -142,6 +150,12 @@ Item {
 
             documentBaseRoot.documentManager.setDocumentTitle({"Id": documentId, "Title": documentName});
         }
+
+        console.log("end updateDocumentTitle");
+    }
+
+    onItemIdChanged: {
+        console.log("onItemIdChanged", itemId);
     }
 
     function updateGui(){}
@@ -189,10 +203,6 @@ Item {
 
         onLoaded: {
             commandsDelegateBase.item.documentBase = documentBaseRoot;
-
-//            if(commandsDelegateBase.item.documentsData !==undefined){
-//                commandsDelegateBase.item.documentsData = documentBaseRoot.documentsData;
-//            }
 
             documentBaseRoot.commandsDelegateLoaded();
         }

@@ -69,6 +69,11 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		return nullptr;
 	}
 
+	objectId = GetObjectIdFromInputParams(inputParams);
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		imtauth::IUserInfo* userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
@@ -80,17 +85,6 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
-
-		if (itemModel.ContainsKey("Id")){
-			QByteArray id = itemModel.GetData("Id").toByteArray();
-			if (!id.isEmpty()){
-				objectId = id;
-			}
-		}
-
-		if (objectId.isEmpty()){
-			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-		}
 
 		userInfoPtr->SetObjectUuid(objectId);
 

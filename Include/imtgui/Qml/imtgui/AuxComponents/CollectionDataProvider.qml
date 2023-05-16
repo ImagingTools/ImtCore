@@ -43,6 +43,12 @@ QtObject {
         }
     }
 
+    function onModelUpdated(){
+        if (!container.completed){
+            container.completed = true;
+        }
+    }
+
     property GqlModel itemsInfoModel: GqlModel {
         function updateModel(externInputParams, fields) {
             console.log( "gqlModelBaseContainer updateModel", container.commandId + "List");
@@ -91,9 +97,11 @@ QtObject {
                             }
                         }
 
-                        container.completed = true;
+//                        container.onModelUpdated();
 
                         container.modelUpdated();
+
+                        container.completed = true;
                     }
                 }
             }

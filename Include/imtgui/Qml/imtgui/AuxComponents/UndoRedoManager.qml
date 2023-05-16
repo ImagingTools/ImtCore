@@ -1,52 +1,60 @@
 import QtQuick 2.12
 import Acf 1.0;
 
-Item {
+QtObject {
     id: undoRedoManager;
-
-    property string commandsId;
-    property var commandsDelegate;
 
     // Model before saving
     property TreeItemModel mainModel: TreeItemModel {};
-
     property TreeItemModel observedModel: null;
+    property DocumentBase documentBase: null;
+    property UndoRedo undoRedo: UndoRedo {
+        onModelAdded: {
+            undoRedoManager.checkCommandMode();
+        }
 
-    property Item documentBase: null;
+        onUndoChanged: {
+            undoRedoManager.checkCommandMode();
+        }
+
+        onRedoChanged: {
+            undoRedoManager.checkCommandMode();
+        }
+    }
+
+    property Component treeItemModelComp: Component {
+        TreeItemModel {}
+    }
 
     property bool transaction: false;
+    property bool modelIsRegistered: false;
 
     signal modelStateChanged();
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
-
         if (undoRedoManager.documentBase != null){
             undoRedoManager.documentBase.saved.disconnect(undoRedoManager.documentSaved);
-        }
-    }
-
-    onCommandsIdChanged: {
-        Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
-    }
-
-    onVisibleChanged: {
-        console.log("undoRedoManager onVisibleChanged", undoRedoManager.visible);
-        if (undoRedoManager.visible){
-            if (undoRedoManager.observedModel != null){
-                Events.subscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
-            }
-        }
-        else{
-            if (undoRedoManager.observedModel != null){
-                Events.unSubscribeEvent(undoRedoManager.commandsId + "CommandActivated", undoRedoManager.commandHandle);
-            }
+            undoRedoManager.documentBase.commandsDelegateLoaded.disconnect(undoRedoManager.connectCommandHandle);
+            undoRedoManager.disconnectCommandHandle();
         }
     }
 
     onDocumentBaseChanged: {
         if (undoRedoManager.documentBase != null){
             undoRedoManager.documentBase.saved.connect(undoRedoManager.documentSaved);
+            undoRedoManager.documentBase.commandsDelegateLoaded.connect(undoRedoManager.connectCommandHandle);
+        }
+    }
+
+    function connectCommandHandle(){
+        if (undoRedoManager.documentBase != null && undoRedoManager.documentBase.commandsDelegate){
+            undoRedoManager.documentBase.commandsDelegate.commandActivated.connect(undoRedoManager.commandHandle);
+        }
+    }
+
+    function disconnectCommandHandle(){
+        if (undoRedoManager.documentBase != null && undoRedoManager.documentBase.commandsDelegate){
+            undoRedoManager.documentBase.commandsDelegate.commandActivated.disconnect(undoRedoManager.commandHandle);
         }
     }
 
@@ -55,9 +63,8 @@ Item {
     }
 
     function beginChanges(){
-        if (undoRedoManager.transaction){
-            console.assert(undoRedoManager.transaction == true,  "beginChanges():: beginChanges transaction == true");
-
+        if (undoRedoManager.transaction || !undoRedoManager.modelIsRegistered){
+            console.warn("UndoRedoManager beginChanges failed!");
             return;
         }
 
@@ -65,9 +72,8 @@ Item {
     }
 
     function endChanges(){
-        if (!undoRedoManager.transaction){
-            console.assert(undoRedoManager.transaction == false,  "endChanges():: beginChanges transaction = false");
-
+        if (!undoRedoManager.transaction || !undoRedoManager.modelIsRegistered){
+            console.warn("UndoRedoManager endChanges failed!");
             return;
         }
         else{
@@ -89,13 +95,9 @@ Item {
 
             let copyModel = undoRedoManager.getCopyFromModel(undoRedoManager.observedModel);
             undoRedo.addModel(copyModel);
+
+            undoRedoManager.modelIsRegistered = true;
         }
-    }
-
-    Component {
-        id: treeItemModelComp;
-
-        TreeItemModel {}
     }
 
     function getCopyFromModel(model){
@@ -113,6 +115,8 @@ Item {
             if (undoRedo.undoStack.length >= 1){
                 let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
                 let isEqual = copyModel.IsEqualWithModel(lastModel);
+                console.log("isEqual", isEqual);
+
                 if (isEqual){
                     return;
                 }
@@ -166,21 +170,5 @@ Item {
     function createModel(obj){
         console.log("createModel", JSON.stringify(obj));
         undoRedoManager.observedModel.Copy(obj);
-    }
-
-    UndoRedo {
-        id: undoRedo;
-
-        onModelAdded: {
-            undoRedoManager.checkCommandMode();
-        }
-
-        onUndoChanged: {
-            undoRedoManager.checkCommandMode();
-        }
-
-        onRedoChanged: {
-            undoRedoManager.checkCommandMode();
-        }
     }
 }

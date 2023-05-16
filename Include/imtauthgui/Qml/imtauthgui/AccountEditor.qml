@@ -15,7 +15,7 @@ DocumentBase {
         groupsProvider.updateModel();
     }
 
-    onModelIsReadyChanged: {
+    onModelsIsLoadedChanged: {
         if (accountEditorContainer.modelIsReady){
             accountEditorContainer.updateGui();
             undoRedoManager.registerModel(accountEditorContainer.documentModel);
@@ -27,9 +27,6 @@ DocumentBase {
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: accountEditorContainer.documentUuid;
-
-        commandsDelegate: accountEditorContainer.commandsDelegate;
         documentBase: accountEditorContainer;
 
         onModelStateChanged: {
@@ -45,14 +42,24 @@ DocumentBase {
         fields: ["Id", "Name"];
 
         onModelUpdated: {
-            if (groupsProvider.collectionModel != null){
-                for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-                    groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
-                }
-                groupsTable.elements = groupsProvider.collectionModel;
-                groupsProvider.collectionModel.modelChanged.connect(accountEditorContainer.updateModel);
+            console.log("AccountEditor onModelUpdated", groupsProvider.completed);
+            for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+                groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
             }
+            groupsTable.elements = groupsProvider.collectionModel;
+            groupsProvider.collectionModel.dataChanged.connect(accountEditorContainer.updateModel);
         }
+
+//        function onModelUpdated(){
+//            console.log("AccountEditor onModelUpdated", groupsProvider.completed);
+//            for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
+//                groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
+//            }
+//            groupsTable.elements = groupsProvider.collectionModel;
+//            groupsProvider.collectionModel.dataChanged.connect(accountEditorContainer.updateModel);
+
+//            groupsProvider.completed = true;
+//        }
     }
 
     function updateGui(){
@@ -99,6 +106,9 @@ DocumentBase {
             }
         }
 
+        console.log("groupsTable.elements", groupsTable.elements);
+        console.log("groupIds", groupIds);
+
         if (groupsTable.elements){
             for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
                 let id = groupsTable.elements.GetData("Id", i);
@@ -121,7 +131,7 @@ DocumentBase {
             return;
         }
 
-//        undoRedoManager.beginChanges();
+        undoRedoManager.beginChanges();
 
 //        accountEditorContainer.documentModel.SetData("Id", accountEditorContainer.itemId);
 
@@ -163,7 +173,7 @@ DocumentBase {
         let groups = selectedGroupIds.join(';');
         accountEditorContainer.documentModel.SetData("Groups", groups)
 
-//        undoRedoManager.endChanges();
+        undoRedoManager.endChanges();
     }
 
     Rectangle {
@@ -530,4 +540,62 @@ DocumentBase {
 
         }//Body column
     }//Flickable
+
+
+//    Rectangle{
+//        anchors.fill: parent;
+
+//        property int i: 0;
+
+//        TreeItemModel {
+//            id: test;
+
+//            Component.onCompleted: {
+//                let index = test.InsertNewItem();
+//                test.SetData("Value", "Test", index);
+//                let childModel = test.AddTreeModel("ChildModel", index);
+//                index = childModel.InsertNewItem();
+//                childModel.SetData("Value", "Test", index);
+//            }
+
+//            onDataChanged: {
+//                console.log("test onDataChanged", topLeft, bottomRight, roleNames);
+//            }
+//        }
+
+//        AuxButton {
+//            width: 100;
+//            height: 20;
+
+//            hasText: true;
+
+//            textButton: "ChildModel";
+
+//            onClicked: {
+//                let childModel = test.GetData("ChildModel");
+
+//                childModel.SetData("Value", "Test" + parent.i);
+//                parent.i++;
+//                console.log("test", test.toJSON());
+//            }
+//        }
+
+//        AuxButton {
+//            x: 200;
+//            width: 100;
+//            height: 20;
+
+//            hasText: true;
+
+//            textButton: "ChildModel";
+
+//            onClicked: {
+
+//                test.SetData("Value", "Test2" + parent.i);
+//                parent.i++;
+
+//                console.log("test", test.toJSON());
+//            }
+//        }
+//    }
 }// Account Editor container

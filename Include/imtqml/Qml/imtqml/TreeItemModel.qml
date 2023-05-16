@@ -211,6 +211,10 @@ JSONListModel {
         return this.count - 1;
     }
 
+    function InsertNewItemWithParameters(index, parameters){
+        this.append(parameters);
+        return this.count - 1;
+    }
 
     function RemoveItem(index){
         this.remove(index)

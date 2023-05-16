@@ -79,6 +79,11 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 		return nullptr;
 	}
 
+	objectId = GetObjectIdFromInputParams(inputParams);
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		imtauth::IRole* roleInstancePtr = m_roleFactCompPtr.CreateInstance();
@@ -94,17 +99,6 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
-
-		if (itemModel.ContainsKey("Id")){
-			QByteArray id = itemModel.GetData("Id").toByteArray();
-			if (!id.isEmpty()){
-				objectId = id;
-			}
-		}
-
-		if (objectId.isEmpty()){
-			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-		}
 
 		roleInfoPtr->SetObjectUuid(objectId);
 

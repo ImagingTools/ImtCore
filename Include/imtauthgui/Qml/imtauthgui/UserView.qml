@@ -44,7 +44,6 @@ DocumentBase {
     UndoRedoManager {
         id: undoRedoManager;
 
-        commandsId: container.documentUuid;
         documentBase: container;
         onModelStateChanged: {
             container.updateGui();

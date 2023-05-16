@@ -26,66 +26,130 @@ DocumentWorkspaceCommandsDelegateBase {
         featuresProvider.updateModel();
     }
 
+//    property Component modelIndexComp: Component {
+//        ModelIndex {}
+//    }
+
+//    function createNewModelIndex(parentIndex, ){
+//        let count = model.GetItemsCount();
+//        model.InsertNewItemWithParameters(count, {"Id":"", "Name":"Feature Name", "Description":"", "Optional":false})
+//    }
+
+    function createNewItem(model){
+        let count = model.GetItemsCount();
+        model.InsertNewItemWithParameters(count, {"Id":"", "Name":"Feature Name", "Description":"", "Optional":false})
+    }
+
     onCommandActivated: {
         console.log("PackageViewCommands onCommandActivated", commandId);
         if (commandId === "New"){
-            let insertIndexes = []
-            if (container.tableTreeViewEditor.selectedIndex == null){
-                insertIndexes.push(container.tableTreeViewEditor.rowCount);
+            let index = container.tableTreeViewEditor.selectedIndex;
+            if (index !== null){
+                let parentModel = index.getParentModel();
+                let childModel = index.getData("ChildModel");
+                if (!childModel){
+                    if (parentModel){
+                        childModel = parentModel.AddTreeModel("ChildModel", index.getIndex());
+                    }
+                    else{
+                        childModel = container.tableTreeViewEditor.rowModel.AddTreeModel("ChildModel", index.getIndex());
+                    }
+                }
+
+                container.createNewItem(childModel);
+
+                container.tableTreeViewEditor.rowModel = 0;
+                container.tableTreeViewEditor.rowModel = container.documentBase.documentModel.GetData("Items");
             }
-            else {
-                let indexes = container.tableTreeViewEditor.selectedIndex.getIndexes();
-
-                let childrenIndexes = container.tableTreeViewEditor.selectedIndex.childModel;
-
-                indexes.push(childrenIndexes.length);
-
-                insertIndexes = indexes;
+            else{
+                container.createNewItem(tableTreeViewEditor.rowModel);
             }
 
-            container.tableTreeViewEditor.insertRow(insertIndexes, {"Id": "", "Name": "Feature Name", "Description": "", "Optional": false, "Selected": true});
+            container.documentBase.modelChanged();
+            container.documentBase.updateModel();
         }
         else if (commandId === "Remove"){
-//            modalDialogManager.openDialog(messageDialog, {"message": qsTr("Remove selected feature from the package ?")});
+            let index = container.tableTreeViewEditor.selectedIndex;
+            if (index !== null){
+                let removedFeaturesIds = []
+                container.getAllRemovedFeatures(container.tableTreeViewEditor.selectedIndex, removedFeaturesIds);
 
-            let removedFeatureId = container.tableTreeViewEditor.selectedIndex.itemData.Id;
-            let indexes = container.tableTreeViewEditor.selectedIndex.getIndexes();
-
-            console.log("tableTreeViewEditor.selectedIndex", container.tableTreeViewEditor.selectedIndex);
-
-            let removedFeaturesIds = []
-            getAllRemovedFeatures(container.tableTreeViewEditor.selectedIndex, removedFeaturesIds);
-
-            console.log("Remove indexes", indexes);
-
-            container.tableTreeViewEditor.removeRow(indexes);
-
-            //Удаление всех зависимостей от этой фичи
-            let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
-            if (dependenciesModel){
+                let featureId = index.itemData.Id;
+                removedFeaturesIds.push(featureId);
+                console.log("removedFeaturesIds", removedFeaturesIds);
 
                 for (let removedFeatureId of removedFeaturesIds){
-                    if (dependenciesModel.ContainsKey(removedFeatureId)){
-                        dependenciesModel.RemoveData(removedFeatureId);
-                    }
+                    container.removeDependencies(removedFeatureId);
+                }
 
-                    let keys = dependenciesModel.GetKeys();
+                let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
+                console.log("dependenciesModel", dependenciesModel.toJSON());
 
-                    for (let i = 0; i < keys.length; i++){
-                        let key = keys[i];
-                        let values = dependenciesModel.GetData(key);
+                container.tableTreeViewEditor.removeByIndex(index);
+                container.documentBase.syncronise()
+                container.documentBase.modelChanged()
+                container.documentBase.updateModel();
 
-                        if (values != ""){
-                            let dependenciesList = values.split(';');
+                container.tableTreeViewEditor.resetSelection();
 
-                            if (dependenciesList.includes(removedFeatureId)){
-                                let pos = dependenciesList.indexOf(removedFeatureId);
-                                dependenciesList.splice(pos, 1);
+//                //Удаление всех зависимостей от этой фичи
+//                let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
+//                if (dependenciesModel){
+//                    for (let removedFeatureId of removedFeaturesIds){
+//                        if (dependenciesModel.ContainsKey(removedFeatureId)){
+//                            dependenciesModel.RemoveData(removedFeatureId);
+//                        }
 
-                                let newDependencies = dependenciesList.join(';');
-                                dependenciesModel.SetData(key, newDependencies);
-                            }
-                        }
+//                        let keys = dependenciesModel.GetKeys();
+
+//                        for (let i = 0; i < keys.length; i++){
+//                            let key = keys[i];
+//                            let values = dependenciesModel.GetData(key);
+
+//                            if (values !== ""){
+//                                let dependenciesList = values.split(';');
+
+//                                if (dependenciesList.includes(removedFeatureId)){
+//                                    let pos = dependenciesList.indexOf(removedFeatureId);
+//                                    dependenciesList.splice(pos, 1);
+
+//                                    let newDependencies = dependenciesList.join(';');
+//                                    dependenciesModel.SetData(key, newDependencies);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+
+//                tableTreeViewEditor.removeByIndex(index);
+//                container.documentBase.modelChanged()
+//                container.documentBase.updateModel();
+            }
+        }
+    }
+
+    function removeDependencies(featureId){
+        let dependenciesModel = container.documentBase.documentModel.GetData("DependenciesModel");
+        if (dependenciesModel){
+            if (dependenciesModel.ContainsKey(featureId)){
+                dependenciesModel.RemoveData(featureId);
+            }
+
+            let keys = dependenciesModel.GetKeys();
+
+            for (let i = 0; i < keys.length; i++){
+                let key = keys[i];
+                let values = dependenciesModel.GetData(key);
+
+                if (values !== ""){
+                    let dependenciesList = values.split(';');
+
+                    if (dependenciesList.includes(featureId)){
+                        let pos = dependenciesList.indexOf(featureId);
+                        dependenciesList.splice(pos, 1);
+
+                        let newDependencies = dependenciesList.join(';');
+                        dependenciesModel.SetData(key, newDependencies);
                     }
                 }
             }
@@ -93,14 +157,12 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     function selectedIndexChanged(){
-//        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
+        //        let mode = tableTreeViewEditor.selectedIndex != null ? "Normal" : "Disabled";
         let isEnabled = container.tableTreeViewEditor.selectedIndex != null;
         container.documentBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
     }
 
-    Component {
-        id: messageDialog;
-
+    property Component messageDialog: Component {
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){

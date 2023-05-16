@@ -9,7 +9,9 @@ Dialog {
 
     signal featureAdded(var modelIndex);
 
-    property ModelIndex selectedIndex: null;
+    property var selectedIndexes: [];
+
+    property TreeItemModel featuresModel: TreeItemModel {}
 
     Component.onCompleted: {
         featuresDialog.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
@@ -17,39 +19,41 @@ Dialog {
 
         featuresDialog.title = qsTr("Select features");
 
-        featuresDialog.updateGui();
+        updateGui();
     }
 
     onFinished: {
         if (buttonId == "Add"){
-            featuresDialog.selectedIndex = featuresDialog.contentItem.tableView.selectedIndex;
+            featuresDialog.selectedIndexes = featuresDialog.contentItem.tableView.getSelectedIndexes();
         }
     }
 
     function updateGui(){
-        featuresDialog.contentItem.tableView.columnModel.clear();
-        featuresDialog.contentItem.tableView.rowModel.clear();
 
-        featuresDialog.contentItem.tableView.addColumn({"Id": "Name", "Name": "Feature Name"})
+        featuresDialog.contentItem.tableView.elements = featuresDialog.featuresModel;
+//        featuresDialog.contentItem.tableView.columnModel.clear();
+//        featuresDialog.contentItem.tableView.rowModel.clear();
 
-        let model = featuresProvider.model;
+//        featuresDialog.contentItem.tableView.addColumn({"Id": "Name", "Name": "Feature Name"})
 
-        for (let i = 0; i < model.GetItemsCount(); i++){
-            let id = model.GetData("Id", i);
-            let name = model.GetData("Name", i);
+//        let model = featuresProvider.model;
 
-            featuresDialog.contentItem.tableView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
+//        for (let i = 0; i < model.GetItemsCount(); i++){
+//            let id = model.GetData("Id", i);
+//            let name = model.GetData("Name", i);
 
-            let childModel = model.GetData("ChildModel", i);
-            if (childModel){
-                for (let j = 0; j < childModel.GetItemsCount(); j++){
-                    let featureId = childModel.GetData("Id", j);
-                    let featureName = childModel.GetData("Name", j);
+//            featuresDialog.contentItem.tableView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
 
-                    featuresDialog.contentItem.tableView.insertRow([i, j], {"Name": featureName, "Id": featureId, "CheckBoxVisible": false})
-                }
-            }
-        }
+//            let childModel = model.GetData("ChildModel", i);
+//            if (childModel){
+//                for (let j = 0; j < childModel.GetItemsCount(); j++){
+//                    let featureId = childModel.GetData("Id", j);
+//                    let featureName = childModel.GetData("Name", j);
+
+//                    featuresDialog.contentItem.tableView.insertRow([i, j], {"Name": featureName, "Id": featureId, "CheckBoxVisible": false})
+//                }
+//            }
+//        }
     }
 
     contentComp: Component{ Item {
@@ -58,6 +62,16 @@ Dialog {
         height: bodyColumn.height + 40;
 
         property alias tableView: tableTreeView;
+
+        property TreeItemModel headersModel: TreeItemModel {
+            Component.onCompleted: {
+                let index = dialogBody.headersModel.InsertNewItem();
+                dialogBody.headersModel.SetData("Id", "Name", index);
+                dialogBody.headersModel.SetData("Name", "Feature Name", index);
+
+                tableTreeView.headers = dialogBody.headersModel;
+            }
+        }
 
         Column {
             id: bodyColumn;
@@ -70,25 +84,39 @@ Dialog {
 
             width: featuresDialog.width;
 
-            BasicTreeView {
+            AuxTable {
                 id: tableTreeView;
 
                 width: parent.width;
                 height: 300;
 
-                onSelectedIndexChanged: {
-                    console.log("onSelectedIndexChanged", tableTreeView.selectedIndex);
+                radius: 0;
 
-                    if (tableTreeView.selectedIndex != null && tableTreeView.selectedIndex.itemData){
-                         console.log("selectedIndex.itemData.Level", tableTreeView.selectedIndex.itemData.Level);
-                        let state = tableTreeView.selectedIndex.itemData.Level === 1;
-
-                        console.log("featuresDialog", featuresDialog);
-                        console.log("featuresDialog.buttons", featuresDialog.buttons);
-                        featuresDialog.buttons.setButtonState("Add", state);
-                    }
+                onSelectionChanged: {
+                    let indexes = tableTreeView.getSelectedIndexes();
+                    featuresDialog.buttons.setButtonState("Add", indexes.length > 0);
                 }
             }
+
+//            BasicTreeView {
+//                id: tableTreeView;
+
+//                width: parent.width;
+//                height: 300;
+
+//                onSelectedIndexChanged: {
+//                    console.log("onSelectedIndexChanged", tableTreeView.selectedIndex);
+
+//                    if (tableTreeView.selectedIndex != null && tableTreeView.selectedIndex.itemData){
+//                         console.log("selectedIndex.itemData.Level", tableTreeView.selectedIndex.itemData.Level);
+//                        let state = tableTreeView.selectedIndex.itemData.Level === 1;
+
+//                        console.log("featuresDialog", featuresDialog);
+//                        console.log("featuresDialog.buttons", featuresDialog.buttons);
+//                        featuresDialog.buttons.setButtonState("Add", state);
+//                    }
+//                }
+//            }
         }
     } }
 

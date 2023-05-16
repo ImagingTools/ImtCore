@@ -12,7 +12,7 @@ Item {
     property bool blockUpdatingModel: false;
 
     Component.onDestruction: {
-        usersProvider.collectionModel.modelChanged.disconnect(groupUsersContainer.updateModel);
+        usersProvider.collectionModel.dataChanged.disconnect(groupUsersContainer.updateModel);
     }
 
     onDocumentModelChanged: {
@@ -90,7 +90,7 @@ Item {
 
                 usersTable.elements = usersProvider.collectionModel;
                 groupUsersContainer.updateGui();
-                usersProvider.collectionModel.modelChanged.connect(groupUsersContainer.updateModel);
+                usersProvider.collectionModel.dataChanged.connect(groupUsersContainer.updateModel);
             }
         }
     }

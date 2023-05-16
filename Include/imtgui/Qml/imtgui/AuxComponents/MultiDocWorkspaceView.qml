@@ -297,6 +297,8 @@ Item {
                     let documentBase = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
                     documentBase.onEntered(inputValue);
 
+//                    documentBase.itemId = inputValue;
+
                     documentController.setData(documentBase.itemId, documentBase.documentModel);
                 }
             }

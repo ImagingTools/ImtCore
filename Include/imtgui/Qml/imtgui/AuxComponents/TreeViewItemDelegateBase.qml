@@ -4,11 +4,11 @@ import Acf 1.0
 TableViewItemDelegateBase {
     id: treeDelegateBase;
 
-    height: !treeDelegateBase.root ? 0 : treeDelegateBase.isOpen ? treeDelegateBase.footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
+    height: !treeDelegateBase.root ? 0 : treeDelegateBase.isOpened ? treeDelegateBase.footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
 
-    property bool isOpen: model.IsOpen;
+    property bool isOpened: true;
 
-    property int checkState: model.CheckState;
+    property bool hasChild: false;
 
     property bool tristate: true; //prefixRowItem.visible;
 
@@ -20,34 +20,7 @@ TableViewItemDelegateBase {
     signal parentCheckStateChanged(var data);
     signal childrenCheckStateChanged(var data);
 
-    function clear(){
-        model.CheckState = Qt.Unchecked;
-        model.Active = true;
-        model.Visible = true;
-    }
-
-    function setState(state){
-        model.CheckState = state;
-    }
-
-    function setActive(active){
-        model.Active = active;
-    }
-
-    function setVisible(visible){
-        model.Visible = visible;
-    }
-
     onSelectedChanged: {
-        if (treeDelegateBase.selected){
-            treeDelegateBase.root.selectedIndex = treeDelegateBase.modelIndex;
-        }
-        else{
-            treeDelegateBase.root.selectedIndex = null;
-        }
-
-        treeDelegateBase.updateSelection();
-
         if(treeDelegateBase.rowBodyItem) {
             treeDelegateBase.rowBodyItem.forceActiveFocus();
         }
@@ -60,10 +33,6 @@ TableViewItemDelegateBase {
             height: treeDelegateBase.root ? treeDelegateBase.root.rowItemHeight : 0;
 
             spacing: 10;
-
-            function click(){
-                checkBox.clicked();
-            }
 
             Item {
                 width: 15;
@@ -78,13 +47,13 @@ TableViewItemDelegateBase {
                     width: 15;
                     height: width;
 
-                    visible: model.ChildModel ? model.ChildModel.count > 0 : false;
+                    visible: treeDelegateBase.hasChild;
 
-                    iconSource: treeDelegateBase.isOpen ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
+                    iconSource: treeDelegateBase.isOpened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
                                                           "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
 
                     onClicked: {
-                        model.IsOpen = !model.IsOpen;
+                        treeDelegateBase.isOpened = !treeDelegateBase.isOpened;
                     }
                 }
             }
@@ -99,29 +68,46 @@ TableViewItemDelegateBase {
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.horizontalCenter: parent.horizontalCenter;
 
-                    checkState: model.CheckState;
+//                    checkState: model.CheckState;
 
-                    isActive: model.Active;
+                    checkState: treeDelegateBase.checkState;
 
-                    visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && model.CheckBoxVisible : false;
+//                    isActive: model.Active;
+
+                    isActive: treeDelegateBase.isActive;
+
+//                    visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && model.CheckBoxVisible : false;
+                    visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && treeDelegateBase.isCheckable : false;
 
                     onClicked: {
-                        if (model.CheckState == Qt.PartiallyChecked){
-                            model.CheckState = Qt.Checked;
+                        console.log("checkBox onClicked1", treeDelegateBase.checkState);
+
+                        if (treeDelegateBase.checkState == Qt.PartiallyChecked){
+                            treeDelegateBase.checkState = Qt.Checked;
                         }
                         else{
-                            model.CheckState = Qt.Checked - model.CheckState;
+                            treeDelegateBase.checkState = Qt.Checked - treeDelegateBase.checkState;
                         }
 
-                        if (treeDelegateBase.parentDelegate){
-                            treeDelegateBase.parentDelegate.childrenCheckStateChanged(treeDelegateBase.itemData);
-                        }
+                        console.log("checkBox onClicked2", treeDelegateBase.checkState);
 
-                        for (let i = 0; i < treeDelegateBase.childrenDelegates.length; i++){
-                            treeDelegateBase.childrenDelegates[i].parentCheckStateChanged(treeDelegateBase.itemData);
-                        }
 
-                        treeDelegateBase.root.rowModelDataChanged(treeDelegateBase, "CheckState");
+//                        if (model.CheckState == Qt.PartiallyChecked){
+//                            model.CheckState = Qt.Checked;
+//                        }
+//                        else{
+//                            model.CheckState = Qt.Checked - model.CheckState;
+//                        }
+
+//                        if (treeDelegateBase.parentDelegate){
+//                            treeDelegateBase.parentDelegate.childrenCheckStateChanged(treeDelegateBase.itemData);
+//                        }
+
+//                        for (let i = 0; i < treeDelegateBase.childrenDelegates.length; i++){
+//                            treeDelegateBase.childrenDelegates[i].parentCheckStateChanged(treeDelegateBase.itemData);
+//                        }
+
+//                        treeDelegateBase.root.rowModelDataChanged(treeDelegateBase, "CheckState");
                     }
                 }
             }
@@ -131,7 +117,8 @@ TableViewItemDelegateBase {
     footerDelegate: Component { Column {
             id: childrenColumn;
 
-            visible: treeDelegateBase.isOpen;
+//            visible: treeDelegateBase.isOpen;
+            visible: treeDelegateBase.isOpened;
 
             Repeater {
                 id: childModelRepeater;
@@ -145,12 +132,12 @@ TableViewItemDelegateBase {
                     item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
                     treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
 
-                    // Связываем modelIndex соседних элементов
-                    if (index > 0){
-                        let prevItem = childModelRepeater.itemAt(index - 1);
-                        item.modelIndex.prevIndex = prevItem.modelIndex;
-                        prevItem.modelIndex.nextIndex =item.modelIndex;
-                    }
+//                    // Связываем modelIndex соседних элементов
+//                    if (index > 0){
+//                        let prevItem = childModelRepeater.itemAt(index - 1);
+//                        item.modelIndex.prevIndex = prevItem.modelIndex;
+//                        prevItem.modelIndex.nextIndex =item.modelIndex;
+//                    }
                 }
 
                 onItemRemoved: {
@@ -168,8 +155,16 @@ TableViewItemDelegateBase {
 
             property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
             onChildModelChanged: {
+                console.log("onChildModelChanged", childModel);
                 if (childrenColumn.childModel){
+                    if (childrenColumn.childModel.GetItemsCount() > 0){
+                            treeDelegateBase.hasChild = true;
+                    }
+
                     childModelRepeater.model = childrenColumn.childModel;
+                }
+                else{
+                    treeDelegateBase.hasChild = false;
                 }
             }
         }

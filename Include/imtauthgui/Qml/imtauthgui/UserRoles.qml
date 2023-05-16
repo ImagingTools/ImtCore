@@ -44,7 +44,7 @@ Item {
 
                     userRolesContainer.updateGui();
 
-                    rolesProvider.collectionModel.modelChanged.connect(userRolesContainer.updateModel);
+                    rolesProvider.collectionModel.dataChanged.connect(userRolesContainer.updateModel);
                 }
             }
         }

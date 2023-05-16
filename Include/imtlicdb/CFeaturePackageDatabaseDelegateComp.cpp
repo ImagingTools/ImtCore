@@ -330,6 +330,14 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 	GenerateDifferences(*oldObjectPtr, *newObjectPtr, addedFeatures, removedFeatures, updatedFeatures);
 
+	// Delete removed features to the package:
+	for (const QByteArray& removedFeatureId : removedFeatures){
+		retVal += "\n" +
+				QString("DELETE FROM \"Features\" WHERE \"Id\" = '%1' AND \"PackageId\" = '%2';")
+				.arg(qPrintable(removedFeatureId))
+				.arg(qPrintable(newPackageId)).toLocal8Bit();
+	}
+
 	// Add new features to the package:
 	for (const QByteArray& addFeatureId : addedFeatures){
 		const imtlic::IFeatureInfo* featureInfoPtr = newObjectPtr->FindFeatureById(addFeatureId);
@@ -343,6 +351,10 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 						imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 			retVal += "\n" +
+					QString("DELETE FROM \"Features\" WHERE \"Id\" = '%1';")
+					.arg(qPrintable(addFeatureId)).toLocal8Bit();
+
+			retVal += "\n" +
 					QString("INSERT INTO \"Features\" (\"Id\", \"Name\", \"Description\", \"PackageId\", \"Optional\") VALUES('%1', '%2', '%3', '%4', '%5');")
 					.arg(qPrintable(addFeatureId))
 					.arg(featureName)
@@ -352,14 +364,6 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 			CreateInsertSubFeaturesQuery(newObjectPtr, featureInfoPtr, retVal);
 		}
-	}
-
-	// Delete removed features to the package:
-	for (const QByteArray& removedFeatureId : removedFeatures){
-		retVal += "\n" +
-				QString("DELETE FROM \"Features\" WHERE \"Id\" = '%1' AND \"PackageId\" = '%2';")
-				.arg(qPrintable(removedFeatureId))
-				.arg(qPrintable(newPackageId)).toLocal8Bit();
 	}
 
 	// Update changed features in the package:

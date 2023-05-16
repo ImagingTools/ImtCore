@@ -1,36 +1,52 @@
 import QtQuick 2.12
-import Acf 1.0
 
-Item {
+QtObject {
     id: root;
 
     property var itemData;
 
-    property var delegateItem: null; //Reference on the delegate from model.
+//    property var delegateItem: null; //Reference on the delegate from model.
 
     property ModelIndex parentIndex: null; //Reference on the parent index model.
-
-    property ModelIndex nextIndex: null; //Reference to the next index.
-    property ModelIndex prevIndex: null; //Reference to the prev index.
 
     property var childModel: []; //Reference on the all children index models.
 
     property int index: -1;
 
-//    function equal(otherIndex){
+    property int depth: 0;
 
-//        console.log("equal")
+    function getData(value){
+        return root.itemData[value];
+    }
 
-//        return root._equalRecursive(root, otherIndex);
-//    }
+    function getDepth(value){
+        return root.depth;
+    }
+
+    function setData(key, value){
+        root.itemData[key] = value;
+    }
+
+    function getParentModel(){
+        if (root.parentIndex != null){
+            return root.parentIndex.getData("ChildModel");
+        }
+
+         return undefined;
+    }
+
+    function getIndex(){
+        return root.index;
+    }
+
+    function addChildIndex(childIndex){
+        childIndex.parentIndex = root;
+        root.childModel.push(childIndex);
+    }
 
     function equal(otherIndex){
-        console.log("equal", otherIndex);
         let selfIndexes = root.getIndexes();
         let otherIndexes = otherIndex.getIndexes();
-
-        console.log("selfIndexes", selfIndexes.toString());
-        console.log("otherIndexes", otherIndexes.toString());
 
         return selfIndexes.toString() === otherIndexes.toString();
     }

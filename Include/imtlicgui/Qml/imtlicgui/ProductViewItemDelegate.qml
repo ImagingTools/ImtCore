@@ -5,10 +5,18 @@ import imtgui  1.0
 TreeViewItemDelegateBase {
     id: productTreeItemDelegate;
 
-    //root: tableView;
-
     signal addButtonClicked();
     signal removeButtonClicked();
+
+    signal dataChanged();
+
+    checkState: model.CheckState ? model.CheckState : Qt.Unchecked;
+
+//    onRootChanged: {
+//        if (productTreeItemDelegate.root != null){
+//            productTreeItemDelegate.root.tableSelection.singleSelect(productTreeItemDelegate.modelIndex);
+//        }
+//    }
 
     rowBodyDelegate: Component { Row {
             id: row;
@@ -24,13 +32,14 @@ TreeViewItemDelegateBase {
 
                     anchors.verticalCenter: parent.verticalCenter;
 
-                    visible: model.Optional ? model.Optional && model.Level != 1 : false;
+                    visible: model.Optional ? model.Optional : false;
 
-                    checkState: model.State;
+                    checkState: productTreeItemDelegate.checkState;
 
                     onClicked: {
-                        model.State = Qt.Checked - model.State;
-                        productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "State");
+                        console.log("checkBox onClicked", model.CheckState);
+
+                        model.CheckState = Qt.Checked - model.CheckState;
                     }
                 }
             }
@@ -38,7 +47,7 @@ TreeViewItemDelegateBase {
             Item {
                 id: nameItem;
 
-                width: productTreeItemDelegate.root ? productTreeItemDelegate.root.width / productTreeItemDelegate.root.columnCount - 20 * model.Level : 0;
+                width: productTreeItemDelegate.root ? productTreeItemDelegate.root.width / productTreeItemDelegate.root.columnCount - 20 * productTreeItemDelegate.level : 0;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
                 Text {
@@ -52,13 +61,14 @@ TreeViewItemDelegateBase {
                     wrapMode: Text.WordWrap;
                     elide: Text.ElideRight;
 
-                    text: model.Name;
+                    text: model.Name ? model.Name : "";
                 }
 
                 MouseArea {
                     anchors.fill: parent;
 
-                    visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
+                    visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && productTreeItemDelegate.level == 0 : false;
+//                    visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                     onClicked: {
                         mouseArea.clicked(null);
@@ -89,15 +99,17 @@ TreeViewItemDelegateBase {
                     onEditingFinished: {
                         inputName.visible = false;
 
-                        if (model.Name != inputName.text){
+                        if (model.Name !== inputName.text){
                             model.Name = inputName.text;
 
-                            if (model.Id == ""){
+                            if (model.Id === ""){
                                 let id = model.Name.replace(/\s+/g, '');
                                 model.Id = id;
                             }
 
-                            productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Name");
+                            productTreeItemDelegate.dataChanged();
+
+//                            productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Name");
                         }
                     }
                 }
@@ -113,7 +125,7 @@ TreeViewItemDelegateBase {
                     width: parent.width;
                     height: parent.height;
 
-                    visible: model.Level == 0;
+                    visible: productTreeItemDelegate.level == 0;
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter;
@@ -126,13 +138,14 @@ TreeViewItemDelegateBase {
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
 
-                        text: model.Id;
+                        text: model.Id ? model.Id : "";
                     }
 
                     MouseArea {
                         anchors.fill: parent;
 
-                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
+                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && productTreeItemDelegate.level == 0 : false;
+//                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                         onClicked: {
                             mouseArea.clicked(null);
@@ -163,10 +176,12 @@ TreeViewItemDelegateBase {
                         onEditingFinished: {
                             inputId.visible = false;
 
-                            if (model.Id != inputId.text){
+                            if (model.Id !== inputId.text){
                                 model.Id = inputId.text;
 
-                                productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Id");
+                                productTreeItemDelegate.dataChanged();
+
+//                                productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Id");
                             }
                         }
                     }
@@ -183,7 +198,7 @@ TreeViewItemDelegateBase {
                     width: parent.width;
                     height: parent.height;
 
-                    visible: model.Level == 0;
+                    visible: productTreeItemDelegate.level == 0;
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter;
@@ -196,13 +211,13 @@ TreeViewItemDelegateBase {
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
 
-                        text: model.Description;
+                        text: model.Description ? model.Description : "";
                     }
 
                     MouseArea {
                         anchors.fill: parent;
-
-                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
+//                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
+                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && productTreeItemDelegate.level == 0 : false;
 
                         onClicked: {
                             mouseArea.clicked(null);
@@ -233,10 +248,12 @@ TreeViewItemDelegateBase {
                         onEditingFinished: {
                             inputDescription.visible = false;
 
-                            if (model.Description != inputDescription.text){
+                            if (model.Description !== inputDescription.text){
                                 model.Description = inputDescription.text;
 
-                                productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Description");
+                                productTreeItemDelegate.dataChanged();
+
+//                                productTreeItemDelegate.root.rowModelDataChanged(productTreeItemDelegate, "Description");
                             }
                         }
                     }
@@ -249,7 +266,8 @@ TreeViewItemDelegateBase {
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
-                visible: model.Level == 0 && model.Selected;
+//                visible: model.Level == 0 && model.Selected;
+                visible: productTreeItemDelegate.level == 0 && productTreeItemDelegate.selected;
 
                 AuxButton {
                     anchors.verticalCenter: addButtonRect.verticalCenter;
@@ -274,7 +292,9 @@ TreeViewItemDelegateBase {
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
-                visible: model.Level == 1 && model.Selected;
+//                visible: model.Level == 1 && model.Selected;
+
+                visible: productTreeItemDelegate.level == 1 && productTreeItemDelegate.selected;
 
                 AuxButton {
                     anchors.verticalCenter: removeButtonRect.verticalCenter;

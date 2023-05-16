@@ -23,9 +23,6 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-	dataModel->SetData("Id", "");
-	dataModel->SetData("Name", "");
-
 	QByteArray userGroupId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userGroupId, dataPtr)){
@@ -79,6 +76,11 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		return nullptr;
 	}
 
+	objectId = GetObjectIdFromInputParams(inputParams);
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtauth::CIdentifiableUserGroupInfo> userGroupInfoPtr = new imtauth::CIdentifiableUserGroupInfo();
@@ -89,17 +91,6 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
-
-		if (itemModel.ContainsKey("Id")){
-			QByteArray id = itemModel.GetData("Id").toByteArray();
-			if (!id.isEmpty()){
-				objectId = id;
-			}
-		}
-
-		if (objectId.isEmpty()){
-			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-		}
 
 		userGroupInfoPtr->SetObjectUuid(objectId);
 

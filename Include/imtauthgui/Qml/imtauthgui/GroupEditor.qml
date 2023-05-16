@@ -63,7 +63,7 @@ Item {
         fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
 
         Component.onDestruction: {
-            groupsProvider.collectionModel.modelChanged.disconnect(userGroupEditorContainer.updateModel);
+            groupsProvider.collectionModel.dataChanged.disconnect(userGroupEditorContainer.updateModel);
         }
 
         onModelUpdated: {
@@ -107,7 +107,7 @@ Item {
                 parentGroupsTable.elements = groupsProvider.collectionModel;
 
                 userGroupEditorContainer.updateGui();
-                groupsProvider.collectionModel.modelChanged.connect(userGroupEditorContainer.updateModel);
+                groupsProvider.collectionModel.dataChanged.connect(userGroupEditorContainer.updateModel);
 
                 nameInput.focus = true;
             }

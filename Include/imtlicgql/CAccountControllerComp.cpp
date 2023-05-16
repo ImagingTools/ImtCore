@@ -23,18 +23,6 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-	dataModel->SetData("Id", "");
-	dataModel->SetData("Name", "");
-	dataModel->SetData("Description", "");
-	dataModel->SetData("Email", "");
-	dataModel->SetData("CompanyName", "");
-	dataModel->SetData("CompanyName", "");
-	dataModel->SetData("Country", "");
-	dataModel->SetData("City", "");
-	dataModel->SetData("PostalCode", "");
-	dataModel->SetData("Street", "");
-	dataModel->SetData("Groups", "");
-
 	QByteArray accountId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -88,6 +76,11 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		return nullptr;
 	}
 
+	objectId = GetObjectIdFromInputParams(inputParams);
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		imtauth::ICompanyInfo* companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
@@ -103,17 +96,6 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
-
-		if (itemModel.ContainsKey("Id")){
-			QByteArray id = itemModel.GetData("Id").toByteArray();
-			if (!id.isEmpty()){
-				objectId = id;
-			}
-		}
-
-		if (objectId.isEmpty()){
-			objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
-		}
 
 		companyInfoPtr->SetObjectUuid(objectId);
 

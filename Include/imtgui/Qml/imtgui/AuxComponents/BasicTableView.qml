@@ -10,12 +10,14 @@ FocusScope {
     property bool readOnly: true;
     property bool withoutSelection: false;
 
-    property alias headerDelegate: listView.header;
+    //    property alias headerDelegate: listView.header;
     property alias rowDelegate: listView.delegate;
-    property alias contentHeader: listView.header;
-    property alias contentFooter: listView.footer;
+
+    //    property alias rowDelegate: tableDelegateLoader.sourceComponent;
+    //    property alias contentHeader: listView.header;
+    //    property alias contentFooter: listView.footer;
     property alias background: backgroundLoader.sourceComponent;
-    property alias boundsBehavior: listView.boundsBehavior;
+    //    property alias boundsBehavior: listView.boundsBehavior;
 
     property int columnCount:repeater.count;
     property int rowCount: listView.count;
@@ -23,31 +25,30 @@ FocusScope {
     property int rowItemHeight: 30;
     property int headerHeight: 35;
 
-    property ListModel rowModel: ListModel {};
+    property var rowModel: ListModel {};
     property var columnModel: ListModel {};
 
     property ModelIndex selectedIndex: null;
 
-    property TreeViewSelection selection: TreeViewSelection {};
+    property TreeViewSelection tableSelection: TreeViewSelection {
+        onSelectionChanged: {
+            if (tableViewRoot.tableSelection.items.length > 0){
+                tableViewRoot.selectedIndex = tableViewRoot.tableSelection.items[0];
+            }
+            else{
+                tableViewRoot.selectedIndex = null;
+            }
 
-    property alias tableListView: listView;
+            tableViewRoot.selectionChanged();
+        }
+    };
 
-    // For subscribing unique events
-    property string commandId: "";
+    property alias tableListView: flick;
 
+    signal selectionChanged();
     signal rowModelDataChanged(var delegate, var prop);
     signal rowAdded();
     signal rowRemoved();
-
-    Component.onCompleted: {
-//        tableViewRoot.Keys.onPressed.connect(tableViewRoot.selection.tableKeyPressed);
-
-        tableViewRoot.selection.selectedIndex = tableViewRoot.selectedIndex;
-    }
-
-    Component.onDestruction: {
-//        tableViewRoot.Keys.onPressed.disconnect(tableViewRoot.selection.tableKeyPressed);
-    }
 
     property var itemsList: [];
 
@@ -58,7 +59,7 @@ FocusScope {
     function _removeItem(item){
         var index = tableViewRoot.itemsList.indexOf(item);
         if (index !== -1) {
-          tableViewRoot.itemsList.splice(index, 1);
+            tableViewRoot.itemsList.splice(index, 1);
         }
     }
 
@@ -79,6 +80,47 @@ FocusScope {
         return result;
     }
 
+    function resetSelection(){
+        tableViewRoot.tableSelection.resetSelection();
+    }
+
+    function addChildItem(parentIndex, rowObj){
+        let count = tableViewRoot.rowModel.GetItemsCount();
+        if (parentIndex !== null){
+            let parentModel = parentIndex.getParentModel();
+            let childModel = parentIndex.getData("ChildModel");
+            if (!childModel){
+                if (parentModel){
+                    childModel = parentModel.AddTreeModel("ChildModel", parentIndex.getIndex());
+                }
+                else{
+                    parentModel = tableViewRoot.rowModel;
+                    childModel = tableViewRoot.rowModel.AddTreeModel("ChildModel", parentIndex.getIndex());
+                }
+            }
+            childModel.InsertNewItemWithParameters(count, rowObj)
+        }
+        else{
+            tableViewRoot.rowModel.InsertNewItemWithParameters(count, rowObj)
+        }
+    }
+
+    function removeByIndex(modelIndex){
+        for (let i = 0; i < tableViewRoot.itemsList.length; i++){
+            let delegateItem = tableViewRoot.itemsList[i];
+            if (delegateItem.modelIndex === modelIndex){
+                let parentModel = modelIndex.getParentModel();
+                if (!parentModel){
+                    parentModel = tableViewRoot.rowModel;
+                }
+                parentModel.RemoveItem(modelIndex.getIndex());
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     Loader {
         id: backgroundLoader;
 
@@ -89,13 +131,21 @@ FocusScope {
         }
     }
 
+    function getRootItemByIndex(index){
+        if (index < 0 || index >= listView.count){
+            return null;
+        }
+
+        return listView.itemAt(index);
+    }
+
     FocusScope {
         id: headerItem;
 
         z: 5;
 
         height: visible ? tableViewRoot.headerHeight : 0;
-        width: listView.width;
+        width: flick.width;
 
         visible: tableViewRoot.headerVisible;
 
@@ -166,38 +216,83 @@ FocusScope {
         }
     }
 
-    ListView {
-        id: listView;
+    Flickable {
+        id: flick;
 
         anchors.top: headerItem.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
 
-        model: tableViewRoot.rowModel;
+        contentWidth: bodyColumn.width;
+        contentHeight: bodyColumn.height;
 
         boundsBehavior: Flickable.StopAtBounds;
-        headerPositioning: ListView.OverlayHeader;
 
-        cacheBuffer: 10000;
+        Column {
+            id: bodyColumn;
 
-        delegate: TableViewItemDelegateBase {
-            root: tableViewRoot;
+            width: parent.width;
+
+            Repeater{
+                id: listView;
+
+                anchors.fill: parent;
+
+                model: tableViewRoot.rowModel;
+
+                delegate: TableViewItemDelegateBase {
+                    root: tableViewRoot;
+                }
+            }
         }
     }
+
+    //    Loader {
+    //        id: tableDelegateLoader;
+
+    //        sourceComponent: TableViewItemDelegateBase {
+    //            root: tableViewRoot;
+    //        }
+
+    //        onLoaded: {
+    //            tableDelegateLoader.item.root = tableViewRoot;
+
+    ////            listView.delegate = tableDelegateLoader.item;
+    //        }
+    //    }
+
+    //    ListView {
+    //        id: listView;
+
+    //        anchors.top: headerItem.bottom;
+    //        anchors.left: parent.left;
+    //        anchors.right: parent.right;
+    //        anchors.bottom: parent.bottom;
+
+    //        model: tableViewRoot.rowModel;
+
+    //        boundsBehavior: Flickable.StopAtBounds;
+    //        headerPositioning: ListView.OverlayHeader;
+
+    //        cacheBuffer: 1000;
+
+    //        delegate: TableViewItemDelegateBase {
+    //            root: tableViewRoot;
+    //        }
+    //    }
 
     CustomScrollbar {
         id: scrollbar;
 
         z: 100;
 
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
+        anchors.right: flick.right;
+        anchors.bottom: flick.bottom;
 
         secondSize: 10;
-        targetItem: listView;
+        targetItem: flick;
     }
-
 
     function addRow(row){
         return insertRow(rowModel.count, row);

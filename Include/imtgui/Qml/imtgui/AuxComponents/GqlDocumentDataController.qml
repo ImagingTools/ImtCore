@@ -137,7 +137,7 @@ QtObject {
 
                         let documentId = dataModelLocal.GetData("Id");
                         let documentName = dataModelLocal.GetData("Name");
-                        container.documentUpdated(documentId, documentName);
+                        container.documentAdded(documentId, documentName);
                     }
                     else if (dataModelLocal.ContainsKey(container.updateCommandId)){
                         dataModelLocal = dataModelLocal.GetData(container.updateCommandId);
@@ -147,7 +147,7 @@ QtObject {
                         let documentName = dataModelLocal.GetData("Name");
 
                         console.log("documentAdded", documentId, documentName);
-                        container.documentAdded(documentId, documentName);
+                        container.documentUpdated(documentId, documentName);
                     }
                 }
             }

@@ -60,7 +60,7 @@ Item {
         fields: ["Id", "Name", "Description"];
 
         Component.onDestruction: {
-            rolesProvider.collectionModel.modelChanged.disconnect(roleEditorContainer.updateModel);
+            rolesProvider.collectionModel.dataChanged.disconnect(roleEditorContainer.updateModel);
         }
 
         onModelUpdated: {

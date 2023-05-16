@@ -34,7 +34,7 @@ Rectangle {
 
     onSettingsModelChanged: {
         if (root.settingsModel != null){
-            root.settingsModel.modelChanged.connect(root.modelChanged);
+            root.settingsModel.dataChanged.connect(root.modelChanged);
             root.updateGui();
         }
     }

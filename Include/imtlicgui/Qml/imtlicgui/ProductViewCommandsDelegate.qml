@@ -18,8 +18,8 @@ DocumentWorkspaceCommandsDelegateBase {
         console.log("CollectionViewCommands onSelectedIndexChanged");
         let isEnabled = false;
 
-        if (container.selectedIndex != null && container.selectedIndex.itemData){
-            let level = container.selectedIndex.itemData.Level;
+        if (container.selectedIndex != null){
+            let level = container.selectedIndex.depth;
             if (level === 0){
                 isEnabled = true;
             }
@@ -27,24 +27,49 @@ DocumentWorkspaceCommandsDelegateBase {
 
         container.documentBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
         container.documentBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
-        container.documentBase.commandsProvider.setCommandIsEnabled("Duplicate", isEnabled);
     }
 
     onCommandActivated: {
         console.log("ProductsCommands onCommandActivated", commandId);
 
         if (commandId === "New"){
-            container.tableData.insertRow([container.tableData.rowCount], {"Id": "", "Name": "License Name", "Description": "", "Selected": true});
+            let count = container.tableData.rowModel.GetItemsCount();
+
+            let licensesModel = container.documentBase.documentModel.GetData("Items");
+//            licensesModel.InsertNewItemWithParameters(count, {"Id":"", "Name":"License Name", "Description":""})
+
+            let index = licensesModel.InsertNewItem();
+
+            licensesModel.SetData("Id", "", index);
+            licensesModel.SetData("Name", "License Name", index);
+            licensesModel.SetData("Description", "", index);
+
+            container.tableData.rowModel.InsertNewItemWithParameters(count, {"Id":"", "Name":"License Name", "Description":""})
+            container.documentBase.updateModel();
+
+            let item = container.tableData.getRootItemByIndex(count);
+            item.select();
         }
         else if (commandId === "Remove"){
             let selectedIndex = container.tableData.selectedIndex;
 
-            let indexes = selectedIndex.getIndexes();
-            if (indexes.length > 1){
-                return;
+            let licenseId = selectedIndex.itemData.Id;
+
+            if (container.documentBase.documentModel.ContainsKey("Features")){
+                let featuresModel = container.documentBase.documentModel.GetData("Features");
+                if (featuresModel.ContainsKey(licenseId)){
+                    featuresModel.RemoveData(licenseId);
+                }
             }
 
-            container.tableData.removeRow([selectedIndex.index]);
+            let licensesModel = container.documentBase.documentModel.GetData("Items");
+            licensesModel.RemoveItem(selectedIndex.getIndex());
+
+            container.tableData.rowModel.RemoveItem(selectedIndex.index);
+
+            container.documentBase.modelChanged();
+            container.documentBase.updateModel();
+            container.tableTreeViewEditor.resetSelection();
         }
     }
 
@@ -54,7 +79,6 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     property Component messageDialog: Component {
-//        id: messageDialog;
         MessageDialog {
             onFinished: {
                 if (buttonId == "Yes"){
@@ -67,7 +91,6 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     property Component setDescriptionDialog: Component {
-//        id: setDescriptionDialog;
         InputDialog {
             onFinished: {
                 if (buttonId == "Ok"){
@@ -81,8 +104,6 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     property Component popupMenu: Component {
-//        id: popupMenu;
-
         PopupMenuDialog {
             onFinished: {
                 console.log("DocumentView PopupMenuDialog", commandId);
@@ -92,7 +113,6 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     property Component editDialog: Component {
-//        id: editDialog;
         EditLicenseDialog {
             onFinished: {
                 if (buttonId == "Ok"){

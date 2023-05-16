@@ -5,7 +5,23 @@ import imtgui  1.0
 TreeViewItemDelegateBase {
     id: packageTreeItemDelegate;
 
-    //root: tableView;
+    onRootChanged: {
+        if (packageTreeItemDelegate.root != null){
+            packageTreeItemDelegate.root.tableSelection.singleSelect(packageTreeItemDelegate.modelIndex);
+        }
+    }
+
+    function idIsValid(id){
+        let delegateItems = packageTreeItemDelegate.root.getItemsDataAsList();
+        for (let item of delegateItems){
+            let itemData = item.getItemData();
+            if (itemData.Id === id){
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     rowBodyDelegate: Component{ Row {
             id: row;
@@ -15,7 +31,6 @@ TreeViewItemDelegateBase {
             Item {
                 id: nameItem;
 
-//                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * model.Level : 0;
                 width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * packageTreeItemDelegate.level : 0;
                 height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
@@ -30,7 +45,7 @@ TreeViewItemDelegateBase {
                     wrapMode: Text.WordWrap;
                     elide: Text.ElideRight;
 
-                    text: model.Name;
+                    text: model.Name ? model.Name : "";
                 }
 
                 MouseArea {
@@ -65,19 +80,17 @@ TreeViewItemDelegateBase {
                     }
 
                     onEditingFinished: {
-                        console.log("inputName onEditingFinished");
-
                         inputName.visible = false;
 
-                        if (model.Name != inputName.text){
+                        if (model.Name !== inputName.text){
+                            let id = inputName.text.replace(/\s+/g, '');
+
                             model.Name = inputName.text;
 
-                            if (model.Id == ""){
+                            if (model.Id === ""){
                                 let id = model.Name.replace(/\s+/g, '');
                                 model.Id = id;
                             }
-
-                            packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Name");
                         }
                     }
                 }
@@ -101,7 +114,7 @@ TreeViewItemDelegateBase {
                     wrapMode: Text.WordWrap;
                     elide: Text.ElideRight;
 
-                    text: model.Id;
+                    text: model.Id ? model.Id : "";
                 }
 
                 MouseArea {
@@ -135,17 +148,34 @@ TreeViewItemDelegateBase {
                         inputId.visible = false;
                     }
 
+                    property bool block: false
+
                     onEditingFinished: {
-                        console.log("inputName onEditingFinished");
+                        if (modalDialogManager.count > 0){
+                            return;
+                        }
 
                         inputId.visible = false;
 
-                        if (model.Id != inputId.text){
-                            model.Id = inputId.text;
-
-
-                            packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Id");
+                        if (model.Id !== inputId.text){
+                            let ok = packageTreeItemDelegate.root.canRename(model.Id);
+                            if (ok){
+                                model.Id = inputId.text;
+                            }
+                            else{
+                                packageTreeItemDelegate.root.openFeatureErrorDialog(qsTr("It is impossible to rename the feature, please remove all dependencies"));
+                            }
                         }
+
+//                        let ok = packageTreeItemDelegate.idIsValid(inputId.text);
+//                        if (ok){
+//                            if (model.Id !== inputId.text){
+//                                model.Id = inputId.text;
+//                            }
+//                        }
+//                        else{
+//                            packageTreeItemDelegate.root.openFeatureErrorDialog();
+//                        }
                     }
                 }
             }
@@ -167,7 +197,7 @@ TreeViewItemDelegateBase {
                     wrapMode: Text.WordWrap;
                     elide: Text.ElideRight;
 
-                    text: model.Description;
+                    text: model.Description ? model.Description : "";
                 }
 
                 MouseArea {
@@ -202,13 +232,10 @@ TreeViewItemDelegateBase {
                     }
 
                     onEditingFinished: {
-                        console.log("inputName onEditingFinished");
                         inputDescription.visible = false;
 
-                        if (model.Description != inputDescription.text){
+                        if (model.Description !== inputDescription.text){
                             model.Description = inputDescription.text;
-
-                            packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Description");
                         }
                     }
                 }
@@ -228,14 +255,10 @@ TreeViewItemDelegateBase {
 
                     checkState: model.Optional ? Qt.Checked : Qt.Unchecked;
 
-//                    visible: model.ChildModel ? model.ChildModel.count === 0 && packageTreeItemDelegate.level !== 0: packageTreeItemDelegate.level !== 0;
-
-                    visible: packageTreeItemDelegate.level === 0 ? false : model.ChildModel ? model.ChildModel.count === 0 :false;
+                    visible: packageTreeItemDelegate.level !== 0 && !packageTreeItemDelegate.hasChild;
 
                     onClicked: {
                         model.Optional = !model.Optional;
-
-                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Optional");
                     }
                 }
             }

@@ -7,15 +7,17 @@ FocusScope {
     width: root ? root.width : 0;
     height: root ? root.rowItemHeight : 0;
 
-    visible: model.Visible;
+    visible: delegate.isVisible;
 
     property Item root: null;
+    property var dataModel: model;
 
     property alias mouseArea: mouseAreaBase;
 
     property ModelIndex modelIndex: ModelIndex {
         itemData: model;
         index: model.index;
+        depth: delegate.level;
     };
 
     property int level: 0;
@@ -42,22 +44,44 @@ FocusScope {
 
     property alias prefixRowLoader: prefixRowLoaderObj;
 
-    property bool selected: model.Selected;
+    property bool selected: false;
+    property bool isActive: true;
+    property bool isVisible: true;
+    property bool isCheckable: true;
+    property int checkState: Qt.Unchecked;
 
     signal clicked();
 
     Component.onDestruction: {
-        delegate.root._removeItem(delegate.itemData);
+        delegate.root._removeItem(delegate);
+
+        delegate.root.tableSelection.selectionChanged.disconnect(delegate.selectionChanged);
     }
 
     onRootChanged:  {
-        if (model.index > 0 && model.Level == 0){
-            let prevItem = delegate.root.tableListView.itemAtIndex(model.index - 1);
-            delegate.modelIndex.prevIndex = prevItem.modelIndex;
-            prevItem.modelIndex.nextIndex = delegate.modelIndex;
-        }
+        delegate.root._addItem(delegate);
 
-        delegate.root._addItem(delegate.itemData);
+        delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
+    }
+
+    function selectionChanged(){
+        console.log("selectionChanged");
+        if (delegate.root){
+            delegate.selected = delegate.root.tableSelection.isSelected(delegate.modelIndex);
+        }
+    }
+
+    function getItemData(){
+        return delegate.itemData;
+    }
+
+    function select(){
+        if (delegate.root.tableSelection.isSelected(delegate.modelIndex)){
+            delegate.root.tableSelection.resetSelection();
+        }
+        else{
+            delegate.root.tableSelection.singleSelect(delegate.modelIndex);
+        }
     }
 
     Loader {
@@ -106,6 +130,10 @@ FocusScope {
             height: delegate.root ? delegate.root.rowItemHeight : 0;
 
             property var values: [];
+            property var columnModel: delegate.root ? delegate.root.columnModel : 0;
+            onColumnModelChanged: {
+                repeater.model = row.columnModel;
+            }
 
             Repeater {
                 id: repeater;
@@ -125,32 +153,15 @@ FocusScope {
 
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
-                        color: delegate.itemData.Active ? Style.textColor : Style.disabledInActiveTextColor;
+
+                        color: delegate.isActive ? Style.textColor : Style.disabledInActiveTextColor;
 
                         wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
 
-                        text: row.values[model.index]
+//                        text: row.values[model.index]
+                        text: delegate.dataModel[model.Id];
                     }
-
-                    Component.onCompleted: {
-                        if (model.index == 0){
-                            text_.width = delegate.root.width / delegate.root.columnCount - delegate.root.shiftLevel * model.Level;
-                        }
-                    }
-                }
-            }
-
-            property var columnModel: delegate.root.columnModel
-
-            onColumnModelChanged: {
-                if(delegate.root.columnModel){
-                    for (let i = 0; i < delegate.root.columnModel.count; i++){
-                        let id = delegate.root.columnModel.get(i).Id;
-                        row.values.push(model[id])
-                    }
-
-                    repeater.model = delegate.root.columnModel;
                 }
             }
         }
@@ -163,17 +174,6 @@ FocusScope {
         anchors.top: headerDelegateLoader.bottom;
     }
 
-    function updateSelection(){
-        if (delegate.root.selection.contains(model)){
-            delegate.root.selection.deselect(model);
-            delegate.root.selectedIndex = null;
-        }
-        else{
-            delegate.root.selection.select(model);
-            delegate.root.selectedIndex = delegate.modelIndex;
-        }
-    }
-
     MouseArea {
         id: mouseAreaBase;
 
@@ -182,9 +182,7 @@ FocusScope {
         z: -1;
 
         onClicked: {
-            if (!delegate.root.withoutSelection){
-                delegate.updateSelection();
-            }
+            delegate.select();
 
             delegate.clicked();
 
@@ -198,7 +196,5 @@ FocusScope {
         anchors.top: rowLoader.bottom;
 
         width: parent.width;
-
-//        sourceComponent: Item {}
     }
 }

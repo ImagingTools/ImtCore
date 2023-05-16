@@ -31,17 +31,17 @@ Item {
     PermissionsProvider {
         id: permissionsProvider;
 
-        Component.onDestruction: {
-            permissionsTable.rowModelDataChanged.disconnect(rolePermissionsContainer.updateModel);
-        }
+//        Component.onDestruction: {
+//            permissionsTable.rowModelDataChanged.disconnect(rolePermissionsContainer.updateModel);
+//        }
 
         onDataModelChanged: {
             if (permissionsProvider.dataModel != null){
-                let listModel = converter.convertToListModel(permissionsProvider.dataModel);
-                permissionsTable.rowModel = listModel;
+//                let listModel = converter.convertToListModel(permissionsProvider.dataModel);
+                permissionsTable.rowModel = permissionsProvider.dataModel;
                 rolePermissionsContainer.updateGui();
 
-                permissionsTable.rowModelDataChanged.connect(rolePermissionsContainer.updateModel);
+//                permissionsTable.rowModelDataChanged.connect(rolePermissionsContainer.updateModel);
             }
         }
 
@@ -72,12 +72,14 @@ Item {
 
         let itemsList = permissionsTable.getItemsDataAsList();
         for (let i = 0; i < itemsList.length; i++){
-            let id = itemsList[i].Id;
+            let delegateItem = itemsList[i];
+            let itemData = delegateItem.getItemData();
+            let id = itemData.Id;
             if (selectedPermissionsIds.includes(id)){
-                itemsList[i].CheckState = Qt.Checked;
+                delegateItem.checkState = Qt.Checked;
             }
             else{
-                itemsList[i].CheckState = Qt.Unchecked;
+                delegateItem.checkState = Qt.Unchecked;
             }
         }
 
@@ -85,14 +87,19 @@ Item {
     }
 
     function updateModel(){
-        console.log("documentModel1", rolePermissionsContainer.documentModel.toJSON());
+        if (rolePermissionsContainer.blockUpdatingModel){
+            return;
+        }
+
         rolePermissionsContainer.undoRedoManager.beginChanges();
 
         let selectedPermissionIds = []
         let itemsList = permissionsTable.getItemsDataAsList();
         for (let i = 0; i < itemsList.length; i++){
-            let id = itemsList[i].Id;
-            let state = itemsList[i].CheckState;
+            let delegateItem = itemsList[i];
+            let itemData = delegateItem.getItemData();
+            let id = itemData.Id;
+            let state = delegateItem.checkState;
             if (state === Qt.Checked){
                 selectedPermissionIds.push(id)
             }
@@ -173,15 +180,25 @@ Item {
 
         tristate: true;
 
+        rowDelegate: Component {
+            TreeViewItemDelegateBase{
+                root: permissionsTable;
+
+                onCheckStateChanged: {
+                    rolePermissionsContainer.updateModel();
+                }
+            }
+        }
+
         Component.onCompleted: {
             permissionsTable.addColumn({"Id": "Name", "Name": "Permission Name"});
         }
 
-        onRowModelDataChanged: {
-            if (!rolePermissionsContainer.blockUpdatingModel){
-                rolePermissionsContainer.updateModel();
-            }
-        }
+//        onRowModelDataChanged: {
+//            if (!rolePermissionsContainer.blockUpdatingModel){
+//                rolePermissionsContainer.updateModel();
+//            }
+//        }
 
         onSelectedIndexChanged: {
             if (selectedIndex != null && selectedIndex.itemData){

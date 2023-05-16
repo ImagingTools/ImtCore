@@ -33,7 +33,7 @@ Item {
                 groupsTable.elements = groupsProvider.collectionModel;
 
                 userGroupsContainer.updateGui();
-                groupsProvider.collectionModel.modelChanged.connect(userGroupsContainer.updateModel);
+                groupsProvider.collectionModel.dataChanged.connect(userGroupsContainer.updateModel);
             }
         }
     }
