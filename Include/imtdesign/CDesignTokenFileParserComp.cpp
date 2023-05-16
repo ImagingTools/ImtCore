@@ -298,7 +298,7 @@ QByteArray CDesignTokenFileParserComp::GetIconColor(const QByteArray& styleName,
 		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onSelectedColorParamName].toByteArray();
 	}
 
-	QByteArray();
+	return QByteArray();
 }
 
 
