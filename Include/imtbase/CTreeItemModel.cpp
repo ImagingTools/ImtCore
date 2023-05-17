@@ -67,6 +67,10 @@ void CTreeItemModel::SetParent(QObject* parent)
 
 bool CTreeItemModel::Copy(CTreeItemModel* object)
 {
+	if (object == nullptr){
+		return false;
+	}
+	
 	bool result = CopyFrom(*object);
 
 	return result;

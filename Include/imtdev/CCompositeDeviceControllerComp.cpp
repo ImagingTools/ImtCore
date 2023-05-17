@@ -293,7 +293,6 @@ void CCompositeDeviceControllerComp::OnDeviceListChanged(int modelId, const istd
 			imtbase::ICollectionInfo::Ids ids = deviceList.GetElementIds();
 
 			for (const imtbase::ICollectionInfo::Id id : ids){
-				QByteArray id = id;
 				QString name = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
 				QString description = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
