@@ -99,8 +99,12 @@ bool CSelection::Serialize(iser::IArchive& archive)
 		istd::CChangeGroup group(this);
 
 		ApplySelectionMode(selectionMode);
-		retVal = ApplySelection(Ids(selectedIds.cbegin(), selectedIds.cend()));
 
+#if QT_VERSION < 0x060000
+		retVal = ApplySelection(selectedIds.toSet());
+#else
+		retVal = ApplySelection(Ids(selectedIds.cbegin(), selectedIds.cend()));
+#endif
 		if (!retVal){
 			ApplySelection(Ids());
 		}
