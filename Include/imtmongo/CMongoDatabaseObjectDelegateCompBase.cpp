@@ -1,5 +1,9 @@
 #include <imtmongo/CMongoDatabaseObjectDelegateCompBase.h>
 
+//Qt includes
+
+#include <QtCore/QUuid>
+
 // mongocxx includes
 #include <bsoncxx/string/to_string.hpp>
 
@@ -35,6 +39,19 @@ QByteArray CMongoDatabaseObjectDelegateCompBase::GetObjectTypeId(const QByteArra
 	}
 
 	return QByteArray();
+}
+
+
+QByteArray CMongoDatabaseObjectDelegateCompBase::GetObjectIdFromMongoId(QByteArray mid) const
+{
+	char bid[12];
+	for(int i = 0;i<12 && i<mid.size();i++)
+		bid[i] = mid.data()[i];
+	uint *bi = (uint*)&bid;
+	QByteArray uId = QUuid(*bi, 0, 0,bid[4],bid[5],bid[6],bid[7],bid[8],bid[9],bid[10],bid[11])
+					.toByteArray();
+
+	return uId;
 }
 
 
@@ -283,6 +300,10 @@ QVariant CMongoDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const bs
 	return QVariant();
 }
 
+QString CMongoDatabaseObjectDelegateCompBase::GetTableName() const
+{
+	return  m_tableNameAttrPtr->GetValue();
+}
 
 } // namespace imtmongo
 

@@ -113,6 +113,11 @@ public:
 	*/
 	virtual QVariant GetElementInfoFromRecord(const bsoncxx::document::view& doc, const QString& infoId) const = 0;
 
+
+	virtual QByteArray GetObjectIdFromMongoId(QByteArray mid) const = 0;
+
+	virtual QString GetTableName() const = 0;
+
 };
 
 

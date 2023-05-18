@@ -1,9 +1,9 @@
 #pragma once
 
 // mongocxx includes
-//#include <bsoncxx/json.hpp>
-//#include <mongocxx/client.hpp>
-//#include <mongocxx/instance.hpp>
+#include <bsoncxx/json.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
 
 
 // ACF includes
@@ -44,8 +44,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, istd::IChangeable, ExtractDatabaseAccessSettings);
 		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, imod::IModel, ExtractDatabaseAccessSettings);
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Settings for database access", false, "DatabaseAccessSettings");
-		I_ASSIGN(m_dbTypeAttrPtr, "DbType", "The property holds database connections using the driver", true, "QPSQL");
-		I_ASSIGN(m_dbNameAttrPtr, "DbName", "The property holds connection's database name", true, "postgres");
+		I_ASSIGN(m_dbTypeAttrPtr, "DbType", "The property holds database connections using the driver", true, "MongoDB");
+		I_ASSIGN(m_dbNameAttrPtr, "DbName", "The property holds connection's database name", true, "agisbil");
 		I_ASSIGN(m_userNameAttrPtr, "UserName", "The property holds connection's user name", true, "postgres");
 		I_ASSIGN(m_paswordAttrPtr, "Pasword", "The property holds connection's password.", true, "12345");
 		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "localhost");
@@ -53,7 +53,7 @@ public:
 		I_ASSIGN(m_migrationFolderPathCompPtr, "MigrationFolderPath", "The property holds the folder contains SQL migraton script", false, "MigrationFolderPath");
 		I_ASSIGN(m_autoCreateDatabaseAttrPtr, "AutoCreateDatabase", "The property holds behavior to create database on startup.\n Possible values:\n0 - will not create new database;\n1 - will create database once;\n2 - will create database at each startup", true, 1);
 		I_ASSIGN(m_autoCreateTablesAttrPtr, "AutoCreateTables", "The property holds behavior to create tables on startup.\n Possible values:\n0 - will not create new tables;\n1 - will create tables once;\n2 - will create tables at each startup", true, 1);
-		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
+		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 270);
 	I_END_COMPONENT;
 
 	CMongoDatabaseEngineComp();
@@ -62,7 +62,7 @@ public:
 	static void DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what);
 	static void DrectBindValueUpdateDefault(QByteArray* string, const QByteArray& what);
 
-	mongocxx::database GetDatabase() override;
+	mongocxx::database* GetDatabase() override;
 
 protected:
 
@@ -110,7 +110,8 @@ private:
 
 	imod::TModelWrap<imtdb::CDatabaseAccessSettings> m_workingAccessSettings;
 
-	mongocxx::database m_database;
+	mongocxx::client * m_client;
+	mongocxx::database* m_database = nullptr;
 
 };
 

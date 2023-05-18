@@ -4,11 +4,14 @@
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/document/value.hpp>
+#include <bsoncxx/string/to_string.hpp>
+#include <bsoncxx/oid.hpp>
 
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 
 // Qt includes
+#include <QtCore/QtDebug>
 #include <QtCore/QSharedPointer>
 
 // ACF includes
@@ -85,8 +88,8 @@ QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
 	coll.insert_one(make_document(kvp("_oid", objectId.toStdString())));
 
 	return QByteArray();
@@ -95,8 +98,8 @@ QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 
 bool CMongoDatabaseObjectCollectionComp::RemoveElement(const Id& elementId)
 {
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
 	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", elementId.toStdString()));
 	coll.delete_one(doc);
 
@@ -106,12 +109,17 @@ bool CMongoDatabaseObjectCollectionComp::RemoveElement(const Id& elementId)
 
 const istd::IChangeable* CMongoDatabaseObjectCollectionComp::GetObjectPtr(const QByteArray& objectId) const
 {
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
-	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
-	bsoncxx::stdx::optional<bsoncxx::document::value> result = coll.find_one(doc);
-	if (result) {
-		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(result.value());
+	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
+
+	bsoncxx::oid id(objectId.data(),12);
+
+	bsoncxx::document::view_or_value filtr = bsoncxx::builder::basic::make_document(kvp("_id",id));
+	mongocxx::cursor cursor = coll.find(filtr);
+
+	for (bsoncxx::document::view doc : cursor)
+	{
+		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(doc);
 		return dataObjPtr;
 	}
 
@@ -125,13 +133,16 @@ bool CMongoDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectI
 		return false;
 	}
 
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
-	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
-	bsoncxx::stdx::optional<bsoncxx::document::value> result = coll.find_one(doc);
-	if (result) {
+	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll =(*db)[GetCollectionName().toStdString()];
+	bsoncxx::oid id(objectId.data(),12);
+	bsoncxx::document::view_or_value filtr = bsoncxx::builder::basic::make_document(kvp("_id",id));
 
-		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(result.value());
+	mongocxx::cursor cursor = coll.find(filtr);
+
+	for (bsoncxx::document::view doc : cursor)
+	{
+		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(doc);
 		dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
 			return dataObjPtr;
 		});
@@ -146,8 +157,8 @@ bool CMongoDatabaseObjectCollectionComp::SetObjectData(
 			const istd::IChangeable& object,
 			CompatibilityMode /*mode*/)
 {
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
 	bsoncxx::document::view_or_value oid = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
 	bsoncxx::document::view_or_value doc = m_objectDelegateCompPtr->CreateUpdateObjectQuery(objectId, object);
 	coll.update_one(oid, doc);
@@ -168,8 +179,8 @@ imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollect
 
 	if (m_objectDelegateCompPtr.IsValid()) {
 
-		mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-		mongocxx::collection coll = db[GetCollectionName().toStdString()];
+		mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+		mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
 		bsoncxx::document::view_or_value find_params ;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
 		mongocxx::options::find findOption;
 		findOption = findOption.limit(count);
@@ -236,8 +247,8 @@ int CMongoDatabaseObjectCollectionComp::GetElementsCount(
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
 
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
 	bsoncxx::document::view_or_value find_params;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
 	int count = coll.count_documents(find_params);
 
@@ -254,12 +265,19 @@ imtbase::ICollectionInfo::Ids CMongoDatabaseObjectCollectionComp::GetElementIds(
 {
 	Ids retVal;
 
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+
+	QString collName = GetCollectionName();
+	qDebug() << "collection name" << collName;
+
+	mongocxx::collection coll = (*db)[collName.toStdString()];
+
 	bsoncxx::document::view_or_value find_params ;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
 	mongocxx::options::find findOption;
-	findOption = findOption.limit(count);
-	findOption = findOption.skip(offset);
+	if(count > 0)
+		findOption = findOption.limit(count);
+	if(offset > 0)
+		findOption = findOption.skip(offset);
 	mongocxx::cursor cursor = coll.find(find_params, findOption);
 
 	// Iterate the cursor into bsoncxx::document::view objects.
@@ -268,14 +286,20 @@ imtbase::ICollectionInfo::Ids CMongoDatabaseObjectCollectionComp::GetElementIds(
 
 		if (id_ele.type() == bsoncxx::type::k_oid) {
 
-			const char* oid = id_ele.get_oid().value.bytes();
+			QByteArray Id(id_ele.get_oid().value.bytes());
+			retVal.push_back(Id);
 
-			retVal.push_back(oid);
 
-				std::cout << "OID: " << oid << std::endl;
-			} else {
-				std::cout << "Error: _id was not an object ID." << std::endl;
-			}
+			std::string oid = id_ele.get_oid().value.to_string();
+			QString id = QString::fromStdString(oid);
+			//retVal.push_back(id.toLocal8Bit());
+//			std::cout << "OID1: " << oid1<< std::endl;
+			std::cout << "OID2: " << oid<< std::endl;
+
+		} else {
+
+			std::cout << "Error: _id was not an object ID." << std::endl;
+		}
 	}
 
 	return retVal;
@@ -304,8 +328,8 @@ imtbase::IObjectCollectionIterator *CMongoDatabaseObjectCollectionComp::CreateOb
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	//mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = (*m_mongoDatabaseEngineCompPtr->GetDatabase())[GetCollectionName().toStdString()];
 	bsoncxx::document::view_or_value findParams ;//= m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(),offset,count,selectionParamsPtr)
 
 	mongocxx::options::find findOption;
@@ -409,8 +433,8 @@ QByteArray CMongoDatabaseObjectCollectionComp::GetCollectionName() const
 
 mongocxx::cursor CMongoDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& objectId) const
 {
-	mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
-	mongocxx::collection coll = db[GetCollectionName().toStdString()];
+	//mongocxx::database db = m_mongoDatabaseEngineCompPtr->GetDatabase();
+	mongocxx::collection coll = (*m_mongoDatabaseEngineCompPtr->GetDatabase())[GetCollectionName().toStdString()];
 	bsoncxx::document::view_or_value doc = bsoncxx::builder::basic::make_document(kvp("_id", objectId.toStdString()));
 	mongocxx::cursor cursor = coll.find(doc);
 	return cursor;

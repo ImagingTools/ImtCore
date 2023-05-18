@@ -83,6 +83,10 @@ public:
 
 	virtual QVariant GetElementInfoFromRecord(const bsoncxx::document::view& doc, const QString& infoId) const override;
 
+	virtual QByteArray GetObjectIdFromMongoId(QByteArray mid) const override;
+
+	virtual QString GetTableName() const override;
+
 protected:
 	virtual QString GetBaseSelectionQuery() const;
 	virtual idoc::IDocumentMetaInfo* CreateCollectionItemMetaInfo(const QByteArray& typeId) const;

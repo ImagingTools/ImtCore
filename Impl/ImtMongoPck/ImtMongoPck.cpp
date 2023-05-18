@@ -5,7 +5,7 @@
 #include <icomp/export.h>
 
 
-namespace ImtDatabasePck
+namespace ImtMongoPck
 {
 
 
@@ -25,6 +25,6 @@ I_EXPORT_COMPONENT(
 			"Mongo Database");
 
 
-} // namespace ImtDatabasePck
+} // namespace ImtMongoPck
 
 

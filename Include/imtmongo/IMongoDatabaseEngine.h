@@ -4,7 +4,6 @@
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
 
-
 // ACF includes
 #include <istd/IPolymorphic.h>
 
@@ -20,7 +19,7 @@ namespace imtmongo
 class IMongoDatabaseEngine: virtual public istd::IPolymorphic
 {
 public:
-	virtual mongocxx::database GetDatabase() = 0;
+	virtual mongocxx::database* GetDatabase() = 0;
 };
 
 

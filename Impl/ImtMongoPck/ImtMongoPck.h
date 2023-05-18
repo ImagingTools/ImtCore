@@ -12,9 +12,9 @@
 
 
 /**
-	ImtDatabasePck package
+	ImtMongoPck package
 */
-namespace ImtDatabasePck
+namespace ImtMongoPck
 {
 
 
@@ -22,6 +22,6 @@ typedef icomp::TModelCompWrap<imtmongo::CMongoDatabaseObjectCollectionComp> Mong
 typedef imtmongo::CMongoDatabaseEngineComp MongoDatabaseEngine;
 
 
-} // namespace ImtDatabasePck
+} // namespace ImtMongoPck
 
 

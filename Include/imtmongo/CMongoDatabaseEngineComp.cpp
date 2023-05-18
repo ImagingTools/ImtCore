@@ -1,7 +1,10 @@
 #include <imtmongo/CMongoDatabaseEngineComp.h>
 
+// mongocxx includes
+#include <bsoncxx/string/to_string.hpp>
 
 // Qt includes
+#include <QtCore/QtDebug>
 #include <QtCore/QDataStream>
 #include <QtCore/QRegularExpression>
 
@@ -15,6 +18,7 @@ namespace imtmongo
 CMongoDatabaseEngineComp::CMongoDatabaseEngineComp()
 	:m_databaseAccessObserver(*this)
 {
+
 }
 
 
@@ -57,13 +61,21 @@ void CMongoDatabaseEngineComp::DrectBindValueUpdateDefault(QByteArray* string, c
 }
 
 
-mongocxx::database CMongoDatabaseEngineComp::GetDatabase()
+mongocxx::database* CMongoDatabaseEngineComp::GetDatabase()
 {
-	mongocxx::instance inst{};
-	mongocxx::client client{mongocxx::uri{"mongodb://localhost:27017"}};
-	QString databaseName = GetDatabaseName();
-	mongocxx::database db = client[databaseName.toStdString()];
-	return db;
+	if(m_database == nullptr)
+	{
+		m_client = new mongocxx::client{mongocxx::uri{"mongodb://localhost:27017"}};
+		m_database = new mongocxx::database;
+
+		mongocxx::instance inst{};
+		//mongocxx::client client{mongocxx::uri{"mongodb://localhost:27017"}};
+		QString databaseName = GetDatabaseName();
+		qDebug() << "database " << databaseName;
+		*m_database = (*m_client)[databaseName.toStdString()];
+
+	}
+	return m_database;
 }
 
 
