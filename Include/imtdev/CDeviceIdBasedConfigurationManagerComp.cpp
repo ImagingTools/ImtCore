@@ -29,20 +29,28 @@ IDeviceConfigurationManager::DeviceConfigurationPtr CDeviceIdBasedConfigurationM
 {
 	DeviceConfigurationPtr configurationPtr;
 
-	if (!deviceId.isEmpty() && m_deviceControllerCompPtr.IsValid()){
+	if (!deviceId.isEmpty()){
 		const IDeviceStaticInfo* staticInfoPtr = nullptr;
-		if (GetStaticDeviceInfo(deviceId, &staticInfoPtr)){
-			if (m_configurations.contains(deviceId)){
+		GetStaticDeviceInfo(deviceId, &staticInfoPtr);
+
+		if (m_configurations.contains(deviceId)){
+			if (staticInfoPtr != nullptr){
 				if (staticInfoPtr->AreConfigurationAccepted(m_configurations[deviceId].data())) {
+					configurationPtr.reset(new iprm::CParamsSet());
 					configurationPtr->CopyFrom(*m_configurations[deviceId].data());
 				}
 				else{
+					configurationPtr.reset(new iprm::CParamsSet());
 					configurationPtr->CopyFrom(staticInfoPtr->GetDefaultConfiguration());
 				}
 			}
 			else{
-				configurationPtr->CopyFrom(staticInfoPtr->GetDefaultConfiguration());
+				configurationPtr->CopyFrom(*m_configurations[deviceId].data());
 			}
+		}
+		else if (staticInfoPtr != nullptr){
+			configurationPtr.reset(new iprm::CParamsSet());
+			configurationPtr->CopyFrom(staticInfoPtr->GetDefaultConfiguration());
 		}
 	}
 
@@ -52,19 +60,25 @@ IDeviceConfigurationManager::DeviceConfigurationPtr CDeviceIdBasedConfigurationM
 
 bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(const QByteArray& deviceId, const iprm::IParamsSet* configurationPtr)
 {
-	if (!deviceId.isEmpty() && configurationPtr != nullptr && m_deviceControllerCompPtr.IsValid()){
+	if (!deviceId.isEmpty() && configurationPtr != nullptr){
 		const IDeviceStaticInfo* staticInfoPtr = nullptr;
-		if (GetStaticDeviceInfo(deviceId, &staticInfoPtr)){
-			if (staticInfoPtr->AreConfigurationAccepted(configurationPtr)){
-				DeviceConfigurationPtr deviceConfigurationPtr(new iprm::CParamsSet);
-				if (deviceConfigurationPtr->CopyFrom(*configurationPtr)){
-					istd::CChangeNotifier notifier(this);
+		GetStaticDeviceInfo(deviceId, &staticInfoPtr);
 
-					m_configurations[deviceId] = deviceConfigurationPtr;
-
-					return true;
-				}
+		// If the (device is connected) && (the configuration is not compatible)
+		if (staticInfoPtr != nullptr){
+			if (!staticInfoPtr->AreConfigurationAccepted(configurationPtr)){
+				return false;
 			}
+		}
+
+		// If (device not connected) || (device connected && configuration compatible)
+		DeviceConfigurationPtr deviceConfigurationPtr(new iprm::CParamsSet);
+		if (deviceConfigurationPtr->CopyFrom(*configurationPtr)){
+			istd::CChangeNotifier notifier(this);
+
+			m_configurations[deviceId] = deviceConfigurationPtr;
+
+			return true;
 		}
 	}
 
