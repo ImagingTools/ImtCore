@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"File persistence for the device data",
 			"File Device Persistence Storage EEPROM");
 
+I_EXPORT_COMPONENT(
+			DeviceIdBasedConfigurationManager,
+			"Device ID based configuration manager",
+			"Device Configuration Manager");
+
 
 } // namespace ImtDevPck
 
