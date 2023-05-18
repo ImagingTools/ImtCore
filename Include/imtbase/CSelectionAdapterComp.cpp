@@ -51,6 +51,9 @@ bool CSelectionAdapterComp::SetSelectedIds(const Ids& selectedIds)
 {
 	if (selectedIds.count() <= 1){
 		if (selectedIds.isEmpty()){
+			istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
+			istd::CChangeNotifier notifier(this, &changeSet);
+
 			UpdateBlockerPtr blockerPtr = CreateUpdateBlocker();
 
 			return m_selectionCompPtr->SetSelectedOptionIndex(-1);
@@ -59,6 +62,9 @@ bool CSelectionAdapterComp::SetSelectedIds(const Ids& selectedIds)
 			int index = GetOptionIndex(*selectedIds.begin());
 
 			if (index >= 0){
+				istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
+				istd::CChangeNotifier notifier(this, &changeSet);
+
 				UpdateBlockerPtr blockerPtr = CreateUpdateBlocker();
 
 				return m_selectionCompPtr->SetSelectedOptionIndex(index);

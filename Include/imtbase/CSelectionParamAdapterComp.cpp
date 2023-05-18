@@ -50,6 +50,9 @@ bool CSelectionParamAdapterComp::SetSelectedOptionIndex(int index)
 	}
 
 	if (!id.isEmpty()){
+		istd::IChangeable::ChangeSet changeSet(CF_SELECTION_CHANGED);
+		istd::CChangeNotifier notifier(this, &changeSet);
+
 		UpdateBlockerPtr blockerPtr = CreateUpdateBlocker();
 
 		return m_selectionCompPtr->SetSelectedIds({ id });
