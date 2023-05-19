@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <iattr/IAttributesProvider.h>
 #include <iser/IVersionInfo.h>
 
 
@@ -23,8 +24,15 @@ public:
 
 	enum VersionIds
 	{
-		VI_FIRMWARE_REVISION = iser::IVersionInfo::UserVersionId,
-		VI_HARDWARE_REVISION
+		VI_FIRMWARE_VERSION_MAJOR = iser::IVersionInfo::UserVersionId,
+		VI_FIRMWARE_VERSION_MINOR,
+		VI_FIRMWARE_VERSION_PATCH,
+		VI_HARDWARE_VERSION_MAJOR,
+		VI_HARDWARE_VERSION_MINOR,
+		VI_HARDWARE_VERSION_PATCH,
+		VI_SDK_VERSION_MAJOR,
+		VI_SDK_VERSION_MINOR,
+		VI_SDK_VERSION_PATCH
 	};
 
 	/**
@@ -41,6 +49,8 @@ public:
 		Get device instance version
 	*/
 	virtual const iser::IVersionInfo& GetVersion() const = 0;
+
+	virtual const iattr::IAttributesProvider* GetDeviceInfo() const = 0;
 };
 
 
