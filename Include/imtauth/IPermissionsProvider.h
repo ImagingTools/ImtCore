@@ -14,7 +14,7 @@ namespace imtauth
 
 
 /**
-	Interface for providing permissions.
+	Interface for providing all permissions related to a product.
 	\ingroup Permission
 */
 class IPermissionsProvider: virtual public istd::IChangeable

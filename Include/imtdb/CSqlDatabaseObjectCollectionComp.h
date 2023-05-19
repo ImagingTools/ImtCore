@@ -74,8 +74,16 @@ public:
 	virtual bool RemoveElement(const Id& elementId) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
-	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr, const Id& parentId = Id(), int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual bool SetObjectData(
+				const Id& objectId,
+				const istd::IChangeable& object,
+				CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual imtbase::IObjectCollection* CreateSubCollection(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,
 				int count = -1,
@@ -121,9 +129,12 @@ public:
 protected:
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	QSqlRecord GetObjectRecord(const QByteArray& objectId) const;
-
-	void OnFilterParamsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* filterParamsPtr);
-	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
+	void OnFilterParamsChanged(
+				const istd::IChangeable::ChangeSet& changeSet,
+				const iprm::IParamsSet* filterParamsPtr);
+	void OnDatabaseAccessChanged(
+				const istd::IChangeable::ChangeSet& changeSet,
+				const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

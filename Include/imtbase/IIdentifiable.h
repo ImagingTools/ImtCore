@@ -9,6 +9,9 @@ namespace imtbase
 {
 
 
+/**
+	Something what can be identified inside of a closed system.
+*/
 class IIdentifiable: virtual public istd::IChangeable
 {
 public:

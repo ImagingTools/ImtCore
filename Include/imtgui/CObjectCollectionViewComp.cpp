@@ -25,9 +25,6 @@
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iwidgets/iwidgets.h>
 
-// ImtCore includes
-#include <imtbase/IObjectCollectionEvent.h>
-
 
 namespace imtgui
 {

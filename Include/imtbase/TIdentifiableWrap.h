@@ -168,6 +168,7 @@ bool TIdentifiableWrap<Base>::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_identifier.clear();
+
 	Base::ResetData();
 
 	return true;

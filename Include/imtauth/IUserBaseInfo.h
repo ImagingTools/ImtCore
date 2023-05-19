@@ -18,8 +18,7 @@ namespace imtauth
 	Interface for describing.
 	\ingroup UserBase
 */
-class IUserBaseInfo:
-		virtual public iser::IObject
+class IUserBaseInfo: virtual public iser::IObject
 {
 public:
 	typedef QList<QByteArray> FeatureIds;
