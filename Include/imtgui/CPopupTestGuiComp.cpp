@@ -67,7 +67,7 @@ void CPopupTestGuiComp::OnDesignSchemaChanged()
 
 // reimplemented (QObject)
 
-bool CPopupTestGuiComp::eventFilter(QObject* watched, QEvent* event)
+bool CPopupTestGuiComp::eventFilter(QObject* /*watched*/, QEvent* event)
 {
 	if (event->type() == QEvent::Move || event->type() == QEvent::Resize){
 		UpdateClientArea();
@@ -234,7 +234,7 @@ void CPopupTestGuiComp::on_AllowClosing_toggled(bool checked)
 }
 
 
-void CPopupTestGuiComp::on_UseAreaProvider_toggled(bool checked)
+void CPopupTestGuiComp::on_UseAreaProvider_toggled(bool /*checked*/)
 {
 	UpdateClientArea();
 }

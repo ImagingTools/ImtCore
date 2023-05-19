@@ -163,7 +163,7 @@ void CMenuPanelComp::OnGuiDesignChanged()
 {
 	BaseClass::OnGuiDesignChanged();
 
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/MenuPanel");
+	iqtgui::SetStyleSheetFromFile(GetWidget(), ":/Styles/MenuPanel");
 }
 
 

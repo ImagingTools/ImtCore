@@ -12,7 +12,7 @@ const float CAxisShape::s_zoomFontFactor = 50.0f;
 // public methods
 
 CAxisShape::CAxisShape()
-	:m_axisLength(0.0),
+	:m_axisLength(1.0),
 	m_axisRange(0.0, 1.0),
 	m_doUpdate(true)
 {

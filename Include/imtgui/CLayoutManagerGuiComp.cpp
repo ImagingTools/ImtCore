@@ -263,7 +263,7 @@ void CLayoutManagerGuiComp::OnGuiDesignChanged()
 {
 	BaseClass::OnGuiDesignChanged();
 
-	iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/CustomLayoutWidgetForm");
+	iqtgui::SetStyleSheetFromFile(GetWidget(), ":/Styles/CustomLayoutWidgetForm");
 }
 
 

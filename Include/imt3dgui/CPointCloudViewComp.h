@@ -28,6 +28,8 @@ public:
 		I_REGISTER_INTERFACE(imod::IModelEditor);
 		I_ASSIGN(m_pointSizeAttrPtr, "PointSize", "Size of the point used for rendering of the 3D-points in the cloud view", true, 3.0);
 		I_ASSIGN(m_showInfoBoxAttrPtr, "ShowInfoBox", "Show info box if enabled", true, false);
+		I_ASSIGN(m_defaultShowAxisAttrPtr, "ShowAxis", "If enabled, the axes are shown", true, true);
+		I_ASSIGN(m_defaultShowGridAttrPtr, "ShowGrid", "If enabled, the grid is shown", true, true);
 	I_END_COMPONENT
 
 protected:
@@ -61,6 +63,8 @@ private:
 
 	I_ATTR(double, m_pointSizeAttrPtr);
 	I_ATTR(bool, m_showInfoBoxAttrPtr);
+	I_ATTR(bool, m_defaultShowAxisAttrPtr);
+	I_ATTR(bool, m_defaultShowGridAttrPtr);
 };
 
 

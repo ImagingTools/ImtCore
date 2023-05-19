@@ -447,10 +447,10 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 
 			QWidget widget;
 
-			iqtgui::SetStyleSheetFromFile(widget, ":/Styles/ImtStyle");
+			iqtgui::SetStyleSheetFromFile(&widget, ":/Styles/ImtStyle");
 
 			QString geometryStyleSheet = widget.styleSheet();
-			iqtgui::SetStyleSheetFromFile(widget, colorSchema.stylePath);
+			iqtgui::SetStyleSheetFromFile(&widget, colorSchema.stylePath);
 
 			QString imtStyle = widget.styleSheet();
 			qApp->setStyleSheet(geometryStyleSheet + imtStyle);

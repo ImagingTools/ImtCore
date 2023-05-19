@@ -210,7 +210,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		}
 	}
 
-	if (m_rightsCommandsCompPtr.IsValid()) {
+	if (m_rightsCommandsCompPtr.IsValid()){
 		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_rightsCommandsCompPtr->GetCommands());
 		if (commandPtr != nullptr){
 			if (m_rightsCommandsToolBar == nullptr){
@@ -463,8 +463,8 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 {
 	BaseClass::OnGuiDesignChanged();
 
-	if (IsGuiCreated()) {
-		iqtgui::SetStyleSheetFromFile(*GetWidget(), ":/Styles/ThumbnailDecoratorGui");
+	if (IsGuiCreated()){
+		iqtgui::SetStyleSheetFromFile(GetWidget(), ":/Styles/ThumbnailDecoratorGui");
 
 		LoginControlButton->setIcon(GetIcon(":/Icons/Account"));
 		ExitButton->setIcon(GetIcon(":/Icons/PowerOff"));

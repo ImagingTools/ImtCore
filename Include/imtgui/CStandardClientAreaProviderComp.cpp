@@ -56,7 +56,7 @@ void CStandardClientAreaProviderComp::OnComponentCreated()
 
 // reimplemented (QObject)
 
-bool CStandardClientAreaProviderComp::eventFilter(QObject* watched, QEvent* event)
+bool CStandardClientAreaProviderComp::eventFilter(QObject* /*watched*/, QEvent* event)
 {
 	if (event->type() == QEvent::Move || event->type() == QEvent::Resize){
 		QWidget* windowPtr = GetWindow();

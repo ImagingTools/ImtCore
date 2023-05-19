@@ -8,8 +8,8 @@ namespace imt3dgui
 // public methods
 
 CGridShape::CGridShape()
-	:m_gridValue(0.0),
-	m_count(0),
+	:m_gridValue(0.2),
+	m_count(15),
 	m_doUpdate(true)
 {
 	m_pointsDataPtr = &m_data;

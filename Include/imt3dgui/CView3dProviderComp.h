@@ -117,8 +117,6 @@ public:
 		I_ASSIGN(m_defaultsUseAntialiasingAttrPtr, "UseAntialiasing", "Use rendering antialiasing", true, true);
 		I_ASSIGN(m_defaultsUseCullfaceAttrPtr, "UseCullFace", "Use cull face mode", true, true);
 		I_ASSIGN(m_defaultsUseBlendAttrPtr, "UseBlend", "Use blending mode", true, true);
-		I_ASSIGN(m_defaultShowAxisAttrPtr, "ShowAxis", "If enabled, the axes are shown", true, true);
-		I_ASSIGN(m_defaultShowGridAttrPtr, "ShowGrid", "If enabled, the grid is shown", true, true);
 	I_END_COMPONENT
 
 protected:
@@ -136,8 +134,6 @@ protected:
 	I_ATTR(bool, m_defaultsUseAntialiasingAttrPtr);
 	I_ATTR(bool, m_defaultsUseCullfaceAttrPtr);
 	I_ATTR(bool, m_defaultsUseBlendAttrPtr);
-	I_ATTR(bool, m_defaultShowAxisAttrPtr);
-	I_ATTR(bool, m_defaultShowGridAttrPtr);
 };
 
 

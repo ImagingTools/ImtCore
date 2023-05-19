@@ -37,6 +37,11 @@ I_EXPORT_COMPONENT(
 			"Style Design Manager");
 
 I_EXPORT_COMPONENT(
+			CompositeShapeView,
+			"3D View for list of shapes",
+			"3D View");
+
+I_EXPORT_COMPONENT(
 			AxisShape,
 			"3D-axis shape",
 			"3D Shape Axis");
@@ -56,6 +61,10 @@ I_EXPORT_COMPONENT(
 			"3D-mesh shape",
 			"3D Shape Mesh");
 
+I_EXPORT_COMPONENT(
+			WireShape,
+			"3D-wire shape",
+			"3D Shape Wire");
 
 } // namespace Imt3dGuiPck
 

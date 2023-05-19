@@ -25,6 +25,8 @@ public:
 		I_REGISTER_INTERFACE(imod::IObserver);
 		I_REGISTER_INTERFACE(imod::IModelEditor);
 		I_ASSIGN(m_showInfoBoxAttrPtr, "ShowInfoBox", "Show info box if enabled", true, false);
+		I_ASSIGN(m_defaultShowAxisAttrPtr, "ShowAxis", "If enabled, the axes are shown", true, true);
+		I_ASSIGN(m_defaultShowGridAttrPtr, "ShowGrid", "If enabled, the grid is shown", true, true);
 	I_END_COMPONENT
 
 protected:
@@ -57,6 +59,8 @@ private:
 	CRulerShape m_rulerShape;
 
 	I_ATTR(bool, m_showInfoBoxAttrPtr);
+	I_ATTR(bool, m_defaultShowAxisAttrPtr);
+	I_ATTR(bool, m_defaultShowGridAttrPtr);
 };
 
 
