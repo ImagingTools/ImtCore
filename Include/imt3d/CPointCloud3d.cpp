@@ -53,7 +53,7 @@ bool CPointCloud3d::InsertPoints(
 			int pointsCount,
 			const void* dataPtr)
 {
-	static ChangeSet appendChangeSet(CF_APPEND);
+	const ChangeSet appendChangeSet(CF_APPEND);
 	istd::CChangeNotifier changeNotifier(this, &appendChangeSet);
 
 	return Append(pointsCount, dataPtr);

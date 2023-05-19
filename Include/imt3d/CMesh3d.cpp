@@ -113,7 +113,7 @@ bool CMesh3d::CreateMesh(PointFormat pointFormat)
 
 bool CMesh3d::CreateMesh(PointFormat pointFormat, int pointsCount, const void* pointsDataPtr, const Indices& indices)
 {
-	static ChangeSet createChangeSet(CF_CREATE);
+	const ChangeSet createChangeSet(CF_CREATE);
 	istd::CChangeNotifier changeNotifier(this, &createChangeSet);
 
 	bool retVal = Create(pointFormat, pointsCount, pointsDataPtr);

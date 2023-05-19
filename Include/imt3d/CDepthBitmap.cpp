@@ -267,7 +267,7 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 				istd::CIndex2d size = inputBitmapPtr->GetImageSize();
 				
 				float minValue = std::numeric_limits<float>::max();
-				float maxValue = -std::numeric_limits<float>::max();
+				float maxValue = std::numeric_limits<float>::lowest();
 
 				for (int y = 0; y < size.GetY(); ++y){
 					const float* inputLinePtr = (const float*)inputBitmapPtr->GetLinePtr(y);
@@ -287,7 +287,10 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 					}
 				}
 
-				if (!size.IsZero()){
+				if (minValue == std::numeric_limits<float>::max()) minValue = 0;
+				if (maxValue == std::numeric_limits<float>::lowest()) maxValue = 1;
+
+				if (size.GetX() > 0 && size.GetY() > 0){
 					Q_ASSERT_X(maxValue >= minValue, "CDepthBitmap::CopyFrom", "Invalid depth range");
 				}
 	
