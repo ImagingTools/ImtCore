@@ -32,7 +32,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(const QByteArray&
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QString(" AND \"%1\".\"Id\" = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
+			baseQuery + QString(" AND \"%1\".Id = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -106,7 +106,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
-			retVal.query += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, CheckSum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
+			retVal.query += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
@@ -173,12 +173,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const istd::IChangeable& object, bool /*useExternDelegate*/) const
+			const istd::IChangeable& object,
+			const ContextDescription& contextDescription,
+			bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
 	QByteArray countRevisionsQuery = QString("SELECT COUNT(*) FROM \"%1\" WHERE %2 = '%3';")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId)).toUtf8();
 
 	QSqlError error;
@@ -212,7 +214,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(objectId))
 					.toLocal8Bit();
 
-		retVal += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, CheckSum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
+		retVal += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 					.arg(qPrintable(s_documentIdColumn))
 					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
@@ -220,14 +222,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(objectId))
 					.arg(qPrintable(documentContent.toBase64()))
 					.arg(revisionsCount + 1)
-					.arg("")
+					.arg(contextDescription.comment)
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum)
 					.toLocal8Bit();
 
-		if (m_metaInfoTableDelegateCompPtr.IsValid()) {
+		if (m_metaInfoTableDelegateCompPtr.IsValid()){
 			idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(&object, collection.GetObjectTypeId(objectId));
-			if (metaInfoPtr.IsValid()) {
+			if (metaInfoPtr.IsValid()){
 				retVal += "\n";
 
 				QByteArrayList columnIds = { s_idColumn, "RevisionId" };
@@ -237,7 +239,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 				tableValues.push_back("'" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "'");
 				tableValues.push_back("'" + revisionUuid + "'");
 
-				for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()) {
+				for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()){
 					QVariant data = metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId));
 
 					QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
@@ -260,10 +262,15 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*newObjectName*/) const
+			const QByteArray& objectId,
+			const QString& newObjectName) const
 {
-	QByteArray retVal;
+	QByteArray retVal = QString("UPDATE \"%1\" SET Name = '%2' WHERE %3 = '%4';")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(newObjectName)
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(objectId))
+				.toLocal8Bit();
 
 	return retVal;
 }
@@ -277,6 +284,171 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 	QByteArray retVal;
 
 	return retVal;
+}
+
+
+// reimplemented (imtbase::IRevisionController)
+
+imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp::GetRevisionInfoList(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
+
+	if ((*m_revisionsTableNameAttrPtr).isEmpty()){
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
+
+	QString revisionListQuery = QString("SELECT revisionnumber, lastmodified, comment from \"%1\" WHERE %2 = '%3'")
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(qPrintable(s_documentIdColumn))
+				.arg(qPrintable(objectId));
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(revisionListQuery.toLocal8Bit(), &sqlError);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Database collection");
+
+		return imtbase::IRevisionController::RevisionInfoList();
+	}
+
+	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
+
+	while (sqlQuery.next()){
+		QSqlRecord revisionRecord = sqlQuery.record();
+		RevisionInfo revisionInfo;
+
+		if (revisionRecord.contains("revisionnumber")){
+			revisionInfo.revision = revisionRecord.value("revisionnumber").toLongLong();
+		}
+
+		if (revisionRecord.contains("lastmodified")){
+			revisionInfo.timestamp = revisionRecord.value("lastmodified").toDateTime();
+		}
+
+		if (revisionRecord.contains("comment")){
+			revisionInfo.comment = revisionRecord.value("comment").toString();
+		}
+
+		revisionInfo.isRevisionAvailable = true;
+
+		revisionInfoList.push_back(revisionInfo);
+	}
+
+	return revisionInfoList;
+}
+
+
+int CSqlDatabaseDocumentDelegateComp::BackupObject(
+			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::ICollectionInfo::Id& objectId,
+			const QString& userComment) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return -1;
+	}
+
+	if ((*m_revisionsTableNameAttrPtr).isEmpty()){
+		return -1;
+	}
+
+	if (objectId.isEmpty()){
+		return -1;
+	}
+
+	QByteArray lastRevisionQuery = QString("SELECT %1 from \"%2\" WHERE %1 in (SELECT lastrevisionid from \"%3\" WHERE %1 = '%4')")
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.toLocal8Bit();
+
+	QByteArray lastRevisionNumberQuery = QString("SELECT revisionnumber from \"%2\" WHERE %1 in (SELECT lastrevisionid from \"%3\" WHERE %1 = '%4')")
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.toLocal8Bit();
+
+	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET comment = '%2' WHERE %3 in (%4)")
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(userComment)
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(lastRevisionQuery))
+				.toLocal8Bit();
+
+	m_databaseEngineCompPtr->ExecSqlQuery(updateCommentQuery);
+
+	QSqlQuery queryResult = m_databaseEngineCompPtr->ExecSqlQuery(lastRevisionNumberQuery);
+	if (queryResult.next()){
+		QSqlRecord record = queryResult.record();
+		if (record.contains("revisionnumber")){
+			return record.value("revisionnumber").toInt();
+		}
+	}
+
+	return -1;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
+			imtbase::IObjectCollection& collection,
+			const imtbase::ICollectionInfo::Id& objectId,
+			int revision) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	if (!m_documentFactoriesCompPtr.IsValid()){
+		return false;
+	}
+
+	QString revisionIdQuery  = QString("SELECT %5 from \"%1\" WHERE %2 = '%3' AND revisionNumber = %4")
+				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
+				.arg(qPrintable(s_documentIdColumn))
+				.arg(qPrintable(objectId))
+				.arg(revision)
+				.arg(qPrintable(s_idColumn));
+
+	QByteArray revisionUuid;
+	QSqlQuery queryResult = m_databaseEngineCompPtr->ExecSqlQuery(revisionIdQuery.toLocal8Bit());
+	if (queryResult.next()){
+		QSqlRecord record = queryResult.record();
+		if (record.contains(qPrintable(s_idColumn))){
+			revisionUuid = record.value(qPrintable(s_idColumn)).toByteArray();
+		}
+	}
+
+	if (revisionUuid.isEmpty()){
+		return false;
+	}
+
+	QString setActiveRevisionQuery = QString("UPDATE \"%1\" SET LastRevisionId = '%2' WHERE %3 = '%4';")
+		.arg(qPrintable(*m_tableNameAttrPtr))
+		.arg(qPrintable(revisionUuid))
+		.arg(qPrintable(s_idColumn))
+		.arg(qPrintable(objectId))
+		.toLocal8Bit();
+
+	istd::CChangeNotifier changeNotifier(&collection);
+
+	QSqlError sqlError;
+	m_databaseEngineCompPtr->ExecSqlQuery(setActiveRevisionQuery.toLocal8Bit(), &sqlError);
+
+	return sqlError.type() == QSqlError::NoError;
+}
+
+
+bool CSqlDatabaseDocumentDelegateComp::ExportObject(
+			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::ICollectionInfo::Id& /*objectId*/,
+			int /*revision*/,
+			const QString& /*filePath*/) const
+{
+	return false;
 }
 
 
@@ -538,23 +710,20 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRec
 
 // protected methods
 
-const ifile::IFilePersistence * CSqlDatabaseDocumentDelegateComp::FindDocumentPersistence(const QByteArray& typeId) const
+const ifile::IFilePersistence* CSqlDatabaseDocumentDelegateComp::FindDocumentPersistence(const QByteArray& typeId) const
 {
 	int persistenceIndex = -1;
 
-	if (m_typesCompPtr.IsValid()) {
-		for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i) {
-			if (typeId == m_typesCompPtr->GetOptionId(i)) {
+	if (m_typesCompPtr.IsValid()){
+		for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i){
+			if (typeId == m_typesCompPtr->GetOptionId(i)){
 				persistenceIndex = i;
 				break;
 			}
 		}
 	}
-    if(persistenceIndex == -1 & m_typesCompPtr->GetOptionsCount() == 1){
-        persistenceIndex = 0;
-    }
 
-	if ((persistenceIndex >= 0) && persistenceIndex < m_documentPersistenceListCompPtr.GetCount()) {
+	if ((persistenceIndex >= 0) && persistenceIndex < m_documentPersistenceListCompPtr.GetCount()){
 		return m_documentPersistenceListCompPtr[persistenceIndex];
 	}
 

@@ -11,9 +11,10 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/IRevisionController.h>
 #include <imtbase/CParamsSetJoiner.h>
-#include <imtdb/CDatabaseEngineComp.h>
 #include <imtbase/CObjectCollection.h>
+#include <imtdb/CDatabaseEngineComp.h>
 #include <imtdb/CSqlDatabaseObjectCollectionIterator.h>
 
 
@@ -35,6 +36,10 @@ CSqlDatabaseObjectCollectionComp::CSqlDatabaseObjectCollectionComp()
 
 const imtbase::IRevisionController* CSqlDatabaseObjectCollectionComp::GetRevisionController() const
 {
+	if (m_objectDelegateCompPtr.IsValid()){
+		return CompCastPtr<imtbase::IRevisionController>(m_objectDelegateCompPtr.GetPtr());
+	}
+
 	return nullptr;
 }
 
@@ -197,7 +202,9 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object);
+	imtdb::IDatabaseObjectDelegate::ContextDescription description;
+
+	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object, description);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -230,18 +237,18 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
-	if (m_objectDelegateCompPtr.IsValid()) {
+	if (m_objectDelegateCompPtr.IsValid()){
 		QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(QByteArray(), offset, count, &filterParams);
-		if (objectSelectionQuery.isEmpty()) {
+		if (objectSelectionQuery.isEmpty()){
 			return nullptr;
 		}
 
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(objectSelectionQuery, &sqlError, true);
 
-		while (sqlQuery.next()) {
+		while (sqlQuery.next()){
 			istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(sqlQuery.record());
-			DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr]() {
+			DataPtr dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
 				return dataObjPtr;
 				});
 
@@ -265,6 +272,9 @@ const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo()
 	if (m_objectDelegateCompPtr.IsValid()){
 		return m_objectDelegateCompPtr->GetObjectTypeInfos();
 	}
+	else {
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+	}
 
 	return nullptr;
 }
@@ -274,6 +284,9 @@ imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetObjectTypeId(c
 {
 	if (m_objectDelegateCompPtr.IsValid()){
 		return m_objectDelegateCompPtr->GetObjectTypeId(objectId);
+	}
+	else{
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
 	}
 
 	return QByteArray();
@@ -293,6 +306,9 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& ob
 			return objectMetaInfoPtr;
 		}
 	}
+	else{
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+	}
 
 	return idoc::MetaInfoPtr();
 }
@@ -305,26 +321,36 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount(
 			const Id& /*parentId*/,
 			int /*iterationFlags*/) const
 {
+	if (!m_objectDelegateCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+
+		return 0;
+	}
+
+	if (!m_dbEngineCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
+
+		return 0;
+	}
+
 	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
 
-	if (m_objectDelegateCompPtr.IsValid()){
-		QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(&filterParams);
-		if (!countQuery.isEmpty()){
-			QSqlError sqlError;
-			QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
+	QByteArray countQuery = m_objectDelegateCompPtr->GetCountQuery(&filterParams);
+	if (!countQuery.isEmpty()){
+		QSqlError sqlError;
+		QSqlQuery result = m_dbEngineCompPtr->ExecSqlQuery(countQuery, &sqlError);
 
-			if (sqlError.type() == QSqlError::NoError){
-				if (result.first()){
-					return result.value(0).toInt();
-				}
-			}
-			else{
-				SendErrorMessage(0, sqlError.text(), "Database collection");
+		if (sqlError.type() == QSqlError::NoError){
+			if (result.first()){
+				return result.value(0).toInt();
 			}
 		}
 		else{
-			SendErrorMessage(0, "Database query could not be created", "Database collection");
+			SendErrorMessage(0, sqlError.text(), "Database collection");
 		}
+	}
+	else{
+		SendErrorMessage(0, "Database query could not be created", "Database collection");
 	}
 
 	return 0;
@@ -375,12 +401,12 @@ bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
 }
 
 
-imtbase::IObjectCollectionIterator *CSqlDatabaseObjectCollectionComp::CreateObjectCollectionIterator(
-			int offset, 
-			int count, 
-			const iprm::IParamsSet *selectionParamsPtr, 
-			const Id &parentId, 
-			int iterationFlags) const
+imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObjectCollectionIterator(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
@@ -445,6 +471,9 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 			}
 		}
 	}
+	else{
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+	}
 
 	return QVariant();
 }
@@ -463,6 +492,9 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id&
 			return collectionMetaInfoPtr;
 		}
 	}
+	else{
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+	}
 
 	return idoc::MetaInfoPtr();
 }
@@ -471,6 +503,8 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id&
 bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+
 		return false;
 	}
 
@@ -508,6 +542,8 @@ bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const
 bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+	
 		return false;
 	}
 
@@ -544,17 +580,23 @@ bool CSqlDatabaseObjectCollectionComp::SetElementEnabled(const Id& /*objectId*/,
 bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+
 		return false;
 	}
+
 	QByteArray resetQuery = m_objectDelegateCompPtr->CreateResetQuery(*this);
 	if (resetQuery.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
+
 		return false;
 	}
 	if (ExecuteTransaction(resetQuery)){
 		istd::CChangeNotifier changeNotifier(this);
+
 		return true;
 	}
+
 	return false;
 }
 
@@ -563,6 +605,12 @@ bool CSqlDatabaseObjectCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQuery) const
 {
+	if (!m_dbEngineCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
+
+		return false;
+	}
+
 	QStringList queryList = QString(qPrintable(sqlQuery)).split(";");
 
 	m_dbEngineCompPtr->BeginTransaction();
@@ -591,6 +639,18 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 
 QSqlRecord CSqlDatabaseObjectCollectionComp::GetObjectRecord(const QByteArray& objectId) const
 {
+	if (!m_objectDelegateCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
+
+		return QSqlRecord();
+	}
+
+	if (!m_dbEngineCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
+
+		return QSqlRecord();
+	}
+
 	QByteArray objectSelectionQuery = m_objectDelegateCompPtr->GetSelectionQuery(objectId);
 	if (!objectSelectionQuery.isEmpty()){
 		QSqlError sqlError;
@@ -644,7 +704,7 @@ void CSqlDatabaseObjectCollectionComp::OnComponentDestroyed()
 	m_filterParamsObserver.UnregisterAllObjects();
 	m_databaseAccessObserver.UnregisterAllObjects();
 
-    BaseClass::OnComponentDestroyed();
+	BaseClass::OnComponentDestroyed();
 }
 
 } // namespace imtdb

@@ -69,8 +69,8 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 		return nullptr;
 	}
 
-	if (record.contains(*m_documentContentColumnIdAttrPtr)){
-		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
+	if (record.contains("Document")){
+		QByteArray documentContent = record.value(qPrintable("Document")).toByteArray();
 
 		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
 			return documentPtr.PopPtr();
@@ -139,6 +139,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
+			const ContextDescription& /*description*/,
 			bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
@@ -335,7 +336,11 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
 	if (!paramIds.isEmpty()){
+#if QT_VERSION < 0x060000
+		QByteArrayList idsList(paramIds.toList());
+#else
 		QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
+#endif
 		for (int i = 0; i < idsList.size(); i++){
 			QByteArray key = idsList[i];
 

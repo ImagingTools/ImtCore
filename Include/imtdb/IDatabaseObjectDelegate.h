@@ -32,6 +32,19 @@ public:
 		QString objectName;
 	};
 
+	struct ContextDescription
+	{
+		/**
+			ID of the initiator of the operation. E.g user-ID
+		*/
+		QString contextOwnerId;
+
+		/**
+			Description/comment related to the operation.
+		*/
+		QString comment;
+	};
+
 	/**
 		Get information about supported object types.
 	*/
@@ -84,6 +97,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
+				const ContextDescription& contextDescription,
 				bool useExternDelegate = true) const = 0;
 
 	/**

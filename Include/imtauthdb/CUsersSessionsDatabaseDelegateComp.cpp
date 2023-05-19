@@ -43,8 +43,8 @@ istd::IChangeable* CUsersSessionsDatabaseDelegateComp::CreateObjectFromRecord(co
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& /*proposedObjectId*/,
-			const QString& objectName,
-			const QString& objectDescription,
+			const QString& /*objectName*/,
+			const QString& /*objectDescription*/,
 			const istd::IChangeable* valuePtr) const
 {
 	const imtauth::ISession* sessionPtr = dynamic_cast<const imtauth::ISession*>(valuePtr);
@@ -68,17 +68,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 
 
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/) const
 {
 	return QByteArray();
 }
 
 
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const istd::IChangeable& /*object*/,
+			const ContextDescription& /*context*/,
 			bool /*useExternDelegate*/) const
 {
 	return QByteArray();
@@ -86,18 +87,18 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& newObjectName) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/) const
 {
 	return QByteArray();
 }
 
 
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& description) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/) const
 {
 	return QByteArray();
 }

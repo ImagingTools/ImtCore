@@ -327,7 +327,11 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
 	if (!paramIds.isEmpty()){
+#if QT_VERSION < 0x060000
+		QByteArrayList idsList(paramIds.toList());
+#else
 		QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
+#endif
 		QByteArray key = idsList[0];
 
 		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));

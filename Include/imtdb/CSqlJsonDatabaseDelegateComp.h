@@ -16,6 +16,7 @@ public:
 
 	I_BEGIN_COMPONENT(CSqlJsonDatabaseDelegateComp)
 		I_ASSIGN(m_isMultiTypeAttrPtr, "IsMultiType", "Is document multitype supported", true, false);
+		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -38,6 +39,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
+				const ContextDescription& description,
 				bool useExternDelegate = true) const override;
 	virtual QByteArray CreateDescriptionObjectQuery(
 				const imtbase::IObjectCollection& collection,
@@ -55,6 +57,7 @@ public:
 
 protected:
 	I_ATTR(bool, m_isMultiTypeAttrPtr);
+	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 };
 
 

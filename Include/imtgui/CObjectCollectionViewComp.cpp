@@ -93,7 +93,11 @@ imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 		}
 	}
 
+#if QT_VERSION < 0x060000
+	ISelection::Ids ids(itemIds.toList().toSet());
+#else
 	ISelection::Ids ids(itemIds.cbegin(), itemIds.cend());
+#endif
 
 	return ids;
 }

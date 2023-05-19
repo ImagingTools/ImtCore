@@ -3,7 +3,12 @@
 
 // Qt includes
 #include <QtCore/QMap>
-#include <QtCore/QRecursiveMutex>
+
+#if QT_VERSION < 0x060000
+	#include <QtCore/QMutex>
+#else
+	#include <QtCore/QRecursiveMutex>
+#endif
 
 // ACF includes
 #include <imod/TModelWrap.h>

@@ -2,7 +2,11 @@
 
 
 // Qt includes
-#include <QtCore/QRecursiveMutex>
+#if QT_VERSION < 0x060000
+	#include <QtCore/QMutex>
+#else
+	#include <QtCore/QRecursiveMutex>
+#endif
 
 // ACF includes
 #include <imod/TModelWrap.h>
@@ -59,7 +63,12 @@ protected:
 
 protected:
 	QMap<QByteArray, DeviceAccessorPtr> m_openedDevices;
+
+#if QT_VERSION < 0x060000
+	mutable QMutex m_openedDevicesMutex;
+#else
 	mutable QRecursiveMutex m_openedDevicesMutex;
+#endif
 
 private:
 	void AutoCloseDisconnectedDevices();

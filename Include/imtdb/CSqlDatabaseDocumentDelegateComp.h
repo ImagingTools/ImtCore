@@ -5,6 +5,7 @@
 #include <ifile/IFilePersistence.h>
 
 // ImtCore includes
+#include <imtbase/IRevisionController.h>
 #include <imtdb/IMetaInfoTableDelegate.h>
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
 
@@ -13,16 +14,19 @@ namespace imtdb
 {
 
 
-class CSqlDatabaseDocumentDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+class CSqlDatabaseDocumentDelegateComp:
+			public imtdb::CSqlDatabaseObjectDelegateCompBase,
+			virtual public imtbase::IRevisionController
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSqlDatabaseDocumentDelegateComp)
+		I_REGISTER_INTERFACE(imtbase::IRevisionController);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
 		I_ASSIGN(m_metaInfoTableDelegateCompPtr, "MetaInfoTableDelegate", "Delegate for the table containing meta-informations for the document type", false, "MetaInfoTableDelegate");
-		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumentContentColumnId", "ID of the column in the table containing document content", true, "Document");
+		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumntContentColumnId", "ID of the column in the table containing document content", true, "Document");
 		I_ASSIGN(m_metaInfoTableNameAttrPtr, "MetaInfoTableName", "Name of the meta-info table", true, "");
 		I_ASSIGN(m_revisionsTableNameAttrPtr, "RevisionsTableName", "Name of the table contained document revisions", true, "");
 	I_END_COMPONENT
@@ -47,6 +51,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
+				const ContextDescription& description,
 				bool useExternDelegate = true) const override;
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,
@@ -56,6 +61,25 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
+
+	// reimplemented (imtbase::IRevisionController)
+	virtual RevisionInfoList GetRevisionInfoList(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId) const override;
+	virtual int BackupObject(
+				const imtbase::IObjectCollection& collection,
+				const imtbase::ICollectionInfo::Id& objectId,
+				const QString& userComment = QString()) const override;
+	virtual bool RestoreObject(
+				imtbase::IObjectCollection& collection,
+				const imtbase::ICollectionInfo::Id& objectId,
+				int revision) const override;
+	virtual bool ExportObject(
+				const imtbase::IObjectCollection& collection,
+				const imtbase::ICollectionInfo::Id& objectId,
+				int revision,
+				const QString& filePath) const override;
+
 protected:
 	virtual istd::IChangeable* CreateObject(const QByteArray& typeId) const;
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const;

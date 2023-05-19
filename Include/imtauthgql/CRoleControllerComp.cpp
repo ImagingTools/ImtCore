@@ -3,15 +3,13 @@
 
 // ImtCore includes
 #include <imtauth/CRole.h>
-#include <imtlic/CFeatureInfo.h>
-#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtauthgql
 {
 
 
-imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString &errorMessage) const
+imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -19,7 +17,7 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
+	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr = new imtbase::CTreeItemModel();
 
 	const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
 	QByteArray objectId = GetObjectIdFromInputParams(*inputParams);
@@ -37,6 +35,7 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
+
 			return nullptr;
 		}
 
@@ -61,21 +60,22 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
+	rootModelPtr->SetExternTreeModel("data", dataModelPtr.PopPtr());
 
 	return rootModelPtr.PopPtr();
 }
 
 
-istd::IChangeable *CRoleControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray& objectId,
-		QString& name,
-		QString& description,
-		QString& errorMessage) const
+istd::IChangeable* CRoleControllerComp::CreateObject(
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
 {
 	if (!m_roleFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
+
 		return nullptr;
 	}
 
@@ -160,8 +160,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 				for (const QByteArray& parentRoleId : parentRoleIds){
 					if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
 						errorMessage = QT_TR_NOOP(QString("Unable include role %1 to the role %2. Check the dependencies between them.")
-												  .arg(qPrintable(parentRoleId))
-												  .arg(qPrintable(roleId)));
+									.arg(qPrintable(parentRoleId))
+									.arg(qPrintable(roleId)));
 
 						return nullptr;
 					}
@@ -173,7 +173,8 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 			QByteArray permissions = itemModel.GetData("Permissions").toByteArray();
 			if (!permissions.isEmpty()){
 				QByteArrayList permissionIds = permissions.split(';');
-				roleInfoPtr->SetLocalPermissions(imtauth::IRole::FeatureIds(permissionIds.begin(), permissionIds.end()));
+
+				roleInfoPtr->SetLocalPermissions(permissionIds);
 			}
 		}
 
@@ -185,3 +186,5 @@ istd::IChangeable *CRoleControllerComp::CreateObject(
 
 
 } // namespace imtauthgql
+
+

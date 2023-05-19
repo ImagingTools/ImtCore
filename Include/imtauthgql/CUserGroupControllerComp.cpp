@@ -70,9 +70,9 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 
 istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray &objectId,
-		QString &name,
-		QString &description,
+		QByteArray& objectId,
+		QString& name,
+		QString& /*description*/,
 		QString& errorMessage) const
 {
 
@@ -131,16 +131,17 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		userGroupInfoPtr->SetId(objectId);
 
 		if (itemModel.ContainsKey("Description")){
-			QString description = itemModel.GetData("Description").toString();
+			QString groupDescription = itemModel.GetData("Description").toString();
 
-			userGroupInfoPtr->SetDescription(description);
+			userGroupInfoPtr->SetDescription(groupDescription);
 		}
 
 		if (itemModel.ContainsKey("Users")){
 			QByteArray users = itemModel.GetData("Users").toByteArray();
 			if (!users.isEmpty()){
 				QByteArrayList userIds = users.split(';');
-				userGroupInfoPtr->SetUsers(imtauth::IUserGroupInfo::UserIds(userIds.begin(), userIds.end()));
+
+				userGroupInfoPtr->SetUsers(userIds);
 			}
 		}
 
@@ -148,7 +149,8 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 			QByteArray roles = itemModel.GetData("Roles").toByteArray();
 			if (!roles.isEmpty()){
 				QByteArrayList roleIds = roles.split(';');
-				userGroupInfoPtr->SetRoles(imtauth::IUserGroupInfo::RoleIds(roleIds.begin(), roleIds.end()));
+
+				userGroupInfoPtr->SetRoles(roleIds);
 			}
 		}
 

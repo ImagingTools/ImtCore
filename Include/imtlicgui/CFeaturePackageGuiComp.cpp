@@ -339,8 +339,12 @@ void CFeaturePackageGuiComp::OnFeatureSelectionChanged(
 	if (featureCollectionIds.count() == 1){
 		imtlic::IFeaturePackage* packagePtr = GetObservedObject();
 		if (packagePtr != nullptr){
-			const imtlic::IFeatureInfo* featurePtr = packagePtr->GetFeatureInfo(
-						QByteArrayList(featureCollectionIds.cbegin(), featureCollectionIds.cend()).first());
+
+#if QT_VERSION < 0x060000
+			const imtlic::IFeatureInfo* featurePtr = packagePtr->GetFeatureInfo(featureCollectionIds.toList().first());
+#else
+			const imtlic::IFeatureInfo* featurePtr = packagePtr->GetFeatureInfo(QByteArrayList(featureCollectionIds.cbegin(), featureCollectionIds.cend()).first());
+#endif
 			if (featurePtr != nullptr){
 				m_selectedFeatureId = featurePtr->GetFeatureId();
 			}

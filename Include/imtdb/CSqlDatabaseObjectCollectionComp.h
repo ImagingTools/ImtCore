@@ -133,7 +133,7 @@ protected:
 	I_REF(IDatabaseEngine, m_dbEngineCompPtr);
 
 private:
-    I_FACT(imtbase::IObjectCollection, m_objectCollectionFactoryCompPtr);
+	I_FACT(imtbase::IObjectCollection, m_objectCollectionFactoryCompPtr);
 	I_REF(ISqlDatabaseObjectDelegate, m_objectDelegateCompPtr);
 	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_REF(iprm::IParamsSet, m_filterParamsCompPtr);

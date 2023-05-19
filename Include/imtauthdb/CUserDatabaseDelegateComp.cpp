@@ -21,7 +21,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		const QByteArray& /*typeId*/,
 		const QByteArray& proposedObjectId,
 		const QString& objectName,
-		const QString& objectDescription,
+		const QString& /*objectDescription*/,
 		const istd::IChangeable* valuePtr) const
 {
 	NewObjectQuery retVal;
@@ -47,8 +47,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 				if (userGroupInfoPtr != nullptr){
 					userGroupInfoPtr->AddUser(objectId);
-
-					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
+					ContextDescription context;
+					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
+								*m_userGroupCollectionCompPtr,
+								groupId,
+								*userGroupInfoPtr,
+								context,
+								false);
 				}
 			}
 		}
@@ -78,6 +83,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
 		const istd::IChangeable& object,
+		const ContextDescription& /*description*/,
 		bool useExternDelegate) const
 {
 	const imtauth::IUserInfo* oldObjectPtr = nullptr;
@@ -124,7 +130,15 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userGroupInfoPtr != nullptr){
 					if (!userGroupInfoPtr->GetUsers().contains(objectId)){
 						userGroupInfoPtr->AddUser(objectId);
-						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
+
+						ContextDescription context;
+
+						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
+									*m_userGroupCollectionCompPtr,
+									groupId,
+									*userGroupInfoPtr,
+									context,
+									false);
 					}
 				}
 			}
@@ -137,7 +151,14 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userGroupInfoPtr != nullptr){
 					bool result = userGroupInfoPtr->RemoveUser(objectId);
 					if (result){
-						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userGroupCollectionCompPtr, groupId, *userGroupInfoPtr, false);
+						ContextDescription context;
+
+						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
+									*m_userGroupCollectionCompPtr,
+									groupId,
+									*userGroupInfoPtr,
+									context,
+									false);
 					}
 				}
 			}

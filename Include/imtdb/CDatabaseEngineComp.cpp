@@ -1,3 +1,23 @@
+/********************************************************************************
+**
+**	Copyright (C) 2017-2020 ImagingTools GmbH
+**
+**	This file is part of the ImagingTools SDK.
+**
+**	This file may be used under the terms of the GNU Lesser
+**	General Public License version 2.1 as published by the Free Software
+**	Foundation and appearing in the file LicenseLGPL.txt included in the
+**	packaging of this file.  Please review the following information to
+**	ensure the GNU Lesser General Public License version 2.1 requirements
+**	will be met: http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
+**
+**	If you are unsure which license is appropriate for your use, please
+**	contact us at info@imagingtools.de.
+**
+**
+********************************************************************************/
+
+
 #include <imtdb/CDatabaseEngineComp.h>
 
 
@@ -93,7 +113,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 		retVal.bindValue(value.key(), *value);
 	}
 
-    retVal.exec();
+	retVal.exec();
 
 	if (sqlError){
 		*sqlError = databaseConnection.lastError().type() ? databaseConnection.lastError() : retVal.lastError();
@@ -194,8 +214,6 @@ bool CDatabaseEngineComp::OpenDatabase() const
 
 	databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
 	QString databaseName = GetDatabaseName();
-	qDebug() << "Open database" << GetDatabaseName() << GetHostName() << GetPort() << GetUserName() << GetPassword();
-
 	if (m_dbTypeAttrPtr->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
 
 	}
@@ -233,7 +251,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		return false;
 	}
 
-	qDebug() << GetHostName() << "test" << QString::number(GetPort()) << GetUserName() << GetPassword() << GetDatabaseName();
+	qDebug() << GetHostName() << GetUserName() << GetPassword() << GetDatabaseName();
 
 	bool retVal = false;
 	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
@@ -254,7 +272,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 			createDatabaseQuery = scriptFile.readAll();
 
-			createDatabaseQuery = createDatabaseQuery.arg(GetDatabaseName());
+			createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
 
 			scriptFile.close();
 		}
@@ -340,43 +358,7 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 		for (int index = databaseVersion + 1; index <= lastMigration; index++){
 			QSqlError sqlError;
 			if (index == 0){
-				QFile sqlQueryFile(folder.filePath("GetRevision.sql"));
-				sqlQueryFile.open(QFile::ReadOnly);
-				QByteArray queryString = sqlQueryFile.readAll();
-				sqlQueryFile.close();
-
-				if (TableExist("Revisions")){
-					queryString = QString(queryString).arg("Revisions").toUtf8();
-				}
-				else{
-					if (TableExist("revisions")){
-						queryString = QString(queryString).arg("revisions").toUtf8();
-					}
-					else{
-						if (*m_autoCreateTablesAttrPtr > 0) {
-							QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
-							if (!migrationsFolder.exists()){
-								SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: ").arg(m_migrationFolderPathCompPtr->GetPath()));
-
-								return false;
-							}
-							ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
-							if (sqlError.type() != QSqlError::NoError){
-
-								SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
-
-								return false;
-							}
-							else{
-								queryString = QString(queryString).arg("Revisions").toUtf8();
-							}
-
-						}
-					}
-				}
-
-				ExecSqlQuery(queryString, &sqlError);
-
+				ExecSqlQueryFromFile(folder.filePath("GetRevision.sql"), &sqlError);
 				if (sqlError.type() != QSqlError::NoError){
 					qCritical() << __FILE__ << __LINE__
 								<< "\n\t| Unable to migration database"
@@ -401,20 +383,9 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 					return false;
 				}
 			}
-
-			QFile sqlQueryFile(folder.filePath("SetRevision.sql"));
-			sqlQueryFile.open(QFile::ReadOnly);
-			QByteArray queryString = sqlQueryFile.readAll();
-			sqlQueryFile.close();
-
-			if (TableExist("Revisions")){
-				queryString = QString(queryString).arg("Revisions").arg(index).toUtf8();
-			}
-			else{
-				queryString = QString(queryString).arg("revisions").arg(index).toUtf8();
-			}
-
-			ExecSqlQuery(queryString, &sqlError);
+			QVariantMap valuesRevision;
+			valuesRevision.insert(":Revision",index);
+			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql"), valuesRevision, &sqlError);
 			if (sqlError.type() != QSqlError::NoError){
 				return false;
 			}
@@ -425,7 +396,9 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 }
 
 
-void CDatabaseEngineComp::OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr)
+void CDatabaseEngineComp::OnDatabaseAccessChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr)
 {
 	EnsureDatabaseCreated();
 
@@ -626,20 +599,7 @@ int CDatabaseEngineComp::GetDatabaseVersion() const
 	if (m_migrationFolderPathCompPtr.IsValid()){
 		QSqlError sqlError;
 		QDir folder(m_migrationFolderPathCompPtr->GetPath());
-
-		QFile sqlQueryFile(folder.filePath("GetRevision.sql"));
-		sqlQueryFile.open(QFile::ReadOnly);
-		QByteArray queryString = sqlQueryFile.readAll();
-		sqlQueryFile.close();
-
-		if (TableExist("Revisions")){
-			queryString = QString(queryString).arg("Revisions").toUtf8();
-		}
-		else{
-			queryString = QString(queryString).arg("revisions").toUtf8();
-		}
-
-		QSqlQuery queryGetRevision = ExecSqlQuery(queryString, &sqlError);
+		QSqlQuery queryGetRevision = ExecSqlQueryFromFile(folder.filePath("GetRevision.sql"), &sqlError);
 		if (sqlError.type() != QSqlError::NoError){
 			return -1;
 		}
@@ -654,48 +614,42 @@ int CDatabaseEngineComp::GetDatabaseVersion() const
 }
 
 
-bool CDatabaseEngineComp::TableExist(const QString &tableName) const
+bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 {
-	QString query = QString("SELECT EXISTS (SELECT 1 FROM pg_tables WHERE TableName = '%1');").arg(tableName);
+	BeginTransaction();
 
-	QSqlError error;
-	QSqlQuery sqlQuery = ExecSqlQuery(query.toUtf8(), &error);
+	QByteArray singleQuery;
 
-	if (error.type() != QSqlError::NoError){
-		SendErrorMessage(0, QString("\n\t| Exists table could not be created""\n\t| Error: %1").arg(error.text()));
+	for (const char* ch = sqlQuery.begin(); ch != sqlQuery.end(); ch++) {
+		if (*ch != ';') {
+			singleQuery.append(*ch);
+		}
+		else {
+			if (!singleQuery.isEmpty()) {
+				QSqlError error;
+				ExecSqlQuery(singleQuery, &error);
+				if (error.type() != QSqlError::NoError) {
+					SendErrorMessage(0, error.text(), "Database collection");
 
-		return false;
-	}
+					CancelTransaction();
 
-	while (sqlQuery.next()){
-		QSqlRecord record = sqlQuery.record();
+					return false;
+				}
 
-		if (record.contains("exists")){
-			bool result = record.value("exists").toBool();
-			return result;
+				singleQuery.clear();
+			}
 		}
 	}
 
-	return false;
-}
+	if (!singleQuery.isEmpty()) {
+		QSqlError error;
+		ExecSqlQuery(singleQuery, &error);
+		if (error.type() != QSqlError::NoError) {
+			SendErrorMessage(0, error.text(), "Database collection");
 
+			CancelTransaction();
 
-bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
-{
-	QStringList queryList = QString(qPrintable(sqlQuery)).split(";");
-
-	BeginTransaction();
-
-	for (QString& singleQuery: queryList){
-		if (!singleQuery.isEmpty()){
-			singleQuery = singleQuery.replace('\b', ';');
-			QSqlError error;
-			ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
-			if (error.type() != QSqlError::NoError){
-				SendErrorMessage(0, error.text(), "Database collection");
-				CancelTransaction();
-				return false;
-			}
+			return false;
 		}
 	}
 

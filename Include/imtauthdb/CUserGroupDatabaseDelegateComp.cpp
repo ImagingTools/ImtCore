@@ -22,7 +22,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 		const QByteArray& /*typeId*/,
 		const QByteArray& proposedObjectId,
 		const QString& objectName,
-		const QString& objectDescription,
+		const QString& /*objectDescription*/,
 		const istd::IChangeable* valuePtr) const
 {
 	NewObjectQuery retVal;
@@ -54,7 +54,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 					if (userInfoPtr != nullptr){
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
-							retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
+							ContextDescription context;
+							retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, context, false);
 						}
 					}
 				}
@@ -81,6 +82,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
 		const istd::IChangeable& object,
+		const ContextDescription& /*description*/,
 		bool useExternDelegate) const
 {
 	const imtauth::IUserGroupInfo* oldObjectPtr = nullptr;
@@ -132,7 +134,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
 
-							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
+							ContextDescription context;
+							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, context, false);
 						}
 					}
 				}
@@ -145,7 +148,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (userInfoPtr != nullptr){
 						bool result = userInfoPtr->RemoveFromGroup(objectId);
 						if (result){
-							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, false);
+							ContextDescription context;
+							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, context, false);
 						}
 					}
 				}

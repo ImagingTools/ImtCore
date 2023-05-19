@@ -50,7 +50,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 		const QByteArray& /*typeId*/,
 		const QByteArray& proposedObjectId,
 		const QString& objectName,
-		const QString& objectDescription,
+		const QString& /*objectDescription*/,
 		const istd::IChangeable* valuePtr) const
 {
 	NewObjectQuery retVal;
@@ -84,10 +84,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 
 
 QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const istd::IChangeable& object,
-		bool /*useExternDelegate*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			const ContextDescription& /*description*/,
+			bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
 

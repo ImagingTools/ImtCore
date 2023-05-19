@@ -113,6 +113,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
+			const ContextDescription& /*description*/,
 			bool /*useExternDelegate*/) const
 {
 	const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(&object);

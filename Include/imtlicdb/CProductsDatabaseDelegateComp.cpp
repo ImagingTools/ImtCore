@@ -222,6 +222,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
+			const ContextDescription& /*description*/,
 			bool /*useExternDelegate*/) const
 {
 	const imtlic::IProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(&object);

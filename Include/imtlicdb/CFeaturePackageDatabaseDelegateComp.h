@@ -33,6 +33,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
+				const ContextDescription& description,
 				bool useExternDelegate = true) const override;
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,
