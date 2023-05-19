@@ -85,9 +85,8 @@ bool CEventItemBase::SetMetaInfo(int /*metaInfoType*/, const QVariant& /*metaInf
 }
 
 
-void CEventItemBase::RemoveMetaInfo(int metaInfoType)
+void CEventItemBase::RemoveMetaInfo(int /*metaInfoType*/)
 {
-	return;
 }
 
 
