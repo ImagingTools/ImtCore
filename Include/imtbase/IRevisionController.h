@@ -33,7 +33,7 @@ public:
 		{
 		}
 
-		int revision;
+		qlonglong revision;
 		QDateTime timestamp;
 		QString user;
 		QString comment;
