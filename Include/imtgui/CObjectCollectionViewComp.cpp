@@ -72,7 +72,6 @@ bool CObjectCollectionViewComp::SetSelectionMode(SelectionMode /*mode*/)
 	return false;
 }
 
-
 imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 {
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
@@ -1545,14 +1544,16 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 
 	QByteArray objectId = m_ids[index.row()];
 
-	QByteArray itemTypeId = collectionPtr->GetObjectTypeId(objectId);
-
+	QByteArray itemTypeId;
 	ObjectMetaInfo metaInfo;
 	if (m_metaInfoMap.contains(objectId)){
 		metaInfo = m_metaInfoMap[objectId];
 	}
 	else{
+		itemTypeId = collectionPtr->GetObjectTypeId(objectId);
+
 		metaInfo = m_parent.GetMetaInfo(objectId, itemTypeId);
+
 		m_metaInfoMap[objectId] = metaInfo;
 	}
 
@@ -1564,6 +1565,10 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 	case Qt::DecorationRole:
 		return metaInfo[index.column()].icon;
 	case DR_TYPE_ID:
+		if (itemTypeId.isEmpty()){
+			itemTypeId = collectionPtr->GetObjectTypeId(objectId);
+		}
+
 		return itemTypeId;
 	case DR_OBJECT_ID:
 		return objectId;
