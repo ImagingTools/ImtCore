@@ -31,10 +31,10 @@ static http_parser_settings s_httpParserSettings
 // public methods
 
 CHttpRequest::CHttpRequest(QObject& socket, const IRequestServlet& handler, const IProtocolEngine& engine)
-	:m_state(RS_NON_STARTED),
+	:m_requestHandler(handler),
+	m_engine(engine),
 	m_socket(socket),
-	m_requestHandler(handler),
-	m_engine(engine)
+	m_state(RS_NON_STARTED)
 {
 	QAbstractSocket* socketPtr = dynamic_cast<QAbstractSocket*>(&socket);
 	if (socketPtr != nullptr){
@@ -367,11 +367,11 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 	}
 #endif
 
-	size_t parsedCount = http_parser_execute(
-    			&m_httpParser,
-				&s_httpParserSettings,
-				data.constData(),
-				size_t(data.size()));
+	int parsedCount = http_parser_execute(
+		&m_httpParser,
+		&s_httpParserSettings,
+		data.constData(),
+		size_t(data.size()));
 	if (parsedCount < data.size()){
 		return false;
 	}
