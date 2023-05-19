@@ -137,7 +137,8 @@ QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			bool /*useExternDelegate*/) const
+			const ContextDescription& contextDescription,
+			bool useExternDelegate) const
 {
 	const imttest::ITestInfo* testInfoPtr = dynamic_cast<const imttest::ITestInfo*>(&object);
 	if (testInfoPtr == nullptr){
