@@ -210,9 +210,11 @@ export class Item extends QtObject {
     }
     $widthChanged(){
         this.dom.style.width = `${this.width}px`
+        this.dom.style.minWidth = `${this.width}px`
     }
     $heightChanged(){
         this.dom.style.height = `${this.height}px`
+        this.dom.style.minHeight = `${this.height}px`
     }
     $visibleChanged(){
         // this.dom.style.opacity = this.visible ? this.opacity : 0

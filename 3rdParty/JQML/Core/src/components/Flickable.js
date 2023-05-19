@@ -23,6 +23,9 @@ export class Flickable extends Item {
         this.$cP('flickableDirection', Flickable.AutoFlickDirection).connect(this.$flickableDirectionChanged.bind(this))
         this.$cP('interactive', true)
         this.$cP('contentItem', null)
+
+		this.$cP('originX', 0)
+		this.$cP('originY', 0)
 		
 
         this.$s.flickEnded = Signal()
@@ -40,7 +43,7 @@ export class Flickable extends Item {
 		this.contentItem = this.createComponent('Item', this)
 		this.contentItem.$sP('width', ()=>{return this.width})
 		this.contentItem.$sP('height', ()=>{return this.height})
-        this.dom.style.overflow = "auto"
+        this.dom.style.overflow = "unset"
     }
 
 	$childChanged(){
@@ -50,6 +53,29 @@ export class Flickable extends Item {
             this.$uP()
         }, 100)
     }
+
+	$minYExtent(){
+		let minY = undefined
+		for(let child of this.contentItem.children){
+			if(child.dom){
+				if(child.y < minY || minY === undefined){
+					minY = child.y
+				}
+			}
+		}
+		return minY ? minY : 0
+	}
+	$minXExtent(){
+		let minX = undefined
+		for(let child of this.contentItem.children){
+			if(child.dom){
+				if(child.x < minX || minX === undefined){
+					minX = child.x
+				}
+			}
+		}
+		return minX ? minX : 0
+	}
 
     // $updateGeometry(){
 	// 	if(this.$contentHeightAuto && this.contentItem){
@@ -125,22 +151,24 @@ export class Flickable extends Item {
     }
     $contentXChanged(){
 		if(this.flickableDirection !== Flickable.VerticalFlick){
+			//this.originX = -this.$minXExtent()
 			this.contentItem.x = -this.contentX
-
+			
         	this.$flickTimerUpdate()
 		}
         
     }
     $contentYChanged(){
 		if(this.flickableDirection !== Flickable.HorizontalFlick){
+			//this.originY = -this.$minYExtent()
 			this.contentItem.y = -this.contentY
 			
 			this.$flickTimerUpdate()
 		}
     }
-    $clipChanged(){
+    // $clipChanged(){
         
-    }
+    // }
 
     $flickTimerUpdate(){
         if(!this.$flickTimer) {

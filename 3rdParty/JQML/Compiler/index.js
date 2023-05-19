@@ -41,6 +41,10 @@ const QML = [
     'FileDialog',
     'Gradient',
     'GradientStop',
+    'WebSocket',
+    'WebView',
+    'Plugin',
+    'Map',
 ]
 
 let source = process.argv[2]
@@ -60,10 +64,10 @@ function getFiles (dir, _files){
     return _files
 }
 
-if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
+// if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
 // if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
-// if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
+if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source
 
 if(!fs.existsSync(source + '/cache/')) fs.mkdirSync(source + '/cache/');
@@ -492,6 +496,16 @@ function qmlprop(m, instructions, file){
             let gradientInstructions = getBaseStructure()
             preCompile(_meta[2][1], _meta[2][3], _meta[2][2], gradientInstructions, file) 
             instructions.propertiesQML.gradient = gradientInstructions
+        } catch {
+            instructions.propertiesLazy[m[1]] = m[3]
+        }
+    } else if(m[1] === "plugin"){
+        try {
+            parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
+            let _meta = parser.parse(m[3])
+            let pluginInstructions = getBaseStructure()
+            preCompile(_meta[2][1], _meta[2][3], _meta[2][2], pluginInstructions, file) 
+            instructions.propertiesQML.plugin = pluginInstructions
         } catch {
             instructions.propertiesLazy[m[1]] = m[3]
         }

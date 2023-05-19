@@ -1,6 +1,8 @@
 import {Qt} from './utils/Qt'
+import {QtPositioning} from './utils/QtPositioning'
 
 global.Qt = Qt
+global.QtPositioning = QtPositioning
 global.QML = {}
 require('./components/Component')
 require('./components/WebSocket')
@@ -40,6 +42,8 @@ require('./components/Href')
 require('./components/FileDialog')
 require('./components/Gradient')
 require('./components/GradientStop')
+require('./components/Plugin')
+require('./components/Map')
 
 QML.Qt = Qt
 for(let key in Qt){
@@ -179,8 +183,24 @@ global.Core = {
     queueCompleted: [],
     focusedElement: null,
     context: null,
-    // languages: {},
-    // currentLanguage: 'ru',
+    mapTools: false,
+    loadMapTools(){
+        if(!this.mapTools){
+            let mapStyle = document.createElement('link')
+            mapStyle.rel = 'stylesheet'
+            mapStyle.href = 'https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css'
+            document.head.appendChild(mapStyle)
+            // let mapScript = document.createElement('script')
+            // mapScript.src = 'https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js'
+            // document.head.appendChild(mapScript) 
+            this.mapTools = true  
+            
+            
+            while(!this.mapTools){}
+            // <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
+	        // <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css"></link>
+        }
+    },
     XMLParser: new DOMParser(),
     updateLanguage(){
         if(Core.context.application && Core.context.language && !Core.context.languages[`${Core.context.application}_${Core.context.language}`]){
@@ -437,11 +457,13 @@ global.Core = {
 
         root.eventState = {
             target: null,
+            catchers: [],
             blocked: function(obj){
                 this.target = obj
             },
             release: function(){
                 this.target = null
+                // this.catchers = []
             },
             view: null,
         }
@@ -461,6 +483,10 @@ global.Core = {
                     if(e.type.indexOf('mouse')>=0 || e.type.indexOf('wheel')>=0 || e.type.indexOf('context')>=0 || e.type.indexOf('touch')>=0){
                         
                         path = document.elementsFromPoint(e.type.indexOf('touch') >= 0 ? e.changedTouches[0].pageX : e.x, e.type.indexOf('touch') >= 0 ? e.changedTouches[0].pageY : e.y)
+                        
+                        if(e.type === 'mousedown' || e.type === 'touchstart') root.eventState.catchers = path
+                        if(e.type === 'mouseup' || e.type === 'touchend') root.eventState.catchers = []
+       
                         for(let indx in UIDList){
                             if(e.type === 'mousemove' && UIDList[indx].visible && UIDList[indx].enabled && UIDList[indx].dom && path.indexOf(UIDList[indx].dom) < 0 && UIDList[indx].$mouseout){
                                 UIDList[indx].$mouseout(e)
@@ -476,12 +502,14 @@ global.Core = {
                         }
                     }
 
+                    // if(root.eventState.catchers.length > 0) path = root.eventState.catchers
+
                     
                     let find = false
                     root.eventState.view = null
                     for(let p of path){
                         let obj = UIDList[p.id.slice(3)]
-                        if(obj && obj.visible && obj.enabled && obj.webScroll !== undefined && !find){
+                        if(obj && obj.visible && obj.enabled && obj.webScroll !== undefined && !find && root.eventState.catchers.indexOf(p) >= 0){
                             find = true
                             root.eventState.view = obj
                         }

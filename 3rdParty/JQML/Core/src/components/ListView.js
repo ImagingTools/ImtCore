@@ -18,6 +18,9 @@ export class ListView extends Flickable {
     $items = []
     $middleWidth = 0
     $middleHeight = 0
+    $enabledScroll = true
+    $oldContentX = 0
+    $oldContentY = 0
 
     constructor(args) {
         super(args)
@@ -49,17 +52,61 @@ export class ListView extends Flickable {
     // $contentHeightChanged(){
         
     // }
+    $getOriginY(){
+        if(this.orientation === ListView.Vertical){
+            if(this.$items[0]) return this.$items[0].y
+
+            let visibleContentHeight = 0
+            let lastIndex = 0
+            for(let child of this.contentItem.children){
+                if(child.dom){
+                    if(child.index > lastIndex) lastIndex = child.index
+                    if(child.y + child.height > visibleContentHeight){
+                        visibleContentHeight = child.y + child.height
+                    }
+                }
+            }
+            return this.contentHeight - (visibleContentHeight + (this.$items.length - lastIndex - 1)*(this.$middleHeight + this.spacing))
+            
+        } else {
+            return 0
+        }
+		
+	}
+	$getOriginX(){
+        if(this.orientation === ListView.Horizontal){
+            if(this.$items[0]) return this.$items[0].x
+
+            let visibleContentWidth = 0
+            let lastIndex = 0
+            for(let child of this.contentItem.children){
+                if(child.dom){
+                    if(child.index > lastIndex) lastIndex = child.index
+                    if(child.x + child.width > visibleContentWidth){
+                        visibleContentWidth = child.x + child.width          
+                    }
+                }
+            }
+            return this.contentWidth - (visibleContentWidth + (this.$items.length - lastIndex - 1)*(this.$middleWidth + this.spacing))
+            
+        } else {
+            return 0
+        }
+		
+	}
 
     $contentXChanged(){
         if(this.orientation === ListView.Horizontal){
             super.$contentXChanged()
             this.$updateView()
+            
         }
     }
     $contentYChanged(){
         if(this.orientation === ListView.Vertical){
             super.$contentYChanged()
             this.$updateView()
+            
         }
     }
     $widthChanged(){
@@ -120,63 +167,69 @@ export class ListView extends Flickable {
                 middleWidth += this.contentItem.children[i].width
                 middleHeight += this.contentItem.children[i].height
             }
-            middleWidth = Math.trunc(middleWidth / this.contentItem.children.length)
-            middleHeight = Math.trunc(middleHeight / this.contentItem.children.length)
+            middleWidth = middleWidth / this.contentItem.children.length
+            middleHeight = middleHeight / this.contentItem.children.length
         }
         this.$middleWidth = middleWidth
         this.$middleHeight = middleHeight
     }
     $updateGeometry(){
-        
-
         if(this.contentItem){
-            this.$getMiddleWH()
+            // this.$getMiddleWH()
             if(this.orientation === ListView.Vertical){
-                let contentHeightFunc = ()=>{
-                    // let top = 0
-                    // let bottom = 0
-                    // if(this.contentItem.children.length)
-                    // for(let child of this.contentItem.children) {
-                    // 	let childTop = child.y
-                    // 	let childBottom = childTop + child.height
-                    // 	if(childTop < top) top = childTop
-                    // 	if(childBottom > bottom) bottom = childBottom
-                    // }
-                    // return bottom - top
-                    if(this.$items[this.$items.length-1]){
-                        return this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height
-                    } else {
-                        return this.$middleHeight * this.$items.length + this.spacing * (this.$items.length-1)
+                let visibleContentHeight = 0
+                let lastIndex = 0
+                let firstIndex = this.contentItem.children.length ? this.contentItem.children[0].index : 0
+                let minY = this.contentItem.children.length ? this.contentItem.children[0].y : 0
+                for(let child of this.contentItem.children){
+                    if(child.dom){
+                        if(child.index > lastIndex) lastIndex = child.index
+                        // if(child.y + child.height > visibleContentHeight){
+                        //     visibleContentHeight = child.y + child.height
+                        // }
+                        
+                        visibleContentHeight += child.height
+                        
+                        if(child.y < minY) minY = child.y
+                        if(child.index < firstIndex) firstIndex = child.index
                     }
-                    
                 }
-                this.contentHeight = contentHeightFunc()
-                // this.$sP('contentHeight', contentHeightFunc)
-                
+                let middleHeight = visibleContentHeight / this.contentItem.children.length
+                // let contentHeight = visibleContentHeight - minY + (Math.round(this.$middleHeight) + this.spacing)*(this.$items.length-this.contentItem.children.length)
+                // this.contentHeight = contentHeight
+                // this.originY = -(contentHeight - (visibleContentHeight + (this.$items.length - lastIndex - 1)*(Math.round(this.$middleHeight) + this.spacing)))
+
+                this.$middleHeight = middleHeight
+                let contentHeight = visibleContentHeight + Math.round(middleHeight)*(this.$items.length-this.contentItem.children.length) + this.spacing * (this.$items.length-1)
+                this.contentHeight = contentHeight
+                this.originY = (minY - firstIndex*(Math.round(middleHeight+this.spacing)))
             }
             
             if(this.orientation === ListView.Horizontal){
-                let contentWidthFunc = ()=>{
-                    // let left = 0
-                    // let right = 0
-                    // if(this.contentItem.children.length)
-                    // for(let child of this.contentItem.children) {
-                    // 	let childLeft = child.x
-                    // 	let childRight = childLeft + child.width
-                    // 	if(childLeft < left) left = childLeft
-                    // 	if(childRight > right) right = childRight
-                    // }
-                    // return right - left
-                    if(this.$items[this.$items.length-1]){
-                        return this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width
-                    } else {
-                        return this.$middleWidth * this.$items.length + this.spacing * (this.$items.length-1)
+                let visibleContentWidth = 0
+                let lastIndex = 0
+                let firstIndex = this.contentItem.children.length ? this.contentItem.children[0].index : 0
+                let minX = this.contentItem.children.length ? this.contentItem.children[0].x : 0
+                for(let child of this.contentItem.children){
+                    if(child.dom){
+                        if(child.index > lastIndex) lastIndex = child.index
+                        visibleContenWidth += child.width
+                        if(child.x < minX) minX = child.x
+                        if(child.index < firstIndex) firstIndex = child.index
                     }
                 }
-                this.contentWidth = contentWidthFunc()
-                // this.$sP('contentWidth', contentWidthFunc)
-                
+                let middleWidth = visibleContentWidth / this.contentItem.children.length
+                // let contentWidth = visibleContentWidth - minX + (Math.round(this.$middleWidth) + this.spacing)*(this.$items.length-this.contentItem.children.length)
+                // this.contentWidth = contentWidth
+                // this.originX = -(contentWidth - (visibleContentWidth + (this.$items.length - lastIndex - 1)*(Math.round(this.$middleWidth) + this.spacing)))
+                this.$middleWidth = middleWidth
+                let contentWidth = visibleContentWidth + Math.round(middleWidth)*(this.$items.length-this.contentItem.children.length) + this.spacing * (this.$items.length-1)
+                this.contentWidth = contentWidth
+                this.originX = (minX - firstIndex*(Math.round(middleWidth)))
             }
+
+            //-this.$getOriginX()
+            //-this.$getOriginY()
         }
 		
     }
@@ -381,6 +434,7 @@ export class ListView extends Flickable {
         let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.contentItem, index: index}) : this.delegate({parent: this.contentItem, index: index})
         obj.widthChanged.connect(this.$updateGeometry.bind(this))
         obj.heightChanged.connect(this.$updateGeometry.bind(this))
+        
         // obj.$orientation = this.orientation
         this.$recursiveIndex(obj, index)
         // obj.$uP()
@@ -401,7 +455,7 @@ export class ListView extends Flickable {
             }
             i++
         }
-        return 0
+        return undefined
 
     }
     $remove(index, count){
@@ -420,162 +474,237 @@ export class ListView extends Flickable {
         this.$updateView()
     }
     $updateView(){
-        if(this.model && this.delegate){
-            let availableArea = {
-                left: this.contentX - this.cacheBuffer,
-                right: this.contentX + this.width + this.cacheBuffer,
-                top: this.contentY - this.cacheBuffer,
-                bottom: this.contentY + this.height + this.cacheBuffer,
-            }
-            let count = 0
-
-            if(typeof this.model === 'number'){
-                count = this.model
+        try {
+            this.$enabledScroll = false
+            if(this.model && this.delegate && this.width > 0 && this.height > 0){
                 
-            } else if (typeof this.model === 'object'){
-                if(this.model.$deps) {
-                    count = this.model.data.length
-                    this.model.$deps[this.UID] = this
-                } else {
-                    count = this.model.length
+                if(this.$items.length <= 0) return
+
+                let leftIndex = this.contentItem.children.length ? this.contentItem.children[0].index : 0
+                let rightIndex = 0
+                let maxX = this.contentItem.children.length ? this.contentItem.children[0].x + this.contentItem.children[0].width : 0
+                let maxY = this.contentItem.children.length ? this.contentItem.children[0].y + this.contentItem.children[0].height : 0
+                let minX = this.contentItem.children.length ? this.contentItem.children[0].x + this.contentItem.children[0].width : 0
+                let minY = this.contentItem.children.length ? this.contentItem.children[0].y + this.contentItem.children[0].height : 0
+                let visibleCount = this.contentItem.children.length
+                let middleWidth = 0
+                let middleHeight = 0
+                let tempChild = this.contentItem.children.slice()
+
+                while(tempChild.length){
+                    let child = tempChild.pop()
+                    middleWidth += child.width
+                    middleHeight += child.height
+
+                    if(child.index > rightIndex){
+                        rightIndex = child.index
+                    }
+                    if(child.index < leftIndex){
+                        leftIndex = child.index
+                    }
+                    if(child.x + child.width > maxX){
+                        maxX = child.x + child.width
+                    }
+                    if(child.y + child.height > maxY){
+                        maxY = child.y + child.height
+                    }
+                    if(child.x < minX){
+                        minX = child.x
+                    }
+                    if(child.y < minY){
+                        minY = child.y
+                    }
+                    if(this.orientation === ListView.Horizontal){
+                            
+                        if(child.x + child.width < this.contentX-this.cacheBuffer || child.x > this.contentX + this.width + this.cacheBuffer) {
+                            this.$items[child.index] = null
+                            child.$destroy()
+                            this.$updateGeometry()
+                        }
+                    } else {
+                        
+                        if(child.y + child.height < this.contentY-this.cacheBuffer || child.y > this.contentY + this.height + this.cacheBuffer) {
+                            this.$items[child.index] = null
+                            child.$destroy()
+                            this.$updateGeometry()
+                        }
+                    }
+                }
+                middleWidth = visibleCount ? middleWidth / visibleCount : 0
+                middleHeight = visibleCount ? middleHeight / visibleCount : 0
+    
+                let currentIndex = this.$getCurrentIndex()
+
+                if(this.contentItem.children.length === 0){
+                    if(this.orientation === ListView.Horizontal){
+                        if(this.contentX <= minX){
+                            currentIndex = leftIndex + Math.ceil((this.contentX - minX + this.spacing)/(Math.round(middleWidth + this.spacing)))
+                        } else {
+                            currentIndex = rightIndex + Math.ceil((this.contentX - maxX - this.spacing)/(Math.round(middleWidth + this.spacing)))
+                        }
+                        if(currentIndex < 0 || currentIndex >= this.$items.length) return
+                        if(middleWidth === 0) currentIndex = 0
+                        // currentIndex = (this.contentX <= minX ? leftIndex : rightIndex) + (Math.round(middleWidth)*(this.$items.length - visibleCount))
+    
+                        if(!this.$items[currentIndex]){
+                            this.$items[currentIndex] = this.$createElement(currentIndex)
+                            if(this.contentY <= minX){
+                                this.$items[currentIndex].x = minX + (Math.round(middleWidth + this.spacing)*(currentIndex-leftIndex))
+                            } else {
+                                this.$items[currentIndex].x = maxX + (Math.round(middleWidth + this.spacing)*(currentIndex-rightIndex-1))
+                            }
+                            // this.$items[currentIndex].x = middleWidth*currentIndex + this.spacing*(currentIndex)
+                            this.$items[currentIndex].y = 0
+    
+                            this.$items[currentIndex].$uP()
+                            this.$updateGeometry()
+                        }
+                    } else {
+                        if(this.contentY <= minY){
+                            currentIndex = leftIndex + Math.ceil((this.contentY - minY + this.spacing)/(Math.round(middleHeight + this.spacing)))
+                        } else {
+                            currentIndex = rightIndex + Math.ceil((this.contentY - maxY - this.spacing)/(Math.round(middleHeight + this.spacing)))
+                        }
+                        if(currentIndex < 0 || currentIndex >= this.$items.length) return
+                        if(middleHeight === 0) currentIndex = 0
+                        // currentIndex = (this.contentY <= minY ? leftIndex : rightIndex) + (Math.round(middleHeight)*(this.$items.length - visibleCount))
+    
+                        if(!this.$items[currentIndex]){
+                            this.$items[currentIndex] = this.$createElement(currentIndex)
+                            this.$items[currentIndex].x = 0
+                            if(this.contentY <= minY){
+                                this.$items[currentIndex].y = minY + (Math.round(middleHeight + this.spacing)*(currentIndex-leftIndex))
+                            } else {
+                                this.$items[currentIndex].y = maxY + (Math.round(middleHeight + this.spacing)*(currentIndex-rightIndex-1))
+                            }
+                            // this.$items[currentIndex].y = middleHeight*currentIndex + this.spacing*(currentIndex)
+    
+                            this.$items[currentIndex].$uP()
+                            this.$updateGeometry()
+                        }
+                    }
+                    leftIndex = currentIndex
+                    rightIndex = currentIndex
                 }
                 
-            } else {
+                
+                // let leftIndex = this.$items.length
+                // let rightIndex = 0
 
-            }
-            if(count <= 0) return
+                // for(let i = 0; i < this.contentItem.children.length; i++){
+                //     if(this.contentItem.children[i].index < leftIndex) leftIndex = this.contentItem.children[i].index
+                //     if(this.contentItem.children[i].index > rightIndex) rightIndex = this.contentItem.children[i].index
+                // }
 
-            if(!this.$items[0]){
-                this.$items[0] = this.$createElement(0)
-                this.$items[0].x = 0
-                this.$items[0].y = 0
-                // this.$items[0].$orientation = this.orientation
-                this.$items[0].$uP()
-                this.$updateGeometry()
-            } else {
-                this.$items[0].x = 0
-                this.$items[0].y = 0
-                this.$updateGeometry()
-            }
-
-            let currentIndex = this.$getCurrentIndex()
-            // console.log('currentIndex', currentIndex)
-
-            for(let i = currentIndex-1; i > 0; i--){
-                if(this.$items[i]){
-
-                    if(this.orientation === ListView.Horizontal){
-                        this.$items[i].y = 0
-                        this.$items[i].$sP('x', ()=>{
-                            return this.$items[i+1].x - this.spacing - this.$items[i].width
-                        })
-                        this.$items[i].$uP()
-                        this.$updateGeometry()
-                    } else {
-                        this.$items[i].x = 0
-                        this.$items[i].$sP('y', ()=>{
-                            return this.$items[i+1].y - this.spacing - this.$items[i].height
-                        })
-                        this.$items[i].$uP()
-                        this.$updateGeometry()
+                
+                // console.log(`DEBUG:::leftIndex=${leftIndex}, rightIndex=${rightIndex}`)
+                
+                if(this.orientation === ListView.Horizontal){
+                    while(leftIndex > 0 && this.$items[leftIndex]){
+                        if(this.$items[leftIndex].x - this.spacing > this.contentX - this.cacheBuffer){
+                            let currIndex = leftIndex-1
+                            let prevIndex = leftIndex
+                            if(!this.$items[currIndex]){
+                                this.$items[currIndex] = this.$createElement(currIndex)
+                                this.$items[currIndex].y = 0
+                                this.$items[currIndex].$sP('x', ()=>{
+                                    if(this.$items[prevIndex]){
+                                        return this.$items[prevIndex].x - this.$items[currIndex].width - this.spacing
+                                    } else {
+                                        return this.$items[currIndex].$p.x.val
+                                    }     
+                                })
+                                this.$items[currIndex].$uP()
+                                this.$updateGeometry()
+                                // console.log(`DEBUG:::createElement(${currIndex})`)
+                            }
+                            
+                        }
+                        leftIndex -= 1
                     }
-                    
-                    if(this.orientation === ListView.Horizontal){
-                        if(this.$items[i].x + this.$items[i].width + this.spacing < availableArea.left || this.$items[i].x - this.spacing > availableArea.right){
-                            this.$items[i].$destroy()
-                            this.$items[i] = null
-                        }
-                    } else {
-                        if(this.$items[i].y + this.$items[i].height + this.spacing < availableArea.top || this.$items[i].y - this.spacing > availableArea.bottom){
-                            this.$items[i].$destroy()
-                            this.$items[i] = null
-                        }
-                    }
-                } else if(this.$items[i+1]){
-                    if(this.orientation === ListView.Horizontal){
-                        if(this.$items[i+1].x > availableArea.left){
-                            this.$items[i] = this.$createElement(i)
-                            this.$items[i].y = 0
-                            this.$items[i].$sP('x', ()=>{
-                                return this.$items[i+1].x - this.spacing - this.$items[i].width
-                            })
-                            this.$items[i].$uP()
-                            this.$updateGeometry()
-                        }
-                    } else {
-                        if(this.$items[i+1].y > availableArea.top){
-                            this.$items[i] = this.$createElement(i)
-                            this.$items[i].x = 0
-                            this.$items[i].$sP('y', ()=>{
-                                return this.$items[i+1].y - this.spacing - this.$items[i].height
-                            })
-                            this.$items[i].$uP()
-                            this.$updateGeometry()
-                        }
-                    }
-                    
                 } else {
-                    break
+                    while(leftIndex > 0 && this.$items[leftIndex]){
+                        if(this.$items[leftIndex].y - this.spacing > this.contentY - this.cacheBuffer){
+                            let currIndex = leftIndex-1
+                            let prevIndex = leftIndex
+                            if(!this.$items[currIndex]){
+                                this.$items[currIndex] = this.$createElement(currIndex)
+                                this.$items[currIndex].x = 0
+                                this.$items[currIndex].$sP('y', ()=>{
+                                    if(this.$items[prevIndex]){
+                                        return this.$items[prevIndex].y - this.$items[currIndex].height - this.spacing
+                                    } else {
+                                        return this.$items[currIndex].$p.y.val
+                                    }     
+                                })
+                                this.$items[currIndex].$uP()
+                                this.$updateGeometry()
+                                // console.log(`DEBUG:::createElement(${currIndex})`)
+                            }
+                            
+                        }
+                        leftIndex -= 1
+                    }
                 }
-            }
-            for(let i = currentIndex+1; i < count; i++){
-                if(this.$items[i]){
-                    if(this.orientation === ListView.Horizontal){
-                        this.$items[i].y = 0
-                        this.$items[i].$sP('x', ()=>{
-                            return this.$items[i-1].x + this.$items[i-1].width + this.spacing
-                        })
-                        this.$items[i].$uP()
-                        this.$updateGeometry()
-                    } else {
-                        this.$items[i].x = 0
-                        this.$items[i].$sP('y', ()=>{
-                            return this.$items[i-1].y + this.$items[i-1].height + this.spacing
-                        })
-                        this.$items[i].$uP()
-                        this.$updateGeometry()
+
+                if(this.orientation === ListView.Horizontal){
+                    while(rightIndex < this.$items.length-1 && this.$items[rightIndex]){
+                        if(this.$items[rightIndex].x + this.$items[rightIndex].width + this.spacing < this.contentX + this.width + this.cacheBuffer){
+                            let currIndex = rightIndex+1
+                            let prevIndex = rightIndex
+                            if(!this.$items[currIndex]){
+                                this.$items[currIndex] = this.$createElement(currIndex)
+                                this.$items[currIndex].y = 0
+                                this.$items[currIndex].$sP('x', ()=>{
+                                    if(this.$items[prevIndex]){
+                                        return this.$items[prevIndex].x + this.$items[prevIndex].width + this.spacing
+                                    } else {
+                                        return this.$items[currIndex].$p.x.val
+                                    }     
+                                })
+                                this.$items[currIndex].$uP()
+                                this.$updateGeometry()
+                                // console.log(`DEBUG:::createElement(${currIndex})`)
+                            }
+                        }
+                        rightIndex += 1
                     }
-                    if(this.orientation === ListView.Horizontal){
-                        if(this.$items[i].x + this.$items[i].width < availableArea.left || this.$items[i].x > availableArea.right){
-                            this.$items[i].$destroy()
-                            this.$items[i] = null
-                        }
-                    } else {
-                        if(this.$items[i].y + this.$items[i].height < availableArea.top || this.$items[i].y > availableArea.bottom){
-                            this.$items[i].$destroy()
-                            this.$items[i] = null
-                        }
-                    }
-                } else if(this.$items[i-1]){
-                    if(this.orientation === ListView.Horizontal){
-                        if(this.$items[i-1].x + this.$items[i-1].width < availableArea.right){
-                            this.$items[i] = this.$createElement(i)
-                            this.$items[i].y = 0
-                            this.$items[i].$sP('x', ()=>{
-                                return this.$items[i-1].x + this.$items[i-1].width + this.spacing
-                            })
-                            this.$items[i].$uP()
-                            this.$updateGeometry()
-                        }
-                    } else {
-                        if(this.$items[i-1].y + this.$items[i-1].height < availableArea.bottom){
-                            this.$items[i] = this.$createElement(i)
-                            this.$items[i].x = 0
-                            this.$items[i].$sP('y', ()=>{
-                                return this.$items[i-1].y + this.$items[i-1].height + this.spacing
-                            })
-                            this.$items[i].$uP()
-                            this.$updateGeometry()
-                        }
-                    }
-                    
                 } else {
-                    break
+                    while(rightIndex < this.$items.length-1 && this.$items[rightIndex]){
+                        if(this.$items[rightIndex].y + this.$items[rightIndex].height + this.spacing < this.contentY + this.height + this.cacheBuffer){
+                            let currIndex = rightIndex+1
+                            let prevIndex = rightIndex
+                            if(!this.$items[currIndex]){
+                                this.$items[currIndex] = this.$createElement(currIndex)
+                                this.$items[currIndex].x = 0
+                                this.$items[currIndex].$sP('y', ()=>{
+                                    if(this.$items[prevIndex]){
+                                        return this.$items[prevIndex].y + this.$items[prevIndex].height + this.spacing
+                                    } else {
+                                        return this.$items[currIndex].$p.y.val
+                                    }     
+                                })
+                                this.$items[currIndex].$uP()
+                                this.$updateGeometry()
+                                // console.log(`DEBUG:::createElement(${currIndex})`)
+                            }
+                        }
+                        rightIndex += 1
+                    }
                 }
+                
+                
+                this.count = this.$items.length
+                
             }
-            this.count = count
+        } catch (error) {
             
+        } finally {
+            // this.$oldContentX = this.contentX
+            // this.$oldContentY = this.contentY
+            this.$enabledScroll = true
         }
+        
     
     }
 
@@ -631,6 +760,47 @@ export class ListView extends Flickable {
         
         
     // }
+
+    $scroll(deltaX, deltaY){
+        if(!this.$enabledScroll) return
+
+		if(this.interactive && this.enabled){
+			if(this.flickableDirection !== Flickable.VerticalFlick && this.contentWidth > 0 && this.contentWidth > this.width){
+				if(deltaX > 0)
+				if(this.contentX + deltaX < this.contentWidth - this.width){
+					this.contentX += deltaX
+				} else {
+					this.contentX = this.contentWidth - this.width
+				}
+				if(deltaX < 0)
+				if(this.contentX + deltaX > 0){
+					this.contentX += deltaX
+				} else {
+					this.contentX = 0
+				}
+			} else {
+				// this.$parentScroll(deltaX, 0)
+			}
+			
+			if(this.flickableDirection !== Flickable.HorizontalFlick && this.contentHeight > 0 && this.contentHeight > this.height){
+				if(deltaY > 0)
+				if(!this.$items[this.$items.length-1] || this.contentY + deltaY < this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height){
+					this.contentY += deltaY
+				} else {
+					this.contentY = this.$items[this.$items.length-1].y+this.$items[this.$items.length-1].height-this.height//this.contentHeight - this.height
+				}
+				if(deltaY < 0)
+				if(!this.$items[0] || this.contentY + deltaY > this.$items[0].y){
+					this.contentY += deltaY
+				} else {
+					this.contentY = this.$items[0].y
+				}
+			} else {
+				// this.$parentScroll(0, deltaY)
+			}
+		}
+
+	}
 
     $mousedown(e, state) {
         this.$snapX = this.contentX

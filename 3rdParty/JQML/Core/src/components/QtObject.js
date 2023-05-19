@@ -15,7 +15,7 @@ export class QtObject {
     // LVL = new Set()
 
     constructor(args) {
-        if(args.parent && args.parent.$flickable && args.parent.contentItem && this.dom) args.parent = args.parent.contentItem
+        if(args.parent && args.parent.$flickable && args.parent.contentItem) args.parent = args.parent.contentItem
         this.$PI = new Proxy(this, Core.proxyHandlerID)
         this.$P0 = new Proxy(this, Core.proxyHandler0)
         this.$qmlClassName = this.constructor.name
@@ -191,12 +191,11 @@ export class QtObject {
         // }
     }
     $uP(step = 0){
+        if(this.UID === null || this.UID === undefined) return
+
         let errors = []
         let errorsSignal = []
         let queueSignals = []
-
-
-        
         
         while(this.$uL.properties.length){
             let propName = this.$uL.properties.shift()
@@ -409,6 +408,8 @@ export class QtObject {
         
         Object.defineProperty(this, name, {
             get: ()=>{ 
+                if(this.UID === null || this.UID === undefined) return
+
                 if(caller && caller !== this.$p[name]){
                     let _caller = caller
                     if(_caller.type === 'alias'){
@@ -439,7 +440,9 @@ export class QtObject {
                 return this.$p[name].val
             },
             set: (newVal)=>{
-                while(this.$uL &&this.$uL.properties.indexOf(name) >= 0){
+                if(this.UID === null || this.UID === undefined) return
+
+                while(this.$uL.properties.indexOf(name) >= 0){
                     this.$uL.properties.splice(this.$uL.properties.indexOf(name), 1)
                 }
                 while(this.$uL.aliases.indexOf(name) >= 0){
@@ -500,6 +503,8 @@ export class QtObject {
             }
             Object.defineProperty(this[name], name2, {
                 get: ()=>{ 
+                    if(this.UID === null || this.UID === undefined) return
+
                     if(caller && caller !== this.$p[`${name}.${name2}`]){
                         let _caller = caller
                         if(_caller.type === 'alias'){
@@ -530,6 +535,8 @@ export class QtObject {
                     return this.$p[`${name}.${name2}`].val
                 },
                 set: (newVal)=>{
+                    if(this.UID === null || this.UID === undefined) return
+
                     while(this.$uL.properties.indexOf(`${name}.${name2}`) >= 0){
                         this.$uL.properties.splice(this.$uL.properties.indexOf(`${name}.${name2}`), 1)
                     }
@@ -554,6 +561,7 @@ export class QtObject {
     }
 
     $sP(name, func){
+        if(this.UID === null || this.UID === undefined) return
         // let names = name.split('.')
         
         // if(names.length === 1){
@@ -569,6 +577,7 @@ export class QtObject {
         if(this.$p[name]){
             if(this.$p[name].type === 'alias'){
                 this.$p[name].func = ()=>{
+                    if(this.UID === null || this.UID === undefined) return
                     caller = this.$p[name]
                     let res = func()
                     caller = null
@@ -589,6 +598,7 @@ export class QtObject {
                 this.$uL.aliases.push(name)
             } else {
                 this.$p[name].func = ()=>{
+                    if(this.UID === null || this.UID === undefined) return
                     caller = this.$p[name]
                     let res = func()
                     caller = null
@@ -715,6 +725,8 @@ export class QtObject {
 
         Object.defineProperty(this, name, {
             get: ()=>{ 
+                if(this.UID === null || this.UID === undefined) return
+
                 if(caller && caller !== this.$p[name]){
                     let _caller = caller
                     if(_caller.type === 'alias'){
@@ -745,6 +757,8 @@ export class QtObject {
                 return this.$p[name].val
             },
             set: (newVal)=>{
+                if(this.UID === null || this.UID === undefined) return
+
                 while(this.$uL.properties.indexOf(name) >= 0){
                     this.$uL.properties.splice(this.$uL.properties.indexOf(name), 1)
                 }
