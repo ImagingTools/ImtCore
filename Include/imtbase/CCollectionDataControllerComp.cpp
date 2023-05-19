@@ -68,7 +68,7 @@ QByteArray CCollectionDataControllerComp::ImportFile(
 			if (state == ifile::IFilePersistence::OS_OK){
 				QFileInfo fileInfo(sourceFilePath);
 
-				return collection.InsertNewObject(typeId, fileInfo.baseName(), QString(QObject::tr("Import from %1").arg(sourceFilePath)), dataPtr);
+				return collection.InsertNewObject(typeId, fileInfo.completeBaseName(), QString(QObject::tr("Import from %1").arg(sourceFilePath)), dataPtr);
 			}
 		}
 	}
