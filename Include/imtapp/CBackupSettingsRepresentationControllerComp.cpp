@@ -1,6 +1,9 @@
 #include <imtapp/CBackupSettingsRepresentationControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QDateTime>
+
 // ImtCore includes
 #include <imtapp/IBackupSettings.h>
 

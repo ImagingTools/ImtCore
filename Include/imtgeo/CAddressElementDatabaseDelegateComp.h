@@ -17,8 +17,8 @@ class CAddressElementDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDeleg
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
-    I_BEGIN_COMPONENT(CAddressElementDatabaseDelegateComp)
-        I_ASSIGN(m_adrElementInfoFactCompPtr, "AddressElemenInfo", "Factory used for creation of the new address elemen instance", true, "AddressElemenInfo");
+	I_BEGIN_COMPONENT(CAddressElementDatabaseDelegateComp)
+		I_ASSIGN(m_adrElementInfoFactCompPtr, "AddressElemenInfo", "Factory used for creation of the new address elemen instance", true, "AddressElemenInfo");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -37,6 +37,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
+				const ContextDescription& description,
 				bool useExternDelegate = true) const override;
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,

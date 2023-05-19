@@ -30,6 +30,9 @@ SUBDIRS += ImtStylePck
 ImtStylePck.file = ../../Impl/ImtStylePck/QMake/ImtStylePck.pro
 ImtStylePck.depends = imtstyle DesignTokenCreatorExe
 
+SUBDIRS += imtapp
+imtapp.file = ../../Include/imtapp/QMake/imtapp.pro
+
 SUBDIRS += imtauth
 imtauth.file = ../../Include/imtauth/QMake/imtauth.pro
 
@@ -48,6 +51,9 @@ imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
 
 SUBDIRS += imtwidgets
 imtwidgets.file = ../../Include/imtwidgets/QMake/imtwidgets.pro
+
+SUBDIRS += imtgeo
+imtgeo.file = ../../Include/imtgeo/QMake/imtgeo.pro
 
 SUBDIRS += imtcom
 imtcom.file = ../../Include/imtcom/QMake/imtcom.pro
@@ -241,4 +247,15 @@ SUBDIRS += ImtImagePck
 ImtImagePck.file = ../../Impl/ImtImagePck/QMake/ImtImagePck.pro
 ImtImagePck.depends = imtimg
 
+SUBDIRS += ImtAppPck
+ImtAppPck.file = ../../Impl/ImtAppPck/QMake/ImtAppPck.pro
+ImtAppPck.depends = imtapp
+
+SUBDIRS += ImtAuthDbPck
+ImtAuthDbPck.file = ../../Impl/ImtAuthDbPck/QMake/ImtAuthDbPck.pro
+ImtAuthDbPck.depends = imtauthdb
+
+SUBDIRS += ImtAuthGqlPck
+ImtAuthGqlPck.file = ../../Impl/ImtAuthGqlPck/QMake/ImtAuthGqlPck.pro
+ImtAuthGqlPck.depends = imtauthgql
 

@@ -1,6 +1,9 @@
 #include <imtapp/CSchedulerParamsRepresentationControllerComp.h>
 
 
+// Qt includes
+#include <QtCore/QTime>
+
 // ImtCore includes
 #include <imtapp/ISchedulerParams.h>
 
@@ -24,7 +27,10 @@ bool CSchedulerParamsRepresentationControllerComp::IsModelSupported(const istd::
 }
 
 
-bool CSchedulerParamsRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CSchedulerParamsRepresentationControllerComp::GetRepresentationFromDataModel(
+			const istd::IChangeable& dataModel,
+			imtbase::CTreeItemModel& representation,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;
