@@ -70,6 +70,12 @@ public:
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
+	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;

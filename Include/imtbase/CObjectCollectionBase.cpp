@@ -246,11 +246,16 @@ bool CObjectCollectionBase::SetObjectData(const Id& objectId, const istd::IChang
 		}
 	}
 
-    return false;
+	return false;
 }
 
 
-IObjectCollection *CObjectCollectionBase::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
+IObjectCollection* CObjectCollectionBase::CreateSubCollection(
+			int offset,
+			int count,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
 
@@ -259,10 +264,21 @@ IObjectCollection *CObjectCollectionBase::CreateSubCollection(int offset, int co
 	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
 
 	for (int i = offset; i < objectsCount; i++){
-        collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].objectPtr, m_objects[i].id);
+		collectionPtr->InsertNewObject(m_objects[i].typeId, m_objects[i].name, m_objects[i].description, m_objects[i].objectPtr, m_objects[i].id);
 	}
 
 	return collectionPtr;
+}
+
+
+imtbase::IObjectCollectionIterator* CObjectCollectionBase::CreateObjectCollectionIterator(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
+{
+	return nullptr;
 }
 
 
@@ -335,12 +351,12 @@ ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 
 
 bool CObjectCollectionBase::GetSubsetInfo(
-			ICollectionInfo& subsetInfo,
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& parentId,
-			int iterationFlags) const
+			ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return false;
 }

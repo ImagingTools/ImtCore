@@ -597,7 +597,12 @@ bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const is
 }
 
 
-imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const
+imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(
+			int offset,
+			int count,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
 	m_filesLock.lockForRead();
@@ -611,7 +616,17 @@ imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(int off
 	m_filesLock.unlock();
 
 	return collectionPtr;
+}
 
+
+imtbase::IObjectCollectionIterator* CFileCollectionCompBase::CreateObjectCollectionIterator(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
+{
+	return nullptr;
 }
 
 
@@ -705,7 +720,13 @@ imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
 }
 
 
-bool CFileCollectionCompBase::GetSubsetInfo(imtbase::ICollectionInfo& subsetInfo, int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+bool CFileCollectionCompBase::GetSubsetInfo(
+			imtbase::ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return false;
 }

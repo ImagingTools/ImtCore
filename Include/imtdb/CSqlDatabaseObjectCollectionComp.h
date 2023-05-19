@@ -76,6 +76,12 @@ public:
 	virtual bool GetObjectData(const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual imtbase::IObjectCollection* CreateSubCollection(int offset = 0, int count = -1, const iprm::IParamsSet* selectionParamsPtr = nullptr, const Id& parentId = Id(), int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
@@ -100,12 +106,6 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const Id& parentId = Id(),
 				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
-	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
-				int offset = 0,
-				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const;
 	virtual Id GetParentId(const Id& elementId) const override;
 	virtual Ids GetElementPath(const Id& elementId) const override;
 	virtual bool IsBranch(const Id& elementId) const override;

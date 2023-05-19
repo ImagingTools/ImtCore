@@ -7,7 +7,6 @@
 // ImtCore includes
 #include <idoc/CStandardDocumentMetaInfo.h>
 #include <imtbase/CCollectionFilter.h>
-#include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 
 
 namespace imtguigql
@@ -95,27 +94,6 @@ imtbase::CTreeItemModel* CObjectMetaInfoCollectionControllerComp::ListObjects(co
 		}
 
 		notificationModel->SetData("PagesCount", pagesCount);
-
-		imtdb::CSqlDatabaseObjectCollectionComp* sqlDatabaseObjectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr());
-
-//		if (sqlDatabaseObjectCollectionCompPtr != nullptr){
-//			imtdb::CSqlDatabaseObjectCollectionComp::ObgectsMetaInfos objectMetaInfos;
-//			QByteArrayList metaInfoIds = GetInformationIds(gqlRequest, "");
-//			sqlDatabaseObjectCollectionCompPtr->GetObjectsMetaInfos(objectMetaInfos, metaInfoIds, offset, count, &filterParams);
-//			for (idoc::MetaInfoPtr metaInfoPtr: objectMetaInfos){
-//				int itemIndex = itemsModel->InsertNewItem();
-//				if (itemIndex >= 0){
-//					for (QByteArray metaInfoId: metaInfoIds){
-////						QVariant elementInformation = metaInfoPtr->GetMetaInfo(metaInfoId);
-////						if (metaInfoId == QByteArray("Added") || metaInfoId == QByteArray("LastModified")){
-////							elementInformation = elementInformation.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-////						}
-////						itemsModel->SetData(metaInfoId, elementInformation, itemIndex);
-//					}
-
-//				}
-//			}
-//		}
 
 		itemsModel->SetIsArray(true);
 		dataModel->SetExternTreeModel("items", itemsModel);

@@ -14,7 +14,7 @@ namespace imtbase
 
 class IRevisionController;
 class ICollectionDataController;
-
+class IObjectCollectionIterator;
 
 /**
 	Common interface for a data object collection.
@@ -185,6 +185,13 @@ public:
 		\param parentId				[optional] Parent element ID. Entire filtering operation applies to the childs of this element only.
 	*/
 	virtual imtbase::IObjectCollection* CreateSubCollection(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
+
+	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,

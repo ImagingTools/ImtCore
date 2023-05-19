@@ -64,8 +64,13 @@ public:
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-    virtual imtbase::IObjectCollection *CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
-
+	virtual imtbase::IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
+	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
@@ -243,9 +248,26 @@ inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjec
 
 
 template<class BaseInterface, class ObjectImpl>
-inline imtbase::IObjectCollection* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const imtbase::ICollectionInfo::Id &parentId, int iterationFlags) const
+inline imtbase::IObjectCollection* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			const imtbase::ICollectionInfo::Id& parentId,
+			int iterationFlags) const
 {
-    return m_collection.CreateSubCollection(offset, count, selectionParamsPtr, parentId, iterationFlags);
+	return m_collection.CreateSubCollection(offset, count, selectionParamsPtr, parentId, iterationFlags);
+}
+
+
+template<class BaseInterface, class ObjectImpl>
+imtbase::IObjectCollectionIterator* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateObjectCollectionIterator(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			const Id& parentId,
+			int iterationFlags) const
+{
+	return m_collection.CreateObjectCollectionIterator(offset, count, selectionParamsPtr, parentId, iterationFlags);
 }
 
 

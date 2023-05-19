@@ -82,6 +82,12 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
 				const Id& parentId = Id(),
 				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				const Id& parentId = Id(),
+				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;

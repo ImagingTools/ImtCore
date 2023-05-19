@@ -11,7 +11,6 @@
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
-#include <imtdb/CSqlDatabaseObjectCollectionComp.h>
 
 
 namespace imtguigql
@@ -512,9 +511,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			offset -= count;
 		}
 
-		imtdb::CSqlDatabaseObjectCollectionComp* objectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr());
-		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
-
+		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 		if (objectCollectionIterator != nullptr){
 			while (objectCollectionIterator->Next()){
 				imtbase::IObjectCollection::DataPtr objectDataPtr;

@@ -58,7 +58,12 @@ int CGqlObjectCollectionComp::GetOperationFlags(const Id& elementId) const
 }
 
 
-imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewBranch(const Id& parentId, const QString& name, const QString& description, const Id& proposedElementId, const idoc::IDocumentMetaInfo* elementMetaInfoPtr)
+imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewBranch(
+			const Id& parentId,
+			const QString& name,
+			const QString& description,
+			const Id& proposedElementId,
+			const idoc::IDocumentMetaInfo* elementMetaInfoPtr)
 {
 	if (m_gqlClientCompPtr.IsValid()){
 		if (m_typesInfo.GetOptionsCount() > 0){
@@ -326,11 +331,22 @@ bool CGqlObjectCollectionComp::SetObjectData(
 
 
 imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& parentId,
-			int iterationFlags) const
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
+{
+	return nullptr;
+}
+
+
+imtbase::IObjectCollectionIterator* CGqlObjectCollectionComp::CreateObjectCollectionIterator(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return nullptr;
 }
