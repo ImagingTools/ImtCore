@@ -193,10 +193,11 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 
 bool CDocumentCollectionViewDelegateComp::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
-	if (BaseClass2::RenameObject(objectId, newName)){
+	const QByteArray objectIdLocal = objectId;
+	if (BaseClass2::RenameObject(objectIdLocal, newName)){
 		for (int i = 0; i < m_openedDocuments.GetCount(); i++){
 			ObjectInfo* objectInfoPtr = m_openedDocuments.GetAt(i);
-			if (objectId == objectInfoPtr->uuid){
+			if (objectIdLocal == objectInfoPtr->uuid){
 				objectInfoPtr->name = newName;
 				if (m_documentManagerCompPtr.IsValid()){
 					for (int docIndex = 0; docIndex < m_documentManagerCompPtr->GetDocumentsCount(); docIndex++){
