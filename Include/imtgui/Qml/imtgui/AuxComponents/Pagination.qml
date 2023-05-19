@@ -85,7 +85,7 @@ Row {
                 id: buttonDelegate;
 
                 height: 20;
-                width: 24;
+                width: Math.max(24, textWidth);
 
                 hasIcon: false;
                 hasText: true;

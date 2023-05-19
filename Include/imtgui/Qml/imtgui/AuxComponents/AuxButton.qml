@@ -35,6 +35,7 @@ Rectangle {
     property alias iconSource: image.source;
     property alias fontColor: text.color;
     property alias mouseArea: ma;
+    property alias textWidth: text.width;
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
