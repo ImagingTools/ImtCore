@@ -159,6 +159,9 @@ export class ListView extends Flickable {
     //     }
         
     // }
+    $childChanged(){
+  
+    }
     $getMiddleWH(){
         let middleWidth = 0
         let middleHeight = 0
@@ -213,7 +216,7 @@ export class ListView extends Flickable {
                 for(let child of this.contentItem.children){
                     if(child.dom){
                         if(child.index > lastIndex) lastIndex = child.index
-                        visibleContenWidth += child.width
+                        visibleContentWidth += child.width
                         if(child.x < minX) minX = child.x
                         if(child.index < firstIndex) firstIndex = child.index
                     }
@@ -476,7 +479,7 @@ export class ListView extends Flickable {
     $updateView(){
         try {
             this.$enabledScroll = false
-            if(this.model && this.delegate && this.width > 0 && this.height > 0){
+            if(this.model && this.delegate){
                 
                 if(this.$items.length <= 0) return
 
