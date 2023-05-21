@@ -42,24 +42,25 @@ DocumentBase {
         fields: ["Id", "Name"];
 
         onModelUpdated: {
-            console.log("AccountEditor onModelUpdated", groupsProvider.completed);
-            for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-                groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
-            }
-            groupsTable.elements = groupsProvider.collectionModel;
-            groupsProvider.collectionModel.dataChanged.connect(accountEditorContainer.updateModel);
-        }
-
-//        function onModelUpdated(){
 //            console.log("AccountEditor onModelUpdated", groupsProvider.completed);
 //            for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
 //                groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
 //            }
-//            groupsTable.elements = groupsProvider.collectionModel;
+            groupsTable.elements = groupsProvider.collectionModel;
 //            groupsProvider.collectionModel.dataChanged.connect(accountEditorContainer.updateModel);
+        }
+    }
 
-//            groupsProvider.completed = true;
-//        }
+    function blockEditing(){
+        accountNameInput.readOnly = true;
+        accountDescriptionInput.readOnly = true;
+        countryInput.readOnly = true;
+        streetInput.readOnly = true;
+        postalCodeInput.readOnly = true;
+        cityInput.readOnly = true;
+        companyNameInput.readOnly = true;
+        emailInput.readOnly = true;
+        groupsTable.readOnly = true;
     }
 
     function updateGui(){
@@ -106,17 +107,13 @@ DocumentBase {
             }
         }
 
-        console.log("groupsTable.elements", groupsTable.elements);
-        console.log("groupIds", groupIds);
+        groupsTable.uncheckAll();
 
         if (groupsTable.elements){
             for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
                 let id = groupsTable.elements.GetData("Id", i);
                 if (groupIds.includes(id)){
-                    groupsTable.elements.SetData("CheckedState", Qt.Checked, i);
-                }
-                else{
-                    groupsTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+                    groupsTable.checkItem(i);
                 }
             }
         }
@@ -157,17 +154,13 @@ DocumentBase {
         accountEditorContainer.documentModel.SetData("CompanyName", companyName)
 
         let email = emailInput.text;
-        accountEditorContainer.documentModel.SetData("Email", email)
+        accountEditorContainer.documentModel.SetData("Email", email);
 
         let selectedGroupIds = []
-        if (groupsTable.elements){
-            for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
-                let id = groupsTable.elements.GetData("Id", i);
-                let state = groupsTable.elements.GetData("CheckedState", i);
-                if (state === Qt.Checked){
-                    selectedGroupIds.push(id)
-                }
-            }
+        let indexes = groupsTable.checkedIndexes;
+        for (let index of indexes){
+            let id = groupsTable.elements.GetData("Id", index);
+            selectedGroupIds.push(id)
         }
 
         let groups = selectedGroupIds.join(';');
@@ -209,6 +202,7 @@ DocumentBase {
         contentHeight: bodyColumn.height;
 
         boundsBehavior: Flickable.StopAtBounds;
+        interactive: !mouseArea.containsMouse;
 
         Column {
             id: bodyColumn;
@@ -528,74 +522,48 @@ DocumentBase {
                 text: qsTr("Groups");
             }
 
-            AuxTable {
-                id: groupsTable;
-
+            Item {
                 width: parent.width;
-                height: 300;
+                height: groupsTable.height;
 
-                checkable: true;
-                radius: 0;
+                MouseArea {
+                    id: mouseArea;
+
+                    anchors.fill: groupsTable;
+                    hoverEnabled: true;
+                }
+
+                AuxTable {
+                    id: groupsTable;
+
+                    width: parent.width;
+                    height: 250;
+
+                    checkable: true;
+                    radius: 0;
+
+                    onCheckedItemsChanged: {
+                        if (accountEditorContainer.blockUpdatingModel){
+                            return;
+                        }
+
+                        let indexes = groupsTable.checkedIndexes;
+                        let groups = accountEditorContainer.documentModel.GetData("Groups");
+                        let groupIDs = [];
+                        for (let index of indexes){
+                            let groupId = groupsTable.elements.GetData("Id", index);
+                            groupIDs.push(groupId);
+                        }
+
+                        let newGroups = groupIDs.join(';');
+                        if (groups !== newGroups){
+                            accountEditorContainer.documentModel.SetData("Groups", groupIDs.join(';'));
+                            undoRedoManager.makeChanges();
+                        }
+                    }
+                }
             }
-
         }//Body column
+
     }//Flickable
-
-
-//    Rectangle{
-//        anchors.fill: parent;
-
-//        property int i: 0;
-
-//        TreeItemModel {
-//            id: test;
-
-//            Component.onCompleted: {
-//                let index = test.InsertNewItem();
-//                test.SetData("Value", "Test", index);
-//                let childModel = test.AddTreeModel("ChildModel", index);
-//                index = childModel.InsertNewItem();
-//                childModel.SetData("Value", "Test", index);
-//            }
-
-//            onDataChanged: {
-//                console.log("test onDataChanged", topLeft, bottomRight, roleNames);
-//            }
-//        }
-
-//        AuxButton {
-//            width: 100;
-//            height: 20;
-
-//            hasText: true;
-
-//            textButton: "ChildModel";
-
-//            onClicked: {
-//                let childModel = test.GetData("ChildModel");
-
-//                childModel.SetData("Value", "Test" + parent.i);
-//                parent.i++;
-//                console.log("test", test.toJSON());
-//            }
-//        }
-
-//        AuxButton {
-//            x: 200;
-//            width: 100;
-//            height: 20;
-
-//            hasText: true;
-
-//            textButton: "ChildModel";
-
-//            onClicked: {
-
-//                test.SetData("Value", "Test2" + parent.i);
-//                parent.i++;
-
-//                console.log("test", test.toJSON());
-//            }
-//        }
-//    }
 }// Account Editor container

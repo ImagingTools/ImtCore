@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 
-
 Rectangle{
     id:scrollContainer;
 
@@ -10,7 +9,7 @@ Rectangle{
     color: backgroundColor;
     radius: 4;
 
-    visible: hideNotUsed ? !notUsed : true;
+    visible: vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
 
     property var targetItem;
 
@@ -31,15 +30,20 @@ Rectangle{
     property bool notUsed: !targetItem ? true : vertical ? targetItem.contentHeight <= targetItem.height:
                                       targetItem.contentWidth <= targetItem.width;
     property bool hideNotUsed: true;
-
     property real koeff: vertical ? (!targetItem || scrollIndicator.height > scrollContainer.minSize ? 1 :(targetItem.height - scrollContainer.minSize)/(targetItem.contentHeight - targetItem.height)):
                                     (!targetItem || scrollIndicator.width > scrollContainer.minSize ? 1 :(targetItem.width - scrollContainer.minSize)/(targetItem.contentWidth - targetItem.width));
 
-
     property bool visibleState: !canFade ? 1 : isMoving ? 1 : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? 1 : 0;
-
     property bool inSideTarget: false;
 
+    onHeightChanged: {
+        visible = vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
+    }
+
+    property int targetContentHeight: targetItem.contentHeight;
+    onTargetContentHeightChanged: {
+        visible = vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
+    }
 
     Component.onCompleted: {
         scrollContainer.opacity = !scrollContainer.canFade;
@@ -52,9 +56,7 @@ Rectangle{
         else {
             animFrom.start();
         }
-
     }
-
 
     PauseAnimation {
         id: fadePause;
@@ -111,7 +113,8 @@ Rectangle{
 
         anchors.fill: parent;
 
-        visible: scrollContainer.visible && !scrollContainer.notUsed;
+//        visible: scrollContainer.visible && !scrollContainer.notUsed;
+        visible: scrollContainer.visible;
         enabled: visible;
         hoverEnabled: enabled;
         property int delta: 40;
@@ -282,14 +285,21 @@ Rectangle{
 
             anchors.fill: parent;
 
-            visible: parent.visible && !scrollContainer.notUsed;
+//            visible: parent.visible && !scrollContainer.notUsed;
+            visible: scrollContainer.visible;
             enabled: visible;
             hoverEnabled: enabled;
 
             property bool dragEnabled: false;
+
+            onDragEnabledChanged: {
+                console.log("onDragEnabledChanged", dragEnabled)
+            }
+
             property var coord :mapToItem(scrollContainer,0,0);
             //cursorShape: containsMouse ? Qt.PointingHandCursor: Qt.ArrowCursor;
             onWheel: {
+                console.log("onWheel", scrollMA.dragEnabled);
                 if(scrollContainer.inSideTarget){
                     wheel.accepted = false;
                 }
@@ -385,10 +395,10 @@ Rectangle{
                 scrollMA.dragEnabled = false;
             }
             onExited: {
-                //scrollMA.dragEnabled = false;
+//                scrollMA.dragEnabled = false;
             }
             onPositionChanged: {
-
+                console.log("onPositionChanged", scrollMA.dragEnabled);
                 if(scrollMA.dragEnabled)
                 {
                     var newCoords = mapToItem(scrollContainer,mouse.x,mouse.y);
@@ -419,12 +429,8 @@ Rectangle{
                     }
 
                     scrollMA.coord = newCoords;
-
                 }
             }
-
         }
-
-
     }
 }

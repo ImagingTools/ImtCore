@@ -94,6 +94,8 @@ FocusScope {
         anchors.fill: textField;
         cursorShape: containerTextField.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
 
+        visible: !containerTextField.readOnly;
+
         acceptedButtons: Qt.RightButton;
 
         onClicked: {
@@ -175,16 +177,14 @@ FocusScope {
         }
 
         onEditingFinished: {
-            console.log("TextInput onEditingFinished");
-
             containerTextField.editingFinished();
         }
 
         Text {
             id: placeHolder;
 
-            anchors.left: parent.left;
-            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: textField.left;
+            anchors.verticalCenter: textField.verticalCenter;
 
             font.pixelSize: containerTextField.placeHolderTextSize;
             font.bold: containerTextField.fontBold;

@@ -273,7 +273,7 @@ TreeViewItemDelegateBase {
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
-                visible: productTreeItemDelegate.level == 0 && productTreeItemDelegate.selected;
+                visible: productTreeItemDelegate.level == 0 && productTreeItemDelegate.selected && !productTreeItemDelegate.root.readOnly;
 
                 AuxButton {
                     anchors.verticalCenter: addButtonRect.verticalCenter;
@@ -303,7 +303,7 @@ TreeViewItemDelegateBase {
                 width: 18;
                 height: productTreeItemDelegate.root ? productTreeItemDelegate.root.rowItemHeight : 0;
 
-                visible: productTreeItemDelegate.level == 1 && productTreeItemDelegate.selected;
+                visible: productTreeItemDelegate.level == 1 && productTreeItemDelegate.selected && !productTreeItemDelegate.root.readOnly;
 
                 AuxButton {
                     anchors.verticalCenter: removeButtonRect.verticalCenter;

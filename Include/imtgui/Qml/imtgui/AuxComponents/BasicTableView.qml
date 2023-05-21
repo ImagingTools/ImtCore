@@ -7,17 +7,13 @@ FocusScope {
     clip: true;
 
     property bool headerVisible: true;
-    property bool readOnly: true;
+    property bool readOnly: false;
     property bool withoutSelection: false;
 
-    //    property alias headerDelegate: listView.header;
-    property alias rowDelegate: listView.delegate;
+    property bool checkable: false;
 
-    //    property alias rowDelegate: tableDelegateLoader.sourceComponent;
-    //    property alias contentHeader: listView.header;
-    //    property alias contentFooter: listView.footer;
+    property alias rowDelegate: listView.delegate;
     property alias background: backgroundLoader.sourceComponent;
-    //    property alias boundsBehavior: listView.boundsBehavior;
 
     property int columnCount:repeater.count;
     property int rowCount: listView.count;
@@ -54,8 +50,100 @@ FocusScope {
     signal rowModelDataChanged(var delegate, var prop);
     signal rowAdded();
     signal rowRemoved();
+    signal checkedItemsChanged();
 
     property var itemsList: [];
+
+    function getCheckedItems(){
+        let result = []
+        let delegates = tableViewRoot.getItemsDataAsList();
+        for (let delegate of delegates){
+            if (delegate.checkState === Qt.Checked){
+                result.push(delegate);
+            }
+        }
+        return result;
+    }
+
+    function checkItem(delegate){
+//        let delegate = tableViewRoot.getItemByIndex(modelIndex);
+        if (delegate){
+            if (delegate.checkState !== Qt.Checked){
+                delegate.checkState = Qt.Checked;
+
+                if (delegate.parentDelegate){
+                    delegate.parentDelegate.childrenCheckStateChanged(delegate);
+                }
+
+                for (let childDelegate of delegate.childrenDelegates){
+                    childDelegate.parentCheckStateChanged(delegate);
+                }
+
+                tableViewRoot.checkedItemsChanged();
+            }
+        }
+    }
+
+    function uncheckItem(delegate){
+//        let delegate = tableViewRoot.getItemByIndex(modelIndex);
+        if (delegate){
+            if (delegate.checkState !== Qt.Unchecked){
+                delegate.checkState = Qt.Unchecked;
+                if (delegate.parentDelegate){
+                    delegate.parentDelegate.childrenCheckStateChanged(delegate);
+                }
+
+                for (let childDelegate of delegate.childrenDelegates){
+                    childDelegate.parentCheckStateChanged(delegate);
+                }
+
+                tableViewRoot.checkedItemsChanged();
+            }
+        }
+    }
+
+    function checkAll(){
+        let ok = false;
+        let delegates = tableViewRoot.getItemsDataAsList();
+        for (let delegate of delegates){
+            if (delegate.checkState !== Qt.Checked){
+                delegate.checkState = Qt.Checked;
+                ok = true;
+            }
+        }
+
+        if (ok){
+            tableViewRoot.checkedItemsChanged();
+        }
+    }
+
+    function uncheckAll(){
+        let ok = false;
+        let delegates = tableViewRoot.getItemsDataAsList();
+        for (let delegate of delegates){
+            if (delegate.checkState !== Qt.Unchecked){
+                delegate.checkState = Qt.Unchecked;
+                ok = true;
+            }
+        }
+
+        if (ok){
+            tableViewRoot.checkedItemsChanged();
+        }
+    }
+
+//    function __checkItems(delegates, state){
+//        for (let delegate of delegates){
+//            delegate.checkState = state;
+//            if (delegate.childrenDelegates.length > 0){
+//                tableViewRoot.__checkItems(delegate.childrenDelegates, state);
+//            }
+//        }
+//    }
+
+//    function __childrenChanged(state){
+
+//    }
 
     function _addItem(item){
         tableViewRoot.itemsList.push(item);
@@ -72,18 +160,18 @@ FocusScope {
         return itemsList;
     }
 
-    function getCheckedItems(){
-        let result = []
+//    function getCheckedItems(){
+//        let result = []
 
-        for (let i = 0; i < tableViewRoot.itemsList.length; i++){
-            let itemData = tableViewRoot.itemsList[i];
-            if (itemData.CheckState === Qt.Checked){
-                result.push(itemData);
-            }
-        }
+//        for (let i = 0; i < tableViewRoot.itemsList.length; i++){
+//            let itemData = tableViewRoot.itemsList[i];
+//            if (itemData.CheckState === Qt.Checked){
+//                result.push(itemData);
+//            }
+//        }
 
-        return result;
-    }
+//        return result;
+//    }
 
     function resetSelection(){
         tableViewRoot.tableSelection.resetSelection();
@@ -128,6 +216,17 @@ FocusScope {
         }
 
         return false;
+    }
+
+    function getItemByIndex(index){
+        let delegates = tableViewRoot.getItemsDataAsList();
+        for (let delegate of delegates){
+            if (delegate.modelIndex.equal(index)){
+                return delegate;
+            }
+        }
+
+        return null;
     }
 
     Loader {
@@ -236,7 +335,6 @@ FocusScope {
 
         anchors.top: headerItem.bottom;
         anchors.bottom: parent.bottom;
-
         width: parent.width;
 
         contentWidth: bodyColumn.width;

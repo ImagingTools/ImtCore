@@ -11,10 +11,6 @@ Item {
 
     property bool blockUpdatingModel: false;
 
-    Component.onDestruction: {
-        usersProvider.collectionModel.dataChanged.disconnect(groupUsersContainer.updateModel);
-    }
-
     onDocumentModelChanged: {
         console.log("GroupUsers onDocumentModelChanged", documentModel);
 
@@ -33,13 +29,13 @@ Item {
             }
         }
 
-        for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
-            let id = usersTable.elements.GetData("Id", i);
-            if (userIds.includes(id)){
-                usersTable.elements.SetData("CheckedState", Qt.Checked, i);
-            }
-            else{
-                usersTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+        usersTable.uncheckAll();
+        if (usersTable.elements){
+            for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
+                let id = usersTable.elements.GetData("Id", i);
+                if (userIds.includes(id)){
+                    usersTable.checkItem(i);
+                }
             }
         }
 
@@ -56,14 +52,11 @@ Item {
         }
 
         let selectedUserIds = []
-        if (usersTable.elements){
-            for (let i = 0; i < usersTable.elements.GetItemsCount(); i++){
-                let id = usersTable.elements.GetData("Id", i);
-                let state = usersTable.elements.GetData("CheckedState", i);
-                if (state === Qt.Checked){
-                    selectedUserIds.push(id)
-                }
-            }
+
+        let indexes = usersTable.checkedIndexes;
+        for (let index of indexes){
+            let id = usersTable.elements.GetData("Id", index);
+            selectedUserIds.push(id);
         }
 
         let result = selectedUserIds.join(';');
@@ -90,13 +83,8 @@ Item {
 
         onModelUpdated: {
             if (usersProvider.collectionModel != null){
-                for (let i = 0; i < usersProvider.collectionModel.GetItemsCount(); i++){
-                    usersProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
-                }
-
                 usersTable.elements = usersProvider.collectionModel;
                 groupUsersContainer.updateGui();
-                usersProvider.collectionModel.dataChanged.connect(groupUsersContainer.updateModel);
             }
         }
     }
@@ -158,5 +146,25 @@ Item {
 
         checkable: true;
         radius: 0;
+
+        onCheckedItemsChanged: {
+            if (groupUsersContainer.blockUpdatingModel){
+                return;
+            }
+
+            let indexes = usersTable.checkedIndexes;
+            let users = groupUsersContainer.documentModel.GetData("Users");
+            let userIDs = [];
+            for (let index of indexes){
+                let userId = usersTable.elements.GetData("Id", index);
+                userIDs.push(userId);
+            }
+
+            let newUsers = userIDs.join(';');
+            if (users !== newUsers){
+                groupUsersContainer.documentModel.SetData("Users", userIDs.join(';'));
+                undoRedoManager.makeChanges();
+            }
+        }
     }
 }//Container

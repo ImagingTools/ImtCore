@@ -105,6 +105,11 @@ DocumentBase {
         productViewContainer.commandsDelegate.tableData = tableView;
     }
 
+    function blockEditing(){
+        tableView.readOnly = true;
+        categoryComboBox.changeable = false;
+    }
+
     function onFeaturesUpdated(){
         console.log( "ProductView onFeaturesUpdated", productViewContainer.featuresUpdated);
 

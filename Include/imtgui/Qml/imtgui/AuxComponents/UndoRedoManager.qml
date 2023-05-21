@@ -62,6 +62,11 @@ QtObject {
         undoRedoManager.mainModel.Copy(undoRedoManager.documentBase.documentModel);
     }
 
+    function makeChanges(){
+        undoRedoManager.beginChanges()
+        undoRedoManager.endChanges()
+    }
+
     function beginChanges(){
         if (undoRedoManager.transaction || !undoRedoManager.modelIsRegistered){
             console.warn("UndoRedoManager beginChanges failed!");
@@ -101,7 +106,7 @@ QtObject {
     }
 
     function getCopyFromModel(model){
-        let emptyModel = treeItemModelComp.createObject(undoRedo);
+        let emptyModel = undoRedoManager.treeItemModelComp.createObject(undoRedo);
         emptyModel.Copy(model)
 
         return emptyModel;

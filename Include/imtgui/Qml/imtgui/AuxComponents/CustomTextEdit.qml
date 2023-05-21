@@ -105,7 +105,51 @@ FocusScope {
             id: mouseArea;
 
             anchors.fill: textEdit;
-            cursorShape: containerTextEdit.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
+//            cursorShape: containerTextEdit.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
+            acceptedButtons: Qt.RightButton;
+
+            visible: !containerTextEdit.readOnly;
+
+            onClicked: {
+                let point = mapToItem(null, mouse.x, mouse.y);
+
+                inputActions.open(point.x, point.y);
+            }
+        }
+
+        InputActions {
+            id: inputActions;
+
+            onCopyClicked: {
+                textEdit.copy();
+            }
+
+            onCutClicked: {
+                textEdit.cut();
+
+                containerTextEdit.editingFinished();
+            }
+
+            onPasteClicked: {
+                let oldText = textEdit.text;
+                textEdit.paste();
+                let newText = textEdit.text;
+                if (oldText !== newText){
+                    containerTextEdit.editingFinished();
+                }
+            }
+
+            onRemoveClicked: {
+                if (textEdit.selectedText !== ""){
+                    textEdit.remove(textEdit.selectionStart, textEdit.selectionEnd);
+
+                    containerTextEdit.editingFinished();
+                }
+            }
+
+            onSelectAllClicked: {
+                textEdit.selectAll();
+            }
         }
 
         TextEdit {

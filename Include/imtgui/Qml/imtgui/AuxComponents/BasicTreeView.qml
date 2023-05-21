@@ -16,38 +16,38 @@ BasicTableView {
 
             root: treeViewRoot;
 
-            onParentCheckStateChanged: {
-                model.CheckState = data.CheckState;
+//            onParentCheckStateChanged: {
+//                model.CheckState = data.CheckState;
 
-                for (let i = 0; i < childrenDelegates.length; i++){
-                    childrenDelegates[i].parentCheckStateChanged(model);
-                }
-            }
+//                for (let i = 0; i < childrenDelegates.length; i++){
+//                    childrenDelegates[i].parentCheckStateChanged(model);
+//                }
+//            }
 
-            onChildrenCheckStateChanged: {
-                let isAllChecked = root.__checkState(childrenDelegates, Qt.Checked);
-                let isAllUnchecked = root.__checkState(childrenDelegates, Qt.Unchecked);
+//            onChildrenCheckStateChanged: {
+//                let isAllChecked = root.__checkState(childrenDelegates, Qt.Checked);
+//                let isAllUnchecked = root.__checkState(childrenDelegates, Qt.Unchecked);
 
-                if (isAllChecked){
-                    if (model.CheckState != Qt.Checked){
-                        model.CheckState = Qt.Checked;
-                    }
-                }
-                else if (isAllUnchecked){
-                    if (model.CheckState != Qt.Unchecked){
-                        model.CheckState = Qt.Unchecked;
-                    }
-                }
-                else if (!isAllChecked && !isAllUnchecked){
-                    if (model.CheckState != Qt.PartiallyChecked){
-                        model.CheckState = Qt.PartiallyChecked;
-                    }
-                }
+//                if (isAllChecked){
+//                    if (model.CheckState != Qt.Checked){
+//                        model.CheckState = Qt.Checked;
+//                    }
+//                }
+//                else if (isAllUnchecked){
+//                    if (model.CheckState != Qt.Unchecked){
+//                        model.CheckState = Qt.Unchecked;
+//                    }
+//                }
+//                else if (!isAllChecked && !isAllUnchecked){
+//                    if (model.CheckState != Qt.PartiallyChecked){
+//                        model.CheckState = Qt.PartiallyChecked;
+//                    }
+//                }
 
-                if (treeViewDeleg.parentDelegate){
-                    treeViewDeleg.parentDelegate.childrenCheckStateChanged(model);
-                }
-            }
+//                if (treeViewDeleg.parentDelegate){
+//                    treeViewDeleg.parentDelegate.childrenCheckStateChanged(model);
+//                }
+//            }
         }
     }
 
@@ -283,7 +283,7 @@ BasicTableView {
 
         for (let i = 0; i < delegates.length; i++){
             let childrenDelegate = delegates[i];
-            if (childrenDelegate.itemData.CheckState != state){
+            if (childrenDelegate.checkState !== state){
                 result = false;
                 break;
             }

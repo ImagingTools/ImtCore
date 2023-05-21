@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: provider;
 
     property TreeItemModel model: TreeItemModel {}
@@ -11,7 +11,7 @@ Item {
 
     function updateModel(){
         console.log("LicensesProvider updateModel");
-        licensesModel.updateModel();
+        provider.licensesModel.updateModel();
     }
 
     function getLicenseName(productId, licenseId){
@@ -31,9 +31,7 @@ Item {
         return ""
     }
 
-    GqlModel {
-        id: licensesModel;
-
+    property GqlModel licensesModel: GqlModel {
         function updateModel() {
             console.log("LicensesProvider updateModel Licenses");
             var query = Gql.GqlRequest("query", "Licenses");
@@ -50,14 +48,15 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State Licenses:", this.state);
             if (this.state === "Ready"){
-                var dataModelLocal = this.GetData("data");
-                if (dataModelLocal.ContainsKey("Licenses")){
-                    dataModelLocal = dataModelLocal.GetData("Licenses");
-                    provider.model = dataModelLocal;
+                if (provider.licensesModel.ContainsKey("data")){
+                    var dataModelLocal = provider.licensesModel.GetData("data");
+                    if (dataModelLocal.ContainsKey("Licenses")){
+                        dataModelLocal = dataModelLocal.GetData("Licenses");
+                        provider.model = dataModelLocal;
 
-                    provider.completed = true;
+                        provider.completed = true;
+                    }
                 }
             }
         }

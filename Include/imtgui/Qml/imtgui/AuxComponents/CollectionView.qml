@@ -51,6 +51,7 @@ Item {
     property alias commandsProvider: commandsProviderLocal;
 
     signal elementsChanged();
+    signal filterDecoratorLoaded();
 
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
@@ -72,6 +73,7 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
+        Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
     }
 
     onCommandUpdateGuiChanged: {
@@ -268,6 +270,9 @@ Item {
         loadData: true;
         hasFilter: collectionViewContainer.hasFilter;
 
+        onFilterDecoratorLoaded: {
+            collectionViewContainer.filterDecoratorLoaded();
+        }
 
         onSelectionChanged: {
             if (collectionMetaInfo.visible){

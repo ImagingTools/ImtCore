@@ -5,6 +5,7 @@ FocusScope {
     id: delegate;
 
     width: root ? root.width : 0;
+    //width: parent.width;
     height: root ? root.rowItemHeight : 0;
 
     visible: delegate.isVisible;

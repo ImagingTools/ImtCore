@@ -78,7 +78,7 @@ QtObject {
             console.log("State:", this.state, container.itemsInfoModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
-                if (itemsInfoModel.ContainsKey("errors")){
+                if (container.itemsInfoModel.ContainsKey("errors")){
                     return;
                 }
 

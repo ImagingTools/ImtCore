@@ -196,7 +196,7 @@ Item {
         anchors.left: mainRec.left;
         anchors.right: mainRec.right;
         anchors.leftMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textLeftMargin: 0;
-        anchors.rightMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textRightMargin : 0;
+      //  anchors.rightMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textRightMargin : 0;
 
         sourceComponent: defaultContent;
 

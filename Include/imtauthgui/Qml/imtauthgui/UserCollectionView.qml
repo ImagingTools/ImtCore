@@ -32,6 +32,8 @@ CollectionView {
 
             height: 20;
 
+            clip: true;
+
             property Item tableCellDelegate: null;
 
             onTableCellDelegateChanged: {
@@ -60,9 +62,13 @@ CollectionView {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
+//                width: item.width;
+
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
                 color: Style.textColor;
+
+                elide: Text.ElideRight;
             }
 
             AuxButton {
@@ -94,20 +100,20 @@ CollectionView {
         id: groupsContentComp;
 
         Item {
-            id: item;
+            id: item2;
 
-            height: 20;
+           // height: 20;
 
             property Item tableCellDelegate: null;
 
             onTableCellDelegateChanged: {
-                if (item.tableCellDelegate != null){
+                if (item2.tableCellDelegate != null){
                     let username = userCollectionViewContainer.baseCollectionView.table.elements.GetData("Name", tableCellDelegate.rowIndex);
                     let groups = userCollectionViewContainer.baseCollectionView.table.elements.GetData("Groups", tableCellDelegate.rowIndex);
                     arrowButton.visible = groups !== "";
                     if (groups !== ""){
                         let groupList = groups.split(';');
-                        name.text = "View groups" + "(" + groupList.length +  ")";
+                        name2.text = "View groups" + "(" + groupList.length +  ")";
 
                         let result = "<b><u>" + username + "</u></b> " + "is included into" + " <b>" + groupList.length + "</b> " + "groups:";
                         for (let i = 0; i < groupList.length; i++){
@@ -116,32 +122,36 @@ CollectionView {
                         arrowButton.tooltipText = result;
                     }
                     else{
-                        name.text = "No groups";
+                        name2.text = "No groups";
                     }
                 }
             }
 
             Text {
-                id: name;
+                id: name2;
 
                 anchors.verticalCenter: parent.verticalCenter;
+
+//                width: item2.width;
 
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
                 color: Style.textColor;
+
+                elide: Text.ElideRight;
             }
 
             AuxButton {
                 id: arrowButton;
 
                 anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: name.right;
-                anchors.leftMargin: 5;
+                anchors.left: name2.right;
+              //  anchors.leftMargin: 5;
 
                 width: 15;
                 height: width;
 
-                visible: name.text !== "";
+                visible: name2.text !== "";
 
                 iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
 

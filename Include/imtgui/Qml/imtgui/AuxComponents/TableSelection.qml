@@ -62,6 +62,10 @@ QtObject {
         root.selectionChanged();
     }
 
+    function isSelected(index){
+        return root.selectedIndexes.includes(index);
+    }
+
     function up(){
         if (root.selectedIndexes.length > 0){
             let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];

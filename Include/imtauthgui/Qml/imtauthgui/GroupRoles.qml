@@ -11,10 +11,6 @@ Item {
 
     property bool blockUpdatingModel: false;
 
-    Component.onDestruction: {
-        rolesProvider.collectionModel.modelChanged.disconnect(groupRolesContainer.updateModel);
-    }
-
     onDocumentModelChanged: {
         console.log("UserRoles onDocumentModelChanged", documentModel);
 
@@ -40,13 +36,13 @@ Item {
             }
         }
 
-        for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
-            let id = rolesTable.elements.GetData("Id", i);
-            if (roleIds.includes(id)){
-                rolesTable.elements.SetData("CheckedState", Qt.Checked, i);
-            }
-            else{
-                rolesTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+        rolesTable.uncheckAll();
+        if (rolesTable.elements){
+            for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
+                let id = rolesTable.elements.GetData("Id", i);
+                if (roleIds.includes(id)){
+                    rolesTable.checkItem(i);
+                }
             }
         }
 
@@ -63,14 +59,10 @@ Item {
         }
 
         let selectedRoleIds = []
-        if (rolesTable.elements){
-            for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
-                let id = rolesTable.elements.GetData("Id", i);
-                let state = rolesTable.elements.GetData("CheckedState", i);
-                if (state === Qt.Checked){
-                    selectedRoleIds.push(id)
-                }
-            }
+        let indexes = rolesTable.checkedIndexes;
+        for (let index of indexes){
+            let id = rolesTable.elements.GetData("Id", index);
+            selectedRoleIds.push(id);
         }
 
         let result = selectedRoleIds.join(';');
@@ -99,15 +91,9 @@ Item {
             if (rolesProvider.collectionModel != null){
                 if (rolesProvider.collectionModel.ContainsKey("Roles")){
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        rolesModel.SetData("CheckedState", Qt.Unchecked, i);
-                    }
-
                     rolesTable.elements = rolesModel;
 
                     groupRolesContainer.updateGui();
-
-                    rolesProvider.collectionModel.dataChanged.connect(groupRolesContainer.updateModel);
                 }
             }
         }
@@ -172,5 +158,25 @@ Item {
 
         checkable: true;
         radius: 0;
+
+        onCheckedItemsChanged: {
+            if (groupRolesContainer.blockUpdatingModel){
+                return;
+            }
+
+            let indexes = rolesTable.checkedIndexes;
+            let roles = groupRolesContainer.documentModel.GetData("Roles");
+            let roleIDs = [];
+            for (let index of indexes){
+                let roleId = rolesTable.elements.GetData("Id", index);
+                roleIDs.push(roleId);
+            }
+
+            let newGroups = roleIDs.join(';');
+            if (roles !== newGroups){
+                groupRolesContainer.documentModel.SetData("Roles", roleIDs.join(';'));
+                undoRedoManager.makeChanges();
+            }
+        }
     }
 }//Container

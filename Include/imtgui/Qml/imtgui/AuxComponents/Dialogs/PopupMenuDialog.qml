@@ -117,7 +117,7 @@ Item {
 
             secondSize: 10;
             targetItem: popupMenuListView;
-            visible: !popupMenuContainer.visibleScrollBar ? false : hideNotUsed ? !notUsed : true;
+//            visible: !popupMenuContainer.visibleScrollBar ? false : hideNotUsed ? !notUsed : true;
 
         }
 

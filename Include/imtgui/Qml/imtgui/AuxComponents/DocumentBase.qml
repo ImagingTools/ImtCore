@@ -15,6 +15,7 @@ Item {
     property Item documentManager: null;
 
     property bool isDirty: false;
+    property bool readOnly: false;
 
     property bool saveIsBlocked: false;
 
@@ -46,11 +47,14 @@ Item {
         return true;
     }
 
+    function blockEditing(){}
+
     Component.onCompleted: {
         console.log("Document onCompleted", itemId);
         documentBaseRoot.documentUuid = uuidGenerator.generateUUID();
 
         documentBaseRoot.commandsProvider.modelLoaded.connect(documentBaseRoot.onCommandsModelLoaded);
+        documentBaseRoot.commandsDelegate.documentBase = documentBaseRoot;
     }
 
     onVisibleChanged: {
@@ -141,7 +145,13 @@ Item {
         }
     }
 
-    function onCommandsModelLoaded(){}
+    // If the command 'Save' is missing then we block the UI
+    function onCommandsModelLoaded(){
+        let saveExists = documentBaseRoot.commandsProvider.commandExists("Save");
+        if (!saveExists){
+            documentBaseRoot.blockEditing();
+        }
+    }
 
     function updateGui(){}
 

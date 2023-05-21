@@ -6,7 +6,7 @@ Rectangle {
 
     width: 1000;
     height: minHeight;
-	color: "transparent";
+    color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
 
 	property alias cellDelegate: dataList.delegate
     property int textTopMargin: 8;
@@ -32,6 +32,8 @@ Rectangle {
     property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
 
     property bool emptyDecorCell: true;
+
+    property bool readOnly: false;
 
     property string selectedColor: Style.selectedColor;
     property real selectedOpacity: 0.5;
@@ -250,16 +252,16 @@ Rectangle {
         id: heightModel;
     }
 
-    Rectangle {
-        id: selectionBackGround;
+//    Rectangle {
+//        id: selectionBackGround;
 
-        anchors.fill: parent;
+//        anchors.fill: parent;
 
-        color: tableDelegateContainer.selectedColor;
-
-        radius: 2;
-        visible: tableDelegateContainer.selected;
-    }
+//        color: tableDelegateContainer.selectedColor;
+//        radius: 2;
+//        opacity: 0.5;
+//        visible: ma.containsMouse;
+//    }
 
     CheckBox {
         id: checkBox;
@@ -273,9 +275,19 @@ Rectangle {
         checkState: tableDelegateContainer.checkedState;
 
         visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
+        isActive: !tableDelegateContainer.readOnly;
 
         onClicked: {
-            model.CheckedState = Qt.Checked - model.CheckedState;
+            if (tableDelegateContainer.readOnly){
+                return;
+            }
+
+            if (tableDelegateContainer.tableItem.itemIsChecked(tableDelegateContainer.rowIndex)){
+                tableDelegateContainer.tableItem.uncheckItem(tableDelegateContainer.rowIndex);
+            }
+            else{
+                tableDelegateContainer.tableItem.checkItem(tableDelegateContainer.rowIndex);
+            }
         }
     }
 
@@ -308,11 +320,12 @@ Rectangle {
 
         anchors.fill: parent;
 
+//        hoverEnabled: true;
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
         onClicked: {
+            console.log("onClicked", model["Id"])
             if (mouse.button === Qt.RightButton) {
-                
                 tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
             }
             tableDelegateContainer.clicked();

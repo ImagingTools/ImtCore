@@ -63,7 +63,7 @@ Item {
     Rectangle {
         id: body;
 
-        width: productRolesDelegate.width;
+        width: productRolesDelegate.width - 10;
         height: 30;
 
         color: Style.alternateBaseColor;
@@ -113,8 +113,8 @@ Item {
 
         color: "transparent";
 
-        width: productRolesDelegate.width;
-        height: rolesColumn.height;
+        width: body.width;
+        height: rolesColumn.height + 2;
 
         border.color: Style.imagingToolsGradient2;
         border.width: 1;
@@ -125,7 +125,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter;
             anchors.verticalCenter: parent.verticalCenter;
 
-            width: rolesBg.width - 2;
+            width: rolesBg.width - rolesBg.border.width * 2;
 
             Repeater {
                 id: rolesRepeater;
@@ -139,7 +139,7 @@ Item {
                 }
 
                 delegate: Rectangle {
-                    width: productRolesDelegate.width;
+                    width: rolesColumn.width;
                     height: body.height;
 
                     property bool selected: false;

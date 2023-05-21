@@ -332,7 +332,7 @@ Item {
             width: 18;
             height: parent.height;
 
-            visible: model.Level == 0;
+            visible: model.Level === 0;
 
             AuxButton {
                 anchors.verticalCenter: buttonRect.verticalCenter;

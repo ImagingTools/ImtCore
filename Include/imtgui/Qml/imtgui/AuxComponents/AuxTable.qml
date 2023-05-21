@@ -14,6 +14,8 @@ Item {
 
     property bool checkable: false;
 
+    property bool scrollbarVisible: true;
+
     property bool showHeaders: true;
 
     property TreeItemModel headers : TreeItemModel{}; //: elementsListObj.model;
@@ -25,10 +27,13 @@ Item {
     property TreeItemModel widthDecorator : TreeItemModel{};
     property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
 
+    property alias scrollbarItem: scrollbar;
+
     property SortController sortController: null;
 
     property alias delegate: elementsListObj.delegate;
     property alias elements: elementsListObj.model;
+
     property alias elementsList: elementsListObj;
     property alias cacheBuffer: elementsListObj.cacheBuffer;
     property alias contentHeight: elementsListObj.contentHeight;
@@ -60,6 +65,8 @@ Item {
     property bool isRightBorder: false;
 
     property bool isAllItemChecked: false;
+
+    property bool readOnly: false;
 
     signal selectionChanged(var selection);
 
@@ -167,6 +174,72 @@ Item {
             pause.stop();
             pause.start();
         }
+    }
+
+    property var checkedIndexes: []
+    signal checkedItemsChanged();
+
+    function checkItem(index){
+        if (!tableContainer.checkable){
+            return;
+        }
+        tableContainer.checkedIndexes.push(index)
+        tableContainer.checkedItemsChanged();
+    }
+
+    function uncheckItem(index){
+        if (!tableContainer.checkable){
+            return;
+        }
+
+        let i = tableContainer.checkedIndexes.indexOf(index);
+        if (i !== -1) {
+          tableContainer.checkedIndexes.splice(i, 1);
+
+          tableContainer.checkedItemsChanged();
+        }
+    }
+
+    function itemIsChecked(index){
+        return tableContainer.checkedIndexes.includes(index);
+    }
+
+    function uncheckAll(){
+        if (!tableContainer.checkable){
+            return;
+        }
+        tableContainer.checkedIndexes = []
+        tableContainer.checkedItemsChanged();
+    }
+
+    function checkAll(){
+        if (!tableContainer.checkable){
+            return;
+        }
+
+        tableContainer.checkedIndexes = []
+
+        let count = tableContainer.elements.GetItemsCount();
+        for (let i = 0; i < count; i++){
+            tableContainer.checkedIndexes.push(i);
+        }
+
+        tableContainer.checkedItemsChanged();
+    }
+
+    function isAllChecked(){
+        if (!tableContainer.checkable){
+            return false;
+        }
+
+        let count = tableContainer.elements.GetItemsCount();
+        for (let i = 0; i < count; i++){
+            if (!tableContainer.checkedIndexes.includes(i)){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     property var columnContentComps: []
@@ -385,50 +458,37 @@ Item {
         return null;
     }
 
-    function allChecked(){
-        if (!tableContainer.checkable){
-            return;
-        }
+//    function allChecked(){
+//        if (!tableContainer.checkable){
+//            return;
+//        }
 
-        if (elementsListObj.model){
-            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
-                let state = elementsListObj.model.GetData("CheckedState", i);
-                if (state !== Qt.Checked){
-                    elementsListObj.model.SetData("CheckedState", Qt.Checked, i);
-                }
-            }
-        }
-    }
+//        if (elementsListObj.model){
+//            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
+//                let state = elementsListObj.model.GetData("CheckedState", i);
+//                if (state !== Qt.Checked){
+//                    elementsListObj.model.SetData("CheckedState", Qt.Checked, i);
+//                }
+//            }
+//        }
+//    }
 
-    function allUnchecked(){
-        if (!tableContainer.checkable){
-            return;
-        }
+//    function allUnchecked(){
+//        if (!tableContainer.checkable){
+//            return;
+//        }
 
-        if (elementsListObj.model){
-            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
-                let state = elementsListObj.model.GetData("CheckedState", i);
-                if (state !== Qt.Unchecked){
-                    elementsListObj.model.SetData("CheckedState", Qt.Unchecked, i);
-                }
-            }
-        }
-    }
+//        if (elementsListObj.model){
+//            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
+//                let state = elementsListObj.model.GetData("CheckedState", i);
+//                if (state !== Qt.Unchecked){
+//                    elementsListObj.model.SetData("CheckedState", Qt.Unchecked, i);
+//                }
+//            }
+//        }
+//    }
 
-    function isAllChecked(){
-        if (!tableContainer.checkable){
-            return false;
-        }
 
-        for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
-            let state = elementsListObj.model.GetData("CheckedState", i);
-            if (state !== Qt.Checked){
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     MouseArea {
         id: maTable;
@@ -446,6 +506,7 @@ Item {
 
         anchors.left: parent.left;
         anchors.right: parent.right;
+        anchors.rightMargin: 5;
         anchors.top: parent.top;
 
         height: visible ? tableContainer.headerHeight: 0;
@@ -656,12 +717,18 @@ Item {
 
                     visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0;
 
+                    isActive: !tableContainer.readOnly;
+
                     onClicked: {
+                        if (tableContainer.readOnly){
+                            return;
+                        }
+
                         if (checkBox.checkState === Qt.Checked){
-                            tableContainer.allUnchecked();
+                            tableContainer.uncheckAll();
                         }
                         else{
-                            tableContainer.allChecked();
+                            tableContainer.checkAll();
                         }
                     }
                 }
@@ -738,7 +805,9 @@ Item {
 
                     anchors.verticalCenter: mainRec.verticalCenter;
                     anchors.right: mainRec.right;
-                    anchors.rightMargin: model.index === headersList.count - 1 ? iconFilter.width : visible ? Math.max(tableContainer.textMarginHor, tableContainer.verticalBorderSize) : 0
+
+                    anchors.rightMargin: 5;
+//                    anchors.rightMargin: model.index === headersList.count - 1 ? iconFilter.width : visible ? Math.max(tableContainer.textMarginHor, tableContainer.verticalBorderSize) : 0
 
                     height: 10;
                     width: visible ? 10 : 0;
@@ -807,26 +876,6 @@ Item {
         }
     }//headers
 
-    AuxButton {
-        id: iconFilter;
-
-        anchors.verticalCenter: headersPanel.verticalCenter;
-        anchors.right: parent.right;
-
-        visible: tableContainer.hasFilter && tableContainer.showHeaders;
-        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
-
-        width: tableContainer.hasFilter ? 20 : 0;
-        height: width;
-
-        iconSource: "../../../" + "Icons/" + Style.theme + "/Filter_On_Normal.svg";
-
-        onClicked: {
-            console.log("AuxButton iconFilter onClicked");
-            tableContainer.filterClicked();
-        }
-    }
-
     Rectangle {
         id: elementsBg;
 
@@ -836,25 +885,27 @@ Item {
         radius: tableContainer.radius;
     }
 
+    property int scrollbarRightMargin: 0;
+
     CustomScrollbar {
         id: scrollbar;
 
         z: 100;
 
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
+        anchors.right: elementsListObj.right;
+        anchors.rightMargin: tableContainer.scrollbarRightMargin;
+        anchors.bottom: elementsListObj.bottom;
+        anchors.top: elementsListObj.top;
 
         secondSize: 10;
         targetItem: elementsListObj;
     }
 
-
-
     ListView {
         id: elementsListObj;
 
         anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.right: headersPanel.right;
         anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
 
@@ -863,16 +914,22 @@ Item {
         cacheBuffer: 1000;
 
         clip: true;
+
+        onModelChanged: {
+            console.log("elementsListObj onModelChanged");
+            console.log("elementsListObj.contentHeight", elementsListObj.contentHeight);
+        }
+
+        onContentHeightChanged: {
+            console.log("onContentHeightChanged", elementsListObj.contentHeight);
+        }
+
         Keys.onUpPressed: {
             tableContainer.tableSelection.up();
         }
 
         Keys.onDownPressed: {
             tableContainer.tableSelection.down();
-        }
-
-        onFocusChanged: {
-            console.log("Table onFocusChanged", focus);
         }
 
         onActiveFocusChanged: {
@@ -896,8 +953,10 @@ Item {
 
             tableItem: tableContainer;
 
+            readOnly: tableContainer.readOnly;
+
             selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
-            checkedState: model.CheckedState ? model.CheckedState : Qt.Unchecked;
+            checkedState: tableContainer.checkedIndexes.includes(model.index) ? Qt.Checked : Qt.Unchecked;
 
             onCheckedStateChanged: {
                 tableContainer.isAllItemChecked = tableContainer.isAllChecked();
@@ -929,10 +988,12 @@ Item {
 
             Component.onCompleted: {
                 tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
+                tableContainer.checkedItemsChanged.connect(tableDelegate.checkedItemsChanged);
             }
 
             Component.onDestruction: {
                 tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
+                tableContainer.checkedItemsChanged.disconnect(tableDelegate.checkedItemsChanged);
             }
 
             function selectionChanged(){
@@ -943,22 +1004,24 @@ Item {
                 }
             }
 
+            function checkedItemsChanged(){
+                tableDelegate.checkedState = tableContainer.checkedIndexes.includes(model.index) ? Qt.Checked : Qt.Unchecked;
+            }
+
             onClicked: {
-                tableContainer.tableSelection.singleSelect(model.index);
+                if (!tableContainer.tableSelection.isSelected(model.index)){
+                    tableContainer.tableSelection.singleSelect(model.index);
+                }
 
                 elementsListObj.forceActiveFocus();
             }
 
             onRightButtonMouseClicked: {
-                console.log("AuxTable onRightButtonMouseClicked", mX, mY);
                 var point = mapToItem(null, mX, mY);
                 tableContainer.rightButtonMouseClicked(point.x, point.y);
             }
 
             onDoubleClicked: {
-                console.log("onDoubleClicked", model["Id"], model["Name"])
-                tableContainer.selectedIndex = model.index;
-
                 var point = mapToItem(null, mX, mY);
                 tableContainer.doubleClicked(point.x, point.y)
                 tableContainer.selectItem(model.Id, model.Name);

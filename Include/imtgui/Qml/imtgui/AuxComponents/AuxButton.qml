@@ -82,7 +82,6 @@ Rectangle {
         visible: auxButtonContainer.hasText;
 
         text: auxButtonContainer.textButton;
-
     }
 
     MouseArea {

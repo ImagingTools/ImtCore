@@ -1,26 +1,22 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
-import imtauthgui 1.0
 
 Rectangle {
     id: filterContainer;
 
-    onHeightChanged: {
-        console.log("filterContainer onHeightChanged", filterContainer.height);
-    }
+    height: 40;
 
-    onWidthChanged: {
-        console.log("filterContainer onWidthChanged", filterContainer.width);
-    }
-
-    color: Style.backgroundColor;
+    color: Style.baseColor;
 
     property alias loaderDecorator: loaderDecoratorObj;
     property string decoratorSource;
 
+    property alias prefixLoaderComp: prefixLoader.sourceComponent;
+
     signal textFilterChanged(int index, string text);
     signal closed();
+
+    signal decoratorLoaded();
 
     onDecoratorSourceChanged: {
         console.log("loaderDecorator.source", filterContainer.decoratorSource);
@@ -43,9 +39,21 @@ Rectangle {
     }
 
     Loader {
+        id: prefixLoader;
+
+        anchors.right: loaderDecoratorObj.left;
+        anchors.rightMargin: 5;
+        anchors.verticalCenter: parent.verticalCenter;
+    }
+
+    Loader {
         id: loaderDecoratorObj;
 
-        anchors.fill: parent;
+        anchors.right: parent.right;
+        anchors.rightMargin: 5;
+        anchors.verticalCenter: parent.verticalCenter;
+
+//        anchors.fill: parent;
 
         function textChanged(index, text){
             filterContainer.textFilterChanged(index, text);
@@ -55,14 +63,12 @@ Rectangle {
             filterContainer.closed();
         }
 
-        onItemChanged: {
-            if (loaderDecoratorObj.item){
-                loaderDecoratorObj.item.width = filterContainer.width;
-                filterContainer.height = loaderDecoratorObj.item.height;
-                if(loaderDecoratorObj.item.rootLoader !==undefined){
-                    loaderDecoratorObj.item.rootLoader = loaderDecoratorObj;
-                }
+        onLoaded: {
+            if(loaderDecoratorObj.item.rootLoader !==undefined){
+                loaderDecoratorObj.item.rootLoader = loaderDecoratorObj;
             }
+
+            filterContainer.decoratorLoaded();
         }
     }
 }

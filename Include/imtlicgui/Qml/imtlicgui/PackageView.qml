@@ -109,6 +109,10 @@ DocumentBase {
         }
     }
 
+    function blockEditing(){
+        treeView.readOnly = true;
+    }
+
     function onFeatureModelChanged(){
         console.log("onFeatureModelChanged");
         container.updateModel();

@@ -17,8 +17,41 @@ TableViewItemDelegateBase {
 
     level: treeDelegateBase.parentDelegate == null ? 0 : treeDelegateBase.parentDelegate.level + 1;
 
-    signal parentCheckStateChanged(var data);
-    signal childrenCheckStateChanged(var data);
+    signal parentCheckStateChanged(var delegate);
+    signal childrenCheckStateChanged(var delegate);
+
+    onParentCheckStateChanged: {
+        treeDelegateBase.checkState = delegate.checkState;
+
+        for (let childrenDelegate of treeDelegateBase.childrenDelegates){
+            childrenDelegate.parentCheckStateChanged(treeDelegateBase);
+        }
+    }
+
+    onChildrenCheckStateChanged: {
+        let isAllChecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Checked);
+        let isAllUnchecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Unchecked);
+
+        if (isAllChecked){
+            if (treeDelegateBase.checkState != Qt.Checked){
+                treeDelegateBase.checkState = Qt.Checked;
+            }
+        }
+        else if (isAllUnchecked){
+            if (treeDelegateBase.checkState!= Qt.Unchecked){
+                treeDelegateBase.checkState = Qt.Unchecked;
+            }
+        }
+        else if (!isAllChecked && !isAllUnchecked){
+            if (treeDelegateBase.checkState != Qt.PartiallyChecked){
+                treeDelegateBase.checkState = Qt.PartiallyChecked;
+            }
+        }
+
+        if (treeDelegateBase.parentDelegate){
+            treeDelegateBase.parentDelegate.childrenCheckStateChanged(treeDelegateBase);
+        }
+    }
 
     onSelectedChanged: {
         if(treeDelegateBase.rowBodyItem) {
@@ -69,33 +102,16 @@ TableViewItemDelegateBase {
                     anchors.horizontalCenter: parent.horizontalCenter;
 
                     checkState: treeDelegateBase.checkState;
-                    isActive: treeDelegateBase.isActive;
+                    isActive: treeDelegateBase.isActive && !treeDelegateBase.root.readOnly;
                     visible: treeDelegateBase.root ? treeDelegateBase.root.tristate && treeDelegateBase.isCheckable : false;
 
                     onClicked: {
-                        if (treeDelegateBase.checkState == Qt.PartiallyChecked){
-                            treeDelegateBase.checkState = Qt.Checked;
+                        if (treeDelegateBase.checkState === Qt.Checked){
+                            treeDelegateBase.root.uncheckItem(treeDelegateBase);
                         }
                         else{
-                            treeDelegateBase.checkState = Qt.Checked - treeDelegateBase.checkState;
+                            treeDelegateBase.root.checkItem(treeDelegateBase);
                         }
-
-//                        if (model.CheckState == Qt.PartiallyChecked){
-//                            model.CheckState = Qt.Checked;
-//                        }
-//                        else{
-//                            model.CheckState = Qt.Checked - model.CheckState;
-//                        }
-
-//                        if (treeDelegateBase.parentDelegate){
-//                            treeDelegateBase.parentDelegate.childrenCheckStateChanged(treeDelegateBase.itemData);
-//                        }
-
-//                        for (let i = 0; i < treeDelegateBase.childrenDelegates.length; i++){
-//                            treeDelegateBase.childrenDelegates[i].parentCheckStateChanged(treeDelegateBase.itemData);
-//                        }
-
-//                        treeDelegateBase.root.rowModelDataChanged(treeDelegateBase, "CheckState");
                     }
                 }
             }
@@ -118,13 +134,6 @@ TableViewItemDelegateBase {
 
                     item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
                     treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
-
-//                    // Связываем modelIndex соседних элементов
-//                    if (index > 0){
-//                        let prevItem = childModelRepeater.itemAt(index - 1);
-//                        item.modelIndex.prevIndex = prevItem.modelIndex;
-//                        prevItem.modelIndex.nextIndex =item.modelIndex;
-//                    }
                 }
 
                 onItemRemoved: {

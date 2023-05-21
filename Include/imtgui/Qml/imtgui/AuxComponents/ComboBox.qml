@@ -220,7 +220,7 @@ FocusScope {
             anchors.fill: parent;
             hoverEnabled: true;
 
-            cursorShape: Qt.PointingHandCursor;
+            cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
             onClicked: {
                 if (comboBoxContainer.changeable && comboBoxContainer.model.GetItemsCount() > 0){

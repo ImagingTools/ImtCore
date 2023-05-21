@@ -36,15 +36,9 @@ Item {
             if (rolesProvider.collectionModel != null){
                 if (rolesProvider.collectionModel.ContainsKey("Roles")){
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        rolesModel.SetData("CheckedState", Qt.Unchecked, i);
-                    }
-
                     rolesTable.elements = rolesModel;
 
                     userRolesContainer.updateGui();
-
-                    rolesProvider.collectionModel.dataChanged.connect(userRolesContainer.updateModel);
                 }
             }
         }
@@ -62,13 +56,14 @@ Item {
             }
         }
 
-        for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
-            let id = rolesTable.elements.GetData("Id", i);
-            if (roleIds.includes(id)){
-                rolesTable.elements.SetData("CheckedState", Qt.Checked, i);
-            }
-            else{
-                rolesTable.elements.SetData("CheckedState", Qt.Unchecked, i);
+        rolesTable.uncheckAll();
+
+        if (rolesTable.elements){
+            for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
+                let id = rolesTable.elements.GetData("Id", i);
+                if (roleIds.includes(id)){
+                    rolesTable.checkItem(i);
+                }
             }
         }
 
@@ -86,14 +81,10 @@ Item {
         }
 
         let selectedRoleIds = []
-        if (rolesTable.elements){
-            for (let i = 0; i < rolesTable.elements.GetItemsCount(); i++){
-                let id = rolesTable.elements.GetData("Id", i);
-                let state = rolesTable.elements.GetData("CheckedState", i);
-                if (state === Qt.Checked){
-                    selectedRoleIds.push(id)
-                }
-            }
+        let indexes = rolesTable.checkedIndexes;
+        for (let index of indexes){
+            let id = rolesTable.elements.GetData("Id", index);
+            selectedRoleIds.push(id);
         }
 
         let result = selectedRoleIds.join(';');
@@ -170,5 +161,25 @@ Item {
 
         checkable: true;
         radius: 0;
+
+        onCheckedItemsChanged: {
+            if (userRolesContainer.blockUpdatingModel){
+                return;
+            }
+
+            let indexes = rolesTable.checkedIndexes;
+            let roles = userRolesContainer.documentModel.GetData("Roles");
+            let roleIDs = [];
+            for (let index of indexes){
+                let groupId = rolesTable.elements.GetData("Id", index);
+                roleIDs.push(groupId);
+            }
+
+            let newRoles = roleIDs.join(';');
+            if (roles !== newRoles){
+                userRolesContainer.documentModel.SetData("Roles", roleIDs.join(';'));
+                undoRedoManager.makeChanges();
+            }
+        }
     }
 }//Container

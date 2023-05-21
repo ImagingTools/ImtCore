@@ -32,6 +32,7 @@ Item {
         anchors.fill: parent;
         color: popupMenuDelegate.selectedColor;
         visible: mouseArea.containsMouse;
+        opacity: 0.5;
     }
 
     Item {

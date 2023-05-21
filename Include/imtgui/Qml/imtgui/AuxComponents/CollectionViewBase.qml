@@ -5,8 +5,6 @@ import imtgui 1.0
 Item {
     id: collectionViewBaseContainer;
 
-
-
     property alias commands: baseCommands;
 
     property string commandsId;
@@ -32,6 +30,7 @@ Item {
     property bool hasSort: true;
 
     property alias filterMenu: filterMenuLocal.sourceComponent;
+    property alias filterMenuItem: filterMenuLocal.item;
     property alias filterMenuVisible: filterMenuLocal.visible;
     property alias modelFilter: modelFilterObj;
     property alias pagination: paginationObj;
@@ -42,6 +41,7 @@ Item {
     signal elementsChanged();
 
     signal selectionChanged(var selection);
+    signal filterDecoratorLoaded();
 
     /**
         Если true -> данные будут запрошены с сервера,
@@ -157,29 +157,30 @@ Item {
         AuxTable {
             id: tableInternal;
 
-            anchors.fill: parent;
+            anchors.left: parent.left;
+            anchors.right: tableRightPanel.left;
+//            anchors.rightMargin: 5;
+            anchors.top: parent.top;
 
             anchors.bottom: paginationObj.visible ? paginationObj.top : parent.bottom;
             anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
             //anchors.margins: thumbnailDecoratorContainer.mainMargin;
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;
+            scrollbarVisible: false;
 
             canSetBorderParams: true;
             canSetBorderParams_deleg: true;
             property real minWidth: 1000000;
             property bool headersCompl: false;
 
+            scrollbarRightMargin: -20;
+
             sortController: sortCont;
 
             onSelectItem: {
                 collectionViewBaseContainer.selectedItem(idSelected, name);
             }
-
-//            onSelectedIndexChanged: {
-//                console.log("CollectionView AuxTable onSelectedIndexChanged");
-//                collectionViewBaseContainer.selectedIndexChanged(tableInternal.selectedIndex);
-//            }
 
             onSelectionChanged: {
                 collectionViewBaseContainer.selectionChanged(selection);
@@ -197,6 +198,81 @@ Item {
                 console.log("onFilterClicked")
                 filterMenuLocal.visible = !filterMenuLocal.visible;
             }
+        }
+
+
+//        Rectangle{
+//            id: bottomLine;
+
+//            anchors.left: tableInternal.right;
+//            anchors.right: parent.right;
+//            anchors.bottom: filterItem.bottom;
+//            height: 1;
+//            color: "lightgray";
+
+//            visible: tableInternal.emptyDecor;
+//        }
+
+        Item {
+            id: tableRightPanel;
+
+            anchors.top: parent.top;
+            anchors.right: parent.right;
+            anchors.rightMargin: 5;
+            anchors.bottom: parent.bottom;
+
+            width: 20;
+
+            Item {
+                id: filterItem;
+
+                anchors.top: parent.top;
+
+                width: parent.width;
+                height: tableInternal.headerHeight;
+
+                AuxButton {
+                    id: iconFilter;
+
+                    anchors.centerIn: parent;
+
+                    visible: collectionViewBaseContainer.hasFilter;
+                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
+                    width: collectionViewBaseContainer.hasFilter ? tableRightPanel.width : 0;
+                    height: width;
+
+                    iconSource: "../../../" + "Icons/" + Style.theme + "/Filter_On_Normal.svg";
+
+                    onClicked: {
+                        console.log("AuxButton iconFilter onClicked");
+                        filterMenuLocal.visible = !filterMenuLocal.visible;
+                    }
+                }
+            }
+
+//            CustomScrollbar {
+//                id: scrollbar;
+
+//                z: 100;
+
+//                anchors.bottom: parent.bottom;
+//                anchors.bottomMargin: 5;
+//                anchors.top: filterItem.bottom;
+//                anchors.topMargin: 5;
+//                anchors.horizontalCenter: parent.horizontalCenter;
+
+//                secondSize: 10;
+//                targetItem: collectionViewBaseContainer.elementsList;
+
+//                onVisibleChanged: {
+//                    tableInternal.scrollbarItem.visible = !visible;
+//                }
+
+//                Component.onCompleted: {
+//                    tableInternal.scrollbarItem.visible = false;
+//                }
+//            }
         }
 
         Loading {
