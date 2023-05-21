@@ -509,7 +509,7 @@ global.Core = {
                     root.eventState.view = null
                     for(let p of path){
                         let obj = UIDList[p.id.slice(3)]
-                        if(obj && obj.visible && obj.enabled && obj.webScroll !== undefined && !find && root.eventState.catchers.indexOf(p) >= 0){
+                        if(obj && obj.visible && obj.enabled && obj.webScroll !== undefined && !find && root.eventState.catchers.indexOf(p) >= 0 && (obj.width < obj.contentWidth ||obj.height < obj.contentHeight)){
                             find = true
                             root.eventState.view = obj
                         }
