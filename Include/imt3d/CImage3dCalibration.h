@@ -36,6 +36,8 @@ public:
 	// reimplemented (istd::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
+	const iimg::CGeneralBitmap& GetXZYBitmap() const { return m_xyzBitmap; }
+
 private:
 	iimg::CGeneralBitmap m_xyzBitmap;
 };
