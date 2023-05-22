@@ -465,7 +465,7 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 // private methods
 
 CImtStyle::CImtStyle()
-	:m_designSchema(DS_INVALID),
+	:m_designSchema(DS_LIGHT),
 	m_styleType(ST_IMAGINGTOOLS),
 	m_wasStyleSheetInitialized(false),
 	m_blockerCount(0)
