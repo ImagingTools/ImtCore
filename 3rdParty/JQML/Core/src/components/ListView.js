@@ -97,6 +97,12 @@ export class ListView extends Flickable {
 
     $contentXChanged(){
         if(this.orientation === ListView.Horizontal){
+            if(this.$items[0] && this.$p.contentX.val < this.$items[0].x){
+                this.$p.contentX.val = this.$items[0].x
+            }
+            if(this.$items[this.$items.length-1] && this.$p.contentX.val > this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width){
+                this.$p.contentX.val = this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width
+            }
             super.$contentXChanged()
             this.$updateView()
             
@@ -104,6 +110,12 @@ export class ListView extends Flickable {
     }
     $contentYChanged(){
         if(this.orientation === ListView.Vertical){
+            if(this.$items[0] && this.$p.contentY.val < this.$items[0].y){
+                this.$p.contentY.val = this.$items[0].y
+            }
+            if(this.$items[this.$items.length-1] && this.$p.contentY.val > this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height){
+                this.$p.contentY.val = this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height
+            }
             super.$contentYChanged()
             this.$updateView()
             
@@ -770,16 +782,16 @@ export class ListView extends Flickable {
 		if(this.interactive && this.enabled){
 			if(this.flickableDirection !== Flickable.VerticalFlick && this.contentWidth > 0 && this.contentWidth > this.width){
 				if(deltaX > 0)
-				if(this.contentX + deltaX < this.contentWidth - this.width){
+				if(!this.$items[this.$items.length-1] || this.contentX + deltaX < this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width){
 					this.contentX += deltaX
 				} else {
-					this.contentX = this.contentWidth - this.width
+					this.contentX = this.$items[this.$items.length-1].x+this.$items[this.$items.length-1].width-this.width//this.contentHeight - this.height
 				}
 				if(deltaX < 0)
-				if(this.contentX + deltaX > 0){
+				if(!this.$items[0] || this.contentX + deltaX > this.$items[0].x){
 					this.contentX += deltaX
 				} else {
-					this.contentX = 0
+					this.contentX = this.$items[0].x
 				}
 			} else {
 				// this.$parentScroll(deltaX, 0)
