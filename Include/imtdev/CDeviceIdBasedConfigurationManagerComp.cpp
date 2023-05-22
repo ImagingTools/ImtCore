@@ -25,7 +25,7 @@ namespace imtdev
 
 // reimplemented (IDeviceConfigurationManager)
 
-IDeviceConfigurationManager::DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfiguration(const QByteArray& deviceId) const
+DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfiguration(const QByteArray& deviceId) const
 {
 	DeviceConfigurationPtr configurationPtr;
 
