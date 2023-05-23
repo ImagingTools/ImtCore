@@ -1031,16 +1031,21 @@ QString CFileCollectionCompBase::CalculateShortFileName(const QString& fileName,
 
 bool CFileCollectionCompBase::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaInfo, const QString& metaInfoFilePath) const
 {
-	const iser::ISerializable* serializablePtr = dynamic_cast<const iser::ISerializable*>(&metaInfo);
-	if (!serializablePtr)
+	iser::ISerializable* serializablePtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&metaInfo));
+	if (serializablePtr == nullptr){
+		Q_ASSERT_X(false, __FILE__, "Serializable interface doesn't support by the meta-info object");
+
 		return false;
+	}
 
-	if (m_helperFilesPersistence.IsValid())
+	if (m_helperFilesPersistence.IsValid()){
 		return m_helperFilesPersistence->SaveToFile(*serializablePtr, metaInfoFilePath) == ifile::IFilePersistence::OS_OK;
+	}
 
-	// using default serializer
+	// Use default serializer:
 	ifile::CCompactXmlFileWriteArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
-	return (const_cast<iser::ISerializable*>(serializablePtr))->Serialize(archive);
+
+	return serializablePtr->Serialize(archive);
 }
 
 
