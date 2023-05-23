@@ -1,1 +1,1 @@
-SELECT * FROM "%1" ORDER BY Revision DESC LIMIT 1;
+SELECT * FROM "Revisions" ORDER BY Revision DESC LIMIT 1;

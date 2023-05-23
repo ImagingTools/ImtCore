@@ -1,4 +1,4 @@
-CREATE DATABASE %1
+CREATE DATABASE ":DatabaseName"
     WITH 
     OWNER = postgres
     ENCODING = 'UTF8'
