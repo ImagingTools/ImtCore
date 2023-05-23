@@ -60,6 +60,12 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 			}
 		}
 	}
+    else {
+        if (m_typesCompPtr->GetOptionsCount() > 0){
+            typeId = m_typesCompPtr->GetOptionId(0);
+            index = 0;
+        }
+    }
 
 	if (m_documentFactoriesCompPtr.GetCount() > 0 && index >= 0){
 		documentPtr.SetPtr(m_documentFactoriesCompPtr.CreateInstance(index));
