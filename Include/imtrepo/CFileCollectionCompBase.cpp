@@ -380,7 +380,10 @@ const ifile::IFilePersistence* CFileCollectionCompBase::GetPersistenceForObjectT
 }
 
 
-bool CFileCollectionCompBase::ExportFile(const imtbase::IObjectCollection& /*collection*/, const QByteArray& objectId, const QString& targetFilePath) const
+bool CFileCollectionCompBase::ExportFile(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const QString& targetFilePath) const
 {
 	if (!targetFilePath.isEmpty()){
 		if (!IsPathInsideRepository(targetFilePath)){
@@ -394,7 +397,11 @@ bool CFileCollectionCompBase::ExportFile(const imtbase::IObjectCollection& /*col
 }
 
 
-QByteArray CFileCollectionCompBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& /*typeId*/, const QString& /*sourceFilePath*/, const ICollectionInfo::Id& /*parentId*/) const
+QByteArray CFileCollectionCompBase::ImportFile(
+			imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*typeId*/,
+			const QString& /*sourceFilePath*/,
+			const ICollectionInfo::Id& /*parentId*/) const
 {
 	return QByteArray();
 }

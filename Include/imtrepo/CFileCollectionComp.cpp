@@ -70,11 +70,8 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 
 int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment) const
 {
-	qDebug() << "BackupObject" << objectId << userComment;
 	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
 	if (collectionPtr == nullptr || !m_compressorCompPtr.IsValid()){
-		qDebug() << "m_compressorCompPtr" << m_compressorCompPtr.IsValid();
-		qDebug() << collectionPtr << "BackupObject Invalid data";
 		return -1;
 	}
 
@@ -86,11 +83,9 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 
 	QFileInfo fileInfo = QFileInfo(fileCollectionInfo.filePath);
 	if (!fileInfo.exists()){
-		qDebug() << "File not exists" << fileCollectionInfo.filePath;
 		return -1;
 	}
 
-//	QString revisionsPath = QFileInfo(collectionPtr->GetFileInfo(objectId).filePath).path() + "/Revisions";
 	QString revisionsPath = fileInfo.path() + "/Revisions";
 
 	if (istd::CSystem::EnsurePathExists(revisionsPath)){
