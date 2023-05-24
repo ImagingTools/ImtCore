@@ -22,6 +22,7 @@ Item {
     property TreeItemModel documentsData: TreeItemModel {}
 
     property bool documentLoading: false;
+    property bool showLoading: true;
 
     property MainDocumentManager mainDocumentManager: null;
 
@@ -66,7 +67,9 @@ Item {
 
     onDocumentLoadingChanged: {
         console.log("onDocumentLoadingChanged", workspaceView.documentLoading);
-        loading.visible = workspaceView.documentLoading;
+        if (workspaceView.showLoading){
+            loading.visible = workspaceView.documentLoading;
+        }
     }
 
     function documentUpdating(updatingFlag){
@@ -257,14 +260,6 @@ Item {
             }
         }
     }
-
-    //    function updateDocumentModel(documentId, params){
-    //        let documentIndex = this.getDocumentIndexById(documentId);
-    //        if (documentIndex >= 0){
-    //            let commandId = workspaceView.mainCollectionView.getEditorCommandId();
-    //            documentController.getData(documentId, params, commandId);
-    //        }
-    //    }
 
     Component {
         id: saveDialog;
