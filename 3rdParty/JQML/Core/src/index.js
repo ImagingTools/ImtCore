@@ -44,6 +44,10 @@ require('./components/Gradient')
 require('./components/GradientStop')
 require('./components/Plugin')
 require('./components/Map')
+require('./components/MapCircle')
+require('./components/MapRectangle')
+require('./components/MapPolygon')
+require('./components/MapPolyline')
 
 QML.Qt = Qt
 for(let key in Qt){

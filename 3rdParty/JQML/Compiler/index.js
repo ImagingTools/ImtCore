@@ -45,6 +45,10 @@ const QML = [
     'WebView',
     'Plugin',
     'Map',
+    'MapCircle',
+    'MapRectangle',
+    'MapPolygon',
+    'MapPolyline',
 ]
 
 let source = process.argv[2]
@@ -564,6 +568,14 @@ function qmlprop(m, instructions, file){
         }
     }
 }
+function qmlobj(m, instructions, file){
+    let cls = 'QtObject'
+    let childInstructions = getBaseStructure()
+   
+    preCompile(cls, m[2], null, childInstructions, file) 
+    instructions.propertiesQML[m[1]] = childInstructions
+    
+}
 function preCompile(cls, meta, on, instructions, file){
     if(file){
         let qmlName = file.split('/').pop()
@@ -594,6 +606,9 @@ function preCompile(cls, meta, on, instructions, file){
             }
             if(m[0] === "qmlelem"){
                 qmlelem(m, instructions, file)
+            }
+            if(m[0] === "qmlobj"){
+                qmlobj(m, instructions, file)
             }
         }
     }
